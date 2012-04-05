@@ -1,0 +1,15 @@
+<configure xmlns='http://namespaces.zope.org/zope'
+           i18n_domain="zope">
+
+  <include package="zope.component" />
+
+  <!--global utilities-->
+  <!--http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/zca.html?highlight=utility-->
+  <!--http://docs.zope.org/zope.component/zcml.html#utility-->
+
+  <utility
+   factory="adhocracy.core.models.utilities.graph_object"
+   provides="adhocracy.core.models.utilities.IGraphConnection"
+  />
+
+</configure>

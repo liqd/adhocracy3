@@ -1,0 +1,8 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+
+   <include package="pyramid_zcml" />
+
+   <include file="views/views.zml" />
+   <include file="models/utilities.zcml" />
+
+</configure>

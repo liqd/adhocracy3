@@ -1,0 +1,10 @@
+.*\.orig$
+.*\.egg-info$
+.*\.pyo$
+.*\.pyc$
+.*\.swp$
+.*\.swo$
+.*~$
+rwproperty
+waitress
+
