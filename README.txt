@@ -39,13 +39,18 @@ Get the source::
     $ hg clone ssh://hg@bitbucket.org/liqd/adhocracy_playground
     $ cd adhocracy_playground 
 
-Create a virtualenv environment::
+Create a virtualenv environment (python2.7)::
 
-    $ virtualenv-2.7 --no-site-packages .
+    $ virtualenv --no-site-packages .
 
 Update setuptools::
 
     $ bin/easy_install -U setuptools
+
+Run the buildout::
+
+    $ bin/python bootstap.py
+    $ bin/buildout 
 
 Start the graph db::
 
