@@ -1,7 +1,7 @@
 adhocracy.core README
 
 
-Softwarestack (mometan):
+Softwarestack (momentan):
 =========================
 
 
@@ -57,7 +57,7 @@ Start the graph db::
     $ bin/rexster
 
 Play with the graph db::
-    
+
     $  bin/rexster-console 
 
 Run Tests::
