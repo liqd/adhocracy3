@@ -1,1 +1,6 @@
 adhocracy.core README
+
+Install:
+========
+
+

@@ -8,11 +8,11 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'rwproperty',
-    'bulbs==0.3-20120331',
+    'bulbs',
     'zope.component>=3.11.0', #make config.hook_zca() work
     'pyramid',
-    'pyramid_tm',
     'pyramid_zcml',
+    'pyramid_tm',
     'pyramid_debugtoolbar',
     'waitress',
     ]
@@ -31,7 +31,8 @@ setup(name='adhocracy.core',
       author_email='',
       url='',
       keywords='web pylons pyramid',
-      packages=find_packages(exclude=['ez_setup']),
+      packages=find_packages('src', exclude=['ez_setup']),
+      package_dir = {'': 'src'},
       include_package_data=True,
       zip_safe=False,
       install_requires = requires,

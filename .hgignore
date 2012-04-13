@@ -5,6 +5,15 @@
 .*\.swp$
 .*\.swo$
 .*~$
+.installed.cfg
+lib
+var
+eggs
+include
+bin
+downloads
+local
 rwproperty
 waitress
+rexster
 
