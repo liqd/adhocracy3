@@ -6,6 +6,7 @@
 .*\.swo$
 .*~$
 .installed.cfg
+.coverage
 lib
 var
 eggs
