@@ -1,7 +1,7 @@
 adhocracy.core README
 
 
-Softwarestack (mometan):
+Softwarestack (momentan):
 =========================
 
 
