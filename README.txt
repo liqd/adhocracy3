@@ -47,18 +47,18 @@ Update setuptools::
 
     $ bin/easy_install -U setuptools
 
-Start the graph db:
+Start the graph db::
 
     $ bin/rexster
 
-Play with the graph db:
+Play with the graph db::
     
     $  bin/rexster-console 
 
-Run Tests:
+Run Tests::
 
     $ bin/nosetests
 
-Start adhocracy:
+Start adhocracy::
 
     $ bin/pserve etc/development.ini 
