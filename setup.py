@@ -10,9 +10,10 @@ requires = [
     'rwproperty',
     'bulbs',
     'zope.component>=3.11.0', #make config.hook_zca() work
+    'zope.configuration>=3.8.0dev',
+    'repoze.lemonade',
     'pyramid',
     'pyramid_zcml>=0.8',
-    'zope.configuration>=3.8.0dev',
     'pyramid_tm',
     'pyramid_debugtoolbar',
     'waitress',

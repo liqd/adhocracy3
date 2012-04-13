@@ -14,18 +14,23 @@ class ModelTests(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def test_object_hierarchy(self):
-        from adhocracy.core.models.interfaces import IGraphConnection
-        from pyramid.threadlocal import get_current_registry
-        registry = get_current_registry()
-        graph = registry.getUtility(IGraphConnection)
+    def test_content_factory(self):
         #create a container
-        container1 = graph.container.get_or_create("name", u"g1", name=u"g1")
+        from adhocracy.core.models.interfaces import IContainer
+        from repoze.lemonade.content import create_content
+        container0 = create_content(IContainer, name=u"g0")
+        assert(container0.name == "g0")
+
+    def test_object_hierarchy(self):
+        #create a container
+        from adhocracy.core.models.interfaces import IContainer
+        from repoze.lemonade.content import create_content
+        container1 = create_content(IContainer, name=u"g1")
         container1.text = u"text1"
         container1.save()
         assert(container1.name == "g1")
         #it can have children
-        container2 = graph.container.get_or_create("name", u"g2", name=u"g2")
+        container2 = create_content(IContainer, name=u"g2")
         container2.text = u"text2"
         container2.save()
         container1["g2"] = container2
@@ -33,6 +38,5 @@ class ModelTests(unittest.TestCase):
         #it can be a children
         assert(container2.__parent__ is not None)
         assert(container2.__parent__ == container1)
-        graph.clear()
 
 
