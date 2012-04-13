@@ -34,8 +34,8 @@ class ContainerMixin(object, DictMixin):
         item = self.inE("child").next().outV()
         if item:
             graph = self._get_graph()
-            proxy = self.get_index_name(graph.config)
-            proxy = getattr(graph, proxy)
+            proxy_name = self.get_index_name(graph.config)
+            proxy = getattr(graph, proxy_name)
             return proxy.get(item.eid)
         raise KeyError
 
