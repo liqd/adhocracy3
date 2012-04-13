@@ -56,8 +56,9 @@ Play with the graph db:
     $  bin/rexster-console 
 
 Run Tests:
+
     $ bin/nosetests
 
 Start adhocracy:
 
-    $ 
+    $ bin/pserve etc/development.ini 
