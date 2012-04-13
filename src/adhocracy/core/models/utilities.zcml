@@ -1,6 +1,7 @@
-<configure xmlns='http://namespaces.zope.org/zope'
+<configure xmlns="http://pylonshq.com/pyramid"
            i18n_domain="zope">
 
+  <include package="pyramid_zcml" />
   <include package="zope.component" />
 
   <!--global utilities-->

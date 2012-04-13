@@ -28,8 +28,6 @@ def main(global_config, **settings):
     #http://readthedocs.org/docs/pyramid_zcml/en/latest/narr.html
     config.include('pyramid_zcml')
     config.load_zcml('configure.zcml')
-    #XXX: Workaround to register utilities, load_zcml is not working somehow :(
-    config.registry.registerUtility(factory=utilities.graph_object)
 
     return config.make_wsgi_app()
 
