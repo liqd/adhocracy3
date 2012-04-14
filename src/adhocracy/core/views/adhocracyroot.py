@@ -19,10 +19,9 @@ class AdhocracyRootView(object):
     def __call__(self):
         return {'project':'adhocracy.core'}
 
-    #different view with name
+    #different view with name @@secondview
     @view_config(context=AdhocracyRoot,
-                 name="secondview",
-                 renderer='adhocracyroot_templates/secondview.pt')
+                 name="secondview",)
     def secondview(self):
         return Response('OK')
 

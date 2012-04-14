@@ -1,7 +1,11 @@
-<configure xmlns='http://namespaces.zope.org/zope'
+<configure xmlns="http://pylonshq.com/pyramid"
+           xmlns:lemonade="http://namespaces.repoze.org/lemonade"
            i18n_domain="zope">
 
+  <include package="pyramid_zcml" />
   <include package="zope.component" />
+  <include package="repoze.lemonade.includes" file="meta.zcml"/>
+
 
   <!--global utilities-->
   <!--http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/zca.html?highlight=utility-->
@@ -11,5 +15,13 @@
    factory="adhocracy.core.models.utilities.graph_object"
    provides="adhocracy.core.models.utilities.IGraphConnection"
   />
+
+  <!--register content type factories-->
+  <!--http://docs.repoze.org/lemonade/-->
+
+  <lemonade:content
+       factory="adhocracy.core.models.utilities.container_factory"
+       type="adhocracy.core.models.interfaces.IContainer"
+       />
 
 </configure>

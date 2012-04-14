@@ -17,3 +17,7 @@ class IGraphConnection(Interface):
 
     child = Attribute("Proxy object to create / search Child Relations")
 
+
+class IContainer(Interface):
+    """The Container content
+    """

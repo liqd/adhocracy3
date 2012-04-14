@@ -1,12 +1,15 @@
 from UserDict import DictMixin
 from rwproperty import setproperty
 from rwproperty import getproperty
+from zope.interface import implements
+
 
 from pyramid.threadlocal import get_current_registry
 from bulbs.model import Node
 from bulbs.property import String
 
 from adhocracy.core.models.interfaces import IGraphConnection
+from adhocracy.core.models.interfaces import IContainer
 
 
 class ContainerMixin(object, DictMixin):
@@ -34,8 +37,8 @@ class ContainerMixin(object, DictMixin):
         item = self.inE("child").next().outV()
         if item:
             graph = self._get_graph()
-            proxy = self.get_index_name(graph.config)
-            proxy = getattr(graph, proxy)
+            proxy_name = self.get_index_name(graph.config)
+            proxy = getattr(graph, proxy_name)
             return proxy.get(item.eid)
         raise KeyError
 
@@ -45,6 +48,8 @@ class ContainerMixin(object, DictMixin):
 
 
 class Container(Node, ContainerMixin):
+
+    implements(IContainer)
 
     element_type = "container"
 
@@ -76,6 +81,3 @@ class Container(Node, ContainerMixin):
         if rel:
             rel[0].child_name = name
             rel[0].save
-
-
-
