@@ -7,7 +7,7 @@ from adhocracy.core.security import SITE_ACL
 class ModelTests(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(settings={'rexster_uri':"http://localhost:8182/graphs/testgraph"})
         self.config.include('pyramid_zcml')
         self.config.load_zcml('adhocracy.core.models:utilities.zcml')
 
@@ -34,7 +34,7 @@ class ModelTests(unittest.TestCase):
         settings = {}
         app = main({}, **settings)
         root = app.root_factory(request)
-        self.assert_(root == app.root_factory(request))
+        self.assert_(root.eid == app.root_factory(request).eid)
         self.assert_(root.__acl__ == SITE_ACL)
         self.assert_(root.__parent__ is None)
         self.assert_(root.__name__ is '')
