@@ -28,6 +28,36 @@ class INode(Interface):
     """
     name = schema.TextLine(title=u"node name (global UID)", required=True)
 
+    def outE(label=None):
+        """
+        Returns the outgoing edges.
+        """
+
+    def inE(label=None):
+        """
+        Returns the incoming edges.
+        """
+
+    def outV(label=None, property_key=None, property_value=None):
+        """
+        Returns outgoing vertiges
+            :param label: Optional edge label.
+            :param property_key: Optional edge property key.
+            :param property_value: Optional edge property value.
+            :type *: str
+            :rtype: Vertex generator
+        """
+
+    def inV(label=None):
+        """
+        Returns the in-adjacent vertices.
+        """
+
+    def save():
+        """
+        Saves changes in the database.
+        """
+
 
 class IRelation(Interface):
     """

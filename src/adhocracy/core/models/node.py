@@ -1,25 +1,24 @@
 from bulbs.model import Node
 from bulbs.utils import initialize_elements
-
+from zope.interface import implements
 
 from adhocracy.core.models.interfaces import IGraphConnection
+from adhocracy.core.models.interfaces import INode
 
 from pyramid.threadlocal import get_current_registry
 
 class NodeAdhocracy(Node):
+
+
+    implements(INode)
 
     def _get_graph(self):
         registry = get_current_registry()
         return registry.getUtility(IGraphConnection)
 
     def outV(self, label=None, property_key=None, property_value=None):
-        """
-        Returns generator with initialized node objects
+        """ read interface  """
 
-        :param label: Optional edge label.
-        :param property_key: Optional edge property key.
-        :param property_value: Optional edge property value.
-        """
         assert(bool(property_key) == bool(property_value)),\
                 "You have to provide both property key and value or None"
         #send gremlin script

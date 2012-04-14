@@ -5,9 +5,9 @@ from zope.interface import implements
 from repoze.lemonade.content import create_content
 
 from pyramid.threadlocal import get_current_registry
-from bulbs.model import Node
 from bulbs.property import String
 
+from adhocracy.core.models.node import NodeAdhocracy
 from adhocracy.core.models.interfaces import IGraphConnection
 from adhocracy.core.models.interfaces import IContainer
 from adhocracy.core.models.interfaces import IChild
@@ -53,7 +53,7 @@ class ContainerMixin(object, DictMixin):
             raise KeyError
         else:
             raise KeyError, "multiple items with key %s"%(key)
-            
+
     def has_key(self, key):
         items = filter(lambda edge: edge.child_name == key, self.inE("child"))
         return len(items) == 1
@@ -63,7 +63,7 @@ class ContainerMixin(object, DictMixin):
         ""
 
 
-class Container(Node, ContainerMixin):
+class Container(NodeAdhocracy, ContainerMixin):
 
     implements(IContainer)
 

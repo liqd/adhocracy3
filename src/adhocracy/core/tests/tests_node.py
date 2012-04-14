@@ -8,6 +8,7 @@ from pyramid import testing
 from pyramid.threadlocal import get_current_registry
 
 from adhocracy.core.models.interfaces import IGraphConnection
+from adhocracy.core.models.interfaces import INode
 from adhocracy.core.models.node import NodeAdhocracy
 
 
@@ -29,7 +30,6 @@ class NodeTests(unittest.TestCase):
         self.config = testing.setUp(settings={'rexster_uri':"http://localhost:8182/graphs/testgraph"})
         self.config.include('pyramid_zcml')
         self.config.load_zcml('adhocracy.core.models:utilities.zcml')
-
         #create example node and relation proxies
         registry = get_current_registry()
         g = registry.getUtility(IGraphConnection)
@@ -56,4 +56,7 @@ class NodeTests(unittest.TestCase):
         #outV returns initialized node objects
         res_object = self.james.outV().next()
         self.assert_(isinstance(res_object, Person))
+        from zope.interface.verify import verifyObject
+        self.assert_(verifyObject(INode,res_object))
+
 
