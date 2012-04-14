@@ -74,15 +74,10 @@ class Container(NodeAdhocracy, ContainerMixin):
 
     @property
     def __parent__(self):
-        rel = list(self.outE("child"))
-        item = rel and rel[0] \
-                 or None
-        if item:
-            graph = self._get_graph()
-            proxy = self.get_index_name(graph.config)
-            proxy = getattr(graph, proxy)
-            item = proxy.get(item.inV().eid)
-        return item
+        try:
+            return self.outV("child").next()
+        except StopIteration:
+            return None
 
     @getproperty
     def __name__(self):
