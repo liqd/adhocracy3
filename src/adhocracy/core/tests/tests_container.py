@@ -55,7 +55,7 @@ class ModelTests(unittest.TestCase):
         self.assert_(container2.eid == container1["g2"].eid)
         self.assert_(not container1.has_key("not_available"))
         self.assertRaises(KeyError, container1.__getitem__, ("not_available"))
-        #it can be a children
+        self.assert_(container1.__parent__ is None)
         self.assert_(container2.__parent__ is not None)
         self.assert_(container2.__parent__.eid == container1.eid)
 
