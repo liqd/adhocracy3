@@ -3,7 +3,6 @@
 from zope.interface import implementer
 from zope.interface import alsoProvides
 from bulbs.rexster import Config
-from bulbs.rexster import REXSTER_URI
 from bulbs.rexster import Graph
 from bulbs.config import DEBUG
 from pyramid.threadlocal import get_current_registry
@@ -20,7 +19,8 @@ from adhocracy.core.models.interfaces import IAdhocracyRoot
 @implementer(IGraphConnection)
 def graph_object():
 
-    config = Config(REXSTER_URI)
+    registry = get_current_registry()
+    config = Config(registry.settings['rexster_uri'])
     #graphdb connection
     g = Graph(config)
     alsoProvides(g, IGraphConnection)

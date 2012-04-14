@@ -41,6 +41,16 @@
             </extensions>
         </graph>
         <graph>
+            <graph-name>testgraph</graph-name>
+            <graph-type>tinkergraph</graph-type>
+            <graph-mock-tx>true</graph-mock-tx>
+            <extensions>
+                <allows>
+                    <allow>tp:gremlin</allow>
+                </allows>
+            </extensions>
+        </graph>
+        <graph>
             <graph-name>tinkergraph-readonly</graph-name>
             <graph-read-only>true</graph-read-only>
             <graph-type>tinkergraph</graph-type>
