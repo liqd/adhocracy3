@@ -9,6 +9,8 @@ class IGraphConnection(Interface):
     Implementation based on http://bulbflow.com/docs/api/bulbs/base/graph/
     """
 
+    scripts = Attribute("Gremlin scripts to send database requests")
+
     vertices = Attribute("Object to create / search Vertices")
 
     edges = Attribute("Object to create / search edges ")
