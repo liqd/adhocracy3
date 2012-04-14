@@ -9,7 +9,6 @@ class ModelTests(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
         self.config.include('pyramid_zcml')
-        import adhocracy.core.models
         self.config.load_zcml('adhocracy.core.models:utilities.zcml')
 
     def tearDown(self):
@@ -27,19 +26,18 @@ class ModelTests(unittest.TestCase):
         node.save()
         node_ = graph.adhocracyroot.get_or_create("name", u"testnode",
                                                    name=u"testnode")
-        assert(node_.__acl__ == testlist)
-
+        self.assert_(node_.__acl__ == testlist)
 
     def test_root_factory(self):
         from adhocracy.core import main
         request = testing.DummyRequest()
         settings = {}
         app = main({}, **settings)
-        root =  app.root_factory(request)
-        assert(root == app.root_factory(request))
-        assert(root.__acl__ == SITE_ACL)
-        assert(root.__parent__ is None)
-        assert(root.__name__ is '')
+        root = app.root_factory(request)
+        self.assert_(root == app.root_factory(request))
+        self.assert_(root.__acl__ == SITE_ACL)
+        self.assert_(root.__parent__ is None)
+        self.assert_(root.__name__ is '')
 
 
 class ViewTests(unittest.TestCase):
