@@ -1,4 +1,5 @@
 """global utilites to work with models, read utilities.zcml"""
+import os.path
 
 from zope.interface import implementer
 from zope.interface import alsoProvides
@@ -8,6 +9,7 @@ from bulbs.rexster import Graph
 from bulbs.config import DEBUG
 from pyramid.threadlocal import get_current_registry
 
+import adhocracy.core.models
 from adhocracy.core.models.container import Container
 from adhocracy.core.models.adhocracyroot import AdhocracyRoot
 from adhocracy.core.models.relations import Child
@@ -26,6 +28,10 @@ def graph_object():
     alsoProvides(g, IGraphConnection)
     #enable loggin
     g.config.set_logger(DEBUG)
+    #add custom gremlin scripts
+    package_path = adhocracy.core.models.__path__[0]
+    file_path = os.path.join(package_path, "gremlin.groovy")
+    g.scripts.update(file_path)
     #add model proxies
     g.add_proxy("adhocracyroot", AdhocracyRoot)
     g.add_proxy("container", Container)
