@@ -45,7 +45,6 @@ class UtilitiesTests(unittest.TestCase):
     def test_child_factory(self):
         from adhocracy.core.models.interfaces import IContainer
         from adhocracy.core.models.interfaces import IChild
-        from adhocracy.core.models.container import Container
         from adhocracy.core.models.relations import Child
         from repoze.lemonade.content import create_content
         parent = create_content(IContainer, name=u"p")
