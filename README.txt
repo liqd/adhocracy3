@@ -62,7 +62,7 @@ Play with the graph db::
 
 Run Tests::
 
-    $ bin/nosetests
+    $ bin/test
 
 Start adhocracy::
 
