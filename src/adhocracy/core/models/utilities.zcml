@@ -20,8 +20,18 @@
   <!--http://docs.repoze.org/lemonade/-->
 
   <lemonade:content
+       factory="adhocracy.core.models.utilities.adhocracyroot_factory"
+       type="adhocracy.core.models.interfaces.IAdhocracyRoot"
+       />
+
+  <lemonade:content
        factory="adhocracy.core.models.utilities.container_factory"
        type="adhocracy.core.models.interfaces.IContainer"
+       />
+
+  <lemonade:content
+       factory="adhocracy.core.models.utilities.child_factory"
+       type="adhocracy.core.models.interfaces.IChild"
        />
 
 </configure>

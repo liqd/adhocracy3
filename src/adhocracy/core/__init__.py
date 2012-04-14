@@ -1,15 +1,13 @@
 from pyramid.config import Configurator
 
 from adhocracy.core.models.adhocracyroot import appmaker
-from adhocracy.core.models.interfaces import IGraphConnection
 
 
 def root_factory(request):
     """Return application root
     """
-    graph = request.registry.getUtility(IGraphConnection)
+    return appmaker()
 
-    return appmaker(graph)
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
@@ -29,4 +27,3 @@ def main(global_config, **settings):
     config.load_zcml('configure.zcml') #declerative configuration: load central zcml file
 
     return config.make_wsgi_app()
-
