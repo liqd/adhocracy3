@@ -26,7 +26,7 @@ class Knows(Relationship):
 
 class NodeTests(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = testing.setUp(settings={'rexster_uri':"http://localhost:8182/graphs/testgraph"})
         self.config.include('pyramid_zcml')
         self.config.load_zcml('adhocracy.core.models:utilities.zcml')
 
