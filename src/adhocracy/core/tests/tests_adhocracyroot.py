@@ -34,7 +34,7 @@ class ModelTests(unittest.TestCase):
         settings = {}
         app = main({}, **settings)
         root = app.root_factory(request)
-        self.assert_(root == app.root_factory(request))
+        self.assert_(root.eid == app.root_factory(request).eid)
         self.assert_(root.__acl__ == SITE_ACL)
         self.assert_(root.__parent__ is None)
         self.assert_(root.__name__ is '')
