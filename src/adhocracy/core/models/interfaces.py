@@ -27,6 +27,8 @@ class INode(Interface):
     Graph node object.
     """
 
+    name = schema.TextLine(title=u"node name (global UID)", required=True)
+
     def outE(label=None):
         """
         Returns the outgoing edges.
@@ -69,15 +71,12 @@ class IAdhocracyRoot(Interface):
     """
     Adhocracy root object.
     """
-    name = schema.TextLine(title=u"node name (global UID)", required=True)
 
 
 class IContainer(Interface):
     """
     Container object.
     """
-    name = schema.TextLine(title=u"node name (global UID)", required=True)
-
     text = schema.Text(title=u"test attribute")
 
 
