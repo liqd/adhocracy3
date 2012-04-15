@@ -26,7 +26,6 @@ class INode(Interface):
     """
     Graph node object.
     """
-    name = schema.TextLine(title=u"node name (global UID)", required=True)
 
     def outE(label=None):
         """
@@ -66,21 +65,23 @@ class IRelation(Interface):
     label = schema.TextLine(title=u"relation type (predicate)", required=True)
 
 
-class IAdhocracyRoot(INode):
+class IAdhocracyRoot(Interface):
     """
     Adhocracy root object.
     """
-    pass
+    name = schema.TextLine(title=u"node name (global UID)", required=True)
 
 
-class IContainer(INode):
+class IContainer(Interface):
     """
     Container object.
     """
+    name = schema.TextLine(title=u"node name (global UID)", required=True)
+
     text = schema.Text(title=u"test attribute")
 
 
-class IChild(IRelation):
+class IChild(Interface):
     """
     Object hierarchy relation.
     """

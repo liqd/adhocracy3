@@ -20,9 +20,11 @@ class ModelTests(unittest.TestCase):
     def test_create_content(self):
         #create a container
         from adhocracy.core.models.interfaces import IContainer
+        from adhocracy.core.models.interfaces import INode
         from repoze.lemonade.content import create_content
         container0 = create_content(IContainer, name=u"g0")
         from zope.interface.verify import verifyObject
+        self.assert_(verifyObject(INode, container0))
         self.assert_(verifyObject(IContainer, container0))
         self.assert_(container0.name == "g0")
 
