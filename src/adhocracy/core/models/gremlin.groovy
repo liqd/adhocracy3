@@ -40,16 +40,13 @@ def bothE(_id, label) {
 
 //extended outV to filter edge properties
 def outV(_id, label, property_key, property_value) {
-  if (label == null)
-    return g.v(_id).outE().filter{
-            if (property_key != null && property_value != null) it.getProperty(property_key) == property_value  
-            else true 
-            }.inV
-  else 
-    return g.v(_id).outE(label).filter{
-            if (property_key != null && property_value != null) it.getProperty(property_key) == property_value  
-            else true 
-            }.inV
+    def matchingEdge(edge) {
+        (property_key == null) || (edge.getProperty(property_key) == property_value)
+    }
+    if (label == null)
+        g.v(_id).outE().filter{matchingEdge(it)}.inV
+    else
+        g.v(_id).outE(label).filter{matchingEdge(it)}.inV
 }
 
 def inV(_id, label, property_key, property_value) {
