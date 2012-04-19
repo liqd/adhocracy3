@@ -3,10 +3,6 @@ from pyramid.response import Response
 from adhocracy.core.models.adhocracyroot import AdhocracyRoot
 
 
-def testview(request):
-    return {'project':'adhocracy.core'}
-
-
 class AdhocracyRootView(object):
 
     def __init__(self, context, request):
