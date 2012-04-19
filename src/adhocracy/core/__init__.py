@@ -16,7 +16,7 @@ def main(global_config, **settings):
     config = Configurator(root_factory=root_factory, settings=settings)
     #hook zope global component registry into the pyramid application registry
     #http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/zca.html?highlight=utility#using-the-zca-global-registry
-    config.hook_zca()
+    #config.hook_zca()
     #add views (TODO: use zcml or imperative?)
     config.add_static_view('static', 'static', cache_max_age=3600)
     #scan modules for configuration decorators

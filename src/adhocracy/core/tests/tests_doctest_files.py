@@ -1,10 +1,19 @@
 import doctest
 from doctest import DocFileSuite
 import unittest
+from adhocracy.core.testing import ADHOCRACY_LAYER_FUNCTIONAL
+from adhocracy.core.testing import Browser
 
 
 flags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
-globs = {}
+
+def globs():
+    app = ADHOCRACY_LAYER_FUNCTIONAL.make_wsgi_app()
+    globs =  {"browser" : Browser(wsgi_app=app),
+              "app"     : app,
+              "app_url" : "http://localhost",
+             }
+    return globs
 
 
 class DoctestTestCase(unittest.TestCase):
@@ -15,9 +24,11 @@ class DoctestTestCase(unittest.TestCase):
     @classmethod
     def test_suite(self):
         return DocFileSuite(
-            "test.rst",
+            "use_cases/test.rst",
             #add here aditional testfiles
-            globs = globs,
+            setUp = ADHOCRACY_LAYER_FUNCTIONAL.setUp,
+            tearDown = ADHOCRACY_LAYER_FUNCTIONAL.tearDown,
+            globs = globs(),
             optionflags = flags
         )
 

@@ -22,7 +22,8 @@ from adhocracy.core.models.interfaces import IAdhocracyRoot
 def graph_object():
 
     registry = get_current_registry()
-    config = Config(registry.settings['rexster_uri'])
+    config = registry.settings and Config(registry.settings['rexster_uri']) \
+             or None
     #graphdb connection
     g = Graph(config)
     alsoProvides(g, IGraphConnection)

@@ -17,6 +17,7 @@ requires = [
     'pyramid_tm',
     'pyramid_debugtoolbar',
     'waitress',
+    'zope.testbrowser[wsgi]',
     ]
 
 setup(name='adhocracy.core',
