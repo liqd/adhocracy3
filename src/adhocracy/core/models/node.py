@@ -31,3 +31,21 @@ class NodeAdhocracy(Node):
         generator = initialize_elements(g.client, resp)
 
         return generator
+
+    def inV(self, label=None, property_key=None, property_value=None):
+        assert(bool(property_key) == bool(property_value)),\
+                "You have to provide both property key and value or None"
+        #send gremlin script
+        g = self._get_graph()
+        script = g.scripts.get('inV')
+        params = dict(_id=self._id, label=label,
+                      property_key=property_key, property_value=property_value)
+        try:
+            resp = g.client.gremlin(script, params)
+        except SystemError as e:
+            import json
+            raise Exception("\n" + json.loads(e.message[1])["error"])
+        #initialize node objects
+        generator = initialize_elements(g.client, resp)
+
+        return generator

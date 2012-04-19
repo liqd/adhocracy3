@@ -52,11 +52,14 @@ def outV(_id, label, property_key, property_value) {
             }.inV
 }
 
-def inV(_id, label) {
-  if (label == null)
-    g.v(_id).in()
-  else
-    g.v(_id).in(label)
+def inV(_id, label, property_key, property_value) {
+    def matchingEdge(edge) {
+        (property_key == null) || (edge.getProperty(property_key) == property_value)
+    }
+    if (label == null)
+        g.v(_id).inE().filter{matchingEdge(it)}.outV
+    else
+        g.v(_id).inE(label).filter{matchingEdge(it)}.outV
 }
 
 def bothV(_id, label) { 
