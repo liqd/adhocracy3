@@ -26,7 +26,11 @@ class NodeAdhocracy(Node):
         script = g.scripts.get('outV')
         params = dict(_id=self._id, label=label,
                       property_key=property_key, property_value=property_value)
-        resp = g.client.gremlin(script, params)
+        try:
+            resp = g.client.gremlin(script, params)
+        except SystemError as e:
+            import json
+            raise GremlinError("\n" + json.loads(e.message[1])["error"])
         #initialize node objects
         generator = initialize_elements(g.client, resp)
 
@@ -44,8 +48,11 @@ class NodeAdhocracy(Node):
             resp = g.client.gremlin(script, params)
         except SystemError as e:
             import json
-            raise Exception("\n" + json.loads(e.message[1])["error"])
+            raise GremlinError("\n" + json.loads(e.message[1])["error"])
         #initialize node objects
         generator = initialize_elements(g.client, resp)
 
         return generator
+
+class GremlinError(Exception):
+    pass
