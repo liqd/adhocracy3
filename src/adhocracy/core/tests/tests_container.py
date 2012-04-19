@@ -4,6 +4,7 @@ from pyramid.threadlocal import get_current_registry
 from pyramid import testing
 
 from adhocracy.core.models.interfaces import IGraphConnection
+from adhocracy.core.utils import to_list
 
 class ModelTests(unittest.TestCase):
     def setUp(self):
@@ -55,7 +56,8 @@ class ModelTests(unittest.TestCase):
         container1["g2"] = container2
         self.assertIsNotNone(container1)
         self.assertIsNotNone(container2)
-        self.assertEquals([container1.eid], [container2.outV("child").next().eid])
+        self.assertEquals([container1.eid],
+            map (lambda x: x.eid, to_list(container2.outV("child"))))
         self.assert_(container1.has_key("g2"))
         self.assert_(container2.eid == container1["g2"].eid)
         self.assert_(not container1.has_key("not_available"))
