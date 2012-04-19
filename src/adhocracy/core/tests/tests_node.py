@@ -10,6 +10,7 @@ from pyramid.threadlocal import get_current_registry
 from adhocracy.core.models.interfaces import IGraphConnection
 from adhocracy.core.models.interfaces import INode
 from adhocracy.core.models.node import NodeAdhocracy
+from adhocracy.core.utils import to_list
 
 
 class Person(NodeAdhocracy):
@@ -38,9 +39,10 @@ class NodeTests(unittest.TestCase):
         self.g = g
 
     def tearDown(self):
+        self.g.clear()
         testing.tearDown()
 
-    def test_outV(self):
+    def create_test_graph(self):
         #add example nodes and relations
         g = self.g
         self.james = g.person.create(name="James", age=34)
@@ -48,6 +50,10 @@ class NodeTests(unittest.TestCase):
         self.tom = g.person.create(name="Tom", age=3)
         self.knows1 = g.knows.create(self.james, self.time, place=u"city")
         self.knows2 = g.knows.create(self.james, self.tom, place=u"village")
+        self.knows3 = g.knows.create(self.time, self.tom, place=u"country")
+
+    def test_outV(self):
+        self.create_test_graph()
         #outV filters edge label, and property key/value
         self.assert_(len([x for x in  self.james.outV()]) == 2)
         self.assert_(len([x for x in  self.james.outV(property_key="place", property_value="city")]) == 1)
@@ -59,4 +65,15 @@ class NodeTests(unittest.TestCase):
         from zope.interface.verify import verifyObject
         self.assert_(verifyObject(INode,res_object))
 
-
+    # like test_outV for inV
+    def test_inV(self):
+        self.create_test_graph()
+        self.assertEquals(len(to_list(self.tom.inV())), 2)
+        self.assertEquals(len(to_list(self.tom.inV(property_key="place", property_value="village"))), 1)
+        self.assertEquals(len(to_list(self.tom.inV(label="knows"))), 2)
+        self.assertEquals(len(to_list(self.tom.inV(label="knows", property_key="place", property_value="village"))), 1)
+        #inV returns initialized node objects
+        for res_object in self.tom.inV():
+            self.assert_(isinstance(res_object, Person))
+            from zope.interface.verify import verifyObject
+            self.assert_(verifyObject(INode,res_object))
