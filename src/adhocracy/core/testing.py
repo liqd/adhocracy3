@@ -1,5 +1,9 @@
 """Helper classes for adhocracy.core test"""
 import zope.testbrowser.wsgi
+from pyramid.threadlocal import get_current_registry
+from pyramid import testing
+
+from adhocracy.core.models.interfaces import IGraphConnection
 
 
 #Functional testing with zope.testbrowser
@@ -20,13 +24,19 @@ class AdhocracyFunctionalLayer(zope.testbrowser.wsgi.Layer):
         return main({}, rexster_uri="http://localhost:8182/graphs/testgraph")
 
     def setUp(test, *args, **kwargs):
-        print("\n-----------------------------------------------------------------"
-              "\n---    Setting up database test environment, please stand by. ---"
-              "\n-----------------------------------------------------------------\n")
+        config = testing.setUp(\
+                    settings={'rexster_uri':"http://localhost:8182/graphs/testgraph"},
+                    #do not hook global registry intro local pyramid registry
+                    hook_zca=False)
+        config.include('pyramid_zcml')
+        config.load_zcml('adhocracy.core.models:utilities.zcml')
         #TODO start rexter
 
-    def tearDown(self, test):
-        pass
+    def tearDown(self, test=None):
+        registry = get_current_registry()
+        graph = registry.getUtility(IGraphConnection)
+        graph.clear()
+        testing.tearDown()
 
 
 ADHOCRACY_LAYER_FUNCTIONAL = AdhocracyFunctionalLayer()

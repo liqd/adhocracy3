@@ -24,7 +24,7 @@ class DoctestTestCase(unittest.TestCase):
     @classmethod
     def test_suite(self):
         return DocFileSuite(
-            "use_cases/test.rst",
+            "models.rst",
             #add here aditional testfiles
             setUp = ADHOCRACY_LAYER_FUNCTIONAL.setUp,
             tearDown = ADHOCRACY_LAYER_FUNCTIONAL.tearDown,
