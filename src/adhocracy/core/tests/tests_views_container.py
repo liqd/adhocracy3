@@ -72,6 +72,7 @@ class ViewFunctionalTests(unittest.TestCase):
         output = """\n\n\n
             Measure time object traversal level 10
             ======================================
+            \n
             browser.open('http://localhost/child0/child1/child2/child3/child4/child5/child6/child7/child8/child9'):\n
             %s
             \n\n\n

@@ -19,12 +19,7 @@ We can add container objects to the root object::
 
 or add them as childs to other container objects::
 
-
-Now we can traverse the resulting object hierachy::
-
-    >>> browser.open('http://localhost/')
-    >>> "pyramid" in browser.contents
-    True
-
-...TODO not working with doctest >>> browser.open('http://localhost/g0')
-
+    >>> container1 = create_content(IContainer, name=u"g1")
+    >>> root["g0"]["g1"] = container1
+    >>> root["g0"]["g1"]
+    <Container: http://localhost...
