@@ -41,23 +41,66 @@ Versioning
  * merging
  * administrative tasks can possibly manipulate the history after the fact
 
-superrelations
- * relations as vertices
-   * referencing relations
-   * relations of more than two vertices (so called hyper-edges)
- * non-exhaustive list of types of relations
-   * classic, referencing relationship (A <- R -> C) (subject, object)
-     * expressible as verbs
-     * comments
-   * containers, referencing (R -> A, R -> B, ...)
-     * possibly ranked edges for orderings
-     * document containing list of statements
-   * synchronized nodes (A -> R -> B, B -> R -> A / cycles)
-     * Translations
-   * unary relations (R -> A)
-   * more complex relations
-     * some discussion leads to a set of (proposed) changes (D <- R -> C1, R -> C2, R C3)
 
-example for doctests:
-    >>> 42
-    42
+Superrelations
+--------------
+
+Superrelations are relations between content nodes are implemented as vertices,
+not as edges. This allows for relations referencing other relations, and for
+relations with connections to more than two vertices (hyperedges).
+
+Note: The term ``superrelation`` is not carved into stone.
+
+
+A non-exhaustive list of types of superrelations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Predicates``
+    Predicates are classical subject-predicate-object relations, expressible
+    as a verb.
+
+    Implemented as a relationship vertex with references to subject and object
+    vertices ``(Subject <- Predicate -> Object)``.
+
+    Example: ``comments``.
+
+
+``Collections``
+    Collections contain parts.
+
+    Implemented as a list vertex with references to parts
+    ``(Collection -> Part_1, Collection -> Part_2, ...)``.
+
+    Example: ``Set``, ``List``.
+
+
+``List``
+    Ordered collection.
+
+    Implemented as a collection with ranked edges.
+
+    Example: ``Document``.
+
+
+``Conjoint nodes``
+    Nodes which essentially belong to each other. Once one node is updated, the
+    other node has to be updated too - the nodes are synchronised.
+
+    Scheme: ``(A -> R -> B, B -> R -> A)`` or other cycles.
+
+    Possible examples: Translations, Binational treaties.
+    
+
+``Unary relations``
+    Relations connected to only one vertex.
+
+    Scheme: ``(R -> A)``
+
+    Possible example: Deletions.
+
+
+``More complex relations``
+    Exampel: Some discussion leads to a set of (proposed) changes.
+   
+    Scheme: ``(D <- R -> C1, R -> C2, R C3)``
+
