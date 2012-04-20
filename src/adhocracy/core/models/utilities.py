@@ -28,7 +28,7 @@ def graph_object():
     g = Graph(config)
     alsoProvides(g, IGraphConnection)
     #enable loggin
-    g.config.set_logger(DEBUG)
+    #g.config.set_logger(DEBUG)
     #add custom gremlin scripts
     package_path = adhocracy.core.models.__path__[0]
     file_path = os.path.join(package_path, "gremlin.groovy")
