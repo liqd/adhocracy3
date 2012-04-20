@@ -10,7 +10,6 @@ from pyramid.threadlocal import get_current_registry
 from adhocracy.core.models.interfaces import IGraphConnection
 from adhocracy.core.models.interfaces import INode
 from adhocracy.core.models.node import NodeAdhocracy
-from adhocracy.core.utils import to_list
 
 
 class Person(NodeAdhocracy):
@@ -68,10 +67,10 @@ class NodeTests(unittest.TestCase):
     # like test_outV for inV
     def test_inV(self):
         self.create_test_graph()
-        self.assertEquals(len(to_list(self.tom.inV())), 2)
-        self.assertEquals(len(to_list(self.tom.inV(property_key="place", property_value="village"))), 1)
-        self.assertEquals(len(to_list(self.tom.inV(label="knows"))), 2)
-        self.assertEquals(len(to_list(self.tom.inV(label="knows", property_key="place", property_value="village"))), 1)
+        self.assertEquals(len(list(self.tom.inV())), 2)
+        self.assertEquals(len(list(self.tom.inV(property_key="place", property_value="village"))), 1)
+        self.assertEquals(len(list(self.tom.inV(label="knows"))), 2)
+        self.assertEquals(len(list(self.tom.inV(label="knows", property_key="place", property_value="village"))), 1)
         #inV returns initialized node objects
         for res_object in self.tom.inV():
             self.assert_(isinstance(res_object, Person))
