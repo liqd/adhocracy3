@@ -20,7 +20,3 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. automodule:: adhocracy.core
-.. autoclass::
-   :members:
-.. autoexception::
