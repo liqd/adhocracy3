@@ -15,39 +15,126 @@ We use bulbs to access the graph database on a low level. Some terms:
 Non-Mutability
 --------------
 
-This section describes rules and properties that we define for adhocracy core. They are not enforced by the underlying db.
+This section describes rules and properties that we define for adhocracy core.
+They are not enforced by the underlying db.
 
-The properties contained in a vertex don't change after creation of a vertex. The same goes for properties of edges. Also, created vertices and edges don't ever get deleted.
+The properties contained in a vertex don't change after creation of a vertex.
+The same goes for properties of edges. Also, created vertices and edges don't
+ever get deleted.
 
-Some (actually most) of the edges are special edges that we will call "references". A reference from A to B captures the idea, that B is somehow an essential part of A. Therefore, the set of outgoing references from a vertex is not allowed to change. The set of ingoing references can change. (The most common case for egdes that are not references is the follower relationship, see below.)
+Some (actually most) of the edges are special edges that we will call
+"references". A reference from A to B captures the idea that B is somehow an
+essential part of A. Therefore, the set of outgoing references from a vertex is
+not allowed to change. The set of incoming references can change. This also
+means that a reference from A to B implies that A is younger or equally old
+than B.
+
+There are two types of references: 
+
+ * References which exist only once, e.g. the object reference in a
+   predicate relationship (reference-to-one)
+ * References exists zero to many times, e.g. parts of collections
+   (reference-to-many)
+
 
 Some intuition
 ~~~~~~~~~~~~~~
-Imagine you have a vertex, transitively follow all its outgoing references and collect all the resulting vertices. Usually, this will result in a tree of vertices. A reference means (as defined above) that the referenced vertices are an "essential part" of the referencing vertex. So our tree of vertices is something like a deep-copy and recursively includes all the essential parts of our root vertex.
 
-(Cycles using references are also allowed, so you might not get a tree, but a graph. The graph will still be a deep-copy on the described sense.)
+Imagine you have a vertex, transitively follow all its outgoing references and
+collect all the resulting vertices. Usually, this will result in a tree of
+vertices. A reference means (as defined above) that the referenced vertices are
+an "essential part" of the referencing vertex. So our tree of vertices is
+something like a deep-copy and recursively includes all the essential parts of
+our root vertex.
 
-
+(Cycles using references are also allowed, so you might not get a tree, but a
+graph. The graph will still be a deep-copy in the described sense.)
 
 Versioning
- * simple vertex modification
-    * follower edges
- * edge propagation
- * recursive inV vertex propagation
-    * termination!
- * prop: a -> b
-        means a is newer (or equally old) as b.
- * forking
- * merging
- * administrative tasks can possibly manipulate the history after the fact
+----------
+
+As objects (vertices and edges) in the graph never change, every object
+modification creates a new vertex which points to the originating vertex with a
+``follows`` relation.
+
+
+Example:
+
+.. digraph::
+
+    user <- agrees_with -> statement -> contains -> substatement;
+    statement <- "statement'" [label="follows"];
+
+The outgoing references will be copied automatically to point
+to the old referred vertices. 
+
+.. digraph::
+
+    user <- agrees_with -> statement -> contains -> substatement;
+    statement <- "statement'" [label="follows"];
+    "statement'" -> "contains'" -> "substatement";
+
+**(Note: The rest of the sections is not finished!)**
+
+Incoming references have to be treated specially:
+
+Vertices that refer to the modified vertex, directly or transitively are marked
+with a "potentially outdated" marker. These vertices are notified and can
+decide by themselves if they are copied into new vertices with references to
+the updated vertex.
+
+.. digraph::
+
+    user <- agrees_with -> statement -> contains -> substatement;
+    statement <- "statement'" [label="follows"];
+    "statement'" -> "contains'" -> "substatement";
+    "user" <- "agrees_with'" -> "statement'";
+
+To guarantee termination, update propagation has to be realized
+transactionally.
+
+
+Forking and merging
+~~~~~~~~~~~~~~~~~~~
+
+Modeling versioning in this manner also allows for forking and merging:
+
+    fork graph example
+
+    merge graph example
+
+Deletion
+~~~~~~~~
+
+ * TODO: write in which cases deletion makes sence
+
+ * Reference deletion
+
+ * Vertex deletion is a special kind of versioning which creates a special
+   ``deletion`` vertex pointing to the deleted vertex with a ``follows`` edge.
+
+
+History manipulation
+~~~~~~~~~~~~~~~~~~~~
+
+In some cases it might be modify or delete existing vertices and edges
+directly, i.e. without using the versioning mechanism. This violates the
+non-mutability property and can be seen as a manipulation of the version
+history.
+
+Manual modification of the graph have to be done very carefully and could be
+considered as administrative tasks.
+
+A typical example for such an administrative task is the real deletion of an
+object containing illegal content.
 
 
 Superrelations
 --------------
 
-Superrelations are relations between content nodes are implemented as vertices,
-not as edges. This allows for relations referencing other relations, and for
-relations with connections to more than two vertices (hyperedges).
+Superrelations are relations between content nodes that are implemented as
+vertices, not as edges. This allows for relations referencing other relations,
+and for relations with connections to more than two vertices (hyperedges).
 
 Note: The term ``superrelation`` is not carved into stone.
 
@@ -55,31 +142,53 @@ Note: The term ``superrelation`` is not carved into stone.
 A non-exhaustive list of types of superrelations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+``Follows``
+    This is the relation used to connect vertices to its predecessor or
+    predecessors.
+
+    Implemented as a vertex with a reference to the new vertex and zero to many
+    references to predecessor vertices. Normal follows relationships have one
+    predecessor relation, new object creations have zero predecessors, while
+    follow superrelations merging several vertices together have two or more
+    predecessors.
+
+    Scheme: ``Successor -> Follows -> Predecessor(s)``
+
+
+``Deletions``
+    Vertex deletion is realized as a unary relation connected to the deleted
+    vertex.
+
+    Scheme: ``Deletion -> Follows -> Node``
+
+
 ``Predicates``
     Predicates are classical subject-predicate-object relations, expressible
     as a verb.
 
-    Implemented as a relationship vertex with references to subject and object
-    vertices ``(Subject <- Predicate -> Object)``.
+    Implemented as a vertex with references to subject and object vertices.
 
-    Example: ``comments``.
+    Scheme: ``Subject <- Predicate -> Object``
+
+    Example: ``comments``
 
 
 ``Collections``
     Collections contain parts.
 
-    Implemented as a list vertex with references to parts
-    ``(Collection -> Part_1, Collection -> Part_2, ...)``.
+    Implemented as a list vertex with references-to-many to parts
 
-    Example: ``Set``, ``List``.
+    Scheme: ``Collection -> Part_1, Collection -> Part_2, ...``.
+
+    Example: ``Set``, ``List``
 
 
-``List``
-    Ordered collection.
+``Lists``
+    Ordered collections.
 
     Implemented as a collection with ranked edges.
 
-    Example: ``Document``.
+    Example: ``Document``
 
 
 ``Conjoint nodes``
@@ -90,14 +199,6 @@ A non-exhaustive list of types of superrelations
 
     Possible examples: Translations, Binational treaties.
     
-
-``Unary relations``
-    Relations connected to only one vertex.
-
-    Scheme: ``(R -> A)``
-
-    Possible example: Deletions.
-
 
 ``More complex relations``
     Exampel: Some discussion leads to a set of (proposed) changes.
