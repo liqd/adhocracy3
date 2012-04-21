@@ -5,12 +5,20 @@ The Supergraph
 Bulbs
 -----
 
-We use bulbs to access the graph database on a low level. Some terms:
+We use bulbs_ to access the graph database on a low level. Some terms:
 
- * vertex   - a node in the graph db
- * edge     - a directed edge in the graph db, connecting to vertices
- * property - vertices and edges can have properties. These appear as fields
-              in the marshalled python objects.
+``vertex``
+    a node in the graph db
+
+``edge``
+    a directed edge in the graph db, connecting to vertices
+
+``property``
+    vertices and edges can have properties. These appear as fields in the
+    marshalled python objects.
+
+.. _bulbs: http://bulbflow.com
+
 
 Non-Mutability
 --------------
@@ -31,11 +39,15 @@ than B.
 
 There are two types of references: 
 
- * References which exist only once, e.g. the object reference in a
-   predicate relationship (reference-to-one)
- * References exists zero to many times, e.g. parts of collections
-   (reference-to-many)
+.. todo::
+    find better names!
 
+``reference-to-one``
+    References which exist only once, e.g. the object reference in a predicate
+    relationship
+
+``reference-to-many``
+    References exists zero to many times, e.g. parts of collections
 
 Some intuition
 ~~~~~~~~~~~~~~
@@ -60,21 +72,29 @@ modification creates a new vertex which points to the originating vertex with a
 
 Example:
 
-.. digraph::
+.. digraph:: graph_1
 
-    user <- agrees_with -> statement -> contains -> substatement;
-    statement <- "statement'" [label="follows"];
+    agrees_with -> user;
+    agrees_with -> statement;
+    statement -> substatement [label = contains];
+
+    node [color = red];
+
+    "statement'" -> statement [label = follows, color = red];
 
 The outgoing references will be copied automatically to point
 to the old referred vertices. 
 
-.. digraph::
+.. digraph:: graph_2
 
-    user <- agrees_with -> statement -> contains -> substatement;
-    statement <- "statement'" [label="follows"];
-    "statement'" -> "contains'" -> "substatement";
+    agrees_with -> user;
+    agrees_with -> statement;
+    statement -> substatement [label = contains];
+    "statement'" -> statement [label = follows];
+    "statement'" -> substatement [label = contains, color = red];
 
-**(Note: The rest of the sections is not finished!)**
+.. note::
+    The rest of the sections is not finished!)
 
 Incoming references have to be treated specially:
 
@@ -83,12 +103,17 @@ with a "potentially outdated" marker. These vertices are notified and can
 decide by themselves if they are copied into new vertices with references to
 the updated vertex.
 
-.. digraph::
+.. digraph:: graph_3
 
-    user <- agrees_with -> statement -> contains -> substatement;
-    statement <- "statement'" [label="follows"];
-    "statement'" -> "contains'" -> "substatement";
-    "user" <- "agrees_with'" -> "statement'";
+    agrees_with -> user;
+    agrees_with -> statement;
+    statement -> substatement [label = contains];
+    "statement'" -> statement [label = follows];
+    "statement'" -> substatement [label = contains];
+    node [color = red];
+    "agrees_with'" -> user [color = red];
+    "agrees_with'" -> "statement'" [color = red];
+    "agrees_with'" -> agrees_with [label = follows, color = red];
 
 To guarantee termination, update propagation has to be realized
 transactionally.
@@ -99,19 +124,20 @@ Forking and merging
 
 Modeling versioning in this manner also allows for forking and merging:
 
-    fork graph example
-
-    merge graph example
+.. todo::
+    include fork and merge graph examples
 
 Deletion
 ~~~~~~~~
 
- * TODO: write in which cases deletion makes sence
+.. todo::
+     * write in which cases deletion makes sence
 
- * Reference deletion
+     * Reference deletion
 
- * Vertex deletion is a special kind of versioning which creates a special
-   ``deletion`` vertex pointing to the deleted vertex with a ``follows`` edge.
+     * Vertex deletion is a special kind of versioning which creates a special
+       ``deletion`` vertex pointing to the deleted vertex with a ``follows``
+       edge.
 
 
 History manipulation
@@ -136,7 +162,8 @@ Superrelations are relations between content nodes that are implemented as
 vertices, not as edges. This allows for relations referencing other relations,
 and for relations with connections to more than two vertices (hyperedges).
 
-Note: The term ``superrelation`` is not carved into stone.
+.. note::
+    The term ``superrelation`` is not carved into stone.
 
 
 A non-exhaustive list of types of superrelations
@@ -178,7 +205,7 @@ A non-exhaustive list of types of superrelations
 
     Implemented as a list vertex with references-to-many to parts
 
-    Scheme: ``Collection -> Part_1, Collection -> Part_2, ...``.
+    Scheme: ``Collection -> Part_1, Collection -> Part_2, ...``
 
     Example: ``Set``, ``List``
 
@@ -195,7 +222,7 @@ A non-exhaustive list of types of superrelations
     Nodes which essentially belong to each other. Once one node is updated, the
     other node has to be updated too - the nodes are synchronised.
 
-    Scheme: ``(A -> R -> B, B -> R -> A)`` or other cycles.
+    Scheme: ``A -> R -> B, B -> R -> A`` or other cyclic subgraphs.
 
     Possible examples: Translations, Binational treaties.
     
@@ -203,5 +230,5 @@ A non-exhaustive list of types of superrelations
 ``More complex relations``
     Exampel: Some discussion leads to a set of (proposed) changes.
    
-    Scheme: ``(D <- R -> C1, R -> C2, R C3)``
+    Scheme: ``D <- R -> C1, R -> C2, R C3``
 
