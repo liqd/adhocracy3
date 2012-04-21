@@ -21,3 +21,6 @@ Indices and tables
 * :ref:`search`
 
 .. automodule:: adhocracy.core
+.. autoclass::
+   :members:
+.. autoexception::
