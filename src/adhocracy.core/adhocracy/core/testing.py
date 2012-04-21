@@ -23,7 +23,7 @@ class AdhocracyFunctionalLayer(zope.testbrowser.wsgi.Layer):
         from adhocracy.core import main
         return main({}, rexster_uri="http://localhost:8182/graphs/testgraph")
 
-    def setUp(test, *args, **kwargs):
+    def setUp(self, *args, **kwargs):
         config = testing.setUp(\
                     settings={'rexster_uri':"http://localhost:8182/graphs/testgraph"},
                     #do not hook global registry intro local pyramid registry

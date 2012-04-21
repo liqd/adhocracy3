@@ -6,13 +6,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = [
-    'adhocracy.core',
-    ]
+requires = ['pyramid', 'zope.component']
 
-setup(name='Adhocracy',
-      version='0.0',
-      description='Buildout to install Adhocracy',
+setup(name='pyramid_adoptedtraversal',
+      version='0.1',
+      description='pyramid_adoptedtraversal',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
@@ -23,15 +21,15 @@ setup(name='Adhocracy',
       author='',
       author_email='',
       url='',
-      keywords='web pylons pyramid',
-      packages=find_packages(exclude=['ez_setup']),
-      #package_dir = {'': 'src'},
+      keywords='web pyramid pylons',
+      packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires = requires,
+      install_requires=requires,
+      tests_require=requires,
+      test_suite="pyramid_adoptedtraversal",
       entry_points = """\
-      [paste.app_factory]
-      main = adhocracy.core:main
       """,
+      paster_plugins=['pyramid'],
       )
 

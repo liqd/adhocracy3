@@ -10,6 +10,7 @@
 .mr.developer.cfg
 htmlcov
 src/bulbs
+src/nose-timer
 lib
 var
 eggs
@@ -22,3 +23,4 @@ waitress
 rexster
 parts
 egs
+docs/build
