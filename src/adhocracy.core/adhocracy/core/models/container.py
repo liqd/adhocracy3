@@ -42,13 +42,10 @@ class ContainerMixin(object, DictMixin):
         return [e.child_name for e in self.inE("child")]
 
     def __getitem__(self, key):
-        items = filter(lambda edge: edge.child_name == key, self.inE("child"))
+        items = list(self.inV("child", property_key="child_name",\
+                        property_value=key))
         if len(items) == 1:
-            item = items[0].outV()
-            graph = self._get_graph()
-            proxy_name = self.get_index_name(graph.config)
-            proxy = getattr(graph, proxy_name)
-            return proxy.get(item.eid)
+            return items[0]
         elif len(items) == 0:
             raise KeyError
         else:

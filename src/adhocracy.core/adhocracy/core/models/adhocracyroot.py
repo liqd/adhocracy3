@@ -1,4 +1,3 @@
-from bulbs.model import Node
 from bulbs.property import String
 from bulbs.property import List
 
@@ -8,10 +7,11 @@ from repoze.lemonade.content import create_content
 
 from adhocracy.core.models.container import ContainerMixin
 from adhocracy.core.models.interfaces import IAdhocracyRoot
+from adhocracy.core.models.node import NodeAdhocracy
 from adhocracy.core.security import SITE_ACL
 
 
-class AdhocracyRoot(Node, ContainerMixin):
+class AdhocracyRoot(NodeAdhocracy, ContainerMixin):
     """no parent == this is the application root object"""
 
     implements(IAdhocracyRoot)

@@ -1,11 +1,12 @@
 from bulbs.model import Node
 from bulbs.utils import initialize_elements
 from zope.interface import implements
+from pyramid.threadlocal import get_current_registry
 
 from adhocracy.core.models.interfaces import IGraphConnection
 from adhocracy.core.models.interfaces import INode
+from adhocracy.core.utils import run_gremlin_script
 
-from pyramid.threadlocal import get_current_registry
 
 class NodeAdhocracy(Node):
 
@@ -22,17 +23,12 @@ class NodeAdhocracy(Node):
         assert(bool(property_key) == bool(property_value)),\
                 "You have to provide both property key and value or None"
         #send gremlin script
-        g = self._get_graph()
-        script = g.scripts.get('outV')
+        graph = self._get_graph()
         params = dict(_id=self._id, label=label,
                       property_key=property_key, property_value=property_value)
-        try:
-            resp = g.client.gremlin(script, params)
-        except SystemError as e:
-            import json
-            raise GremlinError("\n" + json.loads(e.message[1])["error"])
+        resp = run_gremlin_script(name='outV', params=params)
         #initialize node objects
-        generator = initialize_elements(g.client, resp)
+        generator = initialize_elements(graph.client, resp)
 
         return generator
 
@@ -41,18 +37,10 @@ class NodeAdhocracy(Node):
                 "You have to provide both property key and value or None"
         #send gremlin script
         g = self._get_graph()
-        script = g.scripts.get('inV')
         params = dict(_id=self._id, label=label,
                       property_key=property_key, property_value=property_value)
-        try:
-            resp = g.client.gremlin(script, params)
-        except SystemError as e:
-            import json
-            raise GremlinError("\n" + json.loads(e.message[1])["error"])
+        resp = run_gremlin_script(name='inV', params=params)
         #initialize node objects
         generator = initialize_elements(g.client, resp)
 
         return generator
-
-class GremlinError(Exception):
-    pass

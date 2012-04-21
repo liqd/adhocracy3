@@ -7,12 +7,22 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
-    'adhocracy.core',
+    'rwproperty',
+    'bulbs',
+    'zope.component>=3.11.0', #make config.hook_zca() work
+    'zope.configuration>=3.8.0dev',
+    'repoze.lemonade',
+    'pyramid',
+    'pyramid_zcml>=0.8',
+    'pyramid_tm',
+    'pyramid_debugtoolbar',
+    'waitress',
+    'zope.testbrowser[wsgi]',
     ]
 
-setup(name='Adhocracy',
+setup(name='adhocracy.core',
       version='0.0',
-      description='Buildout to install Adhocracy',
+      description='adhocracy.core',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
@@ -29,6 +39,9 @@ setup(name='Adhocracy',
       include_package_data=True,
       zip_safe=False,
       install_requires = requires,
+      tests_require= requires,
+      test_suite="adhocracy.core",
+      namespace_packages=['adhocracy'],
       entry_points = """\
       [paste.app_factory]
       main = adhocracy.core:main
