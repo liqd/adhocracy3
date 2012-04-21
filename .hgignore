@@ -24,5 +24,3 @@ rexster
 parts
 egs
 docs/build
-docs/Makefile
-docs/make.bat
