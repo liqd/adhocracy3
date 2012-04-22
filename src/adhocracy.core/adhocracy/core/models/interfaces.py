@@ -2,6 +2,8 @@ from zope.interface import Interface
 from zope.interface import Attribute
 from zope import schema
 
+from pyramid_adoptedtraversal.interfaces import IChildsDictLike
+
 
 class IGraphConnection(Interface):
     """
@@ -20,6 +22,12 @@ class IGraphConnection(Interface):
     container = Attribute("Proxy object to create / search Container Nodes")
 
     child = Attribute("Proxy object to create / search Child Relations")
+
+
+class IChildsDict(IChildsDictLike):
+    """
+    Dictionary to set and get child nodes
+    """
 
 
 class INode(Interface):

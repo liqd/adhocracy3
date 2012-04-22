@@ -1,0 +1,22 @@
+<configure xmlns="http://pylonshq.com/pyramid"
+           xmlns:lemonade="http://namespaces.repoze.org/lemonade"
+           i18n_domain="zope">
+
+  <include package="pyramid_zcml" />
+
+  <!--Object traverser-->
+  <!--http://readthedocs.org/docs/pyramid_zcml/en/latest/narr.html#configuring-an-alternate-traverser-via-zcml-->
+  <adapter
+    factory="pyramid_adoptedtraversal.resourcetreetraverseradopted.ResourceTreeTraverserAdopted"
+    provides="pyramid.interfaces.ITraverser"
+    for="adhocracy.core.models.interfaces.INode"
+  />
+
+  <!--model adapters -->
+  <adapter
+    factory="adhocracy.core.models.adapters.NodeChildsDictAdapter"
+    provides="adhocracy.core.models.interfaces.IChildsDict"
+    for="adhocracy.core.models.interfaces.INode"
+  />
+
+</configure>
