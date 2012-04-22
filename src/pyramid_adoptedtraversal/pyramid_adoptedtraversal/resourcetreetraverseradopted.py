@@ -2,7 +2,6 @@ import warnings
 
 from zope.interface import (
     implementer,
-    Interface,
 )
 import zope.component
 from pyramid.traversal import (
@@ -20,6 +19,7 @@ from pyramid.compat import (
     )
 from pyramid.exceptions import URLDecodeError
 from pyramid_adoptedtraversal.interfaces import IChildsDictLike
+from pyramid.threadlocal import get_current_registry
 
 
 with warnings.catch_warnings():
@@ -115,7 +115,8 @@ class ResourceTreeTraverserAdopted(ResourceTreeTraverser):
                 try:
                     # CHANGED: try to use adaper to get the __getitem__ method
                     #try local registry
-                    adapter = request.registry.queryAdapter(ob, IChildsDictLike)
+                    registry = get_current_registry()
+                    adapter = registry.queryAdapter(ob, IChildsDictLike)
                     #try global registry
                     if not adapter:
                         adapter = zope.component.queryAdapter(ob, IChildsDictLike)
