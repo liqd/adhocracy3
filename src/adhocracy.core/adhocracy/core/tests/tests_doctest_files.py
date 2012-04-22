@@ -34,7 +34,6 @@ class DoctestTestCase(unittest.TestCase):
     @classmethod
     def test_suite(self):
         return DocFileSuite(
-            "docs/supergraph.rst",
             "models.rst",
             tearDown=tearDownDoctest,
             globs = globs(),
