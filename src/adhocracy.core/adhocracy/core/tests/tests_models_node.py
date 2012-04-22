@@ -1,49 +1,37 @@
 import unittest
 
-from bulbs.model import Relationship
-from bulbs.property import String
-from bulbs.property import Integer
-
-from pyramid import testing
-from pyramid.threadlocal import get_current_registry
-
-from adhocracy.core.models.interfaces import IGraphConnection
+from adhocracy.core.testing import setUp
+from adhocracy.core.testing import tearDown
+from adhocracy.core.testing import get_graph
+from adhocracy.core.testing import Person
+from adhocracy.core.testing import Knows
 from adhocracy.core.models.interfaces import INode
-from adhocracy.core.models.node import NodeAdhocracy
-
-
-class Person(NodeAdhocracy):
-
-    element_type = "person"
-    name = String(nullable=False)
-    age  = Integer()
-
-
-class Knows(Relationship):
-
-    label = "knows"
-    place = String()
 
 
 class NodeTests(unittest.TestCase):
+
     def setUp(self):
-        self.config = testing.setUp(settings={'rexster_uri':"http://localhost:8182/graphs/testgraph"})
-        self.config.include('pyramid_zcml')
-        self.config.load_zcml('adhocracy.core.models:utilities.zcml')
-        #create example node and relation proxies
-        registry = get_current_registry()
-        g = registry.getUtility(IGraphConnection)
-        g.add_proxy("person", Person)
-        g.add_proxy("knows", Knows)
-        self.g = g
+        self.config = setUp()
+        self.graph = get_graph()
+        self.graph.add_proxy("person", Person)
+        self.graph.add_proxy("knows", Knows)
 
     def tearDown(self):
-        self.g.clear()
-        testing.tearDown()
+        tearDown()
 
-    def create_test_graph(self):
-        #add example nodes and relations
-        g = self.g
+    def test_list_persistence(self):
+        node = self.graph.adhocracyroot.get_or_create("name", u"testnode",
+                                                  name=u"testnode")
+        testlist = [[u"d",[[u"c"],[]], u"a"]]
+        node.__acl__ = testlist
+        node.save()
+        node_ = self.graph.adhocracyroot.get_or_create("name", u"testnode",
+                                                   name=u"testnode")
+        self.assert_(node_.__acl__ == testlist)
+
+    def _populate(self):
+        """add example nodes and relations"""
+        g = self.graph
         self.james = g.person.create(name="James", age=34)
         self.time = g.person.create(name="Time", age=3)
         self.tom = g.person.create(name="Tom", age=3)
@@ -52,7 +40,7 @@ class NodeTests(unittest.TestCase):
         self.knows3 = g.knows.create(self.time, self.tom, place=u"country")
 
     def test_outV(self):
-        self.create_test_graph()
+        self._populate()
         #outV filters edge label, and property key/value
         self.assert_(len([x for x in  self.james.outV()]) == 2)
         self.assert_(len([x for x in  self.james.outV(property_key="place", property_value="city")]) == 1)
@@ -66,7 +54,7 @@ class NodeTests(unittest.TestCase):
 
     # like test_outV for inV
     def test_inV(self):
-        self.create_test_graph()
+        self._populate()
         self.assertEquals(len(list(self.tom.inV())), 2)
         self.assertEquals(len(list(self.tom.inV(property_key="place", property_value="village"))), 1)
         self.assertEquals(len(list(self.tom.inV(label="knows"))), 2)

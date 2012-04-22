@@ -4,6 +4,7 @@ from zope.interface import (
     implementer,
     Interface,
 )
+import zope.component
 from pyramid.traversal import (
     ResourceTreeTraverser,
     split_path_info,
@@ -113,10 +114,15 @@ class ResourceTreeTraverserAdopted(ResourceTreeTraverser):
                             'root':root}
                 try:
                     # CHANGED: try to use adaper to get the __getitem__ method
-                    try:
-                        getitem = IChildsDictLike(ob).__getitem__
-                    except TypeError:
-                        getitem = ob.__getitem__
+                    #try local registry
+                    adapter = request.registry.queryAdapter(ob, IChildsDictLike)
+                    #try global registry
+                    if not adapter:
+                        adapter = zope.component.queryAdapter(ob, IChildsDictLike)
+                    #else use the object directly
+                    if not adapter:
+                        adapter = ob
+                    getitem = adapter.__getitem__
                 except AttributeError:
                     return {'context':ob,
                             'view_name':segment,

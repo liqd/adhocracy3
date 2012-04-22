@@ -5,6 +5,7 @@
 
    <!--additional zcml config files-->
    <include file="models/utilities.zcml" />
+   <include file="models/adapters.zcml" />
 
    <!--static ressources-->
    <static

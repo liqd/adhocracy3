@@ -1,32 +1,46 @@
 import unittest
+from repoze.lemonade.testing import registerContentFactory
 from pyramid import testing
 
-from adhocracy.core.security import SITE_ACL
+from adhocracy.core.testing import setUp
+from adhocracy.core.testing import tearDown
+from adhocracy.core.testing import get_graph
 
 
 class ModelTests(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp(settings={'rexster_uri':"http://localhost:8182/graphs/testgraph"})
-        self.config.include('pyramid_zcml')
-        self.config.load_zcml('adhocracy.core.models:utilities.zcml')
+        self.config = setUp()
+        self.graph = get_graph()
+        from adhocracy.core.models.utilities import adhocracyroot_factory
+        registerContentFactory(adhocracyroot_factory, self._target_interface())
 
     def tearDown(self):
-        testing.tearDown()
+        tearDown()
 
-    def test_acl_persistance(self):
-        from adhocracy.core.models.interfaces import IGraphConnection
-        from pyramid.threadlocal import get_current_registry
-        registry = get_current_registry()
-        graph = registry.getUtility(IGraphConnection)
-        node = graph.adhocracyroot.get_or_create("name", u"testnode",
-                                                  name=u"testnode")
-        testlist = [[u"d",[[u"c"],[]], u"a"]]
-        node.__acl__ = testlist
-        node.save()
-        node_ = graph.adhocracyroot.get_or_create("name", u"testnode",
-                                                   name=u"testnode")
-        self.assert_(node_.__acl__ == testlist)
+    def _target_interface(self):
+        from adhocracy.core.models.interfaces import IAdhocracyRoot
+        return IAdhocracyRoot
+
+    def _target_class(self):
+        from adhocracy.core.models.adhocracyroot import AdhocracyRoot
+        return AdhocracyRoot
+
+    def _make_one(self):
+        from repoze.lemonade.content import create_content
+        content = create_content(self._target_interface())
+        return content
+
+    def test_create_content(self):
+        content = self._make_one()
+        self.assert_(content.__parent__ is None)
+        self.assert_(content.__name__ == "")
+        self.assert_(content.name == "adhocracyroot")
+        from zope.interface.verify import verifyObject
+        from adhocracy.core.models.interfaces import INode
+        self.assert_(verifyObject(INode, content))
+        self.assert_(verifyObject(self._target_interface(), content))
+        self.assert_(isinstance(content, self._target_class()))
 
     def test_root_factory(self):
         from adhocracy.core import main
@@ -35,18 +49,12 @@ class ModelTests(unittest.TestCase):
         app = main({}, **settings)
         root = app.root_factory(request)
         self.assert_(root.eid == app.root_factory(request).eid)
+        from adhocracy.core.security import SITE_ACL
         self.assert_(root.__acl__ == SITE_ACL)
-        self.assert_(root.__parent__ is None)
-        self.assert_(root.__name__ is '')
+        self.assert_(isinstance(root, self._target_class()))
 
 
 class ViewTests(unittest.TestCase):
-
-    def setUp(self):
-        self.config = testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
 
     def test_default_view(self):
         from adhocracy.core.views.adhocracyroot import AdhocracyRootView

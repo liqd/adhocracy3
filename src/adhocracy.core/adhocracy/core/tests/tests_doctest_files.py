@@ -1,8 +1,8 @@
 import doctest
 from doctest import DocFileSuite
 import unittest
-from adhocracy.core.testing import ADHOCRACY_LAYER_FUNCTIONAL
-from adhocracy.core.testing import Browser
+
+from adhocracy.core.testing import tearDown
 
 try:
     import interlude
@@ -16,15 +16,13 @@ except ImportError:
 
 flags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
 
+def tearDownDoctest(self, test=None):
+    tearDown()
+
 def globs():
-    app = ADHOCRACY_LAYER_FUNCTIONAL.make_wsgi_app()
-    globs =  {"browser" : Browser(wsgi_app=app),
-              "app"     : app,
-              "app_url" : "http://localhost",
-             }
+    globs = {}
     if interact:
         globs["interact"] = interact
-
     return globs
 
 
@@ -38,9 +36,7 @@ class DoctestTestCase(unittest.TestCase):
         return DocFileSuite(
             "docs/supergraph.rst",
             "models.rst",
-            #add here aditional testfiles
-            setUp = ADHOCRACY_LAYER_FUNCTIONAL.setUp,
-            tearDown = ADHOCRACY_LAYER_FUNCTIONAL.tearDown,
+            tearDown=tearDownDoctest,
             globs = globs(),
             optionflags = flags
         )

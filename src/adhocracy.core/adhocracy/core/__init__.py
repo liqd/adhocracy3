@@ -1,6 +1,7 @@
 from pyramid.config import Configurator
 
 from adhocracy.core.models.adhocracyroot import appmaker
+import adhocracy.core.models
 
 
 def root_factory(request):
@@ -17,10 +18,13 @@ def main(global_config, **settings):
     # hook zope global component registry into the pyramid application registry
     # http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/zca.html?highlight=utility#using-the-zca-global-registry
     #config.hook_zca()
-    # load zcml configuration files
+    # load zcml configuration files (local registry)
     # http://readthedocs.org/docs/pyramid_zcml/en/latest/narr.html
     zcml_config_file = settings.get('configure_zcml', 'configure.zcml')
     config.include('pyramid_zcml') #imperative configuration: run pyramid_zcml.includeme()
     config.load_zcml(zcml_config_file) #declerative configuration: load central zcml file
+    # load zcml configuration files (global registry)
+    from zope.configuration import xmlconfig
+    xmlconfig.file('adapters.zcml', adhocracy.core.models, execute=True)
 
     return config.make_wsgi_app()

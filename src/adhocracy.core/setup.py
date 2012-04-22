@@ -16,8 +16,15 @@ requires = [
     'pyramid_zcml>=0.8',
     'pyramid_tm',
     'pyramid_debugtoolbar',
+    'pyramid_adoptedtraversal',
     'waitress',
-    'zope.testbrowser[wsgi]',
+    ]
+
+tests_requires = [
+    'WebTest',
+    'mock',
+    'wsgi_intercept',
+    'zope.testbrowser',
     ]
 
 setup(name='adhocracy.core',
@@ -39,12 +46,15 @@ setup(name='adhocracy.core',
       include_package_data=True,
       zip_safe=False,
       install_requires = requires,
-      tests_require= requires,
+      tests_require= tests_requires,
       test_suite="adhocracy.core",
       namespace_packages=['adhocracy'],
       entry_points = """\
       [paste.app_factory]
       main = adhocracy.core:main
       """,
+      extras_require = {
+          'test': tests_requires,
+          },
       )
 
