@@ -11,6 +11,7 @@
 htmlcov
 src/bulbs
 src/nose-timer
+src/nose
 lib
 var
 eggs
