@@ -45,8 +45,7 @@ class ModelChildRelationTests(unittest.TestCase):
     def test_create_adapter(self):
         parent = self._make_dummy_node()
         adapter = self._target_interface(parent)
-        from adhocracy.core.models.adapters import NodeChildsDictAdapter
-        self.assert_(isinstance(adapter, NodeChildsDictAdapter))
+        self.assert_(isinstance(adapter, self._target_class))
         from zope.interface.verify import verifyObject
         self.assert_(verifyObject(self._target_interface, adapter))
         self.assert_(adapter.context == parent)
