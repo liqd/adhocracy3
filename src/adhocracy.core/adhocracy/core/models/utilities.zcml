@@ -3,9 +3,7 @@
            i18n_domain="zope">
 
   <include package="pyramid_zcml" />
-  <include package="zope.component" />
   <include package="repoze.lemonade.includes" file="meta.zcml"/>
-
 
   <!--global utilities-->
   <!--http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/zca.html?highlight=utility-->
@@ -20,17 +18,17 @@
   <!--http://docs.repoze.org/lemonade/-->
 
   <lemonade:content
-       factory="adhocracy.core.models.utilities.adhocracyroot_factory"
+       factory="adhocracy.core.models.adhocracyroot.adhocracyroot_factory"
        type="adhocracy.core.models.interfaces.IAdhocracyRoot"
        />
 
   <lemonade:content
-       factory="adhocracy.core.models.utilities.container_factory"
+       factory="adhocracy.core.models.container.container_factory"
        type="adhocracy.core.models.interfaces.IContainer"
        />
 
   <lemonade:content
-       factory="adhocracy.core.models.utilities.child_factory"
+       factory="adhocracy.core.models.relations.child_factory"
        type="adhocracy.core.models.interfaces.IChild"
        />
 

@@ -1,5 +1,6 @@
 from zope.interface import Interface
 from zope.interface import Attribute
+from zope.interface import taggedValue
 from zope import schema
 
 from pyramid_adoptedtraversal.interfaces import IChildsDictLike
@@ -16,13 +17,6 @@ class IGraphConnection(Interface):
     vertices = Attribute("Object to create / search Vertices")
 
     edges = Attribute("Object to create / search edges ")
-
-    adhocracyroot = Attribute("Proxy object to create / search AdhocracyRoot Nodes")
-
-    container = Attribute("Proxy object to create / search Container Nodes")
-
-    child = Attribute("Proxy object to create / search Child Relations")
-
 
 class IChildsDict(IChildsDictLike):
     """
@@ -79,12 +73,18 @@ class IAdhocracyRoot(Interface):
     """
     Adhocracy root object.
     """
+    taggedValue('name', 'adhocracyroot')
+    taggedValue('class', 'adhocracy.core.models.adhocracyroot.AdhocracyRoot')
+
 
 
 class IContainer(Interface):
     """
     Container object.
     """
+    taggedValue('name', 'container')
+    taggedValue('class', 'adhocracy.core.models.container.Container')
+
     text = schema.Text(title=u"test attribute")
 
 
@@ -92,6 +92,9 @@ class IChild(Interface):
     """
     Object hierarchy relation.
     """
+    taggedValue('name', 'child')
+    taggedValue('class', 'adhocracy.core.models.relations.Child')
+
     label = schema.TextLine(title=u"FIXME child (relation type)",
                             required=True,
                             readonly=True)
