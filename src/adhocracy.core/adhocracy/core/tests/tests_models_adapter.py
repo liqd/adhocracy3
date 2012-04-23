@@ -20,16 +20,18 @@ class ModelChildRelationTests(unittest.TestCase):
         registerContentFactory(container_factory, IContainer)
 
         from adhocracy.core.models.interfaces import INode
-        self.config.registry.registerAdapter(self._target_class(), (INode,),\
-                                             self._target_interface())
+        self.config.registry.registerAdapter(self._target_class, (INode,),\
+                                             self._target_interface)
 
     def tearDown(self):
         tearDown()
 
+    @property
     def _target_interface(self):
         from adhocracy.core.models.interfaces import IChildsDict
         return IChildsDict
 
+    @property
     def _target_class(self):
         from adhocracy.core.models.adapters import NodeChildsDictAdapter
         return NodeChildsDictAdapter
@@ -42,22 +44,22 @@ class ModelChildRelationTests(unittest.TestCase):
 
     def test_create_adapter(self):
         parent = self._make_dummy_node()
-        adapter = self._target_interface()(parent)
+        adapter = self._target_interface(parent)
         from adhocracy.core.models.adapters import NodeChildsDictAdapter
         self.assert_(isinstance(adapter, NodeChildsDictAdapter))
         from zope.interface.verify import verifyObject
-        self.assert_(verifyObject(self._target_interface(), adapter))
+        self.assert_(verifyObject(self._target_interface, adapter))
         self.assert_(adapter.context == parent)
 
     def test_interface_inheritance(self):
         parent = self._make_dummy_node()
         from pyramid_adoptedtraversal.interfaces import IChildsDictLike
-        self.assert_(self._target_interface()(parent) == IChildsDictLike(parent))
+        self.assert_(self._target_interface(parent) == IChildsDictLike(parent))
 
     def test_set_item(self):
         parent = self._make_dummy_node(name=u"parent")
         child = self._make_dummy_node(name=u"child")
-        parent_adapter = self._target_interface()(parent)
+        parent_adapter = self._target_interface(parent)
         parent_adapter["g2"] = child
         self.assertIsNotNone(parent)
         self.assertIsNotNone(child)
@@ -74,7 +76,7 @@ class ModelChildRelationTests(unittest.TestCase):
     def test_del_item(self):
         parent = self._make_dummy_node(name=u"parent")
         child = self._make_dummy_node(name=u"child")
-        parent_adapter = self._target_interface()(parent)
+        parent_adapter = self._target_interface(parent)
         parent_adapter["g2"] = child
         del parent_adapter["g2"]
         self.assert_(not parent_adapter.has_key("g2"))

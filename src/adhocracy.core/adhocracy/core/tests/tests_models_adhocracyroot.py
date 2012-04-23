@@ -13,22 +13,24 @@ class ModelTests(unittest.TestCase):
         self.config = setUp()
         self.graph = get_graph()
         from adhocracy.core.models.utilities import adhocracyroot_factory
-        registerContentFactory(adhocracyroot_factory, self._target_interface())
+        registerContentFactory(adhocracyroot_factory, self._target_interface)
 
     def tearDown(self):
         tearDown()
 
+    @property
     def _target_interface(self):
         from adhocracy.core.models.interfaces import IAdhocracyRoot
         return IAdhocracyRoot
 
+    @property
     def _target_class(self):
         from adhocracy.core.models.adhocracyroot import AdhocracyRoot
         return AdhocracyRoot
 
     def _make_one(self):
         from repoze.lemonade.content import create_content
-        content = create_content(self._target_interface())
+        content = create_content(self._target_interface)
         return content
 
     def test_create_content(self):
@@ -39,8 +41,8 @@ class ModelTests(unittest.TestCase):
         from zope.interface.verify import verifyObject
         from adhocracy.core.models.interfaces import INode
         self.assert_(verifyObject(INode, content))
-        self.assert_(verifyObject(self._target_interface(), content))
-        self.assert_(isinstance(content, self._target_class()))
+        self.assert_(verifyObject(self._target_interface, content))
+        self.assert_(isinstance(content, self._target_class))
 
     def test_root_factory(self):
         from adhocracy.core import main
@@ -51,7 +53,7 @@ class ModelTests(unittest.TestCase):
         self.assert_(root.eid == app.root_factory(request).eid)
         from adhocracy.core.security import SITE_ACL
         self.assert_(root.__acl__ == SITE_ACL)
-        self.assert_(isinstance(root, self._target_class()))
+        self.assert_(isinstance(root, self._target_class))
 
 
 class ViewTests(unittest.TestCase):

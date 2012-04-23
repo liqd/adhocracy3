@@ -12,22 +12,24 @@ class ModelTests(unittest.TestCase):
         self.graph = get_graph()
         from adhocracy.core.models.utilities import container_factory
         from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(container_factory, self._target_interface())
+        registerContentFactory(container_factory, self._target_interface)
 
     def tearDown(self):
         tearDown()
 
+    @property
     def _target_interface(self):
         from adhocracy.core.models.interfaces import IContainer
         return IContainer
 
+    @property
     def _target_class(self):
         from adhocracy.core.models.container import Container
         return Container
 
     def _make_one(self, name=u"content"):
         from repoze.lemonade.content import create_content
-        content = create_content(self._target_interface(), name=name)
+        content = create_content(self._target_interface, name=name)
         return content
 
     def test_create_content(self):
@@ -38,8 +40,8 @@ class ModelTests(unittest.TestCase):
         from zope.interface.verify import verifyObject
         from adhocracy.core.models.interfaces import INode
         self.assert_(verifyObject(INode, content))
-        self.assert_(verifyObject(self._target_interface(), content))
-        self.assert_(isinstance(content, self._target_class()))
+        self.assert_(verifyObject(self._target_interface, content))
+        self.assert_(isinstance(content, self._target_class))
 
         #container1.save()
         #self.assert_(container1.name == "g1")
