@@ -6,14 +6,12 @@
    <!--additional zcml config files-->
    <include file="models/utilities.zcml" />
    <include file="models/adapters.zcml" />
+   <include file="views/configure.zcml" />
 
    <!--static ressources-->
    <static
     name="static"
     path="static"
    />
-
-   <!--scan modules for configuration decorators-->
-   <scan package="."/>
 
 </configure>
