@@ -1,6 +1,5 @@
 <configure xmlns="http://pylonshq.com/pyramid"
-           xmlns:lemonade="http://namespaces.repoze.org/lemonade"
-           i18n_domain="zope">
+           xmlns:lemonade="http://namespaces.repoze.org/lemonade">
 
   <include package="pyramid_zcml" />
 

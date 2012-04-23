@@ -1,11 +1,10 @@
+from bulbs.property import String
+from bulbs.property import List
 from zope.interface import implements
 from zope.dottedname.resolve import resolve
 
-from bulbs.property import String
-from bulbs.property import List
-
-from repoze.lemonade.content import create_content
 from pyramid.threadlocal import get_current_registry
+from repoze.lemonade.content import create_content
 
 from adhocracy.core.models.interfaces import IAdhocracyRoot
 from adhocracy.core.models.interfaces import IGraphConnection

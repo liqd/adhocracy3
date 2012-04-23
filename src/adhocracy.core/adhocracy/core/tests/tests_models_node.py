@@ -20,12 +20,12 @@ class NodeTests(unittest.TestCase):
         tearDown()
 
     def test_list_persistence(self):
-        node = self.graph.adhocracyroot.get_or_create("name", u"testnode",
+        node = self.graph.person.get_or_create("name", u"testnode",
                                                   name=u"testnode")
         testlist = [[u"d",[[u"c"],[]], u"a"]]
         node.__acl__ = testlist
         node.save()
-        node_ = self.graph.adhocracyroot.get_or_create("name", u"testnode",
+        node_ = self.graph.person.get_or_create("name", u"testnode",
                                                    name=u"testnode")
         self.assert_(node_.__acl__ == testlist)
 

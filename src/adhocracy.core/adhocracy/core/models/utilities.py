@@ -1,11 +1,10 @@
 """global utilites to work with models, read utilities.zcml"""
 import os.path
-
-from zope.interface import implementer
-from zope.interface import alsoProvides
 from bulbs.rexster import Config
 from bulbs.rexster import Graph
-from bulbs.config import DEBUG
+from zope.interface import implementer
+from zope.interface import alsoProvides
+
 from pyramid.threadlocal import get_current_registry
 
 import adhocracy.core.models

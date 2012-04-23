@@ -1,7 +1,8 @@
-from zope.interface import implements
-from zope.dottedname.resolve import resolve
 from bulbs.model import Relationship
 from bulbs.property import String
+from zope.interface import implements
+from zope.dottedname.resolve import resolve
+
 from pyramid.threadlocal import get_current_registry
 
 from adhocracy.core.models.interfaces import IChild

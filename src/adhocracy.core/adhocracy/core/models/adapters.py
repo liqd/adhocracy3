@@ -1,8 +1,7 @@
 from UserDict import DictMixin
-from zope.interface import (
-    implements,
-    )
+from zope.interface import implements
 from zope.component import adapts
+
 from pyramid.threadlocal import get_current_registry
 from repoze.lemonade.content import create_content
 

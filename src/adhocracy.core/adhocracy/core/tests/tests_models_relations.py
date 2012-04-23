@@ -13,7 +13,7 @@ class ModelChildRelationTests(unittest.TestCase):
     def setUp(self):
         self.config = setUp()
         self.graph = get_graph()
-        from adhocracy.core.models.utilities import child_factory
+        from adhocracy.core.models.relations import child_factory
         registerContentFactory(child_factory, self._target_interface)
         self.graph.add_proxy("person", Person)
 
@@ -38,6 +38,10 @@ class ModelChildRelationTests(unittest.TestCase):
 
     def _make_dummy_node(self, name=u"node"):
         return self.graph.person.create(name=name)
+
+    def test_factory_register(self):
+        from repoze.lemonade.content import get_content_types
+        self.assert_(self._target_interface in get_content_types())
 
     def test_create_relation(self):
         parent = self._make_dummy_node(name=u"parent")

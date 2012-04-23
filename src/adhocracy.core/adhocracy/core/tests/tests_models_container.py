@@ -10,7 +10,7 @@ class ModelTests(unittest.TestCase):
     def setUp(self):
         self.config = setUp()
         self.graph = get_graph()
-        from adhocracy.core.models.utilities import container_factory
+        from adhocracy.core.models.container import container_factory
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(container_factory, self._target_interface)
 
@@ -31,6 +31,10 @@ class ModelTests(unittest.TestCase):
         from repoze.lemonade.content import create_content
         content = create_content(self._target_interface, name=name)
         return content
+
+    def test_factory_register(self):
+        from repoze.lemonade.content import get_content_types
+        self.assert_(self._target_interface in get_content_types())
 
     def test_create_content(self):
         content = self._make_one()
