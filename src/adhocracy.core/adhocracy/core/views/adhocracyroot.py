@@ -13,11 +13,10 @@ class AdhocracyRootView(object):
     @view_config(context=AdhocracyRoot,
                  renderer='adhocracyroot_templates/view.pt')
     def __call__(self):
-        return {'project':'adhocracy.core'}
+        return {'project': 'adhocracy.core'}
 
     #different view with name @@secondview
     @view_config(context=AdhocracyRoot,
                  name="secondview",)
     def secondview(self):
         return Response('OK')
-

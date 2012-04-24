@@ -63,11 +63,12 @@ class ModelChildRelationTests(unittest.TestCase):
         self.assertIsNotNone(parent)
         self.assertIsNotNone(child)
         self.assertEquals([parent.eid],
-            map (lambda x: x.eid, list(child.outV("child"))))
-        self.assert_(parent_adapter.has_key("g2"))
+            map(lambda x: x.eid, list(child.outV("child"))))
+        self.assert_("g2" in parent_adapter)
         self.assert_(child.eid == parent_adapter["g2"].eid)
-        self.assert_(not parent_adapter.has_key("not_available"))
-        self.assertRaises(KeyError, parent_adapter.__getitem__, ("not_available"))
+        self.assert_("not_available" not in parent_adapter)
+        self.assertRaises(KeyError, parent_adapter.__getitem__,\
+                                    ("not_available"))
         self.assert_(parent.__parent__ is None)
         self.assert_(child.__parent__ is not None)
         self.assert_(child.__parent__.eid == parent.eid)
@@ -78,4 +79,4 @@ class ModelChildRelationTests(unittest.TestCase):
         parent_adapter = self._target_interface(parent)
         parent_adapter["g2"] = child
         del parent_adapter["g2"]
-        self.assert_(not parent_adapter.has_key("g2"))
+        self.assert_("g2" in parent_adapter)

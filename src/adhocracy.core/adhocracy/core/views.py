@@ -4,7 +4,7 @@ from adhocracy.core.models import AdhocracyRoot
 
 
 def testview(request):
-    return {'project':'adhocracy.core'}
+    return {'project': 'adhocracy.core'}
 
 
 class AdhocracyView(object):
@@ -18,7 +18,7 @@ class AdhocracyView(object):
                  renderer='adhocracycore:templates/mytemplate.pt')
     def __call__(self):
         # return template variables or html
-        return {'project':'adhocracy.core'}
+        return {'project': 'adhocracy.core'}
         #return Response('OK')
 
     #different view with name
@@ -27,4 +27,3 @@ class AdhocracyView(object):
                  renderer='adhocracycore:templates/mytemplate.pt')
     def secondview(self):
         return Response('OK')
-

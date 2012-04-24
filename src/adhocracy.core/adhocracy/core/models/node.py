@@ -10,7 +10,6 @@ from adhocracy.core.utils import run_gremlin_script
 
 class NodeAdhocracy(Node):
 
-
     implements(INode)
 
     def _get_graph(self):

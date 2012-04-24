@@ -12,5 +12,4 @@ class ContainerView(object):
     @view_config(context=IContainer,
                  renderer='container_templates/view.pt')
     def __call__(self):
-        return {'project':'container'}
-
+        return {'project': 'container'}

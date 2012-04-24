@@ -30,7 +30,8 @@ class NodeChildsDictAdapter(object, DictMixin):
         create_content(IChild, parent=self.context, child=node, child_name=key)
 
     def __delitem__(self, key):
-        items = filter(lambda edge: edge.child_name == key, self.context.inE("child"))
+        items = filter(lambda edge: edge.child_name == key,\
+                                    self.context.inE("child"))
         if len(items) == 1:
             item = items[0]
             graph = self._get_graph()
@@ -39,7 +40,7 @@ class NodeChildsDictAdapter(object, DictMixin):
         elif len(items) == 0:
             raise KeyError
         else:
-            raise KeyError, "multiple items with key %s"%(key)
+            raise KeyError("multiple items with key %s" % (key))
 
     def keys(self):
         return [e.child_name for e in self.context.inE("child")]
@@ -52,10 +53,11 @@ class NodeChildsDictAdapter(object, DictMixin):
         elif len(items) == 0:
             raise KeyError
         else:
-            raise KeyError, "multiple items with key %s"%(key)
+            raise KeyError("multiple items with key %s" % (key))
 
     def has_key(self, key):
-        items = filter(lambda edge: edge.child_name == key, self.context.inE("child"))
+        items = filter(lambda edge: edge.child_name == key,\
+                                    self.context.inE("child"))
         return len(items) == 1
 
     @property

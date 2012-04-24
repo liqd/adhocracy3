@@ -12,6 +12,7 @@ from adhocracy.core.models.node import NodeAdhocracy
 
 #Unit testing
 
+
 def setUp(**kwargs):
     """
        setUp basic test environment with database connection
@@ -28,6 +29,7 @@ def setUp(**kwargs):
 
     return config
 
+
 def tearDown(**kwargs):
     """
        tearDown basic test environment with database
@@ -37,6 +39,7 @@ def tearDown(**kwargs):
     if graph:
         graph.clear()
     testing.tearDown(**kwargs)
+
 
 def get_graph(config=None):
     """
@@ -49,7 +52,7 @@ def get_graph(config=None):
         return registry.queryUtility(IGraphConnection)
 
 
-#Integration testing
+# Integration testing
 
 def load_registry(config):
     """
@@ -94,36 +97,8 @@ def setUpFunctional(global_config=None, **settings):
         test_app=TestApp(app),
         )
 
-#class AdhocracyFunctionalLayer(zope.testbrowser.wsgi.Layer):
-    #"""Layer to setup the WSGI app"""
-
-    #def make_wsgi_app(self):
-        #from adhocracy.core import main
-        #return main({}, rexster_uri="http://localhost:8182/graphs/testgraph")
-
-    #def setUp(self, *args, **kwargs):
-        #config = testing.setUp(\
-                    #settings={'rexster_uri':"http://localhost:8182/graphs/testgraph"},
-                    ##do not hook global registry intro local pyramid registry
-                    #hook_zca=False)
-        #config.include('pyramid_zcml')
-        #config.load_zcml('adhocracy.core.models:utilities.zcml')
-        #from zope.configuration import xmlconfig
-        #import adhocracy.core.models
-        #xmlconfig.file('adapters.zcml', adhocracy.core.models, execute=True)
-        ##TODO start rexter
-
-    #def tearDown(self, test=None):
-        #registry = get_current_registry()
-        #graph = registry.getUtility(IGraphConnection)
-        #graph.clear()
-        #testing.tearDown()
-
-
-#ADHOCRACY_LAYER_FUNCTIONAL = AdhocracyFunctionalLayer()
-
-
 #Various test helper stuff
+
 
 class Dummy(dict):
     def __init__(self, **kwargs):
@@ -135,7 +110,7 @@ class Person(NodeAdhocracy):
 
     element_type = "person"
     name = String(nullable=False)
-    age  = Integer()
+    age = Integer()
 
 
 class Knows(Relationship):
@@ -143,4 +118,3 @@ class Knows(Relationship):
 
     label = "knows"
     place = String()
-

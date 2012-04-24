@@ -18,6 +18,7 @@ class IGraphConnection(Interface):
 
     edges = Attribute("Object to create / search edges ")
 
+
 class IChildsDict(IChildsDictLike):
     """
     Dictionary to set and get child nodes
@@ -77,7 +78,6 @@ class IAdhocracyRoot(Interface):
     taggedValue('class', 'adhocracy.core.models.adhocracyroot.AdhocracyRoot')
 
 
-
 class IContainer(Interface):
     """
     Container object.
@@ -99,4 +99,3 @@ class IChild(Interface):
                             required=True,
                             readonly=True)
     child_name = schema.TextLine(title=u"FIXME", required=True)
-

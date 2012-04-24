@@ -12,6 +12,7 @@ def get_graph():
     registry = get_current_registry()
     return registry.getUtility(IGraphConnection)
 
+
 def run_gremlin_script(name, params={}):
     """
        Queries the database with a gremlin script.

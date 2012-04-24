@@ -28,6 +28,3 @@ def graph_object():
     g.scripts.update(file_path)
 
     return g
-
-
-
