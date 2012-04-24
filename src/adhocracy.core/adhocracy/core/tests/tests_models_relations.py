@@ -12,9 +12,9 @@ class ModelChildRelationTests(unittest.TestCase):
 
     def setUp(self):
         self.config = setUp()
-        self.graph = get_graph()
         from adhocracy.core.models.relations import child_factory
         registerContentFactory(child_factory, self._target_interface)
+        self.graph = get_graph()
         self.graph.add_proxy("person", Person)
 
     def tearDown(self):

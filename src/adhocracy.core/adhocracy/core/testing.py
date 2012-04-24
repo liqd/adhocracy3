@@ -15,7 +15,7 @@ from adhocracy.core.models.node import NodeAdhocracy
 
 def setUp(**kwargs):
     """
-       setUp basic test environment with database connection
+       setUp basic test environment
        proxy to pyramid.testing.setUp(**kwargs)
     """
     testing.tearDown()
@@ -25,7 +25,6 @@ def setUp(**kwargs):
     kwargs['settings'] = settings
     config = testing.setUp(**kwargs)
 
-    config.registry.registerUtility(utilities.graph_object(), IGraphConnection)
 
     return config
 
@@ -41,15 +40,13 @@ def tearDown(**kwargs):
     testing.tearDown(**kwargs)
 
 
-def get_graph(config=None):
+def get_graph():
     """
         returns the graph database connection object
     """
-    if config:
-        return config.registry.queryUtility(IGraphConnection)
-    else:
-        registry = get_current_registry()
-        return registry.queryUtility(IGraphConnection)
+    registry = get_current_registry()
+    registry.registerUtility(utilities.graph_object(), IGraphConnection)
+    return registry.queryUtility(IGraphConnection)
 
 
 # Integration testing

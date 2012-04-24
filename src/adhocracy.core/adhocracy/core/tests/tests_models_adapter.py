@@ -11,7 +11,6 @@ class ModelChildRelationTests(unittest.TestCase):
 
     def setUp(self):
         self.config = setUp()
-        self.graph = get_graph()
         from adhocracy.core.models.relations import child_factory
         from adhocracy.core.models.interfaces import IChild
         registerContentFactory(child_factory, IChild)
@@ -22,6 +21,7 @@ class ModelChildRelationTests(unittest.TestCase):
         from adhocracy.core.models.interfaces import INode
         self.config.registry.registerAdapter(self._target_class, (INode,),\
                                              self._target_interface)
+        self.graph = get_graph()
 
     def tearDown(self):
         tearDown()

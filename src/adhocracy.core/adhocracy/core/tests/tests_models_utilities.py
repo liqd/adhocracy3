@@ -2,11 +2,10 @@ import unittest
 
 from zope.interface.verify import verifyObject
 from pyramid.threadlocal import get_current_registry
-from pyramid import testing
 
 from adhocracy.core.testing import setUp
 from adhocracy.core.testing import tearDown
-
+from adhocracy.core.testing import get_graph
 from adhocracy.core.models.interfaces import IGraphConnection
 
 
@@ -14,6 +13,7 @@ class UtilitiesTests(unittest.TestCase):
 
     def setUp(self):
         self.config = setUp()
+        self.graph = get_graph()
 
     def tearDown(self):
         tearDown()

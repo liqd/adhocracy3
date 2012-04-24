@@ -9,10 +9,10 @@ class ModelTests(unittest.TestCase):
 
     def setUp(self):
         self.config = setUp()
-        self.graph = get_graph()
         from adhocracy.core.models.container import container_factory
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(container_factory, self._target_interface)
+        self.graph = get_graph()
 
     def tearDown(self):
         tearDown()

@@ -36,16 +36,16 @@ class ViewFunctionalTests(unittest.TestCase):
 
     def test_default_view(self):
         #add container object
-        from repoze.lemonade.content import create_content
-        from adhocracy.core.models.interfaces import IAdhocracyRoot
-        root = create_content(IAdhocracyRoot)
-        from adhocracy.core.models.interfaces import IContainer
-        content = create_content(IContainer, name=u"child")
-        from adhocracy.core.models.interfaces import IChildsDict
-        IChildsDict(root)["child"] = content
+        #from repoze.lemonade.content import create_content
+        #from adhocracy.core.models.interfaces import IAdhocracyRoot
+        #root = create_content(IAdhocracyRoot)
+        #from adhocracy.core.models.interfaces import IContainer
+        #content = create_content(IContainer, name=u"child")
+        #from adhocracy.core.models.interfaces import IChildsDict
+        #IChildsDict(root)["child"] = content
 
 
-        ##test object traversal
+        #test object traversal
         from adhocracy.core.testing import setUpFunctional
         tools = setUpFunctional()
         browser = tools["browser"]
