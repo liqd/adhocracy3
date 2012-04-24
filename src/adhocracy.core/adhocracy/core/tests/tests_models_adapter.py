@@ -79,4 +79,4 @@ class ModelChildRelationTests(unittest.TestCase):
         parent_adapter = self._target_interface(parent)
         parent_adapter["g2"] = child
         del parent_adapter["g2"]
-        self.assert_("g2" in parent_adapter)
+        self.assert_("g2" not in parent_adapter)
