@@ -8,9 +8,11 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'rwproperty',
+    'python-dateutil',  #bulbs needs this
     'bulbs',
-    'zope.component>=3.11.0', #make config.hook_zca() work
+    'zope.component>=3.11.0',  # make config.hook_zca() work
     'zope.configuration>=3.8.0dev',
+    'zope.dottedname',
     'repoze.lemonade',
     'pyramid',
     'pyramid_zcml>=0.8',
@@ -30,7 +32,7 @@ tests_requires = [
 setup(name='adhocracy.core',
       version='0.0',
       description='adhocracy.core',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
@@ -45,16 +47,15 @@ setup(name='adhocracy.core',
       #package_dir = {'': 'src'},
       include_package_data=True,
       zip_safe=False,
-      install_requires = requires,
-      tests_require= tests_requires,
+      install_requires=requires,
+      tests_require=tests_requires,
       test_suite="adhocracy.core",
       namespace_packages=['adhocracy'],
-      entry_points = """\
+      entry_points="""\
       [paste.app_factory]
       main = adhocracy.core:main
       """,
-      extras_require = {
+      extras_require={
           'test': tests_requires,
           },
       )
-
