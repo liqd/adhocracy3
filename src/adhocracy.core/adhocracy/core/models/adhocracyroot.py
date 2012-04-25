@@ -38,12 +38,7 @@ def adhocracyroot_factory():
     interface = IAdhocracyRoot
     registry = get_current_registry()
     graph = registry.getUtility(IGraphConnection)
-    #add model proxy
     proxyname = interface.getTaggedValue('name')
-    proxy = getattr(graph, proxyname, None)
-    if not proxy:
-        class_ = resolve(interface.getTaggedValue('class'))
-        graph.add_proxy(proxyname, class_)
-        proxy = getattr(graph, proxyname)
+    proxy = getattr(graph, proxyname)
     #create object
     return proxy.get_or_create("name", "adhocracyroot", name=u"adhocracyroot")
