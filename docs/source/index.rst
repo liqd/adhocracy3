@@ -9,9 +9,10 @@ Welcome to Adhocracy's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   supergraph
+    contents
+
 
 Indices and tables
 ==================
