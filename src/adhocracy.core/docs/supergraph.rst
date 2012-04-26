@@ -2,10 +2,12 @@
 The Supergraph
 ==============
 
-Bulbs
------
+.. note::
+    **Warning: This is a draft. We are currently working on this document.**
 
-We use bulbs_ to access the graph database on a low level. Some terms:
+
+Our Terminology
+---------------
 
 ``vertex``
     a node in the graph db
@@ -17,57 +19,82 @@ We use bulbs_ to access the graph database on a low level. Some terms:
     vertices and edges can have properties. These appear as fields in the
     marshalled python objects.
 
-.. _bulbs: http://bulbflow.com
+``reference``
+    Some (actually most) of the edges are special edges that we will call
+    "references". A reference from A to B captures the idea that B is somehow an
+    essential part of A.
+
+``required reference``
+    A reference from A to B, where the node A could not exist without its
+    relationship to B.
+
+``optional reference``
+    A reference from A to B, where the node A would still make sense without its
+    reference to B.
+
+``node``
+    a vertex that can be referenced and can itself reference other nodes.
+
+``content node``
+    a node that is self-contained, i.e. it has no outgoing references (with the
+    exception of ``follows``-references)
+
+``essence``
+    an essence for a given node is the sub-graph that contains the node itself
+    (the root node of the essence) and all transitively referenced nodes. (An
+    essence for a given node is immutable, see below.)
+
+
+.. _todo::
+    find better names!
+
+.. ``reference-to-one``
+    References which exist only once, e.g. the object reference in a predicate
+    relationship
+
+.. ``reference-to-many``
+    References exists zero to many times, e.g. parts of collections
 
 
 Non-Mutability
 --------------
 
-This section describes rules and properties that we define for adhocracy core.
-They are not enforced by the underlying db.
+.. note::
+    This section describes rules and properties that we define for adhocracy
+    core. They are not enforced by the underlying db.
 
-The properties contained in a vertex don't change after creation of a vertex.
-The same goes for properties of edges. Also, created vertices and edges don't
+The properties contained in a node don't change after creation of the node. The
+same goes for properties of references. Also, created nodes and references don't
 ever get deleted.
 
-Some (actually most) of the edges are special edges that we will call
-"references". A reference from A to B captures the idea that B is somehow an
-essential part of A. Therefore, the set of outgoing references from a vertex is
-not allowed to change. The set of incoming references can change. This also
-means that a reference from A to B implies that A is younger or equally old
-than B.
-
-There are two types of references: 
-
-.. todo::
-    find better names!
-
-``reference-to-one``
-    References which exist only once, e.g. the object reference in a predicate
-    relationship
-
-``reference-to-many``
-    References exists zero to many times, e.g. parts of collections
+The set of outgoing references from a node is not allowed to change. The set of
+incoming references can change. This also means that a reference from A to B
+implies that A is younger or equally old than B.
 
 Some intuition
 ~~~~~~~~~~~~~~
 
-Imagine you have a vertex, transitively follow all its outgoing references and
-collect all the resulting vertices. Usually, this will result in a tree of
-vertices. A reference means (as defined above) that the referenced vertices are
-an "essential part" of the referencing vertex. So our tree of vertices is
-something like a deep-copy and recursively includes all the essential parts of
-our root vertex.
+Imagine you have a node, transitively follow all its outgoing references and
+collect all the resulting nodes. This gives you the node's ``essence``. Usually,
+this will result in a tree of nodes. A reference means (as defined above) that
+the referenced nodes are an "essential part" of the referencing node. So our
+tree of nodes is something like a deep-copy and recursively includes all the
+essential parts of our root node.
 
 (Cycles using references are also allowed, so you might not get a tree, but a
-graph. The graph will still be a deep-copy in the described sense.)
+sub-graph. This sub-graph will still be a deep-copy in the described sense.)
+
+
+.. note::
+    **The rest of this document is not finished! It will change
+    fundamentally!!!**
 
 Versioning
 ----------
 
 As objects (vertices and edges) in the graph never change, every object
 modification creates a new vertex which points to the originating vertex with a
-``follows`` relation.
+``follows`` superrelation.
 
 
 Example:
@@ -83,7 +110,7 @@ Example:
     "statement'" -> statement [label = follows, color = red];
 
 The outgoing references will be copied automatically to point
-to the old referred vertices. 
+to the old referred vertices.
 
 .. digraph:: graph_2
 
@@ -92,9 +119,6 @@ to the old referred vertices.
     statement -> substatement [label = contains];
     "statement'" -> statement [label = follows];
     "statement'" -> substatement [label = contains, color = red];
-
-.. note::
-    The rest of the sections is not finished!)
 
 Incoming references have to be treated specially:
 
@@ -158,8 +182,8 @@ object containing illegal content.
 Superrelations
 --------------
 
-Superrelations are relations between content nodes that are implemented as
-vertices, not as edges. This allows for relations referencing other relations,
+Superrelations are relations between vertices that are implemented as vertices
+themselves, not as edges. This allows for relations referencing other relations,
 and for relations with connections to more than two vertices (hyperedges).
 
 .. note::
@@ -218,17 +242,17 @@ A non-exhaustive list of types of superrelations
     Example: ``Document``
 
 
-``Conjoint nodes``
+``Conjoints Nodes``
     Nodes which essentially belong to each other. Once one node is updated, the
-    other node has to be updated too - the nodes are synchronised.
+    other node has to be updated too - the node are synchronised.
 
     Scheme: ``A -> R -> B, B -> R -> A`` or other cyclic subgraphs.
 
     Possible examples: Translations, Binational treaties.
-    
+
 
 ``More complex relations``
     Exampel: Some discussion leads to a set of (proposed) changes.
-   
+
     Scheme: ``D <- R -> C1, R -> C2, R C3``
 
