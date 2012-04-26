@@ -64,6 +64,10 @@ Run Tests::
 
     $ bin/test
 
+Generate the documentation:
+
+    $ bin/sphinxbuilder
+
 Start adhocracy::
 
     $ bin/pserve etc/development.ini 
