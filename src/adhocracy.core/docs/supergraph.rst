@@ -22,7 +22,7 @@ Our Terminology
 ``reference``
     Some (actually most) of the edges are special edges that we will call
     "references". A reference from A to B captures the idea that B is somehow an
-    essential part of A.
+    essential part of A. References have labels to distinguish different types.
 
 ``required reference``
     A reference from A to B, where the node A could not exist without its
@@ -33,11 +33,11 @@ Our Terminology
     reference to B.
 
 ``node``
-    a vertex that can be referenced and can itself reference other nodes.
+    a vertex that can be referenced and can itself reference other nodes. Every node has a name that uniquely identifies the node.
 
 ``content node``
     a node that is self-contained, i.e. it has no outgoing references (with the
-    exception of ``follows``-references)
+    possible exception of ``follows``-references)
 
 ``essence``
     an essence for a given node is the sub-graph that contains the node itself
@@ -48,7 +48,9 @@ Our Terminology
     something like an inverse essence: the sub-graph of nodes that transitively refer to a given node, excluding that given node.
 
 ``relation``
-    A conglomerate of references and nodes that have a certain meaning. This could be:
+    A conglomerate of references and nodes that have a certain meaning. A relation is something like a pattern of nodes and references (of certain types) that can be found in graphs. (See below for examples.)
+
+.. This could be:
  * a classic binary relation (Subject <- R -> Object)
  * simply a labelled reference (->)
  * something more complex and/or specialized (A <- Contradiction1 -> B, User1 <- marks_as_correct -> Contradiction1)
@@ -94,10 +96,6 @@ essential parts of our root node.
 sub-graph. This sub-graph will still be a deep-copy in the described sense.)
 
 
-.. note::
-    **The rest of this document is not finished! It will change
-    fundamentally!!!**
-
 Versioning
 ----------
 
@@ -108,46 +106,74 @@ Example:
 
 .. digraph:: graph_1
 
-    agrees_with -> user;
-    agrees_with -> statement;
+    agrees_with -> user [label = "subject"];
+    agrees_with -> statement [label = "object"];
     statement -> substatement [label = contains];
 
     node [color = red];
 
-    "statement'" -> statement [label = follows, color = red];
+    "statement'" -> statement [label = follows, color = red, style = dashed];
 
 The outgoing references will be copied automatically to point
 to the old referred nodes.
 
 .. digraph:: graph_2
 
-    agrees_with -> user;
-    agrees_with -> statement;
+    agrees_with -> user [label = "subject"];
+    agrees_with -> statement [label = "object"];
     statement -> substatement [label = contains];
-    "statement'" -> statement [label = follows];
+    "statement'" -> statement [label = follows, style = dashed];
     "statement'" -> substatement [label = contains, color = red];
 
 Incoming references have to be treated specially:
 
 
 
-Nodes that refer to the modified node, directly or transitively are marked with a "potentially outdated" marker. These nodes are notified and can decide by themselves if they are copied into new nodes with references to the updated node.
+Nodes that are the ``dependents`` of the modified node are marked with a pending marker.
 
-.. digraph:: graph_3
+.. digraph:: graph_2
 
-    agrees_with -> user;
-    agrees_with -> statement;
+    agrees_with -> user [label = "subject"];
+    agrees_with -> statement [label = "object"];
+    agrees_with [color = grey];
     statement -> substatement [label = contains];
-    "statement'" -> statement [label = follows];
+    "statement'" -> statement [label = follows, style = dashed];
     "statement'" -> substatement [label = contains];
-    node [color = red];
-    "agrees_with'" -> user [color = red];
-    "agrees_with'" -> "statement'" [color = red];
-    "agrees_with'" -> agrees_with [label = follows, color = red];
 
-To guarantee termination, update propagation has to be realized
-transactionally.
 
+These nodes are notified and have three options:
+
+* They can confirm the changeset. This means they will be copied and their outgoing references will point to the new versions of the referred nodes. The old version will leave the pending state.
+
+.. digraph:: graph_2
+
+    agrees_with -> user [label = "subject"];
+    agrees_with -> statement [label = "object"];
+    "agrees_with'" -> agrees_with [label = "follows", style = dashed, color = red];
+    "agrees_with'" -> user [label = "subject", color = red];
+    "agrees_with'" -> "statement'" [label = "object", color = red];
+    "agrees_with'" [color = red];
+    statement -> substatement [label = contains];
+    "statement'" -> statement [label = follows, style = dashed];
+    "statement'" -> substatement [label = contains];
+
+* They can reject the changeset. This means, they will leave the pending state, but no new nodes nor references get created. The outgoing references of the formerly pending node will not change and point to old versions of nodes.
+
+.. digraph:: graph_2
+
+    agrees_with -> user [label = "subject"];
+    agrees_with -> statement [label = "object"];
+    agrees_with;
+    statement -> substatement [label = contains];
+    "statement'" -> statement [label = follows, style = dashed];
+    "statement'" -> substatement [label = contains];
+
+* They can do nothing and keep the pending state. At any later point in time a node can reject or confirm a changeset, probably triggered by some external event, e.g. user interaction.
+
+
+.. note::
+    **The rest of this document is not finished! It will change
+    fundamentally!!!**
 
 Forking and merging
 ~~~~~~~~~~~~~~~~~~~
