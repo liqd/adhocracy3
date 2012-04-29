@@ -44,6 +44,15 @@ Our Terminology
     (the root node of the essence) and all transitively referenced nodes. (An
     essence for a given node is immutable, see below.)
 
+``dependents``
+    something like an inverse essence: the sub-graph of nodes that transitively refer to a given node, excluding that given node.
+
+``relation``
+    A conglomerate of references and nodes that have a certain meaning. This could be:
+ * a classic binary relation (Subject <- R -> Object)
+ * simply a labelled reference (->)
+ * something more complex and/or specialized (A <- Contradiction1 -> B, User1 <- marks_as_correct -> Contradiction1)
+
 
 .. _todo::
     find better names!
@@ -71,7 +80,7 @@ The set of outgoing references from a node is not allowed to change. The set of
 incoming references can change. This also means that a reference from A to B
 implies that A is younger or equally old than B.
 
-Some intuition
+Some Intuition
 ~~~~~~~~~~~~~~
 
 Imagine you have a node, transitively follow all its outgoing references and
@@ -92,9 +101,7 @@ sub-graph. This sub-graph will still be a deep-copy in the described sense.)
 Versioning
 ----------
 
-As objects (vertices and edges) in the graph never change, every object
-modification creates a new vertex which points to the originating vertex with a
-``follows`` superrelation.
+As existing nodes in the graph never change, every node modification creates a new node which is connected to the originating node with a ``follows`` relation.
 
 
 Example:
@@ -110,7 +117,7 @@ Example:
     "statement'" -> statement [label = follows, color = red];
 
 The outgoing references will be copied automatically to point
-to the old referred vertices.
+to the old referred nodes.
 
 .. digraph:: graph_2
 
@@ -122,10 +129,9 @@ to the old referred vertices.
 
 Incoming references have to be treated specially:
 
-Vertices that refer to the modified vertex, directly or transitively are marked
-with a "potentially outdated" marker. These vertices are notified and can
-decide by themselves if they are copied into new vertices with references to
-the updated vertex.
+
+
+Nodes that refer to the modified node, directly or transitively are marked with a "potentially outdated" marker. These nodes are notified and can decide by themselves if they are copied into new nodes with references to the updated node.
 
 .. digraph:: graph_3
 
