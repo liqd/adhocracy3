@@ -99,7 +99,7 @@ sub-graph. This sub-graph will still be a deep-copy in the described sense.)
 Versioning
 ----------
 
-As existing nodes in the graph never change, every node modification creates a new node which is connected to the originating node with a ``follows`` relation.
+As existing nodes in the graph never change, every node modification creates a new node which is connected to the originating node with a ``follows`` relation. (We haven't decided how to implement this follows relation -- it might be a reference or a node. In the following example graphs the ``follows`` relation is represented by a dashed arrow.)
 
 
 Example:
@@ -171,30 +171,49 @@ These nodes are notified and have three options:
 * They can do nothing and keep the pending state. At any later point in time a node can reject or confirm a changeset, probably triggered by some external event, e.g. user interaction.
 
 
-.. note::
-    **The rest of this document is not finished! It will change
-    fundamentally!!!**
-
 Forking and merging
 ~~~~~~~~~~~~~~~~~~~
 
 Modeling versioning in this manner also allows for forking and merging:
 
-.. todo::
-    include fork and merge graph examples
+.. digraph:: graph42
+
+    "A'" -> A [label = follows, style = dashed];
+    Fork -> A [label = follows, style = dashed];
+    "Fork'" -> Fork [label = follows, style = dashed];
+    "A''" -> "A'" [label = follows, style = dashed];
+    "A''" -> "Fork'" [label = follows, style = dashed];
 
 Deletion
 ~~~~~~~~
 
-.. todo::
-     * write in which cases deletion makes sence
+In many cases, deletion can be represented in the graph by modifying a referring node and remove some outgoing edges. It is not necessary to delete the referred node.
 
-     * Reference deletion
+.. digraph:: graph52
 
-     * Vertex deletion is a special kind of versioning which creates a special
-       ``deletion`` vertex pointing to the deleted vertex with a ``follows``
-       edge.
+    Document -> A [label = contains]
+    Document -> B [label = contains]
+    Document -> C [label = contains]
 
+    "Document'" [color = red];
+    "Document'" -> Document [label = follows, color = red, style = dashed];
+    "Document'" -> A [label = contains, color = red]
+    "Document'" -> B [label = contains, color = red]
+
+In other cases, it might be necessary to directly delete a node. For this case a special ``deleted`` node is introduced:
+
+.. digraph:: graph324
+
+    Alice;
+    likes -> Alice [label = subject];
+    likes -> something [label = object];
+    deleted [color = red];
+    deleted -> likes [label = follows, color = red, style = dashed];
+
+
+.. note::
+    **The rest of this document is not finished! It will change
+    fundamentally!!!**
 
 History manipulation
 ~~~~~~~~~~~~~~~~~~~~
