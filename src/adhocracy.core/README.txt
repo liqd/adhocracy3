@@ -58,13 +58,15 @@ Start the graph db::
 
 Play with the graph db::
 
-    $  bin/rexster-console 
+    $ bin/rexster-console 
 
 Run Tests::
 
     $ bin/test
 
 Generate the documentation:
+
+    In order to build the documentation make sure that `graphviz` is installed.
 
     $ bin/sphinxbuilder
 
