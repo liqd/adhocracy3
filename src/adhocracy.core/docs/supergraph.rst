@@ -184,6 +184,7 @@ Modeling versioning in this manner also allows for forking and merging:
     "A''" -> "A'" [label = follows, style = dashed];
     "A''" -> "Fork'" [label = follows, style = dashed];
 
+
 Deletion
 ~~~~~~~~
 
@@ -211,34 +212,46 @@ In other cases, it might be necessary to directly delete a node. For this case a
     deleted -> likes [label = follows, color = red, style = dashed];
 
 
+History manipulation
+~~~~~~~~~~~~~~~~~~~~
+
+In some cases it might be necessary to modify or delete existing nodes and references directly, bypassing the versioning mechanism. This violates the non-mutability property and can be seen as a manipulation of the version history.
+
+These manual modifications of the graph have to be done very carefully and could be considered as administrative tasks.
+
+A typical example for such an administrative task is the real deletion of a
+node containing illegal content.
+
+
 .. note::
     **The rest of this document is not finished! It will change
     fundamentally!!!**
 
-History manipulation
-~~~~~~~~~~~~~~~~~~~~
+Relations
+---------
 
-In some cases it might be modify or delete existing vertices and edges
-directly, i.e. without using the versioning mechanism. This violates the
-non-mutability property and can be seen as a manipulation of the version
-history.
+We defined relations as a pattern of nodes and references that have a specified meaning. Here is an example of a very simple relation:
 
-Manual modification of the graph have to be done very carefully and could be
-considered as administrative tasks.
+.. digraph:: bla
 
-A typical example for such an administrative task is the real deletion of an
-object containing illegal content.
+    A -> B [label = comments];
+
+This ``comments`` relation captures the idea, that ``A`` comments on ``B``. (Note that this is just an example.) You should check whether this is really what you want, though. As ``A`` references ``B``, ``B`` should be considered and "essential part" of ``A``.
+
+Here is another example of a slightly more complex relation:
+
+.. digraph:: huhu
+
+    likes -> user [label = subject];
+    likes -> something [label = object];
 
 
-Superrelations
---------------
 
-Superrelations are relations between vertices that are implemented as vertices
-themselves, not as edges. This allows for relations referencing other relations,
-and for relations with connections to more than two vertices (hyperedges).
+
+When modelling data that you want to store in a supergraph, you have to define how your data should be represented by nodes and references.
 
 .. note::
-    The term ``superrelation`` is not carved into stone.
+    You should not use the simpler concepts of vertices and edges to model your data. You have to use nodes and references.
 
 
 A non-exhaustive list of types of superrelations
