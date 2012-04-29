@@ -101,8 +101,7 @@ Versioning
 
 As existing nodes in the graph never change, every node modification creates a new node which is connected to the originating node with a ``follows`` relation. (We haven't decided how to implement this follows relation -- it might be a reference or a node. In the following example graphs the ``follows`` relation is represented by a dashed arrow.)
 
-
-Example:
+Example 1.0:
 
 .. digraph:: graph_1
 
@@ -114,8 +113,11 @@ Example:
 
     "statement'" -> statement [label = follows, color = red, style = dashed];
 
+
 The outgoing references will be copied automatically to point
 to the old referred nodes.
+
+Example 1.1:
 
 .. digraph:: graph_2
 
@@ -131,6 +133,8 @@ Incoming references have to be treated specially:
 
 Nodes that are the ``dependents`` of the modified node are marked with a pending marker.
 
+Example 1.2:
+
 .. digraph:: graph_2
 
     agrees_with -> user [label = "subject"];
@@ -145,6 +149,8 @@ These nodes are notified and have three options:
 
 * They can confirm the changeset. This means they will be copied and their outgoing references will point to the new versions of the referred nodes. The old version will leave the pending state.
 
+  Example 1.3:
+
 .. digraph:: graph_2
 
     agrees_with -> user [label = "subject"];
@@ -158,6 +164,8 @@ These nodes are notified and have three options:
     "statement'" -> substatement [label = contains];
 
 * They can reject the changeset. This means, they will leave the pending state, but no new nodes nor references get created. The outgoing references of the formerly pending node will not change and point to old versions of nodes.
+
+  Example 1.4:
 
 .. digraph:: graph_2
 
@@ -176,6 +184,8 @@ Forking and merging
 
 Modeling versioning in this manner also allows for forking and merging:
 
+Example 2.0:
+
 .. digraph:: graph42
 
     "A'" -> A [label = follows, style = dashed];
@@ -190,6 +200,8 @@ Deletion
 
 In many cases, deletion can be represented in the graph by modifying a referring node and remove some outgoing edges. It is not necessary to delete the referred node.
 
+Example 3.0:
+
 .. digraph:: graph52
 
     Document -> A [label = contains]
@@ -202,6 +214,8 @@ In many cases, deletion can be represented in the graph by modifying a referring
     "Document'" -> B [label = contains, color = red]
 
 In other cases, it might be necessary to directly delete a node. For this case a special ``deleted`` node is introduced:
+
+Example 3.1:
 
 .. digraph:: graph324
 
@@ -232,6 +246,8 @@ Relations
 
 We defined relations as a pattern of nodes and references that have a specified meaning. Here is an example of a very simple relation:
 
+Example 5.0:
+
 .. digraph:: bla
 
     A -> B [label = comments];
@@ -239,6 +255,8 @@ We defined relations as a pattern of nodes and references that have a specified 
 This ``comments`` relation captures the idea, that ``A`` comments on ``B``. (Note that this is just an example.) You should check whether this is really what you want, though. As ``A`` references ``B``, ``B`` should be considered and "essential part" of ``A``.
 
 Here is another example of a slightly more complex relation:
+
+Example 5.1:
 
 .. digraph:: huhu
 
