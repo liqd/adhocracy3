@@ -22,6 +22,7 @@ local
 rwproperty
 waitress
 rexster
+neo4jtest
 parts
 egs
 docs/build
