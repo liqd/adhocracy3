@@ -2,9 +2,6 @@
 The Supergraph
 ==============
 
-.. note::
-    **Warning: This is a draft. We are currently working on this document.**
-
 
 Our Terminology
 ---------------
@@ -24,14 +21,6 @@ Our Terminology
     "references". A reference from A to B captures the idea that B is somehow an
     essential part of A. References have labels to distinguish different types.
 
-``required reference``
-    A reference from A to B, where the node A could not exist without its
-    relationship to B.
-
-``optional reference``
-    A reference from A to B, where the node A would still make sense without its
-    reference to B.
-
 ``node``
     a vertex that can be referenced and can itself reference other nodes. Every node has a name that uniquely identifies the node.
 
@@ -48,7 +37,7 @@ Our Terminology
     something like an inverse essence: the sub-graph of nodes that transitively refer to a given node, excluding that given node.
 
 ``relation``
-    A conglomerate of references and nodes that have a certain meaning. A relation is something like a pattern of nodes and references (of certain types) that can be found in graphs. (See below for examples.)
+    A conglomerate of references and nodes that have a certain meaning. A relation is a pattern of nodes and references (of certain types) that can be found in graphs. (See below for examples.)
 
 .. This could be:
  * a classic binary relation (Subject <- R -> Object)
@@ -56,7 +45,7 @@ Our Terminology
  * something more complex and/or specialized (A <- Contradiction1 -> B, User1 <- marks_as_correct -> Contradiction1)
 
 
-.. _todo::
+.. todo
     find better names!
 
 .. ``reference-to-one``
@@ -65,6 +54,15 @@ Our Terminology
 
 .. ``reference-to-many``
     References exists zero to many times, e.g. parts of collections
+
+.. ``required reference``
+    A reference from A to B, where the node A could not exist without its
+    relationship to B.
+
+.. ``optional reference``
+    A reference from A to B, where the node A would still make sense without its
+    reference to B.
+
 
 
 Non-Mutability
@@ -237,10 +235,6 @@ A typical example for such an administrative task is the real deletion of a
 node containing illegal content.
 
 
-.. note::
-    **The rest of this document is not finished! It will change
-    fundamentally!!!**
-
 Relations
 ---------
 
@@ -250,9 +244,9 @@ Example 5.0:
 
 .. digraph:: bla
 
-    A -> B [label = comments];
+    SomeComment -> A [label = comments];
 
-This ``comments`` relation captures the idea, that ``A`` comments on ``B``. (Note that this is just an example.) You should check whether this is really what you want, though. As ``A`` references ``B``, ``B`` should be considered and "essential part" of ``A``.
+This ``comments`` relation captures the idea, that ``SomeComment`` comments on ``A``. Also, the direction of the used reference implies, that ``A`` is an essential part of the comment.
 
 Here is another example of a slightly more complex relation:
 
@@ -260,48 +254,102 @@ Example 5.1:
 
 .. digraph:: huhu
 
-    likes -> user [label = subject];
-    likes -> something [label = object];
+    likes -> SomeUser [label = subject];
+    likes -> B [label = object];
 
+This relation captures the fact, that ``SomeUser`` ``likes`` ``B``. Again the directed references imply something about the nodes: ``SomeUser`` and ``B`` are essential parts of this ``likes`` node.
 
+Here is how you could model a list:
 
+.. digraph:: list
 
-When modelling data that you want to store in a supergraph, you have to define how your data should be represented by nodes and references.
+    list -> A [label = "element {rank: 1}"];
+    list -> B [label = "element {rank: 2}"];
+    list -> C [label = "element {rank: 3}"];
+
+The list relation allows you to store an ordered sequence of nodes. Again the direction of the used references implies that the elements are essential parts of the list.
+
+Modelling Data by Relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The process of modelling your data is basically a process of defining relations. When defining a relation you always have to think about the direction of the used references. Here's a checklist that might help:
+
+.. digraph:: simple
+
+    A -> B [label = someReference]
+
+If you define a relation where ``A`` refers to ``B`` in some manner, then the following should hold:
+
+* It makes sense that ``B`` is an essential part of ``A``.
+* A modification of B (creating a newer version ``B'``) potentially leads to a newer version of ``A`` (``A'``) by triggering an update notification. The class of ``A`` should know how to handle such an update notification: immediate automatic confirmation, immediate automatic rejection or keeping the pending state and taking means to gather a manual decision.
+* No other nodes want to refer to the reference itself. If you want to be able to refer to something, you have to model it as a node. If you want to refer to the relation between ``A`` and ``B`` in our example, you have to add an additional node:
+
+  .. digraph:: hyperedge
+
+        A -> someRelation [label = subject];
+        someRelation -> B [label = object];
+
+  This way you still retain the idea that ``B`` is an essential part of ``A``.
+* Look out for reference cycles. If you define relations that make reference cycles very likely, you should reconsider your modelling. The supergraph allows reference cycles, but they certainly smell bad. (See conjoined_nodes_.)
 
 .. note::
-    You should not use the simpler concepts of vertices and edges to model your data. You have to use nodes and references.
+    Nodes and relations are the means you have to model your data. Don't fall back on simple vertices (not nodes) or simple edges (not relations) for this.
 
+A Common Pitfall
+~~~~~~~~~~~~~~~~~~
 
-A non-exhaustive list of types of superrelations
+If you model binary relations (something along the lines of "subject predicate object"), it's tempting to model the predicate as a single reference:
+
+.. digraph:: singleReferenceBinaryRelation
+
+    subject -> object [label = predicate]
+
+However make sure this is really what you want: Is ``object`` an essential part of ``subject``? If not, you have to change this to:
+
+.. digraph:: hyperEdgeBinaryRelation
+
+    predicate -> A [label = subject];
+    predicate -> B [label = object];
+
+A non-exhaustive list of relations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``Follows``
-    This is the relation used to connect vertices to its predecessor or
-    predecessors.
+    This is the relation used to connect nodes to its predecessor or
+    predecessors. This might be modelled like this (we are still undecided on this):
 
-    Implemented as a vertex with a reference to the new vertex and zero to many
-    references to predecessor vertices. Normal follows relationships have one
-    predecessor relation, new object creations have zero predecessors, while
-    follow superrelations merging several vertices together have two or more
-    predecessors.
+    .. digraph:: follows
 
-    Scheme: ``Successor -> Follows -> Predecessor(s)``
+        "A'" -> A [label = follows, style = dashed];
+
+    ..  Implemented as a vertex with a reference to the new vertex and zero to many
+        references to predecessor vertices. Normal follows relationships have one
+        predecessor relation, new object creations have zero predecessors, while
+        follow superrelations merging several vertices together have two or more
+        predecessors.
+
+        or:
+        Scheme: ``Successor -> Follows -> Predecessor(s)``
 
 
 ``Deletions``
-    Vertex deletion is realized as a unary relation connected to the deleted
-    vertex.
+    Node deletion is realized as a unary relation connected to the deleted
+    node.
 
-    Scheme: ``Deletion -> Follows -> Node``
+    .. digraph:: deletion
+
+        Deletion -> A [label = follows, style = dashed];
+
+    ..  Scheme: ``Deletion -> Follows -> Node``
 
 
 ``Predicates``
-    Predicates are classical subject-predicate-object relations, expressible
-    as a verb.
+    Predicates are classical subject-predicate-object relations (also called binayr relations), expressible as a verb.
 
-    Implemented as a vertex with references to subject and object vertices.
+    .. digraph:: predicates
 
-    Scheme: ``Subject <- Predicate -> Object``
+        predicate -> A [label = subject];
+        predicate -> B [label = object];
 
     Example: ``comments``
 
@@ -311,7 +359,11 @@ A non-exhaustive list of types of superrelations
 
     Implemented as a list vertex with references-to-many to parts
 
-    Scheme: ``Collection -> Part_1, Collection -> Part_2, ...``
+    .. digraph:: collections
+
+        collection -> part_1 [label = element];
+        collection -> part_2 [label = element];
+        collection -> "etc..." [label = element];
 
     Example: ``Set``, ``List``
 
@@ -321,20 +373,39 @@ A non-exhaustive list of types of superrelations
 
     Implemented as a collection with ranked edges.
 
+    .. digraph:: lists
+
+        collection -> part_1 [label = "element {rank: 1}"];
+        collection -> part_2 [label = "element {rank: 2}"];
+        collection -> "etc..." [label = "element {rank: n}"];
+
     Example: ``Document``
 
-
-``Conjoints Nodes``
+``Conjoined Nodes``
     Nodes which essentially belong to each other. Once one node is updated, the
-    other node has to be updated too - the node are synchronised.
+    other node has to be updated too and vice versa - the nodes are synchronised. This can be achieved through cyclic subgraphs.
 
-    Scheme: ``A -> R -> B, B -> R -> A`` or other cyclic subgraphs.
+    .. _conjoined_nodes:
+    .. digraph:: conjoinedNodes
+
+        R1 [label = dependsOn];
+        R2 [label = dependsOn];
+        A -> R1;
+        R1 -> B;
+        B -> R2;
+        R2 -> A;
 
     Possible examples: Translations, Binational treaties.
 
 
 ``More complex relations``
-    Exampel: Some discussion leads to a set of (proposed) changes.
+    Example: Some discussion leads to a set of (proposed) changes.
 
-    Scheme: ``D <- R -> C1, R -> C2, R C3``
+    .. digraph:: complex
 
+        Proposal -> D [label = discussion];
+        Proposal -> C [label = original];
+        Proposal -> "C''" [label = newVersion];
+        "C''" -> "C'" [label = follows, style = dashed, color = grey];
+        "C'" [color = grey];
+        "C'" -> C [label = follows, style = dashed, color = grey];
