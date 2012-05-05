@@ -1,11 +1,11 @@
 import unittest
-from adhocracy.dbgraph.EmbeddedGraphConnection import EmbeddedGraphConnection
+from adhocracy.dbgraph.embeddedgraph import EmbeddedGraph
 
 
 class DBGraphTestSuite(unittest.TestCase):
 
     def setUp(self):
-        self.g = EmbeddedGraphConnection("testdb")
+        self.g = EmbeddedGraph("testdb")
         # TODO: use clear in setUp and/or teardown
 
     def testVertices(self):
