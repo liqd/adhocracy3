@@ -9,8 +9,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = [
     'rwproperty',
     'python-dateutil',  #bulbs needs this
-    'bulbs',
-    'pyblueprints',
+    'adhocracy.dbgraph',
     'zope.component>=3.11.0',  # make config.hook_zca() work
     'zope.configuration>=3.8.0dev',
     'zope.dottedname',

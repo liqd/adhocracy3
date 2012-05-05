@@ -10,6 +10,8 @@ requires = [
     'pyramid',
     'pyramid_debugtoolbar',
     'waitress',
+    'JPype',
+    'neo4j-embedded',
     ]
 
 setup(name='adhocracy.dbgraph',
