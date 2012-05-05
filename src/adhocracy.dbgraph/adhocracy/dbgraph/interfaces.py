@@ -60,15 +60,14 @@ class IEdge(IElement):
     def remove_property(self, key):
         """Removes the value of the property for the given key"""
 
-    def get_dbId(self):
-        """Returns the unique identifier of the element"""
+    def get_dbid(self):
+        """Returns the database id of the element"""
 
     def get_main_interface():
-        """Returns the main interface property (string)"""
+        """Returns the main interface."""
 
     def initialize():
-        """Apply main interface.
-           The main interface is stored in the
+        """Apply main interface that is stored in the
            main_interface" property,
         """
 
@@ -78,14 +77,14 @@ class IGraphConnection(Interface):
     The graph connection object.
     """
 
-    def add_vertex(self, main_interface=IVertex):
+    def add_vertex(main_interface=IVertex):
         """Adds a new vertex to the graph with the given
            Interface.
         """
 
-    def get_vertex(self, dbid):
+    def get_vertex(dbid):
         """Retrieves an existing vertex from the graph
-           with the given database unique identifier
+           with the given dbid or None.
         """
 
     def get_vertices():
@@ -99,7 +98,8 @@ class IGraphConnection(Interface):
 
     def get_edge(dbid):
         """Retrieves an existing edge from the graph
-        @returns The requested Edge or None"""
+           with the given dbid or None.
+        """
 
     def get_edges():
         """Returns an iterator with all the vertices"""
@@ -107,11 +107,11 @@ class IGraphConnection(Interface):
     def remove_edge(edge):
         """Removes the given edge"""
 
-    def clear(self):
+    def clear():
         """Dooms day machine"""
 
     def start_transaction():
-        """Start Transaction to add new or create Vertices/Edges"""
+        """Start Transaction to add new or create Elements"""
 
     def stop_transaction():
         """Stop Transaction"""
