@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from zope.interface import Interface
 
 
@@ -27,12 +28,6 @@ class IElement(Interface):
 
     def get_main_interface():
         """Returns the main interface property (string)"""
-
-    def initialize():
-        """Apply main interface.
-           The main interface is stored in the
-           main_interface" property,
-        """
 
 
 class IVertex(IElement):
