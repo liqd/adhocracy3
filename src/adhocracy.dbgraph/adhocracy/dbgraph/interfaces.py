@@ -66,7 +66,7 @@ class IEdge(IElement):
         """Returns the label of the edge"""
 
 
-class IGraphConnection(Interface):
+class IGraph(Interface):
     """
     The graph connection object.
     """
