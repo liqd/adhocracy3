@@ -20,9 +20,6 @@ class EmbeddedGraph():
 
         self.db.shutdown()
 
-    def __init__(connection_string):
-        """Creates a new GraphConnection"""
-
     def add_vertex(main_interface=IVertex):
         """Adds a new vertex to the graph with the given
            Interface.
