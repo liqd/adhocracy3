@@ -75,14 +75,11 @@ class Vertex(EmbeddedElement):
 class Edge(EmbeddedElement):
     implements(IEdge)
 
-    def start_vertex():
-        """Returns the origin vertex of the edge"""
-        raise NYIException()
+    def start_vertex(self):
+        return Vertex(self.db_element.start)
 
-    def end_vertex():
-        """Returns the target vertex of the edge"""
-        raise NYIException()
+    def end_vertex(self):
+        return Vertex(self.db_element.end)
 
-    def get_label():
-        """Returns the label of the edge"""
-        raise NYIException()
+    def get_label(self):
+        return self.db_element.type.name()

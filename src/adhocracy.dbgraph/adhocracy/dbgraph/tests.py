@@ -102,6 +102,9 @@ class DBGraphTestSuite(unittest.TestCase):
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e = self.g.add_edge(a, b, "foo")
+        assert e.start_vertex() == a
+        assert e.end_vertex() == b
+        assert e.get_label() == "foo"
         self.assertInterface(IEdge, e)
         e_id = e.get_dbId()
         self.assertInterface(IEdge, self.g.get_edge(e_id))
@@ -140,7 +143,6 @@ class DBGraphTestSuite(unittest.TestCase):
         self.g.stop_transaction()
 
     #TODO: Transaction tests
-    #TODO: assert Interfaces
 
 if __name__ == "__main__":
     unittest.main()
