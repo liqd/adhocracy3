@@ -26,3 +26,4 @@ neo4jtest
 parts
 egs
 docs/build
+testdb
