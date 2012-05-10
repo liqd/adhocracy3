@@ -5,17 +5,19 @@
 
   <!--Object traverser-->
   <!--http://readthedocs.org/docs/pyramid_zcml/en/latest/narr.html#configuring-an-alternate-traverser-via-zcml-->
-  <adapter
-    factory="pyramid_adoptedtraversal.resourcetreetraverseradopted.ResourceTreeTraverserAdopted"
-    provides="pyramid.interfaces.ITraverser"
-    for="adhocracy.core.models.interfaces.INode"
-  />
+  <!--<adapter-->
+    <!--factory="pyramid_adoptedtraversal.resourcetreetraverseradopted.ResourceTreeTraverserAdopted"-->
+    <!--provides="pyramid.interfaces.ITraverser"-->
+    <!--for="adhocracy.core.models.interfaces.INode"-->
+  <!--/>-->
 
   <!--model adapters -->
-  <adapter
-    factory="adhocracy.core.models.adapters.NodeChildsDictAdapter"
-    provides="adhocracy.core.models.interfaces.IChildsDict"
-    for="adhocracy.core.models.interfaces.INode"
-  />
+  <!--<adapter-->
+    <!--factory="adhocracy.core.models.adapters.NodeChildsDictAdapter"-->
+    <!--provides="adhocracy.core.models.interfaces.IChildsDict"-->
+    <!--for="adhocracy.core.models.interfaces.INode"-->
+  <!--/>-->
+
+  <adapter factory="adhocracy.core.models.adhocracyroot.AdhocracyRootLocationAware" />
 
 </configure>
