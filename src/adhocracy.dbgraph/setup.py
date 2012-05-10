@@ -14,6 +14,12 @@ requires = [
     'neo4j-embedded',
     ]
 
+tests_require = [
+    'pytest',
+    'pytest-cov',
+    'pytest-xdist',
+    ]
+
 setup(name='adhocracy.dbgraph',
       version='0.0',
       description='adhocracy.dbgraph',
@@ -33,11 +39,13 @@ setup(name='adhocracy.dbgraph',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      tests_require=requires,
-      test_suite="adhocracy.dbgraph",
+      tests_require=tests_require,
       entry_points = """\
       [paste.app_factory]
       main = adhocracy.dbgraph:main
       """,
+      extras_require = {
+          'test': tests_require,
+          },
       )
 
