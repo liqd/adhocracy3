@@ -69,7 +69,7 @@ def get_graph():
     if not graph:
         global_registry = component.getGlobalSiteManager()
         graph = graph_factory()
-        global_registry.registerUtility(graph, IGraph)
+        global_registry.registerUtility(graph)
     return graph
 
 
