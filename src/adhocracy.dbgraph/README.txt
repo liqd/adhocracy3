@@ -3,5 +3,3 @@ adhocracy.dbgraph
 
 setup::
 
-    >>> test
-
