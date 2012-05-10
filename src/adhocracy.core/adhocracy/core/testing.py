@@ -20,7 +20,7 @@ def setUp(**kwargs):
     """
     testing.tearDown()
     settings = {}
-    settings['rexster_uri'] = "http://localhost:8182/graphs/testgraph"
+    settings['neo4j_uri'] = "http://localhost:7475/db/data"
     settings.update(kwargs.get('settings', {}))
     kwargs['settings'] = settings
     config = testing.setUp(**kwargs)

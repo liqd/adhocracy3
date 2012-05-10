@@ -1,0 +1,19 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+<!--main zcml configuration file-->
+
+  <include package="pyramid_zcml" />
+
+  <!--global utilities-->
+  <!--http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/zca.html?highlight=utility-->
+  <!--http://docs.zope.org/zope.component/zcml.html#utility-->
+
+  <utility
+   factory=".embeddedgraph.graph_factory"
+   provides="adhocracy.dbgraph.interfaces.IGraph"
+  />
+
+
+</configure>
+
+
+</configure>

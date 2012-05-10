@@ -38,7 +38,8 @@ def adhocracyroot_factory():
     interface = IAdhocracyRoot
     registry = get_current_registry()
     graph = registry.getUtility(IGraphConnection)
-    proxyname = interface.getTaggedValue('name')
-    proxy = getattr(graph, proxyname)
-    #create object
-    return proxy.get_or_create("name", "adhocracyroot", name=u"adhocracyroot")
+    root = graph.getVertex(0)
+    if not root:
+        root = graph.addVertex(0)
+        root.initialize()
+    return

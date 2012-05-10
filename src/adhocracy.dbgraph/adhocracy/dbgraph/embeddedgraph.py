@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from neo4j import GraphDatabase
-
 from zope.interface import implements
+from pyramid.threadlocal import get_current_registry
+
+from adhocracy.dbgraph.interfaces import IGraph
 
 from adhocracy.dbgraph.interfaces import IGraph
 from adhocracy.dbgraph.interfaces import IElement
@@ -59,3 +61,10 @@ class EmbeddedGraph():
     def stop_transaction(self):
         self.transaction.success()
         self.transaction.finish()
+
+def graph_factory(self):
+    registry = get_current_registry()
+    connection_string = registry.settings['graphdb_connection_string'] \
+                        or "http://localhost:7475/db/data"
+    return EmbeddedGraph(connection_string)
+
