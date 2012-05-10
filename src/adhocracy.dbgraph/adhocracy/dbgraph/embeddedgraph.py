@@ -83,16 +83,13 @@ def graph_factory():
     os.environ['NEO4J_PYTHON_JVMARGS'] = '-Xms128M -Xmx512M'
     from neo4j import GraphDatabase
     db = GraphDatabase(connection_string)
+    def close_db():
+        """Make sure to always close the database
+        """
+        try:
+            db.shutdown()
+            print("db shut down")
+        except NameError:
+            print 'Could not shutdown Neo4j database.'
+    atexit.register(close_db)
     return EmbeddedGraph(db)
-
-
-def _close_db():
-    """Make sure to always close the database
-    """
-    try:
-        graph = get_graph()
-        graph.shutdown()
-    except NameError:
-        print 'Could not shutdown Neo4j database.'
-
-atexit.register(_close_db)
