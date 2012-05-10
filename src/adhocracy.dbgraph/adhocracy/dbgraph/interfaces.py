@@ -71,7 +71,7 @@ class IGraph(Interface):
     The graph connection object.
     """
 
-    def __init__(connection_string):
+    def __init__(graphdb_connection_string):
         """Creates a new GraphConnection"""
 
     def add_vertex(main_interface=IVertex):
