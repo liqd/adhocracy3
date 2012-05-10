@@ -9,11 +9,12 @@ from adhocracy.dbgraph.interfaces import IGraph
 
 GRAPHDB_CONNECTION_STRING = "testdb"
 
+
 class DBGGraphUtilityTests(unittest.TestCase):
 
     def setUp(self):
-        settings = {'graphdb_connection_string' : GRAPHDB_CONNECTION_STRING}
-        testing.setUp(settings = settings)
+        settings = {'graphdb_connection_string': GRAPHDB_CONNECTION_STRING}
+        testing.setUp(settings=settings)
 
     def tearDown(self):
         from adhocracy.dbgraph.embeddedgraph import get_graph

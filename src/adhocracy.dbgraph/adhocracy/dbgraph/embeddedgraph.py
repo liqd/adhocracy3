@@ -73,7 +73,7 @@ def get_graph():
     return graph
 
 
-implementer(IGraph)
+@implementer(IGraph)
 def graph_factory():
     """Utility to store the db graph conneciton object
     """
@@ -83,6 +83,7 @@ def graph_factory():
     os.environ['NEO4J_PYTHON_JVMARGS'] = '-Xms128M -Xmx512M'
     from neo4j import GraphDatabase
     db = GraphDatabase(connection_string)
+
     def close_db():
         """Make sure to always close the database
         """
@@ -91,5 +92,6 @@ def graph_factory():
             print("db shut down")
         except NameError:
             print 'Could not shutdown Neo4j database.'
+
     atexit.register(close_db)
     return EmbeddedGraph(db)
