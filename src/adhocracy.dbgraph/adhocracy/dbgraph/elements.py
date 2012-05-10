@@ -2,6 +2,7 @@
 
 from zope.dottedname.resolve import resolve
 from zope.interface import implements
+from zope.interface import directlyProvides
 
 from adhocracy.dbgraph.interfaces import IElement
 from adhocracy.dbgraph.interfaces import IVertex

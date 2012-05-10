@@ -5,9 +5,6 @@ from zope.interface import implements
 from pyramid.threadlocal import get_current_registry
 
 from adhocracy.dbgraph.interfaces import IGraph
-
-from adhocracy.dbgraph.interfaces import IGraph
-from adhocracy.dbgraph.interfaces import IElement
 from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
 
@@ -41,18 +38,18 @@ class EmbeddedGraph():
     def add_edge(self, in_vertex, out_vertex, label, main_interface=IEdge):
         """Creates a new edge with label(String)"""
 
-    def get_edge(dbid):
+    def get_edge(self, dbid):
         """Retrieves an existing edge from the graph
            with the given dbid or None.
         """
 
-    def get_edges():
+    def get_edges(self):
         """Returns an iterator with all the vertices"""
 
-    def remove_edge(edge):
+    def remove_edge(self, edge):
         """Removes the given edge"""
 
-    def clear():
+    def clear(self):
         """Dooms day machine"""
 
     def start_transaction(self):
@@ -62,9 +59,9 @@ class EmbeddedGraph():
         self.transaction.success()
         self.transaction.finish()
 
-def graph_factory(self):
+
+def graph_factory():
     registry = get_current_registry()
-    connection_string = registry.settings['graphdb_connection_string'] \
-                        or "http://localhost:7475/db/data"
+    connection_string = registry.settings['graphdb_connection_string']
     return EmbeddedGraph(connection_string)
 
