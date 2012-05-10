@@ -4,7 +4,10 @@ import unittest
 
 from pyramid import testing
 from adhocracy.dbgraph.embeddedgraph import EmbeddedGraph
-from adhocracy.dbgraph.interfaces import IGraph, IVertex, IEdge
+from adhocracy.dbgraph.interfaces import IGraph
+from adhocracy.dbgraph.interfaces import IVertex
+from adhocracy.dbgraph.interfaces import IEdge
+from adhocracy.dbgraph.interfaces import DontRemoveRootException
 
 
 GRAPHDB_CONNECTION_STRING = "testdb"
@@ -82,12 +85,13 @@ class DBGraphTestSuite(unittest.TestCase):
 
     def testGetVertices(self):
         self.g.start_transaction()
+        root = self.g.get_root_vertex()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         c = self.g.add_vertex()
         for v in self.g.get_vertices():
             self.assertInterface(IVertex, v)
-        self.assertSetEquality([a, b, c], self.g.get_vertices())
+        self.assertSetEquality([root, a, b, c], self.g.get_vertices())
         self.g.stop_transaction()
 
     def testRemoveVertex(self):
@@ -138,9 +142,36 @@ class DBGraphTestSuite(unittest.TestCase):
         b = self.g.add_vertex()
         self.g.add_edge(a, b, "connects")
         self.g.clear()
-        self.assertSetEquality([], self.g.get_vertices())
+        root = self.g.get_root_vertex()
+        self.assertSetEquality([root], self.g.get_vertices())
+        self.assertSetEquality([], root.get_properties().keys())
         self.assertSetEquality([], self.g.get_edges())
         self.g.stop_transaction()
+
+    def testRootVertex(self):
+        self.g.start_transaction()
+        root = self.g.get_root_vertex()
+        self.assertInterface(IVertex, root)
+
+        def remove_root():
+            self.g.remove_vertex(root)
+        self.assertRaises(DontRemoveRootException, remove_root)
+        self.assertInterface(IVertex, self.g.get_root_vertex())
+        self.g.stop_transaction()
+
+    def testGetProperties(self):
+        self.g.start_transaction()
+        a = self.g.add_vertex()
+        b = self.g.add_vertex()
+        e = self.g.add_edge(a, b, "connects")
+        ap = {'foo': 42, 'bar': 23}
+        a.set_properties(ap)
+        ap['main_interface'] = IVertex.__identifier__
+        ep = {'baz': 42, 'blub': 23}
+        e.set_properties(ep)
+        ep['main_interface'] = IEdge.__identifier__
+        assert ap == a.get_properties()
+        assert ep == e.get_properties()
 
     #TODO: Transaction tests
 

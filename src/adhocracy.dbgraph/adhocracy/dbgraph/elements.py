@@ -40,16 +40,14 @@ class EmbeddedElement(object):
         raise NYIException()
 
     def get_properties(self):
-        """Returns a dictionary with all properties (key/value)"""
-        raise NYIException()
+        return dict(self.db_element)
 
     def set_property(self, key, value):
-        """Sets the property of the element to the given value"""
-        raise NYIException()
+        self.db_element[key] = value
 
     def set_properties(self, property_dictionary):
-        """Add properties. Existing properties are replaced."""
-        raise NYIException()
+        for k in property_dictionary.keys():
+            self.set_property(k, property_dictionary[k])
 
     def remove_property(self, key):
         """Removes the value of the property for the given key"""

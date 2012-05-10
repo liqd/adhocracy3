@@ -86,7 +86,12 @@ class IGraph(Interface):
         """Returns an iterator with all the vertices"""
 
     def remove_vertex(vertex):
-        """Removes the given vertex"""
+        """Removes the given vertex.
+        May raise DontRemoveRootException
+        """
+
+    def get_root_vertex():
+        """Returns the root vertex (with db_id == 0)"""
 
     def add_edge(startVertex, endVertex, label, main_interface=IEdge):
         """Creates a new edge with label(String)"""
@@ -110,3 +115,7 @@ class IGraph(Interface):
 
     def stop_transaction():
         """Stop Transaction"""
+
+
+class DontRemoveRootException(Exception):
+    pass

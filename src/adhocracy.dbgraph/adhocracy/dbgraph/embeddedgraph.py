@@ -8,6 +8,7 @@ from pyramid.threadlocal import get_current_registry
 from adhocracy.dbgraph.interfaces import IGraph
 from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
+from adhocracy.dbgraph.interfaces import DontRemoveRootException
 
 from adhocracy.dbgraph.elements import Vertex
 from adhocracy.dbgraph.elements import Edge
@@ -49,8 +50,13 @@ class EmbeddedGraph():
                 if not _is_deleted_element(node)]
 
     def remove_vertex(self, vertex):
-        """Removes the given vertex"""
-        vertex.db_element.delete()
+        if vertex.get_dbId() == 0:
+            raise DontRemoveRootException()
+        else:
+            vertex.db_element.delete()
+
+    def get_root_vertex(self):
+        return self.get_vertex(0)
 
     def add_edge(self, start_vertex, end_vertex, label, main_interface=IEdge):
         db_edge = start_vertex.db_element.relationships.create(label,
@@ -73,7 +79,13 @@ class EmbeddedGraph():
         for e in self.get_edges():
             self.remove_edge(e)
         for v in self.get_vertices():
-            self.remove_vertex(v)
+            if v.get_dbId() == 0:
+                # this is the root node
+                # don't remove it, but remove all its properties
+                for k in v.db_element.keys():
+                    del v.db_element[k]
+            else:
+                self.remove_vertex(v)
 
     def start_transaction(self):
         self.transaction = self.db.beginTx()
