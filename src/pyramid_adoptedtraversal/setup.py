@@ -6,12 +6,22 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = ['pyramid', 'zope.component']
+requires = [
+    'pyramid',
+    'zope.component'
+    ]
+
+tests_require = [
+    'pytest',
+    'pytest-cov',
+    'pytest-pep8',
+    'pytest-quickcheck',
+    ]
 
 setup(name='pyramid_adoptedtraversal',
       version='0.1',
       description='pyramid_adoptedtraversal',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
@@ -27,9 +37,10 @@ setup(name='pyramid_adoptedtraversal',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      test_suite="pyramid_adoptedtraversal",
-      entry_points = """\
+      entry_points="""\
       """,
+      extras_require={
+          'test': tests_require,
+          },
       paster_plugins=['pyramid'],
       )
-

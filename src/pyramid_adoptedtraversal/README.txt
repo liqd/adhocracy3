@@ -9,6 +9,11 @@ to allow traversal.
 Usage:
 ------
 
+Setup:
+
+    >>> from pyramid import testing
+    >>> ignore = testing.setUp()
+
 Register your own IChildsDictLike adapter::
 
     >>> from pyramid_adoptedtraversal.interfaces import IChildsDictLike
@@ -32,5 +37,9 @@ Register the traverser to use the adpater::
     >>> from pyramid_adoptedtraversal.resourcetreetraverseradopted import ResourceTreeTraverserAdopted
     >>> registry = get_current_registry()    
     >>> registry.registerAdapter(ResourceTreeTraverserAdopted, (Interface,), ITraverser)
+
+Cleanup:
+
+    >>> testing.tearDown()
 
 

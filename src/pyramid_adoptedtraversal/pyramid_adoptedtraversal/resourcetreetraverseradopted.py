@@ -82,8 +82,8 @@ class ResourceTreeTraverserAdopted(ResourceTreeTraverser):
             # HTTP_X_VHM_ROOT
             vroot_path = decode_path_info(environ[VH_ROOT_KEY])
             vroot_tuple = split_path_info(vroot_path)
-            vpath = vroot_path + path # both will (must) be unicode or asciistr
-            vroot_idx = len(vroot_tuple) -1
+            vpath = vroot_path + path  # both will be unicode or asciistr
+            vroot_idx = len(vroot_tuple) - 1
         else:
             vroot_tuple = ()
             vpath = path
@@ -92,7 +92,7 @@ class ResourceTreeTraverserAdopted(ResourceTreeTraverser):
         root = self.root
         ob = vroot = root
 
-        if vpath == '/': # invariant: vpath must not be empty
+        if vpath == '/':  # invariant: vpath must not be empty
             # prevent a call to traversal_path if we know it's going
             # to return the empty tuple
             vpath_tuple = ()
@@ -105,13 +105,13 @@ class ResourceTreeTraverserAdopted(ResourceTreeTraverser):
             vpath_tuple = split_path_info(vpath)
             for segment in vpath_tuple:
                 if segment[:2] == view_selector:
-                    return {'context':ob,
-                            'view_name':segment[2:],
-                            'subpath':vpath_tuple[i+1:],
-                            'traversed':vpath_tuple[:vroot_idx+i+1],
-                            'virtual_root':vroot,
-                            'virtual_root_path':vroot_tuple,
-                            'root':root}
+                    return {'context': ob,
+                            'view_name': segment[2:],
+                            'subpath': vpath_tuple[i + 1:],
+                            'traversed': vpath_tuple[:vroot_idx + i + 1],
+                            'virtual_root': vroot,
+                            'virtual_root_path': vroot_tuple,
+                            'root': root}
                 try:
                     # CHANGED: try to use adaper to get the __getitem__ method
                     #try local registry
@@ -119,35 +119,36 @@ class ResourceTreeTraverserAdopted(ResourceTreeTraverser):
                     adapter = registry.queryAdapter(ob, IChildsDictLike)
                     #try global registry
                     if not adapter:
-                        adapter = zope.component.queryAdapter(ob, IChildsDictLike)
+                        adapter = zope.component.queryAdapter(ob,\
+                                                        IChildsDictLike)
                     #else use the object directly
                     if not adapter:
                         adapter = ob
                     getitem = adapter.__getitem__
                 except AttributeError:
-                    return {'context':ob,
-                            'view_name':segment,
-                            'subpath':vpath_tuple[i+1:],
-                            'traversed':vpath_tuple[:vroot_idx+i+1],
-                            'virtual_root':vroot,
-                            'virtual_root_path':vroot_tuple,
-                            'root':root}
+                    return {'context': ob,
+                            'view_name': segment,
+                            'subpath': vpath_tuple[i + 1:],
+                            'traversed': vpath_tuple[:vroot_idx + i + 1],
+                            'virtual_root': vroot,
+                            'virtual_root_path': vroot_tuple,
+                            'root': root}
 
                 try:
                     next = getitem(segment)
                 except KeyError:
-                    return {'context':ob,
-                            'view_name':segment,
-                            'subpath':vpath_tuple[i+1:],
-                            'traversed':vpath_tuple[:vroot_idx+i+1],
-                            'virtual_root':vroot,
-                            'virtual_root_path':vroot_tuple,
-                            'root':root}
+                    return {'context': ob,
+                            'view_name': segment,
+                            'subpath': vpath_tuple[i + 1:],
+                            'traversed': vpath_tuple[:vroot_idx + i + 1],
+                            'virtual_root': vroot,
+                            'virtual_root_path': vroot_tuple,
+                            'root': root}
                 if i == vroot_idx:
                     vroot = next
                 ob = next
                 i += 1
 
-        return {'context':ob, 'view_name':empty, 'subpath':subpath,
-                'traversed':vpath_tuple, 'virtual_root':vroot,
-                'virtual_root_path':vroot_tuple, 'root':root}
+        return {'context': ob, 'view_name': empty, 'subpath': subpath,
+                'traversed': vpath_tuple, 'virtual_root': vroot,
+                'virtual_root_path': vroot_tuple, 'root': root}
