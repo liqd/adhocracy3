@@ -19,7 +19,7 @@ def _is_deleted_element(element):
     r = False
     try:
         list(element.keys())
-        element.has_key('foo')
+        'foo' in element.keys()
     except Exception, e:
         r = True
     return r
@@ -45,7 +45,8 @@ class EmbeddedGraph():
 
     def get_vertices(self):
         nodes = self.db.nodes
-        return [Vertex(node) for node in nodes if not _is_deleted_element(node)]
+        return [Vertex(node) for node in nodes
+                if not _is_deleted_element(node)]
 
     def remove_vertex(self, vertex):
         """Removes the given vertex"""
@@ -53,15 +54,16 @@ class EmbeddedGraph():
 
     def add_edge(self, start_vertex, end_vertex, label, main_interface=IEdge):
         db_edge = start_vertex.db_element.relationships.create(label,
-                                                     end_vertex.db_element,
-                                                     main_interface = main_interface.__identifier__)
+                    end_vertex.db_element,
+                    main_interface=main_interface.__identifier__)
         return Edge(db_edge)
 
     def get_edge(self, dbid):
         return Edge(self.db.relationships[dbid])
 
     def get_edges(self):
-        return [Edge(edge) for edge in self.db.relationships if not _is_deleted_element(edge)]
+        return [Edge(edge) for edge in self.db.relationships
+                if not _is_deleted_element(edge)]
 
     def remove_edge(self, edge):
         """Removes the given edge"""

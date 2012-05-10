@@ -65,7 +65,6 @@ class DBGraphTestSuite(unittest.TestCase):
         from zope.interface.verify import verifyObject
         assert verifyObject(interface, object)
 
-
     def testGetVertex(self):
         self.g.start_transaction()
         v_id = self.g.add_vertex().get_dbId()

@@ -71,6 +71,7 @@ class Vertex(EmbeddedElement):
         """
         raise NYIException()
 
+
 class Edge(EmbeddedElement):
     implements(IEdge)
 
