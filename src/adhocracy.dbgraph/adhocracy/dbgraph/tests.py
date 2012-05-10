@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from pyramid.threadlocal import get_current_registry
 from pyramid import testing
 
 from adhocracy.dbgraph.embeddedgraph import EmbeddedGraph
-from adhocracy.dbgraph.embeddedgraph import graph_factory
+from adhocracy.dbgraph.embeddedgraph import get_graph
 from adhocracy.dbgraph.interfaces import IGraph
 
 
@@ -38,18 +37,6 @@ def tearDown(**kwargs):
     testing.tearDown(**kwargs)
 
 
-def get_graph():
-    """
-        returns the graph database connection object
-    """
-    registry = get_current_registry()
-    graph = registry.queryUtility(IGraph)
-    if not graph:
-        registry.registerUtility(graph_factory(), IGraph)
-        graph = registry.queryUtility(IGraph)
-    return graph
-
-
 class DBGGraphUtilityTests(unittest.TestCase):
 
     def setUp(self):
@@ -60,12 +47,12 @@ class DBGGraphUtilityTests(unittest.TestCase):
         tearDown()
 
     def test_get_graph_database_connection(self):
-        registry = get_current_registry()
-        graph1 = registry.getUtility(IGraph)
+        from adhocracy.dbgraph.embeddedgraph import get_graph
+        graph1 = get_graph()
         self.assert_(IGraph.providedBy(graph1))
         from zope.interface.verify import verifyObject
         self.assert_(verifyObject(IGraph, graph1))
-        graph2 = registry.getUtility(IGraph)
+        graph2 = get_graph()
         self.assert_(graph1 is graph2)
 
 

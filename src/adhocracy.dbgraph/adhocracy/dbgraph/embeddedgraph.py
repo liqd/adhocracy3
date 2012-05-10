@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-
-from neo4j import GraphDatabase
+import atexit
 from zope.interface import implements
+from zope.interface import implementer
+from zope import component
 from pyramid.threadlocal import get_current_registry
 
 from adhocracy.dbgraph.interfaces import IGraph
@@ -14,8 +15,8 @@ from adhocracy.dbgraph.elements import Vertex
 class EmbeddedGraph():
     implements(IGraph)
 
-    def __init__(self, connection_string):
-        self.db = GraphDatabase(connection_string)
+    def __init__(self, dbgraph_database):
+        self.db = dbgraph_database
 
     def shutdown(self):
         self.db.shutdown()
@@ -60,8 +61,38 @@ class EmbeddedGraph():
         self.transaction.finish()
 
 
-def graph_factory():
-    registry = get_current_registry()
-    connection_string = registry.settings['graphdb_connection_string']
-    return EmbeddedGraph(connection_string)
+def get_graph():
+    """ returns the graph database connection object
+    """
+    global_registry = component.getGlobalSiteManager()
+    graph = global_registry.queryUtility(IGraph)
+    if not graph:
+        global_registry = component.getGlobalSiteManager()
+        graph = graph_factory()
+        global_registry.registerUtility(graph, IGraph)
+    return graph
 
+
+implementer(IGraph)
+def graph_factory():
+    """Utility to store the db graph conneciton object
+    """
+    settings = get_current_registry().settings
+    connection_string = settings['graphdb_connection_string'] or "testdb"
+    import os
+    os.environ['NEO4J_PYTHON_JVMARGS'] = '-Xms128M -Xmx512M'
+    from neo4j import GraphDatabase
+    db = GraphDatabase(connection_string)
+    return EmbeddedGraph(db)
+
+
+def _close_db():
+    """Make sure to always close the database
+    """
+    try:
+        graph = get_graph()
+        graph.shutdown()
+    except NameError:
+        print 'Could not shutdown Neo4j database.'
+
+atexit.register(_close_db)
