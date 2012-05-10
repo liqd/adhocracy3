@@ -1,1 +1,7 @@
-adhocracy.dbgraph README
+adhocracy.dbgraph 
+=================
+
+setup::
+
+    >>> test
+
