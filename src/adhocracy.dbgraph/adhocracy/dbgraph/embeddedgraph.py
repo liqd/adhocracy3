@@ -22,6 +22,19 @@ class EmbeddedGraph():
         self.db.shutdown()
 
     def add_vertex(self, main_interface=IVertex):
+        """
+        >>> import adhocracy.dbgraph.tests
+        >>> adhocracy.dbgraph.tests.setUp()
+        <py...
+        >>> g = get_graph()
+        >>> g.start_transaction()
+        >>> v = g.add_vertex()
+        >>> print(v in g.get_vertices())
+        True
+        >>> g.start_transaction()
+        >>> g.shutdown()
+        >>> adhocracy.dbgraph.tests.tearDown()
+        """
         db_vertex = self.db.node()
         db_vertex['main_interface'] = main_interface.__identifier__
         return Vertex(db_vertex)
