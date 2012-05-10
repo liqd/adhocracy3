@@ -38,13 +38,13 @@ class DBGraphTestSuite(unittest.TestCase):
         db = GraphDatabase(GRAPHDB_CONNECTION_STRING)
         self.g = EmbeddedGraph(db)
         self.g.start_transaction()
-        #self.g.clear()
-        #self.g.stop_transaction()
+        self.g.clear()
+        self.g.stop_transaction()
 
     def tearDown(self):
         try:
-            #self.g.start_transaction()
-            #self.g.clear()
+            self.g.start_transaction()
+            self.g.clear()
             self.g.stop_transaction()
         finally:
             self.g.shutdown()
@@ -97,21 +97,21 @@ class DBGraphTestSuite(unittest.TestCase):
         self.g.stop_transaction()
 
     def testGetEdge(self):
-        #self.g.start_transaction()
+        self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e_id = self.g.add_edge(a, b, "foo").get_dbId()
         self.assertEqual(e_id, self.g.get_edge(e_id).get_dbId())
-        #self.g.stop_transaction()
+        self.g.stop_transaction()
 
     def testRemoveEdge(self):
-        #self.g.start_transaction()
+        self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e = self.g.add_edge(a, b, "foo")
         self.g.remove_edge(e)
         self.assertFalse(e in self.g.get_edges())
-        #self.g.stop_transaction()
+        self.g.stop_transaction()
 
     def testGetEdges(self):
         self.g.start_transaction()
@@ -127,9 +127,7 @@ class DBGraphTestSuite(unittest.TestCase):
         self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
-        #self.g.add_edge(a, b, "connects")
-        #import ipdb
-        #ipdb.set_trace()
+        self.g.add_edge(a, b, "connects")
         self.g.clear()
         self.assertSetEquality([], self.g.get_vertices())
         self.assertSetEquality([], self.g.get_edges())
