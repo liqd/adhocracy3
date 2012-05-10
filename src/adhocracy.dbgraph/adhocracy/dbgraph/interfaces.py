@@ -20,10 +20,10 @@ class IElement(Interface):
     def set_properties(property_dictionary):
         """Add properties. Existing properties are replaced."""
 
-    def remove_property(self, key):
+    def remove_property(key):
         """Removes the value of the property for the given key"""
 
-    def get_dbId(self):
+    def get_dbId():
         """Returns the unique identifier of the element"""
 
     def get_main_interface():

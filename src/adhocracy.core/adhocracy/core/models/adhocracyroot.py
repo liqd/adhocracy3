@@ -1,45 +1,43 @@
-from bulbs.property import String
-from bulbs.property import List
 from zope.interface import implements
-from zope.dottedname.resolve import resolve
+from zope.interface import Interface
+from zope.interface import directlyProvides
+from zope import component
 
-from pyramid.threadlocal import get_current_registry
 from repoze.lemonade.content import create_content
 
-from adhocracy.core.models.interfaces import IAdhocracyRoot
-from adhocracy.core.models.interfaces import IGraphConnection
-from adhocracy.core.models.node import NodeAdhocracy
+from adhocracy.dbgraph.embeddedgraph import get_graph
+from adhocracy.core.models.interfaces import ILocationAware
 from adhocracy.core.security import SITE_ACL
 
 
-class AdhocracyRoot(NodeAdhocracy):
-    """no parent == this is the application root object"""
-
-    implements(IAdhocracyRoot)
-
-    element_type = "adhocracyroot"
-
-    __parent__ = None
-    __name__ = ''
-
-    __acl__ = List()
-    name = String(nullable=False)
+class IAdhocracyRootMarker(Interface):
+    """
+    Adhocracy root object Marker.
+    """
 
 
-def appmaker():
-    root = create_content(IAdhocracyRoot)
-    if not root.__acl__:
-        root.__acl__ = SITE_ACL
-        root.save()
-    return root
+class AdhocracyRootLocationAware(object):
+     implements(ILocationAware)
+     component.adapts(IAdhocracyRootMarker)
+
+     def __init__(self, context):
+         self.context = context
+
+     __parent__ = None
+     __name__ = ''
+     __acl__ = SITE_ACL
 
 
 def adhocracyroot_factory():
-    interface = IAdhocracyRoot
-    registry = get_current_registry()
-    graph = registry.getUtility(IGraphConnection)
-    root = graph.getVertex(0)
-    if not root:
-        root = graph.addVertex(0)
-        root.initialize()
+    graph = get_graph()
+    root = graph.get_vertex(0)
+    if not IAdhocracyRootMarker.providedBy(root):
+        root.set_property("main_interface", IAdhocracyRootMarker)
+        directlyProvides(IAdhocracyRootMarker, root)
     return
+
+
+def appmaker():
+    root = create_content(IAdhocracyRootMarker)
+    return root
+

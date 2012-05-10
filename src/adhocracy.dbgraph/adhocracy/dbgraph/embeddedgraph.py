@@ -10,9 +10,22 @@ from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
 
 from adhocracy.dbgraph.elements import Vertex
+from adhocracy.dbgraph.elements import Edge
 
 
-class EmbeddedGraph(object):
+def _is_deleted_element(element):
+    """Tries to guess, whether an db element is already deleted."""
+    #TODO: implement using TransactionData?
+    r = False
+    try:
+        list(element.keys())
+        element.has_key('foo')
+    except Exception, e:
+        r = True
+    return r
+
+
+class EmbeddedGraph():
     implements(IGraph)
 
     def __init__(self, dbgraph_database):
@@ -31,27 +44,34 @@ class EmbeddedGraph(object):
         return Vertex(db_vertex)
 
     def get_vertices(self):
-        """Returns an iterator with all the vertices"""
+        nodes = self.db.nodes
+        return [Vertex(node) for node in nodes if not _is_deleted_element(node)]
 
     def remove_vertex(self, vertex):
         """Removes the given vertex"""
+        vertex.db_element.delete()
 
-    def add_edge(self, in_vertex, out_vertex, label, main_interface=IEdge):
-        """Creates a new edge with label(String)"""
+    def add_edge(self, start_vertex, end_vertex, label, main_interface=IEdge):
+        db_edge = start_vertex.db_element.relationships.create(label,
+                                                     end_vertex.db_element,
+                                                     main_interface = main_interface.__identifier__)
+        return Edge(db_edge)
 
     def get_edge(self, dbid):
-        """Retrieves an existing edge from the graph
-           with the given dbid or None.
-        """
+        return Edge(self.db.relationships[dbid])
 
     def get_edges(self):
-        """Returns an iterator with all the vertices"""
+        return [Edge(edge) for edge in self.db.relationships if not _is_deleted_element(edge)]
 
     def remove_edge(self, edge):
         """Removes the given edge"""
+        edge.db_element.delete()
 
     def clear(self):
-        """Dooms day machine"""
+        for e in self.get_edges():
+            self.remove_edge(e)
+        for v in self.get_vertices():
+            self.remove_vertex(v)
 
     def start_transaction(self):
         self.transaction = self.db.beginTx()

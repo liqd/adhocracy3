@@ -1,22 +1,20 @@
 from zope.interface import Interface
-from zope.interface import Attribute
 from zope.interface import taggedValue
 from zope import schema
 
 from pyramid_adoptedtraversal.interfaces import IChildsDictLike
 
 
-class IGraphConnection(Interface):
-    """
-    The graph connection object.
-    Implementation based on http://bulbflow.com/docs/api/bulbs/base/graph/
-    """
+class ILocationAware(Interface):
+     """Attributes needed to make the object hierachy work
+        http://readthedocs.org/docs/pyramid/en/1.3-branch/narr/resources.html#location-aware-resources
+     """
 
-    scripts = Attribute("Gremlin scripts to send database requests")
+     #__parent__ = schema.Object(required=True,)
 
-    vertices = Attribute("Object to create / search Vertices")
+     __name__ = schema.TextLine(title=u"Identifier (url slug)", required=True,)
 
-    edges = Attribute("Object to create / search edges ")
+     __acl__ = schema.List(title=u"ACL Control list", required=True, readonly=True)
 
 
 class IChildsDict(IChildsDictLike):
@@ -68,14 +66,6 @@ class IRelation(Interface):
     Graph relation object.
     """
     label = schema.TextLine(title=u"relation type (predicate)", required=True)
-
-
-class IAdhocracyRoot(Interface):
-    """
-    Adhocracy root object.
-    """
-    taggedValue('name', 'adhocracyroot')
-    taggedValue('class', 'adhocracy.core.models.adhocracyroot.AdhocracyRoot')
 
 
 class IContainer(Interface):

@@ -1,16 +1,14 @@
 """Helper classes for adhocracy.core test"""
-from bulbs.model import Relationship
-from bulbs.property import String
-from bulbs.property import Integer
-
 from pyramid.threadlocal import get_current_registry
 from pyramid import testing
 
-from adhocracy.core.models.interfaces import IGraphConnection
-from adhocracy.core.models import utilities
-from adhocracy.core.models.node import NodeAdhocracy
+from adhocracy.dbgraph.embeddedgraph import get_graph
+#from adhocracy.core.models.node import NodeAdhocracy
 
 #Unit testing
+
+
+GRAPHDB_CONNECTION_STRING = "testdb"
 
 
 def setUp(**kwargs):
@@ -20,12 +18,10 @@ def setUp(**kwargs):
     """
     testing.tearDown()
     settings = {}
-    settings['neo4j_uri'] = "http://localhost:7475/db/data"
+    settings['graphdb_connection_string'] = GRAPHDB_CONNECTION_STRING
     settings.update(kwargs.get('settings', {}))
     kwargs['settings'] = settings
     config = testing.setUp(**kwargs)
-
-
     return config
 
 
@@ -35,18 +31,9 @@ def tearDown(**kwargs):
        proxy to paramid.testing.tearDown(**kwargs)
     """
     graph = get_graph()
-    if graph:
-        graph.clear()
+    #graph.clear()
+    get_graph().shutdown()
     testing.tearDown(**kwargs)
-
-
-def get_graph():
-    """
-        returns the graph database connection object
-    """
-    registry = get_current_registry()
-    registry.registerUtility(utilities.graph_object(), IGraphConnection)
-    return registry.queryUtility(IGraphConnection)
 
 
 # Integration testing
@@ -97,21 +84,21 @@ def setUpFunctional(global_config=None, **settings):
 #Various test helper stuff
 
 
-class Dummy(dict):
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
+#class Dummy(dict):
+    #def __init__(self, **kwargs):
+        #self.__dict__.update(kwargs)
 
 
-class Person(NodeAdhocracy):
-    """Dummy node class"""
+#class Person(NodeAdhocracy):
+    #"""Dummy node class"""
 
-    element_type = "person"
-    name = String(nullable=False)
-    age = Integer()
+    #element_type = "person"
+    #name = String(nullable=False)
+    #age = Integer()
 
 
-class Knows(Relationship):
-    """Dummy relation class"""
+#class Knows(Relationship):
+    #"""Dummy relation class"""
 
-    label = "knows"
-    place = String()
+    #label = "knows"
+    #place = String()
