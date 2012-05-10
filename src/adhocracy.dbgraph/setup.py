@@ -27,7 +27,7 @@ tests_require = [
 setup(name='adhocracy.dbgraph',
       version='0.0',
       description='adhocracy.dbgraph',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
@@ -44,11 +44,10 @@ setup(name='adhocracy.dbgraph',
       zip_safe=False,
       install_requires=requires,
       tests_require=tests_require,
-      entry_points = """\
+      entry_points="""\
       [paste.app_factory]
       """,
-      extras_require = {
+      extras_require={
           'test': tests_require,
           },
       )
-
