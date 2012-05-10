@@ -20,8 +20,14 @@ class EmbeddedElement(object):
         if not main_interface:
             directlyProvides(self, main_interface)
 
+    def __eq__(self, other):
+        return self.get_dbId() == other.get_dbId()
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def get_main_interface(self):
-        if self.db_element.has_key('main_interface'):
+        if 'main_interface' in self.db_element.keys():
             return resolve(self.db_element['main_interface'])
         else:
             return IVertex
@@ -67,3 +73,15 @@ class Vertex(EmbeddedElement):
 
 class Edge(EmbeddedElement):
     implements(IEdge)
+
+    def start_vertex():
+        """Returns the origin vertex of the edge"""
+        raise NYIException()
+
+    def end_vertex():
+        """Returns the target vertex of the edge"""
+        raise NYIException()
+
+    def get_label():
+        """Returns the label of the edge"""
+        raise NYIException()

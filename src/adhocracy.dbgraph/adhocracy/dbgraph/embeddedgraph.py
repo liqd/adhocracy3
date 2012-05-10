@@ -10,6 +10,7 @@ from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
 
 from adhocracy.dbgraph.elements import Vertex
+from adhocracy.dbgraph.elements import Edge
 
 
 def _is_deleted_element(element):
@@ -50,22 +51,21 @@ class EmbeddedGraph():
         """Removes the given vertex"""
         vertex.db_element.delete()
 
-    def add_edge(self, in_vertex, out_vertex, label, main_interface=IEdge):
-        """Creates a new edge with label(String)"""
-        raise NYIException()
+    def add_edge(self, start_vertex, end_vertex, label, main_interface=IEdge):
+        db_edge = start_vertex.db_element.relationships.create(label,
+                                                     end_vertex.db_element,
+                                                     main_interface = main_interface.__identifier__)
+        return Edge(db_edge)
 
     def get_edge(self, dbid):
-        """Retrieves an existing edge from the graph
-           with the given dbid or None.
-        """
-        raise NYIException()
+        return Edge(self.db.relationships[dbid])
 
     def get_edges(self):
-        return self.db.relationships
+        return [Edge(edge) for edge in self.db.relationships if not _is_deleted_element(edge)]
 
     def remove_edge(self, edge):
         """Removes the given edge"""
-        raise NYIException()
+        edge.db_element.delete()
 
     def clear(self):
         for e in self.get_edges():

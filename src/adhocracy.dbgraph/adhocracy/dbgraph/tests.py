@@ -4,7 +4,7 @@ import unittest
 
 from pyramid import testing
 from adhocracy.dbgraph.embeddedgraph import EmbeddedGraph
-from adhocracy.dbgraph.interfaces import IGraph, IVertex
+from adhocracy.dbgraph.interfaces import IGraph, IVertex, IEdge
 
 
 GRAPHDB_CONNECTION_STRING = "testdb"
@@ -51,22 +51,25 @@ class DBGraphTestSuite(unittest.TestCase):
 
     # asserts the two iterables a and b contain the same set of elements.
     def assertSetEquality(self, a, b):
-        msg = "%s (%s) and %s (%s) don't represent equal sets." % \
-                (str(a), str(list(a)), str(b), str(list(b)))
+        def to_set(x):
+            return "%s :: %s" % (list(x), type(x))
+        msg = "%s and %s don't represent equal sets." % \
+                (to_set(a), to_set(b))
         for i in a:
             self.assertTrue(i in b, msg)
         for i in b:
             self.assertTrue(i in a, msg)
 
     def assertInterface(self, interface, object):
-        self.assert_(interface.providedBy(object))
+        assert interface.providedBy(object)
         from zope.interface.verify import verifyObject
-        self.assert_(verifyObject(interface, object))
+        assert verifyObject(interface, object)
 
 
     def testGetVertex(self):
         self.g.start_transaction()
         v_id = self.g.add_vertex().get_dbId()
+        self.assertInterface(IVertex, self.g.get_vertex(v_id))
         self.assertEqual(v_id,
                 self.g.get_vertex(v_id).get_dbId())
         self.g.stop_transaction()
@@ -74,7 +77,8 @@ class DBGraphTestSuite(unittest.TestCase):
     def testAddVertex(self):
         self.g.start_transaction()
         v = self.g.add_vertex()
-        self.assertTrue(v in self.g.get_vertices())
+        self.assertInterface(IVertex, v)
+        assert v in self.g.get_vertices()
         self.g.stop_transaction()
 
     def testGetVertices(self):
@@ -82,8 +86,6 @@ class DBGraphTestSuite(unittest.TestCase):
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         c = self.g.add_vertex()
-        for v in [a, b, c]:
-            self.assertInterface(IVertex, v)
         for v in self.g.get_vertices():
             self.assertInterface(IVertex, v)
         self.assertSetEquality([a, b, c], self.g.get_vertices())
@@ -100,7 +102,10 @@ class DBGraphTestSuite(unittest.TestCase):
         self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
-        e_id = self.g.add_edge(a, b, "foo").get_dbId()
+        e = self.g.add_edge(a, b, "foo")
+        self.assertInterface(IEdge, e)
+        e_id = e.get_dbId()
+        self.assertInterface(IEdge, self.g.get_edge(e_id))
         self.assertEqual(e_id, self.g.get_edge(e_id).get_dbId())
         self.g.stop_transaction()
 
@@ -120,6 +125,8 @@ class DBGraphTestSuite(unittest.TestCase):
         c = self.g.add_vertex()
         e = self.g.add_edge(a, b, "foo")
         f = self.g.add_edge(b, c, "foo")
+        for i in self.g.get_edges():
+            self.assertInterface(IEdge, i)
         self.assertSetEquality([e, f], self.g.get_edges())
         self.g.stop_transaction()
 
