@@ -25,6 +25,10 @@ requires = [
 tests_requires = [
     'WebTest',
     'mock',
+    'pytest',
+    'pytest-cov',
+    'pytest-pep8',
+    'pytest-quickcheck',
     'wsgi_intercept',
     'zope.testbrowser',
     ]
@@ -49,7 +53,6 @@ setup(name='adhocracy.core',
       zip_safe=False,
       install_requires=requires,
       tests_require=tests_requires,
-      test_suite="adhocracy.core",
       namespace_packages=['adhocracy'],
       entry_points="""\
       [paste.app_factory]
