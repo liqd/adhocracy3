@@ -12,7 +12,19 @@ from adhocracy.dbgraph.interfaces import IEdge
 from adhocracy.dbgraph.elements import Vertex
 
 
-class EmbeddedGraph(object):
+def _is_deleted_element(element):
+    """Tries to guess, whether an db element is already deleted."""
+    #TODO: implement using TransactionData?
+    r = False
+    try:
+        list(element.keys())
+        element.has_key('foo')
+    except Exception, e:
+        r = True
+    return r
+
+
+class EmbeddedGraph():
     implements(IGraph)
 
     def __init__(self, dbgraph_database):
@@ -31,27 +43,35 @@ class EmbeddedGraph(object):
         return Vertex(db_vertex)
 
     def get_vertices(self):
-        """Returns an iterator with all the vertices"""
+        nodes = self.db.nodes
+        return [Vertex(node) for node in nodes if not _is_deleted_element(node)]
 
     def remove_vertex(self, vertex):
         """Removes the given vertex"""
+        vertex.db_element.delete()
 
     def add_edge(self, in_vertex, out_vertex, label, main_interface=IEdge):
         """Creates a new edge with label(String)"""
+        raise NYIException()
 
     def get_edge(self, dbid):
         """Retrieves an existing edge from the graph
            with the given dbid or None.
         """
+        raise NYIException()
 
     def get_edges(self):
-        """Returns an iterator with all the vertices"""
+        return self.db.relationships
 
     def remove_edge(self, edge):
         """Removes the given edge"""
+        raise NYIException()
 
     def clear(self):
-        """Dooms day machine"""
+        for e in self.get_edges():
+            self.remove_edge(e)
+        for v in self.get_vertices():
+            self.remove_vertex(v)
 
     def start_transaction(self):
         self.transaction = self.db.beginTx()
