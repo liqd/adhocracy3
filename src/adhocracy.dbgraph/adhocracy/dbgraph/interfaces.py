@@ -88,7 +88,7 @@ class IGraph(Interface):
     def remove_vertex(vertex):
         """Removes the given vertex"""
 
-    def add_edge(self, startVertex, endVertex, label, main_interface=IEdge):
+    def add_edge(startVertex, endVertex, label, main_interface=IEdge):
         """Creates a new edge with label(String)"""
 
     def get_edge(dbid):
