@@ -9,7 +9,7 @@ from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
 
 
-class Element():
+class EmbeddedElement(object):
 
     implements(IElement)
 
@@ -43,10 +43,10 @@ class Element():
         """Removes the value of the property for the given key"""
 
 
-class Vertex(Element):
+class Vertex(EmbeddedElement):
 
     implements(IVertex)
 
 
-class Edge(Element):
+class Edge(EmbeddedElement):
     implements(IEdge)

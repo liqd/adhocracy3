@@ -12,7 +12,7 @@ from adhocracy.dbgraph.interfaces import IEdge
 from adhocracy.dbgraph.elements import Vertex
 
 
-class EmbeddedGraph():
+class EmbeddedGraph(object):
     implements(IGraph)
 
     def __init__(self, dbgraph_database):
