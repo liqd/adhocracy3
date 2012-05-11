@@ -46,7 +46,7 @@ def assertInterface(interface, obj):
     assert verifyObject(interface, obj)
 
 
-class DBGraphTestSuite(unittest.TestCase):
+class DBGraphTest(unittest.TestCase):
 
     @classmethod
     def setup_class(self):
