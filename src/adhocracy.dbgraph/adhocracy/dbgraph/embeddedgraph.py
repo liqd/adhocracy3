@@ -96,6 +96,17 @@ def get_graph():
     return graph
 
 
+def del_graph():
+    """manually shuts the graph down, that got created using get_graph.
+    Normally, you don't have to call this function, the global graph db
+    connection will be shut down when the process exits. This is needed,
+    if you manually want to fire up your own neo4j kernel for the same db."""
+    graph = get_graph()
+    graph.shutdown()
+    global_registry = component.getGlobalSiteManager()
+    global_registry.unregisterUtility(graph)
+
+
 @implementer(IGraph)
 def graph_factory():
     """Utility to store the db graph conneciton object

@@ -17,7 +17,7 @@ Set a custom databse connection string in your pyramid settings:
 
 Get the graph object to play with::
 
-    >>> from adhocracy.dbgraph.embeddedgraph import get_graph
+    >>> from adhocracy.dbgraph.embeddedgraph import get_graph, del_graph
     >>> from adhocracy.dbgraph.interfaces import IGraph
     >>> graph1 = get_graph()
     >>> IGraph.providedBy(graph1)
@@ -32,9 +32,13 @@ The graph object object has to be a singleton for all you python processes:
     >>> graph1 is graph2
     True
 
-Shutdown the database::
+Getting the root vertex to start with:
+    >>> graph1.get_root_vertex()
+    <adh...
 
-    >>> graph1.shutdown()
+Manually shutdown the database::
+
+    >>> del_graph()
     >>> testing.tearDown()
 
 

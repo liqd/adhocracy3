@@ -2,10 +2,12 @@
 
 import unittest
 
-from adhocracy.dbgraph.embeddedgraph import EmbeddedGraph
 from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
 from adhocracy.dbgraph.interfaces import DontRemoveRootException
+from adhocracy.dbgraph.embeddedgraph import EmbeddedGraph
+from adhocracy.dbgraph.embeddedgraph import get_graph
+from adhocracy.dbgraph.embeddedgraph import del_graph
 
 
 GRAPHDB_CONNECTION_STRING = "testdb"
@@ -136,6 +138,7 @@ class DBGraphTestSuite(unittest.TestCase):
             self.g.remove_vertex(root)
         self.assertRaises(DontRemoveRootException, remove_root)
         assertInterface(IVertex, self.g.get_root_vertex())
+        assertSetEquality([self.g.get_root_vertex()], self.g.get_vertices())
         self.g.stop_transaction()
 
     def testGetProperties(self):
@@ -193,7 +196,30 @@ class DBGraphTestSuite(unittest.TestCase):
         assertSetEquality([B], c.in_edges())
         self.g.stop_transaction()
 
+
+class GetGraphEmbeddedTestSuite(DBGraphTestSuite):
+    """Like DBGraphTestSuite, but the graph is created using get_graph."""
+
+    def setUp(self):
+        from pyramid import testing
+        settings = {'graphdb_connection_string': GRAPHDB_CONNECTION_STRING}
+        config = testing.setUp(settings=settings)
+        self.g = get_graph()
+        self.g.start_transaction()
+        self.g.clear()
+        self.g.stop_transaction()
+
+    def tearDown(self):
+        self.g.start_transaction()
+        self.g.clear()
+        self.g.stop_transaction()
+        del_graph()
+        from pyramid import testing
+        testing.tearDown()
+
+
     #TODO: Transaction tests
+
 
 if __name__ == "__main__":
     unittest.main()
