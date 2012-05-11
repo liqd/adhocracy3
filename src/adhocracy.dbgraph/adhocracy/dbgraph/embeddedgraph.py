@@ -12,18 +12,7 @@ from adhocracy.dbgraph.interfaces import DontRemoveRootException
 
 from adhocracy.dbgraph.elements import Vertex
 from adhocracy.dbgraph.elements import Edge
-
-
-def _is_deleted_element(element):
-    """Tries to guess, whether an db element is already deleted."""
-    #TODO: implement using TransactionData?
-    r = False
-    try:
-        list(element.keys())
-        'foo' in element.keys()
-    except Exception, e:
-        r = True
-    return r
+from adhocracy.dbgraph.elements import _is_deleted_element
 
 
 class EmbeddedGraph():

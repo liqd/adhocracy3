@@ -9,6 +9,18 @@ from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
 
 
+def _is_deleted_element(element):
+    """Tries to guess, whether an db element is already deleted."""
+    #TODO: implement using TransactionData?
+    r = False
+    try:
+        list(element.keys())
+        'foo' in element.keys()
+    except Exception, e:
+        r = True
+    return r
+
+
 class EmbeddedElement(object):
     implements(IElement)
     """implementation for EmbeddedGraph"""
@@ -36,8 +48,7 @@ class EmbeddedElement(object):
         return self.db_element.id
 
     def get_property(self, key):
-        """Gets the value of the property for the given key"""
-        raise NYIException()
+        return self.db_element[key]
 
     def get_properties(self):
         return dict(self.db_element)
@@ -51,23 +62,17 @@ class EmbeddedElement(object):
 
     def remove_property(self, key):
         """Removes the value of the property for the given key"""
-        raise NYIException()
+        raise NotImplementedError()
 
 
 class Vertex(EmbeddedElement):
     implements(IVertex)
 
     def out_edges(self, label=None):
-        """Returns a generator with  all outgoing edges of the vertex.
-           label: Optional string parameter to filter the edges
-        """
-        raise NYIException()
+        return [Edge(edge) for edge in self.db_element.relationships.outgoing if not _is_deleted_element(edge)]
 
     def in_edges(self, label=None):
-        """Returns a generator with all incoming edges of the vertex.
-           label: Optional string parameter to filter the edges
-        """
-        raise NYIException()
+        return [Edge(edge) for edge in self.db_element.relationships.incoming if not _is_deleted_element(edge)]
 
 
 class Edge(EmbeddedElement):

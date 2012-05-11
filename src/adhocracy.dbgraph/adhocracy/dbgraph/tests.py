@@ -150,6 +150,22 @@ class DBGraphTestSuite(unittest.TestCase):
         ep['main_interface'] = IEdge.__identifier__
         assert ap == a.get_properties()
         assert ep == e.get_properties()
+        self.g.stop_transaction()
+
+    def testGetProperty(self):
+        self.g.start_transaction()
+        a = self.g.add_vertex()
+        b = self.g.add_vertex()
+        e = self.g.add_edge(a, b, "connects")
+        ap = {'foo': 42, 'bar': 23}
+        a.set_properties(ap)
+        ep = {'baz': 42, 'blub': 23}
+        e.set_properties(ep)
+        for k in ap.keys():
+            assert ap[k] == a.get_property(k)
+        for k in ep.keys():
+            assert ep[k] == e.get_property(k)
+        self.g.stop_transaction()
 
     def testInOutEdges(self):
         self.g.start_transaction()
@@ -165,6 +181,7 @@ class DBGraphTestSuite(unittest.TestCase):
         assertSetEquality([A], b.in_edges())
         assertSetEquality([C], c.out_edges())
         assertSetEquality([B], c.in_edges())
+        self.g.stop_transaction()
 
     #TODO: Transaction tests
 
