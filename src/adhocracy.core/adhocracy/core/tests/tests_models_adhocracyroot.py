@@ -49,7 +49,7 @@ class ModelTests(unittest.TestCase):
         settings = {}
         app = main({}, **settings)
         root = app.root_factory(request)
-        self.assert_(root.eid == app.root_factory(request).eid)
+        self.assert_(root.get_dbId() == app.root_factory(request).get_dbId())
         from adhocracy.core.security import SITE_ACL
         self.assert_(self._target_interface.providedBy(root))
         self.assert_(root.__acl__ == SITE_ACL)

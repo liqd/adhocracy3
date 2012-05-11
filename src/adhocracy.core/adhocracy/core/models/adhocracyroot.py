@@ -1,4 +1,5 @@
 from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 from zope.interface import directlyProvides
 from zope import component
@@ -28,13 +29,16 @@ class AdhocracyRootLocationAware(object):
      __acl__ = SITE_ACL
 
 
+@implementer(IAdhocracyRootMarker)
 def adhocracyroot_factory():
     graph = get_graph()
-    root = graph.get_vertex(0)
+    root = graph.get_root_vertex()
     if not IAdhocracyRootMarker.providedBy(root):
+        graph.start_transaction()
         root.set_property("main_interface", IAdhocracyRootMarker.__identifier__)
-        directlyProvides(IAdhocracyRootMarker, root)
-    return
+        directlyProvides(root, IAdhocracyRootMarker)
+        graph.stop_transaction()
+    return root
 
 
 def appmaker():

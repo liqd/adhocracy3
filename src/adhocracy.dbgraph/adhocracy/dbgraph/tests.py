@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+from zope.interface import Interface
 
 from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
+from adhocracy.dbgraph.interfaces import INode
+from adhocracy.dbgraph.interfaces import IReference
 from adhocracy.dbgraph.interfaces import DontRemoveRootException
 from adhocracy.dbgraph.embeddedgraph import EmbeddedGraph
 from adhocracy.dbgraph.embeddedgraph import get_graph
@@ -11,6 +14,18 @@ from adhocracy.dbgraph.embeddedgraph import del_graph
 
 
 GRAPHDB_CONNECTION_STRING = "testdb"
+
+
+class IDummyMarker(Interface):
+    """buh"""
+
+
+class IDummyNodeMarker(INode):
+    """bah"""
+
+
+class IDummyReferenceMarker(IReference):
+    """bih"""
 
 
 def assertSetEquality(a, b):
@@ -25,10 +40,10 @@ def assertSetEquality(a, b):
         assert i in a, msg
 
 
-def assertInterface(interface, object):
-    assert interface.providedBy(object)
+def assertInterface(interface, obj):
+    assert interface.providedBy(obj)
     from zope.interface.verify import verifyObject
-    assert verifyObject(interface, object)
+    assert verifyObject(interface, obj)
 
 
 class DBGraphTestSuite(unittest.TestCase):
@@ -64,6 +79,22 @@ class DBGraphTestSuite(unittest.TestCase):
         assert v in self.g.get_vertices()
         self.g.stop_transaction()
 
+    def testAddVertexWithMarkerInterface(self):
+        self.g.start_transaction()
+        v = self.g.add_vertex(main_interface=IDummyMarker)
+        assertInterface(IVertex, v)
+        assertInterface(IDummyMarker, v)
+        self.g.stop_transaction()
+
+    def testAddNode(self):
+        self.g.start_transaction()
+        v = self.g.add_vertex(main_interface=IDummyNodeMarker)
+        assertInterface(IVertex, v)
+        assertInterface(INode, v)
+        assertInterface(IDummyNodeMarker, v)
+        assert v in self.g.get_vertices()
+        self.g.stop_transaction()
+
     def testGetVertices(self):
         self.g.start_transaction()
         root = self.g.get_root_vertex()
@@ -82,17 +113,45 @@ class DBGraphTestSuite(unittest.TestCase):
         self.assertFalse(v in self.g.get_vertices())
         self.g.stop_transaction()
 
-    def testGetEdge(self):
+    def testAddEdge(self):
         self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e = self.g.add_edge(a, b, "foo")
+        self.g.stop_transaction()
         assert e.start_vertex() == a
         assert e.end_vertex() == b
         assert e.get_label() == "foo"
         assertInterface(IEdge, e)
         e_id = e.get_dbId()
         assertInterface(IEdge, self.g.get_edge(e_id))
+        self.assertEqual(e_id, self.g.get_edge(e_id).get_dbId())
+
+    def testAddEdgeWithMarkerInterface(self):
+        self.g.start_transaction()
+        a = self.g.add_vertex()
+        b = self.g.add_vertex()
+        e = self.g.add_edge(a, b, "foo", main_interface=IDummyMarker)
+        self.g.stop_transaction()
+        assertInterface(IEdge, e)
+        assertInterface(IDummyMarker, e)
+
+    def testAddReference(self):
+        self.g.start_transaction()
+        a = self.g.add_vertex()
+        b = self.g.add_vertex()
+        e = self.g.add_edge(a, b, "foo", main_interface=IDummyReferenceMarker)
+        self.g.stop_transaction()
+        assertInterface(IEdge, e)
+        assertInterface(IReference, e)
+        assertInterface(IDummyReferenceMarker, e)
+
+    def testGetEdge(self):
+        self.g.start_transaction()
+        a = self.g.add_vertex()
+        b = self.g.add_vertex()
+        e = self.g.add_edge(a, b, "foo")
+        e_id = e.get_dbId()
         self.assertEqual(e_id, self.g.get_edge(e_id).get_dbId())
         self.g.stop_transaction()
 
@@ -136,7 +195,7 @@ class DBGraphTestSuite(unittest.TestCase):
 
         def remove_root():
             self.g.remove_vertex(root)
-        self.assertRaises(DontRemoveRootException, remove_root)
+        self.assertRaises(DontRemoveRootException, remove_root())
         assertInterface(IVertex, self.g.get_root_vertex())
         assertSetEquality([self.g.get_root_vertex()], self.g.get_vertices())
         self.g.stop_transaction()
