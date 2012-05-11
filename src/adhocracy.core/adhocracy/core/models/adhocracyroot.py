@@ -32,7 +32,7 @@ def adhocracyroot_factory():
     graph = get_graph()
     root = graph.get_vertex(0)
     if not IAdhocracyRootMarker.providedBy(root):
-        root.set_property("main_interface", IAdhocracyRootMarker)
+        root.set_property("main_interface", IAdhocracyRootMarker.__identifier__)
         directlyProvides(IAdhocracyRootMarker, root)
     return
 
