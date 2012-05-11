@@ -48,21 +48,26 @@ def assertInterface(interface, obj):
 
 class DBGraphTestSuite(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setup_class(self):
         from neo4j import GraphDatabase
         db = GraphDatabase(GRAPHDB_CONNECTION_STRING)
         self.g = EmbeddedGraph(db)
-        self.g.start_transaction()
-        self.g.clear()
-        self.g.stop_transaction()
+
+    @classmethod
+    def teardown_class(self):
+        self.g.shutdown()
+        del self.g
 
     def tearDown(self):
         try:
-            self.g.start_transaction()
-            self.g.clear()
+            #catch aborted transactions
             self.g.stop_transaction()
-        finally:
-            self.g.shutdown()
+        except Exception:
+            pass
+        self.g.start_transaction()
+        self.g.clear()
+        self.g.stop_transaction()
 
     def testGetVertex(self):
         self.g.start_transaction()
@@ -257,28 +262,29 @@ class DBGraphTestSuite(unittest.TestCase):
         self.g.stop_transaction()
 
 
-class GetGraphEmbeddedTestSuite(DBGraphTestSuite):
-    """Like DBGraphTestSuite, but the graph is created using get_graph."""
+#@Sönke Why do want to run all tests twice?
+#class GetGraphEmbeddedTestSuite(DBGraphTestSuite):
+    #"""Like DBGraphTestSuite, but the graph is created using get_graph."""
 
-    def setUp(self):
-        from pyramid import testing
-        settings = {'graphdb_connection_string': GRAPHDB_CONNECTION_STRING}
-        config = testing.setUp(settings=settings)
-        self.g = get_graph()
-        self.g.start_transaction()
-        self.g.clear()
-        self.g.stop_transaction()
+    #@classmethod
+    #def setup_class(self):
+        #from pyramid import testing
+        #settings = {'graphdb_connection_string': GRAPHDB_CONNECTION_STRING}
+        #config = testing.setUp(settings=settings)
+        #self.g = get_graph()
+        #self.g.start_transaction()
+        #self.g.clear()
+        #self.g.stop_transaction()
 
-    def tearDown(self):
-        self.g.start_transaction()
-        self.g.clear()
-        self.g.stop_transaction()
-        del_graph()
-        from pyramid import testing
-        testing.tearDown()
+    #def tearDown(self):
+        #self.g.start_transaction()
+        #self.g.clear()
+        #self.g.stop_transaction()
+        #del_graph()
+        #from pyramid import testing
+        #testing.tearDown()
 
-
-    #TODO: Transaction tests
+    ##TODO: Transaction tests
 
 
 if __name__ == "__main__":

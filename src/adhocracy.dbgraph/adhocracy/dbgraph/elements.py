@@ -92,11 +92,11 @@ class Node(Vertex):
 
     implements(INode)
 
-    __parent__ = None #TODO
+    __parent__ = None  # TODO
 
-    __name__ = "" #TODO
+    __name__ = ""  # TODO
 
-    __acl__ = []  # TODO
+    __acl__ = []   # TODO
 
 
 class Reference(Edge):
@@ -125,5 +125,3 @@ def element_factory(db_element):
         element = Edge(db_element)
     element and directlyProvides(element, interface)
     return element
-
-
