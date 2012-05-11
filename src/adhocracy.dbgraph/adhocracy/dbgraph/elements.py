@@ -7,6 +7,8 @@ from zope.interface import directlyProvides
 from adhocracy.dbgraph.interfaces import IElement
 from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
+from adhocracy.dbgraph.interfaces import INode
+from adhocracy.dbgraph.interfaces import IReference
 
 
 def _is_deleted_element(element):
@@ -16,7 +18,7 @@ def _is_deleted_element(element):
     try:
         list(element.keys())
         'foo' in element.keys()
-    except Exception, e:
+    except Exception:
         r = True
     return r
 
@@ -26,11 +28,7 @@ class EmbeddedElement(object):
     """implementation for EmbeddedGraph"""
 
     def __init__(self, db_element):
-
         self.db_element = db_element
-        main_interface = self.get_main_interface()
-        if not main_interface:
-            directlyProvides(self, main_interface)
 
     def __eq__(self, other):
         return self.get_dbId() == other.get_dbId()
@@ -42,7 +40,7 @@ class EmbeddedElement(object):
         if 'main_interface' in self.db_element.keys():
             return resolve(self.db_element['main_interface'])
         else:
-            return IVertex
+            return None
 
     def get_dbId(self):
         return self.db_element.id
@@ -88,3 +86,45 @@ class Edge(EmbeddedElement):
 
     def get_label(self):
         return self.db_element.type.name()
+
+
+class Node(Vertex):
+    """TODO """
+
+    implements(INode)
+
+    __parent__ = None #TODO
+
+    __name__ = "" #TODO
+
+    __acl__ = []  # TODO
+
+
+class Reference(Edge):
+    """TODO """
+
+    implements(IReference)
+
+
+def element_factory(db_element):
+    """Make a proper element according to the main_interface"""
+
+    interface = IElement
+    if 'main_interface' in db_element.keys():
+        interface = resolve(db_element['main_interface'])
+    # import here, we do not want to wake the jvm earlier...
+    from neo4j._backend  import RelationshipProxy
+    from neo4j._backend  import NodeProxy
+    element = None
+    if issubclass(interface, INode):
+        element = Node(db_element)
+    elif issubclass(interface, IEdge):
+        element = Edge(db_element)
+    elif isinstance(db_element, NodeProxy):
+        element = Vertex(db_element)
+    elif isinstance(db_element, RelationshipProxy):
+        element = Edge(db_element)
+    element and directlyProvides(element, interface)
+    return element
+
+

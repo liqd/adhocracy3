@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
-
 from zope.interface import Interface
+from zope import schema
+
+
+#####################################################
+# Graph db basic elements to access the db directly #
+#####################################################
 
 
 class IElement(Interface):
@@ -119,3 +124,44 @@ class IGraph(Interface):
 
 class DontRemoveRootException(Exception):
     pass
+
+
+####################################
+# Pyramid location aware, security #
+####################################
+
+class ILocationAware(Interface):
+     """Attributes needed to make the object hierachy / local permissions work
+        http://readthedocs.org/docs/pyramid/en/1.3-branch/narr/resources.html
+     """
+
+     #__parent__ = schema.Object(required=True,)
+
+     __name__ = schema.TextLine(title=u"Identifier (url slug)", required=True,)
+
+     __acl__ = schema.List(title=u"ACL Control list", required=True, readonly=True)
+
+
+
+#############################
+# Supergraph basic elements #
+#############################
+
+class INode(IVertex, ILocationAware):
+    """
+    Supergraph Node object.
+    """
+
+    #TODO
+    #def outReferences():
+        #""" """
+
+    #def inReferences():
+        #""" """
+
+
+class IReference(IEdge):
+    """
+    Supergraph Reference object.
+    """
+    #TODO

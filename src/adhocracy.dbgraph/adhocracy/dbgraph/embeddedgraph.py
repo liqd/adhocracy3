@@ -6,13 +6,10 @@ from zope import component
 from pyramid.threadlocal import get_current_registry
 
 from adhocracy.dbgraph.interfaces import IGraph
-from adhocracy.dbgraph.interfaces import IVertex
-from adhocracy.dbgraph.interfaces import IEdge
 from adhocracy.dbgraph.interfaces import DontRemoveRootException
 
-from adhocracy.dbgraph.elements import Vertex
-from adhocracy.dbgraph.elements import Edge
 from adhocracy.dbgraph.elements import _is_deleted_element
+from adhocracy.dbgraph.elements import element_factory
 
 
 class EmbeddedGraph():
@@ -24,18 +21,19 @@ class EmbeddedGraph():
     def shutdown(self):
         self.db.shutdown()
 
-    def add_vertex(self, main_interface=IVertex):
+    def add_vertex(self, main_interface=None):
         db_vertex = self.db.node()
-        db_vertex['main_interface'] = main_interface.__identifier__
-        return Vertex(db_vertex)
+        if main_interface:
+            db_vertex['main_interface'] = main_interface.__identifier__
+        return element_factory(db_vertex)
 
     def get_vertex(self, dbid):
         db_vertex = self.db.node[dbid]
-        return Vertex(db_vertex)
+        return element_factory(db_vertex)
 
     def get_vertices(self):
         nodes = self.db.nodes
-        return [Vertex(node) for node in nodes
+        return [element_factory(node) for node in nodes
                 if not _is_deleted_element(node)]
 
     def remove_vertex(self, vertex):
@@ -47,17 +45,18 @@ class EmbeddedGraph():
     def get_root_vertex(self):
         return self.get_vertex(0)
 
-    def add_edge(self, start_vertex, end_vertex, label, main_interface=IEdge):
+    def add_edge(self, start_vertex, end_vertex, label, main_interface=None):
         db_edge = start_vertex.db_element.relationships.create(label,
-                    end_vertex.db_element,
-                    main_interface=main_interface.__identifier__)
-        return Edge(db_edge)
+                    end_vertex.db_element)
+        if main_interface:
+            db_edge['main_interface'] = main_interface.__identifier__
+        return element_factory(db_edge)
 
     def get_edge(self, dbid):
-        return Edge(self.db.relationships[dbid])
+        return element_factory(self.db.relationships[dbid])
 
     def get_edges(self):
-        return [Edge(edge) for edge in self.db.relationships
+        return [element_factory(edge) for edge in self.db.relationships
                 if not _is_deleted_element(edge)]
 
     def remove_edge(self, edge):

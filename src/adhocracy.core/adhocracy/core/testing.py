@@ -1,5 +1,4 @@
 """Helper classes for adhocracy.core test"""
-from pyramid.threadlocal import get_current_registry
 from pyramid import testing
 
 from adhocracy.dbgraph.embeddedgraph import get_graph
@@ -32,7 +31,6 @@ def tearDown(**kwargs):
     """
     graph = get_graph()
     #graph.clear()
-    get_graph().shutdown()
     testing.tearDown(**kwargs)
 
 
