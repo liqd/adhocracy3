@@ -128,4 +128,5 @@ def graph_factory():
             print 'Could not shutdown Neo4j database.'
 
     atexit.register(close_db)
+
     return EmbeddedGraph(db)

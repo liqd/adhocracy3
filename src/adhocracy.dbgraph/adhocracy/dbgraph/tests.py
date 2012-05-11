@@ -46,7 +46,6 @@ class DBGraphTestSuite(unittest.TestCase):
         finally:
             self.g.shutdown()
 
-
     def testGetVertex(self):
         self.g.start_transaction()
         v_id = self.g.add_vertex().get_dbId()
