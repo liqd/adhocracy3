@@ -11,6 +11,23 @@ from adhocracy.dbgraph.interfaces import DontRemoveRootException
 GRAPHDB_CONNECTION_STRING = "testdb"
 
 
+def assertSetEquality(a, b):
+    """asserts the two iterables a and b contain the same set of elements"""
+    def to_set(x):
+        return "%s :: %s" % (list(x), type(x))
+    msg = "%s and %s don't represent equal sets." % \
+            (to_set(a), to_set(b))
+    for i in a:
+        assert i in b, msg
+    for i in b:
+        assert i in a, msg
+
+def assertInterface(interface, object):
+    assert interface.providedBy(object)
+    from zope.interface.verify import verifyObject
+    assert verifyObject(interface, object)
+
+
 class DBGraphTestSuite(unittest.TestCase):
 
     def setUp(self):
@@ -29,26 +46,11 @@ class DBGraphTestSuite(unittest.TestCase):
         finally:
             self.g.shutdown()
 
-    # asserts the two iterables a and b contain the same set of elements.
-    def assertSetEquality(self, a, b):
-        def to_set(x):
-            return "%s :: %s" % (list(x), type(x))
-        msg = "%s and %s don't represent equal sets." % \
-                (to_set(a), to_set(b))
-        for i in a:
-            self.assertTrue(i in b, msg)
-        for i in b:
-            self.assertTrue(i in a, msg)
-
-    def assertInterface(self, interface, object):
-        assert interface.providedBy(object)
-        from zope.interface.verify import verifyObject
-        assert verifyObject(interface, object)
 
     def testGetVertex(self):
         self.g.start_transaction()
         v_id = self.g.add_vertex().get_dbId()
-        self.assertInterface(IVertex, self.g.get_vertex(v_id))
+        assertInterface(IVertex, self.g.get_vertex(v_id))
         self.assertEqual(v_id,
                 self.g.get_vertex(v_id).get_dbId())
         self.g.stop_transaction()
@@ -56,7 +58,7 @@ class DBGraphTestSuite(unittest.TestCase):
     def testAddVertex(self):
         self.g.start_transaction()
         v = self.g.add_vertex()
-        self.assertInterface(IVertex, v)
+        assertInterface(IVertex, v)
         assert v in self.g.get_vertices()
         self.g.stop_transaction()
 
@@ -67,8 +69,8 @@ class DBGraphTestSuite(unittest.TestCase):
         b = self.g.add_vertex()
         c = self.g.add_vertex()
         for v in self.g.get_vertices():
-            self.assertInterface(IVertex, v)
-        self.assertSetEquality([root, a, b, c], self.g.get_vertices())
+            assertInterface(IVertex, v)
+        assertSetEquality([root, a, b, c], self.g.get_vertices())
         self.g.stop_transaction()
 
     def testRemoveVertex(self):
@@ -86,9 +88,9 @@ class DBGraphTestSuite(unittest.TestCase):
         assert e.start_vertex() == a
         assert e.end_vertex() == b
         assert e.get_label() == "foo"
-        self.assertInterface(IEdge, e)
+        assertInterface(IEdge, e)
         e_id = e.get_dbId()
-        self.assertInterface(IEdge, self.g.get_edge(e_id))
+        assertInterface(IEdge, self.g.get_edge(e_id))
         self.assertEqual(e_id, self.g.get_edge(e_id).get_dbId())
         self.g.stop_transaction()
 
@@ -109,8 +111,8 @@ class DBGraphTestSuite(unittest.TestCase):
         e = self.g.add_edge(a, b, "foo")
         f = self.g.add_edge(b, c, "foo")
         for i in self.g.get_edges():
-            self.assertInterface(IEdge, i)
-        self.assertSetEquality([e, f], self.g.get_edges())
+            assertInterface(IEdge, i)
+        assertSetEquality([e, f], self.g.get_edges())
         self.g.stop_transaction()
 
     def testClear(self):
@@ -120,20 +122,20 @@ class DBGraphTestSuite(unittest.TestCase):
         self.g.add_edge(a, b, "connects")
         self.g.clear()
         root = self.g.get_root_vertex()
-        self.assertSetEquality([root], self.g.get_vertices())
-        self.assertSetEquality([], root.get_properties().keys())
-        self.assertSetEquality([], self.g.get_edges())
+        assertSetEquality([root], self.g.get_vertices())
+        assertSetEquality([], root.get_properties().keys())
+        assertSetEquality([], self.g.get_edges())
         self.g.stop_transaction()
 
     def testRootVertex(self):
         self.g.start_transaction()
         root = self.g.get_root_vertex()
-        self.assertInterface(IVertex, root)
+        assertInterface(IVertex, root)
 
         def remove_root():
             self.g.remove_vertex(root)
         self.assertRaises(DontRemoveRootException, remove_root)
-        self.assertInterface(IVertex, self.g.get_root_vertex())
+        assertInterface(IVertex, self.g.get_root_vertex())
         self.g.stop_transaction()
 
     def testGetProperties(self):
@@ -158,12 +160,12 @@ class DBGraphTestSuite(unittest.TestCase):
         A = self.g.add_edge(a, b, "A")
         B = self.g.add_edge(b, c, "B")
         C = self.g.add_edge(c, a, "C")
-        self.assertSetEquality([A], a.out_edges())
-        self.assertSetEquality([C], a.in_edges())
-        self.assertSetEquality([B], b.out_edges())
-        self.assertSetEquality([A], b.in_edges())
-        self.assertSetEquality([C], c.out_edges())
-        self.assertSetEquality([B], c.in_edges())
+        assertSetEquality([A], a.out_edges())
+        assertSetEquality([C], a.in_edges())
+        assertSetEquality([B], b.out_edges())
+        assertSetEquality([A], b.in_edges())
+        assertSetEquality([C], c.out_edges())
+        assertSetEquality([B], c.in_edges())
 
     #TODO: Transaction tests
 
