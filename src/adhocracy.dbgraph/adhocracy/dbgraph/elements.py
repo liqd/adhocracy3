@@ -69,10 +69,12 @@ class Vertex(EmbeddedElement):
     implements(IVertex)
 
     def out_edges(self, label=None):
-        return [Edge(edge) for edge in self.db_element.relationships.outgoing if not _is_deleted_element(edge)]
+        return [Edge(edge) for edge in self.db_element.relationships.outgoing
+                if not _is_deleted_element(edge)]
 
     def in_edges(self, label=None):
-        return [Edge(edge) for edge in self.db_element.relationships.incoming if not _is_deleted_element(edge)]
+        return [Edge(edge) for edge in self.db_element.relationships.incoming
+                if not _is_deleted_element(edge)]
 
 
 class Edge(EmbeddedElement):

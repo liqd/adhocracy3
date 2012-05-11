@@ -22,6 +22,7 @@ def assertSetEquality(a, b):
     for i in b:
         assert i in a, msg
 
+
 def assertInterface(interface, object):
     assert interface.providedBy(object)
     from zope.interface.verify import verifyObject

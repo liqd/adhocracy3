@@ -21,8 +21,9 @@ def to_dot(graph):
 
     return r
 
+
 def to_pdf(filename, graph):
-    with NamedTemporaryFile(mode = "w") as dotFile:
+    with NamedTemporaryFile(mode="w") as dotFile:
         dotFile.write(to_dot(graph))
         dotFile.flush()
         print(check_output(["dot", dotFile.name, "-Tpdf", "-o", filename]))
