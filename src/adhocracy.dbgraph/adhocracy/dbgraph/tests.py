@@ -173,6 +173,21 @@ class DBGraphTestSuite(unittest.TestCase):
         assert ap == a.get_properties()
         assert ep == e.get_properties()
 
+    def testInOutEdges(self):
+        self.g.start_transaction()
+        a = self.g.add_vertex()
+        b = self.g.add_vertex()
+        c = self.g.add_vertex()
+        A = self.g.add_edge(a, b, "A")
+        B = self.g.add_edge(b, c, "B")
+        C = self.g.add_edge(c, a, "C")
+        self.assertSetEquality([A], a.out_edges())
+        self.assertSetEquality([C], a.in_edges())
+        self.assertSetEquality([B], b.out_edges())
+        self.assertSetEquality([A], b.in_edges())
+        self.assertSetEquality([C], c.out_edges())
+        self.assertSetEquality([B], c.in_edges())
+
     #TODO: Transaction tests
 
 if __name__ == "__main__":
