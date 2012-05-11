@@ -188,17 +188,18 @@ class DBGraphTestSuite(unittest.TestCase):
         assertSetEquality([], self.g.get_edges())
         self.g.stop_transaction()
 
-    def testRootVertex(self):
-        self.g.start_transaction()
+    def testGetRootVertex(self):
         root = self.g.get_root_vertex()
         assertInterface(IVertex, root)
-
-        def remove_root():
-            self.g.remove_vertex(root)
-        self.assertRaises(DontRemoveRootException, remove_root())
-        assertInterface(IVertex, self.g.get_root_vertex())
         assertSetEquality([self.g.get_root_vertex()], self.g.get_vertices())
-        self.g.stop_transaction()
+
+    def testRemvoeRootVertex(self):
+        import pytest
+        with pytest.raises(DontRemoveRootException):
+            self.g.start_transaction()
+            root = self.g.get_root_vertex()
+            self.g.remove_vertex(root)
+            self.g.stop_transaction()
 
     def testGetProperties(self):
         self.g.start_transaction()
