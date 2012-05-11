@@ -1,8 +1,8 @@
 
 
 from tempfile import NamedTemporaryFile
+from subprocess import check_call
 from subprocess import check_output
-from subprocess import STDOUT
 
 
 def to_dot(graph):
@@ -24,6 +24,5 @@ def to_dot(graph):
 def to_pdf(filename, graph):
     with NamedTemporaryFile(mode = "w") as dotFile:
         dotFile.write(to_dot(graph))
-        print(check_output(["pwd"]))
-        print(["dot", "-Tpdf", "-o", filename, dotFile.name])
-        print(check_output(["dot", " -Tpdf ", " -o ", filename, " ", dotFile.name], stderr=STDOUT, shell=True))
+        dotFile.flush()
+        print(check_output(["dot", dotFile.name, "-Tpdf", "-o", filename]))
