@@ -168,6 +168,15 @@ class DBGraphTestSuite(unittest.TestCase):
             assert ep[k] == e.get_property(k)
         self.g.stop_transaction()
 
+    def testRemoveProperty(self):
+        self.g.start_transaction()
+        v = self.g.get_root_vertex()
+        v.set_property("key", "value")
+        assert (v.get_property("key") == "value")
+        v.remove_property("key")
+        assert "key" not in v.get_properties().keys()
+        self.g.stop_transaction()
+
     def testInOutEdges(self):
         self.g.start_transaction()
         a = self.g.add_vertex()

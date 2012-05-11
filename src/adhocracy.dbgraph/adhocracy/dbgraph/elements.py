@@ -61,8 +61,7 @@ class EmbeddedElement(object):
             self.set_property(k, property_dictionary[k])
 
     def remove_property(self, key):
-        """Removes the value of the property for the given key"""
-        raise NotImplementedError()
+        del self.db_element[key]
 
 
 class Vertex(EmbeddedElement):
