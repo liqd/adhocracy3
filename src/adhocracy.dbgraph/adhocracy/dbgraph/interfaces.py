@@ -13,7 +13,7 @@ class IElement(Interface):
     Graph element object.
     """
 
-    def get_property(key):
+    def get_property(key, default=None):
         """Gets the value of the property for the given key"""
 
     def get_properties():
@@ -151,7 +151,7 @@ class ILocationAware(Interface):
 #############################
 
 
-class INode(IVertex, ILocationAware):
+class INode(IVertex):
     """
     Supergraph Node object.
     """
