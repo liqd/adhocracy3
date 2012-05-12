@@ -215,10 +215,8 @@ class DBGraphTest(unittest.TestCase):
         e = self.g.add_edge(a, b, "connects")
         ap = {'foo': 42, 'bar': 23}
         a.set_properties(ap)
-        ap['main_interface'] = IVertex.__identifier__
         ep = {'baz': 42, 'blub': 23}
         e.set_properties(ep)
-        ep['main_interface'] = IEdge.__identifier__
         assert ap == a.get_properties()
         assert ep == e.get_properties()
         self.g.stop_transaction()
