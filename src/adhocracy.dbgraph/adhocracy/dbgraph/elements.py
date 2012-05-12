@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+from rwproperty  import setproperty
+from rwproperty  import getproperty
 from zope.dottedname.resolve import resolve
 from zope.interface import implements
 from zope.interface import directlyProvides
@@ -9,6 +10,7 @@ from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
 from adhocracy.dbgraph.interfaces import INode
 from adhocracy.dbgraph.interfaces import IReference
+from adhocracy.dbgraph.interfaces import ILocationAware
 
 
 def _is_deleted_element(element):
@@ -45,8 +47,11 @@ class EmbeddedElement(object):
     def get_dbId(self):
         return self.db_element.id
 
-    def get_property(self, key):
-        return self.db_element[key]
+    def get_property(self, key, default=None):
+        try:
+            return self.db_element[key]
+        except KeyError:
+            return default
 
     def get_properties(self):
         return dict(self.db_element)
@@ -90,13 +95,25 @@ class Edge(EmbeddedElement):
 class Node(Vertex):
     """TODO """
 
-    implements(INode)
+    implements(INode, ILocationAware)
 
     __parent__ = None  # TODO
 
-    __name__ = ""  # TODO
+    @setproperty
+    def __name__(self, value):
+        self.set_property("__name__", value)
 
-    __acl__ = []   # TODO
+    @getproperty
+    def __name__(self):
+        return self.get_property("__name__", "")
+
+    @setproperty
+    def __acl__(self, value):
+        self.set_property("__acl__", value)
+
+    @getproperty
+    def __acl__(self):
+        return self.get_property("__acl__", [])
 
 
 class Reference(Edge):

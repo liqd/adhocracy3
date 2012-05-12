@@ -9,6 +9,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'setuptools',
+    'rwproperty',
     'zope.dottedname',
     'pyramid',
     'pyramid_debugtoolbar',
