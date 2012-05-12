@@ -7,11 +7,12 @@ from zope import component
 from repoze.lemonade.content import create_content
 
 from adhocracy.dbgraph.embeddedgraph import get_graph
+from adhocracy.dbgraph.interfaces import INode
 from adhocracy.core.models.interfaces import ILocationAware
 from adhocracy.core.security import SITE_ACL
 
 
-class IAdhocracyRootMarker(Interface):
+class IAdhocracyRootMarker(INode):
     """
     Adhocracy root object Marker.
     """

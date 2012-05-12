@@ -36,11 +36,8 @@ class ModelTests(unittest.TestCase):
         content = self._make_one()
         self.assert_(content.__parent__ is None)
         self.assert_(content.__name__ == "")
-        self.assert_(content.name == "adhocracyroot")
         from zope.interface.verify import verifyObject
-        from adhocracy.core.models.interfaces import INode
         self.assert_(self._target_interface.providedBy(content))
-        self.assert_(verifyObject(INode, content))
         self.assert_(verifyObject(self._target_interface, content))
 
     def test_root_factory(self):
