@@ -33,7 +33,12 @@ class IDummyReferenceMarker(IReference):
 class IDummyNodeWithFields(INode):
     """blub"""
 
-    first_name = schema.TextLine(title=u"First name", default=u"default name")
+    first_names = schema.Tuple(
+                    title=u"First names",
+                    #global default value, think before you do this
+                    default=(u"default name",),
+                    value_type=schema.TextLine(title=u"name")
+                    )
 
 
 class DummyNodeWithFieldsAdapter(object):
@@ -45,7 +50,7 @@ class DummyNodeWithFieldsAdapter(object):
     def __init__(self, context):
         self.context = context
 
-    first_name = AdoptedFieldProperty(IDummyNodeWithFields["first_name"])
+    first_names = AdoptedFieldProperty(IDummyNodeWithFields["first_names"])
 
 
 def assertSetEquality(a, b):
@@ -389,21 +394,63 @@ class FieldPropertyTest(unittest.TestCase):
         node = self.g.add_vertex(main_interface=IDummyNodeMarker)
         node_with_fields = IDummyNodeWithFields(node)
         self.g.stop_transaction()
-        assert(node_with_fields.first_name == u"default name")
+        assert(node_with_fields.first_names == (u"default name",))
 
     def testGetSetField(self):
         self.g.start_transaction()
         #set attribute
         node = self.g.add_vertex(main_interface=IDummyNodeMarker)
         node_with_fields = IDummyNodeWithFields(node)
-        node_with_fields.first_name = u"test"
+        node_with_fields.first_names = (u"test",)
         self.g.stop_transaction()
-        assert(node_with_fields.first_name == u"test")
+        assert(node_with_fields.first_names == (u"test",))
         #get attribtute
         v_id = node.get_dbId()
         new_node = self.g.get_vertex(v_id)
         new_node_with_fields = IDummyNodeWithFields(new_node)
-        assert(new_node_with_fields.first_name == u"test")
+        assert(new_node_with_fields.first_names == (u"test",))
+
+    def test_python_list_to_graphdb_converter(self):
+        from zope.schema import List
+        schema_field = List()
+        value = [1]
+        from adhocracy.dbgraph.fieldproperty import python_to_db
+        value_db = python_to_db(schema_field, value)
+        assert(value_db == "[1]")
+        from adhocracy.dbgraph.fieldproperty import db_to_python
+        value = db_to_python(schema_field, value_db)
+        assert(value == [1])
+
+    def test_python_tuple_to_graphdb_converter(self):
+        from zope.schema import Tuple
+        schema_field = Tuple()
+        value = (1,)
+        from adhocracy.dbgraph.fieldproperty import python_to_db
+        value_db = python_to_db(schema_field, value)
+        assert(value_db == "[1]")
+        from adhocracy.dbgraph.fieldproperty import db_to_python
+        value = db_to_python(schema_field, value_db)
+        assert(value == (1,))
+
+    def test_python_dict_to_graphdb_converter(self):
+        from zope.schema import Dict
+        schema_field = Dict()
+        value = {"1": 1}
+        from adhocracy.dbgraph.fieldproperty import python_to_db
+        value_db = python_to_db(schema_field, value)
+        assert value_db == '{"1": 1}'
+        from adhocracy.dbgraph.fieldproperty import db_to_python
+        value = db_to_python(schema_field, value_db)
+        assert(value == {"1": 1})
+
+    def test_python_dict_to_graphdb_converter_assert_string_keys(self):
+        from zope.schema import Dict
+        schema_field = Dict()
+        value = {1: 1}
+        from adhocracy.dbgraph.fieldproperty import python_to_db
+        import pytest
+        with pytest.raises(AssertionError):
+            python_to_db(schema_field, value)
 
 
 if __name__ == "__main__":
