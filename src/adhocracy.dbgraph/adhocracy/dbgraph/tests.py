@@ -47,6 +47,30 @@ def assertInterface(interface, obj):
     assert verifyObject(interface, obj)
 
 
+class FieldsTest(unittest.TestCase):
+
+    @classmethod
+    def setup_class(self):
+        from neo4j import GraphDatabase
+        db = GraphDatabase(GRAPHDB_CONNECTION_STRING)
+        self.g = EmbeddedGraph(db)
+
+    @classmethod
+    def teardown_class(self):
+        self.g.shutdown()
+        del self.g
+
+    def tearDown(self):
+        try:
+            #catch aborted transactions
+            self.g.stop_transaction()
+        except Exception:
+            pass
+        self.g.start_transaction()
+        self.g.clear()
+        self.g.stop_transaction()
+
+
 class DBGraphTest(unittest.TestCase):
 
     @classmethod
