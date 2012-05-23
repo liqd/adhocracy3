@@ -4,8 +4,7 @@
    <include package="pyramid_zcml" />
 
    <!--additional zcml config files-->
-   <include file="models/utilities.zcml" />
-   <include file="models/adapters.zcml" />
+   <include file="models/configure.zcml" />
    <include file="views/configure.zcml" />
 
    <!--static ressources-->

@@ -4,6 +4,7 @@ from pyramid import testing
 
 from adhocracy.core.testing import setUp
 from adhocracy.core.testing import tearDown
+from adhocracy.core.testing import load_registry
 from adhocracy.core.testing import get_graph
 
 
@@ -33,7 +34,9 @@ class ModelTests(unittest.TestCase):
         self.assert_(self._target_interface in get_content_types())
 
     def test_create_content(self):
+        self.graph.start_transaction()
         content = self._make_one()
+        self.graph.end_transaction()
         self.assert_(content.__parent__ is None)
         self.assert_(content.__name__ == "")
         from zope.interface.verify import verifyObject
@@ -45,12 +48,23 @@ class ModelTests(unittest.TestCase):
         request = testing.DummyRequest()
         settings = {}
         app = main({}, **settings)
+        self.graph.start_transaction()
         root = app.root_factory(request)
+        self.graph.end_transaction()
         self.assert_(root.get_dbId() == app.root_factory(request).get_dbId())
         from adhocracy.core.security import SITE_ACL
         self.assert_(self._target_interface.providedBy(root))
         self.assert_(root.__acl__ == SITE_ACL)
 
+
+class ModelFunctionalTests(unittest.TestCase):
+
+    def setUp(self):
+        config = setUp()
+        self.registry = load_registry(config)
+
+    def tearDown(self):
+        tearDown()
 
 #class ViewTests(unittest.TestCase):
 
