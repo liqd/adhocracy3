@@ -11,6 +11,7 @@ requires = [
     'setuptools',
     'rwproperty',
     'zope.dottedname',
+    'zope.schema',
     'pyramid',
     'pyramid_debugtoolbar',
     'waitress',

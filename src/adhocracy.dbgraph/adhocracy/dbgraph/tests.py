@@ -2,6 +2,9 @@
 
 import unittest
 from zope.interface import Interface
+from zope.interface import implements
+from zope.component import adapts
+from zope import schema
 
 from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
@@ -10,9 +13,7 @@ from adhocracy.dbgraph.interfaces import ILocationAware
 from adhocracy.dbgraph.interfaces import IReference
 from adhocracy.dbgraph.interfaces import DontRemoveRootException
 from adhocracy.dbgraph.embeddedgraph import EmbeddedGraph
-from adhocracy.dbgraph.embeddedgraph import get_graph
-from adhocracy.dbgraph.embeddedgraph import del_graph
-
+from adhocracy.dbgraph.fieldproperty import AdoptedFieldProperty
 
 GRAPHDB_CONNECTION_STRING = "testdb"
 
@@ -27,6 +28,24 @@ class IDummyNodeMarker(INode):
 
 class IDummyReferenceMarker(IReference):
     """bih"""
+
+
+class IDummyNodeWithFields(INode):
+    """blub"""
+
+    first_name = schema.TextLine(title=u"First name", default=u"default name")
+
+
+class DummyNodeWithFieldsAdapter(object):
+    """blub"""
+
+    implements(IDummyNodeWithFields)
+    adapts(INode)
+
+    def __init__(self, context):
+        self.context = context
+
+    first_name = AdoptedFieldProperty(IDummyNodeWithFields["first_name"])
 
 
 def assertSetEquality(a, b):
@@ -45,30 +64,6 @@ def assertInterface(interface, obj):
     assert interface.providedBy(obj)
     from zope.interface.verify import verifyObject
     assert verifyObject(interface, obj)
-
-
-class FieldsTest(unittest.TestCase):
-
-    @classmethod
-    def setup_class(self):
-        from neo4j import GraphDatabase
-        db = GraphDatabase(GRAPHDB_CONNECTION_STRING)
-        self.g = EmbeddedGraph(db)
-
-    @classmethod
-    def teardown_class(self):
-        self.g.shutdown()
-        del self.g
-
-    def tearDown(self):
-        try:
-            #catch aborted transactions
-            self.g.stop_transaction()
-        except Exception:
-            pass
-        self.g.start_transaction()
-        self.g.clear()
-        self.g.stop_transaction()
 
 
 class DBGraphTest(unittest.TestCase):
@@ -311,6 +306,55 @@ class DBGraphTest(unittest.TestCase):
         #testing.tearDown()
 
     ##TODO: Transaction tests
+
+
+class FieldPropertyTest(unittest.TestCase):
+
+    @classmethod
+    def setup_class(self):
+        from neo4j import GraphDatabase
+        db = GraphDatabase(GRAPHDB_CONNECTION_STRING)
+        self.g = EmbeddedGraph(db)
+
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
+        gsm.registerAdapter(DummyNodeWithFieldsAdapter)
+
+    @classmethod
+    def teardown_class(self):
+        self.g.shutdown()
+        del self.g
+
+    def tearDown(self):
+        try:
+            self.g.stop_transaction()
+        except Exception:
+            pass
+        self.g.start_transaction()
+        self.g.clear()
+        self.g.stop_transaction()
+
+    def testGetFieldDefault(self):
+        #create node
+        self.g.start_transaction()
+        node = self.g.add_vertex(main_interface=IDummyNodeMarker)
+        node_with_fields = IDummyNodeWithFields(node)
+        self.g.stop_transaction()
+        assert(node_with_fields.first_name == u"default name")
+
+    def testGetSetField(self):
+        self.g.start_transaction()
+        #set attribute
+        node = self.g.add_vertex(main_interface=IDummyNodeMarker)
+        node_with_fields = IDummyNodeWithFields(node)
+        node_with_fields.first_name = u"test"
+        self.g.stop_transaction()
+        assert(node_with_fields.first_name == u"test")
+        #get attribtute
+        v_id = node.get_dbId()
+        new_node = self.g.get_vertex(v_id)
+        new_node_with_fields = IDummyNodeWithFields(new_node)
+        assert(new_node_with_fields.first_name == u"test")
 
 
 if __name__ == "__main__":
