@@ -134,8 +134,8 @@ def element_factory(db_element):
     element = None
     if issubclass(interface, INode):
         element = Node(db_element)
-    elif issubclass(interface, IEdge):
-        element = Edge(db_element)
+    elif issubclass(interface, IReference):
+        element = Reference(db_element)
     elif isinstance(db_element, NodeProxy):
         element = Vertex(db_element)
     elif isinstance(db_element, RelationshipProxy):
