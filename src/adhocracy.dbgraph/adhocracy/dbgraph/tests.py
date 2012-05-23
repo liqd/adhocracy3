@@ -280,6 +280,57 @@ class DBGraphTest(unittest.TestCase):
         assertSetEquality([B], c.in_edges())
         self.g.stop_transaction()
 
+    def testTransactions(self):
+        with BlockingWorkerThread() as thread:
+            def thunk():
+                assert True
+            thread.do(thunk)
+
+#TODO: transactions
+#TODO: nested transactions
+#TODO: success
+#TODO: failure
+
+
+class BlockingWorkerThread(object):
+    """Thread for testing transactions."""
+    def _worker_thread(self):
+        while True:
+            thunk = self.inputCmds.get()
+            try:
+                returnValue = thunk()
+            except Exception, e:
+                self.outputValues.put(e)
+            else:
+                self.outputValues.put(returnValue)
+            finally:
+                self.inputCmds.task_done()
+
+    def __enter__(self):
+        from Queue import Queue
+        from threading import Thread
+
+        self.inputCmds = Queue()
+        self.outputValues = Queue()
+        self.thread = Thread(target=self._worker_thread)
+        self.thread.daemon = True
+        self.thread.start()
+        return self
+
+    def __exit__(self, a, b, c):
+        self.inputCmds.join()
+        self.outputValues.join()
+        # return False to reraise possible exceptions
+        return False
+
+    def do(self, thunk):
+        self.inputCmds.put(thunk)
+        returnValue = self.outputValues.get()
+        self.outputValues.task_done()
+        if isinstance(returnValue, Exception):
+            raise returnValue
+        return returnValue
+
 
 #@Sönke Why do want to run all tests twice?
 #class GetGraphEmbeddedTestSuite(DBGraphTestSuite):
