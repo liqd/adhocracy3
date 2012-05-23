@@ -82,6 +82,9 @@ class EmbeddedGraph():
         self.transaction.success()
         self.transaction.finish()
 
+    def fail_transaction(self):
+        raise NotImplementedError
+
 
 def get_graph():
     """ returns the graph database connection object

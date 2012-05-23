@@ -116,10 +116,14 @@ class IGraph(Interface):
         """Dooms day machine"""
 
     def start_transaction():
-        """Start Transaction to add new or create Elements"""
+        """Start Transaction to add new or create Elements.
+           Returns the transaction."""
 
-    def stop_transaction():
+    def stop_transaction(transaction):
         """Stop Transaction"""
+
+    def fail_transaction(transaction):
+        """Marks the current transaction for rollback."""
 
 
 class DontRemoveRootException(Exception):
