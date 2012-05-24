@@ -28,8 +28,12 @@ class EmbeddedGraph():
         return element_factory(db_vertex)
 
     def get_vertex(self, dbid):
-        db_vertex = self.db.node[dbid]
-        return element_factory(db_vertex)
+        try:
+            db_vertex = self.db.node[dbid]
+        except KeyError:
+            return None
+        else:
+            return element_factory(db_vertex)
 
     def get_vertices(self):
         nodes = self.db.nodes
