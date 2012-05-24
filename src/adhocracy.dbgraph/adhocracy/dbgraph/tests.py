@@ -285,7 +285,12 @@ class DBGraphTest(unittest.TestCase):
         assertSetEquality([B], c.in_edges())
         self.g.stop_transaction()
 
-    def testTransactions(self):
+    def testGetVertexNone(self):
+        self.g.start_transaction()
+        assert None == self.g.get_vertex(23)
+        self.g.stop_transaction()
+
+    def testSimpleTransactions(self):
         with BlockingWorkerThread() as thread:
             def thunk():
                 assert True
