@@ -285,6 +285,24 @@ class DBGraphTest(unittest.TestCase):
         assert None == self.g.get_vertex(23)
         self.g.stop_transaction(tx)
 
+    def testEqNone(self):
+        assert None != self.g.get_root_vertex()
+        assert self.g.get_root_vertex() != None
+
+    def testTransactionGetVertices(self):
+        this_tx = self.g.start_transaction()
+        with BlockingWorkerThread() as thread:
+            def prep():
+                tx = self.g.start_transaction()
+                v = self.g.add_vertex()
+                return (tx, v.get_dbId())
+            (other_tx, v_id) = thread.do(prep)
+            root = self.g.get_root_vertex()
+            assertSetEquality(self.g.get_vertices(), [root])
+            thread.do(lambda: self.g.stop_transaction(other_tx))
+            assertSetEquality(self.g.get_vertices(), [root, self.g.get_vertex(v_id)])
+        self.g.stop_transaction(this_tx)
+
     def testSimpleTransaction(self):
         raise Exception("currently broken")
         this_tx = self.g.start_transaction()
