@@ -71,16 +71,14 @@ class Vertex(EmbeddedElement):
         return "<Vertex %i>" % self.get_dbId()
 
     def out_edges(self, label=None):
-        result = [Edge(edge) for edge in self.db_element.relationships.outgoing
+        return [element_factory(edge) for edge \
+                in self.db_element.relationships.outgoing
                 if not _is_deleted_element(edge)]
-        map(element_factory, result)
-        return result
 
     def in_edges(self, label=None):
-        result = [Edge(edge) for edge in self.db_element.relationships.incoming
+        return [element_factory(edge) for edge \
+                in self.db_element.relationships.incoming
                 if not _is_deleted_element(edge)]
-        map(element_factory, result)
-        return result
 
 
 class Edge(EmbeddedElement):
