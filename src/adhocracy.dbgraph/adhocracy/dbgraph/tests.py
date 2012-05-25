@@ -285,7 +285,7 @@ class DBGraphTest(unittest.TestCase):
         assert None == self.g.get_vertex(23)
         self.g.stop_transaction(tx)
 
-    def _testEqNone(self):
+    def testEqNone(self):
         assert None != self.g.get_root_vertex()
         assert self.g.get_root_vertex() != None
 
