@@ -34,7 +34,7 @@ The graph object object has to be a singleton for all you python processes:
 
 Getting the root vertex to start with:
     >>> graph1.get_root_vertex()
-    <adh...
+    <Vertex 0>
 
 Manually shutdown the database::
 
