@@ -42,9 +42,9 @@ class ModelTests(unittest.TestCase):
         assert(self._target_marker_interface in get_content_types())
 
     def test_create_content(self):
-        self.graph.start_transaction()
+        tx = self.graph.start_transaction()
         content = self._make_one()
-        self.graph.stop_transaction()
+        self.graph.stop_transaction(tx)
         from zope.interface.verify import verifyObject
         from adhocracy.dbgraph.interfaces import INode
         assert(INode.providedBy(content))

@@ -44,11 +44,11 @@ class ChildReferenceTests(unittest.TestCase):
         assert(self._target_marker_interface in get_content_types())
 
     def test_create_content(self):
-        self.graph.start_transaction()
+        tx = self.graph.start_transaction()
         parent = self._make_dummy_node()
         child = self._make_dummy_node()
         content = self._make_one(parent, child, child_name=u"name")
-        self.graph.stop_transaction()
+        self.graph.stop_transaction(tx)
         from zope.interface.verify import verifyObject
         from adhocracy.dbgraph.interfaces import IReference
         assert(IReference.providedBy(content))

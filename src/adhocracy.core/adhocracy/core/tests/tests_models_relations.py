@@ -42,9 +42,9 @@ class ModelChildRelationTests(unittest.TestCase):
         return content
 
     def test_create_adapter(self):
-        self.graph.start_transaction()
+        tx = self.graph.start_transaction()
         parent = self._make_dummy_node()
-        self.graph.stop_transaction()
+        self.graph.stop_transaction(tx)
         adapter = self._target_interface(parent)
         self.assert_(isinstance(adapter, self._target_class))
         from zope.interface.verify import verifyObject
@@ -52,19 +52,19 @@ class ModelChildRelationTests(unittest.TestCase):
         assert(adapter.context == parent)
 
     def test_interface_inheritance(self):
-        self.graph.start_transaction()
+        tx = self.graph.start_transaction()
         parent = self._make_dummy_node()
-        self.graph.stop_transaction()
+        self.graph.stop_transaction(tx)
         from pyramid_adoptedtraversal.interfaces import IChildsDictLike
         assert(self._target_interface(parent) == IChildsDictLike(parent))
 
     def test_set_item(self):
-        self.graph.start_transaction()
+        tx = self.graph.start_transaction()
         parent = self._make_dummy_node()
         child = self._make_dummy_node()
         parent_adapter = self._target_interface(parent)
         parent_adapter["g2"] = child
-        self.graph.stop_transaction()
+        self.graph.stop_transaction(tx)
         self.assertIsNotNone(parent)
         self.assertIsNotNone(child)
         #self.assertEquals([parent.get_dbId()],
@@ -79,11 +79,11 @@ class ModelChildRelationTests(unittest.TestCase):
         #assert(child.__parent__.eid == parent.eid)
 
     def test_del_item(self):
-        self.graph.start_transaction()
+        tx = self.graph.start_transaction()
         parent = self._make_dummy_node()
         child = self._make_dummy_node()
         parent_adapter = self._target_interface(parent)
         parent_adapter["g2"] = child
         del parent_adapter["g2"]
-        self.graph.stop_transaction()
+        self.graph.stop_transaction(tx)
         assert("g2" not in parent_adapter)

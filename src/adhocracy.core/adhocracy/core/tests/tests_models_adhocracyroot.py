@@ -36,17 +36,17 @@ class AdhocracyRootTests(unittest.TestCase):
         self.assert_(self._target_marker_interface in get_content_types())
 
     def test_create_content(self):
-        self.graph.start_transaction()
+        tx = self.graph.start_transaction()
         content = self._make_one()
-        self.graph.stop_transaction()
+        self.graph.stop_transaction(tx)
         from zope.interface.verify import verifyObject
         assert(self._target_marker_interface.providedBy(content))
         assert(verifyObject(self._target_marker_interface, content))
 
     def test_location_aware_adapter(self):
-        self.graph.start_transaction()
+        tx = self.graph.start_transaction()
         content = self._make_one()
-        self.graph.stop_transaction()
+        self.graph.stop_transaction(tx)
         from zope.interface.verify import verifyObject
         from adhocracy.core.models.interfaces import ILocationAware
         content = ILocationAware(content)
@@ -61,9 +61,9 @@ class AdhocracyRootTests(unittest.TestCase):
         request = testing.DummyRequest()
         settings = {}
         app = main({}, **settings)
-        self.graph.start_transaction()
+        tx = self.graph.start_transaction()
         root = app.root_factory(request)
-        self.graph.stop_transaction()
+        self.graph.stop_transaction(tx)
         self.assert_(root.get_dbId() == app.root_factory(request).get_dbId())
         self.assert_(self._target_marker_interface.providedBy(root))
 
