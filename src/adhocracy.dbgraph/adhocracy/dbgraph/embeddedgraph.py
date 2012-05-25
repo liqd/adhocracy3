@@ -28,8 +28,12 @@ class EmbeddedGraph():
         return element_factory(db_vertex)
 
     def get_vertex(self, dbid):
-        db_vertex = self.db.node[dbid]
-        return element_factory(db_vertex)
+        try:
+            db_vertex = self.db.node[dbid]
+        except KeyError:
+            return None
+        else:
+            return element_factory(db_vertex)
 
     def get_vertices(self):
         nodes = self.db.nodes
@@ -76,14 +80,15 @@ class EmbeddedGraph():
                 self.remove_vertex(v)
 
     def start_transaction(self):
-        self.transaction = self.db.beginTx()
+        return self.db.beginTx()
 
-    def stop_transaction(self):
-        self.transaction.success()
-        self.transaction.finish()
+    def stop_transaction(self, tx):
+        tx.success()
+        tx.finish()
 
-    def fail_transaction(self):
-        raise NotImplementedError
+    def fail_transaction(self, tx):
+        tx.failure()
+        tx.finish()
 
 
 def get_graph():

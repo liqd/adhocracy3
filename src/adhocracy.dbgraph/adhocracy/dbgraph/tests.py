@@ -84,48 +84,43 @@ class DBGraphTest(unittest.TestCase):
         del self.g
 
     def tearDown(self):
-        try:
-            #catch aborted transactions
-            self.g.stop_transaction()
-        except Exception:
-            pass
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         self.g.clear()
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testGetVertex(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         v_id = self.g.add_vertex().get_dbId()
         assertInterface(IVertex, self.g.get_vertex(v_id))
         self.assertEqual(v_id,
                 self.g.get_vertex(v_id).get_dbId())
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testAddVertex(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         v = self.g.add_vertex()
         assertInterface(IVertex, v)
         assert v in self.g.get_vertices()
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testAddVertexWithMarkerInterface(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         v = self.g.add_vertex(main_interface=IDummyMarker)
         assertInterface(IVertex, v)
         assertInterface(IDummyMarker, v)
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testAddNode(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         v = self.g.add_vertex(main_interface=IDummyNodeMarker)
         assertInterface(IVertex, v)
         assertInterface(INode, v)
         assertInterface(IDummyNodeMarker, v)
         assert v in self.g.get_vertices()
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testGetVertices(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         root = self.g.get_root_vertex()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
@@ -133,21 +128,21 @@ class DBGraphTest(unittest.TestCase):
         for v in self.g.get_vertices():
             assertInterface(IVertex, v)
         assertSetEquality([root, a, b, c], self.g.get_vertices())
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testRemoveVertex(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         v = self.g.add_vertex()
         self.g.remove_vertex(v)
         self.assertFalse(v in self.g.get_vertices())
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testAddEdge(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e = self.g.add_edge(a, b, "foo")
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
         assert e.start_vertex() == a
         assert e.end_vertex() == b
         assert e.get_label() == "foo"
@@ -157,44 +152,44 @@ class DBGraphTest(unittest.TestCase):
         self.assertEqual(e_id, self.g.get_edge(e_id).get_dbId())
 
     def testAddEdgeWithMarkerInterface(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e = self.g.add_edge(a, b, "foo", main_interface=IDummyMarker)
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
         assertInterface(IEdge, e)
         assertInterface(IDummyMarker, e)
 
     def testAddReference(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e = self.g.add_edge(a, b, "foo", main_interface=IDummyReferenceMarker)
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
         assertInterface(IEdge, e)
         assertInterface(IReference, e)
         assertInterface(IDummyReferenceMarker, e)
 
     def testGetEdge(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e = self.g.add_edge(a, b, "foo")
         e_id = e.get_dbId()
         self.assertEqual(e_id, self.g.get_edge(e_id).get_dbId())
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testRemoveEdge(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e = self.g.add_edge(a, b, "foo")
         self.g.remove_edge(e)
         self.assertFalse(e in self.g.get_edges())
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testGetEdges(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         c = self.g.add_vertex()
@@ -203,10 +198,10 @@ class DBGraphTest(unittest.TestCase):
         for i in self.g.get_edges():
             assertInterface(IEdge, i)
         assertSetEquality([e, f], self.g.get_edges())
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testClear(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         self.g.add_edge(a, b, "connects")
@@ -215,7 +210,7 @@ class DBGraphTest(unittest.TestCase):
         assertSetEquality([root], self.g.get_vertices())
         assertSetEquality([], root.get_properties().keys())
         assertSetEquality([], self.g.get_edges())
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testGetRootVertex(self):
         root = self.g.get_root_vertex()
@@ -225,13 +220,13 @@ class DBGraphTest(unittest.TestCase):
     def testRemvoeRootVertex(self):
         import pytest
         with pytest.raises(DontRemoveRootException):
-            self.g.start_transaction()
+            tx = self.g.start_transaction()
             root = self.g.get_root_vertex()
             self.g.remove_vertex(root)
-            self.g.stop_transaction()
+            self.g.stop_transaction(tx)
 
     def testGetProperties(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e = self.g.add_edge(a, b, "connects")
@@ -241,10 +236,10 @@ class DBGraphTest(unittest.TestCase):
         e.set_properties(ep)
         assert ap == a.get_properties()
         assert ep == e.get_properties()
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testGetProperty(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         e = self.g.add_edge(a, b, "connects")
@@ -256,26 +251,26 @@ class DBGraphTest(unittest.TestCase):
             assert ap[k] == a.get_property(k)
         for k in ep.keys():
             assert ep[k] == e.get_property(k)
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testRemoveProperty(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         v = self.g.get_root_vertex()
         v.set_property("key", "value")
         assert (v.get_property("key") == "value")
         v.remove_property("key")
         assert "key" not in v.get_properties().keys()
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testInOutEdges(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         a = self.g.add_vertex()
         b = self.g.add_vertex()
         c = self.g.add_vertex()
         A = self.g.add_edge(a, b, "A")
         B = self.g.add_edge(b, c, "B")
         C = self.g.add_edge(c, a, "C", main_interface=IDummyReferenceMarker)
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
         assertSetEquality([A], a.out_edges())
         assertSetEquality([C], a.in_edges())
         assertSetEquality([B], b.out_edges())
@@ -285,13 +280,70 @@ class DBGraphTest(unittest.TestCase):
         C_ = c.out_edges()[0]
         assert(IDummyReferenceMarker.providedBy(C_))
 
-    def testTransactions(self):
-        with BlockingWorkerThread() as thread:
-            def thunk():
-                assert True
-            thread.do(thunk)
+    def testGetVertexNone(self):
+        tx = self.g.start_transaction()
+        assert None == self.g.get_vertex(23)
+        self.g.stop_transaction(tx)
 
-#TODO: transactions
+    def testEqNone(self):
+        assert None != self.g.get_root_vertex()
+        assert self.g.get_root_vertex() != None
+
+    def testTransactionGetVertices(self):
+        this_tx = self.g.start_transaction()
+        with BlockingWorkerThread() as thread:
+            def prep():
+                tx = self.g.start_transaction()
+                v = self.g.add_vertex()
+                return (tx, v.get_dbId())
+            (other_tx, v_id) = thread.do(prep)
+            try:
+                root = self.g.get_root_vertex()
+                assertSetEquality(self.g.get_vertices(), [root])
+            except:
+                thread.do(lambda: self.g.fail_transaction(other_tx))
+                raise
+            else:
+                thread.do(lambda: self.g.stop_transaction(other_tx))
+            assertSetEquality(self.g.get_vertices(), [root, self.g.get_vertex(v_id)])
+        self.g.stop_transaction(this_tx)
+
+    def testTransactionEdges(self):
+        prep_tx = self.g.start_transaction()
+        v_id = self.g.add_vertex().get_dbId()
+        self.g.stop_transaction(prep_tx)
+
+        this_tx = self.g.start_transaction()
+        with BlockingWorkerThread() as thread:
+            def prep():
+                tx = self.g.start_transaction()
+                v = self.g.get_vertex(v_id)
+                self.g.add_edge(self.g.get_root_vertex(), v, "connects")
+                return (tx)
+            other_tx = thread.do(prep)
+
+            assertSetEquality(self.g.get_root_vertex().out_edges(), [])
+            thread.do(lambda: self.g.stop_transaction(other_tx))
+            root_out_node_ids = map(
+                lambda e: e.end_vertex().get_dbId(), self.g.get_root_vertex().out_edges())
+            assertSetEquality(root_out_node_ids, [v_id])
+        self.g.stop_transaction(this_tx)
+
+    def testTransactionOtherTransactionException(self):
+        raise Exception("currently broken")
+        with BlockingWorkerThread() as thread:
+            def f():
+                tx = self.g.start_transaction
+                return (tx, self.g.add_vertex())
+            (other_tx, other_v) = thread.do(f)
+
+            thisTx = self.g.start_transaction()
+            self.assertRaises(NotInTransactionException, other_v.get_dbId)
+            self.g.stop_transaction(thisTx)
+
+            thread.do(lambda: self.g.stop_transaction(other_tx))
+
+
 #TODO: nested transactions
 #TODO: success
 #TODO: failure
@@ -305,6 +357,7 @@ class BlockingWorkerThread(object):
             try:
                 returnValue = thunk()
             except Exception, e:
+                print("\nException in BlockingWorkerThread:\n%s" % e)
                 self.outputValues.put(e)
             else:
                 self.outputValues.put(returnValue)
@@ -380,29 +433,25 @@ class FieldPropertyTest(unittest.TestCase):
         del self.g
 
     def tearDown(self):
-        try:
-            self.g.stop_transaction()
-        except Exception:
-            pass
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         self.g.clear()
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
 
     def testGetFieldDefault(self):
         #create node
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         node = self.g.add_vertex(main_interface=IDummyNodeMarker)
         node_with_fields = IDummyNodeWithFields(node)
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
         assert(node_with_fields.first_names == (u"default name",))
 
     def testGetSetField(self):
-        self.g.start_transaction()
+        tx = self.g.start_transaction()
         #set attribute
         node = self.g.add_vertex(main_interface=IDummyNodeMarker)
         node_with_fields = IDummyNodeWithFields(node)
         node_with_fields.first_names = (u"test",)
-        self.g.stop_transaction()
+        self.g.stop_transaction(tx)
         assert(node_with_fields.first_names == (u"test",))
         #get attribtute
         v_id = node.get_dbId()
