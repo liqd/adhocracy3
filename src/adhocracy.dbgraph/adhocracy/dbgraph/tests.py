@@ -303,23 +303,28 @@ class DBGraphTest(unittest.TestCase):
             assertSetEquality(self.g.get_vertices(), [root, self.g.get_vertex(v_id)])
         self.g.stop_transaction(this_tx)
 
-    def testSimpleTransaction(self):
-        raise Exception("currently broken")
+    def testTransactionEdges(self):
+        prep_tx = self.g.start_transaction()
+        v_id = self.g.add_vertex().get_dbId()
+        self.g.stop_transaction(prep_tx)
+
         this_tx = self.g.start_transaction()
         with BlockingWorkerThread() as thread:
-            def f():
+            def prep():
                 tx = self.g.start_transaction()
-                v = self.g.add_vertex()
-                return (tx, v.get_dbId())
-            (other_tx, other_v_id) = thread.do(f)
+                v = self.g.get_vertex(v_id)
+                self.g.add_edge(self.g.get_root_vertex(), v, "connects")
+                return (tx)
+            other_tx = thread.do(prep)
 
-            assert None == self.g.get_vertex(other_v_id)
+            assertSetEquality(self.g.get_root_vertex().out_edges(), [])
             thread.do(lambda: self.g.stop_transaction(other_tx))
-            assert other_v_id == self.g.get_vertex(other_v_id).get_dbId()
-
+            root_out_node_ids = map(
+                lambda e: e.end_vertex().get_dbId(), self.g.get_root_vertex().out_edges())
+            assertSetEquality(root_out_node_ids, [v_id])
         self.g.stop_transaction(this_tx)
 
-    def testOtherTransactionException(self):
+    def testTransactionOtherTransactionException(self):
         raise Exception("currently broken")
         with BlockingWorkerThread() as thread:
             def f():
