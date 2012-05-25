@@ -9,7 +9,6 @@ from zope import schema
 from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
 from adhocracy.dbgraph.interfaces import INode
-from adhocracy.dbgraph.interfaces import ILocationAware
 from adhocracy.dbgraph.interfaces import IReference
 from adhocracy.dbgraph.interfaces import DontRemoveRootException
 from adhocracy.dbgraph.embeddedgraph import EmbeddedGraph
@@ -122,7 +121,6 @@ class DBGraphTest(unittest.TestCase):
         assertInterface(IVertex, v)
         assertInterface(INode, v)
         assertInterface(IDummyNodeMarker, v)
-        assertInterface(ILocationAware, v)
         assert v in self.g.get_vertices()
         self.g.stop_transaction()
 

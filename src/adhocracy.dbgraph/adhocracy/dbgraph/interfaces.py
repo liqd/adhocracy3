@@ -135,22 +135,22 @@ class DontRemoveRootException(Exception):
 ####################################
 
 
-class ILocationAware(Interface):
-    """Attributes needed to make the object hierachy / local permissions work
-        http://readthedocs.org/docs/pyramid/en/1.3-branch/narr/resources.html
-    """
+#class ILocationAware(Interface):
+    #"""Attributes needed to make the object hierachy / local permissions work
+        #http://readthedocs.org/docs/pyramid/en/1.3-branch/narr/resources.html
+    #"""
 
-    #__parent__ = schema.Object(required=True,)
+    ##__parent__ = schema.Object(required=True,)
 
-    __name__ = schema.TextLine(title=u"Identifier (url slug)",\
-                               required=True,)
+    #__name__ = schema.TextLine(title=u"Identifier (url slug)",\
+                               #required=True,)
 
-    __acl__ = schema.List(title=u"ACL Control list",\
-                          required=True,
-                          readonly=True)
+    #__acl__ = schema.List(title=u"ACL Control list",\
+                          #required=True,
+                          #readonly=True)
 
 
-#############################
+##############################
 # Supergraph basic elements #
 #############################
 

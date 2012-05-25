@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from rwproperty  import setproperty
-from rwproperty  import getproperty
 from zope.dottedname.resolve import resolve
 from zope.interface import implements
 from zope.interface import directlyProvides
@@ -10,7 +8,6 @@ from adhocracy.dbgraph.interfaces import IVertex
 from adhocracy.dbgraph.interfaces import IEdge
 from adhocracy.dbgraph.interfaces import INode
 from adhocracy.dbgraph.interfaces import IReference
-from adhocracy.dbgraph.interfaces import ILocationAware
 
 
 def _is_deleted_element(element):
@@ -95,25 +92,7 @@ class Edge(EmbeddedElement):
 class Node(Vertex):
     """TODO """
 
-    implements(INode, ILocationAware)
-
-    __parent__ = None  # TODO
-
-    @setproperty
-    def __name__(self, value):
-        self.set_property("__name__", value)
-
-    @getproperty
-    def __name__(self):
-        return self.get_property("__name__", "")
-
-    @setproperty
-    def __acl__(self, value):
-        self.set_property("__acl__", value)
-
-    @getproperty
-    def __acl__(self):
-        return self.get_property("__acl__", [])
+    implements(INode)
 
 
 class Reference(Edge):
