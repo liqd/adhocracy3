@@ -297,9 +297,14 @@ class DBGraphTest(unittest.TestCase):
                 v = self.g.add_vertex()
                 return (tx, v.get_dbId())
             (other_tx, v_id) = thread.do(prep)
-            root = self.g.get_root_vertex()
-            assertSetEquality(self.g.get_vertices(), [root])
-            thread.do(lambda: self.g.stop_transaction(other_tx))
+            try:
+                root = self.g.get_root_vertex()
+                assertSetEquality(self.g.get_vertices(), [root])
+            except:
+                thread.do(lambda: self.g.fail_transaction(other_tx))
+                raise
+            else:
+                thread.do(lambda: self.g.stop_transaction(other_tx))
             assertSetEquality(self.g.get_vertices(), [root, self.g.get_vertex(v_id)])
         self.g.stop_transaction(this_tx)
 

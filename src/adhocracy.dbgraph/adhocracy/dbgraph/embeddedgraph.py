@@ -87,7 +87,8 @@ class EmbeddedGraph():
         tx.finish()
 
     def fail_transaction(self, tx):
-        raise NotImplementedError
+        tx.failure()
+        tx.finish()
 
 
 def get_graph():
