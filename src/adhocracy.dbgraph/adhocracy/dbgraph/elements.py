@@ -33,7 +33,12 @@ class EmbeddedElement(object):
         self.db_element = db_element
 
     def __eq__(self, other):
-        return self.get_dbId() == other.get_dbId()
+        both_elements = hasattr(self, 'get_dbId') \
+            and hasattr(other, 'get_dbId')
+        if both_elements:
+            return self.get_dbId() == other.get_dbId()
+        else:
+            return False
 
     def __ne__(self, other):
         return not self.__eq__(other)
