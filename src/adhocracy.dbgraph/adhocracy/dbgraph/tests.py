@@ -217,13 +217,13 @@ class DBGraphTest(unittest.TestCase):
         assertInterface(IVertex, root)
         assertSetEquality([self.g.get_root_vertex()], self.g.get_vertices())
 
-    def testRemvoeRootVertex(self):
+    def testRemoveRootVertex(self):
         import pytest
+        tx = self.g.start_transaction()
+        root = self.g.get_root_vertex()
         with pytest.raises(DontRemoveRootException):
-            tx = self.g.start_transaction()
-            root = self.g.get_root_vertex()
             self.g.remove_vertex(root)
-            self.g.stop_transaction(tx)
+        self.g.stop_transaction(tx)
 
     def testGetProperties(self):
         tx = self.g.start_transaction()
@@ -289,7 +289,7 @@ class DBGraphTest(unittest.TestCase):
         assert None != self.g.get_root_vertex()
         assert self.g.get_root_vertex() != None
 
-    def _testTransactionGetVertices(self):
+    def testTransactionGetVertices(self):
         this_tx = self.g.start_transaction()
         with BlockingWorkerThread() as thread:
             def prep():
@@ -310,7 +310,7 @@ class DBGraphTest(unittest.TestCase):
                 [root, self.g.get_vertex(v_id)])
         self.g.stop_transaction(this_tx)
 
-    def _testTransactionEdges(self):
+    def testTransactionEdges(self):
         prep_tx = self.g.start_transaction()
         v_id = self.g.add_vertex().get_dbId()
         self.g.stop_transaction(prep_tx)
@@ -324,8 +324,10 @@ class DBGraphTest(unittest.TestCase):
                 return (tx)
             other_tx = thread.do(prep)
 
-            assertSetEquality(self.g.get_root_vertex().out_edges(), [])
-            thread.do(lambda: self.g.stop_transaction(other_tx))
+            try:
+                assertSetEquality(self.g.get_root_vertex().out_edges(), [])
+            finally:
+                thread.do(lambda: self.g.stop_transaction(other_tx))
             root_out_node_ids = map(
                 lambda e: e.end_vertex().get_dbId(),
                 self.g.get_root_vertex().out_edges())
