@@ -120,7 +120,9 @@ class IGraph(Interface):
            Returns the transaction."""
 
     def stop_transaction(transaction):
-        """Stop Transaction"""
+        """Stop a transaction. You have to make
+        sure, this function gets called
+        on every created transaction in any case."""
 
     def fail_transaction(transaction):
         """Marks the current transaction for rollback."""

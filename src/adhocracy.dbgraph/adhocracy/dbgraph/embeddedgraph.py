@@ -80,13 +80,13 @@ class EmbeddedGraph():
                 self.remove_vertex(v)
 
     def start_transaction(self):
-        self.transaction = self.db.beginTx()
+        return self.db.beginTx()
 
-    def stop_transaction(self):
-        self.transaction.success()
-        self.transaction.finish()
+    def stop_transaction(self, tx):
+        tx.success()
+        tx.finish()
 
-    def fail_transaction(self):
+    def fail_transaction(self, tx):
         raise NotImplementedError
 
 
