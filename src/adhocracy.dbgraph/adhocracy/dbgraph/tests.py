@@ -274,14 +274,16 @@ class DBGraphTest(unittest.TestCase):
         c = self.g.add_vertex()
         A = self.g.add_edge(a, b, "A")
         B = self.g.add_edge(b, c, "B")
-        C = self.g.add_edge(c, a, "C")
+        C = self.g.add_edge(c, a, "C", main_interface=IDummyReferenceMarker)
+        self.g.stop_transaction()
         assertSetEquality([A], a.out_edges())
         assertSetEquality([C], a.in_edges())
         assertSetEquality([B], b.out_edges())
         assertSetEquality([A], b.in_edges())
         assertSetEquality([C], c.out_edges())
         assertSetEquality([B], c.in_edges())
-        self.g.stop_transaction()
+        C_ = c.out_edges()[0]
+        assert(IDummyReferenceMarker.providedBy(C_))
 
     def testTransactions(self):
         with BlockingWorkerThread() as thread:
