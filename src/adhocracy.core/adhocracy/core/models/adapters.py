@@ -5,9 +5,8 @@ from zope.component import adapts
 from pyramid.threadlocal import get_current_registry
 from repoze.lemonade.content import create_content
 
+from adhocracy.dbgraph.interfaces import INode
 from adhocracy.core.models.interfaces import IChildsDict
-from adhocracy.core.models.interfaces import INode
-from adhocracy.core.models.interfaces import IGraphConnection
 from adhocracy.core.models.interfaces import IChild
 
 

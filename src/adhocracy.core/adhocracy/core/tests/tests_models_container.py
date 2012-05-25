@@ -11,41 +11,48 @@ class ModelTests(unittest.TestCase):
         self.config = setUp()
         from adhocracy.core.models.container import container_factory
         from repoze.lemonade.testing import registerContentFactory
-        registerContentFactory(container_factory, self._target_interface)
+        registerContentFactory(container_factory,\
+                               self._target_marker_interface)
+        from adhocracy.core.models.container import ContainerLocationAware
+        self.config.registry.registerAdapter(ContainerLocationAware)
+        from adhocracy.core.models.container import Container
+        self.config.registry.registerAdapter(Container)
         self.graph = get_graph()
 
     def tearDown(self):
         tearDown()
 
     @property
-    def _target_interface(self):
-        from adhocracy.core.models.interfaces import IContainer
-        return IContainer
+    def _target_marker_interface(self):
+        from adhocracy.core.models.container import IContainerMarker
+        return IContainerMarker
 
     @property
-    def _target_class(self):
-        from adhocracy.core.models.container import Container
-        return Container
+    def _target_interface(self):
+        from adhocracy.core.models.container import IContainer
+        return IContainer
 
-    def _make_one(self, name=u"content"):
+    def _make_one(self):
         from repoze.lemonade.content import create_content
-        content = create_content(self._target_interface, name=name)
+        content = create_content(self._target_marker_interface)
         return content
 
     def test_factory_register(self):
         from repoze.lemonade.content import get_content_types
-        self.assert_(self._target_interface in get_content_types())
+        assert(self._target_marker_interface in get_content_types())
 
     def test_create_content(self):
+        self.graph.start_transaction()
         content = self._make_one()
-        self.assert_(content.__parent__ is None)
-        self.assert_(content.__name__ == "")
-        self.assert_(content.name == "content")
+        self.graph.stop_transaction()
         from zope.interface.verify import verifyObject
-        from adhocracy.core.models.interfaces import INode
-        self.assert_(verifyObject(INode, content))
-        self.assert_(verifyObject(self._target_interface, content))
-        self.assert_(isinstance(content, self._target_class))
+        from adhocracy.dbgraph.interfaces import INode
+        assert(INode.providedBy(content))
+        assert(verifyObject(INode, content))
+        assert(verifyObject(self._target_marker_interface, content))
+        content = self._target_interface(content)
+        assert(verifyObject(self._target_interface, content))
+
 
         #container1.save()
         #self.assert_(container1.name == "g1")
@@ -59,8 +66,7 @@ class ModelTests(unittest.TestCase):
         #container1, container2 = self.create_two_nodes()
         #from repoze.lemonade.content import create_content
         #from adhocracy.core.models.interfaces import IChild
-        #child = create_content(IChild, parent=container1, child=container2, child_name=u"g2")
+        #child = create_content(IChild, parent=container1, \
+                #child=container2, child_name=u"g2")
         #self.assert_(child.outV().eid == container2.eid)
         #self.assert_(child.inV().eid == container1.eid)
-
-

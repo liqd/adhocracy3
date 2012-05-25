@@ -1,6 +1,5 @@
 from zope.interface import implements
 from zope.interface import implementer
-from zope.interface import Interface
 from zope.interface import directlyProvides
 from zope import component
 
@@ -45,4 +44,3 @@ def adhocracyroot_factory():
 def appmaker():
     root = create_content(IAdhocracyRootMarker)
     return root
-

@@ -2,7 +2,7 @@
 from pyramid import testing
 
 from adhocracy.dbgraph.embeddedgraph import get_graph
-#from adhocracy.core.models.node import NodeAdhocracy
+from adhocracy.dbgraph.interfaces import INode
 
 #Unit testing
 
@@ -87,12 +87,8 @@ def setUpFunctional(global_config=None, **settings):
         #self.__dict__.update(kwargs)
 
 
-#class Person(NodeAdhocracy):
-    #"""Dummy node class"""
-
-    #element_type = "person"
-    #name = String(nullable=False)
-    #age = Integer()
+class IDummyNode(INode):
+    """Dummy node interface"""
 
 
 #class Knows(Relationship):

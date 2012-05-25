@@ -1,52 +1,70 @@
-from bulbs.property import String
 from rwproperty import setproperty
 from rwproperty import getproperty
-from zope.interface import implements
+from zope import interface
+from zope import schema
+from zope.component import adapts
 
-from pyramid.threadlocal import get_current_registry
+from adhocracy.dbgraph.interfaces import INode
+from adhocracy.dbgraph.embeddedgraph import get_graph
+from adhocracy.dbgraph.fieldproperty import AdoptedFieldProperty
 
-from adhocracy.core.models.node import NodeAdhocracy
-from adhocracy.core.models.interfaces import IGraphConnection
-from adhocracy.core.models.interfaces import IContainer
+from adhocracy.core.models.interfaces import ILocationAware
 
 
-class Container(NodeAdhocracy):
+class IContainerMarker(INode):
+    """
+    Container object Marker.
+    """
 
-    implements(IContainer)
 
-    element_type = "container"
+class IContainer(interface.Interface):
+    """
+    Container object basic interface.
+    """
 
-    text = String(default=u"")
-    name = String(nullable=False)
+    text = schema.TextLine(title=u"Text")
+
+
+class Container(object):
+    interface.implements(IContainer)
+    adapts(IContainerMarker)
+
+    def __init__(self, context):
+         self.context = context
+
+    text = AdoptedFieldProperty(IContainer["text"])
+
+
+class ContainerLocationAware(object):
+    interface.implements(ILocationAware)
+    adapts(IContainerMarker)
+
+    def __init__(self, context):
+         self.context = context
 
     @property
     def __parent__(self):
-        try:
-            return self.outV("child").next()
-        except StopIteration:
-            return None
+        childs = list(self.context.out_edges(label="child"))
+        child = childs and childs[0] or None
+        return child
 
     @getproperty
     def __name__(self):
-        rel = list(self.outE("child"))
-        name = rel and rel[0].child_name \
-               or ""
+        childs = list(self.context.out_edges(label="child"))
+        name = childs and childs[0].child_name or ""
         return name
 
     @setproperty
     def __name__(self, name):
-        rel = list(self.outE("child"))
-        if rel:
-            rel[0].child_name = name
-            rel[0].save
+        childs = list(self.context.out_edges(label="child"))
+        if childs:
+            childs[0].set_property("child_name", name)
+
+    __acl__ = AdoptedFieldProperty(ILocationAware["__acl__"])
 
 
-def container_factory(name, **kw):
-    interface = IContainer
-    registry = get_current_registry()
-    graph = registry.getUtility(IGraphConnection)
-    #add model proxy
-    proxyname = interface.getTaggedValue('name')
-    proxy = getattr(graph, proxyname, None)
-    #create object
-    return proxy.get_or_create("name", name, name=name)
+@interface.implementer(IContainerMarker)
+def container_factory():
+    graph = get_graph()
+    content = graph.add_vertex(IContainerMarker)
+    return content
