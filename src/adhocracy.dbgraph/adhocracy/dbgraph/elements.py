@@ -70,6 +70,9 @@ class EmbeddedElement(object):
 class Vertex(EmbeddedElement):
     implements(IVertex)
 
+    def __repr__(self):
+        return "<Vertex %i>" % self.get_dbId()
+
     def out_edges(self, label=None):
         return [Edge(edge) for edge in self.db_element.relationships.outgoing
                 if not _is_deleted_element(edge)]
@@ -81,6 +84,9 @@ class Vertex(EmbeddedElement):
 
 class Edge(EmbeddedElement):
     implements(IEdge)
+
+    def __repr__(self):
+        return "<Edge %i>" % self.get_dbId()
 
     def start_vertex(self):
         return Vertex(self.db_element.start)
