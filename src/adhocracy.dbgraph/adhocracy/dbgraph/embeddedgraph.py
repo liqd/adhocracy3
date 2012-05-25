@@ -8,7 +8,7 @@ from pyramid.threadlocal import get_current_registry
 from adhocracy.dbgraph.interfaces import IGraph
 from adhocracy.dbgraph.interfaces import DontRemoveRootException
 
-from adhocracy.dbgraph.elements import _is_deleted_element
+from adhocracy.dbgraph.elements import _is_existing_element
 from adhocracy.dbgraph.elements import element_factory
 
 
@@ -17,6 +17,10 @@ class EmbeddedGraph():
 
     def __init__(self, dbgraph_database):
         self.db = dbgraph_database
+        tx = self.start_transaction()
+        #self.db.node[0]['_exists'] = True
+        self.get_root_vertex().db_element['_exists'] = True
+        self.stop_transaction(tx)
 
     def shutdown(self):
         self.db.shutdown()
@@ -25,6 +29,14 @@ class EmbeddedGraph():
         db_vertex = self.db.node()
         if main_interface:
             db_vertex['main_interface'] = main_interface.__identifier__
+
+        # set _exists marker to allow get_vertices to distinguish between
+        # real vertices and vertices which have been created in another
+        # transaction.
+        # this is related to the following issues:
+        # https://github.com/neo4j/community/issues/520
+        # https://github.com/neo4j/community/issues/457
+        db_vertex['_exists'] = True
         return element_factory(db_vertex)
 
     def get_vertex(self, dbid):
@@ -38,7 +50,7 @@ class EmbeddedGraph():
     def get_vertices(self):
         nodes = self.db.nodes
         return [element_factory(node) for node in nodes
-                if not _is_deleted_element(node)]
+                if _is_existing_element(node)]
 
     def remove_vertex(self, vertex):
         if vertex.get_dbId() == 0:
@@ -54,6 +66,7 @@ class EmbeddedGraph():
                     end_vertex.db_element)
         if main_interface:
             db_edge['main_interface'] = main_interface.__identifier__
+        db_edge['_exists'] = True
         return element_factory(db_edge)
 
     def get_edge(self, dbid):
@@ -61,7 +74,7 @@ class EmbeddedGraph():
 
     def get_edges(self):
         return [element_factory(edge) for edge in self.db.relationships
-                if not _is_deleted_element(edge)]
+                if _is_existing_element(edge)]
 
     def remove_edge(self, edge):
         """Removes the given edge"""
@@ -75,7 +88,8 @@ class EmbeddedGraph():
                 # this is the root node
                 # don't remove it, but remove all its properties
                 for k in v.db_element.keys():
-                    del v.db_element[k]
+                    if k != '_exists':
+                        del v.db_element[k]
             else:
                 self.remove_vertex(v)
 
