@@ -30,7 +30,9 @@ def tearDown(**kwargs):
        proxy to paramid.testing.tearDown(**kwargs)
     """
     graph = get_graph()
+    tx = graph.start_transaction()
     graph.clear()
+    graph.stop_transaction(tx)
     testing.tearDown(**kwargs)
 
 
