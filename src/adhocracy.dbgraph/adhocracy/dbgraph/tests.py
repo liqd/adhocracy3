@@ -337,9 +337,17 @@ class DBGraphTest(unittest.TestCase):
         assert "A" not in root.get_properties().keys()
         assert "B" not in root.get_properties().keys()
 
-
-#TODO: success
-#TODO: failure
+    def testTransactionFailure(self):
+        import pytest
+        with pytest.raises(Exception):
+            with self.g.transaction_context():
+                self.g.get_root_vertex().set_property("name", "peter")
+                v = self.g.add_vertex()
+                self.g.add_edge(self.g.get_root_vertex(), v, "connects")
+                raise Exception("fail transaction")
+        assertSetEquality(self.g.get_vertices(), [self.g.get_root_vertex()])
+        assert "name" not in self.g.get_root_vertex().get_properties().keys()
+        assertSetEquality(self.g.get_root_vertex().out_edges(), [])
 
 
 class BlockingWorkerThread(object):
