@@ -12,6 +12,7 @@ from adhocracy.dbgraph.interfaces import INode
 from adhocracy.dbgraph.interfaces import IReference
 from adhocracy.dbgraph.interfaces import DontRemoveRootException
 from adhocracy.dbgraph.embeddedgraph import EmbeddedGraph
+from adhocracy.dbgraph.elements import _is_existing_element
 from adhocracy.dbgraph.fieldproperty import AdoptedFieldProperty
 
 GRAPHDB_CONNECTION_STRING = "testdb"
@@ -309,6 +310,13 @@ class DBGraphTest(unittest.TestCase):
                 self.g.get_vertices(),
                 [root, self.g.get_vertex(v_id)])
         self.g.stop_transaction(this_tx)
+
+    def testIsExistent(self):
+        prep_tx = self.g.start_transaction()
+        v = self.g.add_vertex()
+        assert _is_existing_element(v)
+        self.g.stop_transaction(prep_tx)
+        assert _is_existing_element(v)
 
     def testTransactionRemoveVertexTermination(self):
         """This did not terminate. Therefore there are no asserts."""
