@@ -395,31 +395,6 @@ class BlockingWorkerThread(object):
         return returnValue
 
 
-#@Sönke Why do want to run all tests twice?
-#class GetGraphEmbeddedTestSuite(DBGraphTestSuite):
-    #"""Like DBGraphTestSuite, but the graph is created using get_graph."""
-
-    #@classmethod
-    #def setup_class(self):
-        #from pyramid import testing
-        #settings = {'graphdb_connection_string': GRAPHDB_CONNECTION_STRING}
-        #config = testing.setUp(settings=settings)
-        #self.g = get_graph()
-        #self.g.start_transaction()
-        #self.g.clear()
-        #self.g.stop_transaction()
-
-    #def tearDown(self):
-        #self.g.start_transaction()
-        #self.g.clear()
-        #self.g.stop_transaction()
-        #del_graph()
-        #from pyramid import testing
-        #testing.tearDown()
-
-    ##TODO: Transaction tests
-
-
 class FieldPropertyTest(unittest.TestCase):
 
     @classmethod
