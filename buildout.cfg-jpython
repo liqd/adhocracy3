@@ -1,0 +1,129 @@
+[buildout]
+index = http://d.pypi.python.org/simple
+eggs-directory = eggs
+download-cache = downloads
+extends = 
+    versions.cfg
+    codecheck.cfg
+versions = versions
+extensions =
+    buildout.dumppickedversions
+    mr.developer
+
+eggs =
+    ZopeSkel
+ 
+develop = src/* 
+ 
+parts +=
+#directories:
+    directories
+#install graphdb neo4j
+    neo4j_download 
+    neo4j_bin
+    jpype
+#install adhocracy
+    adhocracy 
+#debug tools
+    omelette 
+    sphinxbuilder    
+    pytest
+    jython
+
+always-checkout = false 
+
+[directories]
+recipe = z3c.recipe.mkdir
+paths = var
+        var/data
+        neo4jtest
+
+[jython]
+recipe = sk.recipe.jython
+initialization = import os;os.environ['JAVA_HOME'] = r'${java-env:JAVA_HOME}'
+url = http://downloads.sourceforge.net/project/jython/jython-dev/2.7.0a1/jython_installer-2.7a1.jar
+
+[jythonsystem]
+executable = /usr/bin/jython
+
+[neo4j_download]
+recipe = hexagonit.recipe.download
+url = http://dist.neo4j.org/neo4j-community-1.7-unix.tar.gz
+destination = ${buildout:directory}/neo4jtest
+ignore-existing = true
+strip-top-level-dir = true
+
+[neo4j_bin]
+recipe = plone.recipe.command
+stop-on-error = false
+command = 
+#link config files
+    cd ${buildout:directory}/neo4jtest/conf
+    rm neo4j.properties  neo4j-server.properties  neo4j-wrapper.conf
+    ln -s ../../etc/neo4jtest/neo4j.properties
+    ln -s ../../etc/neo4jtest/neo4j-server.properties
+    ln -s ../../etc/neo4jtest/neo4j-wrapper.conf
+#create start script
+    cd ${buildout:directory}/bin
+    ln -s ../neo4jtest/bin/neo4j neo4jtest
+update-command = ${neo4j_bin:command}
+
+
+[java-env]
+JAVA_HOME = /usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64
+
+[jpype]
+recipe = zc.recipe.egg:custom
+egg = JPype
+find-links =
+    http://downloads.sourceforge.net/project/jpype/JPype/0.5.4/JPype-0.5.4.2.zip
+environment = java-env
+
+          
+[adhocracy]
+recipe = zc.recipe.egg
+dependent-scripts = true
+python = jython
+eggs =
+    adhocracy.core
+    ipdb
+interpreter = adhocracypy
+initialization = import os;os.environ['JAVA_HOME'] = r'${java-env:JAVA_HOME}'
+ 
+[omelette]
+recipe = collective.recipe.omelette
+eggs = ${adhocracy:eggs}
+
+
+[sphinxbuilder]
+recipe =  collective.recipe.sphinxbuilder
+build = ${buildout:directory}/docs/build
+source = ${buildout:directory}/docs/source
+outputs = doctest html
+extra-paths = ${buildout:directory}/src/adhocracy.core
+eggs = ${adhocracy:eggs}
+
+[pytest]
+recipe = z3c.recipe.scripts
+python = jython
+eggs =
+  adhocracy.core[test]
+  adhocracy.dbgraph[test]
+  pyramid_adoptedtraversal[test]
+  ipdb
+  interlude
+  pytest
+arguments = ['src/adhocracy.dbgraph',
+             'src/pyramid_adoptedtraversal',
+             'src/adhocracy.core'
+            ]
+            + ["--cov", 
+               "src/pyramid_adoptedtraversal/pyramid_adoptedtraversal", 
+               "src/adhocracy.core",
+              ]
+            + ["--pep8", 
+               "--durations=10"
+              ] 
+            + sys.argv[1:]
+initialization = import os;os.environ['JAVA_HOME'] = r'${java-env:JAVA_HOME}'
+
