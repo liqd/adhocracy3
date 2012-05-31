@@ -104,6 +104,25 @@ class EmbeddedGraph():
         tx.failure()
         tx.finish()
 
+    def transaction_context(self):
+        return TransactionContext(self)
+
+
+class TransactionContext(object):
+    def __init__(self, graph):
+        self.graph = graph
+
+    def __enter__(self):
+        self.transaction = self.graph.start_transaction()
+
+    def __exit__(self, type, value, traceback):
+        if value is None:
+            self.graph.stop_transaction(self.transaction)
+        else:
+            self.graph.fail_transaction(self.transaction)
+        # reraise the exception
+        return False
+
 
 def get_graph():
     """ returns the graph database connection object
