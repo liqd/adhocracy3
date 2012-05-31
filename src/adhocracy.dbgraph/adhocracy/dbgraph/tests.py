@@ -320,8 +320,24 @@ class DBGraphTest(unittest.TestCase):
                     self.g.get_root_vertex().out_edges())
                 assertSetEquality(root_out_node_ids, [v_id])
 
+    def testNestedTransactions(self):
+        import pytest
+        with pytest.raises(Exception):
+            with self.g.transaction_context():
+                root = self.g.get_root_vertex()
+                root.set_property("A", "a")
+                assert root.get_properties()["A"] == "a"
+                with self.g.transaction_context():
+                    assert root.get_properties()["A"] == "a"
+                    root.set_property("B", "b")
+                    assert root.get_properties()["B"] == "b"
+                    raise FailTransactionException()
+                assert root.get_properties()["A"] == "a"
+                assert root.get_properties()["B"] == "b"
+        assert "A" not in root.get_properties().keys()
+        assert "B" not in root.get_properties().keys()
 
-#TODO: nested transactions
+
 #TODO: success
 #TODO: failure
 
