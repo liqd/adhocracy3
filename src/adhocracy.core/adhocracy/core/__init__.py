@@ -15,12 +15,15 @@ def main(global_config, **settings):
     # load application settings (rootfactory == try to use object traversal)
     config = Configurator(root_factory=root_factory, settings=settings)
     # hook zope global component registry into the pyramid application registry
-    # http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/zca.html?highlight=utility#using-the-zca-global-registry
+    # http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/\
+    # zca.html?highlight=utility#using-the-zca-global-registry
     # config.hook_zca()
     # load zcml configuration files (local registry)
     # http://readthedocs.org/docs/pyramid_zcml/en/latest/narr.html
     zcml_config_file = settings.get('configure_zcml', 'configure.zcml')
-    config.include('pyramid_zcml')  # imperative configuration: run pyramid_zcml.includeme()
-    config.load_zcml(zcml_config_file)  # declerative configuration: load central zcml file
+    # imperative configuration: run pyramid_zcml.includeme()
+    config.include('pyramid_zcml')
+    # declerative configuration: load central zcml file
+    config.load_zcml(zcml_config_file)
 
     return config.make_wsgi_app()
