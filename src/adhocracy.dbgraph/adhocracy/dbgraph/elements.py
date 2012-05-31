@@ -10,15 +10,24 @@ from adhocracy.dbgraph.interfaces import INode
 from adhocracy.dbgraph.interfaces import IReference
 
 
-def _is_deleted_element(element):
-    """Tries to guess, whether an db element is already deleted."""
+def _is_existing_element(element):
+    """
+    Determines whether a db element is supposed to be visible in this scope.
+    This is related to the following issues:
+    # https://github.com/neo4j/community/issues/520
+    # https://github.com/neo4j/community/issues/457
+    """
+    from neo4j._backend  import NodeProxy
+    from neo4j._backend  import RelationshipProxy
+    assert (type(element) == NodeProxy) or (type(element) == RelationshipProxy)
     #TODO: implement using TransactionData?
-    r = False
+    r = True
     try:
+        r = bool(element.hasProperty('_exists'))
         list(element.keys())
         'foo' in element.keys()
     except Exception:
-        r = True
+        r = False
     return r
 
 
@@ -56,7 +65,8 @@ class EmbeddedElement(object):
             return default
 
     def get_properties(self):
-        return dict(self.db_element)
+        return dict((k, v)
+                for k, v in self.db_element.items() if k != '_exists')
 
     def set_property(self, key, value):
         self.db_element[key] = value
@@ -78,12 +88,12 @@ class Vertex(EmbeddedElement):
     def out_edges(self, label=None):
         return [element_factory(edge) for edge \
                 in self.db_element.relationships.outgoing
-                if not _is_deleted_element(edge)]
+                if _is_existing_element(edge)]
 
     def in_edges(self, label=None):
         return [element_factory(edge) for edge \
                 in self.db_element.relationships.incoming
-                if not _is_deleted_element(edge)]
+                if _is_existing_element(edge)]
 
 
 class Edge(EmbeddedElement):

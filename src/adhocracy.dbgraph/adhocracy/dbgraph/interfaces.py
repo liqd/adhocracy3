@@ -127,6 +127,10 @@ class IGraph(Interface):
     def fail_transaction(transaction):
         """Marks the current transaction for rollback."""
 
+    def transaction_context():
+        """Returns a context for a given transaction.
+        Can be used in with-statements."""
+
 
 class DontRemoveRootException(Exception):
     pass
