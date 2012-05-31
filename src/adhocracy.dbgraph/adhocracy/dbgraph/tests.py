@@ -320,19 +320,6 @@ class DBGraphTest(unittest.TestCase):
                     self.g.get_root_vertex().out_edges())
                 assertSetEquality(root_out_node_ids, [v_id])
 
-    def _testTransactionOtherTransactionException(self):
-        raise Exception("currently broken")
-        with BlockingWorkerThread() as thread:
-            def f():
-                tx = self.g.start_transaction
-                return (tx, self.g.add_vertex())
-            (other_tx, other_v) = thread.do(f)
-
-            with self.g.transaction_context():
-                self.assertRaises(NotInTransactionException, other_v.get_dbId)
-
-            thread.do(lambda: self.g.stop_transaction(other_tx))
-
 
 #TODO: nested transactions
 #TODO: success
