@@ -298,28 +298,6 @@ class DBGraphTest(unittest.TestCase):
             assert _is_existing_element(v.db_element)
         assert _is_existing_element(v.db_element)
 
-    def testTransactionRemoveVertexTermination(self):
-        """This did not terminate. Therefore there are no asserts."""
-        with self.g.transaction_context():
-            v_id = self.g.add_vertex().get_dbId()
-
-        with BlockingWorkerThread() as thread:
-            def prep():
-                tx = self.g.start_transaction()
-                v = self.g.get_vertex(v_id)
-                v.set_property("name", "peter")
-                return tx
-            other_tx = thread.do(prep)
-
-            this_tx = self.g.start_transaction()
-
-            v = self.g.get_vertex(v_id)
-            # this is the call that didn't terminate
-            self.g.remove_vertex(v)
-            self.g.stop_transaction(this_tx)
-
-            thread.do(lambda: self.g.stop_transaction(other_tx))
-
     def testTransactionEdges(self):
         with self.g.transaction_context():
             v_id = self.g.add_vertex().get_dbId()
