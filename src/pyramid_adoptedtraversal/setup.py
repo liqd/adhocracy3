@@ -15,7 +15,6 @@ tests_require = [
     'pytest',
     'pytest-cov',
     'pytest-pep8',
-    'pytest-quickcheck',
     ]
 
 setup(name='pyramid_adoptedtraversal',

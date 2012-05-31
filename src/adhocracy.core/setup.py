@@ -27,7 +27,6 @@ tests_requires = [
     'pytest',
     'pytest-cov',
     'pytest-pep8',
-    'pytest-quickcheck',
     'wsgi_intercept',
     'zope.testbrowser',
     ]
