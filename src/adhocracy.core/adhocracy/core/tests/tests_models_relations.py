@@ -65,15 +65,13 @@ class ModelChildRelationTests(unittest.TestCase):
         parent_adapter = self._target_interface(parent)
         parent_adapter["g2"] = child
         self.graph.stop_transaction(tx)
-        self.assertIsNotNone(parent)
-        self.assertIsNotNone(child)
+        assert("g2" in parent_adapter)
+        assert(child == parent_adapter["g2"])
+        self.assertRaises(KeyError, parent_adapter.__getitem__,\
+                                    ("not_available"))
         #self.assertEquals([parent.get_dbId()],
             #map(lambda x: x.get_dbId(), list(child.outV("child"))))
-        #assert("g2" in parent_adapter)
-        #assert(child.eid == parent_adapter["g2"].eid)
         #assert("not_available" not in parent_adapter)
-        #self.assertRaises(KeyError, parent_adapter.__getitem__,\
-                                    #("not_available"))
         #assert(parent.__parent__ is None)
         #assert(child.__parent__ is not None)
         #assert(child.__parent__.eid == parent.eid)

@@ -18,15 +18,15 @@ class IAdhocracyRootMarker(INode):
 
 
 class AdhocracyRootLocationAware(object):
-     implements(ILocationAware)
-     component.adapts(IAdhocracyRootMarker)
+    implements(ILocationAware)
+    component.adapts(IAdhocracyRootMarker)
 
-     def __init__(self, context):
-         self.context = context
+    def __init__(self, context):
+        self.context = context
 
-     __parent__ = None
-     __name__ = ''
-     __acl__ = SITE_ACL
+    __parent__ = None
+    __name__ = ''
+    __acl__ = SITE_ACL
 
 
 @implementer(IAdhocracyRootMarker)
@@ -34,10 +34,11 @@ def adhocracyroot_factory():
     graph = get_graph()
     root = graph.get_root_vertex()
     if not IAdhocracyRootMarker.providedBy(root):
-        graph.start_transaction()
-        root.set_property("main_interface", IAdhocracyRootMarker.__identifier__)
+        tx = graph.start_transaction()
+        root.set_property("main_interface",\
+                IAdhocracyRootMarker.__identifier__)
         directlyProvides(root, IAdhocracyRootMarker)
-        graph.stop_transaction()
+        graph.stop_transaction(tx)
     return root
 
 

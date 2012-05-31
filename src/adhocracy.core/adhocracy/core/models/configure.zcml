@@ -24,11 +24,12 @@
        />
 
   <!--Object traverse-->
-  <!--http://readthedocs.org/docs/pyramid_zcml/en/latest/narr.html#configuring-an-alternate-traverser-via-zcml-->
+  <!--http://readthedocs.org/docs/pyramid_zcml/en/latest/narr.html\-->
+  <!--#configuring-an-alternate-traverser-via-zcml-->
   <adapter
     factory="pyramid_adoptedtraversal.resourcetreetraverseradopted.ResourceTreeTraverserAdopted"
     provides="pyramid.interfaces.ITraverser"
-    for="adhocracy.core.models.interfaces.INode"
+    for="adhocracy.dbgraph.interfaces.INode"
   />
 
   <!--model adapters -->
@@ -39,6 +40,6 @@
   <adapter factory="adhocracy.core.models.references.Child" />
 
   <!--relations-->
-  <adapter factory="adhocracy.core.models.adapters.NodeChildsDictAdapter" />
+  <adapter factory="adhocracy.core.models.relations.NodeChildsDictAdapter" />
 
 </configure>

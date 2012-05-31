@@ -60,11 +60,11 @@
         #self._populate()
         #self.assertEquals(len(list(self.tom.inV())), 2)
         #self.assertEquals(len(list(self.tom.inV(property_key="place",\
-                                                #property_value="village"))), 1)
+                                         #property_value="village"))), 1)
         #self.assertEquals(len(list(self.tom.inV(label="knows"))), 2)
         #self.assertEquals(len(list(self.tom.inV(label="knows",\
-                                                #property_key="place",\
-                                                #property_value="village"))), 1)
+                                         #property_key="place",\
+                                         #property_value="village"))), 1)
         ##inV returns initialized node objects
         #for res_object in self.tom.inV():
             #self.assert_(isinstance(res_object, Person))

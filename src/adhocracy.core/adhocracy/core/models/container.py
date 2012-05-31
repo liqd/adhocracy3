@@ -30,7 +30,7 @@ class Container(object):
     adapts(IContainerMarker)
 
     def __init__(self, context):
-         self.context = context
+        self.context = context
 
     text = AdoptedFieldProperty(IContainer["text"])
 
@@ -40,7 +40,7 @@ class ContainerLocationAware(object):
     adapts(IContainerMarker)
 
     def __init__(self, context):
-         self.context = context
+        self.context = context
 
     @property
     def __parent__(self):

@@ -22,7 +22,10 @@ class NodeChildsDictAdapter(object, DictMixin):
         self.context = context
 
     def __setitem__(self, key, node):
-        create_content(IChildMarker, parent=self.context, child=node, child_name=key)
+        if key in self.keys():
+            raise KeyError("multiple child nodes with key %s" % (key))
+        create_content(IChildMarker, parent=self.context, child=node,\
+                       child_name=key)
 
     def __delitem__(self, key):
         edges = filter(lambda edge: IChild(edge).child_name == key,\

@@ -5,7 +5,7 @@ from adhocracy.core.testing import tearDown
 from adhocracy.core.testing import get_graph
 
 
-class ModelTests(unittest.TestCase):
+class ContainerModelTests(unittest.TestCase):
 
     def setUp(self):
         self.config = setUp()
@@ -49,24 +49,6 @@ class ModelTests(unittest.TestCase):
         from adhocracy.dbgraph.interfaces import INode
         assert(INode.providedBy(content))
         assert(verifyObject(INode, content))
-        assert(verifyObject(self._target_marker_interface, content))
+        assert(self._target_marker_interface.providedBy(content))
         content = self._target_interface(content)
         assert(verifyObject(self._target_interface, content))
-
-
-        #container1.save()
-        #self.assert_(container1.name == "g1")
-        ##it can have children
-        #container2 = create_content(IContainer, name=u"g2")
-        #container2.text = u"text2"
-        #container2.save()
-        #return (container1, container2)
-
-    #def test_child_factory(self):
-        #container1, container2 = self.create_two_nodes()
-        #from repoze.lemonade.content import create_content
-        #from adhocracy.core.models.interfaces import IChild
-        #child = create_content(IChild, parent=container1, \
-                #child=container2, child_name=u"g2")
-        #self.assert_(child.outV().eid == container2.eid)
-        #self.assert_(child.inV().eid == container1.eid)

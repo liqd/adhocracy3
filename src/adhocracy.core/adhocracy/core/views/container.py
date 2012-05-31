@@ -1,5 +1,5 @@
 from pyramid.view import view_config
-from adhocracy.core.models.interfaces import IContainer
+from adhocracy.core.models.container import IContainerMarker
 
 
 class ContainerView(object):
@@ -9,7 +9,7 @@ class ContainerView(object):
             self.request = request
 
     #default view
-    @view_config(context=IContainer,
+    @view_config(context=IContainerMarker,
                  renderer='container_templates/view.pt')
     def __call__(self):
         return {'project': 'container'}

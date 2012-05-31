@@ -93,10 +93,10 @@ class Edge(EmbeddedElement):
         return "<Edge %i>" % self.get_dbId()
 
     def start_vertex(self):
-        return Vertex(self.db_element.start)
+        return element_factory(self.db_element.start)
 
     def end_vertex(self):
-        return Vertex(self.db_element.end)
+        return element_factory(self.db_element.end)
 
     def get_label(self):
         return self.db_element.type.name()
@@ -121,8 +121,8 @@ def element_factory(db_element):
     if 'main_interface' in db_element.keys():
         interface = resolve(db_element['main_interface'])
     # import here, we do not want to wake the jvm earlier...
-    from neo4j._backend  import RelationshipProxy
-    from neo4j._backend  import NodeProxy
+    from neo4j._backend import RelationshipProxy
+    from neo4j._backend import NodeProxy
     element = None
     if issubclass(interface, INode):
         element = Node(db_element)

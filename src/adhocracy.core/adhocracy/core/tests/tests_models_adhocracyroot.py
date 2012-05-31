@@ -8,13 +8,15 @@ from adhocracy.core.testing import load_registry
 from adhocracy.core.testing import get_graph
 
 
-class AdhocracyRootTests(unittest.TestCase):
+class AdhocracyRootModelTests(unittest.TestCase):
 
     def setUp(self):
         self.config = setUp()
         from adhocracy.core.models.adhocracyroot import adhocracyroot_factory
-        registerContentFactory(adhocracyroot_factory, self._target_marker_interface)
-        from adhocracy.core.models.adhocracyroot import AdhocracyRootLocationAware
+        registerContentFactory(adhocracyroot_factory, \
+                               self._target_marker_interface)
+        from adhocracy.core.models.adhocracyroot\
+                import AdhocracyRootLocationAware
         self.config.registry.registerAdapter(AdhocracyRootLocationAware)
         self.graph = get_graph()
 
@@ -68,7 +70,7 @@ class AdhocracyRootTests(unittest.TestCase):
         self.assert_(self._target_marker_interface.providedBy(root))
 
 
-class ModelFunctionalTests(unittest.TestCase):
+class AdhocracyRootModelFunctionalTests(unittest.TestCase):
 
     def setUp(self):
         config = setUp()
@@ -76,14 +78,3 @@ class ModelFunctionalTests(unittest.TestCase):
 
     def tearDown(self):
         tearDown()
-
-
-#class ViewTests(unittest.TestCase):
-
-    #def test_default_view(self):
-        #from adhocracy.core.views.adhocracyroot import AdhocracyRootView
-        #from adhocracy.core.testing import Dummy
-        #request = testing.DummyRequest()
-        #context = Dummy()
-        #view = AdhocracyRootView(request, context)()
-        #self.assertEqual(view['project'], 'adhocracy.core')

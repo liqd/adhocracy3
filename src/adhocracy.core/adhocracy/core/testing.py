@@ -15,7 +15,7 @@ def setUp(**kwargs):
        setUp basic test environment
        proxy to pyramid.testing.setUp(**kwargs)
     """
-    testing.tearDown()
+    #testing.tearDown()
     settings = {}
     settings['graphdb_connection_string'] = GRAPHDB_CONNECTION_STRING
     settings.update(kwargs.get('settings', {}))
@@ -30,7 +30,7 @@ def tearDown(**kwargs):
        proxy to paramid.testing.tearDown(**kwargs)
     """
     graph = get_graph()
-    #graph.clear()
+    graph.clear()
     testing.tearDown(**kwargs)
 
 
@@ -63,7 +63,7 @@ def setUpFunctional(global_config=None, **settings):
 
     testing.tearDown()
     _settings = {}
-    _settings['rexster_uri'] = "http://localhost:8182/graphs/testgraph"
+    _settings['graphdb_connection_string'] = GRAPHDB_CONNECTION_STRING
     _settings.update(settings)
 
     host = "localhost"
@@ -82,9 +82,9 @@ def setUpFunctional(global_config=None, **settings):
 #Various test helper stuff
 
 
-#class Dummy(dict):
-    #def __init__(self, **kwargs):
-        #self.__dict__.update(kwargs)
+class Dummy(dict):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
 
 
 class IDummyNode(INode):
