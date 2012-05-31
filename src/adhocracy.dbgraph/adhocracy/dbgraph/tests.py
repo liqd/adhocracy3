@@ -314,9 +314,9 @@ class DBGraphTest(unittest.TestCase):
     def testIsExistent(self):
         prep_tx = self.g.start_transaction()
         v = self.g.add_vertex()
-        assert _is_existing_element(v)
+        assert _is_existing_element(v.db_element)
         self.g.stop_transaction(prep_tx)
-        assert _is_existing_element(v)
+        assert _is_existing_element(v.db_element)
 
     def testTransactionRemoveVertexTermination(self):
         """This did not terminate. Therefore there are no asserts."""

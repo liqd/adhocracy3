@@ -17,6 +17,9 @@ def _is_existing_element(element):
     # https://github.com/neo4j/community/issues/520
     # https://github.com/neo4j/community/issues/457
     """
+    from neo4j._backend  import NodeProxy
+    from neo4j._backend  import RelationshipProxy
+    assert (type(element) == NodeProxy) or (type(element) == RelationshipProxy)
     #TODO: implement using TransactionData?
     r = True
     try:
