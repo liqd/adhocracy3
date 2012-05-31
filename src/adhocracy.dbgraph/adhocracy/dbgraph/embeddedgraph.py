@@ -119,7 +119,8 @@ def graph_factory():
     """Utility to store the db graph conneciton object
     """
     settings = get_current_registry().settings
-    connection_string = settings['graphdb_connection_string']
+    connection_string = settings and settings['graphdb_connection_string'] \
+                        or "testdb"
     import os
     os.environ['NEO4J_PYTHON_JVMARGS'] = '-Xms128M -Xmx512M'
     from neo4j import GraphDatabase
