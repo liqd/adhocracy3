@@ -5,17 +5,19 @@
 
 .. include:: ../../README.rst
 
-Contents:
+Contents
+~~~~~~~~
 
 .. toctree::
     :maxdepth: 2
     
     architecture
-    contents
+    supergraph_alias
+    api
 
 
 Indices and tables
-==================
+~~~~~~~~~~~~~~~~~~
 
 * :ref:`genindex`
 * :ref:`modindex`
