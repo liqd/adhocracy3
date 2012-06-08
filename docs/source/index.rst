@@ -11,7 +11,8 @@ Contents
 .. toctree::
     :maxdepth: 2
 
-    contents
+    supergraph_alias
+    api
 
 
 Indices and tables
