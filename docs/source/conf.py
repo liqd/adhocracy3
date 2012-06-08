@@ -28,7 +28,7 @@ import sys, os
 extensions = [
 'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
 'sphinxcontrib.seqdiag', 'sphinxcontrib.blockdiag', 'sphinxcontrib.infrae',
-'sphinxcontrib.infrae']
+'sphinx.ext.coverage', 'sphinx.ext.pngmath', 'sphinx.ext.graphviz']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

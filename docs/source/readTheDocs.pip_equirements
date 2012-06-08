@@ -1,2 +1,5 @@
 sphinxcontrib.infrae==1.0
-file:src/adhocracy.dbgraph#egg=adhocracy.dbgraph
+sphinxcontrib.seqdiag
+sphinxcontrib.blockdiag
+-e file:../../src/adhocracy.dbgraph#egg=adhocracy.dbgraph
+-e file:../../src/adhocracy.core#egg=adhocracy.core
