@@ -18,7 +18,7 @@ Software architecture
      VL [label = "View logic\n (check permissions)"];
      VJ [label = "JSON"];
      VH [label = "HTML page"];
-     VHS [label = "HTML snipplet \n (can be included in \n pages)"];
+     VHS [label = "HTML snippet \n (can be included in \n pages)"];
 
      browser1 [shape = actor label = "HTML client"]
      browser2 [shape = actor label = "HTML client"]
