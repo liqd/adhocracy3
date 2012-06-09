@@ -3,6 +3,9 @@ Software architecture
 =====================
 
 
+One layer can only operate on layers with an arrow pointing to it.
+Inside on group the order is top down, between groups form the left to the right.
+
 .. blockdiag::
 
    diagram {
@@ -27,9 +30,9 @@ Software architecture
      G -> SG -> A -> M -> H, W;
                         H -> W;
                   M, H, W -> VL;
-                                VL -> VH;
-                                VL -> VHS;
-                                VL -> VJ;
+                             VL -> VH;
+                             VL -> VHS;
+                             VL -> VJ;
      VH -> browser1;
      VHS -> browser2;
      VJ -> js;
