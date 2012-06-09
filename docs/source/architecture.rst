@@ -24,8 +24,9 @@ Software architecture
      browser2 [shape = actor label = "HTML client"]
      js [shape = actor label = "Javascript client"]
 
-     G -> SG -> A -> M -> H, W, VL;
-                        H -> W, VL;
+     G -> SG -> A -> M -> H, W;
+                        H -> W;
+                  M, H, W -> VL;
                                 VL -> VH;
                                 VL -> VHS;
                                 VL -> VJ;
