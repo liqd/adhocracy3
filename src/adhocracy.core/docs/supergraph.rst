@@ -344,7 +344,7 @@ A non-exhaustive list of relations
 
 
 ``Predicates``
-    Predicates are classical subject-predicate-object relations (also called binayr relations), expressible as a verb.
+    Predicates are classical subject-predicate-object relations (also called binary relations), expressible as a verb.
 
     .. digraph:: predicates
 
