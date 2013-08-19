@@ -13,24 +13,25 @@ Our Terminology
     python objects.
 
 ``reference``
-    A reference connects a source node to a target node (or a
-    container with many target nodes).  There is a limited number of
-    types of references.  Examples: "contains", "has_author", etc.
+    A reference connects a source node to a target node.
+    References have a specific label, like: "contains", "has_author", etc.
+    There a two basic types:
+
+    * ``reference-to-one``: References which exist only once
+
+    * ``reference-to-many``: References exists zero to many times
+
     What constitutes a node and what constitutes a reference is a
     design decision made on the content design level.
 
-    It is often convenient to talk about nodes as vertices and
-    references as edges in a graph.
+    It is often convenient to talk about nodes as ``vertices`` and
+    references as ``edges`` in a graph.
 
     References are implemented as python attributes containing object
-    references.  (The term "reference" exists both on the data model
-    level and on the implementation level.)  A reference can either
+    references. (The term "reference" exists both on the data model
+    level and on the implementation level.) A reference can either
     connect to a target node, or to a container of target nodes (list,
     set, ...).
-
-``content node``
-    A node that is self-contained, i.e. it has no outgoing references.
-    (Content nodes are the leaves of the reference graph.)
 
 ``essence``
     Some references are "essential" to a source node, and some are
@@ -48,179 +49,26 @@ Our Terminology
     The inverse essence of a node up to reflexivity: A node X is a
     dependent of Y if Y is in the essence of X, but not X itself.
 
+``content node``
+    A node that is self-contained, i.e. it has no outgoing references.
+    (Content nodes are the leaves of the reference graph.)
+
 ``follows``
     Change management is implemented by ``follows`` edges between
     nodes.  A node that changes in fact is copied into a new version
     that follows the previous version.  ``follows`` edges are NOT
     references (neither on the design level nor on the implementation
-    level).  If a node has no outgoing ``follows`` edge, it is called
-    a ``head``.  If it has more than one, it is called a ``fork``.
+    level).
+
+``head`` A node without outgoing ``follows`` edges
+
+``fork`` A node with more than one outgoing ``follows`` edges.
+
+``merge`` A node with more than one incomming ``follows`` edges.
 
 ``relation``
-    A conglomerate of references and nodes that have a certain
-    meaning. A relation is a pattern of nodes and references (of
-    certain types) that can be found in graphs. (See below for
-    examples.)  Examples:
-       * a classic binary relation (Subject <- R -> Object)
-       * simply a labelled reference (->)
-       * something more complex and/or specialized (A <- Contradiction1 -> B, User1 <- marks_as_correct -> Contradiction1)
-
-
-.. todo
-    find better names!
-
-.. ``reference-to-one``
-    References which exist only once, e.g. the object reference in a predicate
-    relationship
-
-.. ``reference-to-many``
-    References exists zero to many times, e.g. parts of collections
-
-.. ``required reference``
-    A reference from A to B, where the node A could not exist without its
-    relationship to B.
-
-.. ``optional reference``
-    A reference from A to B, where the node A would still make sense without its
-    reference to B.
-
-
-
-
-Implementation Notes
---------------------
-
-This paragraph is a summary of the data structure discussions on Fri
-2013-07-19 and before.  The later sections are obsolete to a varying
-extent.
-
-Nodes are implemented as python objects, references as attributes.  In
-addition to the attributes, there is a method:
-
-.. code:: python
-  refs(): { <attr> : <node> }
-
-that returns a dictionary mapping python strings containing attribute
-names to the resp. reference target nodes.  This is interesting
-because not all attributes of the node object are references.
-
-The dependents (inverse references, i.e. only direct dependents) are
-represented by a method:
-
-.. code:: python
-  deps(): { <node> : { <interface> : [ <attr> ] } }
-
-that returns a dictionary mapping nodes to dictionaries, which in turn
-map interfaces to lists of reference names (references are implemented
-as attributes containing python references).
-
-This way, it is easy to ask an object which other objects are
-referencing it.
-
-Alternatively dependents could be implemented as:
-
-.. code:: python
-  deps(): [ (<node>, <interface>, <attr>) ]
-
-There should probably also be transitive hulls for references and
-dependents, e.g. ``trans_refs()`` and ``trans_deps()``, which can be
-implemented easily in terms of the above methods.  (XXX: is it more
-pythonic to say "function" instead of "method"?)
-
-Change management is modelled by nodes being copied into ``follows``
-nodes.  There is a number of meaningful and desirable ways in which
-references can react to changes in referenced and dependent nodes.
-
-If a reference is essential, the target must notify the source of the
-reference.  The source then has three options:
-
- * create a new version itself, keep the old reference unchanged, and
-   update the reference in the new version to point to the new version
-   of the target.  Example: if a paragraph in a document has been
-   updated, the document should be considered updated as well.
-
- * ask the user what to do about the change.  Example: If a user
-   "likes" a node, and the node changes, the user should be able to
-   decide whether she also likes the new version, or only the previous
-   version.
-
- * ignore the change, keep the reference pointed to the old version of
-   the target, and do nothing.  Example: Change suggestions: a user wants
-   to express that she would support a proposal if some changes are made.
-   This change suggestion refers to one version of the proposal and shouldn't
-   be updated to newer versions.
-
-If a reference is not essential, things get more complicated.  The
-source node will still be notified of any change in any target (it
-always is for all references), but it has more freedom of choice in
-what to do, and with that comes more confusion.  Example:
-
-.. digraph:: graph101
-  topic1 -> doc1 [label = "touched by"]
-  topic1 -> doc2 [label = "touched by"]
-  topic2 -> doc3 [label = "touched by"]
-  topic2 -> doc4 [label = "touched by"]
-  topic2 -> doc2 [label = "touched by"]
-
-If topics (in wikimedia-speak: categories) are modelled this way,
-neither of the options of essiential references are desirable, because
-we would always create a new follower node of any topic that touches
-any document that has a new version.  We either want to reference only
-the head of each document, and always update all references whenever
-documents are updated, or we want to reference all versions in the
-history of the document.  (If we only reference heads, then what
-happens if somebody keeps badges or comments or whatnot on the old
-version, refusing to update?  Then the old document, still referenced
-by the comment, falls out of the topic category.  Hum.  I think topic
-references would need to be copied, not moved.  This would cause a lot
-of references.  Perhaps references should be modelled the other way
-round, not as "touched by", but as "touches".  But I digress.)
-
-But if we simply keep track of the head of each document, what happens
-with forks?  In a naive implementation, only the head created earliest
-would keep the topic, and all forks would miss it, because the node
-from which they fork would have passed on the reference to the
-follower already.
-
-Disallowing target node forks may be sometimes an option, but in this
-case it is not.  So there has to be another notification event: If a
-node is forked (has one or more followers already, and gets another
-one), all follower nodes are traversed, and all dependents of those
-nodes are notified of the fork.
-
-The dependents can then decide what to do.  In the topic model above,
-the topic node has to visit the new head and reference it as well,
-without killing the old reference.  In other cases, it may raise an
-exception and thereby disallow forks in target nodes.
-
-This means that some node types are forkable and others are not.
-Nodes therefore need an attribute:
-
-.. code:: python
-  forkable : bool
-
-Because essential edges guarantee immutability of target nodes, they
-are to be preferred over non-essential nodes when modelling
-application data.  The following model:
-
-.. digraph:: graph102
-  user <- likes
-  likes => doc
-
-has a non-essential edge, i.e. the clear update rules of essentiality
-do not apply when the user updates her email address.  The following
-model gets by with only essential edges:
-
-.. digraph:: graph103
-  user => uid
-  likes => uid
-  likes => doc
-
-
-
-XXX: Isn't change management of graph data structures a problem that
-somebody has figured out on a theoretical level yet?
-
+    A pattern of references and nodes that have a certain
+    meaning. (See below for examples.)
 
 
 
@@ -569,3 +417,144 @@ A non-exhaustive list of relations
         "C''" -> "C'" [label = follows, style = dashed, color = grey];
         "C'" [color = grey];
         "C'" -> C [label = follows, style = dashed, color = grey];
+
+
+Implementation Notes
+--------------------
+
+.. Relation example:  something more complex and/or specialized (A <- Contradiction1 -> B, User1 <- marks_as_correct -> Contradiction1)
+
+This paragraph is a summary of the data structure discussions on Fri
+2013-07-19 and before.  The later sections are obsolete to a varying
+extent.
+
+Nodes are implemented as python objects, references as attributes.  In
+addition to the attributes, there is a method:
+
+.. code:: python
+  refs(): { <attr> : <node> }
+
+that returns a dictionary mapping python strings containing attribute
+names to the resp. reference target nodes.  This is interesting
+because not all attributes of the node object are references.
+
+The dependents (inverse references, i.e. only direct dependents) are
+represented by a method:
+
+.. code:: python
+  deps(): { <node> : { <interface> : [ <attr> ] } }
+
+that returns a dictionary mapping nodes to dictionaries, which in turn
+map interfaces to lists of reference names (references are implemented
+as attributes containing python references).
+
+This way, it is easy to ask an object which other objects are
+referencing it.
+
+Alternatively dependents could be implemented as:
+
+.. code:: python
+  deps(): [ (<node>, <interface>, <attr>) ]
+
+There should probably also be transitive hulls for references and
+dependents, e.g. ``trans_refs()`` and ``trans_deps()``, which can be
+implemented easily in terms of the above methods.  (XXX: is it more
+pythonic to say "function" instead of "method"?)
+
+Change management is modelled by nodes being copied into ``follows``
+nodes.  There is a number of meaningful and desirable ways in which
+references can react to changes in referenced and dependent nodes.
+
+If a reference is essential, the target must notify the source of the
+reference.  The source then has three options:
+
+ * create a new version itself, keep the old reference unchanged, and
+   update the reference in the new version to point to the new version
+   of the target.  Example: if a paragraph in a document has been
+   updated, the document should be considered updated as well.
+
+ * ask the user what to do about the change.  Example: If a user
+   "likes" a node, and the node changes, the user should be able to
+   decide whether she also likes the new version, or only the previous
+   version.
+
+ * ignore the change, keep the reference pointed to the old version of
+   the target, and do nothing.  Example: Change suggestions: a user wants
+   to express that she would support a proposal if some changes are made.
+   This change suggestion refers to one version of the proposal and shouldn't
+   be updated to newer versions.
+
+If a reference is not essential, things get more complicated.  The
+source node will still be notified of any change in any target (it
+always is for all references), but it has more freedom of choice in
+what to do, and with that comes more confusion.  Example:
+
+.. digraph:: graph101
+  topic1 -> doc1 [label = "touched by"]
+  topic1 -> doc2 [label = "touched by"]
+  topic2 -> doc3 [label = "touched by"]
+  topic2 -> doc4 [label = "touched by"]
+  topic2 -> doc2 [label = "touched by"]
+
+If topics (in wikimedia-speak: categories) are modelled this way,
+neither of the options of essiential references are desirable, because
+we would always create a new follower node of any topic that touches
+any document that has a new version.  We either want to reference only
+the head of each document, and always update all references whenever
+documents are updated, or we want to reference all versions in the
+history of the document.  (If we only reference heads, then what
+happens if somebody keeps badges or comments or whatnot on the old
+version, refusing to update?  Then the old document, still referenced
+by the comment, falls out of the topic category.  Hum.  I think topic
+references would need to be copied, not moved.  This would cause a lot
+of references.  Perhaps references should be modelled the other way
+round, not as "touched by", but as "touches".  But I digress.)
+
+But if we simply keep track of the head of each document, what happens
+with forks?  In a naive implementation, only the head created earliest
+would keep the topic, and all forks would miss it, because the node
+from which they fork would have passed on the reference to the
+follower already.
+
+Disallowing target node forks may be sometimes an option, but in this
+case it is not.  So there has to be another notification event: If a
+node is forked (has one or more followers already, and gets another
+one), all follower nodes are traversed, and all dependents of those
+nodes are notified of the fork.
+
+The dependents can then decide what to do.  In the topic model above,
+the topic node has to visit the new head and reference it as well,
+without killing the old reference.  In other cases, it may raise an
+exception and thereby disallow forks in target nodes.
+
+This means that some node types are forkable and others are not.
+Nodes therefore need an attribute:
+
+.. code:: python
+  forkable : bool
+
+Because essential edges guarantee immutability of target nodes, they
+are to be preferred over non-essential nodes when modelling
+application data.  The following model:
+
+.. digraph:: graph102
+  user <- likes
+  likes => doc
+
+has a non-essential edge, i.e. the clear update rules of essentiality
+do not apply when the user updates her email address.  The following
+model gets by with only essential edges:
+
+.. digraph:: graph103
+  user => uid
+  likes => uid
+  likes => doc
+
+
+
+XXX: Isn't change management of graph data structures a problem that
+somebody has figured out on a theoretical level yet?
+
+
+
+
