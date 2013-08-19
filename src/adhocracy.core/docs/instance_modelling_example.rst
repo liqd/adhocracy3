@@ -2,22 +2,25 @@
 Example of Modelling a Simple Use-Case Using our Supergraph
 ===========================================================
 
-Superuser Father has an Instance.
-He adds an a participation project "Homestuff" to discuss proposals.
-He creates an proposal "dishwash table" and allows other users to access the proposal.
+1 create participation process and content
+    Superuser Father has an Instance.
+    He adds an a participation project "Homestuff" to discuss proposals.
+    He creates an proposal "dishwash table" and allows other users to access the proposal.
 
-A user Alice looks at an existing proposal. She states her
-disagreement with the proposal (using a "disagree" button).
-She justifies her disagreement with a short text.
+2a user disagrees and comments - user statement about content
+    A user Alice looks at an existing proposal. She states her
+    disagreement with the proposal (using a "disagree" button).
+    She justifies her disagreement with a short text.
 
-User Bob looks at the proposal, sees Alice's reaction and
-states that he seconds both her disagreement and the
-justifying text.
+2a user agrees
+    User Carl looks at everything, and annotates the proposal with an
+    agreement (using an "agree" button).
 
-User Carl looks at everything, and annotates the proposal with an
-agreement (using an "agree" button).  Carl is thus indirectly
-contradicting Alice and Bob, but his agreement is not interacting with
-the other assessments.
+3 user seconds disagreement - user statement about statement
+    User Bob looks at the proposal, sees Alice's reaction and
+    states that he seconds both her disagreement and the
+    justifying text.
+
 
 
 
