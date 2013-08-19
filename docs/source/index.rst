@@ -10,7 +10,7 @@ Contents
 
 .. toctree::
     :maxdepth: 2
-    
+
     architecture
     supergraph_alias
     api
@@ -19,7 +19,4 @@ Contents
 Indices and tables
 ~~~~~~~~~~~~~~~~~~
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
