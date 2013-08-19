@@ -34,3 +34,15 @@ Documentation
 * `adhocracy-3 source code documentation and software architecture <http://adhocracy-3-playground.readthedocs.org/en/latest/index.html>`_
 
 If you want to work on the documentation: It is written using `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ inside the normal github repo. We will gladly accept pull requests.
+
+build instructions
+~~~~~~~~~~~~~~~~~~
+
+The following *may* work, but there may be broken dependencies left in the config files:
+
+1. virtualenv --python=python2.7 --no-site-packages adhocracy-3
+2. source bin/activate
+3. ./bin/easy_install -U distribute
+4. ./bin/python2.7 bootstrap.py
+5. ./bin/buildout install sphinxbuilder
+
