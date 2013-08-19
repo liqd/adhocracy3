@@ -2,6 +2,9 @@
 Example of Modelling a Simple Use-Case Using our Supergraph
 ===========================================================
 
+Superuser Father has an Instance.
+He adds an a participation project "Homestuff" to discuss proposals.
+He creates an proposal "dishwash table" and allows other users to access the proposal.
 
 A user Alice looks at an existing proposal. She states her
 disagreement with the proposal (using a "disagree" button).
@@ -98,13 +101,17 @@ IProposalPool(IPool):
 IAssessmentPool(IPool):
     (contents : set(IAssessment))
 
-IUserPool(IPool):
-    (contents : set(IUser))
-
-IMyInstance(INode):
-    @not_essence
-    users : IUserPool
+IMyParticipationProcess(IPool):
     @not_essence
     assesments : IAssessmentPool
     @not_essence
     proposals : IProposalPool
+
+IUserPool(IPool):
+    (contents : set(IUser))
+
+IInstance(IPool):
+    @not_essence
+    contents: set(IPool)
+    @not_essence
+    users : IUserPool
