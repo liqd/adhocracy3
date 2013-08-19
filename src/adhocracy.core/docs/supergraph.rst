@@ -104,7 +104,7 @@ that returns a dictionary mapping python strings containing attribute
 names to the resp. reference target nodes.  This is interesting
 because not all attributes of the node object are references.
 
-The dependents (inverse references, e.g. only direct dependents) are
+The dependents (inverse references, i.e. only direct dependents) are
 represented by a method:
 
 .. code:: python
