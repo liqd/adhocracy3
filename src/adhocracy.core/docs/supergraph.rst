@@ -24,9 +24,7 @@ Our Terminology
 
     References are implemented as python attributes containing object
     references.  (The term "reference" exists both on the data model
-    level and on the implementation level.)  A reference can either
-    connect to a target node, or to a container of target nodes (list,
-    set, ...).
+    level and on the implementation level.)
 
 ``content node``
     A node that is self-contained, i.e. it has no outgoing references.
