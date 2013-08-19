@@ -8,8 +8,14 @@ disagreement with the proposal (using a "disagree" button).
 She justifies her disagreement with a short text.
 
 User Bob looks at the proposal, sees Alice's reaction and
-states that he seconds both her disagreement and the 
+states that he seconds both her disagreement and the
 justifying text.
+
+User Carl looks at everything, and annotates the proposal with an
+agreement (using an "agree" button).  Carl is thus indirectly
+contradicting Alice and Bob, but his agreement is not interacting with
+the other assessments.
+
 
 
 interfaces that are inherited from
