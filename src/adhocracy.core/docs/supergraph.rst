@@ -13,22 +13,25 @@ Our Terminology
     python objects.
 
 ``reference``
-    A reference connects a source node to a target node (or a
-    container with many target nodes).  There is a limited number of
-    types of references.  Examples: "contains", "has_author", etc.
+    A reference connects a source node to a target node.
+    References have a specific label, like: "contains", "has_author", etc.
+    There a two basic types:
+
+    * ``reference-to-one``: References which exist only once
+
+    * ``reference-to-many``: References exists zero to many times
+
     What constitutes a node and what constitutes a reference is a
     design decision made on the content design level.
 
-    It is often convenient to talk about nodes as vertices and
-    references as edges in a graph.
+    It is often convenient to talk about nodes as ``vertices`` and
+    references as ``edges`` in a graph.
 
     References are implemented as python attributes containing object
-    references.  (The term "reference" exists both on the data model
-    level and on the implementation level.)
-
-``content node``
-    A node that is self-contained, i.e. it has no outgoing references.
-    (Content nodes are the leaves of the reference graph.)
+    references. (The term "reference" exists both on the data model
+    level and on the implementation level.) A reference can either
+    connect to a target node, or to a container of target nodes (list,
+    set, ...).
 
 ``essence``
     Some references are "essential" to a source node, and some are
@@ -46,47 +49,32 @@ Our Terminology
     The inverse essence of a node up to reflexivity: A node X is a
     dependent of Y if Y is in the essence of X, but not X itself.
 
+``content node``
+    A node that is self-contained, i.e. it has no outgoing references.
+    (Content nodes are the leaves of the reference graph.)
+
 ``follows``
     Change management is implemented by ``follows`` edges between
     nodes.  A node that changes in fact is copied into a new version
     that follows the previous version.  ``follows`` edges are NOT
     references (neither on the design level nor on the implementation
-    level).  If a node has no outgoing ``follows`` edge, it is called
-    a ``head``.  If it has more than one, it is called a ``fork``.
+    level).
+
+``head`` A node without outgoing ``follows`` edges
+
+``fork`` A node with more than one outgoing ``follows`` edges.
+
+``merge`` A node with more than one incomming ``follows`` edges.
 
 ``relation``
-    A conglomerate of references and nodes that have a certain
-    meaning. A relation is a pattern of nodes and references (of
-    certain types) that can be found in graphs. (See below for
-    examples.)  Examples:
-       * a classic binary relation (Subject <- R -> Object)
-       * simply a labelled reference (->)
-       * something more complex and/or specialized (A <- Contradiction1 -> B, User1 <- marks_as_correct -> Contradiction1)
-
-
-.. todo
-    find better names!
-
-.. ``reference-to-one``
-    References which exist only once, e.g. the object reference in a predicate
-    relationship
-
-.. ``reference-to-many``
-    References exists zero to many times, e.g. parts of collections
-
-.. ``required reference``
-    A reference from A to B, where the node A could not exist without its
-    relationship to B.
-
-.. ``optional reference``
-    A reference from A to B, where the node A would still make sense without its
-    reference to B.
-
-
+    A pattern of references and nodes that have a certain
+    meaning. (See below for examples.)
 
 
 Implementation Notes
 --------------------
+
+.. Relation example:  something more complex and/or specialized (A <- Contradiction1 -> B, User1 <- marks_as_correct -> Contradiction1)
 
 This paragraph is a summary of the data structure discussions on Fri
 2013-07-19 and before.  The later sections are obsolete to a varying
