@@ -38,11 +38,24 @@ If you want to work on the documentation: It is written using `reStructuredText 
 build instructions
 ~~~~~~~~~~~~~~~~~~
 
-The following *may* work, but there may be broken dependencies left in the config files:
 
-1. virtualenv --python=python2.7 --no-site-packages adhocracy-3
-2. source bin/activate
-3. ./bin/easy_install -U distribute
-4. ./bin/python2.7 bootstrap.py
-5. ./bin/buildout install sphinxbuilder
+Install virtualenvt::
 
+    virtualenv --python=python2.7 --no-site-packages adhocracy-3
+    source bin/activate
+
+Install buildout::
+
+    ./bin/easy_install -U distribute
+    ./bin/python2.7 bootstrap.py
+
+Install and generate the documentation::
+
+    ./bin/buildout install sphinxbuilder
+    .bin/sphinxbuilder
+    xdg-open ./docs/build/html/index.html
+
+Install the example adhocracy 3 implementation.
+The following *may* work, but there may be broken dependencies left in the config files::
+
+    ./bin/buildout install sphinxbuilder
