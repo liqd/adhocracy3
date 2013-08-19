@@ -45,9 +45,8 @@ Our Terminology
     Y.
 
 ``dependents``
-    The inverse essence of a node up to reflexivity: A node X is in
-    one of the dependents of Y if Y is in the essence of X, but not X
-    itself.
+    The inverse essence of a node up to reflexivity: A node X is a
+    dependent of Y if Y is in the essence of X, but not X itself.
 
 ``follows``
     Change management is implemented by ``follows`` edges between
@@ -105,7 +104,8 @@ that returns a dictionary mapping python strings containing attribute
 names to the resp. reference target nodes.  This is interesting
 because not all attributes of the node object are references.
 
-The dependents (inverse references) are represented by a method:
+The dependents (inverse references, e.g. only direct dependents) are
+represented by a method:
 
 .. code:: python
   deps(): { <node> : { <interface> : [ <attr> ] } }
@@ -145,8 +145,10 @@ reference.  The source then has three options:
    version.
 
  * ignore the change, keep the reference pointed to the old version of
-   the target, and do nothing.  Example: (XXX: i am sure there is one,
-   but i can't think of one now.)
+   the target, and do nothing.  Example: Change suggestions: a user wants
+   to express that she would support a proposal if some changes are made.
+   This change suggestion refers to one version of the proposal and shouldn't
+   be updated to newer versions.
 
 If a reference is not essential, things get more complicated.  The
 source node will still be notified of any change in any target (it
