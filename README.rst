@@ -11,6 +11,7 @@ Tested on Debian.  Requirements:
 1. python2.7
 2. git
 3. build-essentials
+4. graphviz
 
 checkout source code ::
     git clone https://github.com/adhocracy/adhocracy-3
