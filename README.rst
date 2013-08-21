@@ -15,7 +15,8 @@ Tested on Debian.  Requirements:
 checkout source code ::
     git clone https://github.com/adhocracy/adhocracy-3
     cd adhocracy-3
-    git submodules init
+    git submodule init
+    git submodule update
 
 compile python and PIL ::
     cd python
