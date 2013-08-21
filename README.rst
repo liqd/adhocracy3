@@ -22,4 +22,12 @@ compile python and PIL ::
     cd python
     python ./bootstrap.py
     ./bin/buildout
+    cd ..
+    ./python/python-3.3/bin/python --version
 
+ocmpile Substance-D ::
+    ./python/python-3.3/bin/python ./bootstrap.py
+    ./bin/buildout
+
+build sphinx documentation ::
+    ...
