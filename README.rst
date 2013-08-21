@@ -6,7 +6,7 @@ Adhocracy-3 Playground Para-Prototype on ZODB / Substance-D / Obviel
 Installation
 ------------
 
-Tested on Debian.  Requirements:
+Requirements (Tested on Debian\Ubuntu):
 
 1. python2.7
 2. git
@@ -14,21 +14,27 @@ Tested on Debian.  Requirements:
 4. graphviz
 
 checkout source code ::
+
     git clone https://github.com/adhocracy/adhocracy-3
     cd adhocracy-3
     git submodule init
     git submodule update
 
-compile python and PIL ::
+compile python 3 and PIL ::
+
     cd python
     python ./bootstrap.py
     ./bin/buildout
     cd ..
     ./python/python-3.3/bin/python --version
 
-ocmpile Substance-D ::
+install adhocracy and the substance-d demo app ::
+
     ./python/python-3.3/bin/python ./bootstrap.py
     ./bin/buildout
 
 build sphinx documentation ::
-    ...
+
+    cd ./docs
+    make html
+    xdg-open docs/build/html/index.html
