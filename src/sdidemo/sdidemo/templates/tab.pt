@@ -1,0 +1,7 @@
+<div metal:use-macro="request.sdiapi.main_template">
+
+  <div metal:fill-slot="main">
+    <h1>Tab ${request.view_name}</h1>
+
+  </div>
+</div>
