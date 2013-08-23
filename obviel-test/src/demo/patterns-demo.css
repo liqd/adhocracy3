@@ -1,0 +1,12 @@
+/* main styling of layout messages */
+div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
+  background:#000;
+  color:#fff;
+}
+
+/* styling of error messages in particular */
+div.jGrowl div.jGrowl-notification.jgrowl-error, div.jGrowl div.jGrowl-closer.jgrowl-error {
+  background:red;
+  color:#fff;
+}
+

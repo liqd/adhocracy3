@@ -1,0 +1,78 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="src/obviel/obviel-template.js"></script>
+        <script type="text/javascript" src="src/obviel/obviel.js"></script>
+    </head>
+    <body>
+        content:
+        <hr>
+        <div id="content">empty</div>
+    </body>
+    <script type="text/javascript">
+
+(function($, obviel) {
+
+    obviel.transformer(function(obj) {
+        obj.iface = obj.main_interface;
+        for (name in obj) {
+            if (name != "main_interface" && name != "iface") {
+                var data = obj[name];
+                data["iface"] = name;
+            };
+        };
+        return obj;
+    });
+
+    // views
+
+    obviel.view({
+        iface: 'document',
+        obvtUrl: 'document.obvt',
+    });
+
+    obviel.view({
+        iface: 'ILikeable',
+        obvtUrl: "ILikeable.obvt",
+    });
+
+    obviel.view({
+        iface: "ICommentable",
+        obvtUrl: "ICommentable.obvt",
+    });
+
+    obviel.view({
+        iface: 'paragraph',
+        obvt: 'parrr: {content}',
+    });
+
+    obviel.view({
+        iface: 'user',
+        obvt: 'user: {name}, email: {email}',
+    });
+
+    obviel.view({
+        iface: 'user',
+        name: 'short',
+        obvt: '{name}',
+    });
+
+
+    // error handling
+    obviel.httpErrorHook(function(xhr) {
+        console.log("httpError:");
+        console.log(xhr);
+    });
+
+
+    // entry
+    $(document).ready(function() {
+        $("#content").render("document.json");
+        setInterval(function() {$("#content").rerender();}, 1000);
+    });
+
+}) (jQuery, obviel);
+
+    </script>
+</html>

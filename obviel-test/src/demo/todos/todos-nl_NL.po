@@ -1,0 +1,58 @@
+# Translations template for PROJECT.
+# Copyright (C) 2012 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# Martijn Faassen <faassen@startifact.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2012-06-27 18:52+0200\n"
+"PO-Revision-Date: 2012-06-06 17:41+0200\n"
+"Last-Translator: Martijn Faassen <faassen@startifact.com>\n"
+"Language-Team: Language -nl\n"
+"Language: -nl_NL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/demo/todos/index.html:24
+msgid "Todos"
+msgstr "Todos"
+
+#: src/demo/todos/index.html:26
+msgid "What needs to be done?"
+msgstr "Wat moet er gedaan worden?"
+
+#: src/demo/todos/index.html:31
+msgid "Mark all as complete"
+msgstr "Markeer alles als gedaan"
+
+#: src/demo/todos/index.html:38
+msgid "Clear completed"
+msgstr "Ruim gedane todos op"
+
+#: src/demo/todos/index.html:43
+msgid "Double-click to edit a todo."
+msgstr "Dubbel-klik om een todo te wijzigen."
+
+#: src/demo/todos/index.html:47
+msgid "Based on {link} {break}Rewritten by: Martijn Faassen for Obviel."
+msgstr "Gebaseerd op {link} {break} Herschreven door: Martijn Faassen voor Obviel."
+
+#: src/demo/todos/index.html:48
+msgid "TodoMVC"
+msgstr "TodoMVC"
+
+#: src/demo/todos/index.html:55
+msgid "Clear {done} completed item"
+msgid_plural "Clear {done} completed items"
+msgstr[0] "Ruim {done} gedane todo op"
+msgstr[1] "Ruim {done} gedane todos op"
+
+#: src/demo/todos/index.html:56
+msgid "{remaining} item left"
+msgid_plural "{remaining} items left"
+msgstr[0] "{remaining} todo staat open"
+msgstr[1] "{remaining} todos staan open"

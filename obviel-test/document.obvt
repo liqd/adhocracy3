@@ -1,0 +1,11 @@
+<div>
+    Title: {document.title} <span data-if="ILikeable" data-render="ILikeable"></span>
+    <hr />
+    Content: {document.content}
+
+    <div data-if="ICommentable">
+        <hr />
+        <div data-render="ICommentable"></div>
+    </div>
+
+</div>

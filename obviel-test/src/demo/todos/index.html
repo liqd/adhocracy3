@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>An Obviel todo demo</title>
+    <link rel="stylesheet" href="todos.css"/>
+    <link rel="i18n" href="todos.i18n"/>
+    <script type="text/javascript" src="../../dependencies/jquery.js"></script>
+    <script type="text/javascript" src="../../dependencies/Gettext.js"></script>
+    <script type="text/javascript" src="../../dependencies/jshashtable_src.js"></script>
+    <script type="text/javascript" src="../../dependencies/jshashset_src.js"></script>
+    <script type="text/javascript" src="../../dependencies/json2.js"></script>
+    <script type="text/javascript" src="../../dependencies/sinon.js"></script>
+    <script type="text/javascript" src="../../obviel/obviel-i18n.js"></script>
+    <script type="text/javascript" src="../../obviel/obviel-template.js"></script>
+    <script type="text/javascript" src="../../obviel/obviel.js"></script>
+    <script type="text/javascript" src="../../obviel/obviel-sync.js"></script>
+    <script type="text/javascript" src="fakehttp.js"></script>
+    <script type="text/javascript" src="todos.js"></script>
+  </head>
+  <body>
+
+    <div id="app"></div>
+    
+    <script type="text/template" id="obvt-todos">
+      <div id="todoapp">
+        <header>
+          <h1 data-trans="">Todos</h1>
+          <input data-on="keypress|createOnEnter" id="new-todo" type="text" 
+                 data-trans="placeholder" placeholder="What needs to be done?" />
+        </header>
+        
+        <section id="main" data-if="items">
+          <input data-on="click|toggleAll" id="toggle-all" type="checkbox"/>
+          <label for="toggle-all" data-trans="">Mark all as complete</label>
+          <ul id="todo-list">
+            <li data-repeat="items" data-render="@."></li>
+          </ul>
+        </section>
+        
+        <footer>
+          <a id="clear-completed" data-trans="">Clear completed</a>
+          <div id="todo-count"></div>
+        </footer>
+      </div>
+
+      <div id="instructions" data-trans="">
+        Double-click to edit a todo.
+      </div>
+    
+      <div id="credits" data-trans="">
+        Based on <a title="a test" data-tvar="link" href="http://addyosmani.github.com/todomvc">TodoMVC</a>
+        <br data-tvar="break" />Rewritten by: Martijn Faassen for Obviel.
+      </div>
+
+    </script>
+
+    <script type="text/template" id="obvt-todo-stats">
+      <a data-if="done" id="clear-completed" data-on="click|clearCompleted" data-trans="">Clear {done} completed item||Clear {done} completed items</a>
+      <div class="todo-count" data-trans="" data-plural="remaining"><b>{remaining}</b> item left||<b>{remaining}</b> items left</div>
+    </script>
+
+    <script type="text/template" id="obvt-todo">
+      <div data-on="dblclick|edit" class="view">
+        <input data-on="click|toggle" data-call="checked" class="toggle" type="checkbox" />
+        <label>{title}</label>
+        <a data-on="click|clear" class="destroy"></a>
+      </div>
+    </script>
+
+    <script type="text/template" id="obvt-todo-editing">
+      <input data-on="keypress|updateOnEnter blur|close" class="edit" type="text" value="{title}" /> 
+    </script>
+
+  </body>
+</html>

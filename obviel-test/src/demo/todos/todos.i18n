@@ -1,0 +1,12 @@
+{
+    "todos": [
+        {
+            "locale": "en_US",
+            "url": null
+        },
+        {
+            "locale": "nl_NL",
+            "url": "todos-nl_NL.json"
+        }
+    ]
+}
