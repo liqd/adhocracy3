@@ -12,11 +12,13 @@ from substanced.content import content
 from substanced.property import PropertySheet
 from substanced.schema import (
     Schema,
-    NameSchemaNode
+    NameSchemaNode,
+    MultireferenceIdSchemaNode,
     )
 from substanced.util import (
     renamer,
     find_catalog,
+    get_oid,
     )
 from substanced.folder import Folder
 from substanced.objectmap import find_objectmap
@@ -35,6 +37,12 @@ class BinderSchema(Schema):
         colander.String(),
         )
 
+def get_all_documents(context, request):
+    catalog = find_catalog(context, 'system')
+    interfaces = catalog['interfaces']
+    docs = interfaces.eq(IDemoContent).execute().all()
+    return map(lambda x: (get_oid(x), x.name), docs)
+
 class DocumentSchema(Schema):
     name = NameSchemaNode(
         editing=context_is_a_document,
@@ -42,9 +50,15 @@ class DocumentSchema(Schema):
     title = colander.SchemaNode(
         colander.String(),
     )
+    author = colander.SchemaNode(
+        colander.String(),
+    )
     body = colander.SchemaNode(
         colander.String(),
         widget=deform.widget.RichTextWidget()
+    )
+    refs = MultireferenceIdSchemaNode(
+        choices_getter = get_all_documents,
     )
 
 
