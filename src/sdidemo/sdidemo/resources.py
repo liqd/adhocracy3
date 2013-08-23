@@ -21,7 +21,10 @@ from substanced.util import (
     get_oid,
     )
 from substanced.folder import Folder
-from substanced.objectmap import find_objectmap
+from substanced.objectmap import (
+    find_objectmap,
+    multireference_targetid_property,
+    )
 
 def context_is_a_binder(context, request):
     return request.registry.content.istype(context, 'Binder')
@@ -143,6 +146,8 @@ class Binder(Folder):
 @implementer(IDemoContent)
 class Document(Persistent):
     name = renamer()
+
+    refs = multireference_targetid_property("document-ref")
 
     def __init__(self, title, body):
         self.title = title
