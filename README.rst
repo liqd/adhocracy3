@@ -33,6 +33,14 @@ install adhocracy and the substance-d demo app ::
     ./python/python-3.3/bin/python ./bootstrap.py
     ./bin/buildout
 
+running the zodb server (in background) ::
+
+    ./bin/runzeo -C etc/zeo.conf &
+
+serving the sdidemo wsgi app using pserve ::
+
+    ./bin/pserve etc/development.ini
+
 build sphinx documentation ::
 
     cd ./docs
