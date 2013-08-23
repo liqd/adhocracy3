@@ -46,7 +46,7 @@ def main(argv=sys.argv):
         format='%(asctime)s %(message)s'
         )
     if not '--config' in argv:
-        print "You must pass --config some_config_file.ini"
+        print("You must pass --config some_config_file.ini")
         sys.exit(2)
     app = CustomConsoleApp(argv)
     app.main()
