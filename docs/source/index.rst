@@ -11,6 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   no_patches
+
 .. include:: ../../README.rst
 
 Indices and tables
