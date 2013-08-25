@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    no_patches
+   rest_api_loosed_couple
 
 .. include:: ../../README.rst
 
