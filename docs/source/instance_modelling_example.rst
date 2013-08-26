@@ -3,7 +3,7 @@ Example of Modelling a Simple Use-Case Using our Supergraph
 ===========================================================
 
 1 create participation process and content
-    Superuser Father has an Instance.
+    Superuser Father has an Instance Hive.
     He adds an a participation project "Homestuff" to discuss proposals.
     He creates an proposal "dishwash table" and allows other users to access the proposal.
 
@@ -72,7 +72,7 @@ IProposal(INode, IAssessable):
 
 IDisagreement(IAssessment, IAssessable):
     (uid : str)
-    (object : IProposal | IAssessment)
+    (object : IProposal)
 
     @essence
     rationale : string
@@ -80,7 +80,7 @@ IDisagreement(IAssessment, IAssessable):
 
 IAgreement(IAssessment, IAssessable):
     (uid : str)
-    (object : IProposal | IAssessment)
+    (object : IProposal)
 
     @essence
     rationale : string

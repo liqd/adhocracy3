@@ -11,7 +11,7 @@ content::
         content-type-name: Partei-Programm
         node-state: pending
         workflow-state: public
-        creator: /users/principe1
+        creator: /users/principal1
         creation-date: 16.01.2013 16:33
 
     data:
