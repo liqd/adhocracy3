@@ -21,7 +21,9 @@ from substanced.util import (
 from .resources import (
     Document,
     DocumentSchema,
+    DocumentPropertySheet,
     BinderSchema,
+    IDemoContent,
     )
 
 #
@@ -39,6 +41,7 @@ def splash_view(request):
 #
 #   "Retail" view for documents.
 #
+'''
 @view_config(
     context=Document,
     renderer='templates/document.pt',
@@ -49,7 +52,7 @@ def document_view(context, request):
             'master': get_renderer(
                 'templates/master.pt').implementation(),
             }
-
+'''
 
 
 
@@ -257,6 +260,25 @@ def ctest(context, request):
     request.response.content_type = 'text/plain'
     request.response.body = str(list(resultset))
     return request.response
-    
-    
-    
+
+
+class RestView():
+
+    def __init__(self, request):
+        self.request = request
+
+    @view_config(
+        renderer = 'json',
+        context = Document,
+    )
+    def get(self):
+        sheet = DocumentPropertySheet(self.request.context, self.request)
+        appstruct = sheet.get()
+        schema = DocumentSchema()
+        cstruct = schema.serialize(appstruct)
+
+        # _csrf_token_ is collander.null and can't be converted to json (by pyramid)
+        del cstruct["_csrf_token_"]
+        # demonstrating to patch the json object
+        cstruct["iface"] = "document"
+        return cstruct
