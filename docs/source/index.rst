@@ -6,11 +6,16 @@
 Welcome to adhocracy-3's documentation!
 =======================================
 
+This documentation is a bit a loose collection of documents.
+There is no good structure yet.
+
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
+   supergraph
+   instance_modelling_example
    no_patches
    rest_api_loosed_couple
 
