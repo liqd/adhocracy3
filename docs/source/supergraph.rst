@@ -432,6 +432,7 @@ Nodes are implemented as python objects, references as attributes.  In
 addition to the attributes, there is a method:
 
 .. code:: python
+
   refs(): { <attr> : <node> }
 
 that returns a dictionary mapping python strings containing attribute
@@ -442,6 +443,7 @@ The dependents (inverse references, i.e. only direct dependents) are
 represented by a method:
 
 .. code:: python
+
   deps(): { <node> : { <interface> : [ <attr> ] } }
 
 that returns a dictionary mapping nodes to dictionaries, which in turn
@@ -454,6 +456,7 @@ referencing it.
 Alternatively dependents could be implemented as:
 
 .. code:: python
+
   deps(): [ (<node>, <interface>, <attr>) ]
 
 There should probably also be transitive hulls for references and
@@ -490,6 +493,7 @@ always is for all references), but it has more freedom of choice in
 what to do, and with that comes more confusion.  Example:
 
 .. digraph:: graph101
+
   topic1 -> doc1 [label = "touched by"]
   topic1 -> doc2 [label = "touched by"]
   topic2 -> doc3 [label = "touched by"]
@@ -531,6 +535,7 @@ This means that some node types are forkable and others are not.
 Nodes therefore need an attribute:
 
 .. code:: python
+
   forkable : bool
 
 Because essential edges guarantee immutability of target nodes, they
@@ -538,17 +543,21 @@ are to be preferred over non-essential nodes when modelling
 application data.  The following model:
 
 .. digraph:: graph102
-  user <- likes
-  likes => doc
+
+  likes -> user;
+  likes -> doc [color = blue];
+
+(Essential egdes are blue.)
 
 has a non-essential edge, i.e. the clear update rules of essentiality
 do not apply when the user updates her email address.  The following
 model gets by with only essential edges:
 
 .. digraph:: graph103
-  user => uid
-  likes => uid
-  likes => doc
+
+  user -> uid [color = blue];
+  likes -> uid [color = blue];
+  likes -> doc [color = blue];
 
 
 
