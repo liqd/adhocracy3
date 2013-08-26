@@ -1,0 +1,7 @@
+adhocracy3 Changelog
+=====================
+
+0.0
+---
+
+-  Initial version
