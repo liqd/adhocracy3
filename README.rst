@@ -19,13 +19,13 @@ Softwarestack ::
 
 - `buildout <http://www.buildout.org/en/latest/>`_ (build system)
 
-- `python <http://www.python.org>`_ (programming language)
+- `python 3 <http://www.python.org>`_ (programming language)
 
 
 Installation
 ------------
 
-Requirements (Tested on Debian\Ubuntu):
+Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
 1. python2.7
 2. git
