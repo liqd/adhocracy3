@@ -1,0 +1,59 @@
+# Translations template for PROJECT.
+# Copyright (C) 2012 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2012-06-27 18:52+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/demo/todos/index.html:24
+msgid "Todos"
+msgstr ""
+
+#: src/demo/todos/index.html:26
+msgid "What needs to be done?"
+msgstr ""
+
+#: src/demo/todos/index.html:31
+msgid "Mark all as complete"
+msgstr ""
+
+#: src/demo/todos/index.html:38
+msgid "Clear completed"
+msgstr ""
+
+#: src/demo/todos/index.html:43
+msgid "Double-click to edit a todo."
+msgstr ""
+
+#: src/demo/todos/index.html:47
+msgid "Based on {link} {break}Rewritten by: Martijn Faassen for Obviel."
+msgstr ""
+
+#: src/demo/todos/index.html:48
+msgid "TodoMVC"
+msgstr ""
+
+#: src/demo/todos/index.html:55
+msgid "Clear {done} completed item"
+msgid_plural "Clear {done} completed items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/demo/todos/index.html:56
+msgid "{remaining} item left"
+msgid_plural "{remaining} items left"
+msgstr[0] ""
+msgstr[1] ""
+

@@ -1,0 +1,3 @@
+[submodule "python/buildout.python"]
+	path = python/buildout.python
+	url = git@github.com:collective/buildout.python.git

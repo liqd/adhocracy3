@@ -1,61 +1,48 @@
-Welcome to Adhocracy-3!
-=======================
 
-Adhocracy 3 is a software for online participation.
-It is an effort to rewrite Adhocracy 2 from scratch.
-It aims to be a flexible framework and an easy customizable web application.
+Adhocracy-3 Playground Para-Prototype on ZODB / Substance-D / Obviel
+====================================================================
 
 
-Status
-------
+Installation
+------------
 
-Adhocracy-3 is in a very early stage: The software architecture design (the big picture) is mostly done. The code currently implements just some very basic database backend functionality with a test suite.
+Requirements (Tested on Debian\Ubuntu):
 
-The current, stable and functional version is adhocracy-2:
+1. python2.7
+2. git
+3. build-essentials
+4. graphviz
 
-* `adhocracy-2 website <https://adhocracy.de>`_
-* `adhocracy-2 source code <https://bitbucket.org/liqd/adhocracy/src>`_
+checkout source code ::
 
+    git clone https://github.com/adhocracy/adhocracy-3
+    cd adhocracy-3
+    git submodule init
+    git submodule update
 
+compile python 3 and PIL ::
 
-How to get involved
--------------------
+    cd python
+    python ./bootstrap.py
+    ./bin/buildout
+    cd ..
+    ./python/python-3.3/bin/python --version
 
-We appreciate any form of cooperation: feedback, software design (review), API design, coding, community work, UI design, etc.. The main places where work on Adhocracy-3 is coordinated are:
+install adhocracy and the substance-d demo app ::
 
-* the `github repo <https://github.com/adhocracy/adhocracy-3>`_
-* the `issue tracker <https://github.com/adhocracy/adhocracy-3/issues>`_ on github
-* the `adhocracy-dev <http://lists.liqd.net/cgi-bin/mailman/listinfo/adhocracy-dev>`_ mailing list
-* the #liqdem IRC channel (Use an IRC client or `visit the chat through your browser <http://webchat.freenode.net/?channels=liqdem>`_.)
+    ./python/python-3.3/bin/python ./bootstrap.py
+    ./bin/buildout
 
-Documentation
--------------
+running the zodb server (in background) ::
 
-* `adhocracy-3 source code documentation and software architecture <http://adhocracy-3-playground.readthedocs.org/en/latest/index.html>`_
+    ./bin/runzeo -C etc/zeo.conf &
 
-If you want to work on the documentation: It is written using `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ inside the normal github repo. We will gladly accept pull requests.
+serving the sdidemo wsgi app using pserve ::
 
-build instructions
-~~~~~~~~~~~~~~~~~~
+    ./bin/pserve etc/development.ini
 
+build sphinx documentation ::
 
-Install virtualenvt::
-
-    virtualenv --python=python2.7 --no-site-packages adhocracy-3
-    source bin/activate
-
-Install buildout::
-
-    ./bin/easy_install -U distribute
-    ./bin/python2.7 bootstrap.py
-
-Install and generate the documentation::
-
-    ./bin/buildout install sphinxbuilder
-    .bin/sphinxbuilder
-    xdg-open ./docs/build/html/index.html
-
-Install the example adhocracy 3 implementation.
-The following *may* work, but there may be broken dependencies left in the config files::
-
-    ./bin/buildout install sphinxbuilder
+    cd ./docs
+    make html
+    xdg-open docs/build/html/index.html

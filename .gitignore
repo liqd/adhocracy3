@@ -1,0 +1,16 @@
+*.swp
+*.swo
+*.pyc
+*.pyo
+__pycache__
+eggs
+parts
+*.egg-info
+.installed.cfg
+.mr.developer.cfg
+src/substancedl
+bin
+docs/build
+python
+develop-eggs
+var

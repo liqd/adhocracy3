@@ -1,9 +1,0 @@
-<configure xmlns="http://pylonshq.com/pyramid">
-
-
-  <utility
-   factory=".embeddedgraph.graph_factory"
-  />
-
-
-</configure>
