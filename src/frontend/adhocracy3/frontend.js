@@ -1,5 +1,7 @@
 (function($, obviel) {
 
+    // global transformer to put obviel iface attributes
+    // into the received json objects.
     obviel.transformer(function(obj) {
         obj.iface = obj.main_interface;
         for (name in obj) {
@@ -12,50 +14,49 @@
     });
 
     // views
+    var rerender_edit_view = function (ev) {
+        this.el.render(this.obj, 'edit');
+    };
 
     obviel.view({
-        iface: 'document',
-        obvtUrl: 'document.obvt',
+        iface: 'text',
+        obvtUrl: 'text.display.obvt',
+        edit: rerender_edit_view,
     });
 
     obviel.view({
-        iface: 'ILikeable',
-        obvtUrl: "ILikeable.obvt",
-    });
-
-    obviel.view({
-        iface: "ICommentable",
-        obvtUrl: "ICommentable.obvt",
-    });
-
-    obviel.view({
-        iface: 'paragraph',
-        obvt: 'parrr: {content}',
-    });
-
-    obviel.view({
-        iface: 'user',
-        obvt: 'user: {name}, email: {email}',
-    });
-
-    obviel.view({
-        iface: 'user',
-        name: 'short',
-        obvt: '{name}',
+        iface: 'text',
+        name: 'edit',
+        obvtUrl: 'text.edit.obvt',
+        save: function() {
+            text = document.getElementById('text_edit').value
+            // FIXME: send a post message
+            console.log('NYI: POST message should be sent here.');
+            this.obj.text.content = text;
+            this.el.render(this.obj);
+        },
     });
 
 
-    // error handling
+    // Adds some crude error handling instead of the default
+    // of silently ignoring errors.
     obviel.httpErrorHook(function(xhr) {
         console.log("httpError:");
         console.log(xhr);
     });
 
 
-    // entry
+    // entry function
     $(document).ready(function() {
+        // Initially renders to the main tag.
         $("#main").render("document.json");
-        setInterval(function() {$("#main").rerender();}, 1000);
     });
+
+    // Re-renders the document.
+    // FIXME: This has to be done better with some
+    // kind of server side push (socket.io?)
+    main_rerender = function() {
+        $("#main").rerender();
+    };
 
 }) (jQuery, obviel);

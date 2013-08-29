@@ -1,0 +1,7 @@
+<p>
+    Text:
+    <br/>
+    {text.content}
+    </br>
+    <button data-on="click|edit">edit</button>
+</p>
