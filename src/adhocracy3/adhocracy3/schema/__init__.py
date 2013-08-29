@@ -14,7 +14,9 @@ def get_all_content(node, context, request):
     catalog = find_catalog(context, 'system')
     interfaces = catalog['interfaces']
     docs = interfaces.eq(interface).execute().all()
-    return map(lambda x: (get_oid(x), x.name), docs)
+    return map(lambda x: (get_oid(x), getattr(x, "name", None) or
+                          x.__name__),
+               [d for d in docs if d])
 
 
 class ReferenceSupergraphBaseSchemaNode(schema.MultireferenceIdSchemaNode):
