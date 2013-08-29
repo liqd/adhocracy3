@@ -592,7 +592,7 @@ if (typeof console === "undefined") {
         name = name || 'default';
         var viewPrototype = this.lookup(obj, name);
         if (viewPrototype === null) {
-            throw new module.LookupError(obj, name);
+            throw ('' + new module.LookupError(obj, name));
         }
         return viewPrototype.clone({
             el: el,
