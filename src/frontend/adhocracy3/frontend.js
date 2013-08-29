@@ -1,17 +1,3 @@
-<html>
-    <head>
-        <meta charset="utf-8">
-        <script type="text/javascript" src="jquery-1.10.2.min.js"></script>
-        <script type="text/javascript" src="src/obviel/obviel-template.js"></script>
-        <script type="text/javascript" src="src/obviel/obviel.js"></script>
-    </head>
-    <body>
-        content:
-        <hr>
-        <div id="content">empty</div>
-    </body>
-    <script type="text/javascript">
-
 (function($, obviel) {
 
     obviel.transformer(function(obj) {
@@ -68,11 +54,8 @@
 
     // entry
     $(document).ready(function() {
-        $("#content").render("document.json");
-        setInterval(function() {$("#content").rerender();}, 1000);
+        $("#main").render("document.json");
+        setInterval(function() {$("#main").rerender();}, 1000);
     });
 
 }) (jQuery, obviel);
-
-    </script>
-</html>
