@@ -1,6 +1,10 @@
 {
-    "main_interface": "text",
-    "text": {
-        "content": "hurra"
+    "main_interface": "document",
+    "document": {
+        "title": "title.json",
+        "paragraphs": [
+            "paragraph1.json",
+            "paragraph2.json"
+        ]
     }
 }

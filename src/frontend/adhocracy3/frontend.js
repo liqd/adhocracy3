@@ -44,6 +44,11 @@
             this.el.render(this.obj);
         },
     });
+    
+    obviel.view(Editable({
+        iface: 'document',
+        obvtUrl: 'document.display.obvt',
+    }));
 
 
     // Adds some crude error handling instead of the default
