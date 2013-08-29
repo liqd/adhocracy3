@@ -77,3 +77,10 @@ build sphinx documentation ::
     make html
     xdg-open docs/build/html/index.html
 
+
+Development ::
+-----------------
+
+Check pep8 and pep257 bevore pushing commits::
+
+    bin/flake8 src/adhocracy3
