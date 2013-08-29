@@ -19,9 +19,7 @@ def set_property_object(schemanode, context, name):
     """
 
     if issubclass(schemanode.__class__, ReferenceSupergraphBaseSchemaNode):
-        property_class = schemanode.property_class
-        args = schemanode.reference_type
-        property_obj = property_class(args)
+        property_obj = schemanode.property_object
         setattr(context, name, property_obj)
 
     if schemanode.__class__ == NameSchemaNode:

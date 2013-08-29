@@ -26,12 +26,13 @@ class ReferenceSupergraphBaseSchemaNode(schema.MultireferenceIdSchemaNode):
    choices_getter = get_all_content
 
    interface = Interface
-   # attribute property class to store reference values
-   property_class = reference_sourceid_property
 
    @property
-   def reference_type(self):
-       return self.name
+   def property_object(self):
+       """Property object to store reference values"""
+
+       reference_type = self.name
+       return reference_sourceid_property(reference_type)
 
 
 class ReferenceSetSchemaNode(ReferenceSupergraphBaseSchemaNode):
