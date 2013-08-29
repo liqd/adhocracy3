@@ -7,5 +7,8 @@ def main(global_config, **settings):
     """
     config = Configurator(settings=settings, root_factory=root_factory)
     config.include('substanced')
+    config.commit()
+    config.include('.resources')
     config.scan()
     return config.make_wsgi_app()
+

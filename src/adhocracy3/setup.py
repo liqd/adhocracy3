@@ -12,6 +12,8 @@ requires = [
     'waitress',
     'substanced',
     'pyramid_tm',
+    'cornice',
+    'zope.dottedname',
     ]
 
 setup(name='adhocracy3',
