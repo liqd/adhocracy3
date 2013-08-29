@@ -14,15 +14,23 @@
     });
 
     // views
-    var rerender_edit_view = function (ev) {
+    var rerender_edit_view = function(ev) {
         this.el.render(this.obj, 'edit');
     };
 
-    obviel.view({
+    // Adds fields to make a view settings object editable.
+    var Editable = function(child) {
+        var result = {
+            edit: rerender_edit_view,
+        };
+        $.extend(result, child);
+        return result;
+    };
+
+    obviel.view(Editable({
         iface: 'text',
         obvtUrl: 'text.display.obvt',
-        edit: rerender_edit_view,
-    });
+    }));
 
     obviel.view({
         iface: 'text',
