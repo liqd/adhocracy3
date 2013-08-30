@@ -19,9 +19,14 @@ from adhocracy3.resources import interfaces
 # Basic Pool
 
 @content(
+    # has to resolve to content interface class
     'adhocracy3.resources.interfaces.IPool',
     add_view='add_pool',
     factory_type = 'pool',
+    # addable content types, class heritage is honored
+    addable_content_interfaces = ["adhocracy3.resources.interfaces.IPool"],
+    # make this addable if supertype is addable
+    is_implicit_addable = True
     )
 @implementer(interfaces.IPool, interfaces.IName)
 def pool():
@@ -38,6 +43,9 @@ def pool():
     'adhocracy3.resources.interfaces.INodeContainer',
     add_view='add_nodecontainer',
     factory_type = 'container',
+    addable_content_interfaces =
+        ["adhocracy3.resources.interfaces.INodeContainer"],
+    is_implicit_addable = True
     )
 @implementer(interfaces.INodeContainer, interfaces.IName)
 def container():
@@ -49,6 +57,7 @@ def container():
 @content(
     'adhocracy3.resources.interfaces.INodeVersions',
     factory_type = 'versions',
+    addable_content_interfaces = ["adhocracy3.resources.interfaces.INode"],
     )
 @implementer(interfaces.INodeVersions)
 def versions():
@@ -61,6 +70,7 @@ def versions():
     'adhocracy3.resources.interfaces.INode',
     add_view='add_node',
     factory_type = 'node',
+    is_implicit_addable = True
     )
 @implementer(interfaces.INode, interfaces.IVersionable)
 def node():
