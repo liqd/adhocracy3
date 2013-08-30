@@ -29,7 +29,7 @@ class AddNodeView(FormView):
     def add_success(self, appstruct):
         registry = self.request.registry
         name = appstruct.pop('name')
-        content = registry.content.create(self.contenttype, **appstruct)
+        content = registry.content.create(self.contenttype, self.context,  **appstruct)
         self.context[name] = content
         return HTTPFound(
             self.request.sdiapi.mgmt_path(self.context, '@@contents')

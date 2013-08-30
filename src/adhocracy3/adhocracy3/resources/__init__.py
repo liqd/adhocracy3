@@ -29,7 +29,7 @@ from adhocracy3.resources import interfaces
     is_implicit_addable = True
     )
 @implementer(interfaces.IPool, interfaces.IName)
-def pool():
+def pool(context):
     content = Folder()
     # Set directly provided interfaces.
     # The implementer decorator does not work with functions
@@ -48,7 +48,7 @@ def pool():
     is_implicit_addable = True
     )
 @implementer(interfaces.INodeContainer, interfaces.IName)
-def container():
+def container(context):
     content = Folder()
     directlyProvides(content, implementedBy(container).interfaces())
     return content
@@ -60,7 +60,7 @@ def container():
     addable_content_interfaces = ["adhocracy3.resources.interfaces.INode"],
     )
 @implementer(interfaces.INodeVersions)
-def versions():
+def versions(context):
     content = RandomAutoNamingFolder
     directlyProvides(content, implementedBy(versions).interfaces())
     return content
@@ -73,7 +73,7 @@ def versions():
     is_implicit_addable = True
     )
 @implementer(interfaces.INode, interfaces.IVersionable)
-def node():
+def node(context):
     content = Folder()
     directlyProvides(content, implementedBy(node).interfaces())
     return content
