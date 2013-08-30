@@ -12,17 +12,9 @@ from adhocracy3.resources.interfaces import (
 #   SDI "add" view for resources
 #
 
-@mgmt_view(
-    context=IFolder,
-    name='add_node',
-    tab_title='Add Node',
-    permission='sdi.add-content',
-    renderer='substanced.sdi:templates/form.pt',
-    tab_condition=False,
-    )
-class AddNodeView(FormView):
-    title = 'Add Node'
-    contenttype = 'adhocracy3.resources.interfaces.INode'
+class AddBaseView(FormView):
+    title = 'Add Ressource'
+    contenttype = 'adhocracy3.resources.interfaces.IContent'
     schema = NameSchema()
     buttons = ('add',)
 
@@ -35,6 +27,20 @@ class AddNodeView(FormView):
             self.request.sdiapi.mgmt_path(self.context, '@@contents')
             )
 
+
+@mgmt_view(
+    context=IFolder,
+    name='add_node',
+    tab_title='Add Node',
+    permission='sdi.add-content',
+    renderer='substanced.sdi:templates/form.pt',
+    tab_condition=False,
+    )
+class AddNodeView(AddBaseView):
+    title = 'Add Node'
+    contenttype = 'adhocracy3.resources.interfaces.INode'
+
+
 @mgmt_view(
     context=IFolder,
     name='add_nodecontainer',
@@ -43,9 +49,8 @@ class AddNodeView(FormView):
     renderer='substanced.sdi:templates/form.pt',
     tab_condition=False,
     )
-class AddNodeContainerView(AddNodeView):
+class AddNodeContainerView(AddBaseView):
     title = 'Add NodeContainer'
-    schema = NameSchema()
     contenttype = 'adhocracy3.resources.interfaces.INodeContainer'
 
 
@@ -57,7 +62,6 @@ class AddNodeContainerView(AddNodeView):
     renderer='substanced.sdi:templates/form.pt',
     tab_condition=False,
     )
-class AddPoolView(AddNodeView):
+class AddPoolView(AddBaseView):
     title = 'Add Pool'
-    schema = NameSchema()
     contenttype = 'adhocracy3.resources.interfaces.IPool'
