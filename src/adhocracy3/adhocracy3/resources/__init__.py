@@ -39,7 +39,7 @@ def pool():
     add_view='add_nodecontainer',
     factory_type = 'container',
     )
-@implementer(interfaces.INodeContainer)
+@implementer(interfaces.INodeContainer, interfaces.IName)
 def container():
     content = Folder()
     directlyProvides(content, implementedBy(container).interfaces())
