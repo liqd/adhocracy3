@@ -13,6 +13,9 @@
 	// over the latter two.  XXX: explain better.
 
 	// FIXME: add attribute "other_interfaces": [] to a3 rest api.
+	// better yet: put all sub-interfaces into a proper attribute
+	// "subinterfaces".  or give them prefix "__widget__"?
+	// they're not necessarily widgets, though.
 
         for (name in obj) {
             if (name != "main_interface" && name != "iface") {
@@ -44,7 +47,32 @@
         obvtUrl: 'text.display.obvt',
     }));
 
-/*
+    // Adds some crude error handling instead of the default
+    // of silently ignoring errors.
+    obviel.httpErrorHook(function(xhr) {
+        console.log("httpError:");
+        console.log(xhr);
+    });
+
+    // entry function
+    $(document).ready(function() {
+        // Initially renders to the main tag.
+        $("#main").render("paragraph1.json");
+    });
+
+    // Re-renders the document.
+    // FIXME: This has to be done better with some
+    // kind of server side push (socket.io?)
+    main_rerender = function() {
+        $("#main").rerender();
+    };
+
+}) (jQuery, obviel);
+
+
+
+/* obsolete code:
+
     obviel.view({
         iface: 'text',
         name: 'edit',
@@ -69,25 +97,3 @@
     });
 */
 
-    // Adds some crude error handling instead of the default
-    // of silently ignoring errors.
-    obviel.httpErrorHook(function(xhr) {
-        console.log("httpError:");
-        console.log(xhr);
-    });
-
-
-    // entry function
-    $(document).ready(function() {
-        // Initially renders to the main tag.
-        $("#main").render("paragraph1.json");
-    });
-
-    // Re-renders the document.
-    // FIXME: This has to be done better with some
-    // kind of server side push (socket.io?)
-    main_rerender = function() {
-        $("#main").rerender();
-    };
-
-}) (jQuery, obviel);

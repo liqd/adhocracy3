@@ -26,7 +26,7 @@ function toForm(obj) {
         data: main_data,
     };
     // console.log(obj);
-    // console.log(form);
+    console.log(form);
     return form;
 };
 
@@ -46,29 +46,3 @@ function toWidget(key, model) {
             throw ("NYI " + model + " : " + typeof(model));
     };
 };
-
-
-    /*
-{
-    "iface": "viewform",
-    "form": {
-        "widgets": [
-            {
-                "ifaces": ["textField"],
-                "name": "text.content",
-                "title": "Text",
-                "validate": {
-                    "required": "true"
-                }
-            }
-        ],
-        "controls": [
-            {
-                "label": "Save",
-                "action": "action"
-            }
-        ]
-    },
-    "data": "paragraph1.json"
-}
-*/
