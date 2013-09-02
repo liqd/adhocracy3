@@ -3,25 +3,37 @@
     // global transformer to put obviel iface attributes
     // into the received json objects.
     obviel.transformer(function(obj) {
+	console.log("transformer-in");
+	console.log(obj);
+
         obj.iface = obj.main_interface;
+
+	// sub-interfaces: a node can be all of 'document',
+	// 'commentable', 'likeable'.  the following loop iterates
+	// over the latter two.  XXX: explain better.
+
+	// FIXME: add attribute "other_interfaces": [] to a3 rest api.
+
         for (name in obj) {
             if (name != "main_interface" && name != "iface") {
                 var data = obj[name];
                 data["iface"] = name;
             };
         };
+
+	console.log(obj);
+	console.log("transformer-out");
         return obj;
     });
 
     // views
-    var rerender_edit_view = function(ev) {
-        this.el.render(this.obj, 'edit');
-    };
 
     // Adds fields to make a view settings object editable.
     var Editable = function(child) {
         var result = {
-            edit: rerender_edit_view,
+            edit: function(ev) {
+                    this.el.render(toForm(this.obj));
+                },
         };
         $.extend(result, child);
         return result;
@@ -32,6 +44,7 @@
         obvtUrl: 'text.display.obvt',
     }));
 
+/*
     obviel.view({
         iface: 'text',
         name: 'edit',
@@ -44,12 +57,17 @@
             this.el.render(this.obj);
         },
     });
-    
+
     obviel.view(Editable({
         iface: 'document',
         obvtUrl: 'document.display.obvt',
     }));
 
+    obviel.view({
+        iface: 'document',
+        name: 'edit',
+    });
+*/
 
     // Adds some crude error handling instead of the default
     // of silently ignoring errors.
@@ -62,7 +80,7 @@
     // entry function
     $(document).ready(function() {
         // Initially renders to the main tag.
-        $("#main").render("document.json");
+        $("#main").render("paragraph1.json");
     });
 
     // Re-renders the document.
