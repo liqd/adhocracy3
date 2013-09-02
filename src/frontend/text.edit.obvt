@@ -1,0 +1,7 @@
+<p>
+    Text:
+    <br/>
+    <textarea data-id="text_edit">{text.content}</textarea>
+    <br/>
+    <button data-on="click|save">save</button>
+</p>
