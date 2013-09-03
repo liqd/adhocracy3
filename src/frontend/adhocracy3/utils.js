@@ -1,7 +1,7 @@
 
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
-}
+};
 
 // Converts an obviel model to an obviel form.
 function toForm(obj) {

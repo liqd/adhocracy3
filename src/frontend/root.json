@@ -1,0 +1,8 @@
+{
+    "main_interface": "listing",
+    "listing": {
+        "elements": [
+            "document.json"
+        ]
+    }
+}

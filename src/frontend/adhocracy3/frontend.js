@@ -2,30 +2,24 @@
 
     // global transformer to put obviel iface attributes
     // into the received json objects.
-    obviel.transformer(function(obj) {
-	console.log("transformer-in");
-	console.log(obj);
+    obviel.transformer(function(obj, path, name) {
+        obj.ifaces = [obj.main_interface];
 
-        obj.iface = obj.main_interface;
+        // sub-interfaces: a node can be all of 'document',
+        // 'commentable', 'likeable'.  the following loop iterates
+        // over the latter two.  XXX: explain better.
 
-	// sub-interfaces: a node can be all of 'document',
-	// 'commentable', 'likeable'.  the following loop iterates
-	// over the latter two.  XXX: explain better.
+        // FIXME: maybe put all sub-interfaces into a proper attribute
+        // "subinterfaces".  or give them prefix "__widget__"?
+        // they're not necessarily widgets, though.
 
-	// FIXME: add attribute "other_interfaces": [] to a3 rest api.
-	// better yet: put all sub-interfaces into a proper attribute
-	// "subinterfaces".  or give them prefix "__widget__"?
-	// they're not necessarily widgets, though.
-
-        for (name in obj) {
-            if (name != "main_interface" && name != "iface") {
-                var data = obj[name];
-                data["iface"] = name;
-            };
+        for (name in obj.other_interfaces) {
+            var data = obj[name];
+            data.ifaces = [name];
         };
 
-	console.log(obj);
-	console.log("transformer-out");
+        obj.path = path;
+
         return obj;
     });
 
@@ -47,6 +41,33 @@
         obvtUrl: 'text.display.obvt',
     }));
 
+    obviel.view({
+        iface: 'text',
+        name: 'short',
+        obvt: '{text.content}'
+    });
+
+    obviel.view(Editable({
+        iface: 'document',
+        obvtUrl: 'document.display.obvt',
+    }));
+
+    obviel.view({
+        iface: 'document',
+        name: 'link',
+        obvt: '<a href="#{path}" data-render="document.title|short"></a>'
+    });
+
+    obviel.view({
+        iface: 'root',
+        obvt: '<a href="#{link}">link</a>'
+    });
+
+    obviel.view({
+        iface: 'listing',
+        obvtUrl: 'listing.obvt'
+    });
+
     // Adds some crude error handling instead of the default
     // of silently ignoring errors.
     obviel.httpErrorHook(function(xhr) {
@@ -54,10 +75,17 @@
         console.log(xhr);
     });
 
+    $(window).bind('hashchange', function(ev) {
+        var path = ev.fragment;
+        console.log("hashchange: " + path);
+        $('#main').render(path);
+    });
+
     // entry function
     $(document).ready(function() {
-        // Initially renders to the main tag.
-        $("#main").render("paragraph1.json");
+        // initially renders to the main tag
+        document.location.hash = "root.json";
+        $(window).trigger('hashchange');
     });
 
     // Re-renders the document.
@@ -68,32 +96,3 @@
     };
 
 }) (jQuery, obviel);
-
-
-
-/* obsolete code:
-
-    obviel.view({
-        iface: 'text',
-        name: 'edit',
-        obvtUrl: 'text.edit.obvt',
-        save: function() {
-            text = document.getElementById('text_edit').value
-            // FIXME: send a post message
-            console.log('NYI: POST message should be sent here.');
-            this.obj.text.content = text;
-            this.el.render(this.obj);
-        },
-    });
-
-    obviel.view(Editable({
-        iface: 'document',
-        obvtUrl: 'document.display.obvt',
-    }));
-
-    obviel.view({
-        iface: 'document',
-        name: 'edit',
-    });
-*/
-
