@@ -1,3 +1,12 @@
 [submodule "python/buildout.python"]
 	path = python/buildout.python
 	url = git@github.com:collective/buildout.python.git
+[submodule "src/frontend/submodules/jquery-datalink"]
+	path = src/frontend/submodules/jquery-datalink
+	url = git://github.com/BorisMoore/jquery-datalink
+[submodule "src/frontend/submodules/jquery"]
+	path = src/frontend/submodules/jquery
+	url = git://github.com/jquery/jquery
+[submodule "src/frontend/submodules/obviel"]
+	path = src/frontend/submodules/obviel
+	url = git://github.com/obviel/obviel
