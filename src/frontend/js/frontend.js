@@ -38,7 +38,7 @@
 
     obviel.view(Editable({
         iface: 'text',
-        obvtUrl: 'text.display.obvt',
+        obvtUrl: 'templates/text.display.obvt',
     }));
 
     obviel.view({
@@ -49,7 +49,7 @@
 
     obviel.view(Editable({
         iface: 'document',
-        obvtUrl: 'document.display.obvt',
+        obvtUrl: 'templates/document.display.obvt',
     }));
 
     obviel.view({
@@ -65,7 +65,7 @@
 
     obviel.view({
         iface: 'listing',
-        obvtUrl: 'listing.obvt'
+        obvtUrl: 'templates/listing.obvt'
     });
 
     // Adds some crude error handling instead of the default
