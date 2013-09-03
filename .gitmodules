@@ -10,3 +10,6 @@
 [submodule "src/frontend/submodules/obviel"]
 	path = src/frontend/submodules/obviel
 	url = git://github.com/obviel/obviel
+[submodule "src/frontend/submodules/jquery-bbq"]
+	path = src/frontend/submodules/jquery-bbq
+	url = git@github.com:cowboy/jquery-bbq.git
