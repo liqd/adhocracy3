@@ -1,0 +1,7 @@
+{
+    "ifaces": ["text"],
+    "main_interface": "text",
+    "text": {
+        "content": "paragraph woefij1"
+    }
+}

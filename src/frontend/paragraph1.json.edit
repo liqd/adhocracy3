@@ -1,0 +1,22 @@
+{
+    "iface": "viewform",
+    "form": {
+        "widgets": [
+            {
+                "ifaces": ["textField"],
+                "name": "text.content",
+                "title": "Text",
+                "validate": {
+                    "required": "true"
+                }
+            }
+        ],
+        "controls": [
+            {
+                "label": "Save",
+                "action": "action"
+            }
+        ]
+    },
+    "data": "paragraph1.json"
+}
