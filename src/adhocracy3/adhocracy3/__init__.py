@@ -1,6 +1,7 @@
 from pyramid.config import Configurator
-
 from substanced import root_factory
+
+
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
@@ -10,6 +11,8 @@ def main(global_config, **settings):
     config.commit()
     config.include('.resources')
     config.include('.content')
+    config.include('.rest')
     config.scan()
+
     return config.make_wsgi_app()
 
