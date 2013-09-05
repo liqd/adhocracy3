@@ -84,4 +84,4 @@ def node(context):
 ############
 
 def includeme(config): # pragma: no cover
-    config.include('.adapters')
+    config.include('.propertysheets')
