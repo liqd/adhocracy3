@@ -29,9 +29,18 @@ def set_property_object(schemanode, context, name):
 
 @implementer(IPropertySheet)
 class PropertySheetAdhocracyContent(PropertySheet):
-    """Subtyped to set required property objects.
-    """
+    """Subtyped to:
 
+            * set required property objects.
+            * set permission attributes
+            * added method to return serialized data (cstruct)
+    """
+    #TODO add interface
+
+    view_permission = "view"
+    edit_permission = "content-edit"
+
+    #TODO check permissions
     def set(self, struct, omit=()):
         if not is_nonstr_iter(omit):
             omit = (omit,)
@@ -51,3 +60,14 @@ class PropertySheetAdhocracyContent(PropertySheet):
                     setattr(self.context, name, new_val)
                     changed = True
         return changed
+
+
+    def cstruct(self):
+        """Retruns dictionary with serialized colander schema data (cstruct).
+        """
+        # TODO enforce validated appstruct data,
+        appstruct = self.get()
+        cstruct = self.schema.serialize(appstruct)
+        if "_csrf_token_" in cstruct:
+            del cstruct["_csrf_token_"]
+        return cstruct
