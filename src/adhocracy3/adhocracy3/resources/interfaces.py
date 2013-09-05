@@ -24,7 +24,18 @@ class IMarker(Interface):
 
 class IContent(Interface):
     """Marker interface for adhocracy content objects
+
     """
+
+    # TODO
+    #  A tagged value "add_permission" sets the permission
+    #  to create this content object and add it to the object hierarchy.
+    # (in addition to the "addable_content_interfaces"  settings)
+    # taggedValue("add_permission", "add-content")
+
+    # A perm permission to list folder contents, view content meta data, search
+    # taggedValue("view_permission", "view-content")
+
 
 class IPool(IContent, IFolder):
     """Folder to define a namespace for supergraph nodes
@@ -43,9 +54,15 @@ class IPropertySheetMarker(Interface):
        IContent objects.
 
        To set/get the data you can adapt to IPropertySheet objects.
+
+       A tagged value "view_permission" set the permission
+       to create this content object and add it to the object hierarchy.
     """
 
     taggedValue("schema", "substanced.schema.Schema")
+
+    taggedValue("view_permission", "view")
+    taggedValue("edit_permission", "edit-content")
 
 
 # Basic Pools
@@ -73,17 +90,6 @@ class INodeTags(IPool):
     """Pool to store tag nodes to reference specific node versions
     """
 
-# Name Data
-
-class NameSchema(Schema):
-
-    name = NameSchemaNode()
-
-
-class IName(IPropertySheetMarker):
-
-    taggedValue("schema", "adhocracy3.resources.interfaces.NameSchema")
-
 
 # Concrete Nodes
 
@@ -95,12 +101,28 @@ class IProposalContainer(INodeContainer):
     """Proposal node container"""
 
 
+# Name Data
+
+class NameSchema(Schema):
+
+    name = NameSchemaNode()
+
+
+class IName(IPropertySheetMarker):
+
+    taggedValue("schema", "adhocracy3.resources.interfaces.NameSchema")
+    taggedValue("view_permission", "view")
+    taggedValue("edit_permission", "edit-content")
+
+
 # Versionable Data
 
 class IVersionable(IPropertySheetMarker):
     """Marker interface representing a node with version data"""
 
     taggedValue("schema", "adhocracy3.resources.interfaces.VersionableSchema")
+    taggedValue("view_permission", "view")
+    taggedValue("edit_permission", "edit-content")
 
 class IForkable(IVersionable):
     """Marker interface representing a forkable node with version data"""
@@ -120,6 +142,8 @@ class IText(IPropertySheetMarker):
     """Marker interfaces representing a node with text data """
 
     taggedValue("schema", "adhocracy3.resources.interfaces.TextSchema")
+    taggedValue("view_permission", "view")
+    taggedValue("edit_permission", "edit-content")
 
 
 class TextSchema(Schema):
