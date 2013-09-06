@@ -19,7 +19,7 @@ from adhocracy3 import interfaces
 # Basic Pool
 
 @content(
-    # has to resolve to content interface class
+    # content type: has to resolve to content interface class
     'adhocracy3.interfaces.IPool',
     add_view='add_pool',
     factory_type = 'pool',

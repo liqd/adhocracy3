@@ -10,7 +10,7 @@ content::
         id: test
         path: "/instances/spd.."
         content_type: IParteiProgramm
-        content_type-name: Partei-Programm
+        content_type_name: Partei-Programm
         workflow_state: public
         creator: /users/principal1
         creation_date: 16.01.2013 16:33

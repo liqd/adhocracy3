@@ -66,7 +66,7 @@ class ContentView():
 
     @reify
     def sheets(self):
-        """Returns dictwith interface-name as keys and property sheets as
+        """Returns dictwith interface-name as keys and property sheet as
            values.
         """
         sheets = self.registry.getAdapters((self.context, self.request),
@@ -76,19 +76,19 @@ class ContentView():
     @reify
     def viewable_sheets(self):
         sheets = {}
-        for name, sheet in self.sheets.items():
+        for ifacename, sheet in self.sheets.items():
             permission = sheet.view_permission
             if has_permission(permission, self.context, self.request):
-                sheets[name] = sheet
+                sheets[ifacename] = sheet
         return sheets
 
     @reify
     def editable_sheets(self):
         sheets = {}
-        for name, sheet in self.sheets.items():
+        for ifacename, sheet in self.sheets.items():
             permission = sheet.edit_permission
             if has_permission(permission, self.context, self.request):
-                sheets[name] = sheet
+                sheets[ifacename] = sheet
 
     @reify
     def addable_content_types(self):
@@ -106,9 +106,9 @@ class ContentView():
         # meta
         data["meta"] = self.head()
         # data
-        for name, sheet in self.viewable_sheets.items():
+        for ifacename, sheet in self.viewable_sheets.items():
             cstruct = sheet.cstruct()
-            data["data"][name] = cstruct
+            data["data"][ifacename] = cstruct
         # children
         meta_children = [self.head(child) for child in self.children]
         data["children"] = meta_children
@@ -144,9 +144,10 @@ class ContentView():
         content = self.registry.content.create(data["content_type"],
                                                self.context)
         #set content data
-        for iface in data["data"]:
-            sheet = self.registry.getMultiAdapter((content, self.request), IPropertySheet, iface)
-            sheet.set(data["data"][iface])
+        for ifacename in data["data"]:
+            sheet = self.registry.getMultiAdapter((content, self.request),\
+                                                  IPropertySheet, ifacename)
+            sheet.set(data["data"][ifacename])
         #add content to parent
         name = getattr(content, "name", "")
         try:
@@ -163,7 +164,7 @@ class ContentView():
         data = self.request.validated
         #set content data
         content = self.context
-        for name in data["data"]:
-            sheet = self.registry.getMultiAdapter((content, self.request), IPropertySheet, name)
-            sheet.set(data["data"][name])
+        for ifacename in data["data"]:
+            sheet = self.registry.getMultiAdapter((content, self.request), IPropertySheet, ifacename)
+            sheet.set(data["data"][ifacename])
         return {"path:": resource_path(content)}

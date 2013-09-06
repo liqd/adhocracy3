@@ -12,9 +12,7 @@ from substanced.sdi import mgmt_view
 
 def has_permission_to_view_any_propertysheet(context, request):
 
-    adapters = request.registry.getAdapters((context, request), IPropertySheet,)
-    sheets = [sheet for name, sheet in adapters]
-
+    sheets = request.registry.getAdapters((context, request), IPropertySheet,)
     for sheet in sheets:
         permissions = getattr(sheet, 'permissions', None)
         if not permissions:
@@ -63,11 +61,10 @@ class PropertySheetsAdhocracyView(PropertySheetsView):
         self.schema = self.active_sheet.schema
 
     def viewable_sheets(self):
-        adapters = self.request.registry.getAdapters((self.context, self.request), IPropertySheet,)
-        candidates = [(name, sheet) for name, sheet in adapters]
+        candidates = self.request.registry.getAdapters((self.context, self.request), IPropertySheet,)
         L = []
-        for name, sheet in candidates:
+        for ifacename, sheet in candidates:
             if not self.has_permission_to('view', sheet):
                 continue
-            L.append((name, sheet))
+            L.append((ifacename, sheet))
         return L
