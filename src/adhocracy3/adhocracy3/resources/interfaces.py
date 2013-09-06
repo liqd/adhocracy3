@@ -73,9 +73,9 @@ class INodeContainer(IPool):
 
        Children:
 
-           versions = INodeVersions object
+           _versions = INodeVersions object
 
-           tags = INodeTags object
+           _tags = INodeTags object
     """
 
     content_type = Attribute('Addable node contenttype, '
