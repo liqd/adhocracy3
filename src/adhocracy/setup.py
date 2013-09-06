@@ -16,9 +16,9 @@ requires = [
     'zope.dottedname',
     ]
 
-setup(name='adhocracy3',
+setup(name='adhocracy',
       version='0.0',
-      description='adhocracy3',
+      description='adhocracy',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
@@ -35,10 +35,10 @@ setup(name='adhocracy3',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      test_suite="adhocracy3",
+      test_suite="adhocracy",
       entry_points="""\
       [paste.app_factory]
-      main = adhocracy3:main
+      main = adhocracy:main
       """,
       )
 

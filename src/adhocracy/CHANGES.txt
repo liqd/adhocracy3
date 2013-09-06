@@ -1,4 +1,4 @@
-adhocracy3 Changelog
+adhocracy Changelog
 =====================
 
 0.0

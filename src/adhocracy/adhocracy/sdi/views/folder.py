@@ -13,7 +13,7 @@ class AdhocracyFolderContents(FolderContents):
     def sdi_add_views(self, context, request):
         add_views = sdi_add_views(context, request)
         #TODO Hack
-        if "adhocracy3" in request.registry.content.typeof(context):
+        if "adhocracy" in request.registry.content.typeof(context):
             addables = request.registry.content.addable_content_types(context)
             add_views = [x for x in add_views if x['content_type'] in addables]
         return add_views

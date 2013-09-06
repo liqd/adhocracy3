@@ -13,7 +13,7 @@ from zope.interface import (
     taggedValue,
 )
 
-from adhocracy3.schema import ReferenceSetSchemaNode
+from adhocracy.schema import ReferenceSetSchemaNode
 
 # Interface types
 
@@ -115,7 +115,7 @@ class NameReadonlySchema(Schema):
 
 class IName(IPropertySheetMarker):
 
-    taggedValue("schema", "adhocracy3.interfaces.NameSchema")
+    taggedValue("schema", "adhocracy.interfaces.NameSchema")
     taggedValue("view_permission", "view")
     taggedValue("edit_permission", "edit-content")
 
@@ -125,7 +125,7 @@ class IName(IPropertySheetMarker):
 class IVersionable(IPropertySheetMarker):
     """Marker interface representing a node with version data"""
 
-    taggedValue("schema", "adhocracy3.interfaces.VersionableSchema")
+    taggedValue("schema", "adhocracy.interfaces.VersionableSchema")
     taggedValue("view_permission", "view")
     taggedValue("edit_permission", "edit-content")
 
@@ -146,7 +146,7 @@ class VersionableSchema(Schema):
 class IText(IPropertySheetMarker):
     """Marker interfaces representing a node with text data """
 
-    taggedValue("schema", "adhocracy3.interfaces.TextSchema")
+    taggedValue("schema", "adhocracy.interfaces.TextSchema")
     taggedValue("view_permission", "view")
     taggedValue("edit_permission", "edit-content")
 

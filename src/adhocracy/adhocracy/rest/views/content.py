@@ -19,10 +19,10 @@ from substanced.interfaces import (
 )
 from substanced.folder import FolderKeyError
 
-from adhocracy3.interfaces import (
+from adhocracy.interfaces import (
     IContent,
     )
-from adhocracy3.rest.views.interfaces import (
+from adhocracy.rest.views.interfaces import (
     ContentGETSchema,
     ContentPOSTSchema,
     ContentPUTSchema,

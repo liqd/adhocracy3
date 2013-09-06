@@ -10,7 +10,7 @@ from substanced.interfaces import IPropertySheet
 from substanced.schema import NameSchemaNode
 from substanced.util import renamer
 
-from adhocracy3.schema import ReferenceSupergraphBaseSchemaNode
+from adhocracy.schema import ReferenceSupergraphBaseSchemaNode
 
 
 def set_property_object(schemanode, context, name):

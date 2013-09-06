@@ -4,7 +4,7 @@ from substanced.sdi import mgmt_view
 from substanced.form import FormView
 from substanced.interfaces import IFolder
 
-from adhocracy3.interfaces import (
+from adhocracy.interfaces import (
     NameSchema
 )
 
@@ -14,7 +14,7 @@ from adhocracy3.interfaces import (
 
 class AddBaseView(FormView):
     title = 'Add Ressource'
-    contenttype = 'adhocracy3.interfaces.IContent'
+    contenttype = 'adhocracy.interfaces.IContent'
     schema = NameSchema()
     buttons = ('add',)
 
@@ -38,7 +38,7 @@ class AddBaseView(FormView):
     )
 class AddNodeView(AddBaseView):
     title = 'Add Node'
-    contenttype = 'adhocracy3.interfaces.INode'
+    contenttype = 'adhocracy.interfaces.INode'
 
 
 @mgmt_view(
@@ -51,7 +51,7 @@ class AddNodeView(AddBaseView):
     )
 class AddNodeContainerView(AddBaseView):
     title = 'Add NodeContainer'
-    contenttype = 'adhocracy3.interfaces.INodeContainer'
+    contenttype = 'adhocracy.interfaces.INodeContainer'
 
 
 @mgmt_view(
@@ -64,4 +64,4 @@ class AddNodeContainerView(AddBaseView):
     )
 class AddPoolView(AddBaseView):
     title = 'Add Pool'
-    contenttype = 'adhocracy3.interfaces.IPool'
+    contenttype = 'adhocracy.interfaces.IPool'

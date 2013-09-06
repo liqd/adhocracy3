@@ -8,7 +8,7 @@ from substanced.folder import (
     Folder,
     RandomAutoNamingFolder,
 )
-from adhocracy3 import interfaces
+from adhocracy import interfaces
 
 
 ######################
@@ -20,11 +20,11 @@ from adhocracy3 import interfaces
 
 @content(
     # content type: has to resolve to content interface class
-    'adhocracy3.interfaces.IPool',
+    'adhocracy.interfaces.IPool',
     add_view='add_pool',
     factory_type = 'pool',
     # addable content types, class heritage is honored
-    addable_content_interfaces = ["adhocracy3.interfaces.IPool"],
+    addable_content_interfaces = ["adhocracy.interfaces.IPool"],
     # make this addable if supertype is addable
     is_implicit_addable = True
     )
@@ -40,11 +40,11 @@ def pool(context):
 # Basic Node
 
 @content(
-    'adhocracy3.interfaces.INodeContainer',
+    'adhocracy.interfaces.INodeContainer',
     add_view='add_nodecontainer',
     factory_type = 'container',
     addable_content_interfaces =
-        ["adhocracy3.interfaces.INodeContainer"],
+        ["adhocracy.interfaces.INodeContainer"],
     is_implicit_addable = True
     )
 @implementer(interfaces.INodeContainer, interfaces.IName)
@@ -55,9 +55,9 @@ def container(context):
 
 
 @content(
-    'adhocracy3.interfaces.INodeVersions',
+    'adhocracy.interfaces.INodeVersions',
     factory_type = 'versions',
-    addable_content_interfaces = ["adhocracy3.interfaces.INode"],
+    addable_content_interfaces = ["adhocracy.interfaces.INode"],
     )
 @implementer(interfaces.INodeVersions)
 def versions(context):
@@ -67,7 +67,7 @@ def versions(context):
 
 
 @content(
-    'adhocracy3.interfaces.INode',
+    'adhocracy.interfaces.INode',
     add_view='add_node',
     factory_type = 'node',
     is_implicit_addable = True
