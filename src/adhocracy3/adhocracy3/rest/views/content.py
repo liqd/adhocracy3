@@ -19,7 +19,7 @@ from substanced.interfaces import (
 )
 from substanced.folder import FolderKeyError
 
-from adhocracy3.resources.interfaces import (
+from adhocracy3.interfaces import (
     IContent,
     )
 from adhocracy3.rest.views.interfaces import (
@@ -158,10 +158,12 @@ class ContentView():
 
     @view_config(request_method='PUT')
     def put(self):
+        #validate request data
         validate_request_data(ContentPUTSchema, self.request)
         data = self.request.validated
+        #set content data
         content = self.context
         for name in data["data"]:
-            sheet = self.registry.getAdapter((content, self.reqeuest), IPropertySheet, name)
+            sheet = self.registry.getMultiAdapter((content, self.request), IPropertySheet, name)
             sheet.set(data["data"][name])
         return {"path:": resource_path(content)}

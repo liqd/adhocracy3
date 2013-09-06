@@ -110,7 +110,7 @@ class NameSchema(Schema):
 
 class IName(IPropertySheetMarker):
 
-    taggedValue("schema", "adhocracy3.resources.interfaces.NameSchema")
+    taggedValue("schema", "adhocracy3.interfaces.NameSchema")
     taggedValue("view_permission", "view")
     taggedValue("edit_permission", "edit-content")
 
@@ -120,7 +120,7 @@ class IName(IPropertySheetMarker):
 class IVersionable(IPropertySheetMarker):
     """Marker interface representing a node with version data"""
 
-    taggedValue("schema", "adhocracy3.resources.interfaces.VersionableSchema")
+    taggedValue("schema", "adhocracy3.interfaces.VersionableSchema")
     taggedValue("view_permission", "view")
     taggedValue("edit_permission", "edit-content")
 
@@ -141,7 +141,7 @@ class VersionableSchema(Schema):
 class IText(IPropertySheetMarker):
     """Marker interfaces representing a node with text data """
 
-    taggedValue("schema", "adhocracy3.resources.interfaces.TextSchema")
+    taggedValue("schema", "adhocracy3.interfaces.TextSchema")
     taggedValue("view_permission", "view")
     taggedValue("edit_permission", "edit-content")
 

@@ -8,23 +8,23 @@ from substanced.folder import (
     Folder,
     RandomAutoNamingFolder,
 )
-from adhocracy3.resources import interfaces
+from adhocracy3 import interfaces
 
 
-###############
-#  Resources  #
-###############
+######################
+#  Adhocracy Content #
+######################
 
 
 # Basic Pool
 
 @content(
     # has to resolve to content interface class
-    'adhocracy3.resources.interfaces.IPool',
+    'adhocracy3.interfaces.IPool',
     add_view='add_pool',
     factory_type = 'pool',
     # addable content types, class heritage is honored
-    addable_content_interfaces = ["adhocracy3.resources.interfaces.IPool"],
+    addable_content_interfaces = ["adhocracy3.interfaces.IPool"],
     # make this addable if supertype is addable
     is_implicit_addable = True
     )
@@ -40,11 +40,11 @@ def pool(context):
 # Basic Node
 
 @content(
-    'adhocracy3.resources.interfaces.INodeContainer',
+    'adhocracy3.interfaces.INodeContainer',
     add_view='add_nodecontainer',
     factory_type = 'container',
     addable_content_interfaces =
-        ["adhocracy3.resources.interfaces.INodeContainer"],
+        ["adhocracy3.interfaces.INodeContainer"],
     is_implicit_addable = True
     )
 @implementer(interfaces.INodeContainer, interfaces.IName)
@@ -55,9 +55,9 @@ def container(context):
 
 
 @content(
-    'adhocracy3.resources.interfaces.INodeVersions',
+    'adhocracy3.interfaces.INodeVersions',
     factory_type = 'versions',
-    addable_content_interfaces = ["adhocracy3.resources.interfaces.INode"],
+    addable_content_interfaces = ["adhocracy3.interfaces.INode"],
     )
 @implementer(interfaces.INodeVersions)
 def versions(context):
@@ -67,7 +67,7 @@ def versions(context):
 
 
 @content(
-    'adhocracy3.resources.interfaces.INode',
+    'adhocracy3.interfaces.INode',
     add_view='add_node',
     factory_type = 'node',
     is_implicit_addable = True
@@ -77,11 +77,3 @@ def node(context):
     content = Folder()
     directlyProvides(content, implementedBy(node).interfaces())
     return content
-
-
-############
-#  config  #
-############
-
-def includeme(config): # pragma: no cover
-    config.include('.propertysheets')

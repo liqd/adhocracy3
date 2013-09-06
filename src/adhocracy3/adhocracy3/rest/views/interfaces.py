@@ -45,7 +45,7 @@ class ContentPUTSchema(colander.Schema):
 
     content_type = colander.SchemaNode(colander.String())
 
-    data = colander.SchemaNode(colander.Mapping())
+    data = colander.SchemaNode(colander.Mapping(unknown="preserve"))
 
 
 #class ContentOPTIONSSchema(colander.Schema):

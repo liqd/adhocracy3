@@ -1,13 +1,12 @@
 from zope.interface import (
     implementer,
     )
-from zope.component import adapter
 from zope.dottedname.resolve import resolve
 from pyramid.interfaces import IRequest
 from substanced.interfaces import IPropertySheet
 
 from adhocracy3.property import PropertySheetAdhocracyContent
-from adhocracy3.resources import interfaces
+from adhocracy3 import interfaces
 
 # PropertySheet adapters
 # read sdi/views/property for adapter lookup examples

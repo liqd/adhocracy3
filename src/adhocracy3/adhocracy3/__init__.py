@@ -8,8 +8,8 @@ def main(global_config, **settings):
     """
     config = Configurator(settings=settings, root_factory=root_factory)
     config.include('substanced')
-    config.commit()
-    config.include('.resources')
+    config.commit() # commit to allow proper config overrides
+    config.include('.propertysheets')
     config.include('.contentregistry')
     config.include('.rest')
     config.scan()
