@@ -10,7 +10,7 @@ def main(global_config, **settings):
     config.include('substanced')
     config.commit()
     config.include('.resources')
-    config.include('.content')
+    config.include('.contentregistry')
     config.include('.rest')
     config.scan()
 
