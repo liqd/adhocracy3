@@ -34,6 +34,8 @@ class PropertySheetAdhocracyContent(PropertySheet):
             * set required property objects.
             * set permission attributes
             * added method to return serialized data (cstruct)
+            * don't save "readonly" SchemaNodes,
+              (works only  with first level SchemaNode children)
     """
     #TODO add interface
 
@@ -47,7 +49,9 @@ class PropertySheetAdhocracyContent(PropertySheet):
         changed = False
         for child in self.schema:
             name = child.name
-            if (name in struct) and not (name in omit):
+            #check readonly fields
+            readonly = getattr(child, "readonly", False)
+            if (name in struct) and not (name in omit) and not readonly:
                 # avoid setting an attribute on the object if it's the same
                 # value as the existing value to avoid database bloat
                 existing_val = getattr(self.context, name, _marker)

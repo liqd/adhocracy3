@@ -108,6 +108,11 @@ class NameSchema(Schema):
     name = NameSchemaNode()
 
 
+class NameReadonlySchema(Schema):
+
+    name = NameSchemaNode(readonly=True)
+
+
 class IName(IPropertySheetMarker):
 
     taggedValue("schema", "adhocracy3.interfaces.NameSchema")

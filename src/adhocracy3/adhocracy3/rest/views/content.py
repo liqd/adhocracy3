@@ -151,7 +151,7 @@ class ContentView():
         name = getattr(content, "name", "")
         try:
             self.context.check_name(name, reserved_names=self.reserved_names)
-        except FolderKeyError:
+        except (FolderKeyError, ValueError):
             name += str(time.time())
         self.context.add(name, content)
         return {"path:": resource_path(content)}
