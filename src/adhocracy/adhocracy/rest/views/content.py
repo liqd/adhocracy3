@@ -119,7 +119,7 @@ class ContentView():
         context = context or self.context
         data = MetaSchema().serialize()
         data["name"] = context.__name__
-        data["path"] = resource_path(self.context)
+        data["path"] = resource_path(context)
         data["content_type"] = self.request.registry.content.typeof(context)
         data["content_type_name"] = data["content_type"]
         return data
