@@ -3,7 +3,12 @@
     // global transformer to put obviel iface attributes
     // into the received json objects.
     obviel.transformer(function(obj, path, name) {
-        obj.ifaces = [obj.main_interface];
+        var main_interface = obj.meta.content_type;
+        if (typeof(main_interface) == 'undefined') {
+            console.log(obj);
+            throw ("Object from path " + path + " does not contain a field 'main_interface'");
+        };
+        obj.ifaces = [main_interface];
 
         // sub-interfaces: a node can be all of 'document',
         // 'commentable', 'likeable'.  the following loop iterates
@@ -18,15 +23,14 @@
             data.ifaces = [name];
         };
 
-        obj.path = path;
-
         return obj;
     });
 
     // views
+    // See also in views.js
 
     // Adds fields to make a view settings object editable.
-    var Editable = function(child) {
+    ad.Editable = function(child) {
         var result = {
             edit: function(ev) {
                     this.el.render(toForm(this.obj));
@@ -36,7 +40,7 @@
         return result;
     };
 
-    obviel.view(Editable({
+    obviel.view(ad.Editable({
         iface: 'text',
         obvtUrl: 'templates/text.display.obvt',
     }));
@@ -47,7 +51,7 @@
         obvt: '{text.content}'
     });
 
-    obviel.view(Editable({
+    obviel.view(ad.Editable({
         iface: 'document',
         obvtUrl: 'templates/document.display.obvt',
     }));
@@ -84,15 +88,7 @@
     // entry function
     $(document).ready(function() {
         // initially renders to the main tag
-        document.location.hash = "root.json";
         $(window).trigger('hashchange');
     });
-
-    // Re-renders the document.
-    // FIXME: This has to be done better with some
-    // kind of server side push (socket.io?)
-    main_rerender = function() {
-        $("#main").rerender();
-    };
 
 }) (jQuery, obviel);
