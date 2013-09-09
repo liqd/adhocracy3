@@ -3,6 +3,7 @@ from zope.interface import (
     directlyProvides,
     implementedBy,
     )
+from pyramid.threadlocal import get_current_registry
 from substanced.content import content
 from substanced.folder import (
     Folder,
@@ -40,28 +41,25 @@ def pool(context):
 # Basic Node
 
 @content(
-    'adhocracy.interfaces.INodeContainer',
-    add_view='add_nodecontainer',
-    factory_type = 'container',
-    addable_content_interfaces =
-        ["adhocracy.interfaces.INodeContainer"],
-    is_implicit_addable = True
-    )
-@implementer(interfaces.INodeContainer, interfaces.IName)
-def container(context):
-    content = Folder()
-    directlyProvides(content, implementedBy(container).interfaces())
-    return content
-
-
-@content(
     'adhocracy.interfaces.INodeVersions',
     factory_type = 'versions',
     addable_content_interfaces = ["adhocracy.interfaces.INode"],
     )
 @implementer(interfaces.INodeVersions)
 def versions(context):
-    content = RandomAutoNamingFolder
+    content = RandomAutoNamingFolder()
+    directlyProvides(content, implementedBy(versions).interfaces())
+    return content
+
+
+@content(
+    'adhocracy.interfaces.INodeTags',
+    factory_type = 'tags',
+    addable_content_interfaces = ["adhocracy.interfaces.INode"],
+    )
+@implementer(interfaces.INodeTags)
+def tags(context):
+    content = Folder()
     directlyProvides(content, implementedBy(versions).interfaces())
     return content
 
@@ -72,8 +70,72 @@ def versions(context):
     factory_type = 'node',
     is_implicit_addable = True
     )
-@implementer(interfaces.INode, interfaces.IVersionable)
+
+@implementer(interfaces.INode, interfaces.INameReadonly, interfaces.IVersionable)
 def node(context):
     content = Folder()
     directlyProvides(content, implementedBy(node).interfaces())
+    return content
+
+
+@content(
+    'adhocracy.interfaces.INodeContainer',
+    add_view='add_nodecontainer',
+    factory_type = 'container',
+    addable_content_interfaces =
+        ["adhocracy.interfaces.INodeContainer"],
+    is_implicit_addable = True
+    )
+@implementer(interfaces.INodeContainer, interfaces.IName)
+def container(context):
+    content = Folder()
+    node_content_type =\
+        interfaces.INodeContainer.getTaggedValue('node_content_type')
+    directlyProvides(content, implementedBy(container).interfaces())
+    registry = get_current_registry()
+    content["_versions"] = registry.content.create(\
+                                interfaces.INodeVersions.__identifier__, context)
+    content["_tags"] = registry.content.create(\
+                                interfaces.INodeTags.__identifier__, context)
+    content["_versions"].add_next(registry.content.create(node_content_type,
+                                                          context))
+    return content
+
+# Concrete Nodes
+
+@content(
+    'adhocracy.interfaces.IProposal',
+    add_view='add_proposal',
+    factory_type = 'proposal',
+    is_implicit_addable = True
+    )
+@implementer(interfaces.IProposal, interfaces.INameReadonly,
+             interfaces.IDocument, interfaces.IVersionable)
+def proposal(context):
+    content = Folder()
+    directlyProvides(content, implementedBy(proposal).interfaces())
+    return content
+
+
+@content(
+    'adhocracy.interfaces.IProposalContainer',
+    add_view='add_proposalcontainer',
+    factory_type = 'proposalcontainer',
+    addable_content_interfaces =
+        ["adhocracy.interfaces.IProposalContainer"],
+    is_implicit_addable = True
+    )
+@implementer(interfaces.INodeContainer, interfaces.IName)
+def proposalcontainer(context):
+    content = Folder()
+    node_content_type =\
+        interfaces.IProposalContainer.getTaggedValue('node_content_type')
+    directlyProvides(content, implementedBy(proposalcontainer).interfaces())
+    registry = get_current_registry()
+    content["_versions"] = registry.content.create(\
+                                interfaces.INodeVersions.__identifier__, context)
+    content["_tags"] = registry.content.create(\
+                                interfaces.INodeTags.__identifier__, context)
+    content["_versions"].add_next(registry.content.create(node_content_type,
+                                                          context))
     return content

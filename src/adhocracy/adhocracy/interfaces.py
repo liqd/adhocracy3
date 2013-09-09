@@ -76,10 +76,12 @@ class INodeContainer(IPool):
            _versions = INodeVersions object
 
            _tags = INodeTags object
+
+       A tagged value "node_content_type" to set the type of node
+       addable to this container.
     """
 
-    content_type = Attribute('Addable node contenttype, '
-                             'has to implement INode and IVersionable')
+    taggedValue("node_content_type", "adhocracy.interfaces.INode")
 
 
 class INodeVersions(IPool, IAutoNamingFolder):
@@ -100,6 +102,8 @@ class IProposal(INode):
 class IProposalContainer(INodeContainer):
     """Proposal node container"""
 
+    taggedValue("node_content_type", "adhocracy.interfaces.IProposal")
+
 
 # Name Data
 
@@ -116,6 +120,13 @@ class NameReadonlySchema(Schema):
 class IName(IPropertySheetMarker):
 
     taggedValue("schema", "adhocracy.interfaces.NameSchema")
+    taggedValue("view_permission", "view")
+    taggedValue("edit_permission", "edit-content")
+
+
+class INameReadonly(IPropertySheetMarker):
+
+    taggedValue("schema", "adhocracy.interfaces.NameReadonlySchema")
     taggedValue("view_permission", "view")
     taggedValue("edit_permission", "edit-content")
 
@@ -140,19 +151,25 @@ class VersionableSchema(Schema):
                                      missing=[],
                                      interface=IVersionable,
                                      )
+    #followed_by = ReferenceSetSchemaNode(
+                                     #default=[],
+                                     #missing=[],
+                                     #interface=IVersionable,
+                                     #readonly=True,
+                                     #)
 
-# Text Data
+# Document Data
 
-class IText(IPropertySheetMarker):
-    """Marker interfaces representing a node with text data """
+class IDocument(IPropertySheetMarker):
+    """Marker interfaces representing a node with document data """
 
-    taggedValue("schema", "adhocracy.interfaces.TextSchema")
+    taggedValue("schema", "adhocracy.interfaces.DocumentSchema")
     taggedValue("view_permission", "view")
     taggedValue("edit_permission", "edit-content")
 
 
-class TextSchema(Schema):
+class DocumentSchema(Schema):
 
     title =  colander.SchemaNode(colander.String(), default="")
 
-    content =  colander.SchemaNode(colander.String(), default="")
+    description =  colander.SchemaNode(colander.String(), default="")
