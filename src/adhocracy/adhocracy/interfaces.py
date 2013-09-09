@@ -76,10 +76,12 @@ class INodeContainer(IPool):
            _versions = INodeVersions object
 
            _tags = INodeTags object
+
+       A tagged value "node_content_type" to set the type of node
+       addable to this container.
     """
 
-    content_type = Attribute('Addable node contenttype, '
-                             'has to implement INode and IVersionable')
+    taggedValue("node_content_type", "adhocracy.interfaces.INode")
 
 
 class INodeVersions(IPool, IAutoNamingFolder):
