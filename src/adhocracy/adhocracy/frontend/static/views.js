@@ -6,8 +6,8 @@
             children_urls = [];
             for (i in this.obj.children) {
                 children_urls.push(this.obj.children[i].path);
-                this.obj.children_urls = children_urls;
             };
+            this.obj.children_urls = children_urls;
         },
         obvtUrl: 'templates/IProposalContainer.obvt',
     }));
