@@ -1,3 +1,4 @@
-This a Proposal! (Yay!)
-<br />
-A proposal doesn't seem to have any content yet. (Boo!)
+<span data-with="data.IDocument">
+    <h3>Proposal: {title}</h3>
+    <small>{description}</small>
+</span>
