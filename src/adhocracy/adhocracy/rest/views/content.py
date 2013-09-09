@@ -108,7 +108,7 @@ class ContentView():
         # data
         for ifacename, sheet in self.viewable_sheets.items():
             cstruct = sheet.cstruct()
-            data["data"][ifacename] = cstruct
+            data["data"][ifacename.split(".")[-1]] = cstruct
         # children
         meta_children = [self.head(child) for child in self.children]
         data["children"] = meta_children
@@ -120,7 +120,7 @@ class ContentView():
         data = MetaSchema().serialize()
         data["name"] = context.__name__
         data["path"] = resource_path(context)
-        data["content_type"] = self.request.registry.content.typeof(context)
+        data["content_type"] = self.request.registry.content.typeof(context).split(".")[-1]
         data["content_type_name"] = data["content_type"]
         return data
 

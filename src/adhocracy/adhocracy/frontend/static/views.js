@@ -1,7 +1,7 @@
 (function($, obviel) {
 
     obviel.view(ad.Editable({
-        iface: 'adhocracy.interfaces.IProposalContainer',
+        iface: 'IProposalContainer',
         before: function() {
             children_urls = [];
             for (i in this.obj.children) {
@@ -13,17 +13,17 @@
     }));
 
     obviel.view(ad.Editable({
-        iface: 'adhocracy.interfaces.IProposal',
+        iface: 'IProposal',
         obvtUrl: 'templates/IProposal.obvt',
     }));
 
     obviel.view({
-        iface: 'adhocracy.interfaces.INodeTags',
+        iface: 'INodeTags',
         obvt: "_tags"
     });
 
     obviel.view({
-        iface: 'adhocracy.interfaces.INodeVersions',
+        iface: 'INodeVersions',
         obvtUrl: "templates/INodeVersions.obvt"
     });
 
