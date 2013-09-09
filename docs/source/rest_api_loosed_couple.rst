@@ -18,7 +18,7 @@ content::
     data:
         IDocument:
             title:  Title
-            text: Bla
+            description: Bla
         IVersionable:
             follows:
                 /instances/spd/w/test0
@@ -53,7 +53,7 @@ content::
     data:
         IDocument:
             title:  Title
-            text: Bla
+            description: Bla
         ...
 
 OPTIONS /instance/app/w/test::

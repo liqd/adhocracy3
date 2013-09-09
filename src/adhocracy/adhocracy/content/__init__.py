@@ -71,7 +71,7 @@ def tags(context):
     is_implicit_addable = True
     )
 
-@implementer(interfaces.INode, interfaces.IVersionable)
+@implementer(interfaces.INode, interfaces.INameReadonly, interfaces.IVersionable)
 def node(context):
     content = Folder()
     directlyProvides(content, implementedBy(node).interfaces())
@@ -88,6 +88,44 @@ def node(context):
     )
 @implementer(interfaces.INodeContainer, interfaces.IName)
 def container(context):
+    content = Folder()
+    node_content_type =\
+        interfaces.INodeContainer.getTaggedValue('node_content_type')
+    directlyProvides(content, implementedBy(container).interfaces())
+    registry = get_current_registry()
+    content["_versions"] = registry.content.create(\
+                                interfaces.INodeVersions.__identifier__, context)
+    content["_tags"] = registry.content.create(\
+                                interfaces.INodeTags.__identifier__, context)
+    content["_versions"].add_next(registry.content.create(node_content_type,
+                                                          context))
+    return content
+
+# Concrete Nodes
+
+@content(
+    'adhocracy.interfaces.IProposal',
+    add_view='add_proposal',
+    factory_type = 'proposal',
+    is_implicit_addable = True
+    )
+@implementer(interfaces.IProposal, interfaces.INameReadonly, interfaces.IVersionable)
+def proposal(context):
+    content = Folder()
+    directlyProvides(content, implementedBy(node).interfaces())
+    return content
+
+
+@content(
+    'adhocracy.interfaces.IProposalContainer',
+    add_view='add_proposalcontainer',
+    factory_type = 'proposalcontainer',
+    addable_content_interfaces =
+        ["adhocracy.interfaces.IProposalContainer"],
+    is_implicit_addable = True
+    )
+@implementer(interfaces.INodeContainer, interfaces.IName)
+def proposalcontainer(context):
     content = Folder()
     node_content_type =\
         interfaces.INodeContainer.getTaggedValue('node_content_type')

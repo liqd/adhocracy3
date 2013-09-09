@@ -2,7 +2,11 @@ from pyramid.httpexceptions import HTTPFound
 
 from substanced.sdi import mgmt_view
 from substanced.form import FormView
-from substanced.interfaces import IFolder
+from substanced.interfaces import (
+    IFolder,
+    IAutoNamingFolder,
+)
+from substanced.schema import Schema
 
 from adhocracy.interfaces import (
     NameSchema
@@ -12,7 +16,7 @@ from adhocracy.interfaces import (
 #   SDI "add" views for adhocracy content
 #
 
-class AddBaseView(FormView):
+class AddPoolBaseView(FormView):
     title = 'Add Ressource'
     contenttype = 'adhocracy.interfaces.IContent'
     schema = NameSchema()
@@ -28,15 +32,31 @@ class AddBaseView(FormView):
             )
 
 
+class AddNodeBaseView(FormView):
+    title = 'Add Ressource'
+    contenttype = 'adhocracy.interfaces.INode'
+    schema = Schema()
+    buttons = ('add',)
+
+    def add_success(self, appstruct):
+        registry = self.request.registry
+        content = registry.content.create(self.contenttype, self.context,  **appstruct)
+        self.context.add_next(content)
+        return HTTPFound(
+            self.request.sdiapi.mgmt_path(self.context, '@@contents')
+            )
+
+# basic nodes
+
 @mgmt_view(
-    context=IFolder,
+    context=IAutoNamingFolder,
     name='add_node',
     tab_title='Add Node',
     permission='sdi.add-content',
     renderer='substanced.sdi:templates/form.pt',
     tab_condition=False,
     )
-class AddNodeView(AddBaseView):
+class AddNodeView(AddNodeBaseView):
     title = 'Add Node'
     contenttype = 'adhocracy.interfaces.INode'
 
@@ -49,7 +69,7 @@ class AddNodeView(AddBaseView):
     renderer='substanced.sdi:templates/form.pt',
     tab_condition=False,
     )
-class AddNodeContainerView(AddBaseView):
+class AddNodeContainerView(AddPoolBaseView):
     title = 'Add NodeContainer'
     contenttype = 'adhocracy.interfaces.INodeContainer'
 
@@ -62,6 +82,38 @@ class AddNodeContainerView(AddBaseView):
     renderer='substanced.sdi:templates/form.pt',
     tab_condition=False,
     )
-class AddPoolView(AddBaseView):
+class AddPoolView(AddPoolBaseView):
     title = 'Add Pool'
     contenttype = 'adhocracy.interfaces.IPool'
+
+# concrete nodes
+
+@mgmt_view(
+    context=IAutoNamingFolder,
+    name='add_proposal',
+    tab_title='Add Proposal',
+    permission='sdi.add-content',
+    renderer='substanced.sdi:templates/form.pt',
+    tab_condition=False,
+    )
+class AddProposalView(AddNodeBaseView):
+    title = 'Add Proposal'
+    contenttype = 'adhocracy.interfaces.IProposal'
+
+
+@mgmt_view(
+    context=IFolder,
+    name='add_proposalcontainer',
+    tab_title='Add ProposalContainer',
+    permission='sdi.add-content',
+    renderer='substanced.sdi:templates/form.pt',
+    tab_condition=False,
+    )
+class AddProposalContainerView(AddPoolBaseView):
+    title = 'Add ProposalContainer'
+    contenttype = 'adhocracy.interfaces.IProposalContainer'
+    name='add_proposal',
+    tab_title='Add Proposal',
+    permission='sdi.add-content',
+    renderer='substanced.sdi:templates/form.pt',
+    tab_condition=False,
