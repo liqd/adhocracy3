@@ -12,6 +12,9 @@ def main(global_config, **settings):
     config.include('.propertysheets')
     config.include('.contentregistry')
     config.include('.rest')
+
+    config.include('.frontend')
+
     config.scan()
 
     return config.make_wsgi_app()
