@@ -105,12 +105,12 @@ class IProposalContainer(INodeContainer):
 
 class NameSchema(Schema):
 
-    name = NameSchemaNode()
+    name = NameSchemaNode(default="")
 
 
 class NameReadonlySchema(Schema):
 
-    name = NameSchemaNode(readonly=True)
+    name = NameSchemaNode(readonly=True, default="")
 
 
 class IName(IPropertySheetMarker):
@@ -153,6 +153,6 @@ class IText(IPropertySheetMarker):
 
 class TextSchema(Schema):
 
-    title =  colander.SchemaNode(colander.String())
+    title =  colander.SchemaNode(colander.String(), default="")
 
-    content =  colander.SchemaNode(colander.String())
+    content =  colander.SchemaNode(colander.String(), default="")
