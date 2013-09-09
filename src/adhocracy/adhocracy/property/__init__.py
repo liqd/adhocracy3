@@ -10,7 +10,7 @@ from substanced.interfaces import IPropertySheet
 from substanced.schema import NameSchemaNode
 from substanced.util import renamer
 
-from adhocracy3.schema import ReferenceSupergraphBaseSchemaNode
+from adhocracy.schema import ReferenceSupergraphBaseSchemaNode
 
 
 def set_property_object(schemanode, context, name):
@@ -29,16 +29,29 @@ def set_property_object(schemanode, context, name):
 
 @implementer(IPropertySheet)
 class PropertySheetAdhocracyContent(PropertySheet):
-    """Subtyped to set required property objects.
-    """
+    """Subtyped to:
 
+            * set required property objects.
+            * set permission attributes
+            * added method to return serialized data (cstruct)
+            * don't save "readonly" SchemaNodes,
+              (works only  with first level SchemaNode children)
+    """
+    #TODO add interface
+
+    view_permission = "view"
+    edit_permission = "content-edit"
+
+    #TODO check permissions
     def set(self, struct, omit=()):
         if not is_nonstr_iter(omit):
             omit = (omit,)
         changed = False
         for child in self.schema:
             name = child.name
-            if (name in struct) and not (name in omit):
+            #check readonly fields
+            readonly = getattr(child, "readonly", False)
+            if (name in struct) and not (name in omit) and not readonly:
                 # avoid setting an attribute on the object if it's the same
                 # value as the existing value to avoid database bloat
                 existing_val = getattr(self.context, name, _marker)
@@ -51,3 +64,14 @@ class PropertySheetAdhocracyContent(PropertySheet):
                     setattr(self.context, name, new_val)
                     changed = True
         return changed
+
+
+    def cstruct(self):
+        """Retruns dictionary with serialized colander schema data (cstruct).
+        """
+        # TODO enforce validated appstruct data,
+        appstruct = self.get()
+        cstruct = self.schema.serialize(appstruct)
+        if "_csrf_token_" in cstruct:
+            del cstruct["_csrf_token_"]
+        return cstruct

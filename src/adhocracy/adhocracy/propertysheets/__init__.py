@@ -1,13 +1,12 @@
 from zope.interface import (
     implementer,
     )
-from zope.component import adapter
 from zope.dottedname.resolve import resolve
 from pyramid.interfaces import IRequest
 from substanced.interfaces import IPropertySheet
 
-from adhocracy3.property import PropertySheetAdhocracyContent
-from adhocracy3.resources import interfaces
+from adhocracy.property import PropertySheetAdhocracyContent
+from adhocracy import interfaces
 
 # PropertySheet adapters
 # read sdi/views/property for adapter lookup examples
@@ -41,6 +40,7 @@ def propertysheet_itext_adapter(context, request):
 
 def includeme(config): # pragma: no cover
 
+    # TODO more DRY for adapter registration
     config.registry.registerAdapter(
         propertysheet_iname_adapter,
         (interfaces.IName, IRequest),

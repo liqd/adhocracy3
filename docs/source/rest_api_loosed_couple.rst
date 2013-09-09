@@ -4,18 +4,18 @@ Adhocracy 3 loosed coupling REST-API with substance-d backend
 GET /instance/app/w/test
 content::
 
+    content_type: IParteiProgramm
+
     meta:
         id: test
-        maininterface: IParteiProgramm
-        content-type-id: parteiprogramm
-        content-type-name: Partei-Programm
-        node-state: pending
-        workflow-state: public
+        path: "/instances/spd.."
+        content_type: IParteiProgramm
+        content_type_name: Partei-Programm
+        workflow_state: public
         creator: /users/principal1
-        creation-date: 16.01.2013 16:33
-
+        creation_date: 16.01.2013 16:33
+        ..
     data:
-        IParteiProgramm:
         IDocument:
             title:  Title
             text: Bla
@@ -37,21 +37,30 @@ content::
                ...
 
     children:            NOTE: this can be huge
-        [p1, "Paragraph-Title", "paragraph", "pending", "public"]
-
-        [p2, "Paragraph-Title", "paragraph", "head", "public"]
-
-        ...
+        {id: test, path: "/instance", ..}
+elf.context.values(       ...
 
 HEAD /instance/app/w/test::
 
     Get only meta data
 
+
+POST/PUT /instance/app/w/test
+content::
+
+    content_type: IParteiProgramm
+
+    data:
+        IDocument:
+            title:  Title
+            text: Bla
+        ...
+
 OPTIONS /instance/app/w/test::
 
-    GET: [IParteiProgramm, IVersionable, IContents, ILikable]
-    PUT: [IParteiProgramm, IVersionable, IContents]
-    POST: [Paragraph, Location, Image]   NOTE: addable content types
+    GET: [IDocument, IVersionable, IContents, ILikable]
+    PUT: [IDocument, IVersionable, IContents]
+    POST: [IPargraph, IText, ILocation, IImage]   NOTE: addable content types
 
 GET /interfaces/..::
 

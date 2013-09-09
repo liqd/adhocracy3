@@ -37,7 +37,7 @@ class AdhocracyContentRegistry(ContentRegistry):
         # TODO evil hack
         addables =[resolve(x) for x in meta.get("addable_content_interfaces",
                                                  [])]
-        maybe_addables = [resolve(x) for x in self.all() if "adhocracy3" in x ]
+        maybe_addables = [resolve(x) for x in self.all() if "adhocracy" in x ]
         all_addables = []
         for maybe in maybe_addables:
             for addable in addables:
