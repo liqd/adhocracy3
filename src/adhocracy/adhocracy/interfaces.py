@@ -163,7 +163,7 @@ class VersionableSchema(Schema):
 class IDocument(IPropertySheetMarker):
     """Marker interfaces representing a node with document data """
 
-    taggedValue("schema", "adhocracy.interfaces.TextSchema")
+    taggedValue("schema", "adhocracy.interfaces.DocumentSchema")
     taggedValue("view_permission", "view")
     taggedValue("edit_permission", "edit-content")
 

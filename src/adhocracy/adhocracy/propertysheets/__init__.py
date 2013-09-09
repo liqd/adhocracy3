@@ -30,7 +30,7 @@ def propertysheet_iversionable_adapter(context, request):
 
 
 @implementer(IPropertySheet)
-def propertysheet_itext_adapter(context, request):
+def propertysheet_idocument_adapter(context, request):
     schema_dotted = interfaces.IDocument.getTaggedValue('schema')
     schema = resolve(schema_dotted)
     sheet = PropertySheetAdhocracyContent(context, request)
@@ -54,7 +54,7 @@ def includeme(config): # pragma: no cover
         interfaces.IVersionable.__identifier__)
 
     config.registry.registerAdapter(
-        propertysheet_itext_adapter,
+        propertysheet_idocument_adapter,
         (interfaces.IDocument, IRequest),
         IPropertySheet,
         interfaces.IDocument.__identifier__)

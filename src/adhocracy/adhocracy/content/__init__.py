@@ -109,10 +109,11 @@ def container(context):
     factory_type = 'proposal',
     is_implicit_addable = True
     )
-@implementer(interfaces.IProposal, interfaces.INameReadonly, interfaces.IVersionable)
+@implementer(interfaces.IProposal, interfaces.INameReadonly,
+             interfaces.IDocument, interfaces.IVersionable)
 def proposal(context):
     content = Folder()
-    directlyProvides(content, implementedBy(node).interfaces())
+    directlyProvides(content, implementedBy(proposal).interfaces())
     return content
 
 
@@ -128,8 +129,8 @@ def proposal(context):
 def proposalcontainer(context):
     content = Folder()
     node_content_type =\
-        interfaces.INodeContainer.getTaggedValue('node_content_type')
-    directlyProvides(content, implementedBy(container).interfaces())
+        interfaces.IProposalContainer.getTaggedValue('node_content_type')
+    directlyProvides(content, implementedBy(proposalcontainer).interfaces())
     registry = get_current_registry()
     content["_versions"] = registry.content.create(\
                                 interfaces.INodeVersions.__identifier__, context)
