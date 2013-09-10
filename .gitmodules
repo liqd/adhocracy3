@@ -1,3 +1,6 @@
 [submodule "python/buildout.python"]
 	path = python/buildout.python
 	url = git@github.com:collective/buildout.python.git
+[submodule "substanced"]
+	path = substanced
+	url = git@github.com:Pylons/substanced.git
