@@ -1,6 +1,6 @@
 (function($, obviel) {
 
-    obviel.view(ad.Editable({
+    obviel.view({
         iface: 'IProposalContainer',
         before: function() {
             children_urls = [];
@@ -10,7 +10,7 @@
             this.obj.children_urls = children_urls;
         },
         obvtUrl: 'templates/IProposalContainer.obvt',
-    }));
+    });
 
     obviel.view(ad.Editable({
         iface: 'IProposal',
@@ -25,6 +25,11 @@
     obviel.view({
         iface: 'INodeVersions',
         obvtUrl: "templates/INodeVersions.obvt"
+    });
+
+    obviel.view({
+        iface: "formlist",
+        obvt: '<div data-repeat="elements" data-render="@."></div>'
     });
 
 

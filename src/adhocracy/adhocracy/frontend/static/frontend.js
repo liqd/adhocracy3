@@ -33,7 +33,7 @@
     ad.Editable = function(child) {
         var result = {
             edit: function(ev) {
-                    this.el.render(toForm(this.obj));
+                    this.el.render(toForms(this.obj));
                 },
         };
         $.extend(result, child);

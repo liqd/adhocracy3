@@ -6,14 +6,22 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 };
 
+function toForms(obj) {
+    var result = [];
+    for (i in obj.data) {
+        result.push(toForm(obj.data[i]));
+    };
+    return {
+        iface: "formlist",
+        elements: result
+    };
+};
+
 // Converts an obviel model to an obviel form.
-function toForm(obj) {
+function toForm(data) {
     subwidgets = [];
-    main_data = obj[obj.main_interface];
-    for (i in main_data) {
-	if (i !== 'iface') {
-            subwidgets.push(toWidget(i, main_data[i]));
-	}
+    for (i in data) {
+        subwidgets.push(toWidget(i, data[i]));
     };
     form = {
         ifaces: ["viewform"],
@@ -26,9 +34,8 @@ function toForm(obj) {
                 },
             ],
         },
-        data: main_data,
+        data: data,
     };
-    // console.log(obj);
     console.log(form);
     return form;
 };
@@ -40,7 +47,16 @@ function toWidget(key, model) {
             return {
                 ifaces: ["textlineField"],
                 name: key,
-                title: "Text",
+                title: key,
+                validate: {
+                    required: true,
+                },
+            };
+        case "object":
+            return {
+                ifaces: ["textlineField"],
+                name: key,
+                title: key,
                 validate: {
                     required: true,
                 },
