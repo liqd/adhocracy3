@@ -49,6 +49,7 @@ class AdhocracyContentRegistry(ContentRegistry):
                 if implicit and issubclass(maybe, addable):
                     addit = True
                 addit and all_addables.append(maybe.__identifier__)
+        all_addables.sort()
         return all_addables
 
 
