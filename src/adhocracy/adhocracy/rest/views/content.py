@@ -180,3 +180,34 @@ class ContentView():
             sheet = self.registry.getMultiAdapter((content, self.request), IPropertySheet, ifacename)
             sheet.set(data["data"][ifacename])
         return {"path:": resource_path(content)}
+
+
+@view_defaults(
+    renderer = 'jsoncolander',
+    context = INode
+)
+class NodeView():
+    """Default views for supergraph nodes.
+    """
+    @view_config(request_method='PUT')
+    def put(self):
+        #validate request data
+        # TODO validate and require correct IVersionable data
+        validate_request_data(ContentPUTSchema, self.request)
+        data = self.request.validated
+        #create new node content
+        content = self.registry.create(data["content_type"], self.context)
+        #set content data
+        for ifacename in data["data"]:
+            sheet = self.registry.getMultiAdapter((content, self.request), IPropertySheet, ifacename)
+            sheet.set(data["data"][ifacename])
+        #add new node content to parent
+        parent = self.context.__parent__
+        if IAutoNamingFolder.provided_by(parent):
+            parent.add_next(content)
+        else:
+            parent.add(str(time.time()), content)
+        return {"path:": resource_path(content)}
+
+
+
