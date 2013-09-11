@@ -1,4 +1,4 @@
-<span data-with="data.IDocument">
+<span data-with="data.adhocracy#interfaces#IDocument">
     <button data-on="click|edit">edit</button>
     <hr />
     <h3>Proposal: {title}</h3>

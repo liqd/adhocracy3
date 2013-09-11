@@ -110,7 +110,7 @@ class ContentView():
         data = MetaSchema().serialize()
         data["name"] = context.__name__
         data["path"] = resource_path(context).split(".")[-1]
-        data["content_type"] = self.request.registry.content.typeof(context).split(".")[-1]
+        data["content_type"] = self.request.registry.content.typeof(context)
         data["content_type_name"] = data["content_type"]
         # FIXME: Merge question: Do we want this?
         #data["oid"] = get_oid(context)
@@ -125,7 +125,7 @@ class ContentView():
         # data
         for ifacename, sheet in self.viewable_sheets.items():
             cstruct = sheet.cstruct()
-            data["data"][ifacename.split(".")[-1]] = cstruct
+            data["data"][ifacename] = cstruct
         # children
         meta_children = [self.meta(child) for child in self.children]
         data["children"] = meta_children
