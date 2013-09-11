@@ -18,6 +18,11 @@
     }));
 
     obviel.view({
+        iface: 'adhocracy.interfaces.IParagraph',
+        obvtUrl: 'templates/IParagraph.obvt',
+    });
+
+    obviel.view({
         iface: 'adhocracy.interfaces.INodeTags',
         obvt: "_tags"
     });
