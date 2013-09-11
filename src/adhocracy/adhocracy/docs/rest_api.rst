@@ -4,23 +4,28 @@ Adhocracy 3 loosed coupling REST-API with substance-d backend
 Prerequist ::
 --------------
 
+usefull imports to work with rest api calls  ::
+
     >>> import requests
-    >>> import json
     >>> from pprint import pprint
+
+start adhocracy testapp ::
+
     >>> from webtest import TestApp
     >>> from adhocracy.testing import config
     >>> from adhocracy import main
     >>> app = main({}, **config)
+    Executing evolution step ...
     >>> testapp = TestApp(app)
 
 
-Working with Pool content
--------------------------
+Basic calls, working with Pool content
+--------------------------------------
 
 OPTIONS ::
 
-    >>> resp = requests.options("http://localhost:6541/adhocracy")
-    >>> pprint(resp.json())
+    >>> resp = testapp.options("/adhocracy")
+    >>> pprint(resp.json)
     {'GET': ['adhocracy.interfaces.IName'],
      'HEAD': [],
      'POST': ['adhocracy.interfaces.INodeContainer',
@@ -30,19 +35,16 @@ OPTIONS ::
 
 HEAD ::
 
-    >>> resp = requests.head("http://localhost:6541/adhocracy")
-    >>> headers = [x for x in resp.headers]
-    >>> headers.sort()
-    >>> headers
-    ['content-length', 'content-type', 'date', 'server']
+    >>> resp = testapp.head("/adhocracy")
+    >>> resp.headerlist # doctest: +ELLIPSIS
+    [('Content-Type', 'application/json; charset=UTF-8'), ...
     >>> resp.text
     ''
 
-
 GET::
 
-    >>> resp = requests.get("http://localhost:6541/adhocracy", )
-    >>> pprint(resp.json())
+    >>> resp = testapp.get("/adhocracy", )
+    >>> pprint(resp.json)
     {'children': [],
      'content_type': 'adhocracy.interfaces.IPool',
      'data': {'adhocracy.interfaces.IName': {'name': ''}},
@@ -51,7 +53,7 @@ GET::
               'creation_date': '',
               'creator': '',
               'name': 'adhocracy',
-              'oid': 8339204787337977585,
+              'oid': ...
               'path': '/adhocracy',
               'workflow_state': ''}}
 
@@ -60,36 +62,23 @@ PUT::
 
     >>> data = {'content_type': 'adhocracy.interfaces.IPool',
     ...         'data': {'adhocracy.interfaces.IName': {'name': 'NEWTITLE'}}}
-    >>> resp = requests.put("http://localhost:6541/adhocracy", data=json.dumps(data))
-    >>> pprint(resp.json())
-    {'path:': '/adhocracy'}
-
-    >>> data['data'] = {'adhocracy.interfaces.IName': {'name': ''}}
-    >>> resp = requests.put("http://localhost:6541/adhocracy", data=json.dumps(data))
+    >>> resp = testapp.put_json("/adhocracy", data)
+    >>> resp.json
+    {'path': '/adhocracy'}
 
 
-
-POST:
+POST::
 
     >>> data = {'content_type': 'adhocracy.interfaces.IProposalContainer',
     ...         'data': {'adhocracy.interfaces.IName': {'name': 'proposal1'}}}
-    >>> resp = requests.post("http://localhost:6541/adhocracy", data=json.dumps(data))
-    >>> pprint(resp.json())
-    {"path": "/adhocracy/proposal1...
+    >>> resp = testapp.post_json("/adhocracy", data)
+    >>> resp.json
+    {'path': '/adhocracy/proposal1'}
 
 
 Interfaces ::
 
      ..data:
-        ..IDocument:
-            ..title:  Title
-            ..description: Bla
-        ..IVersionable:
-            ..follows:
-                ../instances/spd/w/test0
-            ..followed_by:
-                ../instances/spd/w/test1
-                ../instances/spd/w/test2
         ..IContents:
             ..contents:
                 ../instances/spd/w/test/p1
@@ -106,17 +95,32 @@ Working with Node content
 
 The new PropsalContainer has a child _versions to store all proposal node versions ::
 
-    >>> resp = requests.get("http://localhost:6541/adhocracy/proposal1/_versions")
-    >>> pprint(resp.json()["children"])
+    >>> resp = testapp.get("/adhocracy/proposal1/_versions")
+    >>> children = resp.json["children"]
+    >>> len(children)
+    1
 
-The initial node without follows nodes is already there ::
+The initial node without follow Nodes is already there ::
 
+    >>> proposal = children[0]
+    >>> resp = testapp.get(proposal["path"])
+    >>> pprint(resp.json["data"])
+    {'adhocracy.interfaces.IDocument': {'description': '', 'title': ''},
+     'adhocracy.interfaces.IVersionable': {'follows': []}}
 
 
 If we change this node we create a new version ::
 
-NOTE: PUT for INode content is not idempotent this breaks the REST architecture principles
+    >>> data =  {'content_type': 'adhocracy.interfaces.IProposal',
+    ...          'data': {'adhocracy.interfaces.IDocument': {'description': 'synopsis', 'title': 'title'},
+    ...                   'adhocracy.interfaces.IVersionable': {'follows': []}}}
+    >>> resp = testapp.put_json(proposal["path"], data)
+    >>> resp.json
+    {'path': '/adhocracy/proposal1/_versions/...
+    >>> resp.json['path'] != proposal["path"]
+    True
 
+NOTE: PUT for INode content is not idempotent this breaks the REST architecture principles
 
 
 GET /interfaces/..::

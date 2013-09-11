@@ -9,6 +9,7 @@ config = {"pyramid.includes": ["pyramid_zodbconn", "pyramid_tm"],
           "substanced.initial_email": "admin@example.com",
           "substanced.autosync_catalogs": "true",
           "substanced.statsd.enabled": "false ",
+          "substanced.autoevolve": "true",
     }
 
 
