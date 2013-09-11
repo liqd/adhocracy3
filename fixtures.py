@@ -36,7 +36,7 @@ if do_everything or True:
     pprint(resp.json())
     exit(0)  # this is still crashing.
 
-    var v21 = resp.json())
+    v21 = resp.json()
 
     # v2.2, follows v1
     # v2.3, follows v1
