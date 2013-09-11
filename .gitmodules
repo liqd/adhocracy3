@@ -1,6 +1,15 @@
 [submodule "python/buildout.python"]
 	path = python/buildout.python
 	url = git@github.com:collective/buildout.python.git
-[submodule "substanced"]
-	path = substanced
-	url = git@github.com:Pylons/substanced.git
+[submodule "jquery"]
+	path = src/adhocracy/adhocracy/frontend/static/submodules/jquery
+	url = git://github.com/jquery/jquery
+[submodule "jquery-datalink"]
+	path = src/adhocracy/adhocracy/frontend/static/submodules/jquery-datalink
+	url = git://github.com/BorisMoore/jquery-datalink
+[submodule "obviel"]
+	path = src/adhocracy/adhocracy/frontend/static/submodules/obviel
+	url = git://github.com/adhocracy/obviel
+[submodule "jquery-bbq"]
+	path = src/adhocracy/adhocracy/frontend/static/submodules/jquery-bbq
+	url = git@github.com:cowboy/jquery-bbq.git

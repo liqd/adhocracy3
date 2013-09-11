@@ -13,6 +13,9 @@ def main(global_config, **settings):
     config.include('.contentregistry')
     config.include('.evolution')
     config.include('.rest')
+
+    config.include('.frontend')
+
     config.scan()
 
     return config.make_wsgi_app()

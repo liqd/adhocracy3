@@ -1,0 +1,11 @@
+{
+    "main_interface": "document",
+    "other_interfaces": [],
+    "document": {
+        "title": "title.json",
+        "paragraphs": [
+            "document/paragraph1.json",
+            "document/paragraph2.json"
+        ]
+    }
+}

@@ -1,0 +1,5 @@
+<ol>
+    <li data-repeat="children">
+        <a href="#{path}">{name}</a>
+    </li>
+</ol>

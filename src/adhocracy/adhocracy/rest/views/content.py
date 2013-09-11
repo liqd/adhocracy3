@@ -124,7 +124,7 @@ class ContentView():
         # data
         for ifacename, sheet in self.viewable_sheets.items():
             cstruct = sheet.cstruct()
-            data["data"][ifacename] = cstruct
+            data["data"][ifacename.split(".")[-1]] = cstruct
         # children
         meta_children = [self.meta(child) for child in self.children]
         data["children"] = meta_children

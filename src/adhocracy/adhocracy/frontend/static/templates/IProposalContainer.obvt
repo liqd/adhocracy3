@@ -1,0 +1,8 @@
+{@.}
+
+<hr />
+Proposals:
+
+<br />
+
+<div data-repeat='children_urls' data-render="@."></div>
