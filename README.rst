@@ -102,7 +102,7 @@ running the zodb server (in background) ::
 
 updating the object structure ::
 
-    .bin/sd_evolve etc/development.ini
+    ./bin/sd_evolve etc/development.ini
 
 serving the sdidemo wsgi app using pserve ::
 

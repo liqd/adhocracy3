@@ -13,3 +13,6 @@
 [submodule "jquery-bbq"]
 	path = src/adhocracy/adhocracy/frontend/static/submodules/jquery-bbq
 	url = git@github.com:cowboy/jquery-bbq.git
+[submodule "substanced"]
+	path = substanced
+	url = git@github.com:Pylons/substanced.git
