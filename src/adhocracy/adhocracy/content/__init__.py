@@ -139,3 +139,41 @@ def proposalcontainer(context):
     content["_versions"].add_next(registry.content.create(node_content_type,
                                                           context))
     return content
+
+
+@content(
+    'adhocracy.interfaces.IParagraph',
+    add_view='add_paragraph',
+    factory_type = 'paragraph',
+    is_implicit_addable = True
+    )
+@implementer(interfaces.IParagraph, interfaces.INameReadonly,
+             interfaces.IText, interfaces.IVersionable)
+def paragraph(context):
+    content = Folder()
+    directlyProvides(content, implementedBy(paragraph).interfaces())
+    return content
+
+
+@content(
+    'adhocracy.interfaces.IParagraphContainer',
+    add_view='add_paragraphcontainer',
+    factory_type = 'paragraphcontainer',
+    addable_content_interfaces =
+        ["adhocracy.interfaces.IParagraphContainer"],
+    is_implicit_addable = True
+    )
+@implementer(interfaces.INodeContainer, interfaces.IName)
+def paragraphcontainer(context):
+    content = Folder()
+    node_content_type =\
+        interfaces.IParagraphContainer.getTaggedValue('node_content_type')
+    directlyProvides(content, implementedBy(paragraphcontainer).interfaces())
+    registry = get_current_registry()
+    content["_versions"] = registry.content.create(\
+                                interfaces.INodeVersions.__identifier__, context)
+    content["_tags"] = registry.content.create(\
+                                interfaces.INodeTags.__identifier__, context)
+    content["_versions"].add_next(registry.content.create(node_content_type,
+                                                          context))
+    return content

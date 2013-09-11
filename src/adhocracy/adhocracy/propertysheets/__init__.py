@@ -38,6 +38,15 @@ def propertysheet_idocument_adapter(context, request):
     return sheet
 
 
+@implementer(IPropertySheet)
+def propertysheet_itext_adapter(context, request):
+    schema_dotted = interfaces.IText.getTaggedValue('schema')
+    schema = resolve(schema_dotted)
+    sheet = PropertySheetAdhocracyContent(context, request)
+    sheet.schema = schema()
+    return sheet
+
+
 def includeme(config): # pragma: no cover
 
     # TODO more DRY for adapter registration
@@ -58,3 +67,9 @@ def includeme(config): # pragma: no cover
         (interfaces.IDocument, IRequest),
         IPropertySheet,
         interfaces.IDocument.__identifier__)
+
+    config.registry.registerAdapter(
+        propertysheet_itext_adapter,
+        (interfaces.IText, IRequest),
+        IPropertySheet,
+        interfaces.IText.__identifier__)
