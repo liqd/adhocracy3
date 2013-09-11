@@ -18,9 +18,12 @@ from substanced.interfaces import (
     IFolder,
 )
 from substanced.folder import FolderKeyError
+from substanced.interfaces import IAutoNamingFolder
+from substanced.util import get_oid
 
 from adhocracy.interfaces import (
     IContent,
+    INode,
     )
 from adhocracy.rest.views.interfaces import (
     ContentGETSchema,
@@ -69,8 +72,9 @@ class ContentView():
         """Returns dictwith interface-name as keys and property sheet as
            values.
         """
-        sheets = self.registry.getAdapters((self.context, self.request),
-                                           IPropertySheet,)
+        sheets = list(self.registry.getAdapters((self.context, self.request),
+                                                IPropertySheet,))
+        sheets.sort()
         return dict(sheets)
 
     @reify
@@ -89,6 +93,7 @@ class ContentView():
             permission = sheet.edit_permission
             if has_permission(permission, self.context, self.request):
                 sheets[ifacename] = sheet
+        return sheets
 
     @reify
     def addable_content_types(self):
@@ -100,9 +105,21 @@ class ContentView():
         context = self.context
         return context.values() if IFolder.providedBy(context) else []
 
+    def meta(self, context=None):
+        context = context or self.context
+        data = MetaSchema().serialize()
+        data["name"] = context.__name__
+        data["path"] = resource_path(context).split(".")[-1]
+        data["content_type"] = self.request.registry.content.typeof(context).split(".")[-1]
+        data["content_type_name"] = data["content_type"]
+        # FIXME: Merge question: Do we want this?
+        #data["oid"] = get_oid(context)
+        return data
+
     @view_config(request_method='GET')
     def get(self):
         data = ContentGETSchema().serialize()
+        data["content_type"] = self.meta()["content_type"]
         # meta
         data["meta"] = self.head()
         # data
@@ -110,19 +127,13 @@ class ContentView():
             cstruct = sheet.cstruct()
             data["data"][ifacename.split(".")[-1]] = cstruct
         # children
-        meta_children = [self.head(child) for child in self.children]
+        meta_children = [self.meta(child) for child in self.children]
         data["children"] = meta_children
         return data
 
     @view_config(request_method='HEAD')
-    def head(self, context=None):
-        context = context or self.context
-        data = MetaSchema().serialize()
-        data["name"] = context.__name__
-        data["path"] = resource_path(context)
-        data["content_type"] = self.request.registry.content.typeof(context).split(".")[-1]
-        data["content_type_name"] = data["content_type"]
-        return data
+    def head(self):
+        return self.meta()
 
     @view_config(request_method='OPTIONS')
     def options(self):
@@ -130,9 +141,11 @@ class ContentView():
         if self.addable_content_types:
             data["POST"] = self.addable_content_types
         if self.editable_sheets:
-            data["PUT"] = self.editable_sheets
+            data["PUT"] = [x for x in self.editable_sheets]
         if self.viewable_sheets:
-            data["GET"] = self.viewable_sheets
+            data["GET"] = [x for x in self.viewable_sheets]
+        if self.meta:
+            data["HEAD"] = []
         return data
 
     @view_config(request_method='POST')

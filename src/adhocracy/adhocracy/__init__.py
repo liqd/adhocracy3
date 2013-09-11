@@ -11,6 +11,7 @@ def main(global_config, **settings):
     config.commit() # commit to allow proper config overrides
     config.include('.propertysheets')
     config.include('.contentregistry')
+    config.include('.evolution')
     config.include('.rest')
 
     config.include('.frontend')

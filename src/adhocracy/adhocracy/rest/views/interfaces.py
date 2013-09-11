@@ -17,6 +17,8 @@ class MetaSchema(colander.MappingSchema):
 
     creation_date = colander.SchemaNode(colander.String(), default=u"")
 
+    oid = colander.SchemaNode(colander.Integer(), default=0)
+
 
 class MetaListSchema(colander.SequenceSchema):
 
