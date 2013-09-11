@@ -3,4 +3,7 @@
     <hr />
     <h3>Proposal: {title}</h3>
     <small>{description}</small>
+    <ol>
+        <li data-repeat="paragraphs" data-render="@."></li>
+    </ol>
 </span>
