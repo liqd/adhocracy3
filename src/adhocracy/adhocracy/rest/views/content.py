@@ -124,7 +124,7 @@ class ContentView():
         # data
         for ifacename, sheet in self.viewable_sheets.items():
             cstruct = sheet.cstruct()
-            data["data"][ifacename.split(".")[-1]] = cstruct
+            data["data"][ifacename] = cstruct
         # children
         meta_children = [self.meta(child) for child in self.children]
         data["children"] = meta_children
@@ -167,7 +167,7 @@ class ContentView():
         except (FolderKeyError, ValueError):
             name += str(time.time())
         self.context.add(name, content)
-        return {"path:": resource_path(content)}
+        return {"path": resource_path(content)}
 
     @view_config(request_method='PUT')
     def put(self):
@@ -179,16 +179,29 @@ class ContentView():
         for ifacename in data["data"]:
             sheet = self.registry.getMultiAdapter((content, self.request), IPropertySheet, ifacename)
             sheet.set(data["data"][ifacename])
-        return {"path:": resource_path(content)}
+        return {"path": resource_path(content)}
 
 
 @view_defaults(
     renderer = 'jsoncolander',
     context = INode
 )
-class NodeView():
+class NodeView(ContentView):
     """Default views for supergraph nodes.
     """
+
+    @view_config(request_method='GET')
+    def get(self):
+        return super(NodeView, self).get()
+
+    @view_config(request_method='HEAD')
+    def head(self):
+        return super(NodeView, self).head()
+
+    @view_config(request_method='OPTIONS')
+    def options(self):
+        return super(NodeView, self).options()
+
     @view_config(request_method='PUT')
     def put(self):
         #validate request data
@@ -196,18 +209,18 @@ class NodeView():
         validate_request_data(ContentPUTSchema, self.request)
         data = self.request.validated
         #create new node content
-        content = self.registry.create(data["content_type"], self.context)
+        content = self.registry.content.create(data["content_type"], self.context)
         #set content data
         for ifacename in data["data"]:
             sheet = self.registry.getMultiAdapter((content, self.request), IPropertySheet, ifacename)
             sheet.set(data["data"][ifacename])
         #add new node content to parent
         parent = self.context.__parent__
-        if IAutoNamingFolder.provided_by(parent):
+        if IAutoNamingFolder.providedBy(parent):
             parent.add_next(content)
         else:
             parent.add(str(time.time()), content)
-        return {"path:": resource_path(content)}
+        return {"path": resource_path(content)}
 
 
 
