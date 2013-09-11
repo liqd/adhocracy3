@@ -112,8 +112,7 @@ class ContentView():
         data["path"] = resource_path(context).split(".")[-1]
         data["content_type"] = self.request.registry.content.typeof(context)
         data["content_type_name"] = data["content_type"]
-        # FIXME: Merge question: Do we want this?
-        #data["oid"] = get_oid(context)
+        data["oid"] = get_oid(context)
         return data
 
     @view_config(request_method='GET')
