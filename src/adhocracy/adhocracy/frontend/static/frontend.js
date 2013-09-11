@@ -10,6 +10,11 @@
         };
         obj.ifaces = [main_interface];
 
+        for (i in obj.data) {
+            obj.data[i.replace(/\./g, "#")] = obj.data[i];
+            delete obj.data[i];
+        }
+
         // sub-interfaces: a node can be all of 'document',
         // 'commentable', 'likeable'.  the following loop iterates
         // over the latter two.  XXX: explain better.

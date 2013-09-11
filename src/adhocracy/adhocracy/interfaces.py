@@ -104,6 +104,14 @@ class IProposalContainer(INodeContainer):
 
     taggedValue("node_content_type", "adhocracy.interfaces.IProposal")
 
+class IParagraph(INode):
+    """Paragraph of documents"""
+
+class IParagraphContainer(INodeContainer):
+    """IParagraph DAG"""
+
+    taggedValue("node_content_type", "adhocracy.interfaces.IParagraph")
+
 
 # Name Data
 
@@ -173,3 +181,22 @@ class DocumentSchema(Schema):
     title =  colander.SchemaNode(colander.String(), default="")
 
     description =  colander.SchemaNode(colander.String(), default="")
+
+    paragraphs = ReferenceSetSchemaNode(essence_refs=True,
+                                        default=[],
+                                        missing=[],
+                                        interface=IParagraph)
+
+# Text Data
+
+class IText(IPropertySheetMarker):
+    """Marker for nodes that contain text."""
+
+    taggedValue("schema", "adhocracy.interfaces.TextSchema")
+    taggedValue("view_permission", "view")
+    taggedValue("edit_permission", "edit-content")
+
+
+class TextSchema(Schema):
+
+    text = colander.SchemaNode(colander.String(), default="")

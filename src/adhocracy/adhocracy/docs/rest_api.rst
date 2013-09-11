@@ -29,6 +29,7 @@ OPTIONS ::
     {'GET': ['adhocracy.interfaces.IName'],
      'HEAD': [],
      'POST': ['adhocracy.interfaces.INodeContainer',
+              'adhocracy.interfaces.IParagraphContainer',
               'adhocracy.interfaces.IPool',
               'adhocracy.interfaces.IProposalContainer'],
      'PUT': ['adhocracy.interfaces.IName']}
@@ -105,8 +106,11 @@ The initial node without follow Nodes is already there ::
     >>> proposal = children[0]
     >>> resp = testapp.get(proposal["path"])
     >>> pprint(resp.json["data"])
-    {'adhocracy.interfaces.IDocument': {'description': '', 'title': ''},
+    {'adhocracy.interfaces.IDocument': {'description': '',
+                                        'paragraphs': [],
+                                        'title': ''},
      'adhocracy.interfaces.IVersionable': {'follows': []}}
+
 
 
 If we change this node we create a new version ::

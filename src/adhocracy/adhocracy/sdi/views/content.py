@@ -117,3 +117,34 @@ class AddProposalContainerView(AddPoolBaseView):
     permission='sdi.add-content',
     renderer='substanced.sdi:templates/form.pt',
     tab_condition=False,
+
+
+@mgmt_view(
+    context=IAutoNamingFolder,
+    name='add_paragraph',
+    tab_title='Add Paragraph',
+    permission='sdi.add-content',
+    renderer='substanced.sdi:templates/form.pt',
+    tab_condition=False,
+    )
+class AddParagraphView(AddNodeBaseView):
+    title = 'Add Paragraph'
+    contenttype = 'adhocracy.interfaces.IParagraph'
+
+
+@mgmt_view(
+    context=IFolder,
+    name='add_paragraphcontainer',
+    tab_title='Add ParagraphContainer',
+    permission='sdi.add-content',
+    renderer='substanced.sdi:templates/form.pt',
+    tab_condition=False,
+    )
+class AddParagraphContainerView(AddPoolBaseView):
+    title = 'Add ParagraphContainer'
+    contenttype = 'adhocracy.interfaces.IParagraphContainer'
+    name='add_paragraph',
+    tab_title='Add Paragraph',
+    permission='sdi.add-content',
+    renderer='substanced.sdi:templates/form.pt',
+    tab_condition=False,

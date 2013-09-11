@@ -109,7 +109,7 @@ class ContentView():
         context = context or self.context
         data = MetaSchema().serialize()
         data["name"] = context.__name__
-        data["path"] = resource_path(context)
+        data["path"] = resource_path(context).split(".")[-1]
         data["content_type"] = self.request.registry.content.typeof(context)
         data["content_type_name"] = data["content_type"]
         data["oid"] = get_oid(context)

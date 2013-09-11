@@ -1,12 +1,15 @@
 from zope.interface import (
     Interface,
     )
+from pyramid.threadlocal import get_current_request
 from substanced import schema
 from substanced.util import (
     find_catalog,
     get_oid,
     )
 from substanced.objectmap import reference_sourceid_property
+from substanced.util import find_objectmap
+import colander
 
 
 def get_all_content(node, context, request):
@@ -33,6 +36,18 @@ class ReferenceSupergraphBaseSchemaNode(schema.MultireferenceIdSchemaNode):
 
        reference_type = self.name
        return reference_sourceid_property(reference_type)
+
+   def serialize(self, appstruct = colander.null):
+        oids = list(colander.SchemaNode.serialize(self, appstruct))
+        request = get_current_request()
+        object_map = find_objectmap(request.context)
+
+        refs = []
+        for string_oid in oids:
+            path = "/".join(object_map.path_for(int(string_oid)))
+            refs.append(path)
+        return refs
+
 
 
 class ReferenceSetSchemaNode(ReferenceSupergraphBaseSchemaNode):
