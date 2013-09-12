@@ -22,7 +22,11 @@ start adhocracy testapp ::
 Basic calls, working with Pool content
 --------------------------------------
 
-OPTIONS ::
+OPTIONS
+~~~~~~~
+
+Returns possible methods for this resource and available interfaces
+with resources data::
 
     >>> resp = testapp.options("/adhocracy")
     >>> pprint(resp.json)
@@ -34,7 +38,10 @@ OPTIONS ::
               'adhocracy.interfaces.IProposalContainer'],
      'PUT': ['adhocracy.interfaces.IName']}
 
-HEAD ::
+HEAD
+~~~~
+
+Returns only http headers for this resource::
 
     >>> resp = testapp.head("/adhocracy")
     >>> resp.headerlist # doctest: +ELLIPSIS
@@ -42,7 +49,10 @@ HEAD ::
     >>> resp.text
     ''
 
-GET::
+GET
+~~~~
+
+Returns resource meta data, children meta data and all interfaces with data::
 
     >>> resp = testapp.get("/adhocracy", )
     >>> pprint(resp.json)
@@ -59,7 +69,10 @@ GET::
               'workflow_state': ''}}
 
 
-PUT::
+PUT
+~~~~
+
+Modify and return the path of the modified resource::
 
     >>> data = {'content_type': 'adhocracy.interfaces.IPool',
     ...         'data': {'adhocracy.interfaces.IName': {'name': 'NEWTITLE'}}}
@@ -68,7 +81,10 @@ PUT::
     {'path': '/adhocracy'}
 
 
-POST::
+POST
+~~~~
+
+Create new resource and return the path::
 
     >>> data = {'content_type': 'adhocracy.interfaces.IProposalContainer',
     ...         'data': {'adhocracy.interfaces.IName': {'name': 'proposal1'}}}
@@ -103,8 +119,8 @@ The new PropsalContainer has a child _versions to store all proposal node versio
 
 The initial node without follow Nodes is already there ::
 
-    >>> proposal = children[0]
-    >>> resp = testapp.get(proposal["path"])
+    >>> proposalv1 = children[0]
+    >>> resp = testapp.get(proposalv1["path"])
     >>> pprint(resp.json["data"])
     {'adhocracy.interfaces.IDocument': {'description': '',
                                         'paragraphs': [],
@@ -113,18 +129,21 @@ The initial node without follow Nodes is already there ::
 
 
 
-If we change this node we create a new version ::
+If we change this node we create a new version, so we have to mind
+the right follows relation ::
 
     >>> data =  {'content_type': 'adhocracy.interfaces.IProposal',
     ...          'data': {'adhocracy.interfaces.IDocument': {'description': 'synopsis', 'title': 'title'},
-    ...                   'adhocracy.interfaces.IVersionable': {'follows': []}}}
-    >>> resp = testapp.put_json(proposal["path"], data)
+    ...                   'adhocracy.interfaces.IVersionable': {'follows': [proposalv1["path"]]}}}
+    >>> resp = testapp.put_json(proposalv1["path"], data)
     >>> resp.json
     {'path': '/adhocracy/proposal1/_versions/...
-    >>> resp.json['path'] != proposal["path"]
+
+    >>> proposalv2 = resp.json
+    >>> proposalv2['path'] != proposalv1["path"]
     True
 
-NOTE: PUT for INode content is not idempotent this breaks the REST architecture principles
+NOTE: PUT for INode content is not idempotent, this breaks the REST architecture principles
 
 
 GET /interfaces/..::
