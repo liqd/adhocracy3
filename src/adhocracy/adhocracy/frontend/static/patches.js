@@ -217,8 +217,6 @@
     // XXX: ctrl+shift+doublclick: compount versions?
 
     var versionChart = (function(nodeClick, nodeDoubleClick, nodeMouseOver, nodeMouseOut) {
-        // cloned from http://bl.ocks.org/mbostock/4062045
-
 	var width = 600;
 	var height = 150;
         var color = d3.scale.category20();
@@ -229,6 +227,7 @@
             .size([width, height]);
 
         var svg;
+        var tooltip;
         var link;
         var node;
 
@@ -239,6 +238,9 @@
             svg = d3.select("#version_chart").append("svg")
                 .attr("width", width)
                 .attr("height", height);
+            tooltip = d3.select("#version_chart").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
 	};
 
         var refresh = function() {
@@ -280,8 +282,28 @@
                 .call(force.drag)
                 .on("click", nodeClick)
                 .on("dblclick", nodeDoubleClick)
-                .on("mouseover", nodeMouseOver)
-                .on("mouseout", nodeMouseOut);
+                .on("mouseover", function(d) {
+                    d.fixed = true;
+                    tooltip
+			.text(JSON.stringify(d, null, 2))
+			.style("left", d3.event.pageX + "px")
+			.style("top", d3.event.pageY + "px");
+
+                    tooltip.transition()
+			.duration(100)
+			.style("opacity", 1);
+
+                    return nodeMouseOver(d);
+		})
+                //. on("mousemove", ...)
+                .on("mouseout", function(d) {
+                    d.fixed = false;
+                    tooltip.transition()
+			.duration(1800)
+			.style("opacity", 0);
+
+                    return nodeMouseOut(d);
+		});
 
             node.append("title")
                 .text(function(d) { return d.name; });
