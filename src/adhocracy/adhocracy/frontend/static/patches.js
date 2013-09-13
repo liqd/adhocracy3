@@ -54,14 +54,15 @@
     // current version, or a descentant, or a sibling (has a common
     // parent with the current version, or is the descentant of a
     // sibling).  this function refreshes this attribute.
-    var refreshHistoryPhases = function(cache) {
+    var refreshHistoryPhases = function(cache, current_version) {
         Object.keys(cache).forEach(function(version) {
             cache[version].history_phase = 'sibling';
         });
-        ancestors(cache[prop_current_version]).forEach(function(version) {
+        cache[current_version].history_phase = 'current';
+        ancestors(cache[current_version]).forEach(function(version) {
             cache[version].history_phase = 'ancestor';
         });
-        descendants(cache[prop_current_version]).forEach(function(version) {
+        descendants(cache[current_version]).forEach(function(version) {
             cache[version].history_phase = 'descentant';
         });
     }
@@ -189,14 +190,10 @@
 
     var onVersionClick = function(d) {
         console.log('onVersionClick');
-        refresh(d.version);
     };
     var onVersionDoubleClick = function(d) {
         console.log('onVersionDoubleClick');
-
-        // XXX: create new node and merge previous node with
-        // double-clicked node).
-
+        refresh(d.version);
     };
 
     var onVersionMouseOver = function(d) {
@@ -213,8 +210,11 @@
         // d.fixed = false;
     };
 
+
     // XXX: shift+doublclick: delete version?
     // XXX: ctrl+shift+doublclick: compount versions?
+    // XXX: ctrl+shift+alt+doubleclick: create new node and merge previous node with double-clicked node.
+
 
     var versionChart = (function(nodeClick, nodeDoubleClick, nodeMouseOver, nodeMouseMove, nodeMouseOut) {
         var width = 600;
@@ -223,7 +223,7 @@
 
         var force = d3.layout.force()
             .charge(-120)
-            .linkDistance(30)
+            .linkDistance(60)
             .size([width, height]);
 
         var svg;
@@ -264,7 +264,7 @@
 
             link = svg.selectAll(".link")
                 .data(links)
-                .enter().append("line")
+                .enter().append("path")
                 .attr("class", "link")
                 .style("stroke-width", 3);
 
@@ -324,13 +324,60 @@
             cache[prop_current_version].y = height / 2;
 
             // commit moves of all nodes.
-            link.attr("x1", function(d) { return d.source.x; })
-                .attr("y1", function(d) { return d.source.y; })
-                .attr("x2", function(d) { return d.target.x; })
-                .attr("y2", function(d) { return d.target.y; });
-
             node.attr("cx", function(d) { return d.x; })
                 .attr("cy", function(d) { return d.y; });
+
+            //link.attr("x1", function(d) { return d.source.x; })
+            //    .attr("y1", function(d) { return d.source.y; })
+            //    .attr("x2", function(d) { return d.target.x; })
+            //    .attr("y2", function(d) { return d.target.y; });
+
+	    link.attr("d", function(d) {
+                var node_width = 18;
+                var node_height = 18;
+
+		function edge_length(x, y) {
+		    return Math.sqrt(x*x, y*y);
+		}
+
+		var sourcex = d.source.x + node_width  / 2;
+		var sourcey = d.source.y + node_height / 2;
+		var targetx = d.target.x + node_width  / 2;
+		var targety = d.target.y + node_height / 2;
+
+		var dx = targetx - sourcex;
+		var dy = targety - sourcey;
+		var r = 0.08;
+
+		// i tried to figure out what r needs to be to hit
+		// exactly the edge of the icon at 19pxx19px, but i
+		// failed miserably.  :(
+		//
+		// r = Math.max((node_width / 2) / Math.abs(dx), (node_width / 2) / Math.abs(dy));
+		// if (r > 1) { r = 0.1; }
+		// (2 + edge_length(node_width, node_height)) / edge_length(dx, dy);
+		// (this transforms radius in pixels to radius in fraction of total edge length.)
+
+		// start point and end point
+		var sx = sourcex + dx * r;
+		var sy = sourcey + dy * r;
+		var tx = targetx - dx * r;
+		var ty = targety - dy * r;
+
+		var arrow_size = 5;
+		var arrow_size2 = arrow_size*2/3;
+		return ("M " + sx + " " + sy + " " +
+			"L " + tx + " " + ty + " " +
+			"M " + (tx - arrow_size2) + " " + (ty - arrow_size2) + " " +
+			"L " + (tx + arrow_size2) + " " + (ty + arrow_size2) + " " +
+			"M " + (tx - arrow_size2) + " " + (ty + arrow_size2) + " " +
+			"L " + (tx + arrow_size2) + " " + (ty - arrow_size2) + " " +
+			"M " + (tx - arrow_size) + " " + (ty) + " " +
+			"L " + (tx + arrow_size) + " " + (ty) + " " +
+			"M " + (tx) + " " + (ty + arrow_size) + " " +
+			"L " + (tx) + " " + (ty - arrow_size) + " " +
+			"");
+	    });
         };
 
         return { init: init, refresh: refresh };
@@ -343,7 +390,7 @@
         $('#main').render(cache[version], cache[version].render_state);
         prop_previous_version = prop_current_version;
         prop_current_version = version;
-        refreshHistoryPhases(cache);
+        refreshHistoryPhases(cache, prop_current_version);
         versionChart.refresh();
     };
 
