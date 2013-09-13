@@ -71,7 +71,7 @@
         if (obj.follows) {
             var result = [];
             result.push(cache[obj.follows].version);
-            result.concat(ancestors(cache[obj.follows]));
+            result = result.concat(ancestors(cache[obj.follows]));
             return result;
         } else {
             return [];
@@ -83,7 +83,7 @@
         obj.followed_by.forEach(function(version) {
             if (result.indexOf(version) < 0) {  // if running into a cycle, don't traverse it again
                 result.push(version);
-                result.concat(descendants(cache[version]));
+                result = result.concat(descendants(cache[version]));
             }
         });
         return result;
