@@ -18,8 +18,8 @@
 
     // global: current and previous displayed / edited versions.
     // previous is used for cleaning up chart structure.
-    var prop_current_version = 'ahezwipfjfcj';
-    var prop_previous_version = 'ahezwipfjfcj';
+    var prop_current_version = prop_initial_version;
+    var prop_previous_version;
 
     // call initCache every time new objects have been added to update
     // internal the data structure.  in particular, call this function
@@ -49,6 +49,45 @@
         });
     };
 
+    // every version in the cache has an attribute called
+    // history_phase that states whether it is an ancestor of the
+    // current version, or a descentant, or a sibling (has a common
+    // parent with the current version, or is the descentant of a
+    // sibling).  this function refreshes this attribute.
+    var refreshHistoryPhases = function(cache) {
+        Object.keys(cache).forEach(function(version) {
+            cache[version].history_phase = 'sibling';
+	});
+        ancestors(cache[prop_current_version]).forEach(function(version) {
+            cache[version].history_phase = 'ancestor';
+	});
+        descendants(cache[prop_current_version]).forEach(function(version) {
+            cache[version].history_phase = 'descentant';
+	});
+    }
+
+    var ancestors = function(obj) {
+        if (obj.follows) {
+	    var result = [];
+            result.push(cache[obj.follows].version);
+            result.concat(ancestors(cache[obj.follows]));
+            return result;
+	} else {
+            return [];
+	}
+    };
+
+    var descendants = function(obj) {
+        var result = [];
+        obj.followed_by.forEach(function(version) {
+            if (result.indexOf(version) < 0) {  // if running into a cycle, don't traverse it again
+		result.push(version);
+		result.concat(descendants(cache[version]));
+	    }
+	});
+	return result;
+    };
+
     var commitNewVersion = function(obj) {
         var new_ver = createNewVersion();
         var new_obj = { title: obj.title, follows: obj.version, text: obj.text };
@@ -67,8 +106,6 @@
 	};
         return v;
     };
-
-    initCache(cache);
 
 
     // obviel views
@@ -176,6 +213,9 @@
 
     };
 
+    // XXX: shift+doublclick: delete version?
+    // XXX: ctrl+shift+doublclick: compount versions?
+
     var versionChart = (function(nodeClick, nodeDoubleClick, nodeMouseOver, nodeMouseOut) {
         // cloned from http://bl.ocks.org/mbostock/4062045
 
@@ -234,7 +274,9 @@
 			return 10;
                     }
 		})
-                .style("fill", 4)
+                .style("fill", function(d) {
+                    return color(d.history_phase);
+		})
                 .call(force.drag)
                 .on("click", nodeClick)
                 .on("dblclick", nodeDoubleClick)
@@ -276,16 +318,20 @@
         $('#main').render(cache[version], cache[version].render_state);
         prop_previous_version = prop_current_version;
         prop_current_version = version;
+        refreshHistoryPhases(cache);
         versionChart.refresh();
     };
 
-    $(window).bind('hashchange', function(ev) {
-        var version = ev.fragment;
+    $(window).bind('hashchange', function(event) {
+        // (this event is triggered only when following the href
+        // anchors, not when clicking on version nodes in the graph)
+        var version = event.fragment;
         console.log("hashchange: " + version);
         refresh(version);
     });
 
     $(document).ready(function() {
+        initCache(cache);
         versionChart.init();
         refresh(prop_initial_version);
     });
