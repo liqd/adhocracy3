@@ -27,11 +27,11 @@
     // the source easier to read, which is the priority for now.
     var initCache = function(cache) {
         // inject version strings and followed_by edges
-	Object.keys(cache).forEach(function(k) {
+        Object.keys(cache).forEach(function(k) {
             cache[k].version = k;
             cache[k].followed_by = [];
         });
-	Object.keys(cache).forEach(function(k) {
+        Object.keys(cache).forEach(function(k) {
             var parent = cache[k].follows;
             if (parent !== null) {
                 cache[parent].followed_by.push(k)
@@ -39,12 +39,12 @@
         });
 
         // ifaces
-	Object.keys(cache).forEach(function(k) {
+        Object.keys(cache).forEach(function(k) {
             cache[k].ifaces = ['proposal'];
         });
 
         // render_state (edit|display)
-	Object.keys(cache).forEach(function(k) {
+        Object.keys(cache).forEach(function(k) {
             cache[k].render_state = 'display';
         });
     };
@@ -57,35 +57,35 @@
     var refreshHistoryPhases = function(cache) {
         Object.keys(cache).forEach(function(version) {
             cache[version].history_phase = 'sibling';
-	});
+        });
         ancestors(cache[prop_current_version]).forEach(function(version) {
             cache[version].history_phase = 'ancestor';
-	});
+        });
         descendants(cache[prop_current_version]).forEach(function(version) {
             cache[version].history_phase = 'descentant';
-	});
+        });
     }
 
     var ancestors = function(obj) {
         if (obj.follows) {
-	    var result = [];
+            var result = [];
             result.push(cache[obj.follows].version);
             result.concat(ancestors(cache[obj.follows]));
             return result;
-	} else {
+        } else {
             return [];
-	}
+        }
     };
 
     var descendants = function(obj) {
         var result = [];
         obj.followed_by.forEach(function(version) {
             if (result.indexOf(version) < 0) {  // if running into a cycle, don't traverse it again
-		result.push(version);
-		result.concat(descendants(cache[version]));
-	    }
-	});
-	return result;
+                result.push(version);
+                result.concat(descendants(cache[version]));
+            }
+        });
+        return result;
     };
 
     var commitNewVersion = function(obj) {
@@ -103,7 +103,7 @@
         for (i = 0; i < 12; i++) {
             c = String.fromCharCode(Math.floor(Math.random() * 26) + 'a'.charCodeAt(0));
             v = v + c.toString();
-	};
+        };
         return v;
     };
 
@@ -217,8 +217,8 @@
     // XXX: ctrl+shift+doublclick: compount versions?
 
     var versionChart = (function(nodeClick, nodeDoubleClick, nodeMouseOver, nodeMouseMove, nodeMouseOut) {
-	var width = 600;
-	var height = 150;
+        var width = 600;
+        var height = 150;
         var color = d3.scale.category20();
 
         var force = d3.layout.force()
@@ -241,10 +241,10 @@
             tooltip = d3.select("#version_chart").append("div")
                 .attr("class", "tooltip")
                 .style("left", "800px")
-		.style("top", "100px")
+                .style("top", "100px")
                 .style("opacity", 0);
             tooltip.append("pre");
-	};
+        };
 
         var refresh = function() {
             console.assert(svg !== undefined);
@@ -259,8 +259,8 @@
                     var source = nodes.indexOf(cache[n.follows]);
                     var target = nodes.indexOf(n);
                     links.push({ source: source, target: target });
-		}
-	    });
+                }
+            });
 
             link = svg.selectAll(".link")
                 .data(links)
@@ -274,39 +274,39 @@
                 .attr("class", "node")
                 .attr("r", function(d) {
                     if (d.version == prop_current_version) {
-			return 15;
+                        return 15;
                     } else {
-			return 10;
+                        return 10;
                     }
-		})
+                })
                 .style("fill", function(d) {
                     return color(d.history_phase);
-		})
+                })
                 .call(force.drag)
                 .on("click", nodeClick)
                 .on("dblclick", nodeDoubleClick)
                 .on("mouseover", nodeMouseOver)
                 .on("mousemove", function(d) {
                     // tooltip
-			// .style("left", d3.event.pageX + "px")
-			// .style("top", d3.event.pageY + "px");
+                        // .style("left", d3.event.pageX + "px")
+                        // .style("top", d3.event.pageY + "px");
 
                     tooltip.select("pre")
-			.text(JSON.stringify(d, null, 2));
+                        .text(JSON.stringify(d, null, 2));
 
                     tooltip.transition()
-			.duration(100)
-			.style("opacity", 1);
+                        .duration(100)
+                        .style("opacity", 1);
 
                     return nodeMouseMove(d);
-		})
+                })
                 .on("mouseout", function(d) {
                     tooltip.transition()
-			.duration(1800)
-			.style("opacity", 0);
+                        .duration(1800)
+                        .style("opacity", 0);
 
                     return nodeMouseOut(d);
-		});
+                });
 
             node.append("title")
                 .text(function(d) { return d.name; });
