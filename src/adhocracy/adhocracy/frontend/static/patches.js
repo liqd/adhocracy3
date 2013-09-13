@@ -183,14 +183,14 @@
             svg.selectAll(".node").data([]).exit().remove();
             svg.selectAll(".link").data([]).exit().remove();
 
-            var nodes = Object.keys(cache);
+            var nodes = Object.keys(cache).map(function(k) { return cache[k]; });
             var links = [];
             nodes.forEach(function(n) {
-                console.assert(typeof cache[n] !== 'undefined', "n is undefined");
-                console.assert(typeof cache[n].follows !== 'undefined', "n.follows is undefined");
+                console.assert(n,         "n is undefined");
+                console.assert(n.follows, "n.follows is undefined");
 
-                if (cache[n].follows !== null) {
-                    var source = nodes.indexOf(cache[cache[n].follows].version);
+                if (typeof n.follows == 'string') {
+                    var source = nodes.indexOf(cache[n.follows]);
                     var target = nodes.indexOf(n);
                     links.push({ source: source, target: target });
 		}
