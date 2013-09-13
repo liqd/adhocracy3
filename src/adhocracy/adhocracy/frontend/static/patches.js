@@ -201,22 +201,22 @@
 
     var onVersionMouseOver = function(d) {
         console.log('onVersionMouseOver');
+        // d.fixed = true;  // XXX: this makes the graph go insane.  why?
+    };
 
-        // XXX: open tip with textual diff of prop title and text
-
+    var onVersionMouseMove = function(d) {
+        console.log('onVersionMouseMove');
     };
 
     var onVersionMouseOut = function(d) {
         console.log('onVersionMouseOut');
-
-        // XXX: close diff tip
-
+        // d.fixed = false;
     };
 
     // XXX: shift+doublclick: delete version?
     // XXX: ctrl+shift+doublclick: compount versions?
 
-    var versionChart = (function(nodeClick, nodeDoubleClick, nodeMouseOver, nodeMouseOut) {
+    var versionChart = (function(nodeClick, nodeDoubleClick, nodeMouseOver, nodeMouseMove, nodeMouseOut) {
 	var width = 600;
 	var height = 150;
         var color = d3.scale.category20();
@@ -240,7 +240,10 @@
                 .attr("height", height);
             tooltip = d3.select("#version_chart").append("div")
                 .attr("class", "tooltip")
+                .style("left", "800px")
+		.style("top", "100px")
                 .style("opacity", 0);
+            tooltip.append("pre");
 	};
 
         var refresh = function() {
@@ -282,22 +285,22 @@
                 .call(force.drag)
                 .on("click", nodeClick)
                 .on("dblclick", nodeDoubleClick)
-                .on("mouseover", function(d) {
-                    d.fixed = true;
-                    tooltip
-			.text(JSON.stringify(d, null, 2))
-			.style("left", d3.event.pageX + "px")
-			.style("top", d3.event.pageY + "px");
+                .on("mouseover", nodeMouseOver)
+                .on("mousemove", function(d) {
+                    // tooltip
+			// .style("left", d3.event.pageX + "px")
+			// .style("top", d3.event.pageY + "px");
+
+                    tooltip.select("pre")
+			.text(JSON.stringify(d, null, 2));
 
                     tooltip.transition()
 			.duration(100)
 			.style("opacity", 1);
 
-                    return nodeMouseOver(d);
+                    return nodeMouseMove(d);
 		})
-                //. on("mousemove", ...)
                 .on("mouseout", function(d) {
-                    d.fixed = false;
                     tooltip.transition()
 			.duration(1800)
 			.style("opacity", 0);
@@ -331,7 +334,7 @@
         };
 
         return { init: init, refresh: refresh };
-    })(onVersionClick, onVersionDoubleClick, onVersionMouseOver, onVersionMouseOut);
+    })(onVersionClick, onVersionDoubleClick, onVersionMouseOver, onVersionMouseMove, onVersionMouseOut);
 
 
     // main
