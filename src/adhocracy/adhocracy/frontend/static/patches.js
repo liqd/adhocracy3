@@ -13,8 +13,13 @@
           qqfbxcifvrkg: { title: 'tu-tl', follows: 'pufpxzegrxdi', text: 'qqfbxcifvrkg' }
     };
 
-    // path to initial version.  this is displayed after page load.
+    // global: path to initial version.  this is displayed after page load.
     var prop_initial_version = 'ahezwipfjfcj';
+
+    // global: current and previous displayed / edited versions.
+    // previous is used for cleaning up chart structure.
+    var prop_current_version = 'ahezwipfjfcj';
+    var prop_previous_version = 'ahezwipfjfcj';
 
     // call initCache every time new objects have been added to update
     // internal the data structure.  in particular, call this function
@@ -143,9 +148,35 @@
     });
 
 
-    // d3js history
+    // version history chart
 
-    var versionChart = (function() {
+    var onVersionClick = function(d) {
+        console.log('onVersionClick');
+        refresh(d.version);
+    };
+    var onVersionDoubleClick = function(d) {
+        console.log('onVersionDoubleClick');
+
+        // XXX: create new node and merge previous node with
+        // double-clicked node).
+
+    };
+
+    var onVersionMouseOver = function(d) {
+        console.log('onVersionMouseOver');
+
+        // XXX: open tip with textual diff of prop title and text
+
+    };
+
+    var onVersionMouseOut = function(d) {
+        console.log('onVersionMouseOut');
+
+        // XXX: close diff tip
+
+    };
+
+    var versionChart = (function(nodeClick, nodeDoubleClick, nodeMouseOver, nodeMouseOut) {
         // cloned from http://bl.ocks.org/mbostock/4062045
 
 	var width = 600;
@@ -161,23 +192,16 @@
         var link;
         var node;
 
-        force.on("tick", function() {
-            link.attr("x1", function(d) { return d.source.x; })
-                .attr("y1", function(d) { return d.source.y; })
-                .attr("x2", function(d) { return d.target.x; })
-                .attr("y2", function(d) { return d.target.y; });
-
-            node.attr("cx", function(d) { return d.x; })
-                .attr("cy", function(d) { return d.y; });
-        });
-
         var init = function() {
+
+            // XXX: how do i remove the text from <div> element body?
+
             svg = d3.select("#version_chart").append("svg")
                 .attr("width", width)
                 .attr("height", height);
 	};
 
-        var refresh = function(version) {
+        var refresh = function() {
             console.assert(svg !== undefined);
 
             svg.selectAll(".node").data([]).exit().remove();
@@ -203,9 +227,19 @@
                 .data(nodes)
                 .enter().append("circle")
                 .attr("class", "node")
-                .attr("r", 5)
+                .attr("r", function(d) {
+                    if (d.version == prop_current_version) {
+			return 15;
+                    } else {
+			return 10;
+                    }
+		})
                 .style("fill", 4)
-                .call(force.drag);
+                .call(force.drag)
+                .on("click", nodeClick)
+                .on("dblclick", nodeDoubleClick)
+                .on("mouseover", nodeMouseOver)
+                .on("mouseout", nodeMouseOut);
 
             node.append("title")
                 .text(function(d) { return d.name; });
@@ -213,22 +247,40 @@
             force
                 .nodes(nodes)
                 .links(links)
+                .on("tick", tick)
                 .start();
         };
 
+        var tick = function() {
+            // keep current version frozen in one place, no matter what force layout sais.
+            cache[prop_current_version].x = width / 2;
+            cache[prop_current_version].y = height / 2;
+
+            // commit moves of all nodes.
+            link.attr("x1", function(d) { return d.source.x; })
+                .attr("y1", function(d) { return d.source.y; })
+                .attr("x2", function(d) { return d.target.x; })
+                .attr("y2", function(d) { return d.target.y; });
+
+            node.attr("cx", function(d) { return d.x; })
+                .attr("cy", function(d) { return d.y; });
+        };
+
         return { init: init, refresh: refresh };
-    })();
+    })(onVersionClick, onVersionDoubleClick, onVersionMouseOver, onVersionMouseOut);
 
 
     // main
 
     var refresh = function(version) {
         $('#main').render(cache[version], cache[version].render_state);
-        versionChart.refresh(version);
+        prop_previous_version = prop_current_version;
+        prop_current_version = version;
+        versionChart.refresh();
     };
 
     $(window).bind('hashchange', function(ev) {
-        var path = ev.fragment;
+        var version = ev.fragment;
         console.log("hashchange: " + version);
         refresh(version);
     });
