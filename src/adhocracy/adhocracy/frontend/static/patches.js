@@ -148,8 +148,8 @@
     var versionChart = (function() {
         // cloned from http://bl.ocks.org/mbostock/4062045
 
-	var width = 960;
-	var height = 500;
+	var width = 600;
+	var height = 150;
         var color = d3.scale.category20();
 
         var force = d3.layout.force()
@@ -177,7 +177,7 @@
                 .attr("height", height);
 	};
 
-        var refresh = function() {
+        var refresh = function(version) {
             console.assert(svg !== undefined);
 
             svg.selectAll(".node").data([]).exit().remove();
@@ -186,9 +186,6 @@
             var nodes = Object.keys(cache).map(function(k) { return cache[k]; });
             var links = [];
             nodes.forEach(function(n) {
-                console.assert(n,         "n is undefined");
-                console.assert(n.follows, "n.follows is undefined");
-
                 if (typeof n.follows == 'string') {
                     var source = nodes.indexOf(cache[n.follows]);
                     var target = nodes.indexOf(n);
@@ -225,15 +222,15 @@
 
     // main
 
-    var refresh = function(path) {
-        $('#main').render(cache[path], cache[path].render_state);
-        versionChart.refresh(path);
+    var refresh = function(version) {
+        $('#main').render(cache[version], cache[version].render_state);
+        versionChart.refresh(version);
     };
 
     $(window).bind('hashchange', function(ev) {
         var path = ev.fragment;
-        console.log("hashchange: " + path);
-        refresh(path);
+        console.log("hashchange: " + version);
+        refresh(version);
     });
 
     $(document).ready(function() {
