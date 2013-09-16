@@ -77,9 +77,10 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
     // height.
     function enforceRegion(d) {
         var x, y;
+        var pad = 15;
 
         // app region (non-negotiable border)
-        forceIntoRegion(d, 0, 0, width, height, 15, 15);  // XXX: use bbounds to get this more accurate.
+        forceIntoRegion(d, 0, 0, width, height, pad, pad);  // XXX: use bbounds to get this more accurate.
 
         // history region
 	switch(d.history_phase) {
@@ -88,20 +89,17 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
             y = height / 2;
             break;
 	case('ancestor'):
-            x = d.x > width / 2 ? width / 2 : d.x;
-            y = d.y;
-            break;
-	case('descendant'):
-            x = d.x < width / 2 ? width / 2 : d.x;
+            x = d.x > (width / 2 - pad) ? (width / 2 - pad) : d.x;
             y = d.y;
             break;
 	case('sibling'):
-            // XXX behaves like descentants; what we want: siblings
-            // should have x coord width/2; descendants of siblings
-            // should be treated like descentants.  needs to be
-            // distinguished in patches.js.cache.
+	case('descendant'):
+            // siblings behave like descentants: we only distinguish
+            // between "is part of the current version's history" and
+            // "is not".  siblings and descendants are in the latter
+            // category.
 
-            x = d.x < width / 2 ? width / 2 : d.x;
+            x = d.x < (width / 2 + pad) ? (width / 2 + pad) : d.x;
             y = d.y;
             break;
         default:
@@ -127,36 +125,40 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
     // user callbacks (can be set via version graph object returned in
     // module main).
 
-    var usr_cb_click = function(d) { };
-    var usr_cb_dblclick = function(d) { };
+    // refresh events can be triggered both by the graph itself and by
+    // the surrounding app.  if the surrounding app wants to refresh,
+    // it calls the refresh method of the object returned by the
+    // constructor of this module.  if it wants to act on a refresh
+    // event triggered by the graph, it can register this callback
+    // with the cb_refresh method of that object.
+    var usr_cb_refresh   = function(d) { };
+
+    // mouse click event handler
+    var usr_cb_click     = function(d) { };
+
+    // mouse double click event handler
+    var usr_cb_dblclick  = function(d) { };
 
 
     // hard-wired callbacks (if available and after everything else,
     // these invoke user callbacks).
 
     var onNodeClick = function(d) {
-        console.log('onNodeClick');
-
         usr_cb_click(d);
     };
 
-    var onNodeDoubleClick = function(nodes, mkLinks) {
+    var onNodeDblClick = function(nodes, mkLinks) {
         return function(d) {
-            console.log('onNodeDoubleClick');
-
-            refresh(nodes, mkLinks, d);
+            usr_cb_refresh(d.version, 2);
             usr_cb_dblclick(d);
-        };
+        }
     };
 
     var onNodeMouseOver = function(d) {
-        console.log('onNodeMouseOver');
         // d.fixed = true;  // XXX: this makes the graph go insane.  why?
     };
 
     var onNodeMouseMove = function(d) {
-        console.log('onNodeMouseMove');
-
         // tooltip
             // .style("left", d3.event.pageX + "px")
             // .style("top", d3.event.pageY + "px");
@@ -170,7 +172,6 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
     };
 
     var onNodeMouseOut = function(d) {
-        console.log('onNodeMouseOut');
         // d.fixed = false;
 
         tooltip.transition()
@@ -201,10 +202,11 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
         tooltip.append("pre");
     };
 
-    function refresh(nodes, mkLinks, current_version_) {
+    function refresh(nodes, mkLinks, version, recursionDepth) {
+        console.assert(typeof version == 'string');
+        if (!(recursionDepth > 0)) { return; }
+
         links = mkLinks(nodes);
-        previous_version = current_version;
-        current_version = current_version_;
 
         console.assert(svg !== undefined);
 
@@ -226,7 +228,7 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
 		return "node " + d.history_phase;
             })
             .attr("r", function(d) {
-                if (d.version == current_version.version) {
+                if (d.history_phase == 'current') {
                     return 15;
                 } else {
                     return 10;
@@ -234,7 +236,7 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
             })
             .call(force.drag)
             .on("click",     onNodeClick)
-            .on("dblclick",  onNodeDoubleClick(nodes, mkLinks))
+            .on("dblclick",  onNodeDblClick(nodes, mkLinks))
             .on("mouseover", onNodeMouseOver)
             .on("mousemove", onNodeMouseMove)
             .on("mouseout",  onNodeMouseOut);
@@ -247,6 +249,8 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
             .links(links)
             .on("tick", tick)
             .start();
+
+        usr_cb_refresh(version, recursionDepth - 1);
     };
 
     function tick() {
@@ -269,12 +273,15 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
 
     return {
         init: function(domId, nodes, mkLinks, current_version) {
+            console.assert(typeof current_version == 'string');
+
             init(domId);
-            refresh(nodes, mkLinks, current_version);
+            refresh(nodes, mkLinks, current_version, 1);
             return {
 		refresh: refresh,
 
                 // register callbacks
+                cb_refresh:   function(f) { usr_cb_refresh   = f; },
                 cb_click:     function(f) { usr_cb_click     = f; },
                 cb_dblclick:  function(f) { usr_cb_dblclick  = f; }
 	    };

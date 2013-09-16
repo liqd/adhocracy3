@@ -189,7 +189,7 @@ require([ 'jquery',
 
         startEdit: function(ev) {
             this.obj.render_state = 'edit';
-            refresh(this.obj.version, true);
+            refresh(this.obj.version, 1);
         }
     });
 
@@ -214,7 +214,7 @@ require([ 'jquery',
             new_obj.text = document.getElementById("proposal_text").value;
 
             // show new version
-            refresh(new_obj.version, true);
+            refresh(new_obj.version, 2);
 
 
             // XXX: make title editable.
@@ -267,18 +267,19 @@ require([ 'jquery',
 
     // main
 
-    var refresh = function(version, refreshVersionGraph) {
+    var refresh = function(version, recursionDepth) {
         // refresh updates the version graph, but is also registered
         // as a callback in the version graph for double click events.
         // in order to avoid infinite loops, there is a flag that can
         // switch off refreshing of the version graph if it already
         // happened.
 
+        console.assert(typeof version == 'string');
+        if (!(recursionDepth > 0)) { return; }
+
         $('#main').render(cache[version], cache[version].render_state);
         refreshHistoryPhases(cache, version);
-        if (refreshVersionGraph) {
-	    versionGraph.refresh(mkNodes(), mkLinks, cache[version]);
-	}
+        versionGraph.refresh(mkNodes(), mkLinks, version, recursionDepth - 1);
     };
 
     $(window).bind('hashchange', function(event) {
@@ -286,22 +287,15 @@ require([ 'jquery',
         // anchors, not when clicking on version nodes in the graph)
         var version = event.fragment;
         console.log("hashchange: " + version);
-        refresh(version, true);
+        refresh(version, 2);
     });
 
     $(document).ready(function() {
         initCache(cache);
-        versionGraph = graph.init("#version_chart", mkNodes(), mkLinks, cache[prop_initial_version]);
-        versionGraph.cb_dblclick(function(d) {
-            refresh(d.version, false);
-	});
-        refresh(prop_initial_version, true);
+        versionGraph = graph.init("#version_chart", mkNodes(), mkLinks, prop_initial_version);
+        versionGraph.cb_refresh(refresh);
+        refresh(prop_initial_version, 2);
     });
 
 
 }) (); })
-
-
-
-// XXX: visually partition version history in past, present, and
-// future.  somehow.  use css as much as possible.
