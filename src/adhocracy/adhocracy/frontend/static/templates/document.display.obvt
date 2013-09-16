@@ -1,2 +1,0 @@
-<h2 data-render="document.title"></h2>
-<p data-repeat="document.paragraphs" data-render="@."></p>

@@ -3,3 +3,5 @@ Links for debugging:
 
 <a href="{path}">{path}</a>
 <a href="/manage{path}">/manage{path}</a>
+<br />
+<a href="#/adhocracy">#/adhocracy</a>
