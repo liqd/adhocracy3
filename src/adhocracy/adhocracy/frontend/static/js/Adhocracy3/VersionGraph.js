@@ -72,6 +72,46 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
                     "");
     }
 
+    // move every node into its graph region: ancestors to the left,
+    // siblings onto the middle line, and descentants and descentants
+    // of siblings to the right.
+    function enforceRegion(d) {
+        var x;
+        var y;
+	switch(d.history_phase) {
+        case('current'):
+	    x = width / 2;
+            y = height / 2;
+            break;
+	case('ancestor'):
+            x = d.x > width / 2 ? width / 2 : d.x;
+            y = d.y;
+            break;
+	case('descendant'):
+            x = d.x < width / 2 ? width / 2 : d.x;
+            y = d.y;
+            break;
+	case('sibling'):
+            // XXX behaves like descentants; what we want: siblings
+            // should have x coord width/2; descendants of siblings
+            // should be treated like descentants.  needs to be
+            // distinguished in patches.js.cache.
+
+            x = d.x < width / 2 ? width / 2 : d.x;
+            y = d.y;
+            break;
+        default:
+            console.log(d.history_phase);
+            throw "internal error";
+	}
+        pullTowards(d, x, y, 0.1);
+    }
+
+    function pullTowards(d, x, y, distFraction) {
+        d.x += (x - d.x) * distFraction;
+        d.y += (y - d.y) * distFraction;
+    }
+
 
     // user callbacks (can be set via version graph object returned in
     // module main).
@@ -200,9 +240,7 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
     };
 
     function tick() {
-        // keep current version frozen in one place, no matter what force layout sais.
-        current_version.x = width / 2;
-        current_version.y = height / 2;
+        force.nodes().forEach(enforceRegion);
 
         // commit moves of all nodes.
         node.attr("cx", function(d) { return d.x; })

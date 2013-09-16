@@ -19,15 +19,15 @@ require.config({
             exports: 'jquery_ba_bbq'
 	},
         'obviel-templates': {
-            deps: [],
+            deps: ['jquery'],
             exports: 'obviel-templates'
 	},
         'obviel': {
-            deps: [],
+            deps: ['jquery'],
             exports: 'obviel'
 	},
         'obviel-forms': {
-            deps: [],
+            deps: ['jquery'],
             exports: 'obviel-forms'
 	},
         'd3': {
@@ -95,8 +95,8 @@ require([ 'jquery',
 
     // every version in the cache has an attribute called
     // history_phase that states whether it is an ancestor of the
-    // current version, or a descentant, or a sibling (has a common
-    // parent with the current version, or is the descentant of a
+    // current version, or a descendant, or a sibling (has a common
+    // parent with the current version, or is the descendant of a
     // sibling).  this function refreshes this attribute.
     var refreshHistoryPhases = function(cache, current_version) {
         Object.keys(cache).forEach(function(version) {
@@ -107,7 +107,7 @@ require([ 'jquery',
             cache[version].history_phase = 'ancestor';
         });
         descendants(cache[current_version]).forEach(function(version) {
-            cache[version].history_phase = 'descentant';
+            cache[version].history_phase = 'descendant';
         });
     }
 
