@@ -1,8 +1,51 @@
 require.config({
-  baseUrl: "./js/"
+    baseUrl: "./js/",
+    paths: {
+        'jquery':            '../jquery-1.7.2',
+        'jquery_datalink':   '../submodules/jquery-datalink/jquery.datalink',
+        'jquery_ba_bbq':     '../submodules/jquery-bbq/jquery.ba-bbq',
+        'obviel-templates':  '../submodules/obviel/src/obviel/obviel-template',
+        'obviel':            '../submodules/obviel/src/obviel/obviel',
+        'obviel-forms':      '../submodules/obviel/src/obviel/obviel-forms',
+        'd3':                '../d3-3.2.8',
+    },
+    shim: {
+        'jquery_datalink': {
+            deps: ['jquery'],
+            exports: 'jquery_datalink'
+	},
+        'jquery_ba_bbq': {
+            deps: ['jquery'],
+            exports: 'jquery_ba_bbq'
+	},
+        'obviel-templates': {
+            deps: [],
+            exports: 'obviel-templates'
+	},
+        'obviel': {
+            deps: [],
+            exports: 'obviel'
+	},
+        'obviel-forms': {
+            deps: [],
+            exports: 'obviel-forms'
+	},
+        'd3': {
+            deps: [],
+            exports: 'd3'
+	}
+    }
 });
 
-require(['Adhocracy3/VersionGraph'], function(graph) { (function($, obviel) {
+require([ 'jquery',
+          'jquery_datalink',
+          'jquery_ba_bbq',
+          'obviel-templates',
+          'obviel',
+          'obviel-forms',
+          'd3',
+          'Adhocracy3/VersionGraph'
+        ], function($, datalink, bbq, obviel_templates, obviel, obviel_forms, d3, graph) { (function() {
 
 
     // set up static, local proposal db (this is only interesting to
@@ -369,4 +412,4 @@ require(['Adhocracy3/VersionGraph'], function(graph) { (function($, obviel) {
     });
 
 
-}) (jQuery, obviel); })
+}) (); })
