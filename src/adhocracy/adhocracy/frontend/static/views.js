@@ -16,7 +16,7 @@
             before: function() {
                 this.obj._versions_path = this.obj.meta.path + "/_versions";
             },
-            obvt: '<div data-render="_versions_path">hu</div>',
+            obvt: '<div data-render="_versions_path"></div>',
         });
     };
 
@@ -27,11 +27,9 @@
         obviel.view({
             iface: 'adhocracy.interfaces.' + name,
             name: 'small',
-            obvtUrl: 'templates/small.obvt'
+            obvtUrl: 'templates/IName.small.obvt'
         });
     };
-
-
 
     obviel.view(ad.Editable({
         iface: 'adhocracy.interfaces.IProposal',

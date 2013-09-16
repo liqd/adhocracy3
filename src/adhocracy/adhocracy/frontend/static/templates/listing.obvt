@@ -1,4 +1,0 @@
-listing:
-<ol>
-    <li data-repeat="listing.elements" data-render="@.|link"></li>
-</ol>
