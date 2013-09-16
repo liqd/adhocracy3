@@ -3,103 +3,109 @@
 import requests
 import json
 from pprint import pprint
+import random
 
+
+verbose = False
 
 root_url = 'http://localhost:6541'
 prop_name = 'no_more_mosquitos'
 
 
-def run(request, *params):
-    verbose = True
-
-    response = request(*params)
+def run(request, path, *params):
+    """
+    Executes a request and prints debugging info to stdout if verbose == True.
+    """
+    response = request(root_url + path, *params)
     if verbose:
         pprint((request.__name__, params))
         pprint(response)
         if (response.ok):
             pprint(response.json())
+    if response.status_code != 200:
+        print(path)
+        raise Exception("status_code == " + str(response.status_code))
     return response
 
 
-# produces internal error on clean zodb state (git version
-# ffcf498c9820ef22ce7b8c3399330157e17459a8).  (there is probably an
-# error in this script, but it should not make the server crash,
-# right?)
-def utest1():
-    data = {'content_type': 'adhocracy.interfaces.IProposalContainer',
-            'data': {'adhocracy.interfaces.IName': {'name': prop_name}}}
-    r = run(requests.post, root_url + '/adhocracy', json.dumps(data))
+def mk_new_proposal():
+    # FIXME: server should correctly handle clashing proposal names
+    id = random.randint(0, 100000000000000000000)
+    data = {
+        'content_type': 'adhocracy.interfaces.IProposalContainer',
+        'data': {'adhocracy.interfaces.IName': {'name': "Proposal_" + str(id)}}
+    }
 
-    r = run(requests.get, root_url + '/adhocracy/' + prop_name + '/_versions')
-    children = r.json()["children"]
+    response = run(requests.post, '/adhocracy', json.dumps(data))
+    dag_path = response.json()['path']
 
-    url = children[0]['path']
+    response = run(requests.get, dag_path + "/_versions")
+    first_version_path = response.json()['children'][0]['path']
+    return (dag_path, first_version_path)
 
-    r = run(requests.get, root_url + url)
+def mk_new_paragraph():
+    # FIXME: server should correctly handle clashing proposal names
+    id = random.randint(0, 100000000000000000000)
+    data = {
+        'content_type': 'adhocracy.interfaces.IParagraphContainer',
+        'data': {
+            'adhocracy.interfaces.IName': {'name': "Paragraph_" + str(id)}
+        }
+    }
 
-    obj = r.json()["data"]
-    meta = r.json()["meta"]
+    response = run(requests.post, '/adhocracy', json.dumps(data))
+    dag_path = response.json()['path']
 
-    obj['adhocracy.interfaces.IDocument']['title'] = 'No More Mosquitos!'
-    obj['adhocracy.interfaces.IVersionable'] = {'follows': [url]}
+    response = run(requests.get, dag_path + "/_versions")
+    first_version_path = response.json()['children'][0]['path']
 
-    r = run(requests.put, root_url + url, json.dumps({ 'content_type': 'adhocracy.interfaces.IProposal', 'data': obj }))
+    return (dag_path, first_version_path)
 
-    # ...  now do the same thing once more.
-    data = {'content_type': 'adhocracy.interfaces.IProposalContainer',
-            'data': {'adhocracy.interfaces.IName': {'name': prop_name}}}
-    r = run(requests.post, root_url + '/adhocracy', json.dumps(data))      # i think this should yield a clean error response from backend.  -mf
+def put(path, function):
+    """
+    Modifies a resource identified by a path through a given function.
+    Sets also the follows field.
+    Returns the new path.
+    """
+    object = run(requests.get, path).json()
+    oid = object['meta']['oid']
+    new = function(object)
+    new['data']['adhocracy.interfaces.IVersionable']['follows'] = [oid]
+    response = run(requests.post, path, json.dumps(new))
+    return response.json()['path']
 
-    r = run(requests.get, root_url + '/adhocracy/' + prop_name + '/_versions')
-    children = r.json()["children"]
-
-    url = children[0]['path']
-
-    r = run(requests.get, root_url + url)
-
-    obj = r.json()["data"]
-    meta = r.json()["meta"]
-
-    obj['adhocracy.interfaces.IDocument']['title'] = 'No More Mosquitos!'
-    obj['adhocracy.interfaces.IVersionable'] = {'follows': [url]}
-
-    r = run(requests.put, root_url + url, json.dumps({ 'content_type': 'adhocracy.interfaces.IProposal', 'data': obj }))
-
+def get(path):
+    """
+    Retrieves an object with method GET and returns its value as a python object.
+    """
+    return run(requests.get, path).json()
 
 def buildFixtures():
-    data = {'content_type': 'adhocracy.interfaces.IProposalContainer',
-            'data': {'adhocracy.interfaces.IName': {'name': prop_name}}}
-    r = run(requests.post, root_url + '/adhocracy', json.dumps(data))
+    (proposal, proposal1) = mk_new_proposal()
+    (paragraphA, paragraphA1) = mk_new_paragraph()
+    (paragraphB, paragraphB1) = mk_new_paragraph()
 
-    r = run(requests.get, root_url + '/adhocracy/' + prop_name + '/_versions')
-    children = r.json()["children"]
-    #pprint(children)
+    def insert_text(text):
+        def inner(paragraph):
+            paragraph['data']['adhocracy.interfaces.IText']['text'] = text
+            return paragraph
+        return inner
 
-    url = children[0]['path']
-    #pprint(url)
+    paragraphA2 = put(paragraphA1, insert_text("First Paragraph"))
+    paragraphB2 = put(paragraphB1, insert_text("Second Paragraph"))
 
-    r = run(requests.get, root_url + url)
+    def insert_paragraphs(proposal):
+        pa_oid = get(paragraphA2)['meta']['oid']
+        pb_oid = get(paragraphB2)['meta']['oid']
+        proposal['data']['adhocracy.interfaces.IDocument']['paragraphs'] = \
+            [pa_oid, pb_oid]
+        return proposal
 
-    obj = r.json()["data"]
-    meta = r.json()["meta"]
+    proposal2 = put(proposal1, insert_paragraphs)
 
-    obj['adhocracy.interfaces.IDocument']['title'] = 'No More Mosquitos!'
-    obj['adhocracy.interfaces.IVersionable'] = {'follows': [url]}
-
-    pprint(obj)
-
-    r = run(requests.put, root_url + url, json.dumps({ 'content_type': 'adhocracy.interfaces.IProposal', 'data': obj }))
-    url = r.json()['path']
-
-    obj['adhocracy.interfaces.IDocument']['paragraphs'] = ['wef', 'ofq']
-    r = run(requests.put, root_url + url, json.dumps({ 'content_type': 'adhocracy.interfaces.IProposal', 'data': obj }))
-
-
-#buildFixtures()
-utest1()
-
-#r = run(requests.options, root_url + '/adhocracy');
-#r = run(requests.get, root_url + '/adhocracy');
-#r = run(requests.get, u'http://localhost:6541/adhocracy/no_more_mosquitos/_versions/B2BVZ11')
+    print("created a new proposal:")
+    print(root_url + proposal2)
+    print(root_url + "/frontend_static/frontend.html#" + proposal2)
 
 
+buildFixtures()
