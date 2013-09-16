@@ -43,9 +43,10 @@ require([ 'jquery',
           'obviel-templates',
           'obviel',
           'obviel-forms',
-          'd3',
           'Adhocracy3/VersionGraph'
-        ], function($, datalink, bbq, obviel_templates, obviel, obviel_forms, d3, graph) { (function() {
+        ], function($, datalink, bbq, obviel_templates, obviel, obviel_forms, graph) {
+
+(function() {
 
 
     // set up static, local proposal db (this is only interesting to
@@ -63,11 +64,6 @@ require([ 'jquery',
 
     // global: path to initial version.  this is displayed after page load.
     var prop_initial_version = 'ahezwipfjfcj';
-
-    // global: current and previous displayed / edited versions.
-    // previous is used for cleaning up chart structure.
-    var prop_current_version = prop_initial_version;
-    var prop_previous_version;
 
     // call initCache every time new objects have been added to update
     // internal the data structure.  in particular, call this function
@@ -193,7 +189,7 @@ require([ 'jquery',
 
         startEdit: function(ev) {
             this.obj.render_state = 'edit';
-            refresh(this.obj.version);
+            refresh(this.obj.version, true);
         }
     });
 
@@ -218,7 +214,7 @@ require([ 'jquery',
             new_obj.text = document.getElementById("proposal_text").value;
 
             // show new version
-            refresh(new_obj.version);
+            refresh(new_obj.version, true);
 
 
             // XXX: make title editable.
@@ -236,165 +232,53 @@ require([ 'jquery',
 
     // version history chart
 
-    var onVersionClick = function(d) {
-        console.log('onVersionClick');
-    };
-    var onVersionDoubleClick = function(d) {
-        console.log('onVersionDoubleClick');
-        refresh(d.version);
-    };
+    // nodes must be generated from cache, so what passes to the graph
+    // constructor is the object returned by mkNodes().
+    var mkNodes = function() {
+        var nodes = Object
+            .keys(cache)
+            .map(function(k) { return cache[k]; });
 
-    var onVersionMouseOver = function(d) {
-        console.log('onVersionMouseOver');
-        // d.fixed = true;  // XXX: this makes the graph go insane.  why?
-    };
+        // XXX: type check nodes.  (or better yet, do it in graph.init().)
 
-    var onVersionMouseMove = function(d) {
-        console.log('onVersionMouseMove');
-    };
+        return nodes;
+    }
 
-    var onVersionMouseOut = function(d) {
-        console.log('onVersionMouseOut');
-        // d.fixed = false;
-    };
+    // links (edges) are generated from the node list, so what passes
+    // to the graph constructor is (in contrast to mkNodes()) the
+    // *function* mkLinks().
+    var mkLinks = function(nodes) {
+        var links = [];
+        nodes.forEach(function(n) {
+            if (typeof n.follows == 'string') {
+                var source = nodes.indexOf(cache[n.follows]);
+                var target = nodes.indexOf(n);
+                links.push({ source: source, target: target });
+            }
+        });
 
+        // XXX: type check links.  (see also mkNodes() above.)
 
-    // XXX: shift+doublclick: delete version?
-    // XXX: ctrl+shift+doublclick: compount versions?
-    // XXX: ctrl+shift+alt+doubleclick: create new node and merge previous node with double-clicked node.
+        return links;
+    }
 
-
-    var versionChart = (function(nodeClick, nodeDoubleClick, nodeMouseOver, nodeMouseMove, nodeMouseOut) {
-        var width = 600;
-        var height = 150;
-        var color = d3.scale.category20();
-
-        var force = d3.layout.force()
-            .charge(-120)
-            .linkDistance(60)
-            .size([width, height]);
-
-        var svg;
-        var tooltip;
-        var link;
-        var node;
-
-        var init = function() {
-
-            // XXX: how do i remove the text from <div> element body?
-
-            svg = d3.select("#version_chart").append("svg")
-                .attr("width", width)
-                .attr("height", height);
-            tooltip = d3.select("#version_chart").append("div")
-                .attr("class", "tooltip")
-                .style("left", "800px")
-                .style("top", "100px")
-                .style("opacity", 0);
-            tooltip.append("pre");
-        };
-
-        var refresh = function() {
-            console.assert(svg !== undefined);
-
-            svg.selectAll(".node").data([]).exit().remove();
-            svg.selectAll(".link").data([]).exit().remove();
-
-            var nodes = Object.keys(cache).map(function(k) { return cache[k]; });
-            var links = [];
-            nodes.forEach(function(n) {
-                if (typeof n.follows == 'string') {
-                    var source = nodes.indexOf(cache[n.follows]);
-                    var target = nodes.indexOf(n);
-                    links.push({ source: source, target: target });
-                }
-            });
-
-            link = svg.selectAll(".link")
-                .data(links)
-                .enter().append("path")
-                .attr("class", "link")
-                .style("stroke-width", 3);
-
-            node = svg.selectAll(".node")
-                .data(nodes)
-                .enter().append("circle")
-                .attr("class", "node")
-                .attr("r", function(d) {
-                    if (d.version == prop_current_version) {
-                        return 15;
-                    } else {
-                        return 10;
-                    }
-                })
-                .style("fill", function(d) {
-                    return color(d.history_phase);
-                })
-                .call(force.drag)
-                .on("click", nodeClick)
-                .on("dblclick", nodeDoubleClick)
-                .on("mouseover", nodeMouseOver)
-                .on("mousemove", function(d) {
-                    // tooltip
-                        // .style("left", d3.event.pageX + "px")
-                        // .style("top", d3.event.pageY + "px");
-
-                    tooltip.select("pre")
-                        .text(JSON.stringify(d, null, 2));
-
-                    tooltip.transition()
-                        .duration(100)
-                        .style("opacity", 1);
-
-                    return nodeMouseMove(d);
-                })
-                .on("mouseout", function(d) {
-                    tooltip.transition()
-                        .duration(1800)
-                        .style("opacity", 0);
-
-                    return nodeMouseOut(d);
-                });
-
-            node.append("title")
-                .text(function(d) { return d.name; });
-
-            force
-                .nodes(nodes)
-                .links(links)
-                .on("tick", tick)
-                .start();
-        };
-
-        var tick = function() {
-            // keep current version frozen in one place, no matter what force layout sais.
-            cache[prop_current_version].x = width / 2;
-            cache[prop_current_version].y = height / 2;
-
-            // commit moves of all nodes.
-            node.attr("cx", function(d) { return d.x; })
-                .attr("cy", function(d) { return d.y; });
-
-            //link.attr("x1", function(d) { return d.source.x; })
-            //    .attr("y1", function(d) { return d.source.y; })
-            //    .attr("x2", function(d) { return d.target.x; })
-            //    .attr("y2", function(d) { return d.target.y; });
-
-	    link.attr("d", graph.drawArrow);
-        };
-
-        return { init: init, refresh: refresh };
-    })(onVersionClick, onVersionDoubleClick, onVersionMouseOver, onVersionMouseMove, onVersionMouseOut);
+    var versionGraph;
 
 
     // main
 
-    var refresh = function(version) {
+    var refresh = function(version, refreshVersionGraph) {
+        // refresh updates the version graph, but is also registered
+        // as a callback in the version graph for double click events.
+        // in order to avoid infinite loops, there is a flag that can
+        // switch off refreshing of the version graph if it already
+        // happened.
+
         $('#main').render(cache[version], cache[version].render_state);
-        prop_previous_version = prop_current_version;
-        prop_current_version = version;
-        refreshHistoryPhases(cache, prop_current_version);
-        versionChart.refresh();
+        refreshHistoryPhases(cache, version);
+        if (refreshVersionGraph) {
+	    versionGraph.refresh(mkNodes(), mkLinks, cache[version]);
+	}
     };
 
     $(window).bind('hashchange', function(event) {
@@ -402,14 +286,24 @@ require([ 'jquery',
         // anchors, not when clicking on version nodes in the graph)
         var version = event.fragment;
         console.log("hashchange: " + version);
-        refresh(version);
+        refresh(version, true);
     });
 
     $(document).ready(function() {
         initCache(cache);
-        versionChart.init();
-        refresh(prop_initial_version);
+        versionGraph = graph.init("#version_chart", mkNodes(), mkLinks, cache[prop_initial_version]);
+        versionGraph.cb_dblclick(function(d) {
+            refresh(d.version, false);
+	});
+        refresh(prop_initial_version, true);
     });
 
 
 }) (); })
+
+
+
+// XXX: bug: double-click on version graph does not properly refresh.
+// clicking on href anchors in document works fine.
+
+// XXX: visually partition version history in past, present, and future.  somehow.
