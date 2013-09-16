@@ -288,3 +288,11 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
 	}
     };
 });
+
+
+// (note to distant future self: if there are merges, we should make
+// all edges not on some canonical miminum spanning tree infinitely
+// elastic (probably have to not give them to force graph and render
+// them entirely ourselves instead).  this way, it should be
+// relatively easy to write a good physics rule set for
+// planarasition. -mf)
