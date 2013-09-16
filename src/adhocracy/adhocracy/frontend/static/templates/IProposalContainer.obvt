@@ -1,8 +1,11 @@
-{@.}
-
-<hr />
-Proposals:
+<h2>{data.adhocracy#interfaces#IName.name}</h2>
 
 <br />
 
 <div data-repeat='children_urls' data-render="@."></div>
+
+<hr />
+
+<pre>
+    {@.}
+</pre>

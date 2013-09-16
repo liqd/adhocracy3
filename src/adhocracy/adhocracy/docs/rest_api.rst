@@ -1,8 +1,8 @@
 Adhocracy 3 loosed coupling REST-API with substance-d backend
 =============================================================
 
-Prerequist ::
---------------
+Prerequisites
+-------------
 
 usefull imports to work with rest api calls  ::
 

@@ -109,8 +109,8 @@ serving the sdidemo wsgi app using pserve ::
     ./bin/pserve etc/development.ini
 
 
-Documentation ::
------------------
+Documentation
+-------------
 
 build sphinx documentation ::
 
@@ -119,9 +119,16 @@ build sphinx documentation ::
     xdg-open docs/build/html/index.html
 
 
-Development ::
------------------
+Development
+-----------
 
 Check pep8 and pep257 bevore pushing commits::
 
     bin/flake8 src/adhocracy
+
+Running the Testsuite
+---------------------
+
+::
+
+    bin/py.test -s src/adhocracy
