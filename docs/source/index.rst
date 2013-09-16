@@ -17,7 +17,7 @@ Contents:
    supergraph
    instance_modelling_example
    no_patches
-   rest_api_loosed_couple
+   rest_api
 
 .. include:: ../../README.rst
 
