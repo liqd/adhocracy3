@@ -7,7 +7,6 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
 
     var width = 600;
     var height = 150;
-    var color = d3.scale.category20();
 
     var previous_version = null;
     var current_version = null;
@@ -74,10 +73,15 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
 
     // move every node into its graph region: ancestors to the left,
     // siblings onto the middle line, and descentants and descentants
-    // of siblings to the right.
+    // of siblings to the right.  also, enforce screen width and
+    // height.
     function enforceRegion(d) {
-        var x;
-        var y;
+        var x, y;
+
+        // app region (non-negotiable border)
+        forceIntoRegion(d, 0, 0, width, height, 15, 15);  // XXX: use bbounds to get this more accurate.
+
+        // history region
 	switch(d.history_phase) {
         case('current'):
 	    x = width / 2;
@@ -104,10 +108,17 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
             console.log(d.history_phase);
             throw "internal error";
 	}
-        pullTowards(d, x, y, 0.1);
+        pullTowardsPoint(d, x, y, 0.1);
     }
 
-    function pullTowards(d, x, y, distFraction) {
+    function forceIntoRegion(d, xmin, ymin, xmax, ymax, xpad, ypad) {
+        if (d.x < xmin + xpad) { d.x = xmin + xpad; } else
+        if (d.x > xmax - xpad) { d.x = xmax - xpad; };
+        if (d.y < ymin + ypad) { d.y = ymin + ypad; } else
+        if (d.y > ymax - ypad) { d.y = ymax - ypad; };
+    }
+
+    function pullTowardsPoint(d, x, y, distFraction) {
         d.x += (x - d.x) * distFraction;
         d.y += (y - d.y) * distFraction;
     }
@@ -211,16 +222,15 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
         node = svg.selectAll(".node")
             .data(nodes)
             .enter().append("circle")
-            .attr("class", "node")
+            .attr("class", function(d) {
+		return "node " + d.history_phase;
+            })
             .attr("r", function(d) {
                 if (d.version == current_version.version) {
                     return 15;
                 } else {
                     return 10;
                 }
-            })
-            .style("fill", function(d) {
-                return color(d.history_phase);
             })
             .call(force.drag)
             .on("click",     onNodeClick)
