@@ -16,3 +16,6 @@
 [submodule "src/substanced"]
 	path = src/substanced
 	url = git@github.com:Pylons/substanced.git
+[submodule "src/adhocracy/adhocracy/frontend/static/submodules/requirejs"]
+	path = src/adhocracy/adhocracy/frontend/static/submodules/requirejs
+	url = git://github.com/jrburke/requirejs
