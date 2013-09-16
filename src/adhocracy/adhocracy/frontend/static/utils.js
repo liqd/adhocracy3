@@ -9,7 +9,9 @@ function endsWith(str, suffix) {
 function toForms(obj) {
     var result = [];
     for (i in obj.data) {
-        result.push(toForm(obj.data[i]));
+        if (i != "adhocracy#interfaces#IVersionable") {
+            result.push(toForm(obj.data[i]));
+        };
     };
     return {
         iface: "formlist",
@@ -28,15 +30,12 @@ function toForm(data) {
         form: {
             widgets: subwidgets,
             controls: [
-                {
-                    label: "Save",
-                    action: "test-action",  // conjecture: server should deliver edited object after persisting it.
-                },
+                    // conjecture: server should deliver edited object after persisting it.
+                    // No: The server delivers '{path: "PATH_TO_NEW_OBJECT"}' on success.
             ],
         },
         data: data,
     };
-    console.log(form);
     return form;
 };
 
@@ -45,7 +44,7 @@ function toWidget(key, model) {
     switch(typeof(model)) {
         case "string":
             return {
-                ifaces: ["textlineField"],
+                ifaces: ["textField"],
                 name: key,
                 title: key,
                 validate: {

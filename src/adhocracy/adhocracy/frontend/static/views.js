@@ -1,5 +1,37 @@
 (function($, obviel) {
 
+    // for editing
+
+    // FIXME: Put in seperate module
+    // Adds fields to make a view settings object editable.
+    ad.Editable = function(child) {
+        var result = {
+            edit: function(ev) {
+                    this.el.render(this.obj, "edit");
+                },
+        };
+        $.extend(result, child);
+        return result;
+    };
+
+    obviel.view({
+        iface: 'adhocracy.interfaces.IParagraph',
+        name: 'edit',
+        obvt: '<div data-render="form"></div><button data-on="click|preview">Preview</div>',
+        before: function() {
+            this.obj.form = toForms(this.obj);
+        },
+        preview: function() {
+            // FIXME: How do we get the real value?
+            value = document.getElementById('obviel-field-auto0-text').value;
+            this.obj.data['adhocracy#interfaces#IText'].text = value;
+            this.el.render(this.obj);
+        }
+    });
+
+    // end editing
+
+
     // Pool:
     obviel.view({
         iface: 'adhocracy.interfaces.IPool',
@@ -36,10 +68,10 @@
         obvtUrl: 'templates/IProposal.obvt',
     }));
 
-    obviel.view({
+    obviel.view(ad.Editable({
         iface: 'adhocracy.interfaces.IParagraph',
         obvtUrl: 'templates/IParagraph.obvt',
-    });
+    }));
 
     obviel.view({
         iface: 'adhocracy.interfaces.INodeVersions',
@@ -55,6 +87,5 @@
         iface: 'debug_links',
         obvtUrl: 'templates/debug_links.obvt'
     });
-
 
 }) (jQuery, obviel);

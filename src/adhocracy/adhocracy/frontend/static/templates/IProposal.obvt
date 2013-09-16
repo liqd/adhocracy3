@@ -1,7 +1,5 @@
 <span data-with="data.adhocracy#interfaces#IDocument">
-    <button data-on="click|edit">edit</button>
-    <hr />
-    <h3>Proposal: {title}</h3>
+    <h3>Proposal: "{title}"</h3>
     <small>{description}</small>
     <ol>
         <li data-repeat="paragraphs" data-render="@."></li>

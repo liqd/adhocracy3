@@ -29,18 +29,6 @@
         return obj;
     });
 
-    // FIXME: Put in seperate module
-    // Adds fields to make a view settings object editable.
-    ad.Editable = function(child) {
-        var result = {
-            edit: function(ev) {
-                    this.el.render(toForms(this.obj));
-                },
-        };
-        $.extend(result, child);
-        return result;
-    };
-
     // Adds some crude error handling instead of the default
     // of silently ignoring errors.
     obviel.httpErrorHook(function(xhr) {
