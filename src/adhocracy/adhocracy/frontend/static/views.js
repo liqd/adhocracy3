@@ -61,6 +61,21 @@ interfere with her work.
         preview: function() {
             // FIXME: How do we get the real value?
             value = document.getElementById('obviel-field-auto0-text').value;
+
+            console.log("FIXME");
+            console.log(this);
+            console.log(this.el[0]);
+
+
+            // XXX: el[0] must contain another xml tag, say, "<p>" or
+            // "<div>" or "<textarea>" that contains only the contents
+            // we are looking for.  then we can dig into this.el
+            // properly and pluck it.
+
+
+            // .getElementByClass()?
+            // ...?
+
             this.obj.data['adhocracy#interfaces#IText'].text = value;
             this.el.render(this.obj);
         }
