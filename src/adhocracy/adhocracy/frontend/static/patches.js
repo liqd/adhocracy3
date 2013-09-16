@@ -303,7 +303,5 @@ require([ 'jquery',
 
 
 
-// XXX: bug: double-click on version graph does not properly refresh.
-// clicking on href anchors in document works fine.
-
-// XXX: visually partition version history in past, present, and future.  somehow.
+// XXX: visually partition version history in past, present, and
+// future.  somehow.  use css as much as possible.
