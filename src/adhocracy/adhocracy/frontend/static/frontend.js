@@ -86,7 +86,10 @@
 
     $(window).bind('hashchange', function(ev) {
         var path = ev.fragment;
-        console.log("hashchange: " + path);
+        $('#debug_links').render({
+            'iface': 'debug_links',
+            'path': path
+        });
         $('#main').render(path);
     });
 

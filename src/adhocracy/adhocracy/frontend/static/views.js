@@ -37,5 +37,10 @@
         obvt: '<div data-repeat="elements" data-render="@."></div>'
     });
 
+    obviel.view({
+        iface: 'debug_links',
+        obvtUrl: 'templates/debug_links.obvt'
+    });
+
 
 }) (jQuery, obviel);

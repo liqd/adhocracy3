@@ -179,6 +179,10 @@ GET/POST /users::
 NOTES::
 
 content-type and maininterface have almost the same meaning
+
 content-urls: relative oder vollstandige URL?
+
 users, catalog, references, ... per instance or global?
+
 unused rest methods: DELETE
+
