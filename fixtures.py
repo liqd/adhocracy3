@@ -61,17 +61,17 @@ def mk_new_paragraph():
 
     return (dag_path, first_version_path)
 
-def put(path, function):
+def put_new(path, function):
     """
-    Modifies a resource identified by a path through a given function.
-    Sets also the follows field.
+    PUTs a new version of an object identified by a path through a given
+    function. Sets also the follows field.
     Returns the new path.
     """
     object = run(requests.get, path).json()
     oid = object['meta']['oid']
     new = function(object)
     new['data']['adhocracy.interfaces.IVersionable']['follows'] = [oid]
-    response = run(requests.post, path, json.dumps(new))
+    response = run(requests.put, path, json.dumps(new))
     return response.json()['path']
 
 def get(path):
@@ -91,8 +91,8 @@ def buildFixtures():
             return paragraph
         return inner
 
-    paragraphA2 = put(paragraphA1, insert_text("First Paragraph"))
-    paragraphB2 = put(paragraphB1, insert_text("Second Paragraph"))
+    paragraphA2 = put_new(paragraphA1, insert_text("First Paragraph"))
+    paragraphB2 = put_new(paragraphB1, insert_text("Second Paragraph"))
 
     def insert_paragraphs(proposal):
         pa_oid = get(paragraphA2)['meta']['oid']
@@ -101,7 +101,7 @@ def buildFixtures():
             [pa_oid, pb_oid]
         return proposal
 
-    proposal2 = put(proposal1, insert_paragraphs)
+    proposal2 = put_new(proposal1, insert_paragraphs)
 
     print("created a new proposal:")
     print(root_url + proposal2)
