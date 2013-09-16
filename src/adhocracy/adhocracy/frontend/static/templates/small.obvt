@@ -1,0 +1,2 @@
+
+<a href="#{meta.path}">{data.adhocracy#interfaces#IName.name}</a>

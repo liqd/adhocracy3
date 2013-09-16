@@ -1,2 +1,5 @@
 
 {data.adhocracy#interfaces#IText.text}
+<br />
+(<a href="#{meta.path}">#{meta.path}</a>)
+

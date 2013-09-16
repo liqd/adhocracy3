@@ -1,0 +1,4 @@
+
+<ol>
+    <li data-repeat="children" data-render="path|small"></li>
+</ol>
