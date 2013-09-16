@@ -173,7 +173,7 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
             .enter().append("circle")
             .attr("class", "node")
             .attr("r", function(d) {
-                if (d.history_phase == 'current') {
+                if (d.version == current_version.version) {
                     return 15;
                 } else {
                     return 10;
