@@ -32,6 +32,44 @@ stuff, she wants to be notified as soon as possible, but (1) delays
 are acceptable, and (2) she doesn't want the notifications to
 interfere with her work.
 
+
+
+Fri Sep 20 17:21:51 CEST 2013
+
+
+marker interfaces are implemented by json objects that have a
+content-type attribute and a data attribute that contains a list of
+json objects implementing the supported do-er interfaces.
+
+do-er interfaces are implemented by json objects that have
+interface-dependent structure and contain the actual data.
+
+marker and do-er interfaces are interleaved.  whatever that means.
+
+
+to register multiple obviel-ifaces for multiple doer interfaces: there
+is one default view, and
+
+
+register following interfaces:
+
+ - marker interface, 'default'
+ - marker interface, 'edit'
+
+for each do-er interface:
+
+ - do-er-interface, 'default.do-er-interface'
+ - do-er-interface, 'edit.do-er-interface'
+
+
+trick: because there is no way of explicitly picking an interface if
+several matching views are installed, each interface has both iface
+and name set to the same string.  so we can choose via the name.
+(this is for the doer interfaces.  marker interfaces are always listed
+first in the ifaces attribute, so they are picked by default.)  views
+always work on marker interface level.
+
+
 */
 
 
@@ -39,19 +77,35 @@ interfere with her work.
 
     // for editing
 
-    // FIXME: Put in seperate module
     // Adds fields to make a view settings object editable.
+    // FIXME: Put in seperate module
+    // FIXME: only insert one of edit, display, depending on child.name.
+    // FIXME: rename 'child' to 'view' or something.
+    // FIXME: 'save' and 'reset' buttons should pop up whenever in 'preview' mode.
+    //        (you are in preview mode when things have changed w.r.t. model version from server.)
     ad.Editable = function(child) {
         var result = {
             edit: function(ev) {
                     this.el.render(this.obj, "edit");
+                },
+            display: function(ev) {
+                    this.el.render(this.obj, "display");
                 },
         };
         $.extend(result, child);
         return result;
     };
 
-    obviel.view({
+    // FIXME: need separation between marker and do-er views.  perhaps even in rest api.
+
+    // for now, iface-name 'default' means 'display'.
+
+    obviel.view(ad.Editable({
+        iface: 'adhocracy.interfaces.IParagraph',
+        obvtUrl: 'templates/IParagraph.obvt',
+    }));
+
+    obviel.view(ad.Editable({
         iface: 'adhocracy.interfaces.IParagraph',
         name: 'edit',
         obvt: '<textarea class="__widget__" data-with="data.adhocracy#interfaces#IText">' +
@@ -59,15 +113,17 @@ interfere with her work.
               '<button data-on="click|default_view">preview</button>' +
               '',
 
-        default_view: function() {
+        display: function() {
             value = this.el[0].getElementsByClassName('__widget__')[0].value;
             this.obj.data['adhocracy#interfaces#IText'].text = value;
 
             this.el.render(this.obj);
         }
-    });
+    }));
 
-    obviel.view({  // XXX: display/default and edit views should
+/*
+    obviel.view(ad.Editable({
+                   // FIXME: display/default and edit views should
 		   // either both be on IParagraph or both on IText.
         iface: 'adhocracy.interfaces.IText',
         name: 'default',
@@ -76,12 +132,13 @@ interfere with her work.
               '<button data-on="click|preview">preview</button>' +
               '',
 
-        preview: function() {
+        display: function() {
             value = this.el[0].children[1].value;
             this.obj.text = value;
             this.el.render(this.obj);
         }
-    });
+    }));
+*/
 
 
     // Pool:
@@ -108,24 +165,15 @@ interfere with her work.
     };
 
     // small views for named items
-    var interfaces = ["IProposalContainer", "IParagraphContainer"];
-    for (i in interfaces) {
-        name = interfaces[i];
-        obviel.view({
-            iface: 'adhocracy.interfaces.' + name,
-            name: 'small',
-            obvtUrl: 'templates/IName.small.obvt'
-        });
-    };
+    obviel.view({
+        iface: 'adhocracy.interfaces.IName',
+        name: 'small.adhocracy.interfaces.IName',
+        obvtUrl: 'templates/IName.small.obvt'
+    });
 
     obviel.view(ad.Editable({
         iface: 'adhocracy.interfaces.IProposal',
         obvtUrl: 'templates/IProposal.obvt',
-    }));
-
-    obviel.view(ad.Editable({
-        iface: 'adhocracy.interfaces.IParagraph',
-        obvtUrl: 'templates/IParagraph.obvt',
     }));
 
     obviel.view({

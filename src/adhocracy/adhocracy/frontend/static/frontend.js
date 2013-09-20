@@ -13,6 +13,7 @@
         obj.ifaces = [main_interface];
 
         for (i in obj.data) {
+            obj.ifaces.push(i);
             obj.data[i].ifaces = i;
             obj.data[i.replace(/\./g, "#")] = obj.data[i];
             delete obj.data[i];
