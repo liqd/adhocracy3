@@ -54,34 +54,34 @@ interfere with her work.
     obviel.view({
         iface: 'adhocracy.interfaces.IParagraph',
         name: 'edit',
-        obvt: '<div data-render="form"></div><button data-on="click|preview">Preview</div>',
-        before: function() {
-            this.obj.form = toForms(this.obj);
-        },
-        preview: function() {
-            // FIXME: How do we get the real value?
-            value = document.getElementById('obviel-field-auto0-text').value;
+        obvt: '<textarea class="__widget__" data-with="data.adhocracy#interfaces#IText">' +
+              '{text}</textarea>' +
+              '<button data-on="click|default_view">preview</button>' +
+              '',
 
-            console.log("FIXME");
-            console.log(this);
-            console.log(this.el[0]);
-
-
-            // XXX: el[0] must contain another xml tag, say, "<p>" or
-            // "<div>" or "<textarea>" that contains only the contents
-            // we are looking for.  then we can dig into this.el
-            // properly and pluck it.
-
-
-            // .getElementByClass()?
-            // ...?
-
+        default_view: function() {
+            value = this.el[0].getElementsByClassName('__widget__')[0].value;
             this.obj.data['adhocracy#interfaces#IText'].text = value;
+
             this.el.render(this.obj);
         }
     });
 
-    // end editing
+    obviel.view({  // XXX: display/default and edit views should
+		   // either both be on IParagraph or both on IText.
+        iface: 'adhocracy.interfaces.IText',
+        name: 'default',
+        obvt: '<pre>{@.}</pre>' +
+              '<textarea>{text}</textarea>' +
+              '<button data-on="click|preview">preview</button>' +
+              '',
+
+        preview: function() {
+            value = this.el[0].children[1].value;
+            this.obj.text = value;
+            this.el.render(this.obj);
+        }
+    });
 
 
     // Pool:
@@ -92,6 +92,9 @@ interfere with her work.
 
     // Versionables
     var interfaces = ["IProposalContainer", "IParagraphContainer"];
+    // FIXME: all for loops in this file are probably bogus; what they
+    // do is determine the data model by assigning interfaces to
+    // models.  this should be entirely done by the server.
     for (i in interfaces) {
         name = interfaces[i];
         console.log(('adhocracy.interfaces.' + name));

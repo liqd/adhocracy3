@@ -1,5 +1,6 @@
-
+<p>
 {data.adhocracy#interfaces#IText.text}
+<p>
 <button data-on="click|edit">edit</button>
 <br />
 (<a href="#{meta.path}">#{meta.path}</a>)
