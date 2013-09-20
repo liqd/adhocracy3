@@ -110,7 +110,7 @@ always work on marker interface level.
         name: 'edit',
         obvt: '<textarea class="__widget__" data-with="data.adhocracy#interfaces#IText">' +
               '{text}</textarea>' +
-              '<button data-on="click|default_view">preview</button>' +
+              '<button data-on="click|display">preview</button>' +
               '',
 
         display: function() {
@@ -179,11 +179,6 @@ always work on marker interface level.
     obviel.view({
         iface: 'adhocracy.interfaces.INodeVersions',
         obvtUrl: "templates/INodeVersions.obvt"
-    });
-
-    obviel.view({
-        iface: "formlist",
-        obvt: '<div data-repeat="elements" data-render="@."></div>'
     });
 
     obviel.view({

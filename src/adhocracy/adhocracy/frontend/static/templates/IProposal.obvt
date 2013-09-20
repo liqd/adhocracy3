@@ -1,6 +1,6 @@
 <span data-with="data.adhocracy#interfaces#IDocument">
     <h3>Proposal: "{title}"</h3>
-    <small>{description}</small>
+    <p><small>{description}</small></p>
     <ol>
         <li data-repeat="paragraphs" data-render="@."></li>
     </ol>
