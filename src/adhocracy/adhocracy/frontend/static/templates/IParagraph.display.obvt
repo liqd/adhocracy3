@@ -1,7 +1,6 @@
-<p>
-{data.adhocracy#interfaces#IText.text}
-<p>
+<p>{data.adhocracy#interfaces#IText.text}<p>
 <button data-on="click|edit">edit</button>
+<button data-on="click|reset">reset</button>
+<button data-on="click|save">save</button>
 <br />
 (<a href="#{meta.path}">#{meta.path}</a>)
-

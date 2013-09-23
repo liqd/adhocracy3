@@ -86,11 +86,27 @@ views:
 
 
 
-vererbung?  - obviel.extendsIface.  requires server to send inheritance hierarchy to client, id
+vererbung?  - obviel.extendsIface(parent, child).  requires server to send inheritance hierarchy to client, id
 
 
 
 
+Mon Sep 23 10:46:27 CEST 2013
+
+ . save button
+ . reset button / keeping track of changes
+
+
+the save button posts a changed model from the client back to the
+server, creating a new version that is then retrieved and rendered by
+the client.  (there may be performance considerations with this, but
+for now this is how it is implemented.)
+
+in order for the client to decide whether a model contains new data
+that is not available on the server, each sub-tree may contain an
+attribute __orig__ that contains a copy of the previous version of
+that subtree.  "save" and "reset" are only available if __orig__
+exists in some sub-tree.
 
 
 
@@ -103,11 +119,9 @@ vererbung?  - obviel.extendsIface.  requires server to send inheritance hierarch
 
     // Adds fields to make a view settings object editable.
     // FIXME: Put in seperate module
-    // FIXME: 'save' and 'reset' buttons should pop up whenever in 'preview' mode.
-    //        (you are in preview mode when things have changed w.r.t. model version from server.)
     ad.Editable = function(view) {
         var result = {};
-        if (view.name == 'default') {
+        if (typeof(view.name) == 'undefined' || view.name == 'default') {
             result.edit = function(ev) {
                 this.el.render(this.obj, "edit");
             }
@@ -123,22 +137,103 @@ vererbung?  - obviel.extendsIface.  requires server to send inheritance hierarch
 
     // FIXME: need separation between marker and do-er views.  perhaps even in rest api.
 
+    function hasChanged(obj) {
+        Object.keys(obj.data).forEach(function(k) {
+            if ('__orig__' in obj.data[k]) {
+                return true;
+	    }
+            // FIXME: recurse
+	})
+        return false;
+    };
+
+    function resetObj(obj) {
+        console.log('resetObj');
+        Object.keys(obj.data).forEach(function(k) {
+            if ('__orig__' in obj.data[k]) {
+                obj.data[k] = obj.data[k].__orig__;
+                delete obj.data[k].__orig__;
+	    }
+            // FIXME: recurse
+        });
+    };
+
+    function saveObj(obj) {
+        // FIXME: notification field with a "paragraph saved" message.
+        // FIXME: do not send __orig__ sub-trees over the net with the new version.
+
+        if (hasChanged(obj)) {
+            console.log("POST");
+
+            var payload = {
+              'content_type': 'adhocracy.interfaces.IParagraph',
+              'data': obj
+            };
+
+            var path = '';
+
+            $.ajax(path, {
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: showjs(propcontainer),
+                success: dummyHandler("2/success"),
+                error:   dummyHandler("2/error")
+              });
+
+            // FIXME: it is not clear how to push trees of nodes.
+
+            // render newly saved object as returned from server.
+            // (needs to be moved over the wire once to straighten out
+            // meta data.)
+
+	}
+    };
+
+    function dummyHandler(name) {
+        return function(jqxhr, textstatus, errorthrown) {
+            console.log(name + ": [" + showjs(jqxhr) + "][" + textstatus + "][" + errorthrown + "]")
+        }
+    };
+
     obviel.view(ad.Editable({
         iface: 'adhocracy.interfaces.IParagraph',
-        obvtUrl: 'templates/IParagraph.obvt',
+        obvtUrl: 'templates/IParagraph.display.obvt',
+
+        reset: function() {
+            resetObj(this.obj)
+        },
+        save: function() {
+            saveObj(this.obj)
+        },
+
+        // FIXME: register reset, save in Editable
+
+        // FIXME: in IParagraph.*.obvt, render "reset", "save" buttons
+        // conditionally only if __orig__ exists.
     }));
 
     obviel.view(ad.Editable({
         iface: 'adhocracy.interfaces.IParagraph',
         name: 'edit',
-        obvUrl: 'templates/IParagraph.edit.obvt',
+        obvtUrl: 'templates/IParagraph.edit.obvt',
 
         display: function() {
             value = this.el[0].getElementsByClassName('__widget__')[0].value;
-            this.obj.data['adhocracy#interfaces#IText'].text = value;
+
+            var model = this.obj.data['adhocracy#interfaces#IText'];
+            model.__orig__ = model;  // FIXME: use deep copy.  better yet: use 'has_changed' marker and implement 'reset' button with "render('url')".
+            model.text = value;
 
             this.el.render(this.obj);
-        }
+        },
+
+        reset: function() {
+            resetObj(this.obj)
+        },
+        save: function() {
+            saveObj(this.obj)
+        },
     }));
 
 /*
@@ -174,7 +269,7 @@ vererbung?  - obviel.extendsIface.  requires server to send inheritance hierarch
     // models.  this should be entirely done by the server.
     for (i in interfaces) {
         name = interfaces[i];
-        console.log(('adhocracy.interfaces.' + name));
+        // console.log(('adhocracy.interfaces.' + name));
         obviel.view({
             iface: ('adhocracy.interfaces.' + name),
             before: function() {
