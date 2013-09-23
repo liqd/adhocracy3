@@ -232,6 +232,7 @@ exists in some sub-tree.
             resetObj(this.obj)
         },
         save: function() {
+            console.log(ad.repo);
             saveObj(this.obj)
         },
     }));

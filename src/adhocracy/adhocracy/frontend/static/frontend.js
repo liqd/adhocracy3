@@ -1,9 +1,13 @@
 
 (function($, obviel) {
 
+    ad.repo = {};  // FIXME: ask obviel if there is machinery for that already.
+
     // global transformer to put obviel iface attributes
     // into the received json objects.
     obviel.transformer(function(obj, path, name) {
+
+        ad.repo[path] = obj;
 
         var main_interface = obj.meta.content_type;
         if (typeof(main_interface) == 'undefined') {
