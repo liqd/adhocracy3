@@ -126,11 +126,21 @@ exists in some sub-tree.
                 this.el.render(this.obj, "edit");
             }
 	};
+
         if (view.name == 'edit') {
             result.display = function(ev) {
                 this.el.render(this.obj, "default");
             }
 	};
+
+        result.reset = function() {
+            resetObj(this.obj)
+        };
+
+        result.save = function() {
+            saveObj(this.obj)
+        };
+
         $.extend(result, view);
         return result;
     };
@@ -161,6 +171,9 @@ exists in some sub-tree.
     function saveObj(obj) {
         // FIXME: notification field with a "paragraph saved" message.
         // FIXME: do not send __orig__ sub-trees over the net with the new version.
+
+        var changes = collectChangedNodes(ad.repo, obj);
+        console.log(changes);
 
         if (hasChanged(obj)) {
             console.log("POST");
@@ -200,15 +213,6 @@ exists in some sub-tree.
         iface: 'adhocracy.interfaces.IParagraph',
         obvtUrl: 'templates/IParagraph.display.obvt',
 
-        reset: function() {
-            resetObj(this.obj)
-        },
-        save: function() {
-            saveObj(this.obj)
-        },
-
-        // FIXME: register reset, save in Editable
-
         // FIXME: in IParagraph.*.obvt, render "reset", "save" buttons
         // conditionally only if __orig__ exists.
     }));
@@ -226,14 +230,6 @@ exists in some sub-tree.
             model.text = value;
 
             this.el.render(this.obj);
-        },
-
-        reset: function() {
-            resetObj(this.obj)
-        },
-        save: function() {
-            console.log(ad.repo);
-            saveObj(this.obj)
         },
     }));
 
