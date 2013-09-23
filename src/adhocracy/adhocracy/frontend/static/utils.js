@@ -25,3 +25,7 @@ function collectChangedNodes(obj) {
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 };
+
+function deepCopy(obj) {
+    return jQuery.extend(true, {}, obj);
+};
