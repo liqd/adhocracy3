@@ -70,6 +70,30 @@ first in the ifaces attribute, so they are picked by default.)  views
 always work on marker interface level.
 
 
+
+// "do-er interface" => "property sheet interface"
+
+model = {
+ifaces: ["marker", "propsheet1", "propsheet2", ...]
+}
+
+
+views:
+
+{ iface: 'marker', ... }
+{ iface: 'propsheet1', name: 'propsheet1', ... }
+{ iface: 'propsheet2', name: 'propsheet2', ... }
+
+
+
+vererbung?  - obviel.extendsIface.  requires server to send inheritance hierarchy to client, id
+
+
+
+
+
+
+
 */
 
 
@@ -79,26 +103,25 @@ always work on marker interface level.
 
     // Adds fields to make a view settings object editable.
     // FIXME: Put in seperate module
-    // FIXME: only insert one of edit, display, depending on child.name.
-    // FIXME: rename 'child' to 'view' or something.
     // FIXME: 'save' and 'reset' buttons should pop up whenever in 'preview' mode.
     //        (you are in preview mode when things have changed w.r.t. model version from server.)
-    ad.Editable = function(child) {
-        var result = {
-            edit: function(ev) {
-                    this.el.render(this.obj, "edit");
-                },
-            display: function(ev) {
-                    this.el.render(this.obj, "display");
-                },
-        };
-        $.extend(result, child);
+    ad.Editable = function(view) {
+        var result = {};
+        if (view.name == 'default') {
+            result.edit = function(ev) {
+                this.el.render(this.obj, "edit");
+            }
+	};
+        if (view.name == 'edit') {
+            result.display = function(ev) {
+                this.el.render(this.obj, "default");
+            }
+	};
+        $.extend(result, view);
         return result;
     };
 
     // FIXME: need separation between marker and do-er views.  perhaps even in rest api.
-
-    // for now, iface-name 'default' means 'display'.
 
     obviel.view(ad.Editable({
         iface: 'adhocracy.interfaces.IParagraph',
@@ -108,10 +131,7 @@ always work on marker interface level.
     obviel.view(ad.Editable({
         iface: 'adhocracy.interfaces.IParagraph',
         name: 'edit',
-        obvt: '<textarea class="__widget__" data-with="data.adhocracy#interfaces#IText">' +
-              '{text}</textarea>' +
-              '<button data-on="click|display">preview</button>' +
-              '',
+        obvUrl: 'templates/IParagraph.edit.obvt',
 
         display: function() {
             value = this.el[0].getElementsByClassName('__widget__')[0].value;
