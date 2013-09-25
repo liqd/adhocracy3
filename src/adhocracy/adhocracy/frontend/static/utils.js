@@ -60,6 +60,10 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 };
 
+var showjs = function(json) {
+    return JSON.stringify(json, null, 2)
+};
+
 function deepCopy(obj) {
     return jQuery.extend(true, {}, obj);
 };

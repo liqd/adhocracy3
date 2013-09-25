@@ -172,27 +172,40 @@ exists in some sub-tree.
         // FIXME: notification field with a "paragraph saved" message.
         // FIXME: do not send __orig__ sub-trees over the net with the new version.
 
-        var changes = collectChangedNodes(ad.repo, obj);
-        console.log(changes);
+        // var changes = collectChangedNodes(ad.repo, obj);
+        // console.log(changes);
 
-        if (hasChanged(obj)) {
-            console.log("POST");
+        if (true /* hasChanged(obj) */) {
+            console.log("POST?  PUT?");
 
-            var payload = {
-              'content_type': 'adhocracy.interfaces.IParagraph',
-              'data': obj
+            var path = obj.meta.path;
+
+            newObj = {
+                content_type: obj.content_type,
+                data: {
+                    // obj.data.
+                }
+            }
+
+            console.log(obj);
+            console.log(newObj);
+            debugger;
+
+            for (i in obj.data) {
+                obj.data[i.replace(/\#/g, ".")] = obj.data[i];
+                delete obj.data[i];
             };
 
-            var path = '';
+            console.log(path, obj);
 
             $.ajax(path, {
-                type: "POST",
+                type: "PUT",
                 dataType: "json",
                 contentType: "application/json",
-                data: showjs(propcontainer),
+                data: showjs(obj),
                 success: dummyHandler("2/success"),
                 error:   dummyHandler("2/error")
-              });
+            });
 
             // FIXME: it is not clear how to push trees of nodes.
 
