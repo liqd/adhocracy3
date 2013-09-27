@@ -6,14 +6,14 @@ from pyramid.interfaces import IRequest
 from substanced.interfaces import IPropertySheet
 
 from adhocracy.property import PropertySheetAdhocracyContent
-from adhocracy import interfaces
+from adhocracy import propertysheets
 
 # PropertySheet adapters
 # read sdi/views/property for adapter lookup examples
 
 @implementer(IPropertySheet)
 def propertysheet_iname_adapter(context, request):
-    schema_dotted = interfaces.IName.getTaggedValue('schema')
+    schema_dotted = propertysheets.interfaces.IName.getTaggedValue('schema')
     schema = resolve(schema_dotted)
     sheet = PropertySheetAdhocracyContent(context, request)
     sheet.schema = schema()
@@ -22,7 +22,7 @@ def propertysheet_iname_adapter(context, request):
 
 @implementer(IPropertySheet)
 def propertysheet_iversionable_adapter(context, request):
-    schema_dotted = interfaces.IVersionable.getTaggedValue('schema')
+    schema_dotted = propertysheets.interfaces.IVersionable.getTaggedValue('schema')
     schema = resolve(schema_dotted)
     sheet = PropertySheetAdhocracyContent(context, request)
     sheet.schema = schema()
@@ -31,7 +31,7 @@ def propertysheet_iversionable_adapter(context, request):
 
 @implementer(IPropertySheet)
 def propertysheet_idocument_adapter(context, request):
-    schema_dotted = interfaces.IDocument.getTaggedValue('schema')
+    schema_dotted = propertysheets.interfaces.IDocument.getTaggedValue('schema')
     schema = resolve(schema_dotted)
     sheet = PropertySheetAdhocracyContent(context, request)
     sheet.schema = schema()
@@ -40,7 +40,7 @@ def propertysheet_idocument_adapter(context, request):
 
 @implementer(IPropertySheet)
 def propertysheet_itext_adapter(context, request):
-    schema_dotted = interfaces.IText.getTaggedValue('schema')
+    schema_dotted = propertysheets.interfaces.IText.getTaggedValue('schema')
     schema = resolve(schema_dotted)
     sheet = PropertySheetAdhocracyContent(context, request)
     sheet.schema = schema()
@@ -52,24 +52,24 @@ def includeme(config): # pragma: no cover
     # TODO more DRY for adapter registration
     config.registry.registerAdapter(
         propertysheet_iname_adapter,
-        (interfaces.IName, IRequest),
+        (propertysheets.interfaces.IName, IRequest),
         IPropertySheet,
-        interfaces.IName.__identifier__)
+        propertysheets.interfaces.IName.__identifier__)
 
     config.registry.registerAdapter(
         propertysheet_iversionable_adapter,
-        (interfaces.IVersionable, IRequest),
+        (propertysheets.interfaces.IVersionable, IRequest),
         IPropertySheet,
-        interfaces.IVersionable.__identifier__)
+        propertysheets.interfaces.IVersionable.__identifier__)
 
     config.registry.registerAdapter(
         propertysheet_idocument_adapter,
-        (interfaces.IDocument, IRequest),
+        (propertysheets.interfaces.IDocument, IRequest),
         IPropertySheet,
-        interfaces.IDocument.__identifier__)
+        propertysheets.interfaces.IDocument.__identifier__)
 
     config.registry.registerAdapter(
         propertysheet_itext_adapter,
-        (interfaces.IText, IRequest),
+        (propertysheets.interfaces.IText, IRequest),
         IPropertySheet,
-        interfaces.IText.__identifier__)
+        propertysheets.interfaces.IText.__identifier__)
