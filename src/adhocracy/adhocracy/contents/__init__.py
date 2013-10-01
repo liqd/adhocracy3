@@ -1,217 +1,73 @@
 from zope.interface import (
     implementer,
-    directlyProvides,
-    implementedBy,
-    )
-from pyramid.threadlocal import get_current_registry
-from substanced.content import content
-from substanced.folder import (
-    Folder,
-    RandomAutoNamingFolder,
+    directlyProvides
 )
-from adhocracy.propertysheets.interfaces import (
-     IName,
-     INameReadonly,
-     IVersionable,
-     IDocument,
-     IText,
-)
-from adhocracy.contents.interfaces import (
-     IPool,
-     INodeContainer,
-     INodeVersions,
-     INodeTags,
-     INode,
-     IProposal,
-     IProposalContainer,
-     IParagraph,
-     IParagraphContainer,
-)
+from zope.dottedname.resolve import resolve
+from substanced.folder import Folder
+from substanced.content import add_content_type
+from adhocracy.contents import interfaces
 
 #######################
 ##  Adhocracy Content #
 #######################
 
-
-## Basic Pools
-
-
-@content(
-    # content interface/type: has to resolve to content interface class
-    'adhocracy.contents.interfaces.IPool',
-    # propertysheets that can be adapted to set/get data
-    propertysheet_interfaces = [IName],
-    # modifiable name TODO
-    content_name = "Pool",
-    # class
-    #content_class = Folder,
-    # view to make this content addable with sdi
-    add_view='add_pool',
-    # factory identifier
-    factory_type = 'pool',
-    # addable content types, class heritage is honored
-    addable_content_interfaces = ["adhocracy.contents.interfaces.IPool"],
-    # make this addable if supertype is addable
-    is_implicit_addable = True
-    # node_content_type TODO
-    )
-@implementer(IPool,
-             IName)
-def pool(context):
-    content = Folder()
-    # Set directly provided interfaces.
-    # The implementer decorator does not work with functions
-    # in python 3. So we have to declare the provided interfaces manually.
-    directlyProvides(content, implementedBy(pool).interfaces())
-    return content
+## base classes
 
 
-@content(
-    'adhocracy.contents.interfaces.INodeVersions',
-    factory_type = 'versions',
-    addable_content_interfaces = ["adhocracy.contents.interfaces.INode"],
-    )
-@implementer(INodeVersions)
-def versions(context):
-    content = RandomAutoNamingFolder()
-    directlyProvides(content, implementedBy(versions).interfaces())
-    return content
+@implementer(interfaces.INodeContainer)
+class NodeContainerFolder(Folder):
+    """Subtyped to create initial NodeContainer children"""
+
+    def __init__(self, data=None, family=None, node_iface=None):
+        super(NodeContainerFolder, self).__init__(data, family)
+        self.node_iface = node_iface
+        self["_tags"] = ContentFactory(interfaces.INodeTags)(self)
+        self["_versions"] = ContentFactory(interfaces.INodeVersions)(self)
+        self["_versions"].addable_content_interfaces = [self.node_iface.__identifier__]
+        node = ContentFactory(self.node_iface)(self)
+        self["_versions"].add_next(node)
 
 
-@content(
-    'adhocracy.contents.interfaces.INodeTags',
-    factory_type = 'tags',
-    addable_content_interfaces = ["adhocracy.contents.interfaces.INode"],
-    )
-@implementer(INodeTags)
-def tags(context):
-    content = Folder()
-    directlyProvides(content, implementedBy(versions).interfaces())
-    return content
+# basic factory
+class ContentFactory:
+
+    def __init__(self, iface):
+        # default
+        self.main_iface = iface
+        self.addit_ifaces = [resolve(i) for i in (iface.queryTaggedValue("propertysheet_interfaces") or [])]
+        self.base_class = resolve(iface.getTaggedValue("content_class"))
+        self.base_class_kwargs = {}
+        if issubclass(iface, interfaces.INodeContainer):
+            # TODO make factory dapter to remive this if
+            node_content_type = iface.getTaggedValue("node_content_type")
+            node_iface = resolve(node_content_type)
+            self.base_class_kwargs = {"node_iface": node_iface}
+
+    def __call__(self, context, **kwargs):
+        content = self.base_class(**self.base_class_kwargs)
+        directlyProvides(content, [self.main_iface] + self.addit_ifaces)
+        return content
 
 
-# Basic Node
+def includeme(config):
 
-
-@content(
-    'adhocracy.contents.interfaces.INode',
-    add_view='add_node',
-    factory_type = 'node',
-    is_implicit_addable = True
-    )
-@implementer(INode,
-             INameReadonly,
-             IVersionable)
-def node(context):
-    content = Folder()
-    directlyProvides(content, implementedBy(node).interfaces())
-    return content
-
-
-@content(
-    'adhocracy.contents.interfaces.INodeContainer',
-    add_view='add_nodecontainer',
-    factory_type = 'container',
-    addable_content_interfaces =
-        ["adhocracy.contents.interfaces.INodeContainer"],
-    is_implicit_addable = True
-    )
-@implementer(INodeContainer,
-             IName)
-def container(context):
-    content = Folder()
-    node_content_type =\
-        INodeContainer.getTaggedValue('node_content_type')
-    directlyProvides(content, implementedBy(container).interfaces())
-    registry = get_current_registry()
-    content["_versions"] = registry.content.create(\
-                                INodeVersions.__identifier__, context)
-    content["_tags"] = registry.content.create(\
-                                INodeTags.__identifier__, context)
-    content["_versions"].add_next(registry.content.create(node_content_type,
-                                                          context))
-    return content
-
-
-# Concrete Nodes
-
-
-@content(
-    'adhocracy.contents.interfaces.IProposal',
-    add_view='add_proposal',
-    factory_type = 'proposal',
-    is_implicit_addable = True
-    )
-@implementer(IProposal,
-             INameReadonly,
-             IDocument,
-             IVersionable)
-def proposal(context):
-    content = Folder()
-    directlyProvides(content, implementedBy(proposal).interfaces())
-    return content
-
-
-@content(
-    'adhocracy.contents.interfaces.IProposalContainer',
-    add_view='add_proposalcontainer',
-    factory_type = 'proposalcontainer',
-    addable_content_interfaces =
-        ["adhocracy.contents.interfaces.IProposalContainer"],
-    is_implicit_addable = True
-    )
-@implementer(INodeContainer, IName)
-def proposalcontainer(context):
-    content = Folder()
-    node_content_type =\
-        IProposalContainer.getTaggedValue('node_content_type')
-    directlyProvides(content, implementedBy(proposalcontainer).interfaces())
-    registry = get_current_registry()
-    content["_versions"] = registry.content.create(\
-                                INodeVersions.__identifier__, context)
-    content["_tags"] = registry.content.create(\
-                                INodeTags.__identifier__, context)
-    content["_versions"].add_next(registry.content.create(node_content_type,
-                                                          context))
-    return content
-
-
-@content(
-    'adhocracy.contents.interfaces.IParagraph',
-    add_view='add_paragraph',
-    factory_type = 'paragraph',
-    is_implicit_addable = True
-    )
-@implementer(IParagraph,
-             INameReadonly,
-             IText,
-             IVersionable)
-def paragraph(context):
-    content = Folder()
-    directlyProvides(content, implementedBy(paragraph).interfaces())
-    return content
-
-
-@content(
-    'adhocracy.contents.interfaces.IParagraphContainer',
-    add_view='add_paragraphcontainer',
-    factory_type = 'paragraphcontainer',
-    addable_content_interfaces =
-        ["adhocracy.contents.interfaces.IParagraphContainer"],
-    is_implicit_addable = True
-    )
-@implementer(INodeContainer,
-             IName)
-def paragraphcontainer(context):
-    content = Folder()
-    node_content_type =\
-        IParagraphContainer.getTaggedValue('node_content_type')
-    directlyProvides(content, implementedBy(paragraphcontainer).interfaces())
-    registry = get_current_registry()
-    content["_versions"] = registry.content.create(\
-                                INodeVersions.__identifier__, context)
-    content["_tags"] = registry.content.create(\
-                                INodeTags.__identifier__, context)
-    content["_versions"].add_next(registry.content.create(node_content_type,
-                                                          context))
-    return content
+    ifaces = []
+    for key in dir(interfaces):
+        value = getattr(interfaces, key)
+        if value in [interfaces.IContent, interfaces.IContentFolder, interfaces.IContentItem]:
+            continue
+        try:
+            if issubclass(value, interfaces.IContent):
+                ifaces.append(value)
+        except TypeError:
+            continue
+    for iface in ifaces:
+        is_implicit_addable = iface.queryTaggedValue("is_implicit_addable")
+        meta = {"content_name": iface.queryTaggedValue("content_name") or iface.__identifier__,
+                "addable_content_interfaces": iface.queryTaggedValue("addable_content_interfaces") or [],
+                "is_implicit_addable": is_implicit_addable if is_implicit_addable is not None else True,
+                "add_view": "add_" + iface.__identifier__,
+                }
+        add_content_type(config, iface.__identifier__,
+                         ContentFactory(iface),
+                         factory_type=iface.__identifier__, **meta)

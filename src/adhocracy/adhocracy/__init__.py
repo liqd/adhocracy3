@@ -32,6 +32,7 @@ def main(global_config, **settings):
     config.include('substanced')
     config.commit() # commit to allow proper config overrides
     config.include('.propertysheets')
+    config.include('.contents')
     config.include('.contentregistry')
     config.include('.evolution')
     config.include('.rest')
