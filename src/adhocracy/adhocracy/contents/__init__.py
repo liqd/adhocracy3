@@ -7,13 +7,8 @@ from substanced.folder import Folder
 from substanced.content import add_content_type
 from adhocracy.contents import interfaces
 
-#######################
-##  Adhocracy Content #
-#######################
 
-## base classes
-
-
+# base classes
 @implementer(interfaces.INodeContainer)
 class NodeContainerFolder(Folder):
     """Subtyped to create initial NodeContainer children"""
@@ -51,6 +46,7 @@ class ContentFactory:
 
 def includeme(config):
 
+    # register content types
     ifaces = []
     for key in dir(interfaces):
         value = getattr(interfaces, key)

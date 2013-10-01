@@ -10,11 +10,11 @@ from adhocracy.propertysheets import interfaces
 
 class PropertysheetGenericAdapter:
 
-    def __init__(self, isheetmarker):
-        self.isheetmarker = isheetmarker
+    def __init__(self, propsheetmarker_iface):
+        self.propsheetmarker_iface = propsheetmarker_iface
 
     def __call__(self, context, request):
-        schema_dotted = self.isheetmarker.getTaggedValue('schema')
+        schema_dotted = self.propsheetmarker_iface.getTaggedValue('schema')
         schema = resolve(schema_dotted)
         sheet = PropertySheetAdhocracyContent(context, request)
         sheet.schema = schema()
@@ -26,20 +26,20 @@ def includeme(config): # pragma: no cover
     # get all IPropertySheetMarker interfaces
     # inspect.isclass is not working with interfaces,
     # so we have to do it manually
-    isheetmarkers = []
+    propsheetmarker_ifaces = []
     for key in dir(interfaces):
+        value = getattr(interfaces, key)
+        if value is interfaces.IPropertySheetMarker:
+            continue
         try:
-            value = getattr(interfaces, key)
-            if value is interfaces.IPropertySheetMarker:
-                continue
             if issubclass(value, interfaces.IPropertySheetMarker):
-                isheetmarkers.append(value)
+                propsheetmarker_ifaces.append(value)
         except TypeError:
             continue
     # register generic adapter for all IPropertySheetMarkers
-    for isheetmarker in isheetmarkers:
+    for iface in propsheetmarker_ifaces:
         config.registry.registerAdapter(
-            PropertysheetGenericAdapter(isheetmarker),
-            (isheetmarker, IRequest),
+            PropertysheetGenericAdapter(iface),
+            (iface, IRequest),
             IPropertySheet,
-            isheetmarker.__identifier__)
+            iface.__identifier__)
