@@ -16,10 +16,10 @@ class NodeContainerFolder(Folder):
     def __init__(self, data=None, family=None, node_iface=None):
         super(NodeContainerFolder, self).__init__(data, family)
         self.node_iface = node_iface
-        self["_tags"] = ContentFactory(interfaces.INodeTags)(self)
-        self["_versions"] = ContentFactory(interfaces.INodeVersions)(self)
+        self["_tags"] = ContentFactory(interfaces.INodeTags)()
+        self["_versions"] = ContentFactory(interfaces.INodeVersions)()
         self["_versions"].addable_content_interfaces = [self.node_iface.__identifier__]
-        node = ContentFactory(self.node_iface)(self)
+        node = ContentFactory(self.node_iface)()
         self["_versions"].add_next(node)
 
 
@@ -38,7 +38,7 @@ class ContentFactory:
             node_iface = resolve(node_content_type)
             self.base_class_kwargs = {"node_iface": node_iface}
 
-    def __call__(self, context, **kwargs):
+    def __call__(self, **kwargs):
         content = self.base_class(**self.base_class_kwargs)
         directlyProvides(content, [self.main_iface] + self.addit_ifaces)
         return content
