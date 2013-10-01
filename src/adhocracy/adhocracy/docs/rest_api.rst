@@ -44,7 +44,7 @@ HEAD
 Returns only http headers for this resource::
 
     >>> resp = testapp.head("/adhocracy")
-    >>> resp.headerlist # doctest: +ELLIPSIS
+    >>> resp.headerlist # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     [('Content-Type', 'application/json; charset=UTF-8'), ...
     >>> resp.text
     ''
@@ -123,8 +123,9 @@ The initial node without follow Nodes is already there ::
     >>> resp = testapp.get(proposalv1["path"])
     >>> pprint(resp.json["data"])
     {'adhocracy.propertysheets.interfaces.IDocument': {'description': '',
-                                        'paragraphs': [],
-                                        'title': ''},
+                                                       'paragraphs': [],
+                                                       'title': ''},
+     'adhocracy.propertysheets.interfaces.IName': {'name': ''},
      'adhocracy.propertysheets.interfaces.IVersionable': {'follows': []}}
 
 
