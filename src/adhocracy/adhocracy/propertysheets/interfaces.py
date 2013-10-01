@@ -52,8 +52,8 @@ class IName(IPropertySheetMarker):
     taggedValue("view_permission", "view")
     taggedValue("edit_permission", "edit-content")
 
-
-class INameReadonly(IName):
+# TODO this should be a specialication of IName..
+class INameReadonly(IPropertySheetMarker):
 
     taggedValue("schema", "adhocracy.propertysheets.interfaces.NameReadonlySchema")
     taggedValue("view_permission", "view")
