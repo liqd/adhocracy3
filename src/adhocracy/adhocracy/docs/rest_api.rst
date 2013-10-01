@@ -125,7 +125,7 @@ The initial node without follow Nodes is already there ::
     {'adhocracy.propertysheets.interfaces.IDocument': {'description': '',
                                                        'paragraphs': [],
                                                        'title': ''},
-     'adhocracy.propertysheets.interfaces.IName': {'name': ''},
+     'adhocracy.propertysheets.interfaces.INameReadonly': {'name': ''},
      'adhocracy.propertysheets.interfaces.IVersionable': {'follows': []}}
 
 
