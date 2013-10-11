@@ -6,6 +6,7 @@ Prerequisites
 
 usefull imports to work with rest api calls  ::
 
+    >>> import os
     >>> import requests
     >>> from pprint import pprint
     >>> import json
@@ -19,8 +20,16 @@ start adhocracy testapp ::
     >>> from webtest import TestApp
     >>> from adhocracy.testing import config
     >>> from adhocracy import main
-    >>> app = main({}, **config)
-    Executing evolution step ...
+
+    >>> if 'A3_TEST_SERVER' in os.environ and os.environ['A3_TEST_SERVER']:
+    ...     print('skip')
+    ...     from tests.http2wsgi import http2wsgi
+    ...     app = http2wsgi(os.environ['A3_TEST_SERVER'])
+    ... else:
+    ...     print('skip')
+    ...     app = main({}, **config)
+    skip...
+
     >>> testapp = TestApp(app)
 
 
@@ -116,8 +125,11 @@ Create new resource and return the path::
     ...              'adhocracy.propertysheets.interfaces.IName': {'name': 'proposal1'},
     ...              'adhocracy.propertysheets.interfaces.IDag': {}}}
     >>> resp = testapp.post_json("/adhocracy", data)
-    >>> resp.json
-    {'path': ...}
+    >>> pprint_json(resp.json)
+    {
+        "content_type": "adhocracy.contents.interfaces.IProposalContainer",
+        "path": ...
+    }
     >>> proposal1_path = resp.json["path"]
 
 Checking the resource was added::
@@ -160,22 +172,10 @@ contained versions::
     >>> inode_container_data = resp.json["data"]["adhocracy.propertysheets.interfaces.IDag"]
     >>> versions = inode_container_data["versions"]
     >>> len(versions)
-    1
-
-The initial node without follow nodes is already there ::
-
-    >>> proposalv1 = versions[0]
-    >>> resp = testapp.get(proposalv1["path"])
-    >>> pprint(resp.json["data"])
-    {'adhocracy.propertysheets.interfaces.IDocument': {'description': '',
-                                                       'paragraphs': [],
-                                                       'title': ''},
-     'adhocracy.propertysheets.interfaces.INameReadonly': {'name': ''},
-     'adhocracy.propertysheets.interfaces.IVersionable': {'follows': []}}
+    0
 
 
-
-If we change this node we create a new version, so we have to mind
+We create a new version, so we have to mind
 the right follows relation ::
 
     >>> data =  {'content_type': 'adhocracy.contents.interfaces.IProposal',
@@ -183,14 +183,13 @@ the right follows relation ::
     ...                       'description': 'synopsis',
     ...                       'title': 'title'},
     ...                   'adhocracy.propertysheets.interfaces.IVersionable': {
-    ...                       'follows': [proposalv1["path"]]}}}
+    ...                       'follows': []}}}
     >>> resp = testapp.post_json(proposal1_path, data)
-    >>> resp.json
-    {'path': ...
-
-    >>> proposalv2 = resp.json
-    >>> proposalv2['path'] != proposalv1["path"]
-    True
+    >>> pprint_json(resp.json)
+    {
+        "content_type": "adhocracy.contents.interfaces.IProposal",
+        "path": ...
+    }
 
 
 GET /interfaces/..::
