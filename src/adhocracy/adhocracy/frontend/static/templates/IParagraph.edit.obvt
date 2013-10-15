@@ -1,4 +1,6 @@
 <textarea class="__widget__" data-with="data.adhocracy#interfaces#IText">{text}</textarea>
-<button data-on="click|display">preview</button>
+<button data-on="click|display">display</button>
+<button data-on="click|reset">reset</button>
+<button data-on="click|save">save</button>
 <br />
 (<a href="#{meta.path}">#{meta.path}</a>)

@@ -5,6 +5,8 @@
     // into the received json objects.
     obviel.transformer(function(obj, path, name) {
 
+        ad.repo[path] = obj;  // FIXME: do a deep copy here.
+
         var main_interface = obj.meta.content_type;
         if (typeof(main_interface) == 'undefined') {
             console.log(obj);

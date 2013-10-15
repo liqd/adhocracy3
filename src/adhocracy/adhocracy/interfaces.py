@@ -68,7 +68,7 @@ class IPropertySheetMarker(Interface):
 # Basic Pools
 
 class INodeContainer(IPool):
-    """Pool for all versions and tags of one node versions darc
+    """Pool for all versions and tags of one node versions dag
        or other node containers that are part of the essence.
 
        Children:
