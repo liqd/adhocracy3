@@ -222,6 +222,9 @@ exists in some sub-tree.
         }
     };
 
+
+    // Actual views
+
     obviel.view(ad.Editable({
         iface: 'adhocracy.interfaces.IParagraph',
         obvtUrl: 'templates/IParagraph.display.obvt',
@@ -246,25 +249,6 @@ exists in some sub-tree.
         },
     }));
 
-/*
-    obviel.view(ad.Editable({
-                   // FIXME: display/default and edit views should
-		   // either both be on IParagraph or both on IText.
-        iface: 'adhocracy.interfaces.IText',
-        name: 'default',
-        obvt: '<pre>{@.}</pre>' +
-              '<textarea>{text}</textarea>' +
-              '<button data-on="click|preview">preview</button>' +
-              '',
-
-        display: function() {
-            value = this.el[0].children[1].value;
-            this.obj.text = value;
-            this.el.render(this.obj);
-        }
-    }));
-*/
-
 
     // Pool:
     obviel.view({
@@ -273,32 +257,25 @@ exists in some sub-tree.
     });
 
     // Versionables
-    var interfaces = ["IProposalContainer", "IParagraphContainer"];
-    // FIXME: all for loops in this file are probably bogus; what they
-    // do is determine the data model by assigning interfaces to
-    // models.  this should be entirely done by the server.
-    for (i in interfaces) {
-        name = interfaces[i];
-        // console.log(('adhocracy.interfaces.' + name));
-        obviel.view({
-            iface: ('adhocracy.interfaces.' + name),
-            before: function() {
-                this.obj._versions_path = this.obj.meta.path + "/_versions";
-            },
-            obvt: '<div data-render="_versions_path"></div>',
-        });
-    };
+    obviel.view({
+        iface: ('adhocracy.interfaces.INodeContainer'),
+        before: function() {
+            this.obj._versions_path = this.obj.meta.path + "/_versions";
+        },
+        obvt: '<div data-render="_versions_path"></div>',
+    });
 
     // small views for named items
     obviel.view({
         iface: 'adhocracy.interfaces.IName',
-        name: 'small.adhocracy.interfaces.IName',
+        name: 'small_listing',
         obvtUrl: 'templates/IName.small.obvt'
     });
 
+    // view for documents
     obviel.view(ad.Editable({
-        iface: 'adhocracy.interfaces.IProposal',
-        obvtUrl: 'templates/IProposal.obvt',
+        iface: 'adhocracy.interfaces.IDocument',
+        obvtUrl: 'templates/IDocument.obvt',
     }));
 
     obviel.view({

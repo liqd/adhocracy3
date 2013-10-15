@@ -4,9 +4,9 @@
     // global transformer to put obviel iface attributes
     // into the received json objects.
     obviel.transformer(function(obj, path, name) {
-
         ad.repo[path] = obj;  // FIXME: do a deep copy here.
 
+        // set the content_type as the first iface
         var main_interface = obj.meta.content_type;
         if (typeof(main_interface) == 'undefined') {
             console.log(obj);
@@ -14,8 +14,13 @@
         };
         obj.ifaces = [main_interface];
 
+        // add all other provided interfaces to ifaces:
+        for (i in obj.provided_interfaces) {
+            obj.ifaces.push(obj.provided_interfaces[i]);
+        };
+
+        // add ifaces to the propertysheet interfaces in the data field
         for (i in obj.data) {
-            obj.ifaces.push(i);
             obj.data[i].ifaces = i;
             obj.data[i.replace(/\./g, "#")] = obj.data[i];
             delete obj.data[i];

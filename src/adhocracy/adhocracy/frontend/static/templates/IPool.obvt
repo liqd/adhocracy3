@@ -1,3 +1,3 @@
 <ol>
-    <li data-repeat="children" data-render="path|small.adhocracy.interfaces.IName"></li>
+    <li data-repeat="children" data-render="path|small_listing"></li>
 </ol>
