@@ -8,21 +8,6 @@ from substanced.content import add_content_type
 from adhocracy.contents import interfaces
 
 
-# base classes
-@implementer(interfaces.INodeContainer)
-class NodeContainerFolder(Folder):
-    """Subtyped to create initial NodeContainer children"""
-
-    def __init__(self, data=None, family=None, node_iface=None):
-        super(NodeContainerFolder, self).__init__(data, family)
-        self.node_iface = node_iface
-        self["_tags"] = ContentFactory(interfaces.INodeTags)()
-        self["_versions"] = ContentFactory(interfaces.INodeVersions)()
-        self["_versions"].addable_content_interfaces = [self.node_iface.__identifier__]
-        node = ContentFactory(self.node_iface)()
-        self["_versions"].add_next(node)
-
-
 # basic factory
 class ContentFactory:
 
@@ -32,11 +17,6 @@ class ContentFactory:
         self.addit_ifaces = [resolve(i) for i in (iface.queryTaggedValue("propertysheet_interfaces") or [])]
         self.base_class = resolve(iface.getTaggedValue("content_class"))
         self.base_class_kwargs = {}
-        if issubclass(iface, interfaces.INodeContainer):
-            # TODO make factory dapter to remive this if
-            node_content_type = iface.getTaggedValue("node_content_type")
-            node_iface = resolve(node_content_type)
-            self.base_class_kwargs = {"node_iface": node_iface}
 
     def __call__(self, **kwargs):
         content = self.base_class(**self.base_class_kwargs)

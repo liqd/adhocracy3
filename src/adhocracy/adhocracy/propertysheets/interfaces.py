@@ -9,6 +9,7 @@ from zope.interface import (
     )
 
 from adhocracy.schema import ReferenceSetSchemaNode
+from adhocracy.contents.interfaces import INode
 
 
 # Interface types
@@ -60,7 +61,36 @@ class INameReadonly(IPropertySheetMarker):
     taggedValue("edit_permission", "edit-content")
 
 
+# Pool data
+
+class IPool(IPropertySheetMarker):
+    taggedValue("schema", "adhocracy.propertysheets.interfaces.PoolSchema")
+
+
+class PoolSchema(Schema):
+    elements = ReferenceSetSchemaNode(essence_refs=False,
+                                      default=[],
+                                      missing=[],
+                                      interface=INode
+                                      )
+
+
 # Versionable Data
+
+class IDag(IPropertySheetMarker):
+    """Dag for collecting all versions of one document."""
+    taggedValue("schema", "adhocracy.propertysheets.interfaces.DagSchema")
+    taggedValue("view_permission", "view")
+    taggedValue("edit_permission", "edit-content")
+
+class DagSchema(Schema):
+
+    versions = ReferenceSetSchemaNode(essence_refs=False,
+                                      default=[],
+                                      missing=[],
+                                      interface=INode,
+                                      )
+
 
 class IVersionable(IPropertySheetMarker):
     """Marker interface representing a node with version data"""
