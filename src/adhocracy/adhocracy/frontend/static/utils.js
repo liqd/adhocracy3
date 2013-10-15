@@ -17,6 +17,7 @@ ad.repo = {};
 // way to do this yet.)
 function collectChangedNodes(repo, obj) {
     console.log(obj);
+    throw 'not yet implemented.';
 
 /*
 
@@ -53,7 +54,6 @@ stand der diskussion, Mon Sep 23 17:32:18 CEST 2013, niko, sönke, matthias
     };
 */
 
-    return [];
 };
 
 function endsWith(str, suffix) {
