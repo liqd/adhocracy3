@@ -4,7 +4,7 @@ Adhocracy 3 loosed coupling REST-API with substance-d backend
 Prerequisites
 -------------
 
-usefull imports to work with rest api calls  ::
+Some imports to work with rest api calls::
 
     >>> import copy
     >>> from functools import reduce
@@ -23,7 +23,7 @@ usefull imports to work with rest api calls  ::
     ...         base[path[-1]] = sorted(base[path[-1]])
     ...     return d2
 
-start adhocracy testapp ::
+Start Adhocracy testapp::
 
     >>> from webtest import TestApp
     >>> from adhocracy.testing import config
@@ -98,7 +98,7 @@ Returns resource meta data, children meta data and all interfaces with data::
                 "elements": []
             }
         },
-	"path": ...
+        "path": ...
     }
 
 
