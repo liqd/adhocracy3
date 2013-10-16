@@ -6,6 +6,8 @@ Prerequisites
 
 usefull imports to work with rest api calls  ::
 
+    >>> import copy
+    >>> from functools import reduce
     >>> import os
     >>> import requests
     >>> from pprint import pprint
@@ -14,6 +16,12 @@ usefull imports to work with rest api calls  ::
     ...     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
     >>> def pprint_json(obj):
     ...     print(show_json(obj))
+    >>> def sort_dict(d, sort_paths):
+    ...     d2 = copy.deepcopy(d)
+    ...     for path in sort_paths:
+    ...         base = reduce(lambda d, seg: d[seg], path[:-1], d2)
+    ...         base[path[-1]] = sorted(base[path[-1]])
+    ...     return d2
 
 start adhocracy testapp ::
 
@@ -43,14 +51,24 @@ Returns possible methods for this resource and available interfaces
 with resources data::
 
     >>> resp = testapp.options("/adhocracy")
-    >>> pprint(resp.json)
-    {'GET': ['adhocracy.propertysheets.interfaces.IName'],
-     'HEAD': [],
-     'POST': ['adhocracy.contents.interfaces.INodeContainer',
-              'adhocracy.contents.interfaces.IParagraphContainer',
-              'adhocracy.contents.interfaces.IPool',
-              'adhocracy.contents.interfaces.IProposalContainer'],
-     'PUT': ['adhocracy.propertysheets.interfaces.IName']}
+    >>> pprint_json(sort_dict(resp.json, [['PUT'], ['GET']]))
+    {
+        "GET": [
+            "adhocracy.propertysheets.interfaces.IName",
+            "adhocracy.propertysheets.interfaces.IPool"
+        ],
+        "HEAD": [],
+        "POST": [
+            "adhocracy.contents.interfaces.INodeContainer",
+            "adhocracy.contents.interfaces.IParagraphContainer",
+            "adhocracy.contents.interfaces.IPool",
+            "adhocracy.contents.interfaces.IProposalContainer"
+        ],
+        "PUT": [
+            "adhocracy.propertysheets.interfaces.IName",
+            "adhocracy.propertysheets.interfaces.IPool"
+        ]
+    }
 
 HEAD
 ~~~~
