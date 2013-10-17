@@ -345,7 +345,6 @@ var JSC = (function () {
                     return value;
                 }
 
-
 // Make an array of the claims to be checked.
 
                 if (typeof claim === 'function') {

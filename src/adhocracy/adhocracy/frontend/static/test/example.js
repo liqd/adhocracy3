@@ -8,6 +8,10 @@ function le(a, b) {
 
 JSC.clear();
 
+//for (i = 0; i < 100; i++) {
+//    console.log(JSC.any()());
+//}
+
 JSC.test(
     "Less than",
     function (verdict, a, b) {
