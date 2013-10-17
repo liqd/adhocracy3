@@ -7,6 +7,9 @@ a3 testing methods and tools
 overview of options
 ~~~~~~~~~~~~~~~~~~~
 
+http://visionmedia.github.io/mocha/
+ - recommended by tobi
+
 https://github.com/douglascrockford/JSCheck/blob/master/jscheck.js
  - quickcheck for js by douglas crockford ("javascript - the good parts")
  - no 'shrink' (i think)
