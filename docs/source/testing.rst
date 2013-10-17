@@ -8,7 +8,7 @@ overview of options
 ~~~~~~~~~~~~~~~~~~~
 
 http://visionmedia.github.io/mocha/
- - recommended by tobi
+ - recommended by tobias
 
 https://github.com/douglascrockford/JSCheck/blob/master/jscheck.js
  - quickcheck for js by douglas crockford ("javascript - the good parts")
