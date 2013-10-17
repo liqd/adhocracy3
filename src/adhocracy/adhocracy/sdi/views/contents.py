@@ -8,7 +8,7 @@ from substanced.interfaces import (
 )
 from substanced.schema import Schema
 
-from adhocracy.interfaces import (
+from adhocracy.propertysheets.interfaces import (
     NameSchema
 )
 
@@ -25,7 +25,7 @@ class AddPoolBaseView(FormView):
     def add_success(self, appstruct):
         registry = self.request.registry
         name = appstruct.pop('name')
-        content = registry.content.create(self.contenttype, self.context,  **appstruct)
+        content = registry.content.create(self.contenttype, **appstruct)
         self.context[name] = content
         return HTTPFound(
             self.request.sdiapi.mgmt_path(self.context, '@@contents')
@@ -40,7 +40,7 @@ class AddNodeBaseView(FormView):
 
     def add_success(self, appstruct):
         registry = self.request.registry
-        content = registry.content.create(self.contenttype, self.context,  **appstruct)
+        content = registry.content.create(self.contenttype, **appstruct)
         self.context.add_next(content)
         return HTTPFound(
             self.request.sdiapi.mgmt_path(self.context, '@@contents')

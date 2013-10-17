@@ -1,75 +1,45 @@
-from zope.interface import (
-    implementer,
-    )
 from zope.dottedname.resolve import resolve
 from pyramid.interfaces import IRequest
 from substanced.interfaces import IPropertySheet
 
 from adhocracy.property import PropertySheetAdhocracyContent
-from adhocracy import interfaces
+from adhocracy.propertysheets import interfaces
 
 # PropertySheet adapters
 # read sdi/views/property for adapter lookup examples
 
-@implementer(IPropertySheet)
-def propertysheet_iname_adapter(context, request):
-    schema_dotted = interfaces.IName.getTaggedValue('schema')
-    schema = resolve(schema_dotted)
-    sheet = PropertySheetAdhocracyContent(context, request)
-    sheet.schema = schema()
-    return sheet
+class PropertysheetGenericAdapter:
 
+    def __init__(self, propsheetmarker_iface):
+        self.propsheetmarker_iface = propsheetmarker_iface
 
-@implementer(IPropertySheet)
-def propertysheet_iversionable_adapter(context, request):
-    schema_dotted = interfaces.IVersionable.getTaggedValue('schema')
-    schema = resolve(schema_dotted)
-    sheet = PropertySheetAdhocracyContent(context, request)
-    sheet.schema = schema()
-    return sheet
-
-
-@implementer(IPropertySheet)
-def propertysheet_idocument_adapter(context, request):
-    schema_dotted = interfaces.IDocument.getTaggedValue('schema')
-    schema = resolve(schema_dotted)
-    sheet = PropertySheetAdhocracyContent(context, request)
-    sheet.schema = schema()
-    return sheet
-
-
-@implementer(IPropertySheet)
-def propertysheet_itext_adapter(context, request):
-    schema_dotted = interfaces.IText.getTaggedValue('schema')
-    schema = resolve(schema_dotted)
-    sheet = PropertySheetAdhocracyContent(context, request)
-    sheet.schema = schema()
-    return sheet
+    def __call__(self, context, request):
+        schema_dotted = self.propsheetmarker_iface.getTaggedValue('schema')
+        schema = resolve(schema_dotted)
+        sheet = PropertySheetAdhocracyContent(context, request)
+        sheet.schema = schema()
+        return sheet
 
 
 def includeme(config): # pragma: no cover
 
-    # TODO more DRY for adapter registration
-    config.registry.registerAdapter(
-        propertysheet_iname_adapter,
-        (interfaces.IName, IRequest),
-        IPropertySheet,
-        interfaces.IName.__identifier__)
-
-    config.registry.registerAdapter(
-        propertysheet_iversionable_adapter,
-        (interfaces.IVersionable, IRequest),
-        IPropertySheet,
-        interfaces.IVersionable.__identifier__)
-
-    config.registry.registerAdapter(
-        propertysheet_idocument_adapter,
-        (interfaces.IDocument, IRequest),
-        IPropertySheet,
-        interfaces.IDocument.__identifier__)
-
-    config.registry.registerAdapter(
-        propertysheet_itext_adapter,
-        (interfaces.IText, IRequest),
-        IPropertySheet,
-        interfaces.IText.__identifier__)
+    # get all IPropertySheetMarker interfaces
+    # inspect.isclass is not working with interfaces,
+    # so we have to do it manually
+    propsheetmarker_ifaces = []
+    for key in dir(interfaces):
+        value = getattr(interfaces, key)
+        if value is interfaces.IPropertySheetMarker:
+            continue
+        try:
+            if issubclass(value, interfaces.IPropertySheetMarker):
+                propsheetmarker_ifaces.append(value)
+        except TypeError:
+            continue
+    # register generic adapter for all IPropertySheetMarkers
+    for iface in propsheetmarker_ifaces:
+        config.registry.registerAdapter(
+            PropertysheetGenericAdapter(iface),
+            (iface, IRequest),
+            IPropertySheet,
+            iface.__identifier__)

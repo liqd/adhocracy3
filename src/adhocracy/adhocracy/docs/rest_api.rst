@@ -4,18 +4,40 @@ Adhocracy 3 loosed coupling REST-API with substance-d backend
 Prerequisites
 -------------
 
-usefull imports to work with rest api calls  ::
+Some imports to work with rest api calls::
 
+    >>> import copy
+    >>> from functools import reduce
+    >>> import os
     >>> import requests
     >>> from pprint import pprint
+    >>> import json
+    >>> def show_json(obj):
+    ...     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
+    >>> def pprint_json(obj):
+    ...     print(show_json(obj))
+    >>> def sort_dict(d, sort_paths):
+    ...     d2 = copy.deepcopy(d)
+    ...     for path in sort_paths:
+    ...         base = reduce(lambda d, seg: d[seg], path[:-1], d2)
+    ...         base[path[-1]] = sorted(base[path[-1]])
+    ...     return d2
 
-start adhocracy testapp ::
+Start Adhocracy testapp::
 
     >>> from webtest import TestApp
     >>> from adhocracy.testing import config
     >>> from adhocracy import main
-    >>> app = main({}, **config)
-    Executing evolution step ...
+
+    >>> if 'A3_TEST_SERVER' in os.environ and os.environ['A3_TEST_SERVER']:
+    ...     print('skip')
+    ...     from tests.http2wsgi import http2wsgi
+    ...     app = http2wsgi(os.environ['A3_TEST_SERVER'])
+    ... else:
+    ...     print('skip')
+    ...     app = main({}, **config)
+    skip...
+
     >>> testapp = TestApp(app)
 
 
@@ -29,14 +51,24 @@ Returns possible methods for this resource and available interfaces
 with resources data::
 
     >>> resp = testapp.options("/adhocracy")
-    >>> pprint(resp.json)
-    {'GET': ['adhocracy.interfaces.IName'],
-     'HEAD': [],
-     'POST': ['adhocracy.interfaces.INodeContainer',
-              'adhocracy.interfaces.IParagraphContainer',
-              'adhocracy.interfaces.IPool',
-              'adhocracy.interfaces.IProposalContainer'],
-     'PUT': ['adhocracy.interfaces.IName']}
+    >>> pprint_json(sort_dict(resp.json, [['PUT'], ['GET']]))
+    {
+        "GET": [
+            "adhocracy.propertysheets.interfaces.IName",
+            "adhocracy.propertysheets.interfaces.IPool"
+        ],
+        "HEAD": [],
+        "POST": [
+            "adhocracy.contents.interfaces.INodeContainer",
+            "adhocracy.contents.interfaces.IParagraphContainer",
+            "adhocracy.contents.interfaces.IPool",
+            "adhocracy.contents.interfaces.IProposalContainer"
+        ],
+        "PUT": [
+            "adhocracy.propertysheets.interfaces.IName",
+            "adhocracy.propertysheets.interfaces.IPool"
+        ]
+    }
 
 HEAD
 ~~~~
@@ -44,29 +76,30 @@ HEAD
 Returns only http headers for this resource::
 
     >>> resp = testapp.head("/adhocracy")
-    >>> resp.headerlist # doctest: +ELLIPSIS
-    [('Content-Type', 'application/json; charset=UTF-8'), ...
+    >>> resp.headerlist # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    [...('Content-Type', 'application/json; charset=UTF-8'), ...
     >>> resp.text
     ''
 
 GET
-~~~~
+~~~
 
 Returns resource meta data, children meta data and all interfaces with data::
 
     >>> resp = testapp.get("/adhocracy", )
-    >>> pprint(resp.json)
-    {'children': [],
-     'content_type': 'adhocracy.interfaces.IPool',
-     'data': {'adhocracy.interfaces.IName': {'name': ''}},
-     'meta': {'content_type': 'adhocracy.interfaces.IPool',
-              'content_type_name': 'adhocracy.interfaces.IPool',
-              'creation_date': '',
-              'creator': '',
-              'name': 'adhocracy',
-              'oid': ...
-              'path': '/adhocracy',
-              'workflow_state': ''}}
+    >>> pprint_json(resp.json)
+    {
+        "content_type": "adhocracy.contents.interfaces.IPool",
+        "data": {
+            "adhocracy.propertysheets.interfaces.IName": {
+                "name": ""
+            },
+            "adhocracy.propertysheets.interfaces.IPool": {
+                "elements": []
+            }
+        },
+        "path": ...
+    }
 
 
 PUT
@@ -74,24 +107,64 @@ PUT
 
 Modify and return the path of the modified resource::
 
-    >>> data = {'content_type': 'adhocracy.interfaces.IPool',
-    ...         'data': {'adhocracy.interfaces.IName': {'name': 'NEWTITLE'}}}
+    >>> data = {'content_type': 'adhocracy.contents.interfaces.IPool',
+    ...         'data': {'adhocracy.propertysheets.interfaces.IName': {'name': 'NEWTITLE'}}}
     >>> resp = testapp.put_json("/adhocracy", data)
-    >>> resp.json
-    {'path': '/adhocracy'}
+    >>> pprint_json(resp.json)
+    {
+        "content_type": "adhocracy.contents.interfaces.IPool",
+        "path": "/adhocracy"
+    }
 
+Check the changed resource::
+
+    >>> resp = testapp.get("/adhocracy")
+    >>> pprint_json(resp.json)
+    {
+        "content_type": "adhocracy.contents.interfaces.IPool",
+        "data": {
+            "adhocracy.propertysheets.interfaces.IName": {
+                "name": "NEWTITLE"
+            },
+            "adhocracy.propertysheets.interfaces.IPool": {
+                "elements": []
+            }
+        },
+        "path": "/adhocracy"
+    }
 
 POST
 ~~~~
 
 Create new resource and return the path::
 
-    >>> data = {'content_type': 'adhocracy.interfaces.IProposalContainer',
-    ...         'data': {'adhocracy.interfaces.IName': {'name': 'proposal1'}}}
+    >>> data = {'content_type': 'adhocracy.contents.interfaces.IProposalContainer',
+    ...         'data': {
+    ...              'adhocracy.propertysheets.interfaces.IName': {'name': 'proposal1'},
+    ...              'adhocracy.propertysheets.interfaces.IDag': {}}}
     >>> resp = testapp.post_json("/adhocracy", data)
-    >>> resp.json
-    {'path': '/adhocracy/proposal1'}
+    >>> pprint_json(resp.json)
+    {
+        "content_type": "adhocracy.contents.interfaces.IProposalContainer",
+        "path": ...
+    }
+    >>> proposal1_path = resp.json["path"]
 
+Checking the resource was added::
+
+    >>> pprint_json(testapp.get(proposal1_path).json)
+    {
+        "content_type": "adhocracy.contents.interfaces.IProposalContainer",
+        "data": {
+            "adhocracy.propertysheets.interfaces.IDag": {
+                "versions": [...
+            },
+            "adhocracy.propertysheets.interfaces.IName": {
+                "name": "proposal1"
+            }
+        },
+        "path": ...
+    }
 
 Interfaces ::
 
@@ -110,40 +183,31 @@ Interfaces ::
 Working with Node content
 -------------------------
 
-The new PropsalContainer has a child _versions to store all proposal node versions ::
+The new IProposalContainer contains the propertysheet IDag and can be asked for
+contained versions::
 
-    >>> resp = testapp.get("/adhocracy/proposal1/_versions")
-    >>> children = resp.json["children"]
-    >>> len(children)
-    1
-
-The initial node without follow Nodes is already there ::
-
-    >>> proposalv1 = children[0]
-    >>> resp = testapp.get(proposalv1["path"])
-    >>> pprint(resp.json["data"])
-    {'adhocracy.interfaces.IDocument': {'description': '',
-                                        'paragraphs': [],
-                                        'title': ''},
-     'adhocracy.interfaces.IVersionable': {'follows': []}}
+    >>> resp = testapp.get(proposal1_path)
+    >>> inode_container_data = resp.json["data"]["adhocracy.propertysheets.interfaces.IDag"]
+    >>> versions = inode_container_data["versions"]
+    >>> len(versions)
+    0
 
 
-
-If we change this node we create a new version, so we have to mind
+We create a new version, so we have to mind
 the right follows relation ::
 
-    >>> data =  {'content_type': 'adhocracy.interfaces.IProposal',
-    ...          'data': {'adhocracy.interfaces.IDocument': {'description': 'synopsis', 'title': 'title'},
-    ...                   'adhocracy.interfaces.IVersionable': {'follows': [proposalv1["path"]]}}}
-    >>> resp = testapp.put_json(proposalv1["path"], data)
-    >>> resp.json
-    {'path': '/adhocracy/proposal1/_versions/...
-
-    >>> proposalv2 = resp.json
-    >>> proposalv2['path'] != proposalv1["path"]
-    True
-
-NOTE: PUT for INode content is not idempotent, this breaks the REST architecture principles
+    >>> data =  {'content_type': 'adhocracy.contents.interfaces.IProposal',
+    ...          'data': {'adhocracy.propertysheets.interfaces.IDocument': {
+    ...                       'description': 'synopsis',
+    ...                       'title': 'title'},
+    ...                   'adhocracy.propertysheets.interfaces.IVersionable': {
+    ...                       'follows': []}}}
+    >>> resp = testapp.post_json(proposal1_path, data)
+    >>> pprint_json(resp.json)
+    {
+        "content_type": "adhocracy.contents.interfaces.IProposal",
+        "path": ...
+    }
 
 
 GET /interfaces/..::

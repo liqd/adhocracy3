@@ -21,7 +21,7 @@ from substanced.folder import FolderKeyError
 from substanced.interfaces import IAutoNamingFolder
 from substanced.util import get_oid
 
-from adhocracy.interfaces import (
+from adhocracy.contents.interfaces import (
     IContent,
     INode,
     )
@@ -29,7 +29,6 @@ from adhocracy.rest.views.interfaces import (
     ContentGETSchema,
     ContentPOSTSchema,
     ContentPUTSchema,
-    MetaSchema,
     )
 
 
@@ -100,34 +99,17 @@ class ContentView():
         addables = self.registry.content.addable_content_types(self.context)
         return addables
 
-    @reify
-    def children(self):
-        context = self.context
-        return context.values() if IFolder.providedBy(context) else []
-
-    def meta(self, context=None):
-        context = context or self.context
-        data = MetaSchema().serialize()
-        data["name"] = context.__name__
-        data["path"] = resource_path(context).split(".")[-1]
-        data["content_type"] = self.request.registry.content.typeof(context)
-        data["content_type_name"] = data["content_type"]
-        data["oid"] = get_oid(context)
-        return data
+    def set_path_content_type(self, data):
+        data["path"] = resource_path(self.context).split(".")[-1]
+        data["content_type"] = self.request.registry.content.typeof(self.context)
 
     @view_config(request_method='GET')
     def get(self):
         data = ContentGETSchema().serialize()
-        data["content_type"] = self.meta()["content_type"]
-        # meta
-        data["meta"] = self.head()
-        # data
+        self.set_path_content_type(data)
         for ifacename, sheet in self.viewable_sheets.items():
             cstruct = sheet.cstruct()
             data["data"][ifacename] = cstruct
-        # children
-        meta_children = [self.meta(child) for child in self.children]
-        data["children"] = meta_children
         return data
 
     @view_config(request_method='HEAD')
@@ -143,7 +125,7 @@ class ContentView():
             data["PUT"] = [x for x in self.editable_sheets]
         if self.viewable_sheets:
             data["GET"] = [x for x in self.viewable_sheets]
-        if self.meta:
+        if True: # FIXME: how do we want head to behave?
             data["HEAD"] = []
         return data
 
@@ -153,8 +135,7 @@ class ContentView():
         validate_request_data(ContentPOSTSchema, self.request)
         data = self.request.validated
         #create content
-        content = self.registry.content.create(data["content_type"],
-                                               self.context)
+        content = self.registry.content.create(data["content_type"])
         #set content data
         for ifacename in data["data"]:
             sheet = self.registry.getMultiAdapter((content, self.request),\
@@ -167,7 +148,10 @@ class ContentView():
         except (FolderKeyError, ValueError):
             name += str(time.time())
         self.context.add(name, content)
-        return {"path": resource_path(content)}
+        return {
+            "path": resource_path(content),
+            "content_type": self.request.registry.content.typeof(content)
+            }
 
     @view_config(request_method='PUT')
     def put(self):
@@ -179,7 +163,10 @@ class ContentView():
         for ifacename in data["data"]:
             sheet = self.registry.getMultiAdapter((content, self.request), IPropertySheet, ifacename)
             sheet.set(data["data"][ifacename])
-        return {"path": resource_path(content)}
+        return {
+            "path": resource_path(content),
+            "content_type": self.request.registry.content.typeof(self.context)
+            }
 
 
 @view_defaults(
@@ -209,7 +196,7 @@ class NodeView(ContentView):
         validate_request_data(ContentPUTSchema, self.request)
         data = self.request.validated
         #create new node content
-        content = self.registry.content.create(data["content_type"], self.context)
+        content = self.registry.content.create(data["content_type"])
         #set content data
         for ifacename in data["data"]:
             sheet = self.registry.getMultiAdapter((content, self.request), IPropertySheet, ifacename)
