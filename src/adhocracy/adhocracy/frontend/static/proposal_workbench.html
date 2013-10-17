@@ -2,6 +2,8 @@
     <head>
         <meta charset="utf-8">
 
+        <script type="text/javascript" src="submodules/requirejs/require.js"></script>
+
         <script type="text/javascript" src="jquery-1.7.2.js"></script>
         <!-- script type="text/javascript" src="submodules/jquery/dist/..."></script -->
 
@@ -12,15 +14,19 @@
         <script type="text/javascript" src="submodules/obviel/src/obviel/obviel-template.js"></script>
         <script type="text/javascript" src="submodules/obviel/src/obviel/obviel.js"></script>
 
-        <script type="text/javascript" src="js/adhocracy/frames/proposal_workbench.js"></script>
-
     </head>
     <body>
         <div id="proposal_workbench_detail">(javascript not running)</div>
         <div id="proposal_workbench_directory">(javascript not running)</div>
         <div id="proposal_workbench_discussion">(javascript not running)</div>
         <script>
-          $(document).ready(function() { adhocracy.frames.proposal_workbench.init(); });
+          requirejs.config({
+              baseUrl: './js/',
+          });
+          require(['Adhocracy'], function(Adhocracy) {
+              console.log(Adhocracy);
+              $(document).ready(function() { Adhocracy.init(); });
+          });
         </script>
     </body>
 </html>
