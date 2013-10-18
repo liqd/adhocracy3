@@ -45,9 +45,10 @@ define(['jquery',
             ProposalWorkbench.open_proposals('/adhocracy/');
             var expected_names = ['proposal DAG 1', 'proposal DAG 2'];
 
-            var list_items = $('#proposal_workbench_directory')[0].getElementsByTagNames('li');
-            list_items.forEach(function(li) {
-                expect(li.innerText).to.equal(expected_names.shift());
+            var list_items = $('#proposal_workbench_directory li');
+
+            list_items.each(function(i) {
+                expect(list_items[i].innerText).to.equal(expected_names.shift());
             });
         });
     });
