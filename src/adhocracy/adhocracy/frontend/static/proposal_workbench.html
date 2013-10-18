@@ -1,52 +1,63 @@
 <html>
     <head>
         <meta charset="utf-8">
-
+        <link rel="stylesheet" href="submodules/mocha/mocha.css" />
         <script type="text/javascript" src="submodules/requirejs/require.js"></script>
         <script>
-          requirejs.config({
+          require.config({
               baseUrl: './js/',
               paths: {
-                  chai: '../submodules/chai/chai'
+                  jquery: '../jquery-1.7.2',  // FIXME: ../submodules/jquery/dist/...
+                  datalink: '../submodules/jquery-datalink/jquery.datalink',
+                  bbq: '../submodules/submodules/jquery-bbq/jquery.ba-bbq',
+
+                  // <!-- obviel-template has to be imported before obviel. -->
+                  // src="submodules/obviel/src/obviel/obviel-template.js"
+                  // src="submodules/obviel/src/obviel/obviel.js"
+
+                  chai: '../submodules/chai/chai',
+                  mocha: '../submodules/mocha/mocha',
               },
+              shim: {
+                  jquery: {
+                      exports: '$',
+                  },
+                  datalink: {
+                      deps: ['jquery'],
+                  },
+                  bbq: {
+                      deps: ['jquery'],
+                  },
+                  mocha: {
+                      exports: 'mocha',
+                  },
+              }
           });
         </script>
-
-        <script type="text/javascript" src="jquery-1.7.2.js"></script>
-        <!-- script type="text/javascript" src="submodules/jquery/dist/..."></script -->
-
-        <script type="text/javascript" src="submodules/jquery-datalink/jquery.datalink.js"></script>
-        <script type="text/javascript" src="submodules/jquery-bbq/jquery.ba-bbq.js"></script>
-
-        <!-- obviel-template has to be imported before obviel. -->
-        <script type="text/javascript" src="submodules/obviel/src/obviel/obviel-template.js"></script>
-        <script type="text/javascript" src="submodules/obviel/src/obviel/obviel.js"></script>
-
-        <link rel="stylesheet" href="submodules/mocha/mocha.css" />
-        <script src="submodules/mocha/mocha.js"></script>
-        <script>mocha.setup('bdd');</script>
-        <script src="js/test/tests.js"></script>
-        <!-- (the last four have to happen in this order) -->
-
     </head>
     <body>
         <div id="proposal_workbench_detail">(javascript not running)</div>
         <div id="proposal_workbench_directory">(javascript not running)</div>
         <div id="proposal_workbench_discussion">(javascript not running)</div>
         <script>
-          require(['Adhocracy'], function(Adhocracy) {
+          require(['jquery', 'Adhocracy'], function($, Adhocracy) {
               // console.log(Adhocracy);
               $(document).ready(function() { Adhocracy.init(); });
           });
         </script>
 
         <div id="mocha"></div>
+
+        <!-- script src="submodules/mocha/mocha.js"></script -->
+        <!-- script>mocha.setup('bdd');</script -->
+        <!-- script src="js/Test/AdHoc.js"></script -->
+        <!-- (the last four have to happen in this order) -->
+
         <script>
-          $(document).ready(function() { mocha.run(); });  // XXX: mocha.run is called, but it doesn't appear to do
-                                                           // anything if not handed a function as arg.
-
-          $(document).load(function() { console.log('page load complete'); });  // not reached!
+          require(['jquery', 'Test/Main'], function($, Test) {
+              $(document).ready(function() { Test.run(); });
+              $(document).load(function() { console.log('page load complete'); });
+          });
         </script>
-
     </body>
 </html>
