@@ -22,3 +22,6 @@
 [submodule "src/adhocracy/adhocracy/frontend/static/submodules/chai"]
 	path = src/adhocracy/adhocracy/frontend/static/submodules/chai
 	url = https://github.com/chaijs/chai
+[submodule "src/adhocracy/adhocracy/frontend/static/submodules/mocha"]
+	path = src/adhocracy/adhocracy/frontend/static/submodules/mocha
+	url = https://github.com/visionmedia/mocha/
