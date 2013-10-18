@@ -19,3 +19,6 @@
 [submodule "src/adhocracy/adhocracy/frontend/static/submodules/requirejs"]
 	path = src/adhocracy/adhocracy/frontend/static/submodules/requirejs
 	url = git://github.com/jrburke/requirejs
+[submodule "src/adhocracy/adhocracy/frontend/static/submodules/chai"]
+	path = src/adhocracy/adhocracy/frontend/static/submodules/chai
+	url = https://github.com/chaijs/chai
