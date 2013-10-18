@@ -47,9 +47,19 @@ define(['jquery',
 
             var list_items = $('#proposal_workbench_directory li');
 
+            // list_items shouldn't be null.
+            expect(list_items.length).to.equal(expected_names.length);
+
+            // list_items should contain the right proposal names.
             list_items.each(function(i) {
                 expect(list_items[i].innerText).to.equal(expected_names.shift());
             });
+
+
+            // (FIXME: this is not mocha/chai best practice.  use
+            // setup, teardown, and more fine-grained "it"s.)
+
+
         });
     });
 
