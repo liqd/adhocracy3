@@ -22,11 +22,11 @@
         <script type="text/javascript" src="submodules/obviel/src/obviel/obviel-template.js"></script>
         <script type="text/javascript" src="submodules/obviel/src/obviel/obviel.js"></script>
 
-        <!-- `cd js; mkdir test; cd test; mocha init` . -->
-        <link rel="stylesheet" href="js/test/mocha.css" />
-        <script src="js/test/mocha.js"></script>
+        <link rel="stylesheet" href="submodules/mocha/mocha.css" />
+        <script src="submodules/mocha/mocha.js"></script>
         <script>mocha.setup('bdd');</script>
-        <script src="js/test/tests.js"></script>  <!-- (it has to happen in this order) -->
+        <script src="js/test/tests.js"></script>
+        <!-- (the last four have to happen in this order) -->
 
     </head>
     <body>
@@ -42,7 +42,9 @@
 
         <div id="mocha"></div>
         <script>
-          $(document).ready(function() { mocha.run(); });
+          $(document).ready(function() { mocha.run(); });  // XXX: mocha.run is called, but it doesn't appear to do
+                                                           // anything if not handed a function as arg.
+
           $(document).load(function() { console.log('page load complete'); });  // not reached!
         </script>
 
