@@ -47,12 +47,6 @@
         </script>
 
         <div id="mocha"></div>
-
-        <!-- script src="submodules/mocha/mocha.js"></script -->
-        <!-- script>mocha.setup('bdd');</script -->
-        <!-- script src="js/Test/AdHoc.js"></script -->
-        <!-- (the last four have to happen in this order) -->
-
         <script>
           require(['jquery', 'Test/Main'], function($, Test) {
               $(document).ready(function() { Test.run(); });
