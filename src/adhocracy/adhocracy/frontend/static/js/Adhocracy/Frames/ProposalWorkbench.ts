@@ -9,3 +9,7 @@ export function init() {
 
     console.log("module proposal_workbench loaded.");
 };
+
+export function something_pure(i: number): number {
+    return i/2;
+}
