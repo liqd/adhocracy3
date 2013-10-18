@@ -10,11 +10,8 @@
                   jquery: '../jquery-1.7.2',  // FIXME: ../submodules/jquery/dist/...
                   datalink: '../submodules/jquery-datalink/jquery.datalink',
                   bbq: '../submodules/submodules/jquery-bbq/jquery.ba-bbq',
-
-                  // <!-- obviel-template has to be imported before obviel. -->
-                  // src="submodules/obviel/src/obviel/obviel-template.js"
-                  // src="submodules/obviel/src/obviel/obviel.js"
-
+                  obviel: '../submodules/obviel/src/obviel/obviel',
+                  obvieltemplate: '../submodules/obviel/src/obviel/obviel-template',
                   chai: '../submodules/chai/chai',
                   mocha: '../submodules/mocha/mocha',
               },
@@ -28,6 +25,14 @@
                   bbq: {
                       deps: ['jquery'],
                   },
+                  obviel: {
+                      exports: 'obviel',
+                      deps: ['jquery', 'obvieltemplate'],
+                  },
+                  obvieltemplate: {
+                      exports: 'obvieltemplate',
+                      deps: ['jquery'],
+                  },
                   mocha: {
                       exports: 'mocha',
                   },
@@ -39,12 +44,13 @@
         <div id="proposal_workbench_detail">(javascript not running)</div>
         <div id="proposal_workbench_directory">(javascript not running)</div>
         <div id="proposal_workbench_discussion">(javascript not running)</div>
-        <script>
+        <!-- script>
+          // this html file is just for testing.  don't do anything else.
           require(['jquery', 'Adhocracy'], function($, Adhocracy) {
               // console.log(Adhocracy);
               $(document).ready(function() { Adhocracy.init(); });
           });
-        </script>
+        </script -->
 
         <div id="mocha"></div>
         <script>
