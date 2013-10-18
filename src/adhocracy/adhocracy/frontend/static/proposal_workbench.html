@@ -54,7 +54,7 @@
 
         <div id="mocha"></div>
         <script>
-          require(['jquery', 'Test/Main'], function($, Test) {
+          require(['jquery', 'obviel', 'Test/Main'], function($, obviel, Test) {
               $(document).ready(function() { Test.run(); });
               $(document).load(function() { console.log('page load complete'); });
           });
