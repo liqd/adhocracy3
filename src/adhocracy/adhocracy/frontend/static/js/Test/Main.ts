@@ -1,6 +1,10 @@
 declare var define;
 declare var describe;
 declare var it;
+declare var before;
+declare var beforeEach;
+
+// import Util = require('../Adhocracy/Util');
 
 define(['jquery',
         // 'obviel',
@@ -8,14 +12,16 @@ define(['jquery',
         'chai',
         'mocha',
         'Adhocracy',
-        'Adhocracy/Frames/ProposalWorkbench'],
+        'Adhocracy/Frames/ProposalWorkbench',
+        'Adhocracy/Util',],
        function($,
                 // obviel,
                 // obvieltemplate,
                 chai,
                 mocha,
                 Adhocracy,
-                ProposalWorkbench)
+                ProposalWorkbench,
+                Util)
 {
     mocha.setup('bdd');
 
@@ -40,31 +46,34 @@ define(['jquery',
             expect($('#proposal_workbench_detail')[0].innerText).to.equal('...');
         });
 
-        it('directory div must contain list of proposals as created by fixtures.js', function() {
+        describe('directory div must contain list of proposals as created by fixtures.js', function() {
 
             // FIXME: fixtures.js does not exist.  the following
             // should be slightly out of order, but the idea should be
             // valid.
 
-            ProposalWorkbench.open_proposals('/adhocracy/');
-            var expected_names = ['proposal DAG 1', 'proposal DAG 2'];
+            var expected_names;
+            var directory_div;
 
-            var list_items = $('#proposal_workbench_directory li');
-
-            // list_items shouldn't be null.
-            expect(list_items.length).to.equal(expected_names.length);
-
-            // list_items should contain the right proposal names.
-            list_items.each(function(i) {
-                expect(list_items[i].innerText).to.equal(expected_names.shift());
+            beforeEach(function(done) {
+                ProposalWorkbench.open_proposals('/adhocracy/', function() {
+                    expected_names = ['proposal DAG 1', 'proposal DAG 2'];
+                    directory_div = $.makeArray($('#proposal_workbench_directory'))[0]
+                    done();
+                });
             });
 
-
-            // (FIXME: this is not mocha/chai best practice.  use
-            // setup, teardown, and more fine-grained "it"s.)
-
+            it('list_items should contain the right proposal names.', function() {
+                expected_names.forEach(function (name) {
+//                     expect(directory_div.innerText).to.match(
+//                         new RegEx('/' + name + '/'),
+//                         "wef");
+                    expect(Util.isInfixOf(name, directory_div.innerText)).to.equal(true, name);
+                });
+            });
 
         });
+
     });
 
     return {

@@ -50,7 +50,7 @@ stand der diskussion, Mon Sep 23 17:32:18 CEST 2013, niko, sönke, matthias
     var orig = repo[obj.meta.path];
 
     if (obj != orig) {
-	console.log('post');
+        console.log('post');
     };
 */
 
@@ -58,6 +58,10 @@ stand der diskussion, Mon Sep 23 17:32:18 CEST 2013, niko, sönke, matthias
 
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
+};
+
+function isInfixOf(str, infix) {
+    return str.indexOf(infix) !== -1;
 };
 
 var showjs = function(json) {

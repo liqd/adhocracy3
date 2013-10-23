@@ -2,6 +2,8 @@ declare var $;
 declare var obviel;
 declare var obvieltemplate;
 
+import Util = require('Adhocracy/Util');
+
 var some_local_variable = "hey there..";
 
 export function init() {
@@ -16,7 +18,7 @@ export function something_pure(i: number): number {
     return i/2;
 }
 
-export function open_proposals(uri) {
+export function open_proposals(uri, done) {
 
     // three skill levels:
 
@@ -70,7 +72,7 @@ export function open_proposals(uri) {
     });
 
     $('#proposal_workbench_directory')[0].textContent = '';
-    $('#proposal_workbench_directory').render(proposal_dags_with_cheating[0]);
+    $('#proposal_workbench_directory').render(proposal_dags_with_cheating[0]).done(done);
 
     // FIXME: create a proposal list from template.
 
