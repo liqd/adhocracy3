@@ -1,5 +1,5 @@
 # requirement:
-# nmp install -g typescript
+# npm install -g typescript
 # more info on tsc at http://www.typescriptlang.org/
 
 compile:
