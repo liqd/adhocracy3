@@ -19,3 +19,6 @@ develop-eggs
 /include/
 /lib/
 /local/
+/src/adhocracy/adhocracy/frontend/static/js/**/*.js
+/src/adhocracy/adhocracy/frontend/static/js/**/*.js.map
+
