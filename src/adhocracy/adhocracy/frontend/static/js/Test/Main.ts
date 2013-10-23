@@ -1,3 +1,7 @@
+declare var define;
+declare var describe;
+declare var it;
+
 define(['jquery',
         // 'obviel',
         // 'obvieltemplate',
