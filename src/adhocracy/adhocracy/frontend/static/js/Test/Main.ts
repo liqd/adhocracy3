@@ -60,10 +60,7 @@ describe('some trivial DOM invariants', function() {
 
         it('list_items should contain the right proposal names.', function() {
             expected_names.forEach(function (name) {
-//                     expect(directory_div.innerText).to.match(
-//                         new RegEx('/' + name + '/'),
-//                         "wef");
-                expect(Util.isInfixOf(name, directory_div.innerText)).to.equal(true, name);
+                expect(directory_div.innerText).to.match(new RegExp(name));
             });
         });
     });
