@@ -25,3 +25,6 @@
 [submodule "src/adhocracy/adhocracy/frontend/static/submodules/mocha"]
 	path = src/adhocracy/adhocracy/frontend/static/submodules/mocha
 	url = https://github.com/visionmedia/mocha/
+[submodule "src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped"]
+	path = src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped
+	url = https://github.com/borisyankov/DefinitelyTyped

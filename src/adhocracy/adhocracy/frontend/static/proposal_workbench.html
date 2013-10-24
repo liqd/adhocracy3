@@ -2,43 +2,10 @@
     <head>
         <meta charset="utf-8">
         <link rel="stylesheet" href="submodules/mocha/mocha.css" />
-        <script type="text/javascript" src="submodules/requirejs/require.js"></script>
-        <script>
-          require.config({
-              baseUrl: './js/',
-              paths: {
-                  jquery: '../jquery-1.7.2',  // FIXME: ../submodules/jquery/dist/...
-                  datalink: '../submodules/jquery-datalink/jquery.datalink',
-                  bbq: '../submodules/submodules/jquery-bbq/jquery.ba-bbq',
-                  obviel: '../submodules/obviel/src/obviel/obviel',
-                  obvieltemplate: '../submodules/obviel/src/obviel/obviel-template',
-                  chai: '../submodules/chai/chai',
-                  mocha: '../submodules/mocha/mocha',
-              },
-              shim: {
-                  jquery: {
-                      exports: '$',
-                  },
-                  datalink: {
-                      deps: ['jquery'],
-                  },
-                  bbq: {
-                      deps: ['jquery'],
-                  },
-                  obviel: {
-                      exports: 'obviel',
-                      deps: ['jquery', 'obvieltemplate'],
-                  },
-                  obvieltemplate: {
-                      exports: 'obvieltemplate',
-                      deps: ['jquery'],
-                  },
-                  mocha: {
-                      exports: 'mocha',
-                  },
-              }
-          });
-        </script>
+        <script type="text/javascript"
+                src="submodules/requirejs/require.js"></script>
+        <script type="text/javascript"
+                src="require-config.js"></script>
     </head>
     <body>
         <table border="1">
@@ -64,10 +31,12 @@
 
         <div id="mocha"></div>
         <script>
-          require(['jquery', 'obviel', 'Test/Main'], function($, obviel, Test) {
-              $(document).ready(function() { Test.run(); });
-              $(document).load(function() { console.log('page load complete'); });
-          });
+        require(['Test/Main', 'jquery', 'obviel', 'chai', 'mocha'],
+            function(Test) {
+                $(document).ready(function() { Test.run_tests(); });
+                // This isn't executed: (why?)
+                // $(document).load(function() { console.log('page load complete'); });
+        });
         </script>
     </body>
 </html>
