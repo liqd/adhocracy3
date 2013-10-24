@@ -1,37 +1,19 @@
-declare var $;
-declare var obviel;
-declare var obvieltemplate;
+/// <reference path="../../../submodules/DefinitelyTyped/requirejs/require.d.ts"/>
+/// <reference path="../../../submodules/DefinitelyTyped/jquery/jquery.d.ts"/>
 
+declare var $ : any;  // FIXME
+
+var obvieltemplate = require('obvieltemplate');
+var obviel = require('obviel');
+
+import Obviel = require('Adhocracy/Obviel');
 import Util = require('Adhocracy/Util');
-
-var some_local_variable = "hey there..";
-
-export function init() {
-    $("#proposal_workbench_detail").text("...");
-    $("#proposal_workbench_directory").text("...");
-    $("#proposal_workbench_discussion").text("...");
-
-    console.log("module Adhocracy/Frames/ProposalWorkbench loaded.");
-};
-
-export function something_pure(i: number): number {
-    return i/2;
-}
 
 export function open_proposals(uri, done) {
 
-    // three skill levels:
+    Obviel.register_transformer();  // FIXME: this should not happen here.
 
-    /* // 1. create dom elements by hand
-
-    $('#proposal_workbench_directory')[0].textContent = '';
-    $('<ol><li>proposal DAG 1</li><li>proposal DAG 1</li></ol>').appendTo($('#proposal_workbench_directory'));
-
-    */
-
-
-    // 2. create json objects by hand and render them using obviel
-
+/*
     var proposal_dags_with_cheating = [{
         ifaces: ['IName'],
         meta: { path: '...' },
@@ -41,25 +23,25 @@ export function open_proposals(uri, done) {
         meta: { path: '...' },
         data: { 'adhocracy#interfaces#IName': { name: 'proposal DAG 1' } },
     }];
+*/
 
     obviel.view({
-        iface: 'IName',
-        obvtUrl: 'templates/IName.small.obvt',
+        iface: 'adhocracy.propertysheets.interfaces.IPool',
+        name: 'ProposalWorkbench',
+        obvtUrl: 'templates/ProposalWorkbench.obvt',
     });
 
-    $('#proposal_workbench_directory')[0].textContent = '';
-    $('#proposal_workbench_directory').render(proposal_dags_with_cheating[0]).done(done);
+    obviel.view({
+        iface: 'adhocracy.propertysheets.interfaces.IPool',
+        name: 'Directory',
+        obvtUrl: 'templates/Directory.obvt',
+    });
 
+    obviel.view({
+        iface: 'adhocracy.propertysheets.interfaces.IName',
+        name: 'DirectoryEntry',
+        obvtUrl: 'templates/DirectoryEntry.obvt',
+    });
 
-
-
-
-    // FIXME: create a proposal list from template.
-
-
-    // 3. fetch json objects via ajax.
-
-
-
-
+    $('#adhocracy').render('/adhocracy/', 'ProposalWorkbench').done(done);
 }

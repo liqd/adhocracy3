@@ -1,0 +1,14 @@
+<table border="1">
+  <tr>
+    <td>
+      <div id="proposal_workbench_detail"></div>
+    </td>
+    <td>
+      <div id="proposal_workbench_directory"
+           data-render="@.|Directory"></div>
+    </td>
+    <td>
+      <div id="proposal_workbench_discussion"></div>
+    </td>
+  </tr>
+</table>

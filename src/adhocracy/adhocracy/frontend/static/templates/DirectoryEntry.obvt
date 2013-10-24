@@ -1,0 +1,1 @@
+<a href="#{path}">{data.adhocracy#propertysheets#interfaces#IName.name}</a>
