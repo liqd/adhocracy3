@@ -32,30 +32,6 @@ export function open_proposals(uri, done) {
 
     // 2. create json objects by hand and render them using obviel
 
-    var proposal_dags = [{
-        "path": "/adhocracy/0",
-        "data": {
-            "adhocracy.propertysheets.interfaces.IName": {
-                "name": "proposal DAG 1"
-            },
-            "adhocracy.propertysheets.interfaces.IPool": {
-                "elements": []
-            }
-        },
-        "content_type": "adhocracy.contents.interfaces.IProposalContainer"
-    }, {
-        "path": "/adhocracy/0",
-        "data": {
-            "adhocracy.propertysheets.interfaces.IName": {
-                "name": "proposal DAG 1"
-            },
-            "adhocracy.propertysheets.interfaces.IPool": {
-                "elements": []
-            }
-        },
-        "content_type": "adhocracy.contents.interfaces.IProposalContainer"
-    }]
-
     var proposal_dags_with_cheating = [{
         ifaces: ['IName'],
         meta: { path: '...' },
@@ -64,7 +40,7 @@ export function open_proposals(uri, done) {
         ifaces: ['IName'],
         meta: { path: '...' },
         data: { 'adhocracy#interfaces#IName': { name: 'proposal DAG 1' } },
-    }]
+    }];
 
     obviel.view({
         iface: 'IName',
@@ -73,6 +49,10 @@ export function open_proposals(uri, done) {
 
     $('#proposal_workbench_directory')[0].textContent = '';
     $('#proposal_workbench_directory').render(proposal_dags_with_cheating[0]).done(done);
+
+
+
+
 
     // FIXME: create a proposal list from template.
 
