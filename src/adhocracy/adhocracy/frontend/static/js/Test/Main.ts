@@ -28,6 +28,71 @@ describe('something pure yet lame', function() {
     });
 });
 
+// url must yield a content-type that implements property sheet
+// interface IPool, and all elements of IPool must implement property
+// sheet interface IName.
+//
+// FIXME: find haddock for js
+//
+// FIXME: fix type signature for continuation
+function ajax_pool_names(url: string, done_pool_names?: any) {
+    var get_args = {
+        type: "GET",
+        dataType: "json",
+        contentType: "application/json",
+    };
+
+    function ajax_fail(jqxhr, textstatus, errorthrown) {
+        function showjs(json) {
+            return JSON.stringify(json, null, 2)
+        };
+
+        console.log(name + ": [" + showjs(jqxhr) + "][" + textstatus + "][" +
+                    errorthrown + "]");
+
+        throw "ajax error";
+    };
+
+    $.ajax(url, get_args).fail(ajax_fail).done(function(pool) {
+        var refs = pool['data']['adhocracy.propertysheets.interfaces.IPool']['elements'];
+        var elems = refs.map(function(ref) { return $.ajax(ref['path'], get_args); });
+
+        // (Q is a library for promises that might be useful here.  We
+        // are trying to do it by hand first.)
+
+        var results = [];
+        var counter = 0;
+
+        function check_done() {
+            counter += 1;
+            if (counter >= elems.length) {
+                done_pool_names(results.map(function(elem) {
+                    return elem['data']['adhocracy.propertysheets.interfaces.IName']['name'];
+                }));
+            }
+        };
+
+        for (var i in elems) {
+            elems[i].done((function(i) {
+                return function(result) {
+                    results[i] = result;
+                    check_done();
+                }})(i));
+        };
+
+        /* there may be a weirder solution along the lines of this:
+
+        elems.reduce(function(newelem, done??) {
+            newelem.done()...
+        }, ??)(done_pool_names);
+
+        */
+
+        // FIXME: factor this out into a utils module export.
+
+    })
+}
+
 describe('some trivial DOM invariants', function() {
     it('must have three divs named appropriately', function() {
         expect($('#___probably_not_a_valid_dom_elem_id___')).to.have.length(0);
@@ -51,10 +116,13 @@ describe('some trivial DOM invariants', function() {
         var directory_div;
 
         beforeEach(function(done) {
-            ProposalWorkbench.open_proposals('/adhocracy/', function() {
-                expected_names = ['proposal DAG 1', 'proposal DAG 2'];
-                directory_div = $.makeArray($('#proposal_workbench_directory'))[0]
-                done();
+            ajax_pool_names('/adhocracy/', function(names) {
+                expected_names = names;
+
+                ProposalWorkbench.open_proposals('/adhocracy/', function() {
+                    directory_div = $.makeArray($('#proposal_workbench_directory'))[0]
+                    done();
+                });
             });
         });
 
