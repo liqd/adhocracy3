@@ -150,6 +150,16 @@ Create new resource and return the path::
     }
     >>> proposal1_path = resp.json["path"]
 
+
+FIXME: (clarify) should the server really complete the json structure
+recursively where missing?  i think that's dangerous.
+
+FIXME: (clarify) should the IDag property sheet be modelled as
+something other than IPool?  isn't it enough that the containers know
+about their versional dependency?  then an IContainer would just be an
+IPool.
+
+
 Checking the resource was added::
 
     >>> pprint_json(testapp.get(proposal1_path).json)
