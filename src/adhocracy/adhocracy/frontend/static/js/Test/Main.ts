@@ -49,6 +49,9 @@ function ajax_pool_names(url: string, done_pool_names?: any) {
 
     $.ajax(url, get_args).fail(ajax_fail).done(function(pool) {
         var refs = pool['data']['adhocracy.propertysheets.interfaces.IPool']['elements'];
+        if (!refs.length)
+            done_pool_names([]);  // the rest of this block only works on non-empty element lists!
+
         var elems = refs.map(function(ref) { return $.ajax(ref['path'], get_args); });
 
         // (Q is a library for promises that might be useful here.  We
