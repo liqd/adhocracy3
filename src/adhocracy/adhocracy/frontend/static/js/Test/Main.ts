@@ -122,6 +122,43 @@ describe('some trivial DOM invariants', function() {
     });
 });
 
+// collect all links from a dom subtree, select one at random, and
+// trigger a click event on that link.
+function click_any(dom) {
+    var links = dom.find('a:first');
+    console.log(links);
+    links.trigger('click');
+
+/*
+  // this here would be too easy.  unfortunately, this is not how selectors work..
+
+    var links = dom.find('a').toArray();
+    var ix = Math.round(Math.random() * (links.length - 1));
+    links[ix].trigger('click');  // type error!
+
+    perhaps something like this?...
+
+    $(links[ix]).trigger('click');
+
+    (i'll debug this once the links are actually supposed to do something...)
+
+*/
+
+}
+
+describe ('opening proposals', function() {
+
+    it('must open proposal in the left div on click', function() {
+        click_any($('#proposal_workbench_directory'));
+
+        // for a start, just expect a <pre> element to pop up in the
+        // detail div with the raw json object of the proposal.
+
+        expect($('#proposal_workbench_detail pre')).to.have.length(1);
+    });
+
+});
+
 export function run_tests() {
     mocha.run(function() {});
 };
