@@ -13,18 +13,6 @@ export function open_proposals(uri, done) {
 
     Obviel.register_transformer();  // FIXME: this should not happen here.
 
-/*
-    var proposal_dags_with_cheating = [{
-        ifaces: ['IName'],
-        meta: { path: '...' },
-        data: { 'adhocracy#interfaces#IName': { name: 'proposal DAG 1' } },
-    }, {
-        ifaces: ['IName'],
-        meta: { path: '...' },
-        data: { 'adhocracy#interfaces#IName': { name: 'proposal DAG 1' } },
-    }];
-*/
-
     obviel.view({
         iface: 'adhocracy.propertysheets.interfaces.IPool',
         name: 'ProposalWorkbench',
