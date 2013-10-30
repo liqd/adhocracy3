@@ -114,7 +114,7 @@ describe('some trivial DOM invariants', function() {
             expect($('#proposal_workbench_discussion')).to.not.have.length(0);
         });
 
-        it('list_items should contain the right proposal names.', function() {
+        it('list_items must contain the right proposal names.', function() {
             expected_names.forEach(function (name) {
                 expect(directory_div.innerText).to.match(new RegExp(name));
             });
