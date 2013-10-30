@@ -20,11 +20,12 @@
 
       <div id="mocha"></div>
       <script>
-        require(['Test/Main', 'jquery', 'obviel', 'chai', 'mocha'],
-            function(Test) {
+        require(['jquery', 'obvieltemplate', 'obviel', 'chai', 'mocha'], function() {
+            require(['Test/Main'], function(Test) {
                 $(document).ready(function() { Test.run_tests(); });
                 // This isn't executed: (why?)
                 // $(document).load(function() { console.log('page load complete'); });
+            });
         });
       </script>
     </body>
