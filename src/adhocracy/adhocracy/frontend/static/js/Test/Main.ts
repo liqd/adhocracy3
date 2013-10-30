@@ -5,7 +5,7 @@
 
 // for importing things in TypeScript, see
 // http://www.codeproject.com/Articles/528295/ModularizationplusinplusTypeScript
-
+//
 // html5 global variables for elem ids are officially a really bad
 // idea.  a good counter-example is mocha, which both defines a global
 // variable 'mocha' and expects an html div with id 'mocha'.
@@ -17,9 +17,7 @@ var mocha : Mocha = require('mocha');
 var chai = require('chai');
 var expect = chai.expect;
 
-import Adhocracy = require('Adhocracy');
 import ProposalWorkbench = require('Adhocracy/Frames/ProposalWorkbench');
-import Util = require('Adhocracy/Util');
 
 
 mocha.setup({ui: 'bdd', slow: 30, timeout: 2000});
