@@ -14,3 +14,6 @@ clean:
 	find . -name '*~' -exec rm {} \;
 	find . -name '*.js' -exec rm {} \;
 	find . -name '*.js.map' -exec rm {} \;
+
+wc:
+	find . -name '*.ts' | xargs wc
