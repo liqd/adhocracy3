@@ -29,7 +29,7 @@ mocha.setup({ui: 'bdd', slow: 30, timeout: 2000});
 // FIXME: find haddock for js
 //
 // FIXME: fix type signature for continuation
-function ajax_pool_names(url: string, done_pool_names?: any) {
+function ajax_pool_names(url: string, done_pool_names?: (pool: string[]) => any) {
     var get_args = {
         type: "GET",
         dataType: "json",
