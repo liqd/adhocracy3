@@ -3,7 +3,7 @@ require.config({
     paths: {
         jquery: '../jquery-1.7.2',  // FIXME: ../submodules/jquery/dist/...
         datalink: '../submodules/jquery-datalink/jquery.datalink',
-        bbq: '../submodules/submodules/jquery-bbq/jquery.ba-bbq',
+        bbq: '../submodules/jquery-bbq/jquery.ba-bbq',
         obviel: '../submodules/obviel/src/obviel/obviel',
         obvieltemplate: '../submodules/obviel/src/obviel/obviel-template',
         chai: '../submodules/chai/chai',

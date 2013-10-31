@@ -8,8 +8,8 @@
                 src="require-config.js"></script>
     </head>
     <body>
+      <!-- app -->
       <div id="adhocracy">[javascript is not running]</div>
-
       <!-- script>
           // this html file is just for testing.  don't do anything else.
           require(['jquery', 'Adhocracy'], function($, Adhocracy) {
@@ -18,9 +18,15 @@
           });
           </script -->
 
+      <!-- obviel hackery -->
+      <hr>
+      <div id="debug_links"></div>
+
+      <!-- mocha -->
+      <hr>
       <div id="mocha"></div>
       <script>
-        require(['jquery', 'obvieltemplate', 'obviel', 'chai', 'mocha'], function() {
+        require(['jquery', 'bbq', 'datalink', 'obvieltemplate', 'obviel', 'chai', 'mocha'], function() {
             require(['Test/Main'], function(Test) {
                 $(document).ready(function() { Test.run_tests(); });
                 // This isn't executed: (why?)
@@ -28,5 +34,6 @@
             });
         });
       </script>
+
     </body>
 </html>
