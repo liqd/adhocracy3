@@ -129,7 +129,6 @@ function click_any(dom) {
     var ix : number = Math.round(Math.random() * (links.length - 1));
     var link = dom.find('a:eq(' + ix.toString() + ')');
 
-    console.log(link);
     link.trigger('click');
 }
 
