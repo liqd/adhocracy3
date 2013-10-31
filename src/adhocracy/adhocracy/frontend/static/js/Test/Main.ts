@@ -125,25 +125,12 @@ describe('some trivial DOM invariants', function() {
 // collect all links from a dom subtree, select one at random, and
 // trigger a click event on that link.
 function click_any(dom) {
-    var links = dom.find('a:first');
-    console.log(links);
-    links.trigger('click');
-
-/*
-  // this here would be too easy.  unfortunately, this is not how selectors work..
-
     var links = dom.find('a').toArray();
-    var ix = Math.round(Math.random() * (links.length - 1));
-    links[ix].trigger('click');  // type error!
+    var ix : number = Math.round(Math.random() * (links.length - 1));
+    var link = dom.find('a:eq(' + ix.toString() + ')');
 
-    perhaps something like this?...
-
-    $(links[ix]).trigger('click');
-
-    (i'll debug this once the links are actually supposed to do something...)
-
-*/
-
+    console.log(link);
+    link.trigger('click');
 }
 
 describe ('opening proposals', function() {
