@@ -124,23 +124,24 @@ describe('some trivial DOM invariants', function() {
 
 // collect all links from a dom subtree, select one at random, and
 // trigger a click event on that link.
-function click_any(dom) {
+function click_any(dom, done) {
     var links = dom.find('a').toArray();
     var ix : number = Math.round(Math.random() * (links.length - 1));
     var link = dom.find('a:eq(' + ix.toString() + ')');
 
-    link.trigger('click');
+    link.trigger('click', done);
 }
 
 describe ('opening proposals', function() {
 
     it('must open proposal in the left div on click', function() {
-        click_any($('#proposal_workbench_directory'));
+        click_any($('#proposal_workbench_directory'), function() {
 
-        // for a start, just expect a <pre> element to pop up in the
-        // detail div with the raw json object of the proposal.
+            // for a start, just expect a <pre> element to pop up in the
+            // detail div with the raw json object of the proposal.
 
-        expect($('#proposal_workbench_detail pre')).to.have.length(1);
+            expect($('#proposal_workbench_detail pre')).to.have.length(1);
+        });
     });
 
 });
