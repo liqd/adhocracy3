@@ -41,11 +41,33 @@ export function open_proposals(uri, done) {
 
     // detail view
 
+    // the default view for an IDag is the default view for the head.
+    // (if there is more than one head version...  öhm...  something!)
+    // (for now, it's yet a little simpler: an IDag must always also
+    // implement IPool; the IDag property sheet contains the version
+    // numbers and possibly data on version edges; the pool contains
+    // the actual versions.  this view just plucks the first element
+    // of the IPool elements array and renders that.)
     obviel.view({
         iface: 'adhocracy.propertysheets.interfaces.IDag',
-        obvtUrl: 'templates/IDag.obvt',
+        html: '<pre></pre>',
+        render: function() {
+            var elements = this.obj.data['adhocracy#propertysheets#interfaces#IPool'].elements;
+            if (elements.length > 0) {
+                var path = elements[0].path;
+                if (typeof path == 'string') {
+                    // this.render(path);  // FIXME: this recurses indefinitely
+                    $('pre', this.el).text(path);
+                } else {
+                    throw ('bad reference' + elements.toString());
+                }
+            } else {
+                this.el.text('[no versions]');
+            }
+        }
     });
 
+    // default document (details).
     obviel.view({
         iface: 'adhocracy.propertysheets.interfaces.IDocument',
         obvtUrl: 'templates/IDocument.obvt',
