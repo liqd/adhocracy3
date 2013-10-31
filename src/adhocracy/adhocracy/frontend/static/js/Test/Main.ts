@@ -134,7 +134,7 @@ function click_any(dom, done) {
 
 describe ('opening proposals', function() {
 
-    it('must open proposal in the left div on click', function() {
+    it('must open proposal in the left div on click (any version)', function() {
         click_any($('#proposal_workbench_directory'), function() {
 
             // for a start, just expect a <pre> element to pop up in the
@@ -143,6 +143,8 @@ describe ('opening proposals', function() {
             expect($('#proposal_workbench_detail pre')).to.have.length(1);
         });
     });
+
+    it('must always open head, not just any version');
 
 });
 
