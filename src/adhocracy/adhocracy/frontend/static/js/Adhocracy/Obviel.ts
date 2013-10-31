@@ -12,8 +12,7 @@ export function register_transformer() {
 
         var main_interface = obj.content_type;
         if (typeof(main_interface) == 'undefined') {
-            throw ("Object " + obj  + " from path " + path +
-                   " does not contain 'meta.content_type'");
+            throw ("Object " + obj  + " from path " + path + " has no 'content_type' field");
         };
         obj.ifaces = [main_interface];
 
