@@ -80,6 +80,15 @@ export function open_proposals(uri, done) {
     });
 
 
+    // some crude error handling (instead of the default of silently
+    // ignoring errors.)
+
+    obviel.httpErrorHook(function(xhr) {
+        console.log("httpError:");
+        console.log(xhr);
+    });
+
+
     // clickability
 
     obviel.view({
