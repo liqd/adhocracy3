@@ -129,7 +129,21 @@ function click_any(dom, done) {
     var ix : number = Math.round(Math.random() * (links.length - 1));
     var link = dom.find('a:eq(' + ix.toString() + ')');
 
-    link.trigger('click', done);
+    click_element(link[0]);
+}
+
+function click_element(el) {
+    // [http://stackoverflow.com/questions/16802795/click-not-working-in-mocha-phantomjs-on-certain-elements/16803781#16803781]
+    var ev : any = document.createEvent("MouseEvent");
+    ev.initMouseEvent(
+      "click",
+      true /* bubble */, true /* cancelable */,
+      window, null,
+      0, 0, 0, 0, /* coordinates */
+      false, false, false, false, /* modifier keys */
+      0 /*left*/, null
+    );
+    el.dispatchEvent(ev);
 }
 
 describe ('opening proposals', function() {
