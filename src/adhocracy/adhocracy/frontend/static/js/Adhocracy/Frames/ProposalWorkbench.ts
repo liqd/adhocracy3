@@ -56,8 +56,7 @@ export function open_proposals(uri, done) {
             if (elements.length > 0) {
                 var path = elements[0].path;
                 if (typeof path == 'string') {
-                    // this.render(path);  // FIXME: this recurses indefinitely
-                    $('pre', this.el).text(path);
+                    this.el.render(path);
                 } else {
                     throw ('bad reference' + elements.toString());
                 }
