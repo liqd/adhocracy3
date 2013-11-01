@@ -5,3 +5,5 @@ Links for debugging:
 <a href="/manage{path}">/manage{path}</a>
 <br />
 <a href="#/adhocracy">#/adhocracy</a>
+<br />
+<a href="#"># (reload page with fragment deleted)</a>

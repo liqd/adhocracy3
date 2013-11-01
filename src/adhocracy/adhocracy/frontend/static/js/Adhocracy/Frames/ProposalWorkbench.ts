@@ -52,13 +52,20 @@ export function open_proposals(uri, done) {
         iface: 'adhocracy.propertysheets.interfaces.IDag',
         html: '<pre></pre>',
         render: function() {
-            var elements = this.obj.data['adhocracy#propertysheets#interfaces#IPool'].elements;
+            var elements;
+
+            try {
+                elements = this.obj.data['adhocracy#propertysheets#interfaces#IPool'].elements;
+            } catch (e) {
+                throw ('[missing or bad IDag property sheet: ' + this.toString() + ']');
+            }
+
             if (elements.length > 0) {
                 var path = elements[0].path;
                 if (typeof path == 'string') {
                     this.el.render(path);
                 } else {
-                    throw ('bad reference' + elements.toString());
+                    throw ('[bad reference object: ' + elements.toString() + ']');
                 }
             } else {
                 this.el.text('[no versions]');
