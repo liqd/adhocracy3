@@ -4,8 +4,8 @@
 
 declare var $ : any;  // FIXME
 
-var obvieltemplate = require('obvieltemplate');
-var obviel = require('obviel');
+var obvieltemplate : any = require('obvieltemplate');
+var obviel : any = require('obviel');
 var bbq = require('bbq');
 
 import Obviel = require('Adhocracy/Obviel');

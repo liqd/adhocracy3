@@ -14,8 +14,10 @@
 // FIXME: This is missing in mocha's d.ts, isn't it?
 var mocha : Mocha = require('mocha');
 
-var chai = require('chai');
-var expect = chai.expect;
+var expect : chai.ExpectStatic = (function() {
+    var chai = require('chai');
+    return chai.expect;
+})();
 
 import ProposalWorkbench = require('Adhocracy/Frames/ProposalWorkbench');
 
