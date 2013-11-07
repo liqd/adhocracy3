@@ -4,7 +4,6 @@
 
 declare var $ : any;  // FIXME
 
-var obvieltemplate : any = require('obvieltemplate');
 var obviel : any = require('obviel');
 var bbq = require('bbq');
 
