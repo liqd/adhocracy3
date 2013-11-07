@@ -103,7 +103,7 @@ describe('some trivial DOM invariants', function() {
                 expected_names = names;
 
                 ProposalWorkbench.open_proposals('/adhocracy/', function() {
-                    directory_div = $.makeArray($('#proposal_workbench_directory'))[0]
+                    directory_div = $.makeArray($('#proposal_workbench_directory'))[0];
                     done();
                 });
             });
@@ -126,37 +126,33 @@ describe('some trivial DOM invariants', function() {
 
 // collect all links from a dom subtree, select one at random, and
 // trigger a click event on that link.
-function click_any(dom, done) {
+function click_any(dom, done_click) {
     var links = dom.find('a').toArray();
-    var ix : number = Math.round(Math.random() * (links.length - 1));
-    var link = dom.find('a:eq(' + ix.toString() + ')');
 
-    click_element(link[0]);
+    if (links.length > 0) {
+        var ix : number = Math.round(Math.random() * (links.length - 1));
+        var link = dom.find('a:eq(' + ix.toString() + ')');
+        click_element(link[0], done_click);
+    }
 }
 
-function click_element(el) {
-    // [http://stackoverflow.com/questions/16802795/click-not-working-in-mocha-phantomjs-on-certain-elements/16803781#16803781]
+function click_element(el, done_click) {
     var ev : any = document.createEvent("MouseEvent");
-    ev.initMouseEvent(
-      "click",
-      true /* bubble */, true /* cancelable */,
-      window, null,
-      0, 0, 0, 0, /* coordinates */
-      false, false, false, false, /* modifier keys */
-      0 /*left*/, null
-    );
+    ev.initMouseEvent("click");
+    el.addEventListener("click", done_click);
     el.dispatchEvent(ev);
 }
 
 describe ('opening proposals', function() {
 
-    it('must open proposal in the left div on click (any version)', function() {
+    it('must open proposal in the left div on click (any version), if proposal list is non-empty', function(done_it) {
         click_any($('#proposal_workbench_directory'), function() {
 
             // for a start, just expect a <pre> element to pop up in the
             // detail div with the raw json object of the proposal.
 
             expect($('#proposal_workbench_detail pre')).to.have.length(1);
+            done_it();
         });
     });
 
@@ -167,3 +163,9 @@ describe ('opening proposals', function() {
 export function run_tests() {
     mocha.run(function() {});
 };
+
+
+
+// FIXME: s/Adhocracy.Frames.*/Adhocracy.Pages.*/g;
+
+// check out: https://github.com/metaskills/mocha-phantomjs

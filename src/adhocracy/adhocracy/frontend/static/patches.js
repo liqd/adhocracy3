@@ -13,27 +13,27 @@ require.config({
         'jquery_datalink': {
             deps: ['jquery'],
             exports: 'jquery_datalink'
-	},
+        },
         'jquery_ba_bbq': {
             deps: ['jquery'],
             exports: 'jquery_ba_bbq'
-	},
+        },
         'obviel-templates': {
             deps: ['jquery'],
             exports: 'obviel-templates'
-	},
+        },
         'obviel': {
             deps: ['jquery'],
             exports: 'obviel'
-	},
+        },
         'obviel-forms': {
             deps: ['jquery'],
             exports: 'obviel-forms'
-	},
+        },
         'd3': {
             deps: [],
             exports: 'd3'
-	}
+        }
     }
 });
 
@@ -43,7 +43,7 @@ require([ 'jquery',
           'obviel-templates',
           'obviel',
           'obviel-forms',
-          'Adhocracy3/VersionGraph'
+          'Adhocracy/Tools/PathGraph'
         ], function($, datalink, bbq, obviel_templates, obviel, obviel_forms, graph) {
 
 (function() {

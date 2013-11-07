@@ -95,6 +95,9 @@ export function open_proposals(uri, done) {
         obvtUrl: 'templates/debug_links.obvt'
     });
 
+    // hashchange and fragment handling will go away and be replaced
+    // by the new history api.  (suggested by tobias)
+
     $(window).bind('hashchange', function(event) {
         var path = event.fragment;
         $('#debug_links').render({

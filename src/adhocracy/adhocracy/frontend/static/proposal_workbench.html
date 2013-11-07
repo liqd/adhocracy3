@@ -27,13 +27,13 @@
       <div id="mocha"></div>
       <script>
         require(['jquery', 'bbq', 'datalink', 'obviel', 'chai', 'mocha'], function() {
-            require(['Test/Main'], function(Test) {
+            require(['Test/Main'], function() {
+                var Test = require('Test/Main');
                 $(document).ready(function() { Test.run_tests(); });
                 // This isn't executed: (why?)
                 // $(document).load(function() { console.log('page load complete'); });
-            });
+           });
         });
       </script>
-
     </body>
 </html>
