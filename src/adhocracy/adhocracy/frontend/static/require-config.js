@@ -13,6 +13,7 @@ require.config({
         obvieltemplate: '../submodules/obviel/src/obviel/obviel-template',
         chai: '../submodules/chai/chai',
         mocha: '../submodules/mocha/mocha',
+        virtualpointer: '../submodules/virtual-pointer/src/virtual-pointer',
     },
     shim: {
         jquery: {
@@ -33,6 +34,10 @@ require.config({
         },
         mocha: {
             exports: 'mocha',
+        },
+        virtualpointer: {
+            exports: 'virtualpointer',
+            deps: ['jquery'],
         },
     }
 });
