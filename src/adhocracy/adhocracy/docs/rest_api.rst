@@ -91,6 +91,7 @@ Returns resource meta data, children meta data and all interfaces with data::
     {
         "content_type": "adhocracy.contents.interfaces.IPool",
         "data": {
+            ...
             "adhocracy.propertysheets.interfaces.IName": {
                 "name": ""
             },
@@ -123,6 +124,7 @@ Check the changed resource::
     {
         "content_type": "adhocracy.contents.interfaces.IPool",
         "data": {
+            ...
             "adhocracy.propertysheets.interfaces.IName": {
                 "name": "NEWTITLE"
             },
