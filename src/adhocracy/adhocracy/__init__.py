@@ -29,6 +29,7 @@ def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
     config = Configurator(settings=settings, root_factory=root_factory)
+    config.include('pyramid_chameleon')
     config.include('substanced')
     config.commit() # commit to allow proper config overrides
     config.include('.propertysheets')
