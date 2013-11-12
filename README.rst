@@ -5,6 +5,8 @@ Adhocracy-3 Playground Para-Prototype on ZODB / Substance-D / Obviel
 Softwarestack ::
 ----------------
 
+server:
+
 - `substance <http://docs.pylonsproject.org/projects/substanced/en/latest>`_ (application framework/server)
 
 - `Pyramid <http://pylonsproject.org>`_  (web framework)
@@ -20,6 +22,14 @@ Softwarestack ::
 - `buildout <http://www.buildout.org/en/latest/>`_ (build system)
 
 - `python 3 <http://www.python.org>`_ (programming language)
+
+client:
+
+- `javascript` (programming language)
+
+- `typescript` (module system)
+
+- `obviel` (application framework)
 
 
 Installation (server)
@@ -47,36 +57,15 @@ compile python 3 and PIL ::
     cd ..
     ./python/python-3.3/bin/python --version
 
-install adhocracy and the substance-d demo app ::
+install adhocracy ::
 
     ./python/python-3.3/bin/python ./bootstrap.py
     ./bin/buildout
 
-Installation (obviel front-end)
--------------------------------
+install javascript front-end ::
 
-Requirements (Tested on Debian\Ubuntu):
-
-1. git
-2. build-essentials
-3. npm (node package manager, install with debian)
-    (for installing typescript; usage: npm -i <package name>@<package version>)
-4. nodejs (>= 0.10)
-    (for running typescript, FIXME: test debian stable version against tsc-0.9.1.1)
-5. typescript (>= 0.9.1.1)
-    (usage: "tsc --version")
-6. bower (?)
-7. grunt (?)
-
-if you have not built the server backend (see above) yet ::
-
-    git clone https://github.com/adhocracy/adhocracy-3
-    cd adhocracy-3
-    git submodule init
-    git submodule update
     cd src/adhocracy/adhocracy/frontend/static/js/
     make
-    open http://localhost:6541/static/frontend/proposal_workbench.html in browser
 
 
 Run the application
@@ -93,6 +82,10 @@ updating the object structure ::
 serving the sdidemo wsgi app using pserve ::
 
     ./bin/pserve etc/development.ini
+
+open the javascript front-end with your web browser ::
+
+    xdg-open http://localhost:6541/frontend_static/proposal_workbench.html 
 
 
 Documentation
