@@ -130,9 +130,14 @@ function click_any(dom, done_click) {
     var links = dom.find('a').toArray();
 
     if (links.length > 0) {
-        var ix : number = Math.round(Math.random() * (links.length - 1));
+        // var ix : number = Math.round(Math.random() * (links.length - 1));
+        var ix : number = 0;
         var link = dom.find('a:eq(' + ix.toString() + ')');
-        click_element(link[0], done_click);
+        link.trigger(new $.Event('click', {pageX: this.x, pageY: this.y}), done_click);  // link actually *does* have a trigger method!
+        // click_element(link[0], done_click);
+        done_click(true);  // ...  but at this point, it is too early to call done_click.
+    } else {
+        done_click(false);
     }
 }
 
@@ -146,7 +151,8 @@ function click_element(el, done_click) {
 describe ('opening proposals', function() {
 
     it('must open proposal in the left div on click (any version), if proposal list is non-empty', function(done_it) {
-        click_any($('#proposal_workbench_directory'), function() {
+        click_any($('#proposal_workbench_directory'), function(data_available) {
+            expect(data_available).to.be.true;  // (this does not produce a very helpful error message.  blargh.)
 
             // for a start, just expect a <pre> element to pop up in the
             // detail div with the raw json object of the proposal.
