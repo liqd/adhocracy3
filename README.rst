@@ -29,7 +29,7 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
 1. python2.7
 2. git
-3. build-essentials, libyaml-dev, python-dev 
+3. build-essentials, libyaml-dev, python-dev
 4. graphviz
 
 checkout source code ::
@@ -59,8 +59,14 @@ Requirements (Tested on Debian\Ubuntu):
 
 1. git
 2. build-essentials
-3. nodejs (build it from github if you are using testing; the debian packages are broken as of Tue Sep  3 14:52:03 CEST 2013)
-4. bower, grunt
+3. npm (node package manager, install with debian)
+    (for installing typescript; usage: npm -i <package name>@<package version>)
+4. nodejs (>= 0.10)
+    (for running typescript, FIXME: test debian stable version against tsc-0.9.1.1)
+5. typescript (>= 0.9.1.1)
+    (usage: "tsc --version")
+6. bower (?)
+7. grunt (?)
 
 if you have not built the server backend (see above) yet ::
 
@@ -68,30 +74,10 @@ if you have not built the server backend (see above) yet ::
     cd adhocracy-3
     git submodule init
     git submodule update
-    cd src/frontend
+    cd src/adhocracy/adhocracy/frontend/static/js/
+    make
+    open http://localhost:6541/static/frontend/proposal_workbench.html in browser
 
-compile jquery-1.7.2 ::
-
-    # jquery 1.10.2 throws some poorly analysed exceptions when playing with obviel traject
-    # (hum...  Makefile crash?  Ignore commands in this paragraph; I'll just leave jquery-1.7.2.js in src/frontend/ for now.)
-    cd submodules/jquery
-    git checkout tags/1.7.2
-    make jquery
-    cd ../../
-
-compile jquery-1.10.2 ::
-
-    cd submodules/jquery
-    git checkout tags/1.10.2
-    follow procedure in README.md
-    cd ../../
-
-now it gets a little muddy ::
-
-    start a web browser that serves files in src/frontend/, and load
-    /index.html from it.  what that page does is still changing a lot.
-    these installation instructions will get updated once things get
-    more stable.
 
 Run the application
 -------------------
