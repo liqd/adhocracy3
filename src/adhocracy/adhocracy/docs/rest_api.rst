@@ -135,48 +135,102 @@ Check the changed resource::
         "path": "/adhocracy"
     }
 
+FIXME: write test cases for "any sub-structure of an object in a PUT
+request may be missing and will be replaced by the old (overwritten)
+sub-structure.
+
+FIXME: write test cases for attributes with "required", "read-only",
+and possibly others.  (those work the same in PUT and POST, and on any
+attribute in the json tree.)
+
+
 POST
 ~~~~
 
-Create new resource and return the path::
+Create new document version and return the path ::
 
-    >>> data = {'content_type': 'adhocracy.contents.interfaces.IProposalContainer',
-    ...         'data': {
-    ...              'adhocracy.propertysheets.interfaces.IName': {'name': 'proposal1'},
-    ...              'adhocracy.propertysheets.interfaces.IDag': {}}}
+    >>> data = {'content_type': 'adhocracy.contents.interfaces.IProposal'}
     >>> resp = testapp.post_json("/adhocracy", data)
     >>> pprint_json(resp.json)
     {
-        "content_type": "adhocracy.contents.interfaces.IProposalContainer",
+        "content_type": "adhocracy.contents.interfaces.IProposal",
         "path": ...
     }
-    >>> proposal1_path = resp.json["path"]
 
+Fetch posted document version and extract URL for POSTing updates ::
 
-FIXME: (clarify) should the server really complete the json structure
-recursively where missing?  i think that's dangerous.
-
-FIXME: (clarify) should the IDag property sheet be modelled as
-something other than IPool?  isn't it enough that the containers know
-about their versional dependency?  then an IContainer would just be an
-IPool.
-
-
-Checking the resource was added::
-
-    >>> pprint_json(testapp.get(proposal1_path).json)
+    >>> resp = testapp.get_json(resp.json["path"])
+    >>> prop = resp.json
+    >>> pprint_json(prop)
     {
-        "content_type": "adhocracy.contents.interfaces.IProposalContainer",
-        "data": {
-            "adhocracy.propertysheets.interfaces.IDag": {
-                "versions": [...
-            },
-            "adhocracy.propertysheets.interfaces.IName": {
-                "name": "proposal1"
-            }
-        },
-        "path": ...
+        "content_type": "adhocracy.contents.interfaces.IProposal",
+        "data": ...
+        "path": "/adhocracy/...
+        "postroot": "/adhocracy/...
     }
+
+FIXME: find technical term for things that have "post_path" and live
+in "postroots"(?) and for things that initiate "postroots"(?) in
+particular.  (paragraphs have a "post_path", but they live with
+proposals and such.)
+
+FIXME: should "post_path" live in a property sheet, or on top level in
+the content object?
+
+Create new paragraph and add it to proposal ::
+
+    >>> para = {'content_type': 'adhocracy.contents.interfaces.IParagraph',
+    ...         'data': {
+    ...              'adhocracy.propertysheets.interfaces.Text': {
+    ...                  'text': 'mehr kommunismus immer blabla' }}}
+    >>> resp = testapp.post_json(prop["postroot"], para)
+    >>> pprint_json(resp.json)
+    {
+        "content_type": "adhocracy.contents.interfaces.IParagraph",
+        "path": "/adhocracy/...",
+        ...
+    }
+    >>> resp = testapp.get_json(resp.json["path"])
+    >>> para = resp.json
+    >>> prop["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
+    ...      .append(para["path"])
+
+Update versionable predecessor version and get dag-postroot:
+
+(FIXME: s/follows/predecessors/g; s/followed_by/successors/g;?)
+
+    >>> prop_vrsbl = prop["data"]["adhocracy.propertysheets.interfaces.IVersionable"]
+    >>> prop_vrsbl["follows"] = [para["path"]]
+    >>> resp = testapp.post_json(prop_vrsbl["postroot"], prop)
+    >>> resp = testapp.get_json(resp.json["path"])
+    >>> propv2 = resp.json
+    >>> pprint_json(propv2)
+    {
+        "content_type": "adhocracy.contents.interfaces.IProposal",
+        "data": {
+            "adhocracy.propertysheets.interfaces.IVersionable": {
+                "follows": ["/adhocracy/..."],
+                "postroot": "/adhocracy/...
+            },
+            ...
+        }
+        "path": "/adhocracy/...
+        "postroot": "/adhocracy/...
+    }
+
+FIXME: write test cases for "any sub-structure of an object in a POST
+request may be missing and will be replaced by defaults."
+
+(Note: the server may handle paths like the following internally, but
+the client is not supposed to worry about that:
+  proposalspool/ => proposalspool/proposal1/dag/prosoal1V1
+  proposalspool/proposal1/ => proposalspool/proposal1/absatz1pool/dag/absatz1V1)
+
+
+
+
+
+
 
 Interfaces ::
 
@@ -191,6 +245,11 @@ Interfaces ::
                ../users/1
                ../users/2
                .....
+
+
+
+
+
 
 Working with Node content
 -------------------------
