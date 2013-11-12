@@ -22,6 +22,31 @@ var expect : chai.ExpectStatic = (function() {
 import ProposalWorkbench = require('Adhocracy/Frames/ProposalWorkbench');
 
 
+function very_adhoc_fixtures_script() {
+    var root_url = "/adhocracy";
+
+    var showjs = function(json) {
+        return JSON.stringify(json, null, 2)
+    };
+
+    $.ajax(root_url + '/0/0', {type: "GET"}).fail(function() {
+        // run this in case the above GET yields nothing.  (otherwise, assume fixtures are already created.)
+
+        var propcontainer = {
+            'content_type': 'adhocracy.contents.interfaces.IProposalContainer',
+            'data': { 'adhocracy.propertysheets.interfaces.IName': { 'name': 'NoMoreMosquitos' } }
+        };
+
+        $.ajax(root_url, {
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: showjs(propcontainer),
+        });
+    });
+}
+
+
 mocha.setup({ui: 'bdd', slow: 30, timeout: 2000});
 
 // url must yield a content-type that implements property sheet
