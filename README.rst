@@ -62,6 +62,10 @@ install adhocracy ::
     ./python/python-3.3/bin/python ./bootstrap.py
     ./bin/buildout
 
+update your shell environment::
+
+    ./source source_env
+
 install javascript front-end ::
 
     cd src/adhocracy/adhocracy/frontend/static/js/
