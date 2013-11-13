@@ -22,6 +22,10 @@ var expect : chai.ExpectStatic = (function() {
 import ProposalWorkbench = require('Adhocracy/Frames/ProposalWorkbench');
 
 
+// cascade of synchronous ajax calls that establish some fixtures.
+// for the subsequent tests.  data model is outdated and doesn't fit
+// /docs/source/rest_api.rst any more.  but this is anyway not the
+// place to set up fixtures...
 function very_adhoc_fixtures_script() {
     var root_url = "/adhocracy";
 
@@ -36,12 +40,109 @@ function very_adhoc_fixtures_script() {
             'content_type': 'adhocracy.contents.interfaces.IProposalContainer',
             'data': { 'adhocracy.propertysheets.interfaces.IName': { 'name': 'NoMoreMosquitos' } }
         };
+        var resp = $.ajax(root_url, {
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: showjs(propcontainer),
+            async: false
+        });
 
+        var propcontainer_path = $.parseJSON(resp.responseText)['path'];
+
+        var prop = {
+            'content_type': 'adhocracy.contents.interfaces.IProposal',
+            'data': { 'adhocracy.propertysheets.interfaces.IName': { 'name': 'v1' } }
+        };
+        resp = $.ajax(propcontainer_path, {
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: showjs(prop),
+            async: false
+        });
+
+        var propv1 = $.parseJSON(resp.responseText);
+
+        var parcontainer = {'content_type': 'adhocracy.contents.interfaces.IParagraphContainer',
+                            'data': { 'adhocracy.propertysheets.interfaces.IName': { 'name': 'paragraphs' }}};
+        resp = $.ajax(root_url, {
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: showjs(parcontainer),
+            async: false
+        });
+
+        var parcontainer_path = $.parseJSON(resp.responseText)['path'];
+
+        var par = {'content_type': 'adhocracy.contents.interfaces.IParagraph',
+                   'data': { 'adhocracy.propertysheets.interfaces.IParagraph': {
+                                  'text': 'sein bart ist vom vorüberziehn der stäbchen'
+                             }
+                           }
+                  };
+        resp = $.ajax(parcontainer_path, {
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: showjs(par),
+            async: false
+        });
+        propv1['data']['adhocracy.propertysheets.interfaces.IDocument']['paragraphs'].push({
+            'content_type': 'adhocracy.contents.interfaces.IParagraph',
+            'path': $.parseJSON(resp.responseText)['path']
+        });
+
+        par['data']['adhocracy.propertysheets.interfaces.IParagraph']['text'] = 'ganz weiß geworden, so wie nicht mehr frisch';
+        resp = $.ajax(parcontainer_path, {
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: showjs(par),
+            async: false
+        });
+        propv1['data']['adhocracy.propertysheets.interfaces.IDocument']['paragraphs'].push({
+            'content_type': 'adhocracy.contents.interfaces.IParagraph',
+            'path': $.parseJSON(resp.responseText)['path']
+        });
+
+        propv1['data']['adhocracy.propertysheets.interfaces.IVersions']['preds'].push({
+            'content_type': 'adhocracy.contents.interfaces.IProposal',
+            'path': propv1['path']
+        });
+
+        resp = $.ajax(propcontainer_path, {
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: showjs(propv1),
+            async: false
+        });
+
+        propcontainer['data']['adhocracy.propertysheets.interfaces.IName']['name'] = 'CDU für alle';
         $.ajax(root_url, {
             type: "POST",
             dataType: "json",
             contentType: "application/json",
             data: showjs(propcontainer),
+            async: false
+        });
+        propcontainer['data']['adhocracy.propertysheets.interfaces.IName']['name'] = 'Gentechnik jetzt';
+        $.ajax(root_url, {
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: showjs(propcontainer),
+            async: false
+        });
+        propcontainer['data']['adhocracy.propertysheets.interfaces.IName']['name'] = 'Mehr Proposals';
+        $.ajax(root_url, {
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: showjs(propcontainer),
+            async: false
         });
     });
 }
@@ -192,6 +293,7 @@ describe ('opening proposals', function() {
 });
 
 export function run_tests() {
+    very_adhoc_fixtures_script();
     mocha.run(function() {});
 };
 
