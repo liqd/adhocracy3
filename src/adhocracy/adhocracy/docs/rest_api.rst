@@ -218,7 +218,7 @@ Update versionable predecessor version and get dag-postroot:
 (FIXME: s/follows/predecessors/g; s/followed_by/successors/g;?)
 
     >>> prop_vrsbl = prop["data"]["adhocracy.propertysheets.interfaces.IVersionable"]
-    >>> prop_vrsbl["follows"] = [para["path"]]
+    >>> prop_vrsbl["follows"] = [{'content_type': prop["content_type"], 'path': prop["path"]}]
     >>> resp = testapp.post_json(prop_vrsbl["postroot"], prop)
     >>> resp = testapp.get_json(resp.json["path"])
     >>> propv2 = resp.json
@@ -249,32 +249,36 @@ the client is not supposed to worry about that:
 Batch requests
 ~~~~~~~~~~~~~~
 
-URL /adhocracy-batch/ accepts ordered sequences (json arrays) of
-encoded HTTP requests in one HTTP request body.  The response contains
-an ordered sequence of the same (or, in case of error, shorter) length
-that contains the resp. HTTP responses.  First error terminates batch
-processing.  Batch requests are transactional in the sense that either
-all are successfully carried out or nothing is changed on the server.
+The following URL accepts ordered sequences (json arrays) of
+encoded HTTP requests in one HTTP request body ::
+
+    >>> batch_url = '/adhocracy-batch/'
+
+The response contains an ordered sequence of the same (or, in case of
+error, shorter) length that contains the resp. HTTP responses.  First
+error terminates batch processing.  Batch requests are transactional
+in the sense that either all are successfully carried out or nothing
+is changed on the server.
 
 Let's add some more paragraphs to the document above ::
 
     >>> batch = [ { 'method': 'POST',
-    ...             'path': prop["postroot"],
+    ...             'path': propv2["postroot"],
     ...             'body': { 'content_type': 'adhocracy.contents.interfaces.IParagraph',
     ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
     ...                           'text': 'sein blick ist vom vorüberziehn der stäbchen' }}}},
     ...           { 'method': 'POST',
-    ...             'path': prop["postroot"],
+    ...             'path': propv2["postroot"],
     ...             'body': { 'content_type': 'adhocracy.contents.interfaces.IParagraph',
     ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
     ...                           'text': 'ganz weiß geworden, so wie nicht mehr frisch' }}}},
     ...           { 'method': 'POST',
-    ...             'path': prop["postroot"],
+    ...             'path': propv2["postroot"],
     ...             'body': { 'content_type': 'this is not a very well-known content-type, and will trigger an error!',
     ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
     ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
     ...           { 'method': 'POST',
-    ...             'path': prop["postroot"],
+    ...             'path': propv2["postroot"],
     ...             'body': { 'content_type': 'adhocracy.contents.interfaces.IParagraph',
     ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
     ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
@@ -291,10 +295,12 @@ requests!)
 
 FIXME: add paragraphs from first batch with string paths, not numeric paths.
 
-    >>> prop["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
+    >>> propv2["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
     ...      .append({ 'content_type': 'adhocracy.contents.interfaces.IParagraph', 'path': 0})
-    ... prop["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
+    ... propv2["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
     ...      .append({ 'content_type': 'adhocracy.contents.interfaces.IParagraph', 'path': 1})
+    ... propv2_vrsbl = propv2["data"]["adhocracy.propertysheets.interfaces.IVersionable"]
+    ... propv2_vrsbl["follows"] = [{'content_type': prop["content_type"], 'path': prop["path"]}]
     ... batch = [ { 'method': 'POST',
     ...             'path': prop["postroot"],
     ...             'body': { 'content_type': 'adhocracy.contents.interfaces.IParagraph',
@@ -306,8 +312,9 @@ FIXME: add paragraphs from first batch with string paths, not numeric paths.
     ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
     ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
     ...           { 'method': 'POST',
-    ...             'path': prop_vrsbl["postroot"],  # (The post root of the proposal DAG, not the Pool containing the DAG.)
-    ...             'body': prop } ]
+    ...             'path': propv2_vrsbl["postroot"],
+    ...             'body': propv2 }
+    ...         ]
 
 FIXME: send it and expect result of a certain structure.
 
