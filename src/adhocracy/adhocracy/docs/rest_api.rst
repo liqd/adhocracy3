@@ -249,7 +249,7 @@ the client is not supposed to worry about that:
 Batch requests
 ~~~~~~~~~~~~~~
 
-The following URL accepts ordered sequences (json arrays) of
+The following URL accepts POSTs of ordered sequences (json arrays) of
 encoded HTTP requests in one HTTP request body ::
 
     >>> batch_url = '/adhocracy-batch/'
@@ -282,8 +282,31 @@ Let's add some more paragraphs to the document above ::
     ...             'body': { 'content_type': 'adhocracy.contents.interfaces.IParagraph',
     ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
     ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
+    >>> batch_resp = testapp.post_json(batch_url, batch).json
+    >>> pprint_json(batch_resp)
+    [
+        {
+            "code": 200,
+            "body": {
+                "content_type": "adhocracy.contents.interfaces.IParagraph",
+                "path": "..."
+            }
+        },
+        {
+            "code": 200,
+            "body": {
+                "content_type": "adhocracy.contents.interfaces.IParagraph",
+                "path": "..."
+            }
+        },
+        {
+            "code": ...,
+            "body": ...
+        }
+    ]
 
-FIXME: send it and expect result of a certain structure.
+(The third element of the above array must have return code >= 400.
+Not sure how to test this with doctest.)
 
 Do this again with the last two paragraphs, but without the mistake
 above.  Also throw in a request at the end that depends on the former.
@@ -293,9 +316,11 @@ reference object contains a number that points into the batch array
 (numbering starts with '0').  (Numeric paths are only allowed in batch
 requests!)
 
-FIXME: add paragraphs from first batch with string paths, not numeric paths.
-
     >>> propv2["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
+    ...      .append({ 'content_type': 'adhocracy.contents.interfaces.IParagraph', 'path': batch_resp[0]["body"]["path"]})
+    ... propv2["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
+    ...      .append({ 'content_type': 'adhocracy.contents.interfaces.IParagraph', 'path': batch_resp[1]["body"]["path"]})
+    ... propv2["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
     ...      .append({ 'content_type': 'adhocracy.contents.interfaces.IParagraph', 'path': 0})
     ... propv2["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
     ...      .append({ 'content_type': 'adhocracy.contents.interfaces.IParagraph', 'path': 1})
@@ -315,9 +340,36 @@ FIXME: add paragraphs from first batch with string paths, not numeric paths.
     ...             'path': propv2_vrsbl["postroot"],
     ...             'body': propv2 }
     ...         ]
-
-FIXME: send it and expect result of a certain structure.
-
+    >>> batch_resp = testapp.post_json(batch_url, batch).json
+    >>> pprint_json(batch_resp)
+    [
+        {
+            "code": 200,
+            "body": {
+                "content_type": "adhocracy.contents.interfaces.IParagraph",
+                "path": "..."
+            }
+        },
+        {
+            "code": 200,
+            "body": {
+                "content_type": "adhocracy.contents.interfaces.IParagraph",
+                "path": "..."
+            }
+        },
+        {
+            "code": 200,
+            "body": {
+                "content_type": "adhocracy.contents.interfaces.IProposal",
+                "path": "..."
+            }
+        }
+    ]
+    >>> propv3 = testapp.get_json(batch_resp[2]["body"]["path"]).json
+    {
+        "content_type": "adhocracy.contents.interfaces.IProposal",
+        ...
+    }
 
 
 
