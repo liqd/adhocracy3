@@ -144,17 +144,33 @@ and possibly others.  (those work the same in PUT and POST, and on any
 attribute in the json tree.)
 
 
+FIXME: write test cases for "any sub-structure of an object in a PUT
+request may be missing and will be replaced by the old (overwritten)
+sub-structure.
+
+FIXME: write test cases for attributes with "required", "read-only",
+and possibly others.  (those work the same in PUT and POST, and on any
+attribute in the json tree.)
+
+
 POST
 ~~~~
 
 Create new document version and return the path ::
 
-    >>> data = {'content_type': 'adhocracy.contents.interfaces.IProposal'}
-    >>> resp = testapp.post_json("/adhocracy", data)
+    >>> prop = {'content_type': 'adhocracy.contents.interfaces.IProposal',
+    ...         'data': {
+    ...              'adhocracy.propertysheets.interfaces.IName': {
+    ...                  'name': 'kommunismus jetzt!'},
+    ...              'adhocracy.propertysheets.interfaces.IDocument': {
+    ...                  'title': 'kommunismus jetzt!',
+    ...                  'description': 'blabla!',
+    ...                  'paragraphs': []}}}
+    >>> resp = testapp.post_json("/adhocracy", prop)
     >>> pprint_json(resp.json)
     {
         "content_type": "adhocracy.contents.interfaces.IProposal",
-        "path": ...
+        "path": "/adhocracy/...
     }
 
 Fetch posted document version and extract URL for POSTing updates ::
@@ -181,6 +197,8 @@ Create new paragraph and add it to proposal ::
 
     >>> para = {'content_type': 'adhocracy.contents.interfaces.IParagraph',
     ...         'data': {
+    ...              'adhocracy.propertysheets.interfaces.INameReadOnly': {
+    ...                  'name': 'kommunismus jetzt, erster abschnitt!'},
     ...              'adhocracy.propertysheets.interfaces.Text': {
     ...                  'text': 'mehr kommunismus immer blabla' }}}
     >>> resp = testapp.post_json(prop["postroot"], para)
@@ -245,9 +263,6 @@ Interfaces ::
                ../users/1
                ../users/2
                .....
-
-
-
 
 
 

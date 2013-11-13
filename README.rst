@@ -32,6 +32,25 @@ client:
 - `obviel` (application framework)
 
 
+Installation with Vagrant virtual machine
+-----------------------------------------
+
+Requirements:
+
+1. virtualbox: https://virtualbox.org/wiki/Downloads
+2. vagrant: http://docs.vagrantup.com/v2/installation/index.html
+
+create virtual machine and login:
+
+    wget https://raw.github.com/adhocracy/adhocracy-3/master/Vagrantfile
+    vagrant up
+    vagrant ssh
+    cd /home/vagrant/
+
+proceed with installing the server
+TODO: make the automatic setup work (vagrant shell provisioner or salt)
+
+
 Installation (server)
 ---------------------
 
