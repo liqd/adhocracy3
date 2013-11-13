@@ -246,6 +246,72 @@ the client is not supposed to worry about that:
 
 
 
+Batch requests
+~~~~~~~~~~~~~~
+
+URL /adhocracy-batch/ accepts ordered sequences (json arrays) of
+encoded HTTP requests in one HTTP request body.  The response contains
+an ordered sequence of the same (or, in case of error, shorter) length
+that contains the resp. HTTP responses.  First error terminates batch
+processing.  Batch requests are transactional in the sense that either
+all are successfully carried out or nothing is changed on the server.
+
+Let's add some more paragraphs to the document above ::
+
+    >>> batch = [ { 'method': 'POST',
+    ...             'path': prop["postroot"],
+    ...             'body': { 'content_type': 'adhocracy.contents.interfaces.IParagraph',
+    ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
+    ...                           'text': 'sein blick ist vom vorüberziehn der stäbchen' }}}},
+    ...           { 'method': 'POST',
+    ...             'path': prop["postroot"],
+    ...             'body': { 'content_type': 'adhocracy.contents.interfaces.IParagraph',
+    ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
+    ...                           'text': 'ganz weiß geworden, so wie nicht mehr frisch' }}}},
+    ...           { 'method': 'POST',
+    ...             'path': prop["postroot"],
+    ...             'body': { 'content_type': 'this is not a very well-known content-type, and will trigger an error!',
+    ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
+    ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
+    ...           { 'method': 'POST',
+    ...             'path': prop["postroot"],
+    ...             'body': { 'content_type': 'adhocracy.contents.interfaces.IParagraph',
+    ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
+    ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
+
+FIXME: send it and expect result of a certain structure.
+
+Do this again with the last two paragraphs, but without the mistake
+above.  Also throw in a request at the end that depends on the former.
+References to objects earlier in the same batch request are easy:
+Instead of a string that contains the URI, the 'path' field of the
+reference object contains a number that points into the batch array
+(numbering starts with '0').  (Numeric paths are only allowed in batch
+requests!)
+
+FIXME: add paragraphs from first batch with string paths, not numeric paths.
+
+    >>> prop["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
+    ...      .append({ 'content_type': 'adhocracy.contents.interfaces.IParagraph', 'path': 0})
+    ... prop["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
+    ...      .append({ 'content_type': 'adhocracy.contents.interfaces.IParagraph', 'path': 1})
+    ... batch = [ { 'method': 'POST',
+    ...             'path': prop["postroot"],
+    ...             'body': { 'content_type': 'adhocracy.contents.interfaces.IParagraph',
+    ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
+    ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
+    ...           { 'method': 'POST',
+    ...             'path': prop["postroot"],
+    ...             'body': { 'content_type': 'adhocracy.contents.interfaces.IParagraph',
+    ...                       'data': { 'adhocracy.propertysheets.interfaces.Text': {
+    ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
+    ...           { 'method': 'POST',
+    ...             'path': prop_vrsbl["postroot"],  # (The post root of the proposal DAG, not the Pool containing the DAG.)
+    ...             'body': prop } ]
+
+FIXME: send it and expect result of a certain structure.
+
+
 
 
 
