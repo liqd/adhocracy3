@@ -107,6 +107,9 @@ function very_adhoc_fixtures_script() {
             'path': $.parseJSON(resp.responseText)['path']
         });
 
+        propv1['data']['adhocracy.propertysheets.interfaces.IDocument']['title'] = 'Der Käptn';
+        propv1['data']['adhocracy.propertysheets.interfaces.IDocument']['description'] = '(nicht von rainer maria rilke)';
+
         propv1['data']['adhocracy.propertysheets.interfaces.IVersions']['preds'].push({
             'content_type': 'adhocracy.contents.interfaces.IProposal',
             'path': propv1['path']

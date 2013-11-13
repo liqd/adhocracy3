@@ -78,6 +78,11 @@ export function open_proposals(uri, done) {
         obvtUrl: 'templates/IDocument.obvt',
     });
 
+    obviel.view({
+        iface: 'adhocracy.propertysheets.interfaces.IParagraph',
+        obvtUrl: 'templates/IParagraph.obvt',
+    });
+
 
     // some crude error handling (instead of the default of silently
     // ignoring errors.)

@@ -1,11 +1,9 @@
-<pre>{@.}</pre>
+<!-- <pre>{@.}</pre> -->
 
-<!--
-<span data-with="data.adhocracy#interfaces#IDocument">
+<span data-with="data.adhocracy#propertysheets#interfaces#IDocument">
     <h3>Document title: "{title}"</h3>
     <p><small>{description}</small></p>
     <ol>
-        <li data-repeat="paragraphs" data-render="@."></li>
+        <li data-repeat="paragraphs" data-render="path"></li>
     </ol>
 </span>
--->
