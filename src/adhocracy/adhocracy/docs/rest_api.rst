@@ -211,7 +211,7 @@ Create new paragraph and add it to proposal ::
     >>> resp = testapp.get_json(resp.json["path"])
     >>> para = resp.json
     >>> prop["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
-    ...      .append(para["path"])
+    ...      .append({'content_type': 'adhocracy.contents.interfaces.IParagraph', 'path': para["path"]})
 
 Update versionable predecessor version and get dag-postroot:
 
