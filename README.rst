@@ -108,7 +108,7 @@ serving the sdidemo wsgi app using pserve ::
 
 open the javascript front-end with your web browser ::
 
-    xdg-open http://localhost:6541/frontend_static/proposal_workbench.html 
+    xdg-open http://localhost:6541/frontend_static/proposal_workbench.html
 
 
 Documentation
@@ -128,6 +128,7 @@ Check pep8 and pep257 bevore pushing commits::
 
     bin/flake8 src/adhocracy
 
+
 Running the Testsuite
 ---------------------
 
@@ -142,3 +143,17 @@ run the test against already running server ::
 The second case is interesting if you want to create a few objects in
 a running backend in order to make the js front-end tests more
 colorful.
+
+
+haskell backend mockup
+----------------------
+
+Frontend test suite currently (2013-11-13) works best with haskell
+backend:
+
+    git clone https://github.com/zerobuzz/a3-backend-mockup/
+
+Installation instructions will be added soon in README.md
+
+
+
