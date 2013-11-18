@@ -117,6 +117,5 @@ export function open_proposals(uri, done) {
 
     $('#adhocracy').render('/adhocracy/', 'ProposalWorkbench').done(function() {
         $(window).trigger('hashchange');
-        done();
     });
 }

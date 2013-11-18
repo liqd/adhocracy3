@@ -1,5 +1,6 @@
 <html>
     <head>
+        <title>Proposal Workbench</title>
         <meta charset="utf-8">
         <link rel="stylesheet" href="submodules/mocha/mocha.css" />
         <script type="text/javascript"
@@ -10,30 +11,18 @@
     <body>
       <!-- app -->
       <div id="adhocracy">[javascript is not running]</div>
-      <!-- script>
-          // this html file is just for testing.  don't do anything else.
-          require(['jquery', 'Adhocracy'], function($, Adhocracy) {
-              // console.log(Adhocracy);
-              $(document).ready(function() { Adhocracy.init(); });
+      <script>
+          require(['jquery', 'bbq', 'datalink', 'obviel'], function() {
+              require(['Adhocracy/Frames/ProposalWorkbench'], function(ProposalWorkbench) {
+                  $(document).ready(function() { ProposalWorkbench.open_proposals(); });
+                  // This isn't executed: (why?)
+                  $(document).load(function() { console.log('page load complete'); });
+              });
           });
-          </script -->
+      </script>
 
       <!-- obviel hackery -->
       <hr>
       <div id="debug_links"></div>
-
-      <!-- mocha -->
-      <hr>
-      <div id="mocha"></div>
-      <script>
-        require(['jquery', 'bbq', 'datalink', 'obviel', 'chai', 'mocha', 'virtualpointer'], function() {
-            require(['Test/Main'], function() {
-                var Test = require('Test/Main');
-                $(document).ready(function() { Test.run_tests(); });
-                // This isn't executed: (why?)
-                // $(document).load(function() { console.log('page load complete'); });
-           });
-        });
-      </script>
     </body>
 </html>

@@ -11,9 +11,6 @@ require.config({
         bbq: '../submodules/jquery-bbq/jquery.ba-bbq',
         obviel: '../submodules/obviel/src/obviel/obviel',
         obvieltemplate: '../submodules/obviel/src/obviel/obviel-template',
-        chai: '../submodules/chai/chai',
-        mocha: '../submodules/mocha/mocha',
-        virtualpointer: '../submodules/virtual-pointer/src/virtual-pointer',
     },
     shim: {
         jquery: {
@@ -30,13 +27,6 @@ require.config({
         },
         obvieltemplate: {
             exports: 'obvieltemplate',
-            deps: ['jquery'],
-        },
-        mocha: {
-            exports: 'mocha',
-        },
-        virtualpointer: {
-            exports: 'virtualpointer',
             deps: ['jquery'],
         },
     }
