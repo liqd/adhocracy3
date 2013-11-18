@@ -23,14 +23,15 @@ server:
 
 - `python 3 <http://www.python.org>`_ (programming language)
 
-client:
+client (frontend):
 
 - `javascript` (programming language)
 
-- `typescript` (module system)
+- `typescript` <http://www.typescriptlang.org/> (module system)
 
-- `obviel` (application framework)
+- `obviel` <http://www.obviel.org> (application framework)
 
+- `robotframework` <http://robotframework.org/> (acceptance and frontend tests)
 
 Installation with Vagrant virtual machine
 -----------------------------------------
@@ -89,6 +90,12 @@ install javascript front-end ::
 
     cd src/adhocracy/adhocracy/frontend/static/js/
     make
+
+install robotframework for accpetance testing ::
+
+    cd robotframework/
+    python2.7 bootstrap.py
+    bin/buildout 
 
 
 Run the application
