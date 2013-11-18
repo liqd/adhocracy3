@@ -7,10 +7,9 @@ Resource          resource.txt
 *** Test Cases ***
 Proposal Workbench Setup DB
     Setup Proposal DB
-    [Teardown]    Close Browser
 
 Proposal Workbench
-    Open Browser To Proposal Workbench
+    Go To Proposal Workbench
     Open Proposal Detail View
     Open Proposal Editor
     Open Proposal Save Document

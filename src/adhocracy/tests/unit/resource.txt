@@ -11,6 +11,7 @@ Library           Selenium2Library
 ${SERVER}         localhost:8000
 ${BROWSER}        Firefox
 ${DELAY}          0
+${BROWSER LAG}    0.7 secs
 ${SETUP URL}      http://${SERVER}/f/proposal_workbench_setup.html
 ${PAGE URL}       http://${SERVER}/f/proposal_workbench.html
 
@@ -26,10 +27,10 @@ Open Browser To Proposal Workbench
 
 Proposal Workbench Should Be Open
     Title Should Be    Proposal Workbench
-    Sleep  1.2 secs
-    Element Should Be Visible  sizzle=#proposal_workbench_directory
-    Element Should Be Enabled  sizzle=#proposal_workbench_detail
-    Element Should Be Enabled  sizzle=#proposal_workbench_discussion
+    Sleep  ${BROWSER LAG}
+    Element Should Be Visible     sizzle=#proposal_workbench_directory
+    Page Should Contain Element   sizzle=#proposal_workbench_detail
+    Page Should Contain Element   sizzle=#proposal_workbench_discussion
 
 Go To Proposal Workbench
     Go To    ${PAGE URL}
@@ -37,6 +38,7 @@ Go To Proposal Workbench
 
 Open Proposal Detail View
     Click Element               sizzle=#proposal_workbench_directory a
+    Sleep  ${BROWSER LAG}
     Element Should Be Visible   sizzle=#proposal_workbench_detail h3
 
 Open Proposal Editor
