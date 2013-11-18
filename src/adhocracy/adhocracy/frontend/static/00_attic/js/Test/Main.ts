@@ -1,0 +1,149 @@
+mocha.setup({ui: 'bdd', slow: 30, timeout: 2000});
+
+// url must yield a content-type that implements property sheet
+// interface IPool, and all elements of IPool must implement property
+// sheet interface IName.
+//
+// FIXME: find haddock for js
+//
+// FIXME: fix type signature for continuation
+function ajax_pool_names(url: string, done_pool_names?: (pool: string[]) => any) {
+    var get_args = {
+        type: "GET",
+        dataType: "json",
+        contentType: "application/json",
+    };
+
+    function ajax_fail(jqxhr, textstatus, errorthrown) {
+        function showjs(json) {
+            return JSON.stringify(json, null, 2)
+        };
+
+        console.log(name + ": [" + showjs(jqxhr) + "][" + textstatus + "][" +
+                    errorthrown + "]");
+
+        throw "ajax error";
+    };
+
+    $.ajax(url, get_args).fail(ajax_fail).done(function(pool) {
+        var refs = pool['data']['adhocracy.propertysheets.interfaces.IPool']['elements'];
+        if (!refs.length)
+            done_pool_names([]);  // the rest of this block only works on non-empty element lists!
+
+        var elems = refs.map(function(ref) { return $.ajax(ref['path'], get_args); });
+
+        // (Q is a library for promises that might be useful here.  We
+        // are trying to do it by hand first.)
+
+        var results = [];
+        var counter = 0;
+
+        function check_done() {
+            counter += 1;
+            if (counter >= elems.length) {
+                done_pool_names(results.map(function(elem) {
+                    return elem['data']['adhocracy.propertysheets.interfaces.IName']['name'];
+                }));
+            }
+        };
+
+        for (var i in elems) {
+            elems[i].done((function(i) {
+                return function(result) {
+                    results[i] = result;
+                    check_done();
+                }})(i));
+        };
+
+        /* there may be a weirder solution along the lines of this:
+
+        elems.reduce(function(newelem, done??) {
+            newelem.done()...
+        }, ??)(done_pool_names);
+
+        */
+
+        // FIXME: factor this out into a utils module export.
+
+    })
+}
+
+describe('some trivial DOM invariants', function() {
+    describe('directory div must contain list of proposals', function() {
+
+        var expected_names;
+        var directory_div;
+
+        before(function(done) {
+            ajax_pool_names('/adhocracy/', function(names) {
+                expected_names = names;
+
+                ProposalWorkbench.open_proposals('/adhocracy/', function() {
+                    directory_div = $.makeArray($('#proposal_workbench_directory'))[0];
+                    done();
+                });
+            });
+        });
+
+        it('must have three divs named appropriately', function() {
+            expect($('#___probably_not_a_valid_dom_elem_id___')).to.have.length(0);
+            expect($('#proposal_workbench_detail')).to.not.have.length(0);
+            expect($('#proposal_workbench_directory')).to.not.have.length(0);
+            expect($('#proposal_workbench_discussion')).to.not.have.length(0);
+        });
+
+        it('list_items must contain the right proposal names.', function() {
+            expected_names.forEach(function (name) {
+                expect(directory_div.innerText).to.match(new RegExp(name));
+            });
+        });
+    });
+});
+
+// collect all links from a dom subtree, select one at random, and
+// trigger a click event on that link.
+function click_any(dom, done_click) {
+    var links = dom.find('a').toArray();
+
+    if (links.length > 0) {
+        // var ix : number = Math.round(Math.random() * (links.length - 1));
+        var ix : number = 0;
+        var link = dom.find('a:eq(' + ix.toString() + ')');
+        link.trigger(new $.Event('click', {pageX: this.x, pageY: this.y}), done_click);  // link actually *does* have a trigger method!
+        // click_element(link[0], done_click);
+        done_click(true);  // ...  but at this point, it is too early to call done_click.
+    } else {
+        done_click(false);
+    }
+}
+
+function click_element(el, done_click) {
+    var ev : any = document.createEvent("MouseEvent");
+    ev.initMouseEvent("click");
+    el.addEventListener("click", done_click);
+    el.dispatchEvent(ev);
+}
+
+describe ('opening proposals', function() {
+
+    it('must open proposal in the left div on click (any version), if proposal list is non-empty', function(done_it) {
+        click_any($('#proposal_workbench_directory'), function(data_available) {
+            expect(data_available).to.be.true;  // (this does not produce a very helpful error message.  blargh.)
+
+            // for a start, just expect a <pre> element to pop up in the
+            // detail div with the raw json object of the proposal.
+
+            expect($('#proposal_workbench_detail pre')).to.have.length(1);
+            done_it();
+        });
+    });
+
+    it('must always open head, not just any version');
+
+});
+
+export function run_tests() {
+    mocha.run(function() {});
+};
+
+

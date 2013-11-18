@@ -1,19 +1,20 @@
 *** Settings ***
 Documentation     A resource file with reusable keywords and variables.
 ...
-...               The system specific keywords created here form our own
-...               domain specific language. They utilize keywords provided
-...               by the imported Selenium2Library.
-
+...               (Detailed summary missing.)
 Library           Selenium2Library
 
 *** Variables ***
 ${SERVER}         localhost:8000
 ${BROWSER}        Firefox
 ${DELAY}          0
+${SETUP URL}      http://${SERVER}/f/proposal_workbench_setup.html
 ${PAGE URL}       http://${SERVER}/f/proposal_workbench.html
 
 *** Keywords ***
+Setup Proposal DB
+    Open Browser    ${SETUP URL}    ${BROWSER}
+
 Open Browser To Proposal Workbench
     Open Browser    ${PAGE URL}    ${BROWSER}
     Maximize Browser Window
@@ -26,3 +27,4 @@ Proposal Workbench Should Be Open
 Go To Proposal Workbench
     Go To    ${PAGE URL}
     Proposal Workbench Should Be Open
+

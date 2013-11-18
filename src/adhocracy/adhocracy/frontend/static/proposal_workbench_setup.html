@@ -1,0 +1,22 @@
+<html>
+    <head>
+        <title>Proposal Workbench Setup</title>
+        <meta charset="utf-8">
+        <script type="text/javascript"
+                src="submodules/requirejs/require.js"></script>
+        <script type="text/javascript"
+                src="require-config.js"></script>
+    </head>
+    <body>
+      <script>
+        require(['jquery'], function() {
+            require(['Test/Main'], function() {
+                var Test = require('Test/Main');
+                $(document).ready(function() { Test.proposal_workbench_setup(); });
+                // This isn't executed: (why?)
+                // $(document).load(function() { console.log('page load complete'); });
+           });
+        });
+      </script>
+    </body>
+</html>

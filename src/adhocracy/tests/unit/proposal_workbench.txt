@@ -1,0 +1,15 @@
+*** Settings ***
+Documentation     Test suite for module 'Adhocracy/Frames/ProposalWorkbench'
+...
+...               (Detailed summary missing.)
+Resource          resource.txt
+
+*** Test Cases ***
+Proposal Workbench Setup DB
+    Setup Proposal DB
+    [Teardown]    Close Browser
+
+Proposal Workbench
+    Open Browser To Proposal Workbench
+    Go To Proposal Workbench
+    [Teardown]    Close Browser
