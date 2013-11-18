@@ -49,8 +49,9 @@ Open Proposal Editor
     Element Should Be Visible          sizzle=#proposal_workbench_detail .save_button
 
 Edit Proposal
-    Input Text                         sizzle=#proposal_workbench_detail .document_paragraph  ${PAR NEW}
+    Input Text                         sizzle=#proposal_workbench_detail textarea  ${PAR NEW}
     Click Element                      sizzle=#proposal_workbench_detail .save_button
     Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .edit_button  timeout=3
-    (read document from server via ajax)
-    (check that string is the one we just wrote)
+    (the last line does not check for existence of edit button properly (or does it?))
+    (also check that re-render works, and that the new page contains ${PAR NEW}.)
+    (read complete proposal document from server via ajax and compare it against dom tree.)

@@ -29,3 +29,15 @@ export function register_transformer() {
         return obj;
     });
 }
+
+export function make_postable(obj) {
+    var i;
+
+    delete obj['path'];
+    delete obj['ifaces'];
+
+    for (i in obj.data) {
+        obj.data[i.replace(/\#/g, ".")] = obj.data[i];
+        delete obj.data[i];
+    }
+}

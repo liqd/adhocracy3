@@ -47,40 +47,116 @@ export function open_proposals(uri, done) {
     // numbers and possibly data on version edges; the pool contains
     // the actual versions.  this view just plucks the first element
     // of the IPool elements array and renders that.)
+    function render_DAG(this_, view_name) {
+        var elements;
+
+        try {
+            elements = this_.obj.data['adhocracy#propertysheets#interfaces#IPool'].elements;
+        } catch (e) {
+            throw ('[missing or bad IDAG property sheet: ' + this_.toString() + ']');
+        }
+
+        if (elements.length > 0) {
+            var path = elements[elements.length - 1].path;  // last element is the youngest.
+            if (typeof path == 'string') {
+                this_.el.render(path, view_name);
+            } else {
+                throw ('[bad reference object: ' + elements.toString() + ']');
+            }
+        } else {
+            this_.el.text('[no versions]');
+        }
+    }
+
     obviel.view({
         iface: 'adhocracy.propertysheets.interfaces.IDAG',
         html: '<pre></pre>',
-        render: function() {
-            var elements;
-
-            try {
-                elements = this.obj.data['adhocracy#propertysheets#interfaces#IPool'].elements;
-            } catch (e) {
-                throw ('[missing or bad IDAG property sheet: ' + this.toString() + ']');
-            }
-
-            if (elements.length > 0) {
-                var path = elements[elements.length - 1].path;  // last element is the youngest.
-                if (typeof path == 'string') {
-                    this.el.render(path);
-                } else {
-                    throw ('[bad reference object: ' + elements.toString() + ']');
-                }
-            } else {
-                this.el.text('[no versions]');
-            }
-        }
+        render: function() { render_DAG(this, undefined); }
     });
 
-    // default document (details).
+    obviel.view({
+        iface: 'adhocracy.propertysheets.interfaces.IDAG',
+        name: 'edit',
+        html: '<pre></pre>',
+        render: function() { render_DAG(this, 'edit'); }
+    });
+
+
+    // document.
+
     obviel.view({
         iface: 'adhocracy.propertysheets.interfaces.IDocument',
-        obvtUrl: 'templates/IDocument.obvt',
+        obvtUrl: 'templates/IDocumentDisplay.obvt',
+    });
+
+    obviel.view({
+        iface: 'adhocracy.propertysheets.interfaces.IDocument',
+        name: 'edit',
+        obvtUrl: 'templates/IDocumentEdit.obvt',
+    });
+
+
+    // paragraph.
+
+    obviel.view({
+        iface: 'adhocracy.propertysheets.interfaces.IParagraph',
+        obvtUrl: 'templates/IParagraphDisplay.obvt',
+
+        edit: function(ev) {
+            // re-render local object in edit mode.
+            this.el.render(this.obj, 'edit');
+        }
     });
 
     obviel.view({
         iface: 'adhocracy.propertysheets.interfaces.IParagraph',
-        obvtUrl: 'templates/IParagraph.obvt',
+        name: 'edit',
+        obvtUrl: 'templates/IParagraphEdit.obvt',
+
+        reset: function(ev) {
+            // load the object again from server and render it from scratch.
+            var versionurl = this.obj['path'];
+            this.el.render(versionurl, undefined);
+        },
+        save: function(ev) {
+            // send local object to server.  (FIXME: updates will probably come via web sockets.)
+
+            // var dagurl = this.obj['data']['adhocracy.propertysheets.interfaces.IVersions']['versionpostroot'];
+
+            // (FIXME: this is cheating, but it works for now, kind of.)
+            var dagurl = this.obj['path'].substring(0, this.obj['path'].length - 2);
+
+            delete this.obj['data']['adhocracy#propertysheets#interfaces#IVersions'];
+
+            this.obj['data']['adhocracy#propertysheets#interfaces#IParagraph']['text'] =
+                $('textarea', this.el)[0].value;
+
+            Obviel.make_postable(this.obj);
+
+            $.ajax(dagurl, {
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(this.obj)
+            }).fail(function(err, err2) {
+                console.log('ajax post failed!');
+                console.log(err);
+                console.log(err2);
+            }).done(function(resp, resp2) {
+                console.log('ajax post succeeded!');
+                console.log(resp);
+                console.log(resp2);
+
+                var proposalurl = resp.path;
+                // FIXME: this will not update the surrounding
+                // proposal!  (we don't really have a concept for how
+                // to do that.  i guess, web sockets?)
+
+                // FIXME: dagurl is undefined here.  why?
+
+                this.el.render(dagurl, 'display');
+            });
+        }
     });
 
 
