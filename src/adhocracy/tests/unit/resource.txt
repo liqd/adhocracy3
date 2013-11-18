@@ -14,6 +14,7 @@ ${DELAY}          0
 ${BROWSER LAG}    0.7 secs
 ${SETUP URL}      http://${SERVER}/f/proposal_workbench_setup.html
 ${PAGE URL}       http://${SERVER}/f/proposal_workbench.html
+${PAR NEW}        Ihm ist, als ob es tausend Stäbchen gäbchen,
 
 *** Keywords ***
 Setup Proposal DB
@@ -42,7 +43,14 @@ Open Proposal Detail View
     Element Should Be Visible   sizzle=#proposal_workbench_detail h3
 
 Open Proposal Editor
-    Click Element               sizzle=#proposal_workbench_detail .edit_button
-    Element Should Be Visible   sizzle=#proposal_workbench_detail .save_button
+    Element Should Be Visible          sizzle=#proposal_workbench_detail .edit_button
+    Click Element                      sizzle=#proposal_workbench_detail .edit_button
+    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .save_button  timeout=3
+    Element Should Be Visible          sizzle=#proposal_workbench_detail .save_button
 
-Open Proposal Save Document
+Edit Proposal
+    Input Text                         sizzle=#proposal_workbench_detail .document_paragraph  ${PAR NEW}
+    Click Element                      sizzle=#proposal_workbench_detail .save_button
+    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .edit_button  timeout=3
+    (read document from server via ajax)
+    (check that string is the one we just wrote)

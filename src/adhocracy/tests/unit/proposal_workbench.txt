@@ -12,5 +12,5 @@ Proposal Workbench
     Go To Proposal Workbench
     Open Proposal Detail View
     Open Proposal Editor
-    Open Proposal Save Document
+    Edit Proposal
     [Teardown]    Close Browser
