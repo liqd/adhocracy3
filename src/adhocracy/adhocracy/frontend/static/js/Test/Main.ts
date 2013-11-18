@@ -26,6 +26,12 @@ import ProposalWorkbench = require('Adhocracy/Frames/ProposalWorkbench');
 // for the subsequent tests.  data model is outdated and doesn't fit
 // /docs/source/rest_api.rst any more.  but this is anyway not the
 // place to set up fixtures...
+//
+// FIXME: the two paragraphs of the proposal are stored as versions in
+// the same container, so the proposal contains two versions of the
+// same paragraph as different paragraphs.  (we should probably
+// implement postroot logic on the backend first to make it easier to
+// fix this.)
 function very_adhoc_fixtures_script() {
     var root_url = "/adhocracy";
 

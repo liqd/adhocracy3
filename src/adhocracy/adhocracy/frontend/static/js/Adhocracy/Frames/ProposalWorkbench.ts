@@ -60,7 +60,7 @@ export function open_proposals(uri, done) {
             }
 
             if (elements.length > 0) {
-                var path = elements[0].path;
+                var path = elements[elements.length - 1].path;  // last element is the youngest.
                 if (typeof path == 'string') {
                     this.el.render(path);
                 } else {
