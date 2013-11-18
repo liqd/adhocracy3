@@ -21,4 +21,13 @@ develop-eggs
 /local/
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js.map
+/source_env
+/.vagrant
+robotframework/bin/
+robotframework/eggs/
+robotframework/include/
+robotframework/lib/
+robotframework/local/
+robotframework/selenium_demo/
+a3-backend-mockup
 
