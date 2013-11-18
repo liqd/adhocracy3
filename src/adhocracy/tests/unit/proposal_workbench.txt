@@ -11,5 +11,5 @@ Proposal Workbench Setup DB
 
 Proposal Workbench
     Open Browser To Proposal Workbench
-    Go To Proposal Workbench
+    Open Proposal Detail View
     [Teardown]    Close Browser
