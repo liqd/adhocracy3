@@ -2,6 +2,9 @@
 Documentation     A resource file with reusable keywords and variables.
 ...
 ...               (Detailed summary missing.)
+...               Hint: Instead of using a headless browser, you can simply run this:
+...                 nohup Xvfb :100 -ac > /dev/null 2> /dev/null &
+...                 DISPLAY=:100 pybot unit
 Library           Selenium2Library
 
 *** Variables ***
@@ -23,6 +26,10 @@ Open Browser To Proposal Workbench
 
 Proposal Workbench Should Be Open
     Title Should Be    Proposal Workbench
+    Sleep  1.2 secs
+    Element Should Be Visible  sizzle=#proposal_workbench_directory
+    Element Should Be Enabled  sizzle=#proposal_workbench_detail
+    Element Should Be Enabled  sizzle=#proposal_workbench_discussion
 
 Go To Proposal Workbench
     Go To    ${PAGE URL}
@@ -31,3 +38,9 @@ Go To Proposal Workbench
 Open Proposal Detail View
     Click Element               sizzle=#proposal_workbench_directory a
     Element Should Be Visible   sizzle=#proposal_workbench_detail h3
+
+Open Proposal Editor
+    Click Element               sizzle=#proposal_workbench_detail .edit_button
+    Element Should Be Visible   sizzle=#proposal_workbench_detail .save_button
+
+Open Proposal Save Document

@@ -12,4 +12,6 @@ Proposal Workbench Setup DB
 Proposal Workbench
     Open Browser To Proposal Workbench
     Open Proposal Detail View
+    Open Proposal Editor
+    Open Proposal Save Document
     [Teardown]    Close Browser
