@@ -28,3 +28,6 @@ Go To Proposal Workbench
     Go To    ${PAGE URL}
     Proposal Workbench Should Be Open
 
+Open Proposal Detail View
+    Click Element               sizzle=#proposal_workbench_directory a
+    Element Should Be Visible   sizzle=#proposal_workbench_detail h3
