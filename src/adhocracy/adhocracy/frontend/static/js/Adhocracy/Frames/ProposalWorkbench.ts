@@ -142,19 +142,23 @@ export function open_proposals(uri, done) {
                 console.log('ajax post failed!');
                 console.log(err);
                 console.log(err2);
-            }).done(function(resp, resp2) {
+            }).done(function() {
                 console.log('ajax post succeeded!');
-                console.log(resp);
-                console.log(resp2);
 
-                var proposalurl = resp.path;
-                // FIXME: this will not update the surrounding
-                // proposal!  (we don't really have a concept for how
-                // to do that.  i guess, web sockets?)
+                // at this point, we trigger a re-render of the DAG.
+                // in order to get to the path of the DAG, we chop off
+                // the version part of the path of the version
+                // currently rendered.
 
-                // FIXME: dagurl is undefined here.  why?
+                // FIXME: re-render of anything should be triggered by
+                // the server (websockets?  eventsource?  long-poll?).
+                // this 'done' handler should go away completely.
 
-                this.el.render(dagurl, 'display');
+                // FIXME: i am expecting obviel to re-pull the
+                // proposal from the server, but i'm not sure if that
+                // always happens.  what does the obviel code say?
+
+                $('#proposal_workbench_detail').rerender();
             });
         }
     });
