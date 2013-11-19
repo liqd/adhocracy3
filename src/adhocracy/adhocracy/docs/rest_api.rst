@@ -41,8 +41,10 @@ Start Adhocracy testapp::
     >>> testapp = TestApp(app)
 
 
-Basic calls, working with Pool content
---------------------------------------
+Basic calls
+-----------
+
+We can use the following http verbs to work with resources.
 
 OPTIONS
 ~~~~~~~
@@ -73,7 +75,7 @@ with resources data::
 HEAD
 ~~~~
 
-Returns only http headers for this resource::
+Returns only http headers::
 
     >>> resp = testapp.head("/adhocracy")
     >>> resp.headerlist # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
@@ -84,7 +86,7 @@ Returns only http headers for this resource::
 GET
 ~~~
 
-Returns resource meta data, children meta data and all interfaces with data::
+Returns resource and child elements meta data and all interfaces with data::
 
     >>> resp = testapp.get("/adhocracy", )
     >>> pprint_json(resp.json)
@@ -102,56 +104,103 @@ Returns resource meta data, children meta data and all interfaces with data::
         "path": ...
     }
 
+POST
+~~~~
+
+Create a new resource ::
+
+    >>> prop = {'content_type': 'adhocracy.contents.interfaces.IPool',
+    ...         'data': {
+    ...              'adhocracy.propertysheets.interfaces.IName': {
+    ...                  'name': 'PROposals'},
+    ...                  }}
+    >>> resp = testapp.post_json("/adhocracy", prop)
+    >>> pprint_json(resp.json)
+    {
+        "content_type": "adhocracy.contents.interfaces.IPool",
+        "path": "/adhocracy/proposals
+    }
 
 PUT
 ~~~~
 
-Modify and return the path of the modified resource::
+Modify data of an existing resource ::
 
     >>> data = {'content_type': 'adhocracy.contents.interfaces.IPool',
-    ...         'data': {'adhocracy.propertysheets.interfaces.IName': {'name': 'NEWTITLE'}}}
-    >>> resp = testapp.put_json("/adhocracy", data)
+    ...         'data': {'adhocracy.propertysheets.interfaces.IName': {'name': 'Proposals'}}}
+    >>> resp = testapp.put_json("/adhocracy/proposals", data)
     >>> pprint_json(resp.json)
     {
         "content_type": "adhocracy.contents.interfaces.IPool",
-        "path": "/adhocracy"
+        "path": "/adhocracy/proposals"
     }
 
 Check the changed resource::
 
-    >>> resp = testapp.get("/adhocracy")
+    >>> resp = testapp.get("/adhocracy/proposals")
     >>> pprint_json(resp.json)
     {
         "content_type": "adhocracy.contents.interfaces.IPool",
         "data": {
             ...
             "adhocracy.propertysheets.interfaces.IName": {
-                "name": "NEWTITLE"
+                "name": "Proposals"
             },
             "adhocracy.propertysheets.interfaces.IPool": {
                 "elements": []
             }
         },
-        "path": "/adhocracy"
+        "path": "/adhocracy/proposals"
     }
 
-FIXME: write test cases for "any sub-structure of an object in a PUT
-request may be missing and will be replaced by the old (overwritten)
-sub-structure.
-
 FIXME: write test cases for attributes with "required", "read-only",
 and possibly others.  (those work the same in PUT and POST, and on any
 attribute in the json tree.)
 
 
-FIXME: write test cases for "any sub-structure of an object in a PUT
-request may be missing and will be replaced by the old (overwritten)
-sub-structure.
+ERROR Handling
+~~~~~~~~~~~~~~
 
-FIXME: write test cases for attributes with "required", "read-only",
-and possibly others.  (those work the same in PUT and POST, and on any
-attribute in the json tree.)
+The normal return code is 200 ::
 
+    >>> data = {'content_type': 'adhocracy.contents.interfaces.IPool',
+    ...         'data': {'adhocracy.propertysheets.interfaces.IName': {'name': 'Proposals'}}}
+    >>> resp = testapp.put_json("/adhocracy/proposals", data)
+    >>> resp.code
+    200
+
+If you submit invalid data
+
+    >>> data = {'content_type': 'adhocracy.contents.interfaces.IPool',
+    ...         'data': {'adhocracy.propertysheets.interfaces.WRONGINTERFACE': {'name': 'Proposals'}}}
+    >>> resp = testapp.put_json("/adhocracy/proposals", data)
+
+the return code is 400 ::
+
+    >>> resp.code 400
+
+and data with a detailed error description
+(like https://cornice.readthedocs.org/en/latest/validation.html?highlight=schema) ::
+
+     {
+       'status': 'error',
+       'errors': errors.
+     }
+        With errors being a JSON dictionary with the keys “location”, “name”
+        and “description”.
+
+        location is the location of the error. It can be “querystring”,
+        “header” or “body”
+        name is the eventual name of the value that caused problems
+        description is a description of the problem encountered.
+
+FIXME: example error message
+
+If all goes wrong the return code is 500.
+
+
+Create and Update Versionable Resources
+----------------------------------------
 
 POST
 ~~~~
@@ -166,7 +215,7 @@ Create new document version and return the path ::
     ...                  'title': 'kommunismus jetzt!',
     ...                  'description': 'blabla!',
     ...                  'paragraphs': []}}}
-    >>> resp = testapp.post_json("/adhocracy", prop)
+    >>> resp = testapp.post_json("/adhocracy/proposals", prop)
     >>> pprint_json(resp.json)
     {
         "content_type": "adhocracy.contents.interfaces.IProposal",
@@ -185,12 +234,12 @@ Fetch posted document version and extract URL for POSTing updates ::
         "postroot": "/adhocracy/...
     }
 
-FIXME: find technical term for things that have "post_path" and live
-in "postroots"(?) and for things that initiate "postroots"(?) in
-particular.  (paragraphs have a "post_path", but they live with
+FIXME: find technical term for things that have "postroot" and live
+in "postroot"(?) and for things that initiate "postroot"(?) in
+particular.  (paragraphs have a "postroot", but they live with
 proposals and such.)
 
-FIXME: should "post_path" live in a property sheet, or on top level in
+FIXME: should "postroot" live in a property sheet, or on top level in
 the content object?
 
 Create new paragraph and add it to proposal ::
@@ -235,9 +284,6 @@ Update versionable predecessor version and get dag-postroot:
         "path": "/adhocracy/...
         "postroot": "/adhocracy/...
     }
-
-FIXME: write test cases for "any sub-structure of an object in a POST
-request may be missing and will be replaced by defaults."
 
 (Note: the server may handle paths like the following internally, but
 the client is not supposed to worry about that:
