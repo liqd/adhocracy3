@@ -10,18 +10,7 @@ Some imports to work with rest api calls::
     >>> from functools import reduce
     >>> import os
     >>> import requests
-    >>> from pprint import pprint
-    >>> import json
-    >>> def show_json(obj):
-    ...     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': '))
-    >>> def pprint_json(obj):
-    ...     print(show_json(obj))
-    >>> def sort_dict(d, sort_paths):
-    ...     d2 = copy.deepcopy(d)
-    ...     for path in sort_paths:
-    ...         base = reduce(lambda d, seg: d[seg], path[:-1], d2)
-    ...         base[path[-1]] = sorted(base[path[-1]])
-    ...     return d2
+    >>> from adhocracy.testing import pprint_json
 
 Start Adhocracy testapp::
 
@@ -53,7 +42,7 @@ Returns possible methods for this resource and available interfaces
 with resources data::
 
     >>> resp = testapp.options("/adhocracy")
-    >>> pprint_json(sort_dict(resp.json, [['PUT'], ['GET']]))
+    >>> pprint_json(resp.json, [['PUT'], ['GET']])
     {
         "GET": [
             "adhocracy.propertysheets.interfaces.IName",
