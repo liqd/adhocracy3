@@ -32,26 +32,3 @@ Proposal Workbench Should Be Open
     Element Should Be Visible     sizzle=#proposal_workbench_directory
     Page Should Contain Element   sizzle=#proposal_workbench_detail
     Page Should Contain Element   sizzle=#proposal_workbench_discussion
-
-Go To Proposal Workbench
-    Go To    ${PAGE URL}
-    Proposal Workbench Should Be Open
-
-Open Proposal Detail View
-    Click Element               sizzle=#proposal_workbench_directory a
-    Sleep  ${BROWSER LAG}
-    Element Should Be Visible   sizzle=#proposal_workbench_detail h3
-
-Open Proposal Editor
-    Element Should Be Visible          sizzle=#proposal_workbench_detail .edit_button
-    Click Element                      sizzle=#proposal_workbench_detail .edit_button
-    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .save_button  timeout=3
-    Element Should Be Visible          sizzle=#proposal_workbench_detail .save_button
-
-Edit Proposal
-    Input Text                         sizzle=#proposal_workbench_detail textarea  ${PAR NEW}
-    Click Element                      sizzle=#proposal_workbench_detail .save_button
-    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .edit_button  timeout=3
-    (the last line does not check for existence of edit button properly (or does it?))
-    (also check that re-render works, and that the new page contains ${PAR NEW}.)
-    (read complete proposal document from server via ajax and compare it against dom tree.)
