@@ -30,6 +30,38 @@ Start Adhocracy testapp::
     >>> testapp = TestApp(app)
 
 
+Resource structure
+--------------------
+
+Resources have one content interface to set its type, like
+"adhocracy.contents.interfaces.IPool".
+
+Every Resource has multiple
+propertysheet interfaces that define schemata to set/get data.
+
+There are 4 main types of content interfaces::
+
+* Pool: folder content in the object hierachy, namespace, structure and configure child fusels for a specic Beteiligungsverfahren.
+* Fubel: item content created during a Beteiligungsverfahren (mainly).
+
+* FubelVersions-Pool: specific pool for all Versionable-Fubel (DAG), Tag-Fubels, and related FubelVersions-Pools
+* Versionable-Fubel: Fubel with IVersionable propertysheet interface
+* Tag-Fubel: Fubel with the ITag content interface, links to on or more related Versionable-Fubel
+
+Example ressource hierarchy:
+
+    Pool:              categorien
+    Fubel:             categorien/blue
+
+    Pool:              proposals
+    Versions Pool:     proposals/proposal1
+    Versionable Fubel: proposals/proposal1/v1
+    Tag-Fubel:         proposals/proposal1/head
+
+    Versions Pool:     proposals/proposal1/absatz1
+    Versionable Fubel: proposals/proposal1/absatzs1/v1
+    Tag-Fubel:         proposals/proposal1/absatz1/head
+
 Basic calls
 -----------
 
@@ -50,10 +82,8 @@ with resources data::
         ],
         "HEAD": [],
         "POST": [
-            "adhocracy.contents.interfaces.INodeContainer",
-            "adhocracy.contents.interfaces.IParagraphContainer",
             "adhocracy.contents.interfaces.IPool",
-            "adhocracy.contents.interfaces.IProposalContainer"
+            "adhocracy.contents.interfaces.IProposalVersionsPool"
         ],
         "PUT": [
             "adhocracy.propertysheets.interfaces.IName",
@@ -75,7 +105,7 @@ Returns only http headers::
 GET
 ~~~
 
-Returns resource and child elements meta data and all interfaces with data::
+Returns resource and child elements meta data and all propertysheet interfaces with data::
 
     >>> resp = testapp.get("/adhocracy", )
     >>> pprint_json(resp.json)
@@ -109,6 +139,9 @@ Create a new resource ::
         "content_type": "adhocracy.contents.interfaces.IPool",
         "path": "/adhocracy/proposals
     }
+
+FIXME: Was bedeutet das IName interface, ist das die id aus der die URL
+erzeugt wird?
 
 PUT
 ~~~~
@@ -168,7 +201,7 @@ the return code is 400 ::
 
     >>> resp.code 400
 
-and data with a detailed error description
+and you get data with a detailed error description
 (like https://cornice.readthedocs.org/en/latest/validation.html?highlight=schema) ::
 
      {
@@ -191,98 +224,185 @@ If all goes wrong the return code is 500.
 Create and Update Versionable Resources
 ----------------------------------------
 
-POST
-~~~~
+Create
+~~~~~~~
 
-Create new document version and return the path ::
+Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource type) ::
 
-    >>> prop = {'content_type': 'adhocracy.contents.interfaces.IProposal',
+    >>> prop = {'content_type': 'adhocracy.contents.interfaces.IProposalVersionsPool',
     ...         'data': {
     ...              'adhocracy.propertysheets.interfaces.IName': {
-    ...                  'name': 'kommunismus jetzt!'},
-    ...              'adhocracy.propertysheets.interfaces.IDocument': {
-    ...                  'title': 'kommunismus jetzt!',
-    ...                  'description': 'blabla!',
-    ...                  'paragraphs': []}}}
+    ...                  'name': 'kommunismus'},
     >>> resp = testapp.post_json("/adhocracy/proposals", prop)
+    >>> proposal_versions_path = resp.json["path"]
+
+The return data has the new attribute 'first_version_path' to get the path of the first Proposal (aka VersionableFubel)::
+
     >>> pprint_json(resp.json)
     {
-        "content_type": "adhocracy.contents.interfaces.IProposal",
-        "path": "/adhocracy/...
+     "content_type": "adhocracy.contents.interfaces.IProposalVersionsPool",
+     "first_version_path": "/adhocracy/proposals/kommunismus/VERSION_...
+     "path": "/adhocracy/proposals/kommunismus"
     }
+    >>> proposal_v1_path = resp.json["first_version_path"]
 
-Fetch posted document version and extract URL for POSTing updates ::
+The ProposalVersionsPool has the IVersions and ITags interfaces to work with Versions ::
 
-    >>> resp = testapp.get_json(resp.json["path"])
-    >>> prop = resp.json
-    >>> pprint_json(prop)
-    {
-        "content_type": "adhocracy.contents.interfaces.IProposal",
-        "data": ...
-        "path": "/adhocracy/...
-        "postroot": "/adhocracy/...
-    }
-
-FIXME: find technical term for things that have "postroot" and live
-in "postroot"(?) and for things that initiate "postroot"(?) in
-particular.  (paragraphs have a "postroot", but they live with
-proposals and such.)
-
-FIXME: should "postroot" live in a property sheet, or on top level in
-the content object?
-
-Create new paragraph and add it to proposal ::
-
-    >>> para = {'content_type': 'adhocracy.contents.interfaces.IParagraph',
-    ...         'data': {
-    ...              'adhocracy.propertysheets.interfaces.INameReadOnly': {
-    ...                  'name': 'kommunismus jetzt, erster abschnitt!'},
-    ...              'adhocracy.propertysheets.interfaces.Text': {
-    ...                  'text': 'mehr kommunismus immer blabla' }}}
-    >>> resp = testapp.post_json(prop["postroot"], para)
+    >>> resp = testapp.post_get(proposal_versions_path)
     >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.contents.interfaces.IParagraph",
-        "path": "/adhocracy/...",
-        ...
-    }
-    >>> resp = testapp.get_json(resp.json["path"])
-    >>> para = resp.json
-    >>> prop["data"]["adhocracy.propertysheets.interfaces.IDocument"]["paragraphs"]
-    ...      .append({'content_type': 'adhocracy.contents.interfaces.IParagraph', 'path': para["path"]})
+    ...
+        "data": {
+            "adhocracy.propertysheets.interfaces.IName": {
+                "name": "kommunismus"
+            },
+            "adhocracy.propertysheets.interfaces.IVersions": {
+                "elements": [
+                    "/adhocracy/proposals/kommunismus/VERSION_...
+                ]
+            }
+            "adhocracy.propertysheets.interfaces.ITags": {
+                "elements": [
+                    "/adhocracy/proposals/kommunismus/TAG_FIRST"
+                ]
+            }
+            "adhocracy.propertysheets.interfaces.IPool": {
+                "elements": []
+            }
 
-Update versionable predecessor version and get dag-postroot:
+        },
+    ...
 
-(FIXME: s/follows/predecessors/g; s/followed_by/successors/g;?)
+Update
+~~~~~~~
 
-    >>> prop_vrsbl = prop["data"]["adhocracy.propertysheets.interfaces.IVersionable"]
-    >>> prop_vrsbl["follows"] = [{'content_type': prop["content_type"], 'path': prop["path"]}]
-    >>> resp = testapp.post_json(prop_vrsbl["postroot"], prop)
-    >>> resp = testapp.get_json(resp.json["path"])
-    >>> propv2 = resp.json
-    >>> pprint_json(propv2)
+Fetch the first Proposal Version, its empty ::
+
+    >>> resp = testapp.post_get(proposal_v1_path)
+    >>> pprint_json(resp.json)
     {
         "content_type": "adhocracy.contents.interfaces.IProposal",
         "data": {
-            "adhocracy.propertysheets.interfaces.IVersionable": {
-                "follows": ["/adhocracy/..."],
-                "postroot": "/adhocracy/...
+            "adhocracy.propertysheets.interfaces.INameReadOnly": {
+                "name": "VERSION_...
             },
-            ...
-        }
-        "path": "/adhocracy/...
-        "postroot": "/adhocracy/...
+            'adhocracy.propertysheets.interfaces.IDocument': {
+                      'title': '',
+                      'description': '',
+                      'elements': []}}}
+            "adhocracy.propertysheets.interfaces.IPool": {
+                "elements": []
+            },
+            "adhocracy.propertysheets.interfaces.IVersionable": {
+                "follows": [],
+                "followed-by": []
+            }
+
+        },
+        "path": "/adhocracy/proposals/kommunismus/VERSION_...
     }
 
-(Note: the server may handle paths like the following internally, but
-the client is not supposed to worry about that:
-  proposalspool/ => proposalspool/proposal1/dag/prosoal1V1
-  proposalspool/proposal1/ => proposalspool/proposal1/absatz1pool/dag/absatz1V1)
+Create a second proposal that follows the first version ::
 
+    >>> para = {'content_type': 'adhocracy.contents.interfaces.Proposal',
+    ...         'data': {
+    ...              'adhocracy.propertysheets.interfaces.IDocument': {
+    ...                  'title': 'kommunismus jetzt!',
+    ...                  'description': 'blabla!',
+    ...                  'elements': []}
+    ...               'adhocracy.propertysheets.Interfaces.IVersionable': {
+    ...                  'follows': [proposal_v1_path],
+    ...                  }
+    ...          }}
+    >>> resp = testapp.post_json(proposal_versions_path, para)
+    >>> proposal_v2_path = resp.json["path"]
+    >>> proposal_v2_path != proposal_v1_path
+    True
+
+
+Add and update child resource
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Create a SectionVersionsPool inside the ProposalVersionsPool::
+
+    >>> prop = {'content_type': 'adhocracy.contents.interfaces.ISectionVersionsPool',
+    ...         'data': {
+    ...              'adhocracy.propertysheets.interfaces.IName': {
+    ...              'name': 'kapitel1'},
+    >>> resp = testapp.post_json(proposal_versions_path, prop)
+    >>> section_versions_path = resp.json["path"]
+    >>> section_v1_path = resp.json["first_version_path"]
+
+Create a third Proposal version and add the first Section version ::
+
+    >>> para = {'content_type': 'adhocracy.contents.interfaces.Proposal',
+    ...         'data': {
+    ...              'adhocracy.propertysheets.interfaces.IDocument': {
+    ...                  'elements': [section_v1_path]}
+    ...               'adhocracy.propertysheets.Interfaces.IVersionable': {
+    ...                  'follows': [proposal_v2_path],
+    ...                  }
+    ...          }}
+    >>> resp = testapp.post_json(proposal_versions_path, para)
+    >>> proposal_v3_path = resp.json["path"]
+
+
+If we create a second Section version ::
+
+    >>> prop = {'content_type': 'adhocracy.contents.interfaces.ISection',
+    ...         'data': {
+    ...              'adhocracy.propertysheets.interfaces.ISection': {
+    ...                  'title': 'Kapitel Überschrift Bla',
+    ...                  'elements': []}
+    ...               'adhocracy.propertysheets.Interfaces.IVersionable': {
+    ...                  'follows': [section_v1_path],
+    ...                  }
+    ...          }}
+    >>> resp = testapp.post_json(sections_versions_path, prop)
+    >>> section_v2_path = resp.json["path"]
+    >>> section_v2_path != section_v1_path
+    True
+
+we automatically create a fourth Proposal version ::
+
+    >>> resp = testapp.post_get(proposal_versions_path)
+    >>> pprint_json(resp.json)
+    ...
+        "data": {
+            "adhocracy.propertysheets.interfaces.IName": {
+                "name": "kommunismus"
+            },
+            "adhocracy.propertysheets.interfaces.IVersions": {
+                "elements": [
+                    "/adhocracy/proposals/kommunismus/VERSION..."
+                    "/adhocracy/proposals/kommunismus/VERSION..."
+                    "/adhocracy/proposals/kommunismus/VERSION..."
+                    "/adhocracy/proposals/kommunismus/VERSION..."
+                ]
+            }
+            "adhocracy.propertysheets.interfaces.ITags": {
+                "elements": [
+                    "/adhocracy/proposals/kommunismus/TAG_FIRST"
+                ]
+            }
+            "adhocracy.propertysheets.interfaces.IPool": {
+                "elements": [
+                    "/adhocracy/proposals/kommunismus/kapitel1"
+                ]
+            }
+    ...
+
+FIXME: the elements listing in the ITags interface is not very helpfull, the
+tag names (like "FIRST") are missing.
+
+FIXME: should we add a Tag TAG_LAST, to reference the last added version?
+
+FIXME: should the server tell in generally where to post specicfic content interfaces? (like like, discussion,..)
+
+FIXME: s/follows/predecessors/g; s/followed_by/successors/g;?)
 
 
 Batch requests
-~~~~~~~~~~~~~~
+––––––––––––––––
 
 The following URL accepts POSTs of ordered sequences (json arrays) of
 encoded HTTP requests in one HTTP request body ::
