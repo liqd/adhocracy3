@@ -67,6 +67,7 @@ Basic calls
 
 We can use the following http verbs to work with resources.
 
+
 OPTIONS
 ~~~~~~~
 
@@ -111,6 +112,7 @@ Returns only http headers::
     >>> resp.text
     ''
 
+
 GET
 ~~~
 
@@ -132,6 +134,7 @@ Returns resource and child elements meta data and all propertysheet interfaces w
         "path": ...
     }
 
+
 POST
 ~~~~
 
@@ -151,6 +154,7 @@ Create a new resource ::
 
 FIXME: Was bedeutet das IName interface, ist das die id aus der die URL
 erzeugt wird?
+
 
 PUT
 ~~~
@@ -539,7 +543,6 @@ requests!)
         "content_type": "adhocracy.contents.interfaces.IProposal",
         ...
     }
-
 
 
 Other stuff
