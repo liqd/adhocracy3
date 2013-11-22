@@ -91,6 +91,15 @@ with resources data::
         ]
     }
 
+FIXME: IName property sheet will go away.  It used to be an
+unambiguous object identifier, but the path is already good for that.
+It was also confusingly abused as a human-readable descriptor for the
+object, which is somewhat useful, but also useful in references, not
+just in objects.  It was decided that IName will be removed and
+replaced by an optional field "name" next to "content_type", "path",
+and "data".
+
+
 HEAD
 ~~~~
 
@@ -419,6 +428,8 @@ in the sense that either all are successfully carried out or nothing
 is changed on the server.
 
 Let's add some more paragraphs to the document above ::
+
+FIXME: postroot will go away.
 
     >>> batch = [ { 'method': 'POST',
     ...             'path': propv2["postroot"],
