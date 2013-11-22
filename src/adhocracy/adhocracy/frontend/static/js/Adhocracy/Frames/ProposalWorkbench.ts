@@ -20,19 +20,19 @@ export function open_proposals(uri, done) {
     // proposal directory
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IPool',
+        iface: 'P_IPool',
         name: 'ProposalWorkbench',
         obvtUrl: 'templates/ProposalWorkbench.obvt',
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IPool',
+        iface: 'P_IPool',
         name: 'Directory',
         obvtUrl: 'templates/Directory.obvt',
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IName',
+        iface: 'P_IName',
         name: 'DirectoryEntry',
         obvtUrl: 'templates/DirectoryEntry.obvt',
     });
@@ -51,7 +51,7 @@ export function open_proposals(uri, done) {
         var elements;
 
         try {
-            elements = this_.obj.data['adhocracy#propertysheets#interfaces#IDAG'].versions;
+            elements = this_.obj.data['P_IDAG'].versions;
         } catch (e) {
             throw ('[missing or bad IDAG property sheet: ' + this_.toString() + ']');
         }
@@ -71,13 +71,13 @@ export function open_proposals(uri, done) {
     }
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDAG',
+        iface: 'P_IDAG',
         html: '<pre></pre>',
         render: function() { render_DAG(this, undefined); }
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDAG',
+        iface: 'P_IDAG',
         name: 'edit',
         html: '<pre></pre>',
         render: function() { render_DAG(this, 'edit'); }
@@ -87,12 +87,12 @@ export function open_proposals(uri, done) {
     // document.
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDocument',
+        iface: 'P_IDocument',
         obvtUrl: 'templates/IDocumentDisplay.obvt',
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDocument',
+        iface: 'P_IDocument',
         name: 'edit',
         obvtUrl: 'templates/IDocumentEdit.obvt',
     });
@@ -101,7 +101,7 @@ export function open_proposals(uri, done) {
     // paragraph.
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IParagraph',
+        iface: 'P_IParagraph',
         obvtUrl: 'templates/IParagraphDisplay.obvt',
 
         edit: function(ev) {
@@ -111,7 +111,7 @@ export function open_proposals(uri, done) {
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IParagraph',
+        iface: 'P_IParagraph',
         name: 'edit',
         obvtUrl: 'templates/IParagraphEdit.obvt',
 
@@ -126,11 +126,11 @@ export function open_proposals(uri, done) {
             var parDAGPath = this.obj['path'].substring(0, this.obj['path'].lastIndexOf("/"));
             // a nice collection of other solutions is here:
             // http://stackoverflow.com/questions/2187256/js-most-optimized-way-to-remove-a-filename-from-a-path-in-a-string
-            // or, actually: var parDAGPath = this.obj['data']['adhocracy.propertysheets.interfaces.IVersions']['versionpostroot'];
+            // or, actually: var parDAGPath = this.obj['data']['P_IVersions']['versionpostroot'];
 
-            delete this.obj['data']['adhocracy#propertysheets#interfaces#IVersions'];
+            delete this.obj['data']['P_IVersions'];
 
-            this.obj['data']['adhocracy#propertysheets#interfaces#IParagraph']['text'] =
+            this.obj['data']['P_IParagraph']['text'] =
                 $('textarea', this.el)[0].value;
 
             Obviel.make_postable(this.obj);

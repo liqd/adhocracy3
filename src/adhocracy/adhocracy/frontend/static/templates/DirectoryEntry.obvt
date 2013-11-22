@@ -1,2 +1,2 @@
-<a href="#{path}">{data.adhocracy#propertysheets#interfaces#IName.name}</a>
+<a href="#{path}">{data.P_IName.name}</a>
 <!-- FIXME: Use the title of the HEAD of the document DAG instead. -->
