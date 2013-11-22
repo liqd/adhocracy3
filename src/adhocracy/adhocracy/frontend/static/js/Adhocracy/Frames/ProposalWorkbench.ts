@@ -51,13 +51,15 @@ export function open_proposals(uri, done) {
         var elements;
 
         try {
-            elements = this_.obj.data['adhocracy#propertysheets#interfaces#IPool'].elements;
+            elements = this_.obj.data['adhocracy#propertysheets#interfaces#IDAG'].versions;
         } catch (e) {
             throw ('[missing or bad IDAG property sheet: ' + this_.toString() + ']');
         }
 
         if (elements.length > 0) {
-            var path = elements[elements.length - 1].path;  // last element is the youngest.
+            // FIXME: use HEAD tag to get to path.
+            // var path = elements[elements.length - 1].path;  // last element is the youngest.
+            var path = elements[0].path;  // first element is the youngest.
             if (typeof path == 'string') {
                 this_.el.render(path, view_name);
             } else {
@@ -121,10 +123,10 @@ export function open_proposals(uri, done) {
         save: function(ev) {
             // send local object to server.  (FIXME: updates will probably come via web sockets.)
 
-            // var dagurl = this.obj['data']['adhocracy.propertysheets.interfaces.IVersions']['versionpostroot'];
-
-            // (FIXME: this is cheating, but it works for now, kind of.)
-            var dagurl = this.obj['path'].substring(0, this.obj['path'].length - 2);
+            var parDAGPath = this.obj['path'].substring(0, this.obj['path'].lastIndexOf("/"));
+            // a nice collection of other solutions is here:
+            // http://stackoverflow.com/questions/2187256/js-most-optimized-way-to-remove-a-filename-from-a-path-in-a-string
+            // or, actually: var parDAGPath = this.obj['data']['adhocracy.propertysheets.interfaces.IVersions']['versionpostroot'];
 
             delete this.obj['data']['adhocracy#propertysheets#interfaces#IVersions'];
 
@@ -133,7 +135,7 @@ export function open_proposals(uri, done) {
 
             Obviel.make_postable(this.obj);
 
-            $.ajax(dagurl, {
+            $.ajax(parDAGPath, {
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json",
@@ -157,7 +159,6 @@ export function open_proposals(uri, done) {
                 // FIXME: i am expecting obviel to re-pull the
                 // proposal from the server, but i'm not sure if that
                 // always happens.  what does the obviel code say?
-
                 $('#proposal_workbench_detail').rerender();
             });
         }
