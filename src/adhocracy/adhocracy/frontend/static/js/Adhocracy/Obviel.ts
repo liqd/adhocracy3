@@ -22,7 +22,11 @@ export function register_transformer() {
 
         // add ifaces to the propertysheet interfaces in the data field
         for (i in obj.data) {
-            obj.data[i.replace(/\./g, "#")] = obj.data[i];
+            // FIXME: strip noise from content types and property sheet types.
+            // var i_local = 'p' + i.substring(i.lastIndexOf("#") + 1, i.length);
+            var i_local = i.replace(/\./g, "#");
+            // console.log(i_local);
+            obj.data[i_local] = obj.data[i];
             delete obj.data[i];
         }
 
