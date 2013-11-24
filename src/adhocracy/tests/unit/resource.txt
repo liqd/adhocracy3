@@ -6,19 +6,32 @@ Documentation     A resource file with reusable keywords and variables.
 ...                 nohup Xvfb :100 -ac > /dev/null 2> /dev/null &
 ...                 DISPLAY=:100 pybot unit
 Library           Selenium2Library
+Library           Collections
+Library           OperatingSystem
+Library           String
+Library           RequestsLibrary
 
 *** Variables ***
 ${SERVER}         localhost:8000
 ${BROWSER}        Firefox
 ${DELAY}          0
 ${BROWSER LAG}    0.7 secs
-${SETUP URL}      http://${SERVER}/f/proposal_workbench_setup.html
+${CLEANUP URL}    http://${SERVER}/adhocracy/admin/reset-db
 ${PAGE URL}       http://${SERVER}/f/proposal_workbench.html
-${PAR NEW}        Ihm ist, als ob es tausend Stäbchen gäbchen,
+${PAR NEW}        Der Rabe ging im Feld spazieren.
 
 *** Keywords ***
 Setup Proposal DB
-    Open Browser    ${SETUP URL}    ${BROWSER}
+    Open Browser    ${CLEANUP URL}    ${BROWSER}
+
+    # (just to show how to execute python / shell commands:)
+    ${EXIT CODE}  Evaluate  os.system('true')  os
+    Should Be Equal As Integers  ${EXIT CODE}  0
+    ${EXIT CODE}  Evaluate  os.system('false')  os
+    Should Not Be Equal As Integers  ${EXIT CODE}  0
+
+    ${EXIT CODE}  Evaluate  os.system('./unit/post_test_data.py > /dev/null 2>&1')  os
+    Should Be Equal As Integers  ${EXIT CODE}  ${0}
 
 Open Browser To Proposal Workbench
     Open Browser    ${PAGE URL}    ${BROWSER}

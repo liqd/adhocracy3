@@ -8,15 +8,13 @@ Resource          resource.txt
 Proposal Workbench Setup
     Setup Proposal DB
 
-
 Go To Proposal Workbench
     Go To    ${PAGE URL}
     Proposal Workbench Should Be Open
 
 Open Proposal Detail View
     Click Element               sizzle=#proposal_workbench_directory a
-    Sleep  ${BROWSER LAG}
-    Element Should Be Visible   sizzle=#proposal_workbench_detail h3
+    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail h3  timeout=3
 
 Open Proposal Editor
     Element Should Be Visible          sizzle=#proposal_workbench_detail .edit_button
@@ -28,9 +26,17 @@ Edit Proposal
     Input Text                         sizzle=#proposal_workbench_detail textarea  ${PAR NEW}
     Click Element                      sizzle=#proposal_workbench_detail .save_button
     Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .edit_button  timeout=3
-#    (the last line does not check for existence of edit button properly (or does it?))
-#    (also check that re-render works, and that the new page contains ${PAR NEW}.)
-#    (read complete proposal document from server via ajax and compare it against dom tree.)
 
+    Create Session  a3  localhost:8000
+    ${resp}=  Get  a3  /adhocracy/
+    Should Be Equal As Strings  ${resp.status_code}  200
+
+    ${jsondata}=  ToJSON  ${resp.content}
+    Dictionary Should Contain Key  ${jsondata}  content_type
+    Dictionary Should Contain Key  ${jsondata}  path
+    Dictionary Should Contain Key  ${jsondata}  data
+
+#    (check that re-render works, and that the new page contains ${PAR NEW}.)
+#    (read complete proposal document from server via ajax and compare it against dom tree.)
 
 [Teardown]  Close Browser
