@@ -5,12 +5,32 @@ Documentation     Test suite for module 'Adhocracy/Frames/ProposalWorkbench'
 Resource          resource.txt
 
 *** Test Cases ***
-Proposal Workbench Setup DB
+Proposal Workbench Setup
     Setup Proposal DB
 
-Proposal Workbench
-    Go To Proposal Workbench
-    Open Proposal Detail View
-    Open Proposal Editor
-    Edit Proposal
-    [Teardown]    Close Browser
+
+Go To Proposal Workbench
+    Go To    ${PAGE URL}
+    Proposal Workbench Should Be Open
+
+Open Proposal Detail View
+    Click Element               sizzle=#proposal_workbench_directory a
+    Sleep  ${BROWSER LAG}
+    Element Should Be Visible   sizzle=#proposal_workbench_detail h3
+
+Open Proposal Editor
+    Element Should Be Visible          sizzle=#proposal_workbench_detail .edit_button
+    Click Element                      sizzle=#proposal_workbench_detail .edit_button
+    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .save_button  timeout=3
+    Element Should Be Visible          sizzle=#proposal_workbench_detail .save_button
+
+Edit Proposal
+    Input Text                         sizzle=#proposal_workbench_detail textarea  ${PAR NEW}
+    Click Element                      sizzle=#proposal_workbench_detail .save_button
+    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .edit_button  timeout=3
+#    (the last line does not check for existence of edit button properly (or does it?))
+#    (also check that re-render works, and that the new page contains ${PAR NEW}.)
+#    (read complete proposal document from server via ajax and compare it against dom tree.)
+
+
+[Teardown]  Close Browser

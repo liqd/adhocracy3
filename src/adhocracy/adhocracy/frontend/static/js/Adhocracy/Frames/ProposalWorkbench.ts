@@ -20,19 +20,19 @@ export function open_proposals(uri, done) {
     // proposal directory
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IPool',
+        iface: 'P_IPool',
         name: 'ProposalWorkbench',
         obvtUrl: 'templates/ProposalWorkbench.obvt',
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IPool',
+        iface: 'P_IPool',
         name: 'Directory',
         obvtUrl: 'templates/Directory.obvt',
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IName',
+        iface: 'P_IName',
         name: 'DirectoryEntry',
         obvtUrl: 'templates/DirectoryEntry.obvt',
     });
@@ -51,13 +51,15 @@ export function open_proposals(uri, done) {
         var elements;
 
         try {
-            elements = this_.obj.data['adhocracy#propertysheets#interfaces#IPool'].elements;
+            elements = this_.obj.data['P_IDAG'].versions;
         } catch (e) {
             throw ('[missing or bad IDAG property sheet: ' + this_.toString() + ']');
         }
 
         if (elements.length > 0) {
-            var path = elements[elements.length - 1].path;  // last element is the youngest.
+            // FIXME: use HEAD tag to get to path.
+            // var path = elements[elements.length - 1].path;  // last element is the youngest.
+            var path = elements[0].path;  // first element is the youngest.
             if (typeof path == 'string') {
                 this_.el.render(path, view_name);
             } else {
@@ -69,13 +71,13 @@ export function open_proposals(uri, done) {
     }
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDAG',
+        iface: 'P_IDAG',
         html: '<pre></pre>',
         render: function() { render_DAG(this, undefined); }
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDAG',
+        iface: 'P_IDAG',
         name: 'edit',
         html: '<pre></pre>',
         render: function() { render_DAG(this, 'edit'); }
@@ -85,12 +87,12 @@ export function open_proposals(uri, done) {
     // document.
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDocument',
+        iface: 'P_IDocument',
         obvtUrl: 'templates/IDocumentDisplay.obvt',
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDocument',
+        iface: 'P_IDocument',
         name: 'edit',
         obvtUrl: 'templates/IDocumentEdit.obvt',
     });
@@ -99,7 +101,7 @@ export function open_proposals(uri, done) {
     // paragraph.
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IParagraph',
+        iface: 'P_IParagraph',
         obvtUrl: 'templates/IParagraphDisplay.obvt',
 
         edit: function(ev) {
@@ -109,7 +111,7 @@ export function open_proposals(uri, done) {
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IParagraph',
+        iface: 'P_IParagraph',
         name: 'edit',
         obvtUrl: 'templates/IParagraphEdit.obvt',
 
@@ -121,19 +123,19 @@ export function open_proposals(uri, done) {
         save: function(ev) {
             // send local object to server.  (FIXME: updates will probably come via web sockets.)
 
-            // var dagurl = this.obj['data']['adhocracy.propertysheets.interfaces.IVersions']['versionpostroot'];
+            var parDAGPath = this.obj['path'].substring(0, this.obj['path'].lastIndexOf("/"));
+            // a nice collection of other solutions is here:
+            // http://stackoverflow.com/questions/2187256/js-most-optimized-way-to-remove-a-filename-from-a-path-in-a-string
+            // or, actually: var parDAGPath = this.obj['data']['P_IVersions']['versionpostroot'];
 
-            // (FIXME: this is cheating, but it works for now, kind of.)
-            var dagurl = this.obj['path'].substring(0, this.obj['path'].length - 2);
+            delete this.obj['data']['P_IVersions'];
 
-            delete this.obj['data']['adhocracy#propertysheets#interfaces#IVersions'];
-
-            this.obj['data']['adhocracy#propertysheets#interfaces#IParagraph']['text'] =
+            this.obj['data']['P_IParagraph']['text'] =
                 $('textarea', this.el)[0].value;
 
             Obviel.make_postable(this.obj);
 
-            $.ajax(dagurl, {
+            $.ajax(parDAGPath, {
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json",
@@ -142,19 +144,22 @@ export function open_proposals(uri, done) {
                 console.log('ajax post failed!');
                 console.log(err);
                 console.log(err2);
-            }).done(function(resp, resp2) {
+            }).done(function() {
                 console.log('ajax post succeeded!');
-                console.log(resp);
-                console.log(resp2);
 
-                var proposalurl = resp.path;
-                // FIXME: this will not update the surrounding
-                // proposal!  (we don't really have a concept for how
-                // to do that.  i guess, web sockets?)
+                // at this point, we trigger a re-render of the DAG.
+                // in order to get to the path of the DAG, we chop off
+                // the version part of the path of the version
+                // currently rendered.
 
-                // FIXME: dagurl is undefined here.  why?
+                // FIXME: re-render of anything should be triggered by
+                // the server (websockets?  eventsource?  long-poll?).
+                // this 'done' handler should go away completely.
 
-                this.el.render(dagurl, 'display');
+                // FIXME: i am expecting obviel to re-pull the
+                // proposal from the server, but i'm not sure if that
+                // always happens.  what does the obviel code say?
+                $('#proposal_workbench_detail').rerender();
             });
         }
     });
