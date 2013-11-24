@@ -61,6 +61,7 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 2. git
 3. build-essentials, libyaml-dev, python-dev
 4. graphviz
+5. python-wxgtk2.8 (only to run the robotframework test editor ride)
 
 checkout source code ::
 
@@ -95,7 +96,7 @@ install robotframework for accpetance testing ::
 
     cd robotframework/
     python2.7 bootstrap.py
-    bin/buildout 
+    bin/buildout
 
 
 Run the application
