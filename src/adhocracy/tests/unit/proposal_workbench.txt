@@ -13,7 +13,7 @@ Go To Proposal Workbench
     Proposal Workbench Should Be Open
 
 Open Proposal Detail View
-    Click Element               sizzle=#proposal_workbench_directory a
+    Click Element               sizzle=#proposal_workbench_directory a:nth(2)
     Wait Until Page Contains Element   sizzle=#proposal_workbench_detail h3  timeout=3
 
 Open Proposal Editor
@@ -27,7 +27,7 @@ Edit Proposal
     Click Element                      sizzle=#proposal_workbench_detail .save_button
     Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .edit_button  timeout=3
 
-    Create Session  a3  localhost:8000
+    Create Session  a3  http://localhost:8000
     ${resp}=  Get  a3  /adhocracy/
     Should Be Equal As Strings  ${resp.status_code}  200
 
