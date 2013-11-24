@@ -41,15 +41,14 @@ export function register_transformer() {
 export function make_postable(obj) {
     var i;
 
-    obj.content_type = 'adhocracy.contents.interfaces.' + obj.content_type.substring(2);
-    delete obj['ifaces'][0];
+    delete obj['ifaces'];
+    delete obj['path'];
 
-    for (i in obj['ifaces']) {
-        var i_remote = 'adhocracy.contents.interfaces.' + i.substring(2);
+    obj.content_type = 'adhocracy.contents.interfaces.' + obj.content_type.substring(2);
+
+    for (i in obj['data']) {
+        var i_remote = 'adhocracy.propertysheets.interfaces.' + i.substring(2);
         obj.data[i_remote] = obj.data[i];
         delete obj.data[i];
     }
-
-    delete obj['ifaces'];
-    delete obj['path'];
 }
