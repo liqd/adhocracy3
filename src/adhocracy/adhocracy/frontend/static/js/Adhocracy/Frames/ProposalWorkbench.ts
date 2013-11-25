@@ -128,6 +128,7 @@ export function open_proposals(uri, done) {
             // http://stackoverflow.com/questions/2187256/js-most-optimized-way-to-remove-a-filename-from-a-path-in-a-string
             // or, actually: var parDAGPath = this.obj['data']['P_IVersions']['versionpostroot'];
 
+            var followsPath = parDAGPath + "/v_1"  // FIXME: derive this properly (from where?)
             delete this.obj['data']['P_IVersions'];
 
             this.obj['data']['P_IParagraph']['text'] =
@@ -139,6 +140,7 @@ export function open_proposals(uri, done) {
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json",
+                headers: { follows: followsPath },
                 data: JSON.stringify(this.obj)
             }).fail(function(err, err2) {
                 console.log('ajax post failed!');
