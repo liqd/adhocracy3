@@ -31,7 +31,7 @@ Start Adhocracy testapp::
 
 
 Resource structure
---------------------
+------------------
 
 Resources have one content interface to set its type, like
 "adhocracy.contents.interfaces.IPool".
@@ -50,22 +50,23 @@ There are 4 main types of content interfaces::
 
 Example ressource hierarchy:
 
-    Pool:              categorien
-    Fubel:             categorien/blue
+    Pool:              categories
+    Fubel:             categories/blue
 
     Pool:              proposals
     Versions Pool:     proposals/proposal1
     Versionable Fubel: proposals/proposal1/v1
     Tag-Fubel:         proposals/proposal1/head
 
-    Versions Pool:     proposals/proposal1/absatz1
-    Versionable Fubel: proposals/proposal1/absatzs1/v1
-    Tag-Fubel:         proposals/proposal1/absatz1/head
+    Versions Pool:     proposals/proposal1/section1
+    Versionable Fubel: proposals/proposal1/section1/v1
+    Tag-Fubel:         proposals/proposal1/section1/head
 
 Basic calls
 -----------
 
 We can use the following http verbs to work with resources.
+
 
 OPTIONS
 ~~~~~~~
@@ -91,6 +92,15 @@ with resources data::
         ]
     }
 
+FIXME: IName property sheet will go away.  It used to be an
+unambiguous object identifier, but the path is already good for that.
+It was also confusingly abused as a human-readable descriptor for the
+object, which is somewhat useful, but also useful in references, not
+just in objects.  It was decided that IName will be removed and
+replaced by an optional field "name" next to "content_type", "path",
+and "data".
+
+
 HEAD
 ~~~~
 
@@ -101,6 +111,7 @@ Returns only http headers::
     [...('Content-Type', 'application/json; charset=UTF-8'), ...
     >>> resp.text
     ''
+
 
 GET
 ~~~
@@ -123,6 +134,7 @@ Returns resource and child elements meta data and all propertysheet interfaces w
         "path": ...
     }
 
+
 POST
 ~~~~
 
@@ -143,8 +155,9 @@ Create a new resource ::
 FIXME: Was bedeutet das IName interface, ist das die id aus der die URL
 erzeugt wird?
 
+
 PUT
-~~~~
+~~~
 
 Modify data of an existing resource ::
 
@@ -222,10 +235,10 @@ If all goes wrong the return code is 500.
 
 
 Create and Update Versionable Resources
-----------------------------------------
+---------------------------------------
 
 Create
-~~~~~~~
+~~~~~~
 
 Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource type) ::
 
@@ -272,10 +285,11 @@ The ProposalVersionsPool has the IVersions and ITags interfaces to work with Ver
         },
     ...
 
-Update
-~~~~~~~
 
-Fetch the first Proposal Version, its empty ::
+Update
+~~~~~~
+
+Fetch the first Proposal Version, it is empty ::
 
     >>> resp = testapp.post_get(proposal_v1_path)
     >>> pprint_json(resp.json)
@@ -296,7 +310,6 @@ Fetch the first Proposal Version, its empty ::
                 "follows": [],
                 "followed-by": []
             }
-
         },
         "path": "/adhocracy/proposals/kommunismus/VERSION_...
     }
@@ -320,7 +333,7 @@ Create a second proposal that follows the first version ::
 
 
 Add and update child resource
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Create a SectionVersionsPool inside the ProposalVersionsPool::
 
@@ -391,18 +404,21 @@ we automatically create a fourth Proposal version ::
             }
     ...
 
-FIXME: the elements listing in the ITags interface is not very helpfull, the
+FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like "FIRST") are missing.
 
 FIXME: should we add a Tag TAG_LAST, to reference the last added version?
 
-FIXME: should the server tell in generally where to post specicfic content interfaces? (like like, discussion,..)
+FIXME: should the server tell in general where to post speccific
+content interfaces? (like "like", "discussion",..)?  in other words,
+should the client to be able to ask (e.g. with an OPTIONS request)
+where to post a "like"?
 
-FIXME: s/follows/predecessors/g; s/followed_by/successors/g;?)
+FIXME: s/follows/predecessors/g; s/followed_by/successors/g;?
 
 
 Batch requests
-––––––––––––––––
+––––––––––––––
 
 The following URL accepts POSTs of ordered sequences (json arrays) of
 encoded HTTP requests in one HTTP request body ::
@@ -416,6 +432,8 @@ in the sense that either all are successfully carried out or nothing
 is changed on the server.
 
 Let's add some more paragraphs to the document above ::
+
+FIXME: postroot will go away.
 
     >>> batch = [ { 'method': 'POST',
     ...             'path': propv2["postroot"],
@@ -527,92 +545,30 @@ requests!)
     }
 
 
-
-
-
-Interfaces ::
-
-     ..data:
-        ..IContents:
-            ..contents:
-                ../instances/spd/w/test/p1
-                ../instances/spd/w/test/p2
-                .....
-        ..ILikable
-            ..liked:       NOTE: this can be a huge list, better use the supergraph reference search or just show a number
-               ../users/1
-               ../users/2
-               .....
-
-
-
-Working with Node content
--------------------------
-
-The new IProposalContainer contains the propertysheet IDag and can be asked for
-contained versions::
-
-    >>> resp = testapp.get(proposal1_path)
-    >>> inode_container_data = resp.json["data"]["adhocracy.propertysheets.interfaces.IDag"]
-    >>> versions = inode_container_data["versions"]
-    >>> len(versions)
-    0
-
-
-We create a new version, so we have to mind
-the right follows relation ::
-
-    >>> data =  {'content_type': 'adhocracy.contents.interfaces.IProposal',
-    ...          'data': {'adhocracy.propertysheets.interfaces.IDocument': {
-    ...                       'description': 'synopsis',
-    ...                       'title': 'title'},
-    ...                   'adhocracy.propertysheets.interfaces.IVersionable': {
-    ...                       'follows': []}}}
-    >>> resp = testapp.post_json(proposal1_path, data)
-    >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.contents.interfaces.IProposal",
-        "path": ...
-    }
-
+Other stuff
+-----------
 
 GET /interfaces/..::
 
     Get schema/interface information: attribute type/required/readonly, ...
     Get interface inheritage
 
-GET /contenttype/..::
-
-    Get content type information
-
-GET /supergraph/..::
-
-    Get deps / essence_deps / essence references for content object/interface/attribute
-    Get complete essence for content object
 
 GET/POST /workflows/..::
 
-    Get Workflow, Apply Workflow to content object,
+    Get workflow, apply workflow to content object.
+
 
 GET/POST /transitions/..::
 
-    Get available workflow transitions for content object, execute transition
+    Get available workflow transitions for content object, execute transition.
+
 
 GET /query/..::
 
     query catalog to find content below /instances/spd
 
+
 GET/POST /users::
 
     Get/Add user
-
-NOTES::
-
-content-type and maininterface have almost the same meaning
-
-content-urls: relative oder vollstandige URL?
-
-users, catalog, references, ... per instance or global?
-
-unused rest methods: DELETE
-
