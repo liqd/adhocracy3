@@ -37,7 +37,11 @@ export function open_proposals(uri, done) {
         name: 'DirectoryEntry',
 
         render: function() {
-            this.el.render(this.obj.data.P_IDAG.versions[0].path, 'DirectoryEntry');
+            if (this.obj.data.P_IDAG.versions.length > 0) {
+                this.el.render(this.obj.data.P_IDAG.versions[0].path, 'DirectoryEntry');
+            } else {
+                this.el.text('[no versions]');
+            }
         }
     });
 
