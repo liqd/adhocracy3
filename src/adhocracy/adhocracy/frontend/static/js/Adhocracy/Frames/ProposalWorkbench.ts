@@ -219,3 +219,11 @@ export function open_proposals(uri, done) {
         $(window).trigger('hashchange');
     });
 }
+
+export function newProposal() {
+    console.log('[newProposal]');
+}
+
+export function newParagraph() {
+    console.log('[newParagraph]');
+}

@@ -42,11 +42,11 @@ Edit Proposal
     Element Should Contain  sizzle=#proposal_workbench_detail  ${PAR NEW}
 
 Create New Paragraph
-    Click Element  sizzle=#proposal_workbench_detail .create_paragraph_button
+    Click Element  sizzle=.create_paragraph_button
     Wait Until Page Contains Element  sizzle=#proposal_workbench_detail not_sure_how_to_proceed_from_here
 
 Create New Proposal
-    Click Element  sizzle=#proposal_workbench_detail .create_proposal_button
+    Click Element  sizzle=.create_proposal_button
     Wait Until Page Contains Element  sizzle=#proposal_workbench_detail not_sure_how_to_proceed_from_here
 
 [Teardown]  Close Browser
