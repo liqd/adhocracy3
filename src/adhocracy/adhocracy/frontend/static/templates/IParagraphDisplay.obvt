@@ -1,9 +1,9 @@
 <p>{data.P_IParagraph.text}</p>
-<button class="edit_button" data-on="click|edit">edit</button>
+<button type="button" class="edit_button" data-on="click|edit">edit</button>
 
 <!--
-<button class="edit_button" data-on="click|edit">edit</button>
-<button class="display_button" data-on="click|display">display</button>
-<button class="reset_button" data-on="click|reset">reset</button>
-<button class="save_button" data-on="click|save">save</button>
+<button type="button" class="edit_button" data-on="click|edit">edit</button>
+<button type="button" class="display_button" data-on="click|display">display</button>
+<button type="button" class="reset_button" data-on="click|reset">reset</button>
+<button type="button" class="save_button" data-on="click|save">save</button>
 -->

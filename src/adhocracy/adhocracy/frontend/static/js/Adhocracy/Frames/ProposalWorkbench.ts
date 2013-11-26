@@ -9,6 +9,7 @@ var bbq = require('bbq');
 
 import Obviel = require('Adhocracy/Obviel');
 import Util = require('Adhocracy/Util');
+import Css = require('Adhocracy/Css');
 
 export function open_proposals(uri, done) {
 
