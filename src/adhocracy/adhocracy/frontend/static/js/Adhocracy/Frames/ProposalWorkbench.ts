@@ -2,7 +2,7 @@
 /// <reference path="../../../submodules/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../submodules/DefinitelyTyped/jquery.bbq/jquery.bbq.d.ts"/>
 
-declare var $ : any;  // FIXME
+declare var $ : any;  // FIXME: use jquery git submodule, pick a more recent version, and tc-wrap it propertly.
 
 var obviel : any = require('obviel');
 var bbq = require('bbq');
@@ -71,8 +71,8 @@ export function open_proposals(uri, done) {
         }
 
         if (elements.length > 0) {
-            // FIXME: use HEAD tag to get to path.
-            // var path = elements[elements.length - 1].path;  // last element is the youngest.
+            // FIXME: use HEAD tag to get to path.  (this requires the backend to support tags.)
+            // var path = elements[elements.length - 1].path;  // (not) last element is the youngest.
             var path = elements[0].path;  // first element is the youngest.
             if (typeof path == 'string') {
                 this_.el.render(path, view_name);
@@ -135,14 +135,14 @@ export function open_proposals(uri, done) {
             this.el.render(versionurl, undefined);
         },
         save: function(ev) {
-            // send local object to server.  (FIXME: updates will probably come via web sockets.)
+            // send local object to server.
 
             var parDAGPath = this.obj['path'].substring(0, this.obj['path'].lastIndexOf("/"));
             // a nice collection of other solutions is here:
             // http://stackoverflow.com/questions/2187256/js-most-optimized-way-to-remove-a-filename-from-a-path-in-a-string
             // or, actually: var parDAGPath = this.obj['data']['P_IVersions']['versionpostroot'];
 
-            var followsPath = parDAGPath + "/v_1"  // FIXME: derive this properly (from where?)
+            var followsPath = parDAGPath + "/v_1"  // FIXME: hard-coded predecessor version is wrong.  refer to HEAD tag instead.
             delete this.obj['data']['P_IVersions'];
 
             this.obj['data']['P_IParagraph']['text'] =
@@ -169,15 +169,15 @@ export function open_proposals(uri, done) {
                 // currently rendered.
 
                 // FIXME: re-render of anything should be triggered by
-                // the server (websockets?  eventsource?  long-poll?).
-                // this 'done' handler should go away completely.
+                // the server (websockets).  this workaround 'done'
+                // handler should go away completely.
 
-                // FIXME: i am expecting obviel to re-pull the
-                // proposal from the server, but i'm not sure if that
-                // always happens.  what does the obviel code say?
-                // (Update on this: paragraph model objects are *not*
-                // refreshed from the server when rerender is called
-                // on the proposal node!)
+                // (regarding the work-around: i am expecting obviel
+                // to re-pull the proposal from the server, but i'm
+                // not sure if that always happens.  what does the
+                // obviel code say?  (Update on this: paragraph model
+                // objects are *not* refreshed from the server when
+                // rerender is called on the proposal node!)
                 $('#proposal_workbench_detail').rerender();
             });
         }
