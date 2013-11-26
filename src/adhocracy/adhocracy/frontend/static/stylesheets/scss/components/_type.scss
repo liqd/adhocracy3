@@ -1,0 +1,114 @@
+body {
+    color: $fg;
+    line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    // better kerning (char spacing)
+    text-rendering: optimizelegibility;
+}
+
+p {
+    // break very long words
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+a {
+    color: $primary-color;
+}
+
+// smaller headings
+blockquote,
+article,
+section {
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 1em;
+        margin: 10px 0;
+    }
+    h1 {
+        font-size: 1.2em;
+    }
+    h2 {
+        font-size: 1.1em;
+    }
+}
+
+// table
+table {
+    td, th {
+        text-align: left;
+        padding: 0.5em;
+        border-top: 1px solid mix($bg, $fg);
+    }
+    thead, tfoot {
+        th {
+            text-align: center;
+        }
+    }
+
+    caption {
+        font-size: small;
+    }
+}
+
+ul, ol {
+    padding-left: 1.5em;
+}
+li {
+    line-height: 1.5;
+    margin-left: 0;
+}
+dt {
+    font-weight: bold;
+}
+
+del {
+    text-decoration: line-through;
+    color: $red;
+}
+ins {
+    text-decoration: underline;
+    color: $green;
+}
+
+// blockqoute
+blockquote {
+    position: relative;
+    font-style: italic;
+    border-left: 0.4em solid $primary-color;
+    padding-left: 0.5em;
+    margin: 1.5em;
+
+    cite {
+        float: right;
+    }
+}
+
+// figure
+figure {
+    margin: 1em 0;
+}
+figcaption {
+    font-size: small;
+}
+
+// code
+code {
+    font-size: 0.9em;
+    background-color: $bg2;
+}
+pre {
+    margin: 1em 0;
+    display: block;
+    padding: 0.7em;
+    font-size: 0.9em;
+    background-color: $bg2;
+    border: 1px solid mix($bg2, $fg);
+    max-height: 18em;
+    overflow: auto;
+
+    code {
+        background-color: transparent;
+    }
+}
