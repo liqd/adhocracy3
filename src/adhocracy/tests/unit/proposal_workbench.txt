@@ -13,7 +13,7 @@ Go To Proposal Workbench
     Proposal Workbench Should Be Open
 
 Open Proposal Detail View
-    Click Element               sizzle=#proposal_workbench_directory a:nth(2)
+    Click Element               sizzle=#proposal_workbench_directory a:nth(0)
     Wait Until Page Contains Element   sizzle=#proposal_workbench_detail h3  timeout=3 secs
 
 Open Proposal Editor
