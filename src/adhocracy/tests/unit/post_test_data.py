@@ -20,7 +20,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + rootpath
 print '  data: ' + json.dumps(data)
-resp_0 = requests.post(server + rootpath, data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_0 = requests.post(server + rootpath, data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -49,7 +49,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
 print '  data: ' + json.dumps(data)
-resp_1 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_1 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -72,7 +72,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + rootpath
 print '  data: ' + json.dumps(data)
-resp_2 = requests.post(server + rootpath, data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_2 = requests.post(server + rootpath, data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -95,7 +95,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + rootpath
 print '  data: ' + json.dumps(data)
-resp_3 = requests.post(server + rootpath, data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_3 = requests.post(server + rootpath, data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -118,7 +118,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
 print '  data: ' + json.dumps(data)
-resp_4 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_4 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -141,7 +141,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
 print '  data: ' + json.dumps(data)
-resp_5 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_5 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -164,7 +164,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
 print '  data: ' + json.dumps(data)
-resp_6 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_6 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -187,7 +187,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
 print '  data: ' + json.dumps(data)
-resp_7 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_7 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -210,7 +210,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_4.json()['path']
 print '  data: ' + json.dumps(data)
-resp_8 = requests.post(server + resp_4.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_8 = requests.post(server + resp_4.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -228,33 +228,6 @@ else:
 data = {
     "data": {
         "adhocracy.propertysheets.interfaces.IParagraph": {
-            "text": "Sein Bart ist vom Vorüberziehn der Stäbchen\nganz weiß geworden, so wie nicht mehr frisch.\nIhm ist, als wenn es tausend Stäbchen gäbchen\nund in den tausend Stäbchen keinen Fisch.\n"
-        }
-    },
-    "content_type": "adhocracy.contents.interfaces.IParagraph"
-}
-print '====================================================================== [REQUEST]'
-print '  method: ' + 'post'
-print '  uri: ' + server + resp_4.json()['path']
-print '  data: ' + json.dumps(data)
-resp_9 = requests.post(server + resp_4.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
-print ''
-
-print '---------------------------------------------------------------------- [RESPONSE]'
-print '  code: ' + str(resp_9.status_code)
-if resp_9.status_code == 200:
-    print '  data: ' + json.dumps(resp_9.json())
-    print ''
-
-else:
-    print '  data: ' + resp_9.text
-    print ''
-    print 'giving up!'
-    exit(1)
-
-data = {
-    "data": {
-        "adhocracy.propertysheets.interfaces.IParagraph": {
             "text": "Schwach ist sein Gang, mit kurzen Trippelschrittchen\nvom Heck zum Kiel, seniorenhaft verdreht.\nQuecksilberfischig jedes zweite Trittchen,\nweil er auf einem Narwal-Holzbein geht.\n"
         }
     },
@@ -264,7 +237,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_5.json()['path']
 print '  data: ' + json.dumps(data)
-resp_10 = requests.post(server + resp_5.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_10 = requests.post(server + resp_5.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -291,7 +264,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_6.json()['path']
 print '  data: ' + json.dumps(data)
-resp_11 = requests.post(server + resp_6.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_11 = requests.post(server + resp_6.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -318,7 +291,7 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_7.json()['path']
 print '  data: ' + json.dumps(data)
-resp_12 = requests.post(server + resp_7.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_12 = requests.post(server + resp_7.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -338,7 +311,7 @@ data = {
         "adhocracy.propertysheets.interfaces.IDocument": {
             "paragraphs": [
                 {
-                    "path": resp_9.json()['path'],
+                    "path": resp_8.json()['path'],
                     "content_type": "adhocracy.contents.interfaces.IParagraph",
                     "reference_colour": "EssenceRef"
                 },
@@ -368,17 +341,44 @@ print '====================================================================== [R
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
 print '  data: ' + json.dumps(data)
-resp_12 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json'})
+resp_13 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
-print '  code: ' + str(resp_12.status_code)
-if resp_12.status_code == 200:
-    print '  data: ' + json.dumps(resp_12.json())
+print '  code: ' + str(resp_13.status_code)
+if resp_13.status_code == 200:
+    print '  data: ' + json.dumps(resp_13.json())
     print ''
 
 else:
-    print '  data: ' + resp_12.text
+    print '  data: ' + resp_13.text
+    print ''
+    print 'giving up!'
+    exit(1)
+
+data = {
+    "data": {
+        "adhocracy.propertysheets.interfaces.IParagraph": {
+            "text": "Sein Bart ist vom Vorüberziehn der Stäbchen\nganz weiß geworden, so wie nicht mehr frisch.\nIhm ist, als wenn es tausend Stäbchen gäbchen\nund in den tausend Stäbchen keinen Fisch.\n"
+        }
+    },
+    "content_type": "adhocracy.contents.interfaces.IParagraph"
+}
+print '====================================================================== [REQUEST]'
+print '  method: ' + 'post'
+print '  uri: ' + server + resp_4.json()['path']
+print '  data: ' + json.dumps(data)
+resp_19 = requests.post(server + resp_4.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',    'follows': resp_8.json()['path'],})
+print ''
+
+print '---------------------------------------------------------------------- [RESPONSE]'
+print '  code: ' + str(resp_19.status_code)
+if resp_19.status_code == 200:
+    print '  data: ' + json.dumps(resp_19.json())
+    print ''
+
+else:
+    print '  data: ' + resp_19.text
     print ''
     print 'giving up!'
     exit(1)
