@@ -1,2 +1,1 @@
-<a href="#{path}">{data.P_IName.name}</a>
-<!-- FIXME: Use the title of the HEAD of the document DAG instead. -->
+<a href="#{path}">{data.P_IDocument.title}</a>

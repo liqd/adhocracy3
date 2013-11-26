@@ -32,7 +32,16 @@ export function open_proposals(uri, done) {
     });
 
     obviel.view({
-        iface: 'P_IName',
+        iface: 'P_IDAG',
+        name: 'DirectoryEntry',
+
+        render: function() {
+            this.el.render(this.obj.data.P_IDAG.versions[0].path, 'DirectoryEntry');
+        }
+    });
+
+    obviel.view({
+        iface: 'P_IDocument',
         name: 'DirectoryEntry',
         obvtUrl: 'templates/DirectoryEntry.obvt',
     });
@@ -161,6 +170,9 @@ export function open_proposals(uri, done) {
                 // FIXME: i am expecting obviel to re-pull the
                 // proposal from the server, but i'm not sure if that
                 // always happens.  what does the obviel code say?
+                // (Update on this: paragraph model objects are *not*
+                // refreshed from the server when rerender is called
+                // on the proposal node!)
                 $('#proposal_workbench_detail').rerender();
             });
         }
