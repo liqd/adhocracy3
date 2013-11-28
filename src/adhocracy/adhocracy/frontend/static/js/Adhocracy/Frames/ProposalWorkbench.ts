@@ -138,11 +138,25 @@ export function open_proposals(uri, done) {
             // send local object to server.
 
             var parDAGPath = this.obj['path'].substring(0, this.obj['path'].lastIndexOf("/"));
-            // a nice collection of other solutions is here:
+            // a nice collection of other solutions for string disection is this here:
             // http://stackoverflow.com/questions/2187256/js-most-optimized-way-to-remove-a-filename-from-a-path-in-a-string
             // or, actually: var parDAGPath = this.obj['data']['P_IVersions']['versionpostroot'];
 
-            var followsPath = parDAGPath + "/v_1"  // FIXME: hard-coded predecessor version is wrong.  refer to HEAD tag instead.
+            var followsPath = (function() {
+                // FIXME: this is not how we should do this!  either
+                // make each P_IVersions know its own version number,
+                // or when we fetch the DAG in order to get to the
+                // HEAD, keep not only the HEAD, but also its version
+                // number.  (this would be in another view.)
+
+                // FIXME: Obviel.jsonAfterReceive() doesn't work here.
+                // typescript doesn't like something.
+
+                var parDAG = JSON.parse($.ajax(parDAGPath, { type: "GET", async: false }).responseText)
+                var allDAGVersions = parDAG['data']['adhocracy.propertysheets.interfaces.IDAG']['versions'];
+                if ('path' in allDAGVersions[0]) { return allDAGVersions[0]['path']; }
+            })();
+
             delete this.obj['data']['P_IVersions'];
 
             this.obj['data']['P_IParagraph']['text'] =
@@ -178,6 +192,7 @@ export function open_proposals(uri, done) {
                 // obviel code say?  (Update on this: paragraph model
                 // objects are *not* refreshed from the server when
                 // rerender is called on the proposal node!)
+
                 $('#proposal_workbench_detail').rerender();
             });
         }
