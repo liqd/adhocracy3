@@ -12,7 +12,7 @@
       <!-- app -->
       <div id="adhocracy">[javascript is not running]</div>
       <script>
-          var PWB;
+          var PWB;  // FIXME: this is not a good idea.  bind event listeners from inside the module!  (to css classes?)
           require(['jquery', 'bbq', 'datalink', 'obviel'], function() {
               require(['Adhocracy/Frames/ProposalWorkbench'], function(ProposalWorkbench) {
                   PWB = ProposalWorkbench;

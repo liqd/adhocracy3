@@ -50,6 +50,7 @@ Create New Proposal
     Wait Until Page Contains Element  sizzle=#proposal_workbench_detail not_sure_how_to_proceed_from_here
 
 
+# edit two paragraphs simultaneously (see ../adhocracy/frontend/static/00_attic/frontend.js)
 # edit mode for proposals (not individual paragraphs)
 # if document is in edit mode: always add an empty new paragraph at the end.
 # if and only if there is any text in it when document is saved, a new paragraph will be appended to the document.
