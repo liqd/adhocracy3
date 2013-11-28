@@ -10,11 +10,12 @@ from adhocracy.propertysheets import interfaces
 
 class PropertysheetGenericAdapter:
 
-    def __init__(self, propsheetmarker_iface):
-        self.propsheetmarker_iface = propsheetmarker_iface
+    def __init__(self, propertysheet_interf):
+        self.propertysheet_interf = propertysheet_interf
 
     def __call__(self, context, request):
-        schema_dotted = self.propsheetmarker_iface.getTaggedValue('schema')
+        import pdb; pdb.set_trace
+        schema_dotted = self.propertysheet_interf.getTaggedValue('schema')
         schema = resolve(schema_dotted)
         sheet = PropertySheetAdhocracyContent(context, request)
         sheet.schema = schema()
@@ -23,23 +24,27 @@ class PropertysheetGenericAdapter:
 
 def includeme(config): # pragma: no cover
 
-    # get all IPropertySheetMarker interfaces
-    # inspect.isclass is not working with interfaces,
-    # so we have to do it manually
-    propsheetmarker_ifaces = []
-    for key in dir(interfaces):
-        value = getattr(interfaces, key)
-        if value is interfaces.IPropertySheetMarker:
-            continue
-        try:
-            if issubclass(value, interfaces.IPropertySheetMarker):
-                propsheetmarker_ifaces.append(value)
-        except TypeError:
-            continue
-    # register generic adapter for all IPropertySheetMarkers
-    for iface in propsheetmarker_ifaces:
-        config.registry.registerAdapter(
-            PropertysheetGenericAdapter(iface),
-            (iface, IRequest),
-            IPropertySheet,
-            iface.__identifier__)
+    ## TODO auto generate
+    config.registry.registerAdapter(
+        PropertysheetGenericAdapter(interfaces.IName),
+        (interfaces.IName, IRequest),
+        IPropertySheet,
+        interfaces.IName.__identifier__)
+
+    config.registry.registerAdapter(
+        PropertysheetGenericAdapter(interfaces.IVersionable),
+        (interfaces.IVersionable, IRequest),
+        IPropertySheet,
+        interfaces.IVersionable.__identifier__)
+
+    config.registry.registerAdapter(
+        PropertysheetGenericAdapter(interfaces.IDocument),
+        (interfaces.IDocument, IRequest),
+        IPropertySheet,
+        interfaces.IDocument.__identifier__)
+
+    config.registry.registerAdapter(
+        PropertysheetGenericAdapter(interfaces.IText),
+        (interfaces.IText, IRequest),
+        IPropertySheet,
+        interfaces.IText.__identifier__)

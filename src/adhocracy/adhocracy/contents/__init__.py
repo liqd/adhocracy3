@@ -1,12 +1,10 @@
 from zope.interface import (
-    implementer,
     directlyProvides
 )
 from zope.dottedname.resolve import resolve
-from substanced.folder import Folder
 from substanced.content import add_content_type
 from adhocracy.contents import interfaces
-
+from adhocracy.utils import get_interfaces
 
 # basic factory
 class ContentFactory:
@@ -26,18 +24,12 @@ class ContentFactory:
 
 def includeme(config):
 
-    # register content types
-    ifaces = []
-    for key in dir(interfaces):
-        value = getattr(interfaces, key)
-        if value in [interfaces.IContent, interfaces.IContentFolder, interfaces.IContentItem]:
-            continue
-        try:
-            if issubclass(value, interfaces.IContent):
-                ifaces.append(value)
-        except TypeError:
-            continue
+    # iterate all Content interfaces
+    ifaces = get_interfaces(interfaces,
+                            base=interfaces.IContent,
+                            blacklist=[interfaces.IContentFolder, interfaces.IContentItem])
     for iface in ifaces:
+        # register content types
         is_implicit_addable = iface.queryTaggedValue("is_implicit_addable")
         meta = {"content_name": iface.queryTaggedValue("content_name") or iface.__identifier__,
                 "addable_content_interfaces": iface.queryTaggedValue("addable_content_interfaces") or [],

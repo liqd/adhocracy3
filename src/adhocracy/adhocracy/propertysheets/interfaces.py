@@ -2,20 +2,20 @@ import colander
 from substanced.schema import (
     Schema,
     NameSchemaNode
-    )
+)
 from zope.interface import (
     Interface,
     taggedValue,
-    )
+)
 
 from adhocracy.schema import ReferenceSetSchemaNode
-from adhocracy.contents.interfaces import INode
 
 
 # Interface types
 
 
 class IPropertySheetMarker(Interface):
+
     """Marker interface with tagged value "schema" to
        reference a colander schema class.
 
@@ -26,12 +26,13 @@ class IPropertySheetMarker(Interface):
 
        A tagged value "view_permission" set the permission
        to create this content object and add it to the object hierarchy.
+
     """
 
-    taggedValue("schema", "substanced.schema.Schema")
-
-    taggedValue("view_permission", "view")
-    taggedValue("edit_permission", "edit-content")
+    taggedValue(
+        "schema", "substanced.schema.Schema")  # suptype has to override
+    taggedValue("permission_view", "view")  # subtype should override this
+    taggedValue("permission_edit", "edit")  # subtype should override this
 
 
 # Name Data
@@ -50,20 +51,18 @@ class NameReadonlySchema(Schema):
 class IName(IPropertySheetMarker):
 
     taggedValue("schema", "adhocracy.propertysheets.interfaces.NameSchema")
-    taggedValue("view_permission", "view")
-    taggedValue("edit_permission", "edit-content")
 
-# TODO this should be a specialication of IName..
-class INameReadonly(IPropertySheetMarker):
 
-    taggedValue("schema", "adhocracy.propertysheets.interfaces.NameReadonlySchema")
-    taggedValue("view_permission", "view")
-    taggedValue("edit_permission", "edit-content")
+class INameReadonly(IName):
+
+    taggedValue(
+        "schema", "adhocracy.propertysheets.interfaces.NameReadonlySchema")
 
 
 # Pool data
 
 class IPool(IPropertySheetMarker):
+
     taggedValue("schema", "adhocracy.propertysheets.interfaces.PoolSchema")
 
 
@@ -71,38 +70,22 @@ class PoolSchema(Schema):
     elements = ReferenceSetSchemaNode(essence_refs=False,
                                       default=[],
                                       missing=[],
-                                      interface=INode
+                                      interface=Interface
                                       )
-
 
 # Versionable Data
 
-class IDag(IPropertySheetMarker):
-    """Dag for collecting all versions of one document."""
-    taggedValue("schema", "adhocracy.propertysheets.interfaces.DagSchema")
-    taggedValue("view_permission", "view")
-    taggedValue("edit_permission", "edit-content")
-
-class DagSchema(Schema):
-
-    versions = ReferenceSetSchemaNode(essence_refs=False,
-                                      default=[],
-                                      missing=[],
-                                      interface=INode,
-                                      )
-
 
 class IVersionable(IPropertySheetMarker):
-    """Marker interface representing a node with version data"""
 
-    taggedValue("schema", "adhocracy.propertysheets.interfaces.VersionableSchema")
-    taggedValue("view_permission", "view")
-    taggedValue("edit_permission", "edit-content")
+    """Marker interface representing a versionable Fubel."""
+
+    taggedValue(
+        "schema", "adhocracy.propertysheets.interfaces.VersionableSchema")
 
 
-class IForkable(IVersionable):
-    """Marker interface representing a forkable node with version data"""
-
+# class IForkable(IVersionable):
+#     """Marker interface representing a forkable node with version data"""
 
 class VersionableSchema(Schema):
 
@@ -111,46 +94,74 @@ class VersionableSchema(Schema):
                                      missing=[],
                                      interface=IVersionable,
                                      )
-    #followed_by = ReferenceSetSchemaNode(
-                                     #default=[],
-                                     #missing=[],
-                                     #interface=IVersionable,
-                                     #readonly=True,
-                                     #)
+    followed_by = ReferenceSetSchemaNode(
+        default=[],
+        missing=[],
+        interface=IVersionable,
+        readonly=True,
+    )
+
+
+class IVersions(IPropertySheetMarker):
+
+    """Dag for collecting all versions of one Fubel."""
+    taggedValue("schema", "adhocracy.propertysheets.interfaces.VersionsSchema")
+
+
+class VersionsSchema(Schema):
+
+    elements = ReferenceSetSchemaNode(essence_refs=False,
+                                      default=[],
+                                      missing=[],
+                                      interface=IVersionable,
+                                      )
+
+
+class ITags(IPropertySheetMarker):
+
+    """List for collecting all tags one Fubel."""
+    taggedValue("schema", "adhocracy.propertysheets.interfaces.TagsSchema")
+
+
+class TagsSchema(Schema):
+
+    elements = ReferenceSetSchemaNode(essence_refs=False,
+                                      default=[],
+                                      missing=[],
+                                      interface=IVersionable,
+                                      )
+
 
 # Document Data
 
 
 class IDocument(IPropertySheetMarker):
-    """Marker interfaces representing a node with document data """
+
+    """Marker interface representing a Fubel with document data """
 
     taggedValue("schema", "adhocracy.propertysheets.interfaces.DocumentSchema")
-    taggedValue("view_permission", "view")
-    taggedValue("edit_permission", "edit-content")
 
 
 class DocumentSchema(Schema):
 
+    elements = ReferenceSetSchemaNode(essence_refs=True,
+                                      default=[],
+                                      missing=[],
+                                      interface=
+                                      "adhocracy.contents.interfaces.ISection")
+
+
+class ISection(IPropertySheetMarker):
+
+    """Marker interface representing a document section """
+
+    taggedValue("schema", "adhocracy.propertysheets.interfaces.SectionSchema")
+
+
+class SectionSchema(Schema):
     title = colander.SchemaNode(colander.String(), default="")
-
-    description = colander.SchemaNode(colander.String(), default="")
-
-    paragraphs = ReferenceSetSchemaNode(essence_refs=True,
-                                        default=[],
-                                        missing=[],
-                                        interface="adhocracy.contents.interfaces.IParagraph")
-
-# Text Data
-
-
-class IText(IPropertySheetMarker):
-    """Marker for nodes that contain text."""
-
-    taggedValue("schema", "adhocracy.propertysheets.interfaces.TextSchema")
-    taggedValue("view_permission", "view")
-    taggedValue("edit_permission", "edit-content")
-
-
-class TextSchema(Schema):
-
-    text = colander.SchemaNode(colander.String(), default="")
+    elements = ReferenceSetSchemaNode(essence_refs=True,
+                                      default=[],
+                                      missing=[],
+                                      interface=
+                                      "adhocracy.contents.interfaces.ISection")

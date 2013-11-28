@@ -41,7 +41,7 @@ FIXME: maybe rename propertysheet interface to property interface, its shorter
 
 Every Resource has multiple propertysheet interfaces that define schemata to set/get data.
 
-There are 4 main types of content interfaces::
+There are 5 main types of content interfaces::
 
 * Pool: folder content in the object hierachy, namespace, structure and configure child fusels for a specic Beteiligungsverfahren.
 * Fubel: item content created during a Beteiligungsverfahren (mainly).
