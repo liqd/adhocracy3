@@ -148,7 +148,7 @@ export function open_proposals(uri, done) {
             this.obj['data']['P_IParagraph']['text'] =
                 $('textarea', this.el)[0].value;
 
-            Obviel.make_postable(this.obj);
+            Obviel.jsonBeforeSend(this.obj);
 
             $.ajax(parDAGPath, {
                 type: "POST",
