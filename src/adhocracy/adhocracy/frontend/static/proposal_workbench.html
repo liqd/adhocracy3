@@ -12,8 +12,10 @@
       <!-- app -->
       <div id="adhocracy">[javascript is not running]</div>
       <script>
+          var PWB;
           require(['jquery', 'bbq', 'datalink', 'obviel'], function() {
               require(['Adhocracy/Frames/ProposalWorkbench'], function(ProposalWorkbench) {
+                  PWB = ProposalWorkbench;
                   $(document).ready(function() { ProposalWorkbench.open_proposals(); });
                   // This isn't executed: (why?)
                   $(document).load(function() { console.log('page load complete'); });
