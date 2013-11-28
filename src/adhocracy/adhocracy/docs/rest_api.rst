@@ -36,8 +36,10 @@ Resource structure
 Resources have one content interface to set its type, like
 "adhocracy.contents.interfaces.IPool".
 
-Every Resource has multiple
-propertysheet interfaces that define schemata to set/get data.
+FIXME: rename content interface to ressource interface, this is more clear and more common
+FIXME: maybe rename propertysheet interface to property interface, its shorter
+
+Every Resource has multiple propertysheet interfaces that define schemata to set/get data.
 
 There are 4 main types of content interfaces::
 
