@@ -32,8 +32,8 @@ def main(global_config, **settings):
     config.include('pyramid_chameleon')
     config.include('substanced')
     config.commit() # commit to allow proper config overrides
-    config.include('.propertysheets')
-    config.include('.contents')
+    config.include('.properties')
+    config.include('.resources')
     config.include('.contentregistry')
     config.include('.evolution')
     config.include('.rest')

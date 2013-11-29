@@ -8,7 +8,7 @@ from substanced.interfaces import (
 )
 from substanced.schema import Schema
 
-from adhocracy.propertysheets.interfaces import (
+from adhocracy.properties.interfaces import (
     NameSchema
 )
 

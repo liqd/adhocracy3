@@ -26,7 +26,7 @@ function ajax_pool_names(url: string, done_pool_names?: (pool: string[]) => any)
     };
 
     $.ajax(url, get_args).fail(ajax_fail).done(function(pool) {
-        var refs = pool['data']['adhocracy.propertysheets.interfaces.IPool']['elements'];
+        var refs = pool['data']['adhocracy.properties.interfaces.IPool']['elements'];
         if (!refs.length)
             done_pool_names([]);  // the rest of this block only works on non-empty element lists!
 
@@ -42,7 +42,7 @@ function ajax_pool_names(url: string, done_pool_names?: (pool: string[]) => any)
             counter += 1;
             if (counter >= elems.length) {
                 done_pool_names(results.map(function(elem) {
-                    return elem['data']['adhocracy.propertysheets.interfaces.IName']['name'];
+                    return elem['data']['adhocracy.properties.interfaces.IName']['name'];
                 }));
             }
         };

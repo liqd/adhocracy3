@@ -21,7 +21,7 @@ def add_app_root_element(root):
     )
     reg = get_current_registry()
     if "adhocracy" not in root:
-        root["adhocracy"] = reg.content.create("adhocracy.contents.interfaces.IPool")
+        root["adhocracy"] = reg.content.create("adhocracy.resources.interfaces.IPool")
 
 def add_app_root_permissions(root):
     logger.info(

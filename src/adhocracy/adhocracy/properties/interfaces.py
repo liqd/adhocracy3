@@ -50,20 +50,20 @@ class NameReadonlySchema(Schema):
 
 class IName(IPropertySheetMarker):
 
-    taggedValue("schema", "adhocracy.propertysheets.interfaces.NameSchema")
+    taggedValue("schema", "adhocracy.properties.interfaces.NameSchema")
 
 
 class INameReadonly(IName):
 
     taggedValue(
-        "schema", "adhocracy.propertysheets.interfaces.NameReadonlySchema")
+        "schema", "adhocracy.properties.interfaces.NameReadonlySchema")
 
 
 # Pool data
 
 class IPool(IPropertySheetMarker):
 
-    taggedValue("schema", "adhocracy.propertysheets.interfaces.PoolSchema")
+    taggedValue("schema", "adhocracy.properties.interfaces.PoolSchema")
 
 
 class PoolSchema(Schema):
@@ -81,7 +81,7 @@ class IVersionable(IPropertySheetMarker):
     """Marker interface representing a versionable Fubel."""
 
     taggedValue(
-        "schema", "adhocracy.propertysheets.interfaces.VersionableSchema")
+        "schema", "adhocracy.properties.interfaces.VersionableSchema")
 
 
 # class IForkable(IVersionable):
@@ -105,7 +105,7 @@ class VersionableSchema(Schema):
 class IVersions(IPropertySheetMarker):
 
     """Dag for collecting all versions of one Fubel."""
-    taggedValue("schema", "adhocracy.propertysheets.interfaces.VersionsSchema")
+    taggedValue("schema", "adhocracy.properties.interfaces.VersionsSchema")
 
 
 class VersionsSchema(Schema):
@@ -120,7 +120,7 @@ class VersionsSchema(Schema):
 class ITags(IPropertySheetMarker):
 
     """List for collecting all tags one Fubel."""
-    taggedValue("schema", "adhocracy.propertysheets.interfaces.TagsSchema")
+    taggedValue("schema", "adhocracy.properties.interfaces.TagsSchema")
 
 
 class TagsSchema(Schema):
@@ -139,7 +139,7 @@ class IDocument(IPropertySheetMarker):
 
     """Marker interface representing a Fubel with document data """
 
-    taggedValue("schema", "adhocracy.propertysheets.interfaces.DocumentSchema")
+    taggedValue("schema", "adhocracy.properties.interfaces.DocumentSchema")
 
 
 class DocumentSchema(Schema):
@@ -148,14 +148,14 @@ class DocumentSchema(Schema):
                                       default=[],
                                       missing=[],
                                       interface=
-                                      "adhocracy.contents.interfaces.ISection")
+                                      "adhocracy.resources.interfaces.ISection")
 
 
 class ISection(IPropertySheetMarker):
 
     """Marker interface representing a document section """
 
-    taggedValue("schema", "adhocracy.propertysheets.interfaces.SectionSchema")
+    taggedValue("schema", "adhocracy.properties.interfaces.SectionSchema")
 
 
 class SectionSchema(Schema):
@@ -164,4 +164,4 @@ class SectionSchema(Schema):
                                       default=[],
                                       missing=[],
                                       interface=
-                                      "adhocracy.contents.interfaces.ISection")
+                                      "adhocracy.resources.interfaces.ISection")

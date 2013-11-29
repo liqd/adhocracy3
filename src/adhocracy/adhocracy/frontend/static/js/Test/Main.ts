@@ -35,8 +35,8 @@ export function proposal_workbench_setup() {
     $.ajax(root_url + '/admin/reset-db', {type: "GET", async: false});
 
     var propcontainer = {
-        'content_type': 'adhocracy.contents.interfaces.IProposalContainer',
-        'data': { 'adhocracy.propertysheets.interfaces.IName': { 'name': 'NoMoreMosquitos' } }
+        'content_type': 'adhocracy.resources.interfaces.IProposalContainer',
+        'data': { 'adhocracy.properties.interfaces.IName': { 'name': 'NoMoreMosquitos' } }
     };
     var resp = $.ajax(root_url, {
         type: "POST",
@@ -49,8 +49,8 @@ export function proposal_workbench_setup() {
     var propcontainer_path = $.parseJSON(resp.responseText)['path'];
 
     var prop = {
-        'content_type': 'adhocracy.contents.interfaces.IProposal',
-        'data': { 'adhocracy.propertysheets.interfaces.IName': { 'name': 'v1' } }
+        'content_type': 'adhocracy.resources.interfaces.IProposal',
+        'data': { 'adhocracy.properties.interfaces.IName': { 'name': 'v1' } }
     };
     resp = $.ajax(propcontainer_path, {
         type: "POST",
@@ -62,8 +62,8 @@ export function proposal_workbench_setup() {
 
     var propv1 = $.parseJSON(resp.responseText);
 
-    var parcontainer = {'content_type': 'adhocracy.contents.interfaces.IParagraphContainer',
-                        'data': { 'adhocracy.propertysheets.interfaces.IName': { 'name': 'paragraphs' }}};
+    var parcontainer = {'content_type': 'adhocracy.resources.interfaces.IParagraphContainer',
+                        'data': { 'adhocracy.properties.interfaces.IName': { 'name': 'paragraphs' }}};
     resp = $.ajax(root_url, {
         type: "POST",
         dataType: "json",
@@ -74,8 +74,8 @@ export function proposal_workbench_setup() {
 
     var parcontainer_path = $.parseJSON(resp.responseText)['path'];
 
-    var par = {'content_type': 'adhocracy.contents.interfaces.IParagraph',
-               'data': { 'adhocracy.propertysheets.interfaces.IParagraph': {
+    var par = {'content_type': 'adhocracy.resources.interfaces.IParagraph',
+               'data': { 'adhocracy.properties.interfaces.IParagraph': {
                    'text': 'sein bart ist vom vorüberziehn der stäbchen'
                }
                        }
@@ -88,12 +88,12 @@ export function proposal_workbench_setup() {
         async: false
     });
 
-    propv1['data']['adhocracy.propertysheets.interfaces.IDocument']['paragraphs'].push({
-        'content_type': 'adhocracy.contents.interfaces.IParagraph',
+    propv1['data']['adhocracy.properties.interfaces.IDocument']['paragraphs'].push({
+        'content_type': 'adhocracy.resources.interfaces.IParagraph',
         'path': $.parseJSON(resp.responseText)['path']
     });
 
-    par['data']['adhocracy.propertysheets.interfaces.IParagraph']['text'] = 'ganz weiß geworden, so wie nicht mehr frisch';
+    par['data']['adhocracy.properties.interfaces.IParagraph']['text'] = 'ganz weiß geworden, so wie nicht mehr frisch';
     resp = $.ajax(parcontainer_path, {
         type: "POST",
         dataType: "json",
@@ -101,17 +101,17 @@ export function proposal_workbench_setup() {
         data: showjs(par),
         async: false
     });
-    propv1['data']['adhocracy.propertysheets.interfaces.IDocument']['paragraphs'].push({
-        'content_type': 'adhocracy.contents.interfaces.IParagraph',
+    propv1['data']['adhocracy.properties.interfaces.IDocument']['paragraphs'].push({
+        'content_type': 'adhocracy.resources.interfaces.IParagraph',
         'path': $.parseJSON(resp.responseText)['path']
     });
 
-    propv1['data']['adhocracy.propertysheets.interfaces.IDocument']['title'] = 'Der Käptn';
-    propv1['data']['adhocracy.propertysheets.interfaces.IDocument']['description'] = '(nicht von rainer maria rilke)';
+    propv1['data']['adhocracy.properties.interfaces.IDocument']['title'] = 'Der Käptn';
+    propv1['data']['adhocracy.properties.interfaces.IDocument']['description'] = '(nicht von rainer maria rilke)';
 
-    propv1['data']['adhocracy.propertysheets.interfaces.IVersions'] = undefined;
+    propv1['data']['adhocracy.properties.interfaces.IVersions'] = undefined;
     // ['preds'].push({
-    //    'content_type': 'adhocracy.contents.interfaces.IProposal',
+    //    'content_type': 'adhocracy.resources.interfaces.IProposal',
     //    'path': propv1['path']
     //});
     propv1['path'] = undefined;
@@ -124,7 +124,7 @@ export function proposal_workbench_setup() {
         async: false
     });
 
-    propcontainer['data']['adhocracy.propertysheets.interfaces.IName']['name'] = 'CDU für alle';
+    propcontainer['data']['adhocracy.properties.interfaces.IName']['name'] = 'CDU für alle';
     $.ajax(root_url, {
         type: "POST",
         dataType: "json",
@@ -132,7 +132,7 @@ export function proposal_workbench_setup() {
         data: showjs(propcontainer),
         async: false
     });
-    propcontainer['data']['adhocracy.propertysheets.interfaces.IName']['name'] = 'Gentechnik jetzt';
+    propcontainer['data']['adhocracy.properties.interfaces.IName']['name'] = 'Gentechnik jetzt';
     $.ajax(root_url, {
         type: "POST",
         dataType: "json",
@@ -140,7 +140,7 @@ export function proposal_workbench_setup() {
         data: showjs(propcontainer),
         async: false
     });
-    propcontainer['data']['adhocracy.propertysheets.interfaces.IName']['name'] = 'Mehr Proposals';
+    propcontainer['data']['adhocracy.properties.interfaces.IName']['name'] = 'Mehr Proposals';
     $.ajax(root_url, {
         type: "POST",
         dataType: "json",

@@ -3,7 +3,7 @@ from zope.interface import (
 )
 from zope.dottedname.resolve import resolve
 from substanced.content import add_content_type
-from adhocracy.contents import interfaces
+from adhocracy.resources import interfaces
 from adhocracy.utils import get_interfaces
 
 # basic factory

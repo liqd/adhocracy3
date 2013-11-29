@@ -20,19 +20,19 @@ export function open_proposals(uri, done) {
     // proposal directory
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IPool',
+        iface: 'adhocracy.properties.interfaces.IPool',
         name: 'ProposalWorkbench',
         obvtUrl: 'templates/ProposalWorkbench.obvt',
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IPool',
+        iface: 'adhocracy.properties.interfaces.IPool',
         name: 'Directory',
         obvtUrl: 'templates/Directory.obvt',
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IName',
+        iface: 'adhocracy.properties.interfaces.IName',
         name: 'DirectoryEntry',
         obvtUrl: 'templates/DirectoryEntry.obvt',
     });
@@ -69,13 +69,13 @@ export function open_proposals(uri, done) {
     }
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDAG',
+        iface: 'adhocracy.properties.interfaces.IDAG',
         html: '<pre></pre>',
         render: function() { render_DAG(this, undefined); }
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDAG',
+        iface: 'adhocracy.properties.interfaces.IDAG',
         name: 'edit',
         html: '<pre></pre>',
         render: function() { render_DAG(this, 'edit'); }
@@ -85,12 +85,12 @@ export function open_proposals(uri, done) {
     // document.
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDocument',
+        iface: 'adhocracy.properties.interfaces.IDocument',
         obvtUrl: 'templates/IDocumentDisplay.obvt',
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IDocument',
+        iface: 'adhocracy.properties.interfaces.IDocument',
         name: 'edit',
         obvtUrl: 'templates/IDocumentEdit.obvt',
     });
@@ -99,7 +99,7 @@ export function open_proposals(uri, done) {
     // paragraph.
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IParagraph',
+        iface: 'adhocracy.properties.interfaces.IParagraph',
         obvtUrl: 'templates/IParagraphDisplay.obvt',
 
         edit: function(ev) {
@@ -109,7 +109,7 @@ export function open_proposals(uri, done) {
     });
 
     obviel.view({
-        iface: 'adhocracy.propertysheets.interfaces.IParagraph',
+        iface: 'adhocracy.properties.interfaces.IParagraph',
         name: 'edit',
         obvtUrl: 'templates/IParagraphEdit.obvt',
 
@@ -121,7 +121,7 @@ export function open_proposals(uri, done) {
         save: function(ev) {
             // send local object to server.  (FIXME: updates will probably come via web sockets.)
 
-            // var dagurl = this.obj['data']['adhocracy.propertysheets.interfaces.IVersions']['versionpostroot'];
+            // var dagurl = this.obj['data']['adhocracy.properties.interfaces.IVersions']['versionpostroot'];
 
             // (FIXME: this is cheating, but it works for now, kind of.)
             var dagurl = this.obj['path'].substring(0, this.obj['path'].length - 2);

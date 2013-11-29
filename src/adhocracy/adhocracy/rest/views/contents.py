@@ -21,7 +21,7 @@ from substanced.folder import FolderKeyError
 from substanced.interfaces import IAutoNamingFolder
 from substanced.util import get_oid
 
-from adhocracy.contents.interfaces import (
+from adhocracy.resources.interfaces import (
     IContent,
     INode,
     )

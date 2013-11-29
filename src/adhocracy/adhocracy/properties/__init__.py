@@ -3,7 +3,7 @@ from pyramid.interfaces import IRequest
 from substanced.interfaces import IPropertySheet
 
 from adhocracy.property import PropertySheetAdhocracyContent
-from adhocracy.propertysheets import interfaces
+from adhocracy.properties import interfaces
 
 # PropertySheet adapters
 # read sdi/views/property for adapter lookup examples
