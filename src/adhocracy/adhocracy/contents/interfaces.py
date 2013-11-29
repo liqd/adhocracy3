@@ -49,8 +49,8 @@ class IPool(IContent):
 
 class IFubelVersionsPool(IPool):
 
-    """Pool for all versions (DAG) and tags of a VersionableFubel
-       or other other related VersionsPool.
+    """Pool for all Fubel versions (DAG), tags and related Pools.
+
        A tagged value "fubel_content_type" to set the type of VersionableFubel
        addable to this container.
     """
