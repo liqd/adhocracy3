@@ -3,8 +3,8 @@ from zope.dottedname.resolve import resolve
 from substanced.content import add_content_type
 from adhocracy.resources import interfaces
 from adhocracy.utils import (
-    get_interfaces,
-    get_taggedvalues,
+    get_ifaces_from_module,
+    get_all_taggedvalues,
 )
 
 
@@ -14,7 +14,7 @@ class ResourceFactory:
 
     def __init__(self, iface):
         assert iface.isOrExtends(interfaces.IResource)
-        taggedvalues = get_taggedvalues(iface)
+        taggedvalues = get_all_taggedvalues(iface)
         self.class_ = resolve(taggedvalues["content_class"])
         self.resource_iface = iface
         base_ifaces = taggedvalues["basic_properties_interfaces"]
