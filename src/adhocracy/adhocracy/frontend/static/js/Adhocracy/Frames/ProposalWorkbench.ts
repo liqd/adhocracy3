@@ -16,10 +16,14 @@ import Css = require('Adhocracy/Css');
 
 var templatePath : string = '/static/templates';
 var appPrefix : string = '/app';
+var jsonPrefix : string = '/adhocracy';
 
-export function open_proposals(poolUri : string, done ?: any) {
+export function open_proposals(jsonUri : string, done ?: any) {
 
-    // FIXME: much of what happens in this function shouldn't.  refactor!
+    // FIXME: rename open_proposals() to start()
+    // FIXME: much of what happens in this function shouldn't happen here.  refactor!
+
+    var appUri : string = appPrefix + jsonUri;
 
     Obviel.register_transformer();
 
@@ -229,16 +233,48 @@ export function open_proposals(poolUri : string, done ?: any) {
 
     // history api (back button).
     window.addEventListener('popstate', function(event) {
-        onClickDirectoryEntry(event.target.location.toString());
+        onClickDirectoryEntry(event.target.location.toString());  // (besides 'toString()' there is also 'pathname'...)
     });
 
 
     // start.
-    $('#adhocracy').render(poolUri, 'ProposalWorkbench').done(function() {
-        history.pushState(null, null, appPrefix + poolUri);
-    });
+    history.pushState(null, null, appUri);
+    $('#adhocracy').render(jsonUri, 'ProposalWorkbench');
+
+    // FIXME: deep links don't work.  The contents of jsonUri must
+    // contain a proposal pool that contains proposal dags.  Regarding
+    // URLs that open a particular proposal in detail view directly,
+    // there are at least two options:
+    //
+    // 1. fixed object hierarchy: if the object under jsonUri does not
+    // work as a proposal pool, try proposal dag, and then proposal
+    // version.  (dag: remove last stub from the path and render that
+    // as pool/worbench; then render the full path into detail view;
+    // version: same, but remove last two stubs, not one.)
+    //
+    // 2. get parameters: encode the uri of the proposal to be opened
+    // in detail view in a get parameter.  this does not assume any
+    // fixed object hierarchy, but it is more awkward if you like
+    // typing in urls manually.
+    //
+    // either way this has to be fixed, or reload and deep links must
+    // be considered broken.
+
+    // FIXME: history api only goes back one step, and does not go
+    // forward at all.
 }
 
+// if the url with which this page was loaded mentions a particular
+// pool or a particular detail view, return that as poolUri.
+// otherwise, return the default passed as argument to this function.
+export function poolUri(defaultUri) {
+    var uri = window.location.pathname.match(new RegExp('^' + appPrefix + '(' + jsonPrefix + '.*)$'));
+    if (uri) {
+        return uri[1];
+    } else {
+        return defaultUri;
+    }
+}
 
 function onClickDirectoryEntry(pathRaw : string) {
     var pathHtml : string = pathRaw.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');

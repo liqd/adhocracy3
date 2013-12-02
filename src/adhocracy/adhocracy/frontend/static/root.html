@@ -21,7 +21,8 @@
           require(['jquery', 'obviel'], function() {
               require(['Adhocracy/Frames/ProposalWorkbench'], function(ProposalWorkbench) {
                   PWB = ProposalWorkbench;
-                  $(document).ready(function() { ProposalWorkbench.open_proposals('/adhocracy'); });
+                  var uri = ProposalWorkbench.poolUri('/adhocracy');
+                  $(document).ready(function() { ProposalWorkbench.open_proposals(uri); });
                   // This isn't executed: (why?)
                   $(document).load(function() { console.log('page load complete'); });
               });
