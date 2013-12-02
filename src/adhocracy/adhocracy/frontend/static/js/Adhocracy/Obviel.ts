@@ -36,14 +36,20 @@ export function register_transformer() {
 }
 
 
+export interface Content {
+    content_type: string;
+    path?: string;
+    data?: Object;
+}
+
 // out-transformer.  call this on every object before sending it back
 // to the server.
-export function make_postable(inobj) {
+export function make_postable(inobj : Content) {
     var i;
-    var outobj = {};
-
-    outobj.content_type = 'adhocracy.contents.interfaces.' + inobj.content_type.substring(2);
-    outobj.data = {};
+    var outobj : Content = {
+        content_type: 'adhocracy.contents.interfaces.' + inobj.content_type.substring(2),
+        data: {}
+    };
 
     for (i in inobj['data']) {
         var i_remote = 'adhocracy.propertysheets.interfaces.' + i.substring(2);
