@@ -1,1 +1,1 @@
-<a href="#{path}">{data.P_IDocument.title}</a>
+<a href="/app{path}">{data.P_IDocument.title}</a>

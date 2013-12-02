@@ -1,35 +1,41 @@
 /// <reference path="../../../submodules/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../submodules/DefinitelyTyped/jquery/jquery.d.ts"/>
-/// <reference path="../../../submodules/DefinitelyTyped/jquery.bbq/jquery.bbq.d.ts"/>
+
+// FIXME: remove submodules jquery-datalink/, jquery-bbq/ (hash urls
+// aka fragments are obsoleted by html5 history api)
 
 declare var $ : any;  // FIXME: use jquery git submodule, pick a more recent version, and tc-wrap it propertly.
+declare var window : any;    // FIXME: type this more rigorously
+declare var history : any;   // FIXME: type this more rigorously
 
 var obviel : any = require('obviel');
-var bbq = require('bbq');
 
 import Obviel = require('Adhocracy/Obviel');
 import Util = require('Adhocracy/Util');
 import Css = require('Adhocracy/Css');
 
-export function open_proposals(uri, done) {
+var templatePath : string = '/static/templates';
+var appPrefix : string = '/app';
+
+export function open_proposals(poolUri : string, done ?: any) {
 
     // FIXME: much of what happens in this function shouldn't.  refactor!
 
     Obviel.register_transformer();
 
 
-    // proposal directory
+    // views for center column: proposal directory
 
     obviel.view({
         iface: 'P_IPool',
         name: 'ProposalWorkbench',
-        obvtUrl: 'templates/ProposalWorkbench.obvt',
+        obvtUrl: templatePath + '/ProposalWorkbench.obvt',
     });
 
     obviel.view({
         iface: 'P_IPool',
         name: 'Directory',
-        obvtUrl: 'templates/Directory.obvt',
+        obvtUrl: templatePath + '/Directory.obvt',
     });
 
     obviel.view({
@@ -42,17 +48,28 @@ export function open_proposals(uri, done) {
             } else {
                 this.el.text('[no versions]');
             }
-        }
+        },
     });
 
     obviel.view({
         iface: 'P_IDocument',
         name: 'DirectoryEntry',
-        obvtUrl: 'templates/DirectoryEntry.obvt',
+        obvtUrl: templatePath + '/DirectoryEntry.obvt',
+
+        render: function() {
+            $('a', this.el).on('click', function(e) {
+                var pathHtml : string = e.target.href.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');
+                var pathJson : string = pathHtml.replace(new RegExp('^' + appPrefix), '');
+
+                history.pushState(null, null, pathHtml);
+                $('#proposal_workbench_detail').render(pathJson);
+                e.preventDefault();
+            });
+        },
     });
 
 
-    // detail view
+    // views for left column: detail view
 
     // the default view for an IDAG is the default view for the head.
     // (if there is more than one head version...  öhm...  something!)
@@ -102,13 +119,13 @@ export function open_proposals(uri, done) {
 
     obviel.view({
         iface: 'P_IDocument',
-        obvtUrl: 'templates/IDocumentDisplay.obvt',
+        obvtUrl: templatePath + '/IDocumentDisplay.obvt',
     });
 
     obviel.view({
         iface: 'P_IDocument',
         name: 'edit',
-        obvtUrl: 'templates/IDocumentEdit.obvt',
+        obvtUrl: templatePath + '/IDocumentEdit.obvt',
     });
 
 
@@ -116,7 +133,7 @@ export function open_proposals(uri, done) {
 
     obviel.view({
         iface: 'P_IParagraph',
-        obvtUrl: 'templates/IParagraphDisplay.obvt',
+        obvtUrl: templatePath + '/IParagraphDisplay.obvt',
 
         edit: function(ev) {
             // re-render local object in edit mode.
@@ -127,7 +144,7 @@ export function open_proposals(uri, done) {
     obviel.view({
         iface: 'P_IParagraph',
         name: 'edit',
-        obvtUrl: 'templates/IParagraphEdit.obvt',
+        obvtUrl: templatePath + '/IParagraphEdit.obvt',
 
         reset: function(ev) {
             // load the object again from server and render it from scratch.
@@ -208,18 +225,27 @@ export function open_proposals(uri, done) {
     });
 
 
-    // clickability
+    // debugging.
 
     obviel.view({
         iface: 'debug_links',
-        obvtUrl: 'templates/debug_links.obvt'
+        obvtUrl: templatePath + '/debug_links.obvt'
     });
 
-    // hashchange and fragment handling will go away and be replaced
-    // by the new history api.  (suggested by tobias)
 
-    $(window).bind('hashchange', function(event) {
-        var path = event.fragment;
+    // history api.
+
+    window.addEventListener('popstate', function(event) {
+        var path = event.target.location.toString();
+
+        // path needs to be dissected into hostetc, poolUri, and GET
+        // params (we probably want to dissect location, and not the
+        // string representation).  if there is a GET param
+        // detail_view, it contains the URL of the proposal to be
+        // viewed in detail.  similar for detail_edit.
+
+        debugger;
+
         $('#debug_links').render({
             'iface': 'debug_links',
             'path': path
@@ -230,8 +256,8 @@ export function open_proposals(uri, done) {
 
     // start
 
-    $('#adhocracy').render('/adhocracy/', 'ProposalWorkbench').done(function() {
-        $(window).trigger('hashchange');
+    $('#adhocracy').render(poolUri, 'ProposalWorkbench').done(function() {
+        history.pushState(null, null, appPrefix + poolUri);
     });
 }
 
