@@ -55,14 +55,9 @@ export function open_proposals(poolUri : string, done ?: any) {
         iface: 'P_IDocument',
         name: 'DirectoryEntry',
         obvtUrl: templatePath + '/DirectoryEntry.obvt',
-
         render: function() {
             $('a', this.el).on('click', function(e) {
-                var pathHtml : string = e.target.href.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');
-                var pathJson : string = pathHtml.replace(new RegExp('^' + appPrefix), '');
-
-                history.pushState(null, null, pathHtml);
-                $('#proposal_workbench_detail').render(pathJson);
+                onClickDirectoryEntry(e.target.href);
                 e.preventDefault();
             });
         },
@@ -226,39 +221,32 @@ export function open_proposals(poolUri : string, done ?: any) {
 
 
     // debugging.
-
     obviel.view({
         iface: 'debug_links',
         obvtUrl: templatePath + '/debug_links.obvt'
     });
 
 
-    // history api.
-
+    // history api (back button).
     window.addEventListener('popstate', function(event) {
-        var path = event.target.location.toString();
-
-        // path needs to be dissected into hostetc, poolUri, and GET
-        // params (we probably want to dissect location, and not the
-        // string representation).  if there is a GET param
-        // detail_view, it contains the URL of the proposal to be
-        // viewed in detail.  similar for detail_edit.
-
-        debugger;
-
-        $('#debug_links').render({
-            'iface': 'debug_links',
-            'path': path
-        });
-        $('#proposal_workbench_detail').render(path);
+        onClickDirectoryEntry(event.target.location.toString());
     });
 
 
-    // start
-
+    // start.
     $('#adhocracy').render(poolUri, 'ProposalWorkbench').done(function() {
         history.pushState(null, null, appPrefix + poolUri);
     });
+}
+
+
+function onClickDirectoryEntry(pathRaw : string) {
+    var pathHtml : string = pathRaw.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');
+    var pathJson : string = pathHtml.replace(new RegExp('^' + appPrefix), '');
+
+    history.pushState(null, null, pathHtml);
+    $('#proposal_workbench_detail').render(pathJson);
+    $('#debug_links').render({ 'iface': 'debug_links', 'path': pathJson });
 }
 
 export function newProposal() {
