@@ -1,6 +1,5 @@
-
-The Supergraph
-==============
+Concept: The Supergraph
+=========================
 
 
 Our Terminology

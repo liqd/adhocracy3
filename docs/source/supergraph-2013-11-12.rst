@@ -1,5 +1,5 @@
-supergraph 2013-11-12
-=====================
+Concept: The Supergraph - Summary 2013-11-12
+==============================================
 
 
 chronologisch

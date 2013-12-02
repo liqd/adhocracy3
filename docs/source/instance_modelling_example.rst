@@ -1,5 +1,5 @@
 
-Example of Modelling a Simple Use-Case Using our Supergraph
+Concept: Modelling a Simple Use-Case with The Supergraph
 ===========================================================
 
 1 create participation process and content
