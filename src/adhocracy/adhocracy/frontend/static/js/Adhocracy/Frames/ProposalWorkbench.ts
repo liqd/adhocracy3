@@ -148,14 +148,14 @@ export function open_proposals(uri, done) {
             this.obj['data']['P_IParagraph']['text'] =
                 $('textarea', this.el)[0].value;
 
-            Obviel.make_postable(this.obj);
+            var postobj = Obviel.make_postable(this.obj);
 
             $.ajax(parDAGPath, {
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json",
                 headers: { follows: followsPath },
-                data: JSON.stringify(this.obj)
+                data: JSON.stringify(postobj)
             }).fail(function(err, err2) {
                 console.log('ajax post failed!');
                 console.log(err);

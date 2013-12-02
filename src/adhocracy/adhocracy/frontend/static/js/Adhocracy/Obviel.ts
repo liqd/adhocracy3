@@ -38,17 +38,17 @@ export function register_transformer() {
 
 // out-transformer.  call this on every object before sending it back
 // to the server.
-export function make_postable(obj) {
+export function make_postable(inobj) {
     var i;
+    var outobj = {};
 
-    delete obj['ifaces'];
-    delete obj['path'];
+    outobj.content_type = 'adhocracy.contents.interfaces.' + inobj.content_type.substring(2);
+    outobj.data = {};
 
-    obj.content_type = 'adhocracy.contents.interfaces.' + obj.content_type.substring(2);
-
-    for (i in obj['data']) {
+    for (i in inobj['data']) {
         var i_remote = 'adhocracy.propertysheets.interfaces.' + i.substring(2);
-        obj.data[i_remote] = obj.data[i];
-        delete obj.data[i];
+        outobj.data[i_remote] = inobj.data[i];
     }
+
+    return outobj;
 }
