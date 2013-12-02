@@ -24,6 +24,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // FIXME: much of what happens in this function shouldn't happen here.  refactor!
 
     var appUri : string = appPrefix + jsonUri;
+    var currentProposalDAG;
 
     Obviel.register_transformer();
 
@@ -47,6 +48,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
         name: 'DirectoryEntry',
 
         render: function() {
+            currentProposalDAG = this.obj.path;
             if (this.obj.data.P_IDAG.versions.length > 0) {
                 this.el.render(this.obj.data.P_IDAG.versions[0].path, 'DirectoryEntry');
             } else {
@@ -209,7 +211,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 // objects are *not* refreshed from the server when
                 // rerender is called on the proposal node!)
 
-                $('#proposal_workbench_detail').rerender();
+                onClickDirectoryEntry(currentProposalDAG);
             });
         }
     });
