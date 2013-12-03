@@ -35,6 +35,10 @@ export function open_proposals(jsonUri : string, done ?: any) {
         iface: 'P_IPool',
         name: 'ProposalWorkbench',
         obvtUrl: templatePath + '/ProposalWorkbench.obvt',
+        render: function() {
+            $('.create_proposal_button').on('click', newProposal);
+            $('.create_paragraph_button').on('click', newParagraph);
+        },
     });
 
     obviel.view({

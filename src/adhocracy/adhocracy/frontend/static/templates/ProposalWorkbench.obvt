@@ -1,10 +1,9 @@
 <table border="1">
   <tr>
     <td>
-      <button type="button" class="create_proposal_button" onclick="PWB.newProposal();">create new proposal</button>
-      <!-- this can't work, because the requirejs scope does not cover the dom tree.  but how *would* it work? -->
+      <button type="button" class="create_proposal_button">create new proposal</button>
       <div id="proposal_workbench_detail"></div>
-      <button type="button" class="create_paragraph_button" onclick="PWB.newParagraph();">create new paragraph</button>
+      <button type="button" class="create_paragraph_button">create new paragraph</button>
     </td>
     <td>
       <div id="proposal_workbench_directory"
