@@ -25,7 +25,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // FIXME: much of what happens in this function shouldn't happen here.  refactor!
 
     var appUri : string = appPrefix + jsonUri;
-    var currentProposalDAG;
+    var currentProposalVersionPath;
 
     Obviel.register_transformer();
 
@@ -37,8 +37,12 @@ export function open_proposals(jsonUri : string, done ?: any) {
         name: 'ProposalWorkbench',
         obvtUrl: templatePath + '/ProposalWorkbench.obvt',
         render: function() {
-            $('.create_proposal_button').on('click', newProposal);
-            $('.create_paragraph_button').on('click', newParagraph);
+            $('.create_proposal_button')
+                .on('click',
+                    function() { return newProposal(jsonUri) });
+            $('.create_paragraph_button')
+                .on('click',
+                    function() { return newParagraph(currentProposalVersionPath); });
         },
     });
 
@@ -53,7 +57,6 @@ export function open_proposals(jsonUri : string, done ?: any) {
         name: 'DirectoryEntry',
 
         render: function() {
-            currentProposalDAG = this.obj.path;
             if (this.obj.data.P_IDAG.versions.length > 0) {
                 this.el.render(this.obj.data.P_IDAG.versions[0].path, 'DirectoryEntry');
             } else {
@@ -126,12 +129,18 @@ export function open_proposals(jsonUri : string, done ?: any) {
     obviel.view({
         iface: 'P_IDocument',
         obvtUrl: templatePath + '/IDocumentDisplay.obvt',
+        render: function() {
+            currentProposalVersionPath = this.obj.path;
+        }
     });
 
     obviel.view({
         iface: 'P_IDocument',
         name: 'edit',
         obvtUrl: templatePath + '/IDocumentEdit.obvt',
+        render: function() {
+            currentProposalVersionPath = this.obj.path;
+        }
     });
 
 
@@ -185,7 +194,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
             this.obj['data']['P_IParagraph']['text'] =
                 $('textarea', this.el)[0].value;
 
-            var postobj = Obviel.make_postable(this.obj);
+            var postobj = Obviel.jsonBeforeSend(this.obj);
 
             $.ajax(parDAGPath, {
                 type: "POST",
@@ -216,7 +225,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 // objects are *not* refreshed from the server when
                 // rerender is called on the proposal node!)
 
-                onClickDirectoryEntry(currentProposalDAG);
+                onClickDirectoryEntry(currentProposalVersionPath);
             });
         }
     });
@@ -292,10 +301,62 @@ function onClickDirectoryEntry(pathRaw : string) {
     $('#debug_links').render({ 'iface': 'debug_links', 'path': pathJson });
 }
 
-export function newProposal() {
+function newProposal(poolUrl : string) {
     console.log('[newProposal]');
 }
 
-export function newParagraph() {
+function newParagraph(propVersionUrl : string) {
     console.log('[newParagraph]');
+    if (!propVersionUrl) return;  // (there is currently no proposal open in detail view)
+
+    // FIXME: do not always use the head of the document!  this
+    // function should get a specific version that it is supposed to
+    // create a successor of.
+
+    var parDag     : Types.Content = { content_type: 'C_IParagraphContainer' };
+    var parVersion : Types.Content = { content_type: 'C_IParagraph' };
+    var propDagUrl : string        = propVersionUrl.substring(0, propVersionUrl.lastIndexOf("/"));
+
+    $.ajax(propDagUrl, {
+        type: "POST",
+        data: JSON.stringify(Obviel.jsonBeforeSend(parDag)),
+        dataType: "json",
+        contentType: "application/json"
+    }).fail(function() {
+    }).done(function(parDagResponse) {
+        $.ajax(Obviel.jsonAfterReceive(parDagResponse, undefined).path, {
+            type: "POST",
+            data: JSON.stringify(Obviel.jsonBeforeSend(parVersion)),
+            dataType: "json",
+            contentType: "application/json"
+        }).fail(function() {
+        }).done(function(parVersionResponse) {
+            parVersion.content_type = 'adhocracy.contents.interfaces.IParagraph';
+            parVersion.path = Obviel.jsonAfterReceive(parVersionResponse, undefined).path;
+            parVersion.reference_colour = 'EssenceRef';
+
+            $.get(propDagUrl).done(function(propDagResponse) {
+                var propPredecessorPath : string = Obviel.jsonAfterReceive(propDagResponse, undefined).data['P_IDAG'].versions[0].path;
+
+                $.get(propPredecessorPath).done(function(propPredecessorResponse) {
+                    var propSuccessor = Obviel.jsonAfterReceive(propPredecessorResponse, undefined);
+                    propSuccessor.data['P_IDocument'].paragraphs.push(parVersion);
+                    var propPredecessorPath = Obviel.jsonAfterReceive(propPredecessorResponse, undefined).path;
+
+                    $.ajax(propDagUrl, {
+                        type: "POST",
+                        data: JSON.stringify(Obviel.jsonBeforeSend(propSuccessor)),
+                        headers: { follows: propPredecessorPath },
+                        dataType: "json",
+                        contentType: "application/json",
+                    }).fail(function() {
+                    }).done(function() {
+                        return onClickDirectoryEntry(propDagUrl);
+                    });
+                });
+            });
+        });
+    });
+
+    return;
 }

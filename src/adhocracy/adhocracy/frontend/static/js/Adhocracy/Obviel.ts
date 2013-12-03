@@ -16,44 +16,48 @@ export function register_transformer() {
 
 // in-transformer.  call this on every object first thing it hits us
 // from the server.
-export function jsonAfterReceive(obj, path, name) {
+export function jsonAfterReceive(inobj : Types.Content, path) {
     // strip noise from content type and property sheet types
-    obj.content_type = 'C_' + obj.content_type.substring(obj.content_type.lastIndexOf(".") + 1);
+    var outobj : Types.Content = {
+        content_type: 'C_' + inobj.content_type.substring(inobj.content_type.lastIndexOf(".") + 1),
+        path: inobj.path,
+        data: {}
+    }
 
-    for (i in obj.data) {
+    for (i in inobj.data) {
         var i_local = 'P_' + i.substring(i.lastIndexOf(".") + 1);
-        obj.data[i_local] = obj.data[i];
-        delete obj.data[i];
+        outobj.data[i_local] = inobj.data[i];
     }
 
     // add content type to ifaces
-    var main_interface = obj.content_type;
-    if (typeof(main_interface) == 'undefined') {
-        throw ("Object " + obj  + " from path " + path + " has no 'content_type' field");
-    };
-    obj.ifaces = [main_interface];
+    outobj.ifaces = [outobj.content_type];
 
     // add all property sheet types as ifaces
-    for (var i in obj.data) {
-        obj.ifaces.push(i);
+    for (var i in outobj.data) {
+        outobj.ifaces.push(i);
     };
 
-    return obj;
+    return outobj;
 }
 
 
 // out-transformer.  call this on every object before sending it back
 // to the server.
-export function make_postable(inobj : Types.Content) {
+export function jsonBeforeSend(inobj : Types.Content) {
     var i;
     var outobj : Types.Content = {
         content_type: 'adhocracy.contents.interfaces.' + inobj.content_type.substring(2),
         data: {}
     };
 
+    // FIXME: Get this list from the server!  (How?)
+    var readOnlyProperties = ['P_IVersions'];
+
     for (i in inobj['data']) {
-        var i_remote = 'adhocracy.propertysheets.interfaces.' + i.substring(2);
-        outobj.data[i_remote] = inobj.data[i];
+        if (readOnlyProperties.indexOf(i) < 0) {
+            var i_remote = 'adhocracy.propertysheets.interfaces.' + i.substring(2);
+            outobj.data[i_remote] = inobj.data[i];
+        }
     }
 
     return outobj;
