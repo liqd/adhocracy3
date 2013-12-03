@@ -10,6 +10,7 @@ declare var history : any;   // FIXME: type this more rigorously
 
 var obviel : any = require('obviel');
 
+import Types = require('Adhocracy/Types');
 import Obviel = require('Adhocracy/Obviel');
 import Util = require('Adhocracy/Util');
 import Css = require('Adhocracy/Css');

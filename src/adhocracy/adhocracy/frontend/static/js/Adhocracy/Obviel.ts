@@ -3,6 +3,8 @@
 
 var obviel = require('obviel');
 
+import Types = require('Adhocracy/Types');
+
 export function register_transformer() {
 
     // register global transformer to add obviel ifaces attribute to
@@ -40,17 +42,11 @@ export function jsonAfterReceive(obj, path, name) {
 }
 
 
-export interface Content {
-    content_type: string;
-    path?: string;
-    data?: Object;
-}
-
 // out-transformer.  call this on every object before sending it back
 // to the server.
-export function make_postable(inobj : Content) {
+export function make_postable(inobj : Types.Content) {
     var i;
-    var outobj : Content = {
+    var outobj : Types.Content = {
         content_type: 'adhocracy.contents.interfaces.' + inobj.content_type.substring(2),
         data: {}
     };
