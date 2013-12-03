@@ -169,7 +169,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
         save: function(ev) {
             // send local object to server.
 
-            var parDAGPath = this.obj['path'].substring(0, this.obj['path'].lastIndexOf("/"));
+            var parDAGPath = Util.parentPath(this.obj['path']);
             // a nice collection of other solutions for string disection is this here:
             // http://stackoverflow.com/questions/2187256/js-most-optimized-way-to-remove-a-filename-from-a-path-in-a-string
             // or, actually: var parDAGPath = this.obj['data']['P_IVersions']['versionpostroot'];
@@ -301,11 +301,11 @@ function onClickDirectoryEntry(pathRaw : string) {
     $('#debug_links').render({ 'iface': 'debug_links', 'path': pathJson });
 }
 
-function newProposal(poolUrl : string) {
+function newProposal(poolUrl : string) : void {
     console.log('[newProposal]');
 }
 
-function newParagraph(propVersionUrl : string) {
+function newParagraph(propVersionUrl : string) : void {
     console.log('[newParagraph]');
     if (!propVersionUrl) return;  // (there is currently no proposal open in detail view)
 
@@ -313,50 +313,44 @@ function newParagraph(propVersionUrl : string) {
     // function should get a specific version that it is supposed to
     // create a successor of.
 
-    var parDag     : Types.Content = { content_type: 'C_IParagraphContainer' };
-    var parVersion : Types.Content = { content_type: 'C_IParagraph' };
-    var propDagUrl : string        = propVersionUrl.substring(0, propVersionUrl.lastIndexOf("/"));
+    function failDefault() {
+        throw "newParagraph: ajax error.";
+    }
 
-    $.ajax(propDagUrl, {
-        type: "POST",
-        data: JSON.stringify(Obviel.jsonBeforeSend(parDag)),
-        dataType: "json",
-        contentType: "application/json"
-    }).fail(function() {
-    }).done(function(parDagResponse) {
-        $.ajax(Obviel.jsonAfterReceive(parDagResponse, undefined).path, {
-            type: "POST",
-            data: JSON.stringify(Obviel.jsonBeforeSend(parVersion)),
-            dataType: "json",
-            contentType: "application/json"
-        }).fail(function() {
-        }).done(function(parVersionResponse) {
-            parVersion.content_type = 'adhocracy.contents.interfaces.IParagraph';
-            parVersion.path = Obviel.jsonAfterReceive(parVersionResponse, undefined).path;
-            parVersion.reference_colour = 'EssenceRef';
+    var parDag      : Types.Content  = { content_type: 'C_IParagraphContainer' };
+    var propDagUrl  : string         = Util.parentPath(propVersionUrl);
+    Util.post(propDagUrl, parDag, postParDagDone, failDefault);
 
-            $.get(propDagUrl).done(function(propDagResponse) {
-                var propPredecessorPath : string = Obviel.jsonAfterReceive(propDagResponse, undefined).data['P_IDAG'].versions[0].path;
+    function postParDagDone(parDagResponse) {
+        var parVersion : Types.Content = {
+            content_type: 'C_IParagraph',
+        };
+        Util.post(parDagResponse.path, parVersion, postParVersionDone, failDefault);
+    }
 
-                $.get(propPredecessorPath).done(function(propPredecessorResponse) {
-                    var propSuccessor = Obviel.jsonAfterReceive(propPredecessorResponse, undefined);
-                    propSuccessor.data['P_IDocument'].paragraphs.push(parVersion);
-                    var propPredecessorPath = Obviel.jsonAfterReceive(propPredecessorResponse, undefined).path;
+    var parVersionReference : Types.Content = {
+        content_type: 'adhocracy.contents.interfaces.IParagraph',
+        reference_colour: 'EssenceRef'
+    }
 
-                    $.ajax(propDagUrl, {
-                        type: "POST",
-                        data: JSON.stringify(Obviel.jsonBeforeSend(propSuccessor)),
-                        headers: { follows: propPredecessorPath },
-                        dataType: "json",
-                        contentType: "application/json",
-                    }).fail(function() {
-                    }).done(function() {
-                        return onClickDirectoryEntry(propDagUrl);
-                    });
-                });
-            });
-        });
-    });
+    function postParVersionDone(parVersionResponse) {
+        parVersionReference.path = parVersionResponse.path;
+        Util.get(Util.parentPath(propVersionUrl), getPropDagDone, failDefault);
+    }
 
-    return;
+    function getPropDagDone(propDagResponse) {
+        var propPredecessorPath : string = propDagResponse.data['P_IDAG'].versions[0].path;
+        Util.get(propPredecessorPath, propPredecessorDone, failDefault);
+    }
+
+    function propPredecessorDone(propPredecessorResponse) {
+        var propPredecessorPath = propPredecessorResponse.path;
+        var propSuccessor = propPredecessorResponse;
+        propSuccessor.data['P_IDocument'].paragraphs.push(parVersionReference);
+        Util.postx(propDagUrl, propSuccessor, { follows: propPredecessorPath }, propSuccessorDone, failDefault);
+    }
+
+    function propSuccessorDone() {
+        onClickDirectoryEntry(propDagUrl);
+    }
 }

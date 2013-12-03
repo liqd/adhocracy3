@@ -16,7 +16,7 @@ export function register_transformer() {
 
 // in-transformer.  call this on every object first thing it hits us
 // from the server.
-export function jsonAfterReceive(inobj : Types.Content, path) {
+export function jsonAfterReceive(inobj : Types.Content, path) : Types.Content {
     // strip noise from content type and property sheet types
     var outobj : Types.Content = {
         content_type: 'C_' + inobj.content_type.substring(inobj.content_type.lastIndexOf(".") + 1),
@@ -43,7 +43,7 @@ export function jsonAfterReceive(inobj : Types.Content, path) {
 
 // out-transformer.  call this on every object before sending it back
 // to the server.
-export function jsonBeforeSend(inobj : Types.Content) {
+export function jsonBeforeSend(inobj : Types.Content) : Types.Content {
     var i;
     var outobj : Types.Content = {
         content_type: 'adhocracy.contents.interfaces.' + inobj.content_type.substring(2),
