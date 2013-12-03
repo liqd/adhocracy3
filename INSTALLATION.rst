@@ -27,7 +27,7 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
 1. python2.7
 2. git
-3. build-essentials, libyaml-dev, python-dev
+3. build-essentials, libyaml-dev, python-dev, libncurses5-dev
 4. graphviz
 
 checkout source code ::
