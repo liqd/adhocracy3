@@ -163,13 +163,12 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
         reset: function(ev) {
             // load the object again from server and render it from scratch.
-            var versionurl = this.obj['path'];
-            this.el.render(versionurl, undefined);
+            this.el.render(this.obj.path, undefined);
         },
         save: function(ev) {
             // send local object to server.
 
-            var parDAGPath = Util.parentPath(this.obj['path']);
+            var parDAGPath = Util.parentPath(this.obj.path);
             // a nice collection of other solutions for string disection is this here:
             // http://stackoverflow.com/questions/2187256/js-most-optimized-way-to-remove-a-filename-from-a-path-in-a-string
             // or, actually: var parDAGPath = this.obj['data']['P_IVersions']['versionpostroot'];
@@ -186,7 +185,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
                 var parDAG = JSON.parse($.ajax(parDAGPath, { type: "GET", async: false }).responseText)
                 var allDAGVersions = parDAG['data']['adhocracy.propertysheets.interfaces.IDAG']['versions'];
-                if ('path' in allDAGVersions[0]) { return allDAGVersions[0]['path']; }
+                if ('path' in allDAGVersions[0]) { return allDAGVersions[0].path; }
             })();
 
             delete this.obj['data']['P_IVersions'];
