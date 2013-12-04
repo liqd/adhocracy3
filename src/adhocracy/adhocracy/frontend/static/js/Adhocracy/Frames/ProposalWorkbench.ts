@@ -71,7 +71,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
         obvtUrl: templatePath + '/DirectoryEntry.obvt',
         render: function() {
             $('a', this.el).on('click', function(e) {
-                onClickDirectoryEntry(e.target.href);
+                rerenderDetail(e.target.href);
                 e.preventDefault();
             });
         },
@@ -223,7 +223,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 // objects are *not* refreshed from the server when
                 // rerender is called on the proposal node!)
 
-                onClickDirectoryEntry(appPrefix + Util.parentPath(currentProposalVersionPath));
+                rerenderDetail(appPrefix + Util.parentPath(currentProposalVersionPath));
             });
         }
     });
@@ -246,7 +246,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
     // history api (back button).
     window.addEventListener('popstate', function(event) {
-        onClickDirectoryEntry(event.target.location.toString());  // (besides 'toString()' there is also 'pathname'...)
+        rerenderDetail(event.target.location.toString());  // (besides 'toString()' there is also 'pathname'...)
     });
 
 
@@ -289,7 +289,7 @@ export function poolUri(defaultUri) {
     }
 }
 
-function onClickDirectoryEntry(pathRaw : string) {
+function rerenderDetail(pathRaw : string) : void {
     var pathHtml : string = pathRaw.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');
     var pathJson : string = pathHtml.replace(new RegExp('^' + appPrefix), '');
 
@@ -298,13 +298,41 @@ function onClickDirectoryEntry(pathRaw : string) {
     $('#debug_links').render({ 'iface': 'debug_links', 'path': pathJson });
 }
 
+function rerenderDirectory(pathRaw : string) : void {
+    var pathHtml : string = pathRaw.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');
+    var pathJson : string = pathHtml.replace(new RegExp('^' + appPrefix), '');
+
+    $('#proposal_workbench_directory').render(pathJson, 'ProposalWorkbench');
+}
+
 function newProposal(poolUrl : string) : void {
     console.log('[newProposal]');
+    if (!poolUrl) {
+        throw "newProposal: bad argument";
+    }
+
+    function failDefault() {
+        throw "newProposal: ajax error.";
+    }
+
+    var propDag : Types.Content = { content_type: 'C_IProposalContainer' };
+    Util.post(poolUrl, propDag, propDagDone, failDefault);
+
+    function propDagDone(propDagResponse) {
+        var propVersion : Types.Content = { content_type: 'C_IProposal' };
+        Util.post(propDagResponse.path, propVersion, propVersionDone, failDefault);
+    }
+
+    function propVersionDone(popVersionResponse) {
+        rerenderDirectory(appPrefix + poolUrl);  // FIXME: this does not update to the new directory listing.  see console.
+        rerenderDetail(appPrefix + Util.parentPath(popVersionResponse.path));
+    }
 }
 
 function newParagraph(propVersionUrl : string) : void {
     console.log('[newParagraph]');
-    if (!propVersionUrl) return;  // (there is currently no proposal open in detail view)
+    if (!propVersionUrl)
+        return;  // (there is currently no proposal open in detail view)
 
     // FIXME: do not always use the head of the document!  this
     // function should get a specific version that it is supposed to
@@ -319,9 +347,7 @@ function newParagraph(propVersionUrl : string) : void {
     Util.post(propDagUrl, parDag, postParDagDone, failDefault);
 
     function postParDagDone(parDagResponse) {
-        var parVersion : Types.Content = {
-            content_type: 'C_IParagraph',
-        };
+        var parVersion : Types.Content = { content_type: 'C_IParagraph' };
         Util.post(parDagResponse.path, parVersion, postParVersionDone, failDefault);
     }
 
@@ -348,6 +374,6 @@ function newParagraph(propVersionUrl : string) : void {
     }
 
     function propSuccessorDone() {
-        onClickDirectoryEntry(appPrefix + propDagUrl);
+        rerenderDetail(appPrefix + propDagUrl);
     }
 }
