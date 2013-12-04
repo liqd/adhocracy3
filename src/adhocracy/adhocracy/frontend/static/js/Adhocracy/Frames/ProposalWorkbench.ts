@@ -131,7 +131,10 @@ export function open_proposals(jsonUri : string, done ?: any) {
         obvtUrl: templatePath + '/IDocumentDisplay.obvt',
         render: function() {
             currentProposalVersionPath = this.obj.path;
-        }
+        },
+        edit: function() {
+            this.el.render(this.obj, 'edit');
+        },
     });
 
     obviel.view({
@@ -140,7 +143,37 @@ export function open_proposals(jsonUri : string, done ?: any) {
         obvtUrl: templatePath + '/IDocumentEdit.obvt',
         render: function() {
             currentProposalVersionPath = this.obj.path;
-        }
+        },
+        reset: function() {
+            this.el.render(this.obj.path, undefined);
+        },
+        save: function() {
+            // see (view P_IParagraph|edit).save function for more
+            // documentation.  (there is also a utility function
+            // hidden here that should be factored out.)
+            var docDAGPath = Util.parentPath(this.obj.path);
+            var docPoolPath = Util.parentPath(docDAGPath);
+
+            var predecessorPath = (function() {
+                var docDAG = JSON.parse($.ajax(docDAGPath, { type: "GET", async: false }).responseText);
+                var allVersions = docDAG['data']['adhocracy.propertysheets.interfaces.IDAG']['versions'];
+                if (allVersions && allVersions[0] && 'path' in allVersions[0]) {
+                    return allVersions[0].path;
+                }
+            })();
+
+            this.obj.data.P_IDocument.title = $('.edit_document_title', this.el)[0].value;
+            this.obj.data.P_IDocument.description = $('.edit_document_description', this.el)[0].value;
+
+            Util.postx(docDAGPath, this.obj, { follows: predecessorPath }, docDAGPathDone, function(xhr, text, exception) {
+                console.log('ajax post failed!\n' + [xhr, text, exception].toString())
+            });
+
+            function docDAGPathDone(response) {
+                rerenderDirectory(appPrefix + docPoolPath);
+                rerenderDetail(appPrefix + Util.parentPath(response.path));
+            }
+        },
     });
 
 

@@ -1,8 +1,12 @@
 <!-- <pre>{@.}</pre> -->
 
 <span data-with="data.P_IDocument">
-    <h3>Document title: "{title}"</h3>
-    <p><small>{description}</small></p>
+    <div class="document_header">
+        <p>Document title: <textarea class="edit_document_title __widget__">{title}</textarea></p>
+        <p><small>Document description: <textarea class="edit_document_description __widget__">{description}</textarea></small></p>
+        <button type="button" class="reset_button" data-on="click|reset">reset</button>
+        <button type="button" class="save_button" data-on="click|save">save</button>
+    </div>
     <ol>
         <li data-repeat="paragraphs" data-render="path"></li>
     </ol>
