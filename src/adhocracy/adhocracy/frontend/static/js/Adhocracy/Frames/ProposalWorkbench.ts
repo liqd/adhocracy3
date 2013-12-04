@@ -37,10 +37,10 @@ export function open_proposals(jsonUri : string, done ?: any) {
         name: 'ProposalWorkbench',
         obvtUrl: templatePath + '/ProposalWorkbench.obvt',
         render: function() {
-            $('.create_proposal_button')
+            $(Css.clsd('create_proposal_button'))
                 .on('click',
                     function() { return newProposal(jsonUri) });
-            $('.create_paragraph_button')
+            $(Css.clsd('create_paragraph_button'))
                 .on('click',
                     function() { return newParagraph(currentProposalVersionPath); });
         },
@@ -162,8 +162,8 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 }
             })();
 
-            this.obj.data.P_IDocument.title = $('.edit_document_title', this.el)[0].value;
-            this.obj.data.P_IDocument.description = $('.edit_document_description', this.el)[0].value;
+            this.obj.data.P_IDocument.title = $(Css.clsd('edit_document_title'), this.el)[0].value;
+            this.obj.data.P_IDocument.description = $(Css.clsd('edit_document_description'), this.el)[0].value;
 
             Util.postx(docDAGPath, this.obj, { follows: predecessorPath }, docDAGPathDone, function(xhr, text, exception) {
                 console.log('ajax post failed!\n' + [xhr, text, exception].toString())
