@@ -202,10 +202,8 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 contentType: "application/json",
                 headers: { follows: followsPath },
                 data: JSON.stringify(postobj)
-            }).fail(function(err, err2) {
-                console.log('ajax post failed!');
-                console.log(err);
-                console.log(err2);
+            }).fail(function(xhr, text, exception) {
+                console.log('ajax post failed!\n' + [xhr, text, exception].toString());
             }).done(function() {
                 console.log('ajax post succeeded!');
 
@@ -235,8 +233,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // ignoring errors.)
 
     obviel.httpErrorHook(function(xhr) {
-        console.log("httpError:");
-        console.log(xhr);
+        console.log('ajax error in obviel!\n' + [xhr].toString());
     });
 
 
