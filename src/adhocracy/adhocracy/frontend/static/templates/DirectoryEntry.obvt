@@ -1,1 +1,1 @@
-<a href="/app{path}">{data.P_IDocument.title}</a>
+<a href="/app{data.P_IVersions.parent.path}">{data.P_IDocument.title}</a>
