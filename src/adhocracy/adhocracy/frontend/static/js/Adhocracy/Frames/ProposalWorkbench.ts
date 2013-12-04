@@ -170,7 +170,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
             });
 
             function docDAGPathDone(response) {
-                rerenderDirectory(appPrefix + docPoolPath);
+                rerenderDirectory(appUri);
                 rerenderDetail(appPrefix + Util.parentPath(response.path));
             }
         },
@@ -286,7 +286,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
     // FIXME: deep links don't work.  The contents of jsonUri must
     // contain a proposal pool that contains proposal dags.  Regarding
-    // URLs that open a particular proposal in detail view directly,
+    // URIs that open a particular proposal in detail view directly,
     // there are at least two options:
     //
     // 1. fixed object hierarchy: if the object under jsonUri does not
@@ -298,7 +298,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // 2. get parameters: encode the uri of the proposal to be opened
     // in detail view in a get parameter.  this does not assume any
     // fixed object hierarchy, but it is more awkward if you like
-    // typing in urls manually.
+    // typing in uris manually.
     //
     // either way this has to be fixed, or reload and deep links must
     // be considered broken.
@@ -307,7 +307,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // forward at all.
 }
 
-// if the url with which this page was loaded mentions a particular
+// if the uri with which this page was loaded mentions a particular
 // pool or a particular detail view, return that as poolUri.
 // otherwise, return the default passed as argument to this function.
 export function poolUri(defaultUri) {
@@ -335,9 +335,9 @@ function rerenderDirectory(pathRaw : string) : void {
     $('#proposal_workbench_directory').render(pathJson, 'ProposalWorkbench');
 }
 
-function newProposal(poolUrl : string) : void {
+function newProposal(poolUri : string) : void {
     console.log('[newProposal]');
-    if (!poolUrl) {
+    if (!poolUri) {
         throw "newProposal: bad argument";
     }
 
@@ -346,7 +346,7 @@ function newProposal(poolUrl : string) : void {
     }
 
     var propDag : Types.Content = { content_type: 'C_IProposalContainer' };
-    Util.post(poolUrl, propDag, propDagDone, failDefault);
+    Util.post(poolUri, propDag, propDagDone, failDefault);
 
     function propDagDone(propDagResponse) {
         var propVersion : Types.Content = { content_type: 'C_IProposal' };
@@ -359,9 +359,9 @@ function newProposal(poolUrl : string) : void {
     }
 }
 
-function newParagraph(propVersionUrl : string) : void {
+function newParagraph(propVersionUri : string) : void {
     console.log('[newParagraph]');
-    if (!propVersionUrl)
+    if (!propVersionUri)
         return;  // (there is currently no proposal open in detail view)
 
     // FIXME: do not always use the head of the document!  this
@@ -373,8 +373,8 @@ function newParagraph(propVersionUrl : string) : void {
     }
 
     var parDag      : Types.Content  = { content_type: 'C_IParagraphContainer' };
-    var propDagUrl  : string         = Util.parentPath(propVersionUrl);
-    Util.post(propDagUrl, parDag, postParDagDone, failDefault);
+    var propDagUri  : string         = Util.parentPath(propVersionUri);
+    Util.post(propDagUri, parDag, postParDagDone, failDefault);
 
     function postParDagDone(parDagResponse) {
         var parVersion : Types.Content = { content_type: 'C_IParagraph' };
@@ -388,7 +388,7 @@ function newParagraph(propVersionUrl : string) : void {
 
     function postParVersionDone(parVersionResponse) {
         parVersionReference.path = parVersionResponse.path;
-        Util.get(Util.parentPath(propVersionUrl), getPropDagDone, failDefault);
+        Util.get(Util.parentPath(propVersionUri), getPropDagDone, failDefault);
     }
 
     function getPropDagDone(propDagResponse) {
@@ -400,10 +400,10 @@ function newParagraph(propVersionUrl : string) : void {
         var propPredecessorPath = propPredecessorResponse.path;
         var propSuccessor = propPredecessorResponse;
         propSuccessor.data['P_IDocument'].paragraphs.push(parVersionReference);
-        Util.postx(propDagUrl, propSuccessor, { follows: propPredecessorPath }, propSuccessorDone, failDefault);
+        Util.postx(propDagUri, propSuccessor, { follows: propPredecessorPath }, propSuccessorDone, failDefault);
     }
 
     function propSuccessorDone() {
-        rerenderDetail(appPrefix + propDagUrl);
+        rerenderDetail(appPrefix + propDagUri);
     }
 }
