@@ -1,5 +1,7 @@
-<p>{data.P_IParagraph.text}</p>
-<button type="button" class="edit_button" data-on="click|edit">edit</button>
+<div class="paragraph">
+    <p>{data.P_IParagraph.text}</p>
+    <button type="button" class="edit_button" data-on="click|edit">edit</button>
+</div>
 
 <!--
 <button type="button" class="edit_button" data-on="click|edit">edit</button>

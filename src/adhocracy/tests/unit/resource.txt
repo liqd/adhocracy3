@@ -15,9 +15,9 @@ Library           RequestsLibrary
 ${SERVER}         localhost:8000
 ${BROWSER}        Firefox
 ${DELAY}          0
-${BROWSER LAG}    0.7 secs
+${BROWSER LAG}    0 secs
 ${CLEANUP URL}    http://${SERVER}/adhocracy/admin/reset-db
-${PAGE URL}       http://${SERVER}/f/proposal_workbench.html
+${PAGE URL}       http://${SERVER}
 ${PAR NEW}        Der Rabe ging im Feld spazieren.
 
 *** Keywords ***
@@ -30,7 +30,7 @@ Setup Proposal DB
     ${EXIT CODE}  Evaluate  os.system('false')  os
     Should Not Be Equal As Integers  ${EXIT CODE}  0
 
-    ${EXIT CODE}  Evaluate  os.system('./unit/post_test_data.py > /dev/null 2>&1')  os
+    ${EXIT CODE}  Evaluate  os.system('python ./unit/post_test_data.py > /dev/null 2>&1')  os
     Should Be Equal As Integers  ${EXIT CODE}  ${0}
 
 Open Browser To Proposal Workbench

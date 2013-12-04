@@ -1,3 +1,5 @@
-<textarea class="__widget__" data-with="data.P_IParagraph">{text}</textarea>
-<button type="button" class="reset_button" data-on="click|reset">reset</button>
-<button type="button" class="save_button" data-on="click|save">save</button>
+<div class="paragraph">
+    <textarea class="__widget__" data-with="data.P_IParagraph">{text}</textarea>
+    <button type="button" class="reset_button" data-on="click|reset">reset</button>
+    <button type="button" class="save_button" data-on="click|save">save</button>
+</div>
