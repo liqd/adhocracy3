@@ -71,7 +71,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
         obvtUrl: templatePath + '/DirectoryEntry.obvt',
         render: function() {
             $('a', this.el).on('click', function(e) {
-                rerenderDetail(e.target.href);
+                rerenderDetail(e.target.href, undefined);
                 e.preventDefault();
             });
         },
@@ -171,7 +171,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
             function docDAGPathDone(response) {
                 rerenderDirectory(appUri);
-                rerenderDetail(appPrefix + Util.parentPath(response.path));
+                rerenderDetail(appPrefix + Util.parentPath(response.path), undefined);
             }
         },
     });
@@ -254,7 +254,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 // rerender is called on the proposal node!)
 
                 rerenderDirectory(appUri);
-                rerenderDetail(appPrefix + Util.parentPath(currentProposalVersionPath));
+                rerenderDetail(appPrefix + Util.parentPath(currentProposalVersionPath), undefined);
             });
         }
     });
@@ -277,7 +277,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
     // history api (back button).
     window.addEventListener('popstate', function(event) {
-        rerenderDetail(event.target.location.toString());  // (besides 'toString()' there is also 'pathname'...)
+        rerenderDetail(event.target.location.toString(), undefined);  // (besides 'toString()' there is also 'pathname'...)
     });
 
 
@@ -320,12 +320,12 @@ export function poolUri(defaultUri) {
     }
 }
 
-function rerenderDetail(pathRaw : string) : void {
+function rerenderDetail(pathRaw : string, viewname : string) : void {
     var pathHtml : string = pathRaw.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');
     var pathJson : string = pathHtml.replace(new RegExp('^' + appPrefix), '');
 
     history.pushState(null, null, pathHtml);
-    $('#proposal_workbench_detail').render(pathJson);
+    $('#proposal_workbench_detail').render(pathJson, viewname);
     $('#debug_links').render({ 'iface': 'debug_links', 'path': pathJson });
 }
 
@@ -356,7 +356,7 @@ function newProposal(poolUri : string) : void {
 
     function propVersionDone(popVersionResponse) {
         rerenderDirectory(poolUri);
-        rerenderDetail(appPrefix + Util.parentPath(popVersionResponse.path));
+        rerenderDetail(appPrefix + Util.parentPath(popVersionResponse.path), 'edit');
     }
 }
 
@@ -405,6 +405,6 @@ function newParagraph(propVersionUri : string) : void {
     }
 
     function propSuccessorDone() {
-        rerenderDetail(appPrefix + propDagUri);
+        rerenderDetail(appPrefix + propDagUri, undefined);
     }
 }
