@@ -253,6 +253,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 // objects are *not* refreshed from the server when
                 // rerender is called on the proposal node!)
 
+                rerenderDirectory(appUri);
                 rerenderDetail(appPrefix + Util.parentPath(currentProposalVersionPath));
             });
         }
@@ -354,7 +355,7 @@ function newProposal(poolUri : string) : void {
     }
 
     function propVersionDone(popVersionResponse) {
-        rerenderDirectory(appPrefix + poolUrl);
+        rerenderDirectory(poolUri);
         rerenderDetail(appPrefix + Util.parentPath(popVersionResponse.path));
     }
 }
