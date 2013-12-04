@@ -221,8 +221,6 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 if ('path' in allDAGVersions[0]) { return allDAGVersions[0].path; }
             })();
 
-            delete this.obj['data']['P_IVersions'];
-
             this.obj['data']['P_IParagraph']['text'] =
                 $('textarea', this.el)[0].value;
 
@@ -356,7 +354,7 @@ function newProposal(poolUrl : string) : void {
     }
 
     function propVersionDone(popVersionResponse) {
-        rerenderDirectory(appPrefix + poolUrl);  // FIXME: this does not update to the new directory listing.  see console.
+        rerenderDirectory(appPrefix + poolUrl);
         rerenderDetail(appPrefix + Util.parentPath(popVersionResponse.path));
     }
 }
