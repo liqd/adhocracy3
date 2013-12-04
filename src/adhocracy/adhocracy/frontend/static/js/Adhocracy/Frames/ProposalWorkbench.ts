@@ -333,7 +333,7 @@ function rerenderDirectory(pathRaw : string) : void {
     var pathHtml : string = pathRaw.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');
     var pathJson : string = pathHtml.replace(new RegExp('^' + appPrefix), '');
 
-    $('#proposal_workbench_directory').render(pathJson, 'ProposalWorkbench');
+    $('#proposal_workbench_directory').render(pathJson, 'Directory');
 }
 
 function newProposal(poolUri : string) : void {
