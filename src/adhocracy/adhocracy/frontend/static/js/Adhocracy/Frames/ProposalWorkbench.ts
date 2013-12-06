@@ -284,6 +284,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // start.
     history.pushState(null, null, appUri);
     $('#adhocracy').render(jsonUri, 'ProposalWorkbench');
+    wstest();
 
     // FIXME: deep links don't work.  The contents of jsonUri must
     // contain a proposal pool that contains proposal dags.  Regarding
@@ -407,4 +408,31 @@ function newParagraph(propVersionUri : string) : void {
     function propSuccessorDone() {
         rerenderDetail(appPrefix + propDagUri, undefined);
     }
+}
+
+export function wstest() {
+    var uri = 'ws://' + window.location.host + '/adhocracy/?ws=1';
+    console.log(uri);
+    var ws = new WebSocket(uri);
+
+    $('#wstest').append('opening ws connection...\n');
+
+    ws.onerror = function(event) {
+        console.log('ws.onerror: ' + event.toString());
+    };
+
+    ws.onopen = function() {
+        console.log('ws.onopen: success!');
+    };
+
+    ws.onclose = function() {
+        $('#wstest').append('WebSockets connection closed.\n');
+    };
+
+    ws.onmessage = function(event) {
+        console.log(event);
+        $('#wstest').append(event.data);
+    };
+
+    return false;
 }

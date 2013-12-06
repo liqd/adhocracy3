@@ -1,4 +1,7 @@
 <table border="1">
+
+  <pre><div id="wstest"></div></pre>
+
   <tr>
     <td>
       <button type="button" class="create_proposal_button">create new proposal</button>
