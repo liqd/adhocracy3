@@ -116,14 +116,18 @@ export function open_proposals(jsonUri : string, done ?: any) {
     obviel.view({
         iface: 'P_IDAG',
         html: '<pre></pre>',
-        render: function() { render_DAG(this, undefined); }
+        render: function() {
+            render_DAG(this, undefined);
+        },
     });
 
     obviel.view({
         iface: 'P_IDAG',
         name: 'edit',
         html: '<pre></pre>',
-        render: function() { render_DAG(this, 'edit'); }
+        render: function() {
+            render_DAG(this, 'edit');
+        }
     });
 
 
@@ -269,6 +273,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
                 rerenderDirectory(appUri);
                 rerenderDetail(appPrefix + Util.parentPath(currentProposalVersionPath), undefined);
+
             });
         }
     });
@@ -322,6 +327,10 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // forward at all.
 }
 
+
+
+// and-whatnot ///////////////////////////////////////////////////////
+
 // if the uri with which this page was loaded mentions a particular
 // pool or a particular detail view, return that as poolUri.
 // otherwise, return the default passed as argument to this function.
@@ -349,6 +358,10 @@ function rerenderDirectory(pathRaw : string) : void {
 
     $('#proposal_workbench_directory').render(pathJson, 'Directory');
 }
+
+
+
+// object updates ////////////////////////////////////////////////////
 
 function newProposal(poolUri : string) : void {
     console.log('[newProposal]');
