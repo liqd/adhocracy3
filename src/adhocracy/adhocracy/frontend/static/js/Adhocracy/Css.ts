@@ -58,7 +58,7 @@ export function cls(className) {
     }
 };
 
-export function clss(className) {
+export function clsd(className) {
     if (className in dict) {
         return ('.' + className);
     } else {
