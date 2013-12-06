@@ -50,6 +50,9 @@ export function open_proposals(jsonUri : string, done ?: any) {
         iface: 'P_IPool',
         name: 'Directory',
         obvtUrl: templatePath + '/Directory.obvt',
+        render: function() {
+            autoRefresh(this.el, this.obj.path, 'Directory');
+        },
     });
 
     obviel.view({
@@ -131,6 +134,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
         obvtUrl: templatePath + '/IDocumentDisplay.obvt',
         render: function() {
             currentProposalVersionPath = this.obj.path;
+            autoRefresh(this.el, this.obj.path);
         },
         edit: function() {
             this.el.render(this.obj, 'edit');
@@ -143,6 +147,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
         obvtUrl: templatePath + '/IDocumentEdit.obvt',
         render: function() {
             currentProposalVersionPath = this.obj.path;
+            autoRefresh(this.el, this.obj.path);  // FIXME: this is bad if somebody else saves changes while i'm editing!  (:
         },
         reset: function() {
             this.el.render(this.obj.path, undefined);
@@ -170,6 +175,11 @@ export function open_proposals(jsonUri : string, done ?: any) {
             });
 
             function docDAGPathDone(response) {
+
+/*
+  XXXXX: should not be needed any more.
+*/
+
                 rerenderDirectory(appUri);
                 rerenderDetail(appPrefix + Util.parentPath(response.path), undefined);
             }
@@ -237,6 +247,10 @@ export function open_proposals(jsonUri : string, done ?: any) {
             }).done(function() {
                 console.log('ajax post succeeded!');
 
+/*
+  XXXXX: this should not be needed any more.
+*/
+
                 // at this point, we trigger a re-render of the DAG.
                 // in order to get to the path of the DAG, we chop off
                 // the version part of the path of the version
@@ -284,7 +298,6 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // start.
     history.pushState(null, null, appUri);
     $('#adhocracy').render(jsonUri, 'ProposalWorkbench');
-    wstest();
 
     // FIXME: deep links don't work.  The contents of jsonUri must
     // contain a proposal pool that contains proposal dags.  Regarding
@@ -410,29 +423,37 @@ function newParagraph(propVersionUri : string) : void {
     }
 }
 
-export function wstest() {
-    var uri = 'ws://' + window.location.host + '/adhocracy/?ws=1';
-    console.log(uri);
+
+
+// web sockets ///////////////////////////////////////////////////////
+
+// FIXME: ws are not cleaned up properly.  as UI is switched between
+// edit and display, zombie web sockets are accumulated.  i think.
+// must check this out.
+
+export function autoRefresh(el /* : dom[] */, path : string, viewName ?: string) {
+    var uri = 'ws://' + window.location.host + path + '?ws=yes';
     var ws = new WebSocket(uri);
 
-    $('#wstest').append('opening ws connection...\n');
+    ws.onmessage = function(event) {
+        // var path = event.data;
+        // (we don't need to do this; every path gets its own web socket for now.)
+
+        console.log('ws.onmessage: updating ' + path + ' on dom node:\n' + el[0].innerHTML);
+        el.render(path, viewName);
+    };
+
+    // some console info to keep track of things happening:
 
     ws.onerror = function(event) {
         console.log('ws.onerror: ' + event.toString());
     };
 
     ws.onopen = function() {
-        console.log('ws.onopen: success!');
+        console.log('[ws.onopen]');
     };
 
     ws.onclose = function() {
-        $('#wstest').append('WebSockets connection closed.\n');
+        console.log('[ws.onclose]');
     };
-
-    ws.onmessage = function(event) {
-        console.log(event);
-        $('#wstest').append(event.data);
-    };
-
-    return false;
 }
