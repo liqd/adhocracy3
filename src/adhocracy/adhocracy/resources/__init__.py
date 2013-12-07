@@ -1,14 +1,15 @@
-from zope.interface import directlyProvides
-from zope.dottedname.resolve import resolve
-from substanced.content import add_content_type
+from adhocracy.properties.interfaces import IProperty
 from adhocracy.resources import interfaces
 from adhocracy.utils import (
     get_ifaces_from_module,
     get_all_taggedvalues,
 )
+from substanced.content import add_content_type
+from zope.dottedname.resolve import resolve
+from zope.interface import directlyProvides
 
 
-class ResourceFactory:
+class ResourceFactory(object):
 
     """Basic resource factory."""
 
@@ -20,6 +21,8 @@ class ResourceFactory:
         base_ifaces = taggedvalues["basic_properties_interfaces"]
         ext_ifaces = taggedvalues["extended_properties_interfaces"]
         self.prop_ifaces = [resolve(i) for i in base_ifaces.union(ext_ifaces)]
+        for i in self.prop_ifaces:
+            assert i.isOrExtends(IProperty)
 
     def __call__(self, **kwargs):
         content = self.class_()
@@ -27,21 +30,19 @@ class ResourceFactory:
         return content
 
 
-# def includeme(config):
-#
-#     # iterate all Content interfaces
-#     ifaces = get_interfaces(interfaces,
-#                             base=interfaces.IContent,
-#                             blacklist=[interfaces.IContentFolder, interfaces.IContentItem])
-#     for iface in ifaces:
-#         # register content types
-#         is_implicit_addable = iface.queryTaggedValue("is_implicit_addable")
-#         meta = {
-#             "content_name": iface.queryTaggedValue("content_name") or iface.__identifier__,
-#             "addable_content_interfaces": iface.queryTaggedValue("addable_content_interfaces") or [],
-#             "is_implicit_addable": is_implicit_addable if is_implicit_addable is not None else True,
-#             "add_view": "add_" + iface.__identifier__,
-#             }
-#         add_content_type(config, iface.__identifier__,
-#                          ContentFactory(iface),
-#                          factory_type=iface.__identifier__, **meta)
+def includeme(config):
+    """Iterate all resource interfaces and register substanced content types."""
+
+    ifaces = get_ifaces_from_module(interfaces,
+                            base=interfaces.IResource)
+    for iface in ifaces:
+        is_implicit_addable = iface.queryTaggedValue("is_implicit_addable")
+        meta = {
+            "content_name": iface.queryTaggedValue("content_name") or iface.__identifier__,
+            "addable_content_interfaces": iface.queryTaggedValue("addable_content_interfaces") or [],
+            "is_implicit_addable": is_implicit_addable if is_implicit_addable is not None else True,
+            "add_view": "add_" + iface.__identifier__,
+            }
+        add_content_type(config, iface.__identifier__,
+                         ResourceFactory(iface),
+                         factory_type=iface.__identifier__, **meta)

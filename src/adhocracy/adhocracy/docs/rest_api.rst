@@ -10,12 +10,12 @@ Some imports to work with rest api calls::
     >>> from functools import reduce
     >>> import os
     >>> import requests
-    >>> from adhocracy.testing import pprint_json
+    >>> from adhocracy.utils import pprint_json
 
 Start Adhocracy testapp::
 
     >>> from webtest import TestApp
-    >>> from adhocracy.testing import config
+    >>> from adhocracy.conftest import settings_functional
     >>> from adhocracy import main
 
     >>> if 'A3_TEST_SERVER' in os.environ and os.environ['A3_TEST_SERVER']:
@@ -24,7 +24,7 @@ Start Adhocracy testapp::
     ...     app = http2wsgi(os.environ['A3_TEST_SERVER'])
     ... else:
     ...     print('skip')
-    ...     app = main({}, **config)
+    ...     app = main({}, **settings_functional())
     skip...
 
     >>> testapp = TestApp(app)
@@ -50,9 +50,9 @@ There are 5 main types of content interfaces::
 * Versionable-Fubel: Fubel with IVersionable propertysheet interface
 * Tag-Fubel: Fubel with the ITag content interface, links to on or more related Versionable-Fubel
 
-Example ressource hierarchy:
+Example ressource hierarchy ::
 
-l    Pool:              categories
+    Pool:              categories
     Fubel:             categories/blue
 
     Pool:              proposals

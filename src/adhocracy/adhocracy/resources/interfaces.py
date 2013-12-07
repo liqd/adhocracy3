@@ -6,7 +6,7 @@ from zope.interface import (
 
 class IResource(Interface):
 
-    """Marker interface with tagged values to configure a content type."""
+    """Marker interface with tagged values to configure a resource type."""
 
     taggedValue("content_name", "")
     """Human readable name, subtypes have to override"""
@@ -88,7 +88,7 @@ class IVersionableFubel(IFubel):
 
     taggedValue("content_name", "VersionableFubel")
     taggedValue("basic_properties_interfaces", set(
-                ["adhocracy.properties.interfaces.INameReadonly",
+                ["adhocracy.properties.interfaces.INameReadOnly",
                  "adhocracy.properties.interfaces.IVersionable"]))
 
 # # Concrete Fubels and FubelVersionsPools

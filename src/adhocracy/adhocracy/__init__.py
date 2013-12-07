@@ -28,17 +28,21 @@ def root_factory(request, t=transaction, g=get_connection,
     return zodb_root['app_root']
 
 
-def main(global_config, **settings):
-    """ Return a Pyramid WSGI application. """
-    config = Configurator(settings=settings, root_factory=root_factory)
-    config.include('pyramid_chameleon')
+def includeme(config):
+    """Setup basic adhocracy."""
     config.include('substanced')
     config.commit()  # commit to allow proper config overrides
-    #config.include('.properties')
-    #config.include('.resources')
+    config.include('.properties')
+    config.include('.resources')
     #config.include('.registry')
     config.include('.evolution')
     #config.include('.rest')
     config.include('.frontend')
     config.scan()
+
+
+def main(global_config, **settings):
+    """ Return a Pyramid WSGI application. """
+    config = Configurator(settings=settings, root_factory=root_factory)
+    includeme(config)
     return config.make_wsgi_app()
