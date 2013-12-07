@@ -31,3 +31,7 @@ robotframework/local/
 robotframework/selenium_demo/
 a3-backend-mockup
 /.ropeproject/
+.cache/
+/.coverage
+/htmlcov/
+/pylintrc
