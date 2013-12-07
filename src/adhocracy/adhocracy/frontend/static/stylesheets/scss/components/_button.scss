@@ -1,0 +1,86 @@
+@mixin button-base {
+    text-decoration: none;
+    overflow: hidden;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    white-space: nowrap;
+    border: none;
+
+    &:hover {
+        text-decoration: none;
+    }
+
+    // button and anchor element and have different default box sizing
+    @include box-sizing(border-box);
+}
+
+@mixin button-background($color) {
+    $light1: lighten($color, 5%);
+    $light2: lighten($color, 10%);
+    $dark1: darken($color, 5%);
+    $dark2: darken($color, 10%);
+
+    background-color: $color;
+    @include background-image(linear-gradient(top, lighten($color, 5%), darken($color, 5%)));  // FIXME: to bottom
+    border: 1px solid $dark1;
+}
+
+@mixin button($color) {
+    @include button-base;
+    @include button-background($color);
+
+    color: $bg;
+    min-width: 9em;
+    line-height: 1.8em;
+    height: 1.8em;  // fix height in firefox
+    font-size: normal;
+    padding: 0 0.5em;
+
+    &:hover,
+    &:focus,
+    &:active {
+        @include button-background(darken($color, 5%));
+    }
+
+    .inactive &,  // deprecated
+    &:disabled,
+    &.disabled {
+        @include button-background($fg2);
+        cursor: default;
+
+        &.active,
+        &:active {
+            @include box-shadow(none);
+        }
+    }
+}
+
+@mixin button-small($color) {
+    // will always overwrite button, so no need to repeat everything
+    min-width: 0;
+    line-height: 1.4em; // em needed for border-radius
+    height: auto;
+    font-size: small;
+    @include border-radius(0.7em);
+    padding: 0 0.9em;
+
+    &:active,
+    &.active {
+        @include box-shadow(1px 2px 1px #333 inset);
+    }
+}
+
+.button,
+button,
+input[type="reset"],
+input[type="submit"],
+input[type="button"] {
+    @include button($primary-color);
+}
+
+.button_small,  // deprecated
+.button-small {
+    @include button($primary-color);
+    @include button-small($primary-color);
+}

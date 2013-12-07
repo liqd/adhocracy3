@@ -21,6 +21,8 @@ develop-eggs
 /local/
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js.map
+/src/adhocracy/adhocracy/frontend/static/stylesheets/.sass-cache/
+/src/adhocracy/adhocracy/frontend/static/stylesheets/a3.css
 /source_env
 /.vagrant
 robotframework/bin/
@@ -35,3 +37,7 @@ a3-backend-mockup
 /.coverage
 /htmlcov/
 /pylintrc
+/src/adhocracy/tests/selenium-screenshot-*
+/src/adhocracy/tests/report.html
+/src/adhocracy/tests/log.html
+/src/adhocracy/tests/output.xml
