@@ -18,6 +18,7 @@ Contents
    supergraph-2013-11-12.rst
    instance_modelling_example.rst
    no_patches.rst
+   modules
 
 Indices and tables
 ==================
