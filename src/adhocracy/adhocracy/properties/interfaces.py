@@ -76,7 +76,8 @@ class PoolSchema(colander.Schema):
 
     elements = ReferenceSetSchemaNode(default=[],
                                       missing=colander.drop,
-                                      interfaces=[Interface]
+                                      interfaces=[Interface],
+                                      readonly=True,
                                       )
 
 
