@@ -13,6 +13,3 @@
 [submodule "src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped"]
 	path = src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped
 	url = https://github.com/borisyankov/DefinitelyTyped
-[submodule "src/adhocracy/adhocracy/frontend/static/js/virtual-pointer"]
-	path = src/adhocracy/adhocracy/frontend/static/js/virtual-pointer
-	url = https://github.com/ngryman/virtual-pointer
