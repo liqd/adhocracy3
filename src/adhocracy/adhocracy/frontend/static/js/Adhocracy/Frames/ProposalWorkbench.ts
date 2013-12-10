@@ -33,7 +33,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // views for center column: proposal directory
 
     obviel.view({
-        iface: 'adhocracy.properties.interfaces.IPool',
+        iface: 'P_IPool',
         name: 'ProposalWorkbench',
         obvtUrl: templatePath + '/ProposalWorkbench.obvt',
         render: function() {
@@ -47,7 +47,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     });
 
     obviel.view({
-        iface: 'adhocracy.properties.interfaces.IPool',
+        iface: 'P_IPool',
         name: 'Directory',
         obvtUrl: templatePath + '/Directory.obvt',
         render: function() {
@@ -57,7 +57,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     });
 
     obviel.view({
-        iface: 'adhocracy.properties.interfaces.IName',
+        iface: 'P_IDAG',
         name: 'DirectoryEntry',
 
         render: function() {
@@ -95,9 +95,9 @@ export function open_proposals(jsonUri : string, done ?: any) {
         var elements;
 
         try {
-            elements = this_.obj.data['adhocracy.properties.interfaces.IVersions'].versions;
+            elements = this_.obj.data['P_IDAG'].versions;
         } catch (e) {
-            throw ('[missing or bad IVersions property sheet: ' + this_.toString() + ']');
+            throw ('[missing or bad IDAG property sheet: ' + this_.toString() + ']');
         }
 
         if (elements.length > 0) {
@@ -125,7 +125,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
     // FIXME: these two view only differ in view name.  construct them in a more concise way!
     obviel.view({
-        iface: 'adhocracy.properties.interfaces.IVersions',
+        iface: 'P_IDAG',
         name: 'edit',
         render: function() {
             closeWs('#proposal_workbench_detail');
@@ -152,7 +152,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     });
 
     obviel.view({
-        iface: 'adhocracy.properties.interfaces.IDocument',
+        iface: 'P_IDocument',
         name: 'edit',
         obvtUrl: templatePath + '/IDocumentEdit.obvt',
 
@@ -220,7 +220,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     });
 
     obviel.view({
-        iface: 'adhocracy.properties.interfaces.IParagraph',
+        iface: 'P_IParagraph',
         name: 'edit',
         obvtUrl: templatePath + '/IParagraphEdit.obvt',
 
