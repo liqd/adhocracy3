@@ -51,7 +51,8 @@ export function open_proposals(jsonUri : string, done ?: any) {
         name: 'Directory',
         obvtUrl: templatePath + '/Directory.obvt',
         render: function() {
-            autoRefresh(this.el, this.obj.path, 'Directory');
+            updateWs('#proposal_workbench_directory', this.obj.path, 'Directory');
+            // FIXME: get the sizzle from this.el rather than statically?
         },
     });
 
@@ -74,7 +75,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
         obvtUrl: templatePath + '/DirectoryEntry.obvt',
         render: function() {
             $('a', this.el).on('click', function(e) {
-                rerenderDetail(e.target.href, undefined);
+                renderDetail(e.target.href, undefined);
                 e.preventDefault();
             });
         },
@@ -115,17 +116,20 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
     obviel.view({
         iface: 'P_IDAG',
-        html: '<pre></pre>',
         render: function() {
+            updateWs('#proposal_workbench_detail', this.obj.path, undefined);
+            // FIXME: get the sizzle from this.el?
             render_DAG(this, undefined);
         },
     });
 
+    // FIXME: these two view only differ in view name.  construct them in a more concise way!
     obviel.view({
         iface: 'P_IDAG',
         name: 'edit',
-        html: '<pre></pre>',
         render: function() {
+            closeWs('#proposal_workbench_detail');
+            // FIXME: get the sizzle from this.el?
             render_DAG(this, 'edit');
         }
     });
@@ -138,9 +142,9 @@ export function open_proposals(jsonUri : string, done ?: any) {
         obvtUrl: templatePath + '/IDocumentDisplay.obvt',
         render: function() {
             currentProposalVersionPath = this.obj.path;
-            autoRefresh(this.el, this.obj.path);
         },
         edit: function() {
+            closeWs('#proposal_workbench_detail');
             this.el.render(this.obj, 'edit');
         },
     });
@@ -149,13 +153,15 @@ export function open_proposals(jsonUri : string, done ?: any) {
         iface: 'P_IDocument',
         name: 'edit',
         obvtUrl: templatePath + '/IDocumentEdit.obvt',
+
         render: function() {
             currentProposalVersionPath = this.obj.path;
-            autoRefresh(this.el, this.obj.path);  // FIXME: this is bad if somebody else saves changes while i'm editing!  (:
         },
+
         reset: function() {
-            this.el.render(this.obj.path, undefined);
+            updateWs('#proposal_workbench_detail', Util.parentPath(this.obj.path), undefined);
         },
+
         save: function() {
             // see (view P_IParagraph|edit).save function for more
             // documentation.  (there is also a utility function
@@ -179,16 +185,18 @@ export function open_proposals(jsonUri : string, done ?: any) {
             });
 
             function docDAGPathDone(response) {
+                // while in edit mode, the web socket is closed, and
+                // changes won't be visible.  now we need to run one
+                // re-render manually and re-open the we bsocket.
 
-/*
-  XXXXX: should not be needed any more.
-*/
-
-                rerenderDirectory(appUri);
-                rerenderDetail(appPrefix + Util.parentPath(response.path), undefined);
+                var dagPath = Util.parentPath(response.path);
+                var dagView = undefined;
+                $('#proposal_workbench_detail').render(dagPath, dagView);
+                updateWs('#proposal_workbench_detail', dagPath, dagView);
             }
         },
     });
+
 
 
     // paragraph.
@@ -250,30 +258,6 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 console.log('ajax post failed!\n' + [xhr, text, exception].toString());
             }).done(function() {
                 console.log('ajax post succeeded!');
-
-/*
-  XXXXX: this should not be needed any more.
-*/
-
-                // at this point, we trigger a re-render of the DAG.
-                // in order to get to the path of the DAG, we chop off
-                // the version part of the path of the version
-                // currently rendered.
-
-                // FIXME: re-render of anything should be triggered by
-                // the server (websockets).  this workaround 'done'
-                // handler should go away completely.
-
-                // (regarding the work-around: i am expecting obviel
-                // to re-pull the proposal from the server, but i'm
-                // not sure if that always happens.  what does the
-                // obviel code say?  (Update on this: paragraph model
-                // objects are *not* refreshed from the server when
-                // rerender is called on the proposal node!)
-
-                rerenderDirectory(appUri);
-                rerenderDetail(appPrefix + Util.parentPath(currentProposalVersionPath), undefined);
-
             });
         }
     });
@@ -296,7 +280,9 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
     // history api (back button).
     window.addEventListener('popstate', function(event) {
-        rerenderDetail(event.target.location.toString(), undefined);  // (besides 'toString()' there is also 'pathname'...)
+        renderDetail(event.target.location.toString(), undefined);  // (besides 'toString()' there is also 'pathname'...)
+        // FIXME: i don't think this is working properly yet.  but
+        // it's just the 'back' button.
     });
 
 
@@ -329,7 +315,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
 
 
-// and-whatnot ///////////////////////////////////////////////////////
+// and-whatnot
 
 // if the uri with which this page was loaded mentions a particular
 // pool or a particular detail view, return that as poolUri.
@@ -343,25 +329,9 @@ export function poolUri(defaultUri) {
     }
 }
 
-function rerenderDetail(pathRaw : string, viewname : string) : void {
-    var pathHtml : string = pathRaw.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');
-    var pathJson : string = pathHtml.replace(new RegExp('^' + appPrefix), '');
-
-    history.pushState(null, null, pathHtml);
-    $('#proposal_workbench_detail').render(pathJson, viewname);
-    $('#debug_links').render({ 'iface': 'debug_links', 'path': pathJson });
-}
-
-function rerenderDirectory(pathRaw : string) : void {
-    var pathHtml : string = pathRaw.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');
-    var pathJson : string = pathHtml.replace(new RegExp('^' + appPrefix), '');
-
-    $('#proposal_workbench_directory').render(pathJson, 'Directory');
-}
 
 
-
-// object updates ////////////////////////////////////////////////////
+// object updates
 
 function newProposal(poolUri : string) : void {
     console.log('[newProposal]');
@@ -381,9 +351,8 @@ function newProposal(poolUri : string) : void {
         Util.post(propDagResponse.path, propVersion, propVersionDone, failDefault);
     }
 
-    function propVersionDone(popVersionResponse) {
-        rerenderDirectory(poolUri);
-        rerenderDetail(appPrefix + Util.parentPath(popVersionResponse.path), 'edit');
+    function propVersionDone(propVersionResponse) {
+        renderDetail(appPrefix + Util.parentPath(propVersionResponse.path), 'edit');
     }
 }
 
@@ -432,41 +401,90 @@ function newParagraph(propVersionUri : string) : void {
     }
 
     function propSuccessorDone() {
-        rerenderDetail(appPrefix + propDagUri, undefined);
     }
 }
 
 
 
-// web sockets ///////////////////////////////////////////////////////
+// rerender helpers
 
-// FIXME: ws are not cleaned up properly.  as UI is switched between
-// edit and display, zombie web sockets are accumulated.  i think.
-// must check this out.
+function renderDetail(pathRaw : string, viewname : string) : void {
+    var pathHtml : string = pathRaw.replace(new RegExp('^http://[^:/]+(:\\d+)?'), '');
+    var pathJson : string = pathHtml.replace(new RegExp('^' + appPrefix), '');
 
-export function autoRefresh(el /* : dom[] */, path : string, viewName ?: string) {
-    var uri = 'ws://' + window.location.host + path + '?ws=yes';
-    var ws = new WebSocket(uri);
+    history.pushState(null, null, pathHtml);
+    $('#proposal_workbench_detail').render(pathJson, viewname);
+    $('#debug_links').render({ 'iface': 'debug_links', 'path': pathJson });
+}
 
-    ws.onmessage = function(event) {
-        // var path = event.data;
-        // (we don't need to do this; every path gets its own web socket for now.)
 
-        console.log('ws.onmessage: updating ' + path + ' on dom node:\n' + el[0].innerHTML);
-        el.render(path, viewName);
-    };
 
-    // some console info to keep track of things happening:
+// web sockets
 
-    ws.onerror = function(event) {
-        console.log('ws.onerror: ' + event.toString());
-    };
+var wsdict = {};
 
-    ws.onopen = function() {
-        console.log('[ws.onopen]');
-    };
+// Create a web socket and connect it to a dom element for online
+// updates.  If an old web socket was registered, close and delete it.
+// Do *not* render the dom element once initially.  Do *not* push new
+// state to history api stack (this is only desired for *one* dom
+// element per page).
+//
+// FIXME: each time a render is triggered, the queue should be flushed
+// and compressed first.  as it is, if a proposal pool is growing by
+// three proposals before a client looks at the web socket queue
+// again, the client will render the latest version three times rather
+// than once.
+export function updateWs(sizzle : string, path : string, viewName ?: string) : void {
+    if (sizzle in wsdict) {
+        if (wsdict[sizzle].path == path) {
+            wsdict[sizzle].viewName = viewName;
+            return;
+        } else {
+            closeWs(sizzle);
+            makeNew();
+            return;
+        }
+    } else {
+        makeNew();
+        return;
+    }
 
-    ws.onclose = function() {
-        console.log('[ws.onclose]');
-    };
+    function makeNew() {
+        var wsuri = 'ws://' + window.location.host + path + '?ws=node';
+        var ws = new WebSocket(wsuri);
+
+        wsdict[sizzle] = {
+            path: path,
+            viewName: viewName,
+            ws: ws,
+        }
+
+        ws.onmessage = function(event) {
+            // var path = event.data;
+            // (we don't need to do this; every path gets its own web socket for now.)
+
+            console.log('ws.onmessage: updating '  + wsdict[sizzle].path
+                        + ' with view '            + wsdict[sizzle].viewName
+                        + ' on dom node:\n'        + sizzle);
+            $(sizzle).render(wsdict[sizzle].path, wsdict[sizzle].viewName);
+        };
+
+        // some console info to keep track of things happening:
+        ws.onerror = function(event) {
+            console.log('ws.onerror: ' + event.toString());
+        };
+        ws.onopen = function() {
+            console.log('[ws.onopen]');
+        };
+        ws.onclose = function() {
+            console.log('[ws.onclose]');
+        };
+    }
+}
+
+export function closeWs(sizzle : string) {
+    if (sizzle in wsdict) {
+        wsdict[sizzle].ws.close();
+        delete wsdict[sizzle];
+    }
 }
