@@ -161,7 +161,10 @@ export function open_proposals(jsonUri : string, done ?: any) {
         },
 
         reset: function() {
-            updateWs('#proposal_workbench_detail', Util.parentPath(this.obj.path), undefined);
+            var dagPath = Util.parentPath(this.obj.path);
+            var dagView = undefined;
+            $('#proposal_workbench_detail').render(dagPath, dagView);
+            updateWs('#proposal_workbench_detail', dagPath, dagView);
         },
 
         save: function() {
