@@ -19,13 +19,13 @@ export function register_transformer() {
 export function jsonAfterReceive(inobj : Types.Content, path) : Types.Content {
     // strip noise from content type and property sheet types
     var outobj : Types.Content = {
-        content_type: 'C_' + inobj.content_type.substring(inobj.content_type.lastIndexOf(".") + 1),
+        content_type: importContentType(inobj.content_type),
         path: inobj.path,
         data: {}
     }
 
     for (i in inobj.data) {
-        var i_local = 'P_' + i.substring(i.lastIndexOf(".") + 1);
+        var i_local = importPropertyType(i);
         outobj.data[i_local] = inobj.data[i];
     }
 
@@ -46,8 +46,8 @@ export function jsonAfterReceive(inobj : Types.Content, path) : Types.Content {
 export function jsonBeforeSend(inobj : Types.Content) : Types.Content {
     var i;
     var outobj : Types.Content = {
-        content_type: 'adhocracy.contents.interfaces.' + inobj.content_type.substring(2),
-        data: {}
+        content_type: exportContentType(inobj.content_type),
+        data: {},
     };
 
     // FIXME: Get this list from the server!  (How?)
@@ -55,10 +55,27 @@ export function jsonBeforeSend(inobj : Types.Content) : Types.Content {
 
     for (i in inobj['data']) {
         if (readOnlyProperties.indexOf(i) < 0) {
-            var i_remote = 'adhocracy.propertysheets.interfaces.' + i.substring(2);
+            var i_remote = exportPropertyType(i);
             outobj.data[i_remote] = inobj.data[i];
         }
     }
 
     return outobj;
+}
+
+
+function importContentType(s : string) : string {
+    return 'C_' + s.substring(s.lastIndexOf(".") + 1);
+}
+
+function exportContentType(s : string) : string {
+    return 'adhocracy.contents.interfaces.' + s.substring(2);
+}
+
+function importPropertyType(s : string) : string {
+    return 'P_' + s.substring(s.lastIndexOf(".") + 1);
+}
+
+function exportPropertyType(s : string) : string {
+    return 'adhocracy.propertysheets.interfaces.' + s.substring(2);
 }
