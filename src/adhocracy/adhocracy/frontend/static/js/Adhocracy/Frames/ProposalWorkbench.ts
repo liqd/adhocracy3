@@ -140,9 +140,11 @@ export function open_proposals(jsonUri : string, done ?: any) {
     obviel.view({
         iface: 'P_IDocument',
         obvtUrl: templatePath + '/IDocumentDisplay.obvt',
+
         render: function() {
             currentProposalVersionPath = this.obj.path;
         },
+
         edit: function() {
             closeWs('#proposal_workbench_detail');
             this.el.render(this.obj, 'edit');
@@ -188,6 +190,9 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 // while in edit mode, the web socket is closed, and
                 // changes won't be visible.  now we need to run one
                 // re-render manually and re-open the we bsocket.
+                //
+                // FIXME: this is the same as the reset method above.
+                // remove redundancy!
 
                 var dagPath = Util.parentPath(response.path);
                 var dagView = undefined;
@@ -435,6 +440,8 @@ var wsdict = {};
 // again, the client will render the latest version three times rather
 // than once.
 export function updateWs(sizzle : string, path : string, viewName ?: string) : void {
+    console.log('updateWs: ' + sizzle, path, viewName);
+
     if (sizzle in wsdict) {
         if (wsdict[sizzle].path == path) {
             wsdict[sizzle].viewName = viewName;
@@ -483,6 +490,8 @@ export function updateWs(sizzle : string, path : string, viewName ?: string) : v
 }
 
 export function closeWs(sizzle : string) {
+    console.log('closeWs: ' + sizzle);
+
     if (sizzle in wsdict) {
         wsdict[sizzle].ws.close();
         delete wsdict[sizzle];
