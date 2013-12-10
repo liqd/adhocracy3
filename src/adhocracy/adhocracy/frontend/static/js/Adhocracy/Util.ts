@@ -26,7 +26,7 @@ export function post(url : string,
 
 export function postx(url : string,
                       json : Types.Content,
-                      headers : Object,
+                      headers : { [key: string]: any; },
                       done : (c : Types.Content) => void,
                       fail : Function)
 {
