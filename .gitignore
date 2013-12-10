@@ -32,6 +32,11 @@ robotframework/lib/
 robotframework/local/
 robotframework/selenium_demo/
 a3-backend-mockup
+/.ropeproject/
+.cache/
+/.coverage
+/htmlcov/
+/pylintrc
 /src/adhocracy/tests/selenium-screenshot-*
 /src/adhocracy/tests/report.html
 /src/adhocracy/tests/log.html

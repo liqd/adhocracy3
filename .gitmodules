@@ -1,30 +1,15 @@
 [submodule "python/buildout.python"]
 	path = python/buildout.python
 	url = git@github.com:collective/buildout.python.git
-[submodule "jquery-datalink"]
-	path = src/adhocracy/adhocracy/frontend/static/submodules/jquery-datalink
-	url = git://github.com/BorisMoore/jquery-datalink
 [submodule "obviel"]
 	path = src/adhocracy/adhocracy/frontend/static/submodules/obviel
 	url = git://github.com/adhocracy/obviel
-[submodule "jquery-bbq"]
-	path = src/adhocracy/adhocracy/frontend/static/submodules/jquery-bbq
-	url = git@github.com:cowboy/jquery-bbq.git
 [submodule "src/substanced"]
 	path = src/substanced
 	url = git@github.com:Pylons/substanced.git
 [submodule "src/adhocracy/adhocracy/frontend/static/submodules/requirejs"]
 	path = src/adhocracy/adhocracy/frontend/static/submodules/requirejs
 	url = git://github.com/jrburke/requirejs
-[submodule "src/adhocracy/adhocracy/frontend/static/submodules/chai"]
-	path = src/adhocracy/adhocracy/frontend/static/submodules/chai
-	url = https://github.com/chaijs/chai
-[submodule "src/adhocracy/adhocracy/frontend/static/submodules/mocha"]
-	path = src/adhocracy/adhocracy/frontend/static/submodules/mocha
-	url = https://github.com/visionmedia/mocha/
 [submodule "src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped"]
 	path = src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped
 	url = https://github.com/borisyankov/DefinitelyTyped
-[submodule "src/adhocracy/adhocracy/frontend/static/js/virtual-pointer"]
-	path = src/adhocracy/adhocracy/frontend/static/js/virtual-pointer
-	url = https://github.com/ngryman/virtual-pointer
