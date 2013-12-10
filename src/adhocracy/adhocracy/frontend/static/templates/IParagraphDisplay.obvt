@@ -1,5 +1,5 @@
 <div class="paragraph">
-    <p>{data.P_IParagraph.text}</p>
+    <p>{data.adhocracy#propertysheets#interfaces#IParagraph.text}</p>
     <button type="button" class="edit_button" data-on="click|edit">edit</button>
 </div>
 

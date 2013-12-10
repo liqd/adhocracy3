@@ -51,7 +51,7 @@ export function jsonBeforeSend(inobj : Types.Content) : Types.Content {
     };
 
     // FIXME: Get this list from the server!  (How?)
-    var readOnlyProperties = ['P_IVersions'];
+    var readOnlyProperties = ['adhocracy#propertysheets#interfaces#IVersions'];
 
     for (i in inobj['data']) {
         if (readOnlyProperties.indexOf(i) < 0) {
@@ -65,17 +65,21 @@ export function jsonBeforeSend(inobj : Types.Content) : Types.Content {
 
 
 function importContentType(s : string) : string {
-    return 'C_' + s.substring(s.lastIndexOf(".") + 1);
+    // return 'C_' + s.substring(s.lastIndexOf(".") + 1);
+    return s.replace(/\./g, "#");
 }
 
 function exportContentType(s : string) : string {
-    return 'adhocracy.contents.interfaces.' + s.substring(2);
+    // return 'adhocracy.contents.interfaces.' + s.substring(2);
+    return s.replace(/#/g, ".");
 }
 
 function importPropertyType(s : string) : string {
-    return 'P_' + s.substring(s.lastIndexOf(".") + 1);
+    // return 'P_' + s.substring(s.lastIndexOf(".") + 1);
+    return s.replace(/\./g, "#");
 }
 
 function exportPropertyType(s : string) : string {
-    return 'adhocracy.propertysheets.interfaces.' + s.substring(2);
+    // return 'adhocracy.propertysheets.interfaces.' + s.substring(2);
+    return s.replace(/#/g, ".");
 }

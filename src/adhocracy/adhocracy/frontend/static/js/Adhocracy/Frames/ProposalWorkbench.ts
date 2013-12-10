@@ -33,7 +33,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // views for center column: proposal directory
 
     obviel.view({
-        iface: 'P_IPool',
+        iface: 'adhocracy#propertysheets#interfaces#IPool',
         name: 'ProposalWorkbench',
         obvtUrl: templatePath + '/ProposalWorkbench.obvt',
         render: function() {
@@ -47,7 +47,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     });
 
     obviel.view({
-        iface: 'P_IPool',
+        iface: 'adhocracy#propertysheets#interfaces#IPool',
         name: 'Directory',
         obvtUrl: templatePath + '/Directory.obvt',
         render: function() {
@@ -57,12 +57,13 @@ export function open_proposals(jsonUri : string, done ?: any) {
     });
 
     obviel.view({
-        iface: 'P_IDAG',
+        iface: 'adhocracy#propertysheets#interfaces#IDAG',
         name: 'DirectoryEntry',
 
         render: function() {
-            if (this.obj.data.P_IDAG.versions.length > 0) {
-                this.el.render(this.obj.data.P_IDAG.versions[0].path, 'DirectoryEntry');
+            var dag = this.obj.data['adhocracy#propertysheets#interfaces#IDAG'];
+            if (dag.versions.length > 0) {
+                this.el.render(dag.versions[0].path, 'DirectoryEntry');
             } else {
                 this.el.text('[no versions]');
             }
@@ -70,7 +71,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     });
 
     obviel.view({
-        iface: 'P_IDocument',
+        iface: 'adhocracy#propertysheets#interfaces#IDocument',
         name: 'DirectoryEntry',
         obvtUrl: templatePath + '/DirectoryEntry.obvt',
         render: function() {
@@ -95,7 +96,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
         var elements;
 
         try {
-            elements = this_.obj.data['P_IDAG'].versions;
+            elements = this_.obj.data['adhocracy#propertysheets#interfaces#IDAG'].versions;
         } catch (e) {
             throw ('[missing or bad IDAG property sheet: ' + this_.toString() + ']');
         }
@@ -115,7 +116,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     }
 
     obviel.view({
-        iface: 'P_IDAG',
+        iface: 'adhocracy#propertysheets#interfaces#IDAG',
         render: function() {
             updateWs('#proposal_workbench_detail', this.obj.path, undefined);
             // FIXME: get the sizzle from this.el?
@@ -125,7 +126,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
 
     // FIXME: these two view only differ in view name.  construct them in a more concise way!
     obviel.view({
-        iface: 'P_IDAG',
+        iface: 'adhocracy#propertysheets#interfaces#IDAG',
         name: 'edit',
         render: function() {
             closeWs('#proposal_workbench_detail');
@@ -138,7 +139,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // document.
 
     obviel.view({
-        iface: 'P_IDocument',
+        iface: 'adhocracy#propertysheets#interfaces#IDocument',
         obvtUrl: templatePath + '/IDocumentDisplay.obvt',
 
         render: function() {
@@ -152,7 +153,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     });
 
     obviel.view({
-        iface: 'P_IDocument',
+        iface: 'adhocracy#propertysheets#interfaces#IDocument',
         name: 'edit',
         obvtUrl: templatePath + '/IDocumentEdit.obvt',
 
@@ -168,22 +169,25 @@ export function open_proposals(jsonUri : string, done ?: any) {
         },
 
         save: function() {
-            // see (view P_IParagraph|edit).save function for more
+            // see (view adhocracy#propertysheets#interfaces#IParagraph|edit).save function for more
             // documentation.  (there is also a utility function
             // hidden here that should be factored out.)
             var docDAGPath = Util.parentPath(this.obj.path);
             var docPoolPath = Util.parentPath(docDAGPath);
 
             var predecessorPath = (function() {
+                // FIXME: why am i not using the Util.* convenience
+                // http api for this?
                 var docDAG = JSON.parse($.ajax(docDAGPath, { type: "GET", async: false }).responseText);
-                var allVersions = docDAG['data']['adhocracy.propertysheets.interfaces.IDAG']['versions'];
+                var allVersions = docDAG.data['adhocracy.propertysheets.interfaces.IDAG'].versions;
                 if (allVersions && allVersions[0] && 'path' in allVersions[0]) {
                     return allVersions[0].path;
                 }
             })();
 
-            this.obj.data.P_IDocument.title = $(Css.clsd('edit_document_title'), this.el)[0].value;
-            this.obj.data.P_IDocument.description = $(Css.clsd('edit_document_description'), this.el)[0].value;
+            var doc = this.obj.data['adhocracy#propertysheets#interfaces#IDocument'];
+            doc.title = $(Css.clsd('edit_document_title'), this.el)[0].value;
+            doc.description = $(Css.clsd('edit_document_description'), this.el)[0].value;
 
             Util.postx(docDAGPath, this.obj, { follows: predecessorPath }, docDAGPathDone, function(xhr, text, exception) {
                 console.log('ajax post failed!\n' + [xhr, text, exception].toString())
@@ -210,7 +214,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     // paragraph.
 
     obviel.view({
-        iface: 'P_IParagraph',
+        iface: 'adhocracy#propertysheets#interfaces#IParagraph',
         obvtUrl: templatePath + '/IParagraphDisplay.obvt',
 
         edit: function(ev) {
@@ -220,7 +224,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
     });
 
     obviel.view({
-        iface: 'P_IParagraph',
+        iface: 'adhocracy#propertysheets#interfaces#IParagraph',
         name: 'edit',
         obvtUrl: templatePath + '/IParagraphEdit.obvt',
 
@@ -234,11 +238,11 @@ export function open_proposals(jsonUri : string, done ?: any) {
             var parDAGPath = Util.parentPath(this.obj.path);
             // a nice collection of other solutions for string disection is this here:
             // http://stackoverflow.com/questions/2187256/js-most-optimized-way-to-remove-a-filename-from-a-path-in-a-string
-            // or, actually: var parDAGPath = this.obj['data']['P_IVersions']['versionpostroot'];
+            // or, actually: var parDAGPath = this.obj.data['adhocracy#propertysheets#interfaces#IVersions']['versionpostroot'];
 
             var followsPath = (function() {
                 // FIXME: this is not how we should do this!  either
-                // make each P_IVersions know its own version number,
+                // make each adhocracy#propertysheets#interfaces#IVersions know its own version number,
                 // or when we fetch the DAG in order to get to the
                 // HEAD, keep not only the HEAD, but also its version
                 // number.  (this would be in another view.)
@@ -247,11 +251,11 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 // typescript doesn't like something.
 
                 var parDAG = JSON.parse($.ajax(parDAGPath, { type: "GET", async: false }).responseText)
-                var allDAGVersions = parDAG['data']['adhocracy.propertysheets.interfaces.IDAG']['versions'];
+                var allDAGVersions = parDAG['data']['adhocracy#propertysheets#interfaces#IDAG']['versions'];
                 if ('path' in allDAGVersions[0]) { return allDAGVersions[0].path; }
             })();
 
-            this.obj['data']['P_IParagraph']['text'] =
+            this.obj['data']['adhocracy#propertysheets#interfaces#IParagraph']['text'] =
                 $('textarea', this.el)[0].value;
 
             var postobj = Obviel.jsonBeforeSend(this.obj);
@@ -351,11 +355,11 @@ function newProposal(poolUri : string) : void {
         throw "newProposal: ajax error.";
     }
 
-    var propDag : Types.Content = { content_type: 'C_IProposalContainer' };
+    var propDag : Types.Content = { content_type: 'adhocracy#contents#interfaces#IProposalContainer' };
     Util.post(poolUri, propDag, propDagDone, failDefault);
 
     function propDagDone(propDagResponse) {
-        var propVersion : Types.Content = { content_type: 'C_IProposal' };
+        var propVersion : Types.Content = { content_type: 'adhocracy#contents#interfaces#IProposal' };
         Util.post(propDagResponse.path, propVersion, propVersionDone, failDefault);
     }
 
@@ -377,17 +381,17 @@ function newParagraph(propVersionUri : string) : void {
         throw "newParagraph: ajax error.";
     }
 
-    var parDag      : Types.Content  = { content_type: 'C_IParagraphContainer' };
+    var parDag      : Types.Content  = { content_type: 'adhocracy#contents#interfaces#IParagraphContainer' };
     var propDagUri  : string         = Util.parentPath(propVersionUri);
     Util.post(propDagUri, parDag, postParDagDone, failDefault);
 
     function postParDagDone(parDagResponse) {
-        var parVersion : Types.Content = { content_type: 'C_IParagraph' };
+        var parVersion : Types.Content = { content_type: 'adhocracy#contents#interfaces#IParagraph' };
         Util.post(parDagResponse.path, parVersion, postParVersionDone, failDefault);
     }
 
     var parVersionReference : Types.Content = {
-        content_type: 'adhocracy.contents.interfaces.IParagraph',
+        content_type: 'adhocracy#contents#interfaces#IParagraph',
         reference_colour: 'EssenceRef'
     }
 
@@ -397,14 +401,14 @@ function newParagraph(propVersionUri : string) : void {
     }
 
     function getPropDagDone(propDagResponse) {
-        var propPredecessorPath : string = propDagResponse.data['P_IDAG'].versions[0].path;
+        var propPredecessorPath : string = propDagResponse.data['adhocracy#propertysheets#interfaces#IDAG'].versions[0].path;
         Util.get(propPredecessorPath, propPredecessorDone, failDefault);
     }
 
     function propPredecessorDone(propPredecessorResponse) {
         var propPredecessorPath = propPredecessorResponse.path;
         var propSuccessor = propPredecessorResponse;
-        propSuccessor.data['P_IDocument'].paragraphs.push(parVersionReference);
+        propSuccessor.data['adhocracy#propertysheets#interfaces#IDocument'].paragraphs.push(parVersionReference);
         Util.postx(propDagUri, propSuccessor, { follows: propPredecessorPath }, propSuccessorDone, failDefault);
     }
 
