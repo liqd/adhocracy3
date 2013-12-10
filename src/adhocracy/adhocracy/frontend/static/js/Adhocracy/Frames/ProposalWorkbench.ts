@@ -151,7 +151,7 @@ export function open_proposals(uri, done) {
             var followsPath = parDAGPath + "/v_1"  // FIXME: hard-coded predecessor version is wrong.  refer to HEAD tag instead.
             delete this.obj['data']['P_IVersions'];
 
-            this.obj['data'][''adhocracy.properties.interfaces.IParagraph']['text'] =
+            this.obj['data']['adhocracy.properties.interfaces.IParagraph']['text'] =
                 $('textarea', this.el)[0].value;
 
             var postobj = Obviel.make_postable(this.obj);
