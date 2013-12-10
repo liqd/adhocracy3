@@ -52,7 +52,7 @@ install adhocracy ::
 
 update your shell environment::
 
-    ./source source_env
+    source ./source_env
 
 Installation (frontend)
 ------------------------
