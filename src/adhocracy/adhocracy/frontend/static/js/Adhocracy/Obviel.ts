@@ -21,12 +21,12 @@ export function jsonAfterReceive(inobj : Types.Content, path) : Types.Content {
     var outobj : Types.Content = {
         content_type: importContentType(inobj.content_type),
         path: inobj.path,
-        data: {}
+        data: {},
     }
 
     for (i in inobj.data) {
         var i_local = importPropertyType(i);
-        outobj.data[i_local] = inobj.data[i];
+        outobj.data[i_local] = changeContentTypeRecursively(inobj.data[i], importContentType);
     }
 
     // add content type to ifaces
@@ -56,7 +56,7 @@ export function jsonBeforeSend(inobj : Types.Content) : Types.Content {
     for (i in inobj['data']) {
         if (readOnlyProperties.indexOf(i) < 0) {
             var i_remote = exportPropertyType(i);
-            outobj.data[i_remote] = inobj.data[i];
+            outobj.data[i_remote] = changeContentTypeRecursively(inobj.data[i], exportContentType);
         }
     }
 
@@ -82,4 +82,27 @@ function importPropertyType(s : string) : string {
 function exportPropertyType(s : string) : string {
     // return 'adhocracy.propertysheets.interfaces.' + s.substring(2);
     return s.replace(/#/g, ".");
+}
+
+function changeContentTypeRecursively(obj, f) {
+    var t = Object.prototype.toString.call(obj);
+
+    switch(t) {
+    case '[object Object]':
+        var newobj = {};
+        for (var k in obj) {
+            if (k == 'content_type') {
+                newobj[k] = exportContentType(obj[k]);
+            } else {
+                newobj[k] = changeContentTypeRecursively(obj[k], f);
+            }
+        }
+        return newobj;
+
+    case '[object Array]':
+        return obj.map(function(el) { return changeContentTypeRecursively(el, f); });
+
+    default:
+        return obj;
+    }
 }

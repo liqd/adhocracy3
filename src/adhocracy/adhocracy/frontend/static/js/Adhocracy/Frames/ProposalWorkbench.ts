@@ -251,7 +251,7 @@ export function open_proposals(jsonUri : string, done ?: any) {
                 // typescript doesn't like something.
 
                 var parDAG = JSON.parse($.ajax(parDAGPath, { type: "GET", async: false }).responseText)
-                var allDAGVersions = parDAG['data']['adhocracy#propertysheets#interfaces#IDAG']['versions'];
+                var allDAGVersions = parDAG.data['adhocracy.propertysheets.interfaces.IDAG'].versions;
                 if ('path' in allDAGVersions[0]) { return allDAGVersions[0].path; }
             })();
 
@@ -377,17 +377,15 @@ function newParagraph(propVersionUri : string) : void {
     // function should get a specific version that it is supposed to
     // create a successor of.
 
-    function failDefault() {
-        throw "newParagraph: ajax error.";
-    }
-
     var parDag      : Types.Content  = { content_type: 'adhocracy#contents#interfaces#IParagraphContainer' };
     var propDagUri  : string         = Util.parentPath(propVersionUri);
-    Util.post(propDagUri, parDag, postParDagDone, failDefault);
+    Util.post(propDagUri, parDag, postParDagDone,
+              function() { throw "newParagraph: ajax error."; });
 
     function postParDagDone(parDagResponse) {
         var parVersion : Types.Content = { content_type: 'adhocracy#contents#interfaces#IParagraph' };
-        Util.post(parDagResponse.path, parVersion, postParVersionDone, failDefault);
+        Util.post(parDagResponse.path, parVersion, postParVersionDone,
+                  function() { throw "newParagraph: ajax error."; });
     }
 
     var parVersionReference : Types.Content = {
@@ -397,19 +395,22 @@ function newParagraph(propVersionUri : string) : void {
 
     function postParVersionDone(parVersionResponse) {
         parVersionReference.path = parVersionResponse.path;
-        Util.get(Util.parentPath(propVersionUri), getPropDagDone, failDefault);
+        Util.get(Util.parentPath(propVersionUri), getPropDagDone,
+                 function() { throw "newParagraph: ajax error."; });
     }
 
     function getPropDagDone(propDagResponse) {
         var propPredecessorPath : string = propDagResponse.data['adhocracy#propertysheets#interfaces#IDAG'].versions[0].path;
-        Util.get(propPredecessorPath, propPredecessorDone, failDefault);
+        Util.get(propPredecessorPath, propPredecessorDone,
+                 function() { throw "newParagraph: ajax error."; });
     }
 
     function propPredecessorDone(propPredecessorResponse) {
         var propPredecessorPath = propPredecessorResponse.path;
         var propSuccessor = propPredecessorResponse;
         propSuccessor.data['adhocracy#propertysheets#interfaces#IDocument'].paragraphs.push(parVersionReference);
-        Util.postx(propDagUri, propSuccessor, { follows: propPredecessorPath }, propSuccessorDone, failDefault);
+        Util.postx(propDagUri, propSuccessor, { follows: propPredecessorPath }, propSuccessorDone,
+                   function() { throw "newParagraph: ajax error."; });
     }
 
     function propSuccessorDone() {
