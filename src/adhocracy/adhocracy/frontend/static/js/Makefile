@@ -1,7 +1,7 @@
-# requirement (buildout should provide this automatically):
+# requirement:
 # npm install -g typescript
 # more info on tsc at http://www.typescriptlang.org/
-TSC=tsc
+TSC=../../../../../../bin/tsc
 
 compile:
 	$(TSC) --module amd --sourcemap --out Adhocracy.js Adhocracy.ts
