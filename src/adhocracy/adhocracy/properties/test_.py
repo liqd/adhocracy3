@@ -1,6 +1,7 @@
 from adhocracy.properties.interfaces import IProperty
 from pyramid.testing import DummyRequest
 from substanced.interfaces import IFolder
+from unittest.mock import patch
 from zope.interface import (
     Interface,
     implementer,
@@ -78,6 +79,13 @@ def _resourcepropertysheet_make_one(*args):
     return ResourcePropertySheetAdapter(*args)
 
 
+@patch('substanced.objectmap.ObjectMap', autospec=True)
+def _make_folder_with_objectmap(dummyobjectmap=None):
+    folder = DummyFolder()
+    folder.__objectmap__ = dummyobjectmap.return_value
+    return folder
+
+
 def test_resourcepropertysheet_create_valid():
     from adhocracy.interfaces import IResourcePropertySheet
     from zope.interface.verify import verifyObject
@@ -100,6 +108,15 @@ def test_resourcepropertysheet_create_non_valid_non_mapping_context():
 def test_resourcepropertysheet_create_non_valid_non_iproperty_iface():
     with pytest.raises(AssertionError):
         _resourcepropertysheet_make_one(DummyFolder(), None, InterfaceY)
+
+
+@patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
+def test_resourcepropertysheet_create_references(dummy_reference_node=None):
+    node = dummy_reference_node.return_value
+    node.name = "references"
+    inst = _resourcepropertysheet_make_one(DummyFolder(), None, IPropertyB)
+    inst.schema.children.append(node)
+    assert inst._references == {"references": IPropertyB.__identifier__ + ":references"}
 
 
 def test_resourcepropertysheet_get_empty():
@@ -138,6 +155,20 @@ def test_resourcepropertysheet_set_valid_omit_tuple():
 def test_resourcepropertysheet_set_valid_omit_wrong_key():
     inst = _resourcepropertysheet_make_one(DummyFolder(), None, IPropertyB)
     assert inst.set({"count": 11}, omit=("wrongkey",)) is True
+
+
+@patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
+def test_resourcepropertysheet_set_valid_references(dummy_reference_node=None):
+    node = dummy_reference_node.return_value
+    node.name = "references"
+    node.deserialize.return_value = []
+    context = _make_folder_with_objectmap()
+    inst = _resourcepropertysheet_make_one(context, None, IPropertyB)
+    inst.schema.children.append(node)
+    inst.set({"references": [1]})
+    om = context.__objectmap__
+    reftype = inst._references["references"]
+    assert om.connect.assert_called_once_with(context, 1, reftype) is None
 
 
 def test_resourcepropertysheet_get_cstruct_empty():

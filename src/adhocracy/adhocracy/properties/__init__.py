@@ -4,11 +4,14 @@ from adhocracy.properties.interfaces import IIProperty
 from adhocracy.utils import (
     get_ifaces_from_module,
     get_all_taggedvalues,
+    diff_dict,
 )
+from adhocracy.schema import ReferenceSetSchemaNode
 from collections.abc import Mapping
 from pyramid.compat import is_nonstr_iter
 from pyramid.interfaces import IRequest
 from substanced.property import PropertySheet
+from substanced.util import find_objectmap
 from zope.interface import implementer, alsoProvides
 from zope.dottedname.resolve import resolve
 
@@ -40,6 +43,17 @@ class ResourcePropertySheetAdapter(PropertySheet):
             self.context[self.key] = dict()
         return self.context[self.key]
 
+    @property
+    def _references(self):
+        refs = {}
+        for child in self.schema:
+            if isinstance(child, ReferenceSetSchemaNode):
+                keyname = child.name
+                reftype = "{iface}:{keyname}"
+                refs[keyname] = reftype.format(iface=self.iface.__identifier__,
+                                               keyname=keyname)
+        return refs
+
     def get(self):
         """read interface"""
         # fet default values
@@ -61,9 +75,16 @@ class ResourcePropertySheetAdapter(PropertySheet):
         for key in omit:
             if key in struct.keys():
                 del struct[key]
+
         old_struct = self.get()
-        changed_items = struct.items() - old_struct.items()
+        changed_items = diff_dict(old_struct, struct)
         self._data.update(changed_items)
+
+        objectmap = find_objectmap(self.context)
+        for keyname, reftype in self._references.items():
+            for target_oid in changed_items.get(keyname, []):
+                objectmap.connect(self.context, target_oid, reftype)
+
         return False if not changed_items else True
 
     def set_cstruct(self, cstruct):
