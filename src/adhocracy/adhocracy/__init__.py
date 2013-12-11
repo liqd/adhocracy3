@@ -1,35 +1,15 @@
-import transaction
-from pyramid_zodbconn import get_connection
 from pyramid.config import Configurator
-from substanced.stats import statsd_incr
-
-
-def root_factory(request, t=transaction, g=get_connection,
-                 mark_unfinished_as_finished=False):
-    """ Return a Pyramid ``root_factory``.
-
-    Accept a request and return an instance of the ``Root``
-    content type.
-
-    """
-    # accepts "t", "g", and "mark_unfinished_as_finished" for unit testing
-    # purposes only
-    conn = g(request)
-    zodb_root = conn.root()
-    if not 'app_root' in zodb_root:
-        registry = request.registry
-        app_root = registry.content.create('Root')
-        zodb_root['app_root'] = app_root
-        t.savepoint()  # give app_root a _p_jar
-        if mark_unfinished_as_finished:
-            mark_unfinished_as_finished(app_root, registry, t)
-        t.commit()
-    statsd_incr('root_factory', rate=.1)
-    return zodb_root['app_root']
+from pyramid.authorization import ACLAuthorizationPolicy
+from substanced import root_factory
 
 
 def includeme(config):
     """Setup basic adhocracy."""
+    # FIXME: Fix substanced.sdi bug: you need to register the authorisation utility first,
+    # then the auhentication.
+    authz_policy = ACLAuthorizationPolicy()
+    config.set_authorization_policy(authz_policy)
+    # now we can proceed
     config.include('substanced')
     config.commit()  # commit to allow proper config overrides
     config.include('.properties')
