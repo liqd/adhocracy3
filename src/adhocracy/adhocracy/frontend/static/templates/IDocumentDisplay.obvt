@@ -1,8 +1,11 @@
 <!-- <pre>{@.}</pre> -->
 
-<span data-with="data.P_IDocument">
-    <h3>Document title: "{title}"</h3>
-    <p><small>{description}</small></p>
+<span data-with="data.adhocracy#propertysheets#interfaces#IDocument">
+    <div class="document_header">
+        <h3>{title}</h3>
+        <p><small>{description}</small></p>
+        <button type="button" class="edit_button" data-on="click|edit">edit</button>
+    </div>
     <ol>
         <li data-repeat="paragraphs" data-render="path"></li>
     </ol>

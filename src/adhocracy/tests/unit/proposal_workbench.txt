@@ -17,18 +17,22 @@ Open Proposal Detail View
     Wait Until Page Contains Element   sizzle=#proposal_workbench_detail h3  timeout=3 secs
 
 Open Proposal Editor
-    Element Should Be Visible          sizzle=#proposal_workbench_detail .edit_button
-    Click Element                      sizzle=#proposal_workbench_detail .edit_button
-    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .save_button  timeout=3 secs
-    Element Should Be Visible          sizzle=#proposal_workbench_detail .save_button
+    Element Should Be Visible          sizzle=#proposal_workbench_detail .paragraph .edit_button
+    Click Element                      sizzle=#proposal_workbench_detail .paragraph .edit_button
+    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .paragraph .save_button  timeout=3 secs
+    Element Should Be Visible          sizzle=#proposal_workbench_detail .paragraph .save_button
 
-Edit Proposal
-    Input Text                         sizzle=#proposal_workbench_detail textarea  ${PAR NEW}
-    Click Element                      sizzle=#proposal_workbench_detail .save_button
-    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .edit_button  timeout=3 secs
+Edit Paragraph
+    Input Text                         sizzle=#proposal_workbench_detail .paragraph textarea  ${PAR NEW}
+    Click Element                      sizzle=#proposal_workbench_detail .paragraph .save_button
+
+    # confirm that re-render worked.
+    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .paragraph .edit_button  timeout=3 secs
+    Sleep  1 secs   # this seens to be necessary.  (why?)
+    Element Should Contain  sizzle=#proposal_workbench_detail .paragraph  ${PAR NEW}
 
     # confirm that POST worked.
-    Create Session  a3  http://localhost:8000
+    Create Session  a3  ${PAGE URL}
     ${resp}=  Get  a3  /adhocracy/p_0/p_0/v_2  # (FIXME: can we do better here than using a static url?)
     Should Be Equal As Strings  ${resp.status_code}  200
 
@@ -38,7 +42,71 @@ Edit Proposal
     Dictionary Should Contain Key  ${jsondata}  data
     Should Be Equal  ${jsondata['data']['adhocracy.propertysheets.interfaces.IParagraph']['text']}  ${PAR NEW}
 
-    # confirm that re-render worked.  (FIXME: wait for this with timeout=3 secs)
-    Element Should Contain  sizzle=#proposal_workbench_detail  ${PAR NEW}
+Edit Proposal Header
+    Element Should Be Visible  sizzle=#proposal_workbench_detail .document_header .edit_button
+    Click Element  sizzle=#proposal_workbench_detail .document_header .edit_button
+    Wait Until Page Contains Element  sizzle=#proposal_workbench_detail .document_header .save_button
+    Element Should Be Visible  sizzle=#proposal_workbench_detail .document_header .save_button
+
+    Input Text                         sizzle=#proposal_workbench_detail .document_header .edit_document_title        ${PAR NEW} title
+    Input Text                         sizzle=#proposal_workbench_detail .document_header .edit_document_description  ${PAR NEW} description
+    Click Element                      sizzle=#proposal_workbench_detail .document_header .save_button
+
+    # confirm that re-render worked.
+    Wait Until Page Contains Element   sizzle=#proposal_workbench_detail .document_header .edit_button  timeout=3 secs
+    Sleep  1 secs   # this seens to be necessary.  (why?)
+    Element Should Contain  sizzle=#proposal_workbench_detail .document_header  ${PAR NEW} title
+    Element Should Contain  sizzle=#proposal_workbench_detail .document_header  ${PAR NEW} description
+
+    # confirm that POST worked.
+    Create Session  a3  ${PAGE URL}
+    ${resp}=  Get  a3  /adhocracy/p_0/v_5  # (FIXME: can we do better here than using a static url?)
+    Should Be Equal As Strings  ${resp.status_code}  200
+
+    ${jsondata}=  ToJSON  ${resp.content}
+    Dictionary Should Contain Key  ${jsondata}  content_type
+    Dictionary Should Contain Key  ${jsondata}  path
+    Dictionary Should Contain Key  ${jsondata}  data
+    Should Be Equal  ${jsondata['data']['adhocracy.propertysheets.interfaces.IDocument']['title']}        ${PAR NEW} title
+    Should Be Equal  ${jsondata['data']['adhocracy.propertysheets.interfaces.IDocument']['description']}  ${PAR NEW} description
+
+Create New Paragraph
+    Click Element  sizzle=.create_paragraph_button
+    Click Element  sizzle=.create_paragraph_button
+    Click Element  sizzle=.create_paragraph_button
+    Sleep  1 secs
+
+    Create Session  a3  ${PAGE URL}
+    ${resp}=  Get  a3  /adhocracy/p_0/v_8  # (FIXME: as above)
+    Should Be Equal As Strings  ${resp.status_code}  200
+    ${jsondata}=  ToJSON  ${resp.content}
+    ${length}=  Get Length  ${jsondata['data']['adhocracy.propertysheets.interfaces.IDocument']['paragraphs']}
+    Should Be Equal As Integers  ${length}  7
+
+Create New Proposal
+    Click Element  sizzle=.create_proposal_button
+    Sleep  1 secs
+
+    Create Session  a3  ${PAGE URL}
+    ${resp}=  Get  a3  /adhocracy/p_3/v_0  # (FIXME: as above)
+    Should Be Equal As Strings  ${resp.status_code}  200
+    ${jsondata}=  ToJSON  ${resp.content}
+    Should Be Equal As Strings  ${jsondata['data']['adhocracy.propertysheets.interfaces.IDocument']['title']}  (empty title)
+
+
+
+# edit two paragraphs simultaneously (see ../adhocracy/frontend/static/00_attic/frontend.js)
+# reload button in detail view.
+# back button.  (what do we want from that?)
+# if document is in edit mode: always add an empty new paragraph at the end.
+# if and only if there is any text in it when document is saved, a new paragraph will be appended to the document.
+# (empty paragraph also has the save button that works as usual.)
+# delete button for paragraphs.  saving empty paragraphs also deletes paragraph.
+# delete button for proposals.
+# move paragraphs (d3js)
+# filter search
+# facetted search
+
+
 
 [Teardown]  Close Browser

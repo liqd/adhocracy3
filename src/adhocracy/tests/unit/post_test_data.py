@@ -6,21 +6,22 @@ import json
 import requests
 
 if 'A3_TEST_SERVER' in os.environ and os.environ['A3_TEST_SERVER']:
-    server = os.environ['A3_TEST_SERVER']
+    server = os.environ['A3_TEST_SERVER'].rstrip('/')
 else:
     server = "http://localhost:6541"
 
 rootpath = "/adhocracy/"
+null = None  # for more js-ish json representation
 
-data = {
+data = json.dumps({
     "data": {},
     "content_type": "adhocracy.contents.interfaces.IProposalContainer"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + rootpath
-print '  data: ' + json.dumps(data)
-resp_0 = requests.post(server + rootpath, data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_0 = requests.post(server + rootpath, data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -35,7 +36,7 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {
         "adhocracy.propertysheets.interfaces.IDocument": {
             "paragraphs": [],
@@ -44,12 +45,12 @@ data = {
         }
     },
     "content_type": "adhocracy.contents.interfaces.IProposal"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
-print '  data: ' + json.dumps(data)
-resp_1 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_1 = requests.post(server + resp_0.json()['path'], data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -64,15 +65,15 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {},
     "content_type": "adhocracy.contents.interfaces.IProposalContainer"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + rootpath
-print '  data: ' + json.dumps(data)
-resp_2 = requests.post(server + rootpath, data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_2 = requests.post(server + rootpath, data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -87,15 +88,15 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {},
     "content_type": "adhocracy.contents.interfaces.IProposalContainer"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + rootpath
-print '  data: ' + json.dumps(data)
-resp_3 = requests.post(server + rootpath, data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_3 = requests.post(server + rootpath, data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -110,15 +111,15 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {},
     "content_type": "adhocracy.contents.interfaces.IParagraphContainer"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
-print '  data: ' + json.dumps(data)
-resp_4 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_4 = requests.post(server + resp_0.json()['path'], data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -133,15 +134,15 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {},
     "content_type": "adhocracy.contents.interfaces.IParagraphContainer"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
-print '  data: ' + json.dumps(data)
-resp_5 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_5 = requests.post(server + resp_0.json()['path'], data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -156,15 +157,15 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {},
     "content_type": "adhocracy.contents.interfaces.IParagraphContainer"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
-print '  data: ' + json.dumps(data)
-resp_6 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_6 = requests.post(server + resp_0.json()['path'], data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -179,15 +180,15 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {},
     "content_type": "adhocracy.contents.interfaces.IParagraphContainer"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
-print '  data: ' + json.dumps(data)
-resp_7 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_7 = requests.post(server + resp_0.json()['path'], data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -202,15 +203,15 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {},
     "content_type": "adhocracy.contents.interfaces.IParagraph"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_4.json()['path']
-print '  data: ' + json.dumps(data)
-resp_8 = requests.post(server + resp_4.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_8 = requests.post(server + resp_4.json()['path'], data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -225,19 +226,19 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {
         "adhocracy.propertysheets.interfaces.IParagraph": {
             "text": "Schwach ist sein Gang, mit kurzen Trippelschrittchen\nvom Heck zum Kiel, seniorenhaft verdreht.\nQuecksilberfischig jedes zweite Trittchen,\nweil er auf einem Narwal-Holzbein geht.\n"
         }
     },
     "content_type": "adhocracy.contents.interfaces.IParagraph"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_5.json()['path']
-print '  data: ' + json.dumps(data)
-resp_10 = requests.post(server + resp_5.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_10 = requests.post(server + resp_5.json()['path'], data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -252,19 +253,19 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {
         "adhocracy.propertysheets.interfaces.IParagraph": {
             "text": "Nur einmal schiebt der Vorhang vom Pupillchen\nsich auf: Europa retten kann nur er!\nStark wie ein Wal war früher ja sein Willchen.\nDoch heute? Käpt’n Iglo bläst nicht mehr.\n"
         }
     },
     "content_type": "adhocracy.contents.interfaces.IParagraph"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_6.json()['path']
-print '  data: ' + json.dumps(data)
-resp_11 = requests.post(server + resp_6.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_11 = requests.post(server + resp_6.json()['path'], data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -279,19 +280,19 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {
         "adhocracy.propertysheets.interfaces.IParagraph": {
             "text": "...\n"
         }
     },
     "content_type": "adhocracy.contents.interfaces.IParagraph"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_7.json()['path']
-print '  data: ' + json.dumps(data)
-resp_12 = requests.post(server + resp_7.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_12 = requests.post(server + resp_7.json()['path'], data=data, headers={'content-type': 'text/json',})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -306,7 +307,7 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {
         "adhocracy.propertysheets.interfaces.IDocument": {
             "paragraphs": [
@@ -336,12 +337,12 @@ data = {
         }
     },
     "content_type": "adhocracy.contents.interfaces.IProposal"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_0.json()['path']
-print '  data: ' + json.dumps(data)
-resp_13 = requests.post(server + resp_0.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',})
+print '  data: ' + data
+resp_13 = requests.post(server + resp_0.json()['path'], data=data, headers={'content-type': 'text/json',    'follows': resp_1.json()['path'],})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -356,19 +357,19 @@ else:
     print 'giving up!'
     exit(1)
 
-data = {
+data = json.dumps({
     "data": {
         "adhocracy.propertysheets.interfaces.IParagraph": {
             "text": "Sein Bart ist vom Vorüberziehn der Stäbchen\nganz weiß geworden, so wie nicht mehr frisch.\nIhm ist, als wenn es tausend Stäbchen gäbchen\nund in den tausend Stäbchen keinen Fisch.\n"
         }
     },
     "content_type": "adhocracy.contents.interfaces.IParagraph"
-}
+})
 print '====================================================================== [REQUEST]'
 print '  method: ' + 'post'
 print '  uri: ' + server + resp_4.json()['path']
-print '  data: ' + json.dumps(data)
-resp_19 = requests.post(server + resp_4.json()['path'], data=json.dumps(data), headers={'content-type': 'text/json',    'follows': resp_8.json()['path'],})
+print '  data: ' + data
+resp_19 = requests.post(server + resp_4.json()['path'], data=data, headers={'content-type': 'text/json',    'follows': resp_8.json()['path'],})
 print ''
 
 print '---------------------------------------------------------------------- [RESPONSE]'
@@ -379,6 +380,26 @@ if resp_19.status_code == 200:
 
 else:
     print '  data: ' + resp_19.text
+    print ''
+    print 'giving up!'
+    exit(1)
+
+data = ''
+print '====================================================================== [REQUEST]'
+print '  method: ' + 'get'
+print '  uri: ' + server + resp_0.json()['path']
+print '  data: ' + data
+resp_21 = requests.get(server + resp_0.json()['path'], data=data, headers={'content-type': 'text/json',})
+print ''
+
+print '---------------------------------------------------------------------- [RESPONSE]'
+print '  code: ' + str(resp_21.status_code)
+if resp_21.status_code == 200:
+    print '  data: ' + json.dumps(resp_21.json())
+    print ''
+
+else:
+    print '  data: ' + resp_21.text
     print ''
     print 'giving up!'
     exit(1)

@@ -1,7 +1,12 @@
 <table border="1">
+
+  <pre><div id="wstest"></div></pre>
+
   <tr>
     <td>
+      <button type="button" class="create_proposal_button">create new proposal</button>
       <div id="proposal_workbench_detail"></div>
+      <button type="button" class="create_paragraph_button">create new paragraph</button>
     </td>
     <td>
       <div id="proposal_workbench_directory"

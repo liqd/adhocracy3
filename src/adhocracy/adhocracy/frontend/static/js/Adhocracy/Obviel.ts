@@ -3,58 +3,106 @@
 
 var obviel = require('obviel');
 
+import Types = require('Adhocracy/Types');
+
 export function register_transformer() {
 
     // register global transformer to add obviel ifaces attribute to
     // the received json objects.  also runs s/\./#/g on property
     // sheet names.
-    obviel.transformer(function(obj, path, name) {
-
-        // strip noise from content type and property sheet types
-        obj.content_type = 'C_' + obj.content_type.substring(obj.content_type.lastIndexOf(".") + 1);
-
-        for (i in obj.data) {
-            var i_local = 'P_' + i.substring(i.lastIndexOf(".") + 1);
-            obj.data[i_local] = obj.data[i];
-            delete obj.data[i];
-        }
-
-        // add content type to ifaces
-        var main_interface = obj.content_type;
-        if (typeof(main_interface) == 'undefined') {
-            throw ("Object " + obj  + " from path " + path + " has no 'content_type' field");
-        };
-        obj.ifaces = [main_interface];
-
-        // add all property sheet types as ifaces
-        for (var i in obj.data) {
-            obj.ifaces.push(i);
-        };
-
-        return obj;
-    });
+    obviel.transformer(jsonAfterReceive);
 }
 
 
-export interface Content {
-    content_type: string;
-    path?: string;
-    data?: Object;
+// in-transformer.  call this on every object first thing it hits us
+// from the server.
+export function jsonAfterReceive(inobj : Types.Content, path) : Types.Content {
+    // strip noise from content type and property sheet types
+    var outobj : Types.Content = {
+        content_type: importContentType(inobj.content_type),
+        path: inobj.path,
+        data: {},
+    }
+
+    for (i in inobj.data) {
+        var i_local = importPropertyType(i);
+        outobj.data[i_local] = changeContentTypeRecursively(inobj.data[i], importContentType);
+    }
+
+    // add content type to ifaces
+    outobj.ifaces = [outobj.content_type];
+
+    // add all property sheet types as ifaces
+    for (var i in outobj.data) {
+        outobj.ifaces.push(i);
+    };
+
+    return outobj;
 }
+
 
 // out-transformer.  call this on every object before sending it back
 // to the server.
-export function make_postable(inobj : Content) {
+export function jsonBeforeSend(inobj : Types.Content) : Types.Content {
     var i;
-    var outobj : Content = {
-        content_type: 'adhocracy.contents.interfaces.' + inobj.content_type.substring(2),
-        data: {}
+    var outobj : Types.Content = {
+        content_type: exportContentType(inobj.content_type),
+        data: {},
     };
 
+    // FIXME: Get this list from the server!  (How?)
+    var readOnlyProperties = ['adhocracy#propertysheets#interfaces#IVersions'];
+
     for (i in inobj['data']) {
-        var i_remote = 'adhocracy.propertysheets.interfaces.' + i.substring(2);
-        outobj.data[i_remote] = inobj.data[i];
+        if (readOnlyProperties.indexOf(i) < 0) {
+            var i_remote = exportPropertyType(i);
+            outobj.data[i_remote] = changeContentTypeRecursively(inobj.data[i], exportContentType);
+        }
     }
 
     return outobj;
+}
+
+
+function importContentType(s : string) : string {
+    // return 'C_' + s.substring(s.lastIndexOf(".") + 1);
+    return s.replace(/\./g, "#");
+}
+
+function exportContentType(s : string) : string {
+    // return 'adhocracy.contents.interfaces.' + s.substring(2);
+    return s.replace(/#/g, ".");
+}
+
+function importPropertyType(s : string) : string {
+    // return 'P_' + s.substring(s.lastIndexOf(".") + 1);
+    return s.replace(/\./g, "#");
+}
+
+function exportPropertyType(s : string) : string {
+    // return 'adhocracy.propertysheets.interfaces.' + s.substring(2);
+    return s.replace(/#/g, ".");
+}
+
+function changeContentTypeRecursively(obj, f) {
+    var t = Object.prototype.toString.call(obj);
+
+    switch(t) {
+    case '[object Object]':
+        var newobj = {};
+        for (var k in obj) {
+            if (k == 'content_type') {
+                newobj[k] = exportContentType(obj[k]);
+            } else {
+                newobj[k] = changeContentTypeRecursively(obj[k], f);
+            }
+        }
+        return newobj;
+
+    case '[object Array]':
+        return obj.map(function(el) { return changeContentTypeRecursively(el, f); });
+
+    default:
+        return obj;
+    }
 }

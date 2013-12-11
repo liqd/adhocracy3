@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <title>Proposal Workbench</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/static/stylesheets/a3.css" />
+        <script type="text/javascript"
+                src="/static/submodules/requirejs/require.js"></script>
+        <script type="text/javascript"
+                src="/static/require-config.js"></script>
+    </head>
+    <body>
+      <!-- app -->
+      <div id="adhocracy">[javascript is not running]</div>
+      <script>
+          function supports_history_api() {
+              return !!(window.history && history.pushState);
+          };
+          console.log('history api support: ' + supports_history_api().toString());
+
+          require(['jquery', 'obviel'], function() {
+              require(['Adhocracy/Frames/ProposalWorkbench'], function(ProposalWorkbench) {
+                  var uri = ProposalWorkbench.poolUri('/adhocracy');
+                  $(document).ready(function() { ProposalWorkbench.open_proposals(uri); });
+
+                  // FIXME: '.load' isn't executed: why?
+                  $(document).load(function() { console.log('page load complete'); });
+              });
+          });
+      </script>
+
+      <!-- obviel hackery -->
+      <hr>
+      <div id="debug_links"></div>
+    </body>
+</html>
