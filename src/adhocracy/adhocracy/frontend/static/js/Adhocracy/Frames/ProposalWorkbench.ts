@@ -1,23 +1,25 @@
 /// <reference path="../../../submodules/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../submodules/DefinitelyTyped/jquery/jquery.d.ts"/>
-
-// FIXME: remove submodules jquery-datalink/, jquery-bbq/ (hash urls
-// aka fragments are obsoleted by html5 history api)
+/// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 declare var $ : any;  // FIXME: use jquery git submodule, pick a more recent version, and tc-wrap it propertly.
 declare var window : any;    // FIXME: type this more rigorously
 declare var history : any;   // FIXME: type this more rigorously
 
-var obviel : any = require('obviel');
-
 import Types = require('Adhocracy/Types');
-import Obviel = require('Adhocracy/Obviel');
-import Util = require('Adhocracy/Util');
+// import Obviel = require('Adhocracy/Obviel');
+// import Util = require('Adhocracy/Util');
 import Css = require('Adhocracy/Css');
 
 var templatePath : string = '/static/templates';
 var appPrefix : string = '/app';
 var jsonPrefix : string = '/adhocracy';
+
+
+
+
+
+/*
 
 export function open_proposals(jsonUri : string, done ?: any) {
 
@@ -505,3 +507,5 @@ export function closeWs(sizzle : string) {
         delete wsdict[sizzle];
     }
 }
+
+*/
