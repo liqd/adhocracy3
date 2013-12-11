@@ -1,4 +1,5 @@
 from adhocracy.properties.interfaces import IProperty
+from collections import UserDict
 from pyramid.testing import DummyRequest
 from substanced.interfaces import IFolder
 from unittest.mock import patch
@@ -16,8 +17,9 @@ import pytest
 
 
 @implementer(IFolder)
-class DummyFolder(dict):
+class DummyFolder(UserDict):
     interfaces = []
+    __parent__ = None
 
 
 class InterfaceY(Interface):
@@ -243,6 +245,47 @@ def test_resourcepropertysheet_set_cstruct_non_valid_required_and_readonly():
         inst.set_cstruct({})
 
 
+def _poolpropertysheet_make_one(*args):
+    from . import PoolPropertySheetAdapter
+    return PoolPropertySheetAdapter(*args)
+
+
+def test_poolpropertysheet_create_valid():
+    from adhocracy.interfaces import IResourcePropertySheet
+    from zope.interface.verify import verifyObject
+    from adhocracy.properties.interfaces import IPool
+    from pyramid.httpexceptions import HTTPNotImplemented
+    inst = _poolpropertysheet_make_one(DummyFolder(), None, IPool)
+    assert verifyObject(IResourcePropertySheet, inst) is True
+    with pytest.raises(HTTPNotImplemented):
+        inst.set_cstruct({})
+    with pytest.raises(HTTPNotImplemented):
+        inst.set({})
+
+
+def test_poolpropertysheet_create_non_valid():
+    with pytest.raises(AssertionError):
+        _poolpropertysheet_make_one(DummyFolder(), None, IPropertyB)
+
+
+def test_poolpropertysheet_get_empty():
+    from adhocracy.properties.interfaces import IPool
+    context = _make_folder_with_objectmap()
+    context.__objectmap__.pathlookup.return_value = []
+    inst = _poolpropertysheet_make_one(context, None, IPool)
+    assert inst.get() == {"elements": []}
+
+
+def test_poolpropertysheet_get_not_empty():
+    from adhocracy.properties.interfaces import IPool
+    context = _make_folder_with_objectmap()
+    context.__objectmap__.pathlookup.return_value = [1]
+    context.__objectmap__.path_for.return_value = ("", "child1")
+    context["child1"] = DummyFolder()
+    inst = _poolpropertysheet_make_one(context, None, IPool)
+    assert inst.get() == {"elements": ["/child1"]}
+
+
 ############################################
 #  test includeme and adapter registration #
 ############################################
@@ -337,6 +380,8 @@ def test_includeme_register_ipropertysheet_adapter_iversionable(config):
 
 def test_includeme_register_ipropertysheet_adapter_ipool(config):
     from adhocracy.properties.interfaces import IPool
+    from adhocracy.properties import PoolPropertySheetAdapter
     config.include("adhocracy.properties")
     inst = _includeme_make_one(config, DummyFolder(), DummyRequest(), IPool)
+    assert isinstance(inst, PoolPropertySheetAdapter)
     assert inst.iface is IPool

@@ -10,9 +10,14 @@ from adhocracy.schema import ReferenceSetSchemaNode
 from collections.abc import Mapping
 from pyramid.compat import is_nonstr_iter
 from pyramid.interfaces import IRequest
+from pyramid.httpexceptions import HTTPNotImplemented
 from substanced.property import PropertySheet
 from substanced.util import find_objectmap
-from zope.interface import implementer, alsoProvides
+from zope.interface import (
+    implementer,
+    alsoProvides,
+    Interface,
+)
 from zope.dottedname.resolve import resolve
 
 import colander
@@ -20,7 +25,7 @@ import colander
 
 @implementer(IResourcePropertySheet)
 class ResourcePropertySheetAdapter(PropertySheet):
-    """ read interface.."""
+    """ Read interface.."""
 
     def __init__(self, context, request, iface):
         assert isinstance(context, Mapping)
@@ -33,6 +38,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         schema_class = resolve(taggedvalues["schema"])
         schema_obj = schema_class()
         self.schema = schema_obj.bind(context=context, request=request)
+        self._objectmap = find_objectmap(self.context)
         for child in self.schema:
             assert child.default is not colander.null
             assert child.missing is colander.drop
@@ -80,10 +86,9 @@ class ResourcePropertySheetAdapter(PropertySheet):
         changed_items = diff_dict(old_struct, struct)
         self._data.update(changed_items)
 
-        objectmap = find_objectmap(self.context)
         for keyname, reftype in self._references.items():
             for target_oid in changed_items.get(keyname, []):
-                objectmap.connect(self.context, target_oid, reftype)
+                self._objectmap.connect(self.context, target_oid, reftype)
 
         return False if not changed_items else True
 
@@ -101,6 +106,28 @@ class ResourcePropertySheetAdapter(PropertySheet):
         return cstruct
 
 
+@implementer(IResourcePropertySheet)
+class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
+
+    def __init__(self, context, request, iface):
+        assert iface.isOrExtends(interfaces.IPool)
+        super(PoolPropertySheetAdapter, self).__init__(context, request, iface)
+
+    def get(self):
+        struct = super(PoolPropertySheetAdapter, self).get()
+        oids = self._objectmap.pathlookup(self.context, depth=1)
+        for oid in oids:
+            path = "/".join(self._objectmap.path_for(oid))
+            struct["elements"].append(path)
+        return struct
+
+    def set(self, struct, omit=()):
+        raise HTTPNotImplemented()
+
+    def set_cstruct(self, cstruct):
+        raise HTTPNotImplemented()
+
+
 def includeme(config):
     """Iterate all IProperty interfaces and register propertysheet adapters."""
 
@@ -109,5 +136,9 @@ def includeme(config):
     for iface in ifaces:
         alsoProvides(iface, IIProperty)
         config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                        (iface, IRequest, IIProperty),
+                                        (iface, IRequest, Interface),
                                         IResourcePropertySheet)
+
+    config.registry.registerAdapter(PoolPropertySheetAdapter,
+                                    (interfaces.IPool, IRequest, IIProperty),
+                                    IResourcePropertySheet)
