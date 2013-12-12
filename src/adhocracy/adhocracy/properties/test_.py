@@ -97,6 +97,8 @@ def test_resourcepropertysheet_create_valid():
     inst = _resourcepropertysheet_make_one(context, request, iproperty)
     assert inst.context == context
     assert inst.request == request
+    assert inst.permission_view == "view"
+    assert inst.permission_edit == "edit"
     assert isinstance(inst.schema, CountSchema)
     assert inst.key == IPropertyB.__identifier__
     assert verifyObject(IResourcePropertySheet, inst) is True

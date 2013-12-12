@@ -28,13 +28,15 @@ class ResourcePropertySheetAdapter(PropertySheet):
     """ Read interface.."""
 
     def __init__(self, context, request, iface):
-        assert isinstance(context, Mapping)
+        assert hasattr(context, "__setitem__")
         assert iface.isOrExtends(interfaces.IProperty)
         self.context = context
         self.request = request
         self.iface = iface
         taggedvalues = get_all_taggedvalues(iface)
         self.key = taggedvalues.get("key") or iface.__identifier__
+        self.permission_view = taggedvalues["permission_view"]
+        self.permission_edit = taggedvalues["permission_edit"]
         schema_class = resolve(taggedvalues["schema"])
         schema_obj = schema_class()
         self.schema = schema_obj.bind(context=context, request=request)
