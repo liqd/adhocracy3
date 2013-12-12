@@ -65,6 +65,14 @@ app.controller('ATest', function(adhGet, $scope) {
 });
 
 
+app.directive('adhDocumentDetail', function() {
+    return {
+        restrict: 'E',
+        templateUrl: '/static/templates/P/IDocument/ViewDetail.html',
+    }
+});
+
+
 
 // filters
 

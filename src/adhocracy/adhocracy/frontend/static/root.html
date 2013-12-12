@@ -41,13 +41,7 @@
                     </ol>
                 </div>
 
-                <div style="background:yellow">
-                    <p ng-bind="detail.data['P.IDocument'].title"></p>
-                    <small><p ng-bind="detail.data['P.IDocument'].description"></p></small>
-                    <!-- <button type="button" class="edit_button" data-on="click|edit">edit</button> -->
-                    <p ng-repeat="paragraph in detail_paragraphs track by $index">{{paragraph}}</p>
-                    <!-- <pre>{{detail | displayIDocument}}</pre> -->
-                </div>
+                <div adh-document-detail></div>
 
                 <h3>invoice example:</h3>
                 <div>
