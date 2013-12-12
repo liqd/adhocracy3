@@ -26,8 +26,27 @@
 
                 <div>
                     <ol>
-                        <li ng-repeat="entry in directory track by $index">{{entry | fDirectoryEntry}}</li>
+                        <li ng-repeat="entry in directory track by $index">
+                            <div ng-switch="entry">
+                                <div ng-switch-when="undefined">
+                                    <small><tt>(empty DAG)</tt></small>
+                                </div>
+                                <div ng-switch-default>
+                                    <a href ng-click="at.showDetail(entry[0])">
+                                        {{entry[1] | fDirectoryEntry}}
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
                     </ol>
+                </div>
+
+                <div style="background:yellow">
+                    <p ng-bind="detail.data['adhocracy.propertysheets.interfaces.IDocument'].title"></p>
+                    <small><p ng-bind="detail.data['adhocracy.propertysheets.interfaces.IDocument'].description"></p></small>
+                    <!-- <button type="button" class="edit_button" data-on="click|edit">edit</button> -->
+                    <p ng-repeat="paragraph in detail_paragraphs track by $index">{{paragraph}}</p>
+                    <!-- <pre>{{detail | displayIDocument}}</pre> -->
                 </div>
 
                 <h3>invoice example:</h3>
