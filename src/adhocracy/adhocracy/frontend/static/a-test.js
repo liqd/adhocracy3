@@ -43,6 +43,9 @@ app.controller('ATest', function(adhGet, $scope) {
     $scope.detail_paragraphs = [];
 
     this.showDetail = function(path) {
+        $scope.detail = {};
+        $scope.detail_paragraphs = [];
+
         adhGet(path).then(function(data) {
             $scope.detail = data;
 
