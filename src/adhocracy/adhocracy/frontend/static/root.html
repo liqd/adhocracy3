@@ -15,30 +15,38 @@
     <body>
 
 
+<table border="1">
+    <tr>
+        <td>
+            <p>proposal workbench navigation</p>
+        </td>
+        <td>
+            <div ng-controller="ATest as at">
+                <h3>proposal directory</h3>
 
-    <div ng-controller="ATest as at">
-      <h1>...</h1>
+                <div>
+                    <ol>
+                        <li ng-repeat="entry in directory track by $index">{{entry | fDirectoryEntry}}</li>
+                    </ol>
+                </div>
 
-      <div>
-        <ol>
-          <li ng-repeat="entry in directory track by $index">{{entry | fDirectoryEntry}}</li>
-        </ol>
-      </div>
-
-
-      <h1>...</h1>
-
-      <b>Invoice:</b>
-      <div>
-        Quantity: <input type="number" ng-model="at.qty" required >
-      </div>
-      <div>
-        Costs: <input type="number" ng-model="at.cost" required >
-      </div>
-      <div>
-        <b>Total:</b> {{at.qty * at.cost | currency}}
-      </div>
-    </div>
+                <h3>invoice example:</h3>
+                <div>
+                    Quantity: <input type="number" ng-model="at.qty" required >
+                </div>
+                <div>
+                    Costs: <input type="number" ng-model="at.cost" required >
+                </div>
+                <div>
+                    <b>Total:</b> {{at.qty * at.cost | currency}}
+                </div>
+            </div>
+        </td>
+        <td>
+            <p>proposal workbench changes and discussion</p>
+        </td>
+    </tr>
+</table>
 
 
 
