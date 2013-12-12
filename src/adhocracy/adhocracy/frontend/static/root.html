@@ -1,4 +1,5 @@
-<html>
+<!doctype html>
+<html ng-app="ATestMod">
     <head>
         <title>Proposal Workbench</title>
         <meta charset="utf-8">
@@ -7,9 +8,41 @@
                 src="/static/submodules/requirejs/require.js"></script>
         <script type="text/javascript"
                 src="/static/require-config.js"></script>
+        <script src="/static/jquery-1.7.2.js"></script>
+        <script src="/static/angular-1.2.4.js"></script>
+        <script src="/static/a-test.js"></script>
     </head>
     <body>
-      <!-- app -->
+
+
+
+    <div ng-controller="ATest as at">
+      <h1>...</h1>
+
+      <div>
+        <ol>
+          <li ng-repeat="entry in directory track by $index">{{entry | fDirectoryEntry}}</li>
+        </ol>
+      </div>
+
+
+      <h1>...</h1>
+
+      <b>Invoice:</b>
+      <div>
+        Quantity: <input type="number" ng-model="at.qty" required >
+      </div>
+      <div>
+        Costs: <input type="number" ng-model="at.cost" required >
+      </div>
+      <div>
+        <b>Total:</b> {{at.qty * at.cost | currency}}
+      </div>
+    </div>
+
+
+
+      <!-- app --
       <div id="adhocracy">[javascript is not running]</div>
       <script>
           require(['jquery', 'angular'], function() {
@@ -22,5 +55,7 @@
               });
           });
       </script>
+      -->
+
     </body>
 </html>
