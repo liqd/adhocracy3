@@ -1,7 +1,7 @@
-var app = angular.module('ATestMod', []);
+var app = angular.module('Adhocracy', []);
 
 
-app.controller('ATest', function(adhGet, $scope) {
+app.controller('AdhDocumentTOC', function(adhGet, $scope) {
     this.path = '/adhocracy';
 
     adhGet(this.path).then(function(d) {
@@ -62,6 +62,14 @@ app.controller('ATest', function(adhGet, $scope) {
 
     this.qty = 7;
     this.cost = 8;
+});
+
+
+app.directive('adhDocumentWorkbench', function() {
+    return {
+        restrict: 'E',
+        templateUrl: '/static/templates/P/IDocument/Workbench.html',
+    }
 });
 
 
