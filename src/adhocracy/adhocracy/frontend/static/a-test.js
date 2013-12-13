@@ -211,8 +211,6 @@ app.factory('adhHttp', function($http) {
 var importContent = translateContent(shortenType);
 
 var exportContent = function(obj) {
-    console.log(obj.data['P.IDocument'].title);  // (FIXME: remove when done debugging)
-
     newobj = translateContent(unshortenType)(obj);
 
     // FIXME: Get this list from the server!
