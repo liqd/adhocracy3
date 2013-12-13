@@ -24,7 +24,7 @@ class IProperty(Interface):
 
     """Marker interface with tagged values to define resource data."""
 
-    taggedValue("schema", "substanced.schema.Schema")
+    taggedValue("schema", "colander.MappingSchema")
     """Reference colander data schema.
 
     This schema has to define the facade to work with this resource.

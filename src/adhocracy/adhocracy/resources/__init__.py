@@ -6,7 +6,10 @@ from adhocracy.utils import (
 )
 from substanced.content import add_content_type
 from zope.dottedname.resolve import resolve
-from zope.interface import directlyProvides
+from zope.interface import (
+    directlyProvides,
+    alsoProvides,
+)
 
 
 class ResourceFactory(object):
@@ -26,21 +29,26 @@ class ResourceFactory(object):
 
     def __call__(self, **kwargs):
         content = self.class_()
-        directlyProvides(content, [self.resource_iface] + self.prop_ifaces)
+        directlyProvides(content, self.resource_iface)
+        alsoProvides(content, self.prop_ifaces)
         return content
 
 
 def includeme(config):
-    """Iterate all resource interfaces and register substanced content types."""
+    """Register factories in substanced content registry.
+
+    Iterate all resource interfaces and automatically register factories.
+
+    """
+
+    config.include("adhocracy.resources.registry")
 
     ifaces = get_ifaces_from_module(interfaces,
-                            base=interfaces.IResource)
+                                    base=interfaces.IResource)
     for iface in ifaces:
-        is_implicit_addable = iface.queryTaggedValue("is_implicit_addable")
+        name = iface.queryTaggedValue("content_name") or iface.__identifier__
         meta = {
-            "content_name": iface.queryTaggedValue("content_name") or iface.__identifier__,
-            "addable_content_interfaces": iface.queryTaggedValue("addable_content_interfaces") or [],
-            "is_implicit_addable": is_implicit_addable if is_implicit_addable is not None else True,
+            "content_name": name,
             "add_view": "add_" + iface.__identifier__,
             }
         add_content_type(config, iface.__identifier__,

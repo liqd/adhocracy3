@@ -15,7 +15,7 @@ Some imports to work with rest api calls::
 Start Adhocracy testapp::
 
     >>> from webtest import TestApp
-    >>> from adhocracy.conftest import settings_functional
+    >>> from adhocracy.testing import settings_functional
     >>> from adhocracy import main
 
     >>> if 'A3_TEST_SERVER' in os.environ and os.environ['A3_TEST_SERVER']:
@@ -77,21 +77,24 @@ Returns possible methods for this resource and available interfaces
 with resources data::
 
     >>> resp = testapp.options("/adhocracy")
-    >>> pprint_json(resp.json, [['PUT'], ['GET']])
+    >>> pprint_json(resp.json)
     {
-        "GET": [
-            "adhocracy.properties.interfaces.IName",
-            "adhocracy.properties.interfaces.IPool"
-        ],
-        "HEAD": [],
-        "POST": [
-            "adhocracy.resources.interfaces.IPool",
-            "adhocracy.resources.interfaces.IProposalVersionsPool"
-        ],
-        "PUT": [
-            "adhocracy.properties.interfaces.IName",
-            "adhocracy.properties.interfaces.IPool"
-        ]
+        "GET": {"response_body": [
+                    "adhocracy.properties.interfaces.IName",
+                    "adhocracy.properties.interfaces.IPool", 
+                    ],
+               }, 
+        "HEAD": {},
+        "POST": {"request_body": [
+                    "adhocracy.resources.interfaces.IPool",
+                    "adhocracy.resources.interfaces.IProposalVersionsPool",
+                    ],
+        },
+        "PUT": {"request_body": [
+                    "adhocracy.properties.interfaces.IName",
+                    "adhocracy.properties.interfaces.IPool",
+                    ],
+               },
     }
 
 FIXME: IName property sheet will go away.  It used to be an

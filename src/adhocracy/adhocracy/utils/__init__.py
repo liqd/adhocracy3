@@ -38,6 +38,18 @@ def get_ifaces_from_module(module, base=Interface, blacklist=[]):
     return ifaces
 
 
+def diff_dict(dict, dict_updates):
+    """Return dict with all items in dict_updates that are not in dict"""
+    dict_diff = {}
+    for key, value in dict_updates.items():
+        if key not in dict:
+            dict_diff[key] = value
+        else:
+            if dict[key] != dict_updates[key]:
+               dict_diff[key] = value
+    return dict_diff
+
+
 def sort_dict(d, sort_paths):
     d2 = copy.deepcopy(d)
     for path in sort_paths:

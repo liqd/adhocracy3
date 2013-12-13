@@ -1,6 +1,27 @@
 from pyramid.config import Configurator
+from pyramid_zodbconn import get_connection
 from pyramid.authorization import ACLAuthorizationPolicy
-from substanced import root_factory
+from substanced.evolution import mark_unfinished_as_finished as markunf
+
+import transaction
+
+
+def root_factory(request, t=transaction, g=get_connection,
+                 mark_unfinished_as_finished=False):
+    """ A function which can be used as a Pyramid ``root_factory``.  It
+    accepts a request and returns an instance of the ``Root`` content type."""
+    #FIXME: Fix substanced bug: mark_unfinished_as_finished keyqord is not working
+    conn = g(request)
+    zodb_root = conn.root()
+    if not 'app_root' in zodb_root:
+        registry = request.registry
+        app_root = registry.content.create('Root')
+        zodb_root['app_root'] = app_root
+        t.savepoint() # give app_root a _p_jar
+        if mark_unfinished_as_finished:
+            markunf(app_root, registry, t)
+        t.commit()
+    return zodb_root['app_root']
 
 
 def includeme(config):
