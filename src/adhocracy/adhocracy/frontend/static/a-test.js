@@ -255,3 +255,17 @@ function changeContentTypeRecursively(obj, f) {
         return obj;
     }
 }
+
+function deepcp(i) {
+    if (typeof(i) == 'object') {
+        if (typeof(i.length) != 'undefined')
+            var o = new Array();
+        else
+            var o = new Object();
+        for (var x in i)
+            o[x] = deepcp(i[x]);
+        return o;
+    } else {
+        return i;
+    }
+}
