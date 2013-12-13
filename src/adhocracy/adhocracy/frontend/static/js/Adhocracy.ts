@@ -1,4 +1,4 @@
-import pwb = require('Adhocracy/Frames/ProposalWorkbench');
+import pwb = require('Adhocracy/Pages/DocumentWorkbench');
 
 export function init() {
 }

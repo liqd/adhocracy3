@@ -7,9 +7,9 @@ declare var window : any;    // FIXME: type this more rigorously
 declare var history : any;   // FIXME: type this more rigorously
 
 import Types = require('Adhocracy/Types');
-// import Obviel = require('Adhocracy/Obviel');
-// import Util = require('Adhocracy/Util');
+import Util = require('Adhocracy/Util');
 import Css = require('Adhocracy/Css');
+import AdhHttp = require('Adhocracy/Services/AdhHttp');
 
 var templatePath : string = '/static/templates';
 var appPrefix : string = '/app';
