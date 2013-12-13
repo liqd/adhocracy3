@@ -39,25 +39,19 @@ app.controller('AdhDocumentTOC', function(adhHttp, $scope) {
         });
     });
 
-    $scope.detail = {};
-    $scope.detail_paragraphs = [];
-
-    this.showDetail = function(path) {
+    function clearDetail() {
         $scope.detail = {};
-        $scope.detail_paragraphs = [];  // for testing: [{text: 'wef'}, {text: 'foqf'}]
+        $scope.detail_paragraphs = {ref: [], xpath: []};
+    }
+
+    clearDetail();
+    this.showDetail = function(path) {
+        clearDetail();
 
         adhHttp.get(path).then(function(data) {
             $scope.detail = data;
             adhHttp.drill(data, ['P.IDocument', ['paragraphs'], 'P.IParagraph'],
                           $scope.detail_paragraphs, true);
-
-            @@@     //      @@@ problem: drill works fine up to the
-                    //      point where something should be written to
-                    //      target.  i don't understand the calling
-                    //      physics of js functions...  perhaps wrap
-                    //      it in another array, and write into one
-                    //      element?  -mf
-
         });
     }
 
@@ -132,7 +126,11 @@ app.factory('adhHttp', function($http) {
                 }
             } else {
                 if (xpath.length == 0) {
-                    target = data;
+                    if (target.xpath.length != 1) {
+                        throw 'not implemented.';
+                    }
+                    target.ref[target.xpath[0]] = data;
+                    console.log(target);  // FIXME: debugging.
                     return;
                 }
                 var step = xpath.shift();
@@ -142,7 +140,8 @@ app.factory('adhHttp', function($http) {
                 }
                 if (step instanceof Array) {
                     if (step.length != 1 || !(typeof(step[0]) == 'string' || typeof(step[0]) == 'number')) {
-                        // FIXME: what about "[[[step]]]"?
+                        // FIXME: what about "[[step]]"?
+                        // FIXME: if xpath contains more than one [step], i don't know what'll happen...
                         console.log(step);
                         throw 'internal';
                     }
@@ -155,12 +154,13 @@ app.factory('adhHttp', function($http) {
                     }
                     elements = data[step];
 
-                    // if target is not an array, make it one.
-                    if (!(target instanceof Array)) {
-                        target = [];
+                    if (!(target.ref instanceof Array)) {
+                        console.log(target);
+                        throw 'not implemented.';
                     }
 
                     if (!ordered) {
+                        console.log(ordered);
                         throw 'not implemented.';
                     }
 
@@ -168,7 +168,11 @@ app.factory('adhHttp', function($http) {
                     // each element, together with the corresponding
                     // element of target.
                     for (ix in elements) {
-                        adhHttp.drill(elements[ix], xpath, target[ix], ordered);
+                        var subtarget = {
+                            ref: target.ref,
+                            xpath: [ix],
+                        };
+                        adhHttp.drill(elements[ix], deepcp(xpath), subtarget, ordered);
                     }
                     return;
                 }
