@@ -1,8 +1,6 @@
-from substanced.interfaces import IFolder
 from unittest.mock import patch
 from zope.interface import (
     Interface,
-    implementer,
 )
 from pyramid import testing
 
@@ -15,14 +13,6 @@ import unittest
 #  helper  #
 ############
 
-@implementer(IFolder)
-class DummyFolder(dict):
-
-    """Dummy dictionary with IFolder interface"""
-
-    interfaces = []
-
-
 class InterfaceY(Interface):
 
     """Useless Interface for testing"""
@@ -30,7 +20,7 @@ class InterfaceY(Interface):
 
 @patch('substanced.objectmap.ObjectMap', autospec=True)
 def make_folder_with_objectmap(dummyobjectmap=None):
-    folder = DummyFolder()
+    folder = testing.DummyResource()
     folder.__objectmap__ = dummyobjectmap.return_value
     return folder
 
