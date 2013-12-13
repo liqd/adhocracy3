@@ -42,6 +42,7 @@ app.controller('AdhDocumentTOC', function(adhHttp, $scope) {
     function clearDetail() {
         $scope.detail = {};
         $scope.detail_paragraphs = {ref: [], xpath: []};
+        $scope.detail_mode = 'display';
     }
 
     clearDetail();
@@ -55,8 +56,20 @@ app.controller('AdhDocumentTOC', function(adhHttp, $scope) {
         });
     }
 
-    this.qty = 7;
-    this.cost = 8;
+    this.showDetailEdit = function() {
+        $scope.detail_old = deepcp($scope.detail);
+        $scope.detail_mode = 'edit';
+    }
+
+    this.showDetailReset = function() {
+        $scope.detail_mode = 'display';
+    }
+
+    this.showDetailSave = function() {
+        adhHttp.postNewVersion($scope.detail_old.path, $scope.detail, function() {
+            $scope.detail_mode = 'display';
+        });
+    }
 });
 
 
@@ -178,6 +191,15 @@ app.factory('adhHttp', function($http) {
                 }
             }
         },
+
+        postNewVersion: function(oldVersionPath, obj, callback) {
+            var dagPath = parentPath(oldVersionPath);
+            var config = {
+                headers: { follows: oldVersionPath },
+                params: {},
+            };
+            return $http.post(dagPath, exportContent(obj), config).then(callback);
+        },
     };
 
     return adhHttp;
@@ -188,7 +210,23 @@ app.factory('adhHttp', function($http) {
 // plumbing
 
 var importContent = translateContent(shortenType);
-var exportContent = translateContent(unshortenType);
+
+var exportContent = function(obj) {
+    console.log(obj.data['P.IDocument'].title);  // (FIXME: remove when done debugging)
+
+    newobj = translateContent(unshortenType)(obj);
+
+    // FIXME: Get this list from the server!
+    var readOnlyProperties = [
+        'adhocracy.propertysheets.interfaces.IVersions'
+    ];
+
+    for (ro in readOnlyProperties)
+        delete newobj.data[readOnlyProperties[ro]];
+
+    delete newobj.path;
+    return newobj;
+}
 
 var contentTypeNameSpaces = {
     'adhocracy.contents.interfaces': 'C'
@@ -260,9 +298,11 @@ function changeContentTypeRecursively(obj, f) {
     }
 }
 
+// Do a deep copy on any javascript object.  The resuling object does
+// not share sub-structures as the original.
 function deepcp(i) {
     if (typeof(i) == 'object') {
-        if (typeof(i.length) != 'undefined')
+        if (i instanceof Array)
             var o = new Array();
         else
             var o = new Object();
@@ -272,4 +312,8 @@ function deepcp(i) {
     } else {
         return i;
     }
+}
+
+function parentPath(url) {
+    return url.substring(0, url.lastIndexOf("/"));
 }

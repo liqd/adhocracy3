@@ -1,11 +1,17 @@
 <div style="background:yellow">
-    <p ng-bind="detail.data['P.IDocument'].title"></p>
-    <small><p ng-bind="detail.data['P.IDocument'].description"></p></small>
-    <button type="button" class="edit_button" data-on="click|edit">edit</button>
-    <p ng-repeat="paragraph in detail_paragraphs.ref track by $index">{{paragraph.text}}</p>
-
-    <!--
-        <p ng-bind="detail_paragraphs"></p>
-        <pre>{{detail | displayIDocument}}</pre>
-      -->
+    <div ng-show="detail_mode == 'display'">
+        <button type="button" class="edit_button" ng-click="at.showDetailEdit()">edit</button>
+        <br>
+        <p ng-bind="detail.data['P.IDocument'].title"></p>
+        <small><p ng-bind="detail.data['P.IDocument'].description"></p></small>
+        <p ng-repeat="paragraph in detail_paragraphs.ref track by $index">{{paragraph.text}}</p>
+    </div>
+    <div ng-show="detail_mode == 'edit'">
+        <button type="button" class="reset_button" ng-click="at.showDetailReset()">reset</button>
+        <button type="button" class="save_button" ng-click="at.showDetailSave()">save</button>
+        <br>
+        <p>title: <textarea ng-bind="detail.data['P.IDocument'].title"></textarea></p>
+        <small><p ng-bind="detail.data['P.IDocument'].description"></p></small>
+        <p ng-repeat="paragraph in detail_paragraphs.ref track by $index">{{paragraph.text}}</p>
+    </div>
 </div>

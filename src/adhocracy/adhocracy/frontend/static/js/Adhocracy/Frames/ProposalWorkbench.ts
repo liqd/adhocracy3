@@ -2,7 +2,7 @@
 /// <reference path="../../../submodules/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-declare var $ : any;  // FIXME: use jquery git submodule, pick a more recent version, and tc-wrap it propertly.
+declare var $ : any;         // FIXME: use jquery git submodule, pick a more recent version, and tc-wrap it propertly.
 declare var window : any;    // FIXME: type this more rigorously
 declare var history : any;   // FIXME: type this more rigorously
 
