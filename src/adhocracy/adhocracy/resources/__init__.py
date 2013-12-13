@@ -6,7 +6,10 @@ from adhocracy.utils import (
 )
 from substanced.content import add_content_type
 from zope.dottedname.resolve import resolve
-from zope.interface import directlyProvides
+from zope.interface import (
+    directlyProvides,
+    alsoProvides,
+)
 
 
 class ResourceFactory(object):
@@ -26,7 +29,8 @@ class ResourceFactory(object):
 
     def __call__(self, **kwargs):
         content = self.class_()
-        directlyProvides(content, [self.resource_iface] + self.prop_ifaces)
+        directlyProvides(content, self.resource_iface)
+        alsoProvides(content, self.prop_ifaces)
         return content
 
 
