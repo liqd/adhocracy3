@@ -143,7 +143,6 @@ app.factory('adhHttp', function($http) {
                         throw 'not implemented.';
                     }
                     target.ref[target.xpath[0]] = data;
-                    console.log(target);  // FIXME: debugging.
                     return;
                 }
                 var step = xpath.shift();
