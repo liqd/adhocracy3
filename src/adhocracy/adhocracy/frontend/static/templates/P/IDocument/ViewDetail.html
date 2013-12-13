@@ -1,7 +1,11 @@
 <div style="background:yellow">
     <p ng-bind="detail.data['P.IDocument'].title"></p>
     <small><p ng-bind="detail.data['P.IDocument'].description"></p></small>
-    <!-- <button type="button" class="edit_button" data-on="click|edit">edit</button> -->
-    <p ng-repeat="paragraph in detail_paragraphs track by $index">{{paragraph}}</p>
-    <!-- <pre>{{detail | displayIDocument}}</pre> -->
+    <button type="button" class="edit_button" data-on="click|edit">edit</button>
+    <p ng-repeat="paragraph in detail_paragraphs track by $index">{{paragraph.text}}</p>
+
+    <!--
+        <p ng-bind="detail_paragraphs"></p>
+        <pre>{{detail | displayIDocument}}</pre>
+      -->
 </div>

@@ -1,10 +1,10 @@
 var app = angular.module('Adhocracy', []);
 
 
-app.controller('AdhDocumentTOC', function(adhGet, $scope) {
+app.controller('AdhDocumentTOC', function(adhHttp, $scope) {
     this.path = '/adhocracy';
 
-    adhGet(this.path).then(function(d) {
+    adhHttp.get(this.path, ['P.Pool']).then(function(d) {
         var pool = d.data['P.IPool'];
 
         $scope.directory = [];
@@ -23,12 +23,12 @@ app.controller('AdhDocumentTOC', function(adhGet, $scope) {
         // replaced by the referenced object before the path is
         // followed further.)
         pool.elements.map(function(ref) {
-            adhGet(ref.path).then(function(dag) {
+            adhHttp.get(ref.path).then(function(dag) {
                 var dagPS = dag.data['P.IDAG'];
                 if (dagPS.versions.length > 0) {
                     var dagPath = dag.path;
                     var headPath = dagPS.versions[0].path;
-                    adhGet(headPath).then(function(doc) {
+                    adhHttp.get(headPath).then(function(doc) {
                         var docPS = doc.data['P.IDocument'];
                         $scope.directory.push([headPath, docPS.title]);
                     });
@@ -44,19 +44,20 @@ app.controller('AdhDocumentTOC', function(adhGet, $scope) {
 
     this.showDetail = function(path) {
         $scope.detail = {};
-        $scope.detail_paragraphs = [];
+        $scope.detail_paragraphs = [];  // for testing: [{text: 'wef'}, {text: 'foqf'}]
 
-        adhGet(path).then(function(data) {
+        adhHttp.get(path).then(function(data) {
             $scope.detail = data;
+            adhHttp.drill(data, ['P.IDocument', ['paragraphs'], 'P.IParagraph'],
+                          $scope.detail_paragraphs, true);
 
-            var paragraphRefs = data.data['P.IDocument'].paragraphs;
-            for (ix in paragraphRefs) {
-                adhGet(paragraphRefs[ix].path).then((function(ix) {
-                    return function(paragraph) {
-                        $scope.detail_paragraphs[ix] = paragraph.data['P.IParagraph'].text;
-                    };
-                })(ix));
-            }
+            @@@     //      @@@ problem: drill works fine up to the
+                    //      point where something should be written to
+                    //      target.  i don't understand the calling
+                    //      physics of js functions...  perhaps wrap
+                    //      it in another array, and write into one
+                    //      element?  -mf
+
         });
     }
 
@@ -97,16 +98,85 @@ app.filter('fDirectoryEntry', [ function() {
 
 // services
 
-app.factory('adhGet', function($http) {
-    return function(path) {
-        return $http.get(path).then(function(response) {
-            if (response.status != 200) {
-                console.log(response);
-                throw ('adhGet: http error ' + response.status.toString() + ' on path ' + path);
+app.factory('adhHttp', function($http) {
+    var adhHttp = {
+        get: function(path) {
+            return $http.get(path).then(function(response) {
+                if (response.status != 200) {
+                    console.log(response);
+                    throw ('adhHttp.get: http error ' + response.status.toString() + ' on path ' + path);
+                }
+                return importContent(response.data);
+            });
+        },
+
+        drill: function(data, xpath, target, ordered) {
+            function resolveReference() {
+                if ('path' in data) {
+                    adhHttp.get(data['path']).then(function(resource) {
+                        adhHttp.drill(resource, xpath, target, ordered);
+                    });
+                } else {
+                    console.log(data);
+                    throw 'adhHttp.drill: not a resource and not a reference.';
+                }
             }
-            return importContent(response.data);
-        });
-    }
+
+            if ('content_type' in data) {
+                if ('data' in data) {
+                    adhHttp.drill(data['data'], xpath, target, ordered);
+                    return;
+                } else {
+                    resolveReference();
+                    return;
+                }
+            } else {
+                if (xpath.length == 0) {
+                    target = data;
+                    return;
+                }
+                var step = xpath.shift();
+                if (typeof step == 'string' || typeof step == 'number') {
+                    adhHttp.drill(data[step], xpath, target, ordered);
+                    return;
+                }
+                if (step instanceof Array) {
+                    if (step.length != 1 || !(typeof(step[0]) == 'string' || typeof(step[0]) == 'number')) {
+                        // FIXME: what about "[[[step]]]"?
+                        console.log(step);
+                        throw 'internal';
+                    }
+                    step = step[0];
+
+                    if (!(data[step] instanceof Array)) {
+                        console.log(data);
+                        console.log(step);
+                        throw 'internal';
+                    }
+                    elements = data[step];
+
+                    // if target is not an array, make it one.
+                    if (!(target instanceof Array)) {
+                        target = [];
+                    }
+
+                    if (!ordered) {
+                        throw 'not implemented.';
+                    }
+
+                    // loop over step, and call drill recursively on
+                    // each element, together with the corresponding
+                    // element of target.
+                    for (ix in elements) {
+                        adhHttp.drill(elements[ix], xpath, target[ix], ordered);
+                    }
+                    return;
+                }
+            }
+        },
+    };
+
+    return adhHttp;
 });
 
 
