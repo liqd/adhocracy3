@@ -40,6 +40,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from adhocracy.resources import ResourceFactory
         from adhocracy.resources.interfaces import IResource
         from persistent.mapping import PersistentMapping
+        from persistent.interfaces import IPersistent
         from zope.interface import taggedValue, providedBy
 
         class IResourceType(IResource):
@@ -51,6 +52,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         resource = ResourceFactory(IResourceType)()
         assert isinstance(resource, PersistentMapping)
         resource_ifaces = [x for x in providedBy(resource).interfaces()]
+        assert IPersistent in resource_ifaces
         assert IResourceType in resource_ifaces
         assert IPropertyX in resource_ifaces
         assert IPropertyY in resource_ifaces

@@ -8,6 +8,7 @@ from adhocracy.utils import (
 )
 from adhocracy.schema import ReferenceSetSchemaNode
 from collections.abc import Mapping
+from persistent.mapping import PersistentMapping
 from pyramid.compat import is_nonstr_iter
 from pyramid.interfaces import IRequest
 from pyramid.httpexceptions import HTTPNotImplemented
@@ -47,9 +48,11 @@ class ResourcePropertySheetAdapter(PropertySheet):
 
     @property
     def _data(self):
-        if self.key not in self.context:
-            self.context[self.key] = dict()
-        return self.context[self.key]
+        if not hasattr(self.context, "_propertysheets"):
+            self.context._propertysheets = PersistentMapping()
+        if self.key not in self.context._propertysheets:
+            self.context._propertysheets[self.key] = PersistentMapping()
+        return self.context._propertysheets[self.key]
 
     @property
     def _references(self):
