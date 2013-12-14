@@ -2,6 +2,7 @@ from adhocracy.utils import get_all_taggedvalues
 from adhocracy.resources.interfaces import IResource
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.properties.interfaces import IProperty
+from pyramid.security import has_permission
 from zope.dottedname.resolve import resolve
 from zope.interface import providedBy
 from substanced.content import ContentRegistry
@@ -9,13 +10,23 @@ from substanced.content import ContentRegistry
 
 class ResourceContentRegistry(ContentRegistry):
 
-    def resource_propertysheets(self, context, request):
+    def resource_propertysheets(self, context, request,
+                                check_permission_view=False,
+                                check_permission_edit=False):
         """Return dict with name and ResourcepropertySheet objects."""
         propertysheets = {}
         ifaces = [i for i in providedBy(context) if i.isOrExtends(IProperty)]
         for iface in ifaces:
             sheet = self.registry.getMultiAdapter((context, request, iface),
                                                   IResourcePropertySheet)
+            if check_permission_view:
+                permission = getattr(sheet, "permission_view")
+                if not has_permission(permission, context, request):
+                    continue
+            if check_permission_edit:
+                permission = getattr(sheet, "permission_edit")
+                if not has_permission(permission, context, request):
+                    continue
             propertysheets[iface.__identifier__] = sheet
         return propertysheets
 

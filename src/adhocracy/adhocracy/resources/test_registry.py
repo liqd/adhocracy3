@@ -56,24 +56,50 @@ class TestResourceContentRegistry(unittest.TestCase):
         from .registry import ResourceContentRegistry
         return ResourceContentRegistry(registry)
 
-    def test_resource_propertysheets_valid_missing_propertysheets(self):
+    def test_propertysheets_valid_missing_sheets(self):
         inst = self._make_one(self.config)
         context = testing.DummyResource(__provides__=IResource)
         sheets = inst.resource_propertysheets(context, None)
         assert sheets == {}
 
-    def test_resource_propertysheets_valid_with_propertysheets(self):
+    def test_propertysheets_valid_with_sheets(self):
         from adhocracy.properties import ResourcePropertySheetAdapter
         inst = self._make_one(self.config.registry)
         context = testing.DummyResource(__provides__=(IResource, IPropertyA))
         _register_propertysheet_adapter(self.config, context, IPropertyA,
                                         ResourcePropertySheetAdapter)
+
         sheets = inst.resource_propertysheets(context, testing.DummyRequest())
+
         assert IPropertyA.__identifier__ in sheets
         assert isinstance(sheets[IPropertyA.__identifier__],
                           ResourcePropertySheetAdapter)
 
-    def test_resource_addable_types_valid_missing_ipool(self):
+    def test_propertysheets_valid_with_sheets_check_permission_read(self):
+        from adhocracy.properties import ResourcePropertySheetAdapter
+        inst = self._make_one(self.config.registry)
+        context = testing.DummyResource(__provides__=(IResource, IPropertyA))
+        _register_propertysheet_adapter(self.config, context, IPropertyA,
+                                        ResourcePropertySheetAdapter)
+        self.config.testing_securitypolicy(userid='reader', permissive=False)
+
+        sheets = inst.resource_propertysheets(context, testing.DummyRequest(),
+                                              check_permission_view=True)
+        assert sheets == {}
+
+    def test_propertysheets_valid_with_sheets_check_permission_edit(self):
+        from adhocracy.properties import ResourcePropertySheetAdapter
+        inst = self._make_one(self.config.registry)
+        context = testing.DummyResource(__provides__=(IResource, IPropertyA))
+        _register_propertysheet_adapter(self.config, context, IPropertyA,
+                                        ResourcePropertySheetAdapter)
+        self.config.testing_securitypolicy(userid='reader', permissive=False)
+
+        sheets = inst.resource_propertysheets(context, testing.DummyRequest(),
+                                              check_permission_edit=True)
+        assert sheets == {}
+
+    def test_addable_types_valid_missing_ipool(self):
         from zope.interface import Interface
         inst = self._make_one()
         context = testing.DummyResource(__provides__=Interface)
@@ -82,7 +108,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         addables = inst.resource_addable_types(context)
         assert addables == []
 
-    def test_resource_addable_types_valid_no_addables(self):
+    def test_addable_types_valid_no_addables(self):
         inst = self._make_one()
         context = testing.DummyResource(__provides__=IResourceB)
         context.__factory_type__ = IResourceB.__identifier__
@@ -91,7 +117,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         addables = inst.resource_addable_types(context)
         assert addables == []
 
-    def test_resource_addable_types_valid_with_addables(self):
+    def test_addable_types_valid_with_addables(self):
         inst = self._make_one()
         context = testing.DummyResource(__provides__=IResourceA)
         context.__factory_type__ = IResourceA.__identifier__
@@ -101,7 +127,7 @@ class TestResourceContentRegistry(unittest.TestCase):
                                   [IResourceB.__identifier__])
         assert inst.resource_addable_types(context) == [IResourceB.__identifier__]
 
-    def test_resource_addable_types_valid_with_implicit_inherit_addables(self):
+    def test_addable_types_valid_with_implicit_inherit_addables(self):
         inst = self._make_one()
         context = testing.DummyResource(__provides__=IResourceA)
         context.__factory_type__ = IResourceA.__identifier__
@@ -114,7 +140,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         assert addables == [IResourceA.__identifier__,
                             IResourceBA.__identifier__]
 
-    def test_resource_addable_types_valid_non_implicit_inherit_addables(self):
+    def test_addable_types_valid_non_implicit_inherit_addables(self):
         inst = self._make_one()
         context = testing.DummyResource(__provides__=IResourceA)
         context.__factory_type__ = IResourceA.__identifier__
