@@ -3,6 +3,7 @@ from pyramid.testing import (
     DummyRequest,
     DummyResource,
 )
+from unittest.mock import call
 from unittest.mock import patch
 from pyramid import testing
 from zope.interface import (
@@ -150,17 +151,44 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         assert inst.set({"count": 11}, omit=("wrongkey",)) is True
 
     @patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
-    def test_set_valid_references(self, dummy_reference_node=None):
+    def _set_valid_references(self, old_oids, new_oids,
+                              expected_connect_oids,
+                              expected_disconnect_oids,
+                              dummy_reference_node=None):
+
         node = dummy_reference_node.return_value
         node.name = "references"
-        node.deserialize.return_value = []
+        node.deserialize.return_value = old_oids
+        #default value
+        node.serialize.return_value = []
         context = make_folder_with_objectmap()
-        inst = self.make_one(context, None, IPropertyB)
-        inst.schema.children.append(node)
-        inst.set({"references": [1]})
         om = context.__objectmap__
+        inst = self.make_one(context, None, IProperty)
+
+        inst.schema.children.append(node)
+
+        inst.set({"references": new_oids})
         reftype = inst._references["references"]
-        assert om.connect.assert_called_once_with(context, 1, reftype) is None
+        assert om.connect.call_count == len(expected_connect_oids)
+        for oid in expected_connect_oids:
+            assert om.connect.assert_has_calls(
+                call(context, oid, reftype)) is None
+        assert om.disconnect.call_count == len(expected_disconnect_oids)
+        for oid in expected_disconnect_oids:
+            assert om.disconnect.assert_has_calls(
+                call(context, oid, reftype)) is None
+
+    def test_set_valid_references_added(self):
+        self._set_valid_references({1, 3}, {1, 2, 3, 4}, {2, 4}, {})
+
+    def test_set_valid_references_removed(self):
+        self._set_valid_references({5, 6, 7, 8}, {5, 7}, {}, {6, 8})
+
+    def test_set_valid_references_added_and_removed(self):
+        self._set_valid_references({1, 2, 3, 4}, {3, 4, 5, 6}, {5, 6}, {1, 2})
+
+    def test_set_valid_references_unchanged(self):
+        self._set_valid_references({3, 4, 5}, {3, 4, 5}, {}, {})
 
     def test_get_cstruct_empty(self):
         inst = self.make_one(DummyResource(), None, IPropertyB)

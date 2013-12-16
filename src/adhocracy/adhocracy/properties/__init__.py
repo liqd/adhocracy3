@@ -83,19 +83,21 @@ class ResourcePropertySheetAdapter(PropertySheet):
         assert isinstance(struct, Mapping)
         if not is_nonstr_iter(omit):
             omit = (omit,)
-        for key in omit:
-            if key in struct.keys():
-                del struct[key]
 
         old_struct = self.get()
-        changed_items = diff_dict(old_struct, struct)
-        self._data.update(changed_items)
+        (_, changed, _) = diff_dict(old_struct, struct, omit)
 
-        for keyname, reftype in self._references.items():
-            for target_oid in changed_items.get(keyname, []):
-                self._objectmap.connect(self.context, target_oid, reftype)
+        for key in changed:
+            self._data[key] = struct[key]
 
-        return False if not changed_items else True
+            if key in self._references.keys():
+                reftype = self._references[key]
+                for oid in set(struct[key]) - set(old_struct[key]):
+                    self._objectmap.connect(self.context, oid, reftype)
+                for oid in set(old_struct[key]) - set(struct[key]):
+                    self._objectmap.disconnect(self.context, oid, reftype)
+
+        return bool(changed)
 
     def set_cstruct(self, cstruct):
         """read interface"""
