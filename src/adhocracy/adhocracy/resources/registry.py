@@ -31,7 +31,7 @@ class ResourceContentRegistry(ContentRegistry):
         return propertysheets
 
     def resource_addable_types(self, resource):
-        """Return a list with addable adhocracy resource types.
+        """Return a dictionary with addable resource types and iproperties.
 
         The list is generated base on the "addable_content_interfaces"
         taggedValue and interface inheritage.
@@ -41,6 +41,7 @@ class ResourceContentRegistry(ContentRegistry):
         assert content_type is not None
         all_addables = []
         all_types = {}
+        # get all resource types
         for type in self.all():
             try:
                 iface = resolve(type)
@@ -49,17 +50,20 @@ class ResourceContentRegistry(ContentRegistry):
                     all_types[type] = (iface, tvalues)
             except ValueError:
                 pass
+        # get all addable resource types and map iproperties
         if content_type in all_types:
             iface, tvalues = all_types[content_type]
             adds = [resolve(t) for t in
                     tvalues.get("addable_content_interfaces", [])]
             for i, t in all_types.values():
                 for add in adds:
+                    iproperties = t["basic_properties_interfaces"].union(
+                        t["extended_properties_interfaces"])
                     if t["is_implicit_addable"] and i.extends(add):
-                        all_addables.append(i.__identifier__)
+                        all_addables.append((i.__identifier__, iproperties))
                     if i is add:
-                        all_addables.append(i.__identifier__)
-        return all_addables
+                        all_addables.append((i.__identifier__, iproperties))
+        return dict(all_addables)
 
 
 def includeme(config):  # pragma: no cover

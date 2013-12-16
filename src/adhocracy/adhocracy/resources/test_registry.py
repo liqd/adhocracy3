@@ -99,14 +99,16 @@ class TestResourceContentRegistry(unittest.TestCase):
                                               check_permission_edit=True)
         assert sheets == {}
 
-    def test_addable_types_valid_missing_ipool(self):
+    def test_addable_types_valid_context_is_not_ipool(self):
         from zope.interface import Interface
         inst = self._make_one()
         context = testing.DummyResource(__provides__=Interface)
         context.__factory_type__ = Interface.__identifier__
         _register_content_type(inst, Interface.__identifier__)
+
         addables = inst.resource_addable_types(context)
-        assert addables == []
+
+        assert addables == {}
 
     def test_addable_types_valid_no_addables(self):
         inst = self._make_one()
@@ -114,8 +116,10 @@ class TestResourceContentRegistry(unittest.TestCase):
         context.__factory_type__ = IResourceB.__identifier__
         _register_content_type(inst, IResourceB.__identifier__)
         IResourceB.setTaggedValue("addable_content_interfaces", [])
+
         addables = inst.resource_addable_types(context)
-        assert addables == []
+
+        assert addables == {}
 
     def test_addable_types_valid_with_addables(self):
         inst = self._make_one()
@@ -125,7 +129,16 @@ class TestResourceContentRegistry(unittest.TestCase):
         _register_content_type(inst, IResourceB.__identifier__)
         IResourceA.setTaggedValue("addable_content_interfaces",
                                   [IResourceB.__identifier__])
-        assert inst.resource_addable_types(context) == [IResourceB.__identifier__]
+        IResourceB.setTaggedValue("basic_properties_interfaces",
+                                  set(["ipropx"]))
+        IResourceB.setTaggedValue("extended_properties_interfaces",
+                                  set(["ipropy"]))
+
+        addables = inst.resource_addable_types(context)
+
+        wanted =  {IResourceB.__identifier__: set(["ipropx", "ipropy"])}
+        assert wanted == addables
+
 
     def test_addable_types_valid_with_implicit_inherit_addables(self):
         inst = self._make_one()
@@ -136,9 +149,11 @@ class TestResourceContentRegistry(unittest.TestCase):
         IResourceA.setTaggedValue("addable_content_interfaces",
                                   [IResourceA.__identifier__])
         IResourceBA.setTaggedValue("is_implicit_addable", True)
+
         addables = inst.resource_addable_types(context)
-        assert addables == [IResourceA.__identifier__,
-                            IResourceBA.__identifier__]
+
+        wanted = [IResourceA.__identifier__, IResourceBA.__identifier__]
+        assert [x for x in addables.keys()] == wanted
 
     def test_addable_types_valid_non_implicit_inherit_addables(self):
         inst = self._make_one()
@@ -148,10 +163,12 @@ class TestResourceContentRegistry(unittest.TestCase):
         _register_content_type(inst, IResourceBA.__identifier__)
         IResourceA.setTaggedValue("addable_content_interfaces",
                                   [IResourceA.__identifier__])
-
         IResourceBA.setTaggedValue("is_implicit_addable", False)
+
         addables = inst.resource_addable_types(context)
-        assert addables == [IResourceA.__identifier__]
+
+        wanted = [IResourceA.__identifier__]
+        assert [x for x in addables.keys()] == wanted
 
     def test_includeme(self):
         from adhocracy.resources.registry import includeme
