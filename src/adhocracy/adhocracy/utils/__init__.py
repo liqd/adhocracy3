@@ -38,16 +38,23 @@ def get_ifaces_from_module(module, base=Interface, blacklist=[]):
     return ifaces
 
 
-def diff_dict(dict, dict_updates):
-    """Return dict with all items in dict_updates that are not in dict"""
-    dict_diff = {}
-    for key, value in dict_updates.items():
-        if key not in dict:
-            dict_diff[key] = value
-        else:
-            if dict[key] != dict_updates[key]:
-               dict_diff[key] = value
-    return dict_diff
+def diff_dict(old_dict, new_dict, omit=()):
+    """Calculate changed keys of two dictionaries.
+
+    Return tuple of (added, changed, removed) keys between old_dict and
+    new_dict.
+
+    """
+    old = old_dict.keys() - set(omit)
+    new = new_dict.keys() - set(omit)
+
+    added = new - old
+    removed = old - new
+
+    common = old & new
+    changed = set([key for key in common if old_dict[key] != new_dict[key]])
+
+    return (added, changed, removed)
 
 
 def sort_dict(d, sort_paths):
