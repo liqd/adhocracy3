@@ -6,9 +6,7 @@ import Types = require('Adhocracy/Types');
 import Util = require('Adhocracy/Util');
 
 
-/*
-
-// send and receive objects in a convenient form
+// send and receive objects with adhocracy data model awareness
 
 export function adhHttpFactory($http) {
     var adhHttp = {
@@ -69,7 +67,7 @@ export function adhHttpFactory($http) {
                         console.log(step);
                         throw 'internal';
                     }
-                    elements = data[step];
+                    var elements = data[step];
 
                     if (!(target.ref instanceof Array)) {
                         console.log(target);
@@ -84,12 +82,12 @@ export function adhHttpFactory($http) {
                     // loop over step, and call drill recursively on
                     // each element, together with the corresponding
                     // element of target.
-                    for (ix in elements) {
+                    for (var ix in elements) {
                         var subtarget = {
                             ref: target.ref,
                             xpath: [ix],
                         };
-                        adhHttp.drill(elements[ix], deepcp(xpath), subtarget, ordered);
+                        adhHttp.drill(elements[ix], Util.deepcp(xpath), subtarget, ordered);
                     }
                     return;
                 }
@@ -97,7 +95,7 @@ export function adhHttpFactory($http) {
         },
 
         postNewVersion: (oldVersionPath, obj, callback) => {
-            var dagPath = parentPath(oldVersionPath);
+            var dagPath = Util.parentPath(oldVersionPath);
             var config = {
                 headers: { follows: oldVersionPath },
                 params: {},
@@ -115,14 +113,14 @@ export function adhHttpFactory($http) {
 var importContent = translateContent(shortenType);
 
 var exportContent = (obj) => {
-    newobj = translateContent(unshortenType)(obj);
+    var newobj = translateContent(unshortenType)(obj);
 
     // FIXME: Get this list from the server!
     var readOnlyProperties = [
         'adhocracy.propertysheets.interfaces.IVersions'
     ];
 
-    for (ro in readOnlyProperties)
+    for (var ro in readOnlyProperties)
         delete newobj.data[readOnlyProperties[ro]];
 
     delete newobj.path;
@@ -140,7 +138,7 @@ var propertyTypeNameSpaces = {
 function shortenType(nameSpaces) {
     return s => {
         var t = s;
-        for (k in nameSpaces) {
+        for (var k in nameSpaces) {
             t = t.replace(new RegExp('^' + k + '(\\.[^\\.]+)$'), nameSpaces[k] + '$1');
         }
         return t;
@@ -150,7 +148,7 @@ function shortenType(nameSpaces) {
 function unshortenType(nameSpaces) {
     return s => {
         var t = s;
-        for (k in nameSpaces) {
+        for (var k in nameSpaces) {
             t = t.replace(new RegExp('^' + nameSpaces[k] + '(\\.[^\\.]+)$'), k + '$1');
         }
         return t;
@@ -165,10 +163,10 @@ function translateContent(translateType) {
             data: {},
         }
 
-        for (i in inobj.data) {
-            var i_local = translateType(propertyTypeNameSpaces)(i);
-            outobj.data[i_local] =
-                changeContentTypeRecursively(inobj.data[i],
+        for (var k in inobj.data) {
+            var k_local = translateType(propertyTypeNameSpaces)(k);
+            outobj.data[k_local] =
+                changeContentTypeRecursively(inobj.data[k],
                                              translateType(contentTypeNameSpaces));
         }
 
@@ -198,5 +196,3 @@ function changeContentTypeRecursively(obj, f) {
         return obj;
     }
 }
-
-*/
