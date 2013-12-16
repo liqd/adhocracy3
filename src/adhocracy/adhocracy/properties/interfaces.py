@@ -6,7 +6,10 @@ from zope.interface import (
     taggedValue,
 )
 from zope.interface.interfaces import IInterface
-from adhocracy.schema import ReferenceSetSchemaNode
+from adhocracy.schema import (
+    ReferenceSetSchemaNode,
+    Identifier,
+)
 
 import colander
 
@@ -43,14 +46,14 @@ class IProperty(Interface):
 
 class IName(IProperty):
 
-    """Set human readable name of this resource and create identifier."""
+    """Human readable resource Identifier, used to build object paths."""
 
     taggedValue("schema", "adhocracy.properties.interfaces.NameSchema")
 
 
 class NameSchema(colander.Schema):
 
-    name = NameSchemaNode(default="", missing=colander.drop)
+    name = NameSchemaNode(typ=Identifier(), default="", missing=colander.drop)
 
 
 class INameReadOnly(IName):

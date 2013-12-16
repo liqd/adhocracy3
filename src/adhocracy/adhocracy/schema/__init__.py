@@ -7,6 +7,26 @@ from zope.interface import Interface
 import colander
 
 
+class Identifier(colander.SchemaNode):
+    """Alpha/numeric/_/-/. String.
+
+    Example value: blu.ABC_12-3
+    """
+
+    schema_type = colander.String
+    validator = colander.Regex(u'^[a-zA-Z0-9\_\-\.]+$')
+
+
+class AbsolutePath(colander.SchemaNode):
+    """Absolute path made with Identifier Strings.
+
+     Example value: /bluaABC/_123/3
+    """
+
+    schema_type = colander.String
+    validator = colander.Regex(u'^/[a-zA-Z0-9\_\-\.\/]+$')
+
+
 class PathSet(IdSet):
     """ Colander Type to store object paths.
 

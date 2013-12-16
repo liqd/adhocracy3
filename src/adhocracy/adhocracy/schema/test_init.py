@@ -38,6 +38,38 @@ def add_node_binding(node, context=None, request=None):
 #  tests  #
 ###########
 
+class IdentifierUnitTest(unittest.TestCase):
+
+    def make_one(self):
+        from . import Identifier
+        return Identifier()
+
+    def test_valid(self):
+        inst = self.make_one()
+        assert inst.validator(inst, "blu.ABC_12-3") is None
+
+    def test_non_valid(self):
+        inst = self.make_one()
+        with pytest.raises(colander.Invalid):
+            inst.validator(inst, "blu./ABC_12-3")
+
+
+class AbsolutePath(unittest.TestCase):
+
+    def make_one(self):
+        from . import AbsolutePath
+        return AbsolutePath()
+
+    def test_valid(self):
+        inst = self.make_one()
+        assert inst.validator(inst, "/blu.ABC_12-3/aaa") is None
+
+    def test_non_valid(self):
+        inst = self.make_one()
+        with pytest.raises(colander.Invalid):
+            inst.validator(inst, "blu.ABC_12-3")
+
+
 class PathSetUnitTest(unittest.TestCase):
 
     def make_one(self):

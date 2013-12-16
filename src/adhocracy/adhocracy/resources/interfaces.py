@@ -2,6 +2,7 @@ from zope.interface import (
     Interface,
     taggedValue,
 )
+from substanced.interfaces import IAutoNamingFolder
 
 
 class IResource(Interface):
@@ -30,7 +31,7 @@ class IResource(Interface):
     # view for substanced sdi,
 
 
-class IPool(IResource):
+class IPool(IResource, IAutoNamingFolder):
 
     """Folder in the object hierarchy.
 
@@ -39,7 +40,8 @@ class IPool(IResource):
 
     """
 
-    taggedValue("content_class", "substanced.folder.Folder")
+    taggedValue("content_class",
+                "substanced.folder.SequentialAutoNamingFolder")
     taggedValue("basic_properties_interfaces",
                 set(["adhocracy.properties.interfaces.IName",
                      "adhocracy.properties.interfaces.IPool"]))
