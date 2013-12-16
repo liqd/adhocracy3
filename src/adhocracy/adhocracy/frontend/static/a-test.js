@@ -1,5 +1,30 @@
-var app = angular.module('Adhocracy', []);
 
+
+debugger;
+
+
+require(['jquery', 'angular'], function() {
+    require(['Adhocracy',
+             'Adhocracy/Services/Http',
+             'Adhocracy/Controllers/DocumentWorkbench',
+            ],
+            function(Adh,
+                     AdhHttp,
+                     AdhDWB) {
+
+
+                $(document).ready(function() { DWB.run(); });
+                $(document).load(function() { console.log('page load complete'); });
+
+
+                // at this point, the browser has already crashed,
+                // because the 'Adhocracy' angular module is not
+                // available.  i should actually rename that module.
+                // and understand what module type is meant (plain js
+                // i guess, instead of commonjs or amd?).
+
+
+var app = angular.module('Adh');
 
 app.controller('AdhDocumentTOC', function(adhHttp, $scope) {
     this.path = '/adhocracy';
@@ -104,5 +129,9 @@ app.filter('fDirectoryEntry', [ function() {
 
 // services
 
-// import 'Adhocracy/Services/AdhHttp'
 app.factory('adhHttp', AdhHttp.adhHttpFactory);
+
+
+
+            });
+});

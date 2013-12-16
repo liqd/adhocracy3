@@ -8,15 +8,15 @@ import Util = require('Adhocracy/Util');
 
 // send and receive objects with adhocracy data model awareness
 
-export interface AdhHttpService {
-    get: (path: string) => ng.IPromise<Types.Content>;
-    drill: (data: any, xpath: any, target: any, ordered: boolean) => void;
-    postNewVersion: (oldVersionPath: string, obj: any, callback: any) => ng.IPromise<Types.Content>;
+export interface IService {
+    get : (path : string) => ng.IPromise<Types.Content>;
+    drill : (data : any, xpath : any, target : any, ordered : boolean) => void;
+    postNewVersion : (oldVersionPath : string, obj : any, callback : any) => ng.IPromise<Types.Content>;
 }
 
-export function adhHttpFactory($http : ng.IHttpService) : AdhHttpService {
-    var adhHttp : AdhHttpService = {
-        get: (path: string) => {
+export function factory($http : ng.IHttpService) : IService {
+    var adhHttp : IService = {
+        get : (path : string) => {
             return $http.get(path).then((response) => {
                 if (response.status != 200) {
                     console.log(response);
@@ -26,7 +26,7 @@ export function adhHttpFactory($http : ng.IHttpService) : AdhHttpService {
             });
         },
 
-        drill: (data: any, xpath: /* string[] or string[][] */ any, target: any, ordered: boolean) => {
+        drill : (data : any, xpath : /* string[] or string[][] */ any, target : any, ordered : boolean) => {
             function resolveReference() {
                 if ('path' in data) {
                     adhHttp.get(data['path']).then((resource) => {
@@ -100,7 +100,7 @@ export function adhHttpFactory($http : ng.IHttpService) : AdhHttpService {
             }
         },
 
-        postNewVersion: (oldVersionPath: string, obj: any, callback: any) => {
+        postNewVersion : (oldVersionPath : string, obj : any, callback : any) => {
             var dagPath = Util.parentPath(oldVersionPath);
             var config = {
                 headers: { follows: oldVersionPath },
@@ -116,10 +116,10 @@ export function adhHttpFactory($http : ng.IHttpService) : AdhHttpService {
 
 // transform objects on the way in and out
 
-var importContent : (obj: Types.Content) => Types.Content
+var importContent : (obj : Types.Content) => Types.Content
     = translateContent(shortenType);
 
-var exportContent : (obj: Types.Content) => Types.Content
+var exportContent : (obj : Types.Content) => Types.Content
     = (obj) => {
     var newobj = translateContent(unshortenType)(obj);
 

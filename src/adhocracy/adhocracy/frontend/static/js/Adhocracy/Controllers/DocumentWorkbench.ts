@@ -16,7 +16,9 @@ var appPrefix : string = '/app';
 var jsonPrefix : string = '/adhocracy';
 
 
-
+export function run() {
+    console.log('DocumentWorkbench.run()');
+}
 
 
 /*
