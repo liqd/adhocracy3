@@ -37,32 +37,35 @@ class ResourceContentRegistry(ContentRegistry):
         taggedValue and interface inheritage.
 
         """
-        content_type = self.typeof(resource)
-        assert content_type is not None
-        all_addables = []
+        type = self.typeof(resource)
+        assert type is not None
         all_types = {}
         # get all resource types
-        for type in self.all():
+        for type_ in self.all():
             try:
-                iface = resolve(type)
+                iface = resolve(type_)
                 if iface.isOrExtends(IResource):
                     tvalues = get_all_taggedvalues(iface)
-                    all_types[type] = (iface, tvalues)
+                    all_types[type_] = (iface, tvalues)
             except ValueError:
                 pass
         # get all addable resource types and map iproperties
-        if content_type in all_types:
-            iface, tvalues = all_types[content_type]
-            adds = [resolve(t) for t in
-                    tvalues.get("addable_content_interfaces", [])]
-            for i, t in all_types.values():
-                for add in adds:
-                    iproperties = t["basic_properties_interfaces"].union(
-                        t["extended_properties_interfaces"])
-                    if t["is_implicit_addable"] and i.extends(add):
-                        all_addables.append((i.__identifier__, iproperties))
-                    if i is add:
-                        all_addables.append((i.__identifier__, iproperties))
+        all_addables = []
+        if type in all_types:
+            addables_ = all_types[type][1].get("addable_content_interfaces",
+                                               [])
+            addables = [resolve(a) for a in addables_]
+            for type_ in all_types:
+                iface = all_types[type_][0]
+                tvalues = all_types[type_][1]
+                sheets = tvalues["basic_properties_interfaces"]\
+                    .union(tvalues["extended_properties_interfaces"])
+                is_implicit = tvalues["is_implicit_addable"]
+                for addable in addables:
+                    is_extending = iface.extends(addable)
+                    is_is = iface is addable
+                    if is_implicit and is_extending or is_is:
+                        all_addables.append((iface.__identifier__, sheets))
         return dict(all_addables)
 
 

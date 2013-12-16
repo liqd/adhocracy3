@@ -40,8 +40,7 @@ def _register_propertysheet_adapter(config, context, iproperty, adapter):
 
 
 def _register_content_type(registry, type):
-    registry.factory_types[type] = type
-    registry.content_types[type] = type
+    registry.add(type, type, object())
 
 
 class TestResourceContentRegistry(unittest.TestCase):
@@ -136,9 +135,8 @@ class TestResourceContentRegistry(unittest.TestCase):
 
         addables = inst.resource_addable_types(context)
 
-        wanted =  {IResourceB.__identifier__: set(["ipropx", "ipropy"])}
+        wanted = {IResourceB.__identifier__: set(["ipropx", "ipropy"])}
         assert wanted == addables
-
 
     def test_addable_types_valid_with_implicit_inherit_addables(self):
         inst = self._make_one()
@@ -149,11 +147,10 @@ class TestResourceContentRegistry(unittest.TestCase):
         IResourceA.setTaggedValue("addable_content_interfaces",
                                   [IResourceA.__identifier__])
         IResourceBA.setTaggedValue("is_implicit_addable", True)
-
         addables = inst.resource_addable_types(context)
 
         wanted = [IResourceA.__identifier__, IResourceBA.__identifier__]
-        assert [x for x in addables.keys()] == wanted
+        assert sorted([x for x in addables.keys()]) == wanted
 
     def test_addable_types_valid_non_implicit_inherit_addables(self):
         inst = self._make_one()
