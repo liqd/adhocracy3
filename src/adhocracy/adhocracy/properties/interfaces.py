@@ -53,7 +53,7 @@ class IName(IProperty):
 
 class NameSchema(colander.Schema):
 
-    name = NameSchemaNode(typ=Identifier(), default="", missing=colander.drop)
+    name = Identifier(default="", missing=colander.drop)
 
 
 class INameReadOnly(IName):

@@ -287,10 +287,9 @@ class PoolPropertySheetUnitTest(unittest.TestCase):
         from adhocracy.properties.interfaces import IPool
         context = make_folder_with_objectmap()
         context.__objectmap__.pathlookup.return_value = [1]
-        context.__objectmap__.path_for.return_value = ("", "child1")
         context["child1"] = DummyResource()
         inst = self.make_one(context, None, IPool)
-        assert inst.get() == {"elements": ["/child1"]}
+        assert inst.get() == {"elements": [1]}
 
 
 class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
