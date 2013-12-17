@@ -3,6 +3,8 @@
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 declare var $ : any;         // FIXME: use jquery git submodule, pick a more recent version, and tc-wrap it propertly.
+                             // FIXME: also, import this properly instead of declaring an import that happens elsewhere.
+                             // FIXME: also, get rid of jquery altogether in a3.  (:
 declare var window : any;    // FIXME: type this more rigorously
 declare var history : any;   // FIXME: type this more rigorously
 
@@ -11,9 +13,18 @@ import Util = require('Adhocracy/Util');
 import Css = require('Adhocracy/Css');
 import AdhHttp = require('Adhocracy/Services/Http');
 
-var templatePath : string = '/static/templates';
-var appPrefix : string = '/app';
-var jsonPrefix : string = '/adhocracy';
+declare module 'angular' {
+    // FIXME: complete this, and write a pull request for definitely typed.
+}
+
+import angular = require('angular');
+
+var templatePath : string = '/static/templates';  // FIXME: is this still used?
+var appPrefix : string = '/app';                  // FIXME: is this still used?
+var jsonPrefix : string = '/adhocracy';           // FIXME: is this still used?
+
+
+
 
 
 export function run() {
