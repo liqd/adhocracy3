@@ -10,26 +10,25 @@
             <adh-document-workbench></adh-document-workbench>
         </div>
 
-      <!-- app --
-      <div id="adhocracy">[javascript is not running]</div>
-      <script>
-          require(['jquery', 'angular'], function() {
-              require(['Adhocracy/Frames/ProposalWorkbench'], function(ProposalWorkbench) {
-                  var uri = ProposalWorkbench.poolUri('/adhocracy');
-                  $(document).ready(function() { ProposalWorkbench.open_proposals(uri); });
-
-                  // FIXME: '.load' isn't executed: why?
-                  $(document).load(function() { console.log('page load complete'); });
-              });
-          });
-      </script>
-      -->
-
         <script type="text/javascript"
                 src="/static/submodules/requirejs/require.js"></script>
         <script type="text/javascript"
                 src="/static/require-config.js"></script>
+        <script type="text/javascript"
+                src="/static/jquery-1.7.2.js"></script>  <!-- only needed for $(document in this html file) -->
 
-        <script src="/static/a-test.js"></script>
+        <script type="text/javascript">
+            require(['Adhocracy/Controllers/DocumentWorkbench'], function(AdhDWB) {
+                $(document).ready(function() {
+                    AdhDWB.run();
+                    console.log('on page ready: done');
+                });
+
+                $(document).load(function() {
+                    // FIXME: this is never reached.  why?
+                    console.log('on page load: done');
+                });
+            });
+        </script>
     </body>
 </html>
