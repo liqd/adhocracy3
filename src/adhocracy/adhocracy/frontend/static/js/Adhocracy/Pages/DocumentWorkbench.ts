@@ -42,29 +42,18 @@ export function run() {
 
     var subscriptions = {};
 
-    function subscribe(path : string, model : {ref: any}, flushPath ?: boolean) : void {
-        // debugger;
-
-        if (!(path in subscriptions) || flushPath)
-            subscriptions[path] = [];
-        subscriptions[path].push(model);
+    function subscribe(path : string, update : (model: any) => void) : void {
+        subscriptions[path] = update;
     }
 
-    function unsubscribe(path : string, model : {ref: any}, strict ?: boolean) : void {
-        // debugger;
-
+    function unsubscribe(path : string, strict ?: boolean) : void {
         function crash() : void {
-            if (strict)
-                throw 'unsubscribe web socket listener: no subscription for ' + [path, model] + '!'
         }
 
-        if (path in subscriptions) {
-            var ix = subscriptions[path].indexOf(model);
-            if (ix) Util.reduceArray(subscriptions[path], ix, ix);
-            else crash();
-        } else {
-            crash();
-        }
+        if (path in subscriptions)
+            delete subscriptions[path];
+        else if (strict)
+            throw 'unsubscribe web socket listener: no subscription for ' + path + '!'
     }
 
     function createWs(adhHttp : AdhHttp.IService) {
@@ -74,18 +63,14 @@ export function run() {
         ws.onmessage = function(event) {
             var path = event.data;
             console.log('web socket message: update on ' + path);
-            // debugger;
 
             if (path in subscriptions) {
-                console.log('subscribers: ' + subscriptions[path]);
-
+                console.log('subscriber: ' + subscriptions[path]);
                 adhHttp.get(path).then(function(d) {
-                    for (var k in subscriptions[path]) {
-                        subscriptions[path][k].ref = d;
-                    }
+                    subscriptions[path](d);
                 });
             } else {
-                console.log('subscribers: []');
+                console.log('(no subscriber)');
             }
         };
 
@@ -94,10 +79,10 @@ export function run() {
             console.log('ws.onerror: ' + event.toString());
         };
         ws.onopen = function() {
-            console.log('[ws.onopen]');
+            console.log('ws.onopen');
         };
         ws.onclose = function() {
-            console.log('[ws.onclose]');
+            console.log('ws.onclose');
         };
 
         return ws;
@@ -139,7 +124,6 @@ export function run() {
                         adhHttp.get(headPath).then(function(doc) {
                             var docPS = doc;
                             $scope.directory.push([headPath, docPS]);
-                            // subscribe($scope.detail.path, $scope.detail, true);
                         });
                     } else {
                         $scope.directory.push(undefined);
@@ -173,7 +157,6 @@ export function run() {
                 // because some other client may update it.  (no need
                 // to watch entire nested structure because document
                 // root will always be affacted of any changes there.)
-                subscribe($scope.detail.path, $scope.detail, true);
             });
         }
 
