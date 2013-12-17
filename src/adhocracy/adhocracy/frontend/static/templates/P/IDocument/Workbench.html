@@ -1,0 +1,38 @@
+<table border="1">
+    <tr>
+        <td>
+            <p>proposal workbench navigation</p>
+        </td>
+        <td>
+            <div ng-controller="AdhDocumentTOC as at">
+                <h3>table of contents</h3>
+
+                <div>
+                    <ol>
+                        <li ng-repeat="entry in directory track by $index">
+                            <div ng-switch="entry">
+                                <div ng-switch-when="undefined">
+                                    <small><tt>(empty DAG)</tt></small>
+                                </div>
+                                <div ng-switch-default>
+                                    <a href ng-click="at.showDetail(entry[0])">
+                                        {{entry[1] | fDirectoryEntry}}
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <adh-document-detail
+                     adh-vote-button="true"
+                     adh-like-button="true">
+                </adh-document-detail>
+
+            </div>
+        </td>
+        <td>
+            <p>proposal workbench changes and discussion</p>
+        </td>
+    </tr>
+</table>
