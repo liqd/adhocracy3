@@ -97,13 +97,30 @@ with resources data::
                },
     }
 
-FIXME: IName property sheet will go away.  It used to be an
-unambiguous object identifier, but the path is already good for that.
-It was also confusingly abused as a human-readable descriptor for the
-object, which is somewhat useful, but also useful in references, not
-just in objects.  It was decided that IName will be removed and
-replaced by an optional field "name" next to "content_type", "path",
-and "data".
+(IName contains a path that must be a valid identifier for this resource.
+The server will test its validity and reject everything that is not, say,
+the path of the resource that this body was posted to plus one fresh
+extra path element.  For details, see backend unit test documentation
+or such.)
+
+Semantics of read-only and mandatory flags in request body:
+
+FIXME: the remainder of this section must be re-aligned with the actual
+documentation.
+
+*,    read-only, mandatory  => error
+GET,  *,         *          => may be there (for structure selection)
+*,    read-only             => must not be there
+POST,            mandatory  => must be there
+PUT,             mandatory  => may be there
+*,               mandatory  => may be there
+*,               *          => may be there
+
+Both flags only work on a single node in the json tree, not on its
+subtrees.
+
+Possibly extra flag 'post-only': mandatory on post, read-only
+afterwards (on PUT).
 
 
 HEAD
