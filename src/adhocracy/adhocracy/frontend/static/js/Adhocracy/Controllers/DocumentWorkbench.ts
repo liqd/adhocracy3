@@ -560,6 +560,9 @@ function renderDetail(pathRaw : string, viewname : string) : void {
     $('#debug_links').render({ 'iface': 'debug_links', 'path': pathJson });
 }
 
+*/
+
+
 
 
 // web sockets
@@ -611,7 +614,10 @@ export function updateWs(sizzle : string, path : string, viewName ?: string) : v
             console.log('ws.onmessage: updating '  + wsdict[sizzle].path
                         + ' with view '            + wsdict[sizzle].viewName
                         + ' on dom node:\n'        + sizzle);
-            $(sizzle).render(wsdict[sizzle].path, wsdict[sizzle].viewName);
+
+            throw "not implemented";
+
+            // $(sizzle).render(wsdict[sizzle].path, wsdict[sizzle].viewName);
         };
 
         // some console info to keep track of things happening:
@@ -635,5 +641,3 @@ export function closeWs(sizzle : string) {
         delete wsdict[sizzle];
     }
 }
-
-*/
