@@ -14,12 +14,9 @@ declare module 'angular' {
 
 import angular = require('angular');
 
-var templatePath : string = '/static/templates';  // FIXME: is this still used?
-var appPrefix : string = '/app';                  // FIXME: is this still used?
-var jsonPrefix : string = '/adhocracy';           // FIXME: is this still used?
-
-
-
+var templatePath : string = '/static/templates';
+var jsonPrefix : string = '/adhocracy';
+var appPrefix : string = '/app';
 
 
 export function run() {
@@ -35,9 +32,7 @@ export function run() {
     // controller
 
     app.controller('AdhDocumentTOC', function(adhHttp, $scope) {
-        this.path = '/adhocracy';
-
-        adhHttp.get(this.path, ['P.Pool']).then(function(d) {
+        adhHttp.get(jsonPrefix, ['P.Pool']).then(function(d) {
             var pool = d.data['P.IPool'];
 
             $scope.directory = [];
@@ -110,7 +105,7 @@ export function run() {
     app.directive('adhDocumentWorkbench', function() {
         return {
             restrict: 'E',
-            templateUrl: '/static/templates/P/IDocument/Workbench.html',
+            templateUrl: templatePath + '/P/IDocument/Workbench.html',
         }
     });
 
@@ -118,7 +113,7 @@ export function run() {
     app.directive('adhDocumentDetail', function() {
         return {
             restrict: 'E',
-            templateUrl: '/static/templates/P/IDocument/ViewDetail.html',
+            templateUrl: templatePath + '/P/IDocument/ViewDetail.html',
         }
     });
 
