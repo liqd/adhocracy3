@@ -135,6 +135,13 @@ class ValidateRequestWithCorniceSchema(unittest.TestCase):
         self.make_one(schema, self.request)
         assert self.request.errors != []
 
+    def test_non_valid_remove_validated_dict(self):
+        schema = CountSchema
+        self.request.validated == {"secret_data": "buh"}
+        self.request.body = '{"count": "wrong_value"}'
+        self.make_one(schema, self.request)
+        assert self.request.validated == {}
+
 
 class ValidatePUTPropertysheetNamesUnitTest(unittest.TestCase):
 

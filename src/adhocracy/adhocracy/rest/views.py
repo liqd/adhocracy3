@@ -96,6 +96,7 @@ class ResourceView(object):
         for val in validators:
             val(self.context, self.request)
         if self.request.errors:
+            self.request.validated = {}
             raise json_error(self.request.errors)
 
     @view_config(request_method='GET')
