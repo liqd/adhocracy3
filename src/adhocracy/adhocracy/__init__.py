@@ -37,9 +37,8 @@ def includeme(config):
     config.include('.resources')
     #config.include('.registry')
     config.include('.evolution')
-    #config.include('.rest')
+    config.include('.rest')
     config.include('.frontend')
-    config.scan()
 
 
 def main(global_config, **settings):
