@@ -86,6 +86,7 @@ app.controller('AdhDocumentTOC', function(adhHttp, $scope) {
     }
 
     this.showDetailReset = function() {
+        $scope.detail = AdhUtil.deepcp($scope.detail_old);
         $scope.detail_mode = 'display';
     }
 
