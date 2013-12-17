@@ -1,30 +1,29 @@
 
 
-debugger;
-
-
-require(['jquery', 'angular'], function() {
+require(['jquery', 'angular'], function($, angular) {
     require(['Adhocracy',
+             'Adhocracy/Util',
              'Adhocracy/Services/Http',
              'Adhocracy/Controllers/DocumentWorkbench',
             ],
-            function(Adh,
+            function(Adhocracy,
+                     AdhUtil,
                      AdhHttp,
                      AdhDWB) {
 
+$(document).ready(function() {
 
-                $(document).ready(function() { DWB.run(); });
-                $(document).load(function() { console.log('page load complete'); });
-
-
-                // at this point, the browser has already crashed,
-                // because the 'Adhocracy' angular module is not
-                // available.  i should actually rename that module.
-                // and understand what module type is meant (plain js
-                // i guess, instead of commonjs or amd?).
+    var app = angular.module('NGAD', []);
 
 
-var app = angular.module('Adh');
+
+// services
+
+app.factory('adhHttp', ['$http', AdhHttp.factory]);
+
+
+
+// controller
 
 app.controller('AdhDocumentTOC', function(adhHttp, $scope) {
     this.path = '/adhocracy';
@@ -82,7 +81,7 @@ app.controller('AdhDocumentTOC', function(adhHttp, $scope) {
     }
 
     this.showDetailEdit = function() {
-        $scope.detail_old = deepcp($scope.detail);
+        $scope.detail_old = AdhUtil.deepcp($scope.detail);
         $scope.detail_mode = 'edit';
     }
 
@@ -127,10 +126,18 @@ app.filter('fDirectoryEntry', [ function() {
 }]);
 
 
-// services
 
-app.factory('adhHttp', AdhHttp.adhHttpFactory);
+// get going
 
+angular.bootstrap(document, ['NGAD']);
+AdhDWB.run();
+
+});
+
+$(document).load(function() {
+    // FIXME: this is never reached.  why?
+    console.log('page load complete');
+});
 
 
             });

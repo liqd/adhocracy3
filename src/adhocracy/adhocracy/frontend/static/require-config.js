@@ -6,8 +6,10 @@ require.config({
     },
     shim: {
         jquery: {
+            exports: '$',
         },
         angular: {
+            exports: 'angular',
         },
     }
 });

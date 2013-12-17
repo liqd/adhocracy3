@@ -9,7 +9,7 @@ declare var history : any;   // FIXME: type this more rigorously
 import Types = require('Adhocracy/Types');
 import Util = require('Adhocracy/Util');
 import Css = require('Adhocracy/Css');
-import AdhHttp = require('Adhocracy/Services/AdhHttp');
+import AdhHttp = require('Adhocracy/Services/Http');
 
 var templatePath : string = '/static/templates';
 var appPrefix : string = '/app';
