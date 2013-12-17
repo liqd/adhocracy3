@@ -141,11 +141,11 @@ def includeme(config):
     ifaces = get_ifaces_from_module(interfaces,
                                     base=interfaces.IProperty)
     for iface in ifaces:
-        alsoProvides(iface, IIProperty)
         config.registry.registerAdapter(ResourcePropertySheetAdapter,
                                         (iface, IRequest, Interface),
                                         IResourcePropertySheet)
 
+    alsoProvides(interfaces.IPool, IIProperty)
     config.registry.registerAdapter(PoolPropertySheetAdapter,
                                     (interfaces.IPool, IRequest, IIProperty),
                                     IResourcePropertySheet)
