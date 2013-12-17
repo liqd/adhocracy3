@@ -29,27 +29,107 @@ export function run() {
     app.factory('adhHttp', ['$http', AdhHttp.factory]);
 
 
+    // web sockets
+
+    // FIXME: first draft, using a primitive global dictionary for
+    // registering models interested in updates.  (i don't think this
+    // is what we actually want to do once the application gets more
+    // complex, but i want to find out how well it works anyway.  see
+    // also angularjs github wiki, section 'best practice'.)
+
+    // FIXME: make this part of module 'Adhocracy/Service/Http'?  Or
+    // 'Adhocracy/Service/WS'?
+
+    var subscriptions = {};
+
+    function subscribe(path : string, model : {ref: any}, flushPath ?: boolean) : void {
+        debugger;
+
+        if (!(path in subscriptions) || flushPath)
+            subscriptions[path] = [];
+        subscriptions[path].push(model);
+    }
+
+    function unsubscribe(path : string, model : {ref: any}, strict ?: boolean) : void {
+        debugger;
+
+        function crash() : void {
+            if (strict)
+                throw 'unsubscribe web socket listener: no subscription for ' + [path, model] + '!'
+        }
+
+        if (path in subscriptions) {
+            var ix = subscriptions[path].indexOf(model);
+            if (ix) Util.reduceArray(subscriptions[path], ix, ix);
+            else crash();
+        } else {
+            crash();
+        }
+    }
+
+    function createWs(adhHttp : AdhHttp.IService) {
+        var wsuri = 'ws://' + window.location.host + jsonPrefix + '?ws=node';
+        var ws = new WebSocket(wsuri);
+
+        ws.onmessage = function(event) {
+            var path = event.data;
+            console.log('web socket message: update on ' + path);
+            debugger;
+
+            if (path in subscriptions) {
+                console.log('subscribers: ' + subscriptions[path]);
+
+                adhHttp.get(path).then(function(d) {
+                    for (var k in subscriptions[path]) {
+                        subscriptions[path][k].ref = d;
+                    }
+                });
+            } else {
+                console.log('subscribers: []');
+            }
+        };
+
+        // some console info to keep track of things happening:
+        ws.onerror = function(event) {
+            console.log('ws.onerror: ' + event.toString());
+        };
+        ws.onopen = function() {
+            console.log('[ws.onopen]');
+        };
+        ws.onclose = function() {
+            console.log('[ws.onclose]');
+        };
+
+        return ws;
+    }
+
+    function closeWs(ws) : void {
+        console.log('closeWs');
+        ws.close();
+    }
+
+
     // controller
 
-    app.controller('AdhDocumentTOC', function(adhHttp, $scope) {
-        adhHttp.get(jsonPrefix, ['P.Pool']).then(function(d) {
+    app.controller('AdhDocumentTOC', function(adhHttp : AdhHttp.IService,
+                                              $scope : any,  /* FIXME: better type here! */
+                                              $rootScope : ng.IScope) {
+        var ws = createWs(adhHttp);
+
+        adhHttp.get(jsonPrefix).then(function(d) {
             var pool = d.data['P.IPool'];
 
             $scope.directory = [];
 
-            // show paths only.
+            // show paths only.  (not very interesting.)
             // $scope.directory = pool.elements.map(function(d) { return d.path });
 
             // show names of heads of dags under paths.  this yields a
             // directory in non-deterministic order.  which is ok; we want
             // to change order and filters dynamically anyway.
             //
-            // FIXME: write a function that follows references
-            // transparently through the data model.  (it takes an array
-            // of field names, and follows these fields names down into an
-            // object.  each time it hits a reference, the reference is
-            // replaced by the referenced object before the path is
-            // followed further.)
+            // FIXME: rewrite.  see showDetail below.
+            // FIXME: use adhHttp.drill.
             pool.elements.map(function(ref) {
                 adhHttp.get(ref.path).then(function(dag) {
                     var dagPS = dag.data['P.IDAG'];
@@ -57,8 +137,9 @@ export function run() {
                         var dagPath = dag.path;
                         var headPath = dagPS.versions[0].path;
                         adhHttp.get(headPath).then(function(doc) {
-                            var docPS = doc.data['P.IDocument'];
-                            $scope.directory.push([headPath, docPS.title]);
+                            var docPS = doc;
+                            $scope.directory.push([headPath, docPS]);
+                            // subscribe($scope.detail.path, $scope.detail, true);
                         });
                     } else {
                         $scope.directory.push(undefined);
@@ -66,6 +147,12 @@ export function run() {
                 });
             });
         });
+
+        // FIXME: the rest of this controller wants to be rewritten.
+        // the idea should be that all the different $scope variables
+        // are all contained in one object that is $watched by the
+        // view and that we never have to call showDetail to begin
+        // with.  (i think.)
 
         function clearDetail() {
             $scope.detail = {};
@@ -78,9 +165,15 @@ export function run() {
             clearDetail();
 
             adhHttp.get(path).then(function(data) {
-                $scope.detail = data;
+                $scope.detail = { ref: data };
                 adhHttp.drill(data, ['P.IDocument', ['paragraphs'], 'P.IParagraph'],
                               $scope.detail_paragraphs, true);
+
+                // add web socket listener even in detail view,
+                // because some other client may update it.  (no need
+                // to watch entire nested structure because document
+                // root will always be affacted of any changes there.)
+                subscribe($scope.detail.path, $scope.detail, true);
             });
         }
 
@@ -125,7 +218,7 @@ export function run() {
         // pull more data asynchronously here, but i'm not sure this is
         // supposed to work.)
         return function(ref) {
-            return '[' + ref + ']';
+            return '[' + ref.data['P.IDocument'].title + ']';
         };
     }]);
 
@@ -134,85 +227,4 @@ export function run() {
 
     angular.bootstrap(document, ['NGAD']);
 
-}
-
-
-
-// web sockets
-
-// FIXME: make this part of module 'Adhocracy/Service/Http'?  Or 'Adhocracy/Service/WS'?
-
-var wsdict = {};
-
-// Create a web socket and connect it to a dom element for online
-// updates.  If an old web socket was registered, close and delete it.
-// Do *not* render the dom element once initially.  Do *not* push new
-// state to history api stack (this is only desired for *one* dom
-// element per page).
-//
-// FIXME: each time a render is triggered, the queue should be flushed
-// and compressed first.  as it is, if a proposal pool is growing by
-// three proposals before a client looks at the web socket queue
-// again, the client will render the latest version three times rather
-// than once.
-export function updateWs(sizzle : string, path : string, viewName ?: string) : void {
-    console.log('updateWs: ' + sizzle, path, viewName);
-
-    if (sizzle in wsdict) {
-        if (wsdict[sizzle].path == path) {
-            wsdict[sizzle].viewName = viewName;
-            return;
-        } else {
-            closeWs(sizzle);
-            makeNew();
-            return;
-        }
-    } else {
-        makeNew();
-        return;
-    }
-
-    function makeNew() {
-        var wsuri = 'ws://' + window.location.host + path + '?ws=node';
-        var ws = new WebSocket(wsuri);
-
-        wsdict[sizzle] = {
-            path: path,
-            viewName: viewName,
-            ws: ws,
-        }
-
-        ws.onmessage = function(event) {
-            // var path = event.data;
-            // (we don't need to do this; every path gets its own web socket for now.)
-
-            console.log('ws.onmessage: updating '  + wsdict[sizzle].path
-                        + ' with view '            + wsdict[sizzle].viewName
-                        + ' on dom node:\n'        + sizzle);
-
-            throw "not implemented";
-
-            // $(sizzle).render(wsdict[sizzle].path, wsdict[sizzle].viewName);
-        };
-
-        // some console info to keep track of things happening:
-        ws.onerror = function(event) {
-            console.log('ws.onerror: ' + event.toString());
-        };
-        ws.onopen = function() {
-            console.log('[ws.onopen]');
-        };
-        ws.onclose = function() {
-            console.log('[ws.onclose]');
-        };
-    }
-}
-
-export function closeWs(sizzle : string) {
-    console.log('closeWs: ' + sizzle);
-
-    if (sizzle in wsdict) {
-        wsdict[sizzle].ws.close();
-        delete wsdict[sizzle];
-    }
 }
