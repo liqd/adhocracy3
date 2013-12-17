@@ -16,9 +16,11 @@ export function parentPath(url : string) : string {
 export function deepcp(i) {
     if (typeof(i) == 'object') {
         var o : Object;
-        if (i instanceof Array)  o = new Array();
-        else                     o = new Object();
-        for (var x in i)         o[x] = deepcp(i[x]);
+        if (i == null)                o = null;
+        else if (i instanceof Array)  o = new Array();
+        else                          o = new Object();
+
+        for (var x in i) o[x] = deepcp(i[x]);
         return o;
     } else {
         return i;
