@@ -43,7 +43,7 @@ export function run() {
     var subscriptions = {};
 
     function subscribe(path : string, model : {ref: any}, flushPath ?: boolean) : void {
-        debugger;
+        // debugger;
 
         if (!(path in subscriptions) || flushPath)
             subscriptions[path] = [];
@@ -51,7 +51,7 @@ export function run() {
     }
 
     function unsubscribe(path : string, model : {ref: any}, strict ?: boolean) : void {
-        debugger;
+        // debugger;
 
         function crash() : void {
             if (strict)
@@ -74,7 +74,7 @@ export function run() {
         ws.onmessage = function(event) {
             var path = event.data;
             console.log('web socket message: update on ' + path);
-            debugger;
+            // debugger;
 
             if (path in subscriptions) {
                 console.log('subscribers: ' + subscriptions[path]);
