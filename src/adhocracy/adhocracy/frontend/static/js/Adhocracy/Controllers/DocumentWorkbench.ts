@@ -1,12 +1,5 @@
 /// <reference path="../../../submodules/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../../submodules/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
-
-// declare var $ : any;         // FIXME: use jquery git submodule, pick a more recent version, and tc-wrap it propertly.
-                             // FIXME: also, import this properly instead of declaring an import that happens elsewhere.
-                             // FIXME: also, get rid of jquery altogether in a3.  (:
-// declare var window : any;    // FIXME: type this more rigorously
-// declare var history : any;   // FIXME: type this more rigorously
 
 import Types = require('Adhocracy/Types');
 import Util = require('Adhocracy/Util');
