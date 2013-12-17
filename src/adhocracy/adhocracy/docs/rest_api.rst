@@ -1,5 +1,5 @@
-Loosed coupling REST-API 
-========================
+Loose coupling REST-API
+=======================
 
 Prerequisites
 -------------
@@ -81,9 +81,9 @@ with resources data::
     {
         "GET": {"response_body": [
                     "adhocracy.properties.interfaces.IName",
-                    "adhocracy.properties.interfaces.IPool", 
+                    "adhocracy.properties.interfaces.IPool",
                     ],
-               }, 
+               },
         "HEAD": {},
         "POST": {"request_body": [
                     "adhocracy.resources.interfaces.IPool",
@@ -441,6 +441,13 @@ FIXME: s/follows/predecessors/g; s/followed_by/successors/g;?
 
 Batch requests
 ––––––––––––––
+
+FIXME: eliminate talk on postroots (it's obsolete).
+
+FIXME: one batch is one transaction: if the last request failes with a
+4xx error, the entire batch request must be rolled back.  the idea
+expressed in this section that half of a batch should be committed is
+weird and should be dropped.
 
 The following URL accepts POSTs of ordered sequences (json arrays) of
 encoded HTTP requests in one HTTP request body ::
