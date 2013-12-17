@@ -140,6 +140,8 @@ export function run() {
 
 // web sockets
 
+// FIXME: make this part of module 'Adhocracy/Service/Http'?  Or 'Adhocracy/Service/WS'?
+
 var wsdict = {};
 
 // Create a web socket and connect it to a dom element for online
