@@ -60,6 +60,7 @@ export function run() {
 
     function createWs(adhHttp : AdhHttp.IService) {
         var wsuri = 'ws://' + window.location.host + jsonPrefix + '?ws=all';
+        console.log('createWs: ' + wsuri);
         var ws = new WebSocket(wsuri);
 
         ws.onmessage = function(event) {
@@ -105,37 +106,34 @@ export function run() {
             $scope.pool = d;
             subscribe(d.path, function(d) { $scope.pool = d; });
 
-            $scope.pool_entries = [];
+            $scope.poolEntries = [];
 
-            function fetchHead(dag : Types.Content) : void {
+            function fetchHead(ix : number, dag : Types.Content) : void {
                 var dagPS = dag.data['P.IDAG'];
                 if (dagPS.versions.length > 0) {
                     var dagPath = dag.path;
                     var headPath = dagPS.versions[0].path;
                     adhHttp.get(headPath).then(function(doc) {
                         var docPS = doc;
-                        $scope.pool_entries.push([headPath, docPS]);
+                        $scope.poolEntries[ix] = [headPath, docPS];
                     });
                 } else {
-                    $scope.pool_entries.push(undefined);
+                    $scope.poolEntries[ix] = undefined;
                 }
             }
 
-            d.data['P.IPool'].elements.map(function(ref) {
-                adhHttp.get(ref.path).then(function(dag) {
-                    fetchHead(dag);
-                    subscribe(dag.path, fetchHead);
-                });
-            });
+            function init() {
+                var els : Types.Content[] = d.data['P.IPool'].elements;
+                for (var ix in els) {
+                    (function(ix : number) {
+                        var path : string = els[ix].path;
+                        subscribe(path, (dag) => fetchHead(ix, dag));
+                        adhHttp.get(path).then((dag) => fetchHead(ix, dag));
+                    })(ix);
+                }
+            }
 
-            // pool_entries are in non-deterministic order.  which is
-            // ok: we want to change order and filters dynamically
-            // anyway.
-
-            // FIXME: teh subscribe callback of course needs to be
-            // implemented differently.  the way it works now, all
-            // changes are appended to the directory; old entries
-            // never change.
+            init();
         });
 
         function clearDetail() {
