@@ -14,6 +14,39 @@ var templatePath : string = '/static/templates';
 var appPrefix : string = '/app';
 
 
+// the model object that contains the contents of the resource, the
+// view mode (and possibly more stuff in the final implementation).
+interface IDocument {
+    mode        : string;
+    content     : Types.Content;
+    path        : string;
+    details     : Types.Content[];
+    previously ?: IDocument;
+}
+
+function refreshDocument(obj : IDocument,
+                         content ?: Types.Content,
+                         details ?: Types.Content[]) : IDocument {
+    return {
+        mode: obj.mode,
+        content: (typeof content == 'undefined' ? obj.content : content),
+        path: obj.path,
+        details: (typeof details == 'undefined' ? obj.details : details),
+    };
+}
+
+interface IDocumentTOCScope extends ng.IScope {
+    pool : Types.Content;
+    poolEntries : IDocument[];
+}
+
+interface IDocumentDetailScope extends IDocumentTOCScope {
+    // FIXME: i want this interface to extend ng.IScope instead!
+    entry : IDocument;  // FIXME: this is just wrong!
+    model : IDocument;
+}
+
+
 export function run() {
     var app = angular.module('NGAD', []);
 
@@ -35,7 +68,7 @@ export function run() {
     // controllers
 
     app.controller('AdhDocumentTOC', function(adhHttp : AdhHttp.IService,
-                                              $scope : any,  /* FIXME: derive a better type from ng.IScope */
+                                              $scope : IDocumentTOCScope,
                                               $rootScope : ng.IScope) {
 
         console.log('TOC: ' + $scope.$id);
@@ -61,9 +94,7 @@ export function run() {
                         // FIXME: use extend for the following.
 
                         if (ix in $scope.poolEntries) {
-                            $scope.poolEntries[ix].path = headPath;
-                            $scope.poolEntries[ix].content = headContent;
-                            $scope.poolEntries[ix].details = paragraphs;
+                            refreshDocument($scope.poolEntries[ix], headContent, paragraphs);
                         } else {
                             $scope.poolEntries[ix] = {
                                 path: headPath,
@@ -107,7 +138,7 @@ export function run() {
 
 
     app.controller('AdhDocumentDetail', function(adhHttp : AdhHttp.IService,
-                                                 $scope : any,  // FIXME: derive a better type from ng.IScope
+                                                 $scope : IDocumentDetailScope,
                                                  $rootScope : ng.IScope) {
 
         // FIXME: entry should not be visible from TOC $scope.  is
