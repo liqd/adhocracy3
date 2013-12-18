@@ -20,7 +20,6 @@ var appPrefix : string = '/app';
 
 
 export function run() {
-    console.log('DocumentWorkbench.run()');
     var app = angular.module('NGAD', []);
 
 
@@ -42,14 +41,22 @@ export function run() {
 
     var subscriptions = {};
 
+
+
+    // callbacks for websocket signals are a good idea.  unravelling
+    // should also work somehow: if a callback receives an object that
+    // contains references, it keeps calling adhHttp.get more, with
+    // more callbacks, that update the referenced models.
+
+    // FIXME: tear things down properly (unsubscribe, closeWs)
+
+
+
     function subscribe(path : string, update : (model: any) => void) : void {
         subscriptions[path] = update;
     }
 
     function unsubscribe(path : string, strict ?: boolean) : void {
-        function crash() : void {
-        }
-
         if (path in subscriptions)
             delete subscriptions[path];
         else if (strict)
@@ -57,7 +64,7 @@ export function run() {
     }
 
     function createWs(adhHttp : AdhHttp.IService) {
-        var wsuri = 'ws://' + window.location.host + jsonPrefix + '?ws=node';
+        var wsuri = 'ws://' + window.location.host + jsonPrefix + '?ws=all';
         var ws = new WebSocket(wsuri);
 
         ws.onmessage = function(event) {
@@ -66,9 +73,7 @@ export function run() {
 
             if (path in subscriptions) {
                 console.log('subscriber: ' + subscriptions[path]);
-                adhHttp.get(path).then(function(d) {
-                    subscriptions[path](d);
-                });
+                adhHttp.get(path).then(subscriptions[path]);
             } else {
                 console.log('(no subscriber)');
             }
@@ -97,46 +102,46 @@ export function run() {
     // controller
 
     app.controller('AdhDocumentTOC', function(adhHttp : AdhHttp.IService,
-                                              $scope : any,  /* FIXME: better type here! */
+                                              $scope : any,  /* FIXME: derive a better type from ng.IScope */
                                               $rootScope : ng.IScope) {
         var ws = createWs(adhHttp);
 
         adhHttp.get(jsonPrefix).then(function(d) {
-            var pool = d.data['P.IPool'];
+            $scope.pool = d;
+            subscribe(d.path, function(d) { $scope.pool = d; });
 
-            $scope.directory = [];
+            $scope.pool_entries = [];
 
-            // show paths only.  (not very interesting.)
-            // $scope.directory = pool.elements.map(function(d) { return d.path });
+            function fetchHead(dag : Types.Content) : void {
+                var dagPS = dag.data['P.IDAG'];
+                if (dagPS.versions.length > 0) {
+                    var dagPath = dag.path;
+                    var headPath = dagPS.versions[0].path;
+                    adhHttp.get(headPath).then(function(doc) {
+                        var docPS = doc;
+                        $scope.pool_entries.push([headPath, docPS]);
+                    });
+                } else {
+                    $scope.pool_entries.push(undefined);
+                }
+            }
 
-            // show names of heads of dags under paths.  this yields a
-            // directory in non-deterministic order.  which is ok; we want
-            // to change order and filters dynamically anyway.
-            //
-            // FIXME: rewrite.  see showDetail below.
-            // FIXME: use adhHttp.drill.
-            pool.elements.map(function(ref) {
+            d.data['P.IPool'].elements.map(function(ref) {
                 adhHttp.get(ref.path).then(function(dag) {
-                    var dagPS = dag.data['P.IDAG'];
-                    if (dagPS.versions.length > 0) {
-                        var dagPath = dag.path;
-                        var headPath = dagPS.versions[0].path;
-                        adhHttp.get(headPath).then(function(doc) {
-                            var docPS = doc;
-                            $scope.directory.push([headPath, docPS]);
-                        });
-                    } else {
-                        $scope.directory.push(undefined);
-                    }
+                    fetchHead(dag);
+                    subscribe(dag.path, fetchHead);
                 });
             });
-        });
 
-        // FIXME: the rest of this controller wants to be rewritten.
-        // the idea should be that all the different $scope variables
-        // are all contained in one object that is $watched by the
-        // view and that we never have to call showDetail to begin
-        // with.  (i think.)
+            // pool_entries are in non-deterministic order.  which is
+            // ok: we want to change order and filters dynamically
+            // anyway.
+
+            // FIXME: teh subscribe callback of course needs to be
+            // implemented differently.  the way it works now, all
+            // changes are appended to the directory; old entries
+            // never change.
+        });
 
         function clearDetail() {
             $scope.detail = {};
@@ -149,7 +154,7 @@ export function run() {
             clearDetail();
 
             adhHttp.get(path).then(function(data) {
-                $scope.detail = { ref: data };
+                $scope.detail = data;
                 adhHttp.drill(data, ['P.IDocument', ['paragraphs'], 'P.IParagraph'],
                               $scope.detail_paragraphs, true);
 
@@ -171,7 +176,12 @@ export function run() {
         }
 
         this.showDetailSave = function() {
-            adhHttp.postNewVersion($scope.detail_old.path, $scope.detail, function() {
+            var oldVersionPath : string = $scope.detail_old.path;
+            if (typeof oldVersionPath == 'undefined') {
+                console.log($scope.detail_old);
+                throw 'showDetailSave: detail_old.'
+            }
+            adhHttp.postNewVersion(oldVersionPath, $scope.detail, function() {
                 $scope.detail_mode = 'display';
             });
         }
