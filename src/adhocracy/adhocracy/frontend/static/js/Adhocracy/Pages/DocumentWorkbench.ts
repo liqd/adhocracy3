@@ -1,18 +1,13 @@
 /// <reference path="../../../submodules/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../_all.d.ts"/>
+
+import angular = require('angular');
 
 import Types = require('Adhocracy/Types');
 import Util = require('Adhocracy/Util');
 import Css = require('Adhocracy/Css');
 import AdhHttp = require('Adhocracy/Services/Http');
-
-declare module 'angular' {
-    // FIXME: complete this, fill in more concise types, and write a pull request for definitely typed.
-    export var module: any;
-    export var bootstrap: any;
-}
-
-import angular = require('angular');
 
 var templatePath : string = '/static/templates';
 var jsonPrefix : string = '/adhocracy';
