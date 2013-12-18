@@ -204,3 +204,25 @@ function changeContentTypeRecursively(obj, f) {
         return obj;
     }
 }
+
+
+// cache
+
+// this module (or an ancestor of it) will also take care of storing
+// things locally, batching request collection in case of offline work
+// or user-controlled update delay.
+//
+// options for caching:
+//
+//  1. the angular-builtin $cacheFactory (leaves all the
+//     adhocracy-specific stuff to me without trying to guess how it's
+//     done.  it can also very very implicitly with $http, which i
+//     don't think is a good idea.)
+//
+//  2. github.com/jmdobry/angular-cache (about expiration time
+//     guessing, but i want to be explicit about what expires and what
+//     lives.  also supports local storage.  perhaps even better than
+//     1.?)
+//
+//  3. http://gregpike.net/demos/angular-local-storage/demo/demo.html
+//     (writes to disk, which is also interesting.)
