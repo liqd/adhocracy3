@@ -17,7 +17,7 @@ def root_factory(request, t=transaction, g=get_connection,
         registry = request.registry
         app_root = registry.content.create('Root')
         zodb_root['app_root'] = app_root
-        t.savepoint() # give app_root a _p_jar
+        t.savepoint()  # give app_root a _p_jar
         if mark_unfinished_as_finished:
             markunf(app_root, registry, t)
         t.commit()
@@ -26,8 +26,8 @@ def root_factory(request, t=transaction, g=get_connection,
 
 def includeme(config):
     """Setup basic adhocracy."""
-    # FIXME: Fix substanced.sdi bug: you need to register the authorisation utility first,
-    # then the auhentication.
+    # FIXME: Fix substanced.sdi bug: you need to register the authorisation
+    # utility first, # then the auhentication.
     authz_policy = ACLAuthorizationPolicy()
     config.set_authorization_policy(authz_policy)
     # now we can proceed
