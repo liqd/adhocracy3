@@ -109,8 +109,9 @@ class ResourceView(object):
             self.request.validated = {}
             raise json_error(self.request.errors)
 
-    @view_config(request_method='OPTION')
-    def option(self):
+    @view_config(request_method='OPTIONS')
+    def options(self):
+        import ipdb; ipdb.set_trace()
         cstruct = OPTIONResourceResponseSchema().serialize()
         for sheet in self.sheets_edit:
             cstruct["PUT"]["request_body"] = {"data": {sheet: {}}}

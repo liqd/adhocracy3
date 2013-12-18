@@ -280,25 +280,25 @@ class ResourceViewUnitTest(unittest.TestCase):
         assert hasattr(inst, "sheets_edit")
         assert hasattr(inst, "addables")
 
-    def test_option_valid_no_propertysheets_and_addables(self):
+    def test_options_valid_no_propertysheets_and_addables(self):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
         self.request.registry.content.resource_propertysheets.return_value = {}
         self.request.registry.content.resource_addable_types.return_value = {}
 
         inst = self.make_one(self.context, self.request)
-        response = inst.option()
+        response = inst.options()
 
         wanted = OPTIONResourceResponseSchema().serialize()
         assert wanted == response
 
-    def test_option_valid_with_propertysheets_and_addables(self):
+    def test_options_valid_with_propertysheets_and_addables(self):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
         self.request.registry.content.resource_propertysheets.return_value = {
             "propertyx": Dummy()}
         self.request.registry.content.resource_addable_types.return_value = {
             "resourcex": set(["propertyx"])}
         inst = self.make_one(self.context, self.request)
-        response = inst.option()
+        response = inst.options()
 
         wanted = OPTIONResourceResponseSchema().serialize()
         wanted["PUT"]["request_body"] = {"data": {"propertyx": {}}}
