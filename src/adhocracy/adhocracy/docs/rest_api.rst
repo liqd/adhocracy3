@@ -108,6 +108,8 @@ Semantics of read-only and mandatory flags in request body:
 FIXME: the remainder of this section must be re-aligned with the actual
 documentation.
 
+Note: you can already make propertysheets read-only with the taggedValue "readonly"
+
 *,    read-only, mandatory  => error
 GET,  *,         *          => may be there (for structure selection)
 *,    read-only             => must not be there
