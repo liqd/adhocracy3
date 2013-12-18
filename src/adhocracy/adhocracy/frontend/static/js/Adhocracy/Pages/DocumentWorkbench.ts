@@ -41,12 +41,31 @@ export function run() {
                 if (dagPS.versions.length > 0) {
                     var dagPath = dag.path;
                     var headPath = dagPS.versions[0].path;
-                    adhHttp.get(headPath).then(function(doc) {
-                        var docPS = doc;
-                        $scope.poolEntries[ix] = [headPath, docPS];
+                    adhHttp.get(headPath).then(function(headContent) {
+                        var paragraphs = [];
+                        fetchDocumentDetails(headContent,
+                                             (ix, paragraph) => { paragraphs[ix] = paragraph });
+                        $scope.poolEntries[ix] = {
+                            path: headPath,
+                            content: headContent,
+                            mode: 'list',
+                            details: paragraphs,
+                        };
                     });
                 } else {
                     $scope.poolEntries[ix] = undefined;
+                }
+            }
+
+            function fetchDocumentDetails(document : Types.Content,
+                                          update : (ix : number, paragraph : Types.Content) => void) : void {
+                var refs : Types.Reference[] = document['data']['P.IDocument']['paragraphs'];
+                var ix : string;  // must be type 'string' or 'any'
+                for (ix in refs) {
+                    (function(ix) {
+                        var path : string = refs[ix]['path'];
+                        adhHttp.get(path).then((paragraph) => update(ix, paragraph));
+                    })(ix);
                 }
             }
 
@@ -64,48 +83,35 @@ export function run() {
             init();
         });
 
-        function clearDetail() {
-            $scope.detail = {};
-            $scope.detail_paragraphs = {ref: [], xpath: []};
-            $scope.detail_mode = 'display';
+
+        this.showTitle = function(entry) {
+            entry.mode = 'list';
         }
 
-        clearDetail();
-        this.showDetail = function(path) {
-            clearDetail();
-
-            adhHttp.get(path).then(function(data) {
-                $scope.detail = data;
-                adhHttp.drill(data, ['P.IDocument', ['paragraphs'], 'P.IParagraph'],
-                              $scope.detail_paragraphs, true);
-
-                // add web socket listener even in detail view,
-                // because some other client may update it.  (no need
-                // to watch entire nested structure because document
-                // root will always be affacted of any changes there.)
-            });
+        this.showDetailEdit = function(entry) {
+            entry.previously = Util.deepcp(entry);
+            entry.mode = 'edit';
         }
 
-        this.showDetailEdit = function() {
-            $scope.detail_old = Util.deepcp($scope.detail);
-            $scope.detail_mode = 'edit';
+        this.showDetailReset = function(entry) {
+            if ('previously' in entry)
+                delete entry.previously;
+            entry.mode = 'display';
         }
 
-        this.showDetailReset = function() {
-            $scope.detail = Util.deepcp($scope.detail_old);
-            $scope.detail_mode = 'display';
-        }
-
-        this.showDetailSave = function() {
-            var oldVersionPath : string = $scope.detail_old.path;
+        this.showDetailSave = function(entry) {
+            var oldVersionPath : string = entry.previously.path;
             if (typeof oldVersionPath == 'undefined') {
-                console.log($scope.detail_old);
-                throw 'showDetailSave: detail_old.'
+                console.log(entry.previously);
+                throw 'showDetailSave: no previous path!'
             }
-            adhHttp.postNewVersion(oldVersionPath, $scope.detail, function() {
-                $scope.detail_mode = 'display';
-            });
+            adhHttp.postNewVersion(oldVersionPath, entry.content, function() {});
+
+            // FIXME: post updates on paragraphs separately somehow.
+
+            this.showDetailReset(entry);
         }
+
     });
 
 

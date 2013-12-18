@@ -52,13 +52,14 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
 
         // some console info to keep track of things happening:
         ws.onerror = function(event) {
-            console.log('ws.onerror: ' + event.toString());
+            console.log(event);
+            console.log('ws.onerror');
         };
         ws.onopen = function() {
             console.log('ws.onopen');
         };
         ws.onclose = function() {
-            console.log('ws.onclose: re-opening!');
+            console.log('ws.onclose (will try to re-open)');
             ws = openWs(adhHttp);
         };
 
