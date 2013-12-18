@@ -3,6 +3,7 @@ from zope.interface import (
     taggedValue,
 )
 from substanced.interfaces import IAutoNamingFolder
+from substanced.interfaces import IFolder
 
 
 class IResource(Interface):
@@ -31,7 +32,7 @@ class IResource(Interface):
     # view for substanced sdi,
 
 
-class IPool(IResource, IAutoNamingFolder):
+class IPool(IResource, IFolder):
 
     """Folder in the object hierarchy.
 
@@ -40,8 +41,7 @@ class IPool(IResource, IAutoNamingFolder):
 
     """
 
-    taggedValue("content_class",
-                "substanced.folder.SequentialAutoNamingFolder")
+    taggedValue("content_class", "substanced.folder.Folder")
     taggedValue("basic_properties_interfaces",
                 set(["adhocracy.properties.interfaces.IName",
                      "adhocracy.properties.interfaces.IPool"]))
@@ -50,7 +50,7 @@ class IPool(IResource, IAutoNamingFolder):
     """ Set addable content types, class heritage is honored"""
 
 
-class IFubelVersionsPool(IPool):
+class IFubelVersionsPool(IPool, IAutoNamingFolder):
 
     """Pool for all VersionableFubels (DAG), tags and related Pools.
 
@@ -58,6 +58,8 @@ class IFubelVersionsPool(IPool):
 
     """
 
+    taggedValue("content_class", \
+                "substanced.folder.SequentialAutoNamingFolder")
     taggedValue("content_name", "FubelVersionsPool")
     taggedValue("basic_properties_interfaces", set(
                 ["adhocracy.properties.interfaces.IName",

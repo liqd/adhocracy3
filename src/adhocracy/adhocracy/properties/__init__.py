@@ -38,6 +38,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         self.key = taggedvalues.get("key") or iface.__identifier__
         self.permission_view = taggedvalues["permission_view"]
         self.permission_edit = taggedvalues["permission_edit"]
+        self.readonly = taggedvalues["readonly"]
         schema_class = resolve(taggedvalues["schema"])
         schema_obj = schema_class()
         self.schema = schema_obj.bind(context=context, request=request)

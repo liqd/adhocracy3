@@ -83,10 +83,10 @@ class TestResourceContentRegistry(unittest.TestCase):
         self.config.testing_securitypolicy(userid='reader', permissive=False)
 
         sheets = inst.resource_propertysheets(context, testing.DummyRequest(),
-                                              check_permission_view=True)
+                                              onlyviewable=True)
         assert sheets == {}
 
-    def test_propertysheets_valid_with_sheets_check_permission_edit(self):
+    def test_propertysheets_valid_with_sheets_onlyeditable_no_permission(self):
         from adhocracy.properties import ResourcePropertySheetAdapter
         inst = self._make_one(self.config.registry)
         context = testing.DummyResource(__provides__=(IResource, IPropertyA))
@@ -95,7 +95,19 @@ class TestResourceContentRegistry(unittest.TestCase):
         self.config.testing_securitypolicy(userid='reader', permissive=False)
 
         sheets = inst.resource_propertysheets(context, testing.DummyRequest(),
-                                              check_permission_edit=True)
+                                              onlyeditable=True)
+        assert sheets == {}
+
+    def test_propertysheets_valid_with_sheets_onlyeditable_readonly(self):
+        from adhocracy.properties import ResourcePropertySheetAdapter
+        inst = self._make_one(self.config.registry)
+        IPropertyA.setTaggedValue("readonly", True)
+        context = testing.DummyResource(__provides__=(IResource, IPropertyA))
+        _register_propertysheet_adapter(self.config, context, IPropertyA,
+                                        ResourcePropertySheetAdapter)
+
+        sheets = inst.resource_propertysheets(context, testing.DummyRequest(),
+                                              onlyeditable=True)
         assert sheets == {}
 
     def test_addable_types_valid_context_is_not_iresource(self):
@@ -139,13 +151,33 @@ class TestResourceContentRegistry(unittest.TestCase):
         IResourceA.setTaggedValue("addable_content_interfaces",
                                   [IResourceB.__identifier__])
         IResourceB.setTaggedValue("basic_properties_interfaces",
-                                  set(["ipropx"]))
+                                  set([IProperty.__identifier__]))
         IResourceB.setTaggedValue("extended_properties_interfaces",
-                                  set(["ipropy"]))
+                                  set([IPropertyA.__identifier__]))
 
         addables = inst.resource_addable_types(context)
 
-        wanted = {IResourceB.__identifier__: set(["ipropx", "ipropy"])}
+        wanted = {IResourceB.__identifier__: set([IProperty.__identifier__,
+                                                  IPropertyA.__identifier__])}
+        assert wanted == addables
+
+    def test_addable_types_valid_with_addables_and_reaonly_sheets(self):
+        inst = self._make_one()
+        context = testing.DummyResource(__provides__=IResourceA)
+        context.__factory_type__ = IResourceA.__identifier__
+        _register_content_type(inst, IResourceA.__identifier__)
+        _register_content_type(inst, IResourceB.__identifier__)
+        IResourceA.setTaggedValue("addable_content_interfaces",
+                                  [IResourceB.__identifier__])
+        IResourceB.setTaggedValue("basic_properties_interfaces",
+                                  set([IProperty.__identifier__]))
+        IResourceB.setTaggedValue("extended_properties_interfaces",
+                                  set([IPropertyA.__identifier__]))
+        IPropertyA.setTaggedValue("readonly", True)
+
+        addables = inst.resource_addable_types(context)
+
+        wanted = {IResourceB.__identifier__: set([IProperty.__identifier__])}
         assert wanted == addables
 
     def test_addable_types_valid_with_implicit_inherit_addables(self):

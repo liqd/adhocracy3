@@ -34,7 +34,7 @@ def validate_request_with_cornice_schema(schema, request):
 
 def validate_put_propertysheet_names(context, request):
     sheets = request.registry.content.resource_propertysheets(
-        context, request, check_permission_edit=True)
+        context, request, onlyeditable=True)
     put_sheets = request.validated.get("data", {})
     wrong_sheets = put_sheets.keys() - sheets.keys()
     if wrong_sheets:
@@ -90,9 +90,9 @@ class ResourceView(object):
         self.addables = registry.resource_addable_types(context)
         self.sheets_all = registry.resource_propertysheets(context, request)
         self.sheets_view = registry.resource_propertysheets(
-            context, request, check_permission_view=True)
+            context, request, onlyviewable=True)
         self.sheets_edit = registry.resource_propertysheets(
-            context, request, check_permission_edit=True)
+            context, request, onlyeditable=True)
 
     def validate_request_data(self, method):
         """Validates request data.

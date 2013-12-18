@@ -42,6 +42,10 @@ class IProperty(Interface):
     """Permission to view or index this data. Subtype should override."""
     taggedValue("permission_edit", "edit")
     """Permission to edit this data. Subtype should override."""
+    taggedValue("readonly", False)
+    """This propertysheet may not be used to set data."""
+
+
 
 
 class IName(IProperty):
@@ -73,6 +77,7 @@ class IPool(IProperty):
     """Get listing with child objects of this resource."""
 
     taggedValue("schema", "adhocracy.properties.interfaces.PoolSchema")
+    taggedValue("readonly", True)
 
 
 class PoolSchema(colander.Schema):

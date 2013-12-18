@@ -98,6 +98,7 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         assert inst.request == request
         assert inst.permission_view == "view"
         assert inst.permission_edit == "edit"
+        assert inst.readonly == False
         assert isinstance(inst.schema, CountSchema)
         assert inst.key == IPropertyB.__identifier__
         assert verifyObject(IResourcePropertySheet, inst) is True
