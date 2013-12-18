@@ -8,9 +8,9 @@ import Types = require('Adhocracy/Types');
 import Util = require('Adhocracy/Util');
 import Css = require('Adhocracy/Css');
 import AdhHttp = require('Adhocracy/Services/Http');
+import AdhWS = require('Adhocracy/Services/WS');
 
 var templatePath : string = '/static/templates';
-var jsonPrefix : string = '/adhocracy';
 var appPrefix : string = '/app';
 
 
@@ -23,90 +23,16 @@ export function run() {
     app.factory('adhHttp', ['$http', AdhHttp.factory]);
 
 
-    // web sockets
-
-    // FIXME: first draft, using a primitive global dictionary for
-    // registering models interested in updates.  (i don't think this
-    // is what we actually want to do once the application gets more
-    // complex, but i want to find out how well it works anyway.  see
-    // also angularjs github wiki, section 'best practice'.)
-
-    // FIXME: make this part of module 'Adhocracy/Service/Http'?  Or
-    // 'Adhocracy/Service/WS'?
-
-    var subscriptions = {};
-
-
-
-    // callbacks for websocket signals are a good idea.  unravelling
-    // should also work somehow: if a callback receives an object that
-    // contains references, it keeps calling adhHttp.get more, with
-    // more callbacks, that update the referenced models.
-
-    // FIXME: tear things down properly (unsubscribe, closeWs)
-
-
-
-    function subscribe(path : string, update : (model: any) => void) : void {
-        subscriptions[path] = update;
-    }
-
-    function unsubscribe(path : string, strict ?: boolean) : void {
-        if (path in subscriptions)
-            delete subscriptions[path];
-        else if (strict)
-            throw 'unsubscribe web socket listener: no subscription for ' + path + '!'
-    }
-
-    function createWs(adhHttp : AdhHttp.IService) {
-        var wsuri = 'ws://' + window.location.host + jsonPrefix + '?ws=all';
-        console.log('createWs: ' + wsuri);
-        var ws;
-
-        function openOrReopen() {
-            ws = new WebSocket(wsuri);
-
-            ws.onmessage = function(event) {
-                var path = event.data;
-                console.log('web socket message: update on ' + path);
-
-                if (path in subscriptions)
-                    adhHttp.get(path).then(subscriptions[path]);
-            };
-
-            // some console info to keep track of things happening:
-            ws.onerror = function(event) {
-                console.log('ws.onerror: ' + event.toString());
-            };
-            ws.onopen = function() {
-                console.log('ws.onopen');
-            };
-            ws.onclose = function() {
-                console.log('ws.onclose: re-opening!');
-                openOrReopen();
-            };
-        }
-
-        openOrReopen();
-        return ws;
-    }
-
-    function closeWs(ws) : void {
-        console.log('closeWs');
-        ws.close();
-    }
-
-
     // controller
 
     app.controller('AdhDocumentTOC', function(adhHttp : AdhHttp.IService,
                                               $scope : any,  /* FIXME: derive a better type from ng.IScope */
                                               $rootScope : ng.IScope) {
-        var ws = createWs(adhHttp);
+        var ws = AdhWS.factory(adhHttp);
 
-        adhHttp.get(jsonPrefix).then(function(d) {
+        adhHttp.get(AdhHttp.jsonPrefix).then(function(d) {
             $scope.pool = d;
-            subscribe(d.path, function(d) { $scope.pool = d; });
+            ws.subscribe(d.path, function(d) { $scope.pool = d; });
 
             $scope.poolEntries = [];
 
@@ -129,7 +55,7 @@ export function run() {
                 for (var ix in els) {
                     (function(ix : number) {
                         var path : string = els[ix].path;
-                        subscribe(path, (dag) => fetchHead(ix, dag));
+                        ws.subscribe(path, (dag) => fetchHead(ix, dag));
                         adhHttp.get(path).then((dag) => fetchHead(ix, dag));
                     })(ix);
                 }

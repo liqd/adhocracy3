@@ -8,6 +8,8 @@ import Util = require('Adhocracy/Util');
 
 // send and receive objects with adhocracy data model awareness
 
+export var jsonPrefix : string = '/adhocracy';
+
 export interface IService {
     get : (path : string) => ng.IPromise<Types.Content>;
     drill : (data : any, xpath : any, target : any, ordered : boolean) => void;
