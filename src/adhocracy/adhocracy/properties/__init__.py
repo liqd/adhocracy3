@@ -123,7 +123,9 @@ class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
 
     def get(self):
         struct = super(PoolPropertySheetAdapter, self).get()
-        struct["elements"] = self._objectmap.pathlookup(self.context, depth=1)
+        struct["elements"] = self._objectmap.pathlookup(self.context,
+                                                        depth=1,
+                                                        include_origin=False)
         return struct
 
     def set(self, struct, omit=()):
