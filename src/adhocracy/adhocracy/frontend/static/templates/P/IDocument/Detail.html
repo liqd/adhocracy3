@@ -12,6 +12,9 @@
             <p ng-bind="model.content.data['P.IDocument'].title"></p>
             <small><p ng-bind="model.content.data['P.IDocument'].description"></p></small>
             <p ng-repeat="paragraph in model.details track by $index">{{paragraph['data']['P.IParagraph']['text']}}</p>
+
+            <!-- FIXME: write directive and controller for paragraph, just like for document detail? -->
+
         </div>
         <div ng-switch-when="edit">
             <button type="button" class="reset_button" ng-click="ad.showDetailReset()">reset</button>
