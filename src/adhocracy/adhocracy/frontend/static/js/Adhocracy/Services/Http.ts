@@ -18,7 +18,7 @@ export interface IService {
 
 export function factory($http : ng.IHttpService) : IService {
     var adhHttp : IService = {
-        get : (path : string) => {
+        get: (path : string) => {
             return $http.get(path).then((response) => {
                 if (response.status != 200) {
                     console.log(response);
@@ -28,7 +28,7 @@ export function factory($http : ng.IHttpService) : IService {
             });
         },
 
-        drill : (data : any, xpath : /* string[] or string[][] */ any, target : any, ordered : boolean) => {
+        drill: (data : any, xpath : /* string[] or string[][] */ any, target : any, ordered : boolean) => {
             function resolveReference() {
                 if ('path' in data) {
                     adhHttp.get(data['path']).then((resource) => {
@@ -102,7 +102,7 @@ export function factory($http : ng.IHttpService) : IService {
             }
         },
 
-        postNewVersion : (oldVersionPath : string, obj : any, callback : any) => {
+        postNewVersion: (oldVersionPath : string, obj : any, callback : any) => {
             var dagPath = Util.parentPath(oldVersionPath);
             var config = {
                 headers: { follows: oldVersionPath },
