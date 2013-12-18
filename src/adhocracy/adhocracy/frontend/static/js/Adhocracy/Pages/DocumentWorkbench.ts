@@ -61,31 +61,33 @@ export function run() {
     function createWs(adhHttp : AdhHttp.IService) {
         var wsuri = 'ws://' + window.location.host + jsonPrefix + '?ws=all';
         console.log('createWs: ' + wsuri);
-        var ws = new WebSocket(wsuri);
+        var ws;
 
-        ws.onmessage = function(event) {
-            var path = event.data;
-            console.log('web socket message: update on ' + path);
+        function openOrReopen() {
+            ws = new WebSocket(wsuri);
 
-            if (path in subscriptions) {
-                console.log('subscriber: ' + subscriptions[path]);
-                adhHttp.get(path).then(subscriptions[path]);
-            } else {
-                console.log('(no subscriber)');
-            }
-        };
+            ws.onmessage = function(event) {
+                var path = event.data;
+                console.log('web socket message: update on ' + path);
 
-        // some console info to keep track of things happening:
-        ws.onerror = function(event) {
-            console.log('ws.onerror: ' + event.toString());
-        };
-        ws.onopen = function() {
-            console.log('ws.onopen');
-        };
-        ws.onclose = function() {
-            console.log('ws.onclose');
-        };
+                if (path in subscriptions)
+                    adhHttp.get(path).then(subscriptions[path]);
+            };
 
+            // some console info to keep track of things happening:
+            ws.onerror = function(event) {
+                console.log('ws.onerror: ' + event.toString());
+            };
+            ws.onopen = function() {
+                console.log('ws.onopen');
+            };
+            ws.onclose = function() {
+                console.log('ws.onclose: re-opening!');
+                openOrReopen();
+            };
+        }
+
+        openOrReopen();
         return ws;
     }
 
