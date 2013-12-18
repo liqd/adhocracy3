@@ -271,10 +271,41 @@ class ResourceViewUnitTest(unittest.TestCase):
     def test_create_valid(self,):
         inst = self.make_one(self.context, self.request)
         assert inst.context is self.context
-        assert inst.resource_registry == self.request.registry.content
+        assert inst.registry == self.request.registry.content
         assert inst.request is self.request
         assert inst.request.errors == []
         assert inst.request.validated == {}
+        assert hasattr(inst, "sheets_all")
+        assert hasattr(inst, "sheets_view")
+        assert hasattr(inst, "sheets_edit")
+        assert hasattr(inst, "addables")
+
+    def test_option_valid_no_propertysheets_and_addables(self):
+        from adhocracy.rest.schemas import OPTIONResourceResponseSchema
+        self.request.registry.content.resource_propertysheets.return_value = {}
+        self.request.registry.content.resource_addable_types.return_value = {}
+
+        inst = self.make_one(self.context, self.request)
+        response = inst.option()
+
+        wanted = OPTIONResourceResponseSchema().serialize()
+        assert wanted == response
+
+    def test_option_valid_with_propertysheets_and_addables(self):
+        from adhocracy.rest.schemas import OPTIONResourceResponseSchema
+        self.request.registry.content.resource_propertysheets.return_value = {
+            "propertyx": Dummy()}
+        self.request.registry.content.resource_addable_types.return_value = {
+            "resourcex": set(["propertyx"])}
+        inst = self.make_one(self.context, self.request)
+        response = inst.option()
+
+        wanted = OPTIONResourceResponseSchema().serialize()
+        wanted["PUT"]["request_body"] = {"data": {"propertyx": {}}}
+        wanted["GET"]["response_body"]["data"]["propertyx"] = {}
+        wanted["POST"]["request_body"] = [{"content_type": "resourcex",
+                                           "data": {"propertyx": {}}}]
+        assert wanted == response
 
     def test_get_valid_no_propertysheets(self):
         from adhocracy.rest.schemas import GETResourceResponseSchema

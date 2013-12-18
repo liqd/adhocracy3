@@ -5,8 +5,10 @@ from adhocracy.resources.interfaces import (
 )
 from adhocracy.rest.schemas import (
     ResourceResponseSchema,
-    ResourceRequestSchema,
+    PUTResourceRequestSchema,
+    POSTResourceRequestSchema,
     GETResourceResponseSchema,
+    OPTIONResourceResponseSchema,
 )
 from cornice.util import json_error
 from cornice.schemas import (
@@ -72,9 +74,10 @@ class ResourceView(object):
     """Default view for adhocracy resources."""
 
     validation_map = {'GET': (None, []),
-                      'PUT': (ResourceRequestSchema,
+                      'OPTION': (None, []),
+                      'PUT': (PUTResourceRequestSchema,
                               [validate_put_propertysheet_names]),
-                      'POST': (ResourceRequestSchema,
+                      'POST': (POSTResourceRequestSchema,
                                [validate_post_propertysheet_names_addables]),
                       }
     reserved_names = []
@@ -82,7 +85,14 @@ class ResourceView(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self.resource_registry = request.registry.content
+        registry = request.registry.content
+        self.registry = registry
+        self.addables = registry.resource_addable_types(context)
+        self.sheets_all = registry.resource_propertysheets(context, request)
+        self.sheets_view = registry.resource_propertysheets(
+            context, request, check_permission_view=True)
+        self.sheets_edit = registry.resource_propertysheets(
+            context, request, check_permission_edit=True)
 
     def validate_request_data(self, method):
         """Validates request data.
@@ -99,30 +109,38 @@ class ResourceView(object):
             self.request.validated = {}
             raise json_error(self.request.errors)
 
+    @view_config(request_method='OPTION')
+    def option(self):
+        cstruct = OPTIONResourceResponseSchema().serialize()
+        for sheet in self.sheets_edit:
+            cstruct["PUT"]["request_body"] = {"data": {sheet: {}}}
+        for sheet in self.sheets_view:
+            cstruct["GET"]["response_body"]["data"][sheet] = {}
+        for type, sheets in self.addables.items():
+            sheets = dict([(sheet, {}) for sheet in sheets])
+            post_data = {"content_type": type, "data": sheets}
+            cstruct["POST"]["request_body"].append(post_data)
+        return cstruct
+
     @view_config(request_method='GET')
     def get(self):
         self.validate_request_data('GET')
-        sheets = self.resource_registry.resource_propertysheets(
-            self.context, self.request, check_permission_view=True)
         struct = {"data": {}}
-        for sheet in sheets.values():
+        for sheet in self.sheets_view.values():
             key = sheet.iface.__identifier__
             struct["data"][key] = sheet.get_cstruct()
         struct["path"] = resource_path(self.context)
-        struct["content_type"] = self.resource_registry.typeof(self.context)
+        struct["content_type"] = self.registry.typeof(self.context)
         return GETResourceResponseSchema().serialize(struct)
 
     @view_config(request_method='PUT')
     def put(self):
         self.validate_request_data('PUT')
-        sheets = self.resource_registry.resource_propertysheets(self.context,
-                                                                self.request)
         for name, cstruct in self.request.validated["data"].items():
-            sheets[name].set_cstruct(cstruct)
+            self.sheets_edit[name].set_cstruct(cstruct)
         struct = {}
         struct["path"] = resource_path(self.context)
-        struct["content_type"] = self.resource_registry.typeof(self.context)
-        struct["content_type"] = self.resource_registry.typeof(self.context)
+        struct["content_type"] = self.registry.typeof(self.context)
         return ResourceResponseSchema().serialize(struct)
 
     @view_config(request_method='POST')
@@ -131,7 +149,7 @@ class ResourceView(object):
         self.validate_request_data('POST')
         #create resource
         type = self.request.validated["content_type"]
-        resource = self.resource_registry.create(type)
+        resource = self.registry.create(type)
         # add to parent
         name = self.request.validated["data"].get(IName.__identifier__, {})\
             .get("name", "")
@@ -143,15 +161,13 @@ class ResourceView(object):
                 name += "_" + self.context.next_name()
         self.context.add(name, resource, send_events=False)
         # store propertysheets
-        sheets = self.resource_registry.resource_propertysheets(resource,
-                                                                self.request)
         for name, cstruct in self.request.validated["data"].items():
-            sheets[name].set_cstruct(cstruct)
+            self.sheets_edit[name].set_cstruct(cstruct)
         #FIXME use substanced event system
         # response
         struct = {}
         struct["path"] = resource_path(resource)
-        struct["content_type"] = self.resource_registry.typeof(self.context)
+        struct["content_type"] = self.registry.typeof(self.context)
         return ResourceResponseSchema().serialize(struct)
 
 
