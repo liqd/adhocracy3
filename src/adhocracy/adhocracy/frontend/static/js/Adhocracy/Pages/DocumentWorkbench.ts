@@ -23,11 +23,23 @@ export function run() {
     app.factory('adhHttp', ['$http', AdhHttp.factory]);
 
 
-    // controller
+    // filters
+
+    app.filter('viewFilterList', [ function() {
+        return function(obj : Types.Content) : string {
+            return obj.data['P.IDocument'].title;
+        };
+    }]);
+
+
+    // controllers
 
     app.controller('AdhDocumentTOC', function(adhHttp : AdhHttp.IService,
                                               $scope : any,  /* FIXME: derive a better type from ng.IScope */
                                               $rootScope : ng.IScope) {
+
+        console.log('TOC: ' + $scope.$id);
+
         var ws = AdhWS.factory(adhHttp);
 
         adhHttp.get(AdhHttp.jsonPrefix).then(function(d) {
@@ -91,34 +103,45 @@ export function run() {
 
             init();
         });
+    });
 
 
-        this.showTitle = function(entry) {
-            entry.mode = 'list';
+    app.controller('AdhDocumentDetail', function(adhHttp : AdhHttp.IService,
+                                                 $scope : any,  // FIXME: derive a better type from ng.IScope
+                                                 $rootScope : ng.IScope) {
+
+        // FIXME: entry should not be visible from TOC $scope.  is
+        // there a better way to pass it into current $scope?
+        console.log('detail: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
+        $scope.model = $scope.entry;
+        delete $scope.entry;
+
+        this.showTitle = function() {
+            $scope.model.mode = 'list';
         }
 
-        this.showDetailEdit = function(entry) {
-            entry.previously = Util.deepcp(entry);
-            entry.mode = 'edit';
+        this.showDetailEdit = function() {
+            $scope.model.previously = Util.deepcp($scope.model);
+            $scope.model.mode = 'edit';
         }
 
-        this.showDetailReset = function(entry) {
-            if ('previously' in entry)
-                delete entry.previously;
-            entry.mode = 'display';
+        this.showDetailReset = function() {
+            if ('previously' in $scope.model)
+                delete $scope.model.previously;
+            $scope.model.mode = 'display';
         }
 
-        this.showDetailSave = function(entry) {
-            var oldVersionPath : string = entry.previously.path;
+        this.showDetailSave = function() {
+            var oldVersionPath : string = $scope.model.previously.path;
             if (typeof oldVersionPath == 'undefined') {
-                console.log(entry.previously);
+                console.log($scope.model.previously);
                 throw 'showDetailSave: no previous path!'
             }
-            adhHttp.postNewVersion(oldVersionPath, entry.content, function() {});
+            adhHttp.postNewVersion(oldVersionPath, $scope.model.content, function() {});
 
             // FIXME: post updates on paragraphs separately somehow.
 
-            this.showDetailReset(entry);
+            this.showDetailReset($scope.model);
         }
 
     });
@@ -135,21 +158,9 @@ export function run() {
     app.directive('adhDocumentDetail', function() {
         return {
             restrict: 'E',
-            templateUrl: templatePath + '/P/IDocument/ViewDetail.html',
+            templateUrl: templatePath + '/P/IDocument/Detail.html',
         }
     });
-
-
-    // filters
-
-    app.filter('fDirectoryEntry', [ function() {
-        // (dummy filter to show how this works.  originally, i wanted to
-        // pull more data asynchronously here, but i'm not sure this is
-        // supposed to work.)
-        return function(ref) {
-            return '[' + ref.data['P.IDocument'].title + ']';
-        };
-    }]);
 
 
     // get going

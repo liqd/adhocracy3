@@ -15,41 +15,7 @@
                                     <small><tt>(empty DAG)</tt></small>
                                 </div>
                                 <div ng-switch-default>
-<!--
-                                    <adh-document-detail ng-scope="entry"></adh-document-detail>
-
- (how do i get the js context from here into another template file?)
--->
-
-<div style="background:yellow">
-    <div ng-switch="entry.mode">
-        <div ng-switch-when="list">
-            <a href ng-click="at.showDetailReset(entry)">
-                {{entry.content | fDirectoryEntry}}
-            </a>
-        </div>
-        <div ng-switch-when="display">
-            <button type="button" class="edit_button" ng-click="at.showDetailEdit(entry)">edit</button>
-            <button type="button" class="edit_button" ng-click="at.showTitle(entry)">close</button>
-            <br>
-            <p ng-bind="entry.content.data['P.IDocument'].title"></p>
-            <small><p ng-bind="entry.content.data['P.IDocument'].description"></p></small>
-            <p ng-repeat="paragraph in entry.details track by $index">{{paragraph['data']['P.IParagraph']['text']}}</p>
-        </div>
-        <div ng-switch-when="edit">
-            <button type="button" class="reset_button" ng-click="at.showDetailReset(entry)">reset</button>
-            <button type="button" class="save_button" ng-click="at.showDetailSave(entry)">save</button>
-            <br>
-            <p>title: <input ng-model="entry.content.data['P.IDocument'].title"></input></p>
-            <small><p ng-bind="entry.content.data['P.IDocument'].description"></p></small>
-            <p ng-repeat="paragraph in entry.details track by $index">{{paragraph['data']['P.IParagraph']['text']}}</p>
-        </div>
-        <div ng-switch-default>
-            internal error: unknown view mode: {{entry.details}}
-        </div>
-    </div>
-</div>
-
+                                    <adh-document-detail></adh-document-detail>
                                 </div>
                             </div>
                         </li>
