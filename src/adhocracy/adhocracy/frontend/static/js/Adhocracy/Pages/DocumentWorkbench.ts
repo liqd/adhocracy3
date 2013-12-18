@@ -45,12 +45,21 @@ export function run() {
                         var paragraphs = [];
                         fetchDocumentDetails(headContent,
                                              (ix, paragraph) => { paragraphs[ix] = paragraph });
-                        $scope.poolEntries[ix] = {
-                            path: headPath,
-                            content: headContent,
-                            mode: 'list',
-                            details: paragraphs,
-                        };
+
+                        // FIXME: use extend for the following.
+
+                        if (ix in $scope.poolEntries) {
+                            $scope.poolEntries[ix].path = headPath;
+                            $scope.poolEntries[ix].content = headContent;
+                            $scope.poolEntries[ix].details = paragraphs;
+                        } else {
+                            $scope.poolEntries[ix] = {
+                                path: headPath,
+                                content: headContent,
+                                mode: 'list',
+                                details: paragraphs,
+                            }
+                        }
                     });
                 } else {
                     $scope.poolEntries[ix] = undefined;
