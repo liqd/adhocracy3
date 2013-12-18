@@ -10,7 +10,7 @@ Some imports to work with rest api calls::
     >>> from functools import reduce
     >>> import os
     >>> import requests
-    >>> from adhocracy.utils import pprint_json
+    >>> from pprint import pprint
 
 Start Adhocracy testapp::
 
@@ -73,29 +73,31 @@ We can use the following http verbs to work with resources.
 OPTIONS
 ~~~~~~~
 
-Returns possible methods for this resource and available interfaces
-with resources data::
+Returns possible methods for this resource, example request/response data
+structures and available interfaces with resource data::
 
     >>> resp = testapp.options("/adhocracy")
-    >>> pprint_json(resp.json)
-    {
-        "GET": {"response_body": [
-                    "adhocracy.properties.interfaces.IName",
-                    "adhocracy.properties.interfaces.IPool",
-                    ],
-               },
-        "HEAD": {},
-        "POST": {"request_body": [
-                    "adhocracy.resources.interfaces.IPool",
-                    "adhocracy.resources.interfaces.IProposalVersionsPool",
-                    ],
-        },
-        "PUT": {"request_body": [
-                    "adhocracy.properties.interfaces.IName",
-                    "adhocracy.properties.interfaces.IPool",
-                    ],
-               },
-    }
+    >>> wanted =\
+    ... {'GET': {'request_body': {},
+    ...         'request_querystring': {},
+    ...         'response_body': {'content_type': '',
+    ...                           'data': {'adhocracy.properties.interfaces.IName': {},
+    ...                                    'adhocracy.properties.interfaces.IPool': {}},
+    ...                           'path': ''}},
+    ...  'HEAD': {},
+    ...  'OPTION': {},
+    ...  'POST': {'request_body': [{'content_type': 'adhocracy.resources.interfaces.IFubelVersionsPool',
+    ...                            'data': {'adhocracy.properties.interfaces.IName': {},
+    ...                                     'adhocracy.properties.interfaces.IPool': {},
+    ...                                     'adhocracy.properties.interfaces.ITags': {},
+    ...                                     'adhocracy.properties.interfaces.IVersions': {}}},
+    ...                           {'content_type': 'adhocracy.resources.interfaces.IPool',
+    ...                            'data': {'adhocracy.properties.interfaces.IName': {},
+    ...                                     'adhocracy.properties.interfaces.IPool': {}}}],
+    ...          'response_body': {'content_type': '', 'path': ''}},
+    ... 'PUT': {'request_body': {'data': {'adhocracy.properties.interfaces.IName': {},
+    ...                                   'adhocracy.properties.interfaces.IPool': {}}},
+    ...         'response_body': {'content_type': '', 'path': ''}}}
 
 (IName contains a path that must be a valid identifier for this resource.
 The server will test its validity and reject everything that is not, say,
@@ -141,21 +143,11 @@ GET
 Returns resource and child elements meta data and all propertysheet interfaces with data::
 
     >>> resp = testapp.get("/adhocracy", )
-    >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.resources.interfaces.IPool",
-        "data": {
-            ...
-            "adhocracy.properties.interfaces.IName": {
-                "name": ""
-            },
-            "adhocracy.properties.interfaces.IPool": {
-                "elements": []
-            }
-        },
-        "path": ...
-    }
-
+    >>> wanted =\
+    ...  {'content_type': 'adhocracy.resources.interfaces.IPool',
+    ...   'data': {'adhocracy.properties.interfaces.IName': {'name': ''},
+    ...            'adhocracy.properties.interfaces.IPool': {'elements': []}},
+    ...   'path': '/adhocracy'}
 
 POST
 ~~~~
@@ -168,15 +160,13 @@ Create a new resource ::
     ...                  'name': 'PROposals'},
     ...                  }}
     >>> resp = testapp.post_json("/adhocracy", prop)
-    >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.resources.interfaces.IPool",
-        "path": "/adhocracy/proposals
-    }
-
-FIXME: Was bedeutet das IName interface, ist das die id aus der die URL
-erzeugt wird?
-
+    >>> wanted =\
+    ... {
+    ...    "content_type": "adhocracy.resources.interfaces.IPool",
+    ...    "path": "/adhocracy/proposals
+    ... }
+    >>> wanted == resp.json
+    True
 
 PUT
 ~~~
@@ -186,29 +176,19 @@ Modify data of an existing resource ::
     >>> data = {'content_type': 'adhocracy.resources.interfaces.IPool',
     ...         'data': {'adhocracy.properties.interfaces.IName': {'name': 'Proposals'}}}
     >>> resp = testapp.put_json("/adhocracy/proposals", data)
-    >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.resources.interfaces.IPool",
-        "path": "/adhocracy/proposals"
-    }
+    >>> wanted =\
+    ... {
+    ...     "content_type": "adhocracy.resources.interfaces.IPool",
+    ...     "path": "/adhocracy/proposals"
+    ... }
+    >>> wanted == resp.json
+    True
 
-Check the changed resource::
+Check the changed resource ::
 
     >>> resp = testapp.get("/adhocracy/proposals")
-    >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.resources.interfaces.IPool",
-        "data": {
-            ...
-            "adhocracy.properties.interfaces.IName": {
-                "name": "Proposals"
-            },
-            "adhocracy.properties.interfaces.IPool": {
-                "elements": []
-            }
-        },
-        "path": "/adhocracy/proposals"
-    }
+    >>> resp.json["data"]["adhocracy.properties.interfaces.IName"]["name"]
+    "Proposals"
 
 FIXME: write test cases for attributes with "required", "read-only",
 and possibly others.  (those work the same in PUT and POST, and on any
@@ -226,18 +206,16 @@ The normal return code is 200 ::
     >>> resp.code
     200
 
-If you submit invalid data
+If you submit invalid data the return error code is 400::
 
     >>> data = {'content_type': 'adhocracy.resources.interfaces.IPool',
     ...         'data': {'adhocracy.properties.interfaces.WRONGINTERFACE': {'name': 'Proposals'}}}
-    >>> resp = testapp.put_json("/adhocracy/proposals", data)
+    >>> testapp.put_json("/adhocracy/proposals", data)
+    UNEXPECTED EXCEPTION: AppError('Bad response: 400 Bad Request (not 200 OK or 3xx redirect for http://localhost/adhocracy)\n{"status": "error", "errors": [{"description": "The following propertysheets are required to create this resource: {\'adhocracy.properties.interfaces.IPool\'}", "location": "body", "name": "data"}]}',)
+    ...
 
-the return code is 400 ::
 
-    >>> resp.code 400
-
-and you get data with a detailed error description
-(like https://cornice.readthedocs.org/en/latest/validation.html?highlight=schema) ::
+and you get data with a detailed error description:
 
      {
        'status': 'error',
@@ -250,8 +228,6 @@ and you get data with a detailed error description
         “header” or “body”
         name is the eventual name of the value that caused problems
         description is a description of the problem encountered.
-
-FIXME: example error message
 
 If all goes wrong the return code is 500.
 
