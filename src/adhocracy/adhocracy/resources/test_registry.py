@@ -98,6 +98,16 @@ class TestResourceContentRegistry(unittest.TestCase):
                                               check_permission_edit=True)
         assert sheets == {}
 
+    def test_addable_types_valid_context_is_not_iresource(self):
+        inst = self._make_one()
+        context = testing.DummyResource()
+        context.__factory_type__ = "not_resolveable"
+        _register_content_type(inst, "not_resolveable")
+
+        addables = inst.resource_addable_types(context)
+
+        assert addables == {}
+
     def test_addable_types_valid_context_is_not_ipool(self):
         from zope.interface import Interface
         inst = self._make_one()

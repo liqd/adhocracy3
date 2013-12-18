@@ -47,7 +47,7 @@ class ResourceContentRegistry(ContentRegistry):
                 if iface.isOrExtends(IResource):
                     tvalues = get_all_taggedvalues(iface)
                     all_types[type_] = (iface, tvalues)
-            except ValueError:
+            except (ValueError, ImportError):
                 pass
         # get all addable resource types and map iproperties
         all_addables = []
