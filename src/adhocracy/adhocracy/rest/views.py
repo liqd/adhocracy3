@@ -111,10 +111,9 @@ class ResourceView(object):
 
     @view_config(request_method='OPTIONS')
     def options(self):
-        import ipdb; ipdb.set_trace()
         cstruct = OPTIONResourceResponseSchema().serialize()
         for sheet in self.sheets_edit:
-            cstruct["PUT"]["request_body"] = {"data": {sheet: {}}}
+            cstruct["PUT"]["request_body"]["data"][sheet] = {}
         for sheet in self.sheets_view:
             cstruct["GET"]["response_body"]["data"][sheet] = {}
         for type, sheets in self.addables.items():
