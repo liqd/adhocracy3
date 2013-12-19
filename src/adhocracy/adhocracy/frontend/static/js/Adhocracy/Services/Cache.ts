@@ -74,7 +74,14 @@ export function factory(adhHttp        : AdhHttp.IService,
     }
 
     function unsubscribe(path : string) : void {
-        return;
+        ws.unsubscribe(path);
+        cache.remove(path);
+
+        // FIXME: make sure there is no concurrency issue here: what
+        // if the update callback is already queued, but then the
+        // model is removed from cache?  won't that trigger a reload,
+        // and thus waste network and cache resources?
+
     }
 
     function destroy() {
@@ -93,17 +100,16 @@ export function factory(adhHttp        : AdhHttp.IService,
 
 // TODO:
 
-//   - implement trivial unsubscribe
-
-//   - leave object in cache and web socket open if it is unsubscribed
-//     from app.  web socket update notifcations change meaning: if
-//     subscribed from app, update; if not, drop from cache.
-
 //   - maintain both a working copy copy and a pristine copy of server state
 //   - get paragraphs working like documents work already
 
 //   - diff working copy and pristine copy
 //   - commit working copy of one object
 //   - batch commit of a sequence of objects
+
+//   - leave object in cache and web socket open if it is unsubscribed
+//     from app.  web socket update notifcations change meaning: if
+//     subscribed from app, update; if not, drop from cache.
+
 //   - store on disk
 //   - store commits indefinitely in case server is unavailable and sync after offline periods
