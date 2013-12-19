@@ -18,17 +18,17 @@ import AdhWS = require('Adhocracy/Services/WS');
 //   - provides diff, commit, and batch commit functionality;
 //   - can store commits indefinitely in case server is unavailable.
 //
-// lib options for caching:
+// libraries for caching (we are using 1. for now) -
 //
 //  1. the angular-builtin $cacheFactory (leaves all the
-//     adhocracy-specific stuff to me without trying to guess how it's
-//     done.  it can also very very implicitly with $http, which i
-//     don't think is a good idea.)
+//     adhocracy-specific stuff to us without trying to guess how it's
+//     done.)
 //
-//  2. github.com/jmdobry/angular-cache (about expiration time
-//     guessing, but i want to be explicit about what expires and what
-//     lives.  also supports local storage.  perhaps even better than
-//     1.?)
+//  2. github.com/jmdobry/angular-cache (a lot of this is about
+//     expiration time guessing, whereas we want to be explicit about
+//     what expires and what lives.  but it also supports local
+//     storage.)
 //
 //  3. http://gregpike.net/demos/angular-local-storage/demo/demo.html
 //     (writes to disk, which is also interesting.)
+
