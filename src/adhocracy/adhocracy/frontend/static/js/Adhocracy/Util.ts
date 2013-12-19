@@ -5,7 +5,8 @@ import Types = require('Adhocracy/Types');
 export function reduceArray(a : any[], from : number, to ?: number) : any[] {
     var rest = a.slice((to || from) + 1 || a.length);
     a.length = from < 0 ? a.length + from : from;
-    return a.push.apply(a, rest);
+    a.push.apply(a, rest);
+    return a;
 };
 
 export function isInfixOf(needle : any, hay : any[]) : boolean {
