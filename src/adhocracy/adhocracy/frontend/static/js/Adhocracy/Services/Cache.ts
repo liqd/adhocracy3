@@ -96,7 +96,6 @@ export function factory(adhHttp        : AdhHttp.IService,
         // if the update callback is already queued, but then the
         // model is removed from cache?  won't that trigger a reload,
         // and thus waste network and cache resources?
-
     }
 
     function destroy() {
@@ -115,7 +114,7 @@ export function factory(adhHttp        : AdhHttp.IService,
 
 // TODO:
 
-//   - maintain both a working copy copy and a pristine copy of server state
+//   - maintain both a working copy and a pristine copy of server state
 //   - get paragraphs working like documents work already
 
 //   - diff working copy and pristine copy
