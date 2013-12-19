@@ -9,7 +9,7 @@ import AdhHttp = require('Adhocracy/Services/Http');
 
 // web sockets
 
-// first draft, using a primitive global (to the module) web socket
+// first draft, using a primitive global (to the factory) web socket
 // handle, and an equally primitive dictionary for registering models
 // interested in updates.  (i don't think this is what we actually
 // want to do once the application gets more complex, but i want to
@@ -21,7 +21,7 @@ var wsuri : string = 'ws://' + window.location.host + AdhHttp.jsonPrefix + '?ws=
 export interface IService {
     subscribe: (path : string, update : (model: any) => void) => void;
     unsubscribe: (path : string, strict ?: boolean) => void;
-    close: () => void;
+    destroy: () => void;
 }
 
 export function factory(adhHttp : AdhHttp.IService) : IService {
@@ -74,6 +74,6 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
     return {
         subscribe: subscribeWs,
         unsubscribe: unsubscribeWs,
-        close: closeWs,
+        destroy: closeWs,
     }
 }

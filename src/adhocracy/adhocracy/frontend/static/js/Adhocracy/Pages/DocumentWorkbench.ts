@@ -9,6 +9,7 @@ import Util = require('Adhocracy/Util');
 import Css = require('Adhocracy/Css');
 import AdhHttp = require('Adhocracy/Services/Http');
 import AdhWS = require('Adhocracy/Services/WS');
+import AdhCache = require('Adhocracy/Services/Cache');
 
 var templatePath : string = '/static/templates';
 var appPrefix : string = '/app';
@@ -42,7 +43,7 @@ interface IDocumentTOCScope extends ng.IScope {
 
 interface IDocumentDetailScope extends IDocumentTOCScope {
     // FIXME: i want this interface to extend ng.IScope instead!
-    entry : IDocument;  // FIXME: this is just wrong!
+    entry : IDocument;  // FIXME: this is just wrong!  clean up the scope!
     model : IDocument;
 }
 
@@ -53,7 +54,9 @@ export function run() {
 
     // services
 
-    app.factory('adhHttp', ['$http', AdhHttp.factory]);
+    app.factory('adhHttp',   ['$http',                                    AdhHttp.factory]);
+    app.factory('adhWS',     ['adhHttp',                                  AdhWS.factory]);
+    app.factory('adhCache',  ['adhHttp', 'adhWS', '$q', '$cacheFactory',  AdhCache.factory]);
 
 
     // filters
@@ -67,17 +70,17 @@ export function run() {
 
     // controllers
 
-    app.controller('AdhDocumentTOC', function(adhHttp : AdhHttp.IService,
-                                              $scope : IDocumentTOCScope,
-                                              $rootScope : ng.IScope) {
+    app.controller('AdhDocumentTOC', function(adhHttp     : AdhHttp.IService,  // FIXME: don't use http, just use cache.
+                                              adhCache    : AdhCache.IService,
+                                              $scope      : IDocumentTOCScope,
+                                              $rootScope  : ng.IScope
+                                             ) {
 
         console.log('TOC: ' + $scope.$id);
 
-        var ws = AdhWS.factory(adhHttp);
-
         adhHttp.get(AdhHttp.jsonPrefix).then(function(d) {
             $scope.pool = d;
-            ws.subscribe(d.path, function(d) { $scope.pool = d; });
+            adhCache.subscribe(d.path, function(d) { $scope.pool = d; });
 
             $scope.poolEntries = [];
 
@@ -126,7 +129,7 @@ export function run() {
                 for (var ix in els) {
                     (function(ix : number) {
                         var path : string = els[ix].path;
-                        ws.subscribe(path, (dag) => fetchHead(ix, dag));
+                        adhCache.subscribe(path, (dag) => fetchHead(ix, dag));
                         adhHttp.get(path).then((dag) => fetchHead(ix, dag));
                     })(ix);
                 }

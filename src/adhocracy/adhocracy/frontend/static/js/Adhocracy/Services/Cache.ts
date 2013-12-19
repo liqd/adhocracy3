@@ -9,14 +9,17 @@ import AdhWS = require('Adhocracy/Services/WS');
 
 
 // cache
-
-// this module provides an api that
 //
-//   - stores objects locally (in memory and on disk);
-//   - tracks expire notifications via web socket and (after offline periods) via sync;
-//   - maintains both a local, modifiable copy and a pristine server copy;
-//   - provides diff, commit, and batch commit functionality;
-//   - can store commits indefinitely in case server is unavailable.
+// this module provides an api that lets you
+//
+//   - store objects locally in memory
+//   - track expire notifications via web socket
+//   - maintain both a working copy and a pristine copy of server state
+//   - diff working copy and pristine copy
+//   - commit working copy of one object
+//   - batch commit of a sequence of objects
+//   - store on disk
+//   - store commits indefinitely in case server is unavailable and sync after offline periods
 //
 // libraries for caching (we are using 1. for now) -
 //
@@ -32,3 +35,75 @@ import AdhWS = require('Adhocracy/Services/WS');
 //  3. http://gregpike.net/demos/angular-local-storage/demo/demo.html
 //     (writes to disk, which is also interesting.)
 
+
+// (cache size is taylored for testing: small enough to make test
+// suite trigger overflow, big enough for other interesting things to
+// happen.)
+var cacheSizeInObjects = 100;
+
+export interface IService {
+    subscribe : (path : string, update : (model: any) => void) => ng.IPromise<Types.Content>;
+    unsubscribe : (path : string, strict ?: boolean) => void;
+    destroy: () => void;
+}
+
+export function factory(adhHttp        : AdhHttp.IService,
+                        adhWS          : AdhWS.IService,
+                        $q             : ng.IQService,
+                        $cacheFactory  : ng.ICacheFactoryService) : IService
+{
+    var cache = $cacheFactory('1', { capacity: cacheSizeInObjects });
+    var ws = AdhWS.factory(adhHttp);
+
+    // lookup object in cache.  in case of miss, retrieve and add it.
+    // register update callback on its path and return a promise of the object.
+    function subscribe(path : string, update : (model: any) => void) : ng.IPromise<Types.Content> {
+        var model = cache.get(path);
+        if (typeof model != 'undefined') {
+            return $q.defer().promise.then(function() { return model; });
+        } else {
+            adhHttp.get(path).then((model : Types.Content) : Types.Content => {
+                cache.put(path, model);
+                ws.subscribe(path, (model : Types.Content) : void => {
+                    cache.put(path, model);
+                    update(model);
+                });
+                return model;
+            });
+        }
+    }
+
+    function unsubscribe(path : string) : void {
+        return;
+    }
+
+    function destroy() {
+        ws.destroy();
+        cache.destroy();
+    }
+
+    return {
+        subscribe: subscribe,
+        unsubscribe: unsubscribe,
+        destroy: destroy,
+    };
+}
+
+
+
+// TODO:
+
+//   - implement trivial unsubscribe
+
+//   - leave object in cache and web socket open if it is unsubscribed
+//     from app.  web socket update notifcations change meaning: if
+//     subscribed from app, update; if not, drop from cache.
+
+//   - maintain both a working copy copy and a pristine copy of server state
+//   - get paragraphs working like documents work already
+
+//   - diff working copy and pristine copy
+//   - commit working copy of one object
+//   - batch commit of a sequence of objects
+//   - store on disk
+//   - store commits indefinitely in case server is unavailable and sync after offline periods
