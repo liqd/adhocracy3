@@ -92,10 +92,10 @@ export function run() {
                         fetchDocumentDetails(headContent,
                                              (ix, paragraph) => { paragraphs[ix] = paragraph });
 
-                        // FIXME: use extend for the following.
-
                         if (ix in $scope.poolEntries) {
-                            refreshDocument($scope.poolEntries[ix], headContent, paragraphs);
+                            refreshDocument($scope.poolEntries[ix],
+                                            headContent,
+                                            paragraphs);
                         } else {
                             $scope.poolEntries[ix] = {
                                 path: headPath,
