@@ -78,10 +78,8 @@ export function run() {
 
         console.log('TOC: ' + $scope.$id);
 
-        adhHttp.get(AdhHttp.jsonPrefix).then(function(d) {
+        adhCache.subscribe(AdhHttp.jsonPrefix, function(d) {
             $scope.pool = d;
-            adhCache.subscribe(d.path, function(d) { $scope.pool = d; });
-
             $scope.poolEntries = [];
 
             function fetchHead(ix : number, dag : Types.Content) : void {
@@ -130,7 +128,6 @@ export function run() {
                     (function(ix : number) {
                         var path : string = els[ix].path;
                         adhCache.subscribe(path, (dag) => fetchHead(ix, dag));
-                        adhHttp.get(path).then((dag) => fetchHead(ix, dag));
                     })(ix);
                 }
             }

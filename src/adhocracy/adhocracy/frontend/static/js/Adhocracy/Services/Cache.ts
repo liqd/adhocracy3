@@ -42,7 +42,7 @@ import AdhWS = require('Adhocracy/Services/WS');
 var cacheSizeInObjects = 100;
 
 export interface IService {
-    subscribe : (path : string, update : (model: any) => void) => ng.IPromise<Types.Content>;
+    subscribe : (path : string, update : (model: any) => void) => void;
     unsubscribe : (path : string, strict ?: boolean) => void;
     destroy: () => void;
 }
@@ -56,19 +56,34 @@ export function factory(adhHttp        : AdhHttp.IService,
     var ws = AdhWS.factory(adhHttp);
 
     // lookup object in cache.  in case of miss, retrieve and add it.
-    // register update callback on its path and return a promise of the object.
-    function subscribe(path : string, update : (model: any) => void) : ng.IPromise<Types.Content> {
+    // register update callback on its path.  the callback is called
+    // once now and then every time the object is updated in cache,
+    // until unsubscribe is called on this path.
+    function subscribe(path : string, update : (model: any) => void) : void {
+        function wsSubscribe() {
+            ws.subscribe(path, (model : Types.Content) : void => {
+                cache.put(path, model);
+                update(model);
+            });
+        }
+
         var model = cache.get(path);
         if (typeof model != 'undefined') {
-            return $q.defer().promise.then(function() { return model; });
+            console.log('cache hit!');
+            wsSubscribe();
+            update(model);
+
+            // if we had to return a promise from this function, and
+            // had to construct one from the promised value, this is
+            // what we could do.  (just leaving this in because it's
+            // so pretty :-)
+            // return $q.defer().promise.then(function() { return model; });
         } else {
-            adhHttp.get(path).then((model : Types.Content) : Types.Content => {
+            console.log('cache miss!');
+            adhHttp.get(path).then((model : Types.Content) : void => {
                 cache.put(path, model);
-                ws.subscribe(path, (model : Types.Content) : void => {
-                    cache.put(path, model);
-                    update(model);
-                });
-                return model;
+                wsSubscribe();
+                update(model);
             });
         }
     }
