@@ -2,7 +2,7 @@ import Types = require('Adhocracy/Types');
 
 
 // Array Remove - By John Resig (MIT Licensed)
-export function reduceArray(a : any[], from : number, to ?: number) : any[] {
+export function cutArray(a : any[], from : number, to ?: number) : any[] {
     var rest = a.slice((to || from) + 1 || a.length);
     a.length = from < 0 ? a.length + from : from;
     a.push.apply(a, rest);
