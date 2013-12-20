@@ -34,3 +34,27 @@ export function deepcp(i) {
         return i;
     }
 }
+
+
+// Compare two objects, and return a boolen that states whether they
+// are equal.  (This is likely to be an approximation, but it should
+// work at least for json objects.)
+export function deepeq(a : any, b : any) : boolean {
+    if (typeof a != typeof b)
+        return false;
+
+    if (typeof(a) == 'object') {
+        if (a == null) return (b == null);
+
+        for (var x in a) {
+            if (!(x in b)) return false;
+            if (!deepeq(a[x], b[x])) return false;
+        }
+
+        for (var x in b) {
+            if (!(x in a)) return false;
+        }
+    }
+
+    return true;
+}
