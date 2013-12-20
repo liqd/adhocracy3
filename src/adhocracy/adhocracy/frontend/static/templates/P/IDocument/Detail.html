@@ -1,32 +1,27 @@
 <div ng-controller="AdhDocumentDetail as ad" style="background:yellow">
-    <div ng-switch="model.mode">
+    <div ng-switch="doc.viewmode">
         <div ng-switch-when="list">
             <a href ng-click="ad.showDetailReset()">
-                {{model.content | viewFilterList}}
+                {{doc.content | viewFilterList}}
             </a>
         </div>
         <div ng-switch-when="display">
             <button type="button" class="edit_button" ng-click="ad.showDetailEdit()">edit</button>
             <button type="button" class="close_button" ng-click="ad.showTitle()">close</button>
             <br>
-            <p ng-bind="model.content.data['P.IDocument'].title"></p>
-            <small><p ng-bind="model.content.data['P.IDocument'].description"></p></small>
-            <p ng-repeat="paragraph in model.details track by $index">{{paragraph['data']['P.IParagraph']['text']}}</p>
-
-            <!-- FIXME: write directive and controller for paragraph, just like for document detail? -->
-
+            <p ng-bind="doc.content.data['P.IDocument'].title"></p>
+            <small><p ng-bind="doc.content.data['P.IDocument'].description"></p></small>
         </div>
         <div ng-switch-when="edit">
             <button type="button" class="reset_button" ng-click="ad.showDetailReset()">reset</button>
             <button type="button" class="save_button" ng-click="ad.showDetailSave()">save</button>
             <br>
-            <p>title: <input ng-model="model.content.data['P.IDocument'].title"></input></p>
-            <small><p ng-bind="model.content.data['P.IDocument'].description"></p></small>
-            <p ng-repeat="paragraph in model.details track by $index">{{paragraph['data']['P.IParagraph']['text']}}</p>
+            <p>title: <input ng-model="doc.content.data['P.IDocument'].title"></input></p>
+            <small><p ng-bind="doc.content.data['P.IDocument'].description"></p></small>
         </div>
         <div ng-switch-default>
-            internal error: unknown view mode: {{model.details}}
+            internal error: unknown view mode: {{ doc.viewmode }}
         </div>
     </div>
+    <adh-paragraph-detail ng-repeat="paragraph in doc.details track by $index"></adh-paragraph-detail>
 </div>
-

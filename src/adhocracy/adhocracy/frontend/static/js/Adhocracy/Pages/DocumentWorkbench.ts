@@ -18,22 +18,21 @@ var appPrefix : string = '/app';
 // the model object that contains the contents of the resource, the
 // view mode (and possibly more stuff in the final implementation).
 interface IDocument {
-    mode        : string;
+    viewmode    : string;
     content     : Types.Content;
     path        : string;
     details     : Types.Content[];
     previously ?: IDocument;
 }
 
-function refreshDocument(obj : IDocument,
+function refreshDocument(doc : IDocument,
                          content ?: Types.Content,
-                         details ?: Types.Content[]) : IDocument {
-    return {
-        mode: obj.mode,
-        content: (typeof content == 'undefined' ? obj.content : content),
-        path: obj.path,
-        details: (typeof details == 'undefined' ? obj.details : details),
-    };
+                         details ?: Types.Content[]) : IDocument
+{
+    var doc2 = Util.deepcp(doc);
+    if (typeof doc2.content == 'undefined') doc2.content = content;
+    if (typeof doc2.details == 'undefined') doc2.details = details;
+    return doc2;
 }
 
 interface IDocumentTOCScope extends ng.IScope {
@@ -44,7 +43,7 @@ interface IDocumentTOCScope extends ng.IScope {
 interface IDocumentDetailScope extends IDocumentTOCScope {
     // FIXME: i want this interface to extend ng.IScope instead!
     entry : IDocument;  // FIXME: this is just wrong!  clean up the scope!
-    model : IDocument;
+    doc : IDocument;
 }
 
 
@@ -98,9 +97,9 @@ export function run() {
                                             paragraphs);
                         } else {
                             $scope.poolEntries[ix] = {
-                                path: headPath,
+                                viewmode: 'list',
                                 content: headContent,
-                                mode: 'list',
+                                path: headPath,
                                 details: paragraphs,
                             }
                         }
@@ -139,27 +138,59 @@ export function run() {
 
     app.controller('AdhDocumentDetail', function(adhHttp : AdhHttp.IService,
                                                  $scope : IDocumentDetailScope,
-                                                 $rootScope : ng.IScope) {
+                                                 $rootScope : ng.IScope) : void {
 
         // FIXME: entry should not be visible from TOC $scope.  is
         // there a better way to pass it into current $scope?
         console.log('detail: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
-        $scope.model = $scope.entry;
+        $scope.doc = $scope.entry;
         delete $scope.entry;
 
         this.showTitle = function() {
-            $scope.model.mode = 'list';
+            $scope.doc.viewmode = 'list';
         }
 
         this.showDetailEdit = function() {
+            $scope.doc.previously = Util.deepcp($scope.doc);
+            $scope.doc.viewmode = 'edit';
+        }
+
+        this.showDetailReset = function() {
+            if ('previously' in $scope.doc)
+                $scope.doc = $scope.doc.previously;
+            $scope.doc.viewmode = 'display';
+        }
+
+        this.showDetailSave = function() {
+            var oldVersionPath : string = $scope.doc.previously.path;
+            if (typeof oldVersionPath == 'undefined') {
+                console.log($scope.doc.previously);
+                throw 'showDetailSave: no previous path!'
+            }
+            adhHttp.postNewVersion(oldVersionPath, $scope.doc.content, function() {});
+            $scope.doc.viewmode = 'display';
+        }
+    });
+
+
+    app.controller('AdhParagraphDetail', function(adhHttp : AdhHttp.IService, $scope : any) : void {
+
+        // FIXME: see FIXME at beginning of AdhDocumentDetail controller.
+        console.log('paragraph scope: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
+        $scope.viewmode = $scope.doc.viewmode;
+        // $scope.paragraph;
+
+/*
+
+  FIXME: i need to do more thinking to get this right.
+
+        this.showDetailEdit = function() {
             $scope.model.previously = Util.deepcp($scope.model);
-            $scope.model.mode = 'edit';
         }
 
         this.showDetailReset = function() {
             if ('previously' in $scope.model)
                 delete $scope.model.previously;
-            $scope.model.mode = 'display';
         }
 
         this.showDetailSave = function() {
@@ -169,12 +200,9 @@ export function run() {
                 throw 'showDetailSave: no previous path!'
             }
             adhHttp.postNewVersion(oldVersionPath, $scope.model.content, function() {});
-
-            // FIXME: post updates on paragraphs separately somehow.
-
             this.showDetailReset($scope.model);
         }
-
+*/
     });
 
 
@@ -190,6 +218,14 @@ export function run() {
         return {
             restrict: 'E',
             templateUrl: templatePath + '/P/IDocument/Detail.html',
+        }
+    });
+
+
+    app.directive('adhParagraphDetail', function() {
+        return {
+            restrict: 'E',
+            templateUrl: templatePath + '/P/IParagraph/Detail.html',
         }
     });
 
