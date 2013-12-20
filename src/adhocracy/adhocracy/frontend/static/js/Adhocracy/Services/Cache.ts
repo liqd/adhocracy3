@@ -62,7 +62,7 @@ export function factory(adhHttp        : AdhHttp.IService,
     function subscribe(path : string, update : (model: any) => void) : void {
         function wsSubscribe() {
             ws.subscribe(path, (model : Types.Content) : void => {
-                cacheRefreshBoth(cache, path, model);
+                cacheRefresh(cache, path, model);
                 update(model);
             });
         }
@@ -81,7 +81,7 @@ export function factory(adhHttp        : AdhHttp.IService,
         } else {
             console.log('cache miss!');
             adhHttp.get(path).then((model : Types.Content) : void => {
-                cacheRefreshBoth(cache, path, model);
+                cacheRefresh(cache, path, model);
                 wsSubscribe();
                 update(model);
             });
@@ -113,13 +113,13 @@ export function factory(adhHttp        : AdhHttp.IService,
 
 
 // register new copy of object from server.  overwrite local changes.
-function cacheRefreshBoth(cache : ng.ICacheObject, path : string, model : Types.Content) : void {
+function cacheRefresh(cache : ng.ICacheObject, path : string, model : Types.Content) : void {
     cache.put(path, { pristine: Util.deepcp(model), working: model });
 }
 
 // copy pristine copy into working copy.  overwrites local changes.
 // if path is not a valid key in cache, do nothing.
-function cacheRefreshWorking(cache : ng.ICacheObject, path : string) : void {
+function cacheResetWorking(cache : ng.ICacheObject, path : string) : void {
     var old = cache.get(path);
     if (typeof old == 'undefined')
         return;
@@ -130,7 +130,7 @@ function cacheRefreshWorking(cache : ng.ICacheObject, path : string) : void {
 // copy local changes into pristine version.  this must only be done
 // after the object has been successfully posted to the server.  if
 // path is not a valid key in cache, do nothing.
-function cacheRefreshPristine(cache : ng.ICacheObject, path : string) : void {
+function cacheUpdatePristine(cache : ng.ICacheObject, path : string) : void {
     var old = cache.get(path);
     if (typeof old == 'undefined')
         return;
@@ -138,18 +138,23 @@ function cacheRefreshPristine(cache : ng.ICacheObject, path : string) : void {
         old.pristine = Util.deepcp(old.model);
 }
 
+// check if object has changed since last sync.
+function cachePathChanged(cache : ng.ICacheObject, path : string) : boolean {
+    var old = cache.get(path);
+    if (typeof old == 'undefined') throw 'cachePathChanged';
+    return old.working != old.pristine;
+}
+
 
 
 // TODO:
-
-//   - maintain both a working copy and a pristine copy of server state
-//   - diff working copy and pristine copy
+//
 //   - commit working copy of one object
 //   - batch commit of a sequence of objects
-
+//
 //   - leave object in cache and web socket open if it is unsubscribed
 //     from app.  web socket update notifcations change meaning: if
 //     subscribed from app, update; if not, drop from cache.
-
+//
 //   - store on disk
 //   - store commits indefinitely in case server is unavailable and sync after offline periods
