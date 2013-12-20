@@ -7,7 +7,7 @@
         </div>
         <div ng-switch-when="display">
             <button type="button" class="edit_button" ng-click="ad.showDetailEdit()">edit</button>
-            <button type="button" class="edit_button" ng-click="ad.showTitle()">close</button>
+            <button type="button" class="close_button" ng-click="ad.showTitle()">close</button>
             <br>
             <p ng-bind="model.content.data['P.IDocument'].title"></p>
             <small><p ng-bind="model.content.data['P.IDocument'].description"></p></small>
