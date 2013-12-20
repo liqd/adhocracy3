@@ -62,7 +62,7 @@ export function factory(adhHttp        : AdhHttp.IService,
     function subscribe(path : string, update : (model: any) => void) : void {
         function wsSubscribe() {
             ws.subscribe(path, (model : Types.Content) : void => {
-                cache.put(path, model);
+                cache.put(path, { pristine: Util.deepcp(model), working: model });
                 update(model);
             });
         }
@@ -115,8 +115,6 @@ export function factory(adhHttp        : AdhHttp.IService,
 // TODO:
 
 //   - maintain both a working copy and a pristine copy of server state
-//   - get paragraphs working like documents work already
-
 //   - diff working copy and pristine copy
 //   - commit working copy of one object
 //   - batch commit of a sequence of objects
@@ -127,3 +125,10 @@ export function factory(adhHttp        : AdhHttp.IService,
 
 //   - store on disk
 //   - store commits indefinitely in case server is unavailable and sync after offline periods
+
+
+cacheRefreshBoth
+
+cacheRefreshPristine
+
+cacheRefreshWorking
