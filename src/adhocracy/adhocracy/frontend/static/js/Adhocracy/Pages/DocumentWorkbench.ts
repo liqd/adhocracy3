@@ -177,8 +177,10 @@ export function run() {
 
         // FIXME: see FIXME at beginning of AdhDocumentDetail controller.
         console.log('paragraph scope: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
-        $scope.viewmode = $scope.doc.viewmode;
+        $scope.viewmode = () => { return $scope.doc.viewmode };
         // $scope.paragraph;
+
+        $scope.$watch($scope.doc.viewmode);
 
 /*
 
