@@ -28,13 +28,18 @@ interface IDocument {
 interface IDocumentTOCScope extends ng.IScope {
     pool : Types.Content;
     poolEntries : IDocument[];
+    doc : IDocument;
 }
 
 interface IDocumentDetailScope extends IDocumentTOCScope {
-    // FIXME: i want this interface to extend ng.IScope instead!
-    entry : IDocument;  // FIXME: this is just wrong!  clean up the scope!
-    doc : IDocument;
+    viewmode : string;
 }
+
+interface IParagraphDetailScope extends IDocumentDetailScope {
+}
+
+// FIXME: consider using isolated scopes in order to avoid inheriting
+// model data.
 
 
 export function run() {
@@ -129,13 +134,6 @@ export function run() {
                                                  $scope : IDocumentDetailScope,
                                                  $rootScope : ng.IScope) : void {
 
-        // FIXME: entry should not be visible from TOC $scope.  is
-        // there a better way to pass it into current $scope?
-        // http://docs.angularjs.org/guide/scope?_escaped_fragment_=
-        console.log('detail: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
-        $scope.doc = $scope.entry;
-        delete $scope.entry;
-
         this.showTitle = function() {
             $scope.doc.viewmode = 'list';
         }
@@ -163,18 +161,19 @@ export function run() {
     });
 
 
-    app.controller('AdhParagraphDetail', function(adhHttp : AdhHttp.IService, $scope : any) : void {
+    app.controller('AdhParagraphDetail', function(adhHttp : AdhHttp.IService,
+                                                  $scope : IParagraphDetailScope) : void {
 
-        // FIXME: see FIXME at beginning of AdhDocumentDetail controller.
-        console.log('paragraph scope: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
-        $scope.viewmode = () => { return $scope.doc.viewmode };
+        // console.log('paragraph scope: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
+        // $scope.viewmode = () => { return $scope.doc.viewmode };
         // $scope.paragraph;
-
-        $scope.$watch($scope.doc.viewmode);
+        // $scope.$watch($scope.doc.viewmode);
 
 /*
 
-  FIXME: i need to do more thinking to get this right.
+  FIXME: i need to do more thinking to get this right.  the list of
+  fetched paragraphs (as opposed to paragraph references) should only
+  appear in this scope, not in the one above!
 
         this.showDetailEdit = function() {
             $scope.model.previously = Util.deepcp($scope.model);

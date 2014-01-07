@@ -11,8 +11,8 @@
 
                 <div>
                     <ol>
-                        <li ng-repeat="entry in poolEntries track by $index">
-                            <div ng-switch="entry">
+                        <li ng-repeat="doc in poolEntries track by $index">
+                            <div ng-switch="doc">
                                 <div ng-switch-when="undefined">
                                     <small><tt>(empty DAG)</tt></small>
                                 </div>

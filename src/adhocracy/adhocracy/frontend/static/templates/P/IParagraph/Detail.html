@@ -1,5 +1,5 @@
 <div ng-controller="AdhParagraphDetail as ap" class="paragraph" style="background:orange">
-    <div ng-switch="viewmode()">
+    <div ng-switch="doc.viewmode">
         <div ng-switch-when="list">
         </div>
         <div ng-switch-when="display">
@@ -16,7 +16,7 @@
             <textarea class="__widget__">{{ paragraph['data']['P.IParagraph']['text'] }}</textarea>
         </div>
         <div ng-switch-default>
-            internal error: unknown view mode: [{{ model.viewmode }}]
+            internal error: unknown view mode: [{{ doc.viewmode }}]
         </div>
     </div>
 </div>
