@@ -18,7 +18,7 @@ import AdhWS = require('Adhocracy/Services/WS');
 //   - diff working copy and pristine copy
 //   - commit working copy of one object
 //   - batch commit of a sequence of objects
-//   - store on disk
+//   - store on disk (persistence)
 //   - store commits indefinitely in case server is unavailable and sync after offline periods
 //
 // libraries for caching (we are using 1. for now) -
@@ -39,7 +39,7 @@ import AdhWS = require('Adhocracy/Services/WS');
 // (cache size is taylored for testing: small enough to make test
 // suite trigger overflow, big enough for other interesting things to
 // happen.)
-var cacheSizeInObjects = 100;
+var cacheSizeInObjects = 7;
 
 export interface IService {
     subscribe : (path : string, update : (model: any) => void) => void;
@@ -60,29 +60,26 @@ export function factory(adhHttp        : AdhHttp.IService,
     // once now and then every time the object is updated in cache,
     // until unsubscribe is called on this path.
     function subscribe(path : string, update : (model: any) => void) : void {
-        function wsSubscribe() {
-            ws.subscribe(path, (model : Types.Content) : void => {
-                cacheRefresh(cache, path, model);
-                update(model);
-            });
-        }
 
         var model = cache.get(path);
-        if (typeof model != 'undefined') {
+
+        if (typeof model !== 'undefined') {
             console.log('cache hit!');
-            wsSubscribe();
+            cacheUpdate(cache, path, model);
             update(model);
 
             // if we had to return a promise from this function, and
             // had to construct one from the promised value, this is
-            // what we could do.  (just leaving this in because it's
-            // so pretty :-)
-            // return $q.defer().promise.then(function() { return model; });
+            // what we could do:
+            //
+            //   return $q.defer().promise.then(function() { return model; });
+            //
+            // (just leaving this in because it's so pretty :-)
         } else {
             console.log('cache miss!');
             adhHttp.get(path).then((model : Types.Content) : void => {
-                cacheRefresh(cache, path, model);
-                wsSubscribe();
+                cacheUpdate(cache, path, model);
+                ws.subscribe(path, update);
                 update(model);
             });
         }
@@ -113,7 +110,7 @@ export function factory(adhHttp        : AdhHttp.IService,
 
 
 // register new copy of object from server.  overwrite local changes.
-function cacheRefresh(cache : ng.ICacheObject, path : string, model : Types.Content) : void {
+function cacheUpdate(cache : ng.ICacheObject, path : string, model : Types.Content) : void {
     cache.put(path, { pristine: Util.deepcp(model), working: model });
 }
 
@@ -139,7 +136,7 @@ function cacheUpdatePristine(cache : ng.ICacheObject, path : string) : void {
 }
 
 // check if object has changed since last sync.
-function cachePathChanged(cache : ng.ICacheObject, path : string) : boolean {
+function cacheContentChanged(cache : ng.ICacheObject, path : string) : boolean {
     var old = cache.get(path);
     if (typeof old == 'undefined') throw 'cachePathChanged';
     return old.working != old.pristine;

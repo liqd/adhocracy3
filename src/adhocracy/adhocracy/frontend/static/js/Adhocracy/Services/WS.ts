@@ -16,6 +16,9 @@ import AdhHttp = require('Adhocracy/Services/Http');
 // find out how well it works anyway.  see also angularjs github wiki,
 // section 'best practice'.)
 
+// FIXME: the upstream should be used for sending 'ADD' and 'REMOVE'
+// requests to the server, so we won't get any subscriberless content.
+
 var wsuri : string = 'ws://' + window.location.host + AdhHttp.jsonPrefix + '?ws=all';
 
 export interface IService {
@@ -52,8 +55,8 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
 
         // some console info to keep track of things happening:
         ws.onerror = function(event) {
-            console.log(event);
             console.log('ws.onerror');
+            console.log(event);
         };
         ws.onopen = function() {
             console.log('ws.onopen');
