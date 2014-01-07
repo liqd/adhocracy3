@@ -25,16 +25,6 @@ interface IDocument {
     previously ?: IDocument;
 }
 
-function refreshDocument(doc : IDocument,
-                         content ?: Types.Content,
-                         details ?: Types.Content[]) : IDocument
-{
-    var doc2 = Util.deepcp(doc);
-    if (typeof doc2.content == 'undefined') doc2.content = content;
-    if (typeof doc2.details == 'undefined') doc2.details = details;
-    return doc2;
-}
-
 interface IDocumentTOCScope extends ng.IScope {
     pool : Types.Content;
     poolEntries : IDocument[];
@@ -81,7 +71,7 @@ export function run() {
             $scope.pool = d;
             $scope.poolEntries = [];
 
-            function fetchHead(ix : number, dag : Types.Content) : void {
+            function fetchDocumentHead(ix : number, dag : Types.Content) : void {
                 var dagPS = dag.data['P.IDAG'];
                 if (dagPS.versions.length > 0) {
                     var dagPath = dag.path;
@@ -92,14 +82,13 @@ export function run() {
                                              (ix, paragraph) => { paragraphs[ix] = paragraph });
 
                         if (ix in $scope.poolEntries) {
-                            refreshDocument($scope.poolEntries[ix],
-                                            headContent,
-                                            paragraphs);
+                            $scope.poolEntries[ix].content = headContent;
+                            $scope.poolEntries[ix].details = paragraphs;
                         } else {
                             $scope.poolEntries[ix] = {
                                 viewmode: 'list',
-                                content: headContent,
                                 path: headPath,
+                                content: headContent,
                                 details: paragraphs,
                             }
                         }
@@ -126,7 +115,7 @@ export function run() {
                 for (var ix in els) {
                     (function(ix : number) {
                         var path : string = els[ix].path;
-                        adhCache.subscribe(path, (dag) => fetchHead(ix, dag));
+                        adhCache.subscribe(path, (dag) => fetchDocumentHead(ix, dag));
                     })(ix);
                 }
             }
@@ -142,6 +131,7 @@ export function run() {
 
         // FIXME: entry should not be visible from TOC $scope.  is
         // there a better way to pass it into current $scope?
+        // http://docs.angularjs.org/guide/scope?_escaped_fragment_=
         console.log('detail: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
         $scope.doc = $scope.entry;
         delete $scope.entry;
