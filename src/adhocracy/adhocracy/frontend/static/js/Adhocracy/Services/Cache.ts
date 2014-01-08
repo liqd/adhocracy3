@@ -68,12 +68,12 @@ export function factory(adhHttp        : AdhHttp.IService,
 
         if (typeof model !== 'undefined') {
             console.log('cache hit!');
-            cacheUpdate(cache, path, model);
+            writePath(cache, path, model);
             update(model);
         } else {
             console.log('cache miss!');
             adhHttp.get(path).then((model : Types.Content) : void => {
-                cacheUpdate(cache, path, model);
+                writePath(cache, path, model);
                 ws.subscribe(path, (model) => unsubscribe(path));
                 update(model);
             });
@@ -94,7 +94,7 @@ export function factory(adhHttp        : AdhHttp.IService,
 
         if (typeof model !== 'undefined') {
             console.log('cache hit!');
-            cacheUpdate(cache, path, model);  // FIXME: find better name for pristine / working functions.
+            writePath(cache, path, model);
             update(model);
 
             // if we had to return a promise from this function, and
@@ -107,7 +107,7 @@ export function factory(adhHttp        : AdhHttp.IService,
         } else {
             console.log('cache miss!');
             adhHttp.get(path).then((model : Types.Content) : void => {
-                cacheUpdate(cache, path, model);
+                writePath(cache, path, model);
                 ws.subscribe(path, update);
                 update(model);
             });
@@ -139,37 +139,43 @@ export function factory(adhHttp        : AdhHttp.IService,
 
 
 
-// register new copy of object from server.  overwrite local changes.
-function cacheUpdate(cache : ng.ICacheObject, path : string, model : Types.Content) : void {
-    cache.put(path, { pristine: Util.deepcp(model), working: model });
+// overwrite pristine copy.  this must only be done with content data
+// retrieved from the server.  throw an exception if get yields
+// nothing.
+function updatePristine(cache : ng.ICacheObject, path : string, model : Types.Content) : void {
+    var obj = cache.get(path);
+
+    if (typeof obj === 'undefined')
+        throw "nothing found at " + path;
+    else
+        obj.pristine = model;
 }
 
-// copy pristine copy into working copy.  overwrites local changes.
-// if path is not a valid key in cache, do nothing.
-function cacheResetWorking(cache : ng.ICacheObject, path : string) : void {
+// overwrite working copy with pristine.  throw an exception if get
+// yields nothing.
+function resetPath(cache : ng.ICacheObject, path : string) : void {
+    var obj = cache.get(path);
+
+    if (typeof obj === 'undefined')
+        throw "nothing found at " + path;
+    else
+        obj.working = Util.deepcp(obj.pristine);
+}
+
+// overwrite woth pristine and working copy with arg.  pristine is a
+// reference to the arg, working copy is a deep copy.
+function writePath(cache : ng.ICacheObject, path : string, model : Types.Content) : void {
+    cache.put(path, { pristine: model, working: Util.deepcp(model) });
+}
+
+// check if object differs between pristine and working copy.  throws
+// an exception if get yields nothing.
+function workingCopyChanged(cache : ng.ICacheObject, path : string) : boolean {
     var old = cache.get(path);
     if (typeof old == 'undefined')
-        return;
+        throw 'nothing found at ' + path;
     else
-        old.pristine = Util.deepcp(old.model);
-}
-
-// copy local changes into pristine version.  this must only be done
-// after the object has been successfully posted to the server.  if
-// path is not a valid key in cache, do nothing.
-function cacheUpdatePristine(cache : ng.ICacheObject, path : string) : void {
-    var old = cache.get(path);
-    if (typeof old == 'undefined')
-        return;
-    else
-        old.pristine = Util.deepcp(old.model);
-}
-
-// check if object has changed since last sync.
-function cacheContentChanged(cache : ng.ICacheObject, path : string) : boolean {
-    var old = cache.get(path);
-    if (typeof old == 'undefined') throw 'cachePathChanged';
-    return old.working != old.pristine;
+        return old.working != old.pristine;
 }
 
 
