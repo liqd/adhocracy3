@@ -6,14 +6,14 @@
             <!--
             <button type="button" class="edit_button" ng-click="ap.showDetailEdit()">edit</button>
             -->
-            <p>{{ paragraph['data']['P.IParagraph']['text'] }}</p>
+            <p>{{ parcontent['data']['P.IParagraph']['text'] }}</p>
         </div>
         <div ng-switch-when="edit">
             <!--
             <button type="button" class="reset_button" ng-click="ap.showDetailReset()">reset</button>
             <button type="button" class="save_button" ng-click="ap.showDetailSave()">save</button>
             -->
-            <textarea class="__widget__">{{ paragraph['data']['P.IParagraph']['text'] }}</textarea>
+            <textarea class="__widget__">{{ parcontent['data']['P.IParagraph']['text'] }}</textarea>
         </div>
         <div ng-switch-default>
             internal error: unknown view mode: [{{ doc.viewmode }}]

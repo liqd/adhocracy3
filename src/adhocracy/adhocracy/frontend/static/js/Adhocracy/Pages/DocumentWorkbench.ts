@@ -21,14 +21,13 @@ interface IDocument {
     viewmode    : string;
     content     : Types.Content;
     path        : string;
-    details     : Types.Content[];
     previously ?: IDocument;
 }
 
 interface IDocumentTOCScope extends ng.IScope {
     pool : Types.Content;
     poolEntries : IDocument[];
-    doc : IDocument;
+    doc : IDocument;  // (iterates over document list with ng-repeat)
 }
 
 interface IDocumentDetailScope extends IDocumentTOCScope {
@@ -36,6 +35,8 @@ interface IDocumentDetailScope extends IDocumentTOCScope {
 }
 
 interface IParagraphDetailScope extends IDocumentDetailScope {
+    parref      : Types.Reference;
+    parcontent  : Types.Content;
 }
 
 // FIXME: consider using isolated scopes in order to avoid inheriting
@@ -77,41 +78,24 @@ export function run() {
             $scope.poolEntries = [];
 
             function fetchDocumentHead(ix : number, dag : Types.Content) : void {
+                // FIXME: factor out getting from DAG to head version.
                 var dagPS = dag.data['P.IDAG'];
                 if (dagPS.versions.length > 0) {
                     var dagPath = dag.path;
                     var headPath = dagPS.versions[0].path;
                     adhHttp.get(headPath).then(function(headContent) {
-                        var paragraphs = [];
-                        fetchDocumentDetails(headContent,
-                                             (ix, paragraph) => { paragraphs[ix] = paragraph });
-
                         if (ix in $scope.poolEntries) {
                             $scope.poolEntries[ix].content = headContent;
-                            $scope.poolEntries[ix].details = paragraphs;
                         } else {
                             $scope.poolEntries[ix] = {
                                 viewmode: 'list',
                                 path: headPath,
                                 content: headContent,
-                                details: paragraphs,
                             }
                         }
                     });
                 } else {
                     $scope.poolEntries[ix] = undefined;
-                }
-            }
-
-            function fetchDocumentDetails(document : Types.Content,
-                                          update : (ix : number, paragraph : Types.Content) => void) : void {
-                var refs : Types.Reference[] = document['data']['P.IDocument']['paragraphs'];
-                var ix : string;  // must be type 'string' or 'any'
-                for (ix in refs) {
-                    (function(ix) {
-                        var path : string = refs[ix]['path'];
-                        adhHttp.get(path).then((paragraph) => update(ix, paragraph));
-                    })(ix);
                 }
             }
 
@@ -131,6 +115,7 @@ export function run() {
 
 
     app.controller('AdhDocumentDetail', function(adhHttp : AdhHttp.IService,
+                                                 adhCache    : AdhCache.IService,
                                                  $scope : IDocumentDetailScope,
                                                  $rootScope : ng.IScope) : void {
 
@@ -161,19 +146,24 @@ export function run() {
     });
 
 
-    app.controller('AdhParagraphDetail', function(adhHttp : AdhHttp.IService,
-                                                  $scope : IParagraphDetailScope) : void {
+    app.controller('AdhParagraphDetail', function(adhHttp   : AdhHttp.IService,
+                                                  adhCache  : AdhCache.IService,
+                                                  $scope    : IParagraphDetailScope) : void
+    {
+        adhCache.subscribe($scope.parref.path, (content) => $scope.parcontent = content);
+
+/*
+
+
+  FIXME: i need to do more thinking to get this right.  the list of
+  fetched paragraphs (as opposed to paragraph references) should only
+  appear in this scope, not in the one above!
 
         // console.log('paragraph scope: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
         // $scope.viewmode = () => { return $scope.doc.viewmode };
         // $scope.paragraph;
         // $scope.$watch($scope.doc.viewmode);
 
-/*
-
-  FIXME: i need to do more thinking to get this right.  the list of
-  fetched paragraphs (as opposed to paragraph references) should only
-  appear in this scope, not in the one above!
 
         this.showDetailEdit = function() {
             $scope.model.previously = Util.deepcp($scope.model);
