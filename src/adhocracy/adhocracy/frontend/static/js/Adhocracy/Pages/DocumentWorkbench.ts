@@ -65,8 +65,7 @@ export function run() {
 
     // controllers
 
-    app.controller('AdhDocumentTOC', function(adhHttp     : AdhHttp.IService,  // FIXME: don't use http, just use cache.
-                                              adhCache    : AdhCache.IService,
+    app.controller('AdhDocumentTOC', function(adhCache    : AdhCache.IService,
                                               $scope      : IDocumentTOCScope,
                                               $rootScope  : ng.IScope
                                              ) {
@@ -114,8 +113,7 @@ export function run() {
     });
 
 
-    app.controller('AdhDocumentDetail', function(adhHttp : AdhHttp.IService,
-                                                 adhCache    : AdhCache.IService,
+    app.controller('AdhDocumentDetail', function(adhCache    : AdhCache.IService,
                                                  $scope : IDocumentDetailScope,
                                                  $rootScope : ng.IScope) : void {
 
@@ -140,14 +138,13 @@ export function run() {
                 console.log($scope.doc.previously);
                 throw 'showDetailSave: no previous path!'
             }
-            adhHttp.postNewVersion(oldVersionPath, $scope.doc.content, function() {});
+            adhCache.commit(oldVersionPath);
             $scope.doc.viewmode = 'display';
         }
     });
 
 
-    app.controller('AdhParagraphDetail', function(adhHttp   : AdhHttp.IService,
-                                                  adhCache  : AdhCache.IService,
+    app.controller('AdhParagraphDetail', function(adhCache  : AdhCache.IService,
                                                   $scope    : IParagraphDetailScope) : void
     {
         adhCache.subscribe($scope.parref.path, (content) => $scope.parcontent = content);

@@ -82,6 +82,38 @@ export function factory(adhHttp        : AdhHttp.IService,
         }
     }
 
+    // FIXME: document!
+    function commit(path : string) : void {
+        var obj = cache.get(path);
+
+        // if path is invalid, crash.
+        if (typeof obj === 'undefined')
+            throw "unknown path: " + path;
+
+        // if working copy is unchanged, do nothing.
+        if (obj.pristine === obj.working)
+            return;
+
+        // otherwise, post working copy and overwrite pristine with
+        // new version from server.  (must be from server, since
+        // server changes things like version successor and
+        // predecessor edges.)
+        adhHttp.postNewVersion(path, obj.working, (obj) => {
+            obj.pristine = obj;
+            obj.working = Util.deepcp(obj);
+        });
+
+        // notify application of the update.
+
+        // FIXME: not implemented.
+
+    }
+
+    // FIXME: document!
+    function reset(path : string) : void {
+        resetPath(cache, path);
+    }
+
     // lookup object in cache and call callback once immediately and
     // once on every update from the server, until unsubscribe is
     // called on this path.
@@ -133,8 +165,8 @@ export function factory(adhHttp        : AdhHttp.IService,
 
     return {
         get: get,
-        commit: (path) => {},
-        reset: (path) => {},
+        commit: commit,
+        reset: reset,
         subscribe: subscribe,
         unsubscribe: unsubscribe,
         destroy: destroy,

@@ -102,6 +102,7 @@ export function factory($http : ng.IHttpService) : IService {
             }
         },
 
+        // FIXME: make callback optional arg; type it more strictly.
         postNewVersion: (oldVersionPath : string, obj : any, callback : any) => {
             var dagPath = Util.parentPath(oldVersionPath);
             var config = {
