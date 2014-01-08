@@ -83,7 +83,7 @@ export function run() {
                 if (dagPS.versions.length > 0) {
                     var dagPath = dag.path;
                     var headPath = dagPS.versions[0].path;
-                    adhHttp.get(headPath).then(function(headContent) {
+                    adhCache.get(headPath, function(headContent) {
                         if (ix in $scope.poolEntries) {
                             $scope.poolEntries[ix].content = headContent;
                         } else {

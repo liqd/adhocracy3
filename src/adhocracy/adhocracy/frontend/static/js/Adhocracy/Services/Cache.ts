@@ -42,9 +42,10 @@ import AdhWS = require('Adhocracy/Services/WS');
 var cacheSizeInObjects = 7;
 
 export interface IService {
-    subscribe : (path : string, update : (model: any) => void) => void;
-    unsubscribe : (path : string, strict ?: boolean) => void;
-    destroy: () => void;
+    get          : (path : string, update : (model: any) => void) => void;
+    subscribe    : (path : string, update : (model: any) => void) => void;
+    unsubscribe  : (path : string, strict ?: boolean)             => void;
+    destroy      : ()                                             => void;
 }
 
 export function factory(adhHttp        : AdhHttp.IService,
@@ -55,17 +56,45 @@ export function factory(adhHttp        : AdhHttp.IService,
     var cache : ng.ICacheObject = $cacheFactory('1', { capacity: cacheSizeInObjects });
     var ws = AdhWS.factory(adhHttp);
 
-    // lookup object in cache.  in case of miss, retrieve and add it.
-    // register update callback on its path.  the callback is called
-    // once now and then every time the object is updated in cache,
-    // until unsubscribe is called on this path.
-    function subscribe(path : string, update : (model: any) => void) : void {
+    // lookup object in cache can call callback once immediately on
+    // arrival of the object.
+    //
+    // in case of cache miss, retrieve and add it.  register an update
+    // callback with its path that removes it from the cache if the
+    // server sends an expiration notification.
+    function get(path : string, update : (model: any) => void) : void {
 
         var model = cache.get(path);
 
         if (typeof model !== 'undefined') {
             console.log('cache hit!');
             cacheUpdate(cache, path, model);
+            update(model);
+        } else {
+            console.log('cache miss!');
+            adhHttp.get(path).then((model : Types.Content) : void => {
+                cacheUpdate(cache, path, model);
+                ws.subscribe(path, (model) => unsubscribe(path));
+                update(model);
+            });
+        }
+    }
+
+    // lookup object in cache and call callback once immediately and
+    // once on every update from the server, until unsubscribe is
+    // called on this path.
+    //
+    // in case of miss, retrieve and add it.  register update callback
+    // on its path.  the callback is called once now and then every
+    // time the object is updated in cache, until unsubscribe is
+    // called on this path.
+    function subscribe(path : string, update : (model: any) => void) : void {
+
+        var model = cache.get(path);
+
+        if (typeof model !== 'undefined') {
+            console.log('cache hit!');
+            cacheUpdate(cache, path, model);  // FIXME: find better name for pristine / working functions.
             update(model);
 
             // if we had to return a promise from this function, and
@@ -101,6 +130,7 @@ export function factory(adhHttp        : AdhHttp.IService,
     }
 
     return {
+        get: get,
         subscribe: subscribe,
         unsubscribe: unsubscribe,
         destroy: destroy,
