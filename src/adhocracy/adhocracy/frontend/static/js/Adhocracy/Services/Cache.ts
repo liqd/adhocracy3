@@ -43,6 +43,8 @@ var cacheSizeInObjects = 7;
 
 export interface IService {
     get          : (path : string, update : (model: any) => void) => void;
+    commit       : (path : string)                                => void;
+    reset        : (path : string)                                => void;
     subscribe    : (path : string, update : (model: any) => void) => void;
     unsubscribe  : (path : string, strict ?: boolean)             => void;
     destroy      : ()                                             => void;
@@ -131,6 +133,8 @@ export function factory(adhHttp        : AdhHttp.IService,
 
     return {
         get: get,
+        commit: (path) => {},
+        reset: (path) => {},
         subscribe: subscribe,
         unsubscribe: unsubscribe,
         destroy: destroy,
@@ -183,6 +187,7 @@ function workingCopyChanged(cache : ng.ICacheObject, path : string) : boolean {
 // TODO:
 //
 //   - commit working copy of one object
+//   - think about concurrent sanity of commit, reset (what if pristine changes while user changes working copy?)
 //   - batch commit of a sequence of objects
 //
 //   - leave object in cache and web socket open if it is unsubscribed
