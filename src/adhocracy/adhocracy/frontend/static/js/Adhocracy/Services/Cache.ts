@@ -96,24 +96,22 @@ export function factory(adhHttp        : AdhHttp.IService,
         }
 
         // if working copy is unchanged, do nothing.
-        if (Util.deepeq(item.pristine, item.working)) {
-            return;
+        if (!Util.deepeq(item.pristine, item.working)) {
+            // otherwise, post working copy and overwrite pristine with
+            // new version from server.  (must be from server, since
+            // server changes things like version successor and
+            // predecessor edges.)
+            //
+            // when object is retrieved and cached, notify application of
+            // the update.  (necessary in case the server changed the
+            // object in a way relevant to the UI, e.g. by adding an
+            // update timestamp.)
+            adhHttp.postNewVersion(path, item.working, (obj) => {
+                createItem(cache, path, obj);
+                update(obj);
+                return obj;
+            });
         }
-
-        // otherwise, post working copy and overwrite pristine with
-        // new version from server.  (must be from server, since
-        // server changes things like version successor and
-        // predecessor edges.)
-        //
-        // when object is retrieved and cached, notify application of
-        // the update.  (necessary in case the server changed the
-        // object in a way relevant to the UI, e.g. by adding an
-        // update timestamp.)
-        adhHttp.postNewVersion(path, item.working, (obj) => {
-            createItem(cache, path, obj);
-            update(obj);
-            return obj;
-        });
     }
 
     // FIXME: document!
