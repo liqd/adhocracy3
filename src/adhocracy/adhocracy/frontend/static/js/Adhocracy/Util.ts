@@ -40,11 +40,11 @@ export function deepcp(i) {
 // are equal.  (This is likely to be an approximation, but it should
 // work at least for json objects.)
 export function deepeq(a : any, b : any) : boolean {
-    if (typeof a != typeof b)
+    if (typeof a !== typeof b)
         return false;
 
-    if (typeof(a) == 'object') {
-        if (a == null) return (b == null);
+    if (typeof(a) === 'object') {
+        if (a === null) return (b === null);
 
         for (var x in a) {
             if (!(x in b)) return false;
@@ -56,5 +56,5 @@ export function deepeq(a : any, b : any) : boolean {
         }
     }
 
-    return true;
+    return a === b;
 }
