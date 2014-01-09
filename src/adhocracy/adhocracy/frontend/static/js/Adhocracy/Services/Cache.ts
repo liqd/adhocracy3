@@ -42,12 +42,17 @@ import AdhWS = require('Adhocracy/Services/WS');
 var cacheSizeInObjects = 7;
 
 export interface IService {
-    get          : (path : string, update : (model: any) => void) => void;
-    commit       : (path : string)                                => void;
-    reset        : (path : string)                                => void;
-    subscribe    : (path : string, update : (model: any) => void) => void;
-    unsubscribe  : (path : string, strict ?: boolean)             => void;
-    destroy      : ()                                             => void;
+    get          : (path : string, update : (obj: Types.Content) => void) => void;
+    commit       : (path : string, update : (obj: Types.Content) => void) => void;
+    reset        : (path : string, update : (obj: Types.Content) => void) => void;
+    subscribe    : (path : string, update : (obj: Types.Content) => void) => void;
+    unsubscribe  : (path : string, strict ?: boolean)                     => void;
+    destroy      : ()                                                     => void;
+}
+
+interface CacheItem {
+    pristine  : Types.Content;
+    working   : Types.Content;
 }
 
 export function factory(adhHttp        : AdhHttp.IService,
@@ -64,54 +69,63 @@ export function factory(adhHttp        : AdhHttp.IService,
     // in case of cache miss, retrieve and add it.  register an update
     // callback with its path that removes it from the cache if the
     // server sends an expiration notification.
-    function get(path : string, update : (model: any) => void) : void {
+    function get(path : string, update : (obj: Types.Content) => void) : void {
+        var item : CacheItem = cache.get(path);
 
-        var model = cache.get(path);
-
-        if (typeof model !== 'undefined') {
+        if (typeof item !== 'undefined') {
             console.log('cache hit!');
-            writePath(cache, path, model);
-            update(model);
+            resetWorking(cache, path);
+            update(item.working);
         } else {
             console.log('cache miss!');
-            adhHttp.get(path).then((model : Types.Content) : void => {
-                writePath(cache, path, model);
-                ws.subscribe(path, (model) => unsubscribe(path));
-                update(model);
+            adhHttp.get(path).then(obj => {
+                createItem(cache, path, obj);
+                update(obj);
+                ws.subscribe(path, (obj) => unsubscribe(path));
             });
         }
     }
 
     // FIXME: document!
-    function commit(path : string) : void {
-        var obj = cache.get(path);
+    function commit(path : string, update : (obj: Types.Content) => void) : void {
+        var item : CacheItem = cache.get(path);
 
         // if path is invalid, crash.
-        if (typeof obj === 'undefined')
-            throw "unknown path: " + path;
+        if (typeof item === 'undefined') {
+            console.log("unknown path: " + path);
+            throw "died";
+        }
 
         // if working copy is unchanged, do nothing.
-        if (obj.pristine === obj.working)
+        if (Util.deepeq(item.pristine, item.working))
             return;
 
         // otherwise, post working copy and overwrite pristine with
         // new version from server.  (must be from server, since
         // server changes things like version successor and
         // predecessor edges.)
-        adhHttp.postNewVersion(path, obj.working, (obj) => {
-            obj.pristine = obj;
-            obj.working = Util.deepcp(obj);
+        //
+        // when object is retrieved and cached, notify application of
+        // the update.  (necessary in case the server changed the
+        // object in a way relevant to the UI, e.g. by adding an
+        // update timestamp.)
+        adhHttp.postNewVersion(path, item.working, (obj) => {
+            createItem(cache, path, obj);
+            update(obj);
+            return obj;
         });
-
-        // notify application of the update.
-
-        // FIXME: not implemented.
-
     }
 
     // FIXME: document!
-    function reset(path : string) : void {
-        resetPath(cache, path);
+    function reset(path : string, update : (obj: Types.Content) => void) : void {
+        var item : CacheItem = cache.get(path);
+        if (typeof item === 'undefined') {
+            console.log("invalid path: " + path);
+            throw "died";
+        } else {
+            resetWorking(cache, path);
+            update(item.working);
+        }
     }
 
     // lookup object in cache and call callback once immediately and
@@ -122,28 +136,28 @@ export function factory(adhHttp        : AdhHttp.IService,
     // on its path.  the callback is called once now and then every
     // time the object is updated in cache, until unsubscribe is
     // called on this path.
-    function subscribe(path : string, update : (model: any) => void) : void {
+    function subscribe(path : string, update : (n: Types.Content) => void) : void {
 
-        var model = cache.get(path);
+        var item = cache.get(path);
 
-        if (typeof model !== 'undefined') {
+        if (typeof item !== 'undefined') {
             console.log('cache hit!');
-            writePath(cache, path, model);
-            update(model);
+            createItem(cache, path, item);
+            update(item.working);
 
             // if we had to return a promise from this function, and
             // had to construct one from the promised value, this is
             // what we could do:
             //
-            //   return $q.defer().promise.then(function() { return model; });
+            //   return $q.defer().promise.then(function() { return item; });
             //
             // (just leaving this in because it's so pretty :-)
         } else {
             console.log('cache miss!');
-            adhHttp.get(path).then((model : Types.Content) : void => {
-                writePath(cache, path, model);
+            adhHttp.get(path).then((obj : Types.Content) : void => {
+                createItem(cache, path, obj);
                 ws.subscribe(path, update);
-                update(model);
+                update(obj);
             });
         }
     }
@@ -154,7 +168,7 @@ export function factory(adhHttp        : AdhHttp.IService,
 
         // FIXME: make sure there is no concurrency issue here: what
         // if the update callback is already queued, but then the
-        // model is removed from cache?  won't that trigger a reload,
+        // item is removed from cache?  won't that trigger a reload,
         // and thus waste network and cache resources?
     }
 
@@ -175,43 +189,56 @@ export function factory(adhHttp        : AdhHttp.IService,
 
 
 
-// overwrite pristine copy.  this must only be done with content data
-// retrieved from the server.  throw an exception if get yields
+// Overwrite pristine copy.  This must only be done with content data
+// retrieved from the server.  Throw an exception if get yields
 // nothing.
-function updatePristine(cache : ng.ICacheObject, path : string, model : Types.Content) : void {
-    var obj = cache.get(path);
+function updatePristine(cache : ng.ICacheObject, path : string, obj : Types.Content) : void {
+    var item : CacheItem = cache.get(path);
 
-    if (typeof obj === 'undefined')
-        throw "nothing found at " + path;
-    else
-        obj.pristine = model;
+    if (typeof item === 'undefined') {
+        console.log("nothing found at " + path);
+        throw "died";
+    } else {
+        item.pristine = obj;
+    }
 }
 
-// overwrite working copy with pristine.  throw an exception if get
+// Overwrite working copy with pristine.  Throw an exception if get
 // yields nothing.
-function resetPath(cache : ng.ICacheObject, path : string) : void {
-    var obj = cache.get(path);
+function resetWorking(cache : ng.ICacheObject, path : string) : void {
+    var item : CacheItem = cache.get(path);
 
-    if (typeof obj === 'undefined')
-        throw "nothing found at " + path;
-    else
-        obj.working = Util.deepcp(obj.pristine);
+    if (typeof item === 'undefined') {
+        console.log("nothing found at " + path);
+        throw "died";
+    } else {
+        item.working = item.pristine;
+        item.pristine = Util.deepcp(item.working);
+    }
 }
 
-// overwrite woth pristine and working copy with arg.  pristine is a
-// reference to the arg, working copy is a deep copy.
-function writePath(cache : ng.ICacheObject, path : string, model : Types.Content) : void {
-    cache.put(path, { pristine: model, working: Util.deepcp(model) });
+// Overwrite woth pristine and working copy with arg.  Working copy is
+// a reference to the arg, pristine is a deep copy.  Update the
+// working copy simply by updating the object you passed to this
+// function.
+function createItem(cache : ng.ICacheObject, path : string, obj : Types.Content) : CacheItem {
+    var item : CacheItem = { pristine: Util.deepcp(obj), working: obj };
+
+    cache.put(path, item);
+    return item;
 }
 
-// check if object differs between pristine and working copy.  throws
+// Check if object differs between pristine and working copy.  Throws
 // an exception if get yields nothing.
 function workingCopyChanged(cache : ng.ICacheObject, path : string) : boolean {
-    var old = cache.get(path);
-    if (typeof old == 'undefined')
-        throw 'nothing found at ' + path;
-    else
-        return old.working != old.pristine;
+    var item : CacheItem = cache.get(path);
+
+    if (typeof item == 'undefined') {
+        console.log('nothing found at ' + path);
+        throw "died";
+    } else {
+        return item.working != item.pristine;
+    }
 }
 
 
@@ -221,6 +248,11 @@ function workingCopyChanged(cache : ng.ICacheObject, path : string) : boolean {
 //   - commit working copy of one object
 //   - think about concurrent sanity of commit, reset (what if pristine changes while user changes working copy?)
 //   - batch commit of a sequence of objects
+//
+//   - limit cache size, i.e. expire objects.  (what does that mean
+//   - for pristine vs. working copy objects?  we can probably only
+//   - expire unsubscribed objects.  note that in that sense, objects
+//   - retrieved with 'get' are also subscribed!)
 //
 //   - leave object in cache and web socket open if it is unsubscribed
 //     from app.  web socket update notifcations change meaning: if

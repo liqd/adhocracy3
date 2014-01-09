@@ -13,7 +13,10 @@ export var jsonPrefix : string = '/adhocracy';
 export interface IService {
     get : (path : string) => ng.IPromise<Types.Content>;
     drill : (data : any, xpath : any, target : any, ordered : boolean) => void;
-    postNewVersion : (oldVersionPath : string, obj : any, callback : any) => ng.IPromise<Types.Content>;
+    postNewVersion : ( oldVersionPath : string,
+                       obj            : Types.Content,
+                       callback      ?: (n : Types.Content) => Types.Content )
+        => ng.IPromise<Types.Content>;
 }
 
 export function factory($http : ng.IHttpService) : IService {
@@ -103,8 +106,9 @@ export function factory($http : ng.IHttpService) : IService {
             }
         },
 
-        // FIXME: make callback optional arg; type it more strictly.
-        postNewVersion: (oldVersionPath : string, obj : any, callback : any) => {
+        postNewVersion: (oldVersionPath : string,
+                         obj            : Types.Content,
+                         callback      ?: (n : Types.Content) => Types.Content ) => {
             var dagPath = Util.parentPath(oldVersionPath);
             var config = {
                 headers: { follows: oldVersionPath },

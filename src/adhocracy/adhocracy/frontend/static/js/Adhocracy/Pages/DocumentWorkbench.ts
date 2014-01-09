@@ -21,17 +21,15 @@ interface IDocument {
     viewmode    : string;
     content     : Types.Content;
     path        : string;
-    previously ?: IDocument;
 }
 
-interface IDocumentTOCScope extends ng.IScope {
+interface IDocumentWorkbenchScope extends ng.IScope {
     pool : Types.Content;
     poolEntries : IDocument[];
     doc : IDocument;  // (iterates over document list with ng-repeat)
 }
 
-interface IDocumentDetailScope extends IDocumentTOCScope {
-    viewmode : string;
+interface IDocumentDetailScope extends IDocumentWorkbenchScope {
 }
 
 interface IParagraphDetailScope extends IDocumentDetailScope {
@@ -66,7 +64,7 @@ export function run() {
     // controllers
 
     app.controller('AdhDocumentTOC', function(adhCache    : AdhCache.IService,
-                                              $scope      : IDocumentTOCScope,
+                                              $scope      : IDocumentWorkbenchScope,
                                               $rootScope  : ng.IScope
                                              ) {
 
@@ -114,31 +112,28 @@ export function run() {
 
 
     app.controller('AdhDocumentDetail', function(adhCache    : AdhCache.IService,
-                                                 $scope : IDocumentDetailScope,
-                                                 $rootScope : ng.IScope) : void {
+                                                 $scope      : IDocumentDetailScope,
+                                                 $rootScope  : ng.IScope) : void {
 
-        this.showTitle = function() {
+        this.list = function() {
             $scope.doc.viewmode = 'list';
         }
 
-        this.showDetailEdit = function() {
-            $scope.doc.previously = Util.deepcp($scope.doc);
-            $scope.doc.viewmode = 'edit';
-        }
-
-        this.showDetailReset = function() {
-            if ('previously' in $scope.doc)
-                $scope.doc = $scope.doc.previously;
+        this.display = function() {
             $scope.doc.viewmode = 'display';
         }
 
-        this.showDetailSave = function() {
-            var oldVersionPath : string = $scope.doc.previously.path;
-            if (typeof oldVersionPath == 'undefined') {
-                console.log($scope.doc.previously);
-                throw 'showDetailSave: no previous path!'
-            }
-            adhCache.commit(oldVersionPath);
+        this.edit = function() {
+            $scope.doc.viewmode = 'edit';
+        }
+
+        this.reset = function() {
+            adhCache.reset($scope.doc.path, (c) => $scope.doc.content = c);
+            $scope.doc.viewmode = 'display';
+        }
+
+        this.commit = function() {
+            adhCache.commit($scope.doc.path, (c) => $scope.doc.content = c);
             $scope.doc.viewmode = 'display';
         }
     });
