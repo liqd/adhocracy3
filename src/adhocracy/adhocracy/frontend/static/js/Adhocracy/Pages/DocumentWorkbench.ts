@@ -81,7 +81,6 @@ export function run() {
                 // FIXME: factor out getting from DAG to head version.
                 var dagPS = dag.data["P.IDAG"];
                 if (dagPS.versions.length > 0) {
-                    var dagPath = dag.path;
                     var headPath = dagPS.versions[0].path;
                     adhCache.get(headPath, function(headContent) {
                         if (ix in $scope.poolEntries) {
@@ -164,7 +163,6 @@ export function run() {
         // save working copy on 'commit' event from containing document.
         $scope.$on("commit", commit);
     });
-
 
     app.directive("adhDocumentWorkbench", function() {
         return {
