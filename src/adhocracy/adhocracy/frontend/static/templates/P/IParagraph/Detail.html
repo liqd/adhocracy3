@@ -3,17 +3,11 @@
         <div ng-switch-when="list">
         </div>
         <div ng-switch-when="display">
-            <!--
-            <button type="button" class="edit_button" ng-click="ap.showDetailEdit()">edit</button>
-            -->
-            <p>{{ parcontent['data']['P.IParagraph']['text'] }}</p>
+            <p ng-bind="parcontent['data']['P.IParagraph']['text']"></p>
         </div>
         <div ng-switch-when="edit">
-            <!--
-            <button type="button" class="reset_button" ng-click="ap.showDetailReset()">reset</button>
-            <button type="button" class="save_button" ng-click="ap.showDetailSave()">save</button>
-            -->
-            <textarea class="__widget__">{{ parcontent['data']['P.IParagraph']['text'] }}</textarea>
+            <input class="__widget__" style="height: 5em; width: 20em;"
+                   ng-model="parcontent['data']['P.IParagraph']['text']"></input>
         </div>
         <div ng-switch-default>
             internal error: unknown view mode: [{{ doc.viewmode }}]

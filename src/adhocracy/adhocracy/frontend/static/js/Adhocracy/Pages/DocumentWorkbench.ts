@@ -2,17 +2,17 @@
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import angular = require('angular');
+import angular = require("angular");
 
-import Types = require('Adhocracy/Types');
-import Util = require('Adhocracy/Util');
-import Css = require('Adhocracy/Css');
-import AdhHttp = require('Adhocracy/Services/Http');
-import AdhWS = require('Adhocracy/Services/WS');
-import AdhCache = require('Adhocracy/Services/Cache');
+import Types = require("Adhocracy/Types");
+import Util = require("Adhocracy/Util");
+import Css = require("Adhocracy/Css");
+import AdhHttp = require("Adhocracy/Services/Http");
+import AdhWS = require("Adhocracy/Services/WS");
+import AdhCache = require("Adhocracy/Services/Cache");
 
-var templatePath : string = '/static/templates';
-var appPrefix : string = '/app';
+var templatePath : string = "/static/templates";
+var appPrefix : string = "/app";
 
 
 // the model object that contains the contents of the resource, the
@@ -21,17 +21,15 @@ interface IDocument {
     viewmode    : string;
     content     : Types.Content;
     path        : string;
-    previously ?: IDocument;
 }
 
-interface IDocumentTOCScope extends ng.IScope {
+interface IDocumentWorkbenchScope extends ng.IScope {
     pool : Types.Content;
     poolEntries : IDocument[];
     doc : IDocument;  // (iterates over document list with ng-repeat)
 }
 
-interface IDocumentDetailScope extends IDocumentTOCScope {
-    viewmode : string;
+interface IDocumentDetailScope extends IDocumentWorkbenchScope {
 }
 
 interface IParagraphDetailScope extends IDocumentDetailScope {
@@ -44,33 +42,32 @@ interface IParagraphDetailScope extends IDocumentDetailScope {
 
 
 export function run() {
-    var app = angular.module('NGAD', []);
+    var app = angular.module("NGAD", []);
 
 
     // services
 
-    app.factory('adhHttp',   ['$http',                                    AdhHttp.factory]);
-    app.factory('adhWS',     ['adhHttp',                                  AdhWS.factory]);
-    app.factory('adhCache',  ['adhHttp', 'adhWS', '$q', '$cacheFactory',  AdhCache.factory]);
+    app.factory("adhHttp",   ["$http",                                    AdhHttp.factory]);
+    app.factory("adhWS",     ["adhHttp",                                  AdhWS.factory]);
+    app.factory("adhCache",  ["adhHttp", "adhWS", "$q", "$cacheFactory",  AdhCache.factory]);
 
 
     // filters
 
-    app.filter('viewFilterList', [ function() {
+    app.filter("viewFilterList", [ function() {
         return function(obj : Types.Content) : string {
-            return obj.data['P.IDocument'].title;
+            return obj.data["P.IDocument"].title;
         };
     }]);
 
 
     // controllers
 
-    app.controller('AdhDocumentTOC', function(adhCache    : AdhCache.IService,
-                                              $scope      : IDocumentTOCScope,
-                                              $rootScope  : ng.IScope
-                                             ) {
-
-        console.log('TOC: ' + $scope.$id);
+    app.controller("AdhDocumentTOC",
+                   function(adhCache    : AdhCache.IService,
+                            $scope      : IDocumentWorkbenchScope) : void
+    {
+        console.log("TOC: " + $scope.$id);
 
         adhCache.subscribe(AdhHttp.jsonPrefix, function(d) {
             $scope.pool = d;
@@ -78,7 +75,7 @@ export function run() {
 
             function fetchDocumentHead(ix : number, dag : Types.Content) : void {
                 // FIXME: factor out getting from DAG to head version.
-                var dagPS = dag.data['P.IDAG'];
+                var dagPS = dag.data["P.IDAG"];
                 if (dagPS.versions.length > 0) {
                     var dagPath = dag.path;
                     var headPath = dagPS.versions[0].path;
@@ -87,11 +84,11 @@ export function run() {
                             $scope.poolEntries[ix].content = headContent;
                         } else {
                             $scope.poolEntries[ix] = {
-                                viewmode: 'list',
+                                viewmode: "list",
                                 path: headPath,
                                 content: headContent,
-                            }
-                        }
+                            };
+                        };
                     });
                 } else {
                     $scope.poolEntries[ix] = undefined;
@@ -99,7 +96,7 @@ export function run() {
             }
 
             function init() {
-                var els : Types.Content[] = d.data['P.IPool'].elements;
+                var els : Types.Content[] = d.data["P.IPool"].elements;
                 for (var ix in els) {
                     (function(ix : number) {
                         var path : string = els[ix].path;
@@ -113,103 +110,89 @@ export function run() {
     });
 
 
-    app.controller('AdhDocumentDetail', function(adhCache    : AdhCache.IService,
-                                                 $scope : IDocumentDetailScope,
-                                                 $rootScope : ng.IScope) : void {
-
-        this.showTitle = function() {
-            $scope.doc.viewmode = 'list';
-        }
-
-        this.showDetailEdit = function() {
-            $scope.doc.previously = Util.deepcp($scope.doc);
-            $scope.doc.viewmode = 'edit';
-        }
-
-        this.showDetailReset = function() {
-            if ('previously' in $scope.doc)
-                $scope.doc = $scope.doc.previously;
-            $scope.doc.viewmode = 'display';
-        }
-
-        this.showDetailSave = function() {
-            var oldVersionPath : string = $scope.doc.previously.path;
-            if (typeof oldVersionPath == 'undefined') {
-                console.log($scope.doc.previously);
-                throw 'showDetailSave: no previous path!'
-            }
-            adhCache.commit(oldVersionPath);
-            $scope.doc.viewmode = 'display';
-        }
-    });
-
-
-    app.controller('AdhParagraphDetail', function(adhCache  : AdhCache.IService,
-                                                  $scope    : IParagraphDetailScope) : void
+    app.controller("AdhDocumentDetail",
+                   function(adhCache    : AdhCache.IService,
+                            $scope      : IDocumentDetailScope) : void
     {
-        adhCache.subscribe($scope.parref.path, (content) => $scope.parcontent = content);
 
-/*
+        this.list = function() {
+            $scope.doc.viewmode = "list";
+        };
 
+        this.display = function() {
+            $scope.doc.viewmode = "display";
+        };
 
-  FIXME: i need to do more thinking to get this right.  the list of
-  fetched paragraphs (as opposed to paragraph references) should only
-  appear in this scope, not in the one above!
+        this.edit = function() {
+            $scope.doc.viewmode = "edit";
+        };
 
-        // console.log('paragraph scope: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
-        // $scope.viewmode = () => { return $scope.doc.viewmode };
-        // $scope.paragraph;
-        // $scope.$watch($scope.doc.viewmode);
+        this.reset = function() {
+            adhCache.reset($scope.doc.path, (c) => $scope.doc.content = c);
+            $scope.doc.viewmode = "display";
+        };
 
-
-        this.showDetailEdit = function() {
-            $scope.model.previously = Util.deepcp($scope.model);
-        }
-
-        this.showDetailReset = function() {
-            if ('previously' in $scope.model)
-                delete $scope.model.previously;
-        }
-
-        this.showDetailSave = function() {
-            var oldVersionPath : string = $scope.model.previously.path;
-            if (typeof oldVersionPath == 'undefined') {
-                console.log($scope.model.previously);
-                throw 'showDetailSave: no previous path!'
-            }
-            adhHttp.postNewVersion(oldVersionPath, $scope.model.content, function() {});
-            this.showDetailReset($scope.model);
-        }
-*/
+        this.commit = function() {
+            adhCache.commit($scope.doc.path, (c) => $scope.doc.content = c);
+            $scope.$broadcast("commit");
+            $scope.doc.viewmode = "display";
+        };
     });
 
 
-    app.directive('adhDocumentWorkbench', function() {
-        return {
-            restrict: 'E',
-            templateUrl: templatePath + '/P/IDocument/Workbench.html',
+    app.controller("AdhParagraphDetail",
+                   function(adhCache  : AdhCache.IService,
+                            $scope    : IParagraphDetailScope) : void
+    {
+        function update(content) {
+            console.log("par-update: " + $scope.parref.path);
+            $scope.parcontent = content;
         }
+
+        function commit(event, ...args) {
+            console.log("par-commit: " + $scope.parref.path);
+            adhCache.commit($scope.parcontent.path, update);
+
+            // FIXME: the commit-triggered update will be followed by
+            // a redundant update triggered by the web socket event.
+            // not sure what's the best way to tweak this.  shouldn't
+            // do any harm besides the overhead though.
+        }
+
+        // keep pristine copy in sync with cache.
+        adhCache.subscribe($scope.parref.path, update);
+
+        // save working copy on 'commit' event from containing document.
+        $scope.$on("commit", commit);
     });
 
 
-    app.directive('adhDocumentDetail', function() {
+    app.directive("adhDocumentWorkbench", function() {
         return {
-            restrict: 'E',
-            templateUrl: templatePath + '/P/IDocument/Detail.html',
-        }
+            restrict: "E",
+            templateUrl: templatePath + "/P/IDocument/Workbench.html",
+        };
     });
 
 
-    app.directive('adhParagraphDetail', function() {
+    app.directive("adhDocumentDetail", function() {
         return {
-            restrict: 'E',
-            templateUrl: templatePath + '/P/IParagraph/Detail.html',
-        }
+            restrict: "E",
+            templateUrl: templatePath + "/P/IDocument/Detail.html",
+        };
+    });
+
+
+    app.directive("adhParagraphDetail", function() {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/P/IParagraph/Detail.html",
+        };
     });
 
 
     // get going
 
-    angular.bootstrap(document, ['NGAD']);
+    angular.bootstrap(document, ["NGAD"]);
 
 }

@@ -1,6 +1,6 @@
 // version history chart
 
-define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], function() {
+define("Adhocracy3/VersionGraph", ["require", "exports", "module", "d3"], function() {
 
 
     // module state.  this should be much smaller and cleaner.
@@ -29,7 +29,7 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
             var node_height = 18;
 
             function edge_length(x, y) {
-                return Math.sqrt(x*x, y*y);
+                return Math.sqrt(x * x, y * y);
             }
 
             var sourcex = d.source.x + node_width  / 2;
@@ -57,7 +57,7 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
             var ty = targety - dy * r;
 
             var arrow_size = 5;
-            var arrow_size2 = arrow_size*2/3;
+            var arrow_size2 = arrow_size * 2 / 3;
             return ("M " + sx + " " + sy + " " +
                     "L " + tx + " " + ty + " " +
                     "M " + (tx - arrow_size2) + " " + (ty - arrow_size2) + " " +
@@ -83,17 +83,17 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
         forceIntoRegion(d, 0, 0, width, height, pad, pad);  // XXX: use bbounds to get this more accurate.
 
         // history region
-	switch(d.history_phase) {
-        case('current'):
-	    x = width / 2;
+        switch (d.history_phase) {
+        case("current"):
+            x = width / 2;
             y = height / 2;
             break;
-	case('ancestor'):
+        case("ancestor"):
             x = d.x > (width / 2 - pad) ? (width / 2 - pad) : d.x;
             y = d.y;
             break;
-	case('sibling'):
-	case('descendant'):
+        case("sibling"):
+        case("descendant"):
             // siblings behave like descentants: we only distinguish
             // between "is part of the current version's history" and
             // "is not".  siblings and descendants are in the latter
@@ -105,7 +105,7 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
         default:
             console.log(d.history_phase);
             throw "internal error";
-	}
+        };
         pullTowardsPoint(d, x, y, 0.1);
     }
 
@@ -131,13 +131,13 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
     // constructor of this module.  if it wants to act on a refresh
     // event triggered by the graph, it can register this callback
     // with the cb_refresh method of that object.
-    var usr_cb_refresh   = function(d) { };
+    var usr_cb_refresh   = function(d) { return; };
 
     // mouse click event handler
-    var usr_cb_click     = function(d) { };
+    var usr_cb_click     = function(d) { return; };
 
     // mouse double click event handler
-    var usr_cb_dblclick  = function(d) { };
+    var usr_cb_dblclick  = function(d) { return; };
 
 
     // hard-wired callbacks (if available and after everything else,
@@ -151,7 +151,7 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
         return function(d) {
             usr_cb_refresh(d.version, 2);
             usr_cb_dblclick(d);
-        }
+        };
     };
 
     var onNodeMouseOver = function(d) {
@@ -203,7 +203,7 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
     };
 
     function refresh(nodes, mkLinks, version, recursionDepth) {
-        console.assert(typeof version == 'string');
+        console.assert(typeof version === "string");
         if (!(recursionDepth > 0)) { return; }
 
         links = mkLinks(nodes);
@@ -225,10 +225,10 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
             .data(nodes)
             .enter().append("circle")
             .attr("class", function(d) {
-		return "node " + d.history_phase;
+                return "node " + d.history_phase;
             })
             .attr("r", function(d) {
-                if (d.history_phase == 'current') {
+                if (d.history_phase === "current") {
                     return 15;
                 } else {
                     return 10;
@@ -273,19 +273,19 @@ define('Adhocracy3/VersionGraph', ['require', 'exports', 'module', 'd3'], functi
 
     return {
         init: function(domId, nodes, mkLinks, current_version) {
-            console.assert(typeof current_version == 'string');
+            console.assert(typeof current_version === "string");
 
             init(domId);
             refresh(nodes, mkLinks, current_version, 1);
             return {
-		refresh: refresh,
+                refresh: refresh,
 
                 // register callbacks
                 cb_refresh:   function(f) { usr_cb_refresh   = f; },
                 cb_click:     function(f) { usr_cb_click     = f; },
                 cb_dblclick:  function(f) { usr_cb_dblclick  = f; }
-	    };
-	}
+            };
+        }
     };
 });
 
