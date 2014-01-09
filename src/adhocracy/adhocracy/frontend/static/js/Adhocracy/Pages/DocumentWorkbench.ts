@@ -63,11 +63,11 @@ export function run() {
 
     // controllers
 
-    app.controller('AdhDocumentTOC', function(adhCache    : AdhCache.IService,
-                                              $scope      : IDocumentWorkbenchScope,
-                                              $rootScope  : ng.IScope
-                                             ) {
-
+    app.controller('AdhDocumentTOC',
+                   ['adhCache', '$scope'],
+                   function(adhCache    : AdhCache.IService,
+                            $scope      : IDocumentWorkbenchScope) : void
+    {
         console.log('TOC: ' + $scope.$id);
 
         adhCache.subscribe(AdhHttp.jsonPrefix, function(d) {
@@ -111,9 +111,11 @@ export function run() {
     });
 
 
-    app.controller('AdhDocumentDetail', function(adhCache    : AdhCache.IService,
-                                                 $scope      : IDocumentDetailScope,
-                                                 $rootScope  : ng.IScope) : void {
+    app.controller('AdhDocumentDetail',
+                   ['adhCache', '$scope'],
+                   function(adhCache    : AdhCache.IService,
+                            $scope      : IDocumentDetailScope) : void
+    {
 
         this.list = function() {
             $scope.doc.viewmode = 'list';
@@ -139,8 +141,10 @@ export function run() {
     });
 
 
-    app.controller('AdhParagraphDetail', function(adhCache  : AdhCache.IService,
-                                                  $scope    : IParagraphDetailScope) : void
+    app.controller('AdhParagraphDetail',
+                   ['adhCache', '$scope'],
+                   function(adhCache  : AdhCache.IService,
+                            $scope    : IParagraphDetailScope) : void
     {
         adhCache.subscribe($scope.parref.path, (content) => $scope.parcontent = content);
 
