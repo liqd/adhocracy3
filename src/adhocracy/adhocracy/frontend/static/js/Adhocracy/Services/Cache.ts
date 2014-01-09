@@ -77,7 +77,7 @@ export function factory(adhHttp        : AdhHttp.IService,
             update(item.working);
         } else {
             console.log("cache miss!");
-            adhHttp.get(path).then(obj => {
+            adhHttp.get(path).then( (obj : Types.Content) => {
                 createItem(cache, path, obj);
                 update(obj);
                 ws.subscribe(path, (obj) => unsubscribe(path));
@@ -142,7 +142,7 @@ export function factory(adhHttp        : AdhHttp.IService,
 
         if (typeof item !== "undefined") {
             console.log("cache hit!");
-            createItem(cache, path, item);
+            resetWorking(cache, path);  // FIXME: this is very annoying if user is editing when an update occurs
             update(item.working);
 
             // if we had to return a promise from this function, and
