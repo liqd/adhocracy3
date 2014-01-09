@@ -30,6 +30,11 @@ interface IDocumentWorkbenchScope extends ng.IScope {
 }
 
 interface IDocumentDetailScope extends IDocumentWorkbenchScope {
+    list    : () => void;
+    display : () => void;
+    edit    : () => void;
+    reset   : () => void;
+    commit  : () => void;
 }
 
 interface IParagraphDetailScope extends IDocumentDetailScope {
@@ -96,11 +101,11 @@ export function run() {
             }
 
             function init() {
-                var els : Types.Content[] = d.data["P.IPool"].elements;
+                var els : Types.Reference[] = d.data["P.IPool"].elements;
                 for (var ix in els) {
                     (function(ix : number) {
                         var path : string = els[ix].path;
-                        adhCache.subscribe(path, (dag) => fetchDocumentHead(ix, dag));
+                        adhCache.subscribe(path, (dag : Types.Content) => fetchDocumentHead(ix, dag));
                     })(ix);
                 }
             }
@@ -114,25 +119,24 @@ export function run() {
                    function(adhCache    : AdhCache.IService,
                             $scope      : IDocumentDetailScope) : void
     {
-
-        this.list = function() {
+        $scope.list = function() {
             $scope.doc.viewmode = "list";
         };
 
-        this.display = function() {
+        $scope.display = function() {
             $scope.doc.viewmode = "display";
         };
 
-        this.edit = function() {
+        $scope.edit = function() {
             $scope.doc.viewmode = "edit";
         };
 
-        this.reset = function() {
+        $scope.reset = function() {
             adhCache.reset($scope.doc.path, (c) => $scope.doc.content = c);
             $scope.doc.viewmode = "display";
         };
 
-        this.commit = function() {
+        $scope.commit = function() {
             adhCache.commit($scope.doc.path, (c) => $scope.doc.content = c);
             $scope.$broadcast("commit");
             $scope.doc.viewmode = "display";

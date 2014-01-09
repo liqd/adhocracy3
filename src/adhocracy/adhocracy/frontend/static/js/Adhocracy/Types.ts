@@ -1,7 +1,7 @@
 export interface Content {
     content_type: string;
     path?: string;
-    data?: Object;  // FIXME: should this field be mandatory?
+    data: Object;
     reference_colour?: string;
 }
 
