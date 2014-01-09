@@ -14,3 +14,6 @@ clean:
 
 wc:
 	find . -name '*.ts' | xargs wc
+
+tslint:
+	find . -name '*.ts' -exec tslint -f {} \;
