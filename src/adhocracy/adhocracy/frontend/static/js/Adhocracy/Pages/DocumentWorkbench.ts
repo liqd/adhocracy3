@@ -134,6 +134,7 @@ export function run() {
 
         this.commit = function() {
             adhCache.commit($scope.doc.path, (c) => $scope.doc.content = c);
+            $scope.$broadcast('commit');
             $scope.doc.viewmode = 'display';
         }
     });
@@ -143,40 +144,26 @@ export function run() {
                    function(adhCache  : AdhCache.IService,
                             $scope    : IParagraphDetailScope) : void
     {
-        adhCache.subscribe($scope.parref.path, (content) => $scope.parcontent = content);
-
-/*
-
-
-  FIXME: i need to do more thinking to get this right.  the list of
-  fetched paragraphs (as opposed to paragraph references) should only
-  appear in this scope, not in the one above!
-
-        // console.log('paragraph scope: ' + $scope.$id + ' of parent: ' + $scope.$parent.$parent.$id);
-        // $scope.viewmode = () => { return $scope.doc.viewmode };
-        // $scope.paragraph;
-        // $scope.$watch($scope.doc.viewmode);
-
-
-        this.showDetailEdit = function() {
-            $scope.model.previously = Util.deepcp($scope.model);
+        function update(content) {
+            console.log('par-update: ' + $scope.parref.path);
+            $scope.parcontent = content;
         }
 
-        this.showDetailReset = function() {
-            if ('previously' in $scope.model)
-                delete $scope.model.previously;
+        function commit(event, ...args) {
+            console.log('par-commit: ' + $scope.parref.path);
+            adhCache.commit($scope.parcontent.path, update);
+
+            // FIXME: the commit-triggered update will be followed by
+            // a redundant update triggered by the web socket event.
+            // not sure what's the best way to tweak this.  shouldn't
+            // do any harm besides the overhead though.
         }
 
-        this.showDetailSave = function() {
-            var oldVersionPath : string = $scope.model.previously.path;
-            if (typeof oldVersionPath == 'undefined') {
-                console.log($scope.model.previously);
-                throw 'showDetailSave: no previous path!'
-            }
-            adhHttp.postNewVersion(oldVersionPath, $scope.model.content, function() {});
-            this.showDetailReset($scope.model);
-        }
-*/
+        // keep pristine copy in sync with cache.
+        adhCache.subscribe($scope.parref.path, update);
+
+        // save working copy on 'commit' event from containing document.
+        $scope.$on('commit', commit);
     });
 
 
@@ -196,7 +183,7 @@ export function run() {
     });
 
 
-    app.directive('adhParagraphDetail', function() {
+    app.directive("adhParagraphDetail", function() {
         return {
             restrict: 'E',
             templateUrl: templatePath + '/P/IParagraph/Detail.html',
