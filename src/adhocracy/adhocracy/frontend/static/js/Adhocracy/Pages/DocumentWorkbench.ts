@@ -20,7 +20,6 @@ var appPrefix : string = "/app";
 interface IDocument {
     viewmode    : string;
     content     : Types.Content;
-    path        : string;
 }
 
 interface IDocumentWorkbenchScope extends ng.IScope {
@@ -132,12 +131,12 @@ export function run() {
         };
 
         $scope.reset = function() {
-            adhCache.reset($scope.doc.path, (c) => $scope.doc.content = c);
+            adhCache.reset($scope.doc.content.path, (c) => $scope.doc.content = c);
             $scope.doc.viewmode = "display";
         };
 
         $scope.commit = function() {
-            adhCache.commit($scope.doc.path, (c) => $scope.doc.content = c);
+            adhCache.commit($scope.doc.content.path, (c) => $scope.doc.content = c);
             $scope.$broadcast("commit");
             $scope.doc.viewmode = "display";
         };
