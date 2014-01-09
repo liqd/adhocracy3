@@ -2,10 +2,10 @@
 /// <reference path="../../../submodules/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import Types = require('Adhocracy/Types');
-import Util = require('Adhocracy/Util');
-import AdhHttp = require('Adhocracy/Services/Http');
-import AdhWS = require('Adhocracy/Services/WS');
+import Types = require("Adhocracy/Types");
+import Util = require("Adhocracy/Util");
+import AdhHttp = require("Adhocracy/Services/Http");
+import AdhWS = require("Adhocracy/Services/WS");
 
 
 // cache
@@ -58,9 +58,8 @@ interface CacheItem {
 export function factory(adhHttp        : AdhHttp.IService,
                         adhWS          : AdhWS.IService,
                         $q             : ng.IQService,
-                        $cacheFactory  : ng.ICacheFactoryService) : IService
-{
-    var cache : ng.ICacheObject = $cacheFactory('1', { capacity: cacheSizeInObjects });
+                        $cacheFactory  : ng.ICacheFactoryService) : IService {
+    var cache : ng.ICacheObject = $cacheFactory("1", { capacity: cacheSizeInObjects });
     var ws = AdhWS.factory(adhHttp);
 
     // lookup object in cache can call callback once immediately on
@@ -72,12 +71,12 @@ export function factory(adhHttp        : AdhHttp.IService,
     function get(path : string, update : (obj: Types.Content) => void) : void {
         var item : CacheItem = cache.get(path);
 
-        if (typeof item !== 'undefined') {
-            console.log('cache hit!');
+        if (typeof item !== "undefined") {
+            console.log("cache hit!");
             resetWorking(cache, path);
             update(item.working);
         } else {
-            console.log('cache miss!');
+            console.log("cache miss!");
             adhHttp.get(path).then(obj => {
                 createItem(cache, path, obj);
                 update(obj);
@@ -91,14 +90,15 @@ export function factory(adhHttp        : AdhHttp.IService,
         var item : CacheItem = cache.get(path);
 
         // if path is invalid, crash.
-        if (typeof item === 'undefined') {
+        if (typeof item === "undefined") {
             console.log("unknown path: " + path);
             throw "died";
         }
 
         // if working copy is unchanged, do nothing.
-        if (Util.deepeq(item.pristine, item.working))
+        if (Util.deepeq(item.pristine, item.working)) {
             return;
+        }
 
         // otherwise, post working copy and overwrite pristine with
         // new version from server.  (must be from server, since
@@ -119,7 +119,7 @@ export function factory(adhHttp        : AdhHttp.IService,
     // FIXME: document!
     function reset(path : string, update : (obj: Types.Content) => void) : void {
         var item : CacheItem = cache.get(path);
-        if (typeof item === 'undefined') {
+        if (typeof item === "undefined") {
             console.log("invalid path: " + path);
             throw "died";
         } else {
@@ -140,8 +140,8 @@ export function factory(adhHttp        : AdhHttp.IService,
 
         var item = cache.get(path);
 
-        if (typeof item !== 'undefined') {
-            console.log('cache hit!');
+        if (typeof item !== "undefined") {
+            console.log("cache hit!");
             createItem(cache, path, item);
             update(item.working);
 
@@ -153,7 +153,7 @@ export function factory(adhHttp        : AdhHttp.IService,
             //
             // (just leaving this in because it's so pretty :-)
         } else {
-            console.log('cache miss!');
+            console.log("cache miss!");
             adhHttp.get(path).then((obj : Types.Content) : void => {
                 createItem(cache, path, obj);
                 ws.subscribe(path, update);
@@ -195,7 +195,7 @@ export function factory(adhHttp        : AdhHttp.IService,
 function updatePristine(cache : ng.ICacheObject, path : string, obj : Types.Content) : void {
     var item : CacheItem = cache.get(path);
 
-    if (typeof item === 'undefined') {
+    if (typeof item === "undefined") {
         console.log("nothing found at " + path);
         throw "died";
     } else {
@@ -208,7 +208,7 @@ function updatePristine(cache : ng.ICacheObject, path : string, obj : Types.Cont
 function resetWorking(cache : ng.ICacheObject, path : string) : void {
     var item : CacheItem = cache.get(path);
 
-    if (typeof item === 'undefined') {
+    if (typeof item === "undefined") {
         console.log("nothing found at " + path);
         throw "died";
     } else {
@@ -233,11 +233,11 @@ function createItem(cache : ng.ICacheObject, path : string, obj : Types.Content)
 function workingCopyChanged(cache : ng.ICacheObject, path : string) : boolean {
     var item : CacheItem = cache.get(path);
 
-    if (typeof item == 'undefined') {
-        console.log('nothing found at ' + path);
+    if (typeof item === "undefined") {
+        console.log("nothing found at " + path);
         throw "died";
     } else {
-        return item.working != item.pristine;
+        return item.working !== item.pristine;
     }
 }
 
