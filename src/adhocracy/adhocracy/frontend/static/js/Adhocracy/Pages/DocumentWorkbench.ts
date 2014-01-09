@@ -87,12 +87,8 @@ export function run() {
                         if (ix in $scope.poolEntries) {
                             $scope.poolEntries[ix].content = headContent;
                         } else {
-                            $scope.poolEntries[ix] = {
-                                viewmode: "list",
-                                path: headPath,
-                                content: headContent,
-                            };
-                        };
+                            $scope.poolEntries[ix] = { viewmode: "list", content: headContent };
+                        }
                     });
                 } else {
                     $scope.poolEntries[ix] = undefined;
