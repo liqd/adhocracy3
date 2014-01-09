@@ -71,17 +71,17 @@ export function factory(adhHttp        : AdhHttp.IService,
     function get(path : string, update : (obj: Types.Content) => void) : void {
         var item : CacheItem = cache.get(path);
 
-        if (typeof item !== "undefined") {
-            console.log("cache hit!");
-            resetWorking(cache, path);
-            update(item.working);
-        } else {
+        if (typeof item === "undefined") {
             console.log("cache miss!");
             adhHttp.get(path).then( (obj : Types.Content) => {
                 createItem(cache, path, obj);
                 update(obj);
                 ws.subscribe(path, (obj) => unsubscribe(path));
             });
+        } else {
+            console.log("cache hit!");
+            resetWorking(cache, path);
+            update(item.working);
         }
     }
 
@@ -140,7 +140,14 @@ export function factory(adhHttp        : AdhHttp.IService,
 
         var item = cache.get(path);
 
-        if (typeof item !== "undefined") {
+        if (typeof item === "undefined") {
+            console.log("cache miss!");
+            adhHttp.get(path).then((obj : Types.Content) : void => {
+                createItem(cache, path, obj);
+                ws.subscribe(path, update);
+                update(obj);
+            });
+        } else {
             console.log("cache hit!");
             resetWorking(cache, path);  // FIXME: this is very annoying if user is editing when an update occurs
             update(item.working);
@@ -152,13 +159,6 @@ export function factory(adhHttp        : AdhHttp.IService,
             //   return $q.defer().promise.then(function() { return item; });
             //
             // (just leaving this in because it's so pretty :-)
-        } else {
-            console.log("cache miss!");
-            adhHttp.get(path).then((obj : Types.Content) : void => {
-                createItem(cache, path, obj);
-                ws.subscribe(path, update);
-                update(obj);
-            });
         }
     }
 
