@@ -17,5 +17,5 @@ wc:
 	find . -name '*.ts' | xargs wc
 
 tslint:
-	find . -name '*.ts' -exec tslint -f {} \; | $(FIX_TSLINT_ERROR_FORMAT)
+	find . -name '[^.]*.ts' -exec tslint -f {} \; | $(FIX_TSLINT_ERROR_FORMAT)
 
