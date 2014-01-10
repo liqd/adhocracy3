@@ -73,6 +73,8 @@ export function run() {
     {
         console.log("TOC: " + $scope.$id);
 
+        // FIXME: when and how do i unsubscribe?  (applies to all subscriptions in this module.)
+
         adhCache.subscribe(AdhHttp.jsonPrefix, function(d) {
             $scope.pool = d;
             $scope.poolEntries = [];
@@ -163,6 +165,7 @@ export function run() {
         // save working copy on 'commit' event from containing document.
         $scope.$on("commit", commit);
     });
+
 
     app.directive("adhDocumentWorkbench", function() {
         return {

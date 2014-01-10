@@ -41,53 +41,230 @@ import AdhWS = require("Adhocracy/Services/WS");
 // happen.)
 var cacheSizeInObjects = 7;
 
+
+// service interface
+
 export interface IService {
     get          : (path : string, update : (obj: Types.Content) => void) => void;
+    subscribe    : (path : string, update : (obj: Types.Content) => void) => number;
+    unsubscribe  : (path : string, ix : number)                           => void;
     commit       : (path : string, update : (obj: Types.Content) => void) => void;
     reset        : (path : string, update : (obj: Types.Content) => void) => void;
-    subscribe    : (path : string, update : (obj: Types.Content) => void) => void;
-    unsubscribe  : (path : string, strict ?: boolean)                     => void;
     destroy      : ()                                                     => void;
 }
 
-interface CacheItem {
-    pristine  : Types.Content;
-    working   : Types.Content;
+
+// ICacheItem and helpers
+
+interface ICacheItem {
+    pristine       : Types.Content;
+    working        : Types.Content;
+    subscriptions  : Object;
+    freshName      : () => number;
 }
+
+// Create item with undefined pristine and working copy.
+// Subscriptions map is empty; freshName is initialized to start
+// counding at 0.
+function createItem(cache : ng.ICacheObject, path : string) : ICacheItem {
+    function freshNamer() : () => number {
+        var x : number = 0;
+        return () => { x++; return x; };
+    }
+
+    var item : ICacheItem = {
+        pristine: undefined,
+        working: undefined,
+        subscriptions: {},
+        freshName: freshNamer(),
+    };
+
+    cache.put(path, item);
+    return item;
+}
+
+// Overwrite woth pristine and working copy with arg.  Working copy is
+// a reference to the arg, pristine is a deep copy.  Update the
+// working copy simply by updating the object you passed to this
+// function.  item must not be undefined.
+function resetBoth(item : ICacheItem, obj : Types.Content) : void {
+    if (typeof obj === "undefined" || typeof item === "undefined") {
+        console.log("internal error.");
+        throw "died";
+    }
+
+    item.working = obj;
+    item.pristine = Util.deepcp(obj);
+}
+
+function registerUpdater(item : ICacheItem, update : (obj: Types.Content) => void) : number {
+    if (typeof item === "undefined" || typeof update === "undefined") {
+        console.log("internal error.");
+        throw "died";
+    }
+
+    var ix = item.freshName();
+    item.subscriptions[ix] = update;
+    return ix;
+}
+
+function unregisterUpdater(item : ICacheItem, ix : number) : void {
+    if (typeof item === "undefined" || typeof ix === "undefined") {
+        console.log("internal error.");
+        throw "died";
+    }
+
+    delete item.subscriptions[ix];
+}
+
+function updateAll(item : ICacheItem) : void {
+    var obj = item.working;
+    if (typeof obj === "undefined" || typeof item === "undefined") {
+        console.log("internal error.");
+        throw "died";
+    }
+
+    for (var ix in item.subscriptions) {
+        item.subscriptions[ix](obj);
+    }
+}
+
+// Overwrite working copy with pristine.  item must not be undefined.
+function resetWorking(item : ICacheItem) : void {
+    var obj = item.pristine;
+    if (typeof obj === "undefined" || typeof item === "undefined") {
+        console.log("internal error.");
+        throw "died";
+    }
+
+    item.pristine = Util.deepcp(obj);
+    item.working = obj;
+}
+
+
+// factory
 
 export function factory(adhHttp        : AdhHttp.IService,
                         adhWS          : AdhWS.IService,
                         $q             : ng.IQService,
                         $cacheFactory  : ng.ICacheFactoryService) : IService {
     var cache : ng.ICacheObject = $cacheFactory("1", { capacity: cacheSizeInObjects });
-    var ws = AdhWS.factory(adhHttp);
+    var ws : AdhWS.IService = AdhWS.factory(adhHttp);
 
-    // lookup object in cache can call callback once immediately on
-    // arrival of the object.
+
+    // FIXME: update this comment!
     //
-    // in case of cache miss, retrieve and add it.  register an update
-    // callback with its path that removes it from the cache if the
-    // server sends an expiration notification.
+    // lookup object in cache and call callback once immediately and
+    // once on every update from the server, until unsubscribe is
+    // called on this path.
+    //
+    // in case of miss, retrieve and add it.  register update callback
+    // on its path.  the callback is called once now and then every
+    // time the object is updated in cache, until unsubscribe is
+    // called on this path.
     function get(path : string, update : (obj: Types.Content) => void) : void {
-        var item : CacheItem = cache.get(path);
+        var item : ICacheItem = cache.get(path);
 
         if (typeof item === "undefined") {
             console.log("cache miss!");
-            adhHttp.get(path).then( (obj : Types.Content) => {
-                createItem(cache, path, obj);
-                update(obj);
-                ws.subscribe(path, (obj) => unsubscribe(path));
-            });
+            item = createItem(cache, path);
+            registerWS(item, path, update);
         } else {
             console.log("cache hit!");
-            resetWorking(cache, path);
             update(item.working);
         }
     }
 
-    // FIXME: document!
-    function commit(path : string, update : (obj: Types.Content) => void) : void {
-        var item : CacheItem = cache.get(path);
+    // FIXME: update this comment!
+    function subscribe(path : string, update : (obj: Types.Content) => void) : number {
+        var item : ICacheItem = cache.get(path);
+        var ix : number;
+
+        if (typeof item === "undefined") {
+            console.log("cache miss!");
+            item = createItem(cache, path);
+            ix = registerUpdater(item, update);
+            registerWS(item, path);
+        } else {
+            console.log("cache hit!");
+            update(item.working);
+            ix = registerUpdater(item, update);
+        }
+
+        return ix;
+
+        // FIXME: is there another concurrency issue in this block?
+        // what if a few subscribes and unsubscribes happen
+        // synchronously, before the http get has a chance to run?
+
+        // if we had to return a promise from this function, and
+        // had to construct one from the promised value, this is
+        // what we could do:
+        //
+        //   return $q.defer().promise.then(function() { return item; });
+        //
+        // (just leaving this in because it's so pretty :-)
+    }
+
+    // Fetch obj asynchronously from server.  Initialize item with
+    // pristine and working copy and update all subscriptions once.
+    // Register web socket listener that updates all subscriptions on
+    // server notification.  If server sends an update notifcation, but
+    // subscription map is empty, the object is removed from cache.
+    function registerWS(item : ICacheItem,
+                        path : string,
+                        updateOnce ?: (obj : Types.Content) => void) : void {
+        if (typeof cache === "undefined" || typeof ws === "undefined" || typeof item === "undefined") {
+            console.log("internal error.");
+            throw "died";
+        }
+
+        function sync(firstcall : boolean, obj : Types.Content) {
+            if (firstcall) {
+                if (typeof updateOnce !== "undefined") {
+                    updateOnce(obj);
+                }
+                resetBoth(item, obj);
+                updateAll(item);
+            } else {
+                if (Object.keys(item.subscriptions).length === 0) {
+                    ws.unsubscribe(path);
+                    cache.remove(path);
+                } else {
+                    resetBoth(item, obj);
+                    updateAll(item);
+                }
+            }
+        }
+
+        adhHttp.get(path).then((obj : Types.Content) : void => {
+            sync(true, obj);
+            ws.subscribe(path, (obj) => sync(false, obj));
+        });
+    }
+
+    function unsubscribe(path : string, ix : number) : void {
+        var item = cache.get(path);
+
+        if (typeof item === "undefined") {
+            console.log("attempt to unsubscribe unregistered path: ", path, ix);
+        } else {
+            if (!(ix in item.subscriptions)) {
+                console.log("attempt to unsubscribe unregistered index: ", path, ix);
+            } else {
+                delete item.subscriptions[ix];
+            }
+        }
+
+        // FIXME: make sure there is no concurrency issue here: what
+        // if the update callback is already queued, but then the
+        // item is removed from cache?  won't that trigger a reload,
+        // and thus waste network and cache resources?
+    }
+
+    // FIXME: document this!
+    function commit(path : string) : void {
+        var item : ICacheItem = cache.get(path);
 
         // if path is invalid, crash.
         if (typeof item === "undefined") {
@@ -107,67 +284,24 @@ export function factory(adhHttp        : AdhHttp.IService,
             // object in a way relevant to the UI, e.g. by adding an
             // update timestamp.)
             adhHttp.postNewVersion(path, item.working, (obj) => {
-                createItem(cache, path, obj);
-                update(obj);
+                resetBoth(item, obj);
+                updateAll(item);
                 return obj;
             });
         }
     }
 
-    // FIXME: document!
-    function reset(path : string, update : (obj: Types.Content) => void) : void {
-        var item : CacheItem = cache.get(path);
+    // FIXME: document this!
+    function reset(path : string) : void {
+        var item : ICacheItem = cache.get(path);
+
         if (typeof item === "undefined") {
             console.log("invalid path: " + path);
             throw "died";
         } else {
-            resetWorking(cache, path);
-            update(item.working);
+            resetWorking(item);
+            updateAll(item);
         }
-    }
-
-    // lookup object in cache and call callback once immediately and
-    // once on every update from the server, until unsubscribe is
-    // called on this path.
-    //
-    // in case of miss, retrieve and add it.  register update callback
-    // on its path.  the callback is called once now and then every
-    // time the object is updated in cache, until unsubscribe is
-    // called on this path.
-    function subscribe(path : string, update : (n: Types.Content) => void) : void {
-
-        var item = cache.get(path);
-
-        if (typeof item === "undefined") {
-            console.log("cache miss!");
-            adhHttp.get(path).then((obj : Types.Content) : void => {
-                createItem(cache, path, obj);
-                ws.subscribe(path, update);
-                update(obj);
-            });
-        } else {
-            console.log("cache hit!");
-            resetWorking(cache, path);  // FIXME: this is very annoying if user is editing when an update occurs
-            update(item.working);
-
-            // if we had to return a promise from this function, and
-            // had to construct one from the promised value, this is
-            // what we could do:
-            //
-            //   return $q.defer().promise.then(function() { return item; });
-            //
-            // (just leaving this in because it's so pretty :-)
-        }
-    }
-
-    function unsubscribe(path : string) : void {
-        ws.unsubscribe(path);
-        cache.remove(path);
-
-        // FIXME: make sure there is no concurrency issue here: what
-        // if the update callback is already queued, but then the
-        // item is removed from cache?  won't that trigger a reload,
-        // and thus waste network and cache resources?
     }
 
     function destroy() {
@@ -177,66 +311,12 @@ export function factory(adhHttp        : AdhHttp.IService,
 
     return {
         get: get,
-        commit: commit,
-        reset: reset,
         subscribe: subscribe,
         unsubscribe: unsubscribe,
+        commit: commit,
+        reset: reset,
         destroy: destroy,
     };
-}
-
-
-
-// Overwrite pristine copy.  This must only be done with content data
-// retrieved from the server.  Throw an exception if get yields
-// nothing.
-function updatePristine(cache : ng.ICacheObject, path : string, obj : Types.Content) : void {
-    var item : CacheItem = cache.get(path);
-
-    if (typeof item === "undefined") {
-        console.log("nothing found at " + path);
-        throw "died";
-    } else {
-        item.pristine = obj;
-    }
-}
-
-// Overwrite working copy with pristine.  Throw an exception if get
-// yields nothing.
-function resetWorking(cache : ng.ICacheObject, path : string) : void {
-    var item : CacheItem = cache.get(path);
-
-    if (typeof item === "undefined") {
-        console.log("nothing found at " + path);
-        throw "died";
-    } else {
-        item.working = item.pristine;
-        item.pristine = Util.deepcp(item.working);
-    }
-}
-
-// Overwrite woth pristine and working copy with arg.  Working copy is
-// a reference to the arg, pristine is a deep copy.  Update the
-// working copy simply by updating the object you passed to this
-// function.
-function createItem(cache : ng.ICacheObject, path : string, obj : Types.Content) : CacheItem {
-    var item : CacheItem = { pristine: Util.deepcp(obj), working: obj };
-
-    cache.put(path, item);
-    return item;
-}
-
-// Check if object differs between pristine and working copy.  Throws
-// an exception if get yields nothing.
-function workingCopyChanged(cache : ng.ICacheObject, path : string) : boolean {
-    var item : CacheItem = cache.get(path);
-
-    if (typeof item === "undefined") {
-        console.log("nothing found at " + path);
-        throw "died";
-    } else {
-        return item.working !== item.pristine;
-    }
 }
 
 

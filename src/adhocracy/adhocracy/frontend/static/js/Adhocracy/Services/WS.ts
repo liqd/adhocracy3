@@ -23,7 +23,7 @@ var wsuri : string = "ws://" + window.location.host + AdhHttp.jsonPrefix + "?ws=
 
 export interface IService {
     subscribe: (path : string, update : (model: any) => void) => void;
-    unsubscribe: (path : string, strict ?: boolean) => void;
+    unsubscribe: (path : string) => void;
     destroy: () => void;
 }
 
@@ -32,13 +32,17 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
     var subscriptions = {};
 
     function subscribeWs(path : string, update : (model: any) => void) : void {
-        subscriptions[path] = update;
+        if (path in subscriptions) {
+            throw "unsubscribe web socket listener: attempt to subscribe to " + path + " twice!";
+        } else {
+            subscriptions[path] = update;
+        }
     }
 
-    function unsubscribeWs(path : string, strict ?: boolean) : void {
+    function unsubscribeWs(path : string) : void {
         if (path in subscriptions) {
             delete subscriptions[path];
-        } else if (strict) {
+        } else {
             throw "unsubscribe web socket listener: no subscription for " + path + "!";
         }
     }
