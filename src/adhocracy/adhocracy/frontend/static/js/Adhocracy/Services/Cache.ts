@@ -45,12 +45,13 @@ var cacheSizeInObjects = 7;
 // service interface
 
 export interface IService {
-    get          : (path : string, update : (obj: Types.Content) => void) => void;
-    subscribe    : (path : string, update : (obj: Types.Content) => void) => number;
-    unsubscribe  : (path : string, ix : number)                           => void;
-    commit       : (path : string, update : (obj: Types.Content) => void) => void;
-    reset        : (path : string, update : (obj: Types.Content) => void) => void;
-    destroy      : ()                                                     => void;
+    get          : (path : string,                      update : (obj: Types.Content) => void) => void;
+    put          : (path : string, obj : Types.Content, update : (obj: Types.Content) => void) => void;
+    subscribe    : (path : string,                      update : (obj: Types.Content) => void) => number;
+    unsubscribe  : (path : string, ix : number)                                                => void;
+    commit       : (path : string,                      update : (obj: Types.Content) => void) => void;
+    reset        : (path : string,                      update : (obj: Types.Content) => void) => void;
+    destroy      : ()                                                                          => void;
 }
 
 
@@ -172,6 +173,31 @@ export function factory(adhHttp        : AdhHttp.IService,
         } else {
             console.log("cache hit!");
             update(item.working);
+        }
+    }
+
+    function put(path : string, obj : Types.Content, update : (obj: Types.Content) => void) : void {
+        var item : ICacheItem = cache.get(path);
+
+        if (typeof item === "undefined") {
+            console.log("cache miss!");
+            item = createItem(cache, path);
+
+            // FIXME: post this to server immediately; on success,
+            // update working copy and initialize pristine copy.
+
+            // FIXME: what happens if somebody works on the object
+            // while it's still going to the server?
+
+        } else {
+            console.log("cache hit!");
+
+            // FIXME: see if we need to create a new version or
+            // overwrite old object (extend http for the latter, and
+            // probably the case distinction should also go there).
+            // notify server immediately; on success, update item and
+            // call update callback.
+
         }
     }
 
@@ -311,6 +337,7 @@ export function factory(adhHttp        : AdhHttp.IService,
 
     return {
         get: get,
+        put: put,
         subscribe: subscribe,
         unsubscribe: unsubscribe,
         commit: commit,
