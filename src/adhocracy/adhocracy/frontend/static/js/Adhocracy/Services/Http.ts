@@ -21,115 +21,118 @@ export interface IService {
 }
 
 export function factory($http : ng.IHttpService) : IService {
-    // FIXME: declare local functions like in ./Cache.ts, rather than
-    // one giant object dict.
     var adhHttp : IService = {
-        get: (path : string) => {
-            return $http.get(path).then((response) => {
-                if (response.status !== 200) {
-                    console.log(response);
-                    throw ("adhHttp.get: http error " + response.status.toString() + " on path " + path);
-                }
-                return importContent(response.data);
-            });
-        },
+        get: get,
+        put: put,
+        drill: drill,
+        postNewVersion: postNewVersion,
+    };
 
-        put: (path : string, obj : Types.Content) => {
-            return $http.put(path, obj).then((response) => {
-                if (response.status !== 200) {
-                    console.log(response);
-                    throw ("adhHttp.put: http error " + response.status.toString() + " on path " + path);
-                }
-                return importContent(response.data);
-            });
-        },
+    function get(path : string) : ng.IPromise<Types.Content> {
+        return $http.get(path).then((response) => {
+            if (response.status !== 200) {
+                console.log(response);
+                throw ("adhHttp.get: http error " + response.status.toString() + " on path " + path);
+            }
+            return importContent(response.data);
+        });
+    }
+
+    function put(path : string, obj : Types.Content) : ng.IPromise<Types.Content> {
+        return $http.put(path, obj).then((response) => {
+            if (response.status !== 200) {
+                console.log(response);
+                throw ("adhHttp.put: http error " + response.status.toString() + " on path " + path);
+            }
+            return importContent(response.data);
+        });
+    }
 
         // DEPRECATED?
-        drill: (data : any, xpath : /* string[] or string[][] */ any, target : any, ordered : boolean) => {
-            function resolveReference() {
-                if ("path" in data) {
-                    adhHttp.get(data.path).then((resource) => {
-                        adhHttp.drill(resource, xpath, target, ordered);
-                    });
-                } else {
-                    console.log(data);
-                    throw "adhHttp.drill: not a resource and not a reference.";
-                }
-            }
-
-            if ("content_type" in data) {
-                if ("data" in data) {
-                    adhHttp.drill(data.data, xpath, target, ordered);
-                    return;
-                } else {
-                    resolveReference();
-                    return;
-                }
+    function drill(data : any, xpath : /* string[] or string[][] */ any, target : any, ordered : boolean) : void {
+        function resolveReference() {
+            if ("path" in data) {
+                adhHttp.get(data.path).then((resource) => {
+                    adhHttp.drill(resource, xpath, target, ordered);
+                });
             } else {
-                if (xpath.length === 0) {
-                    if (target.xpath.length !== 1) {
-                        throw "not implemented.";
-                    }
-                    target.ref[target.xpath[0]] = data;
-                    return;
-                }
-                var step = xpath.shift();
-                if (typeof step === "string" || typeof step === "number") {
-                    adhHttp.drill(data[step], xpath, target, ordered);
-                    return;
-                }
-                if (step instanceof Array) {
-                    if (step.length !== 1 || !(typeof(step[0]) === "string" || typeof(step[0]) === "number")) {
-                        // FIXME: what about "[[step]]"?
-                        // FIXME: if xpath contains more than one [step], i don't know what'll happen...
-                        console.log(step);
-                        throw "internal";
-                    }
-                    step = step[0];
-
-                    if (!(data[step] instanceof Array)) {
-                        console.log(data);
-                        console.log(step);
-                        throw "internal";
-                    }
-                    var elements = data[step];
-
-                    if (!(target.ref instanceof Array)) {
-                        console.log(target);
-                        throw "not implemented.";
-                    }
-
-                    if (!ordered) {
-                        console.log(ordered);
-                        throw "not implemented.";
-                    }
-
-                    // loop over step, and call drill recursively on
-                    // each element, together with the corresponding
-                    // element of target.
-                    for (var ix in elements) {
-                        var subtarget = {
-                            ref: target.ref,
-                            xpath: [ix],
-                        };
-                        adhHttp.drill(elements[ix], Util.deepcp(xpath), subtarget, ordered);
-                    }
-                    return;
-                }
+                console.log(data);
+                throw "adhHttp.drill: not a resource and not a reference.";
             }
-        },
+        }
 
-        postNewVersion: (oldVersionPath : string,
-                         obj            : Types.Content,
-                         callback      ?: (n : Types.Content) => Types.Content ) => {
-            var dagPath = Util.parentPath(oldVersionPath);
-            var config = {
-                headers: { follows: oldVersionPath },
-                params: {},
-            };
-            return $http.post(dagPath, exportContent(obj), config).then(callback);
-        },
-    };
+        if ("content_type" in data) {
+            if ("data" in data) {
+                adhHttp.drill(data.data, xpath, target, ordered);
+                return;
+            } else {
+                resolveReference();
+                return;
+            }
+        } else {
+            if (xpath.length === 0) {
+                if (target.xpath.length !== 1) {
+                    throw "not implemented.";
+                }
+                target.ref[target.xpath[0]] = data;
+                return;
+            }
+            var step = xpath.shift();
+            if (typeof step === "string" || typeof step === "number") {
+                adhHttp.drill(data[step], xpath, target, ordered);
+                return;
+            }
+            if (step instanceof Array) {
+                if (step.length !== 1 || !(typeof(step[0]) === "string" || typeof(step[0]) === "number")) {
+                    // FIXME: what about "[[step]]"?
+                    // FIXME: if xpath contains more than one [step], i don't know what'll happen...
+                    console.log(step);
+                    throw "internal";
+                }
+                step = step[0];
+
+                if (!(data[step] instanceof Array)) {
+                    console.log(data);
+                    console.log(step);
+                    throw "internal";
+                }
+                var elements = data[step];
+
+                if (!(target.ref instanceof Array)) {
+                    console.log(target);
+                    throw "not implemented.";
+                }
+
+                if (!ordered) {
+                    console.log(ordered);
+                    throw "not implemented.";
+                }
+
+                // loop over step, and call drill recursively on
+                // each element, together with the corresponding
+                // element of target.
+                for (var ix in elements) {
+                    var subtarget = {
+                        ref: target.ref,
+                        xpath: [ix],
+                    };
+                    adhHttp.drill(elements[ix], Util.deepcp(xpath), subtarget, ordered);
+                }
+                return;
+            }
+        }
+    }
+
+    function postNewVersion(oldVersionPath : string,
+                            obj            : Types.Content,
+                            callback      ?: (n : Types.Content) => Types.Content ) : ng.IPromise<Types.Content> {
+        var dagPath = Util.parentPath(oldVersionPath);
+        var config = {
+            headers: { follows: oldVersionPath },
+            params: {},
+        };
+        return $http.post(dagPath, exportContent(obj), config).then(callback);
+    }
 
     return adhHttp;
 }
