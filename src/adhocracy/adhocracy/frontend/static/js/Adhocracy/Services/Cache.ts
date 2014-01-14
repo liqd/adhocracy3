@@ -45,13 +45,13 @@ var cacheSizeInObjects = 7;
 // service interface
 
 export interface IService {
-    get          : (path : string,                      update : (obj: Types.Content) => void) => void;
-    put          : (path : string, obj : Types.Content, update : (obj: Types.Content) => void) => void;
-    subscribe    : (path : string,                      update : (obj: Types.Content) => void) => number;
-    unsubscribe  : (path : string, ix : number)                                                => void;
-    commit       : (path : string,                      update : (obj: Types.Content) => void) => void;
-    reset        : (path : string,                      update : (obj: Types.Content) => void) => void;
-    destroy      : ()                                                                          => void;
+    get          : (path : string,                      update : (obj: Types.Content) => void)                      => void;
+    put          : (path : string, obj : Types.Content, update : (obj: Types.Content) => void, subscribe : boolean) => number;
+    subscribe    : (path : string,                      update : (obj: Types.Content) => void)                      => number;
+    unsubscribe  : (path : string, ix : number)                                                                     => void;
+    commit       : (path : string,                      update : (obj: Types.Content) => void)                      => void;
+    reset        : (path : string,                      update : (obj: Types.Content) => void)                      => void;
+    destroy      : ()                                                                                               => void;
 }
 
 
@@ -159,13 +159,18 @@ export function factory(adhHttp        : AdhHttp.IService,
     // lookup object in cache.  in case of miss, retrieve the object
     // and add it to the cache.  call callback once immediately, then
     // discard the callback.
+    //
+    // FIXME: subscribe should be dropped from this API, and get
+    // should have an extra subscribe flag that states whether it
+    // wants to get updates or not, just like put.  this should make
+    // getAndWatch go away.
     function get(path : string, update : (obj: Types.Content) => void) : void {
         var item : ICacheItem = cache.get(path);
 
         if (typeof item === "undefined") {
             console.log("cache miss!");
             item = createEmptyItem(cache, path);
-            getAndWatch(item, path, update);
+            adhHttp.get(path).then(watch_(item, path), update);
         } else {
             console.log("cache hit!");
             update(item.working);
@@ -173,28 +178,33 @@ export function factory(adhHttp        : AdhHttp.IService,
     }
 
     // FIXME: document!
-    function put(path : string, obj : Types.Content, update : (obj: Types.Content) => void) : void {
+    function put(path : string, obj : Types.Content,
+                 update : (obj: Types.Content) => void,
+                 subscribe : boolean) : number {
         var item : ICacheItem = cache.get(path);
+        var ix : number;
 
         if (typeof item === "undefined") {
             console.log("cache miss!");
             item = createEmptyItem(cache, path);
-
-            // FIXME: post this to server immediately; on success,
-            // update working copy and initialize pristine copy.
-
-            // FIXME: what happens if somebody works on the object
-            // while it's still going to the server?
-
+            if (subscribe) {
+                ix = registerUpdater(item, update);
+                adhHttp.put(path, obj).then(watch_(item, path));
+                return ix;
+            } else {
+                adhHttp.put(path, obj).then(update);
+                return;
+            }
         } else {
             console.log("cache hit!");
+
+            throw "put on existing objects not implemented";
 
             // FIXME: see if we need to create a new version or
             // overwrite old object (extend http for the latter, and
             // probably the case distinction should also go there).
             // notify server immediately; on success, update item and
             // call update callback.
-
         }
     }
 
@@ -211,7 +221,7 @@ export function factory(adhHttp        : AdhHttp.IService,
             console.log("cache miss!");
             item = createEmptyItem(cache, path);
             ix = registerUpdater(item, update);
-            getAndWatch(item, path);
+            adhHttp.get(path).then(watch_(item, path));
         } else {
             console.log("cache hit!");
             update(item.working);
@@ -290,42 +300,32 @@ export function factory(adhHttp        : AdhHttp.IService,
     // updaters on every server update notification.  If server sends
     // an update notifcation, but subscription map is empty, the
     // listener callback removes the item from cache.
-    function getAndWatch(item : ICacheItem,
-                         path : string,
-                         updateOnce ?: (obj : Types.Content) => void) : void
+    function watch_(item : ICacheItem,
+                    path : string,
+                    updateOnce ?: (obj : Types.Content) => void) : (obj : Types.Content) => void
     {
-        if (typeof cache === "undefined" || typeof ws === "undefined" || typeof item === "undefined") {
-            console.log("internal error.");
-            throw "died";
-        }
-
-        function syncFirst(obj : Types.Content) {
+        return (obj : Types.Content) => {
             resetBoth(item, obj);
             updateAll(item);
 
             if (typeof updateOnce !== "undefined") {
                 updateOnce(obj);
             }
-        }
 
-        function syncThen(obj : Types.Content) {
-            if (Object.keys(item.subscriptions).length === 0) {
-                ws.unsubscribe(path);
-                cache.remove(path);
-            } else {
-                resetBoth(item, obj);
-                updateAll(item);
-            }
+            ws.subscribe(path, (obj) => {
+                if (Object.keys(item.subscriptions).length === 0) {
+                    ws.unsubscribe(path);
+                    cache.remove(path);
+                } else {
+                    resetBoth(item, obj);
+                    updateAll(item);
+                }
 
-            // FIXME: make sure there is no concurrency issue here: what
-            // if the update callback is already queued, but then the item
-            // is removed from cache?
-        }
-
-        adhHttp.get(path).then((obj : Types.Content) : void => {
-            syncFirst(obj);
-            ws.subscribe(path, syncThen);
-        });
+                // FIXME: make sure there is no concurrency issue here: what
+                // if the update callback is already queued, but then the item
+                // is removed from cache?
+            });
+        };
     }
 
     return {
