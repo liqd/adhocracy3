@@ -40,6 +40,21 @@ export function deepcp(i) {
 }
 
 
+// Do a deep copy of a javascript source object into a target object.
+// References to the target object are not severed; rather, all fields
+// in the target object are deleted, and all fields in the source
+// object are copied using deepcp().
+export function deepoverwrite(source, target) {
+    var k;
+    for (k in target) {
+        delete target[k];
+    }
+    for (k in source) {
+        target[k] = deepcp(source[k]);
+    }
+}
+
+
 // Compare two objects, and return a boolen that states whether they
 // are equal.  (This is likely to be an approximation, but it should
 // work at least for json objects.)
