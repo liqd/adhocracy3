@@ -68,8 +68,9 @@ export function run() {
     // controllers
 
     app.controller("AdhDocumentTOC",
-                   function(adhCache    : AdhCache.IService,
-                            $scope      : IDocumentWorkbenchScope) : void
+                   ['adhCache', '$scope',
+                    function(adhCache    : AdhCache.IService,
+                             $scope      : IDocumentWorkbenchScope) : void
     {
         console.log("TOC: " + $scope.$id);
 
@@ -108,12 +109,13 @@ export function run() {
 
             init();
         });
-    });
+    }]);
 
 
     app.controller("AdhDocumentDetail",
-                   function(adhCache    : AdhCache.IService,
-                            $scope      : IDocumentDetailScope) : void
+                   ['adhCache', '$scope',
+                    function(adhCache    : AdhCache.IService,
+                             $scope      : IDocumentDetailScope) : void
     {
         $scope.list = function() {
             $scope.doc.viewmode = "list";
@@ -137,12 +139,13 @@ export function run() {
             $scope.$broadcast("commit");
             $scope.doc.viewmode = "display";
         };
-    });
+    }]);
 
 
     app.controller("AdhParagraphDetail",
-                   function(adhCache  : AdhCache.IService,
-                            $scope    : IParagraphDetailScope) : void
+                   ['adhCache', '$scope',
+                    function(adhCache  : AdhCache.IService,
+                             $scope    : IParagraphDetailScope) : void
     {
         function update(content) {
             console.log("par-update: " + $scope.parref.path);
@@ -164,7 +167,7 @@ export function run() {
 
         // save working copy on 'commit' event from containing document.
         $scope.$on("commit", commit);
-    });
+    }]);
 
 
     app.directive("adhDocumentWorkbench", function() {
