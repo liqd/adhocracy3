@@ -121,6 +121,9 @@ function unregisterUpdater(path : string, item : ICacheItem, ix : number) : void
     }
 }
 
+// FIXME: obj is already the working copy, which is already a
+// reference to the angular model.  calling this function should not
+// be necessary when ws update notifications arrive.
 function updateAll(item : ICacheItem) : void {
     var obj = item.working;
     if (typeof obj === "undefined" || typeof item === "undefined") {
@@ -164,6 +167,8 @@ export function factory(adhHttp        : AdhHttp.IService,
     // should have an extra subscribe flag that states whether it
     // wants to get updates or not, just like put.  this should make
     // getAndWatch go away.
+    //
+    // FIXME: 'update' => 'updateModel'
     function get(path : string, update : (obj: Types.Content) => void) : void {
         var item : ICacheItem = cache.get(path);
 
@@ -300,6 +305,12 @@ export function factory(adhHttp        : AdhHttp.IService,
     // updaters on every server update notification.  If server sends
     // an update notifcation, but subscription map is empty, the
     // listener callback removes the item from cache.
+    //
+    // FIXME: 'watch_' => 'initializeCacheItem_'?
+    //
+    // FIXME: 'updateOnce' => 'updateModelOnce'
+    //
+    // FIXME: move this function outside of the factory?  or move everything inside?
     function watch_(item : ICacheItem,
                     path : string,
                     updateOnce ?: (obj : Types.Content) => void) : (obj : Types.Content) => void
@@ -313,6 +324,13 @@ export function factory(adhHttp        : AdhHttp.IService,
             }
 
             ws.subscribe(path, (obj) => {
+
+                // FIXME: at this point, ws has already retrieved the
+                // updated obj, and only then do we check whether
+                // anybody is still interested.  ws should give us the
+                // option of reacting to the web socket notification
+                // before it http-gets the updated object.
+
                 if (Object.keys(item.subscriptions).length === 0) {
                     ws.unsubscribe(path);
                     cache.remove(path);
