@@ -12,6 +12,7 @@ export var jsonPrefix : string = "/adhocracy";
 
 export interface IService {
     get : (path : string) => ng.IPromise<Types.Content>;
+    put : (path : string, obj : Types.Content) => ng.IPromise<Types.Content>;
     drill : (data : any, xpath : any, target : any, ordered : boolean) => void;
     postNewVersion : ( oldVersionPath : string,
                        obj            : Types.Content,
@@ -20,12 +21,24 @@ export interface IService {
 }
 
 export function factory($http : ng.IHttpService) : IService {
+    // FIXME: declare local functions like in ./Cache.ts, rather than
+    // one giant object dict.
     var adhHttp : IService = {
         get: (path : string) => {
             return $http.get(path).then((response) => {
                 if (response.status !== 200) {
                     console.log(response);
                     throw ("adhHttp.get: http error " + response.status.toString() + " on path " + path);
+                }
+                return importContent(response.data);
+            });
+        },
+
+        put: (path : string, obj : Types.Content) => {
+            return $http.put(path, obj).then((response) => {
+                if (response.status !== 200) {
+                    console.log(response);
+                    throw ("adhHttp.put: http error " + response.status.toString() + " on path " + path);
                 }
                 return importContent(response.data);
             });
