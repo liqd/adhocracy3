@@ -68,7 +68,7 @@ export function run() {
     // controllers
 
     app.controller("AdhDocumentTOC",
-                   ['adhCache', '$scope',
+                   ["adhCache", "$scope",
                     function(adhCache    : AdhCache.IService,
                              $scope      : IDocumentWorkbenchScope) : void
     {
@@ -113,7 +113,7 @@ export function run() {
 
 
     app.controller("AdhDocumentDetail",
-                   ['adhCache', '$scope',
+                   ["adhCache", "$scope",
                     function(adhCache    : AdhCache.IService,
                              $scope      : IDocumentDetailScope) : void
     {
@@ -143,7 +143,7 @@ export function run() {
 
 
     app.controller("AdhParagraphDetail",
-                   ['adhCache', '$scope',
+                   ["adhCache", "$scope",
                     function(adhCache  : AdhCache.IService,
                              $scope    : IParagraphDetailScope) : void
     {
