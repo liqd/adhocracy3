@@ -76,7 +76,7 @@ export function run() {
 
         // FIXME: when and how do i unsubscribe?  (applies to all subscriptions in this module.)
 
-        adhCache.subscribe(AdhHttp.jsonPrefix, function(d) {
+        adhCache.get(AdhHttp.jsonPrefix, true, function(d) {
             $scope.pool = d;
             $scope.poolEntries = [];
 
@@ -85,7 +85,7 @@ export function run() {
                 var dagPS = dag.data["P.IDAG"];
                 if (dagPS.versions.length > 0) {
                     var headPath = dagPS.versions[0].path;
-                    adhCache.get(headPath, function(headContent) {
+                    adhCache.get(headPath, false, function(headContent) {
                         if (ix in $scope.poolEntries) {
                             $scope.poolEntries[ix].content = headContent;
                         } else {
@@ -102,7 +102,7 @@ export function run() {
                 for (var ix in els) {
                     (function(ix : number) {
                         var path : string = els[ix].path;
-                        adhCache.subscribe(path, (dag : Types.Content) => fetchDocumentHead(ix, dag));
+                        adhCache.get(path, true, (dag : Types.Content) => fetchDocumentHead(ix, dag));
                     })(ix);
                 }
             }
@@ -163,7 +163,7 @@ export function run() {
         }
 
         // keep pristine copy in sync with cache.
-        adhCache.subscribe($scope.parref.path, update);
+        adhCache.get($scope.parref.path, true, update);
 
         // save working copy on 'commit' event from containing document.
         $scope.$on("commit", commit);

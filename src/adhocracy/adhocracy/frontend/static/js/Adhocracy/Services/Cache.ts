@@ -45,9 +45,8 @@ var cacheSizeInObjects = 7;
 // service interface
 
 export interface IService {
-    get          : (path : string,                      update : (obj: Types.Content) => void)                      => void;
-    put          : (path : string, obj : Types.Content, update : (obj: Types.Content) => void, subscribe : boolean) => number;
-    subscribe    : (path : string,                      update : (obj: Types.Content) => void)                      => number;
+    get          : (path : string,                      subscribe : boolean, update : (obj: Types.Content) => void) => number;
+    put          : (path : string, obj : Types.Content, subscribe : boolean, update : (obj: Types.Content) => void) => number;
     unsubscribe  : (path : string, ix : number)                                                                     => void;
     commit       : (path : string,                      update : (obj: Types.Content) => void)                      => void;
     reset        : (path : string,                      update : (obj: Types.Content) => void)                      => void;
@@ -64,137 +63,65 @@ interface ICacheItem {
     freshName      : () => number;
 }
 
-// Create item with undefined pristine and working copy.
-// Subscriptions map is empty; freshName is initialized to start
-// counding at 0.
-function createEmptyItem(cache : ng.ICacheObject, path : string) : ICacheItem {
-    function freshNamer() : () => number {
-        var x : number = 0;
-        return () => { x++; return x; };
-    }
-
-    var item : ICacheItem = {
-        pristine: undefined,
-        working: undefined,
-        subscriptions: {},
-        freshName: freshNamer(),
-    };
-
-    cache.put(path, item);
-    return item;
-}
-
-// Overwrite woth pristine and working copy with arg.  Working copy is
-// a reference to the arg, pristine is a deep copy.  Update the
-// working copy simply by updating the object you passed to this
-// function.  item must not be undefined.
-function resetBoth(item : ICacheItem, obj : Types.Content) : void {
-    if (typeof obj === "undefined" || typeof item === "undefined") {
-        console.log("internal error.");
-        throw "died";
-    }
-
-    item.working = obj;
-    item.pristine = Util.deepcp(obj);
-}
-
-function registerUpdater(item : ICacheItem, update : (obj: Types.Content) => void) : number {
-    if (typeof item === "undefined" || typeof update === "undefined") {
-        console.log("internal error.");
-        throw "died";
-    }
-
-    var ix = item.freshName();
-    item.subscriptions[ix] = update;
-    return ix;
-}
-
-function unregisterUpdater(path : string, item : ICacheItem, ix : number) : void {
-    if (typeof item === "undefined") {
-        console.log("attempt to unsubscribe unregistered path: ", path, ix);
-    } else {
-        if (!(ix in item.subscriptions)) {
-            console.log("attempt to unsubscribe unregistered index: ", path, ix);
-        } else {
-            delete item.subscriptions[ix];
-        }
-    }
-}
-
-// FIXME: obj is already the working copy, which is already a
-// reference to the angular model.  calling this function should not
-// be necessary when ws update notifications arrive.
-function updateAll(item : ICacheItem) : void {
-    var obj = item.working;
-    if (typeof obj === "undefined" || typeof item === "undefined") {
-        console.log("internal error.");
-        throw "died";
-    }
-
-    for (var ix in item.subscriptions) {
-        item.subscriptions[ix](obj);
-    }
-}
-
-// Overwrite working copy with pristine.  item must not be undefined.
-function resetWorking(item : ICacheItem) : void {
-    var obj = item.pristine;
-    if (typeof obj === "undefined" || typeof item === "undefined") {
-        console.log("internal error.");
-        throw "died";
-    }
-
-    item.pristine = Util.deepcp(obj);
-    item.working = obj;
-}
-
 
 // factory
 
 export function factory(adhHttp        : AdhHttp.IService,
                         adhWS          : AdhWS.IService,
                         $q             : ng.IQService,
-                        $cacheFactory  : ng.ICacheFactoryService) : IService {
+                        $cacheFactory  : ng.ICacheFactoryService) : IService
+{
+    //////////////////////////////////////////////////////////////////////
+    // private state
+
     var cache : ng.ICacheObject = $cacheFactory("1", { capacity: cacheSizeInObjects });
     var ws : AdhWS.IService = AdhWS.factory(adhHttp);
 
 
+
+    //////////////////////////////////////////////////////////////////////
+    // public api
+
     // lookup object in cache.  in case of miss, retrieve the object
-    // and add it to the cache.  call callback once immediately, then
-    // discard the callback.
+    // and add it to the cache.  call callback once immediately with a
+    // reference to the working copy as argument, then discard the
+    // callback.  if the subscribe flag is true, keep the referenced
+    // working copy in sync with server updates.
     //
-    // FIXME: subscribe should be dropped from this API, and get
-    // should have an extra subscribe flag that states whether it
-    // wants to get updates or not, just like put.  this should make
-    // getAndWatch go away.
-    //
-    // FIXME: 'update' => 'updateModel'
-    function get(path : string, update : (obj: Types.Content) => void) : void {
-        var item : ICacheItem = cache.get(path);
-
-        if (typeof item === "undefined") {
-            console.log("cache miss!");
-            item = createEmptyItem(cache, path);
-            adhHttp.get(path).then(watch_(item, path), update);
-        } else {
-            console.log("cache hit!");
-            update(item.working);
-        }
-    }
-
-    // FIXME: document!
-    function put(path : string, obj : Types.Content,
-                 update : (obj: Types.Content) => void,
-                 subscribe : boolean) : number {
+    // FIXME: 'update' => 'updateModel'  (or, rather, see FIXME on updateAll!  make sure all comments are in sync with current implementation!)
+    function get(path : string, subscribe : boolean, update : (obj: Types.Content) => void) : number {
         var item : ICacheItem = cache.get(path);
         var ix : number;
 
         if (typeof item === "undefined") {
             console.log("cache miss!");
-            item = createEmptyItem(cache, path);
+            item = createEmptyItem(path);
             if (subscribe) {
                 ix = registerUpdater(item, update);
-                adhHttp.put(path, obj).then(watch_(item, path));
+            }
+            adhHttp.get(path).then(initializeCacheItem(item, path), update);
+        } else {
+            console.log("cache hit!");
+            if (subscribe) {
+                ix = registerUpdater(item, update);
+            }
+            update(item.working);
+        }
+
+        return ix;
+    }
+
+    // FIXME: document!
+    function put(path : string, obj : Types.Content, subscribe : boolean, update : (obj: Types.Content) => void) : number {
+        var item : ICacheItem = cache.get(path);
+        var ix : number;
+
+        if (typeof item === "undefined") {
+            console.log("cache miss!");
+            item = createEmptyItem(path);
+            if (subscribe) {
+                ix = registerUpdater(item, update);
+                adhHttp.put(path, obj).then(initializeCacheItem(item, path));
                 return ix;
             } else {
                 adhHttp.put(path, obj).then(update);
@@ -211,37 +138,6 @@ export function factory(adhHttp        : AdhHttp.IService,
             // notify server immediately; on success, update item and
             // call update callback.
         }
-    }
-
-    // lookup object in cache.  in case of miss, retrieve the object
-    // add it to the cache, and register item with the ws service
-    // (which calls the updater once immediately).  updater callback
-    // will be registered in the cache item and called once
-    // immediately.  returns a (numeric) subscription handle.
-    function subscribe(path : string, update : (obj: Types.Content) => void) : number {
-        var item : ICacheItem = cache.get(path);
-        var ix : number;
-
-        if (typeof item === "undefined") {
-            console.log("cache miss!");
-            item = createEmptyItem(cache, path);
-            ix = registerUpdater(item, update);
-            adhHttp.get(path).then(watch_(item, path));
-        } else {
-            console.log("cache hit!");
-            update(item.working);
-            ix = registerUpdater(item, update);
-        }
-
-        return ix;
-
-        // if we had to return a promise from this function, and
-        // had to construct one from the promised value, this is
-        // what we could do:
-        //
-        //   return $q.defer().promise.then(function() { return item; });
-        //
-        // (just leaving this in because it's so pretty :-)
     }
 
     // remove subscription from cache item.  ix is the subscription
@@ -298,6 +194,31 @@ export function factory(adhHttp        : AdhHttp.IService,
         cache.destroy();
     }
 
+
+
+    //////////////////////////////////////////////////////////////////////
+    // private api
+
+    // Create item with undefined pristine and working copy.
+    // Subscriptions map is empty; freshName is initialized to start
+    // counding at 0.
+    function createEmptyItem(path : string) : ICacheItem {
+        function freshNamer() : () => number {
+            var x : number = 0;
+            return () => { x++; return x; };
+        }
+
+        var item : ICacheItem = {
+            pristine: undefined,
+            working: undefined,
+            subscriptions: {},
+            freshName: freshNamer(),
+        };
+
+        cache.put(path, item);
+        return item;
+    }
+
     // Fetch obj asynchronously from server.  Initialize item with
     // pristine and working copy, call all registered updaters once,
     // and then call updateOnce parameter once and discard it.
@@ -306,14 +227,10 @@ export function factory(adhHttp        : AdhHttp.IService,
     // an update notifcation, but subscription map is empty, the
     // listener callback removes the item from cache.
     //
-    // FIXME: 'watch_' => 'initializeCacheItem_'?
-    //
     // FIXME: 'updateOnce' => 'updateModelOnce'
-    //
-    // FIXME: move this function outside of the factory?  or move everything inside?
-    function watch_(item : ICacheItem,
-                    path : string,
-                    updateOnce ?: (obj : Types.Content) => void) : (obj : Types.Content) => void
+    function initializeCacheItem(item : ICacheItem,
+                                 path : string,
+                                 updateOnce ?: (obj : Types.Content) => void) : (obj : Types.Content) => void
     {
         return (obj : Types.Content) => {
             resetBoth(item, obj);
@@ -346,10 +263,77 @@ export function factory(adhHttp        : AdhHttp.IService,
         };
     }
 
+    // Overwrite woth pristine and working copy with arg.  Working copy is
+    // a reference to the arg, pristine is a deep copy.  Update the
+    // working copy simply by updating the object you passed to this
+    // function.  item must not be undefined.
+    function resetBoth(item : ICacheItem, obj : Types.Content) : void {
+        if (typeof obj === "undefined" || typeof item === "undefined") {
+            console.log("internal error.");
+            throw "died";
+        }
+
+        item.working = obj;
+        item.pristine = Util.deepcp(obj);
+    }
+
+    function registerUpdater(item : ICacheItem, update : (obj: Types.Content) => void) : number {
+        if (typeof item === "undefined" || typeof update === "undefined") {
+            console.log("internal error.");
+            throw "died";
+        }
+
+        var ix = item.freshName();
+        item.subscriptions[ix] = update;
+        return ix;
+    }
+
+    function unregisterUpdater(path : string, item : ICacheItem, ix : number) : void {
+        if (typeof item === "undefined") {
+            console.log("attempt to unsubscribe unregistered path: ", path, ix);
+        } else {
+            if (!(ix in item.subscriptions)) {
+                console.log("attempt to unsubscribe unregistered index: ", path, ix);
+            } else {
+                delete item.subscriptions[ix];
+            }
+        }
+    }
+
+    // FIXME: obj is already the working copy, which is already a
+    // reference to the angular model.  calling this function should not
+    // be necessary when ws update notifications arrive.
+    function updateAll(item : ICacheItem) : void {
+        var obj = item.working;
+        if (typeof obj === "undefined" || typeof item === "undefined") {
+            console.log("internal error.");
+            throw "died";
+        }
+
+        for (var ix in item.subscriptions) {
+            item.subscriptions[ix](obj);
+        }
+    }
+
+    // Overwrite working copy with pristine.  item must not be undefined.
+    function resetWorking(item : ICacheItem) : void {
+        var obj = item.pristine;
+        if (typeof obj === "undefined" || typeof item === "undefined") {
+            console.log("internal error.");
+            throw "died";
+        }
+
+        item.pristine = Util.deepcp(obj);
+        item.working = obj;
+    }
+
+
+    //////////////////////////////////////////////////////////////////////
+    // compose cache object
+
     return {
         get: get,
         put: put,
-        subscribe: subscribe,
         unsubscribe: unsubscribe,
         commit: commit,
         reset: reset,
