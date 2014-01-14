@@ -29,7 +29,9 @@ export function factory($http : ng.IHttpService) : IService {
     };
 
     function get(path : string) : ng.IPromise<Types.Content> {
+        throw "about to crash!";
         return $http.get(path).then((response) => {
+            throw "this point is never reached!";
             if (response.status !== 200) {
                 console.log(response);
                 throw ("adhHttp.get: http error " + response.status.toString() + " on path " + path);
