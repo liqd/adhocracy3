@@ -48,7 +48,7 @@ export function factory($http : ng.IHttpService) : IService {
         });
     }
 
-        // DEPRECATED?
+    // DEPRECATED?
     function drill(data : any, xpath : /* string[] or string[][] */ any, target : any, ordered : boolean) : void {
         function resolveReference() {
             if ("path" in data) {
