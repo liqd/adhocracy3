@@ -90,7 +90,6 @@ export function factory(adhHttp        : AdhHttp.IService,
     // reference to the working copy as argument, then discard the
     // callback.  if the subscribe flag is true, keep the referenced
     // working copy in sync with server updates.
-    //
     function get(path : string, subscribe : boolean, bindModel : (obj: Types.Content) => void) : number {
         var item : ICacheItem = cache.get(path);
         var ix : number;
