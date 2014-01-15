@@ -72,8 +72,7 @@ interface ICacheItem {
 export function factory(adhHttp        : AdhHttp.IService,
                         adhWS          : AdhWS.IService,
                         $q             : ng.IQService,
-                        $cacheFactory  : ng.ICacheFactoryService) : IService
-{
+                        $cacheFactory  : ng.ICacheFactoryService) : IService {
     //////////////////////////////////////////////////////////////////////
     // private state
 
@@ -106,9 +105,6 @@ export function factory(adhHttp        : AdhHttp.IService,
                 };
             }
         } else {
-
-            throw "get: cache hit!";
-
             if (subscribe) {
                 return {
                     handle: registerSubscription(item),
@@ -116,7 +112,6 @@ export function factory(adhHttp        : AdhHttp.IService,
                 };
             } else {
                 return {
-                    handle: registerSubscription(item),
                     promise: Util.mkPromise($q, Util.deepcp(item.working))
                 };
             }
@@ -212,7 +207,7 @@ export function factory(adhHttp        : AdhHttp.IService,
 
         var item : ICacheItem = {
             pristine: undefined,
-            working: { content_type: '', data: {} },  // deepoverwrite requires this not to be undefined!
+            working: { content_type: "", data: {} },  // deepoverwrite requires this not to be undefined!
             subscriptions: {},
             freshName: freshNamer(),
         };
