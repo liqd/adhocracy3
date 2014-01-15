@@ -27,24 +27,22 @@ export function factory($http : ng.IHttpService) : IService {
         drill: drill,
     };
 
-    function get(path : string) : ng.IPromise<Types.Content> {
-        return $http.get(path).then((response) => {
-            if (response.status !== 200) {
-                console.log(response);
-                throw ("adhHttp.get: http error " + response.status.toString() + " on path " + path);
+    function assertResponse(msg : string, path : string) {
+        return (resp) => {
+            if (resp.status !== 200) {
+                console.log(resp);
+                throw (msg + ": http error " + resp.status.toString() + " on path " + path);
             }
-            return importContent(response.data);
-        });
+            return importContent(resp.data);
+        }
+    }
+
+    function get(path : string) : ng.IPromise<Types.Content> {
+        return $http.get(path).then(assertResponse("adhHttp.get", path));
     }
 
     function put(path : string, obj : Types.Content) : ng.IPromise<Types.Content> {
-        return $http.put(path, obj).then((response) => {
-            if (response.status !== 200) {
-                console.log(response);
-                throw ("adhHttp.put: http error " + response.status.toString() + " on path " + path);
-            }
-            return importContent(response.data);
-        });
+        return $http.put(path, obj).then(assertResponse("adhHttp.put", path));
     }
 
     function postNewVersion(oldVersionPath : string, obj : Types.Content) : ng.IPromise<Types.Content> {
@@ -53,11 +51,11 @@ export function factory($http : ng.IHttpService) : IService {
             headers: { follows: oldVersionPath },
             params: {},
         };
-        return $http.post(dagPath, exportContent(obj), config);
+        return $http.post(dagPath, exportContent(obj), config).then(assertResponse("adhHttp.postNewVersion", dagPath));
     }
 
     function postToPool(poolPath : string, obj : Types.Content) : ng.IPromise<Types.Content> {
-        return $http.post(poolPath, exportContent(obj));
+        return $http.post(poolPath, exportContent(obj)).then(assertResponse("adhHttp.postToPool", poolPath));
     }
 
     // DEPRECATED?
