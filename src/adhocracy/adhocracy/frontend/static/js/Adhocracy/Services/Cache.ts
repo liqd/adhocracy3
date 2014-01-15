@@ -165,7 +165,7 @@ export function factory(adhHttp        : AdhHttp.IService,
             // the update.  (necessary in case the server changed the
             // object in a way relevant to the UI, e.g. by adding an
             // update timestamp.)
-            adhHttp.postNewVersion(path, item.working, (obj) => {
+            adhHttp.postNewVersion(path, item.working).then((obj) => {
                 resetBoth(item, obj);
                 return obj;
             });

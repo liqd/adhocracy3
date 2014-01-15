@@ -13,19 +13,18 @@ export var jsonPrefix : string = "/adhocracy";
 export interface IService {
     get : (path : string) => ng.IPromise<Types.Content>;
     put : (path : string, obj : Types.Content) => ng.IPromise<Types.Content>;
+    postNewVersion : (oldVersionPath : string, obj : Types.Content) => ng.IPromise<Types.Content>;
+    postToPool : (poolPath : string, obj : Types.Content) => ng.IPromise<Types.Content>;
     drill : (data : any, xpath : any, target : any, ordered : boolean) => void;
-    postNewVersion : ( oldVersionPath : string,
-                       obj            : Types.Content,
-                       callback      ?: (n : Types.Content) => Types.Content )
-        => ng.IPromise<Types.Content>;
 }
 
 export function factory($http : ng.IHttpService) : IService {
     var adhHttp : IService = {
         get: get,
         put: put,
-        drill: drill,
         postNewVersion: postNewVersion,
+        postToPool: postToPool,
+        drill: drill,
     };
 
     function get(path : string) : ng.IPromise<Types.Content> {
@@ -46,6 +45,19 @@ export function factory($http : ng.IHttpService) : IService {
             }
             return importContent(response.data);
         });
+    }
+
+    function postNewVersion(oldVersionPath : string, obj : Types.Content) : ng.IPromise<Types.Content> {
+        var dagPath = Util.parentPath(oldVersionPath);
+        var config = {
+            headers: { follows: oldVersionPath },
+            params: {},
+        };
+        return $http.post(dagPath, exportContent(obj), config);
+    }
+
+    function postToPool(poolPath : string, obj : Types.Content) : ng.IPromise<Types.Content> {
+        return $http.post(poolPath, exportContent(obj));
     }
 
     // DEPRECATED?
@@ -121,17 +133,6 @@ export function factory($http : ng.IHttpService) : IService {
                 return;
             }
         }
-    }
-
-    function postNewVersion(oldVersionPath : string,
-                            obj            : Types.Content,
-                            callback      ?: (n : Types.Content) => Types.Content ) : ng.IPromise<Types.Content> {
-        var dagPath = Util.parentPath(oldVersionPath);
-        var config = {
-            headers: { follows: oldVersionPath },
-            params: {},
-        };
-        return $http.post(dagPath, exportContent(obj), config).then(callback);
     }
 
     return adhHttp;
