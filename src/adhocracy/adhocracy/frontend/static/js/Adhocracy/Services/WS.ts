@@ -10,7 +10,7 @@ import AdhHttp = require("Adhocracy/Services/Http");
 // web sockets
 
 // first draft, using a primitive global (to the factory) web socket
-// handle, and an equally primitive dictionary for registering models
+// handle, and an equally primitive dictionary for registering objs
 // interested in updates.  (i don't think this is what we actually
 // want to do once the application gets more complex, but i want to
 // find out how well it works anyway.  see also angularjs github wiki,
@@ -22,7 +22,7 @@ import AdhHttp = require("Adhocracy/Services/Http");
 var wsuri : string = "ws://" + window.location.host + AdhHttp.jsonPrefix + "?ws=all";
 
 export interface IService {
-    subscribe: (path : string, update : (model: any) => void) => void;
+    subscribe: (path : string, update : (obj: any) => void) => void;
     unsubscribe: (path : string) => void;
     destroy: () => void;
 }
@@ -31,9 +31,9 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
     var ws = openWs(adhHttp);
     var subscriptions = {};
 
-    function subscribeWs(path : string, update : (model: any) => void) : void {
+    function subscribeWs(path : string, update : (obj: Types.Content) => void) : void {
         if (path in subscriptions) {
-            throw "unsubscribe web socket listener: attempt to subscribe to " + path + " twice!";
+            throw "WS: subscribe: attempt to subscribe to " + path + " twice!";
         } else {
             subscriptions[path] = update;
         }
@@ -43,7 +43,7 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
         if (path in subscriptions) {
             delete subscriptions[path];
         } else {
-            throw "unsubscribe web socket listener: no subscription for " + path + "!";
+            throw "wS: unsubscribe: no subscription for " + path + "!";
         }
     }
 
@@ -52,23 +52,21 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
 
         ws.onmessage = function(event) {
             var path = event.data;
-            console.log("web socket message: update on " + path);
+            console.log("WS message: " + path);
 
             if (path in subscriptions) {
                 adhHttp.get(path).then(subscriptions[path]);
             }
         };
 
-        // some console info to keep track of things happening:
         ws.onerror = function(event) {
-            console.log("ws.onerror");
-            console.log(event);
+            console.log("WS error: ", event);
         };
+
         ws.onopen = function() {
-            console.log("ws.onopen");
         };
+
         ws.onclose = function() {
-            console.log("ws.onclose (will try to re-open)");
             ws = openWs(adhHttp);
         };
 
@@ -76,7 +74,6 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
     }
 
     function closeWs() : void {
-        console.log("closeWs");
         ws.close();
     }
 
