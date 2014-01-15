@@ -76,7 +76,7 @@ export function run() {
 
         // FIXME: when and how do i unsubscribe?  (applies to all subscriptions in this module.)
 
-        adhCache.get(AdhHttp.jsonPrefix, true, function(d) {
+        adhCache.get(AdhHttp.jsonPrefix, true).promise.then(function(d) {
             $scope.pool = d;
             $scope.poolEntries = [];
 
@@ -85,7 +85,7 @@ export function run() {
                 var dagPS = dag.data["P.IDAG"];
                 if (dagPS.versions.length > 0) {
                     var headPath = dagPS.versions[0].path;
-                    adhCache.get(headPath, false, function(headContent) {
+                    adhCache.get(headPath, false).promise.then(function(headContent) {
                         if (ix in $scope.poolEntries) {
                             $scope.poolEntries[ix].content = headContent;
                         } else {
@@ -102,7 +102,7 @@ export function run() {
                 for (var ix in els) {
                     (function(ix : number) {
                         var path : string = els[ix].path;
-                        adhCache.get(path, true, (dag : Types.Content) => fetchDocumentHead(ix, dag));
+                        adhCache.get(path, true).promise.then((dag : Types.Content) => fetchDocumentHead(ix, dag));
                     })(ix);
                 }
             }
@@ -130,12 +130,12 @@ export function run() {
         };
 
         $scope.reset = function() {
-            adhCache.reset($scope.doc.content.path, (c) => $scope.doc.content = c);
+            adhCache.reset($scope.doc.content.path);
             $scope.doc.viewmode = "display";
         };
 
         $scope.commit = function() {
-            adhCache.commit($scope.doc.content.path, (c) => $scope.doc.content = c);
+            adhCache.commit($scope.doc.content.path);
             $scope.$broadcast("commit");
             $scope.doc.viewmode = "display";
         };
@@ -154,7 +154,7 @@ export function run() {
 
         function commit(event, ...args) {
             console.log("par-commit: " + $scope.parref.path);
-            adhCache.commit($scope.parcontent.path, update);
+            adhCache.commit($scope.parcontent.path);
 
             // FIXME: the commit-triggered update will be followed by
             // a redundant update triggered by the web socket event.
@@ -163,7 +163,7 @@ export function run() {
         }
 
         // keep pristine copy in sync with cache.
-        adhCache.get($scope.parref.path, true, update);
+        adhCache.get($scope.parref.path, true).promise.then(update);
 
         // save working copy on 'commit' event from containing document.
         $scope.$on("commit", commit);

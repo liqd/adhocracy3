@@ -43,14 +43,20 @@ export function deepcp(i) {
 // Do a deep copy of a javascript source object into a target object.
 // References to the target object are not severed; rather, all fields
 // in the target object are deleted, and all fields in the source
-// object are copied using deepcp().
+// object are copied using deepcp().  Crashes if target is not an
+// object.
 export function deepoverwrite(source, target) {
     var k;
-    for (k in target) {
-        delete target[k];
+    try {
+        for (k in target) {
+            delete target[k];
+        }
+        for (k in source) {
+            target[k] = deepcp(source[k]);
+        }
     }
-    for (k in source) {
-        target[k] = deepcp(source[k]);
+    catch(e) {
+        throw ("Util.deepoverwrite: " + [source, target, e]);
     }
 }
 
@@ -79,4 +85,10 @@ export function deepeq(a : any, b : any) : boolean {
     }
 
     return a === b;
+}
+
+
+// sugar for angular
+export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
+    return $q.defer().promise.then(() => { return item; });
 }
