@@ -54,8 +54,7 @@ export function deepoverwrite(source, target) {
         for (k in source) {
             target[k] = deepcp(source[k]);
         }
-    }
-    catch(e) {
+    } catch (e) {
         throw ("Util.deepoverwrite: " + [source, target, e]);
     }
 }
@@ -90,5 +89,7 @@ export function deepeq(a : any, b : any) : boolean {
 
 // sugar for angular
 export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
-    return $q.defer().promise.then(() => { return item; });
+    var deferred = $q.defer();
+    deferred.resolve();
+    return deferred.promise.then(() => { return obj; });
 }
