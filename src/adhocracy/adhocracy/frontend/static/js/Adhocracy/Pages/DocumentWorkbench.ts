@@ -76,8 +76,8 @@ export function run() {
 
         // FIXME: when and how do i unsubscribe?  (applies to all subscriptions in this module.)
 
-        adhCache.get(AdhHttp.jsonPrefix, true).promise.then(function(d) {
-            $scope.pool = d;
+        adhCache.get(AdhHttp.jsonPrefix, true).promise.then(function(pool) {
+            $scope.pool = pool;
             $scope.poolEntries = [];
 
             function fetchDocumentHead(ix : number, dag : Types.Content) : void {
@@ -98,7 +98,7 @@ export function run() {
             }
 
             function init() {
-                var els : Types.Reference[] = d.data["P.IPool"].elements;
+                var els : Types.Reference[] = pool.data["P.IPool"].elements;
                 for (var ix in els) {
                     (function(ix : number) {
                         var path : string = els[ix].path;
@@ -135,6 +135,7 @@ export function run() {
         };
 
         $scope.commit = function() {
+            console.log("doc-commit: ", $scope.doc.content, $scope.doc.content.path);
             adhCache.commit($scope.doc.content.path);
             $scope.$broadcast("commit");
             $scope.doc.viewmode = "display";

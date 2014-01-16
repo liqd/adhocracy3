@@ -154,14 +154,13 @@ export function factory(adhHttp        : AdhHttp.IService,
     // server.  (must be from server, since server changes things like
     // version successor and predecessor edges.)  if path is not
     // cached, crash.  returns a boolean that states whether a new
-    // version was actually created.
+    // version was actually created.  if path is invalid, crash.
     function commit(path : string) : boolean {
         var item : ICacheItem = cache.get(path);
         var workingCopyNew : boolean;
 
-        // if path is invalid, crash.
         if (typeof item === "undefined") {
-            console.log("unknown path: " + path);
+            console.log("adhCache.commit: invalid path: " + path);
             throw "died";
         }
 
@@ -179,11 +178,11 @@ export function factory(adhHttp        : AdhHttp.IService,
         var item : ICacheItem = cache.get(path);
 
         if (typeof item === "undefined") {
-            console.log("invalid path: " + path);
+            console.log("adhCache.reset: invalid path: " + path);
             throw "died";
-        } else {
-            resetWorking(item);
         }
+
+        resetWorking(item);
     }
 
     function destroy() {
