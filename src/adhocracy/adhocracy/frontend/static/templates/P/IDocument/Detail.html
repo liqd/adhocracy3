@@ -1,7 +1,7 @@
 <div ng-controller="AdhDocumentDetail as ad" style="background:yellow">
     <div ng-switch="doc.viewmode">
         <div ng-switch-when="list">
-            <a href ng-click="display()">
+            <a href ng-click="display()" class="document_title">
                 {{doc.content | viewFilterList}}
             </a>
         </div>
@@ -9,14 +9,14 @@
             <button type="button" class="edit_button" ng-click="edit()">edit</button>
             <button type="button" class="close_button" ng-click="list()">close</button>
             <br>
-            <p ng-bind="doc.content.data['P.IDocument'].title"></p>
+            <p ng-bind="doc.content.data['P.IDocument'].title" class="document_title"></p>
             <small><p ng-bind="doc.content.data['P.IDocument'].description"></p></small>
         </div>
         <div ng-switch-when="edit">
             <button type="button" class="reset_button" ng-click="reset()">reset</button>
             <button type="button" class="save_button" ng-click="commit()">save</button>
             <br>
-            <p>title: <input ng-model="doc.content.data['P.IDocument'].title"></input></p>
+            <p>title: <input ng-model="doc.content.data['P.IDocument'].title" class="document_title"></input></p>
             <small><p ng-bind="doc.content.data['P.IDocument'].description"></p></small>
         </div>
         <div ng-switch-default>

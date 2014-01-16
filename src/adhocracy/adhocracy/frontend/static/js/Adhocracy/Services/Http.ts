@@ -139,10 +139,10 @@ export function factory($http : ng.IHttpService) : IService {
 
 // transform objects on the way in and out
 
-var importContent : (obj : Types.Content) => Types.Content
+export var importContent : (obj : Types.Content) => Types.Content
     = translateContent(shortenType);
 
-var exportContent : (obj : Types.Content) => Types.Content
+export var exportContent : (obj : Types.Content) => Types.Content
     = (obj) =>
 {
     var newobj = translateContent(unshortenType)(obj);
