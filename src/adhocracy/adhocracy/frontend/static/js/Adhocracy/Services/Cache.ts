@@ -235,7 +235,7 @@ export function factory(adhHttp        : AdhHttp.IService,
                     ws.unsubscribe(path);
                     cache.remove(path);
                 } else {
-                    resetBoth(item, obj);
+                    adhHttp.get(path).then((obj) => { resetBoth(item, obj); });
                 }
 
                 // FIXME: make sure there is no concurrency issue here: what
