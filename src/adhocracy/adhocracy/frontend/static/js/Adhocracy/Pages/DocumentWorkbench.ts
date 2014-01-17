@@ -76,20 +76,20 @@ export function run() {
 
         // FIXME: when and how do i unsubscribe?  (applies to all subscriptions in this module.)
 
-        adhCache.get(AdhHttp.jsonPrefix, true).promise.then(function(pool) {
-            $scope.pool = pool;
+        adhCache.get(AdhHttp.jsonPrefix, true).then(function(poolRef) {
+            $scope.pool = poolRef.ref;
             $scope.poolEntries = [];
 
-            function fetchDocumentHead(ix : number, dag : Types.Content) : void {
+            function fetchDocumentHead(ix : number, dagRef : AdhCache.IContentRef) : void {
                 // FIXME: factor out getting from DAG to head version.
-                var dagPS = dag.data["P.IDAG"];
+                var dagPS = dagRef.ref.data["P.IDAG"];
                 if (dagPS.versions.length > 0) {
                     var headPath = dagPS.versions[0].path;
-                    adhCache.get(headPath, false).promise.then(function(headContent) {
+                    adhCache.get(headPath, false).then(function(headContentRef) {
                         if (ix in $scope.poolEntries) {
-                            $scope.poolEntries[ix].content = headContent;
+                            Util.deepoverwrite(headContentRef.ref, $scope.poolEntries[ix].content);
                         } else {
-                            $scope.poolEntries[ix] = { viewmode: "list", content: headContent };
+                            $scope.poolEntries[ix] = { viewmode: "list", content: headContentRef.ref };
                         }
                     });
                 } else {
@@ -98,11 +98,11 @@ export function run() {
             }
 
             function init() {
-                var els : Types.Reference[] = pool.data["P.IPool"].elements;
+                var els : Types.Reference[] = poolRef.ref.data["P.IPool"].elements;
                 for (var ix in els) {
                     (function(ix : number) {
                         var path : string = els[ix].path;
-                        adhCache.get(path, true).promise.then((dag : Types.Content) => fetchDocumentHead(ix, dag));
+                        adhCache.get(path, true).then((dagRef) => fetchDocumentHead(ix, dagRef));
                     })(ix);
                 }
             }
@@ -148,9 +148,9 @@ export function run() {
                     function(adhCache  : AdhCache.IService,
                              $scope    : IParagraphDetailScope) : void
     {
-        function update(content) {
+        function update(contentRef : AdhCache.IContentRef) {
             console.log("par-update: " + $scope.parref.path);
-            $scope.parcontent = content;
+            $scope.parcontent = contentRef.ref;
         }
 
         function commit(event, ...args) {
@@ -164,7 +164,7 @@ export function run() {
         }
 
         // keep pristine copy in sync with cache.
-        adhCache.get($scope.parref.path, true).promise.then(update);
+        adhCache.get($scope.parref.path, true).then(update);
 
         // save working copy on 'commit' event from containing document.
         $scope.$on("commit", commit);

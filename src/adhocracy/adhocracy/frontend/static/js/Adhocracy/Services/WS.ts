@@ -64,6 +64,7 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
         };
 
         ws.onopen = function() {
+            return;
         };
 
         ws.onclose = function() {

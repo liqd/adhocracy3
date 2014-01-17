@@ -48,8 +48,8 @@ var cacheSizeInObjects = 7;
 // service interface
 
 export interface IService {
-    get          : (path : string,                      subscribe : boolean) => { handle?: number; promise: ng.IPromise<Types.Content> };
-    put          : (path : string, obj : Types.Content, subscribe : boolean) => { handle?: number; promise: ng.IPromise<Types.Content> };
+    get          : (path : string,                      subscribe : boolean) => ng.IPromise<IContentRef>;
+    put          : (path : string, obj : Types.Content, subscribe : boolean) => ng.IPromise<IContentRef>;
     unsubscribe  : (path : string, ix : number) => void;
     commit       : (path : string) => boolean;
     reset        : (path : string) => void;
@@ -59,9 +59,27 @@ export interface IService {
 
 // ICacheItem and helpers
 
+// an object containing a handle for unsubscription and the object
+// itself.  bind the contentref to the angular view in order to avoid
+// accidental severance when the content object is updated (this
+// library will write to the 'ref' field).
+//
+// if this is returned not as a subscribed object, but as something
+// just interesting once (or updated from elsewhere), then ix is
+// undefined and ref contains a deep copy of the working copy of the
+// cache item.  (in that case, binding the cache working copy to the
+// angular view is not possible.)
+export interface IContentRef {
+    ix ?: number;
+    ref : Types.Content;
+}
+
+// internal cache item type.  contains pristine copy, working copy, a
+// dict of subscriptions, and a generator for fresh subscription
+// handles.
 interface ICacheItem {
     pristine       : Types.Content;
-    working        : Types.Content;
+    working        : IContentRef;
     subscriptions  : Object;
     freshName      : () => number;
 }
@@ -89,50 +107,35 @@ export function factory(adhHttp        : AdhHttp.IService,
     // reference to the working copy as argument, then discard the
     // callback.  if the subscribe flag is true, keep the referenced
     // working copy in sync with server updates.
-    function get(path : string, subscribe : boolean) : { handle?: number; promise: ng.IPromise<Types.Content> } {
+    function get(path : string, subscribe : boolean) : ng.IPromise<IContentRef> {
         var item : ICacheItem = cache.get(path);
 
         if (typeof item === "undefined") {
             item = createEmptyItem(path);
             if (subscribe) {
-                return {
-                    handle: registerSubscription(item),
-                    promise: adhHttp.get(path).then(initItem(item, path))
-                };
+                return adhHttp.get(path).then(initItem(item, path, subscribe));
             } else {
-                return {
-                    promise: adhHttp.get(path).then(initItem(item, path)).then(Util.deepcp)
-                };
+                return adhHttp.get(path).then(initItem(item, path)).then(Util.deepcp);
             }
         } else {
             if (subscribe) {
-                return {
-                    handle: registerSubscription(item),
-                    promise: Util.mkPromise($q, item.working)
-                };
+                return Util.mkPromise($q, { ix: registerSubscription(item), ref: item.working });
             } else {
-                return {
-                    promise: Util.mkPromise($q, Util.deepcp(item.working))
-                };
+                return Util.mkPromise($q, { ref: Util.deepcp(item.working) });
             }
         }
     }
 
     // FIXME: document!
-    function put(path : string, obj : Types.Content, subscribe : boolean) : { handle?: number; promise: ng.IPromise<Types.Content> } {
+    function put(path : string, obj : Types.Content, subscribe : boolean) : ng.IPromise<IContentRef> {
         var item : ICacheItem = cache.get(path);
 
         if (typeof item === "undefined") {
             item = createEmptyItem(path);
             if (subscribe) {
-                return {
-                    handle: registerSubscription(item),
-                    promise: adhHttp.put(path, obj).then(initItem(item, path))
-                };
+                return adhHttp.put(path, obj).then(initItem(item, path, subscribe));
             } else {
-                return {
-                    promise: adhHttp.put(path, obj).then(initItem(item, path)).then(Util.deepcp)
-                };
+                return adhHttp.put(path, obj).then(initItem(item, path)).then(Util.deepcp);
             }
         } else {
             throw "put on existing objects not implemented";
@@ -166,7 +169,7 @@ export function factory(adhHttp        : AdhHttp.IService,
 
         workingCopyNew = !Util.deepeq(item.pristine, item.working);
         if (workingCopyNew) {
-            adhHttp.postNewVersion(path, item.working).then((obj) => resetBoth(item, obj));
+            adhHttp.postNewVersion(path, item.working.ref).then((obj) => resetBoth(item, obj));
         }
 
         return workingCopyNew;
@@ -206,7 +209,7 @@ export function factory(adhHttp        : AdhHttp.IService,
 
         var item : ICacheItem = {
             pristine: undefined,
-            working: { content_type: "", data: {} },  // deepoverwrite requires this not to be undefined!
+            working: undefined,
             subscriptions: {},
             freshName: freshNamer(),
         };
@@ -215,14 +218,23 @@ export function factory(adhHttp        : AdhHttp.IService,
         return item;
     }
 
-    // Fetch obj asynchronously from server.  Initialize item with
-    // pristine and working copy.  Register web socket listener
-    // callback that checks if object is still needed on every server
-    // update.  If not, it is dropped from the cache.  Return a
-    // promise with the working copy.
-    function initItem(item : ICacheItem, path : string) : (obj : Types.Content) => Types.Content {
+    // Call this in the promise of an http get or put.  Load pristine
+    // and working copy into item.  If this is a subscription, create
+    // the subscription handle and register it in working copy ref.
+    // Register web socket listener callback.  (the callback checks if
+    // object is still needed on every server update.  If so, it is
+    // kept up-to-date.  If not, it is dropped from the cache.)
+    //
+    // Return a promise with the working copy.
+    function initItem(item : ICacheItem, path : string, subscribe ?: boolean) : (obj : Types.Content) => IContentRef {
         return (obj) => {
+            item.working = { ix : undefined, ref : undefined };
             resetBoth(item, obj);
+
+            if (subscribe) {
+                item.working.ix = registerSubscription(item);
+            }
+
             ws.subscribe(path, (obj) => {
 
                 // FIXME: at this point, ws has already retrieved the
@@ -243,7 +255,7 @@ export function factory(adhHttp        : AdhHttp.IService,
                 // is removed from cache?
             });
 
-            return obj;
+            return item.working;
         };
     }
 
@@ -252,13 +264,13 @@ export function factory(adhHttp        : AdhHttp.IService,
     // working copy simply by updating the object you passed to this
     // function.  item must not be undefined.
     function resetBoth(item : ICacheItem, obj : Types.Content) : void {
-        Util.deepoverwrite(obj, item.working);
+        item.working.ref = obj;
         item.pristine = Util.deepcp(obj);
     }
 
     // Overwrite working copy with pristine.  item must not be undefined.
     function resetWorking(item : ICacheItem) : void {
-        Util.deepoverwrite(item.pristine, item.working);
+        item.working.ref = item.pristine;
     }
 
     function registerSubscription(item : ICacheItem) : number {

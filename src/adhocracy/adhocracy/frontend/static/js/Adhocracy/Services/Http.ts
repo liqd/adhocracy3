@@ -34,7 +34,7 @@ export function factory($http : ng.IHttpService) : IService {
                 throw (msg + ": http error " + resp.status.toString() + " on path " + path);
             }
             return importContent(resp.data);
-        }
+        };
     }
 
     function get(path : string) : ng.IPromise<Types.Content> {
