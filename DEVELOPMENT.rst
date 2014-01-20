@@ -4,10 +4,16 @@ Development
 Development
 -----------
 
-Check pep8 and pep257 bevore pushing commits::
+Use test driven development and check code style bevore pushing commits
+(see `Coding Style Guideline` ).
 
-    bin/flake8 src/adhocracy
+Manually check pyflake, pep257::
 
+    bin/code_check src/adhocracy
+
+Example Vim config according to coding guideline::
+
+    https://github.com/liqd/vim_config
 
 Running the Testsuite
 ---------------------
@@ -34,3 +40,5 @@ backend:
     git clone https://github.com/zerobuzz/a3-backend-mockup/
 
 Installation instructions will be added soon in README.md
+
+
