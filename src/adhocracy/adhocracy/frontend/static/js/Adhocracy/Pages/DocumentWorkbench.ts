@@ -15,17 +15,16 @@ var templatePath : string = "/static/templates";
 var appPrefix : string = "/app";
 
 
-// the model object that contains the contents of the resource, the
-// view mode (and possibly more stuff in the final implementation).
+// contents of the resource with view mode.
 interface IDocument {
-    viewmode    : string;
-    content     : Types.Content;
+    viewmode : string;
+    content  : Types.Content;
 }
 
 interface IDocumentWorkbenchScope extends ng.IScope {
-    pool : Types.Content;
+    pool        : Types.Content;
     poolEntries : IDocument[];
-    doc : IDocument;  // (iterates over document list with ng-repeat)
+    doc         : IDocument;  // (iterates over document list with ng-repeat)
 }
 
 interface IDocumentDetailScope extends IDocumentWorkbenchScope {
@@ -76,34 +75,37 @@ export function run() {
 
         // FIXME: when and how do i unsubscribe?  (applies to all subscriptions in this module.)
 
-        adhCache.get(AdhHttp.jsonPrefix, true).then(function(poolRef) {
-            $scope.pool = poolRef.ref;
+        adhCache.get(AdhHttp.jsonPrefix, true, function(pool) {
+            $scope.pool = pool;
             $scope.poolEntries = [];
 
-            function fetchDocumentHead(ix : number, dagRef : AdhCache.IContentRef) : void {
-                // FIXME: factor out getting from DAG to head version.
-                var dagPS = dagRef.ref.data["P.IDAG"];
+            // FIXME: factor out getting the head version of a DAG.
+
+            function fetchDocumentHead(n : number, dag : Types.Content) : void {
+                var dagPS = dag.data["P.IDAG"];
                 if (dagPS.versions.length > 0) {
                     var headPath = dagPS.versions[0].path;
-                    adhCache.get(headPath, false).then(function(headContentRef) {
-                        if (ix in $scope.poolEntries) {
-                            Util.deepoverwrite(headContentRef.ref, $scope.poolEntries[ix].content);
+                    adhCache.get(headPath, false, function(headContent) {
+                        if (n in $scope.poolEntries) {
+                            // leave original headContentRef intact,
+                            // just replace subscription handle and
+                            // content object.
+                            $scope.poolEntries[n].content = headContent;
                         } else {
-                            $scope.poolEntries[ix] = { viewmode: "list", content: headContentRef.ref };
+                            // bind original headContentRef to model.
+                            $scope.poolEntries[n] = { viewmode: "list", content: headContent };
                         }
                     });
-                } else {
-                    $scope.poolEntries[ix] = undefined;
                 }
             }
 
             function init() {
-                var els : Types.Reference[] = poolRef.ref.data["P.IPool"].elements;
-                for (var ix in els) {
-                    (function(ix : number) {
-                        var path : string = els[ix].path;
-                        adhCache.get(path, true).then((dagRef) => fetchDocumentHead(ix, dagRef));
-                    })(ix);
+                var els : Types.Reference[] = pool.data["P.IPool"].elements;
+                for (var n in els) {
+                    (function(n : number) {
+                        var path : string = els[n].path;
+                        adhCache.get(path, true, (dag) => fetchDocumentHead(n, dag));
+                    })(n);
                 }
             }
 
@@ -130,13 +132,13 @@ export function run() {
         };
 
         $scope.reset = function() {
-            adhCache.reset($scope.doc.content.path);
+            adhCache.get($scope.doc.content.path, false, (obj) => { $scope.doc.content = obj; });
             $scope.doc.viewmode = "display";
         };
 
         $scope.commit = function() {
-            console.log("doc-commit: ", $scope.doc.content, $scope.doc.content.path);
-            adhCache.commit($scope.doc.content.path);
+            console.log("doc-commit: ", $scope.doc, $scope.doc.content.path);
+            adhCache.commit($scope.doc.content.path, $scope.doc.content);
             $scope.$broadcast("commit");
             $scope.doc.viewmode = "display";
         };
@@ -148,14 +150,14 @@ export function run() {
                     function(adhCache  : AdhCache.IService,
                              $scope    : IParagraphDetailScope) : void
     {
-        function update(contentRef : AdhCache.IContentRef) {
+        function update(content : Types.Content) {
             console.log("par-update: " + $scope.parref.path);
-            $scope.parcontent = contentRef.ref;
+            $scope.parcontent = content;
         }
 
         function commit(event, ...args) {
             console.log("par-commit: " + $scope.parref.path);
-            adhCache.commit($scope.parcontent.path);
+            adhCache.commit($scope.parcontent.path, $scope.parcontent);
 
             // FIXME: the commit-triggered update will be followed by
             // a redundant update triggered by the web socket event.
@@ -164,7 +166,7 @@ export function run() {
         }
 
         // keep pristine copy in sync with cache.
-        adhCache.get($scope.parref.path, true).then(update);
+        adhCache.get($scope.parref.path, true, update);
 
         // save working copy on 'commit' event from containing document.
         $scope.$on("commit", commit);
