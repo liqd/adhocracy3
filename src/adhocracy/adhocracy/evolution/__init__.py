@@ -1,4 +1,4 @@
-""" Evolve scripts for the adhocracy application """
+""" Evolve scripts for the adhocracy application."""
 
 import logging
 from pyramid.threadlocal import get_current_registry
@@ -16,9 +16,8 @@ logger = logging.getLogger('evolution')
 
 
 def add_app_root_element(root):
-    logger.info(
-        'Add application root object to the zodb root'
-    )
+    """Add application root object to the zodb root."""
+    logger.info(add_app_root_element.__doc__)
     reg = get_current_registry()
     if "adhocracy" not in root:
         root["adhocracy"] = reg.content.create(
@@ -26,9 +25,8 @@ def add_app_root_element(root):
 
 
 def add_app_root_permissions(root):
-    logger.info(
-        'Set permissions for the application root object'
-    )
+    """Set permissions for the application root object."""
+    logger.info(add_app_root_permissions.__doc__)
     app_root = root["adhocracy"]
     acl = get_acl(app_root, [])
     acl.append((Allow, 'system.Everyone', ALL_PERMISSIONS))
@@ -36,6 +34,7 @@ def add_app_root_permissions(root):
 
 
 def includeme(config):
+    """Run pyramid configuration."""
     config.add_evolution_step(add_app_root_element)
     config.add_evolution_step(
         add_app_root_permissions, after=add_app_root_element)

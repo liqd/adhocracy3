@@ -1,4 +1,4 @@
-"""functional testing helpers"""
+"""Functional testing helpers."""
 
 
 def settings_functional():

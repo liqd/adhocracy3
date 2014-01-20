@@ -25,6 +25,7 @@ def get_ifaces_from_module(module, base=Interface, blacklist=[]):
     so we have to do it manually
 
     """
+
     ifaces = []
     for key in dir(module):
         value = getattr(module, key)
@@ -58,6 +59,7 @@ def diff_dict(old_dict, new_dict, omit=()):
 
 
 def sort_dict(d, sort_paths):
+    """Return sorted dictionary."""
     d2 = copy.deepcopy(d)
     for path in sort_paths:
         base = reduce(lambda d, seg: d[seg], path[:-1], d2)
@@ -66,6 +68,7 @@ def sort_dict(d, sort_paths):
 
 
 def pprint_json(json_dict):
+    """Return sorted string representation of the dict."""
     json_dict_sorted = sort_dict(json_dict)
     py_dict = json.dumps(json_dict_sorted, sort_keys=True,
                          indent=4, separators=(',', ': '))

@@ -1,3 +1,4 @@
+"""Content registry."""
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.resources.interfaces import IResource
 from adhocracy.interfaces import IResourcePropertySheet
@@ -9,6 +10,8 @@ from substanced.content import ContentRegistry
 
 
 class ResourceContentRegistry(ContentRegistry):
+
+    """Subtype of the substanced Content registry."""
 
     def resource_propertysheets(self, context, request,
                                 onlyeditable=False,
@@ -82,6 +85,7 @@ class ResourceContentRegistry(ContentRegistry):
 
 
 def includeme(config):  # pragma: no cover
+    """Run pyramid config."""
     content_old = config.registry.content
     content_new = ResourceContentRegistry(config.registry)
     content_new.__dict__.update(content_old.__dict__)

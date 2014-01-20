@@ -1,3 +1,4 @@
+"""Interfaces for adhocarcy resources."""
 from zope.interface import (
     Interface,
     taggedValue,
@@ -58,7 +59,7 @@ class IFubelVersionsPool(IPool, IAutoNamingFolder):
 
     """
 
-    taggedValue("content_class", \
+    taggedValue("content_class",
                 "substanced.folder.SequentialAutoNamingFolder")
     taggedValue("content_name", "FubelVersionsPool")
     taggedValue("basic_properties_interfaces", set(

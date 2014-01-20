@@ -1,3 +1,4 @@
+"""Adhocarcy properties."""
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.properties import interfaces
 from adhocracy.properties.interfaces import IIProperty
@@ -26,7 +27,8 @@ import colander
 
 @implementer(IResourcePropertySheet)
 class ResourcePropertySheetAdapter(PropertySheet):
-    """ Read interface.."""
+
+    """Read interface.."""
 
     def __init__(self, context, request, iface):
         assert hasattr(context, "__setitem__")
@@ -67,7 +69,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         return refs
 
     def get(self):
-        """read interface"""
+        """Return: read interface."""
         # fet default values
         cstruct_default = self.schema.serialize()
         # default == "" is ignored FIXME: this is  ugly
@@ -80,7 +82,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         return struct
 
     def set(self, struct, omit=()):
-        """read interface"""
+        """Return: read interface."""
         assert isinstance(struct, Mapping)
         if not is_nonstr_iter(omit):
             omit = (omit,)
@@ -101,14 +103,14 @@ class ResourcePropertySheetAdapter(PropertySheet):
         return bool(changed)
 
     def set_cstruct(self, cstruct):
-        """read interface"""
+        """Return: read interface."""
         omit = [child.name for child in self.schema
                 if getattr(child, "readonly", False)]
         struct = self.schema.deserialize(cstruct)
         self.set(struct, omit=omit)
 
     def get_cstruct(self):
-        """read interface"""
+        """Return: read interface."""
         struct = self.get()
         cstruct = self.schema.serialize(struct)
         return cstruct
@@ -117,11 +119,14 @@ class ResourcePropertySheetAdapter(PropertySheet):
 @implementer(IResourcePropertySheet)
 class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
 
+    """Adapts Pool resource  to substance PropertySheet."""
+
     def __init__(self, context, request, iface):
         assert iface.isOrExtends(interfaces.IPool)
         super(PoolPropertySheetAdapter, self).__init__(context, request, iface)
 
     def get(self):
+        """Return data struct."""
         struct = super(PoolPropertySheetAdapter, self).get()
         struct["elements"] = self._objectmap.pathlookup(self.context,
                                                         depth=1,
@@ -129,9 +134,11 @@ class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
         return struct
 
     def set(self, struct, omit=()):
+        """Return None."""
         raise HTTPNotImplemented()
 
     def set_cstruct(self, cstruct):
+        """Return None."""
         raise HTTPNotImplemented()
 
 

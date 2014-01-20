@@ -1,3 +1,4 @@
+"""Resouce configuration and default factory."""
 from adhocracy.properties.interfaces import IProperty
 from adhocracy.resources import interfaces
 from adhocracy.utils import (
@@ -50,7 +51,7 @@ def includeme(config):
         meta = {
             "content_name": name,
             "add_view": "add_" + iface.__identifier__,
-            }
+        }
         add_content_type(config, iface.__identifier__,
                          ResourceFactory(iface),
                          factory_type=iface.__identifier__, **meta)

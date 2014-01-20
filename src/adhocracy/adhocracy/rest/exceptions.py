@@ -1,3 +1,4 @@
+"""Rest API exceptions."""
 from cornice.util import _JSONError
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
@@ -10,6 +11,7 @@ import colander
     permission=NO_PERMISSION_REQUIRED,
 )
 def handle_error_400_colander_invalid(error, request):
+    """Return 400 JSON error."""
     errors = []
     for path, description in error.asdict().items():
         errors.append(('body', path, description))
@@ -21,6 +23,7 @@ def handle_error_400_colander_invalid(error, request):
     permission=NO_PERMISSION_REQUIRED,
 )
 def handle_error_500_exception(error, request):
+    """Return 500 JSON error."""
     args = str(error.args)
     msg = getattr(error, "msg", "")
     error = ('internal', args, msg)

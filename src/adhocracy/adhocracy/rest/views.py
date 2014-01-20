@@ -1,3 +1,4 @@
+"""Rest API views."""
 from adhocracy.properties.interfaces import IName
 from adhocracy.resources.interfaces import (
     IResource,
@@ -25,14 +26,17 @@ from substanced.folder import FolderKeyError
 
 def validate_request_with_cornice_schema(schema, request):
         """Validate request data with colander schema.
-           Add errors to request.errors
-           Add validated data to request.validated
+
+        Add errors to request.errors
+        Add validated data to request.validated
+
         """
         schema = CorniceSchema.from_colander(schema)
         validate_colander_schema(schema, request)
 
 
 def validate_put_propertysheet_names(context, request):
+    """Validate propertysheet names."""
     sheets = request.registry.content.resource_propertysheets(
         context, request, onlyeditable=True)
     put_sheets = request.validated.get("data", {})
@@ -44,6 +48,7 @@ def validate_put_propertysheet_names(context, request):
 
 
 def validate_post_propertysheet_names_addables(context, request):
+    """Validate addable propertysheet names."""
     addables = request.registry.content.resource_addable_types(context)
     content_type = request.validated.get("content_type", "")
     if content_type not in addables:
@@ -71,6 +76,7 @@ def validate_post_propertysheet_names_addables(context, request):
     context=IResource
 )
 class ResourceView(object):
+
     """Default view for adhocracy resources."""
 
     validation_map = {'GET': (None, []),
@@ -95,9 +101,10 @@ class ResourceView(object):
             context, request, onlyeditable=True)
 
     def validate_request_data(self, method):
-        """Validates request data.
+        """Validate request data.
 
         Raise 400 error if request.errors is not empty after validation.
+
         """
         schema = self.validation_map[method][0]
         validators = self.validation_map[method][1]
@@ -111,6 +118,12 @@ class ResourceView(object):
 
     @view_config(request_method='OPTIONS')
     def options(self):
+        """HTTP OPTION.
+
+        Return dictionary describing the available request and response
+        data structures.
+
+        """
         cstruct = OPTIONResourceResponseSchema().serialize()
         for sheet in self.sheets_edit:
             cstruct["PUT"]["request_body"]["data"][sheet] = {}
@@ -124,6 +137,11 @@ class ResourceView(object):
 
     @view_config(request_method='GET')
     def get(self):
+        """HTTP GET.
+
+        Return dictionary with resource data structure.
+
+        """
         self.validate_request_data('GET')
         struct = {"data": {}}
         for sheet in self.sheets_view.values():
@@ -135,6 +153,11 @@ class ResourceView(object):
 
     @view_config(request_method='PUT')
     def put(self):
+        """HTTP PUT.
+
+        Return dictionary with PATH of modified resource.
+
+        """
         self.validate_request_data('PUT')
         for name, cstruct in self.request.validated["data"].items():
             self.sheets_edit[name].set_cstruct(cstruct)
@@ -145,6 +168,11 @@ class ResourceView(object):
 
     @view_config(request_method='POST')
     def post(self):
+        """HTTP POST.
+
+        Return dictionary with PATH of new resource.
+
+        """
         #validate request data
         self.validate_request_data('POST')
         #create resource
@@ -172,4 +200,5 @@ class ResourceView(object):
 
 
 def includeme(config):  # pragma: no cover
+    """Run Pyramid configuration."""
     pass

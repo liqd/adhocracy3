@@ -1,3 +1,4 @@
+"""Colander schema extensions."""
 from substanced import schema
 from substanced.objectmap import reference_sourceid_property
 from substanced.schema import IdSet
@@ -8,9 +9,11 @@ import colander
 
 
 class Identifier(colander.SchemaNode):
+
     """Alpha/numeric/_/-/. String.
 
     Example value: blu.ABC_12-3
+
     """
 
     schema_type = colander.String
@@ -18,9 +21,11 @@ class Identifier(colander.SchemaNode):
 
 
 class AbsolutePath(colander.SchemaNode):
-    """Absolute path made with Identifier Strings.
 
-     Example value: /bluaABC/_123/3
+    """Absolute path made with  Identifier Strings.
+
+    Example value: /bluaABC/_123/3
+
     """
 
     schema_type = colander.String
@@ -28,15 +33,23 @@ class AbsolutePath(colander.SchemaNode):
 
 
 class PathSet(IdSet):
+
     """ Colander Type to store object paths.
 
     Serialize to a list of absolute object paths (["/o1/o2", "/o3"]).
     Deserialize to a list of zodb oids [123123, 4324324].
 
     Raise colander.Invalid if path or oid does not exist.
+
     """
 
     def serialize(self, node, value):
+        """Serialize oid to path.
+
+        Return List with paths.
+
+        """
+
         if value is colander.null:
             return value
         self._check_iterable(node, value)
@@ -54,6 +67,11 @@ class PathSet(IdSet):
         return paths
 
     def deserialize(self, node, value):
+        """Deserialize path to oid.
+
+        Return List with oids.
+
+        """
         if value is colander.null:
             return value
         self._check_iterable(node, value)
@@ -72,6 +90,7 @@ class PathSet(IdSet):
 
 
 def get_all_resources(node, context, request):
+    """Return List with all resources."""
     return []
     #FIXME: we need this to make the sdi work
     # interfaces = [node.interfaces]
@@ -85,7 +104,8 @@ def get_all_resources(node, context, request):
 
 
 class ReferenceSetSchemaNode(schema.MultireferenceIdSchemaNode):
-    """Colander SchemaNode to store a set of references"""
+
+    """Colander SchemaNode to store a set of references."""
 
     schema_type = PathSet
 
@@ -97,12 +117,13 @@ class ReferenceSetSchemaNode(schema.MultireferenceIdSchemaNode):
 
     @property
     def property_object(self):
-        """Property object to store reference values"""
+        """Return property object to store reference values."""
 
         reference_type = self.name
         return reference_sourceid_property(reference_type)
 
     def validator(self, node, value):
+        """Validate."""
         context = node.bindings["context"]
         object_map = find_objectmap(context)
         for oid in value:

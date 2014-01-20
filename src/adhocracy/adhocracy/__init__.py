@@ -1,3 +1,4 @@
+"""Setup pyramid wsgi app."""
 from pyramid.config import Configurator
 from pyramid_zodbconn import get_connection
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -8,9 +9,13 @@ import transaction
 
 def root_factory(request, t=transaction, g=get_connection,
                  mark_unfinished_as_finished=False):
-    """ A function which can be used as a Pyramid ``root_factory``.  It
-    accepts a request and returns an instance of the ``Root`` content type."""
-    #FIXME: Fix substanced bug: mark_unfinished_as_finished keyqord is not working
+    """ A function which can be used as a Pyramid ``root_factory``.
+
+    It accepts a request and returns an instance of the ``Root`` content type.
+
+    """
+    #FIXME: Fix substanced bug: mark_unfinished_as_finished keyqord
+    # is not working
     conn = g(request)
     zodb_root = conn.root()
     if not 'app_root' in zodb_root:

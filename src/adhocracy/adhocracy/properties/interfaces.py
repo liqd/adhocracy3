@@ -1,3 +1,4 @@
+"""Interfaces for resource propertysheets."""
 from substanced.schema import (
     NameSchemaNode
 )
@@ -46,8 +47,6 @@ class IProperty(Interface):
     """This propertysheet may not be used to set data."""
 
 
-
-
 class IName(IProperty):
 
     """Human readable resource Identifier, used to build object paths."""
@@ -56,6 +55,8 @@ class IName(IProperty):
 
 
 class NameSchema(colander.Schema):
+
+    """Colander schema for IName."""
 
     name = Identifier(default="", missing=colander.drop)
 
@@ -69,6 +70,8 @@ class INameReadOnly(IName):
 
 class NameReadOnlySchema(colander.Schema):
 
+    """Colander schema for INameReadOnly."""
+
     name = NameSchemaNode(readonly=True, default="", missing=colander.drop)
 
 
@@ -81,6 +84,8 @@ class IPool(IProperty):
 
 
 class PoolSchema(colander.Schema):
+
+    """Colander schema for IPool."""
 
     elements = ReferenceSetSchemaNode(default=[],
                                       missing=colander.drop,
@@ -101,6 +106,8 @@ class IVersionable(IProperty):
 #
 class VersionableSchema(colander.Schema):
 
+    """Colander schema for IVersionable."""
+
     follows = ReferenceSetSchemaNode(default=[],
                                      missing=colander.drop,
                                      interfaces=[IVersionable]
@@ -118,10 +125,13 @@ class VersionableSchema(colander.Schema):
 class IVersions(IProperty):
 
     """Dag for collecting all versions of one Fubel."""
+
     taggedValue("schema", "adhocracy.properties.interfaces.VersionsSchema")
 
 
 class VersionsSchema(colander.Schema):
+
+    """Colander schema for IVersions."""
 
     elements = ReferenceSetSchemaNode(default=[],
                                       missing=colander.drop,
@@ -137,6 +147,8 @@ class ITags(IProperty):
 
 
 class TagsSchema(colander.Schema):
+
+    """Colander schema for ITags."""
 
     elements = ReferenceSetSchemaNode(default=[],
                                       missing=colander.drop,
