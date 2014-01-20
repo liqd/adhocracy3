@@ -100,12 +100,12 @@ export function run() {
             }
 
             function init() {
-                var els : Types.Reference[] = pool.data["P.IPool"].elements;
-                for (var n in els) {
-                    (function(n : number) {
-                        var path : string = els[n].path;
-                        adhCache.get(path, true, (dag) => fetchDocumentHead(n, dag));
-                    })(n);
+                var dagRefs : Types.Reference[] = pool.data["P.IPool"].elements;
+                for (var dagRefIx in dagRefs) {
+                    (function(dagRefIx : number) {
+                        var dagRefPath : string = dagRefs[dagRefIx].path;
+                        adhCache.get(dagRefPath, true, (dag) => fetchDocumentHead(dagRefIx, dag));
+                    })(dagRefIx);
                 }
             }
 
