@@ -43,7 +43,7 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
         if (path in subscriptions) {
             delete subscriptions[path];
         } else {
-            throw "wS: unsubscribe: no subscription for " + path + "!";
+            throw "WS: unsubscribe: no subscription for " + path + "!";
         }
     }
 
