@@ -62,7 +62,7 @@ export interface IService {
 // client)
 interface ICacheItem {
     pristine       : Types.Content;
-    subscriptions  : Object;
+    subscriptions  : Object;  /* { <path> : <callack>, ... } */
     freshName      : () => number;
 }
 
@@ -217,15 +217,9 @@ export function factory(adhHttp        : AdhHttp.IService,
         return (obj) => {
             item.pristine = obj;
 
-            ws.subscribe(path, (obj) => {
+            ws.subscribe(path, () => {
                 if (Object.keys(item.subscriptions).length === 0) {
                     // if no subscriptions exist, drop item from cache.
-
-                    // FIXME: at this point, ws has already retrieved the
-                    // updated obj, and only then do we check whether
-                    // anybody is still interested.  ws should give us the
-                    // choice whether to get the update or drop the
-                    // obsolete item from the cache before that happens.
 
                     ws.unsubscribe(path);
                     cache.remove(path);
@@ -237,8 +231,8 @@ export function factory(adhHttp        : AdhHttp.IService,
 
                     adhHttp.get(path).then((obj) => {
                         item.pristine = obj;
-                        for (var up in item.subscriptions) {
-                            item.subscriptions[up](Util.deepcp(obj));
+                        for (var ix in item.subscriptions) {
+                            item.subscriptions[ix](Util.deepcp(obj));
                         }
                     });
                 }

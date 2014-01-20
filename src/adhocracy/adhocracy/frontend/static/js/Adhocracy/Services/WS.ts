@@ -22,7 +22,7 @@ import AdhHttp = require("Adhocracy/Services/Http");
 var wsuri : string = "ws://" + window.location.host + AdhHttp.jsonPrefix + "?ws=all";
 
 export interface IService {
-    subscribe: (path : string, update : (obj: any) => void) => void;
+    subscribe: (path : string, update : () => void) => void;
     unsubscribe: (path : string) => void;
     destroy: () => void;
 }
@@ -55,7 +55,7 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
             console.log("WS message: " + path);
 
             if (path in subscriptions) {
-                adhHttp.get(path).then(subscriptions[path]);
+                subscriptions[path]();
             }
         };
 
