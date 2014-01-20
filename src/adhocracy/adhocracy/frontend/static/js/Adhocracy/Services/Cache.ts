@@ -8,9 +8,6 @@ import AdhHttp = require("Adhocracy/Services/Http");
 import AdhWS = require("Adhocracy/Services/WS");
 
 
-// FIXME: all comments in this module may be out of sync.  check and, if necessary, rewrite!
-
-
 // cache
 //
 // this module provides an api that lets you
@@ -107,7 +104,7 @@ export function factory(adhHttp        : AdhHttp.IService,
                 ix = registerSubscription(item, updateModel);
             }
 
-            // FIXME: can $q do this more elegantly?
+            // (can $q do this more elegantly?)
             function check() {
                 if (typeof item.pristine === "undefined") {
                     setTimeout(check, tickms);
