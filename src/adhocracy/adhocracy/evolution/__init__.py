@@ -19,15 +19,15 @@ def add_app_root_element(root):
     """Add application root object to the zodb root."""
     logger.info(add_app_root_element.__doc__)
     reg = get_current_registry()
-    if "adhocracy" not in root:
-        root["adhocracy"] = reg.content.create(
-            "adhocracy.resources.interfaces.IPool")
+    if 'adhocracy' not in root:
+        root['adhocracy'] = reg.content.create(
+            'adhocracy.resources.interfaces.IPool')
 
 
 def add_app_root_permissions(root):
     """Set permissions for the application root object."""
     logger.info(add_app_root_permissions.__doc__)
-    app_root = root["adhocracy"]
+    app_root = root['adhocracy']
     acl = get_acl(app_root, [])
     acl.append((Allow, 'system.Everyone', ALL_PERMISSIONS))
     set_acl(app_root, acl)

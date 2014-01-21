@@ -39,7 +39,7 @@ def validate_put_propertysheet_names(context, request):
     """Validate propertysheet names."""
     sheets = request.registry.content.resource_propertysheets(
         context, request, onlyeditable=True)
-    put_sheets = request.validated.get("data", {})
+    put_sheets = request.validated.get('data', {})
     wrong_sheets = put_sheets.keys() - sheets.keys()
     if wrong_sheets:
         error = 'The following propertysheets are mispelled or you do not '\
@@ -50,14 +50,14 @@ def validate_put_propertysheet_names(context, request):
 def validate_post_propertysheet_names_addables(context, request):
     """Validate addable propertysheet names."""
     addables = request.registry.content.resource_addable_types(context)
-    content_type = request.validated.get("content_type", "")
+    content_type = request.validated.get('content_type', '')
     if content_type not in addables:
         error = 'The following resource type is not '\
                 'addable: {iresource} '.format(iresource=content_type)
         request.errors.add('body', 'content_type', error)
     else:
         sheets = addables[content_type]
-        post_sheets = request.validated.get("data", {})
+        post_sheets = request.validated.get('data', {})
         wrong_sheets = set(post_sheets.keys()) - sheets
         if wrong_sheets:
             error = 'The following propertysheets are not allowed for this '\
@@ -126,13 +126,13 @@ class ResourceView(object):
         """
         cstruct = OPTIONResourceResponseSchema().serialize()
         for sheet in self.sheets_edit:
-            cstruct["PUT"]["request_body"]["data"][sheet] = {}
+            cstruct['PUT']['request_body']['data'][sheet] = {}
         for sheet in self.sheets_view:
-            cstruct["GET"]["response_body"]["data"][sheet] = {}
+            cstruct['GET']['response_body']['data'][sheet] = {}
         for type, sheets in self.addables.items():
             sheets = dict([(sheet, {}) for sheet in sheets])
-            post_data = {"content_type": type, "data": sheets}
-            cstruct["POST"]["request_body"].append(post_data)
+            post_data = {'content_type': type, 'data': sheets}
+            cstruct['POST']['request_body'].append(post_data)
         return cstruct
 
     @view_config(request_method='GET')
@@ -143,12 +143,12 @@ class ResourceView(object):
 
         """
         self.validate_request_data('GET')
-        struct = {"data": {}}
+        struct = {'data': {}}
         for sheet in self.sheets_view.values():
             key = sheet.iface.__identifier__
-            struct["data"][key] = sheet.get_cstruct()
-        struct["path"] = resource_path(self.context)
-        struct["content_type"] = self.registry.typeof(self.context)
+            struct['data'][key] = sheet.get_cstruct()
+        struct['path'] = resource_path(self.context)
+        struct['content_type'] = self.registry.typeof(self.context)
         return GETResourceResponseSchema().serialize(struct)
 
     @view_config(request_method='PUT')
@@ -159,11 +159,11 @@ class ResourceView(object):
 
         """
         self.validate_request_data('PUT')
-        for name, cstruct in self.request.validated["data"].items():
+        for name, cstruct in self.request.validated['data'].items():
             self.sheets_edit[name].set_cstruct(cstruct)
         struct = {}
-        struct["path"] = resource_path(self.context)
-        struct["content_type"] = self.registry.typeof(self.context)
+        struct['path'] = resource_path(self.context)
+        struct['content_type'] = self.registry.typeof(self.context)
         return ResourceResponseSchema().serialize(struct)
 
     @view_config(request_method='POST')
@@ -176,26 +176,26 @@ class ResourceView(object):
         #validate request data
         self.validate_request_data('POST')
         #create resource
-        type = self.request.validated["content_type"]
+        type = self.request.validated['content_type']
         resource = self.registry.create(type)
         # add to parent
-        name = self.request.validated["data"].get(IName.__identifier__, {})\
-            .get("name", "")
+        name = self.request.validated['data'].get(IName.__identifier__, {})\
+            .get('name', '')
         if IVersionableFubel.providedBy(resource):
             name = self.context.next_name()
         try:
             name = self.context.check_name(name, self.reserved_names)
         except (FolderKeyError, ValueError):
-                name += "_" + self.context.next_name()
+                name += '_' + self.context.next_name()
         self.context.add(name, resource, send_events=False)
         # store propertysheets
-        for name, cstruct in self.request.validated["data"].items():
+        for name, cstruct in self.request.validated['data'].items():
             self.sheets_edit[name].set_cstruct(cstruct)
         #FIXME use substanced event system
         # response
         struct = {}
-        struct["path"] = resource_path(resource)
-        struct["content_type"] = self.registry.typeof(self.context)
+        struct['path'] = resource_path(resource)
+        struct['content_type'] = self.registry.typeof(self.context)
         return ResourceResponseSchema().serialize(struct)
 
 

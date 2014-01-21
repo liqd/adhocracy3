@@ -25,6 +25,6 @@ def handle_error_400_colander_invalid(error, request):
 def handle_error_500_exception(error, request):
     """Return 500 JSON error."""
     args = str(error.args)
-    msg = getattr(error, "msg", "")
+    msg = getattr(error, 'msg', '')
     error = ('internal', args, msg)
     return _JSONError([error], 500)

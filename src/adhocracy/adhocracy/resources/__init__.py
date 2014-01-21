@@ -20,10 +20,10 @@ class ResourceFactory(object):
     def __init__(self, iface):
         assert iface.isOrExtends(interfaces.IResource)
         taggedvalues = get_all_taggedvalues(iface)
-        self.class_ = resolve(taggedvalues["content_class"])
+        self.class_ = resolve(taggedvalues['content_class'])
         self.resource_iface = iface
-        base_ifaces = taggedvalues["basic_properties_interfaces"]
-        ext_ifaces = taggedvalues["extended_properties_interfaces"]
+        base_ifaces = taggedvalues['basic_properties_interfaces']
+        ext_ifaces = taggedvalues['extended_properties_interfaces']
         self.prop_ifaces = [resolve(i) for i in base_ifaces.union(ext_ifaces)]
         for i in self.prop_ifaces:
             assert i.isOrExtends(IProperty)
@@ -42,15 +42,15 @@ def includeme(config):
 
     """
 
-    config.include("adhocracy.resources.registry")
+    config.include('adhocracy.resources.registry')
 
     ifaces = get_ifaces_from_module(interfaces,
                                     base=interfaces.IResource)
     for iface in ifaces:
-        name = iface.queryTaggedValue("content_name") or iface.__identifier__
+        name = iface.queryTaggedValue('content_name') or iface.__identifier__
         meta = {
-            "content_name": name,
-            "add_view": "add_" + iface.__identifier__,
+            'content_name': name,
+            'add_view': 'add_' + iface.__identifier__,
         }
         add_content_type(config, iface.__identifier__,
                          ResourceFactory(iface),

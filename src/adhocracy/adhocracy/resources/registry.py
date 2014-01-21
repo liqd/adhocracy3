@@ -23,14 +23,14 @@ class ResourceContentRegistry(ContentRegistry):
             sheet = self.registry.getMultiAdapter((context, request, iface),
                                                   IResourcePropertySheet)
             if onlyviewable:
-                permission = getattr(sheet, "permission_view")
+                permission = getattr(sheet, 'permission_view')
                 if not has_permission(permission, context, request):
                     continue
             if onlyeditable:
-                permission = getattr(sheet, "permission_edit")
+                permission = getattr(sheet, 'permission_edit')
                 if not has_permission(permission, context, request):
                     continue
-                if getattr(sheet, "readonly"):
+                if getattr(sheet, 'readonly'):
                     continue
             propertysheets[iface.__identifier__] = sheet
         return propertysheets
@@ -38,7 +38,7 @@ class ResourceContentRegistry(ContentRegistry):
     def resource_addable_types(self, resource):
         """Return a dictionary with addable resource types and iproperties.
 
-        The list is generated base on the "addable_content_interfaces"
+        The list is generated base on the 'addable_content_interfaces'
         taggedValue and interface inheritage.
 
         """
@@ -57,24 +57,24 @@ class ResourceContentRegistry(ContentRegistry):
         # get all addable resource types and map iproperties
         all_addables = []
         if type in all_types:
-            addables_ = all_types[type][1].get("addable_content_interfaces",
+            addables_ = all_types[type][1].get('addable_content_interfaces',
                                                [])
             addables = [resolve(a) for a in addables_]
             for type_ in all_types:
                 iface = all_types[type_][0]
                 tvalues = all_types[type_][1]
                 # get resource type propertysheet interfaces
-                sheet_names = tvalues["basic_properties_interfaces"]\
-                    .union(tvalues["extended_properties_interfaces"])
+                sheet_names = tvalues['basic_properties_interfaces']\
+                    .union(tvalues['extended_properties_interfaces'])
                 sheets_no_readonly = set([])
                 for sheet_name in sheet_names:
                     sheet_iface = resolve(sheet_name)
                     sheet_tvalues = get_all_taggedvalues(sheet_iface)
-                    readonly = sheet_tvalues["readonly"]
+                    readonly = sheet_tvalues['readonly']
                     if not readonly:
                         sheets_no_readonly.add(sheet_name)
                 # check resource type inheritance and add
-                is_implicit = tvalues["is_implicit_addable"]
+                is_implicit = tvalues['is_implicit_addable']
                 for addable in addables:
                     is_extending = iface.extends(addable)
                     is_is = iface is addable
