@@ -11,6 +11,7 @@ from adhocracy.rest.schemas import (
     GETResourceResponseSchema,
     OPTIONResourceResponseSchema,
 )
+from copy import deepcopy
 from cornice.util import json_error
 from cornice.schemas import (
     validate_colander_schema,
@@ -124,7 +125,8 @@ class ResourceView(object):
         data structures.
 
         """
-        cstruct = OPTIONResourceResponseSchema().serialize()
+        cstruct_singleton = OPTIONResourceResponseSchema().serialize()
+        cstruct = deepcopy(cstruct_singleton)
         for sheet in self.sheets_edit:
             cstruct['PUT']['request_body']['data'][sheet] = {}
         for sheet in self.sheets_view:
