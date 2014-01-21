@@ -14,10 +14,10 @@ class HandleError400ColanderInvalidUnitTest(unittest.TestCase):
         from cornice.util import _JSONError
         import json
         request = testing.DummyRequest()
-        invalid0 = colander.SchemaNode(typ=colander.String(), name="parent0",
-                                       msg="msg_parent")
-        invalid1 = colander.SchemaNode(typ=colander.String(), name="child1")
-        invalid2 = colander.SchemaNode(typ=colander.String(), name="child2")
+        invalid0 = colander.SchemaNode(typ=colander.String(), name='parent0',
+                                       msg='msg_parent')
+        invalid1 = colander.SchemaNode(typ=colander.String(), name='child1')
+        invalid2 = colander.SchemaNode(typ=colander.String(), name='child2')
         error0 = colander.Invalid(invalid0)
         error1 = colander.Invalid(invalid1)
         error2 = colander.Invalid(invalid2)
@@ -28,8 +28,8 @@ class HandleError400ColanderInvalidUnitTest(unittest.TestCase):
 
         assert isinstance(inst, _JSONError)
         assert inst.status == '400 Bad Request'
-        wanted = {"status": "error",
-                  "errors": [["body", "parent0.child1.child2", ""]]}
+        wanted = {'status': 'error',
+                  'errors': [['body', 'parent0.child1.child2', '']]}
         assert json.loads(inst.body.decode()) == wanted
 
 
@@ -43,12 +43,12 @@ class HandleError500ExceptionUnitTest(unittest.TestCase):
         from cornice.util import _JSONError
         import json
         request = testing.DummyRequest()
-        error = Exception("arg1")
+        error = Exception('arg1')
 
         inst = self.make_one(error, request)
 
         assert isinstance(inst, _JSONError)
         assert inst.status == '500 Internal Server Error'
-        wanted = {"status": "error",
-                  "errors": [["internal", "('arg1',)", ""]]}
+        wanted = {'status': 'error',
+                  'errors': [['internal', '('arg1',)', '']]}
         assert json.loads(inst.body.decode()) == wanted

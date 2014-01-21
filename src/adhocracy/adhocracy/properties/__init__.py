@@ -31,17 +31,17 @@ class ResourcePropertySheetAdapter(PropertySheet):
     """Read interface.."""
 
     def __init__(self, context, request, iface):
-        assert hasattr(context, "__setitem__")
+        assert hasattr(context, '__setitem__')
         assert iface.isOrExtends(interfaces.IProperty)
         self.context = context
         self.request = request
         self.iface = iface
         taggedvalues = get_all_taggedvalues(iface)
-        self.key = taggedvalues.get("key") or iface.__identifier__
-        self.permission_view = taggedvalues["permission_view"]
-        self.permission_edit = taggedvalues["permission_edit"]
-        self.readonly = taggedvalues["readonly"]
-        schema_class = resolve(taggedvalues["schema"])
+        self.key = taggedvalues.get('key') or iface.__identifier__
+        self.permission_view = taggedvalues['permission_view']
+        self.permission_edit = taggedvalues['permission_edit']
+        self.readonly = taggedvalues['readonly']
+        schema_class = resolve(taggedvalues['schema'])
         schema_obj = schema_class()
         self.schema = schema_obj.bind(context=context, request=request)
         self._objectmap = find_objectmap(self.context)
@@ -51,7 +51,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
 
     @property
     def _data(self):
-        if not hasattr(self.context, "_propertysheets"):
+        if not hasattr(self.context, '_propertysheets'):
             self.context._propertysheets = PersistentMapping()
         if self.key not in self.context._propertysheets:
             self.context._propertysheets[self.key] = PersistentMapping()
@@ -63,7 +63,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         for child in self.schema:
             if isinstance(child, ReferenceSetSchemaNode):
                 keyname = child.name
-                reftype = "{iface}:{keyname}"
+                reftype = '{iface}:{keyname}'
                 refs[keyname] = reftype.format(iface=self.iface.__identifier__,
                                                keyname=keyname)
         return refs
@@ -72,8 +72,8 @@ class ResourcePropertySheetAdapter(PropertySheet):
         """Return: read interface."""
         # fet default values
         cstruct_default = self.schema.serialize()
-        # default == "" is ignored FIXME: this is  ugly
-        items_empty_strs = [x for x in cstruct_default.items() if x[1] == ""]
+        # default == '' is ignored FIXME: this is  ugly
+        items_empty_strs = [x for x in cstruct_default.items() if x[1] == '']
         struct = self.schema.deserialize(cstruct_default)
         struct.update(items_empty_strs)
         # merge stored values with default values
@@ -105,7 +105,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
     def set_cstruct(self, cstruct):
         """Return: read interface."""
         omit = [child.name for child in self.schema
-                if getattr(child, "readonly", False)]
+                if getattr(child, 'readonly', False)]
         struct = self.schema.deserialize(cstruct)
         self.set(struct, omit=omit)
 
@@ -128,7 +128,7 @@ class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
     def get(self):
         """Return data struct."""
         struct = super(PoolPropertySheetAdapter, self).get()
-        struct["elements"] = self._objectmap.pathlookup(self.context,
+        struct['elements'] = self._objectmap.pathlookup(self.context,
                                                         depth=1,
                                                         include_origin=False)
         return struct

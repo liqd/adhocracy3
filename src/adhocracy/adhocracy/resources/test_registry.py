@@ -101,7 +101,7 @@ class TestResourceContentRegistry(unittest.TestCase):
     def test_propertysheets_valid_with_sheets_onlyeditable_readonly(self):
         from adhocracy.properties import ResourcePropertySheetAdapter
         inst = self._make_one(self.config.registry)
-        IPropertyA.setTaggedValue("readonly", True)
+        IPropertyA.setTaggedValue('readonly', True)
         context = testing.DummyResource(__provides__=(IResource, IPropertyA))
         _register_propertysheet_adapter(self.config, context, IPropertyA,
                                         ResourcePropertySheetAdapter)
@@ -113,8 +113,8 @@ class TestResourceContentRegistry(unittest.TestCase):
     def test_addable_types_valid_context_is_not_iresource(self):
         inst = self._make_one()
         context = testing.DummyResource()
-        context.__factory_type__ = "not_resolveable"
-        _register_content_type(inst, "not_resolveable")
+        context.__factory_type__ = 'not_resolveable'
+        _register_content_type(inst, 'not_resolveable')
 
         addables = inst.resource_addable_types(context)
 
@@ -136,7 +136,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         context = testing.DummyResource(__provides__=IResourceB)
         context.__factory_type__ = IResourceB.__identifier__
         _register_content_type(inst, IResourceB.__identifier__)
-        IResourceB.setTaggedValue("addable_content_interfaces", [])
+        IResourceB.setTaggedValue('addable_content_interfaces', [])
 
         addables = inst.resource_addable_types(context)
 
@@ -148,11 +148,11 @@ class TestResourceContentRegistry(unittest.TestCase):
         context.__factory_type__ = IResourceA.__identifier__
         _register_content_type(inst, IResourceA.__identifier__)
         _register_content_type(inst, IResourceB.__identifier__)
-        IResourceA.setTaggedValue("addable_content_interfaces",
+        IResourceA.setTaggedValue('addable_content_interfaces',
                                   [IResourceB.__identifier__])
-        IResourceB.setTaggedValue("basic_properties_interfaces",
+        IResourceB.setTaggedValue('basic_properties_interfaces',
                                   set([IProperty.__identifier__]))
-        IResourceB.setTaggedValue("extended_properties_interfaces",
+        IResourceB.setTaggedValue('extended_properties_interfaces',
                                   set([IPropertyA.__identifier__]))
 
         addables = inst.resource_addable_types(context)
@@ -167,13 +167,13 @@ class TestResourceContentRegistry(unittest.TestCase):
         context.__factory_type__ = IResourceA.__identifier__
         _register_content_type(inst, IResourceA.__identifier__)
         _register_content_type(inst, IResourceB.__identifier__)
-        IResourceA.setTaggedValue("addable_content_interfaces",
+        IResourceA.setTaggedValue('addable_content_interfaces',
                                   [IResourceB.__identifier__])
-        IResourceB.setTaggedValue("basic_properties_interfaces",
+        IResourceB.setTaggedValue('basic_properties_interfaces',
                                   set([IProperty.__identifier__]))
-        IResourceB.setTaggedValue("extended_properties_interfaces",
+        IResourceB.setTaggedValue('extended_properties_interfaces',
                                   set([IPropertyA.__identifier__]))
-        IPropertyA.setTaggedValue("readonly", True)
+        IPropertyA.setTaggedValue('readonly', True)
 
         addables = inst.resource_addable_types(context)
 
@@ -186,9 +186,9 @@ class TestResourceContentRegistry(unittest.TestCase):
         context.__factory_type__ = IResourceA.__identifier__
         _register_content_type(inst, IResourceA.__identifier__)
         _register_content_type(inst, IResourceBA.__identifier__)
-        IResourceA.setTaggedValue("addable_content_interfaces",
+        IResourceA.setTaggedValue('addable_content_interfaces',
                                   [IResourceA.__identifier__])
-        IResourceBA.setTaggedValue("is_implicit_addable", True)
+        IResourceBA.setTaggedValue('is_implicit_addable', True)
         addables = inst.resource_addable_types(context)
 
         wanted = [IResourceA.__identifier__, IResourceBA.__identifier__]
@@ -200,9 +200,9 @@ class TestResourceContentRegistry(unittest.TestCase):
         context.__factory_type__ = IResourceA.__identifier__
         _register_content_type(inst, IResourceA.__identifier__)
         _register_content_type(inst, IResourceBA.__identifier__)
-        IResourceA.setTaggedValue("addable_content_interfaces",
+        IResourceA.setTaggedValue('addable_content_interfaces',
                                   [IResourceA.__identifier__])
-        IResourceBA.setTaggedValue("is_implicit_addable", False)
+        IResourceBA.setTaggedValue('is_implicit_addable', False)
 
         addables = inst.resource_addable_types(context)
 
@@ -212,7 +212,7 @@ class TestResourceContentRegistry(unittest.TestCase):
     def test_includeme(self):
         from adhocracy.resources.registry import includeme
         from adhocracy.resources.registry import ResourceContentRegistry
-        self.config.include("substanced.content")
+        self.config.include('substanced.content')
         self.config.commit()
         includeme(self.config)
         registry = self.config.registry.content

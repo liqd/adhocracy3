@@ -8,16 +8,16 @@ class ResourceResponseSchema(colander.Schema):
 
     """Data structure for responses of Resource requests."""
 
-    content_type = colander.SchemaNode(colander.String(), default="")
+    content_type = colander.SchemaNode(colander.String(), default='')
 
-    path = AbsolutePath(default="")
+    path = AbsolutePath(default='')
 
 
 class GETResourceResponseSchema(ResourceResponseSchema):
 
     """Data structure for Resource GET requests."""
 
-    data = colander.SchemaNode(colander.Mapping(unknown="preserve"),
+    data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
                                default={})
 
 
@@ -25,7 +25,7 @@ class PUTResourceRequestSchema(colander.Schema):
 
     """Data structure for Resource PUT requests."""
 
-    data = colander.SchemaNode(colander.Mapping(unknown="preserve"),
+    data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
                                default={})
 
 
@@ -33,7 +33,7 @@ class POSTResourceRequestSchema(PUTResourceRequestSchema):
 
     """Data structure for Resource POST requests."""
 
-    content_type = colander.SchemaNode(colander.String(), default="")
+    content_type = colander.SchemaNode(colander.String(), default='')
 
 
 class POSTResourceRequestSchemaList(colander.List):
