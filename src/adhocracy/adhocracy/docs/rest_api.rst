@@ -110,13 +110,13 @@ documentation.
 
 Note: you can already make propertysheets read-only with the taggedValue "readonly"
 
-*,    read-only, mandatory  => error
-GET,  *,         *          => may be there (for structure selection)
-*,    read-only             => must not be there
+\*,    read-only, mandatory  => error
+GET,  \*,         *          => may be there (for structure selection)
+\*,    read-only             => must not be there
 POST,            mandatory  => must be there
 PUT,             mandatory  => may be there
-*,               mandatory  => may be there
-*,               *          => may be there
+\*,               mandatory  => may be there
+\*,               *          => may be there
 
 Both flags only work on a single node in the json tree, not on its
 subtrees.
