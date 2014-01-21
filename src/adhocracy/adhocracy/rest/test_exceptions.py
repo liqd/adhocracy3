@@ -50,5 +50,5 @@ class HandleError500ExceptionUnitTest(unittest.TestCase):
         assert isinstance(inst, _JSONError)
         assert inst.status == '500 Internal Server Error'
         wanted = {'status': 'error',
-                  'errors': [['internal', '('arg1',)', '']]}
+                  'errors': [['internal', "('arg1',)", '']]}
         assert json.loads(inst.body.decode()) == wanted
