@@ -110,7 +110,7 @@ class ValidateRequestWithCorniceSchema(unittest.TestCase):
 
     def test_valid_request_body(self):
         schema = CountSchema
-        self.request.body = '{'count': '1'}'
+        self.request.body = '{"count": "1"}'
         self.make_one(schema, self.request)
         wanted = {'count': 1}
         assert self.request.validated == wanted
@@ -131,14 +131,14 @@ class ValidateRequestWithCorniceSchema(unittest.TestCase):
 
     def test_non_valid_request_body(self):
         schema = CountSchema
-        self.request.body = '{'count': 'wrong_value'}'
+        self.request.body = '{"count": "wrong_value"}'
         self.make_one(schema, self.request)
         assert self.request.errors != []
 
     def test_non_valid_remove_validated_dict(self):
         schema = CountSchema
         self.request.validated == {'secret_data': 'buh'}
-        self.request.body = '{'count': 'wrong_value'}'
+        self.request.body = '{"count": "wrong_value"}'
         self.make_one(schema, self.request)
         assert self.request.validated == {}
 
@@ -334,7 +334,7 @@ class ResourceViewUnitTest(unittest.TestCase):
 
     def test_put_valid_no_propertysheets(self):
         self.request.registry.content.resource_propertysheets.return_value = {}
-        self.request.body = '{'content_type': 'X', 'data': {}}'
+        self.request.body = '{"content_type": "X", "data": {}}'
 
         inst = self.make_one(self.context, self.request)
         response = inst.put()
@@ -404,8 +404,8 @@ class ResourceViewUnitTest(unittest.TestCase):
                                                          propertysheet}
         registry.resource_addable_types.return_value = {'iresourcex':
                                                         set(['ipropertyx'])}
-        self.request.body = '{'content_type': 'iresourcex', 'data':'\
-                            '{'ipropertyx': {'a': 'b'}}}'
+        self.request.body = '{"content_type": "iresourcex", "data":'\
+                            '{"ipropertyx": {"a": "b"}}}'
 
         inst = self.make_one(self.context, self.request)
         with pytest.raises(colander.Invalid):
