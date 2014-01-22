@@ -45,6 +45,8 @@ class IProperty(Interface):
     """Permission to edit this data. Subtype should override."""
     taggedValue('readonly', False)
     """This propertysheet may not be used to set data."""
+    taggedValue('createmandatory', False)
+    """This propertysheet is mandatory when creating a new resource."""
 
 
 class IName(IProperty):
@@ -102,7 +104,7 @@ class IVersionable(IProperty):
 
 
 # class IForkable(IVersionable):
-# #     """Marker interface representing a forkable node with version data"""
+# """Marker interface representing a forkable node with version data"""
 #
 class VersionableSchema(colander.Schema):
 

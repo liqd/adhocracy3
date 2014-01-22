@@ -32,6 +32,12 @@ class IPropertyB(IProperty):
     taggedValue('schema', 'adhocracy.properties.test_init.CountSchema')
 
 
+class IPropertyC(IProperty):
+    taggedValue('schema', 'adhocracy.properties.test_init.CountSchema')
+    taggedValue('readonly', True)
+    taggedValue('createmandatory', True)
+
+
 class CountSchema(colander.MappingSchema):
     count = colander.SchemaNode(colander.Int(),
                                 default=0,
@@ -98,10 +104,15 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         assert inst.request == request
         assert inst.permission_view == 'view'
         assert inst.permission_edit == 'edit'
-        assert inst.readonly == False
+        assert inst.readonly is False
+        assert inst.createmandatory is False
         assert isinstance(inst.schema, CountSchema)
         assert inst.key == IPropertyB.__identifier__
         assert verifyObject(IResourcePropertySheet, inst) is True
+
+    def test_create_non_valid_set_readonly_or_createmandatory(self):
+        with pytest.raises(AssertionError):
+            self.make_one(DummyResource(), None, IPropertyC)
 
     def test_create_non_valid_non_mapping_context(self):
         with pytest.raises(AssertionError):

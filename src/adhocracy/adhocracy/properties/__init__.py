@@ -33,6 +33,8 @@ class ResourcePropertySheetAdapter(PropertySheet):
     def __init__(self, context, request, iface):
         assert hasattr(context, '__setitem__')
         assert iface.isOrExtends(interfaces.IProperty)
+        assert (not (iface.queryTaggedValue('createmandatory', False)
+                and iface.queryTaggedValue('readonly', False)))
         self.context = context
         self.request = request
         self.iface = iface
@@ -41,6 +43,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         self.permission_view = taggedvalues['permission_view']
         self.permission_edit = taggedvalues['permission_edit']
         self.readonly = taggedvalues['readonly']
+        self.createmandatory = taggedvalues['createmandatory']
         schema_class = resolve(taggedvalues['schema'])
         schema_obj = schema_class()
         self.schema = schema_obj.bind(context=context, request=request)
