@@ -68,12 +68,12 @@ class CorniceDummyRequest(testing.DummyRequest):
         self.errors = Errors(self)
 
 
-@patch('adhocracy.resources.registry.ResourceContentRegistry', autospec=True)
+@patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
 def make_mock_resource_registry(mock_registry=None):
     return mock_registry.return_value
 
 
-@patch('adhocracy.resources.registry.ResourceContentRegistry', autospec=True)
+@patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
 def make_mock_resource_registry_with_mock_type(iresource, mock_registry=None):
     registry = mock_registry.return_value
     registry.typeof.return_value = iresource.__identifier__
@@ -90,7 +90,14 @@ def make_mock_propertysheet(iproperty, dummy_propertysheet=None):
     propertysheet.get_cstruct.return_value = cstruct
     propertysheet.permission_view = 'view'
     propertysheet.permission_edit = 'edit'
+    propertysheet.readonly = False
+    propertysheet.createmandatory = False
     return propertysheet
+
+
+class DummyPropertysheet(Dummy):
+    readonly = False
+    createmandatory = False
 
 
 ##########
@@ -157,32 +164,44 @@ class ValidatePUTPropertysheetNamesUnitTest(unittest.TestCase):
         from .views import validate_put_propertysheet_names
         validate_put_propertysheet_names(context, request)
 
-    def test_valid_no_propertysheets(self):
-        propertysheets = self.request.registry.content.resource_propertysheets
-        propertysheets.return_value = {}
+    def test_valid_no_sheets(self):
+        sheets = self.request.registry.content.resource_sheets
+        sheets.return_value = {}
         self.request.validated = {'data': {}}
         self.make_one(self.context, self.request)
         assert self.request.errors == []
 
-    def test_valid_with_propertysheets(self):
-        self.request.registry.content.resource_propertysheets.return_value =\
-            {'propertysheet': Dummy()}
-        self.request.validated = {'data': {'propertysheet': {'x': 'y'}}}
+    def test_valid_with_sheets(self):
+        self.request.registry.content.resource_sheets.return_value =\
+            {'sheet': DummyPropertysheet()}
+        self.request.validated = {'data': {'sheet': {'x': 'y'}}}
+        self.make_one(self.context, self.request)
+
+        self.request.registry.content.resource_sheets.assert_called_with(
+            self.context, self.request, onlyeditable=True)
+        assert self.request.errors == []
+
+    def test_valid_with_sheets_missing(self):
+        self.request.registry.content.resource_sheets.return_value =\
+            {'sheet': DummyPropertysheet(), 'sheetB': DummyPropertysheet()}
+        self.request.validated = {'data': {'sheet': {'x': 'y'}}}
         self.make_one(self.context, self.request)
         assert self.request.errors == []
 
-    def test_non_valid_with_propertysheets_wrong_name(self):
-        self.request.registry.content.resource_propertysheets.return_value =\
-            {'propertysheet': Dummy()}
-        self.request.validated = {'data': {'wrongname': {'x': 'y'}}}
+    def test_valid_with_sheets_missing_createmandatory(self):
+        sheets = {'sheet': DummyPropertysheet(),
+                  'sheetB': DummyPropertysheet()}
+        sheets['sheetB'].createmandatory = True
+        self.request.registry.content.resource_sheets.return_value =\
+            sheets
+        self.request.validated = {'data': {'sheet': {'x': 'y'}}}
         self.make_one(self.context, self.request)
-        assert self.request.errors != []
+        assert self.request.errors == []
 
-    def test_non_valid_with_propertysheets_no_permission(self):
-        self.request.registry.content.resource_propertysheets.return_value =\
-            {'propertysheet': Dummy()}
+    def test_non_valid_with_sheets_wrong_name(self):
+        self.request.registry.content.resource_sheets.return_value =\
+            {'sheet': DummyPropertysheet()}
         self.request.validated = {'data': {'wrongname': {'x': 'y'}}}
-        self.config.testing_securitypolicy(userid='reader', permissive=False)
         self.make_one(self.context, self.request)
         assert self.request.errors != []
 
@@ -198,13 +217,14 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
         self.request = request
 
     def make_one(self, context, request):
-        from .views import validate_post_propertysheet_names_addables
-        validate_post_propertysheet_names_addables(context, request)
+        from .views import validate_post_propertysheet_names_and_resource_type
+        validate_post_propertysheet_names_and_resource_type(context, request)
 
-    def test_valid(self):
+    def test_valid_optional(self):
         registry = self.request.registry.content
-        registry.resource_addable_types.return_value = {'iresourcex':
-                                                        set(['ipropertyx'])}
+        registry.resource_addables.return_value = {'iresourcex': {
+            'sheets_mandatory': [],
+            'sheets_optional': ['ipropertyx']}}
         self.request.validated = {'content_type': 'iresourcex',
                                   'data': {'ipropertyx': {'a': 'b'}}}
 
@@ -212,10 +232,23 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
 
         assert self.request.errors == []
 
-    def test_non_valid_wrong_iresource(self):
+    def test_valid_mandatory(self):
         registry = self.request.registry.content
-        registry.resource_addable_types.return_value = {'iresourcex':
-                                                        set(['ipropertyx'])}
+        registry.resource_addables.return_value = {'iresourcex': {
+            'sheets_optional': [],
+            'sheets_mandatory': ['ipropertyx']}}
+        self.request.validated = {'content_type': 'iresourcex',
+                                  'data': {'ipropertyx': {'a': 'b'}}}
+
+        self.make_one(self.context, self.request)
+
+        assert self.request.errors == []
+
+    def test_non_valid_wrong_content_type(self):
+        registry = self.request.registry.content
+        registry.resource_addables.return_value = {'iresourcex': {
+            'sheets_optional': [],
+            'sheets_mandatory': ['ipropertyx']}}
         self.request.validated = {'content_type': 'wrong_iresource',
                                   'data': {'ipropertyx': {'a': 'b'}}}
 
@@ -223,10 +256,11 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
 
         assert self.request.errors != []
 
-    def test_non_valid_wrong_iproperty(self):
+    def test_non_valid_wrong_sheet(self):
         registry = self.request.registry.content
-        registry.resource_addable_types.return_value = {'iresourcex':
-                                                        set(['ipropertyx'])}
+        registry.resource_addables.return_value = {'iresourcex': {
+            'sheets_optional': [],
+            'sheets_mandatory': ['ipropertyx']}}
         self.request.validated = {'content_type': 'iresourcex',
                                   'data': {'wrong_iproperty': {'a': 'b'}}}
 
@@ -234,20 +268,17 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
 
         assert self.request.errors != []
 
-    def test_non_valid_missing_iproperty(self):
+    def test_non_valid_missing_sheet_mandatory(self):
         registry = self.request.registry.content
-        registry.resource_addable_types.return_value = {'iresourcex':
-                                                        set(['ipropertyx',
-                                                             'ipropertyy'])}
+        registry.resource_addables.return_value = {'iresourcex': {
+            'sheets_optional': ['propertyy'],
+            'sheets_mandatory': ['ipropertyx']}}
         self.request.validated = {'content_type': 'iresourcex',
-                                  'data': {'ipropertyx': {'a': 'b'}}}
+                                  'data': {'ipropertyy': {'a': 'b'}}}
 
         self.make_one(self.context, self.request)
 
         assert self.request.errors != []
-
-    #FIXME:  how to find out what iproperties are needed for posting?
-    #        maybe mark iproperty 'readonly' or 'addable'?
 
 
 # FIXME: split View in subclasses?
@@ -282,8 +313,8 @@ class ResourceViewUnitTest(unittest.TestCase):
 
     def test_options_valid_no_propertysheets_and_addables(self):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-        self.request.registry.content.resource_propertysheets.return_value = {}
-        self.request.registry.content.resource_addable_types.return_value = {}
+        self.request.registry.content.resource_sheets.return_value = {}
+        self.request.registry.content.resource_addables.return_value = {}
 
         inst = self.make_one(self.context, self.request)
         response = inst.options()
@@ -293,23 +324,26 @@ class ResourceViewUnitTest(unittest.TestCase):
 
     def test_options_valid_with_propertysheets_and_addables(self):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-        self.request.registry.content.resource_propertysheets.return_value = {
-            'propertyx': Dummy()}
-        self.request.registry.content.resource_addable_types.return_value = {
-            'resourcex': set(['propertyx'])}
+        self.request.registry.content.resource_sheets.return_value = {
+            'ipropertyx': Dummy()}
+        self.request.registry.content.resource_addables.return_value = {
+            'iresourcex': {'sheets_mandatory': [],
+                           'sheets_optional': ['ipropertyx']}}
+
         inst = self.make_one(self.context, self.request)
         response = inst.options()
 
         wanted = OPTIONResourceResponseSchema().serialize()
-        wanted['PUT']['request_body'] = {'data': {'propertyx': {}}}
-        wanted['GET']['response_body']['data']['propertyx'] = {}
-        wanted['POST']['request_body'] = [{'content_type': 'resourcex',
-                                           'data': {'propertyx': {}}}]
+        wanted['PUT']['request_body'] = {'data': {'ipropertyx': {}}}
+        wanted['GET']['response_body']['data']['ipropertyx'] = {}
+        wanted['POST']['request_body'] = [{'content_type': 'iresourcex',
+                                           'data': {'ipropertyx': {}}}]
+
         assert wanted == response
 
     def test_get_valid_no_propertysheets(self):
         from adhocracy.rest.schemas import GETResourceResponseSchema
-        self.request.registry.content.resource_propertysheets.return_value = {}
+        self.request.registry.content.resource_sheets.return_value = {}
 
         inst = self.make_one(self.context, self.request)
         response = inst.get()
@@ -322,7 +356,7 @@ class ResourceViewUnitTest(unittest.TestCase):
 
     def test_get_valid_with_propertysheets(self):
         propertysheet = make_mock_propertysheet(IPropertyB)
-        self.request.registry.content.resource_propertysheets.return_value = {
+        self.request.registry.content.resource_sheets.return_value = {
             IPropertyB.__identifier__: propertysheet}
 
         inst = self.make_one(self.context, self.request)
@@ -333,7 +367,7 @@ class ResourceViewUnitTest(unittest.TestCase):
         assert wanted == response['data']
 
     def test_put_valid_no_propertysheets(self):
-        self.request.registry.content.resource_propertysheets.return_value = {}
+        self.request.registry.content.resource_sheets.return_value = {}
         self.request.body = '{"content_type": "X", "data": {}}'
 
         inst = self.make_one(self.context, self.request)
@@ -345,7 +379,7 @@ class ResourceViewUnitTest(unittest.TestCase):
     def test_put_valid_with_propertysheets(self):
         propertysheet = make_mock_propertysheet(IPropertyB)
         propertysheet.set_cstruct.return_value = True
-        self.request.registry.content.resource_propertysheets.return_value = {
+        self.request.registry.content.resource_sheets.return_value = {
             IPropertyB.__identifier__: propertysheet}
         body = json.dumps({'content_type': IResource.__identifier__,
                            'data': {IPropertyB.__identifier__: {'x': 'y'}}})
@@ -360,7 +394,7 @@ class ResourceViewUnitTest(unittest.TestCase):
 
     def test_put_non_valid_with_propertysheets_raise_invalid(self):
         propertysheet = make_mock_propertysheet(IPropertyB)
-        self.request.registry.content.resource_propertysheets.return_value = {
+        self.request.registry.content.resource_sheets.return_value = {
             IPropertyB.__identifier__: propertysheet}
         body = json.dumps({'content_type': IResource.__identifier__,
                            'data': {IPropertyB.__identifier__: {'x': 'y'}}})
@@ -378,10 +412,11 @@ class ResourceViewUnitTest(unittest.TestCase):
         propertysheet.set_cstruct.return_value = True
         registry = self.request.registry.content
         registry.create.return_value = testing.DummyResource()
-        registry.resource_propertysheets.return_value =\
+        registry.resource_sheets.return_value =\
             {IName.__identifier__: propertysheet}
-        registry.resource_addable_types.return_value =\
-            {'iresourcex': set([IName.__identifier__])}
+        registry.resource_addables.return_value = {'iresourcex': {
+            'sheets_mandatory': [],
+            'sheets_optional': [IName.__identifier__]}}
         body = {'content_type': 'iresourcex',
                 'data': {IName.__identifier__: {'name': 'child'}}}
         self.request.body = json.dumps(body)
@@ -400,10 +435,10 @@ class ResourceViewUnitTest(unittest.TestCase):
         propertysheet.set_cstruct.side_effect = colander.Invalid(invalid_node)
         registry = self.request.registry.content
         registry.create.return_value = testing.DummyResource()
-        registry.resource_propertysheets.return_value = {'ipropertyx':
-                                                         propertysheet}
-        registry.resource_addable_types.return_value = {'iresourcex':
-                                                        set(['ipropertyx'])}
+        registry.resource_sheets.return_value = {'ipropertyx': propertysheet}
+        registry.resource_addables.return_value = {'iresourcex': {
+            'sheets_mandatory': [],
+            'sheets_optional': ['ipropertyx']}}
         self.request.body = '{"content_type": "iresourcex", "data":'\
                             '{"ipropertyx": {"a": "b"}}}'
 

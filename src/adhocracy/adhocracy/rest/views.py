@@ -37,38 +37,39 @@ def validate_request_with_cornice_schema(schema, request):
 
 
 def validate_put_propertysheet_names(context, request):
-    """Validate propertysheet names."""
-    sheets = request.registry.content.resource_propertysheets(
+    """Validate propertysheet names for put requests."""
+    sheets = request.registry.content.resource_sheets(
         context, request, onlyeditable=True)
-    put_sheets = request.validated.get('data', {})
-    wrong_sheets = put_sheets.keys() - sheets.keys()
+    puted = request.validated.get('data', {}).keys()
+    wrong_sheets = set(puted) - set(sheets)
     if wrong_sheets:
         error = 'The following propertysheets are mispelled or you do not '\
                 'have the edit permission: {names}'.format(names=wrong_sheets)
         request.errors.add('body', 'data', error)
 
 
-def validate_post_propertysheet_names_addables(context, request):
-    """Validate addable propertysheet names."""
-    addables = request.registry.content.resource_addable_types(context)
+def validate_post_propertysheet_names_and_resource_type(context, request):
+    """Validate addable propertysheet names for post requests."""
+    addables = request.registry.content.resource_addables(context, request)
     content_type = request.validated.get('content_type', '')
     if content_type not in addables:
         error = 'The following resource type is not '\
                 'addable: {iresource} '.format(iresource=content_type)
         request.errors.add('body', 'content_type', error)
     else:
-        sheets = addables[content_type]
-        post_sheets = request.validated.get('data', {})
-        wrong_sheets = set(post_sheets.keys()) - sheets
+        optional = addables[content_type]['sheets_optional']
+        mandatory = addables[content_type]['sheets_mandatory']
+        posted = request.validated.get('data', {}).keys()
+        wrong_sheets = set(posted) - set(optional + mandatory)
         if wrong_sheets:
             error = 'The following propertysheets are not allowed for this '\
                     'resource type or mispelled: {names}'.format(names=
                                                                  wrong_sheets)
             request.errors.add('body', 'data', error)
-        missing_sheets = sheets - set(post_sheets.keys())
+        missing_sheets = set(mandatory) - set(posted)
         if missing_sheets:
-            error = 'The following propertysheets are required to create this'\
-                    ' resource: {names}'.format(names=missing_sheets)
+            error = 'The following propertysheets are mandatory to create '\
+                    'this resource: {names}'.format(names=missing_sheets)
             request.errors.add('body', 'data', error)
 
 
@@ -80,13 +81,14 @@ class ResourceView(object):
 
     """Default view for adhocracy resources."""
 
-    validation_map = {'GET': (None, []),
-                      'OPTION': (None, []),
-                      'PUT': (PUTResourceRequestSchema,
-                              [validate_put_propertysheet_names]),
-                      'POST': (POSTResourceRequestSchema,
-                               [validate_post_propertysheet_names_addables]),
-                      }
+    validation_map = \
+        {'GET': (None, []),
+         'OPTION': (None, []),
+         'PUT': (PUTResourceRequestSchema,
+                 [validate_put_propertysheet_names]),
+         'POST': (POSTResourceRequestSchema,
+                  [validate_post_propertysheet_names_and_resource_type])
+         }
     reserved_names = []
 
     def __init__(self, context, request):
@@ -94,12 +96,12 @@ class ResourceView(object):
         self.request = request
         registry = request.registry.content
         self.registry = registry
-        self.addables = registry.resource_addable_types(context)
-        self.sheets_all = registry.resource_propertysheets(context, request)
-        self.sheets_view = registry.resource_propertysheets(
-            context, request, onlyviewable=True)
-        self.sheets_edit = registry.resource_propertysheets(
-            context, request, onlyeditable=True)
+        self.addables = registry.resource_addables(context, request)
+        self.sheets_all = registry.resource_sheets(context, request)
+        self.sheets_view = registry.resource_sheets(context, request,
+                                                    onlyviewable=True)
+        self.sheets_edit = registry.resource_sheets(context, request,
+                                                    onlyeditable=True)
 
     def validate_request_data(self, method):
         """Validate request data.
@@ -132,8 +134,9 @@ class ResourceView(object):
         for sheet in self.sheets_view:
             cstruct['GET']['response_body']['data'][sheet] = {}
         for type, sheets in self.addables.items():
-            sheets = dict([(sheet, {}) for sheet in sheets])
-            post_data = {'content_type': type, 'data': sheets}
+            names = sheets['sheets_optional'] + sheets['sheets_mandatory']
+            sheets_dict = dict([(s, {}) for s in names])
+            post_data = {'content_type': type, 'data': sheets_dict}
             cstruct['POST']['request_body'].append(post_data)
         return cstruct
 
