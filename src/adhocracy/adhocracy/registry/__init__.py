@@ -5,7 +5,6 @@ from adhocracy.utils import get_all_taggedvalues
 from adhocracy.resources import ResourceFactory
 from adhocracy.resources.interfaces import IResource
 from pyramid.security import has_permission
-from pyramid import testing
 from substanced.content import ContentRegistry
 from zope.dottedname.resolve import resolve
 from zope.interface import (
