@@ -19,6 +19,7 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
         from adhocracy.evolution import add_app_root_element
         self.config.include('substanced.content')
         self.config.include('adhocracy.resources')
+        self.config.include('adhocracy.registry')
         root = testing.DummyResource()
         add_app_root_element(root)
         assert 'adhocracy' in root

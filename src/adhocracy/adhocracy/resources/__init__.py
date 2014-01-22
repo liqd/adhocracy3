@@ -41,9 +41,6 @@ def includeme(config):
     Iterate all resource interfaces and automatically register factories.
 
     """
-
-    config.include('adhocracy.resources.registry')
-
     ifaces = get_ifaces_from_module(interfaces,
                                     base=interfaces.IResource)
     for iface in ifaces:

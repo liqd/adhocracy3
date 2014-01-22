@@ -91,6 +91,7 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
     def test_includeme_registry_register_factories(self):
         self.config.include('substanced.content')
         self.config.include('adhocracy.resources')
+        self.config.include('adhocracy.registry')
         content_types = self.config.registry.content.factory_types
         assert 'adhocracy.resources.interfaces.IFubel' in content_types
         assert 'adhocracy.resources.interfaces.IVersionableFubel'\
@@ -102,6 +103,7 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
     def test_includeme_registry_create_content(self):
         self.config.include('substanced.content')
         self.config.include('adhocracy.resources')
+        self.config.include('adhocracy.registry')
         iresource = adhocracy.resources.interfaces.IPool
         iresource_id = iresource.__identifier__
         resource = self.config.registry.content.create(iresource_id)
