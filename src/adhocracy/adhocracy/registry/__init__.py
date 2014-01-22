@@ -131,6 +131,7 @@ class ResourceContentRegistry(ContentRegistry):
         for type_iface in addable_types:
             sheetnames = {}
             resource = ResourceFactory(type_iface)()
+            resource.__parent__ = context
             sheets = self.resource_sheets(resource, request,
                                           onlycreatable=True)
             sheetnames['sheets_mandatory'] = \
