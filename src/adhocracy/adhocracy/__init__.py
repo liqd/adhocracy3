@@ -40,7 +40,7 @@ def includeme(config):
     config.commit()  # commit to allow proper config overrides
     config.include('.properties')
     config.include('.resources')
-    #config.include('.registry')
+    config.include('.registry')
     config.include('.evolution')
     config.include('.rest')
     config.include('.frontend')
