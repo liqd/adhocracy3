@@ -157,38 +157,41 @@ class TagsSchema(colander.Schema):
                                       interface=IVersionable,
                                       )
 
-#
-# # Document Data
-#
-#
-# class IDocument(IProperty):
-#
-#     """Marker interface representing a Fubel with document data """
-#
-#     taggedValue('schema', 'adhocracy.properties.interfaces.DocumentSchema')
-#
-#
-# class DocumentSchema(colander.Schema):
-#
-#     elements = ReferenceSetSchemaNode(essence_refs=True,
-#                                       default=[],
-#                                       missing=colander.drop,
-#                                       interface=
-#                                    'adhocracy.resources.interfaces.ISection')
-#
-#
-# class ISection(IProperty):
-#
-#     """Marker interface representing a document section """
-#
-#     taggedValue('schema', 'adhocracy.properties.interfaces.SectionSchema')
-#
-#
-# class SectionSchema(colander.Schema):
-#     title = colander.SchemaNode(colander.String(), default='')
-#     elements = ReferenceSetSchemaNode(essence_refs=True,
-#                                       default=[],
-#                                       missing=colander.drop,
-#                                       interface=
 
-#                                    'adhocracy.resources.interfaces.ISection')
+# Document Data
+
+class IDocument(IProperty):
+
+    """Marker interface representing a Fubel with document data."""
+
+    taggedValue('schema', 'adhocracy.properties.interfaces.DocumentSchema')
+
+
+class DocumentSchema(colander.Schema):
+
+    """Colander schema for IDocument."""
+
+    elements = ReferenceSetSchemaNode(
+        essence_refs=True,
+        default=[],
+        missing=colander.drop,
+        interface='adhocracy.resources.interfaces.ISection')
+
+
+class ISection(IProperty):
+
+    """Marker interface representing a document section."""
+
+    taggedValue('schema', 'adhocracy.properties.interfaces.SectionSchema')
+
+
+class SectionSchema(colander.Schema):
+
+    """Colander schema for ISection."""
+
+    title = colander.SchemaNode(colander.String(), default='')
+    elements = ReferenceSetSchemaNode(
+        essence_refs=True,
+        default=[],
+        missing=colander.drop,
+        interface='adhocracy.resources.interfaces.ISection')

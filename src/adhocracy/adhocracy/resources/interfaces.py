@@ -87,43 +87,47 @@ class IFubel(IResource):
                 ['adhocracy.properties.interfaces.IName']))
 
 
-class IVersionableFubel(IFubel):
+class IVersionableFubel(IResource):
 
-    """Versionable Fuble, created during a Participation Process (mainly)."""
+    """Versionable object, created during a Participation Process (mainly)."""
 
     taggedValue('content_name', 'VersionableFubel')
     taggedValue('basic_properties_interfaces', set(
                 ['adhocracy.properties.interfaces.INameReadOnly',
                  'adhocracy.properties.interfaces.IVersionable']))
 
-# # Concrete Fubels and FubelVersionsPools
-#
-# class IProposal(IVersionableFubel):
-#
-#     """Proposal Fubel"""
-#     taggedValue('extended_properties_interfaces', set(
-#                 ['adhocracy.properties.interfaces.IDocument']))
-#
-#
-# class IProposalVersionsPool(IFubelVersionsPool):
-#
-#     """Proposal Versions Pool"""
-#     taggedValue('addable_content_interfaces', set(
-#         ['adhocracy.resources.interfaces.ITags',
-#          'adhocracy.resources.interfaces.IFubelVersionsPool']))
-#     taggedValue('fubel_content_type',
-#                 'adhocracy.resources.interfaces.IProposal')
-#
-#
-# class ISection(IVersionableFubel):
-#
-#     """Paragraph of documents"""
-#
-#
-# class ISectionVersionsPool(IFubelVersionsPool):
-#
-#     """Paragraph Versions Pool"""
-#     taggedValue('addable_content_interfaces', set(
-#         ['adhocracy.resources.interfaces.ITags',
-#          'adhocracy.resources.interfaces.ISection']))
-#     taggedValue('fubel_type', 'adhocracy.resources.interfaces.ISection')
+
+# Concrete Fubels and FubelVersionsPools
+
+class IProposal(IVersionableFubel):
+
+    """Versionable Fubel with Document propertysheet."""
+
+    taggedValue('extended_properties_interfaces', set(
+                ['adhocracy.properties.interfaces.IDocument']))
+
+
+class IProposalVersionsPool(IFubelVersionsPool):
+
+    """Proposal Versions Pool."""
+
+    taggedValue('addable_content_interfaces', set(
+        ['adhocracy.resources.interfaces.ITags',
+         'adhocracy.resources.interfaces.IFubelVersionsPool']))
+    taggedValue('fubel_content_type',
+                'adhocracy.resources.interfaces.IProposal')
+
+
+class ISection(IVersionableFubel):
+
+    """Document section."""
+
+
+class ISectionVersionsPool(IFubelVersionsPool):
+
+    """Section Versions Pool."""
+
+    taggedValue('addable_content_interfaces', set(
+        ['adhocracy.resources.interfaces.ITags',
+         'adhocracy.resources.interfaces.ISection']))
+    taggedValue('fubel_type', 'adhocracy.resources.interfaces.ISection')
