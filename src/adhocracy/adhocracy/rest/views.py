@@ -2,12 +2,14 @@
 from adhocracy.properties.interfaces import IName
 from adhocracy.resources.interfaces import (
     IResource,
+    IPool,
+    IFubel,
     IVersionableFubel,
 )
 from adhocracy.rest.schemas import (
     ResourceResponseSchema,
-    PUTResourceRequestSchema,
     POSTResourceRequestSchema,
+    PUTResourceRequestSchema,
     GETResourceResponseSchema,
     OPTIONResourceResponseSchema,
 )
@@ -24,19 +26,10 @@ from pyramid.view import (
 from pyramid.traversal import resource_path
 from substanced.folder import FolderKeyError
 
-
-def validate_request_with_cornice_schema(schema, request):
-        """Validate request data with colander schema.
-
-        Add errors to request.errors
-        Add validated data to request.validated
-
-        """
-        schema = CorniceSchema.from_colander(schema)
-        validate_colander_schema(schema, request)
+import functools
 
 
-def validate_put_propertysheet_names(context, request):
+def validate_put_sheet_names(context, request):
     """Validate propertysheet names for put requests."""
     sheets = request.registry.content.resource_sheets(
         context, request, onlyeditable=True)
@@ -48,7 +41,7 @@ def validate_put_propertysheet_names(context, request):
         request.errors.add('body', 'data', error)
 
 
-def validate_post_propertysheet_names_and_resource_type(context, request):
+def validate_post_sheet_names_and_resource_type(context, request):
     """Validate addable propertysheet names for post requests."""
     addables = request.registry.content.resource_addables(context, request)
     content_type = request.validated.get('content_type', '')
@@ -73,22 +66,83 @@ def validate_post_propertysheet_names_and_resource_type(context, request):
             request.errors.add('body', 'data', error)
 
 
-@view_defaults(
-    renderer='simplejson',
-    context=IResource
-)
-class ResourceView(object):
+def validate_request_data(context, request, schema=None, extra_validators=[]):
+        """Validate request data.
 
-    """Default view for adhocracy resources."""
+        Args:
+            context (class): context passed to validator functions
+            request (IRequest): request object passed to validator functions
+            schema (colander.Schema): Schema to validate request body with json
+                data, request url parameters or headers (based on Cornice).
+            extra_validators (List): validator functions with parameter context
+                and request.
 
-    validation_map = \
-        {'GET': (None, []),
-         'OPTION': (None, []),
-         'PUT': (PUTResourceRequestSchema,
-                 [validate_put_propertysheet_names]),
-         'POST': (POSTResourceRequestSchema,
-                  [validate_post_propertysheet_names_and_resource_type])
-         }
+        Raises:
+            _JSONError: HTTP 400 error based on Cornice if bad request data.
+
+        """
+        if schema:
+            schema = CorniceSchema.from_colander(schema)
+            validate_colander_schema(schema, request)
+        for val in extra_validators:
+            val(context, request)
+        if request.errors:
+            request.validated = {}
+            raise json_error(request.errors)
+
+
+def validate_request_data_decorator():
+    """Validate request data for every http method of your RESTView class.
+
+    Runs validate_request_data with schema and validators set in the attribute
+    `validation_<http method>`.
+
+    Returns:
+        class: view class
+    Raises:
+        _JSONError: HTTP 400 error based on Cornice if bad request data.
+
+    """
+    def _dec(f):
+        @functools.wraps(f)
+        def wrapper(context, request):
+            http_method = request.method.upper()
+            view_class = f.__original_view__
+            vals = getattr(view_class, 'validation_' + http_method, (None, []))
+            validate_request_data(context, request, schema=vals[0],
+                                  extra_validators=vals[1])
+            return f(context, request)
+        return wrapper
+    return _dec
+
+
+class RESTView(object):
+
+    """Class stub with request data validation support.
+
+    Subclasses must implement the wanted request methods
+    and configure the pyramid view::
+
+        @view_defaults(
+            renderer='simplejson',
+            context=IResource,
+            decorator=validate_request_data_decorator(),
+        )
+        class MySubClass(RESTView):
+            validation_GET = (MyColanderSchema, [my_extra_validation_function])
+
+            @view_config(request_method='GET')
+            def get(self):
+            ...
+
+    """
+
+    validation_OPTIONS = (None, [])
+    validation_HEAD = (None, [])
+    validation_GET = (None, [])
+    validation_PUT = (None, [])
+    validation_POST = (None, [])
+
     reserved_names = []
 
     def __init__(self, context, request):
@@ -96,44 +150,38 @@ class ResourceView(object):
         self.request = request
         registry = request.registry.content
         self.registry = registry
-        self.addables = registry.resource_addables(context, request)
-        self.sheets_all = registry.resource_sheets(context, request)
-        self.sheets_view = registry.resource_sheets(context, request,
-                                                    onlyviewable=True)
-        self.sheets_edit = registry.resource_sheets(context, request,
-                                                    onlyeditable=True)
 
-    def validate_request_data(self, method):
-        """Validate request data.
 
-        Raise 400 error if request.errors is not empty after validation.
+@view_defaults(
+    renderer='simplejson',
+    context=IResource,
+    decorator=validate_request_data_decorator(),
+)
+class ResourceRESTView(RESTView):
 
-        """
-        schema = self.validation_map[method][0]
-        validators = self.validation_map[method][1]
-        if schema:
-            validate_request_with_cornice_schema(schema, self.request)
-        for val in validators:
-            val(self.context, self.request)
-        if self.request.errors:
-            self.request.validated = {}
-            raise json_error(self.request.errors)
+    """Default view for Resources, implements get and options."""
 
     @view_config(request_method='OPTIONS')
     def options(self):
-        """HTTP OPTION.
+        """Handle OPTIONS requests.
 
         Return dictionary describing the available request and response
         data structures.
 
         """
+        addables = self.registry.resource_addables(self.context, self.request)
+        sheets_view = self.registry.resource_sheets(self.context, self.request,
+                                                    onlyviewable=True)
+        sheets_edit = self.registry.resource_sheets(self.context, self.request,
+                                                    onlyeditable=True)
+
         cstruct_singleton = OPTIONResourceResponseSchema().serialize()
         cstruct = deepcopy(cstruct_singleton)
-        for sheet in self.sheets_edit:
+        for sheet in sheets_edit:
             cstruct['PUT']['request_body']['data'][sheet] = {}
-        for sheet in self.sheets_view:
+        for sheet in sheets_view:
             cstruct['GET']['response_body']['data'][sheet] = {}
-        for type, sheets in self.addables.items():
+        for type, sheets in addables.items():
             names = sheets['sheets_optional'] + sheets['sheets_mandatory']
             sheets_dict = dict([(s, {}) for s in names])
             post_data = {'content_type': type, 'data': sheets_dict}
@@ -142,44 +190,83 @@ class ResourceView(object):
 
     @view_config(request_method='GET')
     def get(self):
-        """HTTP GET.
-
-        Return dictionary with resource data structure.
-
-        """
-        self.validate_request_data('GET')
+        """Handle GET requests. Return dict with resource data structure."""
+        sheets_view = self.registry.resource_sheets(self.context, self.request,
+                                                    onlyviewable=True)
         struct = {'data': {}}
-        for sheet in self.sheets_view.values():
+        for sheet in sheets_view.values():
             key = sheet.iface.__identifier__
             struct['data'][key] = sheet.get_cstruct()
         struct['path'] = resource_path(self.context)
         struct['content_type'] = self.registry.typeof(self.context)
         return GETResourceResponseSchema().serialize(struct)
 
+
+@view_defaults(
+    renderer='simplejson',
+    context=IFubel,
+    decorator=validate_request_data_decorator(),
+)
+class FubelRESTView(ResourceRESTView):
+
+    """View for non versionable Fubels, implements get, options and put."""
+
+    validation_PUT = (PUTResourceRequestSchema,
+                      [validate_put_sheet_names])
+
+    @view_config(request_method='OPTIONS')
+    def options(self):
+        """Handle OPTIONS requests. Return dict."""
+        return super(FubelRESTView, self).options()
+
+    @view_config(request_method='GET')
+    def get(self):
+        """Handle GET requests. Return dict."""
+        return super(FubelRESTView, self).get()
+
     @view_config(request_method='PUT')
     def put(self):
-        """HTTP PUT.
-
-        Return dictionary with PATH of modified resource.
-
-        """
-        self.validate_request_data('PUT')
+        """Handle HTTP PUT. Return dict with PATH of modified resource."""
+        sheets_edit = self.registry.resource_sheets(self.context, self.request,
+                                                    onlyeditable=True)
         for name, cstruct in self.request.validated['data'].items():
-            self.sheets_edit[name].set_cstruct(cstruct)
+            sheets_edit[name].set_cstruct(cstruct)
         struct = {}
         struct['path'] = resource_path(self.context)
         struct['content_type'] = self.registry.typeof(self.context)
         return ResourceResponseSchema().serialize(struct)
 
+
+@view_defaults(
+    renderer='simplejson',
+    context=IPool,
+    decorator=validate_request_data_decorator(),
+)
+class PoolRESTView(FubelRESTView):
+
+    """View for Pools, implements get, options, put and post."""
+
+    validation_POST = (POSTResourceRequestSchema,
+                       [validate_post_sheet_names_and_resource_type])
+
+    @view_config(request_method='OPTIONS')
+    def options(self):
+        """Handle OPTIONS requests. Return dict."""
+        return super(PoolRESTView, self).options()
+
+    @view_config(request_method='GET')
+    def get(self):
+        """Handle GET requests. Return dict."""
+        return super(PoolRESTView, self).get()
+
+    @view_config(request_method='PUT')
+    def put(self):
+        """Handle HTTP PUT. Return dict with PATH of modified resource."""
+        return super(PoolRESTView, self).put()
+
     @view_config(request_method='POST')
     def post(self):
-        """HTTP POST.
-
-        Return dictionary with PATH of new resource.
-
-        """
-        #validate request data
-        self.validate_request_data('POST')
+        """HTTP POST. Return dictionary with PATH of new resource."""
         #create resource
         type = self.request.validated['content_type']
         resource = self.registry.create(type)
@@ -193,9 +280,12 @@ class ResourceView(object):
         except (FolderKeyError, ValueError):
                 name += '_' + self.context.next_name()
         self.context.add(name, resource, send_events=False)
-        # store propertysheets
+        # store sheets
+        sheets_creatables = self.registry.resource_sheets(self.context,
+                                                          self.request,
+                                                          onlycreatable=True)
         for name, cstruct in self.request.validated['data'].items():
-            self.sheets_edit[name].set_cstruct(cstruct)
+            sheets_creatables[name].set_cstruct(cstruct)
         #FIXME use substanced event system
         # response
         struct = {}
