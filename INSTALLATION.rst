@@ -62,15 +62,6 @@ install javascript front-end ::
     cd src/adhocracy/adhocracy/frontend/static/js/
     make
 
-Testing
----------
-
-install robotframework for accpetance testing ::
-
-    cd robotframework/
-    python2.7 bootstrap.py
-    bin/buildout
-
 Documentation
 -------------
 

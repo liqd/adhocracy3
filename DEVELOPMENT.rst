@@ -15,6 +15,16 @@ Example Vim config according to coding guideline::
 
     https://github.com/liqd/vim_config
 
+Install Robotframework
+----------------------
+
+install robotframework for accpetance testing ::
+
+    cd robotframework/
+    python2.7 bootstrap.py
+    bin/buildout
+
+
 Running the Testsuite
 ---------------------
 
