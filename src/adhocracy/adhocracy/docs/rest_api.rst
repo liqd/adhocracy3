@@ -1,9 +1,8 @@
 # doctest: +ELLIPSIS
 # doctest: +NORMALIZE_WHITESPACE
 
-NORMALIZE_WHITESPACE
-Loose coupling REST-API
-=======================
+REST-API (with loose coupling)
+===============================
 
 Prerequisites
 -------------
@@ -242,23 +241,19 @@ Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource ty
     ...         }
     >>> resp = testapp.post_json("/adhocracy/PROposals", prop)
     >>> proposal_versions_path = resp.json["path"]
+    >>> proposal_versions_path 
+    /adhocracy/PROposals/kommunismus
 
 The return data has the new attribute 'first_version_path' to get the path of the first Proposal (aka VersionableFubel)::
 
-    >>> pprint_json(resp.json)
-    {
-     "content_type": "adhocracy.resources.interfaces.IProposalVersionsPool",
-     "first_version_path": "/adhocracy/PROposals/kommunismus/VERSION_...
-     "path": "/adhocracy/PROposals/kommunismus"
-    }
-    >>> proposal_v1_path = resp.json["first_version_path"]
+    >>> proposal_v1_path = resp.json['first_version_path']
+    >>> proposal_v1_path 
+    /adhocracy/PROposals/kommunismus/VERSION_...
 
 The ProposalVersionsPool has the IVersions and ITags interfaces to work with Versions ::
 
-    >>> resp = testapp.post_get(proposal_versions_path)
-    >>> pprint_json(resp.json)
-    ...
-        "data": {
+    >>> pprint(resp.json['data']}
+        {
             "adhocracy.properties.interfaces.IName": {
                 "name": "kommunismus"
             },
@@ -276,9 +271,7 @@ The ProposalVersionsPool has the IVersions and ITags interfaces to work with Ver
                 "elements": []
             }
 
-        },
-    ...
-
+        }
 
 Update
 ~~~~~~
