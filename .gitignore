@@ -11,6 +11,7 @@ __pycache__
 *.egg-info
 .installed.cfg
 .mr.developer.cfg
+.sass-cache
 /bin
 /docs/build
 python

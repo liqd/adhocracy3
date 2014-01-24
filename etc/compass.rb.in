@@ -1,9 +1,9 @@
 # To change this config file please edit *.in and rerun buildout.
 
 http_path = "/"
-css_dir = "${adhocracy.frontend.static_dir}/stylesheets"
-sass_dir = "${adhocracy.frontend.static_dir}/stylesheets/scss"
-images_dir = "${adhocracy.frontend.static_dir}/images"
-javascripts_dir = "${adhocracy.frontend.static_dir}/js"
+css_dir = "${adhocracy:frontend.static_dir}/stylesheets"
+sass_dir = "${adhocracy:frontend.static_dir}/stylesheets/scss"
+images_dir = "${adhocracy:frontend.static_dir}/images"
+javascripts_dir = "${adhocracy:frontend.static_dir}/js"
 
-add_import_path "${adhocracy.frontend.static_dir}/stylesheets/scss"
+add_import_path "${adhocracy:frontend.static_dir}/stylesheets/scss"
