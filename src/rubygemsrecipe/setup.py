@@ -29,6 +29,7 @@ setup(name=name,
       py_modules=['rubygems'],
       include_package_data=True,
       zip_safe=False,
+      use_2to3 = True,
       install_requires=[
           'zc.buildout',
           'setuptools',

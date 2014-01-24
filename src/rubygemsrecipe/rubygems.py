@@ -86,6 +86,7 @@ class Recipe(object):
 
         f = urllib.urlopen('http://rubygems.org/pages/download')
         s = f.read()
+        s = unicode(s)
         f.close()
         r = re.search(r'http://production.cf.rubygems.org/rubygems/'
                       r'rubygems-([0-9.]+).zip', s)
