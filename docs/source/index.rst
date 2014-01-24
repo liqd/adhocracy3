@@ -14,7 +14,7 @@ Contents
    INSTALLATION
    rest_api
    DEVELOPMENT
-   CODEING_STYLE_GUIDELINE.rst
+   CODING_STYLE_GUIDELINE.rst
    supergraph.rst
    supergraph-2013-11-12.rst
    instance_modelling_example.rst
