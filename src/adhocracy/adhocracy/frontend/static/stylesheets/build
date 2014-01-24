@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# This needs scss and compass
-scss --compass scss/a3.scss a3.css
