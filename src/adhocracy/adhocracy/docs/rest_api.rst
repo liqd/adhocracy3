@@ -242,7 +242,7 @@ Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource ty
     >>> resp = testapp.post_json("/adhocracy/PROposals", prop)
     >>> proposal_versions_path = resp.json["path"]
     >>> proposal_versions_path 
-    /adhocracy/PROposals/kommunismus
+    '/adhocracy/PROposals/kommunismus'
 
 The return data has the new attribute 'first_version_path' to get the path of the first Proposal (aka VersionableFubel)::
 
