@@ -1,7 +1,4 @@
 """Interfaces for resource propertysheets."""
-from substanced.schema import (
-    NameSchemaNode
-)
 from zope.interface import (
     Interface,
     taggedValue,
@@ -74,7 +71,7 @@ class NameReadOnlySchema(colander.Schema):
 
     """Colander schema for INameReadOnly."""
 
-    name = NameSchemaNode(readonly=True, default='', missing=colander.drop)
+    name = Identifier(readonly=True, default='', missing=colander.drop)
 
 
 class IPool(IProperty):

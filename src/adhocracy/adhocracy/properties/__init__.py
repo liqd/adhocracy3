@@ -11,7 +11,6 @@ from adhocracy.schema import ReferenceSetSchemaNode
 from collections.abc import Mapping
 from persistent.mapping import PersistentMapping
 from pyramid.compat import is_nonstr_iter
-from pyramid.interfaces import IRequest
 from pyramid.httpexceptions import HTTPNotImplemented
 from substanced.property import PropertySheet
 from substanced.util import find_objectmap
@@ -30,13 +29,13 @@ class ResourcePropertySheetAdapter(PropertySheet):
 
     """Read interface.."""
 
-    def __init__(self, context, request, iface):
+    def __init__(self, context, iface):
         assert hasattr(context, '__setitem__')
         assert iface.isOrExtends(interfaces.IProperty)
         assert (not (iface.queryTaggedValue('createmandatory', False)
                 and iface.queryTaggedValue('readonly', False)))
         self.context = context
-        self.request = request
+        self.request = None  # just to fullfill the interface
         self.iface = iface
         taggedvalues = get_all_taggedvalues(iface)
         self.key = taggedvalues.get('key') or iface.__identifier__
@@ -46,7 +45,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         self.createmandatory = taggedvalues['createmandatory']
         schema_class = resolve(taggedvalues['schema'])
         schema_obj = schema_class()
-        self.schema = schema_obj.bind(context=context, request=request)
+        self.schema = schema_obj.bind(context=context)
         self._objectmap = find_objectmap(self.context)
         for child in self.schema:
             assert child.default is not colander.null
@@ -124,9 +123,9 @@ class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
 
     """Adapts Pool resource  to substance PropertySheet."""
 
-    def __init__(self, context, request, iface):
+    def __init__(self, context, iface):
         assert iface.isOrExtends(interfaces.IPool)
-        super(PoolPropertySheetAdapter, self).__init__(context, request, iface)
+        super(PoolPropertySheetAdapter, self).__init__(context, iface)
 
     def get(self):
         """Return data struct."""
@@ -152,10 +151,10 @@ def includeme(config):
                                     base=interfaces.IProperty)
     for iface in ifaces:
         config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                        (iface, IRequest, Interface),
+                                        (iface, Interface),
                                         IResourcePropertySheet)
 
     alsoProvides(interfaces.IPool, IIProperty)
     config.registry.registerAdapter(PoolPropertySheetAdapter,
-                                    (interfaces.IPool, IRequest, IIProperty),
+                                    (interfaces.IPool, IIProperty),
                                     IResourcePropertySheet)

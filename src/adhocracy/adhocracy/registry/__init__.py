@@ -37,7 +37,7 @@ class ResourceContentRegistry(ContentRegistry):
         sheets = {}
         ifaces = [i for i in providedBy(context) if i.isOrExtends(IProperty)]
         for iface in ifaces:
-            sheet = self.registry.getMultiAdapter((context, request, iface),
+            sheet = self.registry.getMultiAdapter((context, iface),
                                                   IResourcePropertySheet)
             if onlyviewable:
                 if not has_permission(sheet.permission_view, context, request):

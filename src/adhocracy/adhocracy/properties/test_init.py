@@ -1,8 +1,5 @@
 from adhocracy.properties.interfaces import IProperty
-from pyramid.testing import (
-    DummyRequest,
-    DummyResource,
-)
+from pyramid.testing import DummyResource
 from unittest.mock import call
 from unittest.mock import patch
 from pyramid import testing
@@ -97,11 +94,9 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         from adhocracy.interfaces import IResourcePropertySheet
         from zope.interface.verify import verifyObject
         context = DummyResource()
-        request = None
         iproperty = IPropertyB
-        inst = self.make_one(context, request, iproperty)
+        inst = self.make_one(context, iproperty)
         assert inst.context == context
-        assert inst.request == request
         assert inst.permission_view == 'view'
         assert inst.permission_edit == 'edit'
         assert inst.readonly is False
@@ -112,54 +107,54 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
 
     def test_create_non_valid_set_readonly_or_createmandatory(self):
         with pytest.raises(AssertionError):
-            self.make_one(DummyResource(), None, IPropertyC)
+            self.make_one(DummyResource(), IPropertyC)
 
     def test_create_non_valid_non_mapping_context(self):
         with pytest.raises(AssertionError):
-            self.make_one(object(), None, IPropertyB)
+            self.make_one(object(), IPropertyB)
 
     def test_create_non_valid_non_iproperty_iface(self):
         with pytest.raises(AssertionError):
-            self.make_one(DummyResource(), None, InterfaceY)
+            self.make_one(DummyResource(), InterfaceY)
 
     @patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
     def test_create_references(self, dummy_reference_node=None):
         node = dummy_reference_node.return_value
         node.name = 'references'
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         inst.schema.children.append(node)
         assert inst._references == {'references': IPropertyB.__identifier__
                                     + ':references'}
 
     def test_get_empty(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         assert inst.get() == {'count': 0}
 
     def test_get_non_empty(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         inst._data['count'] = 11
         assert inst.get() == {'count': 11}
 
     def test_set_valid(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         assert inst.set({'count': 11}) is True
         assert inst.get() == {'count': 11}
 
     def test_set_valid_empty(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         assert inst.set({}) is False
         assert inst.get() == {'count': 0}
 
     def test_set_valid_omit_str(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         assert inst.set({'count': 11}, omit='count') is False
 
     def test_set_valid_omit_tuple(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         assert inst.set({'count': 11}, omit=('count',)) is False
 
     def test_set_valid_omit_wrong_key(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         assert inst.set({'count': 11}, omit=('wrongkey',)) is True
 
     @patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
@@ -175,7 +170,7 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         node.serialize.return_value = []
         context = make_folder_with_objectmap()
         om = context.__objectmap__
-        inst = self.make_one(context, None, IProperty)
+        inst = self.make_one(context, IProperty)
 
         inst.schema.children.append(node)
 
@@ -203,55 +198,55 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         self._set_valid_references({3, 4, 5}, {3, 4, 5}, {}, {})
 
     def test_get_cstruct_empty(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         assert inst.get_cstruct() == {'count': '0'}
 
     def test_get_cstruct_non_empty(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         inst._data['count'] = 11
         assert inst.get_cstruct() == {'count': '11'}
 
     def test_set_cstruct_valid(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         inst.set_cstruct({'count': '11'})
         assert inst.get_cstruct() == {'count': '11'}
 
     def test_set_cstruct_valid_empty(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         inst.set_cstruct({})
         assert inst.get_cstruct() == {'count': '0'}
 
     def test_set_cstruct_valid_with_name_conflicts(self):
         context = DummyResource()
-        inst1 = self.make_one(context, None, IPropertyB)
+        inst1 = self.make_one(context, IPropertyB)
         inst1.set_cstruct({'count': '1'})
-        inst2 = self.make_one(context, None, IPropertyA)
+        inst2 = self.make_one(context, IPropertyA)
         inst2.set_cstruct({'count': '2'})
         assert inst1.get_cstruct() == {'count': '1'}
         assert inst2.get_cstruct() == {'count': '2'}
 
     def test_set_cstruct_valid_readonly(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         inst.schema.children[0].readonly = True
         inst.set_cstruct({'count': '1'})
         assert inst.get_cstruct() == {'count': '0'}
 
     def test_get_cstruct_non_valid_missing_default_value(self):
         with pytest.raises(AssertionError):
-            self.make_one(DummyResource(), None, IPropertyZ)
+            self.make_one(DummyResource(), IPropertyZ)
 
     def test_get_cstruct_non_valid_missing_missing_value(self):
         with pytest.raises(AssertionError):
-            self.make_one(DummyResource(), None, IPropertyY)
+            self.make_one(DummyResource(), IPropertyY)
 
     def test_set_cstruct_non_valid_wrong_type(self):
-        inst = self.make_one(DummyResource(), None, IPropertyB)
+        inst = self.make_one(DummyResource(), IPropertyB)
         with pytest.raises(colander.Invalid):
             inst.set_cstruct({'count': 'wrongnumber'})
 
     # TODO
     # def test_set_cstruct_non_valid_required(self):
-    #     inst = self.make_one(DummyResource(), None, IPropertyB)
+    #     inst = self.make_one(DummyResource(), IPropertyB)
     #     inst.schema.children[0].required_ = True
     #     # FIXME: the attriute required is automatically set
     #     # without 'missing' value
@@ -259,7 +254,7 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
     #         inst.set_cstruct({})
 
     # def test_set_cstruct_non_valid_required_and_readonly(self):
-    #     inst = self.make_one(DummyResource(), None, IPropertyB)
+    #     inst = self.make_one(DummyResource(), IPropertyB)
     #     inst.schema.children[0].required_ = True
     #     inst.schema.children[0].readonly = True
     #     with pytest.raises(AssertionError):
@@ -277,7 +272,7 @@ class PoolPropertySheetUnitTest(unittest.TestCase):
         from zope.interface.verify import verifyObject
         from adhocracy.properties.interfaces import IPool
         from pyramid.httpexceptions import HTTPNotImplemented
-        inst = self.make_one(DummyResource(), None, IPool)
+        inst = self.make_one(DummyResource(), IPool)
         assert verifyObject(IResourcePropertySheet, inst) is True
         with pytest.raises(HTTPNotImplemented):
             inst.set_cstruct({})
@@ -286,13 +281,13 @@ class PoolPropertySheetUnitTest(unittest.TestCase):
 
     def test_create_non_valid(self):
         with pytest.raises(AssertionError):
-            self.make_one(DummyResource(), None, IPropertyB)
+            self.make_one(DummyResource(), IPropertyB)
 
     def test_get_empty(self):
         from adhocracy.properties.interfaces import IPool
         context = make_folder_with_objectmap()
         context.__objectmap__.pathlookup.return_value = []
-        inst = self.make_one(context, None, IPool)
+        inst = self.make_one(context, IPool)
         assert inst.get() == {'elements': []}
 
     def test_get_not_empty(self):
@@ -300,7 +295,7 @@ class PoolPropertySheetUnitTest(unittest.TestCase):
         context = make_folder_with_objectmap()
         context.__objectmap__.pathlookup.return_value = [1]
         context['child1'] = DummyResource()
-        inst = self.make_one(context, None, IPool)
+        inst = self.make_one(context, IPool)
         assert inst.get() == {'elements': [1]}
 
 
@@ -312,12 +307,11 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def make_one(self, config, context, request, iface):
+    def make_one(self, config, context, iface):
         from adhocracy.interfaces import IResourcePropertySheet
         from zope.interface import alsoProvides
-        request = DummyRequest()
         alsoProvides(context, iface)
-        inst = config.registry.getMultiAdapter((context, request, iface),
+        inst = config.registry.getMultiAdapter((context, iface),
                                                IResourcePropertySheet)
         return inst
 
@@ -325,18 +319,16 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
         from adhocracy.interfaces import IResourcePropertySheet
         from adhocracy.properties.interfaces import IIProperty
         from adhocracy.properties import ResourcePropertySheetAdapter
-        from pyramid.interfaces import IRequest
         from zope.interface import alsoProvides
         alsoProvides(iface, IIProperty)
         self.config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                             (iface, IRequest, IIProperty),
+                                             (iface, IIProperty),
                                              IResourcePropertySheet)
 
     def test_register_ipropertysheet_adapter_inheritance(self):
         self.register_propertysheet_adapter(self.config, IExtendPropertyB)
         context = DummyResource()
-        inst_extend = self.make_one(self.config, context,
-                                    DummyRequest(), IExtendPropertyB)
+        inst_extend = self.make_one(self.config, context, IExtendPropertyB)
         assert IPropertyB.providedBy(context)
         assert IExtendPropertyB.providedBy(context)
         assert 'count' in inst_extend.get()
@@ -346,10 +338,8 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
         self.register_propertysheet_adapter(self.config, IPropertyB)
         self.register_propertysheet_adapter(self.config, IExtendPropertyB)
         context = DummyResource()
-        inst_extend = self.make_one(self.config, context,
-                                    DummyRequest(), IExtendPropertyB)
-        inst = self.make_one(self.config, context,
-                             DummyRequest(), IPropertyB)
+        inst_extend = self.make_one(self.config, context, IExtendPropertyB)
+        inst = self.make_one(self.config, context, IPropertyB)
         inst_extend.set({'count': 1})
         assert inst_extend.key == inst.key
         assert inst.get() == {'count': 1}
@@ -361,40 +351,37 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
     def test_includeme_register_ipropertysheet_adapter_iname(self):
         from adhocracy.properties.interfaces import IName
         self.config.include('adhocracy.properties')
-        inst = self.make_one(self.config, DummyResource(), DummyRequest(), IName)
+        inst = self.make_one(self.config, DummyResource(), IName)
         assert inst.iface is IName
 
     def test_includeme_register_ipropertysheet_adapter_inamereadonly(self):
         from adhocracy.properties.interfaces import INameReadOnly
         self.config.include('adhocracy.properties')
-        inst = self.make_one(self.config, DummyResource(), DummyRequest(),
-                             INameReadOnly)
+        inst = self.make_one(self.config, DummyResource(), INameReadOnly)
         assert inst.iface is INameReadOnly
 
     def test_includeme_register_ipropertysheet_adapter_iversions(self):
         from adhocracy.properties.interfaces import IVersions
         self.config.include('adhocracy.properties')
-        inst = self.make_one(self.config, DummyResource(), DummyRequest(),
-                             IVersions)
+        inst = self.make_one(self.config, DummyResource(), IVersions)
         assert inst.iface is IVersions
 
     def test_includeme_register_ipropertysheet_adapter_itags(self):
         from adhocracy.properties.interfaces import ITags
         self.config.include('adhocracy.properties')
-        inst = self.make_one(self.config, DummyResource(), DummyRequest(), ITags)
+        inst = self.make_one(self.config, DummyResource(), ITags)
         assert inst.iface is ITags
 
     def test_includeme_register_ipropertysheet_adapter_iversionable(self):
         from adhocracy.properties.interfaces import IVersionable
         self.config.include('adhocracy.properties')
-        inst = self.make_one(self.config, DummyResource(), DummyRequest(),
-                             IVersionable)
+        inst = self.make_one(self.config, DummyResource(), IVersionable)
         assert inst.iface is IVersionable
 
     def test_includeme_register_ipropertysheet_adapter_ipool(self):
         from adhocracy.properties.interfaces import IPool
         from adhocracy.properties import PoolPropertySheetAdapter
         self.config.include('adhocracy.properties')
-        inst = self.make_one(self.config, DummyResource(), DummyRequest(), IPool)
+        inst = self.make_one(self.config, DummyResource(), IPool)
         assert isinstance(inst, PoolPropertySheetAdapter)
         assert inst.iface is IPool
