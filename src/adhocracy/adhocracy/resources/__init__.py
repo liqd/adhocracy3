@@ -30,11 +30,14 @@ class ResourceFactory(object):
         self.prop_ifaces = [resolve(i) for i in base_ifaces.union(ext_ifaces)]
         for i in self.prop_ifaces:
             assert i.isOrExtends(IProperty)
+        self.after_creation = taggedvalues['after_creation']
 
     def __call__(self, **kwargs):
         content = self.class_()
         directlyProvides(content, self.resource_iface)
         alsoProvides(content, self.prop_ifaces)
+        for call in self.after_creation:
+            call(content, None)
         return content
 
 
