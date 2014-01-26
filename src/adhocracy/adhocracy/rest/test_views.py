@@ -514,7 +514,7 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         assert 'put' in dir(inst)
 
     def test_post_valid_with_sheets(self):
-        from adhocracy.sheets.interfaces import IName
+        from adhocracy.sheets.name import IName
         sheet = make_mock_sheet(ISheetB)
         sheet.set_cstruct.return_value = True
         registry = self.request.registry.content

@@ -138,7 +138,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         _register_content_type(inst, IResourceB.__identifier__)
         IResourceA.setTaggedValue('addable_content_interfaces',
                                   [IResourceB.__identifier__])
-        IResourceB.setTaggedValue('basic_sheets_interfaces', set())
+        IResourceB.setTaggedValue('basic_sheets', set())
 
         addables = inst.resource_addables(context, testing.DummyRequest())
 
@@ -153,8 +153,8 @@ class TestResourceContentRegistry(unittest.TestCase):
         _register_content_type(inst, IResourceBA.__identifier__)
         IResourceA.setTaggedValue('addable_content_interfaces',
                                   [IResourceA.__identifier__])
-        IResourceA.setTaggedValue('basic_sheets_interfaces', set())
-        IResourceBA.setTaggedValue('basic_sheets_interfaces', set())
+        IResourceA.setTaggedValue('basic_sheets', set())
+        IResourceBA.setTaggedValue('basic_sheets', set())
         IResourceBA.setTaggedValue('is_implicit_addable', True)
         addables = inst.resource_addables(context, testing.DummyRequest())
 
@@ -168,7 +168,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         _register_content_type(inst, IResourceB.__identifier__)
         IResourceA.setTaggedValue('addable_content_interfaces',
                                   [IResourceB.__identifier__])
-        IResourceB.setTaggedValue('basic_sheets_interfaces', set([
+        IResourceB.setTaggedValue('basic_sheets', set([
                                   ISheetA.__identifier__,
                                   ISheet.__identifier__]))
         ISheetA.setTaggedValue('createmandatory', True)

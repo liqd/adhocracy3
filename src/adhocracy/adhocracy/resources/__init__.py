@@ -25,8 +25,8 @@ class ResourceFactory(object):
         taggedvalues = get_all_taggedvalues(iface)
         self.class_ = resolve(taggedvalues['content_class'])
         self.resource_iface = iface
-        base_ifaces = taggedvalues['basic_sheets_interfaces']
-        ext_ifaces = taggedvalues['extended_sheets_interfaces']
+        base_ifaces = taggedvalues['basic_sheets']
+        ext_ifaces = taggedvalues['extended_sheets']
         self.prop_ifaces = [resolve(i) for i in base_ifaces.union(ext_ifaces)]
         for i in self.prop_ifaces:
             assert i.isOrExtends(ISheet)

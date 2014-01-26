@@ -261,44 +261,6 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
     #         inst.set_cstruct({})
 
 
-class PoolPropertySheetUnitTest(unittest.TestCase):
-
-    def make_one(self, *args):
-        from . import PoolPropertySheetAdapter
-        return PoolPropertySheetAdapter(*args)
-
-    def test_create_valid(self):
-        from adhocracy.interfaces import IResourcePropertySheet
-        from zope.interface.verify import verifyObject
-        from adhocracy.sheets.interfaces import IPool
-        from pyramid.httpexceptions import HTTPNotImplemented
-        inst = self.make_one(DummyResource(), IPool)
-        assert verifyObject(IResourcePropertySheet, inst) is True
-        with pytest.raises(HTTPNotImplemented):
-            inst.set_cstruct({})
-        with pytest.raises(HTTPNotImplemented):
-            inst.set({})
-
-    def test_create_non_valid(self):
-        with pytest.raises(AssertionError):
-            self.make_one(DummyResource(), ISheetB)
-
-    def test_get_empty(self):
-        from adhocracy.sheets.interfaces import IPool
-        context = make_folder_with_objectmap()
-        context.__objectmap__.pathlookup.return_value = []
-        inst = self.make_one(context, IPool)
-        assert inst.get() == {'elements': []}
-
-    def test_get_not_empty(self):
-        from adhocracy.sheets.interfaces import IPool
-        context = make_folder_with_objectmap()
-        context.__objectmap__.pathlookup.return_value = [1]
-        context['child1'] = DummyResource()
-        inst = self.make_one(context, IPool)
-        assert inst.get() == {'elements': [1]}
-
-
 class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
 
     def setUp(self):
@@ -349,39 +311,31 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
         assert inst.get() == {'count': 2}
 
     def test_includeme_register_ipropertysheet_adapter_iname(self):
-        from adhocracy.sheets.interfaces import IName
+        from adhocracy.sheets.name import IName
         self.config.include('adhocracy.sheets')
         inst = self.make_one(self.config, DummyResource(), IName)
         assert inst.iface is IName
 
     def test_includeme_register_ipropertysheet_adapter_inamereadonly(self):
-        from adhocracy.sheets.interfaces import INameReadOnly
+        from adhocracy.sheets.name import INameReadOnly
         self.config.include('adhocracy.sheets')
         inst = self.make_one(self.config, DummyResource(), INameReadOnly)
         assert inst.iface is INameReadOnly
 
     def test_includeme_register_ipropertysheet_adapter_iversions(self):
-        from adhocracy.sheets.interfaces import IVersions
+        from adhocracy.sheets.versions import IVersions
         self.config.include('adhocracy.sheets')
         inst = self.make_one(self.config, DummyResource(), IVersions)
         assert inst.iface is IVersions
 
     def test_includeme_register_ipropertysheet_adapter_itags(self):
-        from adhocracy.sheets.interfaces import ITags
+        from adhocracy.sheets.tags import ITags
         self.config.include('adhocracy.sheets')
         inst = self.make_one(self.config, DummyResource(), ITags)
         assert inst.iface is ITags
 
     def test_includeme_register_ipropertysheet_adapter_iversionable(self):
-        from adhocracy.sheets.interfaces import IVersionable
+        from adhocracy.sheets.versions import IVersionable
         self.config.include('adhocracy.sheets')
         inst = self.make_one(self.config, DummyResource(), IVersionable)
         assert inst.iface is IVersionable
-
-    def test_includeme_register_ipropertysheet_adapter_ipool(self):
-        from adhocracy.sheets.interfaces import IPool
-        from adhocracy.sheets import PoolPropertySheetAdapter
-        self.config.include('adhocracy.sheets')
-        inst = self.make_one(self.config, DummyResource(), IPool)
-        assert isinstance(inst, PoolPropertySheetAdapter)
-        assert inst.iface is IPool

@@ -1,6 +1,6 @@
 from pyramid import testing
 
-import adhocracy.sheets.interfaces
+from adhocracy.sheets.interfaces import ISheet
 import pytest
 import zope.interface
 import unittest
@@ -20,14 +20,14 @@ class InterfaceY(zope.interface.Interface):
     """Useless Interface for testing"""
 
 
-class ISheetX(adhocracy.interfaces.ISheet):
+class ISheetX(ISheet):
 
-    """Useless PropertyInterface for testing"""
+    """Useless PropertyInterface for testing."""
 
 
-class ISheetY(adhocracy.interfaces.ISheet):
+class ISheetY(ISheet):
 
-    """Useless PropertyInterface for testing"""
+    """Useless PropertyInterface for testing."""
 
 
 ###########
@@ -44,9 +44,9 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from zope.interface import taggedValue, providedBy
 
         class IResourceType(IResource):
-            taggedValue('extended_sheets_interfaces',
+            taggedValue('extended_sheets',
                         set([ISheetX.__identifier__]))
-            taggedValue('basic_sheets_interfaces',
+            taggedValue('basic_sheets',
                         set([ISheetY.__identifier__]))
 
         resource = ResourceFactory(IResourceType)()
@@ -87,7 +87,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from zope.interface import taggedValue
 
         class IResourceType(IResource):
-            taggedValue('basic_sheets_interfaces',
+            taggedValue('basic_sheets',
                         set([InterfaceY.__identifier__]))
 
         with pytest.raises(AssertionError):

@@ -1,12 +1,9 @@
 """Adhocarcy sheets."""
-from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.sheets import interfaces
 from adhocracy.interfaces import (
-    IISheet,
+    IResourcePropertySheet,
     ISheet,
 )
 from adhocracy.utils import (
-    get_ifaces_from_module,
     get_all_taggedvalues,
     diff_dict,
 )
@@ -14,13 +11,10 @@ from adhocracy.schema import ReferenceSetSchemaNode
 from collections.abc import Mapping
 from persistent.mapping import PersistentMapping
 from pyramid.compat import is_nonstr_iter
-from pyramid.httpexceptions import HTTPNotImplemented
 from substanced.property import PropertySheet
 from substanced.util import find_objectmap
 from zope.interface import (
     implementer,
-    alsoProvides,
-    Interface,
 )
 from zope.dottedname.resolve import resolve
 
@@ -34,7 +28,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
 
     def __init__(self, context, iface):
         assert hasattr(context, '__setitem__')
-        assert iface.isOrExtends(interfaces.ISheet)
+        assert iface.isOrExtends(ISheet)
         assert (not (iface.queryTaggedValue('createmandatory', False)
                 and iface.queryTaggedValue('readonly', False)))
         self.context = context
@@ -121,43 +115,10 @@ class ResourcePropertySheetAdapter(PropertySheet):
         return cstruct
 
 
-@implementer(IResourcePropertySheet)
-class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
-
-    """Adapts Pool resource  to substance PropertySheet."""
-
-    def __init__(self, context, iface):
-        assert iface.isOrExtends(interfaces.IPool)
-        super(PoolPropertySheetAdapter, self).__init__(context, iface)
-
-    def get(self):
-        """Return data struct."""
-        struct = super(PoolPropertySheetAdapter, self).get()
-        struct['elements'] = self._objectmap.pathlookup(self.context,
-                                                        depth=1,
-                                                        include_origin=False)
-        return struct
-
-    def set(self, struct, omit=()):
-        """Return None."""
-        raise HTTPNotImplemented()
-
-    def set_cstruct(self, cstruct):
-        """Return None."""
-        raise HTTPNotImplemented()
-
-
 def includeme(config):
-    """Iterate all ISheet interfaces and register propertysheet adapters."""
-
-    ifaces = get_ifaces_from_module(interfaces,
-                                    base=ISheet)
-    for iface in ifaces:
-        config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                        (iface, Interface),
-                                        IResourcePropertySheet)
-
-    alsoProvides(interfaces.IPool, IISheet)
-    config.registry.registerAdapter(PoolPropertySheetAdapter,
-                                    (interfaces.IPool, IISheet),
-                                    IResourcePropertySheet)
+    """Include all sheets in this package."""
+    config.include('.name')
+    config.include('.pool')
+    config.include('.document')
+    config.include('.versions')
+    config.include('.tags')

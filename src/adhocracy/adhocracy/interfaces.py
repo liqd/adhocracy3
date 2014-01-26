@@ -4,19 +4,17 @@ from zope.interface import (
     Attribute,
     Interface,
     taggedValue,
+    provider,
 )
 from zope.interface.interfaces import IInterface
 
 
 class IISheet(IInterface):
 
-    """Mark ISheet class to allow registering a MultiAdapter.
-
-    See adhocracy.sheets.includme for examples.
-
-    """
+    """Mark ISheet classes to ease overriding registered adapters."""
 
 
+@provider(IISheet)
 class ISheet(Interface):
 
     """Marker interface with tagged values to define resource data."""
@@ -58,9 +56,9 @@ class IResource(Interface):
     taggedValue('is_implicit_addable', True)
     """Make this content type adddable if supertype is addable."""
 
-    taggedValue('basic_sheets_interfaces', set())
+    taggedValue('basic_sheets', set())
     """Basic property interfaces to define data """
-    taggedValue('extended_sheets_interfaces', set())
+    taggedValue('extended_sheets', set())
     """Extended property interfaces to define data, subtypes should override"""
     taggedValue('after_creation', [])
     """Callables to run after creation. They are passed the instance being
@@ -69,7 +67,7 @@ class IResource(Interface):
 
 class IResourcePropertySheet(IPropertySheet):
 
-    """Adapter for Resources to set/get the data.
+    """PropertySheet object to set/get resource data.
 
     It uses the ISheet ``schema``  taggedvalue to get the wanted data
     schema. The data store must prevent attribute name conflicts.

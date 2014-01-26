@@ -100,8 +100,8 @@ class ResourceContentRegistry(ContentRegistry):
             example::
 
                 {'adhocracy.resources.interfaces.IResourceA':
-                    'sheets_mandatory': ['adhocracy.sheets.interfaces.IA']
-                    'sheets_optional': ['adhocracy.sheets.interfaces.IB']
+                    'sheets_mandatory': ['adhocracy.sheets.example.IA']
+                    'sheets_optional': ['adhocracy.sheets.example.IB']
                 }
 
         """
