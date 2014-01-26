@@ -1,6 +1,6 @@
 """Test rest.views module."""
-from adhocracy.properties.interfaces import IProperty
-from adhocracy.resources.interfaces import IResource
+from adhocracy.interfaces import IProperty
+from adhocracy.interfaces import IResource
 from cornice.util import (
     extract_json_data,
 )

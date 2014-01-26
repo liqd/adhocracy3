@@ -1,20 +1,16 @@
 """Content registry."""
 from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.properties.interfaces import IProperty
-from adhocracy.utils import get_all_taggedvalues
+from adhocracy.interfaces import IProperty
 from adhocracy.utils import (
     get_all_taggedvalues,
     get_resource_interface,
 )
 from adhocracy.resources import ResourceFactory
-from adhocracy.resources.interfaces import IResource
+from adhocracy.interfaces import IResource
 from pyramid.security import has_permission
 from substanced.content import ContentRegistry
 from zope.dottedname.resolve import resolve
-from zope.interface import (
-    providedBy,
-    directlyProvidedBy,
-)
+from zope.interface import providedBy
 
 
 class ResourceContentRegistry(ContentRegistry):

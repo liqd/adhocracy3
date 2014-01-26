@@ -1,4 +1,4 @@
-from adhocracy.properties.interfaces import IProperty
+from adhocracy.interfaces import IProperty
 from pyramid.testing import DummyResource
 from unittest.mock import call
 from unittest.mock import patch
@@ -317,7 +317,7 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
 
     def register_propertysheet_adapter(self, config, iface):
         from adhocracy.interfaces import IResourcePropertySheet
-        from adhocracy.properties.interfaces import IIProperty
+        from adhocracy.interfaces import IIProperty
         from adhocracy.properties import ResourcePropertySheetAdapter
         from zope.interface import alsoProvides
         alsoProvides(iface, IIProperty)

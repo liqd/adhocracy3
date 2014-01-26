@@ -1,7 +1,10 @@
 """Adhocarcy properties."""
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.properties import interfaces
-from adhocracy.properties.interfaces import IIProperty
+from adhocracy.interfaces import (
+    IIProperty,
+    IProperty,
+)
 from adhocracy.utils import (
     get_ifaces_from_module,
     get_all_taggedvalues,
@@ -148,7 +151,7 @@ def includeme(config):
     """Iterate all IProperty interfaces and register propertysheet adapters."""
 
     ifaces = get_ifaces_from_module(interfaces,
-                                    base=interfaces.IProperty)
+                                    base=IProperty)
     for iface in ifaces:
         config.registry.registerAdapter(ResourcePropertySheetAdapter,
                                         (iface, Interface),

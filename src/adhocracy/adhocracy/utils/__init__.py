@@ -1,6 +1,10 @@
 """Helper functions."""
 from functools import reduce
-from zope.interface import Interface
+from zope.interface import (
+    Interface,
+    directlyProvidedBy,
+)
+from adhocracy.interfaces import IResource
 
 import copy
 import json

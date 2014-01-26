@@ -1,5 +1,8 @@
 """Resouce configuration and default factory."""
-from adhocracy.properties.interfaces import IProperty
+from adhocracy.interfaces import (
+    IProperty,
+    IResource,
+)
 from adhocracy.resources import interfaces
 from adhocracy.utils import (
     get_ifaces_from_module,
@@ -18,7 +21,7 @@ class ResourceFactory(object):
     """Basic resource factory."""
 
     def __init__(self, iface):
-        assert iface.isOrExtends(interfaces.IResource)
+        assert iface.isOrExtends(IResource)
         taggedvalues = get_all_taggedvalues(iface)
         self.class_ = resolve(taggedvalues['content_class'])
         self.resource_iface = iface
@@ -42,7 +45,7 @@ def includeme(config):
 
     """
     ifaces = get_ifaces_from_module(interfaces,
-                                    base=interfaces.IResource)
+                                    base=IResource)
     for iface in ifaces:
         name = iface.queryTaggedValue('content_name') or iface.__identifier__
         meta = {

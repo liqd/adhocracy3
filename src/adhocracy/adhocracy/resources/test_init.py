@@ -20,12 +20,12 @@ class InterfaceY(zope.interface.Interface):
     """Useless Interface for testing"""
 
 
-class IPropertyX(adhocracy.properties.interfaces.IProperty):
+class IPropertyX(adhocracy.interfaces.IProperty):
 
     """Useless PropertyInterface for testing"""
 
 
-class IPropertyY(adhocracy.properties.interfaces.IProperty):
+class IPropertyY(adhocracy.interfaces.IProperty):
 
     """Useless PropertyInterface for testing"""
 
@@ -38,7 +38,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
     def test_valid_assign_ifaces(self):
         from adhocracy.resources import ResourceFactory
-        from adhocracy.resources.interfaces import IResource
+        from adhocracy.interfaces import IResource
         from persistent.mapping import PersistentMapping
         from persistent.interfaces import IPersistent
         from zope.interface import taggedValue, providedBy

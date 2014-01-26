@@ -1,10 +1,8 @@
 """Rest API views."""
-from adhocracy.properties.interfaces import IName
+from adhocracy.interfaces import IResource
 from adhocracy.resources.interfaces import (
-    IResource,
-    IPool,
     IFubel,
-    IVersionableFubel,
+    IPool,
 )
 from adhocracy.rest.schemas import (
     ResourceResponseSchema,
