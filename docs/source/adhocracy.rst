@@ -1,5 +1,5 @@
 adhocracy package
-==================
+=================
 
 Subpackages
 -----------
@@ -7,21 +7,24 @@ Subpackages
 .. toctree::
 
     adhocracy.evolution
+    adhocracy.folder
     adhocracy.frontend
-    adhocracy.properties
     adhocracy.registry
     adhocracy.resources
     adhocracy.rest
     adhocracy.schema
+    adhocracy.sheets
     adhocracy.utils
 
-
+Submodules
+----------
 
 adhocracy.interfaces module
 ---------------------------
 
 .. automodule:: adhocracy.interfaces
     :members:
+    :undoc-members:
     :show-inheritance:
 
 Module contents
@@ -29,4 +32,5 @@ Module contents
 
 .. automodule:: adhocracy
     :members:
+    :undoc-members:
     :show-inheritance:

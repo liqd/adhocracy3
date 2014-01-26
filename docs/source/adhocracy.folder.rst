@@ -1,5 +1,5 @@
-adhocracy.registry package
-==========================
+adhocracy.folder package
+========================
 
 Submodules
 ----------
@@ -7,7 +7,7 @@ Submodules
 Module contents
 ---------------
 
-.. automodule:: adhocracy.registry
+.. automodule:: adhocracy.folder
     :members:
     :undoc-members:
     :show-inheritance:

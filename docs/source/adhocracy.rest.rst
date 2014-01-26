@@ -1,6 +1,9 @@
 adhocracy.rest package
 ======================
 
+Submodules
+----------
+
 adhocracy.rest.exceptions module
 --------------------------------
 
@@ -16,7 +19,6 @@ adhocracy.rest.schemas module
     :members:
     :undoc-members:
     :show-inheritance:
-
 
 adhocracy.rest.views module
 ---------------------------
