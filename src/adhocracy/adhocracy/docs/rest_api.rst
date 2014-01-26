@@ -90,7 +90,7 @@ structures and available interfaces with resource data::
     ['adhocracy.properties.interfaces.IName']
 
 The value for POST gives us list with valid request data stubs::
-  
+
     >>> data_post_pool = {'content_type': 'adhocracy.resources.interfaces.IPool',
     ...                   'data': {'adhocracy.properties.interfaces.IName': {}}}
     >>> data_post_pool in resp_data["POST"]["request_body"]
@@ -103,25 +103,6 @@ extra path element.  For details, see backend unit test documentation
 or such.)
 
 Semantics of read-only and mandatory flags in request body:
-
-FIXME: the remainder of this section must be re-aligned with the actual
-documentation.
-
-Note: you can already make propertysheets read-only with the taggedValue "readonly"
-
-\*,    read-only, mandatory  => error
-GET,  \*,         \*          => may be there (for structure selection)
-\*,    read-only             => must not be there
-POST,            mandatory  => must be there
-PUT,             mandatory  => may be there
-\*,               mandatory  => may be there
-\*,               \*          => may be there
-
-Both flags only work on a single node in the json tree, not on its
-subtrees.
-
-Possibly extra flag 'post-only': mandatory on post, read-only
-afterwards (on PUT).
 
 
 HEAD
@@ -241,13 +222,13 @@ Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource ty
     ...         }
     >>> resp = testapp.post_json("/adhocracy/PROposals", prop)
     >>> proposal_versions_path = resp.json["path"]
-    >>> proposal_versions_path 
+    >>> proposal_versions_path
     /adhocracy/PROposals/kommunismus
 
 The return data has the new attribute 'first_version_path' to get the path of the first Proposal (aka VersionableFubel)::
 
     >>> proposal_v1_path = resp.json['first_version_path']
-    >>> proposal_v1_path 
+    >>> proposal_v1_path
     /adhocracy/PROposals/kommunismus/VERSION_...
 
 The ProposalVersionsPool has the IVersions and ITags interfaces to work with Versions ::
