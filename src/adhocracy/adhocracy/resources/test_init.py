@@ -1,6 +1,6 @@
 from pyramid import testing
 
-import adhocracy.properties.interfaces
+import adhocracy.sheets.interfaces
 import pytest
 import zope.interface
 import unittest
@@ -20,12 +20,12 @@ class InterfaceY(zope.interface.Interface):
     """Useless Interface for testing"""
 
 
-class IPropertyX(adhocracy.interfaces.IProperty):
+class ISheetX(adhocracy.interfaces.ISheet):
 
     """Useless PropertyInterface for testing"""
 
 
-class IPropertyY(adhocracy.interfaces.IProperty):
+class ISheetY(adhocracy.interfaces.ISheet):
 
     """Useless PropertyInterface for testing"""
 
@@ -44,18 +44,18 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from zope.interface import taggedValue, providedBy
 
         class IResourceType(IResource):
-            taggedValue('extended_properties_interfaces',
-                        set([IPropertyX.__identifier__]))
-            taggedValue('basic_properties_interfaces',
-                        set([IPropertyY.__identifier__]))
+            taggedValue('extended_sheets_interfaces',
+                        set([ISheetX.__identifier__]))
+            taggedValue('basic_sheets_interfaces',
+                        set([ISheetY.__identifier__]))
 
         resource = ResourceFactory(IResourceType)()
         assert isinstance(resource, PersistentMapping)
         resource_ifaces = [x for x in providedBy(resource).interfaces()]
         assert IPersistent in resource_ifaces
         assert IResourceType in resource_ifaces
-        assert IPropertyX in resource_ifaces
-        assert IPropertyY in resource_ifaces
+        assert ISheetX in resource_ifaces
+        assert ISheetY in resource_ifaces
 
     def test_valid_after_create(self):
         from adhocracy.resources import ResourceFactory
@@ -87,7 +87,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from zope.interface import taggedValue
 
         class IResourceType(IResource):
-            taggedValue('basic_properties_interfaces',
+            taggedValue('basic_sheets_interfaces',
                         set([InterfaceY.__identifier__]))
 
         with pytest.raises(AssertionError):

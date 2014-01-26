@@ -38,7 +38,7 @@ def includeme(config):
     # now we can proceed
     config.include('substanced')
     config.commit()  # commit to allow proper config overrides
-    config.include('.properties')
+    config.include('.sheets')
     config.include('.resources')
     config.include('.registry')
     config.include('.evolution')

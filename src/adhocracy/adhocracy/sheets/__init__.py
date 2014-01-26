@@ -1,9 +1,9 @@
-"""Adhocarcy properties."""
+"""Adhocarcy sheets."""
 from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.properties import interfaces
+from adhocracy.sheets import interfaces
 from adhocracy.interfaces import (
-    IIProperty,
-    IProperty,
+    IISheet,
+    ISheet,
 )
 from adhocracy.utils import (
     get_ifaces_from_module,
@@ -34,7 +34,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
 
     def __init__(self, context, iface):
         assert hasattr(context, '__setitem__')
-        assert iface.isOrExtends(interfaces.IProperty)
+        assert iface.isOrExtends(interfaces.ISheet)
         assert (not (iface.queryTaggedValue('createmandatory', False)
                 and iface.queryTaggedValue('readonly', False)))
         self.context = context
@@ -148,16 +148,16 @@ class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
 
 
 def includeme(config):
-    """Iterate all IProperty interfaces and register propertysheet adapters."""
+    """Iterate all ISheet interfaces and register propertysheet adapters."""
 
     ifaces = get_ifaces_from_module(interfaces,
-                                    base=IProperty)
+                                    base=ISheet)
     for iface in ifaces:
         config.registry.registerAdapter(ResourcePropertySheetAdapter,
                                         (iface, Interface),
                                         IResourcePropertySheet)
 
-    alsoProvides(interfaces.IPool, IIProperty)
+    alsoProvides(interfaces.IPool, IISheet)
     config.registry.registerAdapter(PoolPropertySheetAdapter,
-                                    (interfaces.IPool, IIProperty),
+                                    (interfaces.IPool, IISheet),
                                     IResourcePropertySheet)

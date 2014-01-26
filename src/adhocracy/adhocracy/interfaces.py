@@ -8,16 +8,16 @@ from zope.interface import (
 from zope.interface.interfaces import IInterface
 
 
-class IIProperty(IInterface):
+class IISheet(IInterface):
 
-    """Mark IProperty class to allow registering a MultiAdapter.
+    """Mark ISheet class to allow registering a MultiAdapter.
 
-    See adhocracy.properties.includme for examples.
+    See adhocracy.sheets.includme for examples.
 
     """
 
 
-class IProperty(Interface):
+class ISheet(Interface):
 
     """Marker interface with tagged values to define resource data."""
 
@@ -58,9 +58,9 @@ class IResource(Interface):
     taggedValue('is_implicit_addable', True)
     """Make this content type adddable if supertype is addable."""
 
-    taggedValue('basic_properties_interfaces', set())
+    taggedValue('basic_sheets_interfaces', set())
     """Basic property interfaces to define data """
-    taggedValue('extended_properties_interfaces', set())
+    taggedValue('extended_sheets_interfaces', set())
     """Extended property interfaces to define data, subtypes should override"""
     taggedValue('after_creation', [])
     """Callables to run after creation. They are passed the instance being
@@ -71,12 +71,12 @@ class IResourcePropertySheet(IPropertySheet):
 
     """Adapter for Resources to set/get the data.
 
-    It uses the IProperty ``schema``  taggedvalue to get the wanted data
+    It uses the ISheet ``schema``  taggedvalue to get the wanted data
     schema. The data store must prevent attribute name conflicts.
 
     """
 
-    iface = Attribute('The IProperty interface used to configure this Sheet.')
+    iface = Attribute('The ISheet interface used to configure this Sheet.')
     key = Attribute('Internal dictionary key to store the schema data.')
     readonly = Attribute('Bool to indicate you should not set data.')
     createmandatory = Attribute('Bool to indicate you should set data when '

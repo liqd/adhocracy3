@@ -14,9 +14,9 @@ class IPool(IResource, IAutoNamingFolder):
     """
 
     taggedValue('content_class', 'adhocracy.folder.ResourcesAutolNamingFolder')
-    taggedValue('basic_properties_interfaces',
-                set(['adhocracy.properties.interfaces.IName',
-                     'adhocracy.properties.interfaces.IPool']))
+    taggedValue('basic_sheets_interfaces',
+                set(['adhocracy.sheets.interfaces.IName',
+                     'adhocracy.sheets.interfaces.IPool']))
     taggedValue('addable_content_interfaces',
                 set(['adhocracy.resources.interfaces.IPool']))
     """ Set addable content types, class heritage is honored"""
@@ -31,11 +31,11 @@ class IFubelVersionsPool(IPool):
     """
 
     taggedValue('content_name', 'FubelVersionsPool')
-    taggedValue('basic_properties_interfaces', set(
-                ['adhocracy.properties.interfaces.IName',
-                 'adhocracy.properties.interfaces.ITags',
-                 'adhocracy.properties.interfaces.IVersions',
-                 'adhocracy.properties.interfaces.IPool']))
+    taggedValue('basic_sheets_interfaces', set(
+                ['adhocracy.sheets.interfaces.IName',
+                 'adhocracy.sheets.interfaces.ITags',
+                 'adhocracy.sheets.interfaces.IVersions',
+                 'adhocracy.sheets.interfaces.IPool']))
     taggedValue('addable_content_interfaces', set([
                 'adhocracy.resources.interfaces.IVersionableFubel',
                 'adhocracy.resources.interfaces.ITag',
@@ -52,8 +52,8 @@ class IFubel(IResource):
     """Small object without versions and children."""
 
     taggedValue('content_name', 'Fubel')
-    taggedValue('basic_properties_interfaces', set(
-                ['adhocracy.properties.interfaces.IName']))
+    taggedValue('basic_sheets_interfaces', set(
+                ['adhocracy.sheets.interfaces.IName']))
 
 
 class IVersionableFubel(IResource):
@@ -61,9 +61,9 @@ class IVersionableFubel(IResource):
     """Versionable object, created during a Participation Process (mainly)."""
 
     taggedValue('content_name', 'VersionableFubel')
-    taggedValue('basic_properties_interfaces', set(
-                ['adhocracy.properties.interfaces.INameReadOnly',
-                 'adhocracy.properties.interfaces.IVersionable']))
+    taggedValue('basic_sheets_interfaces', set(
+                ['adhocracy.sheets.interfaces.INameReadOnly',
+                 'adhocracy.sheets.interfaces.IVersionable']))
 
 
 # Concrete Fubels and FubelVersionsPools
@@ -72,8 +72,8 @@ class IProposal(IVersionableFubel):
 
     """Versionable Fubel with Document propertysheet."""
 
-    taggedValue('extended_properties_interfaces', set(
-                ['adhocracy.properties.interfaces.IDocument']))
+    taggedValue('extended_sheets_interfaces', set(
+                ['adhocracy.sheets.interfaces.IDocument']))
 
 
 class IProposalVersionsPool(IFubelVersionsPool):

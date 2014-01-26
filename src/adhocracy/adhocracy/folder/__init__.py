@@ -1,6 +1,6 @@
 """Folder content type for resources."""
 from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.properties.interfaces import IName
+from adhocracy.sheets.interfaces import IName
 from adhocracy.resources.interfaces import IVersionableFubel
 from substanced.interfaces import IAutoNamingFolder
 from substanced.folder import Folder
@@ -49,7 +49,7 @@ class ResourcesAutolNamingFolder(Folder):
             - zero-filling the left hand side of the result with 7 zeros.
             - add prefix "VERSION_" to the left hand side.
 
-        adhocracy.properties.interfaces.IName:
+        adhocracy.sheets.interfaces.IName:
 
             - use the `name` attribute
 

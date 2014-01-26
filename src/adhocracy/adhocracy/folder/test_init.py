@@ -14,12 +14,12 @@ class SheetNameDummy(object):
 
 def create_dummy_with_name_propertysheet(config):
     from adhocracy.interfaces import IResourcePropertySheet
-    from adhocracy.properties.interfaces import IName
-    from adhocracy.interfaces import IIProperty
+    from adhocracy.sheets.interfaces import IName
+    from adhocracy.interfaces import IISheet
     from zope.interface import alsoProvides
-    alsoProvides(IName, IIProperty)
+    alsoProvides(IName, IISheet)
     config.registry.registerAdapter(SheetNameDummy,
-                                    (IName, IIProperty),
+                                    (IName, IISheet),
                                     IResourcePropertySheet)
     return testing.DummyResource(__provides__=IName)
 

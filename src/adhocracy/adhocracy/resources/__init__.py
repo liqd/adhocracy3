@@ -1,6 +1,6 @@
 """Resouce configuration and default factory."""
 from adhocracy.interfaces import (
-    IProperty,
+    ISheet,
     IResource,
 )
 from adhocracy.resources import interfaces
@@ -25,11 +25,11 @@ class ResourceFactory(object):
         taggedvalues = get_all_taggedvalues(iface)
         self.class_ = resolve(taggedvalues['content_class'])
         self.resource_iface = iface
-        base_ifaces = taggedvalues['basic_properties_interfaces']
-        ext_ifaces = taggedvalues['extended_properties_interfaces']
+        base_ifaces = taggedvalues['basic_sheets_interfaces']
+        ext_ifaces = taggedvalues['extended_sheets_interfaces']
         self.prop_ifaces = [resolve(i) for i in base_ifaces.union(ext_ifaces)]
         for i in self.prop_ifaces:
-            assert i.isOrExtends(IProperty)
+            assert i.isOrExtends(ISheet)
         self.after_creation = taggedvalues['after_creation']
 
     def __call__(self, **kwargs):

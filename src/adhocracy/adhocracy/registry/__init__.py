@@ -1,6 +1,6 @@
 """Content registry."""
 from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.interfaces import IProperty
+from adhocracy.interfaces import ISheet
 from adhocracy.utils import (
     get_all_taggedvalues,
     get_resource_interface,
@@ -35,7 +35,7 @@ class ResourceContentRegistry(ContentRegistry):
 
         assert IResource.providedBy(context)
         sheets = {}
-        ifaces = [i for i in providedBy(context) if i.isOrExtends(IProperty)]
+        ifaces = [i for i in providedBy(context) if i.isOrExtends(ISheet)]
         for iface in ifaces:
             sheet = self.registry.getMultiAdapter((context, iface),
                                                   IResourcePropertySheet)
@@ -100,8 +100,8 @@ class ResourceContentRegistry(ContentRegistry):
             example::
 
                 {'adhocracy.resources.interfaces.IResourceA':
-                    'sheets_mandatory': ['adhocracy.properties.interfaces.IA']
-                    'sheets_optional': ['adhocracy.properties.interfaces.IB']
+                    'sheets_mandatory': ['adhocracy.sheets.interfaces.IA']
+                    'sheets_optional': ['adhocracy.sheets.interfaces.IB']
                 }
 
         """
