@@ -10,4 +10,4 @@ Module contents
 .. automodule:: adhocracy.folder
     :members:
     :undoc-members:
-    :show-inheritance:
+    

@@ -25,7 +25,7 @@ adhocracy.interfaces module
 .. automodule:: adhocracy.interfaces
     :members:
     :undoc-members:
-    :show-inheritance:
+    
 
 Module contents
 ---------------
@@ -33,4 +33,4 @@ Module contents
 .. automodule:: adhocracy
     :members:
     :undoc-members:
-    :show-inheritance:
+    
