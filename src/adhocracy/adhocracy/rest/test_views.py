@@ -1,6 +1,6 @@
 """Test rest.views module."""
-from adhocracy.properties.interfaces import IProperty
-from adhocracy.resources.interfaces import IResource
+from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IResource
 from cornice.util import (
     extract_json_data,
 )
@@ -25,7 +25,7 @@ class IResourceX(IResource):
     pass
 
 
-class IPropertyB(IProperty):
+class ISheetB(ISheet):
     taggedValue('schema', 'adhocracy.rest.test_views.CountSchema')
 
 
@@ -41,14 +41,8 @@ class Dummy(object):
 
 class DummyFolder(testing.DummyResource):
 
-    def add(self, name, resource, **kwargs):
-        self[name] = resource
-
-    def next_name(self, *kwargs):
-        return '0000001'
-
-    def check_name(self, name, reserved_names=[]):
-        return name
+    def add_next(self, resource, **kwargs):
+        self['child'] = resource
 
 
 class CorniceDummyRequest(testing.DummyRequest):
@@ -80,7 +74,7 @@ def make_mock_resource_registry_with_mock_type(iresource, mock_registry=None):
     return registry
 
 
-@patch('adhocracy.properties.ResourcePropertySheetAdapter')
+@patch('adhocracy.sheets.ResourcePropertySheetAdapter')
 def make_mock_sheet(iproperty, dummy_sheet=None):
     sheet = dummy_sheet.return_value
     sheet.iface = iproperty
@@ -406,15 +400,15 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
         assert wanted == response
 
     def test_get_valid_with_sheets(self):
-        sheet = make_mock_sheet(IPropertyB)
+        sheet = make_mock_sheet(ISheetB)
         self.request.registry.content.resource_sheets.return_value = {
-            IPropertyB.__identifier__: sheet}
+            ISheetB.__identifier__: sheet}
 
         inst = self.make_one(self.context, self.request)
         response = inst.get()
 
         data = sheet.schema.serialize()
-        wanted = {IPropertyB.__identifier__: data}
+        wanted = {ISheetB.__identifier__: data}
         assert wanted == response['data']
 
 
@@ -458,12 +452,12 @@ class FubelRESTViewUnitTest(unittest.TestCase):
         assert wanted == response
 
     def test_put_valid_with_sheets(self):
-        sheet = make_mock_sheet(IPropertyB)
+        sheet = make_mock_sheet(ISheetB)
         sheet.set_cstruct.return_value = True
         self.request.registry.content.resource_sheets.return_value = {
-            IPropertyB.__identifier__: sheet}
+            ISheetB.__identifier__: sheet}
         data = {'content_type': IResource.__identifier__,
-                'data': {IPropertyB.__identifier__: {'x': 'y'}}}
+                'data': {ISheetB.__identifier__: {'x': 'y'}}}
         self.request.validated = data
 
         inst = self.make_one(self.context, self.request)
@@ -474,11 +468,11 @@ class FubelRESTViewUnitTest(unittest.TestCase):
         assert sheet.set_cstruct.called
 
     def test_put_non_valid_with_sheets_raise_invalid(self):
-        sheet = make_mock_sheet(IPropertyB)
+        sheet = make_mock_sheet(ISheetB)
         self.request.registry.content.resource_sheets.return_value = {
-            IPropertyB.__identifier__: sheet}
+            ISheetB.__identifier__: sheet}
         data = {'content_type': IResource.__identifier__,
-                'data': {IPropertyB.__identifier__: {'x': 'y'}}}
+                'data': {ISheetB.__identifier__: {'x': 'y'}}}
         self.request.validated = data
 
         invalid_node = colander.SchemaNode(typ=colander.String())
@@ -520,8 +514,8 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         assert 'put' in dir(inst)
 
     def test_post_valid_with_sheets(self):
-        from adhocracy.properties.interfaces import IName
-        sheet = make_mock_sheet(IPropertyB)
+        from adhocracy.sheets.name import IName
+        sheet = make_mock_sheet(ISheetB)
         sheet.set_cstruct.return_value = True
         registry = self.request.registry.content
         registry.create.return_value = testing.DummyResource()
@@ -542,7 +536,7 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         assert 'child' in self.context
 
     def test_post_non_valid_with_sheets_raise_invalid(self):
-        sheet = make_mock_sheet(IPropertyB)
+        sheet = make_mock_sheet(ISheetB)
         sheet.set_cstruct.return_value = True
         invalid_node = colander.SchemaNode(typ=colander.String())
         sheet.set_cstruct.side_effect = colander.Invalid(invalid_node)

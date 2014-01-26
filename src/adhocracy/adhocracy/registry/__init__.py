@@ -1,16 +1,16 @@
 """Content registry."""
 from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.properties.interfaces import IProperty
-from adhocracy.utils import get_all_taggedvalues
+from adhocracy.interfaces import ISheet
+from adhocracy.utils import (
+    get_all_taggedvalues,
+    get_resource_interface,
+)
 from adhocracy.resources import ResourceFactory
-from adhocracy.resources.interfaces import IResource
+from adhocracy.interfaces import IResource
 from pyramid.security import has_permission
 from substanced.content import ContentRegistry
 from zope.dottedname.resolve import resolve
-from zope.interface import (
-    providedBy,
-    directlyProvidedBy,
-)
+from zope.interface import providedBy
 
 
 class ResourceContentRegistry(ContentRegistry):
@@ -35,9 +35,9 @@ class ResourceContentRegistry(ContentRegistry):
 
         assert IResource.providedBy(context)
         sheets = {}
-        ifaces = [i for i in providedBy(context) if i.isOrExtends(IProperty)]
+        ifaces = [i for i in providedBy(context) if i.isOrExtends(ISheet)]
         for iface in ifaces:
-            sheet = self.registry.getMultiAdapter((context, request, iface),
+            sheet = self.registry.getMultiAdapter((context, iface),
                                                   IResourcePropertySheet)
             if onlyviewable:
                 if not has_permission(sheet.permission_view, context, request):
@@ -100,17 +100,14 @@ class ResourceContentRegistry(ContentRegistry):
             example::
 
                 {'adhocracy.resources.interfaces.IResourceA':
-                    'sheets_mandatory': ['adhocracy.properties.interfaces.IA']
-                    'sheets_optional': ['adhocracy.properties.interfaces.IB']
+                    'sheets_mandatory': ['adhocracy.sheets.example.IA']
+                    'sheets_optional': ['adhocracy.sheets.example.IB']
                 }
 
         """
         assert IResource.providedBy(context)
         all_types = self.resource_types()
-        #get type data
-        ifaces = list(directlyProvidedBy(context))
-        iface = [i for i in ifaces if i.isOrExtends(IResource)][0]
-        name = iface.__identifier__
+        name = get_resource_interface(context).__identifier__
         assert name in all_types
         metadata = all_types[name]['metadata']
         addables = [resolve(i) for i

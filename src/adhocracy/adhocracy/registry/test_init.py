@@ -2,7 +2,7 @@ from adhocracy.resources.interfaces import (
     IResource,
     IPool,
 )
-from adhocracy.properties.interfaces import IProperty
+from adhocracy.interfaces import ISheet
 from pyramid import testing
 
 import unittest
@@ -25,19 +25,18 @@ class IResourceB(IPool):
     pass
 
 
-class IPropertyA(IProperty):
+class ISheetA(ISheet):
     pass
 
 
 def _register_propertysheet_adapter(config, context, iproperty):
-    from adhocracy.properties import ResourcePropertySheetAdapter
+    from adhocracy.sheets import ResourcePropertySheetAdapter
     from adhocracy.interfaces import IResourcePropertySheet
-    from adhocracy.properties.interfaces import IIProperty
-    from pyramid.interfaces import IRequest
+    from adhocracy.interfaces import IISheet
     from zope.interface import alsoProvides
-    alsoProvides(iproperty, IIProperty)
+    alsoProvides(iproperty, IISheet)
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (iproperty, IRequest, IIProperty),
+                                    (iproperty, IISheet),
                                     IResourcePropertySheet)
 
 
@@ -64,21 +63,21 @@ class TestResourceContentRegistry(unittest.TestCase):
         assert sheets == {}
 
     def test_sheets_valid_with_sheets(self):
-        from adhocracy.properties import ResourcePropertySheetAdapter
+        from adhocracy.sheets import ResourcePropertySheetAdapter
         inst = self._make_one(self.config.registry)
-        context = testing.DummyResource(__provides__=(IResource, IPropertyA))
-        _register_propertysheet_adapter(self.config, context, IPropertyA)
+        context = testing.DummyResource(__provides__=(IResource, ISheetA))
+        _register_propertysheet_adapter(self.config, context, ISheetA)
 
         sheets = inst.resource_sheets(context, testing.DummyRequest())
 
-        assert IPropertyA.__identifier__ in sheets
-        assert isinstance(sheets[IPropertyA.__identifier__],
+        assert ISheetA.__identifier__ in sheets
+        assert isinstance(sheets[ISheetA.__identifier__],
                           ResourcePropertySheetAdapter)
 
     def test_sheets_valid_with_sheets_no_permission(self):
         inst = self._make_one(self.config.registry)
-        context = testing.DummyResource(__provides__=(IResource, IPropertyA))
-        _register_propertysheet_adapter(self.config, context, IPropertyA)
+        context = testing.DummyResource(__provides__=(IResource, ISheetA))
+        _register_propertysheet_adapter(self.config, context, ISheetA)
         self.config.testing_securitypolicy(userid='reader', permissive=False)
 
         sheets = inst.resource_sheets(context, testing.DummyRequest(),
@@ -87,8 +86,8 @@ class TestResourceContentRegistry(unittest.TestCase):
 
     def test_sheets_valid_with_sheets_onlyeditable_no_permission(self):
         inst = self._make_one(self.config.registry)
-        context = testing.DummyResource(__provides__=(IResource, IPropertyA))
-        _register_propertysheet_adapter(self.config, context, IPropertyA)
+        context = testing.DummyResource(__provides__=(IResource, ISheetA))
+        _register_propertysheet_adapter(self.config, context, ISheetA)
         self.config.testing_securitypolicy(userid='reader', permissive=False)
 
         sheets = inst.resource_sheets(context, testing.DummyRequest(),
@@ -97,10 +96,10 @@ class TestResourceContentRegistry(unittest.TestCase):
 
     def test_sheets_valid_with_sheets_onlyeditable_readonly(self):
         inst = self._make_one(self.config.registry)
-        IPropertyA.setTaggedValue('readonly', True)
-        IPropertyA.setTaggedValue('createmandatory', False)
-        context = testing.DummyResource(__provides__=(IResource, IPropertyA))
-        _register_propertysheet_adapter(self.config, context, IPropertyA)
+        ISheetA.setTaggedValue('readonly', True)
+        ISheetA.setTaggedValue('createmandatory', False)
+        context = testing.DummyResource(__provides__=(IResource, ISheetA))
+        _register_propertysheet_adapter(self.config, context, ISheetA)
 
         sheets = inst.resource_sheets(context, testing.DummyRequest(),
                                       onlyeditable=True)
@@ -139,7 +138,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         _register_content_type(inst, IResourceB.__identifier__)
         IResourceA.setTaggedValue('addable_content_interfaces',
                                   [IResourceB.__identifier__])
-        IResourceB.setTaggedValue('basic_properties_interfaces', set())
+        IResourceB.setTaggedValue('basic_sheets', set())
 
         addables = inst.resource_addables(context, testing.DummyRequest())
 
@@ -154,8 +153,8 @@ class TestResourceContentRegistry(unittest.TestCase):
         _register_content_type(inst, IResourceBA.__identifier__)
         IResourceA.setTaggedValue('addable_content_interfaces',
                                   [IResourceA.__identifier__])
-        IResourceA.setTaggedValue('basic_properties_interfaces', set())
-        IResourceBA.setTaggedValue('basic_properties_interfaces', set())
+        IResourceA.setTaggedValue('basic_sheets', set())
+        IResourceBA.setTaggedValue('basic_sheets', set())
         IResourceBA.setTaggedValue('is_implicit_addable', True)
         addables = inst.resource_addables(context, testing.DummyRequest())
 
@@ -169,17 +168,17 @@ class TestResourceContentRegistry(unittest.TestCase):
         _register_content_type(inst, IResourceB.__identifier__)
         IResourceA.setTaggedValue('addable_content_interfaces',
                                   [IResourceB.__identifier__])
-        IResourceB.setTaggedValue('basic_properties_interfaces', set([
-                                  IPropertyA.__identifier__,
-                                  IProperty.__identifier__]))
-        IPropertyA.setTaggedValue('createmandatory', True)
-        _register_propertysheet_adapter(self.config, context, IProperty)
-        _register_propertysheet_adapter(self.config, context, IPropertyA)
+        IResourceB.setTaggedValue('basic_sheets', set([
+                                  ISheetA.__identifier__,
+                                  ISheet.__identifier__]))
+        ISheetA.setTaggedValue('createmandatory', True)
+        _register_propertysheet_adapter(self.config, context, ISheet)
+        _register_propertysheet_adapter(self.config, context, ISheetA)
         addables = inst.resource_addables(context, testing.DummyRequest())
 
         wanted = {IResourceB.__identifier__: {
-            'sheets_optional': [IProperty.__identifier__],
-            'sheets_mandatory': [IPropertyA.__identifier__]}}
+            'sheets_optional': [ISheet.__identifier__],
+            'sheets_mandatory': [ISheetA.__identifier__]}}
         assert wanted == addables
 
     def test_includeme(self):

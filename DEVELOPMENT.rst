@@ -9,11 +9,12 @@ Use test driven development and check code style bevore pushing commits
 
 Manually check pyflake, pep257::
 
-    bin/code_check src/adhocracy
+    bin/check_code src/adhocracy
 
 Example Vim config according to coding guideline::
 
     https://github.com/liqd/vim_config
+
 
 Install Robotframework
 ----------------------

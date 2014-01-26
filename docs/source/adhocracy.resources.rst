@@ -1,6 +1,9 @@
 adhocracy.resources package
 ===========================
 
+Submodules
+----------
+
 adhocracy.resources.interfaces module
 -------------------------------------
 

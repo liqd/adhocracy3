@@ -1,9 +1,9 @@
-"""Adhocarcy properties."""
-from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.properties import interfaces
-from adhocracy.properties.interfaces import IIProperty
+"""Adhocarcy sheets."""
+from adhocracy.interfaces import (
+    IResourcePropertySheet,
+    ISheet,
+)
 from adhocracy.utils import (
-    get_ifaces_from_module,
     get_all_taggedvalues,
     diff_dict,
 )
@@ -11,14 +11,10 @@ from adhocracy.schema import ReferenceSetSchemaNode
 from collections.abc import Mapping
 from persistent.mapping import PersistentMapping
 from pyramid.compat import is_nonstr_iter
-from pyramid.interfaces import IRequest
-from pyramid.httpexceptions import HTTPNotImplemented
 from substanced.property import PropertySheet
 from substanced.util import find_objectmap
 from zope.interface import (
     implementer,
-    alsoProvides,
-    Interface,
 )
 from zope.dottedname.resolve import resolve
 
@@ -30,13 +26,13 @@ class ResourcePropertySheetAdapter(PropertySheet):
 
     """Read interface.."""
 
-    def __init__(self, context, request, iface):
+    def __init__(self, context, iface):
         assert hasattr(context, '__setitem__')
-        assert iface.isOrExtends(interfaces.IProperty)
+        assert iface.isOrExtends(ISheet)
         assert (not (iface.queryTaggedValue('createmandatory', False)
                 and iface.queryTaggedValue('readonly', False)))
         self.context = context
-        self.request = request
+        self.request = None  # just to fullfill the interface
         self.iface = iface
         taggedvalues = get_all_taggedvalues(iface)
         self.key = taggedvalues.get('key') or iface.__identifier__
@@ -46,7 +42,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         self.createmandatory = taggedvalues['createmandatory']
         schema_class = resolve(taggedvalues['schema'])
         schema_obj = schema_class()
-        self.schema = schema_obj.bind(context=context, request=request)
+        self.schema = schema_obj.bind(context=context)
         self._objectmap = find_objectmap(self.context)
         for child in self.schema:
             assert child.default is not colander.null
@@ -119,43 +115,10 @@ class ResourcePropertySheetAdapter(PropertySheet):
         return cstruct
 
 
-@implementer(IResourcePropertySheet)
-class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
-
-    """Adapts Pool resource  to substance PropertySheet."""
-
-    def __init__(self, context, request, iface):
-        assert iface.isOrExtends(interfaces.IPool)
-        super(PoolPropertySheetAdapter, self).__init__(context, request, iface)
-
-    def get(self):
-        """Return data struct."""
-        struct = super(PoolPropertySheetAdapter, self).get()
-        struct['elements'] = self._objectmap.pathlookup(self.context,
-                                                        depth=1,
-                                                        include_origin=False)
-        return struct
-
-    def set(self, struct, omit=()):
-        """Return None."""
-        raise HTTPNotImplemented()
-
-    def set_cstruct(self, cstruct):
-        """Return None."""
-        raise HTTPNotImplemented()
-
-
 def includeme(config):
-    """Iterate all IProperty interfaces and register propertysheet adapters."""
-
-    ifaces = get_ifaces_from_module(interfaces,
-                                    base=interfaces.IProperty)
-    for iface in ifaces:
-        config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                        (iface, IRequest, Interface),
-                                        IResourcePropertySheet)
-
-    alsoProvides(interfaces.IPool, IIProperty)
-    config.registry.registerAdapter(PoolPropertySheetAdapter,
-                                    (interfaces.IPool, IRequest, IIProperty),
-                                    IResourcePropertySheet)
+    """Include all sheets in this package."""
+    config.include('.name')
+    config.include('.pool')
+    config.include('.document')
+    config.include('.versions')
+    config.include('.tags')
