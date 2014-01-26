@@ -20,12 +20,12 @@ class InterfaceY(zope.interface.Interface):
     """Useless Interface for testing"""
 
 
-class IPropertyX(adhocracy.properties.interfaces.IProperty):
+class IPropertyX(adhocracy.interfaces.IProperty):
 
     """Useless PropertyInterface for testing"""
 
 
-class IPropertyY(adhocracy.properties.interfaces.IProperty):
+class IPropertyY(adhocracy.interfaces.IProperty):
 
     """Useless PropertyInterface for testing"""
 
@@ -38,7 +38,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
     def test_valid_assign_ifaces(self):
         from adhocracy.resources import ResourceFactory
-        from adhocracy.resources.interfaces import IResource
+        from adhocracy.interfaces import IResource
         from persistent.mapping import PersistentMapping
         from persistent.interfaces import IPersistent
         from zope.interface import taggedValue, providedBy
@@ -57,6 +57,20 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         assert IPropertyX in resource_ifaces
         assert IPropertyY in resource_ifaces
 
+    def test_valid_after_create(self):
+        from adhocracy.resources import ResourceFactory
+        from adhocracy.interfaces import IResource
+        from zope.interface import taggedValue
+
+        def dummy_after_create(context, registry):
+            context.test = 'aftercreate'
+
+        class IResourceType(IResource):
+            taggedValue('after_creation', [dummy_after_create])
+
+        resource = ResourceFactory(IResourceType)()
+        assert resource.test == 'aftercreate'
+
     def test_resourcerfactory_none_valid_wrong_iresource_iface(self):
         from adhocracy.resources import ResourceFactory
         from zope.interface import Interface
@@ -69,7 +83,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
     def test_none_valid_wrong_iproperty_iface(self):
         from adhocracy.resources import ResourceFactory
-        from adhocracy.resources.interfaces import IResource
+        from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
         class IResourceType(IResource):
@@ -84,14 +98,14 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
+        self.config.include('substanced.content')
+        self.config.include('adhocracy.resources')
+        self.config.include('adhocracy.registry')
 
     def tearDown(self):
         testing.tearDown()
 
     def test_includeme_registry_register_factories(self):
-        self.config.include('substanced.content')
-        self.config.include('adhocracy.resources')
-        self.config.include('adhocracy.registry')
         content_types = self.config.registry.content.factory_types
         assert 'adhocracy.resources.interfaces.IFubel' in content_types
         assert 'adhocracy.resources.interfaces.IVersionableFubel'\
@@ -101,10 +115,8 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
         assert 'adhocracy.resources.interfaces.IPool' in content_types
 
     def test_includeme_registry_create_content(self):
-        self.config.include('substanced.content')
-        self.config.include('adhocracy.resources')
-        self.config.include('adhocracy.registry')
-        iresource = adhocracy.resources.interfaces.IPool
+        from adhocracy.resources.interfaces import IPool
+        iresource = IPool
         iresource_id = iresource.__identifier__
         resource = self.config.registry.content.create(iresource_id)
         assert iresource.providedBy(resource)

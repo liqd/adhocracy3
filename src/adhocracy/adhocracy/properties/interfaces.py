@@ -1,52 +1,15 @@
 """Interfaces for resource propertysheets."""
-from substanced.schema import (
-    NameSchemaNode
-)
 from zope.interface import (
     Interface,
     taggedValue,
 )
-from zope.interface.interfaces import IInterface
+from adhocracy.interfaces import IProperty
 from adhocracy.schema import (
     ReferenceSetSchemaNode,
     Identifier,
 )
 
 import colander
-
-
-class IIProperty(IInterface):
-
-    """Mark IProperty class to allow registering a MultiAdapter.
-
-    See adhocracy.properties.includme for examples.
-
-    """
-
-
-class IProperty(Interface):
-
-    """Marker interface with tagged values to define resource data."""
-
-    taggedValue('schema', 'colander.MappingSchema')
-    """Reference colander data schema.
-
-    This schema has to define the facade to work with this resource.
-    To set/get the data you can adapt to IPropertySheet objects.
-
-    Subtype has to override.
-
-    """
-    taggedValue('key', '')
-    """Key to store the schema data, defaults to IProperyXY.__identifier__"""
-    taggedValue('permission_view', 'view')
-    """Permission to view or index this data. Subtype should override."""
-    taggedValue('permission_edit', 'edit')
-    """Permission to edit this data. Subtype should override."""
-    taggedValue('readonly', False)
-    """This propertysheet may not be used to set data."""
-    taggedValue('createmandatory', False)
-    """This propertysheet is mandatory when creating a new resource."""
 
 
 class IName(IProperty):
@@ -74,7 +37,7 @@ class NameReadOnlySchema(colander.Schema):
 
     """Colander schema for INameReadOnly."""
 
-    name = NameSchemaNode(readonly=True, default='', missing=colander.drop)
+    name = Identifier(readonly=True, default='', missing=colander.drop)
 
 
 class IPool(IProperty):

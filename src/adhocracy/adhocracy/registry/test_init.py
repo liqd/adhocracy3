@@ -2,7 +2,7 @@ from adhocracy.resources.interfaces import (
     IResource,
     IPool,
 )
-from adhocracy.properties.interfaces import IProperty
+from adhocracy.interfaces import IProperty
 from pyramid import testing
 
 import unittest
@@ -32,12 +32,11 @@ class IPropertyA(IProperty):
 def _register_propertysheet_adapter(config, context, iproperty):
     from adhocracy.properties import ResourcePropertySheetAdapter
     from adhocracy.interfaces import IResourcePropertySheet
-    from adhocracy.properties.interfaces import IIProperty
-    from pyramid.interfaces import IRequest
+    from adhocracy.interfaces import IIProperty
     from zope.interface import alsoProvides
     alsoProvides(iproperty, IIProperty)
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (iproperty, IRequest, IIProperty),
+                                    (iproperty, IIProperty),
                                     IResourcePropertySheet)
 
 

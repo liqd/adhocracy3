@@ -1,10 +1,29 @@
 """Helper functions."""
 from functools import reduce
-from zope.interface import Interface
+from zope.interface import (
+    Interface,
+    directlyProvidedBy,
+)
+from adhocracy.interfaces import IResource
 
 import copy
 import json
 import pprint
+
+
+def get_resource_interface(context):
+    """Get resource type interface.
+
+    Args:
+        context (IResource): object
+    Returns:
+        interface
+
+    """
+    assert IResource.providedBy(context)
+    ifaces = list(directlyProvidedBy(context))
+    iresources = [i for i in ifaces if i.isOrExtends(IResource)]
+    return iresources[0]
 
 
 def get_all_taggedvalues(iface):

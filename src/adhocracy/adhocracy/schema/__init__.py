@@ -89,7 +89,7 @@ class PathSet(IdSet):
         return oids
 
 
-def get_all_resources(node, context, request):
+def get_all_resources(node, context):
     """Return List with all resources."""
     return []
     #FIXME: we need this to make the sdi work
@@ -114,6 +114,10 @@ class ReferenceSetSchemaNode(schema.MultireferenceIdSchemaNode):
     interfaces = [Interface]
     # FIXME: add coices getter to make sdi view work
     choices_getter = get_all_resources
+
+    def _get_choices(self):
+        context = self.bindings['context']
+        return self.choices_getter(context)
 
     @property
     def property_object(self):

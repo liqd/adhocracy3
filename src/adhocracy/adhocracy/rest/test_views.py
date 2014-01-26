@@ -1,6 +1,6 @@
 """Test rest.views module."""
-from adhocracy.properties.interfaces import IProperty
-from adhocracy.resources.interfaces import IResource
+from adhocracy.interfaces import IProperty
+from adhocracy.interfaces import IResource
 from cornice.util import (
     extract_json_data,
 )
@@ -41,14 +41,8 @@ class Dummy(object):
 
 class DummyFolder(testing.DummyResource):
 
-    def add(self, name, resource, **kwargs):
-        self[name] = resource
-
-    def next_name(self, *kwargs):
-        return '0000001'
-
-    def check_name(self, name, reserved_names=[]):
-        return name
+    def add_next(self, resource, **kwargs):
+        self['child'] = resource
 
 
 class CorniceDummyRequest(testing.DummyRequest):
