@@ -7,6 +7,21 @@ import json
 import pprint
 
 
+def get_resource_interface(context):
+    """Get resource type interface.
+
+    Args:
+        context (IResource): object
+    Returns:
+        interface
+
+    """
+    assert IResource.providedBy(context)
+    ifaces = list(directlyProvidedBy(context))
+    iresources = [i for i in ifaces if i.isOrExtends(IResource)]
+    return iresources[0]
+
+
 def get_all_taggedvalues(iface):
     """return dict with all own and all inherited taggedvalues."""
     iro = [i for i in iface.__iro__]

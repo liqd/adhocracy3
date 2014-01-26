@@ -2,6 +2,10 @@
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.properties.interfaces import IProperty
 from adhocracy.utils import get_all_taggedvalues
+from adhocracy.utils import (
+    get_all_taggedvalues,
+    get_resource_interface,
+)
 from adhocracy.resources import ResourceFactory
 from adhocracy.resources.interfaces import IResource
 from pyramid.security import has_permission
@@ -107,10 +111,7 @@ class ResourceContentRegistry(ContentRegistry):
         """
         assert IResource.providedBy(context)
         all_types = self.resource_types()
-        #get type data
-        ifaces = list(directlyProvidedBy(context))
-        iface = [i for i in ifaces if i.isOrExtends(IResource)][0]
-        name = iface.__identifier__
+        name = get_resource_interface(context).__identifier__
         assert name in all_types
         metadata = all_types[name]['metadata']
         addables = [resolve(i) for i
