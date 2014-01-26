@@ -41,14 +41,8 @@ class Dummy(object):
 
 class DummyFolder(testing.DummyResource):
 
-    def add(self, name, resource, **kwargs):
-        self[name] = resource
-
-    def next_name(self, *kwargs):
-        return '0000001'
-
-    def check_name(self, name, reserved_names=[]):
-        return name
+    def add_next(self, resource, **kwargs):
+        self['child'] = resource
 
 
 class CorniceDummyRequest(testing.DummyRequest):

@@ -22,7 +22,6 @@ from pyramid.view import (
     view_defaults,
 )
 from pyramid.traversal import resource_path
-from substanced.folder import FolderKeyError
 
 import functools
 
@@ -268,22 +267,14 @@ class PoolRESTView(FubelRESTView):
         #create resource
         type = self.request.validated['content_type']
         resource = self.registry.create(type)
-        # add to parent
-        name = self.request.validated['data'].get(IName.__identifier__, {})\
-            .get('name', '')
-        if IVersionableFubel.providedBy(resource):
-            name = self.context.next_name()
-        try:
-            name = self.context.check_name(name, self.reserved_names)
-        except (FolderKeyError, ValueError):
-                name += '_' + self.context.next_name()
-        self.context.add(name, resource, send_events=False)
+        sheets = self.registry.resource_sheets(resource, self.request)
         # store sheets
-        sheets_creatables = self.registry.resource_sheets(self.context,
-                                                          self.request,
-                                                          onlycreatable=True)
-        for name, cstruct in self.request.validated['data'].items():
-            sheets_creatables[name].set_cstruct(cstruct)
+        resource.__parent__ = self.context  # link parent for schema validation
+        for sheetname, cstruct in self.request.validated['data'].items():
+            sheets[sheetname].set_cstruct(cstruct)
+        del resource.__parent__
+        # add to parent
+        self.context.add_next(resource, send_events=False)
         #FIXME use substanced event system
         # response
         struct = {}
