@@ -1,16 +1,11 @@
 """ Evolve scripts for the adhocracy application."""
+from pyramid.threadlocal import get_current_registry
+from pyramid.security import Allow
+from pyramid.security import ALL_PERMISSIONS
+from substanced.util import set_acl
+from substanced.util import get_acl
 
 import logging
-from pyramid.threadlocal import get_current_registry
-from pyramid.security import (
-    Allow,
-    ALL_PERMISSIONS,
-)
-from substanced.util import (
-    set_acl,
-    get_acl
-)
-
 
 logger = logging.getLogger('evolution')
 

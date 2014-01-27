@@ -1,19 +1,13 @@
 """Resouce configuration and default factory."""
-from adhocracy.interfaces import (
-    ISheet,
-    IResource,
-)
+from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IResource
 from adhocracy.resources import interfaces
-from adhocracy.utils import (
-    get_ifaces_from_module,
-    get_all_taggedvalues,
-)
+from adhocracy.utils import get_ifaces_from_module
+from adhocracy.utils import get_all_taggedvalues
 from substanced.content import add_content_type
 from zope.dottedname.resolve import resolve
-from zope.interface import (
-    directlyProvides,
-    alsoProvides,
-)
+from zope.interface import directlyProvides
+from zope.interface import alsoProvides
 
 
 class ResourceFactory(object):

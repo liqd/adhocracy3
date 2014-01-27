@@ -1,21 +1,15 @@
 """Adhocarcy sheets."""
-from adhocracy.interfaces import (
-    IResourcePropertySheet,
-    ISheet,
-)
-from adhocracy.utils import (
-    get_all_taggedvalues,
-    diff_dict,
-)
+from adhocracy.interfaces import IResourcePropertySheet
+from adhocracy.interfaces import ISheet
+from adhocracy.utils import get_all_taggedvalues
+from adhocracy.utils import diff_dict
 from adhocracy.schema import ReferenceSetSchemaNode
 from collections.abc import Mapping
 from persistent.mapping import PersistentMapping
 from pyramid.compat import is_nonstr_iter
 from substanced.property import PropertySheet
 from substanced.util import find_objectmap
-from zope.interface import (
-    implementer,
-)
+from zope.interface import implementer
 from zope.dottedname.resolve import resolve
 
 import colander

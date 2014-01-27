@@ -1,15 +1,11 @@
 """Test rest.views module."""
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
-from cornice.util import (
-    extract_json_data,
-)
+from cornice.util import extract_json_data
 from cornice.errors import Errors
 from mock import patch
 from pyramid import testing
-from zope.interface import (
-    taggedValue,
-)
+from zope.interface import taggedValue
 from zope.dottedname.resolve import resolve
 
 import colander

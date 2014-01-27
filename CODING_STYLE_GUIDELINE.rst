@@ -39,7 +39,7 @@ Imports
 
     * sort alphabetical, empty line between import .. and import .. from statements.
     * don't use * to import everything from a module
-    * use commas and newlines if you import multiple things from one moudle
+    * don't use relative import paths
     * dont catch ImportError to detect wheter a package is available or not, as it might hide circular import errors. Instead use pkgresources.getdistribution and catch DistributionNotFound. (http://do3.cc/blog/2010/08/20/do-not-catch-import-errors,-use-pkg_resources/)
 
 Javascript

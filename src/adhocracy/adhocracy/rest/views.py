@@ -1,26 +1,18 @@
 """Rest API views."""
 from adhocracy.interfaces import IResource
-from adhocracy.resources.interfaces import (
-    IFubel,
-    IPool,
-)
-from adhocracy.rest.schemas import (
-    ResourceResponseSchema,
-    POSTResourceRequestSchema,
-    PUTResourceRequestSchema,
-    GETResourceResponseSchema,
-    OPTIONResourceResponseSchema,
-)
+from adhocracy.resources.interfaces import IFubel
+from adhocracy.resources.interfaces import IPool
+from adhocracy.rest.schemas import ResourceResponseSchema
+from adhocracy.rest.schemas import POSTResourceRequestSchema
+from adhocracy.rest.schemas import PUTResourceRequestSchema
+from adhocracy.rest.schemas import GETResourceResponseSchema
+from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from copy import deepcopy
 from cornice.util import json_error
-from cornice.schemas import (
-    validate_colander_schema,
-    CorniceSchema,
-)
-from pyramid.view import (
-    view_config,
-    view_defaults,
-)
+from cornice.schemas import validate_colander_schema
+from cornice.schemas import CorniceSchema
+from pyramid.view import view_config
+from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
 
 import functools

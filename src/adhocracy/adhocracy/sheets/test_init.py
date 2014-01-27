@@ -1,16 +1,12 @@
-from adhocracy.interfaces import (
-    ISheet,
-    IISheet,
-)
-from pyramid.testing import DummyResource
+from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IISheet
 from unittest.mock import call
 from unittest.mock import patch
 from pyramid import testing
-from zope.interface import (
-    Interface,
-    taggedValue,
-    provider,
-)
+from zope.interface import Interface
+from zope.interface import taggedValue
+from zope.interface import provider
+
 import colander
 import pytest
 import unittest
@@ -103,7 +99,7 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
     def test_create_valid(self):
         from adhocracy.interfaces import IResourcePropertySheet
         from zope.interface.verify import verifyObject
-        context = DummyResource()
+        context = testing.DummyResource()
         iproperty = ISheetB
         inst = self.make_one(context, iproperty)
         assert inst.context == context
@@ -117,7 +113,7 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
 
     def test_create_non_valid_set_readonly_or_createmandatory(self):
         with pytest.raises(AssertionError):
-            self.make_one(DummyResource(), ISheetC)
+            self.make_one(testing.DummyResource(), ISheetC)
 
     def test_create_non_valid_non_mapping_context(self):
         with pytest.raises(AssertionError):
@@ -125,46 +121,46 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
 
     def test_create_non_valid_non_iproperty_iface(self):
         with pytest.raises(AssertionError):
-            self.make_one(DummyResource(), InterfaceY)
+            self.make_one(testing.DummyResource(), InterfaceY)
 
     @patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
     def test_create_references(self, dummy_reference_node=None):
         node = dummy_reference_node.return_value
         node.name = 'references'
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         inst.schema.children.append(node)
         assert inst._references == {'references': ISheetB.__identifier__
                                     + ':references'}
 
     def test_get_empty(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         assert inst.get() == {'count': 0}
 
     def test_get_non_empty(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         inst._data['count'] = 11
         assert inst.get() == {'count': 11}
 
     def test_set_valid(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         assert inst.set({'count': 11}) is True
         assert inst.get() == {'count': 11}
 
     def test_set_valid_empty(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         assert inst.set({}) is False
         assert inst.get() == {'count': 0}
 
     def test_set_valid_omit_str(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         assert inst.set({'count': 11}, omit='count') is False
 
     def test_set_valid_omit_tuple(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         assert inst.set({'count': 11}, omit=('count',)) is False
 
     def test_set_valid_omit_wrong_key(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         assert inst.set({'count': 11}, omit=('wrongkey',)) is True
 
     @patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
@@ -208,26 +204,26 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         self._set_valid_references({3, 4, 5}, {3, 4, 5}, {}, {})
 
     def test_get_cstruct_empty(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         assert inst.get_cstruct() == {'count': '0'}
 
     def test_get_cstruct_non_empty(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         inst._data['count'] = 11
         assert inst.get_cstruct() == {'count': '11'}
 
     def test_set_cstruct_valid(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         inst.set_cstruct({'count': '11'})
         assert inst.get_cstruct() == {'count': '11'}
 
     def test_set_cstruct_valid_empty(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         inst.set_cstruct({})
         assert inst.get_cstruct() == {'count': '0'}
 
     def test_set_cstruct_valid_with_name_conflicts(self):
-        context = DummyResource()
+        context = testing.DummyResource()
         inst1 = self.make_one(context, ISheetB)
         inst1.set_cstruct({'count': '1'})
         inst2 = self.make_one(context, ISheetA)
@@ -236,21 +232,21 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         assert inst2.get_cstruct() == {'count': '2'}
 
     def test_set_cstruct_valid_readonly(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         inst.schema.children[0].readonly = True
         inst.set_cstruct({'count': '1'})
         assert inst.get_cstruct() == {'count': '0'}
 
     def test_get_cstruct_non_valid_missing_default_value(self):
         with pytest.raises(AssertionError):
-            self.make_one(DummyResource(), ISheetZ)
+            self.make_one(testing.DummyResource(), ISheetZ)
 
     def test_get_cstruct_non_valid_missing_missing_value(self):
         with pytest.raises(AssertionError):
-            self.make_one(DummyResource(), ISheetY)
+            self.make_one(testing.DummyResource(), ISheetY)
 
     def test_set_cstruct_non_valid_wrong_type(self):
-        inst = self.make_one(DummyResource(), ISheetB)
+        inst = self.make_one(testing.DummyResource(), ISheetB)
         with pytest.raises(colander.Invalid):
             inst.set_cstruct({'count': 'wrongnumber'})
 
@@ -297,7 +293,7 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
 
     def test_register_ipropertysheet_adapter_inheritance(self):
         self.register_propertysheet_adapter(self.config, IExtendPropertyB)
-        context = DummyResource()
+        context = testing.DummyResource()
         inst_extend = self.get_one(self.config, context, IExtendPropertyB)
         assert ISheetB.providedBy(context)
         assert IExtendPropertyB.providedBy(context)
@@ -307,7 +303,7 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
     def test_register_ipropertysheet_adapter_extend(self):
         self.register_propertysheet_adapter(self.config, ISheetB)
         self.register_propertysheet_adapter(self.config, IExtendPropertyB)
-        context = DummyResource()
+        context = testing.DummyResource()
         inst_extend = self.get_one(self.config, context, IExtendPropertyB)
         inst = self.get_one(self.config, context, ISheetB)
         inst_extend.set({'count': 1})
@@ -336,36 +332,37 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
                                              (ISheetB, Interface),
                                              IResourcePropertySheet)
 
-        context = DummyResource()
+        context = testing.DummyResource()
         inst = self.get_one(self.config, context, ISheetB)
         assert isinstance(inst, OverrideAdapter)
 
     def test_includeme_register_ipropertysheet_adapter_iname(self):
         from adhocracy.sheets.name import IName
         self.config.include('adhocracy.sheets')
-        inst = self.get_one(self.config, DummyResource(), IName)
+        inst = self.get_one(self.config, testing.DummyResource(), IName)
         assert inst.iface is IName
 
     def test_includeme_register_ipropertysheet_adapter_inamereadonly(self):
         from adhocracy.sheets.name import INameReadOnly
         self.config.include('adhocracy.sheets')
-        inst = self.get_one(self.config, DummyResource(), INameReadOnly)
+        inst = self.get_one(self.config, testing.DummyResource(),
+                            INameReadOnly)
         assert inst.iface is INameReadOnly
 
     def test_includeme_register_ipropertysheet_adapter_iversions(self):
         from adhocracy.sheets.versions import IVersions
         self.config.include('adhocracy.sheets')
-        inst = self.get_one(self.config, DummyResource(), IVersions)
+        inst = self.get_one(self.config, testing.DummyResource(), IVersions)
         assert inst.iface is IVersions
 
     def test_includeme_register_ipropertysheet_adapter_itags(self):
         from adhocracy.sheets.tags import ITags
         self.config.include('adhocracy.sheets')
-        inst = self.get_one(self.config, DummyResource(), ITags)
+        inst = self.get_one(self.config, testing.DummyResource(), ITags)
         assert inst.iface is ITags
 
     def test_includeme_register_ipropertysheet_adapter_iversionable(self):
         from adhocracy.sheets.versions import IVersionable
         self.config.include('adhocracy.sheets')
-        inst = self.get_one(self.config, DummyResource(), IVersionable)
+        inst = self.get_one(self.config, testing.DummyResource(), IVersionable)
         assert inst.iface is IVersionable
