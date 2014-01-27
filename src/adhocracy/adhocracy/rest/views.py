@@ -1,7 +1,7 @@
 """Rest API views."""
 from adhocracy.interfaces import IResource
-from adhocracy.resources.interfaces import IFubel
-from adhocracy.resources.interfaces import IPool
+from adhocracy.resources import IFubel
+from adhocracy.resources import IPool
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
 from adhocracy.rest.schemas import PUTResourceRequestSchema

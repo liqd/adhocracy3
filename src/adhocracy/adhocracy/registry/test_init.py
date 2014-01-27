@@ -1,6 +1,6 @@
 from adhocracy.interfaces import ISheet
-from adhocracy.resources.interfaces import IResource
-from adhocracy.resources.interfaces import IPool
+from adhocracy.resources import IResource
+from adhocracy.resources import IPool
 from pyramid import testing
 
 import unittest

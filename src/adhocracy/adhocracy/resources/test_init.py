@@ -1,6 +1,6 @@
 from pyramid import testing
 
-from adhocracy.sheets.interfaces import ISheet
+from adhocracy.sheets import ISheet
 import pytest
 import zope.interface
 import unittest
@@ -107,15 +107,15 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
 
     def test_includeme_registry_register_factories(self):
         content_types = self.config.registry.content.factory_types
-        assert 'adhocracy.resources.interfaces.IFubel' in content_types
-        assert 'adhocracy.resources.interfaces.IVersionableFubel'\
+        assert 'adhocracy.resources.IFubel' in content_types
+        assert 'adhocracy.resources.IVersionableFubel'\
             in content_types
-        assert 'adhocracy.resources.interfaces.IFubelVersionsPool'\
+        assert 'adhocracy.resources.IFubelVersionsPool'\
             in content_types
-        assert 'adhocracy.resources.interfaces.IPool' in content_types
+        assert 'adhocracy.resources.IPool' in content_types
 
     def test_includeme_registry_create_content(self):
-        from adhocracy.resources.interfaces import IPool
+        from adhocracy.resources import IPool
         iresource = IPool
         iresource_id = iresource.__identifier__
         resource = self.config.registry.content.create(iresource_id)

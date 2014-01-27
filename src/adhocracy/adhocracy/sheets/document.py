@@ -27,7 +27,7 @@ class DocumentSchema(colander.Schema):
         essence_refs=True,
         default=[],
         missing=colander.drop,
-        interface='adhocracy.resources.interfaces.ISection')
+        interface='adhocracy.resources.ISection')
 
 
 @provider(IISheet)

@@ -59,9 +59,9 @@ class ResourceContentRegistry(ContentRegistry):
 
             example::
 
-                {'adhocracy.resources.interfaces.IResourceA':
+                {'adhocracy.resources.IResourceA':
                   {
-                    'name': "adhocracy.resources.interfaces.IResourceA",
+                    'name': "adhocracy.resources.IResourceA",
                     'iface': adhocracy.resource.interface.IResourceA.__class__,
                     'metadata': {"addable_content_interfaces": [...], ...}
                   }
@@ -97,7 +97,7 @@ class ResourceContentRegistry(ContentRegistry):
 
             example::
 
-                {'adhocracy.resources.interfaces.IResourceA':
+                {'adhocracy.resources.IResourceA':
                     'sheets_mandatory': ['adhocracy.sheets.example.IA']
                     'sheets_optional': ['adhocracy.sheets.example.IB']
                 }

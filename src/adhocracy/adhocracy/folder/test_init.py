@@ -37,19 +37,19 @@ class ResourcesAutolNamingFolderUnitTest(unittest.TestCase):
         return ResourcesAutolNamingFolder(d)
 
     def test_next_name_versionable_empty(self):
-        from adhocracy.resources.interfaces import IVersionableFubel
+        from adhocracy.resources import IVersionableFubel
         ob = testing.DummyResource(__provides__=IVersionableFubel)
         inst = self._makeOne()
         assert inst.next_name(ob) == 'VERSION_' + '0'.zfill(7)
 
     def test_next_name_versionable_nonempty_intifiable(self):
-        from adhocracy.resources.interfaces import IVersionableFubel
+        from adhocracy.resources import IVersionableFubel
         ob = testing.DummyResource(__provides__=IVersionableFubel)
         inst = self._makeOne({'VERSION_0000000': ob})
         assert inst.next_name(ob).startswith('VERSION_' + '0'.zfill(7) + '_20')
 
     def test_next_name_versionable_nonempty_nonintifiable(self):
-        from adhocracy.resources.interfaces import IVersionableFubel
+        from adhocracy.resources import IVersionableFubel
         ob = testing.DummyResource(__provides__=IVersionableFubel)
         inst = self._makeOne({'abcd': ob})
         assert inst.next_name(ob) == 'VERSION_' + '0'.zfill(7)
@@ -70,7 +70,7 @@ class ResourcesAutolNamingFolderUnitTest(unittest.TestCase):
         assert inst.next_name(ob).startswith('dummyname_20')
 
     def test_add_next_versionable_empty(self):
-        from adhocracy.resources.interfaces import IVersionableFubel
+        from adhocracy.resources import IVersionableFubel
         ob = testing.DummyResource(__provides__=IVersionableFubel)
         inst = self._makeOne()
         result = inst.add_next(ob)
