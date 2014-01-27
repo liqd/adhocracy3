@@ -112,7 +112,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         resource = ResourceFactory(IResourceType)(appstructs=data)
         assert resource['_data'] == data
 
-    def test_resourcerfactory_none_valid_wrong_iresource_iface(self):
+    def test_non_valid_wrong_iresource_iface(self):
         from adhocracy.resources import ResourceFactory
         from zope.interface import Interface
 
@@ -122,7 +122,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         with pytest.raises(AssertionError):
             ResourceFactory(InterfaceY)()
 
-    def test_none_valid_wrong_iproperty_iface(self):
+    def test_non_valid_wrong_iproperty_iface(self):
         from adhocracy.resources import ResourceFactory
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
