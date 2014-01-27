@@ -1,6 +1,7 @@
 """Resource type configuration and default factory."""
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
+from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.utils import get_ifaces_from_module
 from adhocracy.utils import get_all_taggedvalues
 from substanced.content import add_content_type
@@ -9,6 +10,7 @@ from zope.dottedname.resolve import resolve
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 from zope.interface import taggedValue
+from zope.component import getMultiAdapter
 
 import sys
 
@@ -127,13 +129,22 @@ class ResourceFactory(object):
             assert i.isOrExtends(ISheet)
         self.after_creation = taggedvalues['after_creation']
 
+    def _set_appstructs(self, resource, appstructs):
+        for key, struct in appstructs.items():
+            iface = resolve(key)
+            sheet = getMultiAdapter((resource, iface),
+                                    IResourcePropertySheet)
+            sheet.set(struct)
+
     def __call__(self, **kwargs):
-        content = self.class_()
-        directlyProvides(content, self.resource_iface)
-        alsoProvides(content, self.prop_ifaces)
+        resource = self.class_()
+        directlyProvides(resource, self.resource_iface)
+        alsoProvides(resource, self.prop_ifaces)
+        if 'appstructs' in kwargs:
+            self._set_appstructs(resource, kwargs['appstructs'])
         for call in self.after_creation:
-            call(content, None)
-        return content
+            call(resource, None)
+        return resource
 
 
 def includeme(config):

@@ -30,11 +30,38 @@ class ISheetY(ISheet):
     """Useless PropertyInterface for testing."""
 
 
+class DummyPropertySheetAdapter(object):
+
+    _data = {}
+
+    def __init__(self, context, iface):
+        self.context = context
+        self.iface = iface
+        self.context['_data'] = {}
+
+    def set(self, appstruct):
+        self.context['_data'][self.iface.__identifier__] = appstruct
+
+
+def _register_dummypropertysheet_adapter(config, isheet):
+    from adhocracy.interfaces import IResourcePropertySheet
+    from zope.interface.interfaces import IInterface
+    config.registry.registerAdapter(DummyPropertySheetAdapter,
+                                    (isheet, IInterface),
+                                    IResourcePropertySheet)
+
+
 ###########
 #  tests  #
 ###########
 
 class ResourceFactoryUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_valid_assign_ifaces(self):
         from adhocracy.resources import ResourceFactory
@@ -70,6 +97,20 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         resource = ResourceFactory(IResourceType)()
         assert resource.test == 'aftercreate'
+
+    def test_valid_with_sheet_data(self):
+        from adhocracy.resources import ResourceFactory
+        from adhocracy.interfaces import IResource
+        from zope.interface import taggedValue
+
+        class IResourceType(IResource):
+            taggedValue('basic_sheets', set([ISheetY.__identifier__]))
+
+        data = {ISheetY.__identifier__: {"count": 0}}
+        _register_dummypropertysheet_adapter(self.config, ISheetY)
+
+        resource = ResourceFactory(IResourceType)(appstructs=data)
+        assert resource['_data'] == data
 
     def test_resourcerfactory_none_valid_wrong_iresource_iface(self):
         from adhocracy.resources import ResourceFactory
