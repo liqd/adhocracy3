@@ -1,4 +1,7 @@
-from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import (
+    ISheet,
+    IISheet,
+)
 from pyramid.testing import DummyResource
 from unittest.mock import call
 from unittest.mock import patch
@@ -6,6 +9,7 @@ from pyramid import testing
 from zope.interface import (
     Interface,
     taggedValue,
+    provider,
 )
 import colander
 import pytest
@@ -21,14 +25,17 @@ class InterfaceY(Interface):
     pass
 
 
+@provider(IISheet)
 class ISheetA(ISheet):
     taggedValue('schema', 'adhocracy.sheets.test_init.CountSchema')
 
 
+@provider(IISheet)
 class ISheetB(ISheet):
     taggedValue('schema', 'adhocracy.sheets.test_init.CountSchema')
 
 
+@provider(IISheet)
 class ISheetC(ISheet):
     taggedValue('schema', 'adhocracy.sheets.test_init.CountSchema')
     taggedValue('readonly', True)
@@ -41,6 +48,7 @@ class CountSchema(colander.MappingSchema):
                                 missing=colander.drop)
 
 
+@provider(IISheet)
 class ISheetZ(ISheet):
     taggedValue('schema',
                 'adhocracy.sheets.test_init.CountSchemaMissingDefault')
@@ -51,6 +59,7 @@ class CountSchemaMissingDefault(colander.MappingSchema):
                                 missing=colander.drop)
 
 
+@provider(IISheet)
 class ISheetY(ISheet):
     taggedValue('schema',
                 'adhocracy.sheets.test_init.CountSchemaMissingMissing')
@@ -61,6 +70,7 @@ class CountSchemaMissingMissing(colander.MappingSchema):
                                 default=0)
 
 
+@provider(IISheet)
 class IExtendPropertyB(ISheetB):
     taggedValue('schema',
                 'adhocracy.sheets.test_init.ExtendCountSchema')
@@ -269,7 +279,7 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def make_one(self, config, context, iface):
+    def get_one(self, config, context, iface):
         from adhocracy.interfaces import IResourcePropertySheet
         from zope.interface import alsoProvides
         alsoProvides(context, iface)
@@ -279,29 +289,27 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
 
     def register_propertysheet_adapter(self, config, iface):
         from adhocracy.interfaces import IResourcePropertySheet
-        from adhocracy.interfaces import IISheet
         from adhocracy.sheets import ResourcePropertySheetAdapter
-        from zope.interface import alsoProvides
-        alsoProvides(iface, IISheet)
+        from zope.interface import Interface
         self.config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                             (iface, IISheet),
+                                             (iface, Interface),
                                              IResourcePropertySheet)
 
     def test_register_ipropertysheet_adapter_inheritance(self):
         self.register_propertysheet_adapter(self.config, IExtendPropertyB)
         context = DummyResource()
-        inst_extend = self.make_one(self.config, context, IExtendPropertyB)
+        inst_extend = self.get_one(self.config, context, IExtendPropertyB)
         assert ISheetB.providedBy(context)
         assert IExtendPropertyB.providedBy(context)
         assert 'count' in inst_extend.get()
         assert 'newattribute' in inst_extend.get()
 
-    def test_includeme_register_ipropertysheet_adapter_extend(self):
+    def test_register_ipropertysheet_adapter_extend(self):
         self.register_propertysheet_adapter(self.config, ISheetB)
         self.register_propertysheet_adapter(self.config, IExtendPropertyB)
         context = DummyResource()
-        inst_extend = self.make_one(self.config, context, IExtendPropertyB)
-        inst = self.make_one(self.config, context, ISheetB)
+        inst_extend = self.get_one(self.config, context, IExtendPropertyB)
+        inst = self.get_one(self.config, context, ISheetB)
         inst_extend.set({'count': 1})
         assert inst_extend.key == inst.key
         assert inst.get() == {'count': 1}
@@ -310,32 +318,54 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
         assert inst_extend.get() == {'count': 2, 'newattribute': ''}
         assert inst.get() == {'count': 2}
 
+    def test_register_ipropertysheet_adapter_override(self):
+        from adhocracy.interfaces import IResourcePropertySheet
+        from adhocracy.interfaces import IISheet
+        from adhocracy.sheets import ResourcePropertySheetAdapter
+        from zope.interface import Interface
+
+        class OverrideAdapter(object):
+            def __init__(*args):
+                pass
+
+        self.config.registry.registerAdapter(OverrideAdapter,
+                                             (ISheetB, IISheet),
+                                             IResourcePropertySheet)
+        default_adapter = ResourcePropertySheetAdapter
+        self.config.registry.registerAdapter(default_adapter,
+                                             (ISheetB, Interface),
+                                             IResourcePropertySheet)
+
+        context = DummyResource()
+        inst = self.get_one(self.config, context, ISheetB)
+        assert isinstance(inst, OverrideAdapter)
+
     def test_includeme_register_ipropertysheet_adapter_iname(self):
         from adhocracy.sheets.name import IName
         self.config.include('adhocracy.sheets')
-        inst = self.make_one(self.config, DummyResource(), IName)
+        inst = self.get_one(self.config, DummyResource(), IName)
         assert inst.iface is IName
 
     def test_includeme_register_ipropertysheet_adapter_inamereadonly(self):
         from adhocracy.sheets.name import INameReadOnly
         self.config.include('adhocracy.sheets')
-        inst = self.make_one(self.config, DummyResource(), INameReadOnly)
+        inst = self.get_one(self.config, DummyResource(), INameReadOnly)
         assert inst.iface is INameReadOnly
 
     def test_includeme_register_ipropertysheet_adapter_iversions(self):
         from adhocracy.sheets.versions import IVersions
         self.config.include('adhocracy.sheets')
-        inst = self.make_one(self.config, DummyResource(), IVersions)
+        inst = self.get_one(self.config, DummyResource(), IVersions)
         assert inst.iface is IVersions
 
     def test_includeme_register_ipropertysheet_adapter_itags(self):
         from adhocracy.sheets.tags import ITags
         self.config.include('adhocracy.sheets')
-        inst = self.make_one(self.config, DummyResource(), ITags)
+        inst = self.get_one(self.config, DummyResource(), ITags)
         assert inst.iface is ITags
 
     def test_includeme_register_ipropertysheet_adapter_iversionable(self):
         from adhocracy.sheets.versions import IVersionable
         self.config.include('adhocracy.sheets')
-        inst = self.make_one(self.config, DummyResource(), IVersionable)
+        inst = self.get_one(self.config, DummyResource(), IVersionable)
         assert inst.iface is IVersionable
