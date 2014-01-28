@@ -1,6 +1,6 @@
 from pyramid import testing
 
-import adhocracy.properties.interfaces
+from adhocracy.sheets import ISheet
 import pytest
 import zope.interface
 import unittest
@@ -20,14 +20,35 @@ class InterfaceY(zope.interface.Interface):
     """Useless Interface for testing"""
 
 
-class IPropertyX(adhocracy.properties.interfaces.IProperty):
+class ISheetX(ISheet):
 
-    """Useless PropertyInterface for testing"""
+    """Useless PropertyInterface for testing."""
 
 
-class IPropertyY(adhocracy.properties.interfaces.IProperty):
+class ISheetY(ISheet):
 
-    """Useless PropertyInterface for testing"""
+    """Useless PropertyInterface for testing."""
+
+
+class DummyPropertySheetAdapter(object):
+
+    _data = {}
+
+    def __init__(self, context, iface):
+        self.context = context
+        self.iface = iface
+        self.context['_data'] = {}
+
+    def set(self, appstruct):
+        self.context['_data'][self.iface.__identifier__] = appstruct
+
+
+def _register_dummypropertysheet_adapter(config, isheet):
+    from adhocracy.interfaces import IResourcePropertySheet
+    from zope.interface.interfaces import IInterface
+    config.registry.registerAdapter(DummyPropertySheetAdapter,
+                                    (isheet, IInterface),
+                                    IResourcePropertySheet)
 
 
 ###########
@@ -36,28 +57,62 @@ class IPropertyY(adhocracy.properties.interfaces.IProperty):
 
 class ResourceFactoryUnitTest(unittest.TestCase):
 
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
     def test_valid_assign_ifaces(self):
         from adhocracy.resources import ResourceFactory
-        from adhocracy.resources.interfaces import IResource
+        from adhocracy.interfaces import IResource
         from persistent.mapping import PersistentMapping
         from persistent.interfaces import IPersistent
         from zope.interface import taggedValue, providedBy
 
         class IResourceType(IResource):
-            taggedValue("extended_properties_interfaces",
-                        set([IPropertyX.__identifier__]))
-            taggedValue("basic_properties_interfaces",
-                        set([IPropertyY.__identifier__]))
+            taggedValue('extended_sheets',
+                        set([ISheetX.__identifier__]))
+            taggedValue('basic_sheets',
+                        set([ISheetY.__identifier__]))
 
         resource = ResourceFactory(IResourceType)()
         assert isinstance(resource, PersistentMapping)
         resource_ifaces = [x for x in providedBy(resource).interfaces()]
         assert IPersistent in resource_ifaces
         assert IResourceType in resource_ifaces
-        assert IPropertyX in resource_ifaces
-        assert IPropertyY in resource_ifaces
+        assert ISheetX in resource_ifaces
+        assert ISheetY in resource_ifaces
 
-    def test_resourcerfactory_none_valid_wrong_iresource_iface(self):
+    def test_valid_after_create(self):
+        from adhocracy.resources import ResourceFactory
+        from adhocracy.interfaces import IResource
+        from zope.interface import taggedValue
+
+        def dummy_after_create(context, registry):
+            context.test = 'aftercreate'
+
+        class IResourceType(IResource):
+            taggedValue('after_creation', [dummy_after_create])
+
+        resource = ResourceFactory(IResourceType)()
+        assert resource.test == 'aftercreate'
+
+    def test_valid_with_sheet_data(self):
+        from adhocracy.resources import ResourceFactory
+        from adhocracy.interfaces import IResource
+        from zope.interface import taggedValue
+
+        class IResourceType(IResource):
+            taggedValue('basic_sheets', set([ISheetY.__identifier__]))
+
+        data = {ISheetY.__identifier__: {"count": 0}}
+        _register_dummypropertysheet_adapter(self.config, ISheetY)
+
+        resource = ResourceFactory(IResourceType)(appstructs=data)
+        assert resource['_data'] == data
+
+    def test_non_valid_wrong_iresource_iface(self):
         from adhocracy.resources import ResourceFactory
         from zope.interface import Interface
 
@@ -67,13 +122,13 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         with pytest.raises(AssertionError):
             ResourceFactory(InterfaceY)()
 
-    def test_none_valid_wrong_iproperty_iface(self):
+    def test_non_valid_wrong_iproperty_iface(self):
         from adhocracy.resources import ResourceFactory
-        from adhocracy.resources.interfaces import IResource
+        from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
         class IResourceType(IResource):
-            taggedValue("basic_properties_interfaces",
+            taggedValue('basic_sheets',
                         set([InterfaceY.__identifier__]))
 
         with pytest.raises(AssertionError):
@@ -84,25 +139,25 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
+        self.config.include('substanced.content')
+        self.config.include('adhocracy.resources')
+        self.config.include('adhocracy.registry')
 
     def tearDown(self):
         testing.tearDown()
 
     def test_includeme_registry_register_factories(self):
-        self.config.include("substanced.content")
-        self.config.include("adhocracy.resources")
         content_types = self.config.registry.content.factory_types
-        assert 'adhocracy.resources.interfaces.IFubel' in content_types
-        assert 'adhocracy.resources.interfaces.IVersionableFubel'\
+        assert 'adhocracy.resources.IFubel' in content_types
+        assert 'adhocracy.resources.IVersionableFubel'\
             in content_types
-        assert 'adhocracy.resources.interfaces.IFubelVersionsPool'\
+        assert 'adhocracy.resources.IFubelVersionsPool'\
             in content_types
-        assert 'adhocracy.resources.interfaces.IPool' in content_types
+        assert 'adhocracy.resources.IPool' in content_types
 
     def test_includeme_registry_create_content(self):
-        self.config.include("substanced.content")
-        self.config.include("adhocracy.resources")
-        iresource = adhocracy.resources.interfaces.IPool
+        from adhocracy.resources import IPool
+        iresource = IPool
         iresource_id = iresource.__identifier__
         resource = self.config.registry.content.create(iresource_id)
         assert iresource.providedBy(resource)

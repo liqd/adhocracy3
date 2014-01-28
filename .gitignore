@@ -11,8 +11,11 @@ __pycache__
 *.egg-info
 .installed.cfg
 .mr.developer.cfg
+.sass-cache
 /bin
 /docs/build
+/etc/compass.min.rb
+/etc/compass.rb
 python
 develop-eggs
 /var
@@ -23,6 +26,8 @@ develop-eggs
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js.map
 /src/adhocracy/adhocracy/frontend/static/stylesheets/.sass-cache/
 /src/adhocracy/adhocracy/frontend/static/stylesheets/a3.css
+/src/adhocracy/adhocracy/frontend/static/stylesheets/min/
+/src/rubygemsrecipe/build/
 /source_env
 /.vagrant
 robotframework/bin/

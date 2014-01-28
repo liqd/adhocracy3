@@ -1,5 +1,8 @@
-Loosed coupling REST-API 
-========================
+# doctest: +ELLIPSIS
+# doctest: +NORMALIZE_WHITESPACE
+
+REST-API (with loose coupling)
+===============================
 
 Prerequisites
 -------------
@@ -10,7 +13,7 @@ Some imports to work with rest api calls::
     >>> from functools import reduce
     >>> import os
     >>> import requests
-    >>> from adhocracy.utils import pprint_json
+    >>> from pprint import pprint
 
 Start Adhocracy testapp::
 
@@ -34,7 +37,7 @@ Resource structure
 ------------------
 
 Resources have one content interface to set its type, like
-"adhocracy.resources.interfaces.IPool".
+"adhocracy.resources.IPool".
 
 FIXME: rename content interface to ressource interface, this is more clear and more common
 FIXME: maybe rename propertysheet interface to property interface, its shorter
@@ -73,37 +76,33 @@ We can use the following http verbs to work with resources.
 OPTIONS
 ~~~~~~~
 
-Returns possible methods for this resource and available interfaces
-with resources data::
+Returns possible methods for this resource, example request/response data
+structures and available interfaces with resource data::
 
-    >>> resp = testapp.options("/adhocracy")
-    >>> pprint_json(resp.json)
-    {
-        "GET": {"response_body": [
-                    "adhocracy.properties.interfaces.IName",
-                    "adhocracy.properties.interfaces.IPool", 
-                    ],
-               }, 
-        "HEAD": {},
-        "POST": {"request_body": [
-                    "adhocracy.resources.interfaces.IPool",
-                    "adhocracy.resources.interfaces.IProposalVersionsPool",
-                    ],
-        },
-        "PUT": {"request_body": [
-                    "adhocracy.properties.interfaces.IName",
-                    "adhocracy.properties.interfaces.IPool",
-                    ],
-               },
-    }
+    >>> resp_data = testapp.options("/adhocracy").json
+    >>> sorted(resp_data.keys())
+    ['GET', 'HEAD', 'OPTION', 'POST', 'PUT']
 
-FIXME: IName property sheet will go away.  It used to be an
-unambiguous object identifier, but the path is already good for that.
-It was also confusingly abused as a human-readable descriptor for the
-object, which is somewhat useful, but also useful in references, not
-just in objects.  It was decided that IName will be removed and
-replaced by an optional field "name" next to "content_type", "path",
-and "data".
+    >>> sorted(resp_data["GET"]["response_body"]["data"].keys())
+    ['adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool']
+
+    >>> sorted(resp_data["PUT"]["request_body"]["data"].keys())
+    ['adhocracy.sheets.name.IName']
+
+The value for POST gives us list with valid request data stubs::
+
+    >>> data_post_pool = {'content_type': 'adhocracy.resources.IPool',
+    ...                   'data': {'adhocracy.sheets.name.IName': {}}}
+    >>> data_post_pool in resp_data["POST"]["request_body"]
+    True
+
+  (IName contains a path that must be a valid identifier for this resource.
+The server will test its validity and reject everything that is not, say,
+the path of the resource that this body was posted to plus one fresh
+extra path element.  For details, see backend unit test documentation
+or such.)
+
+Semantics of read-only and mandatory flags in request body:
 
 
 HEAD
@@ -123,75 +122,42 @@ GET
 
 Returns resource and child elements meta data and all propertysheet interfaces with data::
 
-    >>> resp = testapp.get("/adhocracy", )
-    >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.resources.interfaces.IPool",
-        "data": {
-            ...
-            "adhocracy.properties.interfaces.IName": {
-                "name": ""
-            },
-            "adhocracy.properties.interfaces.IPool": {
-                "elements": []
-            }
-        },
-        "path": ...
-    }
-
+    >>> resp_data = testapp.get("/adhocracy").json
+    >>> pprint(resp_data["data"])
+    {'adhocracy.sheets.name.IName': {'name': ''},
+     'adhocracy.sheets.pool.IPool': {'elements': []}}
 
 POST
 ~~~~
 
 Create a new resource ::
 
-    >>> prop = {'content_type': 'adhocracy.resources.interfaces.IPool',
+    >>> prop = {'content_type': 'adhocracy.resources.IPool',
     ...         'data': {
-    ...              'adhocracy.properties.interfaces.IName': {
-    ...                  'name': 'PROposals'},
-    ...                  }}
-    >>> resp = testapp.post_json("/adhocracy", prop)
-    >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.resources.interfaces.IPool",
-        "path": "/adhocracy/proposals
-    }
-
-FIXME: Was bedeutet das IName interface, ist das die id aus der die URL
-erzeugt wird?
-
+    ...              'adhocracy.sheets.name.IName': {
+    ...                  'name': 'Proposals'}}}
+    >>> resp_data = testapp.post_json("/adhocracy", prop).json
+    >>> resp_data["content_type"]
+    'adhocracy.resources.IPool'
+    >>> resp_data["path"]
+    '/adhocracy/Proposals'
 
 PUT
 ~~~
 
 Modify data of an existing resource ::
 
-    >>> data = {'content_type': 'adhocracy.resources.interfaces.IPool',
-    ...         'data': {'adhocracy.properties.interfaces.IName': {'name': 'Proposals'}}}
-    >>> resp = testapp.put_json("/adhocracy/proposals", data)
-    >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.resources.interfaces.IPool",
-        "path": "/adhocracy/proposals"
-    }
+    >>> data = {'content_type': 'adhocracy.resources.IPool',
+    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'proposals'}}}
+    >>> resp_data = testapp.put_json("/adhocracy/Proposals", data).json
+    >>> pprint(resp_data)
+    {'content_type': 'adhocracy.resources.IPool', 'path': '/adhocracy/Proposals'}
 
-Check the changed resource::
+Check the changed resource ::
 
-    >>> resp = testapp.get("/adhocracy/proposals")
-    >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.resources.interfaces.IPool",
-        "data": {
-            ...
-            "adhocracy.properties.interfaces.IName": {
-                "name": "Proposals"
-            },
-            "adhocracy.properties.interfaces.IPool": {
-                "elements": []
-            }
-        },
-        "path": "/adhocracy/proposals"
-    }
+    >>> resp_data = testapp.get("/adhocracy/Proposals").json
+    >>> resp_data["data"]["adhocracy.sheets.name.IName"]["name"]
+    'proposals'
 
 FIXME: write test cases for attributes with "required", "read-only",
 and possibly others.  (those work the same in PUT and POST, and on any
@@ -201,40 +167,40 @@ attribute in the json tree.)
 ERROR Handling
 ~~~~~~~~~~~~~~
 
+FIXME: ... is not working anymore in this doctest
+
 The normal return code is 200 ::
 
-    >>> data = {'content_type': 'adhocracy.resources.interfaces.IPool',
-    ...         'data': {'adhocracy.properties.interfaces.IName': {'name': 'Proposals'}}}
-    >>> resp = testapp.put_json("/adhocracy/proposals", data)
-    >>> resp.code
-    200
+    >>> data = {'content_type': 'adhocracy.resources.IPool',
+    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'Proposals'}}}
 
-If you submit invalid data
+.. >>> testapp.put_json("/adhocracy/Proposals", data)
+.. 200 OK application/json ...
 
-    >>> data = {'content_type': 'adhocracy.resources.interfaces.IPool',
-    ...         'data': {'adhocracy.properties.interfaces.WRONGINTERFACE': {'name': 'Proposals'}}}
-    >>> resp = testapp.put_json("/adhocracy/proposals", data)
+If you submit invalid data the return error code is 400::
 
-the return code is 400 ::
+    >>> data = {'content_type': 'adhocracy.resources.IPool',
+    ...         'data': {'adhocracy.sheets.example.WRONGINTERFACE': {'name': 'Proposals'}}}
 
-    >>> resp.code 400
+.. >>> testapp.put_json("/adhocracy/Proposals", data)
+.. Traceback (most recent call last):
+.. ...
+.. {"errors": [{"description": ...
 
-and you get data with a detailed error description
-(like https://cornice.readthedocs.org/en/latest/validation.html?highlight=schema) ::
+and you get data with a detailed error description::
 
      {
        'status': 'error',
        'errors': errors.
      }
-        With errors being a JSON dictionary with the keys “location”, “name”
-        and “description”.
 
-        location is the location of the error. It can be “querystring”,
-        “header” or “body”
-        name is the eventual name of the value that caused problems
-        description is a description of the problem encountered.
+With errors being a JSON dictionary with the keys “location”, “name”
+and “description”.
 
-FIXME: example error message
+location is the location of the error. It can be “querystring”,
+“header” or “body”
+name is the eventual name of the value that caused problems
+description is a description of the problem encountered.
 
 If all goes wrong the return code is 500.
 
@@ -242,54 +208,78 @@ If all goes wrong the return code is 500.
 Create and Update Versionable Resources
 ---------------------------------------
 
+
+FIXME: this section needs to be edited to work for the following
+scenario: A document has two paragraphs, and is changed first in the
+first, then in the second:
+
+
+ Doc     v0       v1      v2
+                 /       /
+ Par1    v0    v1       /
+                       /
+ Par2    v0          v1
+
+-----> time --------------------------------------->
+
+We want document to be available in 3 versions that are linearly
+dependent on each other.  But when the update to Par2 is to be posted,
+the client has no way of telling that it should update v1 of document,
+BUT NOT v0!
+
+Solution: If DAGs are nested inside each other like Par1, Par2 are
+nested in Doc in the above example, the POST request creating a new
+version of the child DAG must contain follows entries not only for
+itself, but for all ancestor DAGs.
+
+[end of FIXME]
+
+
+
 Create
 ~~~~~~
 
 Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource type) ::
 
-    >>> prop = {'content_type': 'adhocracy.resources.interfaces.IProposalVersionsPool',
+    >>> prop = {'content_type': 'adhocracy.resources.IProposalVersionsPool',
     ...         'data': {
-    ...              'adhocracy.properties.interfaces.IName': {
-    ...                  'name': 'kommunismus'},
-    >>> resp = testapp.post_json("/adhocracy/proposals", prop)
+    ...              'adhocracy.sheets.name.IName': {
+    ...                  'name': 'kommunismus'}
+    ...              }
+    ...         }
+    >>> resp = testapp.post_json("/adhocracy/Proposals", prop)
     >>> proposal_versions_path = resp.json["path"]
+    >>> proposal_versions_path
+    '/adhocracy/Proposals/kommunismus'
 
 The return data has the new attribute 'first_version_path' to get the path of the first Proposal (aka VersionableFubel)::
 
-    >>> pprint_json(resp.json)
-    {
-     "content_type": "adhocracy.resources.interfaces.IProposalVersionsPool",
-     "first_version_path": "/adhocracy/proposals/kommunismus/VERSION_...
-     "path": "/adhocracy/proposals/kommunismus"
-    }
-    >>> proposal_v1_path = resp.json["first_version_path"]
+    >>> proposal_v1_path = resp.json['first_version_path']
+    >>> proposal_v1_path
+    /adhocracy/Proposals/kommunismus/VERSION_...
 
 The ProposalVersionsPool has the IVersions and ITags interfaces to work with Versions ::
 
-    >>> resp = testapp.post_get(proposal_versions_path)
-    >>> pprint_json(resp.json)
-    ...
-        "data": {
-            "adhocracy.properties.interfaces.IName": {
+    >>> pprint(resp.json['data']}
+        {
+            "adhocracy.sheets.name.IName": {
                 "name": "kommunismus"
             },
-            "adhocracy.properties.interfaces.IVersions": {
+            "adhocracy.sheets.versions.IVersions": {
                 "elements": [
-                    "/adhocracy/proposals/kommunismus/VERSION_...
+                    "/adhocracy/Proposals/kommunismus/VERSION_...
                 ]
             }
-            "adhocracy.properties.interfaces.ITags": {
+            "adhocracy.sheets.tags.ITags": {
                 "elements": [
-                    "/adhocracy/proposals/kommunismus/TAG_FIRST"
+                    "/adhocracy/Proposals/kommunismus/TAG_FIRST"
                 ]
             }
-            "adhocracy.properties.interfaces.IPool": {
+            "adhocracy.sheets.pool.IPool": {
                 "elements": []
             }
 
-        },
-    ...
-
+        }
 
 Update
 ~~~~~~
@@ -299,35 +289,35 @@ Fetch the first Proposal Version, it is empty ::
     >>> resp = testapp.post_get(proposal_v1_path)
     >>> pprint_json(resp.json)
     {
-        "content_type": "adhocracy.resources.interfaces.IProposal",
+        "content_type": "adhocracy.resources.IProposal",
         "data": {
-            "adhocracy.properties.interfaces.INameReadOnly": {
+            "adhocracy.sheets.name.INameReadOnly": {
                 "name": "VERSION_...
             },
-            'adhocracy.properties.interfaces.IDocument': {
+            'adhocracy.sheets.document.IDocument': {
                       'title': '',
                       'description': '',
                       'elements': []}}}
-            "adhocracy.properties.interfaces.IPool": {
+            "adhocracy.sheets.pool.IPool": {
                 "elements": []
             },
-            "adhocracy.properties.interfaces.IVersionable": {
+            "adhocracy.sheets.versions.IVersionable": {
                 "follows": [],
                 "followed-by": []
             }
         },
-        "path": "/adhocracy/proposals/kommunismus/VERSION_...
+        "path": "/adhocracy/Proposals/kommunismus/VERSION_...
     }
 
 Create a second proposal that follows the first version ::
 
-    >>> para = {'content_type': 'adhocracy.resources.interfaces.Proposal',
+    >>> para = {'content_type': 'adhocracy.resources.Proposal',
     ...         'data': {
-    ...              'adhocracy.properties.interfaces.IDocument': {
+    ...              'adhocracy.sheets.document.IDocument': {
     ...                  'title': 'kommunismus jetzt!',
     ...                  'description': 'blabla!',
     ...                  'elements': []}
-    ...               'adhocracy.properties.Interfaces.IVersionable': {
+    ...               'adhocracy.sheets.Interfaces.IVersionable': {
     ...                  'follows': [proposal_v1_path],
     ...                  }
     ...          }}
@@ -342,9 +332,9 @@ Add and update child resource
 
 Create a SectionVersionsPool inside the ProposalVersionsPool::
 
-    >>> prop = {'content_type': 'adhocracy.resources.interfaces.ISectionVersionsPool',
+    >>> prop = {'content_type': 'adhocracy.resources.ISectionVersionsPool',
     ...         'data': {
-    ...              'adhocracy.properties.interfaces.IName': {
+    ...              'adhocracy.sheets.name.IName': {
     ...              'name': 'kapitel1'},
     >>> resp = testapp.post_json(proposal_versions_path, prop)
     >>> section_versions_path = resp.json["path"]
@@ -352,11 +342,11 @@ Create a SectionVersionsPool inside the ProposalVersionsPool::
 
 Create a third Proposal version and add the first Section version ::
 
-    >>> para = {'content_type': 'adhocracy.resources.interfaces.Proposal',
+    >>> para = {'content_type': 'adhocracy.resources.Proposal',
     ...         'data': {
-    ...              'adhocracy.properties.interfaces.IDocument': {
+    ...              'adhocracy.sheets.document.IDocument': {
     ...                  'elements': [section_v1_path]}
-    ...               'adhocracy.properties.Interfaces.IVersionable': {
+    ...               'adhocracy.sheets.Interfaces.IVersionable': {
     ...                  'follows': [proposal_v2_path],
     ...                  }
     ...          }}
@@ -366,12 +356,12 @@ Create a third Proposal version and add the first Section version ::
 
 If we create a second Section version ::
 
-    >>> prop = {'content_type': 'adhocracy.resources.interfaces.ISection',
+    >>> prop = {'content_type': 'adhocracy.resources.ISection',
     ...         'data': {
-    ...              'adhocracy.properties.interfaces.ISection': {
+    ...              'adhocracy.sheets.document.ISections': {
     ...                  'title': 'Kapitel Überschrift Bla',
     ...                  'elements': []}
-    ...               'adhocracy.properties.Interfaces.IVersionable': {
+    ...               'adhocracy.sheets.Interfaces.IVersionable': {
     ...                  'follows': [section_v1_path],
     ...                  }
     ...          }}
@@ -386,25 +376,25 @@ we automatically create a fourth Proposal version ::
     >>> pprint_json(resp.json)
     ...
         "data": {
-            "adhocracy.properties.interfaces.IName": {
+            "adhocracy.sheets.name.IName": {
                 "name": "kommunismus"
             },
-            "adhocracy.properties.interfaces.IVersions": {
+            "adhocracy.sheets.versions.IVersions": {
                 "elements": [
-                    "/adhocracy/proposals/kommunismus/VERSION..."
-                    "/adhocracy/proposals/kommunismus/VERSION..."
-                    "/adhocracy/proposals/kommunismus/VERSION..."
-                    "/adhocracy/proposals/kommunismus/VERSION..."
+                    "/adhocracy/Proposals/kommunismus/VERSION..."
+                    "/adhocracy/Proposals/kommunismus/VERSION..."
+                    "/adhocracy/Proposals/kommunismus/VERSION..."
+                    "/adhocracy/Proposals/kommunismus/VERSION..."
                 ]
             }
-            "adhocracy.properties.interfaces.ITags": {
+            "adhocracy.sheets.tags.ITags": {
                 "elements": [
-                    "/adhocracy/proposals/kommunismus/TAG_FIRST"
+                    "/adhocracy/Proposals/kommunismus/TAG_FIRST"
                 ]
             }
-            "adhocracy.properties.interfaces.IPool": {
+            "adhocracy.sheets.pool.IPool": {
                 "elements": [
-                    "/adhocracy/proposals/kommunismus/kapitel1"
+                    "/adhocracy/Proposals/kommunismus/kapitel1"
                 ]
             }
     ...
@@ -425,6 +415,13 @@ FIXME: s/follows/predecessors/g; s/followed_by/successors/g;?
 Batch requests
 ––––––––––––––
 
+FIXME: eliminate talk on postroots (it's obsolete).
+
+FIXME: one batch is one transaction: if the last request failes with a
+4xx error, the entire batch request must be rolled back.  the idea
+expressed in this section that half of a batch should be committed is
+weird and should be dropped.
+
 The following URL accepts POSTs of ordered sequences (json arrays) of
 encoded HTTP requests in one HTTP request body ::
 
@@ -442,23 +439,23 @@ FIXME: postroot will go away.
 
     >>> batch = [ { 'method': 'POST',
     ...             'path': propv2["postroot"],
-    ...             'body': { 'content_type': 'adhocracy.resources.interfaces.IParagraph',
-    ...                       'data': { 'adhocracy.properties.interfaces.Text': {
+    ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
+    ...                       'data': { 'adhocracy.sheets.document.Text': {
     ...                           'text': 'sein blick ist vom vorüberziehn der stäbchen' }}}},
     ...           { 'method': 'POST',
     ...             'path': propv2["postroot"],
-    ...             'body': { 'content_type': 'adhocracy.resources.interfaces.IParagraph',
-    ...                       'data': { 'adhocracy.properties.interfaces.Text': {
+    ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
+    ...                       'data': { 'adhocracy.sheets.document.Text': {
     ...                           'text': 'ganz weiß geworden, so wie nicht mehr frisch' }}}},
     ...           { 'method': 'POST',
     ...             'path': propv2["postroot"],
     ...             'body': { 'content_type': 'this is not a very well-known content-type, and will trigger an error!',
-    ...                       'data': { 'adhocracy.properties.interfaces.Text': {
+    ...                       'data': { 'adhocracy.sheets.document.Text': {
     ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
     ...           { 'method': 'POST',
     ...             'path': propv2["postroot"],
-    ...             'body': { 'content_type': 'adhocracy.resources.interfaces.IParagraph',
-    ...                       'data': { 'adhocracy.properties.interfaces.Text': {
+    ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
+    ...                       'data': { 'adhocracy.sheets.document.Text': {
     ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
     >>> batch_resp = testapp.post_json(batch_url, batch).json
     >>> pprint_json(batch_resp)
@@ -466,14 +463,14 @@ FIXME: postroot will go away.
         {
             "code": 200,
             "body": {
-                "content_type": "adhocracy.resources.interfaces.IParagraph",
+                "content_type": "adhocracy.resources.IParagraph",
                 "path": "..."
             }
         },
         {
             "code": 200,
             "body": {
-                "content_type": "adhocracy.resources.interfaces.IParagraph",
+                "content_type": "adhocracy.resources.IParagraph",
                 "path": "..."
             }
         },
@@ -494,25 +491,25 @@ reference object contains a number that points into the batch array
 (numbering starts with '0').  (Numeric paths are only allowed in batch
 requests!)
 
-    >>> propv2["data"]["adhocracy.properties.interfaces.IDocument"]["paragraphs"]
-    ...      .append({ 'content_type': 'adhocracy.resources.interfaces.IParagraph', 'path': batch_resp[0]["body"]["path"]})
-    ... propv2["data"]["adhocracy.properties.interfaces.IDocument"]["paragraphs"]
-    ...      .append({ 'content_type': 'adhocracy.resources.interfaces.IParagraph', 'path': batch_resp[1]["body"]["path"]})
-    ... propv2["data"]["adhocracy.properties.interfaces.IDocument"]["paragraphs"]
-    ...      .append({ 'content_type': 'adhocracy.resources.interfaces.IParagraph', 'path': 0})
-    ... propv2["data"]["adhocracy.properties.interfaces.IDocument"]["paragraphs"]
-    ...      .append({ 'content_type': 'adhocracy.resources.interfaces.IParagraph', 'path': 1})
-    ... propv2_vrsbl = propv2["data"]["adhocracy.properties.interfaces.IVersionable"]
+    >>> propv2["data"]["adhocracy.sheets.document.IDocument"]["paragraphs"]
+    ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': batch_resp[0]["body"]["path"]})
+    ... propv2["data"]["adhocracy.sheets.document.IDocument"]["paragraphs"]
+    ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': batch_resp[1]["body"]["path"]})
+    ... propv2["data"]["adhocracy.sheets.document.IDocument"]["paragraphs"]
+    ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': 0})
+    ... propv2["data"]["adhocracy.sheets.document.IDocument"]["paragraphs"]
+    ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': 1})
+    ... propv2_vrsbl = propv2["data"]["adhocracy.sheets.versions.IVersionable"]
     ... propv2_vrsbl["follows"] = [{'content_type': prop["content_type"], 'path': prop["path"]}]
     ... batch = [ { 'method': 'POST',
     ...             'path': prop["postroot"],
-    ...             'body': { 'content_type': 'adhocracy.resources.interfaces.IParagraph',
-    ...                       'data': { 'adhocracy.properties.interfaces.Text': {
+    ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
+    ...                       'data': { 'adhocracy.sheets.document.Text': {
     ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
     ...           { 'method': 'POST',
     ...             'path': prop["postroot"],
-    ...             'body': { 'content_type': 'adhocracy.resources.interfaces.IParagraph',
-    ...                       'data': { 'adhocracy.properties.interfaces.Text': {
+    ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
+    ...                       'data': { 'adhocracy.sheets.document.Text': {
     ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
     ...           { 'method': 'POST',
     ...             'path': propv2_vrsbl["postroot"],
@@ -524,28 +521,28 @@ requests!)
         {
             "code": 200,
             "body": {
-                "content_type": "adhocracy.resources.interfaces.IParagraph",
+                "content_type": "adhocracy.resources.IParagraph",
                 "path": "..."
             }
         },
         {
             "code": 200,
             "body": {
-                "content_type": "adhocracy.resources.interfaces.IParagraph",
+                "content_type": "adhocracy.resources.IParagraph",
                 "path": "..."
             }
         },
         {
             "code": 200,
             "body": {
-                "content_type": "adhocracy.resources.interfaces.IProposal",
+                "content_type": "adhocracy.resources.IProposal",
                 "path": "..."
             }
         }
     ]
     >>> propv3 = testapp.get_json(batch_resp[2]["body"]["path"]).json
     {
-        "content_type": "adhocracy.resources.interfaces.IProposal",
+        "content_type": "adhocracy.resources.IProposal",
         ...
     }
 

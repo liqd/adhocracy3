@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# This needs scss and compass
-# if impatient, try this:
-# apt-get install rubygems
-# gem install --user-install compass
-
-scss --compass scss/a3.scss a3.css

@@ -1,10 +1,27 @@
 """Helper functions."""
 from functools import reduce
 from zope.interface import Interface
+from zope.interface import directlyProvidedBy
+from adhocracy.interfaces import IResource
 
 import copy
 import json
 import pprint
+
+
+def get_resource_interface(context):
+    """Get resource type interface.
+
+    Args:
+        context (IResource): object
+    Returns:
+        interface
+
+    """
+    assert IResource.providedBy(context)
+    ifaces = list(directlyProvidedBy(context))
+    iresources = [i for i in ifaces if i.isOrExtends(IResource)]
+    return iresources[0]
 
 
 def get_all_taggedvalues(iface):
@@ -25,6 +42,7 @@ def get_ifaces_from_module(module, base=Interface, blacklist=[]):
     so we have to do it manually
 
     """
+
     ifaces = []
     for key in dir(module):
         value = getattr(module, key)
@@ -38,19 +56,27 @@ def get_ifaces_from_module(module, base=Interface, blacklist=[]):
     return ifaces
 
 
-def diff_dict(dict, dict_updates):
-    """Return dict with all items in dict_updates that are not in dict"""
-    dict_diff = {}
-    for key, value in dict_updates.items():
-        if key not in dict:
-            dict_diff[key] = value
-        else:
-            if dict[key] != dict_updates[key]:
-               dict_diff[key] = value
-    return dict_diff
+def diff_dict(old_dict, new_dict, omit=()):
+    """Calculate changed keys of two dictionaries.
+
+    Return tuple of (added, changed, removed) keys between old_dict and
+    new_dict.
+
+    """
+    old = old_dict.keys() - set(omit)
+    new = new_dict.keys() - set(omit)
+
+    added = new - old
+    removed = old - new
+
+    common = old & new
+    changed = set([key for key in common if old_dict[key] != new_dict[key]])
+
+    return (added, changed, removed)
 
 
 def sort_dict(d, sort_paths):
+    """Return sorted dictionary."""
     d2 = copy.deepcopy(d)
     for path in sort_paths:
         base = reduce(lambda d, seg: d[seg], path[:-1], d2)
@@ -59,6 +85,7 @@ def sort_dict(d, sort_paths):
 
 
 def pprint_json(json_dict):
+    """Return sorted string representation of the dict."""
     json_dict_sorted = sort_dict(json_dict)
     py_dict = json.dumps(json_dict_sorted, sort_keys=True,
                          indent=4, separators=(',', ': '))

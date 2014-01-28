@@ -14,11 +14,22 @@ Contents
    INSTALLATION
    rest_api
    DEVELOPMENT
+   CODING_STYLE_GUIDELINE.rst
    supergraph.rst
    supergraph-2013-11-12.rst
    instance_modelling_example.rst
    no_patches.rst
-   modules
+   adhocracy
+   adhocracy.evolution
+   adhocracy.frontend
+   adhocracy.properties
+   adhocracy.registry
+   adhocracy.resources
+   adhocracy.rest
+   adhocracy.schema
+   adhocracy.utils
+
+
 
 Indices and tables
 ==================
