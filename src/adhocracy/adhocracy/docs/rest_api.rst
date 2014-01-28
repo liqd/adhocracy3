@@ -208,6 +208,34 @@ If all goes wrong the return code is 500.
 Create and Update Versionable Resources
 ---------------------------------------
 
+
+FIXME: this section needs to be edited to work for the following
+scenario: A document has two paragraphs, and is changed first in the
+first, then in the second:
+
+
+ Doc     v0       v1      v2
+                 /       /
+ Par1    v0    v1       /
+                       /
+ Par2    v0          v1
+
+-----> time --------------------------------------->
+
+We want document to be available in 3 versions that are linearly
+dependent on each other.  But when the update to Par2 is to be posted,
+the client has no way of telling that it should update v1 of document,
+BUT NOT v0!
+
+Solution: If DAGs are nested inside each other like Par1, Par2 are
+nested in Doc in the above example, the POST request creating a new
+version of the child DAG must contain follows entries not only for
+itself, but for all ancestor DAGs.
+
+[end of FIXME]
+
+
+
 Create
 ~~~~~~
 
