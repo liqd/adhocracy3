@@ -1,35 +1,34 @@
+<!doctype html>
 <html>
     <head>
-        <title>Proposal Workbench</title>
+        <title>adhocracy root page</title>
         <meta charset="utf-8">
         <link rel="stylesheet" href="/static/stylesheets/a3.css" />
+    </head>
+    <body>
+        <div>
+            <adh-document-workbench></adh-document-workbench>
+        </div>
+
         <script type="text/javascript"
                 src="/static/submodules/requirejs/require.js"></script>
         <script type="text/javascript"
                 src="/static/require-config.js"></script>
-    </head>
-    <body>
-      <!-- app -->
-      <div id="adhocracy">[javascript is not running]</div>
-      <script>
-          function supports_history_api() {
-              return !!(window.history && history.pushState);
-          };
-          console.log('history api support: ' + supports_history_api().toString());
+        <script type="text/javascript"
+                src="/static/jquery-1.7.2.js"></script>  <!-- only needed for $(document in this html file) -->
 
-          require(['jquery', 'obviel'], function() {
-              require(['Adhocracy/Frames/ProposalWorkbench'], function(ProposalWorkbench) {
-                  var uri = ProposalWorkbench.poolUri('/adhocracy');
-                  $(document).ready(function() { ProposalWorkbench.open_proposals(uri); });
+        <script type="text/javascript">
+            require(['Adhocracy/Pages/DocumentWorkbench'], function(AdhDWB) {
+                $(document).ready(function() {
+                    AdhDWB.run();
+                    console.log('on page ready: done');
+                });
 
-                  // FIXME: '.load' isn't executed: why?
-                  $(document).load(function() { console.log('page load complete'); });
-              });
-          });
-      </script>
-
-      <!-- obviel hackery -->
-      <hr>
-      <div id="debug_links"></div>
+                $(document).load(function() {
+                    // FIXME: this is never reached.  why?
+                    console.log('on page load: done');
+                });
+            });
+        </script>
     </body>
 </html>

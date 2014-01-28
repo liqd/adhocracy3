@@ -12,6 +12,12 @@ Go To Proposal Workbench
     Go To    ${PAGE URL}
     Proposal Workbench Should Be Open
 
+Go To Proposal Workbench
+    ${resp}=  Execute Async JavaScript  arguments[0](2.1);
+    Should be equal as strings  ${resp}  2.1
+    ${resp}=  Execute Async JavaScript  var i = angular.injector(['ng','NGAD']); var h = i.get('adhHttp'); h.get('/adhocracy').then(arguments[0]);
+    Should be equal as strings  ${resp}  '[3,"true"]'
+
 Open Proposal Detail View
     Click Element               sizzle=#proposal_workbench_directory a:nth(0)
     Wait Until Page Contains Element   sizzle=#proposal_workbench_detail h3  timeout=3 secs

@@ -1,0 +1,34 @@
+<table border="1">
+    <tr>
+        <td>
+            <div id="document_workbench_navigate">
+                <p>document workbench navigation</p>
+            </div>
+        </td>
+        <td>
+            <div id="document_workbench_list" ng-controller="AdhDocumentTOC as at">
+                <h3>table of contents</h3>
+
+                <div>
+                    <ol>
+                        <li ng-repeat="doc in poolEntries track by $index">
+                            <div ng-switch="doc">
+                                <div ng-switch-when="undefined">
+                                    <small><tt>(empty DAG)</tt></small>
+                                </div>
+                                <div ng-switch-default>
+                                    <adh-document-detail></adh-document-detail>
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </td>
+        <td>
+            <div id="document_workbench_participate">
+                <p>proposal workbench changes and discussion</p>
+            </div>
+        </td>
+    </tr>
+</table>

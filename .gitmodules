@@ -1,9 +1,6 @@
 [submodule "python/buildout.python"]
 	path = python/buildout.python
 	url = git@github.com:collective/buildout.python.git
-[submodule "obviel"]
-	path = src/adhocracy/adhocracy/frontend/static/submodules/obviel
-	url = git://github.com/adhocracy/obviel
 [submodule "src/substanced"]
 	path = src/substanced
 	url = git@github.com:Pylons/substanced.git
@@ -13,3 +10,6 @@
 [submodule "src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped"]
 	path = src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped
 	url = https://github.com/borisyankov/DefinitelyTyped
+[submodule "src/adhocracy/adhocracy/frontend/static/submodules/angular.js"]
+	path = src/adhocracy/adhocracy/frontend/static/submodules/angular.js
+	url = https://github.com/angular/angular.js

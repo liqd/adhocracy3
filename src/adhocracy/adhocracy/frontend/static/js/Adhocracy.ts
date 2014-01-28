@@ -1,4 +1,6 @@
-import pwb = require('Adhocracy/Frames/ProposalWorkbench');
+import Css = require("Adhocracy/Css");
+import DWB = require("Adhocracy/Pages/DocumentWorkbench");
 
-export function init() {
+export function init() : void {
+    return;
 }
