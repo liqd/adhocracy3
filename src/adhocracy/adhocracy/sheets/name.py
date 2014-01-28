@@ -1,15 +1,11 @@
 """Name Sheet."""
-from adhocracy.interfaces import (
-    ISheet,
-    IISheet,
-    IResourcePropertySheet,
-)
+from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IISheet
+from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import Identifier
-from zope.interface import (
-    provider,
-    taggedValue,
-)
+from zope.interface import provider
+from zope.interface import taggedValue
 from zope.interface.interfaces import IInterface
 
 import colander

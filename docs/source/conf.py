@@ -252,3 +252,17 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
+
+#autodoc config
+autodoc_member_order = 'bysource'
+autoclass_content = 'both'
+autodoc_default_flags = ['members', 'undoc-members']
+
+#custom skip methods
+def skip(app, what, name, obj, skip, options):
+    if name in ["__doc__"]:
+        return True
+    return True
+
+def setup(app):
+    app.connect("autodoc-skip-member", skip)

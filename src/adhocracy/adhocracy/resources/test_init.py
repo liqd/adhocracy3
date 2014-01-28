@@ -1,6 +1,6 @@
 from pyramid import testing
 
-from adhocracy.sheets.interfaces import ISheet
+from adhocracy.sheets import ISheet
 import pytest
 import zope.interface
 import unittest
@@ -30,11 +30,38 @@ class ISheetY(ISheet):
     """Useless PropertyInterface for testing."""
 
 
+class DummyPropertySheetAdapter(object):
+
+    _data = {}
+
+    def __init__(self, context, iface):
+        self.context = context
+        self.iface = iface
+        self.context['_data'] = {}
+
+    def set(self, appstruct):
+        self.context['_data'][self.iface.__identifier__] = appstruct
+
+
+def _register_dummypropertysheet_adapter(config, isheet):
+    from adhocracy.interfaces import IResourcePropertySheet
+    from zope.interface.interfaces import IInterface
+    config.registry.registerAdapter(DummyPropertySheetAdapter,
+                                    (isheet, IInterface),
+                                    IResourcePropertySheet)
+
+
 ###########
 #  tests  #
 ###########
 
 class ResourceFactoryUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_valid_assign_ifaces(self):
         from adhocracy.resources import ResourceFactory
@@ -71,7 +98,21 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         resource = ResourceFactory(IResourceType)()
         assert resource.test == 'aftercreate'
 
-    def test_resourcerfactory_none_valid_wrong_iresource_iface(self):
+    def test_valid_with_sheet_data(self):
+        from adhocracy.resources import ResourceFactory
+        from adhocracy.interfaces import IResource
+        from zope.interface import taggedValue
+
+        class IResourceType(IResource):
+            taggedValue('basic_sheets', set([ISheetY.__identifier__]))
+
+        data = {ISheetY.__identifier__: {"count": 0}}
+        _register_dummypropertysheet_adapter(self.config, ISheetY)
+
+        resource = ResourceFactory(IResourceType)(appstructs=data)
+        assert resource['_data'] == data
+
+    def test_non_valid_wrong_iresource_iface(self):
         from adhocracy.resources import ResourceFactory
         from zope.interface import Interface
 
@@ -81,7 +122,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         with pytest.raises(AssertionError):
             ResourceFactory(InterfaceY)()
 
-    def test_none_valid_wrong_iproperty_iface(self):
+    def test_non_valid_wrong_iproperty_iface(self):
         from adhocracy.resources import ResourceFactory
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
@@ -107,15 +148,15 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
 
     def test_includeme_registry_register_factories(self):
         content_types = self.config.registry.content.factory_types
-        assert 'adhocracy.resources.interfaces.IFubel' in content_types
-        assert 'adhocracy.resources.interfaces.IVersionableFubel'\
+        assert 'adhocracy.resources.IFubel' in content_types
+        assert 'adhocracy.resources.IVersionableFubel'\
             in content_types
-        assert 'adhocracy.resources.interfaces.IFubelVersionsPool'\
+        assert 'adhocracy.resources.IFubelVersionsPool'\
             in content_types
-        assert 'adhocracy.resources.interfaces.IPool' in content_types
+        assert 'adhocracy.resources.IPool' in content_types
 
     def test_includeme_registry_create_content(self):
-        from adhocracy.resources.interfaces import IPool
+        from adhocracy.resources import IPool
         iresource = IPool
         iresource_id = iresource.__identifier__
         resource = self.config.registry.content.create(iresource_id)

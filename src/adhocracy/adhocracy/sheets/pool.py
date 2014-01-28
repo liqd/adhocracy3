@@ -1,18 +1,14 @@
 """Pool Sheet."""
-from adhocracy.interfaces import (
-    ISheet,
-    IISheet,
-    IResourcePropertySheet,
-)
+from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IISheet
+from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import ReferenceSetSchemaNode
 from pyramid.httpexceptions import HTTPNotImplemented
-from zope.interface import (
-    provider,
-    taggedValue,
-    Interface,
-    implementer,
-)
+from zope.interface import provider
+from zope.interface import taggedValue
+from zope.interface import Interface
+from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
 import colander

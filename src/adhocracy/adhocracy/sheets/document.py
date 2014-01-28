@@ -1,15 +1,11 @@
 """Sheets to store a document."""
-from adhocracy.interfaces import (
-    ISheet,
-    IISheet,
-    IResourcePropertySheet,
-)
+from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IISheet
+from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import ReferenceSetSchemaNode
-from zope.interface import (
-    provider,
-    taggedValue,
-)
+from zope.interface import provider
+from zope.interface import taggedValue
 from zope.interface.interfaces import IInterface
 
 import colander
@@ -31,7 +27,7 @@ class DocumentSchema(colander.Schema):
         essence_refs=True,
         default=[],
         missing=colander.drop,
-        interface='adhocracy.resources.interfaces.ISection')
+        interface='adhocracy.resources.ISection')
 
 
 @provider(IISheet)

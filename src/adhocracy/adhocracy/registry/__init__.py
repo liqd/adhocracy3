@@ -1,10 +1,8 @@
 """Content registry."""
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import ISheet
-from adhocracy.utils import (
-    get_all_taggedvalues,
-    get_resource_interface,
-)
+from adhocracy.utils import get_all_taggedvalues
+from adhocracy.utils import get_resource_interface
 from adhocracy.resources import ResourceFactory
 from adhocracy.interfaces import IResource
 from pyramid.security import has_permission
@@ -61,9 +59,9 @@ class ResourceContentRegistry(ContentRegistry):
 
             example::
 
-                {'adhocracy.resources.interfaces.IResourceA':
+                {'adhocracy.resources.IResourceA':
                   {
-                    'name': "adhocracy.resources.interfaces.IResourceA",
+                    'name': "adhocracy.resources.IResourceA",
                     'iface': adhocracy.resource.interface.IResourceA.__class__,
                     'metadata': {"addable_content_interfaces": [...], ...}
                   }
@@ -99,7 +97,7 @@ class ResourceContentRegistry(ContentRegistry):
 
             example::
 
-                {'adhocracy.resources.interfaces.IResourceA':
+                {'adhocracy.resources.IResourceA':
                     'sheets_mandatory': ['adhocracy.sheets.example.IA']
                     'sheets_optional': ['adhocracy.sheets.example.IB']
                 }

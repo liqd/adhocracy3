@@ -1,11 +1,9 @@
 """Basic Interfaces used by all packages."""
 from substanced.interfaces import IPropertySheet
-from zope.interface import (
-    Attribute,
-    Interface,
-    taggedValue,
-    provider,
-)
+from zope.interface import Attribute
+from zope.interface import Interface
+from zope.interface import taggedValue
+from zope.interface import provider
 from zope.interface.interfaces import IInterface
 
 

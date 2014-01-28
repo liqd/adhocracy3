@@ -1,7 +1,5 @@
 from unittest.mock import patch
-from zope.interface import (
-    Interface,
-)
+from zope.interface import Interface
 from pyramid import testing
 
 import colander
