@@ -135,12 +135,12 @@ Create a new resource ::
     >>> prop = {'content_type': 'adhocracy.resources.IPool',
     ...         'data': {
     ...              'adhocracy.sheets.name.IName': {
-    ...                  'name': 'PROposals'}}}
+    ...                  'name': 'Proposals'}}}
     >>> resp_data = testapp.post_json("/adhocracy", prop).json
     >>> resp_data["content_type"]
     'adhocracy.resources.IPool'
     >>> resp_data["path"]
-    '/adhocracy/PROposals'
+    '/adhocracy/Proposals'
 
 PUT
 ~~~
@@ -149,13 +149,13 @@ Modify data of an existing resource ::
 
     >>> data = {'content_type': 'adhocracy.resources.IPool',
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'proposals'}}}
-    >>> resp_data = testapp.put_json("/adhocracy/PROposals", data).json
+    >>> resp_data = testapp.put_json("/adhocracy/Proposals", data).json
     >>> pprint(resp_data)
-    {'content_type': 'adhocracy.resources.IPool', 'path': '/adhocracy/PROposals'}
+    {'content_type': 'adhocracy.resources.IPool', 'path': '/adhocracy/Proposals'}
 
 Check the changed resource ::
 
-    >>> resp_data = testapp.get("/adhocracy/PROposals").json
+    >>> resp_data = testapp.get("/adhocracy/Proposals").json
     >>> resp_data["data"]["adhocracy.sheets.name.IName"]["name"]
     'proposals'
 
@@ -174,7 +174,7 @@ The normal return code is 200 ::
     >>> data = {'content_type': 'adhocracy.resources.IPool',
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'Proposals'}}}
 
-.. >>> testapp.put_json("/adhocracy/PROposals", data)
+.. >>> testapp.put_json("/adhocracy/Proposals", data)
 .. 200 OK application/json ...
 
 If you submit invalid data the return error code is 400::
@@ -182,7 +182,7 @@ If you submit invalid data the return error code is 400::
     >>> data = {'content_type': 'adhocracy.resources.IPool',
     ...         'data': {'adhocracy.sheets.example.WRONGINTERFACE': {'name': 'Proposals'}}}
 
-.. >>> testapp.put_json("/adhocracy/PROposals", data)
+.. >>> testapp.put_json("/adhocracy/Proposals", data)
 .. Traceback (most recent call last):
 .. ...
 .. {"errors": [{"description": ...
@@ -219,16 +219,16 @@ Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource ty
     ...                  'name': 'kommunismus'}
     ...              }
     ...         }
-    >>> resp = testapp.post_json("/adhocracy/PROposals", prop)
+    >>> resp = testapp.post_json("/adhocracy/Proposals", prop)
     >>> proposal_versions_path = resp.json["path"]
-    >>> proposal_versions_path 
+    >>> proposal_versions_path
     '/adhocracy/Proposals/kommunismus'
 
 The return data has the new attribute 'first_version_path' to get the path of the first Proposal (aka VersionableFubel)::
 
     >>> proposal_v1_path = resp.json['first_version_path']
     >>> proposal_v1_path
-    /adhocracy/PROposals/kommunismus/VERSION_...
+    /adhocracy/Proposals/kommunismus/VERSION_...
 
 The ProposalVersionsPool has the IVersions and ITags interfaces to work with Versions ::
 
@@ -239,12 +239,12 @@ The ProposalVersionsPool has the IVersions and ITags interfaces to work with Ver
             },
             "adhocracy.sheets.versions.IVersions": {
                 "elements": [
-                    "/adhocracy/PROposals/kommunismus/VERSION_...
+                    "/adhocracy/Proposals/kommunismus/VERSION_...
                 ]
             }
             "adhocracy.sheets.tags.ITags": {
                 "elements": [
-                    "/adhocracy/PROposals/kommunismus/TAG_FIRST"
+                    "/adhocracy/Proposals/kommunismus/TAG_FIRST"
                 ]
             }
             "adhocracy.sheets.pool.IPool": {
@@ -278,7 +278,7 @@ Fetch the first Proposal Version, it is empty ::
                 "followed-by": []
             }
         },
-        "path": "/adhocracy/PROposals/kommunismus/VERSION_...
+        "path": "/adhocracy/Proposals/kommunismus/VERSION_...
     }
 
 Create a second proposal that follows the first version ::
@@ -353,20 +353,20 @@ we automatically create a fourth Proposal version ::
             },
             "adhocracy.sheets.versions.IVersions": {
                 "elements": [
-                    "/adhocracy/PROposals/kommunismus/VERSION..."
-                    "/adhocracy/PROposals/kommunismus/VERSION..."
-                    "/adhocracy/PROposals/kommunismus/VERSION..."
-                    "/adhocracy/PROposals/kommunismus/VERSION..."
+                    "/adhocracy/Proposals/kommunismus/VERSION..."
+                    "/adhocracy/Proposals/kommunismus/VERSION..."
+                    "/adhocracy/Proposals/kommunismus/VERSION..."
+                    "/adhocracy/Proposals/kommunismus/VERSION..."
                 ]
             }
             "adhocracy.sheets.tags.ITags": {
                 "elements": [
-                    "/adhocracy/PROposals/kommunismus/TAG_FIRST"
+                    "/adhocracy/Proposals/kommunismus/TAG_FIRST"
                 ]
             }
             "adhocracy.sheets.pool.IPool": {
                 "elements": [
-                    "/adhocracy/PROposals/kommunismus/kapitel1"
+                    "/adhocracy/Proposals/kommunismus/kapitel1"
                 ]
             }
     ...
