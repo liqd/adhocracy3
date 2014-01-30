@@ -13,6 +13,24 @@ import colander
 
 
 @provider(IISheet)
+class ITag(ISheet):
+
+    """List all tags for this FubelVersionsPool."""
+
+    taggedValue('schema', 'adhocracy.sheets.tags.TagSchema')
+
+
+class TagSchema(colander.Schema):
+
+    """Colander schema for ITags."""
+
+    elements = ReferenceSetSchemaNode(default=[],
+                                      missing=colander.drop,
+                                      interface=IVersionable,
+                                      )
+
+
+@provider(IISheet)
 class ITags(ISheet):
 
     """List all tags for this FubelVersionsPool."""
@@ -26,12 +44,15 @@ class TagsSchema(colander.Schema):
 
     elements = ReferenceSetSchemaNode(default=[],
                                       missing=colander.drop,
-                                      interface=IVersionable,
+                                      interface=ITag,
                                       )
 
 
 def includeme(config):
     """Register adapter."""
+    config.registry.registerAdapter(ResourcePropertySheetAdapter,
+                                    (ITag, IInterface),
+                                    IResourcePropertySheet)
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
                                     (ITags, IInterface),
                                     IResourcePropertySheet)

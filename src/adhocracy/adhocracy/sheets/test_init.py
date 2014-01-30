@@ -335,34 +335,3 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
         context = testing.DummyResource()
         inst = self.get_one(self.config, context, ISheetB)
         assert isinstance(inst, OverrideAdapter)
-
-    def test_includeme_register_ipropertysheet_adapter_iname(self):
-        from adhocracy.sheets.name import IName
-        self.config.include('adhocracy.sheets')
-        inst = self.get_one(self.config, testing.DummyResource(), IName)
-        assert inst.iface is IName
-
-    def test_includeme_register_ipropertysheet_adapter_inamereadonly(self):
-        from adhocracy.sheets.name import INameReadOnly
-        self.config.include('adhocracy.sheets')
-        inst = self.get_one(self.config, testing.DummyResource(),
-                            INameReadOnly)
-        assert inst.iface is INameReadOnly
-
-    def test_includeme_register_ipropertysheet_adapter_iversions(self):
-        from adhocracy.sheets.versions import IVersions
-        self.config.include('adhocracy.sheets')
-        inst = self.get_one(self.config, testing.DummyResource(), IVersions)
-        assert inst.iface is IVersions
-
-    def test_includeme_register_ipropertysheet_adapter_itags(self):
-        from adhocracy.sheets.tags import ITags
-        self.config.include('adhocracy.sheets')
-        inst = self.get_one(self.config, testing.DummyResource(), ITags)
-        assert inst.iface is ITags
-
-    def test_includeme_register_ipropertysheet_adapter_iversionable(self):
-        from adhocracy.sheets.versions import IVersionable
-        self.config.include('adhocracy.sheets')
-        inst = self.get_one(self.config, testing.DummyResource(), IVersionable)
-        assert inst.iface is IVersionable
