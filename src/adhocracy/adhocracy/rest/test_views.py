@@ -5,8 +5,8 @@ from cornice.util import extract_json_data
 from cornice.errors import Errors
 from mock import patch
 from pyramid import testing
+from pyramid.path import DottedNameResolver
 from zope.interface import taggedValue
-from zope.dottedname.resolve import resolve
 
 import colander
 import pytest
@@ -72,9 +72,10 @@ def make_mock_resource_registry_with_mock_type(iresource, mock_registry=None):
 
 @patch('adhocracy.sheets.ResourcePropertySheetAdapter')
 def make_mock_sheet(iproperty, dummy_sheet=None):
+    res = DottedNameResolver()
     sheet = dummy_sheet.return_value
     sheet.iface = iproperty
-    schema = resolve(iproperty.getTaggedValue('schema'))
+    schema = res.maybe_resolve(iproperty.getTaggedValue('schema'))
     sheet.schema = schema()
     cstruct = sheet.schema.serialize()
     sheet.get_cstruct.return_value = cstruct

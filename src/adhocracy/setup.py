@@ -14,7 +14,6 @@ requires = [
     'substanced',
     'pyramid_tm',
     'cornice',
-    'zope.dottedname',
     ]
 
 setup(name='adhocracy',

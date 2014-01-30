@@ -6,7 +6,6 @@ from adhocracy.utils import get_ifaces_from_module
 from adhocracy.utils import get_all_taggedvalues
 from substanced.content import add_content_type
 from substanced.interfaces import IAutoNamingFolder
-from zope.dottedname.resolve import resolve
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 from zope.interface import taggedValue
@@ -118,16 +117,18 @@ class ResourceFactory(object):
     """Basic resource factory."""
 
     def __init__(self, iface):
+        res = DottedNameResolver()
+        iface = res.maybe_resolve(iface)
         assert iface.isOrExtends(IResource)
-        taggedvalues = get_all_taggedvalues(iface)
-        self.class_ = resolve(taggedvalues['content_class'])
+        meta = get_all_taggedvalues(iface)
         self.resource_iface = iface
-        base_ifaces = taggedvalues['basic_sheets']
-        ext_ifaces = taggedvalues['extended_sheets']
-        self.prop_ifaces = [resolve(i) for i in base_ifaces.union(ext_ifaces)]
-        for i in self.prop_ifaces:
-            assert i.isOrExtends(ISheet)
-        self.after_creation = taggedvalues['after_creation']
+        self.class_ = res.maybe_resolve(meta['content_class'])
+        self.prop_ifaces = []
+        for i in meta['basic_sheets'].union(meta['extended_sheets']):
+            prop_iface = res.maybe_resolve(i)
+            assert prop_iface.isOrExtends(ISheet)
+            self.prop_ifaces.append(prop_iface)
+        self.after_creation = meta['after_creation']
 
     def _set_appstructs(self, resource, appstructs):
         for key, struct in appstructs.items():
@@ -137,6 +138,7 @@ class ResourceFactory(object):
             sheet.set(struct)
 
     def __call__(self, **kwargs):
+        res = DottedNameResolver()
         resource = self.class_()
         directlyProvides(resource, self.resource_iface)
         alsoProvides(resource, self.prop_ifaces)

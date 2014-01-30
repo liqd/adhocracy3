@@ -6,8 +6,8 @@ from adhocracy.utils import get_resource_interface
 from adhocracy.resources import ResourceFactory
 from adhocracy.interfaces import IResource
 from pyramid.security import has_permission
+from pyramid.path import DottedNameResolver
 from substanced.content import ContentRegistry
-from zope.dottedname.resolve import resolve
 from zope.interface import providedBy
 
 
@@ -70,9 +70,10 @@ class ResourceContentRegistry(ContentRegistry):
 
         """
         resource_types = {}
+        res = DottedNameResolver()
         for type_ in self.all():
             try:
-                iface = resolve(type_)
+                iface = res.maybe_resolve(type_)
                 if iface.isOrExtends(IResource):
                     metadata = get_all_taggedvalues(iface)
                     resource_types[type_] = {'name': type_,
@@ -125,7 +126,8 @@ class ResourceContentRegistry(ContentRegistry):
         types_with_sheetnames = {}
         for type_iface in addable_types:
             sheetnames = {}
-            resource = ResourceFactory(type_iface)()
+            resource = ResourceFactory(type_iface)(context, add_oid=False,
+                                                   run_after_creation=False)
             resource.__parent__ = context
             sheets = self.resource_sheets(resource, request,
                                           onlycreatable=True)
