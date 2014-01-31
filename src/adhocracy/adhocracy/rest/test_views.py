@@ -5,7 +5,6 @@ from cornice.util import extract_json_data
 from cornice.errors import Errors
 from mock import patch
 from pyramid import testing
-from pyramid.path import DottedNameResolver
 from zope.interface import taggedValue
 
 import colander
@@ -31,10 +30,6 @@ class CountSchema(colander.MappingSchema):
                                 missing=colander.drop)
 
 
-class Dummy(object):
-    pass
-
-
 class DummyFolder(testing.DummyResource):
 
     def add(self, name, resource, **kwargs):
@@ -46,6 +41,8 @@ class DummyFolder(testing.DummyResource):
 class CorniceDummyRequest(testing.DummyRequest):
 
     def __init__(self, registry=None):
+        class Dummy(object):
+            pass
         self.headers = {}
         self.body = ''
         self.GET = {}
@@ -63,29 +60,6 @@ class CorniceDummyRequest(testing.DummyRequest):
 @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
 def make_mock_resource_registry(mock_registry=None):
     return mock_registry.return_value
-
-
-@patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
-def make_mock_resource_registry_with_mock_type(iresource, mock_registry=None):
-    registry = mock_registry.return_value
-    registry.typeof.return_value = iresource.__identifier__
-    return registry
-
-
-@patch('adhocracy.sheets.ResourcePropertySheetAdapter')
-def make_mock_sheet(iproperty, dummy_sheet=None):
-    res = DottedNameResolver()
-    sheet = dummy_sheet.return_value
-    sheet.iface = iproperty
-    schema = res.maybe_resolve(iproperty.getTaggedValue('schema'))
-    sheet.schema = schema()
-    cstruct = sheet.schema.serialize()
-    sheet.get_cstruct.return_value = cstruct
-    sheet.permission_view = 'view'
-    sheet.permission_edit = 'edit'
-    sheet.readonly = False
-    sheet.createmandatory = False
-    return sheet
 
 
 class DummyPropertysheet(object):
@@ -109,10 +83,10 @@ class DummyPropertysheet(object):
         self._dummy_appstruct = appstruct
 
 
-
 ##########
 #  tests #
 ##########
+
 
 class ValidateRequestDataUnitTest(unittest.TestCase):
 
@@ -449,7 +423,7 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
 
     def setUp(self):
         self.context = DummyFolder(__provides__=IResourceX)
-        registry = make_mock_resource_registry_with_mock_type(IResourceX)
+        registry = make_mock_resource_registry()
         request = CorniceDummyRequest()
         request.registry.content = registry
         self.request = request
@@ -478,7 +452,7 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
 
     def test_options_valid_with_sheets_and_addables(self):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-        self.resource_sheets.return_value = {'ipropertyx': Dummy()}
+        self.resource_sheets.return_value = {'ipropertyx': object()}
         self.resource_addables.return_value = \
             {'iresourcex': {'sheets_mandatory': [],
                             'sheets_optional': ['ipropertyx']}}
