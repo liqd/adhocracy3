@@ -7,6 +7,7 @@ from adhocracy.rest.schemas import POSTResourceRequestSchema
 from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
+from adhocracy.utils import get_resource_interface
 from copy import deepcopy
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
@@ -223,7 +224,8 @@ class ResourceRESTView(RESTView):
             key = sheet.iface.__identifier__
             struct['data'][key] = sheet.get_cstruct()
         struct['path'] = resource_path(self.context)
-        struct['content_type'] = self.registry.typeof(self.context)
+        iresource = get_resource_interface(self.context)
+        struct['content_type'] = iresource.__identifier__
         return GETResourceResponseSchema().serialize(struct)
 
 
@@ -261,7 +263,8 @@ class FubelRESTView(ResourceRESTView):
             sheet.set(appstruct)
         struct = {}
         struct['path'] = resource_path(self.context)
-        struct['content_type'] = self.registry.typeof(self.context)
+        iresource = get_resource_interface(self.context)
+        struct['content_type'] = iresource.__identifier__
         return ResourceResponseSchema().serialize(struct)
 
 
@@ -304,7 +307,8 @@ class PoolRESTView(FubelRESTView):
         # response
         struct = {}
         struct['path'] = resource_path(resource)
-        struct['content_type'] = self.registry.typeof(self.context)
+        iresource = get_resource_interface(resource)
+        struct['content_type'] = iresource.__identifier__
         return ResourceResponseSchema().serialize(struct)
 
 

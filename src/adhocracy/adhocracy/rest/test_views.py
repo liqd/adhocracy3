@@ -88,15 +88,26 @@ def make_mock_sheet(iproperty, dummy_sheet=None):
     return sheet
 
 
-class DummyPropertysheet(Dummy):
+class DummyPropertysheet(object):
+
+    iface = None
     readonly = False
     createmandatory = False
+
+    _dummy_appstruct = None
 
     def validate_cstruct(self, cstruct):
         if 'dummy_invalid' in cstruct:
             raise colander.Invalid(None)
         cstruct['dummy_validated'] = True
         return cstruct
+
+    def get_cstruct(self):
+        return {'dummy_cstruct': {}}
+
+    def set(self, appstruct):
+        self._dummy_appstruct = appstruct
+
 
 
 ##########
@@ -110,7 +121,6 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
         validate_request_data(context, request, **kw)
 
     def setUp(self):
-        self.config = testing.setUp()
         self.request = CorniceDummyRequest()
         self.context = testing.DummyResource()
         setattr(self.request, 'errors', Errors(self.request))
@@ -179,9 +189,8 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
 class ValidatePropertysheetCstructsUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
         self.context = testing.DummyResource()
-        self.request = CorniceDummyRequest(registry=self.config.registry)
+        self.request = CorniceDummyRequest()
 
     def make_one(self, context, request, sheets):
         from .views import validate_sheet_cstructs
@@ -222,9 +231,8 @@ class ValidatePropertysheetCstructsUnitTest(unittest.TestCase):
 class ValidatePutPropertysheetCstructsUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
         self.context = testing.DummyResource()
-        request = CorniceDummyRequest(registry=self.config.registry)
+        request = CorniceDummyRequest()
         resource_registry = make_mock_resource_registry()
         request.registry.content = resource_registry
         self.request = request
@@ -248,35 +256,34 @@ class ValidatePutPropertysheetCstructsUnitTest(unittest.TestCase):
 class ValidatePostPropertysheetCstructsUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
         self.context = testing.DummyResource()
-        request = CorniceDummyRequest(registry=self.config.registry)
+        request = CorniceDummyRequest()
         resource_registry = make_mock_resource_registry()
         request.registry.content = resource_registry
         self.request = request
-        self.sheets = request.registry.content.resource_sheets
+        self.resource_sheets = request.registry.content.resource_sheets
+        self.resource_types = request.registry.content.resource_types
+        self.create = request.registry.content.create
 
     def make_one(self, context, request):
         from .views import validate_post_sheet_cstructs
         validate_post_sheet_cstructs(context, request)
 
     def test_valid(self):
-        self.sheets.return_value = {'sheet': DummyPropertysheet()}
-        self.request.registry.content.create.return_value = \
-            testing.DummyResource()
-        self.request.registry.content.resource_types.return_value = \
-            {'resourcex': {}}
+        self.resource_sheets.return_value = {'sheet': DummyPropertysheet()}
+        self.create.return_value = testing.DummyResource()
+        self.resource_types.return_value = {'resourcex': {}}
         self.request.validated = {'content_type': 'resourcex',
                                   'data': {'sheet': {'y': 'x'}}}
 
         self.make_one(self.context, self.request)
 
         assert self.request.validated['data']['sheet']['dummy_validated']
-        params = self.request.registry.content.resource_sheets.call_args_list
-        assert params[0][1] == {'onlycreatable': True}
-        self.request.registry.content.create.assert_called_with(
-            self.context, 'resourcex', add_to_context=False,
-            run_after_creation=False)
+        assert self.resource_sheets.call_args_list[0][1] == \
+            {'onlycreatable': True}
+        self.create.assert_called_with('resourcex', self.context,
+                                       add_to_context=False,
+                                       run_after_creation=False)
 
     def test_valid_missing_content_type(self):
         self.request.validated = {'data': {'sheet': {'y': 'x'}}}
@@ -289,41 +296,38 @@ class ValidatePostPropertysheetCstructsUnitTest(unittest.TestCase):
         assert self.request.validated == {}
 
 
-
 class ValidatePUTPropertysheetNamesUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
         self.context = testing.DummyResource()
-        request = CorniceDummyRequest(registry=self.config.registry)
+        request = CorniceDummyRequest()
         resource_registry = make_mock_resource_registry()
         request.registry.content = resource_registry
         self.request = request
+        self.resource_sheets = request.registry.content.resource_sheets
 
     def make_one(self, context, request):
         from .views import validate_put_sheet_names
         validate_put_sheet_names(context, request)
 
     def test_valid_no_sheets(self):
-        sheets = self.request.registry.content.resource_sheets
-        sheets.return_value = {}
+        self.resource_sheets.return_value = {}
         self.request.validated = {'data': {}}
         self.make_one(self.context, self.request)
         assert self.request.errors == []
 
     def test_valid_with_sheets(self):
-        self.request.registry.content.resource_sheets.return_value =\
-            {'sheet': DummyPropertysheet()}
+        self.resource_sheets.return_value = {'sheet': DummyPropertysheet()}
         self.request.validated = {'data': {'sheet': {'x': 'y'}}}
         self.make_one(self.context, self.request)
 
-        self.request.registry.content.resource_sheets.assert_called_with(
-            self.context, self.request, onlyeditable=True)
+        self.resource_sheets.assert_called_with(self.context, self.request,
+                                                onlyeditable=True)
         assert self.request.errors == []
 
     def test_valid_with_sheets_missing(self):
-        self.request.registry.content.resource_sheets.return_value =\
-            {'sheet': DummyPropertysheet(), 'sheetB': DummyPropertysheet()}
+        self.resource_sheets.return_value = {'sheet': DummyPropertysheet(),
+                                             'sheetB': DummyPropertysheet()}
         self.request.validated = {'data': {'sheet': {'x': 'y'}}}
         self.make_one(self.context, self.request)
         assert self.request.errors == []
@@ -332,15 +336,13 @@ class ValidatePUTPropertysheetNamesUnitTest(unittest.TestCase):
         sheets = {'sheet': DummyPropertysheet(),
                   'sheetB': DummyPropertysheet()}
         sheets['sheetB'].createmandatory = True
-        self.request.registry.content.resource_sheets.return_value =\
-            sheets
+        self.resource_sheets.return_value = sheets
         self.request.validated = {'data': {'sheet': {'x': 'y'}}}
         self.make_one(self.context, self.request)
         assert self.request.errors == []
 
     def test_non_valid_with_sheets_wrong_name(self):
-        self.request.registry.content.resource_sheets.return_value =\
-            {'sheet': DummyPropertysheet()}
+        self.resource_sheets.return_value = {'sheet': DummyPropertysheet()}
         self.request.validated = {'data': {'wrongname': {'x': 'y'}}}
         self.make_one(self.context, self.request)
         assert self.request.errors != []
@@ -349,20 +351,19 @@ class ValidatePUTPropertysheetNamesUnitTest(unittest.TestCase):
 class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
         self.context = testing.DummyResource()
-        request = CorniceDummyRequest(registry=self.config.registry)
+        request = CorniceDummyRequest()
         resource_registry = make_mock_resource_registry()
         request.registry.content = resource_registry
         self.request = request
+        self.resource_addables = request.registry.content.resource_addables
 
     def make_one(self, context, request):
         from .views import validate_post_sheet_names_and_resource_type
         validate_post_sheet_names_and_resource_type(context, request)
 
     def test_valid_optional(self):
-        registry = self.request.registry.content
-        registry.resource_addables.return_value = {'iresourcex': {
+        self.resource_addables.return_value = {'iresourcex': {
             'sheets_mandatory': [],
             'sheets_optional': ['ipropertyx']}}
         self.request.validated = {'content_type': 'iresourcex',
@@ -373,8 +374,7 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
         assert self.request.errors == []
 
     def test_valid_mandatory(self):
-        registry = self.request.registry.content
-        registry.resource_addables.return_value = {'iresourcex': {
+        self.resource_addables.return_value = {'iresourcex': {
             'sheets_optional': [],
             'sheets_mandatory': ['ipropertyx']}}
         self.request.validated = {'content_type': 'iresourcex',
@@ -385,8 +385,7 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
         assert self.request.errors == []
 
     def test_non_valid_wrong_content_type(self):
-        registry = self.request.registry.content
-        registry.resource_addables.return_value = {'iresourcex': {
+        self.resource_addables.return_value = {'iresourcex': {
             'sheets_optional': [],
             'sheets_mandatory': ['ipropertyx']}}
         self.request.validated = {'content_type': 'wrong_iresource',
@@ -397,8 +396,7 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
         assert self.request.errors != []
 
     def test_non_valid_wrong_sheet(self):
-        registry = self.request.registry.content
-        registry.resource_addables.return_value = {'iresourcex': {
+        self.resource_addables.return_value = {'iresourcex': {
             'sheets_optional': [],
             'sheets_mandatory': ['ipropertyx']}}
         self.request.validated = {'content_type': 'iresourcex',
@@ -409,8 +407,7 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
         assert self.request.errors != []
 
     def test_non_valid_missing_sheet_mandatory(self):
-        registry = self.request.registry.content
-        registry.resource_addables.return_value = {'iresourcex': {
+        self.resource_addables.return_value = {'iresourcex': {
             'sheets_optional': ['propertyy'],
             'sheets_mandatory': ['ipropertyx']}}
         self.request.validated = {'content_type': 'iresourcex',
@@ -424,15 +421,10 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
 class RESTViewUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
         self.context = DummyFolder(__provides__=IResourceX)
-        self.request = CorniceDummyRequest(registry=self.config.registry)
-        registry = None
-        self.request.registry.content = registry
-        self.request.errors = Errors(self.request)
-
-    def tearDown(self):
-        testing.tearDown()
+        self.request = CorniceDummyRequest()
+        resource_registry = object()
+        self.request.registry.content = resource_registry
 
     def make_one(self, context, request):
         from .views import RESTView
@@ -456,15 +448,13 @@ class RESTViewUnitTest(unittest.TestCase):
 class ResourceRESTViewUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
         self.context = DummyFolder(__provides__=IResourceX)
         registry = make_mock_resource_registry_with_mock_type(IResourceX)
-        self.request = CorniceDummyRequest(registry=self.config.registry)
-        self.request.registry.content = registry
-        self.request.errors = Errors(self.request)
-
-    def tearDown(self):
-        testing.tearDown()
+        request = CorniceDummyRequest()
+        request.registry.content = registry
+        self.request = request
+        self.resource_sheets = request.registry.content.resource_sheets
+        self.resource_addables = request.registry.content.resource_addables
 
     def make_one(self, context, request):
         from .views import ResourceRESTView
@@ -477,8 +467,8 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
 
     def test_options_valid_no_sheets_and_addables(self):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-        self.request.registry.content.resource_sheets.return_value = {}
-        self.request.registry.content.resource_addables.return_value = {}
+        self.resource_sheets.return_value = {}
+        self.resource_addables.return_value = {}
 
         inst = self.make_one(self.context, self.request)
         response = inst.options()
@@ -488,11 +478,10 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
 
     def test_options_valid_with_sheets_and_addables(self):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-        self.request.registry.content.resource_sheets.return_value = {
-            'ipropertyx': Dummy()}
-        self.request.registry.content.resource_addables.return_value = {
-            'iresourcex': {'sheets_mandatory': [],
-                           'sheets_optional': ['ipropertyx']}}
+        self.resource_sheets.return_value = {'ipropertyx': Dummy()}
+        self.resource_addables.return_value = \
+            {'iresourcex': {'sheets_mandatory': [],
+                            'sheets_optional': ['ipropertyx']}}
 
         inst = self.make_one(self.context, self.request)
         response = inst.options()
@@ -507,7 +496,7 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
 
     def test_get_valid_no_sheets(self):
         from adhocracy.rest.schemas import GETResourceResponseSchema
-        self.request.registry.content.resource_sheets.return_value = {}
+        self.resource_sheets.return_value = {}
 
         inst = self.make_one(self.context, self.request)
         response = inst.get()
@@ -519,30 +508,26 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
         assert wanted == response
 
     def test_get_valid_with_sheets(self):
-        sheet = make_mock_sheet(ISheetB)
-        self.request.registry.content.resource_sheets.return_value = {
-            ISheetB.__identifier__: sheet}
+        sheet = DummyPropertysheet()
+        sheet.iface = ISheetB
+        self.resource_sheets.return_value = {ISheetB.__identifier__: sheet}
 
         inst = self.make_one(self.context, self.request)
         response = inst.get()
 
-        data = sheet.schema.serialize()
-        wanted = {ISheetB.__identifier__: data}
+        wanted = {ISheetB.__identifier__: {'dummy_cstruct': {}}}
         assert wanted == response['data']
 
 
 class FubelRESTViewUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
         self.context = DummyFolder(__provides__=IResourceX)
-        registry = make_mock_resource_registry_with_mock_type(IResourceX)
-        self.request = CorniceDummyRequest(registry=self.config.registry)
-        self.request.registry.content = registry
-        self.request.errors = Errors(self.request)
-
-    def tearDown(self):
-        testing.tearDown()
+        resource_registry = make_mock_resource_registry()
+        request = CorniceDummyRequest()
+        request.registry.content = resource_registry
+        self.request = request
+        self.resource_sheets = request.registry.content.resource_sheets
 
     def make_one(self, context, request):
         from .views import FubelRESTView
@@ -564,7 +549,7 @@ class FubelRESTViewUnitTest(unittest.TestCase):
         assert 'put' in dir(inst)
 
     def test_put_valid_no_sheets(self):
-        self.request.registry.content.resource_sheets.return_value = {}
+        self.resource_sheets.return_value = {}
         self.request.validated = {"content_type": "X", "data": {}}
 
         inst = self.make_one(self.context, self.request)
@@ -574,11 +559,9 @@ class FubelRESTViewUnitTest(unittest.TestCase):
         assert wanted == response
 
     def test_put_valid_with_sheets(self):
-        sheet = make_mock_sheet(ISheetB)
-        sheet.set_cstruct.return_value = True
-        self.request.registry.content.resource_sheets.return_value = {
-            ISheetB.__identifier__: sheet}
-        data = {'content_type': IResource.__identifier__,
+        sheet = DummyPropertysheet()
+        self.resource_sheets.return_value = {ISheetB.__identifier__: sheet}
+        data = {'content_type': 'X',
                 'data': {ISheetB.__identifier__: {'x': 'y'}}}
         self.request.validated = data
 
@@ -587,36 +570,18 @@ class FubelRESTViewUnitTest(unittest.TestCase):
 
         wanted = {'path': '/', 'content_type': IResourceX.__identifier__}
         assert wanted == response
-        assert sheet.set_cstruct.called
-
-    def test_put_non_valid_with_sheets_raise_invalid(self):
-        sheet = make_mock_sheet(ISheetB)
-        self.request.registry.content.resource_sheets.return_value = {
-            ISheetB.__identifier__: sheet}
-        data = {'content_type': IResource.__identifier__,
-                'data': {ISheetB.__identifier__: {'x': 'y'}}}
-        self.request.validated = data
-
-        invalid_node = colander.SchemaNode(typ=colander.String())
-        sheet.set_cstruct.side_effect = colander.Invalid(invalid_node)
-
-        inst = self.make_one(self.context, self.request)
-        with pytest.raises(colander.Invalid):
-            inst.put()
+        assert sheet._dummy_appstruct == {'x': 'y'}
 
 
 class PoolRESTViewUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
         self.context = DummyFolder()
-        registry = make_mock_resource_registry_with_mock_type(IResourceX)
-        self.request = CorniceDummyRequest(registry=self.config.registry)
-        self.request.registry.content = registry
-        self.request.errors = Errors(self.request)
-
-    def tearDown(self):
-        testing.tearDown()
+        resource_registry = make_mock_resource_registry()
+        request = CorniceDummyRequest()
+        request.registry.content = resource_registry
+        self.request = request
+        self.create = request.registry.content.create
 
     def make_one(self, context, request):
         from .views import PoolRESTView
@@ -642,7 +607,7 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         child = testing.DummyResource(__provides__=IResourceX)
         child.__parent__ = self.context
         child.__name__ = 'child'
-        self.request.registry.content.create.return_value = child
+        self.create.return_value = child
         self.request.validated = {'content_type': IResourceX.__identifier__,
                                   'data': {}}
         inst = self.make_one(self.context, self.request)
