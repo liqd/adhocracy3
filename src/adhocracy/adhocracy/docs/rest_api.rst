@@ -124,7 +124,7 @@ Returns resource and child elements meta data and all propertysheet interfaces w
 
     >>> resp_data = testapp.get("/adhocracy").json
     >>> pprint(resp_data["data"])
-    {'adhocracy.sheets.name.IName': {'name': ''},
+    {'adhocracy.sheets.name.IName': {'name': 'adhocracy'},
      'adhocracy.sheets.pool.IPool': {'elements': []}}
 
 POST

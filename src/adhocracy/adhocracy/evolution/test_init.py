@@ -3,6 +3,24 @@ from pyramid import testing
 import unittest
 
 
+#############
+#  helpers  #
+#############
+
+class DummyFolder(testing.DummyResource):
+
+    def add(self, name, obj, **kwargs):
+        self[name] = obj
+        obj.__name__ = name
+        obj.__parent__ = self
+        obj.__oid__ = 1
+
+    def check_name(self, name):
+        if name == 'invalid':
+            raise ValueError
+        return name
+
+
 ################
 #  tests       #
 ################
@@ -20,7 +38,8 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
         self.config.include('substanced.content')
         self.config.include('adhocracy.resources')
         self.config.include('adhocracy.registry')
-        root = testing.DummyResource()
+        self.config.include('adhocracy.sheets.name')
+        root = DummyFolder()
         add_app_root_element(root)
         assert 'adhocracy' in root
 

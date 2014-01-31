@@ -96,12 +96,13 @@ class ResourcePropertySheetAdapter(PropertySheet):
 
         return bool(changed)
 
-    def set_cstruct(self, cstruct):
+    def validate_cstruct(self, cstruct):
         """Return: read interface."""
-        omit = [child.name for child in self.schema
-                if getattr(child, 'readonly', False)]
+        for child in self.schema:
+            if getattr(child, 'readonly', False):
+                raise colander.Invalid(child, msg=u'This key is readonly')
         struct = self.schema.deserialize(cstruct)
-        self.set(struct, omit=omit)
+        return struct
 
     def get_cstruct(self):
         """Return: read interface."""

@@ -15,8 +15,11 @@ def add_app_root_element(root):
     logger.info(add_app_root_element.__doc__)
     reg = get_current_registry()
     if 'adhocracy' not in root:
-        root['adhocracy'] = reg.content.create(
-            'adhocracy.resources.IPool')
+        appstructs = {'adhocracy.sheets.name.IName': {'name': 'adhocracy'}}
+        reg.content.create('adhocracy.resources.IPool',
+                           root,
+                           appstructs=appstructs,
+                           )
 
 
 def add_app_root_permissions(root):

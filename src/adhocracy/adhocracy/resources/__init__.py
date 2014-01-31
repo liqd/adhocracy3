@@ -4,14 +4,18 @@ from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.utils import get_ifaces_from_module
 from adhocracy.utils import get_all_taggedvalues
+from adhocracy.utils import get_resource_interface
+from pyramid.path import DottedNameResolver
 from substanced.content import add_content_type
 from substanced.interfaces import IAutoNamingFolder
+from substanced.util import get_oid
+from zope.component import getMultiAdapter
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 from zope.interface import taggedValue
-from zope.component import getMultiAdapter
 
 import sys
+import datetime
 
 
 class IPool(IResource, IAutoNamingFolder):
@@ -32,6 +36,24 @@ class IPool(IResource, IAutoNamingFolder):
     """ Set addable content types, class heritage is honored"""
 
 
+def fubelversionspool_create_initial_content(context, registry):
+    """Add first version and the Tags LAST and FIRST."""
+    iface = get_resource_interface(context)
+    fubel_type = get_all_taggedvalues(iface)['fubel_type']
+    fubel_first = ResourceFactory(fubel_type)(context)
+
+    fubel_oid = get_oid(fubel_first)
+    tag_first_data = {'adhocracy.sheets.tags.ITag': {'elements':
+                                                     [fubel_oid]},
+                      'adhocracy.sheets.name.IName': {'name': u'FIRST'}}
+    ResourceFactory(ITag)(context, appstructs=tag_first_data)
+
+    tag_last_data = {'adhocracy.sheets.tags.ITag': {'elements':
+                                                    [fubel_oid]},
+                     'adhocracy.sheets.name.IName': {'name': u'LAST'}}
+    ResourceFactory(ITag)(context, appstructs=tag_last_data)
+
+
 class IFubelVersionsPool(IPool):
 
     """Pool for all VersionableFubels (DAG), tags and related Pools.
@@ -50,6 +72,7 @@ class IFubelVersionsPool(IPool):
                 'adhocracy.resources.IVersionableFubel',
                 'adhocracy.resources.ITag',
                 ]))
+    taggedValue('after_creation', [fubelversionspool_create_initial_content])
     taggedValue('fubel_type',
                 'adhocracy.resources.IVersionableFubel')
     """Type of VersionableFubel for this VersionPool.
@@ -66,14 +89,23 @@ class IFubel(IResource):
                 ['adhocracy.sheets.name.IName']))
 
 
+class ITag(IResource):
+
+    """Tag to link specific versions."""
+
+    taggedValue('content_name', 'Fubel')
+    taggedValue('basic_sheets', set(
+                ['adhocracy.sheets.name.IName',
+                 'adhocracy.sheets.tags.ITag']))
+
+
 class IVersionableFubel(IResource):
 
     """Versionable object, created during a Participation Process (mainly)."""
 
     taggedValue('content_name', 'VersionableFubel')
     taggedValue('basic_sheets', set(
-                ['adhocracy.sheets.name.INameReadOnly',
-                 'adhocracy.sheets.versions.IVersionable']))
+                ['adhocracy.sheets.versions.IVersionable']))
 
 
 # Concrete Fubels and FubelVersionsPools
@@ -130,22 +162,53 @@ class ResourceFactory(object):
             self.prop_ifaces.append(prop_iface)
         self.after_creation = meta['after_creation']
 
-    def _set_appstructs(self, resource, appstructs):
-        for key, struct in appstructs.items():
-            iface = resolve(key)
-            sheet = getMultiAdapter((resource, iface),
-                                    IResourcePropertySheet)
-            sheet.set(struct)
+    def add(self, context, resource, appstructs):
+        """Add to context.
 
-    def __call__(self, **kwargs):
+        Returns:
+            name (String)
+        Raises:
+            substanced.folder.FolderKeyError
+            ValueError
+
+        """
+        # TODO use seperated factory for IVersionables
+        name_identifier = 'adhocracy.sheets.name.IName'
+        name = ''
+        if name_identifier in appstructs:
+            name = appstructs[name_identifier]['name']
+            name = context.check_name(name)
+            appstructs[name_identifier]['name'] = name
+        if not name:
+            name = datetime.datetime.now().isoformat()
+        if IVersionableFubel.providedBy(resource):
+            name = context.next_name(resource, prefix='VERSION_')
+        context.add(name, resource, send_events=False)
+
+    def __call__(self,
+                 context,
+                 appstructs={},
+                 run_after_creation=True,
+                 add_to_context=True
+                 ):
         res = DottedNameResolver()
         resource = self.class_()
         directlyProvides(resource, self.resource_iface)
         alsoProvides(resource, self.prop_ifaces)
-        if 'appstructs' in kwargs:
-            self._set_appstructs(resource, kwargs['appstructs'])
-        for call in self.after_creation:
-            call(resource, None)
+        if add_to_context:
+            self.add(context, resource, appstructs)
+        else:
+            resource.__parent__ = None
+            resource.__name__ = ''
+        if appstructs:
+            for key, struct in appstructs.items():
+                iface = res.maybe_resolve(key)
+                sheet = getMultiAdapter((resource, iface),
+                                        IResourcePropertySheet)
+                sheet.set(struct)
+        if run_after_creation:
+            for call in self.after_creation:
+                call(resource, None)
         return resource
 
 

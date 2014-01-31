@@ -3,27 +3,6 @@ from pyramid import testing
 import unittest
 
 
-class SheetNameDummy(object):
-
-    def __init__(*args):
-        pass
-
-    def get(self):
-        return {'name': 'dummyname'}
-
-
-def create_dummy_with_name_propertysheet(config):
-    from adhocracy.interfaces import IResourcePropertySheet
-    from adhocracy.sheets.name import IName
-    from adhocracy.interfaces import IISheet
-    from zope.interface import alsoProvides
-    alsoProvides(IName, IISheet)
-    config.registry.registerAdapter(SheetNameDummy,
-                                    (IName, IISheet),
-                                    IResourcePropertySheet)
-    return testing.DummyResource(__provides__=IName)
-
-
 class ResourcesAutolNamingFolderUnitTest(unittest.TestCase):
 
     def setUp(self):
@@ -36,45 +15,48 @@ class ResourcesAutolNamingFolderUnitTest(unittest.TestCase):
         from . import ResourcesAutolNamingFolder
         return ResourcesAutolNamingFolder(d)
 
-    def test_next_name_versionable_empty(self):
-        from adhocracy.resources import IVersionableFubel
-        ob = testing.DummyResource(__provides__=IVersionableFubel)
+    def test_create(self):
+        from adhocracy.interfaces import IAutoNamingManualFolder
+        from zope.interface.verify import verifyObject
         inst = self._makeOne()
-        assert inst.next_name(ob) == 'VERSION_' + '0'.zfill(7)
+        assert verifyObject(IAutoNamingManualFolder, inst)
 
-    def test_next_name_versionable_nonempty_intifiable(self):
-        from adhocracy.resources import IVersionableFubel
-        ob = testing.DummyResource(__provides__=IVersionableFubel)
-        inst = self._makeOne({'VERSION_0000000': ob})
-        assert inst.next_name(ob).startswith('VERSION_' + '0'.zfill(7) + '_20')
-
-    def test_next_name_versionable_nonempty_nonintifiable(self):
-        from adhocracy.resources import IVersionableFubel
-        ob = testing.DummyResource(__provides__=IVersionableFubel)
-        inst = self._makeOne({'abcd': ob})
-        assert inst.next_name(ob) == 'VERSION_' + '0'.zfill(7)
-
-    def test_next_name_other_noname_empty(self):
+    def test_next_name_empty(self):
         ob = testing.DummyResource()
         inst = self._makeOne()
-        assert inst.next_name(ob).startswith('20')
+        assert inst.next_name(ob) == '0'.zfill(7)
+        assert inst.next_name(ob) == '1'.zfill(7)
 
-    def test_next_name_other_with_name_empty(self):
-        ob = create_dummy_with_name_propertysheet(self.config)
+    def test_next_name_nonempty(self):
+        ob = testing.DummyResource()
+        inst = self._makeOne({'nonintifiable': ob})
+        assert inst.next_name(ob) == '0'.zfill(7)
+
+    def test_next_name_nonempty_intifiable(self):
+        ob = testing.DummyResource()
+        inst = self._makeOne({'0000000': ob})
+        assert inst.next_name(ob).startswith('0'.zfill(7) + '_20')
+
+    def test_next_name_empty_prefix(self):
+        ob = testing.DummyResource()
         inst = self._makeOne()
-        assert inst.next_name(ob) == 'dummyname'
+        assert inst.next_name(ob, prefix='prefix') == 'prefix' + '0'.zfill(7)
+        assert inst.next_name(ob,) == '1'.zfill(7)
 
-    def test_next_name_other_with_name_nonempty(self):
-        ob = create_dummy_with_name_propertysheet(self.config)
-        inst = self._makeOne({'dummyname': ob})
-        assert inst.next_name(ob).startswith('dummyname_20')
-
-    def test_add_next_versionable_empty(self):
-        from adhocracy.resources import IVersionableFubel
-        ob = testing.DummyResource(__provides__=IVersionableFubel)
+    def test_add(self):
+        ob = testing.DummyResource()
         inst = self._makeOne()
-        result = inst.add_next(ob)
-        name = 'VERSION_' + '0'.zfill(7)
-        assert ob.__name__ == name
-        assert name in inst
-        assert name == result
+        inst.add('name', ob)
+        assert 'name' in inst
+
+    def test_add_next(self):
+        ob = testing.DummyResource()
+        inst = self._makeOne()
+        inst.add_next(ob)
+        assert '0'.zfill(7) in inst
+
+    def test_add_next_prefix(self):
+        ob = testing.DummyResource()
+        inst = self._makeOne()
+        inst.add_next(ob, prefix='prefix')
+        assert 'prefix' + '0'.zfill(7) in inst

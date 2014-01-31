@@ -18,8 +18,44 @@ from pyramid.traversal import resource_path
 import functools
 
 
+def validate_sheet_cstructs(context, request, sheets):
+    """Validate propertysheet data."""
+    validated = request.validated.get('data', {})
+    sheetnames_wrong = []
+    for sheetname, cstruct in validated.items():
+        if sheetname in sheets:
+            sheet = sheets[sheetname]
+            appstruct = sheet.validate_cstruct(cstruct)
+            validated[sheetname] = appstruct
+        else:
+            sheetnames_wrong.append(sheetname)
+    for sheetname in sheetnames_wrong:
+        del validated[sheetname]
+
+
+def validate_put_sheet_cstructs(context, request):
+    """Validate propertysheet data for put requests."""
+    sheets = request.registry.content.resource_sheets(
+        context, request, onlyeditable=True)
+    validate_sheet_cstructs(context, request, sheets)
+
+
+def validate_post_sheet_cstructs(context, request):
+    """Validate propertysheet data for put requests."""
+    type_ = request.validated.get('content_type', '')
+    dummy = object()
+    sheets = {}
+    if type_ in request.registry.content.resource_types():
+        dummy = request.registry.content.create(
+            type_, context, add_to_context=False, run_after_creation=False)
+        dummy.__parent__ = context
+        sheets = request.registry.content.resource_sheets(
+            dummy, request, onlycreatable=True)
+    validate_sheet_cstructs(dummy, request, sheets)
+
+
 def validate_put_sheet_names(context, request):
-    """Validate propertysheet names for put requests."""
+    """Validate propertysheet names for put requests. Return None."""
     sheets = request.registry.content.resource_sheets(
         context, request, onlyeditable=True)
     puted = request.validated.get('data', {}).keys()
@@ -56,7 +92,7 @@ def validate_post_sheet_names_and_resource_type(context, request):
 
 
 def validate_request_data(context, request, schema=None, extra_validators=[]):
-        """Validate request data.
+        """ Validate request data.
 
         Args:
             context (class): context passed to validator functions
@@ -201,7 +237,8 @@ class FubelRESTView(ResourceRESTView):
     """View for non versionable Fubels, implements get, options and put."""
 
     validation_PUT = (PUTResourceRequestSchema,
-                      [validate_put_sheet_names])
+                      [validate_put_sheet_names,
+                       validate_put_sheet_cstructs])
 
     @view_config(request_method='OPTIONS')
     def options(self):
@@ -216,10 +253,12 @@ class FubelRESTView(ResourceRESTView):
     @view_config(request_method='PUT')
     def put(self):
         """Handle HTTP PUT. Return dict with PATH of modified resource."""
-        sheets_edit = self.registry.resource_sheets(self.context, self.request,
-                                                    onlyeditable=True)
-        for name, cstruct in self.request.validated['data'].items():
-            sheets_edit[name].set_cstruct(cstruct)
+        sheets = self.registry.resource_sheets(self.context, self.request,
+                                               onlyeditable=True)
+        appstructs = self.request.validated.get('data', {})
+        for sheetname, appstruct in appstructs.items():
+            sheet = sheets[sheetname]
+            sheet.set(appstruct)
         struct = {}
         struct['path'] = resource_path(self.context)
         struct['content_type'] = self.registry.typeof(self.context)
@@ -236,7 +275,8 @@ class PoolRESTView(FubelRESTView):
     """View for Pools, implements get, options, put and post."""
 
     validation_POST = (POSTResourceRequestSchema,
-                       [validate_post_sheet_names_and_resource_type])
+                       [validate_post_sheet_names_and_resource_type,
+                        validate_post_sheet_cstructs])
 
     @view_config(request_method='OPTIONS')
     def options(self):
@@ -257,17 +297,10 @@ class PoolRESTView(FubelRESTView):
     def post(self):
         """HTTP POST. Return dictionary with PATH of new resource."""
         #create resource
-        type = self.request.validated['content_type']
-        resource = self.registry.create(type)
-        sheets = self.registry.resource_sheets(resource, self.request)
-        # store sheets
-        resource.__parent__ = self.context  # link parent for schema validation
-        for sheetname, cstruct in self.request.validated['data'].items():
-            sheets[sheetname].set_cstruct(cstruct)
-        del resource.__parent__
-        # add to parent
-        self.context.add_next(resource, send_events=False)
-        #FIXME use substanced event system
+        resource_type = self.request.validated['content_type']
+        appstructs = self.request.validated.get('data', {})
+        resource = self.registry.create(resource_type, self.context,
+                                        appstructs=appstructs)
         # response
         struct = {}
         struct['path'] = resource_path(resource)

@@ -1,9 +1,7 @@
 from adhocracy.sheets import ISheet
-from mock import patch
 from pyramid import testing
 
 import pytest
-import zope.interface
 import unittest
 
 
@@ -11,24 +9,12 @@ import unittest
 #  helpers  #
 #############
 
-class InterfaceX(zope.interface.Interface):
-
-    """Useless Interface for testing."""
-
-
-class InterfaceY(zope.interface.Interface):
-
-    """Useless Interface for testing."""
+class ISheetY(ISheet):
+    pass
 
 
 class ISheetX(ISheet):
-
-    """Useless PropertyInterface for testing."""
-
-
-class ISheetY(ISheet):
-
-    """Useless PropertyInterface for testing."""
+    pass
 
 
 class DummyPropertySheetAdapter(object):
@@ -60,27 +46,39 @@ def _register_dummypropertysheet_adapter(config):
                                     IResourcePropertySheet)
 
 
-@patch('substanced.objectmap.ObjectMap', autospec=True)
-def make_folder_with_objectmap(dummyobjectmap=None):
-    folder = testing.DummyResource()
-    folder.__objectmap__ = dummyobjectmap.return_value
-    folder.__objectmap__.new_objectid.return_value = 1
-    return folder
+class DummyFolder(testing.DummyResource):
+
+    def add(self, name, obj, **kwargs):
+        self[name] = obj
+        obj.__name__ = name
+        obj.__parent__ = self
+        obj.__oid__ = 1
+
+    def check_name(self, name):
+        if name == 'invalid':
+            raise ValueError
+        return name
+
+    def next_name(self, obj, prefix=''):
+        return prefix + '_0000000'
 
 
 ###########
 #  tests  #
 ###########
 
-class VersionableFubelIntegrationTest(unittest.TestCase):
+class FubelVersionsPoolIntegrationTest(unittest.TestCase):
 
     def setUp(self):
+        from substanced.objectmap import ObjectMap
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.resources')
         self.config.include('adhocracy.sheets.name')
         self.config.include('adhocracy.sheets.tags')
-        self.context = make_folder_with_objectmap()
+        context = DummyFolder()
+        context.__objectmap__ = ObjectMap(context)
+        self.context = context
 
     def tearDown(self):
         testing.tearDown()
@@ -93,7 +91,6 @@ class VersionableFubelIntegrationTest(unittest.TestCase):
     def test_create(self):
         from . import IVersionableFubel
         from . import ITag
-        #_register_dummypropertysheet_adapter(self.config)
         inst = self.make_one()
         fubel = inst['VERSION_0000000']
         fubel_oid = fubel.__oid__
@@ -114,7 +111,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
-        context = make_folder_with_objectmap()
+        context = DummyFolder()
         self.context = context
 
     def tearDown(self):
@@ -129,28 +126,45 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         inst = self.make_one(IResource)
         assert '__call__' in dir(inst)
 
-    def test_valid_dotted_resource_iface(self):
+    def test_valid_IResource(self):
+        from zope.interface.verify import verifyObject
         from adhocracy.interfaces import IResource
-        from persistent.mapping import PersistentMapping
-        from persistent.interfaces import IPersistent
-        from zope.interface import directlyProvidedBy
-        inst = self.make_one(IResource.__identifier__)
-        resource = inst(self.context)
-
-        assert isinstance(resource, PersistentMapping)
-        assert IPersistent.providedBy(resource)
-        assert IResource in directlyProvidedBy(resource)
-
-    def test_valid_non_dotted_resource_iface(self):
-        from adhocracy.interfaces import IResource
-        from persistent.mapping import PersistentMapping
         from persistent.interfaces import IPersistent
         from zope.interface import directlyProvidedBy
         inst = self.make_one(IResource)
         resource = inst(self.context)
 
-        assert isinstance(resource, PersistentMapping)
         assert IPersistent.providedBy(resource)
+        assert IResource in directlyProvidedBy(resource)
+        assert verifyObject(IResource, resource)
+
+    def test_valid_IVersionableFubel(self):
+        from adhocracy.resources import IVersionableFubel
+        inst = self.make_one(IVersionableFubel)
+        resource = inst(self.context)
+        assert IVersionableFubel.providedBy(resource)
+
+    def test_valid_add_to_context(self):
+        from adhocracy.interfaces import IResource
+        inst = self.make_one(IResource)
+        resource = inst(self.context)
+        assert resource.__parent__ == self.context
+        assert resource.__name__ in self.context
+        assert resource.__oid__ == 1
+
+    def test_valid_non_add_to_context(self):
+        from adhocracy.interfaces import IResource
+        inst = self.make_one(IResource)
+        resource = inst(self.context, add_to_context=False)
+        assert resource.__parent__ is None
+        assert resource.__name__ == ''
+        assert not hasattr(resource, '__oid__')
+
+    def test_valid_dotted_resource_iface(self):
+        from adhocracy.interfaces import IResource
+        from zope.interface import directlyProvidedBy
+        inst = self.make_one(IResource.__identifier__)
+        resource = inst(self.context)
         assert IResource in directlyProvidedBy(resource)
 
     def test_valid_non_dotted_sheet_ifaces(self):
@@ -167,22 +181,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         assert ISheetX.providedBy(resource)
         assert ISheetY.providedBy(resource)
 
-    def test_valid_add_oid(self):
-        from adhocracy.interfaces import IResource
-        inst = self.make_one(IResource)
-        resource = inst(self.context)
-        assert resource.__oid__ == 1
-        assert not hasattr(resource, '__parent__')
-
-    def test_valid_non_add_oid(self):
-        from adhocracy.interfaces import IResource
-        resource = self.make_one(IResource)(self.context, add_oid=False)
-        with pytest.raises(AttributeError):
-            resource.__oid__
-        assert not hasattr(resource, '__parent__')
-
     def test_valid_after_create(self):
-        from adhocracy.resources import ResourceFactory
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
@@ -192,11 +191,12 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         class IResourceType(IResource):
             taggedValue('after_creation', [dummy_after_create])
 
-        resource = ResourceFactory(IResourceType)(self.context)
+        inst = self.make_one(IResourceType)
+        resource = inst(self.context)
+
         assert resource.test == 'aftercreate'
 
-    def test_valid_non_after_create(self):
-        from adhocracy.resources import ResourceFactory
+    def test_valid_no_run_after_create(self):
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
@@ -206,74 +206,101 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         class IResourceType(IResource):
             taggedValue('after_creation', [dummy_after_create])
 
-        resource = ResourceFactory(IResourceType)(self.context,
-                                                  run_after_creation=False)
+        inst = self.make_one(IResourceType)
+        resource = inst(self.context, run_after_creation=False)
         with pytest.raises(AttributeError):
             resource.test
 
     def test_valid_with_appstructs_data(self):
-        from adhocracy.resources import ResourceFactory
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
         class IResourceType(IResource):
-            taggedValue('basic_sheets', set([ISheetY.__identifier__]))
+            taggedValue('basic_sheets', set([ISheetY]))
 
         data = {ISheetY.__identifier__: {"count": 0}}
         _register_dummypropertysheet_adapter(self.config)
 
-        resource = ResourceFactory(IResourceType)(self.context, appstructs=data)
-        assert resource['dummy_appstruct'] == data[ISheetY.__identifier__]
+        inst = self.make_one(IResourceType)
+        resource = inst(self.context, appstructs=data)
 
-    def test_valid_with_ctructs_data(self):
-        from adhocracy.resources import ResourceFactory
+        assert resource['dummy_appstruct'] == {'count': 0}
+
+    def test_valid_with_appstructs_name_data(self):
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
         class IResourceType(IResource):
-            taggedValue('basic_sheets', set([ISheetY.__identifier__]))
+            taggedValue('basic_sheets', set([ISheetY]))
 
-        data = {ISheetY.__identifier__: {"count": 0}}
+        data = {"adhocracy.sheets.name.IName": {"name": "child"}}
         _register_dummypropertysheet_adapter(self.config)
 
-        resource = ResourceFactory(IResourceType)(self.context, cstructs=data)
-        assert resource['dummy_cstruct'] == data[ISheetY.__identifier__]
+        inst = self.make_one(IResourceType)
+        resource = inst(self.context, appstructs=data)
 
+        assert resource['dummy_appstruct'] == {'name': 'child'}
+
+    def test_non_valid_with_appstructs_empty_name_data(self):
+        from adhocracy.interfaces import IResource
+        from zope.interface import taggedValue
+
+        class IResourceType(IResource):
+            taggedValue('basic_sheets', set([ISheetY]))
+
+        data = {"adhocracy.sheets.name.IName": {"name": "invalid"}}
+        _register_dummypropertysheet_adapter(self.config)
+
+        inst = self.make_one(IResourceType)
+        with pytest.raises(ValueError):
+            inst(self.context, appstructs=data)
+
+
+    # def test_valid_with_ctructs_data(self):
+    #     from adhocracy.interfaces import IResource
+    #     from zope.interface import taggedValue
+
+    #     class IResourceType(IResource):
+    #         taggedValue('basic_sheets', set([ISheetY.__identifier__]))
+
+    #     data = {ISheetY.__identifier__: {"count": 0}}
+    #     _register_dummypropertysheet_adapter(self.config)
+
+    #     inst = self.make_one(IResourceType)
+    #     resource = inst(self.context, cstructs=data)
+
+    #     assert resource['dummy_cstruct'] == data[ISheetY.__identifier__]
     def test_non_valid_missing_context(self):
         from adhocracy.interfaces import IResource
         with pytest.raises(TypeError):
             self.make_one(IResource)()
 
     def test_non_valid_wrong_iresource_iface(self):
-        from adhocracy.resources import ResourceFactory
         from zope.interface import Interface
 
-        class InterfaceY(Interface):
-            pass
-
         with pytest.raises(AssertionError):
-            ResourceFactory(InterfaceY)(self.context)
+            self.make_one(Interface)
 
     def test_non_valid_wrong_iproperty_iface(self):
-        from adhocracy.resources import ResourceFactory
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
+        from zope.interface import Interface
 
         class IResourceType(IResource):
-            taggedValue('basic_sheets',
-                        set([InterfaceY.__identifier__]))
+            taggedValue('basic_sheets', set([Interface]))
 
         with pytest.raises(AssertionError):
-            ResourceFactory(IResourceType)(self.context)
+            self.make_one(IResourceType)
 
 
-class ResourceFactoryIntegrationTest(unittest.TestCase):
+class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.resources')
         self.config.include('adhocracy.registry')
+        self.context = DummyFolder()
 
     def tearDown(self):
         testing.tearDown()
@@ -291,6 +318,6 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
         from adhocracy.resources import IPool
         iresource = IPool
         iresource_id = iresource.__identifier__
-        context = make_folder_with_objectmap()
-        resource = self.config.registry.content.create(iresource_id, context)
+        resource = self.config.registry.content.create(iresource_id,
+                                                       self.context)
         assert iresource.providedBy(resource)

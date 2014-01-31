@@ -1,10 +1,29 @@
 """Basic Interfaces used by all packages."""
 from substanced.interfaces import IPropertySheet
+from substanced.interfaces import IAutoNamingFolder
+from pyramid.interfaces import ILocation
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface import taggedValue
 from zope.interface import provider
 from zope.interface.interfaces import IInterface
+
+
+class IAutoNamingManualFolder(IAutoNamingFolder):
+
+    """Auto-nameing Folder that allows to set manul names in addition."""
+
+    def next_name(subobject, prefix=''):
+        """Return Name for subobject."""
+
+    def add_next(subobject,
+                 send_events=True,
+                 duplicating=None,
+                 moving=None,
+                 registry=None,
+                 prefix='',
+                 ):
+        """Add new child object and autgenerate name."""
 
 
 class IISheet(IInterface):
@@ -38,7 +57,7 @@ class ISheet(Interface):
     """This propertysheet is mandatory when creating a new resource."""
 
 
-class IResource(Interface):
+class IResource(ILocation):
 
     """Marker interface with tagged values to configure a resource type."""
 
@@ -79,13 +98,18 @@ class IResourcePropertySheet(IPropertySheet):
                                 'creating a new resource.')
 
     def get_cstruct():
-        """ Return a serialized dictionary representing the propertyt state."""
+        """ Return a serialized dictionary representing the property state."""
         pass
 
-    def set_cstruct(cstruct):
-        """ Accept ``cstruct``  and persist it to the context.
+    def validate_cstruct(cstruct):
+        """ Validate ``cstruct`` data.
 
-        (a serialized dictionary representing the property state)
+        Args:
+            cstruct (Dictionary): serialized application data (colander)
+        Returns:
+            appstruct (Dictionary): deserialized application data (colander)
+        Raises:
+            colander.Invalid
 
         """
         pass

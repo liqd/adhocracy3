@@ -123,6 +123,14 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         with pytest.raises(AssertionError):
             self.make_one(testing.DummyResource(), InterfaceY)
 
+    def test_create_valid_missing_default_value(self):
+        with pytest.raises(AssertionError):
+            self.make_one(testing.DummyResource(), ISheetZ)
+
+    def test_create_non_valid_missing_missing_value(self):
+        with pytest.raises(AssertionError):
+            self.make_one(testing.DummyResource(), ISheetY)
+
     @patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
     def test_create_references(self, dummy_reference_node=None):
         node = dummy_reference_node.return_value
@@ -162,6 +170,15 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
     def test_set_valid_omit_wrong_key(self):
         inst = self.make_one(testing.DummyResource(), ISheetB)
         assert inst.set({'count': 11}, omit=('wrongkey',)) is True
+
+    def test_set_valid_with_name_conflicts(self):
+        context = testing.DummyResource()
+        inst1 = self.make_one(context, ISheetB)
+        inst1.set({'count': 1})
+        inst2 = self.make_one(context, ISheetA)
+        inst2.set({'count': 2})
+        assert inst1.get() == {'count': 1}
+        assert inst2.get() == {'count': 2}
 
     @patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
     def _set_valid_references(self, old_oids, new_oids,
@@ -212,43 +229,26 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         inst._data['count'] = 11
         assert inst.get_cstruct() == {'count': '11'}
 
-    def test_set_cstruct_valid(self):
+    def test_validate_cstruct_valid(self):
         inst = self.make_one(testing.DummyResource(), ISheetB)
-        inst.set_cstruct({'count': '11'})
-        assert inst.get_cstruct() == {'count': '11'}
+        appstruct = inst.validate_cstruct({'count': '11'})
+        assert appstruct == {'count': 11}
 
-    def test_set_cstruct_valid_empty(self):
+    def test_validate_cstruct_valid_empty(self):
         inst = self.make_one(testing.DummyResource(), ISheetB)
-        inst.set_cstruct({})
-        assert inst.get_cstruct() == {'count': '0'}
+        appstruct = inst.validate_cstruct({})
+        assert appstruct == {}
 
-    def test_set_cstruct_valid_with_name_conflicts(self):
-        context = testing.DummyResource()
-        inst1 = self.make_one(context, ISheetB)
-        inst1.set_cstruct({'count': '1'})
-        inst2 = self.make_one(context, ISheetA)
-        inst2.set_cstruct({'count': '2'})
-        assert inst1.get_cstruct() == {'count': '1'}
-        assert inst2.get_cstruct() == {'count': '2'}
-
-    def test_set_cstruct_valid_readonly(self):
+    def test_validate_cstruct_non_valid_readonly(self):
         inst = self.make_one(testing.DummyResource(), ISheetB)
         inst.schema.children[0].readonly = True
-        inst.set_cstruct({'count': '1'})
-        assert inst.get_cstruct() == {'count': '0'}
+        with pytest.raises(colander.Invalid):
+            inst.validate_cstruct({'count': 1})
 
-    def test_get_cstruct_non_valid_missing_default_value(self):
-        with pytest.raises(AssertionError):
-            self.make_one(testing.DummyResource(), ISheetZ)
-
-    def test_get_cstruct_non_valid_missing_missing_value(self):
-        with pytest.raises(AssertionError):
-            self.make_one(testing.DummyResource(), ISheetY)
-
-    def test_set_cstruct_non_valid_wrong_type(self):
+    def test_validate_cstruct_non_valid_wrong_type(self):
         inst = self.make_one(testing.DummyResource(), ISheetB)
         with pytest.raises(colander.Invalid):
-            inst.set_cstruct({'count': 'wrongnumber'})
+            inst.validate_cstruct({'count': 'wrongnumber'})
 
     # TODO
     # def test_set_cstruct_non_valid_required(self):
