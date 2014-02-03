@@ -323,11 +323,11 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
                 pass
 
         self.config.registry.registerAdapter(OverrideAdapter,
-                                             (ISheetB, IInterface),
+                                             (ISheetB, IISpecialAdapter),
                                              IResourcePropertySheet)
         default_adapter = ResourcePropertySheetAdapter
         self.config.registry.registerAdapter(default_adapter,
-                                             (ISheetB, IISpecialAdapter),
+                                             (ISheetB, IInterface),
                                              IResourcePropertySheet)
 
         context = testing.DummyResource()
