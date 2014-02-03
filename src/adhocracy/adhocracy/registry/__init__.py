@@ -49,6 +49,8 @@ class ResourceContentRegistry(ContentRegistry):
                 if sheet.createmandatory:
                     continue
             sheets[iface.__identifier__] = sheet
+        if 'adhocracy.sheets.versions.IVersions' in sheets:
+            sheets['adhocracy.sheets.versions.IVersions'].get()
         return sheets
 
     def resource_types(self):

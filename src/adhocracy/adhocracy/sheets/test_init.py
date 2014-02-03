@@ -1,11 +1,11 @@
 from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IISheet
 from unittest.mock import call
 from unittest.mock import patch
 from pyramid import testing
 from zope.interface import Interface
 from zope.interface import taggedValue
 from zope.interface import provider
+from zope.interface.interfaces import IInterface
 
 import colander
 import pytest
@@ -16,22 +16,24 @@ import unittest
 #  helper  #
 ############
 
+class IISpecialAdapter(IInterface):
+
+    """Marker interfaces to register special propertysheet adapter."""
+
 
 class InterfaceY(Interface):
     pass
 
 
-@provider(IISheet)
 class ISheetA(ISheet):
     taggedValue('schema', 'adhocracy.sheets.test_init.CountSchema')
 
 
-@provider(IISheet)
+@provider(IISpecialAdapter)
 class ISheetB(ISheet):
     taggedValue('schema', 'adhocracy.sheets.test_init.CountSchema')
 
 
-@provider(IISheet)
 class ISheetC(ISheet):
     taggedValue('schema', 'adhocracy.sheets.test_init.CountSchema')
     taggedValue('readonly', True)
@@ -44,7 +46,6 @@ class CountSchema(colander.MappingSchema):
                                 missing=colander.drop)
 
 
-@provider(IISheet)
 class ISheetZ(ISheet):
     taggedValue('schema',
                 'adhocracy.sheets.test_init.CountSchemaMissingDefault')
@@ -55,7 +56,6 @@ class CountSchemaMissingDefault(colander.MappingSchema):
                                 missing=colander.drop)
 
 
-@provider(IISheet)
 class ISheetY(ISheet):
     taggedValue('schema',
                 'adhocracy.sheets.test_init.CountSchemaMissingMissing')
@@ -66,7 +66,6 @@ class CountSchemaMissingMissing(colander.MappingSchema):
                                 default=0)
 
 
-@provider(IISheet)
 class IExtendPropertyB(ISheetB):
     taggedValue('schema',
                 'adhocracy.sheets.test_init.ExtendCountSchema')
@@ -316,20 +315,19 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
 
     def test_register_ipropertysheet_adapter_override(self):
         from adhocracy.interfaces import IResourcePropertySheet
-        from adhocracy.interfaces import IISheet
         from adhocracy.sheets import ResourcePropertySheetAdapter
-        from zope.interface import Interface
+        from zope.interface.interfaces import IInterface
 
         class OverrideAdapter(object):
             def __init__(*args):
                 pass
 
         self.config.registry.registerAdapter(OverrideAdapter,
-                                             (ISheetB, IISheet),
+                                             (ISheetB, IInterface),
                                              IResourcePropertySheet)
         default_adapter = ResourcePropertySheetAdapter
         self.config.registry.registerAdapter(default_adapter,
-                                             (ISheetB, Interface),
+                                             (ISheetB, IISpecialAdapter),
                                              IResourcePropertySheet)
 
         context = testing.DummyResource()

@@ -1,11 +1,15 @@
 """Rest API views."""
 from adhocracy.interfaces import IResource
+from adhocracy.resources import IFubelVersionsPool
+from adhocracy.resources import IVersionableFubel
 from adhocracy.resources import IFubel
 from adhocracy.resources import IPool
 from adhocracy.rest.schemas import ResourceResponseSchema
+from adhocracy.rest.schemas import FubelVersionsPoolResponseSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
 from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
+from adhocracy.rest.schemas import GETFubelVersionsPoolResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.utils import get_resource_interface
 from copy import deepcopy
@@ -219,6 +223,7 @@ class ResourceRESTView(RESTView):
         """Handle GET requests. Return dict with resource data structure."""
         sheets_view = self.registry.resource_sheets(self.context, self.request,
                                                     onlyviewable=True)
+        response_schema = GETResourceResponseSchema()
         struct = {'data': {}}
         for sheet in sheets_view.values():
             key = sheet.iface.__identifier__
@@ -226,7 +231,13 @@ class ResourceRESTView(RESTView):
         struct['path'] = resource_path(self.context)
         iresource = get_resource_interface(self.context)
         struct['content_type'] = iresource.__identifier__
-        return GETResourceResponseSchema().serialize(struct)
+        if IFubelVersionsPool.providedBy(self.context):
+            response_schema = GETFubelVersionsPoolResponseSchema()
+            for v in self.context.values():
+                if IVersionableFubel.providedBy(v):
+                    struct['first_version_path'] = resource_path(v)
+                    break
+        return response_schema.serialize(struct)
 
 
 @view_defaults(
@@ -305,11 +316,18 @@ class PoolRESTView(FubelRESTView):
         resource = self.registry.create(resource_type, self.context,
                                         appstructs=appstructs)
         # response
+        response_schema = ResourceResponseSchema()
         struct = {}
         struct['path'] = resource_path(resource)
         iresource = get_resource_interface(resource)
         struct['content_type'] = iresource.__identifier__
-        return ResourceResponseSchema().serialize(struct)
+        if IFubelVersionsPool.providedBy(resource):
+            response_schema = FubelVersionsPoolResponseSchema()
+            for v in resource.values():
+                if IVersionableFubel.providedBy(v):
+                    struct['first_version_path'] = resource_path(v)
+                    break
+        return response_schema.serialize(struct)
 
 
 def includeme(config):  # pragma: no cover

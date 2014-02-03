@@ -1,17 +1,18 @@
 """Sheets to work with versionable resources."""
 from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IISheet
 from adhocracy.interfaces import IResourcePropertySheet
+from adhocracy.interfaces import IIResourcePropertySheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
+from adhocracy.sheets.pool import PoolPropertySheetAdapter
+from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceSetSchemaNode
 from zope.interface import provider
 from zope.interface import taggedValue
-from zope.interface.interfaces import IInterface
 
 import colander
 
 
-@provider(IISheet)
+@provider(IIResourcePropertySheet)
 class IVersionable(ISheet):
 
     """Make this Fubel versionable."""
@@ -38,9 +39,10 @@ class VersionableSchema(colander.Schema):
 #         interface=IVersionable,
 #         readonly=True,
 #     )
+# FIXME: check constrains (ist the follwed node the right node?)
 
 
-@provider(IISheet)
+@provider(IIPool)
 class IVersions(ISheet):
 
     """Dag for collecting all versions of one Fubel."""
@@ -54,36 +56,15 @@ class VersionsSchema(colander.Schema):
 
     elements = ReferenceSetSchemaNode(default=[],
                                       missing=colander.drop,
-                                      interface=[IVersionable],
-                                      )
-
-
-@provider(IISheet)
-class ITags(ISheet):
-
-    """List all tags for this FubelVersionsPool."""
-
-    taggedValue('schema', 'adhocracy.sheets.tags.TagsSchema')
-
-
-class TagsSchema(colander.Schema):
-
-    """Colander schema for ITags."""
-
-    elements = ReferenceSetSchemaNode(default=[],
-                                      missing=colander.drop,
-                                      interface=IVersionable,
+                                      interfaces=[IVersionable],
                                       )
 
 
 def includeme(config):
     """Register adapter."""
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (IVersionable, IInterface),
+                                    (IVersionable, IIResourcePropertySheet),
                                     IResourcePropertySheet)
-    config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (IVersions, IInterface),
-                                    IResourcePropertySheet)
-    config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (ITags, IInterface),
+    config.registry.registerAdapter(PoolPropertySheetAdapter,
+                                    (IVersions, IIPool),
                                     IResourcePropertySheet)

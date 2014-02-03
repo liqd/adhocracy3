@@ -1,17 +1,16 @@
 """Sheets to store a document."""
 from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IISheet
 from adhocracy.interfaces import IResourcePropertySheet
+from adhocracy.interfaces import IIResourcePropertySheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import ReferenceSetSchemaNode
 from zope.interface import provider
 from zope.interface import taggedValue
-from zope.interface.interfaces import IInterface
 
 import colander
 
 
-@provider(IISheet)
+@provider(IIResourcePropertySheet)
 class IDocument(ISheet):
 
     """Marker interface representing a Fubel with document data."""
@@ -23,6 +22,10 @@ class DocumentSchema(colander.Schema):
 
     """Colander schema for IDocument."""
 
+    title = colander.SchemaNode(colander.String(), default='',
+                                missing=colander.drop,)
+    description = colander.SchemaNode(colander.String(), default='',
+                                      missing=colander.drop,)
     elements = ReferenceSetSchemaNode(
         essence_refs=True,
         default=[],
@@ -30,7 +33,7 @@ class DocumentSchema(colander.Schema):
         interface='adhocracy.resources.ISection')
 
 
-@provider(IISheet)
+@provider(IIResourcePropertySheet)
 class ISection(ISheet):
 
     """Marker interface representing a document section."""
@@ -42,7 +45,8 @@ class SectionSchema(colander.Schema):
 
     """Colander schema for ISection."""
 
-    title = colander.SchemaNode(colander.String(), default='')
+    title = colander.SchemaNode(colander.String(), default='',
+                                missing=colander.drop,)
     elements = ReferenceSetSchemaNode(
         essence_refs=True,
         default=[],
@@ -53,8 +57,8 @@ class SectionSchema(colander.Schema):
 def includeme(config):
     """Register adapter."""
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (IDocument, IInterface),
+                                    (IDocument, IIResourcePropertySheet),
                                     IResourcePropertySheet)
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (ISection, IInterface),
+                                    (ISection, IIResourcePropertySheet),
                                     IResourcePropertySheet)

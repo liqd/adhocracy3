@@ -123,9 +123,10 @@ class IProposalVersionsPool(IFubelVersionsPool):
     """Proposal Versions Pool."""
 
     taggedValue('addable_content_interfaces', set(
-        ['adhocracy.resources.ITags',
-         'adhocracy.resources.IFubelVersionsPool']))
-    taggedValue('fubel_content_type',
+        ['adhocracy.resources.ITag',
+         'adhocracy.resources.IFubelVersionsPool',
+         'adhocracy.resources.IProposal']))
+    taggedValue('fubel_type',
                 'adhocracy.resources.IProposal')
 
 
@@ -133,13 +134,16 @@ class ISection(IVersionableFubel):
 
     """Document section."""
 
+    taggedValue('extended_sheets', set(
+                ['adhocracy.sheets.document.ISection']))
+
 
 class ISectionVersionsPool(IFubelVersionsPool):
 
     """Section Versions Pool."""
 
     taggedValue('addable_content_interfaces', set(
-        ['adhocracy.resources.ITags',
+        ['adhocracy.resources.ITag',
          'adhocracy.resources.ISection']))
     taggedValue('fubel_type', 'adhocracy.resources.ISection')
 
@@ -205,7 +209,8 @@ class ResourceFactory(object):
                 iface = res.maybe_resolve(key)
                 sheet = getMultiAdapter((resource, iface),
                                         IResourcePropertySheet)
-                sheet.set(struct)
+                if not sheet.readonly:
+                    sheet.set(struct)
         if run_after_creation:
             for call in self.after_creation:
                 call(resource, None)

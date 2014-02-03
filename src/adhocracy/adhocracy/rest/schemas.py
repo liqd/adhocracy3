@@ -13,12 +13,26 @@ class ResourceResponseSchema(colander.Schema):
     path = AbsolutePath(default='')
 
 
+class FubelVersionsPoolResponseSchema(ResourceResponseSchema):
+
+    """Data structure for responses of IFubelVersionsPool requests."""
+
+    first_version_path = AbsolutePath(default='')
+
+
 class GETResourceResponseSchema(ResourceResponseSchema):
 
     """Data structure for Resource GET requests."""
 
     data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
                                default={})
+
+
+class GETFubelVersionsPoolResponseSchema(GETResourceResponseSchema):
+
+    """Data structure for responses of IFubelVersionsPool requests."""
+
+    first_version_path = AbsolutePath(default='')
 
 
 class PUTResourceRequestSchema(colander.Schema):

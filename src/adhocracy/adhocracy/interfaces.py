@@ -5,7 +5,6 @@ from pyramid.interfaces import ILocation
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface import taggedValue
-from zope.interface import provider
 from zope.interface.interfaces import IInterface
 
 
@@ -26,12 +25,11 @@ class IAutoNamingManualFolder(IAutoNamingFolder):
         """Add new child object and autgenerate name."""
 
 
-class IISheet(IInterface):
+class IIResourcePropertySheet(IInterface):
 
-    """Mark ISheet classes to ease overriding registered adapters."""
+    """Marker interfaces to register the default propertysheet adapter."""
 
 
-@provider(IISheet)
 class ISheet(Interface):
 
     """Marker interface with tagged values to define resource data."""

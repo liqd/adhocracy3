@@ -1,18 +1,19 @@
 """Sheets to work with versionable resources."""
 from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IISheet
 from adhocracy.interfaces import IResourcePropertySheet
+from adhocracy.interfaces import IIResourcePropertySheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.versions import IVersionable
+from adhocracy.sheets.pool import PoolPropertySheetAdapter
+from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceSetSchemaNode
 from zope.interface import provider
 from zope.interface import taggedValue
-from zope.interface.interfaces import IInterface
 
 import colander
 
 
-@provider(IISheet)
+@provider(IIResourcePropertySheet)
 class ITag(ISheet):
 
     """List all tags for this FubelVersionsPool."""
@@ -30,7 +31,7 @@ class TagSchema(colander.Schema):
                                       )
 
 
-@provider(IISheet)
+@provider(IIPool)
 class ITags(ISheet):
 
     """List all tags for this FubelVersionsPool."""
@@ -44,15 +45,15 @@ class TagsSchema(colander.Schema):
 
     elements = ReferenceSetSchemaNode(default=[],
                                       missing=colander.drop,
-                                      interface=ITag,
+                                      interfaces=[ITag],
                                       )
 
 
 def includeme(config):
     """Register adapter."""
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (ITag, IInterface),
+                                    (ITag, IIResourcePropertySheet),
                                     IResourcePropertySheet)
-    config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (ITags, IInterface),
+    config.registry.registerAdapter(PoolPropertySheetAdapter,
+                                    (ITags, IIPool),
                                     IResourcePropertySheet)

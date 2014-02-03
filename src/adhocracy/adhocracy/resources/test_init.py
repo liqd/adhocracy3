@@ -19,6 +19,8 @@ class ISheetX(ISheet):
 
 class DummyPropertySheetAdapter(object):
 
+    readonly = False
+
     def __init__(self, context, iface):
         self.context = context
         self.iface = iface

@@ -492,6 +492,19 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
         wanted = {ISheetB.__identifier__: {'dummy_cstruct': {}}}
         assert wanted == response['data']
 
+    def test_get_fubelversionspool_valid_no_sheets(self):
+        from adhocracy.resources import IFubelVersionsPool
+        from adhocracy.resources import IVersionableFubel
+        context = testing.DummyResource(__provides__=IFubelVersionsPool)
+        context['firt'] = testing.DummyResource(__provides__=IVersionableFubel)
+
+        inst = self.make_one(context, self.request)
+
+        wanted = {'path': '/', 'data': {},
+                  'content_type': IFubelVersionsPool.__identifier__,
+                  'first_version_path': '/firt'}
+        assert inst.get() == wanted
+
 
 class FubelRESTViewUnitTest(unittest.TestCase):
 
@@ -561,7 +574,7 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         from .views import PoolRESTView
         return PoolRESTView(context, request)
 
-    def test_create_valid(self,):
+    def test_create(self,):
         from .views import validate_post_sheet_names_and_resource_type
         from .views import validate_post_sheet_cstructs
         from .views import FubelRESTView
@@ -577,7 +590,7 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
-    def test_post_valid_with_sheets(self):
+    def test_post_valid(self):
         child = testing.DummyResource(__provides__=IResourceX)
         child.__parent__ = self.context
         child.__name__ = 'child'
@@ -588,4 +601,24 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         response = inst.post()
 
         wanted = {'path': '/child', 'content_type': IResourceX.__identifier__}
+        assert wanted == response
+
+    def test_post_valid_fubelversionspool(self):
+        from adhocracy.resources import IFubelVersionsPool
+        from adhocracy.resources import IVersionableFubel
+        child = testing.DummyResource(__provides__=IFubelVersionsPool,
+                                      __parent__=self.context,
+                                      __name__='child')
+        first = testing.DummyResource(__provides__=IVersionableFubel)
+        child['first'] = first
+        self.create.return_value = child
+        self.request.validated = {'content_type':
+                                  IVersionableFubel.__identifier__,
+                                  'data': {}}
+        inst = self.make_one(self.context, self.request)
+        response = inst.post()
+
+        wanted = {'path': '/child',
+                  'content_type': IFubelVersionsPool.__identifier__,
+                  'first_version_path': '/child/first'}
         assert wanted == response
