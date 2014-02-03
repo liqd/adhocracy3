@@ -209,31 +209,53 @@ Create and Update Versionable Resources
 ---------------------------------------
 
 
-FIXME: this section needs to be edited to work for the following
-scenario: A document has two paragraphs, and is changed first in the
-first, then in the second:
+Introduction and Motivation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+This section explains updates to resources with version control.  Two
+property sheets are central to version control in adhocracy: IDAG and
+IVersion.  IVersion is in all content objects that support version
+control, and IDAG is a container that manages all versions of a
+particular content object in a directed acyclic graph.
 
- Doc     v0       v1      v2
-                 /       /
- Par1    v0    v1       /
-                       /
- Par2    v0          v1
+IDAG content objects as well as IVersion objects need to be created
+explicitly by the frontend.  IDAG content objects may also implement
+the IPool property sheet for containing further IDAG content objects
+for sub-structures of structured versionable content types.  Example:
+A document may consist of a title, description, and a list of
+references to paragraphs.  There is a DAG for each document and each
+such dag contains one DAG for each paragraph that occurs in any
+version of the document.  Paragraph refs in the document object point
+to specific versions in those DAGs.
 
------> time --------------------------------------->
+The server supports updating a content object implementing IVersion by
+letting you post a content object with missing IVersion property sheet
+to the DAG (IVersion is read-only and managed by the server), and
+passing a list of parent versions in the post parameters of the
+request.  If there is only one parent version, the new version either
+forks off an existing branch or just continues a linear history.  If
+there are several parent versions, we have a merge commit.
 
-We want document to be available in 3 versions that are linearly
-dependent on each other.  But when the update to Par2 is to be posted,
-the client has no way of telling that it should update v1 of document,
-BUT NOT v0!
+When posting updates to nested sub-structures, the front-end must
+decide for which parent objects it wants to trigger an update.  To
+stay in the example above: If we have a document with two paragraphs,
+and update a paragraph, the post request must contain both the parent
+version(s) of the paragraph, but also the parent version(s) of the
+document that it is supposed to update.
 
-Solution: If DAGs are nested inside each other like Par1, Par2 are
-nested in Doc in the above example, the POST request creating a new
-version of the child DAG must contain follows entries not only for
-itself, but for all ancestor DAGs.
+To see why, consider the following situation::
 
-[end of FIXME]
+    Doc     v0       v1      v2
+                    /       /
+    Par1    v0    v1       /
+                          /
+    Par2    v0          v1
 
+          >-----> time >-------->
+
+We want Doc to be available in 3 versions that are linearly dependent
+on each other.  But when the update to Par2 is posted, the server has
+no way of knowing that it should update v1 of Doc, BUT NOT v0!
 
 
 Create
