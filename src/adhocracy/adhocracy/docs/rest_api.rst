@@ -288,6 +288,12 @@ The return data has the new attribute 'first_version_path' to get the path of th
     >>> proposal_v1_path
     /adhocracy/Proposals/kommunismus/VERSION_...
 
+Version IDs are numeric and assigned by the server.  The front-end has
+no control over them, and they are not supposed to be human-memorable.
+For human-memorable version pointers that also allow for complex
+update behavior (fixed-commit, always-newest, ...), consider property
+sheet ITags.
+
 The ProposalVersionsPool has the IVersions and ITags interfaces to work with Versions ::
 
     >>> pprint(resp.json['data']}
