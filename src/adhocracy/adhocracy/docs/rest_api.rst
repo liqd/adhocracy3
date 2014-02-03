@@ -282,11 +282,11 @@ Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource ty
     >>> proposal_versions_path
     '/adhocracy/Proposals/kommunismus'
 
-The return data has the new attribute 'first_version_path' to get the path of the first Proposal (aka VersionableFubel)::
+The return data has the new attribute 'first_version_path' to get the path first Version::
 
     >>> proposal_v1_path = resp.json['first_version_path']
     >>> proposal_v1_path
-    /adhocracy/Proposals/kommunismus/VERSION_...
+    '/adhocracy/Proposals/kommunismus/VERSION_0000000'
 
 Version IDs are numeric and assigned by the server.  The front-end has
 no control over them, and they are not supposed to be human-memorable.
@@ -294,69 +294,37 @@ For human-memorable version pointers that also allow for complex
 update behavior (fixed-commit, always-newest, ...), consider property
 sheet ITags.
 
-The ProposalVersionsPool has the IVersions and ITags interfaces to work with Versions ::
+The ProposalVersionsPool has the IVersions and ITags interfaces to work with Versions::
 
-    >>> pprint(resp.json['data']}
-        {
-            "adhocracy.sheets.name.IName": {
-                "name": "kommunismus"
-            },
-            "adhocracy.sheets.versions.IVersions": {
-                "elements": [
-                    "/adhocracy/Proposals/kommunismus/VERSION_...
-                ]
-            }
-            "adhocracy.sheets.tags.ITags": {
-                "elements": [
-                    "/adhocracy/Proposals/kommunismus/TAG_FIRST"
-                ]
-            }
-            "adhocracy.sheets.pool.IPool": {
-                "elements": []
-            }
+    >>> resp = testapp.get(proposal_versions_path)
+    >>> resp.json['data']['adhocracy.sheets.versions.IVersions']['elements']
+    ['/adhocracy/Proposals/kommunismus/VERSION_0000000']
 
-        }
+    >>> resp.json['data']['adhocracy.sheets.tags.ITags']['elements']
+    ['/adhocracy/Proposals/kommunismus/FIRST', '/adhocracy/Proposals/kommunismus/LAST']
 
 Update
 ~~~~~~
 
 Fetch the first Proposal Version, it is empty ::
 
-    >>> resp = testapp.post_get(proposal_v1_path)
-    >>> pprint_json(resp.json)
-    {
-        "content_type": "adhocracy.resources.IProposal",
-        "data": {
-            "adhocracy.sheets.name.INameReadOnly": {
-                "name": "VERSION_...
-            },
-            'adhocracy.sheets.document.IDocument': {
-                      'title': '',
-                      'description': '',
-                      'elements': []}}}
-            "adhocracy.sheets.pool.IPool": {
-                "elements": []
-            },
-            "adhocracy.sheets.versions.IVersionable": {
-                "follows": [],
-                "followed-by": []
-            }
-        },
-        "path": "/adhocracy/Proposals/kommunismus/VERSION_...
-    }
+    >>> resp = testapp.get(proposal_v1_path)
+    >>> pprint(resp.json['data']['adhocracy.sheets.document.IDocument'])
+    {'description': '', 'elements': [], 'title': ''}
+
+    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])
+    {'follows': []}
 
 Create a second proposal that follows the first version ::
 
-    >>> para = {'content_type': 'adhocracy.resources.Proposal',
-    ...         'data': {
-    ...              'adhocracy.sheets.document.IDocument': {
-    ...                  'title': 'kommunismus jetzt!',
-    ...                  'description': 'blabla!',
-    ...                  'elements': []}
-    ...               'adhocracy.sheets.Interfaces.IVersionable': {
-    ...                  'follows': [proposal_v1_path],
-    ...                  }
-    ...          }}
+    >>> para = {'content_type': 'adhocracy.resources.IProposal',
+    ...         'data': {'adhocracy.sheets.document.IDocument': {
+    ...                     'title': 'kommunismus jetzt!',
+    ...                     'description': 'blabla!',
+    ...                     'elements': []},
+    ...                  'adhocracy.sheets.versions.IVersionable': {
+    ...                     'follows': [proposal_v1_path]}
+    ...             }}
     >>> resp = testapp.post_json(proposal_versions_path, para)
     >>> proposal_v2_path = resp.json["path"]
     >>> proposal_v2_path != proposal_v1_path
@@ -369,23 +337,20 @@ Add and update child resource
 Create a SectionVersionsPool inside the ProposalVersionsPool::
 
     >>> prop = {'content_type': 'adhocracy.resources.ISectionVersionsPool',
-    ...         'data': {
-    ...              'adhocracy.sheets.name.IName': {
-    ...              'name': 'kapitel1'},
+    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel1'},}
+    ...         }
     >>> resp = testapp.post_json(proposal_versions_path, prop)
     >>> section_versions_path = resp.json["path"]
     >>> section_v1_path = resp.json["first_version_path"]
 
 Create a third Proposal version and add the first Section version ::
 
-    >>> para = {'content_type': 'adhocracy.resources.Proposal',
-    ...         'data': {
-    ...              'adhocracy.sheets.document.IDocument': {
-    ...                  'elements': [section_v1_path]}
-    ...               'adhocracy.sheets.Interfaces.IVersionable': {
-    ...                  'follows': [proposal_v2_path],
-    ...                  }
-    ...          }}
+    >>> para = {'content_type': 'adhocracy.resources.IProposal',
+    ...         'data': {'adhocracy.sheets.document.IDocument': {
+    ...                     'elements': [section_v1_path]},
+    ...                  'adhocracy.sheets.versions.IVersionable': {
+    ...                     'follows': [proposal_v2_path],}
+    ...                 }}
     >>> resp = testapp.post_json(proposal_versions_path, para)
     >>> proposal_v3_path = resp.json["path"]
 
@@ -394,46 +359,26 @@ If we create a second Section version ::
 
     >>> prop = {'content_type': 'adhocracy.resources.ISection',
     ...         'data': {
-    ...              'adhocracy.sheets.document.ISections': {
+    ...              'adhocracy.sheets.document.ISection': {
     ...                  'title': 'Kapitel Überschrift Bla',
-    ...                  'elements': []}
-    ...               'adhocracy.sheets.Interfaces.IVersionable': {
+    ...                  'elements': []},
+    ...               'adhocracy.sheets.versions.IVersionable': {
     ...                  'follows': [section_v1_path],
     ...                  }
     ...          }}
-    >>> resp = testapp.post_json(sections_versions_path, prop)
-    >>> section_v2_path = resp.json["path"]
+    >>> resp = testapp.post_json(section_versions_path, prop)
+    >>> section_v2_path = resp.json['path']
     >>> section_v2_path != section_v1_path
     True
 
 we automatically create a fourth Proposal version ::
 
-    >>> resp = testapp.post_get(proposal_versions_path)
-    >>> pprint_json(resp.json)
-    ...
-        "data": {
-            "adhocracy.sheets.name.IName": {
-                "name": "kommunismus"
-            },
-            "adhocracy.sheets.versions.IVersions": {
-                "elements": [
-                    "/adhocracy/Proposals/kommunismus/VERSION..."
-                    "/adhocracy/Proposals/kommunismus/VERSION..."
-                    "/adhocracy/Proposals/kommunismus/VERSION..."
-                    "/adhocracy/Proposals/kommunismus/VERSION..."
-                ]
-            }
-            "adhocracy.sheets.tags.ITags": {
-                "elements": [
-                    "/adhocracy/Proposals/kommunismus/TAG_FIRST"
-                ]
-            }
-            "adhocracy.sheets.pool.IPool": {
-                "elements": [
-                    "/adhocracy/Proposals/kommunismus/kapitel1"
-                ]
-            }
-    ...
+    >>> resp = testapp.get(proposal_versions_path)
+    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersions'])
+    {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000000',
+                  '/adhocracy/Proposals/kommunismus/VERSION_0000001',
+                  '/adhocracy/Proposals/kommunismus/VERSION_0000002',
+                  '/adhocracy/Proposals/kommunismus/VERSION_0000003']}
 
 FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
