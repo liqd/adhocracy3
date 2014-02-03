@@ -10,6 +10,3 @@
 [submodule "src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped"]
 	path = src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped
 	url = https://github.com/borisyankov/DefinitelyTyped
-[submodule "src/adhocracy/adhocracy/frontend/static/submodules/angular.js"]
-	path = src/adhocracy/adhocracy/frontend/static/submodules/angular.js
-	url = https://github.com/angular/angular.js
