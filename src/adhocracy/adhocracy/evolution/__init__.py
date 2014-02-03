@@ -16,7 +16,7 @@ def add_app_root_element(root):
     reg = get_current_registry()
     if 'adhocracy' not in root:
         appstructs = {'adhocracy.sheets.name.IName': {'name': 'adhocracy'}}
-        reg.content.create('adhocracy.resources.IPool',
+        reg.content.create('adhocracy.resources.pool.IBasicPool',
                            root,
                            appstructs=appstructs,
                            )

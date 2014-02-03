@@ -493,8 +493,8 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
         assert wanted == response['data']
 
     def test_get_fubelversionspool_valid_no_sheets(self):
-        from adhocracy.resources import IFubelVersionsPool
-        from adhocracy.resources import IVersionableFubel
+        from adhocracy.interfaces import IFubelVersionsPool
+        from adhocracy.interfaces import IVersionableFubel
         context = testing.DummyResource(__provides__=IFubelVersionsPool)
         context['firt'] = testing.DummyResource(__provides__=IVersionableFubel)
 
@@ -604,8 +604,8 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         assert wanted == response
 
     def test_post_valid_fubelversionspool(self):
-        from adhocracy.resources import IFubelVersionsPool
-        from adhocracy.resources import IVersionableFubel
+        from adhocracy.interfaces import IFubelVersionsPool
+        from adhocracy.interfaces import IVersionableFubel
         child = testing.DummyResource(__provides__=IFubelVersionsPool,
                                       __parent__=self.context,
                                       __name__='child')

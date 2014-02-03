@@ -1,9 +1,9 @@
 """Rest API views."""
 from adhocracy.interfaces import IResource
-from adhocracy.resources import IFubelVersionsPool
-from adhocracy.resources import IVersionableFubel
-from adhocracy.resources import IFubel
-from adhocracy.resources import IPool
+from adhocracy.interfaces import IFubelVersionsPool
+from adhocracy.interfaces import IVersionableFubel
+from adhocracy.interfaces import IFubel
+from adhocracy.interfaces import IPool
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import FubelVersionsPoolResponseSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema

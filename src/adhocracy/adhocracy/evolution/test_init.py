@@ -36,8 +36,8 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
     def test_add_root_element(self):
         from adhocracy.evolution import add_app_root_element
         self.config.include('substanced.content')
-        self.config.include('adhocracy.resources')
         self.config.include('adhocracy.registry')
+        self.config.include('adhocracy.resources.pool')
         self.config.include('adhocracy.sheets.name')
         root = DummyFolder()
         add_app_root_element(root)

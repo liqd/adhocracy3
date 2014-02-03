@@ -1,7 +1,7 @@
 """Basic Interfaces used by all packages."""
-from substanced.interfaces import IPropertySheet
-from substanced.interfaces import IAutoNamingFolder
 from pyramid.interfaces import ILocation
+from substanced.interfaces import IAutoNamingFolder
+from substanced.interfaces import IPropertySheet
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface import taggedValue
@@ -55,31 +55,6 @@ class ISheet(Interface):
     """This propertysheet is mandatory when creating a new resource."""
 
 
-class IResource(ILocation):
-
-    """Marker interface with tagged values to configure a resource type."""
-
-    taggedValue('content_name', '')
-    """Human readable name, subtypes have to override"""
-    taggedValue('content_class', 'persistent.mapping.PersistentMapping')
-    """Class to create content objects"""
-
-    taggedValue('permission_add', 'add')
-    """Permission to add this content object to the object hierarchy. """
-    taggedValue('permission_view', 'view')
-    """Permission to view content data and view in listings"""
-    taggedValue('is_implicit_addable', True)
-    """Make this content type adddable if supertype is addable."""
-
-    taggedValue('basic_sheets', set())
-    """Basic property interfaces to define data """
-    taggedValue('extended_sheets', set())
-    """Extended property interfaces to define data, subtypes should override"""
-    taggedValue('after_creation', [])
-    """Callables to run after creation. They are passed the instance being
-    created and the registry."""
-
-
 class IResourcePropertySheet(IPropertySheet):
 
     """PropertySheet object to set/get resource data.
@@ -111,3 +86,102 @@ class IResourcePropertySheet(IPropertySheet):
 
         """
         pass
+
+
+class IResource(ILocation):
+
+    """Marker interface with tagged values to configure a resource type."""
+
+    taggedValue('content_name', '')
+    """Human readable name, subtypes have to override"""
+    taggedValue('content_class', 'persistent.mapping.PersistentMapping')
+    """Class to create content objects"""
+
+    taggedValue('permission_add', 'add')
+    """Permission to add this content object to the object hierarchy. """
+    taggedValue('permission_view', 'view')
+    """Permission to view content data and view in listings"""
+    taggedValue('is_implicit_addable', True)
+    """Make this content type adddable if supertype is addable."""
+
+    taggedValue('basic_sheets', set())
+    """Basic property interfaces to define data """
+    taggedValue('extended_sheets', set())
+    """Extended property interfaces to define data, subtypes should override"""
+    taggedValue('after_creation', [])
+    """Callables to run after creation. They are passed the instance being
+    created and the registry."""
+
+
+class IPool(IResource, IAutoNamingFolder):
+
+    """Folder in the object hierarchy.
+
+    Namespace, structure and configure Fubels for a Participation Process.
+    Additional TaggedValue: 'addable_content_interfaces'
+
+    """
+
+    taggedValue('content_class', 'adhocracy.folder.ResourcesAutolNamingFolder')
+    taggedValue('basic_sheets',
+                set(['adhocracy.sheets.name.IName',
+                     'adhocracy.sheets.pool.IPool']))
+    taggedValue('addable_content_interfaces',
+                set(['adhocracy.interfaces.IPool']))
+    """ Set addable content types, class heritage is honored"""
+
+
+class IFubelVersionsPool(IPool):
+
+    """Pool for all VersionableFubels (DAG), tags and related Pools.
+
+    Additional TaggedValue: 'fubel_type'
+
+    """
+
+    taggedValue('content_name', 'FubelVersionsPool')
+    taggedValue('basic_sheets', set(
+                ['adhocracy.sheets.name.IName',
+                 'adhocracy.sheets.tags.ITags',
+                 'adhocracy.sheets.versions.IVersions',
+                 'adhocracy.sheets.pool.IPool']))
+    taggedValue('addable_content_interfaces', set([
+                'adhocracy.resources.IVersionableFubel',
+                'adhocracy.resources.ITag',
+                ]))
+    taggedValue(
+        'after_creation',
+        ["adhocracy.resources.fubelversionspool_create_initial_content"])
+    taggedValue('fubel_type',
+                'adhocracy.resources.IVersionableFubel')
+    """Type of VersionableFubel for this VersionPool.
+    Subtypes have to override.
+    """
+
+
+class IFubel(IResource):
+
+    """Small object without versions and children."""
+
+    taggedValue('content_name', 'Fubel')
+    taggedValue('basic_sheets', set(
+                ['adhocracy.sheets.name.IName']))
+
+
+class ITag(IResource):
+
+    """Tag to link specific versions."""
+
+    taggedValue('content_name', 'Fubel')
+    taggedValue('basic_sheets', set(
+                ['adhocracy.sheets.name.IName',
+                 'adhocracy.sheets.tags.ITag']))
+
+
+class IVersionableFubel(IResource):
+
+    """Versionable object, created during a Participation Process (mainly)."""
+
+    taggedValue('content_name', 'VersionableFubel')
+    taggedValue('basic_sheets', set(
+                ['adhocracy.sheets.versions.IVersionable']))

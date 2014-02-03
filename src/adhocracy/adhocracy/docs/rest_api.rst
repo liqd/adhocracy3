@@ -37,7 +37,7 @@ Resource structure
 ------------------
 
 Resources have one content interface to set its type, like
-"adhocracy.resources.IPool".
+"adhocracy.resources.pool.IBasicPool".
 
 FIXME: rename content interface to ressource interface, this is more clear and more common
 FIXME: maybe rename propertysheet interface to property interface, its shorter
@@ -91,7 +91,7 @@ structures and available interfaces with resource data::
 
 The value for POST gives us list with valid request data stubs::
 
-    >>> data_post_pool = {'content_type': 'adhocracy.resources.IPool',
+    >>> data_post_pool = {'content_type': 'adhocracy.resources.pool.IBasicPool',
     ...                   'data': {'adhocracy.sheets.name.IName': {}}}
     >>> data_post_pool in resp_data["POST"]["request_body"]
     True
@@ -132,13 +132,13 @@ POST
 
 Create a new resource ::
 
-    >>> prop = {'content_type': 'adhocracy.resources.IPool',
+    >>> prop = {'content_type': 'adhocracy.resources.pool.IBasicPool',
     ...         'data': {
     ...              'adhocracy.sheets.name.IName': {
     ...                  'name': 'Proposals'}}}
     >>> resp_data = testapp.post_json("/adhocracy", prop).json
     >>> resp_data["content_type"]
-    'adhocracy.resources.IPool'
+    'adhocracy.resources.pool.IBasicPool'
     >>> resp_data["path"]
     '/adhocracy/Proposals'
 
@@ -147,11 +147,12 @@ PUT
 
 Modify data of an existing resource ::
 
-    >>> data = {'content_type': 'adhocracy.resources.IPool',
+    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'proposals'}}}
     >>> resp_data = testapp.put_json("/adhocracy/Proposals", data).json
     >>> pprint(resp_data)
-    {'content_type': 'adhocracy.resources.IPool', 'path': '/adhocracy/Proposals'}
+    {'content_type': 'adhocracy.resources.pool.IBasicPool',
+     'path': '/adhocracy/Proposals'}
 
 Check the changed resource ::
 
@@ -171,7 +172,7 @@ FIXME: ... is not working anymore in this doctest
 
 The normal return code is 200 ::
 
-    >>> data = {'content_type': 'adhocracy.resources.IPool',
+    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'Proposals'}}}
 
 .. >>> testapp.put_json("/adhocracy/Proposals", data)
@@ -179,7 +180,7 @@ The normal return code is 200 ::
 
 If you submit invalid data the return error code is 400::
 
-    >>> data = {'content_type': 'adhocracy.resources.IPool',
+    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
     ...         'data': {'adhocracy.sheets.example.WRONGINTERFACE': {'name': 'Proposals'}}}
 
 .. >>> testapp.put_json("/adhocracy/Proposals", data)
@@ -271,7 +272,7 @@ Create
 
 Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource type) ::
 
-    >>> prop = {'content_type': 'adhocracy.resources.IProposalVersionsPool',
+    >>> prop = {'content_type': 'adhocracy.resources.proposal.IProposalVersionsPool',
     ...         'data': {
     ...              'adhocracy.sheets.name.IName': {
     ...                  'name': 'kommunismus'}
@@ -317,7 +318,7 @@ Fetch the first Proposal Version, it is empty ::
 
 Create a second proposal that follows the first version ::
 
-    >>> para = {'content_type': 'adhocracy.resources.IProposal',
+    >>> para = {'content_type': 'adhocracy.resources.proposal.IProposal',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
     ...                     'title': 'kommunismus jetzt!',
     ...                     'description': 'blabla!',
@@ -336,7 +337,7 @@ Add and update child resource
 
 Create a SectionVersionsPool inside the ProposalVersionsPool::
 
-    >>> prop = {'content_type': 'adhocracy.resources.ISectionVersionsPool',
+    >>> prop = {'content_type': 'adhocracy.resources.section.ISectionVersionsPool',
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel1'},}
     ...         }
     >>> resp = testapp.post_json(proposal_versions_path, prop)
@@ -345,7 +346,7 @@ Create a SectionVersionsPool inside the ProposalVersionsPool::
 
 Create a third Proposal version and add the first Section version ::
 
-    >>> para = {'content_type': 'adhocracy.resources.IProposal',
+    >>> para = {'content_type': 'adhocracy.resources.proposal.IProposal',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
     ...                     'elements': [section_v1_path]},
     ...                  'adhocracy.sheets.versions.IVersionable': {
@@ -357,7 +358,7 @@ Create a third Proposal version and add the first Section version ::
 
 If we create a second Section version ::
 
-    >>> prop = {'content_type': 'adhocracy.resources.ISection',
+    >>> prop = {'content_type': 'adhocracy.resources.section.ISection',
     ...         'data': {
     ...              'adhocracy.sheets.document.ISection': {
     ...                  'title': 'Kapitel Überschrift Bla',
@@ -516,14 +517,14 @@ requests!)
         {
             'code': 200,
             'body': {
-                'content_type': 'adhocracy.resources.IProposal',
+                'content_type': 'adhocracy.resources.proposal.IProposal',
                 'path': '...'
             }
         }
     ]
     >>> propv3 = testapp.get_json(batch_resp[2]['body']['path']).json
     {
-        'content_type': 'adhocracy.resources.IProposal',
+        'content_type': 'adhocracy.resources.proposal.IProposal',
         ...
     }
 

@@ -1,4 +1,4 @@
-from adhocracy.sheets import ISheet
+from adhocracy.interfaces import ISheet
 from pyramid import testing
 
 import pytest
@@ -86,13 +86,13 @@ class FubelVersionsPoolIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def make_one(self):
-        from . import IFubelVersionsPool
+        from adhocracy.interfaces import IFubelVersionsPool
         from . import ResourceFactory
         return ResourceFactory(IFubelVersionsPool)(self.context)
 
     def test_create(self):
-        from . import IVersionableFubel
-        from . import ITag
+        from adhocracy.interfaces import IVersionableFubel
+        from adhocracy.interfaces import ITag
         inst = self.make_one()
         fubel = inst['VERSION_0000000']
         fubel_oid = fubel.__oid__
@@ -141,7 +141,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         assert verifyObject(IResource, resource)
 
     def test_valid_IVersionableFubel(self):
-        from adhocracy.resources import IVersionableFubel
+        from adhocracy.interfaces import IVersionableFubel
         inst = self.make_one(IVersionableFubel)
         resource = inst(self.context)
         assert IVersionableFubel.providedBy(resource)
@@ -293,33 +293,3 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         with pytest.raises(AssertionError):
             self.make_one(IResourceType)
-
-
-class IncludemeIntegrationTest(unittest.TestCase):
-
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('substanced.content')
-        self.config.include('adhocracy.resources')
-        self.config.include('adhocracy.registry')
-        self.context = DummyFolder()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_includeme_registry_register_factories(self):
-        content_types = self.config.registry.content.factory_types
-        assert 'adhocracy.resources.IFubel' in content_types
-        assert 'adhocracy.resources.IVersionableFubel'\
-            in content_types
-        assert 'adhocracy.resources.IFubelVersionsPool'\
-            in content_types
-        assert 'adhocracy.resources.IPool' in content_types
-
-    def test_includeme_registry_create_content(self):
-        from adhocracy.resources import IPool
-        iresource = IPool
-        iresource_id = iresource.__identifier__
-        resource = self.config.registry.content.create(iresource_id,
-                                                       self.context)
-        assert iresource.providedBy(resource)
