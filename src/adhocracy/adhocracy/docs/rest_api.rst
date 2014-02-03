@@ -219,16 +219,9 @@ control, and IDAG is a container that manages all versions of a
 particular content object in a directed acyclic graph.
 
 IDAG content objects as well as IVersion objects need to be created
-explicitly by the frontend.  IDAG content objects may also implement
-the IPool property sheet for containing further IDAG content objects
-for sub-structures of structured versionable content types.  Example:
-A document may consist of a title, description, and a list of
-references to paragraphs.  There is a DAG for each document and each
-such dag contains one DAG for each paragraph that occurs in any
-version of the document.  Paragraph refs in the document object point
-to specific versions in those DAGs.
+explicitly by the frontend.
 
-The server supports updating a content object implementing IVersion by
+The server supports updating a content object that implements IVersion by
 letting you post a content object with missing IVersion property sheet
 to the DAG (IVersion is read-only and managed by the server), and
 passing a list of parent versions in the post parameters of the
@@ -236,11 +229,26 @@ request.  If there is only one parent version, the new version either
 forks off an existing branch or just continues a linear history.  If
 there are several parent versions, we have a merge commit.
 
+Example: If a new versionable content object has been created by the
+user, the front-end first posts an IDAG.  The IDAG works a little like
+an IPool in that it allows posting versions to it.  The front-end will
+then simply post the initial version into the IDAG with an empty
+predecessor version list.
+
+IDAG content objects may also implement the IPool property sheet for
+containing further IDAG content objects for sub-structures of
+structured versionable content types.  Example: A document may consist
+of a title, description, and a list of references to sections.
+There is a DAG for each document and each such dag contains one DAG
+for each section that occurs in any version of the document.
+Section refs in the document object point to specific versions in
+those DAGs.
+
 When posting updates to nested sub-structures, the front-end must
 decide for which parent objects it wants to trigger an update.  To
-stay in the example above: If we have a document with two paragraphs,
-and update a paragraph, the post request must contain both the parent
-version(s) of the paragraph, but also the parent version(s) of the
+stay in the example above: If we have a document with two sections,
+and update a section, the post request must contain both the parent
+version(s) of the section, but also the parent version(s) of the
 document that it is supposed to update.
 
 To see why, consider the following situation::
