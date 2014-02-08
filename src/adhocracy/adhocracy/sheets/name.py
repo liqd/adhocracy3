@@ -15,14 +15,7 @@ class IName(ISheet):
 
     """Human readable resource Identifier, used to build object paths."""
 
-    taggedValue('schema', 'adhocracy.sheets.name.NameSchema')
-
-
-class NameSchema(colander.Schema):
-
-    """Colander schema for IName."""
-
-    name = Identifier(default='', missing=colander.drop)
+    taggedValue('field:name', Identifier(default='', missing=colander.drop))
 
 
 def includeme(config):

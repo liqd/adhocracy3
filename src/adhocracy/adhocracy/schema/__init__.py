@@ -1,4 +1,5 @@
 """Colander schema extensions."""
+from pyramid.path import DottedNameResolver
 from substanced import schema
 from substanced.objectmap import reference_sourceid_property
 from substanced.schema import IdSet
@@ -130,9 +131,11 @@ class ReferenceSetSchemaNode(schema.MultireferenceIdSchemaNode):
         """Validate."""
         context = node.bindings['context']
         object_map = find_objectmap(context)
+        res = DottedNameResolver()
         for oid in value:
             resource = object_map.object_for(oid)
             for i in node.interfaces:
+                i = res.maybe_resolve(i)
                 if not i.providedBy(resource):
                     error = 'This Resource does not provide interface %s' % \
                             (i.__identifier__)

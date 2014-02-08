@@ -15,22 +15,25 @@ class IDocument(ISheet):
 
     """Marker interface representing a Fubel with document data."""
 
-    taggedValue('schema', 'adhocracy.sheets.document.DocumentSchema')
-
-
-class DocumentSchema(colander.Schema):
-
-    """Colander schema for IDocument."""
-
-    title = colander.SchemaNode(colander.String(), default='',
-                                missing=colander.drop,)
-    description = colander.SchemaNode(colander.String(), default='',
-                                      missing=colander.drop,)
-    elements = ReferenceSetSchemaNode(
-        essence_refs=True,
-        default=[],
-        missing=colander.drop,
-        interface='adhocracy.resources.ISection')
+    taggedValue('field:title',
+                colander.SchemaNode(colander.String(),
+                                    default='',
+                                    missing=colander.drop,
+                                    )
+                )
+    taggedValue('field:description',
+                colander.SchemaNode(colander.String(),
+                                    default='',
+                                    missing=colander.drop,
+                                    )
+                )
+    taggedValue('field:elements',
+                ReferenceSetSchemaNode(default=[],
+                                       missing=colander.drop,
+                                       interfaces=
+                                       ['adhocracy.sheets.document.ISection'],
+                                       )
+                )
 
 
 @provider(IIResourcePropertySheet)
@@ -38,20 +41,19 @@ class ISection(ISheet):
 
     """Marker interface representing a document section."""
 
-    taggedValue('schema', 'adhocracy.sheets.document.SectionSchema')
-
-
-class SectionSchema(colander.Schema):
-
-    """Colander schema for ISection."""
-
-    title = colander.SchemaNode(colander.String(), default='',
-                                missing=colander.drop,)
-    elements = ReferenceSetSchemaNode(
-        essence_refs=True,
-        default=[],
-        missing=colander.drop,
-        interface='adhocracy.sheets.document.ISections')
+    taggedValue('field:title',
+                colander.SchemaNode(colander.String(),
+                                    default='',
+                                    missing=colander.drop,
+                                    )
+                )
+    taggedValue('field:elements',
+                ReferenceSetSchemaNode(default=[],
+                                       missing=colander.drop,
+                                       interfaces=
+                                       ['adhocracy.sheets.document.ISection'],
+                                       )
+                )
 
 
 def includeme(config):

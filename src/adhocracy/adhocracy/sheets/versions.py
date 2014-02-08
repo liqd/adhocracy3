@@ -17,21 +17,12 @@ class IVersionable(ISheet):
 
     """Make this Fubel versionable."""
 
-    taggedValue('schema', 'adhocracy.sheets.versions.VersionableSchema')
-
-
-# class IForkable(IVersionable):
-# """Marker interface representing a forkable node with version data"""
-
-class VersionableSchema(colander.Schema):
-
-    """Colander schema for IVersionable."""
-
-    follows = ReferenceSetSchemaNode(default=[],
-                                     missing=colander.drop,
-                                     interfaces=[IVersionable]
-                                     )
-    """follows"""
+    taggedValue('field:follows',
+                ReferenceSetSchemaNode(
+                    default=[],
+                    missing=colander.drop,
+                    interfaces=['adhocracy.sheets.versions.IVersionable'],
+                ))
 
 # followed_by = ReferenceSetSchemaNode(
 #         default=[],
@@ -47,17 +38,12 @@ class IVersions(ISheet):
 
     """Dag for collecting all versions of one Fubel."""
 
-    taggedValue('schema', 'adhocracy.sheets.versions.VersionsSchema')
-
-
-class VersionsSchema(colander.Schema):
-
-    """Colander schema for IVersions."""
-
-    elements = ReferenceSetSchemaNode(default=[],
-                                      missing=colander.drop,
-                                      interfaces=[IVersionable],
-                                      )
+    taggedValue('field:elements',
+                ReferenceSetSchemaNode(default=[],
+                                       missing=colander.drop,
+                                       interfaces=[IVersionable],
+                                       )
+                )
 
 
 def includeme(config):

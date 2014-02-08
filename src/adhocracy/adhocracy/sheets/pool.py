@@ -4,6 +4,7 @@ from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import ReferenceSetSchemaNode
+from pyramid.path import DottedNameResolver
 from pyramid.httpexceptions import HTTPNotImplemented
 from substanced.util import get_oid
 from zope.interface import provider
@@ -24,19 +25,13 @@ class IPool(ISheet):
 
     """Get listing with child objects of this resource."""
 
-    taggedValue('schema', 'adhocracy.sheets.pool.PoolSchema')
     taggedValue('readonly', True)
-
-
-class PoolSchema(colander.Schema):
-
-    """Colander schema for IPool."""
-
-    elements = ReferenceSetSchemaNode(default=[],
-                                      missing=colander.drop,
-                                      interfaces=[IResource],
-                                      readonly=True,
-                                      )
+    taggedValue('field:elements',
+                ReferenceSetSchemaNode(default=[],
+                                       missing=colander.drop,
+                                       interfaces=[IResource],
+                                       )
+                )
 
 
 @implementer(IResourcePropertySheet)
@@ -48,7 +43,9 @@ class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
         """Return data struct."""
         struct = super(PoolPropertySheetAdapter, self).get()
         elements = []
-        ifaces = self.schema['elements'].interfaces
+        res = DottedNameResolver()
+        elements_ifaces = self.schema['elements'].interfaces
+        ifaces = [res.maybe_resolve(i) for i in elements_ifaces]
         for v in self.context.values():
             for i in ifaces:
                 if i.providedBy(v):

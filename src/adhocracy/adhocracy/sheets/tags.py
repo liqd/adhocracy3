@@ -18,17 +18,12 @@ class ITag(ISheet):
 
     """List all tags for this FubelVersionsPool."""
 
-    taggedValue('schema', 'adhocracy.sheets.tags.TagSchema')
-
-
-class TagSchema(colander.Schema):
-
-    """Colander schema for ITags."""
-
-    elements = ReferenceSetSchemaNode(default=[],
-                                      missing=colander.drop,
-                                      interface=IVersionable,
-                                      )
+    taggedValue('field:elements',
+                ReferenceSetSchemaNode(default=[],
+                                       missing=colander.drop,
+                                       interface=[IVersionable]
+                                       )
+                )
 
 
 @provider(IIPool)
@@ -36,17 +31,12 @@ class ITags(ISheet):
 
     """List all tags for this FubelVersionsPool."""
 
-    taggedValue('schema', 'adhocracy.sheets.tags.TagsSchema')
-
-
-class TagsSchema(colander.Schema):
-
-    """Colander schema for ITags."""
-
-    elements = ReferenceSetSchemaNode(default=[],
-                                      missing=colander.drop,
-                                      interfaces=[ITag],
-                                      )
+    taggedValue('field:elements',
+                ReferenceSetSchemaNode(default=[],
+                                       missing=colander.drop,
+                                       interfaces=[ITag],
+                                       )
+                )
 
 
 def includeme(config):

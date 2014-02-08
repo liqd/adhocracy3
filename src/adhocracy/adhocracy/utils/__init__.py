@@ -1,13 +1,53 @@
 """Helper functions."""
+from adhocracy.interfaces import IResource
 from functools import reduce
 from zope.interface import Interface
 from zope.interface import directlyProvidedBy
-from adhocracy.interfaces import IResource
 
 import copy
+import colander
 import json
 import pprint
 
+
+def create_schema_from_dict(key_values, base_node=None):
+    """Create colander.SchemaNode instance from dictionary.
+
+    Args:
+         key_values (dict): Dictionary with colander schema names and nodes.
+                            The key is the name and has to start with
+                            "field:", has to be an instance of
+                            colander.SchemaNode.
+
+         base_node (colander.SchemaNode): Base Node to add the nodes to.
+                                          Defaults to Mapping SchemaNode.
+    Returns:
+         colander.SchemaNode
+
+    """
+    if not base_node:
+        base_node = colander.SchemaNode(colander.Mapping())
+    for key, node in key_values.items():
+        if not key.startswith('field:'):
+            continue
+        assert isinstance(node, colander.SchemaNode)
+        name = key.split(':')[1]
+        node.name = name
+        base_node.add(node)
+    return base_node
+
+
+# def get_essence(context):
+#     """Get resource essence.
+#
+#     Args:
+#         context (IResource): object
+#     Returns:
+#         Set: context object and all objects in its ``essence``
+#
+#     """
+#     assert IResource.providedBy(context)
+#     essence = set()
 
 def get_resource_interface(context):
     """Get resource type interface.
@@ -15,7 +55,7 @@ def get_resource_interface(context):
     Args:
         context (IResource): object
     Returns:
-        interface
+        Interface
 
     """
     assert IResource.providedBy(context)

@@ -3,11 +3,11 @@ from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import ISheet
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import diff_dict
+from adhocracy.utils import create_schema_from_dict
 from adhocracy.schema import ReferenceSetSchemaNode
 from collections.abc import Mapping
 from persistent.mapping import PersistentMapping
 from pyramid.compat import is_nonstr_iter
-from pyramid.path import DottedNameResolver
 from substanced.property import PropertySheet
 from substanced.util import find_objectmap
 from zope.interface import implementer
@@ -27,7 +27,6 @@ class ResourcePropertySheetAdapter(PropertySheet):
         assert iface.isOrExtends(self.isheet)
         assert (not (iface.queryTaggedValue('createmandatory', False)
                 and iface.queryTaggedValue('readonly', False)))
-        res = DottedNameResolver()
         self.context = context
         self.request = None  # just to fullfill the interface
         self.iface = iface
@@ -37,8 +36,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         self.permission_edit = taggedvalues['permission_edit']
         self.readonly = taggedvalues['readonly']
         self.createmandatory = taggedvalues['createmandatory']
-        schema_class = res.maybe_resolve(taggedvalues['schema'])
-        schema_obj = schema_class()
+        schema_obj = create_schema_from_dict(taggedvalues)
         self.schema = schema_obj.bind(context=context)
         self._objectmap = find_objectmap(self.context)
         for child in self.schema:
