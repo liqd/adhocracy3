@@ -32,8 +32,8 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
 checkout source code ::
 
-    git clone https://github.com/adhocracy/adhocracy-3
-    cd adhocracy-3
+    git clone ssh://git@foucault.liqd.net:22012/a3.git
+    cd a3
     git submodule init
     git submodule update
 
@@ -61,7 +61,7 @@ install javascript front-end ::
 
     cd src/adhocracy/adhocracy/frontend/static/js/
     make
-    cd ../../../../../..
+    cd ../../../../../..  # (or 'cd -')
 
 Documentation
 -------------
@@ -69,7 +69,7 @@ Documentation
 build sphinx documentation ::
 
     bin/sphinx_build_adhocracy
-    xdg-open docs/build/html/index.html
+    xdg-open docs/build/html/index.html  # (alternatively, cut & paste the url into your browser)
 
 Run the application
 -------------------
@@ -88,7 +88,7 @@ serving the sdidemo wsgi app using pserve ::
 
 open the javascript front-end with your web browser ::
 
-    xdg-open http://localhost:6541/frontend_static/proposal_workbench.html
+    xdg-open http://localhost:6541/frontend_static/root.html
 
 
 
