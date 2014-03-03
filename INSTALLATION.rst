@@ -61,6 +61,7 @@ install javascript front-end ::
 
     cd src/adhocracy/adhocracy/frontend/static/js/
     make
+    cd ../../../../../..
 
 Documentation
 -------------
