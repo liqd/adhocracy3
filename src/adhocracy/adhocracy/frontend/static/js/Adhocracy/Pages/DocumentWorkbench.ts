@@ -11,7 +11,7 @@ import AdhHttp = require("Adhocracy/Services/Http");
 import AdhWS = require("Adhocracy/Services/WS");
 import AdhCache = require("Adhocracy/Services/Cache");
 
-var templatePath : string = "/static/templates";
+var templatePath : string = "/frontend_static/templates";
 var appPrefix : string = "/app";
 
 
