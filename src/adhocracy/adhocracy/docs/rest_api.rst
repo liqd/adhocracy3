@@ -272,21 +272,21 @@ Create
 
 Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource type) ::
 
-    >>> prop = {'content_type': 'adhocracy.resources.proposal.IProposalVersionsPool',
+    >>> pdag = {'content_type': 'adhocracy.resources.proposal.IProposalVersionsPool',  # FIXME: s/IProposalVersionsPool/ProposalItem/
     ...         'data': {
     ...              'adhocracy.sheets.name.IName': {
     ...                  'name': 'kommunismus'}
     ...              }
     ...         }
-    >>> resp = testapp.post_json("/adhocracy/Proposals", prop)
-    >>> proposal_versions_path = resp.json["path"]
-    >>> proposal_versions_path
+    >>> resp = testapp.post_json("/adhocracy/Proposals", pdag)
+    >>> pdag_path = resp.json["path"]
+    >>> pdag_path
     '/adhocracy/Proposals/kommunismus'
 
 The return data has the new attribute 'first_version_path' to get the path first Version::
 
-    >>> proposal_v1_path = resp.json['first_version_path']
-    >>> proposal_v1_path
+    >>> pvrs0_path = resp.json['first_version_path']  # FIXME: generalize over 'first_version_path'?
+    >>> pvrs0_path
     '/adhocracy/Proposals/kommunismus/VERSION_0000000'
 
 Version IDs are numeric and assigned by the server.  The front-end has
@@ -297,7 +297,7 @@ sheet ITags.
 
 The ProposalVersionsPool has the IVersions and ITags interfaces to work with Versions::
 
-    >>> resp = testapp.get(proposal_versions_path)
+    >>> resp = testapp.get(pdag_path)
     >>> resp.json['data']['adhocracy.sheets.versions.IVersions']['elements']
     ['/adhocracy/Proposals/kommunismus/VERSION_0000000']
 
@@ -309,26 +309,26 @@ Update
 
 Fetch the first Proposal Version, it is empty ::
 
-    >>> resp = testapp.get(proposal_v1_path)
+    >>> resp = testapp.get(pvrs0_path)
     >>> pprint(resp.json['data']['adhocracy.sheets.document.IDocument'])
     {'description': '', 'elements': [], 'title': ''}
 
-    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])
+    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])  # FIXME: s/IVersionable/Version/
     {'follows': []}
 
 Create a second proposal that follows the first version ::
 
-    >>> para = {'content_type': 'adhocracy.resources.proposal.IProposal',
+    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposal',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
     ...                     'title': 'kommunismus jetzt!',
     ...                     'description': 'blabla!',
     ...                     'elements': []},
     ...                  'adhocracy.sheets.versions.IVersionable': {
-    ...                     'follows': [proposal_v1_path]}
+    ...                     'follows': [pvrs0_path]}
     ...             }}
-    >>> resp = testapp.post_json(proposal_versions_path, para)
-    >>> proposal_v2_path = resp.json["path"]
-    >>> proposal_v2_path != proposal_v1_path
+    >>> resp = testapp.post_json(pdag_path, pvrs)
+    >>> pvrs1_path = resp.json["path"]
+    >>> pvrs1_path != pvrs0_path
     True
 
 
@@ -337,44 +337,43 @@ Add and update child resource
 
 Create a SectionVersionsPool inside the ProposalVersionsPool::
 
-    >>> prop = {'content_type': 'adhocracy.resources.section.ISectionVersionsPool',
+    >>> sdag = {'content_type': 'adhocracy.resources.section.ISectionVersionsPool',  # FIXME: s/ISectionVersionsPool/SectionItem/
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel1'},}
     ...         }
-    >>> resp = testapp.post_json(proposal_versions_path, prop)
-    >>> section_versions_path = resp.json["path"]
-    >>> section_v1_path = resp.json["first_version_path"]
+    >>> resp = testapp.post_json(pdag_path, sdag)
+    >>> sdag_path = resp.json["path"]
+    >>> svrs0_path = resp.json["first_version_path"]
 
 Create a third Proposal version and add the first Section version ::
 
-    >>> para = {'content_type': 'adhocracy.resources.proposal.IProposal',
+    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposal',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
-    ...                     'elements': [section_v1_path]},
+    ...                     'elements': [svrs0_path]},
     ...                  'adhocracy.sheets.versions.IVersionable': {
-    ...                     'follows': [proposal_v2_path],}
+    ...                     'follows': [pvrs1_path],}
     ...                 }}
-    >>> resp = testapp.post_json(proposal_versions_path, para)
-    >>> proposal_v3_path = resp.json["path"]
-
+    >>> resp = testapp.post_json(pdag_path, pvrs)
+    >>> pvrs2_path = resp.json["path"]
 
 If we create a second Section version ::
 
-    >>> prop = {'content_type': 'adhocracy.resources.section.ISection',
+    >>> vers = {'content_type': 'adhocracy.resources.section.ISection',
     ...         'data': {
     ...              'adhocracy.sheets.document.ISection': {
     ...                  'title': 'Kapitel Überschrift Bla',
     ...                  'elements': []},
     ...               'adhocracy.sheets.versions.IVersionable': {
-    ...                  'follows': [section_v1_path],
+    ...                  'follows': [svrs0_path],
     ...                  }
     ...          }}
-    >>> resp = testapp.post_json(section_versions_path, prop)
-    >>> section_v2_path = resp.json['path']
-    >>> section_v2_path != section_v1_path
+    >>> resp = testapp.post_json(sdag_path, vers)
+    >>> svrs1_path = resp.json['path']
+    >>> svrs1_path != svrs0_path
     True
 
 we automatically create a fourth Proposal version ::
 
-    >>> resp = testapp.get(proposal_versions_path)
+    >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersions'])
     {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000000',
                   '/adhocracy/Proposals/kommunismus/VERSION_0000001',
