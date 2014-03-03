@@ -67,10 +67,44 @@ Example ressource hierarchy ::
     Versionable Fubel: proposals/proposal1/section1/v1
     Tag-Fubel:         proposals/proposal1/section1/head
 
-Basic calls
------------
 
-We can use the following http verbs to work with resources.
+
+Meta-API
+--------
+
+The backend needs to answer to kinds of questions:
+
+ 1. Globally: What content types exist?  What property sheets may or
+    must they contain?  (What parts of) what property sheets are
+    read-only?  mandatory?  optional?
+
+ 2. In the context of a given session and URL: What HTTP methods are
+    allowed?  With what content objects in the body?  What are the
+    authorizations (display / edit / vote-on / ...)?
+
+The second kind is implemented with the OPTIONS method on the existing
+URLs.  The first is implemented with the OPTIONS method on URLs under
+a dedicated prefix.
+
+
+Global Info
+~~~~~~~~~~~
+
+The dedicated prefix defaults to '/meta_api/', but can
+be customized.
+
+    >>> resp = testapp.options("/meta_api/")
+    >>> sorted(resp_data.keys())
+    ['adhocracy.resources.pool.IBasicPool', 'adhocracy.resources.pool.IProposal', ...]
+
+sub-urls:
+
+/meta_api/role
+/meta_api/role/content_type
+/meta_api/role/content_type/property_sheet
+
+FIXME: explain!
+
 
 
 OPTIONS
@@ -83,6 +117,16 @@ structures and available interfaces with resource data::
     >>> sorted(resp_data.keys())
     ['GET', 'HEAD', 'OPTION', 'POST', 'PUT']
 
+    >>> resp_data["GET"]["response_body"]["content_type"]
+    FIXME: yields content type of /adhocracy
+
+    >>> resp_data["GET"]["response_body"]["role"]
+    FIXME: i forgot what this is supposed to do
+
+    FIXME: ["response_body"] is redundant and can be removed.
+    ["data"] is covered by the global, role-specific meta api (see
+    last section), and can be removed as well.
+
     >>> sorted(resp_data["GET"]["response_body"]["data"].keys())
     ['adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool']
 
@@ -92,9 +136,13 @@ structures and available interfaces with resource data::
 The value for POST gives us list with valid request data stubs::
 
     >>> data_post_pool = {'content_type': 'adhocracy.resources.pool.IBasicPool',
-    ...                   'data': {'adhocracy.sheets.name.IName': {}}}
+    ...                   'data': {'adhocracy.sheets.name.IName': {}}}  # FIXME: only content types!
     >>> data_post_pool in resp_data["POST"]["request_body"]
     True
+
+FIXME: postables can be inferred from schema info handed out in the
+global case (to be covered in last section).
+
 
   (IName contains a path that must be a valid identifier for this resource.
 The server will test its validity and reject everything that is not, say,
@@ -102,7 +150,18 @@ the path of the resource that this body was posted to plus one fresh
 extra path element.  For details, see backend unit test documentation
 or such.)
 
-Semantics of read-only and mandatory flags in request body:
+Semantics of read-only and mandatory and optional flags in request / response body.
+
+FIXME: optimize for caching.  but same url has different
+authorizations for same content type under different urls!
+
+
+
+
+Basic calls
+-----------
+
+We can use the following http verbs to work with resources.
 
 
 HEAD
