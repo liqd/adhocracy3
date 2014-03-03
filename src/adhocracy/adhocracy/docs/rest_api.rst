@@ -364,7 +364,8 @@ If we create a second Section version ::
     ...                  'elements': []},
     ...               'adhocracy.sheets.versions.IVersionable': {
     ...                  'follows': [svrs0_path],
-    ...                  }
+    ...                  'root_version': [pvrs2_path]
+    ...                  }   # the two lists in this dict must have the same length!
     ...          }}
     >>> resp = testapp.post_json(sdag_path, vers)
     >>> svrs1_path = resp.json['path']
