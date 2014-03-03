@@ -383,7 +383,7 @@ Create a second proposal that follows the first version ::
     ...                     'description': 'blabla!',
     ...                     'elements': []},
     ...                  'adhocracy.sheets.versions.IVersionable': {
-    ...                     'follows': [pvrs0_path]}
+    ...                     'follows': [pvrs0_path]}  # FIXME: should be a reference ('{"content_type": ..., "path": ...}').  this issue occurs a few more times in this document.
     ...             }}
     >>> resp = testapp.post_json(pdag_path, pvrs)
     >>> pvrs1_path = resp.json["path"]
