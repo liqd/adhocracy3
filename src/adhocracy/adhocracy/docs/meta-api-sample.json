@@ -1,0 +1,103 @@
+{
+    "ContentTypes": {
+        "adhocracy.resources.proposal.IProposal": {
+            "extended_sheets": [ "adhocracy.sheets.document.IDocument" ]
+        },
+        "adhocracy.resources.proposal.IProposalVersionsPool": {
+            "addable_content_interfaces": [
+                "adhocracy.sheets.tags.ITag",
+                "adhocracy.resources.section.ISectionVersionsPool",
+                "adhocracy.resources.proposal.IProposal"
+            ],
+            "fubel_type": "adhocracy.resources.proposal.IProposal"
+        },
+        "adhocracy.resources.section.ISection": {
+            "extended_sheets": [ "adhocracy.sheets.document.ISection" ]
+        },
+        "adhocracy.resources.section.ISectionVersionsPool": {
+            "addable_content_interfaces": [
+                "adhocracy.sheets.tags.ITag",
+                "adhocracy.resources.section.ISection"
+            ],
+            "fubel_type": "adhocracy.resources.section.ISection"
+        }
+    },
+    "PropertySheets": {
+        "adhocracy.sheets.document.IDocument": {
+            "fields": [
+                {
+                    "name": "title",
+                    "type": "String",
+                    "mandatory": false,
+                    "repeated": false,
+                    "readonly": false
+                },
+                {
+                    "name": "description",
+                    "type": "String",
+                    "mandatory": false,
+                    "repeated": false,
+                    "readonly": false
+                },
+                {
+                    "name": "elements",
+                    "type": "adhocracy.sheets.document.ISection",
+                    "mandatory": false,
+                    "repeated": true,
+                    "readonly": false
+                 }
+            ]
+        },
+        "adhocracy.sheets.document.ISection": {
+            "fields": [
+                {
+                    "name": "title",
+                    "type": "String",
+                    "mandatory": false,
+                    "repeated": false,
+                    "readonly": false
+                },
+                {
+                    "name": "elements",
+                    "type": "adhocracy.sheets.document.ISection",
+                    "mandatory": false,
+                    "repeated": true,
+                    "readonly": false
+                }
+            ]
+        },
+        "adhocracy.sheets.name.IName": {
+            "fields": [
+                {
+                    "name": "name",
+                    "type": "adhocracy.schema.Identifier",
+                    "mandatory": false,
+                    "repeated": false,
+                    "readonly": false
+                }
+            ]
+        },
+        "adhocracy.sheets.tags.ITag": {
+            "fields": [
+                {
+                    "name": "elements",
+                    "type": "adhocracy.sheets.versions.IVersionable",
+                    "mandatory": false,
+                    "repeated": true,
+                    "readonly": false
+                }
+            ]
+        },
+        "adhocracy.sheets.versions.IVersionable": {
+            "fields": [
+                {
+                    "name": "follows",
+                    "type": "adhocracy.sheets.versions.IVersionable",
+                    "mandatory": false,
+                    "repeated": true,
+                    "readonly": false
+                }
+            ]
+        }
+    }
+}
