@@ -39,21 +39,21 @@ Resource structure
 Resources have one content interface to set its type, like
 "adhocracy.resources.pool.IBasicPool".
 
-FIXME: rename content interface to ressource interface, this is more clear and more common
+FIXME: rename content interface to resource interface, this is more clear and more common
 FIXME: maybe rename propertysheet interface to property interface, its shorter
 
 Every Resource has multiple propertysheet interfaces that define schemata to set/get data.
 
 There are 5 main types of content interfaces:
 
-* Pool: folder content in the object hierachy, namespace, structure and configure child fusels for a specic Beteiligungsverfahren.
+* Pool: folder content in the object hierarchy, namespace, structure and configure child fusels for a specic Beteiligungsverfahren.
 * Fubel: item content created during a Beteiligungsverfahren (mainly).
 
 * FubelVersions-Pool: specific pool for all Versionable-Fubel (DAG), Tag-Fubels, and related FubelVersions-Pools
 * Versionable-Fubel: Fubel with IVersionable propertysheet interface
 * Tag-Fubel: Fubel with the ITag content interface, links to on or more related Versionable-Fubel
 
-Example ressource hierarchy ::
+Example resource hierarchy::
 
     Pool:              categories
     Fubel:             categories/blue
@@ -67,6 +67,45 @@ Example ressource hierarchy ::
     Versionable Fubel: proposals/proposal1/section1/v1
     Tag-Fubel:         proposals/proposal1/section1/head
 
+
+PROPOSAL: the 5 names above are hard to understand and the differences are
+not always very clear. Instead, use 4 basic types:
+
+* Pool: folder content in the object hierarchy, can contain other Pools
+  (subfolders) and Items of any kind (name unchanged)
+* Item: base class of any versionable items, such as Proposals, Documents,
+  Sections etc. Contains a list of ItemVersions, sub-Items (e.g. Sections
+  within Documents), and meta-data such as Tags (was: FubelVersions-Pool)
+* ItemVersion: a specific version of a versionable item, e.g. a
+  ProposalVersion, DocumentVersion, or SectionVersion (was:
+  Versionable-Fubel).
+* Simple: Base class of anything that is neither versionable nor a
+  container (was: any Fubel that is not a Versionable-Fubel) . For
+  versionables, use Item instead; for non-versionable containers, use Pool
+  instead.
+
+Derived type:
+
+* Tag: a subtype of Simple, points to one (or sometimes zero or many)
+  ItemVersion, e.g. the current HEAD or the last APPROVED version of a
+  Document (was: Tag-Fubel). Can be modified but doesn't have its own
+  version history, hence it's a Simple instead of an Item.
+
+The old Fubel type as "generic supertype of almost anything" disappears.
+
+Example resource hierarchy, as above::
+
+    Pool:         categories
+    Simple:       categories/blue
+
+    Pool:         proposals
+    Item:         proposals/proposal1
+    ItemVersion:  proposals/proposal1/v1
+    Tag:          proposals/proposal1/head
+
+    Item:         proposals/proposal1/section1
+    ItemVersion:  proposals/proposal1/section1/v1
+    Tag:          proposals/proposal1/section1/head
 
 
 Meta-API
