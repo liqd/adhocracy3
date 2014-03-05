@@ -69,7 +69,7 @@ class DummyFolder(testing.DummyResource):
 #  tests  #
 ###########
 
-class FubelVersionsPoolIntegrationTest(unittest.TestCase):
+class ItemIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         from substanced.objectmap import ObjectMap
@@ -86,25 +86,25 @@ class FubelVersionsPoolIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def make_one(self):
-        from adhocracy.interfaces import IFubelVersionsPool
+        from adhocracy.interfaces import IItem
         from . import ResourceFactory
-        return ResourceFactory(IFubelVersionsPool)(self.context)
+        return ResourceFactory(IItem)(self.context)
 
     def test_create(self):
-        from adhocracy.interfaces import IVersionableFubel
+        from adhocracy.interfaces import IItemVersion
         from adhocracy.interfaces import ITag
         inst = self.make_one()
-        fubel = inst['VERSION_0000000']
-        fubel_oid = fubel.__oid__
+        item_version = inst['VERSION_0000000']
+        item_version_oid = item_version.__oid__
         first = inst['FIRST']
         last = inst['LAST']
-        assert IVersionableFubel.providedBy(fubel)
+        assert IItemVersion.providedBy(item_version)
         assert ITag.providedBy(first)
         assert ITag.providedBy(last)
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements': [fubel_oid]},
+        wanted = {'adhocracy.sheets.tags.ITag': {'elements': [item_version_oid]},
                   'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
         assert first._propertysheets == wanted
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements': [fubel_oid]},
+        wanted = {'adhocracy.sheets.tags.ITag': {'elements': [item_version_oid]},
                   'adhocracy.sheets.name.IName': {'name': 'LAST'}}
         assert last._propertysheets == wanted
 
@@ -140,11 +140,11 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         assert IResource in directlyProvidedBy(resource)
         assert verifyObject(IResource, resource)
 
-    def test_valid_IVersionableFubel(self):
-        from adhocracy.interfaces import IVersionableFubel
-        inst = self.make_one(IVersionableFubel)
+    def test_valid_IItemVersion(self):
+        from adhocracy.interfaces import IItemVersion
+        inst = self.make_one(IItemVersion)
         resource = inst(self.context)
-        assert IVersionableFubel.providedBy(resource)
+        assert IItemVersion.providedBy(resource)
 
     def test_valid_add_to_context(self):
         from adhocracy.interfaces import IResource

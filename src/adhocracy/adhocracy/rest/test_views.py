@@ -492,21 +492,21 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
         wanted = {ISheetB.__identifier__: {'dummy_cstruct': {}}}
         assert wanted == response['data']
 
-    def test_get_fubelversionspool_valid_no_sheets(self):
-        from adhocracy.interfaces import IFubelVersionsPool
-        from adhocracy.interfaces import IVersionableFubel
-        context = testing.DummyResource(__provides__=IFubelVersionsPool)
-        context['firt'] = testing.DummyResource(__provides__=IVersionableFubel)
+    def test_get_item_valid_no_sheets(self):
+        from adhocracy.interfaces import IItem
+        from adhocracy.interfaces import IItemVersion
+        context = testing.DummyResource(__provides__=IItem)
+        context['firt'] = testing.DummyResource(__provides__=IItemVersion)
 
         inst = self.make_one(context, self.request)
 
         wanted = {'path': '/', 'data': {},
-                  'content_type': IFubelVersionsPool.__identifier__,
+                  'content_type': IItem.__identifier__,
                   'first_version_path': '/firt'}
         assert inst.get() == wanted
 
 
-class FubelRESTViewUnitTest(unittest.TestCase):
+class SimpleRESTViewUnitTest(unittest.TestCase):
 
     def setUp(self):
         self.context = DummyFolder(__provides__=IResourceX)
@@ -517,8 +517,8 @@ class FubelRESTViewUnitTest(unittest.TestCase):
         self.resource_sheets = request.registry.content.resource_sheets
 
     def make_one(self, context, request):
-        from .views import FubelRESTView
-        return FubelRESTView(context, request)
+        from .views import SimpleRESTView
+        return SimpleRESTView(context, request)
 
     def test_create_valid(self,):
         from .views import validate_put_sheet_names
@@ -577,10 +577,10 @@ class PoolRESTViewUnitTest(unittest.TestCase):
     def test_create(self,):
         from .views import validate_post_sheet_names_and_resource_type
         from .views import validate_post_sheet_cstructs
-        from .views import FubelRESTView
+        from .views import SimpleRESTView
         from .schemas import POSTResourceRequestSchema
         inst = self.make_one(self.context, self.request)
-        assert issubclass(inst.__class__, FubelRESTView)
+        assert issubclass(inst.__class__, SimpleRESTView)
         assert inst.validation_POST ==\
             (POSTResourceRequestSchema,
              [validate_post_sheet_names_and_resource_type,
@@ -603,22 +603,22 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         wanted = {'path': '/child', 'content_type': IResourceX.__identifier__}
         assert wanted == response
 
-    def test_post_valid_fubelversionspool(self):
-        from adhocracy.interfaces import IFubelVersionsPool
-        from adhocracy.interfaces import IVersionableFubel
-        child = testing.DummyResource(__provides__=IFubelVersionsPool,
+    def test_post_valid_item(self):
+        from adhocracy.interfaces import IItem
+        from adhocracy.interfaces import IItemVersion
+        child = testing.DummyResource(__provides__=IItem,
                                       __parent__=self.context,
                                       __name__='child')
-        first = testing.DummyResource(__provides__=IVersionableFubel)
+        first = testing.DummyResource(__provides__=IItemVersion)
         child['first'] = first
         self.create.return_value = child
         self.request.validated = {'content_type':
-                                  IVersionableFubel.__identifier__,
+                                  IItemVersion.__identifier__,
                                   'data': {}}
         inst = self.make_one(self.context, self.request)
         response = inst.post()
 
         wanted = {'path': '/child',
-                  'content_type': IFubelVersionsPool.__identifier__,
+                  'content_type': IItem.__identifier__,
                   'first_version_path': '/child/first'}
         assert wanted == response

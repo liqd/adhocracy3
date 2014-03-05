@@ -13,7 +13,7 @@ import colander
 @provider(IIResourcePropertySheet)
 class IDocument(ISheet):
 
-    """Marker interface representing a Fubel with document data."""
+    """Marker interface representing an item with document data."""
 
     taggedValue('field:title',
                 colander.SchemaNode(colander.String(),
@@ -28,16 +28,17 @@ class IDocument(ISheet):
                                     )
                 )
     taggedValue('field:elements',
-                ReferenceSetSchemaNode(default=[],
-                                       missing=colander.drop,
-                                       interfaces=
-                                       ['adhocracy.sheets.document.ISection'],
-                                       )
+                ReferenceSetSchemaNode(
+                    default=[],
+                    missing=colander.drop,
+                    interfaces=
+                    ['adhocracy.sheets.document.ISectionVersion'],
+                )
                 )
 
 
 @provider(IIResourcePropertySheet)
-class ISection(ISheet):
+class ISectionVersion(ISheet):
 
     """Marker interface representing a document section."""
 
@@ -48,11 +49,12 @@ class ISection(ISheet):
                                     )
                 )
     taggedValue('field:elements',
-                ReferenceSetSchemaNode(default=[],
-                                       missing=colander.drop,
-                                       interfaces=
-                                       ['adhocracy.sheets.document.ISection'],
-                                       )
+                ReferenceSetSchemaNode(
+                    default=[],
+                    missing=colander.drop,
+                    interfaces=
+                    ['adhocracy.sheets.document.ISectionVersion'],
+                )
                 )
 
 
@@ -62,5 +64,5 @@ def includeme(config):
                                     (IDocument, IIResourcePropertySheet),
                                     IResourcePropertySheet)
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (ISection, IIResourcePropertySheet),
+                                    (ISectionVersion, IIResourcePropertySheet),
                                     IResourcePropertySheet)

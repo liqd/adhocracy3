@@ -1,31 +1,32 @@
 """Section resource type."""
-from adhocracy.interfaces import IVersionableFubel
-from adhocracy.interfaces import IFubelVersionsPool
+from adhocracy.interfaces import IItemVersion
+from adhocracy.interfaces import IItem
 from adhocracy.interfaces import ITag
 from adhocracy.resources import ResourceFactory
 from substanced.content import add_content_type
 from zope.interface import taggedValue
 
 
-class ISection(IVersionableFubel):
+class ISectionVersion(IItemVersion):
 
     """Document section."""
 
-    taggedValue('extended_sheets', set(['adhocracy.sheets.document.ISection']))
+    taggedValue('extended_sheets',
+                set(['adhocracy.sheets.document.ISectionVersion']))
 
 
-class ISectionVersionsPool(IFubelVersionsPool):
+class ISection(IItem):
 
     """Section Versions Pool."""
 
     taggedValue('addable_content_interfaces', set([ITag,
-                                                   ISection]))
-    taggedValue('fubel_type', ISection)
+                                                   ISectionVersion]))
+    taggedValue('item_type', ISectionVersion)
 
 
 def includeme(config):
     """Register resource type factory in substanced content registry."""
-    ifaces = [ISection, ISectionVersionsPool]
+    ifaces = [ISectionVersion, ISection]
     for iface in ifaces:
         name = iface.queryTaggedValue('content_name') or iface.__identifier__
         meta = {'content_name': name,

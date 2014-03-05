@@ -15,7 +15,7 @@ import colander
 @provider(IIResourcePropertySheet)
 class IVersionable(ISheet):
 
-    """Make this Fubel versionable."""
+    """Make this item versionable."""
 
     taggedValue('field:follows',
                 ReferenceSetSchemaNode(
@@ -36,7 +36,7 @@ class IVersionable(ISheet):
 @provider(IIPool)
 class IVersions(ISheet):
 
-    """Dag for collecting all versions of one Fubel."""
+    """Dag for collecting all versions of one item."""
 
     taggedValue('field:elements',
                 ReferenceSetSchemaNode(default=[],

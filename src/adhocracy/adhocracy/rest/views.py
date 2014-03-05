@@ -1,15 +1,15 @@
 """Rest API views."""
 from adhocracy.interfaces import IResource
-from adhocracy.interfaces import IFubelVersionsPool
-from adhocracy.interfaces import IVersionableFubel
-from adhocracy.interfaces import IFubel
+from adhocracy.interfaces import IItem
+from adhocracy.interfaces import IItemVersion
+from adhocracy.interfaces import ISimple
 from adhocracy.interfaces import IPool
 from adhocracy.rest.schemas import ResourceResponseSchema
-from adhocracy.rest.schemas import FubelVersionsPoolResponseSchema
+from adhocracy.rest.schemas import ItemResponseSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
 from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
-from adhocracy.rest.schemas import GETFubelVersionsPoolResponseSchema
+from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.utils import get_resource_interface
 from copy import deepcopy
@@ -231,10 +231,10 @@ class ResourceRESTView(RESTView):
         struct['path'] = resource_path(self.context)
         iresource = get_resource_interface(self.context)
         struct['content_type'] = iresource.__identifier__
-        if IFubelVersionsPool.providedBy(self.context):
-            response_schema = GETFubelVersionsPoolResponseSchema()
+        if IItem.providedBy(self.context):
+            response_schema = GETItemResponseSchema()
             for v in self.context.values():
-                if IVersionableFubel.providedBy(v):
+                if IItemVersion.providedBy(v):
                     struct['first_version_path'] = resource_path(v)
                     break
         return response_schema.serialize(struct)
@@ -242,12 +242,12 @@ class ResourceRESTView(RESTView):
 
 @view_defaults(
     renderer='simplejson',
-    context=IFubel,
+    context=ISimple,
     decorator=validate_request_data_decorator(),
 )
-class FubelRESTView(ResourceRESTView):
+class SimpleRESTView(ResourceRESTView):
 
-    """View for non versionable Fubels, implements get, options and put."""
+    """View for simples (non versionable), implements get, options and put."""
 
     validation_PUT = (PUTResourceRequestSchema,
                       [validate_put_sheet_names,
@@ -256,12 +256,12 @@ class FubelRESTView(ResourceRESTView):
     @view_config(request_method='OPTIONS')
     def options(self):
         """Handle OPTIONS requests. Return dict."""
-        return super(FubelRESTView, self).options()
+        return super(SimpleRESTView, self).options()
 
     @view_config(request_method='GET')
     def get(self):
         """Handle GET requests. Return dict."""
-        return super(FubelRESTView, self).get()
+        return super(SimpleRESTView, self).get()
 
     @view_config(request_method='PUT')
     def put(self):
@@ -284,7 +284,7 @@ class FubelRESTView(ResourceRESTView):
     context=IPool,
     decorator=validate_request_data_decorator(),
 )
-class PoolRESTView(FubelRESTView):
+class PoolRESTView(SimpleRESTView):
 
     """View for Pools, implements get, options, put and post."""
 
@@ -321,10 +321,10 @@ class PoolRESTView(FubelRESTView):
         struct['path'] = resource_path(resource)
         iresource = get_resource_interface(resource)
         struct['content_type'] = iresource.__identifier__
-        if IFubelVersionsPool.providedBy(resource):
-            response_schema = FubelVersionsPoolResponseSchema()
+        if IItem.providedBy(resource):
+            response_schema = ItemResponseSchema()
             for v in resource.values():
-                if IVersionableFubel.providedBy(v):
+                if IItemVersion.providedBy(v):
                     struct['first_version_path'] = resource_path(v)
                     break
         return response_schema.serialize(struct)

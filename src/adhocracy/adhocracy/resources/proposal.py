@@ -1,35 +1,35 @@
 """Proposal resource type."""
-from adhocracy.interfaces import IVersionableFubel
+from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ITag
-from adhocracy.interfaces import IFubelVersionsPool
-from adhocracy.resources.section import ISectionVersionsPool
+from adhocracy.interfaces import IItem
+from adhocracy.resources.section import ISection
 from adhocracy.resources import ResourceFactory
 from substanced.content import add_content_type
 from zope.interface import taggedValue
 
 
-class IProposal(IVersionableFubel):
+class IProposalVersion(IItemVersion):
 
-    """Versionable Fubel with Document propertysheet."""
+    """Versionable item with Document propertysheet."""
 
     taggedValue('extended_sheets',
                 set(['adhocracy.sheets.document.IDocument']))
 
 
-class IProposalVersionsPool(IFubelVersionsPool):
+class IProposal(IItem):
 
-    """Proposal Versions Pool."""
+    """All versions of a Proposal."""
 
     taggedValue('addable_content_interfaces', set([ITag,
-                                                   ISectionVersionsPool,
-                                                   IProposal,
+                                                   ISection,
+                                                   IProposalVersion,
                                                    ]))
-    taggedValue('fubel_type', IProposal)
+    taggedValue('item_type', IProposalVersion)
 
 
 def includeme(config):
     """Register resource type factory in substanced content registry."""
-    ifaces = [IProposal, IProposalVersionsPool]
+    ifaces = [IProposalVersion, IProposal]
     for iface in ifaces:
         name = iface.queryTaggedValue('content_name') or iface.__identifier__
         meta = {'content_name': name,

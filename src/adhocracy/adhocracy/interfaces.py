@@ -117,7 +117,7 @@ class IPool(IResource, IAutoNamingFolder):
 
     """Folder in the object hierarchy.
 
-    Namespace, structure and configure Fubels for a Participation Process.
+    Can contain other Pools (subfolders) and Items of any kind.
     Additional TaggedValue: 'addable_content_interfaces'
 
     """
@@ -131,57 +131,55 @@ class IPool(IResource, IAutoNamingFolder):
     """ Set addable content types, class heritage is honored"""
 
 
-class IFubelVersionsPool(IPool):
+class IItem(IPool):
 
-    """Pool for all VersionableFubels (DAG), tags and related Pools.
+    """Pool for any versionable objects (DAG), tags and related Pools.
 
-    Additional TaggedValue: 'fubel_type'
+    Additional TaggedValue: 'item_type'
 
     """
 
-    taggedValue('content_name', 'FubelVersionsPool')
+    taggedValue('content_name', 'Item')
     taggedValue('basic_sheets', set(
                 ['adhocracy.sheets.name.IName',
                  'adhocracy.sheets.tags.ITags',
                  'adhocracy.sheets.versions.IVersions',
                  'adhocracy.sheets.pool.IPool']))
     taggedValue('addable_content_interfaces', set([
-                'adhocracy.resources.IVersionableFubel',
+                'adhocracy.resources.IItemVersion',
                 'adhocracy.resources.ITag',
                 ]))
     taggedValue(
         'after_creation',
-        ["adhocracy.resources.fubelversionspool_create_initial_content"])
-    taggedValue('fubel_type',
-                'adhocracy.resources.IVersionableFubel')
-    """Type of VersionableFubel for this VersionPool.
-    Subtypes have to override.
-    """
+        ["adhocracy.resources.item_create_initial_content"])
+    taggedValue('item_type',
+                'adhocracy.resources.IItemVersion')
+    """Type of versions in this item. Subtypes have to override."""
 
 
-class IFubel(IResource):
+class ISimple(IResource):
 
     """Small object without versions and children."""
 
-    taggedValue('content_name', 'Fubel')
+    taggedValue('content_name', 'Simple')
     taggedValue('basic_sheets', set(
                 ['adhocracy.sheets.name.IName']))
 
 
-class ITag(IResource):
+class ITag(ISimple):
 
     """Tag to link specific versions."""
 
-    taggedValue('content_name', 'Fubel')
+    taggedValue('content_name', 'Tag')
     taggedValue('basic_sheets', set(
                 ['adhocracy.sheets.name.IName',
                  'adhocracy.sheets.tags.ITag']))
 
 
-class IVersionableFubel(IResource):
+class IItemVersion(IResource):
 
     """Versionable object, created during a Participation Process (mainly)."""
 
-    taggedValue('content_name', 'VersionableFubel')
+    taggedValue('content_name', 'ItemVersion')
     taggedValue('basic_sheets', set(
                 ['adhocracy.sheets.versions.IVersionable']))

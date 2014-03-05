@@ -16,7 +16,7 @@ import colander
 @provider(IIResourcePropertySheet)
 class ITag(ISheet):
 
-    """List all tags for this FubelVersionsPool."""
+    """List all tags for this Item."""
 
     taggedValue('field:elements',
                 ReferenceSetSchemaNode(default=[],
@@ -29,7 +29,7 @@ class ITag(ISheet):
 @provider(IIPool)
 class ITags(ISheet):
 
-    """List all tags for this FubelVersionsPool."""
+    """List all tags for this Item."""
 
     taggedValue('field:elements',
                 ReferenceSetSchemaNode(default=[],

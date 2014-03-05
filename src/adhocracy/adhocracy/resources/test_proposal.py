@@ -33,14 +33,14 @@ class IncludemeIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_includeme_registry_register_factories(self):
+        from adhocracy.resources.proposal import IProposalVersion
         from adhocracy.resources.proposal import IProposal
-        from adhocracy.resources.proposal import IProposalVersionsPool
         content_types = self.config.registry.content.factory_types
-        assert IProposalVersionsPool.__identifier__ in content_types
         assert IProposal.__identifier__ in content_types
+        assert IProposalVersion.__identifier__ in content_types
 
     def test_includeme_registry_create_content(self):
-        from adhocracy.resources.proposal import IProposal
-        res = self.config.registry.content.create(IProposal.__identifier__,
+        from adhocracy.resources.proposal import IProposalVersion
+        res = self.config.registry.content.create(IProposalVersion.__identifier__,
                                                   self.context)
-        assert IProposal.providedBy(res)
+        assert IProposalVersion.providedBy(res)

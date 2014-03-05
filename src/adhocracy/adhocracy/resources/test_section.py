@@ -33,14 +33,14 @@ class IncludemeIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_includeme_registry_register_factories(self):
+        from adhocracy.resources.section import ISectionVersion
         from adhocracy.resources.section import ISection
-        from adhocracy.resources.section import ISectionVersionsPool
         content_types = self.config.registry.content.factory_types
-        assert ISectionVersionsPool.__identifier__ in content_types
         assert ISection.__identifier__ in content_types
+        assert ISectionVersion.__identifier__ in content_types
 
     def test_includeme_registry_create_content(self):
-        from adhocracy.resources.section import ISection
-        res = self.config.registry.content.create(ISection.__identifier__,
+        from adhocracy.resources.section import ISectionVersion
+        res = self.config.registry.content.create(ISectionVersion.__identifier__,
                                                   self.context)
-        assert ISection.providedBy(res)
+        assert ISectionVersion.providedBy(res)

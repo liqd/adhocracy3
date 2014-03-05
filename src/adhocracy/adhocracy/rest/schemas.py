@@ -13,9 +13,9 @@ class ResourceResponseSchema(colander.Schema):
     path = AbsolutePath(default='')
 
 
-class FubelVersionsPoolResponseSchema(ResourceResponseSchema):
+class ItemResponseSchema(ResourceResponseSchema):
 
-    """Data structure for responses of IFubelVersionsPool requests."""
+    """Data structure for responses of IItem requests."""
 
     first_version_path = AbsolutePath(default='')
 
@@ -28,9 +28,9 @@ class GETResourceResponseSchema(ResourceResponseSchema):
                                default={})
 
 
-class GETFubelVersionsPoolResponseSchema(GETResourceResponseSchema):
+class GETItemResponseSchema(GETResourceResponseSchema):
 
-    """Data structure for responses of IFubelVersionsPool requests."""
+    """Data structure for responses of IItem requests."""
 
     first_version_path = AbsolutePath(default='')
 

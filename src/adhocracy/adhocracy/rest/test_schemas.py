@@ -20,11 +20,11 @@ class ResourceResponseSchemaUnitTest(unittest.TestCase):
         assert inst.serialize({'content_type': 'x', 'path': '/'}) == wanted
 
 
-class FubelVersionsPoolResponseSchemaUnitTest(unittest.TestCase):
+class ItemResponseSchemaUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from .schemas import FubelVersionsPoolResponseSchema
-        return FubelVersionsPoolResponseSchema()
+        from .schemas import ItemResponseSchema
+        return ItemResponseSchema()
 
     def test_serialize_no_appstruct(self):
         inst = self.make_one()
