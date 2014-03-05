@@ -230,6 +230,11 @@ Example 3.1:
     deleted [color = red];
     deleted -> likes [label = follows, color = red, style = dashed];
 
+PROPOSAL: Not sure if this is already the intention, but it might be enough
+to have just one universal DELETED node (or NULL node) in the whole graph.
+The DELETED node ``follows`` all nodes that have been deleted (multiple
+predecessors). Any node that has been deleted points to the DELETED node as
+its successor.
 
 History manipulation
 ~~~~~~~~~~~~~~~~~~~~
