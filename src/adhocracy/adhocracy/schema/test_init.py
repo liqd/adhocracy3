@@ -132,15 +132,19 @@ class ReferenceSetSchemaNodeUnitTest(unittest.TestCase):
         assert inst.missing == []
 
     def test_valid_interface(self):
+        from zope.interface import alsoProvides
         inst = self.make_one()
+        isheet = inst.reftype.getTaggedValue('target_isheet')
         context = make_folder_with_objectmap()
-        context.__objectmap__.object_for.return_value = lambda *arg: context
+        alsoProvides(context, isheet)
+        context.__objectmap__.object_for.return_value = context
         inst = add_node_binding(node=inst, context=context)
         assert inst.validator(inst, [1]) is None
+
+    def test_nonvalid_interface(self):
         inst = self.make_one()
-        inst.interfaces = [InterfaceY]
         context = make_folder_with_objectmap()
-        context.__objectmap__.object_for.return_value = lambda *arg: context
+        context.__objectmap__.object_for.return_value = context
         inst = add_node_binding(node=inst, context=context)
         with pytest.raises(colander.Invalid):
             inst.validator(inst, [1])

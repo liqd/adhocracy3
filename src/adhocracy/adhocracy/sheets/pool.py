@@ -1,7 +1,7 @@
 """Pool Sheet."""
 from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourcePropertySheet
+from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import ReferenceSetSchemaNode
 from pyramid.path import DottedNameResolver
@@ -27,11 +27,20 @@ class IPool(ISheet):
 
     taggedValue('readonly', True)
     taggedValue('field:elements',
-                ReferenceSetSchemaNode(default=[],
-                                       missing=colander.drop,
-                                       interfaces=[IResource],
-                                       )
-                )
+                ReferenceSetSchemaNode(
+                    default=[],
+                    missing=colander.drop,
+                    reftype='adhocracy.sheets.pool.IPoolElementsReference',
+                ))
+
+
+class IPoolElementsReference(AdhocracyReferenceType):
+
+    """IPool reference."""
+
+    source_isheet = IPool
+    source_isheet_field = 'elements'
+    target_isheet = ISheet
 
 
 @implementer(IResourcePropertySheet)
@@ -44,13 +53,12 @@ class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
         struct = super(PoolPropertySheetAdapter, self).get()
         elements = []
         res = DottedNameResolver()
-        elements_ifaces = self.schema['elements'].interfaces
-        ifaces = [res.maybe_resolve(i) for i in elements_ifaces]
+        reftype_ = self.schema['elements'].reftype
+        reftype = res.maybe_resolve(reftype_)
+        isheet = reftype.getTaggedValue('target_isheet')
         for v in self.context.values():
-            for i in ifaces:
-                if i.providedBy(v):
-                    elements.append(get_oid(v))
-                    break
+            if isheet.providedBy(v):
+                elements.append(get_oid(v))
         struct['elements'] = elements
         return struct
 

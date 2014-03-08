@@ -41,8 +41,8 @@ class PoolPropertySheetUnitTest(unittest.TestCase):
 
     def test_get_not_empty(self):
         from adhocracy.sheets.pool import IPool
-        from adhocracy.interfaces import IResource
-        self.context['child1'] = testing.DummyResource(__provides__=IResource,
+        from adhocracy.interfaces import ISheet
+        self.context['child1'] = testing.DummyResource(__provides__=ISheet,
                                                        __oid__=1)
         inst = self.make_one(self.context, IPool)
         assert inst.get() == {'elements': [1]}

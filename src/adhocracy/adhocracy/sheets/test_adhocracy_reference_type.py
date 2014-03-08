@@ -1,0 +1,76 @@
+from adhocracy.interfaces import ISheet
+from unittest.mock import call
+from unittest.mock import patch
+from pyramid import testing
+from zope.interface import Interface
+from zope.interface import taggedValue
+from zope.interface import provider
+
+import colander
+import pytest
+import unittest
+
+
+############
+#  helper  #
+############
+
+
+@patch('substanced.objectmap.ObjectMap', autospec=True)
+def make_folder_with_objectmap(dummyobjectmap=None):
+    folder = testing.DummyResource()
+    folder.__objectmap__ = dummyobjectmap.return_value
+    return folder
+
+
+##########
+#  tests #
+##########
+
+class AdhocracyReferenceTypeUnitTests(unittest.TestCase):
+
+    # def setUp(self):
+    #     class ISheetValid(ISheet):
+    #         taggedValue('field:count',
+    #                     colander.SchemaNode(colander.Int(),
+    #                                         missing=colander.drop,
+    #                                         default=0))
+    #     self.isheet_valid = ISheetValid
+
+    def test_create_valid(self):
+        from adhocracy.interfaces import AdhocracyReferenceType as Reference
+        # substanced standard tagged values
+        assert Reference.getTaggedValue('source_integrity') is False
+        assert Reference.getTaggedValue('target_integrity') is False
+        assert Reference.getTaggedValue('source_ordered') is False
+        assert Reference.getTaggedValue('target_ordered') is False
+        # extra tagged values
+        assert Reference.getTaggedValue('source_isheet') is ISheet
+        assert Reference.getTaggedValue('source_isheet_field') == u''
+        assert Reference.getTaggedValue('target_isheet') is ISheet
+
+    def test_create_valid_custom_values(self):
+        from adhocracy.interfaces import AdhocracyReferenceType
+        from adhocracy.interfaces import ISheet
+
+        class IA(ISheet):
+            pass
+
+        class Reference(AdhocracyReferenceType):
+            source_integrity = True
+            target_integrity = True
+            target_ordered = True
+            source_ordered = True
+            source_isheet = IA
+            source_isheet_field = u''
+            target_isheet = IA
+
+        # substanced standard tagged values
+        assert Reference.getTaggedValue('source_integrity')
+        assert Reference.getTaggedValue('target_integrity')
+        assert Reference.getTaggedValue('source_ordered')
+        assert Reference.getTaggedValue('target_ordered')
+        # extra tagged values
+        assert Reference.getTaggedValue('source_isheet') is IA
+        assert Reference.getTaggedValue('source_isheet_field') == u''
+        assert Reference.getTaggedValue('target_isheet') is IA

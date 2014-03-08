@@ -56,10 +56,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         refs = {}
         for child in self.schema:
             if isinstance(child, ReferenceSetSchemaNode):
-                keyname = child.name
-                reftype = '{iface}:{keyname}'
-                refs[keyname] = reftype.format(iface=self.iface.__identifier__,
-                                               keyname=keyname)
+                refs[child.name] = child.reftype
         return refs
 
     def get(self):

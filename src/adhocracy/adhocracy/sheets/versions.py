@@ -2,6 +2,7 @@
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IIResourcePropertySheet
+from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
@@ -17,12 +18,23 @@ class IVersionable(ISheet):
 
     """Make this item versionable."""
 
-    taggedValue('field:follows',
-                ReferenceSetSchemaNode(
-                    default=[],
-                    missing=colander.drop,
-                    interfaces=['adhocracy.sheets.versions.IVersionable'],
-                ))
+    taggedValue(
+        'field:follows',
+        ReferenceSetSchemaNode(
+            default=[],
+            missing=colander.drop,
+            reftype='adhocracy.sheets.versions.IVersionableFollowsReference'
+        ))
+
+
+class IVersionableFollowsReference(AdhocracyReferenceType):
+
+    """IVersionable reference."""
+
+    source_isheet = IVersionable
+    source_isheet_field = 'follows'
+    target_isheet = IVersionable
+
 
 # followed_by = ReferenceSetSchemaNode(
 #         default=[],
@@ -38,12 +50,22 @@ class IVersions(ISheet):
 
     """Dag for collecting all versions of one item."""
 
-    taggedValue('field:elements',
-                ReferenceSetSchemaNode(default=[],
-                                       missing=colander.drop,
-                                       interfaces=[IVersionable],
-                                       )
-                )
+    taggedValue(
+        'field:elements',
+        ReferenceSetSchemaNode(
+            default=[],
+            missing=colander.drop,
+            reftype='adhocracy.sheets.versions.IVersionsElementsReference',
+        ))
+
+
+class IVersionsElementsReference(AdhocracyReferenceType):
+
+    """IVersions reference."""
+
+    source_isheet = IVersions
+    source_isheet_field = 'elements'
+    target_isheet = IVersionable
 
 
 def includeme(config):

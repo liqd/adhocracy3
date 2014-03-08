@@ -91,12 +91,11 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
     @patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
     def test_create_references(self, dummy_reference_node=None):
         node = dummy_reference_node.return_value
-        node.name = 'references'
+        node.name = 'fieldname'
+        node.reftype = 'reftype'
         inst = self.make_one(testing.DummyResource(), self.isheet_valid)
         inst.schema.children.append(node)
-        assert inst._references == {'references':
-                                    self.isheet_valid.__identifier__
-                                    + ':references'}
+        assert inst._references == {'fieldname': 'reftype'}
 
     def test_get_empty(self):
         inst = self.make_one(testing.DummyResource(), self.isheet_valid)
