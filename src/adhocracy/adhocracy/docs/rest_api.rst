@@ -39,8 +39,8 @@ Resource structure
 Resources have one content interface to set its type, like
 "adhocracy.resources.pool.IBasicPool".
 
-FIXME: rename content interface to resource interface, this is more clear and more common
-FIXME: maybe rename propertysheet interface to property interface, its shorter
+FIXME: rename content (interface) to resource (interface), this is more clear and more common
+FIXME: maybe rename propertysheet (interface) to sheet (interface), it's shorter
 
 Every Resource has multiple propertysheet interfaces that define schemata to set/get data.
 
@@ -71,18 +71,19 @@ Example resource hierarchy::
 PROPOSAL: the 5 names above are hard to understand and the differences are
 not always very clear. Instead, use 4 basic types:
 
-* Pool: folder content in the object hierarchy, can contain other Pools
-  (subfolders) and Items of any kind (name unchanged)
-* Item: base class of any versionable items, such as Proposals, Documents,
-  Sections etc. Contains a list of ItemVersions, sub-Items (e.g. Sections
-  within Documents), and meta-data such as Tags (was: FubelVersions-Pool)
-* ItemVersion: a specific version of a versionable item, e.g. a
-  ProposalVersion, DocumentVersion, or SectionVersion (was:
-  Versionable-Fubel).
+* Pool (name unchanged): folder content in the object hierarchy, can
+  contain other Pools (subfolders) and Items of any kind.
+* Item (was: FubelVersions-Pool): base class of any versionable items,
+  such as Proposals, Documents, Sections etc. Contains a list of
+  ItemVersions, sub-Items (e.g. Sections within Documents), and
+  meta-data such as Tags.
+* ItemVersion (was: Versionable-Fubel): a specific version of a
+  versionable item, e.g. a ProposalVersion, DocumentVersion, or
+  SectionVersion.
 * Simple: Base class of anything that is neither versionable nor a
-  container (was: any Fubel that is not a Versionable-Fubel) . For
-  versionables, use Item instead; for non-versionable containers, use Pool
-  instead.
+  container (was: any Fubel that is not a Versionable-Fubel).  For
+  versionables, use Item instead; for non-versionable containers, use
+  Pool instead.
 
 Derived type:
 
@@ -193,7 +194,6 @@ Semantics of read-only and mandatory and optional flags in request / response bo
 
 FIXME: optimize for caching.  but same url has different
 authorizations for same content type under different urls!
-
 
 
 
