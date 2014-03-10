@@ -32,13 +32,13 @@ class IDocument(ISheet):
                     default=[],
                     missing=colander.drop,
                     interfaces=
-                    ['adhocracy.sheets.document.ISectionVersion'],
+                    ['adhocracy.sheets.document.ISection'],
                 )
                 )
 
 
 @provider(IIResourcePropertySheet)
-class ISectionVersion(ISheet):
+class ISection(ISheet):
 
     """Marker interface representing a document section."""
 
@@ -53,7 +53,7 @@ class ISectionVersion(ISheet):
                     default=[],
                     missing=colander.drop,
                     interfaces=
-                    ['adhocracy.sheets.document.ISectionVersion'],
+                    ['adhocracy.sheets.document.ISection'],
                 )
                 )
 
@@ -64,5 +64,5 @@ def includeme(config):
                                     (IDocument, IIResourcePropertySheet),
                                     IResourcePropertySheet)
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (ISectionVersion, IIResourcePropertySheet),
+                                    (ISection, IIResourcePropertySheet),
                                     IResourcePropertySheet)

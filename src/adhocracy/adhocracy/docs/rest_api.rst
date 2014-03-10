@@ -391,9 +391,9 @@ Fetch the first Proposal Version, it is empty ::
     >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])  # FIXME: s/IVersionable/Version/
     {'follows': []}
 
-Create a second proposal that follows the first version ::
+Create a new version of the proposal that follows the first version ::
 
-    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposal',
+    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposalVersion',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
     ...                     'title': 'kommunismus jetzt!',
     ...                     'description': 'blabla!',
@@ -421,7 +421,7 @@ Create a Section item inside the Proposal item::
 
 Create a third Proposal version and add the first Section version ::
 
-    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposal',
+    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposalVersion',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
     ...                     'elements': [svrs0_path]},
     ...                  'adhocracy.sheets.versions.IVersionable': {
@@ -432,7 +432,7 @@ Create a third Proposal version and add the first Section version ::
 
 If we create a second Section version ::
 
-    >>> vers = {'content_type': 'adhocracy.resources.section.ISection',
+    >>> vers = {'content_type': 'adhocracy.resources.section.ISectionVersion',
     ...         'data': {
     ...              'adhocracy.sheets.document.ISection': {
     ...                  'title': 'Kapitel Überschrift Bla',
