@@ -56,6 +56,7 @@ def itemversion_create_notify(context, registry=None):
             # Notify all items that reference the old ItemVersion
             for reftype in om.get_reftypes():
                 if not issubclass(reftype, AdhocracyReferenceType):
+                    # we do not care for standard substanced reference types
                     continue
                 for other in om.sources(old_version, reftype):
                     event_ref = SheetReferencedItemHasNewVersion(

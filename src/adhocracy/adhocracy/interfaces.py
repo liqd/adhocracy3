@@ -226,17 +226,16 @@ AdhocracyReferenceType = AdhocracyReferenceClass(
 
 class IItemNewVersionAdded(IObjectEvent):
 
-    """ An event type sent when a new ItemVersion is added."""
+    """An event type sent when a new ItemVersion is added."""
 
     object = Attribute('The Item to which the ItemVersion is being added')
     old_version = Attribute('The old ItemVersion followed by the new one')
-    new_version = Attribute('The name of the ItemVerison within the Item'
-                            ' container')
+    new_version = Attribute('The new ItemVersion')
 
 
 class ISheetReferencedItemHasNewVersion(IObjectEvent):
 
-    """ An event type sent when a referenced ItemVersion has a new follower."""
+    """An event type sent when a referenced ItemVersion has a new follower."""
 
     object = Attribute('The resource referencing the outdated ItemVersion.')
     isheet = Attribute('The sheet referencing the outdated ItemVersion')
