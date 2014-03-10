@@ -8,6 +8,7 @@ from zope.interface import Interface
 from zope.interface import taggedValue
 from zope.interface.interfaces import IInterface
 from zope.interface.interface import InterfaceClass
+from zope.interface.interfaces import IObjectEvent
 
 
 class IAutoNamingManualFolder(IAutoNamingFolder):
@@ -185,6 +186,9 @@ class IItemVersion(IResource):
     taggedValue('content_name', 'ItemVersion')
     taggedValue('basic_sheets', set(
                 ['adhocracy.sheets.versions.IVersionable']))
+    taggedValue(
+        'after_creation',
+        ['adhocracy.resources.itemversion_create_notify'])
 
 
 class AdhocracyReferenceClass(ReferenceClass):
@@ -218,3 +222,25 @@ class AdhocracyReferenceClass(ReferenceClass):
 
 AdhocracyReferenceType = AdhocracyReferenceClass(
     "AdhocracyReferenceType", __module__='adhocracy.interfaces')
+
+
+class IItemNewVersionAdded(IObjectEvent):
+
+    """ An event type sent when a new ItemVersion is added."""
+
+    object = Attribute('The Item to which the ItemVersion is being added')
+    old_version = Attribute('The old ItemVersion followed by the new one')
+    new_version = Attribute('The name of the ItemVerison within the Item'
+                            ' container')
+
+
+class ISheetReferencedItemHasNewVersion(IObjectEvent):
+
+    """ An event type sent when a referenced ItemVersion has a new follower."""
+
+    object = Attribute('The resource referencing the outdated ItemVersion.')
+    isheet = Attribute('The sheet referencing the outdated ItemVersion')
+    isheet_field = Attribute('The sheet field referencing the outdated '
+                             'ItemVersion')
+    old_version_oid = Attribute('The referenced but outdated ItemVersion oid')
+    new_version_oid = Attribute('The follower of the outdated ItemVersion oid')
