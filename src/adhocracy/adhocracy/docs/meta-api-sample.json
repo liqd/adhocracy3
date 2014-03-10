@@ -1,14 +1,14 @@
 {
-    "ContentTypes": {
-        "adhocracy.resources.proposal.IProposal": {
+    "resources": {
+        "adhocracy.resources.proposal.IProposalVersion": {
             "sheets": [ "adhocracy.sheets.document.IDocument" ]
         },
-        "adhocracy.resources.proposal.IProposalVersionsPool": {
+        "adhocracy.resources.proposal.IProposal": {
             "extra_element_types": [
                 "adhocracy.sheets.tags.ITag",
                 "adhocracy.resources.section.ISectionVersionsPool"
             ],
-            "main_element_type": "adhocracy.resources.proposal.IProposal"
+            "main_element_type": "adhocracy.resources.proposal.IProposalVersion"
         },
         "adhocracy.resources.section.ISection": {
             "sheets": [ "adhocracy.sheets.document.ISection" ]
@@ -20,7 +20,7 @@
             "main_element_type": "adhocracy.resources.section.ISection"
         }
     },
-    "PropertySheets": {
+    "sheets": {
         "adhocracy.sheets.document.IDocument": {
             "fields": [
                 {
