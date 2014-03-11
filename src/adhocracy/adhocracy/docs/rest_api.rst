@@ -106,11 +106,12 @@ Global Info
 The dedicated prefix defaults to '/meta_api/', but can
 be customized.
 
-    >> resp = testapp.options("/meta_api/")
-    >> sorted(resp_data.keys())
-    ['adhocracy.resources.pool.IBasicPool', 'adhocracy.resources.pool.IProposal', ...]
+    >>> resp_data = testapp.get("/meta_api/")
+    >>> print(resp_data)
+    {'bla'...}
 
-FIXME: make the above example a test once it works!
+    >>> sorted(resp_data.keys())
+    ['resources', 'sheets']
 
 sub-urls:
 

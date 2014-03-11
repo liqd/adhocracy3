@@ -19,8 +19,21 @@ from cornice.schemas import CorniceSchema
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
+from substanced.interfaces import IRoot
 
 import functools
+
+
+def maybe_class_to_dotted_name(obj):
+    """Return the dotted name of a type object.
+
+    If obj is a string instead of a type object, it is returned as is.
+
+    """
+    if isinstance(obj, str):
+        return obj  # return unchanged
+    else:
+        return obj.__module__ + '.' + obj.__name__
 
 
 def validate_sheet_cstructs(context, request, sheets):
@@ -328,6 +341,69 @@ class PoolRESTView(SimpleRESTView):
                     struct['first_version_path'] = resource_path(v)
                     break
         return response_schema.serialize(struct)
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IRoot,
+    name='meta_api'
+)
+class MetaApiView(RESTView):
+
+    """Access to metadata about the API specification of this installation.
+
+    Returns a JSON document describing the existing resources and sheets.
+
+    """
+
+    @view_config(request_method='GET')
+    def get(self):
+        """Return the API specification of this installation as JSON."""
+        resource_types = self.registry.resource_types()
+        resource_map = {}
+
+        for name, value in resource_types.items():
+            prop_map = {}
+            metadata = value['metadata']
+
+            # List of sheets
+            sheets = []
+            if 'basic_sheets' in metadata:
+                sheets.extend(metadata['basic_sheets'])
+            if 'extended_sheets' in metadata:
+                sheets.extend(metadata['extended_sheets'])
+            prop_map['sheets'] = sheets
+
+            # Main element type if this is a pool or item
+            if 'item_type' in metadata:
+                main_element_type = maybe_class_to_dotted_name(
+                    metadata['item_type'])
+                prop_map['main_element_type'] = main_element_type
+            else:
+                main_element_type = None
+
+            # Other addable element types
+            if 'addable_content_interfaces' in metadata:
+                extra_element_types = metadata['addable_content_interfaces']
+                extra_element_names = []
+
+                for typ in extra_element_types:
+                    dotted_name = maybe_class_to_dotted_name(typ)
+                    # Skip main element type
+                    if not dotted_name == main_element_type:
+                        extra_element_names.append(dotted_name)
+
+                prop_map['extra_element_types'] = extra_element_names
+
+            resource_map[name] = prop_map
+
+        struct = {
+            'resources':
+            resource_map,
+            'sheets':
+            {}
+        }
+        return struct
 
 
 def includeme(config):  # pragma: no cover

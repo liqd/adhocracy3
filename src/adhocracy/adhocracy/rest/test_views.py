@@ -622,3 +622,24 @@ class PoolRESTViewUnitTest(unittest.TestCase):
                   'content_type': IItem.__identifier__,
                   'first_version_path': '/child/first'}
         assert wanted == response
+
+
+class MetaApiViewUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        self.context = DummyFolder()
+        resource_registry = make_mock_resource_registry()
+        request = CorniceDummyRequest()
+        request.registry.content = resource_registry
+        self.request = request
+        self.create = request.registry.content.create
+
+    def make_one(self, context, request):
+        from .views import MetaApiView
+        return MetaApiView(context, request)
+
+    def test_get_meta_api(self):
+        inst = self.make_one(self.context, self.request)
+        response = inst.get()
+        print(response) # TODO testing
+        assert sorted(response.keys()) == ['resources', 'sheets']

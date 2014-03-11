@@ -6,14 +6,14 @@
         "adhocracy.resources.proposal.IProposal": {
             "extra_element_types": [
                 "adhocracy.sheets.tags.ITag",
-                "adhocracy.resources.section.ISectionVersionsPool"
+                "adhocracy.resources.section.ISection"
             ],
             "main_element_type": "adhocracy.resources.proposal.IProposalVersion"
         },
-        "adhocracy.resources.section.ISection": {
+        "adhocracy.resources.section.ISectionVersion": {
             "sheets": [ "adhocracy.sheets.document.ISection" ]
         },
-        "adhocracy.resources.section.ISectionVersionsPool": {
+        "adhocracy.resources.section.ISection": {
             "extra_element_types": [
                 "adhocracy.sheets.tags.ITag"
             ],
