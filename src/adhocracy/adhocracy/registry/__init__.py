@@ -53,6 +53,27 @@ class ResourceContentRegistry(ContentRegistry):
             sheets['adhocracy.sheets.versions.IVersions'].get()
         return sheets
 
+    def sheet_metadata(self, sheets):
+        """Get dictionary with metadata about sheets.
+
+        Expects an iterable of types or dotted names listing the sheets to
+        retrieve as argument.
+
+        Returns a mapping from sheet identifiers (dotted names) to metadata
+        describing the sheet.
+
+        """
+        sheet_metadata = {}
+        res = DottedNameResolver()
+
+        for sheet in sheets:
+            iface = res.maybe_resolve(sheet)
+            if iface.isOrExtends(ISheet):
+                metadata = get_all_taggedvalues(iface)
+            sheet_metadata[iface.__identifier__] = metadata
+
+        return sheet_metadata
+
     def resource_types(self):
         """Get dictionary with all resource types and metadata.
 

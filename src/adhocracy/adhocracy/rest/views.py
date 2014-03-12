@@ -19,6 +19,7 @@ from cornice.schemas import CorniceSchema
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
+from substanced.schema import MultireferenceIdSchemaNode
 from substanced.interfaces import IRoot
 
 import functools
@@ -361,7 +362,9 @@ class MetaApiView(RESTView):
         """Return the API specification of this installation as JSON."""
         resource_types = self.registry.resource_types()
         resource_map = {}
+        sheet_set = set()
 
+        # Add info about all resources
         for name, value in resource_types.items():
             prop_map = {}
             metadata = value['metadata']
@@ -373,6 +376,7 @@ class MetaApiView(RESTView):
             if 'extended_sheets' in metadata:
                 sheets.extend(metadata['extended_sheets'])
             prop_map['sheets'] = sheets
+            sheet_set.update(sheets)
 
             # Main element type if this is a pool or item
             if 'item_type' in metadata:
@@ -397,11 +401,51 @@ class MetaApiView(RESTView):
 
             resource_map[name] = prop_map
 
+        # Add info about all sheets referenced by any of the resources
+        sheet_metadata = self.registry.sheet_metadata(sheet_set)
+        sheet_map = {}
+        field_prefix = 'field:'
+        prefix_len = len(field_prefix)
+
+        for sheet_name, metadata in sheet_metadata.items():
+            # readonly and (create)mandatory flags are currently defined for
+            # the whole sheet, but we copy them as attributes into each field
+            # definition, since this might change in the future
+            mandatory = metadata['createmandatory']
+            readonly = metadata['readonly']
+            fields = []
+
+            # Create field definitions
+            for key, value in metadata.items():
+                if key.startswith(field_prefix):
+                    fieldname = key[prefix_len:]
+
+                    if isinstance(value, MultireferenceIdSchemaNode):
+                        typ = maybe_class_to_dotted_name(value.reftype)
+                        repeated = True
+                    else:
+                        # TODO strip 'colander.' prefix, if present
+                        typ = maybe_class_to_dotted_name(type(value.typ))
+                        repeated = False
+
+                    fielddesc = {
+                        'name': fieldname,
+                        'type': typ,
+                        'mandatory': mandatory,
+                        'readonly': readonly,
+                        'repeated': repeated
+                    }
+                    fields.append(fielddesc)
+
+            # For now, each sheet definition only contains a 'fields' attribute
+            # listing the defined fields
+            sheet_map[sheet_name] = {'fields': fields}
+
         struct = {
             'resources':
             resource_map,
             'sheets':
-            {}
+            sheet_map
         }
         return struct
 

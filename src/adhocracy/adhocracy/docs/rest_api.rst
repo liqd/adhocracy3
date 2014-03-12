@@ -106,8 +106,8 @@ Global Info
 The dedicated prefix defaults to '/meta_api/', but can
 be customized.
 
-    >>> resp_data = testapp.get("/meta_api/")
-    >>> print(resp_data)
+    >>> resp_data = testapp.get("/meta_api/").json
+    >>> pprint(resp_data)
     {'bla'...}
 
     >>> sorted(resp_data.keys())
