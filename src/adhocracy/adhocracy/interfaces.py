@@ -2,10 +2,13 @@
 from pyramid.interfaces import ILocation
 from substanced.interfaces import IAutoNamingFolder
 from substanced.interfaces import IPropertySheet
+from substanced.interfaces import ReferenceClass
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface import taggedValue
 from zope.interface.interfaces import IInterface
+from zope.interface.interface import InterfaceClass
+from zope.interface.interfaces import IObjectEvent
 
 
 class IAutoNamingManualFolder(IAutoNamingFolder):
@@ -183,3 +186,60 @@ class IItemVersion(IResource):
     taggedValue('content_name', 'ItemVersion')
     taggedValue('basic_sheets', set(
                 ['adhocracy.sheets.versions.IVersionable']))
+    taggedValue(
+        'after_creation',
+        ['adhocracy.resources.itemversion_create_notify'])
+
+
+class AdhocracyReferenceClass(ReferenceClass):
+
+    """ Use class attributes "target_*" and "source_*" to set tagged values."""
+
+    def __init__(self, *arg, **kw):
+        try:
+            attrs = arg[2] or {}
+        except IndexError:
+            attrs = kw.get('attrs', {})
+        # get class attribute values and remove them
+        si = attrs.pop('source_integrity', False)
+        ti = attrs.pop('target_integrity', False)
+        so = attrs.pop('source_ordered', False)
+        to = attrs.pop('target_ordered', False)
+        sif = attrs.pop('source_isheet', ISheet)
+        sifa = attrs.pop('source_isheet_field', u'')
+        tif = attrs.pop('target_isheet', ISheet)
+        # initialize interface class
+        InterfaceClass.__init__(self, *arg, **kw)
+        # set tagged values based on attribute values
+        self.setTaggedValue('source_integrity', si)
+        self.setTaggedValue('target_integrity', ti)
+        self.setTaggedValue('source_ordered', so)
+        self.setTaggedValue('target_ordered', to)
+        self.setTaggedValue('source_isheet', sif)
+        self.setTaggedValue('source_isheet_field', sifa)
+        self.setTaggedValue('target_isheet', tif)
+
+
+AdhocracyReferenceType = AdhocracyReferenceClass(
+    "AdhocracyReferenceType", __module__='adhocracy.interfaces')
+
+
+class IItemNewVersionAdded(IObjectEvent):
+
+    """An event type sent when a new ItemVersion is added."""
+
+    object = Attribute('The Item to which the ItemVersion is being added')
+    old_version = Attribute('The old ItemVersion followed by the new one')
+    new_version = Attribute('The new ItemVersion')
+
+
+class ISheetReferencedItemHasNewVersion(IObjectEvent):
+
+    """An event type sent when a referenced ItemVersion has a new follower."""
+
+    object = Attribute('The resource referencing the outdated ItemVersion.')
+    isheet = Attribute('The sheet referencing the outdated ItemVersion')
+    isheet_field = Attribute('The sheet field referencing the outdated '
+                             'ItemVersion')
+    old_version_oid = Attribute('The referenced but outdated ItemVersion oid')
+    new_version_oid = Attribute('The follower of the outdated ItemVersion oid')

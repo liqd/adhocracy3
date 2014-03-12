@@ -8,6 +8,7 @@ from adhocracy.schema import ReferenceSetSchemaNode
 from collections.abc import Mapping
 from persistent.mapping import PersistentMapping
 from pyramid.compat import is_nonstr_iter
+from pyramid.path import DottedNameResolver
 from substanced.property import PropertySheet
 from substanced.util import find_objectmap
 from zope.interface import implementer
@@ -42,6 +43,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         for child in self.schema:
             assert child.default is not colander.null
             assert child.missing is colander.drop
+        self.res = DottedNameResolver()
 
     @property
     def _data(self):
@@ -56,10 +58,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
         refs = {}
         for child in self.schema:
             if isinstance(child, ReferenceSetSchemaNode):
-                keyname = child.name
-                reftype = '{iface}:{keyname}'
-                refs[keyname] = reftype.format(iface=self.iface.__identifier__,
-                                               keyname=keyname)
+                refs[child.name] = self.res.maybe_resolve(child.reftype)
         return refs
 
     def get(self):

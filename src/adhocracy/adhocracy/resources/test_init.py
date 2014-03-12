@@ -1,5 +1,6 @@
 from adhocracy.interfaces import ISheet
 from pyramid import testing
+from zope.interface import Interface
 
 import pytest
 import unittest
@@ -93,7 +94,9 @@ class ItemIntegrationTest(unittest.TestCase):
     def test_create(self):
         from adhocracy.interfaces import IItemVersion
         from adhocracy.interfaces import ITag
+
         inst = self.make_one()
+
         item_version = inst['VERSION_0000000']
         item_version_oid = item_version.__oid__
         first = inst['FIRST']
@@ -101,12 +104,84 @@ class ItemIntegrationTest(unittest.TestCase):
         assert IItemVersion.providedBy(item_version)
         assert ITag.providedBy(first)
         assert ITag.providedBy(last)
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements': [item_version_oid]},
+        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
+                                                 [item_version_oid]},
                   'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
         assert first._propertysheets == wanted
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements': [item_version_oid]},
+        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
+                                                 [item_version_oid]},
                   'adhocracy.sheets.name.IName': {'name': 'LAST'}}
         assert last._propertysheets == wanted
+
+
+class ItemVersionIntegrationTest(unittest.TestCase):
+
+    def setUp(self):
+        from substanced.objectmap import ObjectMap
+        # TODO make unittest instead of intergration test.
+        from adhocracy.folder import ResourcesAutolNamingFolder
+        self.config = testing.setUp()
+        self.config.include('substanced.content')
+        self.config.include('adhocracy.resources')
+        self.config.include('adhocracy.sheets.name')
+        self.config.include('adhocracy.sheets.versions')
+        context = ResourcesAutolNamingFolder()
+        context.__objectmap__ = ObjectMap(context)
+        self.context = context
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def make_one(self, appstructs={}):
+        from adhocracy.interfaces import IItemVersion
+        from . import ResourceFactory
+        return ResourceFactory(IItemVersion)(self.context,
+                                             appstructs=appstructs)
+
+    def test_create_without_referencing_items(self):
+        from adhocracy.interfaces import IItemVersion
+        from adhocracy.interfaces import IItemNewVersionAdded
+        from adhocracy.sheets.versions import IVersionable
+        events = []
+
+        def listener(event):
+            events.append(event)
+        self.config.add_subscriber(listener, IItemNewVersionAdded)
+
+        old_version = self.make_one()
+        new_version_data = {IVersionable.__identifier__:
+                            {"follows": [old_version.__oid__]}}
+        self.make_one(new_version_data)
+
+        new_version = self.make_one()
+
+        assert IItemVersion.providedBy(new_version)
+        assert len(events) == 1
+        assert IItemNewVersionAdded.providedBy(events[0])
+
+    def test_create_with_referencing_items(self):
+        from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
+        from adhocracy.interfaces import AdhocracyReferenceType
+        from adhocracy.interfaces import ISheet
+        from adhocracy.sheets.versions import IVersionable
+        events = []
+
+        def listener(event):
+            events.append(event)
+        self.config.add_subscriber(listener, ISheetReferencedItemHasNewVersion)
+
+        other_version = self.make_one()
+        old_version = self.make_one()
+        om = self.context.__objectmap__
+        om.connect(other_version, old_version, AdhocracyReferenceType)
+        new_version_data = {IVersionable.__identifier__:
+                            {"follows": [old_version.__oid__]}}
+        self.make_one(new_version_data)
+
+        assert len(events) == 2
+        assert ISheetReferencedItemHasNewVersion.providedBy(events[0])
+        assert events[0].isheet == ISheet
+        assert events[1].isheet == IVersionable
 
 
 class ResourceFactoryUnitTest(unittest.TestCase):

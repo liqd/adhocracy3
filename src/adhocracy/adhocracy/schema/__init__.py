@@ -1,10 +1,10 @@
 """Colander schema extensions."""
+from adhocracy.interfaces import AdhocracyReferenceType
 from pyramid.path import DottedNameResolver
 from substanced import schema
 from substanced.objectmap import reference_sourceid_property
 from substanced.schema import IdSet
 from substanced.util import find_objectmap
-from zope.interface import Interface
 
 import colander
 
@@ -112,8 +112,7 @@ class ReferenceSetSchemaNode(schema.MultireferenceIdSchemaNode):
 
     default = []
     missing = []
-    interfaces = [Interface]
-    # FIXME: add coices getter to make sdi view work
+    reftype = AdhocracyReferenceType
     choices_getter = get_all_resources
 
     def _get_choices(self):
@@ -123,20 +122,18 @@ class ReferenceSetSchemaNode(schema.MultireferenceIdSchemaNode):
     @property
     def property_object(self):
         """Return property object to store reference values."""
-
-        reference_type = self.name
-        return reference_sourceid_property(reference_type)
+        return reference_sourceid_property(self.reftype)
 
     def validator(self, node, value):
         """Validate."""
         context = node.bindings['context']
         object_map = find_objectmap(context)
         res = DottedNameResolver()
+        reftype = res.maybe_resolve(self.reftype)
+        isheet = reftype.getTaggedValue('target_isheet')
         for oid in value:
             resource = object_map.object_for(oid)
-            for i in node.interfaces:
-                i = res.maybe_resolve(i)
-                if not i.providedBy(resource):
+            if not isheet.providedBy(resource):
                     error = 'This Resource does not provide interface %s' % \
-                            (i.__identifier__)
+                            (isheet.__identifier__)
                     raise colander.Invalid(node, msg=error, value=oid)
