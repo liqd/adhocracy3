@@ -44,57 +44,30 @@ FIXME: maybe rename propertysheet (interface) to sheet (interface), it's shorter
 
 Every Resource has multiple propertysheet interfaces that define schemata to set/get data.
 
-There are 5 main types of content interfaces:
+There are 4 main types of content interfaces:
 
-* Pool: folder content in the object hierarchy, namespace, structure and configure child fusels for a specic Beteiligungsverfahren.
-* Fubel: item content created during a Beteiligungsverfahren (mainly).
-
-* FubelVersions-Pool: specific pool for all Versionable-Fubel (DAG), Tag-Fubels, and related FubelVersions-Pools
-* Versionable-Fubel: Fubel with IVersionable propertysheet interface
-* Tag-Fubel: Fubel with the ITag content interface, links to on or more related Versionable-Fubel
-
-Example resource hierarchy::
-
-    Pool:              categories
-    Fubel:             categories/blue
-
-    Pool:              proposals
-    Versions Pool:     proposals/proposal1
-    Versionable Fubel: proposals/proposal1/v1
-    Tag-Fubel:         proposals/proposal1/head
-
-    Versions Pool:     proposals/proposal1/section1
-    Versionable Fubel: proposals/proposal1/section1/v1
-    Tag-Fubel:         proposals/proposal1/section1/head
-
-
-PROPOSAL: the 5 names above are hard to understand and the differences are
-not always very clear. Instead, use 4 basic types:
-
-* Pool (name unchanged): folder content in the object hierarchy, can
-  contain other Pools (subfolders) and Items of any kind.
-* Item (was: FubelVersions-Pool): base class of any versionable items,
+* Pool: folder content in the object hierarchy, can contain other Pools
+  (subfolders) and Items of any kind.
+* Item (old name: FubelVersions-Pool): base class of any versionable items,
   such as Proposals, Documents, Sections etc. Contains a list of
-  ItemVersions, sub-Items (e.g. Sections within Documents), and
-  meta-data such as Tags.
-* ItemVersion (was: Versionable-Fubel): a specific version of a
+  ItemVersions, sub-Items (e.g. Sections within Documents), and meta-data
+  such as Tags.
+* ItemVersion (old name: Versionable-Fubel): a specific version of a
   versionable item, e.g. a ProposalVersion, DocumentVersion, or
   SectionVersion.
 * Simple: Base class of anything that is neither versionable nor a
-  container (was: any Fubel that is not a Versionable-Fubel).  For
-  versionables, use Item instead; for non-versionable containers, use
-  Pool instead.
+  container (old name: any Fubel that is not a Versionable-Fubel).  For
+  versionables, use Item instead; for non-versionable containers, use Pool
+  instead.
 
-Derived type:
+A frequently used derived type is:
 
 * Tag: a subtype of Simple, points to one (or sometimes zero or many)
   ItemVersion, e.g. the current HEAD or the last APPROVED version of a
-  Document (was: Tag-Fubel). Can be modified but doesn't have its own
+  Document (old name: Tag-Fubel). Can be modified but doesn't have its own
   version history, hence it's a Simple instead of an Item.
 
-The old Fubel type as "generic supertype of almost anything" disappears.
-
-Example resource hierarchy, as above::
+Example resource hierarchy::
 
     Pool:         categories
     Simple:       categories/blue
@@ -133,9 +106,11 @@ Global Info
 The dedicated prefix defaults to '/meta_api/', but can
 be customized.
 
-    >>> resp = testapp.options("/meta_api/")
-    >>> sorted(resp_data.keys())
+    >> resp = testapp.options("/meta_api/")
+    >> sorted(resp_data.keys())
     ['adhocracy.resources.pool.IBasicPool', 'adhocracy.resources.pool.IProposal', ...]
+
+FIXME: make the above example a test once it works!
 
 sub-urls:
 
@@ -153,32 +128,34 @@ OPTIONS
 Returns possible methods for this resource, example request/response data
 structures and available interfaces with resource data::
 
-    >>> resp_data = testapp.options("/adhocracy").json
-    >>> sorted(resp_data.keys())
+    >> resp_data = testapp.options("/adhocracy").json
+    >> sorted(resp_data.keys())
     ['GET', 'HEAD', 'OPTION', 'POST', 'PUT']
 
-    >>> resp_data["GET"]["response_body"]["content_type"]
+    >> resp_data["GET"]["response_body"]["content_type"]
     FIXME: yields content type of /adhocracy
 
-    >>> resp_data["GET"]["response_body"]["role"]
+    >> resp_data["GET"]["response_body"]["role"]
     FIXME: i forgot what this is supposed to do
 
     FIXME: ["response_body"] is redundant and can be removed.
     ["data"] is covered by the global, role-specific meta api (see
     last section), and can be removed as well.
 
-    >>> sorted(resp_data["GET"]["response_body"]["data"].keys())
+    >> sorted(resp_data["GET"]["response_body"]["data"].keys())
     ['adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool']
 
-    >>> sorted(resp_data["PUT"]["request_body"]["data"].keys())
+    >> sorted(resp_data["PUT"]["request_body"]["data"].keys())
     ['adhocracy.sheets.name.IName']
 
 The value for POST gives us list with valid request data stubs::
 
-    >>> data_post_pool = {'content_type': 'adhocracy.resources.pool.IBasicPool',
+    >> data_post_pool = {'content_type': 'adhocracy.resources.pool.IBasicPool',
     ...                   'data': {'adhocracy.sheets.name.IName': {}}}  # FIXME: only content types!
-    >>> data_post_pool in resp_data["POST"]["request_body"]
+    >> data_post_pool in resp_data["POST"]["request_body"]
     True
+
+FIXME: make the above examples tests once they work!
 
 FIXME: postables can be inferred from schema info handed out in the
 global case (to be covered in last section).
@@ -368,9 +345,9 @@ no way of knowing that it should update v1 of Doc, BUT NOT v0!
 Create
 ~~~~~~
 
-Create a ProposalVersionsPool (aka FubelVersionsPool with the wanted resource type) ::
+Create a Proposal (a subclass of Item which pools ProposalVersion's) ::
 
-    >>> pdag = {'content_type': 'adhocracy.resources.proposal.IProposalVersionsPool',  # FIXME: s/IProposalVersionsPool/ProposalItem/
+    >>> pdag = {'content_type': 'adhocracy.resources.proposal.IProposal',
     ...         'data': {
     ...              'adhocracy.sheets.name.IName': {
     ...                  'name': 'kommunismus'}
@@ -393,7 +370,7 @@ For human-memorable version pointers that also allow for complex
 update behavior (fixed-commit, always-newest, ...), consider property
 sheet ITags.
 
-The ProposalVersionsPool has the IVersions and ITags interfaces to work with Versions::
+The Proposal has the IVersions and ITags interfaces to work with Versions::
 
     >>> resp = testapp.get(pdag_path)
     >>> resp.json['data']['adhocracy.sheets.versions.IVersions']['elements']
@@ -414,9 +391,9 @@ Fetch the first Proposal Version, it is empty ::
     >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])  # FIXME: s/IVersionable/Version/
     {'follows': []}
 
-Create a second proposal that follows the first version ::
+Create a new version of the proposal that follows the first version ::
 
-    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposal',
+    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposalVersion',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
     ...                     'title': 'kommunismus jetzt!',
     ...                     'description': 'blabla!',
@@ -433,9 +410,9 @@ Create a second proposal that follows the first version ::
 Add and update child resource
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Create a SectionVersionsPool inside the ProposalVersionsPool::
+Create a Section item inside the Proposal item::
 
-    >>> sdag = {'content_type': 'adhocracy.resources.section.ISectionVersionsPool',  # FIXME: s/ISectionVersionsPool/SectionItem/
+    >>> sdag = {'content_type': 'adhocracy.resources.section.ISection',
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel1'},}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag)
@@ -444,7 +421,7 @@ Create a SectionVersionsPool inside the ProposalVersionsPool::
 
 Create a third Proposal version and add the first Section version ::
 
-    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposal',
+    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposalVersion',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
     ...                     'elements': [svrs0_path]},
     ...                  'adhocracy.sheets.versions.IVersionable': {
@@ -455,7 +432,7 @@ Create a third Proposal version and add the first Section version ::
 
 If we create a second Section version ::
 
-    >>> vers = {'content_type': 'adhocracy.resources.section.ISection',
+    >>> vers = {'content_type': 'adhocracy.resources.section.ISectionVersion',
     ...         'data': {
     ...              'adhocracy.sheets.document.ISection': {
     ...                  'title': 'Kapitel Überschrift Bla',
