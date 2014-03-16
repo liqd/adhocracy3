@@ -132,11 +132,11 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def make_one(self, appstructs={}):
+    def make_one(self, iface=None, appstructs={}):
         from adhocracy.interfaces import IItemVersion
         from . import ResourceFactory
-        return ResourceFactory(IItemVersion)(self.context,
-                                             appstructs=appstructs)
+        return ResourceFactory(iface or IItemVersion)(self.context,
+                                                      appstructs=appstructs)
 
     def test_create_without_referencing_items(self):
         from adhocracy.interfaces import IItemVersion
@@ -151,7 +151,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         old_version = self.make_one()
         new_version_data = {IVersionable.__identifier__:
                             {"follows": [old_version.__oid__]}}
-        self.make_one(new_version_data)
+        self.make_one(appstructs=new_version_data)
 
         new_version = self.make_one()
 
@@ -176,12 +176,36 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         om.connect(other_version, old_version, AdhocracyReferenceType)
         new_version_data = {IVersionable.__identifier__:
                             {"follows": [old_version.__oid__]}}
-        self.make_one(new_version_data)
+        self.make_one(appstructs=new_version_data)
 
         assert len(events) == 2
         assert ISheetReferencedItemHasNewVersion.providedBy(events[0])
         assert events[0].isheet == ISheet
         assert events[1].isheet == IVersionable
+
+    def test_autoupdate_with_referencing_items(self):
+        from adhocracy.interfaces import IItemVersion
+        from adhocracy.sheets.versions import IVersionable
+        from adhocracy.sheets.document import ISection
+        from adhocracy.sheets.versions import IVersionableFollowsReference
+        from zope.interface import taggedValue
+        # add autoupdate sheet for more tests see adhocracy.subscriber
+        self.config.include('adhocracy.sheets.document')
+        self.config.include('adhocracy.subscriber')
+
+        class ISectionVersion(IItemVersion):
+            taggedValue('extended_sheets', set([ISection]))
+
+        child = self.make_one(iface=ISectionVersion)
+        root = self.make_one(iface=ISectionVersion,
+                             appstructs={ISection.__identifier__:
+                                         {"elements": [child.__oid__]}})
+        self.make_one(iface=ISectionVersion,
+                      appstructs={IVersionable.__identifier__:
+                                  {'follows': [child.__oid__]}})
+        om = self.context.__objectmap__
+        root_followed_by = list(om.sources(root, IVersionableFollowsReference))
+        assert len(root_followed_by) == 1
 
 
 class ResourceFactoryUnitTest(unittest.TestCase):

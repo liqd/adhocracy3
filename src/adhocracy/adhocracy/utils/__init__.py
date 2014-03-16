@@ -1,8 +1,10 @@
 """Helper functions."""
 from adhocracy.interfaces import IResource
+from adhocracy.interfaces import ISheet
 from functools import reduce
 from zope.interface import Interface
 from zope.interface import directlyProvidedBy
+from zope.interface import providedBy
 
 import copy
 import colander
@@ -62,6 +64,20 @@ def get_resource_interface(context):
     ifaces = list(directlyProvidedBy(context))
     iresources = [i for i in ifaces if i.isOrExtends(IResource)]
     return iresources[0]
+
+
+def get_sheet_interfaces(context):
+    """Get sheet interfaces.
+
+    Args:
+        context (IResource): object
+    Returns:
+        interfaces: list with ISheet interfaces
+
+    """
+    assert IResource.providedBy(context)
+    ifaces = list(providedBy(context))
+    return [i for i in ifaces if i.isOrExtends(ISheet)]
 
 
 def get_all_taggedvalues(iface):
