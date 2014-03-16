@@ -106,9 +106,9 @@ Global Info
 The dedicated prefix defaults to '/meta_api/', but can
 be customized.
 
-    >> resp = testapp.options("/meta_api/")
-    >> sorted(resp_data.keys())
-    ['adhocracy.resources.pool.IBasicPool', 'adhocracy.resources.pool.IProposal', ...]
+    .. >> resp = testapp.options("/meta_api/")
+    .. >> sorted(resp_data.keys())
+    .. ['adhocracy.resources.pool.IBasicPool', 'adhocracy.resources.pool.IProposal', ...]
 
 FIXME: make the above example a test once it works!
 
@@ -494,48 +494,48 @@ Let's add some more paragraphs to the document above ::
 
 FIXME: postroot will go away.
 
-    >>> batch = [ { 'method': 'POST',
-    ...             'path': propv2['postroot'],
-    ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
-    ...                       'data': { 'adhocracy.sheets.document.Text': {
-    ...                           'text': 'sein blick ist vom vorüberziehn der stäbchen' }}}},
-    ...           { 'method': 'POST',
-    ...             'path': propv2['postroot'],
-    ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
-    ...                       'data': { 'adhocracy.sheets.document.Text': {
-    ...                           'text': 'ganz weiß geworden, so wie nicht mehr frisch' }}}},
-    ...           { 'method': 'POST',
-    ...             'path': propv2['postroot'],
-    ...             'body': { 'content_type': 'this is not a very well-known content-type, and will trigger an error!',
-    ...                       'data': { 'adhocracy.sheets.document.Text': {
-    ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
-    ...           { 'method': 'POST',
-    ...             'path': propv2['postroot'],
-    ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
-    ...                       'data': { 'adhocracy.sheets.document.Text': {
-    ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
-    >>> batch_resp = testapp.post_json(batch_url, batch).json
-    >>> pprint(batch_resp)
-    [
-        {
-            'code': 200,
-            'body': {
-                'content_type': 'adhocracy.resources.IParagraph',
-                'path': '...'
-            }
-        },
-        {
-            'code': 200,
-            'body': {
-                'content_type': 'adhocracy.resources.IParagraph',
-                'path': '...'
-            }
-        },
-        {
-            'code': ...,
-            'body': ...
-        }
-    ]
+    .. >>> batch = [ { 'method': 'POST',
+    .. ...             'path': propv2['postroot'],
+    .. ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
+    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
+    .. ...                           'text': 'sein blick ist vom vorüberziehn der stäbchen' }}}},
+    .. ...           { 'method': 'POST',
+    .. ...             'path': propv2['postroot'],
+    .. ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
+    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
+    .. ...                           'text': 'ganz weiß geworden, so wie nicht mehr frisch' }}}},
+    .. ...           { 'method': 'POST',
+    .. ...             'path': propv2['postroot'],
+    .. ...             'body': { 'content_type': 'this is not a very well-known content-type, and will trigger an error!',
+    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
+    .. ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
+    .. ...           { 'method': 'POST',
+    .. ...             'path': propv2['postroot'],
+    .. ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
+    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
+    .. ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
+    .. >>> batch_resp = testapp.post_json(batch_url, batch).json
+    .. >>> pprint(batch_resp)
+    .. [
+    ..     {
+    ..         'code': 200,
+    ..         'body': {
+    ..             'content_type': 'adhocracy.resources.IParagraph',
+    ..             'path': '...'
+    ..         }
+    ..     },
+    ..     {
+    ..         'code': 200,
+    ..         'body': {
+    ..             'content_type': 'adhocracy.resources.IParagraph',
+    ..             'path': '...'
+    ..         }
+    ..     },
+    ..     {
+    ..         'code': ...,
+    ..         'body': ...
+    ..     }
+    .. ]
 
 (The third element of the above array must have return code >= 400.
 Not sure how to test this with doctest.)
@@ -548,60 +548,60 @@ reference object contains a number that points into the batch array
 (numbering starts with '0').  (Numeric paths are only allowed in batch
 requests!)
 
-    >>> propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
-    ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': batch_resp[0]['body']['path']})
-    ... propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
-    ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': batch_resp[1]['body']['path']})
-    ... propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
-    ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': 0})
-    ... propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
-    ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': 1})
-    ... propv2_vrsbl = propv2['data']['adhocracy.sheets.versions.IVersionable']
-    ... propv2_vrsbl['follows'] = [{'content_type': prop['content_type'], 'path': prop['path']}]
-    ... batch = [ { 'method': 'POST',
-    ...             'path': prop['postroot'],
-    ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
-    ...                       'data': { 'adhocracy.sheets.document.Text': {
-    ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
-    ...           { 'method': 'POST',
-    ...             'path': prop['postroot'],
-    ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
-    ...                       'data': { 'adhocracy.sheets.document.Text': {
-    ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
-    ...           { 'method': 'POST',
-    ...             'path': propv2_vrsbl['postroot'],
-    ...             'body': propv2 }
-    ...         ]
-    >>> batch_resp = testapp.post_json(batch_url, batch).json
-    >>> pprint(batch_resp)
-    [
-        {
-            'code': 200,
-            'body': {
-                'content_type': 'adhocracy.resources.IParagraph',
-                'path': '...'
-            }
-        },
-        {
-            'code': 200,
-            'body': {
-                'content_type': 'adhocracy.resources.IParagraph',
-                'path': '...'
-            }
-        },
-        {
-            'code': 200,
-            'body': {
-                'content_type': 'adhocracy.resources.proposal.IProposal',
-                'path': '...'
-            }
-        }
-    ]
-    >>> propv3 = testapp.get_json(batch_resp[2]['body']['path']).json
-    {
-        'content_type': 'adhocracy.resources.proposal.IProposal',
-        ...
-    }
+    .. >>> propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
+    .. ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': batch_resp[0]['body']['path']})
+    .. ... propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
+    .. ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': batch_resp[1]['body']['path']})
+    .. ... propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
+    .. ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': 0})
+    .. ... propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
+    .. ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': 1})
+    .. ... propv2_vrsbl = propv2['data']['adhocracy.sheets.versions.IVersionable']
+    .. ... propv2_vrsbl['follows'] = [{'content_type': prop['content_type'], 'path': prop['path']}]
+    .. ... batch = [ { 'method': 'POST',
+    .. ...             'path': prop['postroot'],
+    .. ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
+    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
+    .. ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
+    .. ...           { 'method': 'POST',
+    .. ...             'path': prop['postroot'],
+    .. ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
+    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
+    .. ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
+    .. ...           { 'method': 'POST',
+    .. ...             'path': propv2_vrsbl['postroot'],
+    .. ...             'body': propv2 }
+    .. ...         ]
+    .. >>> batch_resp = testapp.post_json(batch_url, batch).json
+    .. >>> pprint(batch_resp)
+    .. [
+    ..     {
+    ..         'code': 200,
+    ..         'body': {
+    ..             'content_type': 'adhocracy.resources.IParagraph',
+    ..             'path': '...'
+    ..         }
+    ..     },
+    ..     {
+    ..         'code': 200,
+    ..         'body': {
+    ..             'content_type': 'adhocracy.resources.IParagraph',
+    ..             'path': '...'
+    ..         }
+    ..     },
+    ..     {
+    ..         'code': 200,
+    ..         'body': {
+    ..             'content_type': 'adhocracy.resources.proposal.IProposal',
+    ..             'path': '...'
+    ..         }
+    ..     }
+    .. ]
+    .. >>> propv3 = testapp.get_json(batch_resp[2]['body']['path']).json
+    .. {
+    ..     'content_type': 'adhocracy.resources.proposal.IProposal',
+    ..     ...
+    .. }
 
 
 Other stuff
