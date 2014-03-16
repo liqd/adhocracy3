@@ -2,6 +2,8 @@
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IIResourcePropertySheet
+from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
+from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import ReferenceSetSchemaNode
 from zope.interface import provider
@@ -11,7 +13,7 @@ import colander
 
 
 @provider(IIResourcePropertySheet)
-class IDocument(ISheet):
+class IDocument(ISheet, ISheetReferenceAutoUpdateMarker):
 
     """Marker interface representing an item with document data."""
 
@@ -27,18 +29,17 @@ class IDocument(ISheet):
                                     missing=colander.drop,
                                     )
                 )
-    taggedValue('field:elements',
-                ReferenceSetSchemaNode(
-                    default=[],
-                    missing=colander.drop,
-                    interfaces=
-                    ['adhocracy.sheets.document.ISection'],
-                )
-                )
+    taggedValue(
+        'field:elements',
+        ReferenceSetSchemaNode(
+            default=[],
+            missing=colander.drop,
+            reftype='adhocracy.sheets.document.IDocumentElementsReference',
+        ))
 
 
 @provider(IIResourcePropertySheet)
-class ISection(ISheet):
+class ISection(ISheet, ISheetReferenceAutoUpdateMarker):
 
     """Marker interface representing a document section."""
 
@@ -48,14 +49,31 @@ class ISection(ISheet):
                                     missing=colander.drop,
                                     )
                 )
-    taggedValue('field:elements',
-                ReferenceSetSchemaNode(
-                    default=[],
-                    missing=colander.drop,
-                    interfaces=
-                    ['adhocracy.sheets.document.ISection'],
-                )
-                )
+    taggedValue(
+        'field:elements',
+        ReferenceSetSchemaNode(
+            default=[],
+            missing=colander.drop,
+            reftype='adhocracy.sheets.document.ISectionElementsReference',
+        ))
+
+
+class IDocumentElementsReference(AdhocracyReferenceType):
+
+    """IDocument reference."""
+
+    source_isheet = IDocument
+    source_isheet_field = 'elements'
+    target_isheet = ISection
+
+
+class ISectionElementsReference(AdhocracyReferenceType):
+
+    """ISection reference."""
+
+    source_isheet = ISection
+    source_isheet_field = 'elements'
+    target_isheet = ISection
 
 
 def includeme(config):
