@@ -11,8 +11,6 @@ from adhocracy.schema import ReferenceSetSchemaNode
 from zope.interface import provider
 from zope.interface import taggedValue
 
-import colander
-
 
 @provider(IIResourcePropertySheet)
 class ITag(ISheet):
@@ -21,11 +19,8 @@ class ITag(ISheet):
 
     taggedValue('field:elements',
                 ReferenceSetSchemaNode(
-                    default=[],
-                    missing=colander.drop,
                     reftype='adhocracy.sheets.tags.ITagElementsReference',
-                )
-                )
+                ))
 
 
 class ITagElementsReference(AdhocracyReferenceType):
@@ -44,11 +39,8 @@ class ITags(ISheet):
 
     taggedValue('field:elements',
                 ReferenceSetSchemaNode(
-                    default=[],
-                    missing=colander.drop,
                     reftype='adhocracy.sheets.tags.ITagsElementsReference',
-                )
-                )
+                ))
 
 
 class ITagsElementsReference(AdhocracyReferenceType):

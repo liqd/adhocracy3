@@ -32,8 +32,6 @@ class IDocument(ISheet, ISheetReferenceAutoUpdateMarker):
     taggedValue(
         'field:elements',
         ReferenceSetSchemaNode(
-            default=[],
-            missing=colander.drop,
             reftype='adhocracy.sheets.document.IDocumentElementsReference',
         ))
 
@@ -52,8 +50,6 @@ class ISection(ISheet, ISheetReferenceAutoUpdateMarker):
     taggedValue(
         'field:elements',
         ReferenceSetSchemaNode(
-            default=[],
-            missing=colander.drop,
             reftype='adhocracy.sheets.document.ISectionElementsReference',
         ))
 

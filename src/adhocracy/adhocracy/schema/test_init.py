@@ -129,7 +129,7 @@ class ReferenceSetSchemaNodeUnitTest(unittest.TestCase):
 
     def test_missing(self):
         inst = self.make_one()
-        assert inst.missing == []
+        assert inst.missing == colander.drop
 
     def test_valid_interface(self):
         from zope.interface import alsoProvides

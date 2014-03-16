@@ -12,8 +12,6 @@ from zope.interface import taggedValue
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
-import colander
-
 
 class IIPool(IInterface):
 
@@ -28,8 +26,6 @@ class IPool(ISheet):
     taggedValue('readonly', True)
     taggedValue('field:elements',
                 ReferenceSetSchemaNode(
-                    default=[],
-                    missing=colander.drop,
                     reftype='adhocracy.sheets.pool.IPoolElementsReference',
                 ))
 
