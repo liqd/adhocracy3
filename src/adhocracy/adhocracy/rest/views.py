@@ -11,7 +11,7 @@ from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-from adhocracy.utils import get_resource_interface
+from adhocracy.utils import get_resource_interface, strip_optional_prefix
 from copy import deepcopy
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
@@ -404,8 +404,6 @@ class MetaApiView(RESTView):
         # Add info about all sheets referenced by any of the resources
         sheet_metadata = self.registry.sheet_metadata(sheet_set)
         sheet_map = {}
-        field_prefix = 'field:'
-        prefix_len = len(field_prefix)
 
         for sheet_name, metadata in sheet_metadata.items():
             # readonly and (create)mandatory flags are currently defined for
@@ -417,15 +415,18 @@ class MetaApiView(RESTView):
 
             # Create field definitions
             for key, value in metadata.items():
-                if key.startswith(field_prefix):
-                    fieldname = key[prefix_len:]
+                fieldname = strip_optional_prefix(key, 'field:')
+
+                # Only process 'field:...' definitions
+                if fieldname != key:
 
                     if isinstance(value, MultireferenceIdSchemaNode):
                         typ = maybe_class_to_dotted_name(value.reftype)
                         repeated = True
                     else:
-                        # TODO strip 'colander.' prefix, if present
                         typ = maybe_class_to_dotted_name(type(value.typ))
+                        # Strip 'colander.' prefix, if present
+                        typ = strip_optional_prefix(typ, 'colander.')
                         repeated = False
 
                     fielddesc = {

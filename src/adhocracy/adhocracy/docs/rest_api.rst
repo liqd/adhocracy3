@@ -103,24 +103,82 @@ a dedicated prefix.
 Global Info
 ~~~~~~~~~~~
 
-The dedicated prefix defaults to '/meta_api/', but can
-be customized.
+The dedicated prefix defaults to '/meta_api/', but can be customized. The
+result is a JSON object with two main keys, 'resources' and 'sheets'::
 
     >>> resp_data = testapp.get("/meta_api/").json
-    >>> pprint(resp_data)
-    {'bla'...}
-
     >>> sorted(resp_data.keys())
     ['resources', 'sheets']
 
-sub-urls:
+The 'resources' key points to an object whose keys are all the resources
+(content types) defined by the system::
 
-/meta_api/role
-/meta_api/role/content_type
-/meta_api/role/content_type/property_sheet
+    >>> sorted(resp_data['resources'].keys())
+    [...'adhocracy.resources.pool.IBasicPool', ...'adhocracy.resources.section.ISection'...]
 
-FIXME: explain!
+Each of these keys points to an object describing the resource. If the
+resource implements property sheets (and a resource that doesn't would be
+rather useless!), the object will have a 'sheets' key whose value is a list
+of the sheets implemented by the resource::
 
+    >>> basicpool_desc = resp_data['resources']['adhocracy.resources.pool.IBasicPool']
+    >>> sorted(basicpool_desc['sheets'])
+    ['adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool'...]
+
+If the resource is an item, it will also have a 'main_element_type' key
+whose value is the type of versions managed by this item (e.g. a Section
+will manage SectionVersions as main element type)::
+
+    >>> section_desc = resp_data['resources']['adhocracy.resources.section.ISection']
+    >>> section_desc['main_element_type']
+    'adhocracy.resources.section.ISectionVersion'
+
+If the resource is a pool or item that can contain resources of other
+kinds, it will also have an 'extra_element_types' key whose value is the
+list of other resources the pool/item can contain (e.g. a pool can contain
+other pools; a section can contain tags)::
+
+    >>> basicpool_desc['extra_element_types']
+    ['adhocracy.interfaces.IPool'...]
+    >>> section_desc['extra_element_types']
+    ['adhocracy.interfaces.ITag'...]
+
+The 'sheets' key points to an object whose keys are all the property sheets
+implemented by any of the resources::
+
+     >>> sorted(resp_data['sheets'].keys())
+     [...'adhocracy.sheets.name.IName', ...'adhocracy.sheets.pool.IPool'...]
+
+Each of these keys points to an object describing the resource. Each of
+these objects has a 'fields' key whose value is a list of objects
+describing the fields defined by the sheet:
+
+    >>> pprint(resp_data['sheets']['adhocracy.sheets.name.IName']['fields'][0])
+    {'mandatory': False,
+     'name': 'name',
+     'readonly': False,
+     'repeated': False,
+     'type': 'String'}
+
+Each field definition has the following keys:
+
+name
+  The field name
+
+type
+  The type of the field, either a basic type (as defined by Colander) such
+  as 'String' or 'Int', or a custom-defined type such as
+  'adhocracy.sheets.pool.IPoolElementsReference'
+
+mandatory
+  Flag specifying whether the field must be set if the sheet is created
+
+readonly
+  Flag specifying whether the field can be set by the user (if false, it's
+  automatically set by the server)
+
+repeated
+  Flag specifying whether the field can occur multiple times (it is a list)
 
 
 OPTIONS

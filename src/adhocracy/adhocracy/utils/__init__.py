@@ -146,3 +146,15 @@ def pprint_json(json_dict):
     py_dict = json.dumps(json_dict_sorted, sort_keys=True,
                          indent=4, separators=(',', ': '))
     pprint.pprint(py_dict)
+
+
+def strip_optional_prefix(s, prefix):
+    """Strip an optional prefix from a string.
+
+    If `s` doesn't start with `prefix`, it is returned unchanged.
+
+    """
+    if s.startswith(prefix):
+        return s[len(prefix):]
+    else:
+        return s
