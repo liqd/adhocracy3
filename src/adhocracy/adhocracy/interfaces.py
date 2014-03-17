@@ -35,7 +35,7 @@ class IIResourcePropertySheet(IInterface):
 
 class ISheet(Interface):
 
-    """Marker interface with tagged values to define resource data."""
+    """Interface with tagged values to define resource data."""
 
     taggedValue('schema', 'colander.MappingSchema')
     """Reference colander data schema.
@@ -56,6 +56,16 @@ class ISheet(Interface):
     """This propertysheet may not be used to set data."""
     taggedValue('createmandatory', False)
     """This propertysheet is mandatory when creating a new resource."""
+
+
+class ISheetReferenceAutoUpdateMarker(ISheet):
+
+    """Sheet Interface to autoupdate sheets with references.
+
+    If one referenced resource has a new version this sheet
+    changes the reference to the new version.
+
+    """
 
 
 class IResourcePropertySheet(IPropertySheet):

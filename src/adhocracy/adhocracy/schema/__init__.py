@@ -111,7 +111,7 @@ class ReferenceSetSchemaNode(schema.MultireferenceIdSchemaNode):
     schema_type = PathSet
 
     default = []
-    missing = []
+    missing = colander.drop
     reftype = AdhocracyReferenceType
     choices_getter = get_all_resources
 

@@ -29,14 +29,6 @@ def make_folder_with_objectmap(dummyobjectmap=None):
 
 class AdhocracyReferenceTypeUnitTests(unittest.TestCase):
 
-    # def setUp(self):
-    #     class ISheetValid(ISheet):
-    #         taggedValue('field:count',
-    #                     colander.SchemaNode(colander.Int(),
-    #                                         missing=colander.drop,
-    #                                         default=0))
-    #     self.isheet_valid = ISheetValid
-
     def test_create_valid(self):
         from adhocracy.interfaces import AdhocracyReferenceType as Reference
         # substanced standard tagged values

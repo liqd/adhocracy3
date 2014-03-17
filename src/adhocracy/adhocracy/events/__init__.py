@@ -6,6 +6,7 @@ https://substanced.readthedocs.org/en/latest/api.html#module-substanced.event
 """
 from adhocracy.interfaces import IItemNewVersionAdded
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
+from adhocracy.interfaces import ISheet
 from zope.interface import implementer
 
 
@@ -39,3 +40,31 @@ class SheetReferencedItemHasNewVersion(object):
         self.isheet_field = isheet_field
         self.old_version_oid = old_version_oid
         self.new_version_oid = new_version_oid
+
+
+class _ISheetPredicate(object):
+
+    """Allow the register event subscriber with the 'isheet' predicate."""
+
+    def __init__(self, val, config):
+        assert val.isOrExtends(ISheet)
+        self.val = val
+        self.config = config
+
+    def phash(self):
+        """Return text representation."""
+        return 'isheet = %s' % (self.val,)
+
+    text = phash
+
+    def __call__(self, event):
+        result = False
+        if ISheetReferencedItemHasNewVersion.providedBy(event):
+            if event.isheet.isOrExtends(self.val):
+                result = True
+        return result
+
+
+def includeme(config):
+    """ register event subscriber predicate 'isheet'."""
+    config.add_subscriber_predicate('isheet', _ISheetPredicate)

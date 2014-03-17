@@ -70,7 +70,8 @@ class ResourcePropertySheetAdapter(PropertySheet):
         struct = self.schema.deserialize(cstruct_default)
         struct.update(items_empty_strs)
         # merge stored values with default values
-        struct_stored = self.schema.deserialize(self._data)
+        cstruct = self.schema.serialize(self._data)
+        struct_stored = self.schema.deserialize(cstruct)
         struct.update(struct_stored)
         return struct
 

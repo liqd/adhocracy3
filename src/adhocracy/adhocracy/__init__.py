@@ -40,6 +40,8 @@ def includeme(config):
     config.commit()  # commit to allow proper config overrides
     config.include('.sheets')
     config.include('.resources')
+    config.include('.events')
+    config.include('.subscriber')
     config.include('.registry')
     config.include('.evolution')
     config.include('.rest')
