@@ -39,12 +39,14 @@ Resource structure
 Resources have one content interface to set its type, like
 "adhocracy.resources.pool.IBasicPool".
 
-FIXME: rename content (interface) to resource (interface), this is more clear and more common
-FIXME: maybe rename propertysheet (interface) to sheet (interface), it's shorter
+Terminology: we refer to content interfaces and the objects specified
+by content interfaces as "resources"; resources consist of "sheets"
+which are based on the substance-d concept of property sheet
+interfaces.
 
-Every Resource has multiple propertysheet interfaces that define schemata to set/get data.
+Every Resource has multiple sheets that define schemata to set/get data.
 
-There are 4 main types of content interfaces:
+There are 4 main types of resources:
 
 * Pool: folder content in the object hierarchy, can contain other Pools
   (subfolders) and Items of any kind.
@@ -87,12 +89,12 @@ Meta-API
 
 The backend needs to answer to kinds of questions:
 
- 1. Globally: What content types exist?  What property sheets may or
-    must they contain?  (What parts of) what property sheets are
+ 1. Globally: What resources (content types) exist?  What sheets may or
+    must they contain?  (What parts of) what sheets are
     read-only?  mandatory?  optional?
 
  2. In the context of a given session and URL: What HTTP methods are
-    allowed?  With what content objects in the body?  What are the
+    allowed?  With what resource objects in the body?  What are the
     authorizations (display / edit / vote-on / ...)?
 
 The second kind is implemented with the OPTIONS method on the existing
@@ -116,7 +118,7 @@ The 'resources' key points to an object whose keys are all the resources
     [...'adhocracy.resources.pool.IBasicPool', ...'adhocracy.resources.section.ISection'...]
 
 Each of these keys points to an object describing the resource. If the
-resource implements property sheets (and a resource that doesn't would be
+resource implements sheets (and a resource that doesn't would be
 rather useless!), the object will have a 'sheets' key whose value is a list
 of the sheets implemented by the resource::
 
@@ -142,7 +144,7 @@ other pools; a section can contain tags)::
     >>> section_desc['extra_element_types']
     ['adhocracy.interfaces.ITag'...]
 
-The 'sheets' key points to an object whose keys are all the property sheets
+The 'sheets' key points to an object whose keys are all the sheets
 implemented by any of the resources::
 
      >>> sorted(resp_data['sheets'].keys())
@@ -228,7 +230,7 @@ or such.)
 Semantics of read-only and mandatory and optional flags in request / response body.
 
 FIXME: optimize for caching.  but same url has different
-authorizations for same content type under different urls!
+authorizations for same resource under different urls!
 
 
 
@@ -253,7 +255,7 @@ Returns only http headers::
 GET
 ~~~
 
-Returns resource and child elements meta data and all propertysheet interfaces with data::
+Returns resource and child elements meta data and all sheet with data::
 
     >>> resp_data = testapp.get("/adhocracy").json
     >>> pprint(resp_data["data"])
@@ -347,30 +349,30 @@ Introduction and Motivation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This section explains updates to resources with version control.  Two
-property sheets are central to version control in adhocracy: IDAG and
-IVersion.  IVersion is in all content objects that support version
+sheets are central to version control in adhocracy: IDAG and
+IVersion.  IVersion is in all resources that support version
 control, and IDAG is a container that manages all versions of a
-particular content object in a directed acyclic graph.
+particular content element in a directed acyclic graph.
 
-IDAG content objects as well as IVersion objects need to be created
+IDAGs as well as IVersions need to be created
 explicitly by the frontend.
 
-The server supports updating a content object that implements IVersion by
-letting you post a content object with missing IVersion property sheet
+The server supports updating a resource that implements IVersion by
+letting you post a content element with missing IVersion sheet
 to the DAG (IVersion is read-only and managed by the server), and
 passing a list of parent versions in the post parameters of the
 request.  If there is only one parent version, the new version either
 forks off an existing branch or just continues a linear history.  If
 there are several parent versions, we have a merge commit.
 
-Example: If a new versionable content object has been created by the
+Example: If a new versionable content element has been created by the
 user, the front-end first posts an IDAG.  The IDAG works a little like
 an IPool in that it allows posting versions to it.  The front-end will
 then simply post the initial version into the IDAG with an empty
 predecessor version list.
 
-IDAG content objects may also implement the IPool property sheet for
-containing further IDAG content objects for sub-structures of
+IDAGs may also implement the IPool sheet for
+containing further IDAGs for sub-structures of
 structured versionable content types.  Example: A document may consist
 of a title, description, and a list of references to sections.
 There is a DAG for each document and each such dag contains one DAG
@@ -425,7 +427,7 @@ The return data has the new attribute 'first_version_path' to get the path first
 Version IDs are numeric and assigned by the server.  The front-end has
 no control over them, and they are not supposed to be human-memorable.
 For human-memorable version pointers that also allow for complex
-update behavior (fixed-commit, always-newest, ...), consider property
+update behavior (fixed-commit, always-newest, ...), consider
 sheet ITags.
 
 The Proposal has the IVersions and ITags interfaces to work with Versions::
@@ -520,7 +522,7 @@ tag names (like 'FIRST') are missing.
 FIXME: should we add a Tag TAG_LAST, to reference the last added version?
 
 FIXME: should the server tell in general where to post speccific
-content interfaces? (like 'like', 'discussion',..)?  in other words,
+content types? (like 'like', 'discussion',..)?  in other words,
 should the client to be able to ask (e.g. with an OPTIONS request)
 where to post a 'like'?
 
@@ -673,12 +675,12 @@ GET /interfaces/..::
 
 GET/POST /workflows/..::
 
-    Get workflow, apply workflow to content object.
+    Get workflow, apply workflow to resource.
 
 
 GET/POST /transitions/..::
 
-    Get available workflow transitions for content object, execute transition.
+    Get available workflow transitions for resource, execute transition.
 
 
 GET /query/..::
