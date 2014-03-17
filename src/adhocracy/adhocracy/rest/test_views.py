@@ -641,5 +641,5 @@ class MetaApiViewUnitTest(unittest.TestCase):
     def test_get_meta_api(self):
         inst = self.make_one(self.context, self.request)
         response = inst.get()
-        print(response) # TODO testing
         assert sorted(response.keys()) == ['resources', 'sheets']
+        # Additional tests are in rest_api.rst

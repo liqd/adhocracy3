@@ -96,8 +96,7 @@ The backend needs to answer to kinds of questions:
     authorizations (display / edit / vote-on / ...)?
 
 The second kind is implemented with the OPTIONS method on the existing
-URLs.  The first is implemented with the OPTIONS method on URLs under
-a dedicated prefix.
+URLs.  The first is implemented with the GET method on a dedicated URL.
 
 
 Global Info
