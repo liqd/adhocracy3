@@ -175,7 +175,7 @@ mandatory
   Flag specifying whether the field must be set if the sheet is created
 
 readonly
-  Flag specifying whether the field can be set by the user (if false, it's
+  Flag specifying whether the field can be set by the user (if true, it's
   automatically set by the server)
 
 repeated

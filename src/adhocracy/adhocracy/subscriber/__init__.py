@@ -1,4 +1,4 @@
-"""adhocracy.event event subcriber to hanle auto updates of resources."""
+"""adhocracy.event event subcriber to handle auto updates of resources."""
 
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IResource
