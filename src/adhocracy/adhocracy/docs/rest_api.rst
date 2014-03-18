@@ -186,52 +186,65 @@ OPTIONS
 ~~~~~~~
 
 Returns possible methods for this resource, example request/response data
-structures and available interfaces with resource data::
+structures and available interfaces with resource data. The result is a
+JSON object that has the allowed request methods as keys::
 
-    >> resp_data = testapp.options("/adhocracy").json
-    >> sorted(resp_data.keys())
+    >>> resp_data = testapp.options("/adhocracy").json
+    >>> sorted(resp_data.keys())
     ['GET', 'HEAD', 'OPTION', 'POST', 'PUT']
 
-    >> resp_data["GET"]["response_body"]["content_type"]
-    FIXME: yields content type of /adhocracy
+If a GET, POST, or PUT request is allowed, the corresponding key will point
+to an object that contains at least 'request_body' and 'response_body' as
+keys::
 
-    >> resp_data["GET"]["response_body"]["role"]
-    FIXME: i forgot what this is supposed to do
+    >>> sorted(resp_data['GET'].keys())
+    [...'request_body', ...'response_body'...]
+    >>> sorted(resp_data['POST'].keys())
+    [...'request_body', ...'response_body'...]
+    >>> sorted(resp_data['PUT'].keys())
+    [...'request_body', ...'response_body'...]
 
-    FIXME: ["response_body"] is redundant and can be removed.
-    ["data"] is covered by the global, role-specific meta api (see
-    last section), and can be removed as well.
+The 'response_body' sub-key returned for a GET request gives a stub view of
+the actual response body that will be returned::
 
-    >> sorted(resp_data["GET"]["response_body"]["data"].keys())
-    ['adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool']
+    >>> pprint(resp_data['GET']['response_body'])
+    {'content_type': '',
+     'data': {...'adhocracy.sheets.name.IName': {}...},
+     'path': ''}
 
-    >> sorted(resp_data["PUT"]["request_body"]["data"].keys())
-    ['adhocracy.sheets.name.IName']
+'content_type' and 'path' will be filled in responses returned by an actual
+GET request. 'data' points to an object whose keys are the property sheets
+that are part of the returned resource. The corresponding values will be
+filled during actual GET requests; the stub contains just empty objects
+('{}') instead.
 
-The value for POST gives us list with valid request data stubs::
+If the current user has the right to post new versions of the resource or
+add new details to it, the 'request_body' sub-key returned for POST points
+to a array of stub views of allowed requests::
 
-    >> data_post_pool = {'content_type': 'adhocracy.resources.pool.IBasicPool',
-    ...                   'data': {'adhocracy.sheets.name.IName': {}}}  # FIXME: only content types!
-    >> data_post_pool in resp_data["POST"]["request_body"]
+    >>> data_post_pool = {'content_type': 'adhocracy.resources.pool.IBasicPool',
+    ...                   'data': {'adhocracy.sheets.name.IName': {}}}
+    >>> data_post_pool in resp_data["POST"]["request_body"]
     True
 
-FIXME: make the above examples tests once they work!
+The 'response_body' sub-key again gives a stub view of the response
+body::
 
-FIXME: postables can be inferred from schema info handed out in the
-global case (to be covered in last section).
+     >>> pprint(resp_data['POST']['response_body'])
+     {'content_type': '', 'path': ''}
 
+If the current user has the right to modify the resource in-place, the
+'request_body' sub-key returned for PUT gives a stub view of how the actual
+request should look like::
 
-  (IName contains a path that must be a valid identifier for this resource.
-The server will test its validity and reject everything that is not, say,
-the path of the resource that this body was posted to plus one fresh
-extra path element.  For details, see backend unit test documentation
-or such.)
+     >>> pprint(resp_data['PUT']['request_body'])
+     {'data': {...'adhocracy.sheets.name.IName': {}...}}
 
-Semantics of read-only and mandatory and optional flags in request / response body.
+The 'response_body' sub-key gives, as usual, a stub view of the resulting
+response body::
 
-FIXME: optimize for caching.  but same url has different
-authorizations for same resource under different urls!
-
+     >>> pprint(resp_data['PUT']['response_body'])
+     {'content_type': '', 'path': ''}
 
 
 Basic calls
