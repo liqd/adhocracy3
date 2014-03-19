@@ -11,7 +11,9 @@ from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-from adhocracy.utils import get_resource_interface, strip_optional_prefix
+from adhocracy.utils import get_resource_interface
+from adhocracy.utils import strip_optional_prefix
+from adhocracy.utils import to_dotted_name
 from copy import deepcopy
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
@@ -19,22 +21,10 @@ from cornice.schemas import CorniceSchema
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
-from substanced.schema import MultireferenceIdSchemaNode
 from substanced.interfaces import IRoot
+from substanced.schema import IdSet
 
 import functools
-
-
-def maybe_class_to_dotted_name(obj):
-    """Return the dotted name of a type object.
-
-    If obj is a string instead of a type object, it is returned as is.
-
-    """
-    if isinstance(obj, str):
-        return obj  # return unchanged
-    else:
-        return obj.__module__ + '.' + obj.__name__
 
 
 def validate_sheet_cstructs(context, request, sheets):
@@ -357,14 +347,25 @@ class MetaApiView(RESTView):
 
     """
 
-    @view_config(request_method='GET')
-    def get(self):
-        """Return the API specification of this installation as JSON."""
-        resource_types = self.registry.resource_types()
+    def _describe_resources(self, resource_types):
+        """Build a description of the resources registered in the system.
+
+        Args:
+          resource_types: list of resource types as returned by the registry
+
+        Returns:
+          A 2-tuple of (resource_map, sheet_set)
+
+          resource_map is a dict (suitable for JSON serialization) that
+          describes all the resources registered in the system.
+
+          sheet_set is a set containing the names of all sheets references by
+          resources.
+
+        """
         resource_map = {}
         sheet_set = set()
 
-        # Add info about all resources
         for name, value in resource_types.items():
             prop_map = {}
             metadata = value['metadata']
@@ -380,8 +381,7 @@ class MetaApiView(RESTView):
 
             # Main element type if this is a pool or item
             if 'item_type' in metadata:
-                main_element_type = maybe_class_to_dotted_name(
-                    metadata['item_type'])
+                main_element_type = to_dotted_name(metadata['item_type'])
                 prop_map['main_element_type'] = main_element_type
             else:
                 main_element_type = None
@@ -392,24 +392,33 @@ class MetaApiView(RESTView):
                 extra_element_names = []
 
                 for typ in extra_element_types:
-                    dotted_name = maybe_class_to_dotted_name(typ)
+                    dotted_name = to_dotted_name(typ)
                     # Skip main element type
                     if not dotted_name == main_element_type:
                         extra_element_names.append(dotted_name)
 
                 prop_map['extra_element_types'] = extra_element_names
-
             resource_map[name] = prop_map
+        return resource_map, sheet_set
 
-        # Add info about all sheets referenced by any of the resources
-        sheet_metadata = self.registry.sheet_metadata(sheet_set)
+    def _describe_sheets(self, sheet_metadata):
+        """Build a description of the sheets used in the system.
+
+        Args:
+          sheet_metadata: mapping of sheet names to metadata about them, as
+            returned by the registry
+
+        Returns:
+          A dict (suitable for JSON serialization) that describes the sheets
+          and their fields
+
+        """
         sheet_map = {}
-
         for sheet_name, metadata in sheet_metadata.items():
-            # readonly and (create)mandatory flags are currently defined for
+            # readonly and createmandatory flags are currently defined for
             # the whole sheet, but we copy them as attributes into each field
             # definition, since this might change in the future
-            mandatory = metadata['createmandatory']
+            createmandatory = metadata['createmandatory']
             readonly = metadata['readonly']
             fields = []
 
@@ -419,28 +428,48 @@ class MetaApiView(RESTView):
 
                 # Only process 'field:...' definitions
                 if fieldname != key:
+                    valuetype = type(value.typ)
 
-                    if isinstance(value, MultireferenceIdSchemaNode):
-                        typ = maybe_class_to_dotted_name(value.reftype)
-                        repeated = True
+                    # FIXME: Add additional listtypes such as "list" as the
+                    # need arised
+                    if issubclass(valuetype, IdSet):
+                        listtype = 'set'
                     else:
-                        typ = maybe_class_to_dotted_name(type(value.typ))
-                        # Strip 'colander.' prefix, if present
-                        typ = strip_optional_prefix(typ, 'colander.')
-                        repeated = False
+                        listtype = 'single'
+
+                    typ = to_dotted_name(valuetype)
+                    typ = strip_optional_prefix(typ, 'colander.')
+
+                    # Workaround for PathSet: it's actally a set of
+                    # AbsolutePath's
+                    if typ == 'adhocracy.schema.PathSet':
+                        typ = 'adhocracy.schema.AbsolutePath'
 
                     fielddesc = {
                         'name': fieldname,
-                        'type': typ,
-                        'mandatory': mandatory,
+                        'valuetype': typ,
+                        'listtype': listtype,
+                        'createmandatory': createmandatory,
                         'readonly': readonly,
-                        'repeated': repeated
                     }
                     fields.append(fielddesc)
 
             # For now, each sheet definition only contains a 'fields' attribute
             # listing the defined fields
             sheet_map[sheet_name] = {'fields': fields}
+
+        return sheet_map
+
+    @view_config(request_method='GET')
+    def get(self):
+        """Return the API specification of this installation as JSON."""
+        # Collect info about all resources
+        resource_types = self.registry.resource_types()
+        resource_map, sheet_set = self._describe_resources(resource_types)
+
+        # Collect info about all sheets referenced by any of the resources
+        sheet_metadata = self.registry.sheet_metadata(sheet_set)
+        sheet_map = self._describe_sheets(sheet_metadata)
 
         struct = {
             'resources':

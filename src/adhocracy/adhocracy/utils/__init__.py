@@ -2,6 +2,7 @@
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ISheet
 from functools import reduce
+from substanced.util import get_dotted_name
 from zope.interface import Interface
 from zope.interface import directlyProvidedBy
 from zope.interface import providedBy
@@ -151,10 +152,35 @@ def pprint_json(json_dict):
 def strip_optional_prefix(s, prefix):
     """Strip an optional prefix from a string.
 
-    If `s` doesn't start with `prefix`, it is returned unchanged.
+    Args:
+      s (str): the string to process
+      prefix (str): the prefix to strip from the string, if present
+
+    Returns:
+      str: `s` stripped of the `prefix`
+
+      If `s` doesn't start with `prefix`, it is returned unchanged.
 
     """
     if s.startswith(prefix):
         return s[len(prefix):]
     else:
         return s
+
+
+def to_dotted_name(obj):
+    """Return the dotted name of a type object.
+
+    Args:
+      obj (str or type)
+
+    Returns:
+      The dotted name of `obj`, if it's a type.
+      If `obj` is a string, it is returned as is (since we suppose that it
+      already represents a type name).
+
+    """
+    if isinstance(obj, str):
+        return obj  # return unchanged
+    else:
+        return get_dotted_name(obj)

@@ -104,14 +104,14 @@ URLs.  The first is implemented with the GET method on a dedicated URL.
 Global Info
 ~~~~~~~~~~~
 
-The dedicated prefix defaults to '/meta_api/', but can be customized. The
-result is a JSON object with two main keys, 'resources' and 'sheets'::
+The dedicated prefix defaults to "/meta_api/", but can be customized. The
+result is a JSON object with two main keys, "resources" and "sheets"::
 
     >>> resp_data = testapp.get("/meta_api/").json
     >>> sorted(resp_data.keys())
     ['resources', 'sheets']
 
-The 'resources' key points to an object whose keys are all the resources
+The "resources" key points to an object whose keys are all the resources
 (content types) defined by the system::
 
     >>> sorted(resp_data['resources'].keys())
@@ -119,14 +119,14 @@ The 'resources' key points to an object whose keys are all the resources
 
 Each of these keys points to an object describing the resource. If the
 resource implements sheets (and a resource that doesn't would be
-rather useless!), the object will have a 'sheets' key whose value is a list
+rather useless!), the object will have a "sheets" key whose value is a list
 of the sheets implemented by the resource::
 
     >>> basicpool_desc = resp_data['resources']['adhocracy.resources.pool.IBasicPool']
     >>> sorted(basicpool_desc['sheets'])
     ['adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool'...]
 
-If the resource is an item, it will also have a 'main_element_type' key
+If the resource is an item, it will also have a "main_element_type" key
 whose value is the type of versions managed by this item (e.g. a Section
 will manage SectionVersions as main element type)::
 
@@ -135,7 +135,7 @@ will manage SectionVersions as main element type)::
     'adhocracy.resources.section.ISectionVersion'
 
 If the resource is a pool or item that can contain resources of other
-kinds, it will also have an 'extra_element_types' key whose value is the
+kinds, it will also have an "extra_element_types" key whose value is the
 list of other resources the pool/item can contain (e.g. a pool can contain
 other pools; a section can contain tags)::
 
@@ -144,42 +144,44 @@ other pools; a section can contain tags)::
     >>> section_desc['extra_element_types']
     ['adhocracy.interfaces.ITag'...]
 
-The 'sheets' key points to an object whose keys are all the sheets
+The "sheets" key points to an object whose keys are all the sheets
 implemented by any of the resources::
 
      >>> sorted(resp_data['sheets'].keys())
      [...'adhocracy.sheets.name.IName', ...'adhocracy.sheets.pool.IPool'...]
 
 Each of these keys points to an object describing the resource. Each of
-these objects has a 'fields' key whose value is a list of objects
+these objects has a "fields" key whose value is a list of objects
 describing the fields defined by the sheet:
 
     >>> pprint(resp_data['sheets']['adhocracy.sheets.name.IName']['fields'][0])
-    {'mandatory': False,
+    {'createmandatory': False,
+     'listtype': 'single',
      'name': 'name',
      'readonly': False,
-     'repeated': False,
-     'type': 'String'}
+     'valuetype': 'String'}
 
 Each field definition has the following keys:
 
 name
   The field name
 
-type
-  The type of the field, either a basic type (as defined by Colander) such
-  as 'String' or 'Int', or a custom-defined type such as
-  'adhocracy.sheets.pool.IPoolElementsReference'
-
-mandatory
+createmandatory
   Flag specifying whether the field must be set if the sheet is created
 
 readonly
   Flag specifying whether the field can be set by the user (if true, it's
   automatically set by the server)
 
-repeated
-  Flag specifying whether the field can occur multiple times (it is a list)
+listtype
+  Specifies whether the field contains just a "single" value, a "list" of
+  values (order matters, duplicates are allowed), or a "set" of values
+  (unordered, no duplicates).
+
+valuetype
+  The type of values stored in the field, either a basic type (as defined
+  by Colander) such as "String" or "Int", or a custom-defined type such as
+  "adhocracy.schema.AbsolutePath"
 
 
 OPTIONS
@@ -194,7 +196,7 @@ JSON object that has the allowed request methods as keys::
     ['GET', 'HEAD', 'OPTION', 'POST', 'PUT']
 
 If a GET, POST, or PUT request is allowed, the corresponding key will point
-to an object that contains at least 'request_body' and 'response_body' as
+to an object that contains at least "request_body" and "response_body" as
 keys::
 
     >>> sorted(resp_data['GET'].keys())
@@ -204,7 +206,7 @@ keys::
     >>> sorted(resp_data['PUT'].keys())
     [...'request_body', ...'response_body'...]
 
-The 'response_body' sub-key returned for a GET request gives a stub view of
+The "response_body" sub-key returned for a GET request gives a stub view of
 the actual response body that will be returned::
 
     >>> pprint(resp_data['GET']['response_body'])
@@ -212,14 +214,14 @@ the actual response body that will be returned::
      'data': {...'adhocracy.sheets.name.IName': {}...},
      'path': ''}
 
-'content_type' and 'path' will be filled in responses returned by an actual
-GET request. 'data' points to an object whose keys are the property sheets
+"content_type" and "path" will be filled in responses returned by an actual
+GET request. "data" points to an object whose keys are the property sheets
 that are part of the returned resource. The corresponding values will be
 filled during actual GET requests; the stub contains just empty objects
-('{}') instead.
+("{}") instead.
 
 If the current user has the right to post new versions of the resource or
-add new details to it, the 'request_body' sub-key returned for POST points
+add new details to it, the "request_body" sub-key returned for POST points
 to a array of stub views of allowed requests::
 
     >>> data_post_pool = {'content_type': 'adhocracy.resources.pool.IBasicPool',
@@ -227,20 +229,20 @@ to a array of stub views of allowed requests::
     >>> data_post_pool in resp_data["POST"]["request_body"]
     True
 
-The 'response_body' sub-key again gives a stub view of the response
+The "response_body" sub-key again gives a stub view of the response
 body::
 
      >>> pprint(resp_data['POST']['response_body'])
      {'content_type': '', 'path': ''}
 
 If the current user has the right to modify the resource in-place, the
-'request_body' sub-key returned for PUT gives a stub view of how the actual
+"request_body" sub-key returned for PUT gives a stub view of how the actual
 request should look like::
 
      >>> pprint(resp_data['PUT']['request_body'])
      {'data': {...'adhocracy.sheets.name.IName': {}...}}
 
-The 'response_body' sub-key gives, as usual, a stub view of the resulting
+The "response_body" sub-key gives, as usual, a stub view of the resulting
 response body::
 
      >>> pprint(resp_data['PUT']['response_body'])
