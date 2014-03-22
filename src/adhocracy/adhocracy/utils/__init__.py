@@ -2,6 +2,7 @@
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ISheet
 from functools import reduce
+from pyramid.path import DottedNameResolver
 from substanced.util import get_dotted_name
 from zope.interface import Interface
 from zope.interface import directlyProvidedBy
@@ -86,9 +87,23 @@ def get_all_taggedvalues(iface):
     iro = [i for i in iface.__iro__]
     iro.reverse()
     taggedvalues = dict()
+    # accumulate tagged values
     for i in iro:
         for key in i.getTaggedValueTags():
             taggedvalues[key] = i.getTaggedValue(key)
+    # normalise tagged values with python callables
+    res = DottedNameResolver()
+    for key, value in taggedvalues.items():
+        if key in ['basic_sheets',
+                   'extended_sheets',
+                   'addable_content_interfaces',
+                   'after_creation']:
+            value_ = set([res.maybe_resolve(x) for x in value])
+            taggedvalues[key] = value_
+        if key in ['item_type',
+                   'content_class']:
+            value_ = res.maybe_resolve(value)
+            taggedvalues[key] = value_
     return taggedvalues
 
 

@@ -131,10 +131,8 @@ class ResourceContentRegistry(ContentRegistry):
         all_types = self.resource_types()
         name = get_resource_interface(context).__identifier__
         assert name in all_types
-        res = DottedNameResolver()
         metadata = all_types[name]['metadata']
-        addables = [res.maybe_resolve(i) for i
-                    in metadata.get('addable_content_interfaces', [])]
+        addables = metadata.get('addable_content_interfaces', [])
         #get all addable types
         addable_types = []
         for type in all_types.values():
