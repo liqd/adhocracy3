@@ -4,6 +4,7 @@ from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISimple
 from adhocracy.interfaces import IPool
+from adhocracy.interfaces import ISheet
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
@@ -14,6 +15,7 @@ from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
+from adhocracy.utils import get_all_taggedvalues
 from copy import deepcopy
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
@@ -376,7 +378,7 @@ class MetaApiView(RESTView):
                 sheets.extend(metadata['basic_sheets'])
             if 'extended_sheets' in metadata:
                 sheets.extend(metadata['extended_sheets'])
-            prop_map['sheets'] = sheets
+            prop_map['sheets'] = [to_dotted_name(s) for s in sheets]
             sheet_set.update(sheets)
 
             # Main element type if this is a pool or item
@@ -460,6 +462,24 @@ class MetaApiView(RESTView):
 
         return sheet_map
 
+    def _sheet_metadata(self, isheets):
+        """Get dictionary with metadata about sheets.
+
+        Expects an iterable of ISheet interface classes.
+
+        Returns a mapping from sheet identifiers (dotted names) to metadata
+        describing the sheet.
+
+        """
+        sheet_metadata = {}
+
+        for isheet in isheets:
+            if isheet.isOrExtends(ISheet):
+                metadata = get_all_taggedvalues(isheet)
+            sheet_metadata[isheet.__identifier__] = metadata
+
+        return sheet_metadata
+
     @view_config(request_method='GET')
     def get(self):
         """Return the API specification of this installation as JSON."""
@@ -468,7 +488,7 @@ class MetaApiView(RESTView):
         resource_map, sheet_set = self._describe_resources(resource_types)
 
         # Collect info about all sheets referenced by any of the resources
-        sheet_metadata = self.registry.sheet_metadata(sheet_set)
+        sheet_metadata = self._sheet_metadata(sheet_set)
         sheet_map = self._describe_sheets(sheet_metadata)
 
         struct = {

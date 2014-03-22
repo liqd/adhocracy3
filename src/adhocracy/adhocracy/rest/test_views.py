@@ -1,8 +1,6 @@
 """Test rest.views module."""
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
-from adhocracy.schema import Identifier
-from adhocracy.schema import ReferenceSetSchemaNode
 from cornice.util import extract_json_data
 from cornice.errors import Errors
 from mock import patch
@@ -23,7 +21,7 @@ class IResourceX(IResource):
 
 
 class ISheetB(ISheet):
-    taggedValue('schema', 'adhocracy.rest.test_views.CountSchema')
+    pass
 
 
 class CountSchema(colander.MappingSchema):
@@ -83,6 +81,20 @@ class DummyPropertysheet(object):
 
     def set(self, appstruct):
         self._dummy_appstruct = appstruct
+
+
+def make_resource_types(iresource, metadata):
+    """Helper method that assembles dummy resource metadata.
+
+    It returns the same structure like the resource_types method from
+    adhocracy.registry.
+
+    """
+    return {iresource.__identifier__: {'name': iresource.__identifier__,
+                                       'iface': iresource,
+                                       'metadata': metadata
+                                       }
+            }
 
 
 ##########
@@ -635,186 +647,183 @@ class MetaApiViewUnitTest(unittest.TestCase):
         request.registry.content = resource_registry
         self.request = request
         self.resource_types = request.registry.content.resource_types
-        self.sheet_metadata = request.registry.content.sheet_metadata
-
-        # Building blocks for dummies
-        self.dummy_item_type = 'DummyItemVersion'
-        self.dummy_addables = [self.dummy_item_type, 'DummyTag',
-                'DummyComment']
-        self.basic_dummy_sheets = ['BasicDummySheet']
-        self.extended_dummy_sheets = ['EnhancedDummySheet',
-                'AdvancedDummySheet']
-
-        # Build some dummy resource descriptions
-        # res1 has everything
-        self.res1_meta = self._build_resource_metadata(self.dummy_item_type,
-                self.dummy_addables, self.basic_dummy_sheets,
-                self.extended_dummy_sheets)
-        # res2 has only addables
-        self.res2_meta = self._build_resource_metadata(None,
-                self.dummy_addables, None, None)
-        # res3 has only basic sheets
-        self.res3_meta = self._build_resource_metadata(None, None,
-                self.basic_dummy_sheets, None)
-        # res4 has only item type and extended sheets
-        self.res4_meta = self._build_resource_metadata(self.dummy_item_type,
-                None, None, self.extended_dummy_sheets)
 
     def make_one(self, context, request):
         from .views import MetaApiView
         return MetaApiView(context, request)
 
-    def test_get_empty_meta_api(self):
+    def test_get_empty(self):
+        self.resource_types.return_value = {}
         inst = self.make_one(self.context, self.request)
+
         response = inst.get()
+
         assert sorted(response.keys()) == ['resources', 'sheets']
         assert response['resources'] == {}
         assert response['sheets'] == {}
 
-    def _build_resource_metadata(self, item_type, addable_content_interfaces,
-            basic_sheets, extended_sheets):
-        """Helper method that assembles dummy resource metadata."""
-        metadata = {}
-        if item_type is not None:
-            metadata['item_type'] = item_type
-        if addable_content_interfaces:
-            metadata['addable_content_interfaces'] = addable_content_interfaces
-        if basic_sheets:
-            metadata['basic_sheets'] = basic_sheets
-        if extended_sheets:
-            metadata['extended_sheets'] = extended_sheets
-        return { 'metadata': metadata }
+    def test_get_resources(self):
+        from adhocracy.interfaces import IResource
+        self.resource_types.return_value = make_resource_types(IResource, {})
+        inst = self.make_one(self.context, self.request)
+        response = inst.get()
+        assert IResource.__identifier__ in response['resources']
+        assert response['resources'][IResource.__identifier__] == {'sheets': []}
 
-    def _check_resource_desc(self, result, metametadata):
-        """Check that a resource description looks as expected."""
-        assert result is not None
-        # metadata as returned by the registry is wrapped in an outer
-        # 'metadata' element
-        metadata = metametadata['metadata']
-        item_type = metadata.get('item_type')
-        assert result.get('main_element_type') == item_type
+    def test_get_resources_with_arbitary_metadata(self):
+        from adhocracy.interfaces import IResource
+        self.resource_types.return_value =\
+            make_resource_types(IResource, {'arbitary': u'stuff'})
+        inst = self.make_one(self.context, self.request)
+        resources_metadata = inst.get()['resources']
+        wanted_resources_metadata = \
+            {IResource.__identifier__: {'other_metadata': u'other',
+                                        'sheets': []}}
+        assert wanted_resources_metadata == resources_metadata
+        # TODO: the simple way to implement the api_meta is just outputting
+        # all taggedvalues. Do we want it this way?
+        # joka 22.03.2014
 
-        addables = metadata.get('addable_content_interfaces', [])
-        extra_element_types = result.get('extra_element_types', [])
-        if item_type is not None and item_type in addables:
-            # main_element_type shouldn't be repeated in extra_element_types
-            assert len(extra_element_types) + 1 == len(addables)
-            assert item_type not in extra_element_types
-        else:
-            assert sorted(extra_element_types) == sorted(addables)
+    def test_get_resources_with_sheets_metadata(self):
+        from adhocracy.interfaces import ISheet
+        from adhocracy.interfaces import IResource
+        self.resource_types.return_value = \
+            make_resource_types(IResource, {'basic_sheets': set([ISheet]),
+                                            'extended_sheets': set([ISheetB])})
+        inst = self.make_one(self.context, self.request)
+        resources_metadata = inst.get()['resources']
+        wanted_resources_metadata = \
+            {IResource.__identifier__:
+             {'sheets': [ISheet.__identifier__, ISheetB.__identifier__]}}
+        assert wanted_resources_metadata == resources_metadata
 
-        basic_sheets = metadata.get('basic_sheets', [])
-        extended_sheets = metadata.get('extended_sheets', [])
-        sheets = result.get('sheets', [])
-        assert len(sheets) == len(basic_sheets) + len(extended_sheets)
-        for sheet in basic_sheets:
-            assert sheet in sheets
-        for sheet in extended_sheets:
-            assert sheet in sheets
+    def test_get_resources_with_addables_metadata(self):
+        from adhocracy.interfaces import IResource
+        from adhocracy.interfaces import IItemVersion
+        self.resource_types.return_value = make_resource_types(
+            IResource,
+            {'addable_content_interfaces': set([IItemVersion, IResource]),
+             'item_type': IItemVersion})
+        inst = self.make_one(self.context, self.request)
+        resources_metadata = inst.get()['resources']
+        wanted_resources_metadata = \
+            {IResource.__identifier__:
+             {'extra_element_types': [IResource.__identifier__],
+              'main_element_type': IItemVersion.__identifier__,
+              'sheets': []}}
+        # TODO: why is IItemVersion not shown in extra_element_types?
+        # TODO: make sure meta_api and taggedValues are using the same names
+        # (extra_element_types, main_element_type vs addable_content_interf..)
+        # joka 22.03.2014
+        assert wanted_resources_metadata == resources_metadata
 
-    def test_get_resources_via_meta_api(self):
-        self.resource_types.return_value = {
-                'Resource1': self.res1_meta,
-                'Resource2': self.res2_meta,
-                'Resource3': self.res3_meta,
-                'Resource4': self.res4_meta,
-                }
+    def test_get_sheets(self):
+        from adhocracy.interfaces import ISheet
+        from adhocracy.interfaces import IResource
+        self.resource_types.return_value = make_resource_types(
+            IResource, {'basic_sheets': set([ISheet])})
 
         inst = self.make_one(self.context, self.request)
         response = inst.get()
-        resources_desc = response['resources']
-        assert len(resources_desc) == 4
+        assert ISheet.__identifier__ in response['sheets']
+        assert 'fields' in response['sheets'][ISheet.__identifier__]
+        assert response['sheets'][ISheet.__identifier__]['fields'] == []
 
-        # Check that descriptions are as they should be
-        self._check_resource_desc(resources_desc['Resource1'], self.res1_meta)
-        self._check_resource_desc(resources_desc['Resource2'], self.res2_meta)
-        self._check_resource_desc(resources_desc['Resource3'], self.res3_meta)
-        self._check_resource_desc(resources_desc['Resource4'], self.res4_meta)
+    def test_get_sheets_with_field(self):
+        from adhocracy.interfaces import ISheet
+        from adhocracy.interfaces import IResource
+        import colander
 
-    def _build_sheet_metadata(self, createmandatory, readonly, **fields):
-        """Helper method that assembles dummy sheet metadata."""
-        metadata = {
-                'createmandatory': createmandatory,
-                'readonly': readonly,
-                }
-        for fieldname, fieldtype in fields.items():
-            metadata['field:' + fieldname] = fieldtype
-        return metadata
-
-    def _check_sheet_desc(self, result, metadata, expected_map):
-        """Check that a sheet description looks as expected."""
-        assert result is not None
-        fields = result['fields']
-
-        # metadata contains 'createmandatory' and 'readonly' as additional
-        # entries
-        assert len(fields) == len(metadata) - 2
-
-        for field in fields:
-            assert field['createmandatory'] == metadata['createmandatory']
-            assert field['readonly'] == metadata['readonly']
-
-            fieldname = field['name']
-            assert fieldname in expected_map
-
-            expected_values = expected_map[fieldname]
-            assert field['valuetype'] == expected_values['valuetype']
-            assert field['listtype'] == expected_values['listtype']
-
-    def test_get_sheets_via_meta_api(self):
-        self.resource_types.return_value = { 'Resource1': self.res1_meta }
-        # Some types for testing with the expected result
-        node_map = {
-            'title': colander.SchemaNode(colander.String()),
-            'elements': ReferenceSetSchemaNode(
-                reftype='adhocracy.sheets.document.ISectionElementsReference'
-            ),
-            'name': Identifier(),
-            'count': colander.SchemaNode(colander.Integer()),
-            'follows': ReferenceSetSchemaNode(
-                reftype='adhocracy.sheets.versions.IVersionableFollowsReference'
-            )
-        }
-        expected_map = {
-            'title': { 'valuetype': 'String', 'listtype': 'single' },
-            'elements': {
-                'valuetype': 'adhocracy.schema.AbsolutePath',
-                'listtype': 'set'
-            },
-            'name': { 'valuetype': 'String', 'listtype': 'single' },
-            'count': { 'valuetype': 'Integer', 'listtype': 'single' },
-            'follows': {
-                'valuetype': 'adhocracy.schema.AbsolutePath',
-                'listtype': 'set'
-            },
-        }
-
-        basic_meta = self._build_sheet_metadata(False, True,
-                title=node_map['title'], elements=node_map['elements'])
-        enhanced_meta = self._build_sheet_metadata(True, False,
-                name=node_map['name'])
-        advanced_meta = self._build_sheet_metadata(False, False,
-                count=node_map['count'], follows=node_map['follows'])
-        empty_meta = self._build_sheet_metadata(True, True)
-
-        self.sheet_metadata.return_value = {
-                'BasicDummySheet': basic_meta,
-                'EnhancedDummySheet': enhanced_meta,
-                'AdvancedDummySheet': advanced_meta,
-                'EmptyDummySheet': empty_meta
-                }
-
+        class ISheetF(ISheet):
+            taggedValue('field:test', colander.SchemaNode(colander.Int()))
+        self.resource_types.return_value = make_resource_types(
+            IResource, {'basic_sheets': set([ISheetF])})
         inst = self.make_one(self.context, self.request)
-        response = inst.get()
-        sheets_desc = response['sheets']
-        assert len(sheets_desc) == 4
 
-        # Check that descriptions are as they should be
-        self._check_sheet_desc(sheets_desc['BasicDummySheet'],
-                basic_meta, expected_map)
-        self._check_sheet_desc(sheets_desc['EnhancedDummySheet'],
-                enhanced_meta, expected_map)
-        self._check_sheet_desc(sheets_desc['AdvancedDummySheet'],
-                advanced_meta, expected_map)
-        self._check_sheet_desc(sheets_desc['EmptyDummySheet'],
-                empty_meta, expected_map)
+        sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
+
+        assert len(sheet_metadata['fields']) == 1
+        field_metadata = sheet_metadata['fields'][0]
+        assert field_metadata['createmandatory'] is False
+        assert field_metadata['readonly'] is False
+        assert field_metadata['name'] == 'test'
+        assert 'listtype' in field_metadata
+        assert 'valuetype' in field_metadata
+
+    def test_get_sheets_with_field_colander_noniteratable(self):
+        from adhocracy.interfaces import ISheet
+        from adhocracy.interfaces import IResource
+        import colander
+
+        class ISheetF(ISheet):
+            taggedValue('field:test', colander.SchemaNode(colander.Int()))
+        self.resource_types.return_value = make_resource_types(
+            IResource, {'basic_sheets': set([ISheetF])})
+        inst = self.make_one(self.context, self.request)
+
+        sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
+
+        field_metadata = sheet_metadata['fields'][0]
+        assert field_metadata['listtype'] == 'single'
+        assert field_metadata['valuetype'] == 'Integer'
+        # TODO: "listtype: single, valuetype: Integer" sounds a bit wired for
+        # me, because Integer is not a list type at all. Maybe "valuetype", and
+        # optional "list_valuetype" for iteratables?
+        # joka
+
+    def test_get_sheets_with_field_adhocracy_noniteratable(self):
+        from adhocracy.interfaces import ISheet
+        from adhocracy.interfaces import IResource
+        from adhocracy.schema import Identifier
+
+        class ISheetF(ISheet):
+            taggedValue('field:test', Identifier())
+        self.resource_types.return_value = make_resource_types(
+            IResource, {'basic_sheets': set([ISheetF])})
+        inst = self.make_one(self.context, self.request)
+
+        sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
+
+        field_metadata = sheet_metadata['fields'][0]
+        assert field_metadata['listtype'] == 'single'
+        assert field_metadata['valuetype'] == 'Identifier'
+        #TODO this should be 'Identifier' instead of String. joka
+
+    def test_get_sheets_with_field_adhocracy_referenceset(self):
+        from adhocracy.interfaces import ISheet
+        from adhocracy.interfaces import IResource
+        from adhocracy.interfaces import AdhocracyReferenceType
+        from adhocracy.schema import ReferenceSetSchemaNode
+
+        class ISheetF(ISheet):
+            taggedValue('field:test', ReferenceSetSchemaNode(
+                reftype=AdhocracyReferenceType))
+        self.resource_types.return_value = make_resource_types(
+            IResource, {'basic_sheets': set([ISheetF])})
+        inst = self.make_one(self.context, self.request)
+
+        sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
+
+        field_metadata = sheet_metadata['fields'][0]
+        assert field_metadata['listtype'] == 'set'
+        assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
+        # TODO Why do we remove the prefix 'colander.' but not
+        # 'adhocracy.schema.'? joka
+
+    def test_get_sheets_with_field_adhocracy_referenceset_with_dotted(self):
+        from adhocracy.interfaces import ISheet
+        from adhocracy.interfaces import IResource
+        from adhocracy.schema import ReferenceSetSchemaNode
+
+        class ISheetF(ISheet):
+            taggedValue('field:test', ReferenceSetSchemaNode(
+                reftype='adhocracy.interfaces.AdhocracyReferenceType'))
+        self.resource_types.return_value = make_resource_types(
+            IResource, {'basic_sheets': set([ISheetF])})
+        inst = self.make_one(self.context, self.request)
+
+        sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
+
+        field_metadata = sheet_metadata['fields'][0]
+        assert field_metadata['listtype'] == 'set'
+        assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
