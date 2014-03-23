@@ -50,7 +50,6 @@ class PathSet(IdSet):
         Return List with paths.
 
         """
-
         if value is colander.null:
             return value
         self._check_iterable(node, value)

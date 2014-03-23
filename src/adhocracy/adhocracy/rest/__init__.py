@@ -17,7 +17,6 @@ jsoncolander = JSON(adapters=[(_null, colander_null_json_adapter)], indent=2)
 
 def includeme(config):  # pragma: no cover
     """Run pyramid configuration."""
-
     config.include('cornice')
     config.scan('.views')
     config.scan('.exceptions')

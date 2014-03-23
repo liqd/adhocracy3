@@ -98,7 +98,6 @@ def get_ifaces_from_module(module, base=Interface, blacklist=[]):
     so we have to do it manually
 
     """
-
     ifaces = []
     for key in dir(module):
         value = getattr(module, key)
