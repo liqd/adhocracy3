@@ -32,7 +32,8 @@ Docstring formatting
 ++++++++++++++++++++
 
     * pep257 (must, bei tests und zope.Interface classes should)
-    function definition google style (input, output, raises) (should) http://sphinxcontrib-napoleon.readthedocs.org/en/latest/example_google.html. In Future use python 3 annotations for type checking and sphinx docu generation (for example: mypy interperter or https://pypi.python.org/pypi/sphinx_typesafe/0.2)
+    * Public function/method docstring in google style (Args: Returns: Raises:, http://sphinxcontrib-napoleon.readthedocs.org/en/latest/example_google.html. (must)
+      In Future maybe use python 3 annotations for type checking and sphinx docu generation (for example: mypy interperter or https://pypi.python.org/pypi/sphinx_typesafe/0.2)
 
 Imports
 +++++++
