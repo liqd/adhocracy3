@@ -39,12 +39,14 @@ Resource structure
 Resources have one content interface to set its type, like
 "adhocracy.resources.pool.IBasicPool".
 
-FIXME: rename content (interface) to resource (interface), this is more clear and more common
-FIXME: maybe rename propertysheet (interface) to sheet (interface), it's shorter
+Terminology: we refer to content interfaces and the objects specified
+by content interfaces as "resources"; resources consist of "sheets"
+which are based on the substance-d concept of property sheet
+interfaces.
 
-Every Resource has multiple propertysheet interfaces that define schemata to set/get data.
+Every Resource has multiple sheets that define schemata to set/get data.
 
-There are 4 main types of content interfaces:
+There are 4 main types of resources:
 
 * Pool: folder content in the object hierarchy, can contain other Pools
   (subfolders) and Items of any kind.
@@ -87,91 +89,166 @@ Meta-API
 
 The backend needs to answer to kinds of questions:
 
- 1. Globally: What content types exist?  What property sheets may or
-    must they contain?  (What parts of) what property sheets are
+ 1. Globally: What resources (content types) exist?  What sheets may or
+    must they contain?  (What parts of) what sheets are
     read-only?  mandatory?  optional?
 
  2. In the context of a given session and URL: What HTTP methods are
-    allowed?  With what content objects in the body?  What are the
+    allowed?  With what resource objects in the body?  What are the
     authorizations (display / edit / vote-on / ...)?
 
 The second kind is implemented with the OPTIONS method on the existing
-URLs.  The first is implemented with the OPTIONS method on URLs under
-a dedicated prefix.
+URLs.  The first is implemented with the GET method on a dedicated URL.
 
 
 Global Info
 ~~~~~~~~~~~
 
-The dedicated prefix defaults to '/meta_api/', but can
-be customized.
+The dedicated prefix defaults to "/meta_api/", but can be customized. The
+result is a JSON object with two main keys, "resources" and "sheets"::
 
-    .. >> resp = testapp.options("/meta_api/")
-    .. >> sorted(resp_data.keys())
-    .. ['adhocracy.resources.pool.IBasicPool', 'adhocracy.resources.pool.IProposal', ...]
+    >>> resp_data = testapp.get("/meta_api/").json
+    >>> sorted(resp_data.keys())
+    ['resources', 'sheets']
 
-FIXME: make the above example a test once it works!
+The "resources" key points to an object whose keys are all the resources
+(content types) defined by the system::
 
-sub-urls:
+    >>> sorted(resp_data['resources'].keys())
+    [...'adhocracy.resources.pool.IBasicPool', ...'adhocracy.resources.section.ISection'...]
 
-/meta_api/role
-/meta_api/role/content_type
-/meta_api/role/content_type/property_sheet
+Each of these keys points to an object describing the resource. If the
+resource implements sheets (and a resource that doesn't would be
+rather useless!), the object will have a "sheets" key whose value is a list
+of the sheets implemented by the resource::
 
-FIXME: explain!
+    >>> basicpool_desc = resp_data['resources']['adhocracy.resources.pool.IBasicPool']
+    >>> sorted(basicpool_desc['sheets'])
+    ['adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool'...]
 
+If the resource is an item, it will also have a "item_type" key whose value
+is the type of versions managed by this item (e.g. a Section will manage
+SectionVersions as main element type)::
+
+    >>> section_desc = resp_data['resources']['adhocracy.resources.section.ISection']
+    >>> section_desc['item_type']
+    'adhocracy.resources.section.ISectionVersion'
+
+If the resource is a pool or item that can contain resources, it will also
+have an "element_types" key whose value is the list of all resources the
+pool/item can contain (including the "item_type" if it's an item). For
+example, a pool can contain other pools; a section can contain tags. ::
+
+    >>> basicpool_desc['element_types']
+    ['adhocracy.interfaces.IPool'...]
+    >>> sorted(section_desc['element_types'])
+    ['adhocracy.interfaces.ITag', ...'adhocracy.resources.section.ISectionVersion'...]
+
+The "sheets" key points to an object whose keys are all the sheets
+implemented by any of the resources::
+
+     >>> sorted(resp_data['sheets'].keys())
+     [...'adhocracy.sheets.name.IName', ...'adhocracy.sheets.pool.IPool'...]
+
+Each of these keys points to an object describing the resource. Each of
+these objects has a "fields" key whose value is a list of objects
+describing the fields defined by the sheet:
+
+    >>> pprint(resp_data['sheets']['adhocracy.sheets.name.IName']['fields'][0])
+    {'createmandatory': False,
+     'name': 'name',
+     'readonly': False,
+     'valuetype': 'adhocracy.schema.Identifier'}
+
+Each field definition has the following keys:
+
+name
+    The field name
+
+createmandatory
+    Flag specifying whether the field must be set if the sheet is created
+
+readonly
+    Flag specifying whether the field can be set by the user (if true, it's
+    automatically set by the server)
+
+valuetype
+    The type of values stored in the field, either a basic type (as defined
+    by Colander) such as "String" or "Integer", or a custom-defined type
+    such as "adhocracy.schema.AbsolutePath"
+
+There also is an optional key:
+
+containertype
+    Only present if the field can store multiple values (each of the type
+    specified by the "valuetype" attribute). If present, the value of this
+    attribute is either "list" (a list of values: order matters, duplicates
+    are allowed) or "set" (a set of values: unordered, no duplicates).
 
 
 OPTIONS
 ~~~~~~~
 
 Returns possible methods for this resource, example request/response data
-structures and available interfaces with resource data::
+structures and available interfaces with resource data. The result is a
+JSON object that has the allowed request methods as keys::
 
-    >> resp_data = testapp.options("/adhocracy").json
-    >> sorted(resp_data.keys())
+    >>> resp_data = testapp.options("/adhocracy").json
+    >>> sorted(resp_data.keys())
     ['GET', 'HEAD', 'OPTION', 'POST', 'PUT']
 
-    >> resp_data["GET"]["response_body"]["content_type"]
-    FIXME: yields content type of /adhocracy
+If a GET, POST, or PUT request is allowed, the corresponding key will point
+to an object that contains at least "request_body" and "response_body" as
+keys::
 
-    >> resp_data["GET"]["response_body"]["role"]
-    FIXME: i forgot what this is supposed to do
+    >>> sorted(resp_data['GET'].keys())
+    [...'request_body', ...'response_body'...]
+    >>> sorted(resp_data['POST'].keys())
+    [...'request_body', ...'response_body'...]
+    >>> sorted(resp_data['PUT'].keys())
+    [...'request_body', ...'response_body'...]
 
-    FIXME: ["response_body"] is redundant and can be removed.
-    ["data"] is covered by the global, role-specific meta api (see
-    last section), and can be removed as well.
+The "response_body" sub-key returned for a GET request gives a stub view of
+the actual response body that will be returned::
 
-    >> sorted(resp_data["GET"]["response_body"]["data"].keys())
-    ['adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool']
+    >>> pprint(resp_data['GET']['response_body'])
+    {'content_type': '',
+     'data': {...'adhocracy.sheets.name.IName': {}...},
+     'path': ''}
 
-    >> sorted(resp_data["PUT"]["request_body"]["data"].keys())
-    ['adhocracy.sheets.name.IName']
+"content_type" and "path" will be filled in responses returned by an actual
+GET request. "data" points to an object whose keys are the property sheets
+that are part of the returned resource. The corresponding values will be
+filled during actual GET requests; the stub contains just empty objects
+("{}") instead.
 
-The value for POST gives us list with valid request data stubs::
+If the current user has the right to post new versions of the resource or
+add new details to it, the "request_body" sub-key returned for POST points
+to a array of stub views of allowed requests::
 
-    >> data_post_pool = {'content_type': 'adhocracy.resources.pool.IBasicPool',
-    ...                   'data': {'adhocracy.sheets.name.IName': {}}}  # FIXME: only content types!
-    >> data_post_pool in resp_data["POST"]["request_body"]
+    >>> data_post_pool = {'content_type': 'adhocracy.resources.pool.IBasicPool',
+    ...                   'data': {'adhocracy.sheets.name.IName': {}}}
+    >>> data_post_pool in resp_data["POST"]["request_body"]
     True
 
-FIXME: make the above examples tests once they work!
+The "response_body" sub-key again gives a stub view of the response
+body::
 
-FIXME: postables can be inferred from schema info handed out in the
-global case (to be covered in last section).
+     >>> pprint(resp_data['POST']['response_body'])
+     {'content_type': '', 'path': ''}
 
+If the current user has the right to modify the resource in-place, the
+"request_body" sub-key returned for PUT gives a stub view of how the actual
+request should look like::
 
-  (IName contains a path that must be a valid identifier for this resource.
-The server will test its validity and reject everything that is not, say,
-the path of the resource that this body was posted to plus one fresh
-extra path element.  For details, see backend unit test documentation
-or such.)
+     >>> pprint(resp_data['PUT']['request_body'])
+     {'data': {...'adhocracy.sheets.name.IName': {}...}}
 
-Semantics of read-only and mandatory and optional flags in request / response body.
+The "response_body" sub-key gives, as usual, a stub view of the resulting
+response body::
 
-FIXME: optimize for caching.  but same url has different
-authorizations for same content type under different urls!
-
+     >>> pprint(resp_data['PUT']['response_body'])
+     {'content_type': '', 'path': ''}
 
 
 Basic calls
@@ -195,7 +272,7 @@ Returns only http headers::
 GET
 ~~~
 
-Returns resource and child elements meta data and all propertysheet interfaces with data::
+Returns resource and child elements meta data and all sheet with data::
 
     >>> resp_data = testapp.get("/adhocracy").json
     >>> pprint(resp_data["data"])
@@ -289,30 +366,30 @@ Introduction and Motivation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This section explains updates to resources with version control.  Two
-property sheets are central to version control in adhocracy: IDAG and
-IVersion.  IVersion is in all content objects that support version
+sheets are central to version control in adhocracy: IDAG and
+IVersion.  IVersion is in all resources that support version
 control, and IDAG is a container that manages all versions of a
-particular content object in a directed acyclic graph.
+particular content element in a directed acyclic graph.
 
-IDAG content objects as well as IVersion objects need to be created
+IDAGs as well as IVersions need to be created
 explicitly by the frontend.
 
-The server supports updating a content object that implements IVersion by
-letting you post a content object with missing IVersion property sheet
+The server supports updating a resource that implements IVersion by
+letting you post a content element with missing IVersion sheet
 to the DAG (IVersion is read-only and managed by the server), and
 passing a list of parent versions in the post parameters of the
 request.  If there is only one parent version, the new version either
 forks off an existing branch or just continues a linear history.  If
 there are several parent versions, we have a merge commit.
 
-Example: If a new versionable content object has been created by the
+Example: If a new versionable content element has been created by the
 user, the front-end first posts an IDAG.  The IDAG works a little like
 an IPool in that it allows posting versions to it.  The front-end will
 then simply post the initial version into the IDAG with an empty
 predecessor version list.
 
-IDAG content objects may also implement the IPool property sheet for
-containing further IDAG content objects for sub-structures of
+IDAGs may also implement the IPool sheet for
+containing further IDAGs for sub-structures of
 structured versionable content types.  Example: A document may consist
 of a title, description, and a list of references to sections.
 There is a DAG for each document and each such dag contains one DAG
@@ -367,7 +444,7 @@ The return data has the new attribute 'first_version_path' to get the path first
 Version IDs are numeric and assigned by the server.  The front-end has
 no control over them, and they are not supposed to be human-memorable.
 For human-memorable version pointers that also allow for complex
-update behavior (fixed-commit, always-newest, ...), consider property
+update behavior (fixed-commit, always-newest, ...), consider
 sheet ITags.
 
 The Proposal has the IVersions and ITags interfaces to work with Versions::
@@ -462,7 +539,7 @@ tag names (like 'FIRST') are missing.
 FIXME: should we add a Tag TAG_LAST, to reference the last added version?
 
 FIXME: should the server tell in general where to post speccific
-content interfaces? (like 'like', 'discussion',..)?  in other words,
+content types? (like 'like', 'discussion',..)?  in other words,
 should the client to be able to ask (e.g. with an OPTIONS request)
 where to post a 'like'?
 
@@ -615,12 +692,12 @@ GET /interfaces/..::
 
 GET/POST /workflows/..::
 
-    Get workflow, apply workflow to content object.
+    Get workflow, apply workflow to resource.
 
 
 GET/POST /transitions/..::
 
-    Get available workflow transitions for content object, execute transition.
+    Get available workflow transitions for resource, execute transition.
 
 
 GET /query/..::

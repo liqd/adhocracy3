@@ -131,7 +131,8 @@ class IPool(IResource, IAutoNamingFolder):
     """Folder in the object hierarchy.
 
     Can contain other Pools (subfolders) and Items of any kind.
-    Additional TaggedValue: 'addable_content_interfaces'
+    Additional TaggedValue: 'element_types' (types of resources that can be
+    added to this pool).
 
     """
 
@@ -139,7 +140,7 @@ class IPool(IResource, IAutoNamingFolder):
     taggedValue('basic_sheets',
                 set(['adhocracy.sheets.name.IName',
                      'adhocracy.sheets.pool.IPool']))
-    taggedValue('addable_content_interfaces',
+    taggedValue('element_types',
                 set(['adhocracy.interfaces.IPool']))
     """ Set addable content types, class heritage is honored"""
 
@@ -158,7 +159,7 @@ class IItem(IPool):
                  'adhocracy.sheets.tags.ITags',
                  'adhocracy.sheets.versions.IVersions',
                  'adhocracy.sheets.pool.IPool']))
-    taggedValue('addable_content_interfaces', set([
+    taggedValue('element_types', set([
                 'adhocracy.resources.IItemVersion',
                 'adhocracy.resources.ITag',
                 ]))

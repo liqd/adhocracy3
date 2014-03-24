@@ -4,6 +4,7 @@ from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISimple
 from adhocracy.interfaces import IPool
+from adhocracy.interfaces import ISheet
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
@@ -12,6 +13,10 @@ from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.utils import get_resource_interface
+from adhocracy.utils import strip_optional_prefix
+from adhocracy.utils import to_dotted_name
+from adhocracy.utils import get_all_taggedvalues
+from colander import SchemaNode
 from copy import deepcopy
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
@@ -19,6 +24,8 @@ from cornice.schemas import CorniceSchema
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
+from substanced.interfaces import IRoot
+from substanced.schema import IdSet
 
 import functools
 
@@ -328,6 +335,179 @@ class PoolRESTView(SimpleRESTView):
                     struct['first_version_path'] = resource_path(v)
                     break
         return response_schema.serialize(struct)
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IRoot,
+    name='meta_api'
+)
+class MetaApiView(RESTView):
+
+    """Access to metadata about the API specification of this installation.
+
+    Returns a JSON document describing the existing resources and sheets.
+
+    """
+
+    def _describe_resources(self, resource_types):
+        """Build a description of the resources registered in the system.
+
+        Args:
+          resource_types: list of resource types as returned by the registry
+
+        Returns:
+          A 2-tuple of (resource_map, sheet_set)
+
+          resource_map is a dict (suitable for JSON serialization) that
+          describes all the resources registered in the system.
+
+          sheet_set is a set containing the names of all sheets references by
+          resources.
+
+        """
+        resource_map = {}
+        sheet_set = set()
+
+        for name, value in resource_types.items():
+            prop_map = {}
+            metadata = value['metadata']
+
+            # List of sheets
+            sheets = []
+            if 'basic_sheets' in metadata:
+                sheets.extend(metadata['basic_sheets'])
+            if 'extended_sheets' in metadata:
+                sheets.extend(metadata['extended_sheets'])
+            prop_map['sheets'] = [to_dotted_name(s) for s in sheets]
+            sheet_set.update(sheets)
+
+            # Main element type if this is a pool or item
+            if 'item_type' in metadata:
+                item_type = to_dotted_name(metadata['item_type'])
+                prop_map['item_type'] = item_type
+            else:
+                item_type = None
+
+            # Other addable element types
+            if 'element_types' in metadata:
+                element_types = metadata['element_types']
+                element_names = []
+
+                for typ in element_types:
+                    element_names.append(to_dotted_name(typ))
+
+                prop_map['element_types'] = element_names
+            resource_map[name] = prop_map
+        return resource_map, sheet_set
+
+    def _describe_sheets(self, sheet_metadata):
+        """Build a description of the sheets used in the system.
+
+        Args:
+          sheet_metadata: mapping of sheet names to metadata about them, as
+            returned by the registry
+
+        Returns:
+          A dict (suitable for JSON serialization) that describes the sheets
+          and their fields
+
+        """
+        sheet_map = {}
+        for sheet_name, metadata in sheet_metadata.items():
+            # readonly and createmandatory flags are currently defined for
+            # the whole sheet, but we copy them as attributes into each field
+            # definition, since this might change in the future
+            createmandatory = metadata['createmandatory']
+            readonly = metadata['readonly']
+            fields = []
+
+            # Create field definitions
+            for key, value in metadata.items():
+                fieldname = strip_optional_prefix(key, 'field:')
+
+                # Only process 'field:...' definitions
+                if fieldname != key:
+                    valuetype = type(value.typ)
+                    outertype = type(value.typ)
+
+                    # FIXME: Add additional containertypes such as "list" as
+                    # the need arised
+                    if issubclass(valuetype, IdSet):
+                        containertype = 'set'
+                    else:
+                        containertype = None
+                        # If the outer type is not a container and it's not
+                        # just a generic SchemaNode, we use the outer type
+                        # as "valuetype" since it provides most specific
+                        # information (e.g. "adhocracy.schema.Identifier"
+                        # instead of just "String")
+                        outertype = type(value)
+                        if outertype is not SchemaNode:
+                            valuetype = outertype
+
+                    typ = to_dotted_name(valuetype)
+                    typ = strip_optional_prefix(typ, 'colander.')
+
+                    # Workaround for PathSet: it's actally a set of
+                    # AbsolutePath's
+                    if typ == 'adhocracy.schema.PathSet':
+                        typ = 'adhocracy.schema.AbsolutePath'
+
+                    fielddesc = {
+                        'name': fieldname,
+                        'valuetype': typ,
+                        'createmandatory': createmandatory,
+                        'readonly': readonly,
+                    }
+
+                    if containertype is not None:
+                        fielddesc['containertype'] = containertype
+
+                    fields.append(fielddesc)
+
+            # For now, each sheet definition only contains a 'fields' attribute
+            # listing the defined fields
+            sheet_map[sheet_name] = {'fields': fields}
+
+        return sheet_map
+
+    def _sheet_metadata(self, isheets):
+        """Get dictionary with metadata about sheets.
+
+        Expects an iterable of ISheet interface classes.
+
+        Returns a mapping from sheet identifiers (dotted names) to metadata
+        describing the sheet.
+
+        """
+        sheet_metadata = {}
+
+        for isheet in isheets:
+            if isheet.isOrExtends(ISheet):
+                metadata = get_all_taggedvalues(isheet)
+            sheet_metadata[isheet.__identifier__] = metadata
+
+        return sheet_metadata
+
+    @view_config(request_method='GET')
+    def get(self):
+        """Return the API specification of this installation as JSON."""
+        # Collect info about all resources
+        resource_types = self.registry.resource_types()
+        resource_map, sheet_set = self._describe_resources(resource_types)
+
+        # Collect info about all sheets referenced by any of the resources
+        sheet_metadata = self._sheet_metadata(sheet_set)
+        sheet_map = self._describe_sheets(sheet_metadata)
+
+        struct = {
+            'resources':
+            resource_map,
+            'sheets':
+            sheet_map
+        }
+        return struct
 
 
 def includeme(config):  # pragma: no cover

@@ -79,14 +79,12 @@ class ResourceFactory(object):
         assert iface.isOrExtends(IResource)
         meta = get_all_taggedvalues(iface)
         self.resource_iface = iface
-        self.class_ = res.maybe_resolve(meta['content_class'])
+        self.class_ = meta['content_class']
         self.prop_ifaces = []
-        for i in meta['basic_sheets'].union(meta['extended_sheets']):
-            prop_iface = res.maybe_resolve(i)
+        for prop_iface in meta['basic_sheets'].union(meta['extended_sheets']):
             assert prop_iface.isOrExtends(ISheet)
             self.prop_ifaces.append(prop_iface)
-        self.after_creation = [res.maybe_resolve(call) for call in
-                               meta['after_creation']]
+        self.after_creation = meta['after_creation']
 
     def add(self, context, resource, appstructs):
         """Add to context.

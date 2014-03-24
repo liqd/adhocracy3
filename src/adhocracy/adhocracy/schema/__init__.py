@@ -35,7 +35,7 @@ class AbsolutePath(colander.SchemaNode):
 
 class PathSet(IdSet):
 
-    """ Colander Type to store object paths.
+    """Colander Type to store object paths.
 
     Serialize to a list of absolute object paths (['/o1/o2', '/o3']).
     Deserialize to a list of zodb oids [123123, 4324324].

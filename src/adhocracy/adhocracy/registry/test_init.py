@@ -121,7 +121,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         inst = self._make_one()
         context = testing.DummyResource(__provides__=IResourceB)
         _register_content_type(inst, IResourceB.__identifier__)
-        IResourceB.setTaggedValue('addable_content_interfaces', [])
+        IResourceB.setTaggedValue('element_types', [])
 
         addables = inst.resource_addables(context, testing.DummyRequest())
 
@@ -132,7 +132,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         context = testing.DummyResource(__provides__=IResourceA)
         _register_content_type(inst, IResourceA.__identifier__)
         _register_content_type(inst, IResourceB.__identifier__)
-        IResourceA.setTaggedValue('addable_content_interfaces',
+        IResourceA.setTaggedValue('element_types',
                                   [IResourceB.__identifier__])
         IResourceB.setTaggedValue('basic_sheets', set())
 
@@ -147,7 +147,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         context = testing.DummyResource(__provides__=IResourceA)
         _register_content_type(inst, IResourceA.__identifier__)
         _register_content_type(inst, IResourceBA.__identifier__)
-        IResourceA.setTaggedValue('addable_content_interfaces',
+        IResourceA.setTaggedValue('element_types',
                                   [IResourceA.__identifier__])
         IResourceA.setTaggedValue('basic_sheets', set())
         IResourceBA.setTaggedValue('basic_sheets', set())
@@ -162,7 +162,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         context = testing.DummyResource(__provides__=IResourceA)
         _register_content_type(inst, IResourceA.__identifier__)
         _register_content_type(inst, IResourceB.__identifier__)
-        IResourceA.setTaggedValue('addable_content_interfaces',
+        IResourceA.setTaggedValue('element_types',
                                   [IResourceB.__identifier__])
         IResourceB.setTaggedValue('basic_sheets', set([
                                   ISheetA.__identifier__,
