@@ -670,20 +670,6 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert IResource.__identifier__ in response['resources']
         assert response['resources'][IResource.__identifier__] == {'sheets': []}
 
-    def test_get_resources_with_arbitary_metadata(self):
-        from adhocracy.interfaces import IResource
-        self.resource_types.return_value =\
-            make_resource_types(IResource, {'arbitary': u'stuff'})
-        inst = self.make_one(self.context, self.request)
-        resources_metadata = inst.get()['resources']
-        wanted_resources_metadata = \
-            {IResource.__identifier__: {'other_metadata': u'other',
-                                        'sheets': []}}
-        assert wanted_resources_metadata == resources_metadata
-        # TODO: the simple way to implement the api_meta is just outputting
-        # all taggedvalues. Do we want it this way?
-        # joka 22.03.2014
-
     def test_get_resources_with_sheets_metadata(self):
         from adhocracy.interfaces import ISheet
         from adhocracy.interfaces import IResource
@@ -708,14 +694,11 @@ class MetaApiViewUnitTest(unittest.TestCase):
         resources_metadata = inst.get()['resources']
         wanted_resources_metadata = \
             {IResource.__identifier__:
-             {'extra_element_types': [IResource.__identifier__],
+             {'element_types': [IResource.__identifier__, IItemVersion.__identifier__],
               'main_element_type': IItemVersion.__identifier__,
               'sheets': []}}
-        # TODO: why is IItemVersion not shown in extra_element_types?
-        # TODO: make sure meta_api and taggedValues are using the same names
-        # (extra_element_types, main_element_type vs addable_content_interf..)
-        # joka 22.03.2014
         assert wanted_resources_metadata == resources_metadata
+        # FIXME: change tagged values from *addable_* / item_type / ... to {,main_}element_type
 
     def test_get_sheets(self):
         from adhocracy.interfaces import ISheet
@@ -747,7 +730,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert field_metadata['createmandatory'] is False
         assert field_metadata['readonly'] is False
         assert field_metadata['name'] == 'test'
-        assert 'listtype' in field_metadata
+        assert 'containertype' in field_metadata
         assert 'valuetype' in field_metadata
 
     def test_get_sheets_with_field_colander_noniteratable(self):
@@ -764,12 +747,9 @@ class MetaApiViewUnitTest(unittest.TestCase):
         sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
 
         field_metadata = sheet_metadata['fields'][0]
-        assert field_metadata['listtype'] == 'single'
+        assert 'containertype' not in field_metadata
         assert field_metadata['valuetype'] == 'Integer'
-        # TODO: "listtype: single, valuetype: Integer" sounds a bit wired for
-        # me, because Integer is not a list type at all. Maybe "valuetype", and
-        # optional "list_valuetype" for iteratables?
-        # joka
+        # TODO: (write tests for all actual container types.  also fix this in rest_api.rst.)
 
     def test_get_sheets_with_field_adhocracy_noniteratable(self):
         from adhocracy.interfaces import ISheet
@@ -785,9 +765,8 @@ class MetaApiViewUnitTest(unittest.TestCase):
         sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
 
         field_metadata = sheet_metadata['fields'][0]
-        assert field_metadata['listtype'] == 'single'
+        assert field_metadata['containertype'] == 'single'
         assert field_metadata['valuetype'] == 'Identifier'
-        #TODO this should be 'Identifier' instead of String. joka
 
     def test_get_sheets_with_field_adhocracy_referenceset(self):
         from adhocracy.interfaces import ISheet
@@ -805,10 +784,8 @@ class MetaApiViewUnitTest(unittest.TestCase):
         sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
 
         field_metadata = sheet_metadata['fields'][0]
-        assert field_metadata['listtype'] == 'set'
+        assert field_metadata['containertype'] == 'set'
         assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
-        # TODO Why do we remove the prefix 'colander.' but not
-        # 'adhocracy.schema.'? joka
 
     def test_get_sheets_with_field_adhocracy_referenceset_with_dotted(self):
         from adhocracy.interfaces import ISheet
@@ -825,5 +802,5 @@ class MetaApiViewUnitTest(unittest.TestCase):
         sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
 
         field_metadata = sheet_metadata['fields'][0]
-        assert field_metadata['listtype'] == 'set'
+        assert field_metadata['containertype'] == 'set'
         assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
