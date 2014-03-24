@@ -86,7 +86,7 @@ class DummyPropertysheet(object):
 def make_resource_types(iresource, metadata):
     """Helper method that assembles dummy resource metadata.
 
-    It returns the same structure like the resource_types method from
+    It returns the same structure as the resource_types method from
     adhocracy.registry.
 
     """
