@@ -96,7 +96,7 @@ def get_all_taggedvalues(iface):
     for key, value in taggedvalues.items():
         if key in ['basic_sheets',
                    'extended_sheets',
-                   'addable_content_interfaces',
+                   'element_types',
                    'after_creation']:
             value_ = set([res.maybe_resolve(x) for x in value])
             taggedvalues[key] = value_

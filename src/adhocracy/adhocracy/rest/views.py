@@ -16,6 +16,7 @@ from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
 from adhocracy.utils import get_all_taggedvalues
+from colander import SchemaNode
 from copy import deepcopy
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
@@ -383,23 +384,20 @@ class MetaApiView(RESTView):
 
             # Main element type if this is a pool or item
             if 'item_type' in metadata:
-                main_element_type = to_dotted_name(metadata['item_type'])
-                prop_map['main_element_type'] = main_element_type
+                item_type = to_dotted_name(metadata['item_type'])
+                prop_map['item_type'] = item_type
             else:
-                main_element_type = None
+                item_type = None
 
             # Other addable element types
-            if 'addable_content_interfaces' in metadata:
-                extra_element_types = metadata['addable_content_interfaces']
-                extra_element_names = []
+            if 'element_types' in metadata:
+                element_types = metadata['element_types']
+                element_names = []
 
-                for typ in extra_element_types:
-                    dotted_name = to_dotted_name(typ)
-                    # Skip main element type
-                    if not dotted_name == main_element_type:
-                        extra_element_names.append(dotted_name)
+                for typ in element_types:
+                    element_names.append(to_dotted_name(typ))
 
-                prop_map['extra_element_types'] = extra_element_names
+                prop_map['element_types'] = element_names
             resource_map[name] = prop_map
         return resource_map, sheet_set
 
@@ -431,13 +429,22 @@ class MetaApiView(RESTView):
                 # Only process 'field:...' definitions
                 if fieldname != key:
                     valuetype = type(value.typ)
+                    outertype = type(value.typ)
 
-                    # FIXME: Add additional listtypes such as "list" as the
-                    # need arised
+                    # FIXME: Add additional containertypes such as "list" as
+                    # the need arised
                     if issubclass(valuetype, IdSet):
-                        listtype = 'set'
+                        containertype = 'set'
                     else:
-                        listtype = 'single'
+                        containertype = None
+                        # If the outer type is not a container and it's not
+                        # just a generic SchemaNode, we use the outer type
+                        # as "valuetype" since it provides most specific
+                        # information (e.g. "adhocracy.schema.Identifier"
+                        # instead of just "String")
+                        outertype = type(value)
+                        if outertype is not SchemaNode:
+                            valuetype = outertype
 
                     typ = to_dotted_name(valuetype)
                     typ = strip_optional_prefix(typ, 'colander.')
@@ -450,10 +457,13 @@ class MetaApiView(RESTView):
                     fielddesc = {
                         'name': fieldname,
                         'valuetype': typ,
-                        'listtype': listtype,
                         'createmandatory': createmandatory,
                         'readonly': readonly,
                     }
+
+                    if containertype is not None:
+                        fielddesc['containertype'] = containertype
+
                     fields.append(fielddesc)
 
             # For now, each sheet definition only contains a 'fields' attribute

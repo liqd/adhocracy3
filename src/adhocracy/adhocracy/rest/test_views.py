@@ -688,17 +688,20 @@ class MetaApiViewUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IItemVersion
         self.resource_types.return_value = make_resource_types(
             IResource,
-            {'addable_content_interfaces': set([IItemVersion, IResource]),
+            {'element_types': set([IItemVersion, IResource]),
              'item_type': IItemVersion})
         inst = self.make_one(self.context, self.request)
         resources_metadata = inst.get()['resources']
-        wanted_resources_metadata = \
-            {IResource.__identifier__:
-             {'element_types': [IResource.__identifier__, IItemVersion.__identifier__],
-              'main_element_type': IItemVersion.__identifier__,
-              'sheets': []}}
-        assert wanted_resources_metadata == resources_metadata
-        # FIXME: change tagged values from *addable_* / item_type / ... to {,main_}element_type
+        wanted_element_types = sorted([IItemVersion.__identifier__,
+                                       IResource.__identifier__])
+        wanted_item_type = IItemVersion.__identifier__
+        wanted_sheets = []
+        assert IResource.__identifier__ in resources_metadata
+        this_resource_metadata = resources_metadata[IResource.__identifier__]
+        assert wanted_element_types == sorted(
+                this_resource_metadata['element_types'])
+        assert wanted_item_type == this_resource_metadata['item_type']
+        assert wanted_sheets == this_resource_metadata['sheets']
 
     def test_get_sheets(self):
         from adhocracy.interfaces import ISheet
@@ -730,7 +733,6 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert field_metadata['createmandatory'] is False
         assert field_metadata['readonly'] is False
         assert field_metadata['name'] == 'test'
-        assert 'containertype' in field_metadata
         assert 'valuetype' in field_metadata
 
     def test_get_sheets_with_field_colander_noniteratable(self):
@@ -749,7 +751,6 @@ class MetaApiViewUnitTest(unittest.TestCase):
         field_metadata = sheet_metadata['fields'][0]
         assert 'containertype' not in field_metadata
         assert field_metadata['valuetype'] == 'Integer'
-        # TODO: (write tests for all actual container types.  also fix this in rest_api.rst.)
 
     def test_get_sheets_with_field_adhocracy_noniteratable(self):
         from adhocracy.interfaces import ISheet
@@ -765,8 +766,8 @@ class MetaApiViewUnitTest(unittest.TestCase):
         sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
 
         field_metadata = sheet_metadata['fields'][0]
-        assert field_metadata['containertype'] == 'single'
-        assert field_metadata['valuetype'] == 'Identifier'
+        assert 'containertype' not in field_metadata
+        assert field_metadata['valuetype'] == 'adhocracy.schema.Identifier'
 
     def test_get_sheets_with_field_adhocracy_referenceset(self):
         from adhocracy.interfaces import ISheet

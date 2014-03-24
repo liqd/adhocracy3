@@ -20,10 +20,10 @@ class IProposal(IItem):
 
     """All versions of a Proposal."""
 
-    taggedValue('addable_content_interfaces', set([ITag,
-                                                   ISection,
-                                                   IProposalVersion,
-                                                   ]))
+    taggedValue('element_types', set([ITag,
+                                      ISection,
+                                      IProposalVersion,
+                                      ]))
     taggedValue('item_type', IProposalVersion)
 
 

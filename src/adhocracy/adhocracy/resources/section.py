@@ -19,8 +19,7 @@ class ISection(IItem):
 
     """Section Versions Pool."""
 
-    taggedValue('addable_content_interfaces', set([ITag,
-                                                   ISectionVersion]))
+    taggedValue('element_types', set([ITag, ISectionVersion]))
     taggedValue('item_type', ISectionVersion)
 
 

@@ -65,7 +65,7 @@ class ResourceContentRegistry(ContentRegistry):
                   {
                     'name': "adhocracy.resources.IResourceA",
                     'iface': adhocracy.resource.interface.IResourceA.__class__,
-                    'metadata': {"addable_content_interfaces": [...], ...}
+                    'metadata': {"element_types": [...], ...}
                   }
                   ...
                 }
@@ -95,7 +95,7 @@ class ResourceContentRegistry(ContentRegistry):
         Returns:
             dic: resource types with property sheet names
 
-            The list is generated based on the 'addable_content_interfaces'
+            The list is generated based on the 'element_types'
             taggedValue, resource type interface inheritage and permissions.
 
             example::
@@ -111,7 +111,7 @@ class ResourceContentRegistry(ContentRegistry):
         name = get_resource_interface(context).__identifier__
         assert name in all_types
         metadata = all_types[name]['metadata']
-        addables = metadata.get('addable_content_interfaces', [])
+        addables = metadata.get('element_types', [])
         #get all addable types
         addable_types = []
         for type in all_types.values():

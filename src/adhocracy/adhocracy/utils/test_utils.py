@@ -60,7 +60,7 @@ def test_get_all_taggedvalues_iitem_normalize_dotted_string_to_callable():
         taggedValue('after_creation', set([Interface.__identifier__]))
         taggedValue('basic_sheets', set([Interface.__identifier__]))
         taggedValue('extended_sheets', set([Interface.__identifier__]))
-        taggedValue('addable_content_interfaces',
+        taggedValue('element_types',
                     set([Interface.__identifier__]))
 
     metadata = get_all_taggedvalues(IA)
@@ -74,7 +74,7 @@ def test_get_all_taggedvalues_iitem_normalize_dotted_string_to_callable():
     assert metadata['basic_sheets'] == set([Interface])
     assert 'extended_sheets' in IResource.getTaggedValueTags()
     assert metadata['extended_sheets'] == set([Interface])
-    assert 'addable_content_interfaces' in IItem.getTaggedValueTags()
-    assert metadata['addable_content_interfaces'] == set([Interface])
+    assert 'element_types' in IItem.getTaggedValueTags()
+    assert metadata['element_types'] == set([Interface])
 
 #FIXME: more tests

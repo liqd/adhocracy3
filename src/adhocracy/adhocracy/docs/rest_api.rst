@@ -126,23 +126,23 @@ of the sheets implemented by the resource::
     >>> sorted(basicpool_desc['sheets'])
     ['adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool'...]
 
-If the resource is an item, it will also have a "main_element_type" key
-whose value is the type of versions managed by this item (e.g. a Section
-will manage SectionVersions as main element type)::
+If the resource is an item, it will also have a "item_type" key whose value
+is the type of versions managed by this item (e.g. a Section will manage
+SectionVersions as main element type)::
 
     >>> section_desc = resp_data['resources']['adhocracy.resources.section.ISection']
-    >>> section_desc['main_element_type']
+    >>> section_desc['item_type']
     'adhocracy.resources.section.ISectionVersion'
 
-If the resource is a pool or item that can contain resources of other
-kinds, it will also have an "extra_element_types" key whose value is the
-list of other resources the pool/item can contain (e.g. a pool can contain
-other pools; a section can contain tags)::
+If the resource is a pool or item that can contain resources, it will also
+have an "element_types" key whose value is the list of all resources the
+pool/item can contain (including the "item_type" if it's an item). For
+example, a pool can contain other pools; a section can contain tags. ::
 
-    >>> basicpool_desc['extra_element_types']
+    >>> basicpool_desc['element_types']
     ['adhocracy.interfaces.IPool'...]
-    >>> section_desc['extra_element_types']
-    ['adhocracy.interfaces.ITag'...]
+    >>> sorted(section_desc['element_types'])
+    ['adhocracy.interfaces.ITag', ...'adhocracy.resources.section.ISectionVersion'...]
 
 The "sheets" key points to an object whose keys are all the sheets
 implemented by any of the resources::
@@ -156,32 +156,34 @@ describing the fields defined by the sheet:
 
     >>> pprint(resp_data['sheets']['adhocracy.sheets.name.IName']['fields'][0])
     {'createmandatory': False,
-     'listtype': 'single',
      'name': 'name',
      'readonly': False,
-     'valuetype': 'String'}
+     'valuetype': 'adhocracy.schema.Identifier'}
 
 Each field definition has the following keys:
 
 name
-  The field name
+    The field name
 
 createmandatory
-  Flag specifying whether the field must be set if the sheet is created
+    Flag specifying whether the field must be set if the sheet is created
 
 readonly
-  Flag specifying whether the field can be set by the user (if true, it's
-  automatically set by the server)
-
-listtype
-  Specifies whether the field contains just a "single" value, a "list" of
-  values (order matters, duplicates are allowed), or a "set" of values
-  (unordered, no duplicates).
+    Flag specifying whether the field can be set by the user (if true, it's
+    automatically set by the server)
 
 valuetype
-  The type of values stored in the field, either a basic type (as defined
-  by Colander) such as "String" or "Int", or a custom-defined type such as
-  "adhocracy.schema.AbsolutePath"
+    The type of values stored in the field, either a basic type (as defined
+    by Colander) such as "String" or "Integer", or a custom-defined type
+    such as "adhocracy.schema.AbsolutePath"
+
+There also is an optional key:
+
+containertype
+    Only present if the field can store multiple values (each of the type
+    specified by the "valuetype" attribute). If present, the value of this
+    attribute is either "list" (a list of values: order matters, duplicates
+    are allowed) or "set" (a set of values: unordered, no duplicates).
 
 
 OPTIONS
