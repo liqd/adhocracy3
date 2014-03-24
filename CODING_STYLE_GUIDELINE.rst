@@ -32,12 +32,14 @@ Docstring formatting
 ++++++++++++++++++++
 
     * pep257 (must, bei tests und zope.Interface classes should)
-    function definition google style (input, output, raises) (should) http://sphinxcontrib-napoleon.readthedocs.org/en/latest/example_google.html. In Future use python 3 annotations for type checking and sphinx docu generation (for example: mypy interperter or https://pypi.python.org/pypi/sphinx_typesafe/0.2)
+    * Public function/method docstring in google style (Args: Returns: Raises:, http://sphinxcontrib-napoleon.readthedocs.org/en/latest/example_google.html. (must)
+      In Future maybe use python 3 annotations for type checking and sphinx docu generation (for example: mypy interperter or https://pypi.python.org/pypi/sphinx_typesafe/0.2)
 
 Imports
 +++++++
 
     * sort alphabetical, empty line between import .. and import .. from statements.
+    * one import per line
     * don't use * to import everything from a module
     * don't use relative import paths
     * dont catch ImportError to detect wheter a package is available or not, as it might hide circular import errors. Instead use pkgresources.getdistribution and catch DistributionNotFound. (http://do3.cc/blog/2010/08/20/do-not-catch-import-errors,-use-pkg_resources/)

@@ -30,7 +30,6 @@ class ResourceContentRegistry(ContentRegistry):
             dic: key - sheet name (interface identifier), value - sheet object.
 
         """
-
         assert IResource.providedBy(context)
         sheets = {}
         ifaces = [i for i in providedBy(context) if i.isOrExtends(ISheet)]

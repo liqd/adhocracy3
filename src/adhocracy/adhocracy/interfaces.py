@@ -165,7 +165,7 @@ class IItem(IPool):
                 ]))
     taggedValue(
         'after_creation',
-        ["adhocracy.resources.item_create_initial_content"])
+        ['adhocracy.resources.item_create_initial_content'])
     taggedValue('item_type',
                 'adhocracy.resources.IItemVersion')
     """Type of versions in this item. Subtypes have to override."""
@@ -232,7 +232,7 @@ class AdhocracyReferenceClass(ReferenceClass):
 
 
 AdhocracyReferenceType = AdhocracyReferenceClass(
-    "AdhocracyReferenceType", __module__='adhocracy.interfaces')
+    'AdhocracyReferenceType', __module__='adhocracy.interfaces')
 
 
 class IItemNewVersionAdded(IObjectEvent):
