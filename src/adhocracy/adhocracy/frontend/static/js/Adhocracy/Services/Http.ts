@@ -84,11 +84,11 @@ export var exportContent : (obj : Types.Content) => Types.Content
 };
 
 var contentTypeNameSpaces = {
-    "adhocracy.contents.interfaces": "C"
+    "adhocracy.resources": "R"
 };
 
 var propertyTypeNameSpaces = {
-    "adhocracy.propertysheets.interfaces": "P"
+    "adhocracy.sheets": "S"
 };
 
 function shortenType(nameSpaces) {
@@ -105,7 +105,7 @@ function unshortenType(nameSpaces) {
     return s => {
         var t = s;
         for (var k in nameSpaces) {
-            t = t.replace(new RegExp("^" + nameSpaces[k] + "(\\.[^\\.]+)$"), k + "$1");
+            t = t.replace(new RegExp("^" + nameSpaces[k] + "\\.(.+)$"), k + ".$1");
         }
         return t;
     };

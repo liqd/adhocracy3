@@ -51,15 +51,17 @@ export function run() {
     // services
 
     app.factory("adhHttp",   ["$http",                                    AdhHttp.factory]);
-    app.factory("adhWS",     ["adhHttp",                                  AdhWS.factory]);
-    app.factory("adhCache",  ["adhHttp", "adhWS", "$q", "$cacheFactory",  AdhCache.factory]);
+
+    // FIXME: web sockets and cache services are defunct
+    // app.factory("adhWS",     ["adhHttp",                                  AdhWS.factory]);
+    // app.factory("adhCache",  ["adhHttp", "adhWS", "$q", "$cacheFactory",  AdhCache.factory]);
 
 
     // filters
 
     app.filter("viewFilterList", [ function() {
         return function(obj : Types.Content) : string {
-            return obj.data["P.IDocument"].title;
+            return obj.data["adhocracy.sheets.IDocument"].title;
         };
     }]);
 
@@ -67,25 +69,23 @@ export function run() {
     // controllers
 
     app.controller("AdhDocumentTOC",
-                   ["adhCache", "$scope",
-                    function(adhCache    : AdhCache.IService,
-                             $scope      : IDocumentWorkbenchScope) : void
+                   ["adhHttp", "$scope",
+                    function(adhHttp  : AdhHttp.IService,
+                             $scope   : IDocumentWorkbenchScope) : void
     {
         console.log("TOC: " + $scope.$id);
 
-        // FIXME: when and how do i unsubscribe?  (applies to all subscriptions in this module.)
-
-        adhCache.get(AdhHttp.jsonPrefix, true, function(pool) {
+        adhHttp.get(AdhHttp.jsonPrefix).then((pool) => {
             $scope.pool = pool;
             $scope.poolEntries = [];
 
             // FIXME: factor out getting the head version of a DAG.
 
             function fetchDocumentHead(n : number, dag : Types.Content) : void {
-                var dagPS = dag.data["P.IDAG"];
+                var dagPS = dag.data["adhocracy.sheets.IDAG"];
                 if (dagPS.versions.length > 0) {
                     var headPath = dagPS.versions[0].path;
-                    adhCache.get(headPath, false, function(headContent) {
+                    adhHttp.get(headPath).then((headContent) => {
                         if (n in $scope.poolEntries) {
                             // leave original headContentRef intact,
                             // just replace subscription handle and
@@ -100,11 +100,11 @@ export function run() {
             }
 
             function init() {
-                var dagRefs : Types.Reference[] = pool.data["P.IPool"].elements;
+                var dagRefs : Types.Reference[] = pool.data["adhocracy.sheets.pool.IPool"].elements;
                 for (var dagRefIx in dagRefs) {
                     (function(dagRefIx : number) {
                         var dagRefPath : string = dagRefs[dagRefIx].path;
-                        adhCache.get(dagRefPath, true, (dag) => fetchDocumentHead(dagRefIx, dag));
+                        adhHttp.get(dagRefPath).then((dag) => fetchDocumentHead(dagRefIx, dag));
                     })(dagRefIx);
                 }
             }
@@ -115,9 +115,9 @@ export function run() {
 
 
     app.controller("AdhDocumentDetail",
-                   ["adhCache", "$scope",
-                    function(adhCache    : AdhCache.IService,
-                             $scope      : IDocumentDetailScope) : void
+                   ["adhHttp", "$scope",
+                    function(adhHttp  : AdhHttp.IService,
+                             $scope   : IDocumentDetailScope) : void
     {
         $scope.list = function() {
             $scope.doc.viewmode = "list";
@@ -132,13 +132,15 @@ export function run() {
         };
 
         $scope.reset = function() {
-            adhCache.get($scope.doc.content.path, false, (obj) => { $scope.doc.content = obj; });
+            adhHttp.get($scope.doc.content.path).then((obj) => { $scope.doc.content = obj; });
             $scope.doc.viewmode = "display";
         };
 
         $scope.commit = function() {
             console.log("doc-commit: ", $scope.doc, $scope.doc.content.path);
-            adhCache.commit($scope.doc.content.path, $scope.doc.content);
+
+            adhHttp.postNewVersion($scope.doc.content.path, $scope.doc.content);
+
             $scope.$broadcast("commit");
             $scope.doc.viewmode = "display";
         };
@@ -146,9 +148,9 @@ export function run() {
 
 
     app.controller("AdhParagraphDetail",
-                   ["adhCache", "$scope",
-                    function(adhCache  : AdhCache.IService,
-                             $scope    : IParagraphDetailScope) : void
+                   ["adhHttp", "$scope",
+                    function(adhHttp  : AdhHttp.IService,
+                             $scope   : IParagraphDetailScope) : void
     {
         function update(content : Types.Content) {
             console.log("par-update: " + $scope.parref.path);
@@ -157,16 +159,11 @@ export function run() {
 
         function commit(event, ...args) {
             console.log("par-commit: " + $scope.parref.path);
-            adhCache.commit($scope.parcontent.path, $scope.parcontent);
-
-            // FIXME: the commit-triggered update will be followed by
-            // a redundant update triggered by the web socket event.
-            // not sure what's the best way to tweak this.  shouldn't
-            // do any harm besides the overhead though.
+            adhHttp.postNewVersion($scope.parcontent.path, $scope.parcontent);
         }
 
-        // keep pristine copy in sync with cache.
-        adhCache.get($scope.parref.path, true, update);
+        // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
+        adhHttp.get($scope.parref.path).then(update);
 
         // save working copy on 'commit' event from containing document.
         $scope.$on("commit", commit);
