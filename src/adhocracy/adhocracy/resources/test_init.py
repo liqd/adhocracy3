@@ -175,7 +175,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         om = self.context.__objectmap__
         om.connect(other_version, old_version, AdhocracyReferenceType)
         new_version_data = {IVersionable.__identifier__:
-                            {"follows": [old_version.__oid__]}}
+                            {'follows': [old_version.__oid__]}}
         self.make_one(appstructs=new_version_data)
 
         assert len(events) == 2
