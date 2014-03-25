@@ -32,26 +32,29 @@ def collect_reftypes(objectmap, excluded_fields = []):
 def _check_ancestry(objectmap, reftypes, startnode, descendant,
        checked_children):
     """Helper method that recursively checks for an ancestry relation."""
-    if startnode not in checked_children:  # Avoid checking a node twice
-        checked_children.add(startnode)
-        unchecked_children = set()
+    if startnode == descendant:
+        return True  # Got it already!
+    if startnode in checked_children:
+        return False  # Node was already checked, no need to do it again
 
-        # Check outgoing connections of the requested types
-        for reftype in reftypes:
-            for node in objectmap.targets(startnode, reftype):
-                if node == descendant:
-                    return True  # Got it!
-                if node not in checked_children and node not in \
-                        unchecked_children:
-                    # We'll have to check this node
-                    unchecked_children.add(node)
+    checked_children.add(startnode)
+    unchecked_children = set()
 
-        # Check any unchecked_children
-        for node in unchecked_children:
-            gotit = _check_ancestry(objectmap, reftypes, node, descendant,
-                    checked_children)
-            if gotit:
-                return True
+    # Check outgoing connections of the requested types
+    for reftype in reftypes:
+        for node in objectmap.targets(startnode, reftype):
+            if node == descendant:
+                return True  # Got it!
+            if node not in checked_children and node not in unchecked_children:
+                # We'll have to check this node
+                unchecked_children.add(node)
+
+    # Check any unchecked_children
+    for node in unchecked_children:
+        gotit = _check_ancestry(objectmap, reftypes, node, descendant,
+                checked_children)
+        if gotit:
+            return True
 
     return False  # Sorry, not found
 
