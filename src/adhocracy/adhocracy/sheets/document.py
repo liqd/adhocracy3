@@ -54,6 +54,19 @@ class ISection(ISheet, ISheetReferenceAutoUpdateMarker):
         ))
 
 
+@provider(IIResourcePropertySheet)
+class IParagraph(ISheet, ISheetReferenceAutoUpdateMarker):
+
+    """Marker interface representing a document paragraph."""
+
+    taggedValue('field:content',
+                colander.SchemaNode(colander.String(),
+                                    default='',
+                                    missing=colander.drop,
+                                    )
+                )
+
+
 class IDocumentElementsReference(AdhocracyReferenceType):
 
     """IDocument reference."""
@@ -72,6 +85,15 @@ class ISectionElementsReference(AdhocracyReferenceType):
     target_isheet = ISection
 
 
+class IParagraphElementsReference(AdhocracyReferenceType):
+
+    """IParagraph reference."""
+
+    source_isheet = ISection
+    source_isheet_field = 'elements'
+    target_isheet = IParagraph
+
+
 def includeme(config):
     """Register adapter."""
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
@@ -79,4 +101,7 @@ def includeme(config):
                                     IResourcePropertySheet)
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
                                     (ISection, IIResourcePropertySheet),
+                                    IResourcePropertySheet)
+    config.registry.registerAdapter(ResourcePropertySheetAdapter,
+                                    (IParagraph, IIResourcePropertySheet),
                                     IResourcePropertySheet)
