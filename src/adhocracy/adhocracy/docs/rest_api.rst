@@ -486,6 +486,45 @@ Create a new version of the proposal that follows the first version ::
 Add and update child resource
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+We expect certain Versionable fields for the rest of this test suite
+to work ::
+
+    >>> resp = testapp.get('/meta_api')
+    >>> pprint(resp.json['sheets']['adhocracy.sheets.versions.IVersionable']['fields'])
+    [
+        {
+            'containertype': 'set',
+            'createallowed': true,
+            'createmandatory': false,
+            'name': 'follows',
+            'readonly': true
+            'valuetype': 'adhocracy.schema.AbsolutePath',
+        },
+        {
+            'containertype': 'set',
+            'createallowed': true,
+            'createmandatory': false,
+            'name': 'followed_by',
+            'readonly': true
+            'valuetype': 'adhocracy.schema.AbsolutePath',
+        },
+        {
+            'containertype': 'set',
+            'createallowed': true,
+            'createmandatory': false,
+            'name': 'root_versions',
+            'readonly': true
+            'valuetype': 'adhocracy.schema.AbsolutePath',
+        }
+    ]
+
+(The 'createallowed' field indicates that the field may or may not be
+present in the initially posted content element, even if it is
+otherwise 'readonly'.)
+
+FIXME: the entire above section may want to go to the meta_api section
+in this file.
+
 Create a Section item inside the Proposal item::
 
     >>> sdag = {'content_type': 'adhocracy.resources.section.ISection',
