@@ -1,8 +1,8 @@
+from adhocracy.folder import ResourcesAutolNamingFolder
 from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.interfaces import IItemVersion
-from adhocracy.interfaces import IResource
-from adhocracy.sheets.document import IDocument
-from adhocracy.sheets.versions import IVersionable
+from adhocracy.resources import ResourceFactory
+from adhocracy.sheets.versions import IVersionableFollowsReference
 from pyramid import testing
 from substanced.objectmap import ObjectMap
 from . import is_ancestor
@@ -15,21 +15,16 @@ class GraphUnitTest(unittest.TestCase):
     def new_objectid(self):
         return self.objectmap.new_objectid()
 
-    def make_one(self, path):
+    def make_one(self, iface=None, appstructs={}):
         """Make a resource ."""
-        resource = testing.DummyResource(__parent__=self.context)
-        self.objectmap.add(resource, (path,))
-        return resource
-
+        return ResourceFactory(iface or IItemVersion)(self.context,
+                                                      appstructs=appstructs)
     def setUp(self):
         self.config = testing.setUp()
-        context = testing.DummyResource()
-        self.objectmap =ObjectMap(context)
-        context.__objectmap__ = self.objectmap
-        self.objectmap.add(context, ('parent',))
+        context = ResourcesAutolNamingFolder()
+        context.__objectmap__ = ObjectMap(context)
         self.context = context
-        # create dummy child
-        self.child = self.make_one('child')
+        self.child = self.make_one()
 
     def tearDown(self):
         testing.tearDown()
@@ -55,27 +50,65 @@ class GraphUnitTest(unittest.TestCase):
         assert result is True
 
     def test_is_ancestor_direct_link(self):
-        """True if direct AdhocracyReferenceType link from ancestor to descendent."""
-        ancestor = self.make_one('anc')
-        self.objectmap.connect(ancestor, self.child, AdhocracyReferenceType)
-        assert [self.child] == list(self.objectmap.targets(ancestor,
-            AdhocracyReferenceType))
-        assert [ancestor] == list(self.objectmap.sources(self.child,
-            AdhocracyReferenceType))
-        result = is_ancestor(ancestor, self.child)
+        """True if direct AdhocracyReferenceType link from ancestor to
+        descendent.
+
+        """
+        root = self.make_one()
+        element = self.make_one()
+        om = self.context.__objectmap__
+        om.connect(root, element, AdhocracyReferenceType)
+        result = is_ancestor(root, element)
         assert result is True
+        # Inverse relation should NOT be found
+        result = is_ancestor(element, root)
+        assert result is False
 
-## TODO
-##    def test_is_ancestor_direct_link(self):
-##        """"False if direct follows link from root to offspring."""
-##        old_version = self.make_one()
-##        new_version_data = {IVersionable.__identifier__:
-##                            {'follows': [old_version.__oid__]}}
-##        self.make_one(appstructs=new_version_data)
-##        new_version = self.make_one()
-##        result = is_ancestor(old_version, new_version)
-##        assert result is False
+    def test_is_ancestor_direct_follows_link(self):
+        """False if direct IVersionableFollowsReference link from ancestor to
+        descendent.
 
-# TODO True if indirect element/contains/comments link from A to D
-# TODO False if C is element of A and D follows C
-# TODO False if direct element link from D to A
+        """
+        other_version = self.make_one()
+        old_version = self.make_one()
+        om = self.context.__objectmap__
+        om.connect(other_version, old_version, IVersionableFollowsReference)
+        result = is_ancestor(other_version, old_version)
+        assert result is False
+        # Inverse relation should not be found either
+        result = is_ancestor(old_version, other_version)
+        assert result is False
+
+    def test_is_ancestor_indirect_link(self):
+        """True if two-level AdhocracyReferenceType link from ancestor to
+        descendent.
+
+        """
+        grandma = self.make_one()
+        dad = self.make_one()
+        daugher = self.make_one()
+        om = self.context.__objectmap__
+        om.connect(grandma, dad, AdhocracyReferenceType)
+        om.connect(dad, daugher, AdhocracyReferenceType)
+        result = is_ancestor(grandma, daugher)
+        assert result is True
+        # Inverse relation should NOT be found
+        result = is_ancestor(daugher, grandma)
+        assert result is False
+
+    def test_is_ancestor_indirect_follows_link(self):
+        """True if two-level link from ancestor to descendent that includes a
+        follows relation.
+
+        """
+        dad = self.make_one()
+        daugher = self.make_one()
+        step_son = self.make_one()
+        om = self.context.__objectmap__
+        om.connect(dad, daugher, AdhocracyReferenceType)
+        om.connect(step_son, daugher, IVersionableFollowsReference)
+        result = is_ancestor(dad, step_son)
+        assert result is False
+        # Inverse relation should not be found either
+        result = is_ancestor(step_son, dad)
+        assert result is False

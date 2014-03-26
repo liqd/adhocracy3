@@ -466,7 +466,7 @@ Fetch the first Proposal Version, it is empty ::
     {'description': '', 'elements': [], 'title': ''}
 
     >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])
-    {'follows': []}
+    {'follows': [], 'root_versions': []}
 
 Create a new version of the proposal that follows the first version ::
 
