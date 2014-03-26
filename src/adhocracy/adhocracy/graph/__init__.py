@@ -4,7 +4,7 @@ from adhocracy.interfaces import AdhocracyReferenceType
 from substanced.objectmap import find_objectmap
 
 
-def collect_reftypes(objectmap, excluded_fields = []):
+def collect_reftypes(objectmap, excluded_fields=[]):
     """Collect all Adhocracy reference types except those excluded.
 
     Args:
@@ -30,8 +30,12 @@ def collect_reftypes(objectmap, excluded_fields = []):
 
 
 def _check_ancestry(objectmap, reftypes, startnode, descendant,
-       checked_children):
-    """Helper method that recursively checks for an ancestry relation."""
+                    checked_children):
+    """Helper method that recursively checks for an ancestry relation.
+
+    Returns True if an ancestry relation was found, False otherwise.
+
+    """
     if startnode == descendant:
         return True  # Got it already!
     if startnode in checked_children:
@@ -52,7 +56,7 @@ def _check_ancestry(objectmap, reftypes, startnode, descendant,
     # Check any unchecked_children
     for node in unchecked_children:
         gotit = _check_ancestry(objectmap, reftypes, node, descendant,
-                checked_children)
+                                checked_children)
         if gotit:
             return True
 
@@ -86,4 +90,4 @@ def is_ancestor(ancestor, descendant):
     reftypes = collect_reftypes(objectmap, ['follows'])
     checked_children = set()
     return _check_ancestry(objectmap, reftypes, ancestor, descendant,
-        checked_children)
+                           checked_children)
