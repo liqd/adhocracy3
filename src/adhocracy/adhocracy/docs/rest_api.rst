@@ -571,6 +571,34 @@ a fourth Proposal version is automatically created with it ::
                   '/adhocracy/Proposals/kommunismus/VERSION_0000002',
                   '/adhocracy/Proposals/kommunismus/VERSION_0000003']}
 
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000003')
+    >>> pvrs3_path = resp.json['path']
+
+When creating a third Section version, use the 'root_versions'
+attribute to make sure only the active Proposal version is updated ::
+
+    >>> svrs['data']['adhocracy.sheets.document.ISection']['title'] = 'Ein Gespenst'
+    >>> svrs['data']['adhocracy.sheets.versions.IVersionable']['follows'] = [svrs1_path]
+    >>> svrs['data']['adhocracy.sheets.versions.IVersionable']['root_versions'] = [pvrs3_path]
+    >>> resp = testapp.post_json(sdag_path, svrs)
+    >>> svrs2_path = resp.json['path']
+    >>> svrs2_path != svrs1_path
+    True
+
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000002')
+    >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
+    1
+
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000003')
+    >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
+    1
+
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
+    0
+
+
+
 FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
 
