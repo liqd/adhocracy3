@@ -465,7 +465,7 @@ Fetch the first Proposal Version, it is empty ::
     >>> pprint(resp.json['data']['adhocracy.sheets.document.IDocument'])
     {'description': '', 'elements': [], 'title': ''}
 
-    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])  # FIXME: s/IVersionable/Version/
+    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])
     {'follows': []}
 
 Create a new version of the proposal that follows the first version ::
@@ -476,8 +476,7 @@ Create a new version of the proposal that follows the first version ::
     ...                     'description': 'blabla!',
     ...                     'elements': []},
     ...                  'adhocracy.sheets.versions.IVersionable': {
-    ...                     'follows': [pvrs0_path]}  # FIXME: should be a reference ('{"content_type": ..., "path": ...}').  this issue occurs a few more times in this document.
-    ...             }}
+    ...                     'follows': [pvrs0_path]}}}
     >>> resp = testapp.post_json(pdag_path, pvrs)
     >>> pvrs1_path = resp.json["path"]
     >>> pvrs1_path != pvrs0_path
@@ -509,22 +508,22 @@ Create a third Proposal version and add the first Section version ::
 
 If we create a second Section version ::
 
-    >>> vers = {'content_type': 'adhocracy.resources.section.ISectionVersion',
+    >>> svrs = {'content_type': 'adhocracy.resources.section.ISectionVersion',
     ...         'data': {
     ...              'adhocracy.sheets.document.ISection': {
     ...                  'title': 'Kapitel Überschrift Bla',
     ...                  'elements': []},
     ...               'adhocracy.sheets.versions.IVersionable': {
     ...                  'follows': [svrs0_path],
-    ...                  'root_version': [pvrs2_path]
+    ...                  'root_versions': [pvrs2_path]
     ...                  }   # the two lists in this dict must have the same length!
     ...          }}
-    >>> resp = testapp.post_json(sdag_path, vers)
+    >>> resp = testapp.post_json(sdag_path, svrs)
     >>> svrs1_path = resp.json['path']
     >>> svrs1_path != svrs0_path
     True
 
-we automatically create a fourth Proposal version ::
+a fourth Proposal version is automatically created with it ::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersions'])
