@@ -1,3 +1,4 @@
+from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import IResource
 from adhocracy.sheets.document import IDocument
@@ -9,46 +10,26 @@ from . import is_ancestor
 import unittest
 
 
-class DummyFolder(testing.DummyResource):
-
-    def add(self, name, obj, **kwargs):
-        self[name] = obj
-        obj.__name__ = name
-        obj.__parent__ = self
-        obj.__oid__ = 1
-
-    def check_name(self, name):
-        if name == 'invalid':
-            raise ValueError
-        return name
-
-    def next_name(self, obj, prefix=''):
-        return prefix + '_0000000'
-
-
 class GraphUnitTest(unittest.TestCase):
 
-    def make_one(self, oid, provides=(IResource, IVersionable),
-            appstruct={}):
-        """Make a resource."""
-        resource = testing.DummyResource(__parent__=self.parent,
-                                         __oid__=oid,
-                                         __provides__=provides
-                                         )
-        resource.dummy_appstruct = appstruct
+    def new_objectid(self):
+        return self.objectmap.new_objectid()
+
+    def make_one(self, path):
+        """Make a resource ."""
+        resource = testing.DummyResource(__parent__=self.context)
+        self.objectmap.add(resource, (path,))
         return resource
 
     def setUp(self):
         self.config = testing.setUp()
-        context = DummyFolder()
-        context.__objectmap__ = ObjectMap(context)
+        context = testing.DummyResource()
+        self.objectmap =ObjectMap(context)
+        context.__objectmap__ = self.objectmap
+        self.objectmap.add(context, ('parent',))
         self.context = context
-        # create dummy parent (Item for versionables)
-        self.parent = testing.DummyResource()
-        # create dummy child with sheet data (ItemVersion for versionables)
-        self.child = self.make_one(0,
-                appstruct={IVersionable.__identifier__: {'follows': [-1]}}
-        )
+        # create dummy child
+        self.child = self.make_one('child')
 
     def tearDown(self):
         testing.tearDown()
@@ -74,11 +55,13 @@ class GraphUnitTest(unittest.TestCase):
         assert result is True
 
     def test_is_ancestor_direct_link(self):
-        """True if direct 'elements' link from ancestor to descendent."""
-        ancestor = self.make_one(1,
-                appstruct={IDocument.__identifier__: {'elements': [self.child.__oid__]}}
-        )
-        # TODO fix errors -- resources not connected to objectmap
+        """True if direct AdhocracyReferenceType link from ancestor to descendent."""
+        ancestor = self.make_one('anc')
+        self.objectmap.connect(ancestor, self.child, AdhocracyReferenceType)
+        assert [self.child] == list(self.objectmap.targets(ancestor,
+            AdhocracyReferenceType))
+        assert [ancestor] == list(self.objectmap.sources(self.child,
+            AdhocracyReferenceType))
         result = is_ancestor(ancestor, self.child)
         assert result is True
 

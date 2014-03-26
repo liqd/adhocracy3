@@ -489,8 +489,10 @@ Add and update child resource
 We expect certain Versionable fields for the rest of this test suite
 to work ::
 
-    >>> resp = testapp.get('/meta_api')
-    >>> pprint(resp.json['sheets']['adhocracy.sheets.versions.IVersionable']['fields'])
+FIXME: Make this an actual test case and make it work.
+
+    >> resp = testapp.get('/meta_api')
+    >> pprint(resp.json['sheets']['adhocracy.sheets.versions.IVersionable']['fields'])
     [
         {
             'containertype': 'set',
