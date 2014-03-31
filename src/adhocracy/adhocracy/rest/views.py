@@ -12,6 +12,8 @@ from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
+from adhocracy.sheets.versions import followed_by
+from adhocracy.sheets.versions import IVersionable
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
@@ -235,6 +237,9 @@ class ResourceRESTView(RESTView):
         for sheet in sheets_view.values():
             key = sheet.iface.__identifier__
             struct['data'][key] = sheet.get_cstruct()
+            if issubclass(IVersionable, sheet.iface):
+                # Calculate followed_by attribute of IVersionable
+                struct['data'][key]['followed_by'] = followed_by(self.context)
         struct['path'] = resource_path(self.context)
         iresource = get_resource_interface(self.context)
         struct['content_type'] = iresource.__identifier__

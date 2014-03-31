@@ -7,10 +7,30 @@ from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceSetSchemaNode
+from pyramid.traversal import resource_path
+from substanced.util import find_objectmap
 from zope.interface import provider
 from zope.interface import taggedValue
 
 import colander
+
+
+def followed_by(resource):
+    """Determine the successors ("followed_by") of a versionable resource.
+
+    Args:
+        resource (IResource that implements the IVersionable sheet)
+
+    Returns:
+        a list of resource paths to successor versions (possibly empty)
+
+    """
+    om = find_objectmap(resource)
+    result = []
+    if om is not None:
+        for source in om.sources(resource, IVersionableFollowsReference):
+            result.append(resource_path(source))
+    return result
 
 
 @provider(IIResourcePropertySheet)
@@ -26,20 +46,40 @@ class IVersionable(ISheet):
             reftype='adhocracy.sheets.versions.IVersionableFollowsReference'
         ))
     taggedValue(
+        'field:followed_by',
+        ReferenceSetSchemaNode(
+            default=[],
+            missing=colander.drop,
+            reftype='adhocracy.sheets.versions.IVersionableFollowedByReference'
+        ))
+    taggedValue(
         'field:root_versions',
         ReferenceSetSchemaNode(
             default=[],
             missing=colander.drop,
-            reftype='adhocracy.sheets.versions.IVersionableFollowsReference'
+            reftype='adhocracy.sheets.versions.IRootVersionsReference'
         ))
 
 
 class IVersionableFollowsReference(AdhocracyReferenceType):
 
-    """IVersionable reference."""
+    """IVersionable reference to preceding versions."""
 
     source_isheet = IVersionable
     source_isheet_field = 'follows'
+    target_isheet = IVersionable
+
+
+class IVersionableFollowedByReference(AdhocracyReferenceType):
+
+    """IVersionable reference to subsequent versions.
+
+    Not stored in DB, but auto-calculated on demand.
+
+    """
+
+    source_isheet = IVersionable
+    source_isheet_field = 'followed_by'
     target_isheet = IVersionable
 
 
@@ -50,14 +90,6 @@ class IRootVersionsReference(AdhocracyReferenceType):
     source_isheet = IVersionable
     source_isheet_field = 'root_versions'
     target_isheet = ISheet
-
-# followed_by = ReferenceSetSchemaNode(
-#         default=[],
-#         missing=colander.drop,
-#         interface=IVersionable,
-#         readonly=True,
-#     )
-# FIXME: check constrains (ist the follwed node the right node?)
 
 
 @provider(IIPool)
