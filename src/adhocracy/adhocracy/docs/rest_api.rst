@@ -459,7 +459,7 @@ The Proposal has the IVersions and ITags interfaces to work with Versions::
 Update
 ~~~~~~
 
-Fetch the first Proposal Version, it is empty ::
+Fetch the first Proposal version, it is empty ::
 
     >>> resp = testapp.get(pvrs0_path)
     >>> pprint(resp.json['data']['adhocracy.sheets.document.IDocument'])
@@ -527,7 +527,7 @@ otherwise 'readonly'.)
 FIXME: the entire above section may want to go to the meta_api section
 in this file.
 
-Create a Section item inside the Proposal item::
+Create a Section item inside the Proposal item ::
 
     >>> sdag = {'content_type': 'adhocracy.resources.section.ISection',
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel1'},}
@@ -536,18 +536,28 @@ Create a Section item inside the Proposal item::
     >>> sdag_path = resp.json["path"]
     >>> svrs0_path = resp.json["first_version_path"]
 
-Create a third Proposal version and add the first Section version ::
+and a second Section ::
+
+    >>> sdag = {'content_type': 'adhocracy.resources.section.ISection',
+    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel2'},}
+    ...         }
+    >>> resp = testapp.post_json(pdag_path, sdag)
+    >>> s2dag_path = resp.json["path"]
+    >>> s2vrs0_path = resp.json["first_version_path"]
+
+Create a third Proposal version and add the two Sections in their
+initial versions ::
 
     >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposalVersion',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
-    ...                     'elements': [svrs0_path]},
+    ...                     'elements': [svrs0_path, s2vrs0_path]},
     ...                  'adhocracy.sheets.versions.IVersionable': {
     ...                     'follows': [pvrs1_path],}
     ...                 }}
     >>> resp = testapp.post_json(pdag_path, pvrs)
     >>> pvrs2_path = resp.json["path"]
 
-If we create a second Section version ::
+If we create a second version of kapitel1 ::
 
     >>> svrs = {'content_type': 'adhocracy.resources.section.ISectionVersion',
     ...         'data': {
@@ -576,17 +586,36 @@ a fourth Proposal version is automatically created with it ::
     >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000003')
     >>> pvrs3_path = resp.json['path']
 
-When creating a third Section version, use the 'root_versions'
-attribute to make sure only the active Proposal version is updated ::
+More interestingly, if we then create a second version of kapitel2 ::
 
-    >>> svrs['data']['adhocracy.sheets.document.ISection']['title'] = 'Ein Gespenst'
-    >>> svrs['data']['adhocracy.sheets.versions.IVersionable']['follows'] = [svrs1_path]
-    >>> svrs['data']['adhocracy.sheets.versions.IVersionable']['root_versions'] = [pvrs3_path]
-    >>> resp = testapp.post_json(sdag_path, svrs)
-    >>> svrs2_path = resp.json['path']
-    >>> svrs2_path != svrs1_path
+    >>> svrs = {'content_type': 'adhocracy.resources.section.ISectionVersion',
+    ...         'data': {
+    ...              'adhocracy.sheets.document.ISection': {
+    ...                  'title': 'on the hardness of version control',
+    ...                  'elements': []},
+    ...               'adhocracy.sheets.versions.IVersionable': {
+    ...                  'follows': [s2vrs0_path],
+    ...                  'root_versions': [pvrs3_path]
+    ...                  }
+    ...          }}
+    >>> resp = testapp.post_json(s2dag_path, svrs)
+    >>> s2vrs1_path = resp.json['path']
+    >>> s2vrs1_path != s2vrs0_path
     True
 
+a Proposal version is automatically created only for pvrs3, not for
+pvrs2 (which also contains s2vrs0_path) ::
+
+    >>> resp = testapp.get(pdag_path)
+    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersions'])
+    {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000000',
+                  '/adhocracy/Proposals/kommunismus/VERSION_0000001',
+                  '/adhocracy/Proposals/kommunismus/VERSION_0000002',
+                  '/adhocracy/Proposals/kommunismus/VERSION_0000003',
+                  '/adhocracy/Proposals/kommunismus/VERSION_0000004']}
+
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> pvrs4_path = resp.json['path']
     >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000002')
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     1
@@ -598,6 +627,8 @@ attribute to make sure only the active Proposal version is updated ::
     >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     0
+
+
 
 
 
