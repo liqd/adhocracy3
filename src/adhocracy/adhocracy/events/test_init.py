@@ -36,9 +36,11 @@ class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
         isheet_field = 'example_field'
         old_version_oid = 5
         new_version_oid = 6
+        root_version_oid = old_version_oid
 
         inst = self._makeOne(obj, isheet, isheet_field,
-                             old_version_oid, new_version_oid)
+                             old_version_oid, new_version_oid,
+                             root_version_oid)
 
         assert ISheetReferencedItemHasNewVersion.providedBy(inst)
         assert verifyObject(ISheetReferencedItemHasNewVersion, inst)

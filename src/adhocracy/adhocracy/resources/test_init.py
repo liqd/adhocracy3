@@ -1,4 +1,5 @@
 from adhocracy.interfaces import ISheet
+from adhocracy.sheets.versions import IVersionable
 from pyramid import testing
 from zope.interface import Interface
 
@@ -132,6 +133,26 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
+    def make_new_version_data(self, follows_oid, root_oid=None):
+        """Create a versionable sheet with follows and root_versions fields.
+
+        Args:
+            follows_oid (int): OID of preceding version (follows)
+            root_oid (optional int): OID of root element; if None, the
+                follows_oid is used instead
+
+        """
+
+        from adhocracy.sheets.versions import IVersionable
+        if root_oid is None:
+            root_oid = follows_oid
+        return {
+            IVersionable.__identifier__: {
+                'follows': [follows_oid],
+                'root_versions': [root_oid]
+                }
+            }
+
     def make_one(self, iface=None, appstructs={}):
         from adhocracy.interfaces import IItemVersion
         from . import ResourceFactory
@@ -141,7 +162,6 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def test_create_without_referencing_items(self):
         from adhocracy.interfaces import IItemVersion
         from adhocracy.interfaces import IItemNewVersionAdded
-        from adhocracy.sheets.versions import IVersionable
         events = []
 
         def listener(event):
@@ -149,8 +169,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         self.config.add_subscriber(listener, IItemNewVersionAdded)
 
         old_version = self.make_one()
-        new_version_data = {IVersionable.__identifier__:
-                            {"follows": [old_version.__oid__]}}
+        new_version_data = self.make_new_version_data(old_version.__oid__)
         self.make_one(appstructs=new_version_data)
 
         new_version = self.make_one()
@@ -163,7 +182,6 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
         from adhocracy.interfaces import AdhocracyReferenceType
         from adhocracy.interfaces import ISheet
-        from adhocracy.sheets.versions import IVersionable
         events = []
 
         def listener(event):
@@ -174,18 +192,16 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         old_version = self.make_one()
         om = self.context.__objectmap__
         om.connect(other_version, old_version, AdhocracyReferenceType)
-        new_version_data = {IVersionable.__identifier__:
-                            {'follows': [old_version.__oid__]}}
+        new_version_data = self.make_new_version_data(old_version.__oid__)
         self.make_one(appstructs=new_version_data)
 
-        assert len(events) == 2
+        assert len(events) == 3
         assert ISheetReferencedItemHasNewVersion.providedBy(events[0])
         assert events[0].isheet == ISheet
         assert events[1].isheet == IVersionable
 
     def test_autoupdate_with_referencing_items(self):
         from adhocracy.interfaces import IItemVersion
-        from adhocracy.sheets.versions import IVersionable
         from adhocracy.sheets.document import ISection
         from adhocracy.sheets.versions import IVersionableFollowsReference
         from zope.interface import taggedValue
@@ -200,9 +216,10 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         root = self.make_one(iface=ISectionVersion,
                              appstructs={ISection.__identifier__:
                                          {"elements": [child.__oid__]}})
+        new_version_data = self.make_new_version_data(child.__oid__,
+                root.__oid__)
         self.make_one(iface=ISectionVersion,
-                      appstructs={IVersionable.__identifier__:
-                                  {'follows': [child.__oid__]}})
+                      appstructs=new_version_data)
         om = self.context.__objectmap__
         root_followed_by = list(om.sources(root, IVersionableFollowsReference))
         assert len(root_followed_by) == 1

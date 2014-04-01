@@ -1,6 +1,7 @@
 """Utilities for working with the version/reference graph (DAG)."""
 
 from adhocracy.interfaces import AdhocracyReferenceType
+from adhocracy.sheets.versions import IRootVersionsReference
 from adhocracy.sheets.versions import IVersionableFollowsReference
 from substanced.objectmap import find_objectmap
 
@@ -91,8 +92,10 @@ def is_ancestor(ancestor, descendant):
         return True
 
     objectmap = find_objectmap(ancestor)
-    # We don't want any 'follows' links
-    reftypes = collect_reftypes(objectmap, [IVersionableFollowsReference])
+    # We don't want any 'follows' and 'root_versions' links
+    reftypes = collect_reftypes(objectmap,
+                                [IVersionableFollowsReference,
+                                 IRootVersionsReference])
     checked_map = {}
     return _check_ancestry(objectmap, reftypes, ancestor, descendant,
                            checked_map)

@@ -9,6 +9,7 @@ from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import get_resource_interface
+from adhocracy.sheets.versions import IRootVersionsReference
 from adhocracy.sheets.versions import IVersionableFollowsReference
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
@@ -43,11 +44,23 @@ def itemversion_create_notify(context, registry=None):
     """Notify referencing Items after createing a new ItemVersion."""
     om = find_objectmap(context)
     if registry is not None and om is not None:
-        follows = om.targets(context, IVersionableFollowsReference)
+        follows = list(om.targets(context, IVersionableFollowsReference))
+        root_versions = list(om.targets(context, IRootVersionsReference))
+        # Both lists must have the same number of entries
+        assert len(follows) == len(root_versions), \
+            'Got {} follows and {} root_versions references, expected same ' \
+            'number'.format(len(follows), len(root_versions))
+        # FIXME: does the OM preserve the original order? Maybe better
+        # consult the stored values? ->
+        # sheet = registry.getMultiAdapter((context, IVersionable),
+        #                     IResourcePropertySheet)
+        # assert len(sheet.get_cstruct()['follows']) == len(sheet.get_cstruct()
+        #                                                   ['root_versions'])
         new_version = context
         new_version_oid = get_oid(new_version)
-        for old_version in follows:
+        for (old_version, root_version) in zip(follows, root_versions):
             old_version_oid = get_oid(old_version)
+            root_version_oid = get_oid(root_version)
             # Notify that an new ItemVersion is being created
             event_new = ItemNewVersionAdded(new_version.__parent__,
                                             old_version,
@@ -64,7 +77,8 @@ def itemversion_create_notify(context, registry=None):
                         reftype.getTaggedValue('source_isheet'),
                         reftype.getTaggedValue('source_isheet_field'),
                         old_version_oid,
-                        new_version_oid
+                        new_version_oid,
+                        root_version_oid
                     )
                     registry.notify(event_ref)
 

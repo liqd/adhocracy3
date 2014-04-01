@@ -50,6 +50,16 @@ def _register_dummypropertysheet_adapter(config):
                                     IResourcePropertySheet)
 
 
+class DummyObjectMap():
+    """Dummy object map that just returns a single resource."""
+
+    def __init__(self, resource):
+        self.resource = resource
+
+    def object_for(self, oid):
+        return self.resource
+
+
 ###########
 #  tests  #
 ###########
@@ -81,6 +91,8 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         ])
         IDummySheetAutoUpdate.setTaggedValue('readonly', False)
         self.child = child
+        objectmap = DummyObjectMap(child)
+        child.__objectmap__ = objectmap
         # create dummy event
         self.event = testing.DummyResource(__provides__=
                                            ISheetReferencedItemHasNewVersion,
@@ -88,7 +100,8 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
                                            isheet=IDummySheetNoAutoUpdate,
                                            isheet_field='elements',
                                            old_version_oid=1,
-                                           new_version_oid=2,)
+                                           new_version_oid=2,
+                                           root_version_oid=0)
 
     def tearDown(self):
         testing.tearDown()
@@ -115,7 +128,8 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
             (IDummySheetAutoUpdate.__identifier__,
              {'title': u't', 'elements': [9, self.event.new_version_oid, 10]}),
             (IVersionable.__identifier__,
-             {'follows': [self.child.__oid__]}),
+             {'follows': [self.child.__oid__],
+              'root_versions': [self.child.__oid__]}),
         ])
         assert child_new_wanted_appstructs == child_new_appstructs
 
