@@ -195,7 +195,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         new_version_data = self.make_new_version_data(old_version.__oid__)
         self.make_one(appstructs=new_version_data)
 
-        assert len(events) == 3
+        assert len(events) == 2
         assert ISheetReferencedItemHasNewVersion.providedBy(events[0])
         assert events[0].isheet == ISheet
         assert events[1].isheet == IVersionable

@@ -1,7 +1,6 @@
 """Utilities for working with the version/reference graph (DAG)."""
 
 from adhocracy.interfaces import AdhocracyReferenceType
-from adhocracy.sheets.versions import IRootVersionsReference
 from adhocracy.sheets.versions import IVersionableFollowsReference
 from substanced.objectmap import find_objectmap
 
@@ -69,33 +68,42 @@ def _check_ancestry(objectmap, reftypes, startnode, descendant, checked_map):
     return False  # Sorry, not found
 
 
-def is_ancestor(ancestor, descendant):
-    """Check wheter an ancestry relation exists between two relations.
+def is_in_subtree(descendant, ancestors):
+    """Check wheter an resource is in a subtree below other resources.
 
     Args:
-         ancestor (IResource): the candidate ancestor
          descendant (IResource): the candidate descendant
+         ancestors (list of IResource): the candidate ancestors
 
     Returns:
-        True iff there exists a relation from `ancestor` to `descendant` that
-        does NOT include any 'follows' links. For example, descendant might be
-        an element of an element (of an element...) of ancestor. Also if
-        ancestor and descendant are the same node.
+        True iff there exists a relation from one of the `ancestors` to
+        `descendant` that does NOT include any 'follows' links. For example,
+        descendant might be an element of an element (of an element...) of an
+        ancestor. Also if descendant and of the ancestors are the same node.
 
-        False otherwise (including the case that ancestor or descendant is
-        None).
+        False otherwise (including the case that descendant is None and
+        ancestors is None or empty).
 
     """
-    if ancestor is None or descendant is None:
+    if not ancestors or descendant is None:
         return False
-    if ancestor.__oid__ == descendant.__oid__:
-        return True
 
-    objectmap = find_objectmap(ancestor)
-    # We don't want any 'follows' and 'root_versions' links
+    descendant_oid = descendant.__oid__
+
+    for ancestor in ancestors:
+        if ancestor.__oid__ == descendant_oid:
+            return True
+
+    objectmap = find_objectmap(descendant)
+    # We don't want any 'follows' links
     reftypes = collect_reftypes(objectmap,
-                                [IVersionableFollowsReference,
-                                 IRootVersionsReference])
+                                [IVersionableFollowsReference])
     checked_map = {}
-    return _check_ancestry(objectmap, reftypes, ancestor, descendant,
-                           checked_map)
+
+    for ancestor in ancestors:
+        found = _check_ancestry(objectmap, reftypes, ancestor, descendant,
+                                checked_map)
+        if found:
+            return True  # We're done
+
+    return False  # No luck

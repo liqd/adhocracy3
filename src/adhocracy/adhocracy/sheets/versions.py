@@ -52,13 +52,6 @@ class IVersionable(ISheet):
             missing=colander.drop,
             reftype='adhocracy.sheets.versions.IVersionableFollowedByReference'
         ))
-    taggedValue(
-        'field:root_versions',
-        ReferenceSetSchemaNode(
-            default=[],
-            missing=colander.drop,
-            reftype='adhocracy.sheets.versions.IRootVersionsReference'
-        ))
 
 
 class IVersionableFollowsReference(AdhocracyReferenceType):
@@ -81,15 +74,6 @@ class IVersionableFollowedByReference(AdhocracyReferenceType):
     source_isheet = IVersionable
     source_isheet_field = 'followed_by'
     target_isheet = IVersionable
-
-
-class IRootVersionsReference(AdhocracyReferenceType):
-
-    """Reference to roots of versionable."""
-
-    source_isheet = IVersionable
-    source_isheet_field = 'root_versions'
-    target_isheet = ISheet
 
 
 @provider(IIPool)

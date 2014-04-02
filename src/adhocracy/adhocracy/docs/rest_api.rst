@@ -11,6 +11,7 @@ Some imports to work with rest api calls::
 
     >>> import copy
     >>> from functools import reduce
+    >>> from operator import itemgetter
     >>> import os
     >>> import requests
     >>> from pprint import pprint
@@ -466,7 +467,7 @@ Fetch the first Proposal version, it is empty ::
     {'description': '', 'elements': [], 'title': ''}
 
     >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])
-    {'followed_by': [], 'follows': [], 'root_versions': []}
+    {'followed_by': [], 'follows': []}
 
 Create a new version of the proposal that follows the first version ::
 
@@ -489,43 +490,25 @@ Add and update child resource
 We expect certain Versionable fields for the rest of this test suite
 to work ::
 
-FIXME: Make this an actual test case and make it work.
+    >>> resp = testapp.get('/meta_api')
+    >>> vers_fields = resp.json['sheets']['adhocracy.sheets.versions.IVersionable']['fields']
+    >>> pprint(sorted(vers_fields, key=itemgetter('name')))
+    [{'containertype': 'set',
+      'createmandatory': False,
+      'name': 'followed_by',
+      'readonly': True,
+      'valuetype': 'adhocracy.schema.AbsolutePath'},
+     {'containertype': 'set',
+      'createmandatory': False,
+      'name': 'follows',
+      'readonly': False,
+      'valuetype': 'adhocracy.schema.AbsolutePath'}]
 
-    >> resp = testapp.get('/meta_api')
-    >> pprint(resp.json['sheets']['adhocracy.sheets.versions.IVersionable']['fields'])
-    [
-        {
-            'containertype': 'set',
-            'createallowed': true,
-            'createmandatory': false,
-            'name': 'follows',
-            'readonly': true
-            'valuetype': 'adhocracy.schema.AbsolutePath',
-        },
-        {
-            'containertype': 'set',
-            'createallowed': true,
-            'createmandatory': false,
-            'name': 'followed_by',
-            'readonly': true
-            'valuetype': 'adhocracy.schema.AbsolutePath',
-        },
-        {
-            'containertype': 'set',
-            'createallowed': true,
-            'createmandatory': false,
-            'name': 'root_versions',
-            'readonly': true
-            'valuetype': 'adhocracy.schema.AbsolutePath',
-        }
-    ]
-
-(The 'createallowed' field indicates that the field may or may not be
-present in the initially posted content element, even if it is
-otherwise 'readonly'.)
-
-FIXME: the entire above section may want to go to the meta_api section
-in this file.
+The 'follows' element must be set by the client when it creates a new
+version that is the successor of one or several earlier versions. The
+'followed_by' element is automatically populated by the server by
+"reversing" any 'follows' links pointing to the version in question.
+Therefore 'followed_by' is read-only, while 'follows' is writable.
 
 Create a Section item inside the Proposal item ::
 
@@ -565,16 +548,25 @@ If we create a second version of kapitel1 ::
     ...                  'title': 'Kapitel Überschrift Bla',
     ...                  'elements': []},
     ...               'adhocracy.sheets.versions.IVersionable': {
-    ...                  'follows': [svrs0_path],
-    ...                  'root_versions': [pvrs2_path]
-    ...                  }   # the two lists in this dict must have the same length!
-    ...          }}
+    ...                  'follows': [svrs0_path]
+    ...                  }
+    ...          },
+    ...          'root_versions': [pvrs2_path]
+    ...         }
     >>> resp = testapp.post_json(sdag_path, svrs)
     >>> svrs1_path = resp.json['path']
     >>> svrs1_path != svrs0_path
     True
 
-a fourth Proposal version is automatically created with it ::
+Whenever a IVersionable contains 'follows' link(s) to preceding versions,
+there should be a top-level 'root_versions' element listing the version of
+their root elements. 'root_versions' is a set, which means that order
+doesn't matter and duplicates are ignored. In this case, it points to the
+proposal version containing the section to update.
+
+The 'root_versions' set allows automatical updates of items that embedding
+or otherwise linking to the updated item. In this case, a fourth Proposal
+version is automatically created along with the updated Section version::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersions'])
@@ -586,7 +578,7 @@ a fourth Proposal version is automatically created with it ::
     >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000003')
     >>> pvrs3_path = resp.json['path']
 
-More interestingly, if we then create a second version of kapitel2 ::
+More interestingly, if we then create a second version of kapitel2::
 
     >>> svrs = {'content_type': 'adhocracy.resources.section.ISectionVersion',
     ...         'data': {
@@ -594,10 +586,11 @@ More interestingly, if we then create a second version of kapitel2 ::
     ...                  'title': 'on the hardness of version control',
     ...                  'elements': []},
     ...               'adhocracy.sheets.versions.IVersionable': {
-    ...                  'follows': [s2vrs0_path],
-    ...                  'root_versions': [pvrs3_path]
+    ...                  'follows': [s2vrs0_path]
     ...                  }
-    ...          }}
+    ...          },
+    ...          'root_versions': [pvrs3_path]
+    ...         }
     >>> resp = testapp.post_json(s2dag_path, svrs)
     >>> s2vrs1_path = resp.json['path']
     >>> s2vrs1_path != s2vrs0_path
