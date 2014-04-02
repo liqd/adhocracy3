@@ -3,6 +3,7 @@ require.config({
     paths: {
         jquery: '../jquery-1.7.2',
         angular: '../angular-1.2.4',
+        underscore: '../underscore'
     },
     shim: {
         jquery: {
@@ -10,6 +11,9 @@ require.config({
         },
         angular: {
             exports: 'angular',
+        },
+        underscore: {
+            exports: '_',
         },
     }
 });

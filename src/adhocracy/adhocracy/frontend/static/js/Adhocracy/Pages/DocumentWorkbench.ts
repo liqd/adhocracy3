@@ -1,8 +1,10 @@
 /// <reference path="../../../submodules/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../submodules/DefinitelyTyped/underscore/underscore.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
 import angular = require("angular");
+import _ = require("underscore");
 
 import Types = require("Adhocracy/Types");
 import Util = require("Adhocracy/Util");
@@ -104,6 +106,12 @@ class SectionVersion extends Resource {
     }
 }
 
+//FIXME: backend should have LAST
+function newestVersion(versions: string[]) {
+    return _.max(versions, (version_path) => parseInt(version_path.match(/\d*$/)[0]))
+}
+
+
 export function run() {
     var app = angular.module("NGAD", []);
 
@@ -121,7 +129,7 @@ export function run() {
 
     app.filter("viewFilterList", [ function() {
         return function(obj : Types.Content) : string {
-            return obj.data["adhocracy.sheets.IDocument"].title;
+            return obj.data["adhocracy.sheets.document.IDocument"].title;
         };
     }]);
 
@@ -142,9 +150,9 @@ export function run() {
             // FIXME: factor out getting the head version of a DAG.
 
             function fetchDocumentHead(n : number, dag : Types.Content) : void {
-                var dagPS = dag.data["adhocracy.sheets.IDAG"];
-                if (dagPS.versions.length > 0) {
-                    var headPath = dagPS.versions[0].path;
+                var dagPS = dag.data["adhocracy.sheets.versions.IVersions"].elements;
+                if (dagPS.length > 0) {
+                    var headPath = newestVersion(dagPS); //FIXME: backend should have LAST
                     adhHttp.get(headPath).then((headContent) => {
                         if (n in $scope.poolEntries) {
                             // leave original headContentRef intact,
@@ -160,10 +168,10 @@ export function run() {
             }
 
             function init() {
-                var dagRefs : Types.Reference[] = pool.data["adhocracy.sheets.pool.IPool"].elements;
+                var dagRefs : string[] = pool.data["adhocracy.sheets.pool.IPool"].elements;
                 for (var dagRefIx in dagRefs) {
                     (function(dagRefIx : number) {
-                        var dagRefPath : string = dagRefs[dagRefIx].path;
+                        var dagRefPath : string = dagRefs[dagRefIx];
                         adhHttp.get(dagRefPath).then((dag) => fetchDocumentHead(dagRefIx, dag));
                     })(dagRefIx);
                 }

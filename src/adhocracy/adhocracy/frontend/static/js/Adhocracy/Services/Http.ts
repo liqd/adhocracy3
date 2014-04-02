@@ -116,6 +116,7 @@ function translateContent(translateType) {
         var outobj = {
             content_type: translateType(contentTypeNameSpaces)(inobj.content_type),
             path: inobj.path,
+            first_version_path: inobj.first_version_path,
             data: {},
         };
 

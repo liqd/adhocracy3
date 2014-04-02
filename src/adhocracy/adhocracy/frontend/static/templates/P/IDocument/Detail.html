@@ -9,19 +9,19 @@
             <button type="button" class="edit_button" ng-click="edit()">edit</button>
             <button type="button" class="close_button" ng-click="list()">close</button>
             <br>
-            <p ng-bind="doc.content.data['P.IDocument'].title" class="document_title"></p>
-            <small><p ng-bind="doc.content.data['P.IDocument'].description"></p></small>
+            <p ng-bind="doc.content.data['adhocracy.sheets.document.IDocument'].title" class="document_title"></p>
+            <small><p ng-bind="doc.content.data['adhocracy.sheets.document.IDocument'].description"></p></small>
         </div>
         <div ng-switch-when="edit">
             <button type="button" class="reset_button" ng-click="reset()">reset</button>
             <button type="button" class="save_button" ng-click="commit()">save</button>
             <br>
-            <p>title: <input ng-model="doc.content.data['P.IDocument'].title" class="document_title"></input></p>
-            <small><p ng-bind="doc.content.data['P.IDocument'].description"></p></small>
+            <p>title: <input ng-model="doc.content.data['adhocracy.sheets.document.IDocument'].title" class="document_title"></input></p>
+            <small><p ng-bind="doc.content.data['adhocracy.sheets.document.IDocument'].description"></p></small>
         </div>
         <div ng-switch-default>
             internal error: unknown view mode: {{ doc.viewmode }}
         </div>
     </div>
-    <adh-paragraph-detail ng-repeat="parref in doc.content.data['P.IDocument'].paragraphs track by $index"></adh-paragraph-detail>
+    <adh-paragraph-detail ng-repeat="parref in doc.content.data['adhocracy.sheets.document.IDocument'].paragraphs track by $index"></adh-paragraph-detail>
 </div>
