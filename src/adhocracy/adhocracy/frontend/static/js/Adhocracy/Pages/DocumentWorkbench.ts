@@ -43,6 +43,66 @@ interface IParagraphDetailScope extends IDocumentDetailScope {
 // FIXME: consider using isolated scopes in order to avoid inheriting
 // model data.
 
+class Resource {
+    content_type : string;
+    data : Object;
+    constructor(content_type: string) {
+        this.content_type = content_type;
+        this.data = {};
+    }
+    addISection(title: string, elements: string[]) {
+        this.data['adhocracy.sheets.document.ISection'] = {
+            'title': title,
+            'elements': elements
+        }
+        return this;
+    }
+    addIDocument(title: string, description: string, elements: string[]) {
+        this.data['adhocracy.sheets.document.IDocument'] = {
+            "title": title,
+            "description": description,
+            "elements": elements
+        }
+        return this;
+    }
+    addIVersionable(follows: string[], root_version: string[]) {
+        this.data['adhocracy.sheets.versions.IVersionable'] = {
+            'follows': follows,
+            'root_version': root_version
+        };
+        return this;
+    }
+    addIName(name: string) {
+        this.data['adhocracy.sheets.name.IName'] = {
+            'name': name
+        }
+        return this;
+    }
+}
+
+class Proposal extends Resource {
+    constructor(name?: string) {
+        super("adhocracy.resources.proposal.IProposal");
+        if (name !== undefined)
+            this.addIName(name);
+    }
+}
+
+class Section extends Resource {
+    constructor(name?: string) {
+        super("adhocracy.resources.section.ISection");
+        if (name !== undefined)
+            this.addIName(name);
+    }
+}
+
+class SectionVersion extends Resource {
+    constructor(title: string, elements: string[],follows: string[], root_version: string[]) {
+        super("adhocracy.resources.section.ISectionVersion");
+        this.addISection(title, elements)
+            .addIVersionable(follows, root_version);
+    }
+}
 
 export function run() {
     var app = angular.module("NGAD", []);
@@ -168,6 +228,51 @@ export function run() {
         // save working copy on 'commit' event from containing document.
         $scope.$on("commit", commit);
     }]);
+
+
+    app.controller("NewProposal",
+                   ["$scope", "$http", "$q",
+                    function($scope    ,
+                             $http     : ng.IHttpService,
+                             $q        : ng.IQService) : void
+    {
+        $scope.proposalVersion = (new Resource("adhocracy.resources.proposal.IProposalVersion"))
+                                              .addIDocument("greg", "ewfwef", []);
+
+        $scope.sections = [];
+
+        $scope.pushSection = function () {
+            $scope.sections.push({'wrap': ""});  //FIXME: use resource with ISection instead
+        };
+
+        $scope.commit = function () {
+
+            var proposalName = $scope.proposalVersion.data['adhocracy.sheets.document.IDocument'].title;
+
+            $http.post("/adhocracy", new Proposal(proposalName)).then( (resp) => {
+                var proposalPath = decodeURIComponent(resp.data.path);
+                var proposalFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
+
+                var sectionPromises = $scope.sections.map( (text) =>
+                    $http.post(proposalPath, new Section()).then( (resp) => {
+                        var sectionPath = decodeURIComponent(resp.data.path);
+                        var sectionFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
+
+                        return $http.post(sectionPath, new SectionVersion(text.wrap, [], [sectionFirstVersionPath], [proposalPath]));
+                    })
+                );
+
+                $q.all(sectionPromises).then( (allResp) => {
+                    var paths = allResp.map( (resp) => decodeURIComponent(resp.data.path) );
+
+                    $scope.proposalVersion.addIVersionable(paths, [proposalFirstVersionPath]);
+                    $http.post(proposalPath, $scope.proposalVersion);
+                });
+            });
+        };
+
+    }]);
+
 
 
     app.directive("adhDocumentWorkbench", function() {

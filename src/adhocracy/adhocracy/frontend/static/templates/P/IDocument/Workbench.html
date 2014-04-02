@@ -26,8 +26,16 @@
             </div>
         </td>
         <td>
-            <div id="document_workbench_participate">
+            <div id="document_workbench_participate" ng-controller="NewProposal">
                 <p>proposal workbench changes and discussion</p>
+                <input ng-model="proposalVersion.data['adhocracy.sheets.document.IDocument'].title"></input>
+                <textarea ng-model="proposalVersion.data['adhocracy.sheets.document.IDocument'].description"></textarea>
+                <hr></hr>
+                <div ng-repeat="section in sections">
+                    <textarea ng-model="section.wrap"></textarea>
+                </div>
+                <button type="button" class="new_button" ng-click="commit()">send</button>
+                <button type="button" class="new_button" ng-click="pushSection()">new paragraph</button>
             </div>
         </td>
     </tr>
