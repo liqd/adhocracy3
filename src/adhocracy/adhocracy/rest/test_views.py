@@ -598,7 +598,7 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         assert inst.validation_POST ==\
             (POSTResourceRequestSchema,
              [validate_post_sheet_names_and_resource_type,
-              validate_post_sheet_cstructs,
+              validate_post_sheet_cstructs
               ])
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
@@ -617,6 +617,51 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         wanted = {'path': '/child', 'content_type': IResourceX.__identifier__}
         assert wanted == response
 
+
+class ItemRESTViewUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        self.context = DummyFolder()
+        resource_registry = make_mock_resource_registry()
+        request = CorniceDummyRequest()
+        request.registry.content = resource_registry
+        self.request = request
+        self.create = request.registry.content.create
+
+    def make_one(self, context, request):
+        from .views import ItemRESTView
+        return ItemRESTView(context, request)
+
+    def test_create(self,):
+        from .views import validate_post_sheet_names_and_resource_type
+        from .views import validate_post_sheet_cstructs
+        from .views import SimpleRESTView
+        from .schemas import POSTItemRequestSchema
+        inst = self.make_one(self.context, self.request)
+        assert issubclass(inst.__class__, SimpleRESTView)
+        assert inst.validation_POST ==\
+            (POSTItemRequestSchema,
+             [validate_post_sheet_names_and_resource_type,
+              validate_post_sheet_cstructs
+              ])
+        assert 'options' in dir(inst)
+        assert 'get' in dir(inst)
+        assert 'put' in dir(inst)
+
+    def test_post_valid(self):
+        child = testing.DummyResource(__provides__=IResourceX)
+        child.__parent__ = self.context
+        child.__name__ = 'child'
+        self.create.return_value = child
+        self.request.validated = {'content_type': IResourceX.__identifier__,
+                                  'data': {},
+                                  'root_versions': []}
+        inst = self.make_one(self.context, self.request)
+        response = inst.post()
+
+        wanted = {'path': '/child', 'content_type': IResourceX.__identifier__}
+        assert wanted == response
+
     def test_post_valid_item(self):
         from adhocracy.interfaces import IItem
         from adhocracy.interfaces import IItemVersion
@@ -628,7 +673,8 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         self.create.return_value = child
         self.request.validated = {'content_type':
                                   IItemVersion.__identifier__,
-                                  'data': {}}
+                                  'data': {},
+                                  'root_versions': []}
         inst = self.make_one(self.context, self.request)
         response = inst.post()
 

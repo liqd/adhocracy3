@@ -55,6 +55,19 @@ def itemversion_create_notify(context, registry=None, options=[]):
         follows = list(om.targets(context, IVersionableFollowsReference))
         new_version = context
         new_version_oid = get_oid(new_version)
+
+        if options and isinstance(options[0], str):
+            # Convert resource paths to resources
+            # FIXME should we do this earlier?
+            root_resources = []
+            for path in options:
+                root = om.object_for((path,))
+                if root is None:
+                    # FIXME how to handle this?
+                    raise ValueError('Not a valid resource path: ' + path)
+                root_resources.append(root)
+            options = root_resources
+
         for old_version in follows:
             old_version_oid = get_oid(old_version)
             # Notify that an new ItemVersion is being created
@@ -160,12 +173,12 @@ class ResourceFactory(object):
 
         if run_after_creation:
             registry = get_current_registry()
-            if options is None:
-                for call in self.after_creation:
-                    call(resource, registry)
-            else:
+            if options:
                 for call in self.after_creation:
                     call(resource, registry, options)
+            else:
+                for call in self.after_creation:
+                    call(resource, registry)
 
         return resource
 

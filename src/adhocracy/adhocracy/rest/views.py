@@ -7,6 +7,7 @@ from adhocracy.interfaces import IPool
 from adhocracy.interfaces import ISheet
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
+from adhocracy.rest.schemas import POSTItemRequestSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
 from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
@@ -66,7 +67,6 @@ def validate_post_sheet_cstructs(context, request):
         sheets = request.registry.content.resource_sheets(
             dummy, request, onlycreatable=True)
     validate_sheet_cstructs(dummy, request, sheets)
-    # TODO validate root_versions element
 
 
 def validate_put_sheet_names(context, request):
@@ -320,15 +320,14 @@ class PoolRESTView(SimpleRESTView):
         """Handle HTTP PUT. Return dict with PATH of modified resource."""
         return super(PoolRESTView, self).put()
 
-    @view_config(request_method='POST')
-    def post(self):
-        """HTTP POST. Return dictionary with PATH of new resource."""
-        #create resource
-        resource_type = self.request.validated['content_type']
-        appstructs = self.request.validated.get('data', {})
-        resource = self.registry.create(resource_type, self.context,
-                                        appstructs=appstructs)
-        # response
+    def build_post_response(self, resource):
+        """Helper method that builds a response for a POST request.
+
+        Returns:
+            the serialized response
+
+        """
+
         response_schema = ResourceResponseSchema()
         struct = {}
         struct['path'] = resource_path(resource)
@@ -341,6 +340,45 @@ class PoolRESTView(SimpleRESTView):
                     struct['first_version_path'] = resource_path(v)
                     break
         return response_schema.serialize(struct)
+
+    @view_config(request_method='POST')
+    def post(self):
+        """HTTP POST. Return dictionary with PATH of new resource."""
+        resource_type = self.request.validated['content_type']
+        appstructs = self.request.validated.get('data', {})
+        resource = self.registry.create(resource_type, self.context,
+                                        appstructs=appstructs)
+        return self.build_post_response(resource)
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IItem,
+    decorator=validate_request_data_decorator(),
+)
+class ItemRESTView(PoolRESTView):
+
+    """View for Items and ItemVersions, overwrites POST handling."""
+
+    validation_POST = (POSTItemRequestSchema,
+                       [validate_post_sheet_names_and_resource_type,
+                        validate_post_sheet_cstructs])
+
+    @view_config(request_method='POST')
+    def post(self):
+        """HTTP POST. Return dictionary with PATH of new resource."""
+        resource_type = self.request.validated['content_type']
+        appstructs = self.request.validated.get('data', {})
+        root_versions = self.request.validated.get('root_versions', None)
+        if root_versions:
+            # pass non-empty root_versions along to resource creator
+            resource = self.registry.create(resource_type, self.context,
+                                            appstructs=appstructs,
+                                            options=root_versions)
+        else:
+            resource = self.registry.create(resource_type, self.context,
+                                            appstructs=appstructs)
+        return self.build_post_response(resource)
 
 
 @view_defaults(

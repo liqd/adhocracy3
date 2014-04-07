@@ -30,11 +30,15 @@ class GraphUnitTest(unittest.TestCase):
         testing.tearDown()
 
     def test_is_in_subtree_with_none_ancestor(self):
-        """False if ancestor is None."""
+        """False if ancestors is None."""
         result = is_in_subtree(self.child, None)
         assert result is False
 
-    # TODO test empty ancestors
+    def test_is_in_subtree_with_no_ancestors(self):
+        """False if ancestors is an empty list."""
+        result = is_in_subtree(self.child, [])
+        assert result is False
+
 
     def test_is_in_subtree_with_none_descendant(self):
         """False if descendant is None."""
@@ -42,7 +46,7 @@ class GraphUnitTest(unittest.TestCase):
         assert result is False
 
     def test_is_in_subtree_with_just_none(self):
-        """False if ancestor and descendant are both None."""
+        """False if ancestors and descendant are both None."""
         result = is_in_subtree(None, None)
         assert result is False
 
@@ -115,4 +119,17 @@ class GraphUnitTest(unittest.TestCase):
         result = is_in_subtree(dad, [step_son])
         assert result is False
 
-    # TODO test that found if first or second element in list
+    def test_ancestor_list_has_multiple_elements(self):
+        """True if ancestors is a two-element list and one of them is the right
+        one.
+
+        """
+        root = self.make_one()
+        not_root = self.make_one()
+        element = self.make_one()
+        om = self.context.__objectmap__
+        om.connect(root, element, AdhocracyReferenceType)
+        result = is_in_subtree(element, [root, not_root])
+        assert result is True
+        result = is_in_subtree(element, [not_root, root])
+        assert result is True

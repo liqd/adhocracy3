@@ -477,7 +477,8 @@ Create a new version of the proposal that follows the first version ::
     ...                     'description': 'blabla!',
     ...                     'elements': []},
     ...                  'adhocracy.sheets.versions.IVersionable': {
-    ...                     'follows': [pvrs0_path]}}}
+    ...                     'follows': [pvrs0_path]}},
+    ...          'root_versions': [pvrs0_path]}
     >>> resp = testapp.post_json(pdag_path, pvrs)
     >>> pvrs1_path = resp.json["path"]
     >>> pvrs1_path != pvrs0_path
@@ -536,7 +537,8 @@ initial versions ::
     ...                     'elements': [svrs0_path, s2vrs0_path]},
     ...                  'adhocracy.sheets.versions.IVersionable': {
     ...                     'follows': [pvrs1_path],}
-    ...                 }}
+    ...                 },
+    ...          'root_versions': [pvrs1_path]}
     >>> resp = testapp.post_json(pdag_path, pvrs)
     >>> pvrs2_path = resp.json["path"]
 

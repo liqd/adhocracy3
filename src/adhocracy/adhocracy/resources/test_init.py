@@ -133,31 +133,27 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def make_new_version_data(self, follows_oid, root_oid=None):
-        """Create a versionable sheet with follows and root_versions fields.
+    def make_new_version_data(self, follows_oid):
+        """Create a versionable sheet with follows field.
 
         Args:
             follows_oid (int): OID of preceding version (follows)
-            root_oid (optional int): OID of root element; if None, the
-                follows_oid is used instead
 
         """
 
         from adhocracy.sheets.versions import IVersionable
-        if root_oid is None:
-            root_oid = follows_oid
         return {
             IVersionable.__identifier__: {
                 'follows': [follows_oid],
-                'root_versions': [root_oid]
                 }
             }
 
-    def make_one(self, iface=None, appstructs={}):
+    def make_one(self, iface=None, appstructs={}, root_versions=[]):
         from adhocracy.interfaces import IItemVersion
         from . import ResourceFactory
         return ResourceFactory(iface or IItemVersion)(self.context,
-                                                      appstructs=appstructs)
+                                                      appstructs=appstructs,
+                                                      options=root_versions)
 
     def test_create_without_referencing_items(self):
         from adhocracy.interfaces import IItemVersion
@@ -170,9 +166,8 @@ class ItemVersionIntegrationTest(unittest.TestCase):
 
         old_version = self.make_one()
         new_version_data = self.make_new_version_data(old_version.__oid__)
-        self.make_one(appstructs=new_version_data)
-
-        new_version = self.make_one()
+        new_version = self.make_one(appstructs=new_version_data,
+                      root_versions=[old_version])
 
         assert IItemVersion.providedBy(new_version)
         assert len(events) == 1
@@ -193,7 +188,8 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         om = self.context.__objectmap__
         om.connect(other_version, old_version, AdhocracyReferenceType)
         new_version_data = self.make_new_version_data(old_version.__oid__)
-        self.make_one(appstructs=new_version_data)
+        self.make_one(appstructs=new_version_data,
+                      root_versions=[old_version])
 
         assert len(events) == 2
         assert ISheetReferencedItemHasNewVersion.providedBy(events[0])
@@ -216,10 +212,10 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         root = self.make_one(iface=ISectionVersion,
                              appstructs={ISection.__identifier__:
                                          {"elements": [child.__oid__]}})
-        new_version_data = self.make_new_version_data(child.__oid__,
-                root.__oid__)
+        new_version_data = self.make_new_version_data(child.__oid__)
         self.make_one(iface=ISectionVersion,
-                      appstructs=new_version_data)
+                      appstructs=new_version_data,
+                      root_versions=[root])
         om = self.context.__objectmap__
         root_followed_by = list(om.sources(root, IVersionableFollowsReference))
         assert len(root_followed_by) == 1
