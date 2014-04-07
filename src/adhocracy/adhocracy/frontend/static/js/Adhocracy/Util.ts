@@ -93,3 +93,7 @@ export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
     deferred.resolve();
     return deferred.promise.then(() => { return obj; });
 }
+
+export function normalizeName(name: string) : string {
+    return name.toLowerCase().replace(/\ /g, "_");
+}

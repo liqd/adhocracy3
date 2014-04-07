@@ -85,21 +85,23 @@ class Resource {
 class Proposal extends Resource {
     constructor(name?: string) {
         super("adhocracy.resources.proposal.IProposal");
-        if (name !== undefined)
+        if (name !== undefined) {
             this.addIName(name);
+        }
     }
 }
 
 class Section extends Resource {
     constructor(name?: string) {
         super("adhocracy.resources.section.ISection");
-        if (name !== undefined)
+        if (name !== undefined) {
             this.addIName(name);
+        }
     }
 }
 
 class SectionVersion extends Resource {
-    constructor(title: string, elements: string[],follows: string[], root_version: string[]) {
+    constructor(title: string, elements: string[], follows: string[], root_version: string[]) {
         super("adhocracy.resources.section.ISectionVersion");
         this.addISection(title, elements)
             .addIVersionable(follows, root_version);
@@ -108,7 +110,7 @@ class SectionVersion extends Resource {
 
 //FIXME: backend should have LAST
 function newestVersion(versions: string[]) {
-    return _.max(versions, (version_path) => parseInt(version_path.match(/\d*$/)[0]))
+    return _.max(versions, (version_path) => parseInt(version_path.match(/\d*$/)[0], 10));
 }
 
 
