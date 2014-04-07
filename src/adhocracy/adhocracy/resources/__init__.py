@@ -45,7 +45,7 @@ def itemversion_create_notify(context, registry=None, options=[]):
     Args:
         context (IResource): the newly created resource
         registry: the registry
-        options: list of root versions. Will be passed along to resource that
+        options: list of root versions. Will be passed along to resources that
             reference old versions so they can decide whether they should
             update themselfes.
 
@@ -123,17 +123,33 @@ class ResourceFactory(object):
                  context,
                  appstructs={},
                  run_after_creation=True,
-                 add_to_context=True
+                 add_to_context=True,
+                 options=None
                  ):
+        """Triggered whan a ResourceFactory instance is called.
+
+        Args:
+            after_creation (bool): whether to invoke after_creation hooks
+            options (optional): if not None, will be passed along to
+                after_creation hooks as 3rd argument (after the newly created
+                resource and the registry)
+
+        Returns:
+            the newly created resource
+
+        """
+
         res = DottedNameResolver()
         resource = self.class_()
         directlyProvides(resource, self.resource_iface)
         alsoProvides(resource, self.prop_ifaces)
+
         if add_to_context:
             self.add(context, resource, appstructs)
         else:
             resource.__parent__ = None
             resource.__name__ = ''
+
         if appstructs:
             for key, struct in appstructs.items():
                 iface = res.maybe_resolve(key)
@@ -141,10 +157,16 @@ class ResourceFactory(object):
                                         IResourcePropertySheet)
                 if not sheet.readonly:
                     sheet.set(struct)
+
         if run_after_creation:
             registry = get_current_registry()
-            for call in self.after_creation:
-                call(resource, registry)
+            if options is None:
+                for call in self.after_creation:
+                    call(resource, registry)
+            else:
+                for call in self.after_creation:
+                    call(resource, registry, options)
+
         return resource
 
 

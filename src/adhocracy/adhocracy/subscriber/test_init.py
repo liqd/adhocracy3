@@ -101,7 +101,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
                                            isheet_field='elements',
                                            old_version_oid=1,
                                            new_version_oid=2,
-                                           root_version_oid=0)
+                                           root_versions=[child])
 
     def tearDown(self):
         testing.tearDown()
@@ -128,8 +128,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
             (IDummySheetAutoUpdate.__identifier__,
              {'title': u't', 'elements': [9, self.event.new_version_oid, 10]}),
             (IVersionable.__identifier__,
-             {'follows': [self.child.__oid__],
-              'root_versions': [self.child.__oid__]}),
+             {'follows': [self.child.__oid__]}),
         ])
         assert child_new_wanted_appstructs == child_new_appstructs
 

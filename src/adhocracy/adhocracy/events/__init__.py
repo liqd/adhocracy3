@@ -35,13 +35,13 @@ class SheetReferencedItemHasNewVersion(object):
                  isheet_field,
                  old_version_oid,
                  new_version_oid,
-                 root_version_oid):
+                 root_versions):
         self.object = object
         self.isheet = isheet
         self.isheet_field = isheet_field
         self.old_version_oid = old_version_oid
         self.new_version_oid = new_version_oid
-        self.root_version_oid = root_version_oid
+        self.root_versions = root_versions
 
 
 class _ISheetPredicate(object):
