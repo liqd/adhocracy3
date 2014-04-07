@@ -53,31 +53,31 @@ class Resource {
         this.data = {};
     }
     addISection(title: string, elements: string[]) {
-        this.data['adhocracy.sheets.document.ISection'] = {
-            'title': title,
-            'elements': elements
-        }
+        this.data["adhocracy.sheets.document.ISection"] = {
+            title: title,
+            elements: elements,
+        };
         return this;
     }
     addIDocument(title: string, description: string, elements: string[]) {
-        this.data['adhocracy.sheets.document.IDocument'] = {
-            "title": title,
-            "description": description,
-            "elements": elements
-        }
+        this.data["adhocracy.sheets.document.IDocument"] = {
+            title: title,
+            description: description,
+            elements: elements,
+        };
         return this;
     }
     addIVersionable(follows: string[], root_version: string[]) {
-        this.data['adhocracy.sheets.versions.IVersionable'] = {
-            'follows': follows,
-            'root_version': root_version
+        this.data["adhocracy.sheets.versions.IVersionable"] = {
+            follows: follows,
+            root_version: root_version,
         };
         return this;
     }
     addIName(name: string) {
-        this.data['adhocracy.sheets.name.IName'] = {
-            'name': name
-        }
+        this.data["adhocracy.sheets.name.IName"] = {
+            name: name,
+        };
         return this;
     }
 }
