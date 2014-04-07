@@ -240,51 +240,6 @@ export function run() {
     }]);
 
 
-    app.controller("NewProposal",
-                   ["$scope", "$http", "$q",
-                    function($scope    ,
-                             $http     : ng.IHttpService,
-                             $q        : ng.IQService) : void
-    {
-        $scope.proposalVersion = (new Resource("adhocracy.resources.proposal.IProposalVersion"))
-                                              .addIDocument("greg", "ewfwef", []);
-
-        $scope.sections = [];
-
-        $scope.pushSection = function () {
-            $scope.sections.push({'wrap': ""});  //FIXME: use resource with ISection instead
-        };
-
-        $scope.commit = function () {
-
-            var proposalName = $scope.proposalVersion.data['adhocracy.sheets.document.IDocument'].title;
-
-            $http.post("/adhocracy", new Proposal(proposalName)).then( (resp) => {
-                var proposalPath = decodeURIComponent(resp.data.path);
-                var proposalFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
-
-                var sectionPromises = $scope.sections.map( (text) =>
-                    $http.post(proposalPath, new Section()).then( (resp) => {
-                        var sectionPath = decodeURIComponent(resp.data.path);
-                        var sectionFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
-
-                        return $http.post(sectionPath, new SectionVersion(text.wrap, [], [sectionFirstVersionPath], [proposalPath]));
-                    })
-                );
-
-                $q.all(sectionPromises).then( (allResp) => {
-                    var paths = allResp.map( (resp) => decodeURIComponent(resp.data.path) );
-
-                    $scope.proposalVersion.addIVersionable(paths, [proposalFirstVersionPath]);
-                    $http.post(proposalPath, $scope.proposalVersion);
-                });
-            });
-        };
-
-    }]);
-
-
-
     app.directive("adhDocumentWorkbench", function() {
         return {
             restrict: "E",
@@ -308,6 +263,79 @@ export function run() {
         };
     });
 
+    app.directive("adhEditDocumentSheet", function() {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/Sheets/IDocument/Edit.html",
+            scope: {
+                sheet: "=",
+            },
+        };
+    });
+
+    app.directive("adhShowDocumentSheet", function() {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/Sheets/IDocument/Show.html",
+            scope: {
+                sheet: "="
+            },
+        };
+    });
+
+    app.directive("adhEditProposalVersionResource", function() {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/Resources/IProposalVersion/Edit.html",
+            scope: {
+                resource: "="
+            },
+        };
+    });
+
+    function postProposal($http, $q, proposalVersion, sectionVersions) {
+        var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
+
+        $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).then( (resp) => {
+            var proposalPath = decodeURIComponent(resp.data.path);
+            var proposalFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
+
+            var sectionPromises = sectionVersions.map( (section) =>
+                $http.post(proposalPath, new Section()).then( (resp) => {
+                    var sectionPath = decodeURIComponent(resp.data.path);
+                    var sectionFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
+
+                    return $http.post(sectionPath, section.addIVersionable([sectionFirstVersionPath], [proposalPath]));
+                })
+            );
+
+            $q.all(sectionPromises).then( () => {
+                proposalVersion.addIVersionable([], [proposalFirstVersionPath]);
+
+                $http.post(proposalPath, proposalVersion);
+            });
+        });
+    };
+
+    app.directive("adhNewProposal", ["$http", "$q", function($http, $q) {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/newProposal.html",
+            scope: {},  //isolates this scope, i.e. makes this $scope not ihnerit from any parent scope
+            controller: function($scope) {
+                $scope.proposalVersion = (new Resource("adhocracy.resources.proposal.IProposalVersion"))
+                                              .addIDocument("", "", []);
+
+                $scope.sections = [];
+
+                $scope.pushSection = function () {
+                    $scope.sections.push(new Resource("adhocracy.resources.section.ISectionVersion").addISection("", []));
+                };
+
+                $scope.commit = () => postProposal($http, $q, $scope.proposalVersion, $scope.sections);
+            }
+        };
+    }]);
 
     // get going
 

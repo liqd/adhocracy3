@@ -1,0 +1,6 @@
+<adh-edit-proposal-version-resource resource="proposalVersion"></adh-edit-proposal-version-resource>
+<div ng-repeat="section in sections">
+    <textarea ng-model="section.data['adhocracy.sheets.document.ISection'].title"></textarea>
+</div>
+<button type="button" class="new_button" ng-click="commit()">send</button>
+<button type="button" class="new_button" ng-click="pushSection()">new paragraph</button>
