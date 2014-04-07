@@ -199,7 +199,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         child = self.make_one(iface=ISectionVersion)
         root = self.make_one(iface=ISectionVersion,
                              appstructs={ISection.__identifier__:
-                                         {"elements": [child.__oid__]}})
+                                         {"subsections": [child.__oid__]}})
         self.make_one(iface=ISectionVersion,
                       appstructs={IVersionable.__identifier__:
                                   {'follows': [child.__oid__]}})

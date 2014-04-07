@@ -52,6 +52,24 @@ class ISection(ISheet, ISheetReferenceAutoUpdateMarker):
         ReferenceSetSchemaNode(
             reftype='adhocracy.sheets.document.ISectionElementsReference',
         ))
+    taggedValue(
+        'field:subsections',
+        ReferenceSetSchemaNode(
+            reftype='adhocracy.sheets.document.ISubsectionsReference',
+        ))
+
+
+@provider(IIResourcePropertySheet)
+class IParagraph(ISheet, ISheetReferenceAutoUpdateMarker):
+
+    """Marker interface representing a document paragraph."""
+
+    taggedValue('field:content',
+                colander.SchemaNode(colander.String(),
+                                    default='',
+                                    missing=colander.drop,
+                                    )
+                )
 
 
 class IDocumentElementsReference(AdhocracyReferenceType):
@@ -65,10 +83,19 @@ class IDocumentElementsReference(AdhocracyReferenceType):
 
 class ISectionElementsReference(AdhocracyReferenceType):
 
-    """ISection reference."""
+    """Reference from a section to its direct elements, such as paragraphs."""
 
     source_isheet = ISection
     source_isheet_field = 'elements'
+    target_isheet = IParagraph
+
+
+class ISubsectionsReference(AdhocracyReferenceType):
+
+    """Reference from a section to its subsections."""
+
+    source_isheet = ISection
+    source_isheet_field = 'subsections'
     target_isheet = ISection
 
 
@@ -79,4 +106,7 @@ def includeme(config):
                                     IResourcePropertySheet)
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
                                     (ISection, IIResourcePropertySheet),
+                                    IResourcePropertySheet)
+    config.registry.registerAdapter(ResourcePropertySheetAdapter,
+                                    (IParagraph, IIResourcePropertySheet),
                                     IResourcePropertySheet)

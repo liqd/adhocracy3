@@ -1,37 +1,31 @@
-"""Proposal resource type."""
+"""Section resource type."""
 from adhocracy.interfaces import IItemVersion
-from adhocracy.interfaces import ITag
 from adhocracy.interfaces import IItem
-from adhocracy.resources.section import ISection
-from adhocracy.resources.paragraph import IParagraph
+from adhocracy.interfaces import ITag
 from adhocracy.resources import ResourceFactory
 from substanced.content import add_content_type
 from zope.interface import taggedValue
 
 
-class IProposalVersion(IItemVersion):
+class IParagraphVersion(IItemVersion):
 
-    """Versionable item with Document propertysheet."""
+    """Document paragraph (a leaf in the section tree)."""
 
     taggedValue('extended_sheets',
-                set(['adhocracy.sheets.document.IDocument']))
+                set(['adhocracy.sheets.document.IParagraph']))
 
 
-class IProposal(IItem):
+class IParagraph(IItem):
 
-    """All versions of a Proposal."""
+    """Paragraph Versions Pool."""
 
-    taggedValue('element_types', set([ITag,
-                                      ISection,
-                                      IParagraph,
-                                      IProposalVersion,
-                                      ]))
-    taggedValue('item_type', IProposalVersion)
+    taggedValue('element_types', set([ITag, IParagraphVersion]))
+    taggedValue('item_type', IParagraphVersion)
 
 
 def includeme(config):
     """Register resource type factory in substanced content registry."""
-    ifaces = [IProposalVersion, IProposal]
+    ifaces = [IParagraphVersion, IParagraph]
     for iface in ifaces:
         name = iface.queryTaggedValue('content_name') or iface.__identifier__
         meta = {'content_name': name,
