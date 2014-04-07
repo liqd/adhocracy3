@@ -52,6 +52,11 @@ class ISection(ISheet, ISheetReferenceAutoUpdateMarker):
         ReferenceSetSchemaNode(
             reftype='adhocracy.sheets.document.ISectionElementsReference',
         ))
+    taggedValue(
+        'field:subsections',
+        ReferenceSetSchemaNode(
+            reftype='adhocracy.sheets.document.ISubsectionsReference',
+        ))
 
 
 @provider(IIResourcePropertySheet)
@@ -78,20 +83,20 @@ class IDocumentElementsReference(AdhocracyReferenceType):
 
 class ISectionElementsReference(AdhocracyReferenceType):
 
-    """ISection reference."""
-
-    source_isheet = ISection
-    source_isheet_field = 'elements'
-    target_isheet = ISection
-
-
-class IParagraphElementsReference(AdhocracyReferenceType):
-
-    """IParagraph reference."""
+    """Reference from a section to its direct elements, such as paragraphs."""
 
     source_isheet = ISection
     source_isheet_field = 'elements'
     target_isheet = IParagraph
+
+
+class ISubsectionsReference(AdhocracyReferenceType):
+
+    """Reference from a section to its subsections."""
+
+    source_isheet = ISection
+    source_isheet_field = 'subsections'
+    target_isheet = ISection
 
 
 def includeme(config):
