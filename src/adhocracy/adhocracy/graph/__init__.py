@@ -39,12 +39,6 @@ def _check_ancestry(objectmap, reftypes, startnode, descendant, checked_map):
     """
     startnode_oid = startnode.__oid__
     descendant_oid = descendant.__oid__
-
-    if startnode_oid == descendant_oid:
-        return True  # Got it already!
-    if startnode_oid in checked_map:
-        return False  # Node was already checked, no need to do it again
-
     checked_map[startnode_oid] = startnode
     unchecked_map = {}
 

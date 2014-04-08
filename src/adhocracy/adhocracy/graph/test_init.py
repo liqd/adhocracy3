@@ -5,6 +5,7 @@ from adhocracy.resources import ResourceFactory
 from adhocracy.sheets.versions import IVersionableFollowsReference
 from pyramid import testing
 from substanced.objectmap import ObjectMap
+from . import collect_reftypes
 from . import is_in_subtree
 
 import unittest
@@ -19,6 +20,7 @@ class GraphUnitTest(unittest.TestCase):
         """Make a resource ."""
         return ResourceFactory(iface or IItemVersion)(self.context,
                                                       appstructs=appstructs)
+
     def setUp(self):
         self.config = testing.setUp()
         context = ResourcesAutolNamingFolder()
@@ -133,3 +135,41 @@ class GraphUnitTest(unittest.TestCase):
         assert result is True
         result = is_in_subtree(element, [not_root, root])
         assert result is True
+
+    def test_collect_reftypes_with_empty_objectmap_and_default_excludes(self):
+        """No relations in objectmap, so result should be empty."""
+        om = self.context.__objectmap__
+        result = collect_reftypes(om)
+        assert result == []
+
+    def test_collect_reftypes_with_empty_objectmap_and_None_excludes(self):
+        """No relations in objectmap, so result should be empty."""
+        om = self.context.__objectmap__
+        result = collect_reftypes(om, None)
+        assert result == []
+
+    def test_collect_reftypes_two_types(self):
+        """Two reftypes in objectmap, both should be found."""
+        dad = self.make_one()
+        daugher = self.make_one()
+        step_son = self.make_one()
+        om = self.context.__objectmap__
+        om.connect(dad, daugher, AdhocracyReferenceType)
+        om.connect(step_son, daugher, IVersionableFollowsReference)
+        result = collect_reftypes(om)
+        assert len(result) == 2
+        assert AdhocracyReferenceType in result
+        assert IVersionableFollowsReference in result
+
+    def test_collect_reftypes_one_excluded(self):
+        """Two reftypes in OM, one is excluded, the other should be found."""
+        dad = self.make_one()
+        daugher = self.make_one()
+        step_son = self.make_one()
+        om = self.context.__objectmap__
+        om.connect(dad, daugher, AdhocracyReferenceType)
+        om.connect(step_son, daugher, IVersionableFollowsReference)
+        result = collect_reftypes(om, [AdhocracyReferenceType])
+        assert len(result) == 1
+        assert IVersionableFollowsReference in result
+        assert AdhocracyReferenceType not in result
