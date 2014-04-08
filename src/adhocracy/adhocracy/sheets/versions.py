@@ -7,6 +7,7 @@ from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceSetSchemaNode
+from adhocracy.schema import ReferenceListSchemaNode
 from zope.interface import provider
 from zope.interface import taggedValue
 
@@ -52,7 +53,7 @@ class IVersions(ISheet):
 
     taggedValue(
         'field:elements',
-        ReferenceSetSchemaNode(
+        ReferenceListSchemaNode(
             default=[],
             missing=colander.drop,
             reftype='adhocracy.sheets.versions.IVersionsElementsReference',

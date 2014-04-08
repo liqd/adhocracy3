@@ -4,7 +4,7 @@ from adhocracy.interfaces import ISheet
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import diff_dict
 from adhocracy.utils import create_schema_from_dict
-from adhocracy.schema import ReferenceSetSchemaNode
+from adhocracy.schema import AbstractReferenceIterableSchemaNode
 from collections.abc import Mapping
 from persistent.mapping import PersistentMapping
 from pyramid.compat import is_nonstr_iter
@@ -57,7 +57,7 @@ class ResourcePropertySheetAdapter(PropertySheet):
     def _references(self):
         refs = {}
         for child in self.schema:
-            if isinstance(child, ReferenceSetSchemaNode):
+            if isinstance(child, AbstractReferenceIterableSchemaNode):
                 refs[child.name] = self.res.maybe_resolve(child.reftype)
         return refs
 

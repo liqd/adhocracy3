@@ -12,6 +12,7 @@ from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
+from adhocracy.schema import PathList
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
@@ -431,9 +432,9 @@ class MetaApiView(RESTView):
                     valuetype = type(value.typ)
                     outertype = type(value.typ)
 
-                    # FIXME: Add additional containertypes such as "list" as
-                    # the need arised
-                    if issubclass(valuetype, IdSet):
+                    if issubclass(valuetype, PathList):
+                        containertype = 'list'
+                    elif issubclass(valuetype, IdSet):
                         containertype = 'set'
                     else:
                         containertype = None
@@ -449,9 +450,10 @@ class MetaApiView(RESTView):
                     typ = to_dotted_name(valuetype)
                     typ = strip_optional_prefix(typ, 'colander.')
 
-                    # Workaround for PathSet: it's actally a set of
+                    # Workaround for PathList/PathSet: it's a list/set of
                     # AbsolutePath's
-                    if typ == 'adhocracy.schema.PathSet':
+                    if typ in ('adhocracy.schema.PathList',
+                               'adhocracy.schema.PathSet'):
                         typ = 'adhocracy.schema.AbsolutePath'
 
                     fielddesc = {

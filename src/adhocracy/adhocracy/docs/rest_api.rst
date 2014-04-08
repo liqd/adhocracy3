@@ -185,6 +185,31 @@ containertype
     attribute is either "list" (a list of values: order matters, duplicates
     are allowed) or "set" (a set of values: unordered, no duplicates).
 
+For example, the 'subsections' field of ISection is an ordered list:
+
+    >>> secfields = resp_data['sheets']['adhocracy.sheets.document.ISection']['fields']
+    >>> for field in secfields:
+    ...     if field['name'] == 'subsections':
+    ...         pprint(field)
+    ...         break
+    {'containertype': 'list',
+     'createmandatory': False,
+     'name': 'subsections',
+     'readonly': False,
+     'valuetype': 'adhocracy.schema.AbsolutePath'}
+
+The 'follows' field of IVersionable, however, is an unordered set:
+
+    >>> verfields = resp_data['sheets']['adhocracy.sheets.versions.IVersionable']['fields']
+    >>> for field in verfields:
+    ...     if field['name'] == 'follows':
+    ...         pprint(field)
+    ...         break
+    {'containertype': 'set',
+     'createmandatory': False,
+     'name': 'follows',
+     'readonly': False,
+     'valuetype': 'adhocracy.schema.AbsolutePath'}
 
 OPTIONS
 ~~~~~~~
@@ -465,7 +490,7 @@ Fetch the first Proposal Version, it is empty ::
     >>> pprint(resp.json['data']['adhocracy.sheets.document.IDocument'])
     {'description': '', 'elements': [], 'title': ''}
 
-    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])  # FIXME: s/IVersionable/Version/
+    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])
     {'follows': []}
 
 Create a new version of the proposal that follows the first version ::

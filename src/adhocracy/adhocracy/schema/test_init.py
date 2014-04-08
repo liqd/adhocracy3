@@ -68,11 +68,11 @@ class AbsolutePath(unittest.TestCase):
             inst.validator(inst, 'blu.ABC_12-3')
 
 
-class PathSetUnitTest(unittest.TestCase):
+class PathListUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import PathSet
-        return PathSet()
+        from . import PathList
+        return PathList()
 
     def test_serialize_valid_null(self):
         inst = self.make_one()
@@ -107,6 +107,55 @@ class PathSetUnitTest(unittest.TestCase):
         node = add_node_binding(colander.Mapping(), context=context)
         result = inst.deserialize(node, ['/o1'])
         assert result == [1]
+
+    def test_deserialize_non_valid_non_null(self):
+        inst = self.make_one()
+        context = make_folder_with_objectmap()
+        context.__objectmap__.objectid_for.return_value = None
+        node = add_node_binding(colander.Mapping(), context=context)
+        with pytest.raises(colander.Invalid):
+            inst.deserialize(node, ['/wrong_path'])
+
+
+class PathSetUnitTest(unittest.TestCase):
+
+    def make_one(self):
+        from . import PathSet
+        return PathSet()
+
+    def test_serialize_valid_null(self):
+        inst = self.make_one()
+        result = inst.serialize(None, colander.null)
+        assert result == colander.null
+
+    def test_serialize_valid_non_null(self):
+        inst = self.make_one()
+        context = make_folder_with_objectmap()
+        context.__objectmap__.path_for.return_value = ('', 'o1')
+        node = add_node_binding(colander.Mapping(), context=context)
+        result = inst.serialize(node, {1})
+        assert result == ['/o1']
+
+    def test_serialize_non_valid_noniterable(self):
+        inst = self.make_one()
+        with pytest.raises(colander.Invalid):
+            inst.serialize(None, None)
+
+    def test_serialize_non_valid_non_null(self):
+        inst = self.make_one()
+        context = make_folder_with_objectmap()
+        context.__objectmap__.path_for.return_value = None
+        node = add_node_binding(colander.Mapping(), context=context)
+        with pytest.raises(colander.Invalid):
+            inst.serialize(node, {0})
+
+    def test_deserialize_valid_non_null(self):
+        inst = self.make_one()
+        context = make_folder_with_objectmap()
+        context.__objectmap__.objectid_for.return_value = 1
+        node = add_node_binding(colander.Mapping(), context=context)
+        result = inst.deserialize(node, ['/o1'])
+        assert result == {1}
 
     def test_deserialize_non_valid_non_null(self):
         inst = self.make_one()
