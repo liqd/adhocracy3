@@ -15,6 +15,8 @@ export interface IService<Data> {
     put : (path : string, obj : Types.Content<Data>) => ng.IPromise<Types.Content<Data>>;
     postNewVersion : (oldVersionPath : string, obj : Types.Content<Data>) => ng.IPromise<Types.Content<Data>>;
     postToPool : (poolPath : string, obj : Types.Content<Data>) => ng.IPromise<Types.Content<Data>>;
+    metaApiResource : (name : string) => any;
+    metaApiSheet : (name : string) => any;
 }
 
 export function factory<Data>($http : ng.IHttpService) : IService<Data> {
@@ -23,6 +25,8 @@ export function factory<Data>($http : ng.IHttpService) : IService<Data> {
         put: put,
         postNewVersion: postNewVersion,
         postToPool: postToPool,
+        metaApiResource: metaApiResource,
+        metaApiSheet: metaApiSheet
     };
 
     function assertResponse(msg : string, path : string) {
@@ -54,6 +58,21 @@ export function factory<Data>($http : ng.IHttpService) : IService<Data> {
 
     function postToPool(poolPath : string, obj : Types.Content<Data>) : ng.IPromise<Types.Content<Data>> {
         return $http.post(poolPath, exportContent(obj)).then(assertResponse("adhHttp.postToPool", poolPath));
+    }
+
+    // query meta-api for resource content types.  return the json
+    // object explaining the content type of a resource.  if called
+    // without an argument, return a list of all known content types.
+    function metaApiResource(name : string) : any {
+        throw "not implemented.";
+        // return $http.get("/meta_api");
+    }
+
+    // query meta-api for property types.  return the json object
+    // explaining the type of a property sheet.  if called without an
+    // argument, return a list of all known property sheets.
+    function metaApiSheet(name : string) : any {
+        throw "not implemented.";
     }
 
     return adhHttp;
