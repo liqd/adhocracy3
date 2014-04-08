@@ -1,4 +1,4 @@
-<table border="1">
+<table border="1" ng-controller="AdhDocumentTOC as at">
     <tr>
         <td>
             <div id="document_workbench_navigate">
@@ -6,7 +6,7 @@
             </div>
         </td>
         <td>
-            <div id="document_workbench_list" ng-controller="AdhDocumentTOC as at">
+            <div id="document_workbench_list">
                 <h3>table of contents</h3>
 
                 <div>
@@ -26,7 +26,7 @@
             </div>
         </td>
         <td>
-            <adh-new-proposal></adh-new-proposal>
+            <adh-new-proposal on-new-proposal="insertParagraph"></adh-new-proposal>
         </td>
     </tr>
 </table>

@@ -24,9 +24,10 @@ interface IDocument {
 }
 
 interface IDocumentWorkbenchScope extends ng.IScope {
-    pool        : Types.Content;
-    poolEntries : IDocument[];
-    doc         : IDocument;  // (iterates over document list with ng-repeat)
+    pool            : Types.Content;
+    poolEntries     : IDocument[];
+    doc             : IDocument;  // (iterates over document list with ng-repeat)
+    insertParagraph : (IDocument) => void;
 }
 
 interface IDocumentDetailScope extends IDocumentWorkbenchScope {
@@ -45,6 +46,11 @@ interface IParagraphDetailScope extends IDocumentDetailScope {
 // FIXME: consider using isolated scopes in order to avoid inheriting
 // model data.
 
+interface IDocumentSheet {
+    title: string;
+    description: string;
+    elements: string[];
+}
 
 class Resource {
     content_type : string;
@@ -159,6 +165,10 @@ export function run() {
                     function(adhHttp  : AdhHttp.IService,
                              $scope   : IDocumentWorkbenchScope) : void
     {
+        $scope.insertParagraph = function (proposalVersion) {
+            $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
+        };
+
         console.log("TOC: " + $scope.$id);
 
         adhHttp.get(AdhHttp.jsonPrefix).then((pool) => {
@@ -337,7 +347,9 @@ export function run() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/newProposal.html",
-            scope: {},  //isolates this scope, i.e. makes this $scope not ihnerit from any parent scope
+            scope: {
+                onNewProposal: "="
+            },  //isolates this scope, i.e. this $scope does not ihnerit from any parent $scope
             controller: function($scope) {
                 $scope.proposalVersion = (new Resource("adhocracy.resources.proposal.IProposalVersion"))
                                               .addIDocument("", "", []);
@@ -348,7 +360,15 @@ export function run() {
                     $scope.paragraphVersions.push(new Resource("adhocracy.resources.paragraph.IParagraphVersion")
                                                       .addIParagraph(""));
                 };
-                $scope.commit = () => postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions);
+
+                $scope.commit = function() {
+                    var proposalPromise = postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions);
+                    proposalPromise.then( (resp) =>
+                        $http.get(resp.data.path).then( (respGet =>
+                            $scope.onNewProposal(respGet.data))
+                        )
+                    );
+                }
             }
         };
     }]);
