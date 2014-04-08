@@ -18,19 +18,19 @@ var appPrefix : string = "/app";
 
 
 // contents of the resource with view mode.
-interface IDocument {
+interface IDocument<Data> {
     viewmode : string;
-    content  : Types.Content;
+    content  : Types.Content<Data>;
 }
 
-interface IDocumentWorkbenchScope extends ng.IScope {
-    pool            : Types.Content;
-    poolEntries     : IDocument[];
-    doc             : IDocument;  // (iterates over document list with ng-repeat)
-    insertParagraph : (IDocument) => void;
+interface IDocumentWorkbenchScope<Data> extends ng.IScope {
+    pool            : Types.Content<Data>;
+    poolEntries     : IDocument<Data>[];
+    doc             : IDocument<Data>;  // (iterates over document list with ng-repeat)
+    insertParagraph : (IDocumentSheet) => void;
 }
 
-interface IDocumentDetailScope extends IDocumentWorkbenchScope {
+interface IDocumentDetailScope<Data> extends IDocumentWorkbenchScope<Data> {
     list    : () => void;
     display : () => void;
     edit    : () => void;
@@ -38,9 +38,9 @@ interface IDocumentDetailScope extends IDocumentWorkbenchScope {
     commit  : () => void;
 }
 
-interface IParagraphDetailScope extends IDocumentDetailScope {
+interface IParagraphDetailScope<Data> extends IDocumentDetailScope<Data> {
     parref      : Types.Reference;
-    parcontent  : Types.Content;
+    parcontent  : Types.Content<Data>;
 }
 
 // FIXME: consider using isolated scopes in order to avoid inheriting
@@ -136,7 +136,7 @@ function newestVersion(versions: string[]) {
 }
 
 
-export function run() {
+export function run<Data>() {
     var app = angular.module("NGAD", []);
 
 
@@ -152,7 +152,7 @@ export function run() {
     // filters
 
     app.filter("viewFilterList", [ function() {
-        return function(obj : Types.Content) : string {
+        return function(obj : Types.Content<Data>) : string {
             return obj.data["adhocracy.sheets.document.IDocument"].title;
         };
     }]);
@@ -162,8 +162,8 @@ export function run() {
 
     app.controller("AdhDocumentTOC",
                    ["adhHttp", "$scope",
-                    function(adhHttp  : AdhHttp.IService,
-                             $scope   : IDocumentWorkbenchScope) : void
+                    function(adhHttp  : AdhHttp.IService<Data>,
+                             $scope   : IDocumentWorkbenchScope<Data>) : void
     {
         $scope.insertParagraph = function (proposalVersion) {
             $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
@@ -177,7 +177,7 @@ export function run() {
 
             // FIXME: factor out getting the head version of a DAG.
 
-            function fetchDocumentHead(n : number, dag : Types.Content) : void {
+            function fetchDocumentHead(n : number, dag : Types.Content<Data>) : void {
                 var dagPS = dag.data["adhocracy.sheets.versions.IVersions"].elements;
                 if (dagPS.length > 0) {
                     var headPath = newestVersion(dagPS); //FIXME: backend should have LAST
@@ -212,8 +212,8 @@ export function run() {
 
     app.controller("AdhDocumentDetail",
                    ["adhHttp", "$scope",
-                    function(adhHttp  : AdhHttp.IService,
-                             $scope   : IDocumentDetailScope) : void
+                    function(adhHttp  : AdhHttp.IService<Data>,
+                             $scope   : IDocumentDetailScope<Data>) : void
     {
         $scope.list = function() {
             $scope.doc.viewmode = "list";
@@ -245,10 +245,10 @@ export function run() {
 
     app.controller("AdhParagraphDetail",
                    ["adhHttp", "$scope",
-                    function(adhHttp  : AdhHttp.IService,
-                             $scope   : IParagraphDetailScope) : void
+                    function(adhHttp  : AdhHttp.IService<Data>,
+                             $scope   : IParagraphDetailScope<Data>) : void
     {
-        function update(content : Types.Content) {
+        function update(content : Types.Content<Data>) {
             console.log("par-update: " + $scope.parref.path);
             $scope.parcontent = content;
         }
@@ -376,5 +376,4 @@ export function run() {
     // get going
 
     angular.bootstrap(document, ["NGAD"]);
-
 }

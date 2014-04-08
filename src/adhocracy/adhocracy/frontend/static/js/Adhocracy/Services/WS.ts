@@ -21,17 +21,17 @@ import AdhHttp = require("Adhocracy/Services/Http");
 
 var wsuri : string = "ws://" + window.location.host + AdhHttp.jsonPrefix + "?ws=all";
 
-export interface IService {
+export interface IService<Data> {
     subscribe: (path : string, update : () => void) => void;
     unsubscribe: (path : string) => void;
     destroy: () => void;
 }
 
-export function factory(adhHttp : AdhHttp.IService) : IService {
+export function factory<Data>(adhHttp : AdhHttp.IService<Data>) : IService<Data> {
     var ws = openWs(adhHttp);
     var subscriptions = {};
 
-    function subscribeWs(path : string, update : (obj: Types.Content) => void) : void {
+    function subscribeWs(path : string, update : (obj: Types.Content<Data>) => void) : void {
         if (path in subscriptions) {
             throw "WS: subscribe: attempt to subscribe to " + path + " twice!";
         } else {
@@ -47,7 +47,7 @@ export function factory(adhHttp : AdhHttp.IService) : IService {
         }
     }
 
-    function openWs(adhHttp : AdhHttp.IService) {
+    function openWs(adhHttp : AdhHttp.IService<Data>) {
         ws = new WebSocket(wsuri);
 
         ws.onmessage = function(event) {

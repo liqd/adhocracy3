@@ -10,15 +10,15 @@ import Util = require("Adhocracy/Util");
 
 export var jsonPrefix : string = "/adhocracy";
 
-export interface IService {
-    get : (path : string) => ng.IPromise<Types.Content>;
-    put : (path : string, obj : Types.Content) => ng.IPromise<Types.Content>;
-    postNewVersion : (oldVersionPath : string, obj : Types.Content) => ng.IPromise<Types.Content>;
-    postToPool : (poolPath : string, obj : Types.Content) => ng.IPromise<Types.Content>;
+export interface IService<Data> {
+    get : (path : string) => ng.IPromise<Types.Content<Data>>;
+    put : (path : string, obj : Types.Content<Data>) => ng.IPromise<Types.Content<Data>>;
+    postNewVersion : (oldVersionPath : string, obj : Types.Content<Data>) => ng.IPromise<Types.Content<Data>>;
+    postToPool : (poolPath : string, obj : Types.Content<Data>) => ng.IPromise<Types.Content<Data>>;
 }
 
-export function factory($http : ng.IHttpService) : IService {
-    var adhHttp : IService = {
+export function factory<Data>($http : ng.IHttpService) : IService<Data> {
+    var adhHttp : IService<Data> = {
         get: get,
         put: put,
         postNewVersion: postNewVersion,
@@ -35,15 +35,15 @@ export function factory($http : ng.IHttpService) : IService {
         };
     }
 
-    function get(path : string) : ng.IPromise<Types.Content> {
+    function get(path : string) : ng.IPromise<Types.Content<Data>> {
         return $http.get(path).then(assertResponse("adhHttp.get", path));
     }
 
-    function put(path : string, obj : Types.Content) : ng.IPromise<Types.Content> {
+    function put(path : string, obj : Types.Content<Data>) : ng.IPromise<Types.Content<Data>> {
         return $http.put(path, obj).then(assertResponse("adhHttp.put", path));
     }
 
-    function postNewVersion(oldVersionPath : string, obj : Types.Content) : ng.IPromise<Types.Content> {
+    function postNewVersion(oldVersionPath : string, obj : Types.Content<Data>) : ng.IPromise<Types.Content<Data>> {
         var dagPath = Util.parentPath(oldVersionPath);
         var config = {
             headers: { follows: oldVersionPath },
@@ -52,7 +52,7 @@ export function factory($http : ng.IHttpService) : IService {
         return $http.post(dagPath, exportContent(obj), config).then(assertResponse("adhHttp.postNewVersion", dagPath));
     }
 
-    function postToPool(poolPath : string, obj : Types.Content) : ng.IPromise<Types.Content> {
+    function postToPool(poolPath : string, obj : Types.Content<Data>) : ng.IPromise<Types.Content<Data>> {
         return $http.post(poolPath, exportContent(obj)).then(assertResponse("adhHttp.postToPool", poolPath));
     }
 
@@ -62,13 +62,12 @@ export function factory($http : ng.IHttpService) : IService {
 
 // transform objects on the way in and out
 
-export var importContent : (obj : Types.Content) => Types.Content
-    = translateContent(shortenType);
+export function importContent<Data>(obj : Types.Content<Data>) : Types.Content<Data> {
+    return obj;
+}
 
-export var exportContent : (obj : Types.Content) => Types.Content
-    = (obj) =>
-{
-    var newobj = translateContent(unshortenType)(obj);
+export function exportContent<Data>(obj : Types.Content<Data>) : Types.Content<Data> {
+    var newobj : Types.Content<Data> = obj
 
     // FIXME: Get this list from the server!
     var readOnlyProperties = [
@@ -82,74 +81,3 @@ export var exportContent : (obj : Types.Content) => Types.Content
     delete newobj.path;
     return newobj;
 };
-
-var contentTypeNameSpaces = {
-    "adhocracy.resources": "R"
-};
-
-var propertyTypeNameSpaces = {
-    "adhocracy.sheets": "S"
-};
-
-function shortenType(nameSpaces) {
-    return s => {
-        var t = s;
-        for (var k in nameSpaces) {
-            t = t.replace(new RegExp("^" + k + "(\\.[^\\.]+)$"), nameSpaces[k] + "$1");
-        }
-        return t;
-    };
-}
-
-function unshortenType(nameSpaces) {
-    return s => {
-        var t = s;
-        for (var k in nameSpaces) {
-            t = t.replace(new RegExp("^" + nameSpaces[k] + "\\.(.+)$"), k + ".$1");
-        }
-        return t;
-    };
-}
-
-function translateContent(translateType) {
-    return inobj => {
-        var outobj = {
-            content_type: translateType(contentTypeNameSpaces)(inobj.content_type),
-            path: inobj.path,
-            first_version_path: inobj.first_version_path,
-            data: {},
-        };
-
-        for (var k in inobj.data) {
-            var k_local = translateType(propertyTypeNameSpaces)(k);
-            outobj.data[k_local] =
-                changeContentTypeRecursively(inobj.data[k],
-                                             translateType(contentTypeNameSpaces));
-        }
-
-        return outobj;
-    };
-}
-
-function changeContentTypeRecursively(obj, f) {
-    var t = Object.prototype.toString.call(obj);
-
-    switch (t) {
-    case "[object Object]":
-        var newobj = {};
-        for (var k in obj) {
-            if (k === "content_type") {
-                newobj[k] = f(obj[k]);
-            } else {
-                newobj[k] = changeContentTypeRecursively(obj[k], f);
-            }
-        }
-        return newobj;
-
-    case "[object Array]":
-        return obj.map((el) => { return changeContentTypeRecursively(el, f); });
-
-    default:
-        return obj;
-    }
-}
