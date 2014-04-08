@@ -45,6 +45,7 @@ interface IParagraphDetailScope extends IDocumentDetailScope {
 // FIXME: consider using isolated scopes in order to avoid inheriting
 // model data.
 
+
 class Resource {
     content_type : string;
     data : Object;
@@ -80,11 +81,26 @@ class Resource {
         };
         return this;
     }
+    addIParagraph(content: string) {
+        this.data["adhocracy.sheets.document.IParagraph"] = {
+            content: content,
+        };
+        return this;
+    }
 }
 
 class Proposal extends Resource {
     constructor(name?: string) {
         super("adhocracy.resources.proposal.IProposal");
+        if (name !== undefined) {
+            this.addIName(name);
+        }
+    }
+}
+
+class Paragraph extends Resource {
+    constructor(name?: string) {
+        super("adhocracy.resources.paragraph.IParagraph");
         if (name !== undefined) {
             this.addIName(name);
         }
@@ -293,26 +309,26 @@ export function run() {
         };
     });
 
-    function postProposal($http, $q, proposalVersion, sectionVersions) {
+    function postProposal($http, $q, proposalVersion, paragraphVersions) {
         var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 
-        $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).then( (resp) => {
+        return $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).then( (resp) => {
             var proposalPath = decodeURIComponent(resp.data.path);
             var proposalFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
 
-            var sectionPromises = sectionVersions.map( (section) =>
-                $http.post(proposalPath, new Section()).then( (resp) => {
-                    var sectionPath = decodeURIComponent(resp.data.path);
-                    var sectionFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
+            var paragraphPromises = paragraphVersions.map( (paragraph) =>
+                $http.post(proposalPath, new Paragraph()).then( (resp) => {
+                    var paragraphPath = decodeURIComponent(resp.data.path);
+                    var paragraphFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
 
-                    return $http.post(sectionPath, section.addIVersionable([sectionFirstVersionPath], [proposalPath]));
+                    return $http.post(paragraphPath, paragraph.addIVersionable([paragraphFirstVersionPath], [proposalPath]));
                 })
             );
 
-            $q.all(sectionPromises).then( () => {
+            return $q.all(paragraphPromises).then( () => {
                 proposalVersion.addIVersionable([], [proposalFirstVersionPath]);
 
-                $http.post(proposalPath, proposalVersion);
+                return $http.post(proposalPath, proposalVersion);
             });
         });
     };
@@ -326,13 +342,13 @@ export function run() {
                 $scope.proposalVersion = (new Resource("adhocracy.resources.proposal.IProposalVersion"))
                                               .addIDocument("", "", []);
 
-                $scope.sections = [];
+                $scope.paragraphVersions = [];
 
-                $scope.pushSection = function () {
-                    $scope.sections.push(new Resource("adhocracy.resources.section.ISectionVersion").addISection("", []));
+                $scope.pushParagraphVersion = function () {
+                    $scope.paragraphVersions.push(new Resource("adhocracy.resources.paragraph.IParagraphVersion")
+                                                      .addIParagraph(""));
                 };
-
-                $scope.commit = () => postProposal($http, $q, $scope.proposalVersion, $scope.sections);
+                $scope.commit = () => postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions);
             }
         };
     }]);
