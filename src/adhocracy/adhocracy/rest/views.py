@@ -22,6 +22,7 @@ from copy import deepcopy
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
 from cornice.schemas import CorniceSchema
+from pyramid.path import DottedNameResolver
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
@@ -351,6 +352,11 @@ class MetaApiView(RESTView):
 
     """
 
+    def __init__(self, context, request):
+        """Create a new instance."""
+        super().__init__(context, request)
+        self.resolver = DottedNameResolver()
+
     def _describe_resources(self, resource_types):
         """Build a description of the resources registered in the system.
 
@@ -465,6 +471,18 @@ class MetaApiView(RESTView):
 
                     if containertype is not None:
                         fielddesc['containertype'] = containertype
+
+                    # In case of AbsolutePath's, we add the type of the
+                    # referenced sheet as 'targetsheet'
+                    if typ == 'adhocracy.schema.AbsolutePath':
+                        reftype = getattr(value, 'reftype', None)
+                        if reftype is not None:
+                            reftype = self.resolver.maybe_resolve(
+                                value.reftype)
+                            target_isheet = reftype.getTaggedValue(
+                                'target_isheet')
+                            fielddesc['targetsheet'] = to_dotted_name(
+                                target_isheet)
 
                     fields.append(fielddesc)
 
