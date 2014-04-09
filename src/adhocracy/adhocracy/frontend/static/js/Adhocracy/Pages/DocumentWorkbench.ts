@@ -49,11 +49,18 @@ interface IParagraphDetailScope<Data> extends IDocumentDetailScope<Data> {
 function addParagraph(stuff: Types.Content<HasIDocumentSheet>){
     stuff["adhocracy.sheets.document.IDocument"]
 }
+
+interface HasIDocumentSheet {
+    "adhocracy.sheets.document.IDocument": IDocumentSheet;
+}
+
 interface IDocumentSheet {
     title: string;
     description: string;
     elements: string[];
 }
+
+interface MeineHeine extends Resource, HasIDocumentSheet {}
 
 class Resource {
     content_type : string;
@@ -165,10 +172,10 @@ export function run<Data>() {
 
     app.controller("AdhDocumentTOC",
                    ["adhHttp", "$scope",
-                    function(adhHttp  : AdhHttp.IService<Data>,
-                             $scope   : IDocumentWorkbenchScope<Data>) : void
+                    function(adhHttp  : AdhHttp.IService<HasIDocumentSheet>,
+                             $scope   : IDocumentWorkbenchScope<HasIDocumentSheet>) : void
     {
-        $scope.insertParagraph = function (proposalVersion) {
+        $scope.insertParagraph = function (proposalVersion: Types.Content<HasIDocumentSheet>) {
             $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
         };
 
@@ -180,7 +187,7 @@ export function run<Data>() {
 
             // FIXME: factor out getting the head version of a DAG.
 
-            function fetchDocumentHead(n : number, dag : Types.Content<Data>) : void {
+            function fetchDocumentHead(n : number, dag : Types.Content<HasIDocumentSheet>) : void {
                 var dagPS = dag.data["adhocracy.sheets.versions.IVersions"].elements;
                 if (dagPS.length > 0) {
                     var headPath = newestVersion(dagPS); //FIXME: backend should have LAST
@@ -248,10 +255,10 @@ export function run<Data>() {
 
     app.controller("AdhParagraphDetail",
                    ["adhHttp", "$scope",
-                    function(adhHttp  : AdhHttp.IService<Data>,
-                             $scope   : IParagraphDetailScope<Data>) : void
+                    function(adhHttp  : AdhHttp.IService<HasIDocumentSheet>,
+                             $scope   : IParagraphDetailScope<HasIDocumentSheet>) : void
     {
-        function update(content : Types.Content<Data>) {
+        function update(content : Types.Content<any>) {
             console.log("par-update: " + $scope.parref.path);
             $scope.parcontent = content;
         }
@@ -322,11 +329,15 @@ export function run<Data>() {
         };
     });
 
-    function postProposal($http, $q, proposalVersion, paragraphVersions) {
     function addParagraph(proposalVersion: MeineHeine, paragraphPath: string) {
         return proposalVersion.data["adhocracy.sheets.document.IDocument"].elements.push(paragraphPath);
     };
 
+
+    function postProposal($http
+                         ,$q: ng.IQService
+                         ,proposalVersion: MeineHeine
+                         ,paragraphVersions) {
         var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 
         return $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).then( (resp) => {
@@ -367,7 +378,7 @@ export function run<Data>() {
         });
     };
 
-    app.directive("adhNewProposal", ["$http", "$q", function($http, $q) {
+    app.directive("adhNewProposal", ["$http", "$q", function($http: ng.IHttpService, $q : ng.IQService) {
         return {
             restrict: "E",
             templateUrl: templatePath + "/newProposal.html",
