@@ -27,7 +27,7 @@ interface IDocumentWorkbenchScope<Data> extends ng.IScope {
     pool            : Types.Content<Data>;
     poolEntries     : IDocument<Data>[];
     doc             : IDocument<Data>;  // (iterates over document list with ng-repeat)
-    insertParagraph : (IDocumentSheet) => void;
+    insertParagraph : any;
 }
 
 interface IDocumentDetailScope<Data> extends IDocumentWorkbenchScope<Data> {
@@ -46,6 +46,9 @@ interface IParagraphDetailScope<Data> extends IDocumentDetailScope<Data> {
 // FIXME: consider using isolated scopes in order to avoid inheriting
 // model data.
 
+function addParagraph(stuff: Types.Content<HasIDocumentSheet>){
+    stuff["adhocracy.sheets.document.IDocument"]
+}
 interface IDocumentSheet {
     title: string;
     description: string;
@@ -320,11 +323,17 @@ export function run<Data>() {
     });
 
     function postProposal($http, $q, proposalVersion, paragraphVersions) {
+    function addParagraph(proposalVersion: MeineHeine, paragraphPath: string) {
+        return proposalVersion.data["adhocracy.sheets.document.IDocument"].elements.push(paragraphPath);
+    };
+
         var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 
         return $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).then( (resp) => {
             var proposalPath = decodeURIComponent(resp.data.path);
             var proposalFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
+
+            var sectionPromiseStupid = $http.post(proposalPath, new Section());
 
             var paragraphPromises = paragraphVersions.map( (paragraph) =>
                 $http.post(proposalPath, new Paragraph()).then( (resp) => {
@@ -335,10 +344,25 @@ export function run<Data>() {
                 })
             );
 
-            return $q.all(paragraphPromises).then( () => {
-                proposalVersion.addIVersionable([], [proposalFirstVersionPath]);
+            var sectionVersionPromise = sectionPromiseStupid.then( respSection => {
+                return $q.all(paragraphPromises).then( (respParagraps) => {
+                    var paths = respParagraps.map( (resp) => decodeURIComponent(resp.data.path) );
 
-                return $http.post(proposalPath, proposalVersion);
+                    var sectionVersion = new SectionVersion(undefined, paths, [], [decodeURIComponent(respSection.data.first_version_path)]);
+
+                    return $http.post(decodeURIComponent(respSection.data.path), sectionVersion);
+                })
+            });
+
+            return $q.all(paragraphPromises).then( (respParagraps) => {
+                return sectionVersionPromise.then( (respSectionVersion) => {
+                    //respParagraps.map( (resp) => addParagraph(proposalVersion, decodeURIComponent(resp.data.path)) );
+                    addParagraph(proposalVersion, decodeURIComponent(respSectionVersion.data.path));
+
+                    proposalVersion.addIVersionable([], [proposalFirstVersionPath]);
+
+                    return $http.post(proposalPath, proposalVersion);
+                })
             });
         });
     };
