@@ -140,12 +140,6 @@ class SectionVersion extends Resource {
     }
 }
 
-//FIXME: backend should have LAST
-function newestVersion(versions: string[]) {
-    return _.max(versions, (version_path) => parseInt(version_path.match(/\d*$/)[0], 10));
-}
-
-
 export function run<Data>() {
     var app = angular.module("NGAD", []);
 
@@ -190,7 +184,7 @@ export function run<Data>() {
             function fetchDocumentHead(n : number, dag : Types.Content<HasIDocumentSheet>) : void {
                 var dagPS = dag.data["adhocracy.sheets.versions.IVersions"].elements;
                 if (dagPS.length > 0) {
-                    var headPath = newestVersion(dagPS); //FIXME: backend should have LAST
+                    var headPath = Util.newestVersion(dagPS); //FIXME: backend should have LAST
                     adhHttp.get(headPath).then((headContent) => {
                         if (n in $scope.poolEntries) {
                             // leave original headContentRef intact,
