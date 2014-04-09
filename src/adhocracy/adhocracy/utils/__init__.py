@@ -107,25 +107,6 @@ def get_all_taggedvalues(iface):
     return taggedvalues
 
 
-def get_ifaces_from_module(module, base=Interface, blacklist=[]):
-    """return list with interface class objects in module.
-
-    Note: inspect.isclass is not working with interfaces,
-    so we have to do it manually
-
-    """
-    ifaces = []
-    for key in dir(module):
-        value = getattr(module, key)
-        if value in blacklist + [base]:
-            continue
-        try:
-            if issubclass(value, base):
-                ifaces.append(value)
-        except TypeError:
-            continue
-    return ifaces
-
 
 def diff_dict(old_dict, new_dict, omit=()):
     """Calculate changed keys of two dictionaries.
