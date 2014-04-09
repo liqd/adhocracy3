@@ -85,7 +85,6 @@ class IResourcePropertySheet(IPropertySheet):
 
     def get_cstruct():
         """ Return a serialized dictionary representing the property state."""
-        pass
 
     def validate_cstruct(cstruct):
         """ Validate ``cstruct`` data.
@@ -98,7 +97,6 @@ class IResourcePropertySheet(IPropertySheet):
             colander.Invalid
 
         """
-        pass
 
 
 class IResource(ILocation):

@@ -23,7 +23,7 @@ def root_factory(request, t=transaction, g=get_connection,
         app_root = registry.content.create('Root')
         zodb_root['app_root'] = app_root
         t.savepoint()  # give app_root a _p_jar
-        if mark_unfinished_as_finished:
+        if mark_unfinished_as_finished:  # pragma: no cover
             markunf(app_root, registry, t)
         t.commit()
     return zodb_root['app_root']

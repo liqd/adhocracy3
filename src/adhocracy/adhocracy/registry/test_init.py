@@ -101,6 +101,28 @@ class TestResourceContentRegistry(unittest.TestCase):
                                       onlyeditable=True)
         assert sheets == {}
 
+    def test_sheets_valid_with_sheets_onlymandatory_no_createmandatory(self):
+        inst = self._make_one(self.config.registry)
+        ISheetA.setTaggedValue('readonly', False)
+        ISheetA.setTaggedValue('createmandatory', False)
+        context = testing.DummyResource(__provides__=(IResource, ISheetA))
+        _register_propertysheet_adapter(self.config, context, ISheetA)
+
+        sheets = inst.resource_sheets(context, testing.DummyRequest(),
+                                      onlymandatorycreatable=True)
+        assert sheets == {}
+
+    def test_sheets_valid_with_sheets_onlymandatory_with_createmandatory(self):
+        inst = self._make_one(self.config.registry)
+        ISheetA.setTaggedValue('readonly', False)
+        ISheetA.setTaggedValue('createmandatory', True)
+        context = testing.DummyResource(__provides__=(IResource, ISheetA))
+        _register_propertysheet_adapter(self.config, context, ISheetA)
+
+        sheets = inst.resource_sheets(context, testing.DummyRequest(),
+                                      onlymandatorycreatable=True)
+        assert ISheetA.__identifier__ in sheets
+
     def test_addables_valid_context_is_not_iresource(self):
         inst = self._make_one()
         context = testing.DummyResource()

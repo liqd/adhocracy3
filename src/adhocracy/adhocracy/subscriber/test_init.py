@@ -128,6 +128,28 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         assert not factory.called
 
     @patch('adhocracy.resources.ResourceFactory', autospec=True)
+    def test_call_versionable_with_autoupdate_readonly_other(self,
+                                                             dummyfactor=None):
+        factory = dummyfactor.return_value
+        from adhocracy.sheets.versions import IVersionable
+        self.event.isheet = IDummySheetAutoUpdate
+        IDummySheetNoAutoUpdate.setTaggedValue('readonly', True)
+
+        self._makeOne(self.event)
+
+        assert factory.called
+        child_new_parent = factory.call_args[0][0]
+        child_new_appstructs = factory.call_args[1]['appstructs']
+        assert child_new_parent is self.child.__parent__
+        child_new_wanted_appstructs = dict([
+            (IDummySheetAutoUpdate.__identifier__,
+             {'title': u't', 'elements': [9, self.event.new_version_oid, 10]}),
+            (IVersionable.__identifier__,
+             {'follows': [self.child.__oid__]}),
+        ])
+        assert child_new_wanted_appstructs == child_new_appstructs
+
+    @patch('adhocracy.resources.ResourceFactory', autospec=True)
     def test_call_versionable_with_noautoupdate(self, dummyfactory=None):
         factory = dummyfactory.return_value
         self.event.isheet = IDummySheetNoAutoUpdate

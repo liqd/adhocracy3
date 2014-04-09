@@ -1,3 +1,5 @@
+import pytest
+
 ################
 #  test utils  #
 ################
@@ -30,6 +32,55 @@ def test_strip_optional_prefix():
     assert strip_optional_prefix(' footile ', 'foo') == ' footile '
     assert strip_optional_prefix('foo', 'foo') == ''
     assert strip_optional_prefix('foo', 'foot') == 'foo'
+
+
+def test_get_resource_interface_multiple_provided():
+    from . import get_resource_interface
+    from adhocracy.interfaces import IResource
+    from zope.interface import directlyProvides
+    from pyramid.testing import DummyResource
+    context = DummyResource()
+
+    class IA(IResource):
+        pass
+
+    class IB(IResource):
+        pass
+
+    directlyProvides(context, IA, IB)
+    assert get_resource_interface(context) == IA
+
+
+def test_get_resource_interface_none_provided():
+    from . import get_resource_interface
+    from pyramid.testing import DummyResource
+    context = DummyResource()
+    with pytest.raises(AssertionError):
+        get_resource_interface(context)
+
+
+def test_get_sheet_interfaces_multiple_provided():
+    from . import get_sheet_interfaces
+    from adhocracy.interfaces import ISheet
+    from adhocracy.interfaces import IResource
+    from pyramid.testing import DummyResource
+
+    class IA(ISheet):
+        pass
+
+    class IB(ISheet):
+        pass
+
+    context = DummyResource(__provides__=(IResource, IA, IB))
+    assert get_sheet_interfaces(context) == [IA, IB]
+
+
+def test_get_sheet_interfaces_none_provided():
+    from . import get_sheet_interfaces
+    from adhocracy.interfaces import IResource
+    from pyramid.testing import DummyResource
+    context = DummyResource(__provides__=IResource)
+    assert get_sheet_interfaces(context) == []
 
 
 def test_get_all_taggedvalues_inheritance():
@@ -77,4 +128,15 @@ def test_get_all_taggedvalues_iitem_normalize_dotted_string_to_callable():
     assert 'element_types' in IItem.getTaggedValueTags()
     assert metadata['element_types'] == set([Interface])
 
-#FIXME: more tests
+
+def test_to_dotted_name_module():
+    from . import to_dotted_name
+    import os
+    assert to_dotted_name(os.walk) == 'os.walk'
+
+
+def test_to_dotted_name_dotted_string():
+    from . import to_dotted_name
+    assert to_dotted_name('os.walk') == 'os.walk'
+
+

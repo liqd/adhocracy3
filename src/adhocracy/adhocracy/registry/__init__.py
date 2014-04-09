@@ -45,7 +45,7 @@ class ResourceContentRegistry(ContentRegistry):
                 if sheet.readonly:
                     continue
             if onlymandatorycreatable:
-                if sheet.createmandatory:
+                if not sheet.createmandatory:
                     continue
             sheets[iface.__identifier__] = sheet
         if 'adhocracy.sheets.versions.IVersions' in sheets:
