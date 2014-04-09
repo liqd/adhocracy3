@@ -103,7 +103,11 @@ class AbstractPathIterable(IdSet):
 
 class PathList(AbstractPathIterable):
 
-    """Colander type that stores multiple object paths in a list."""
+    """List of :class:`AbsolutePath`.
+
+    Example value: [/bluaABC, /_123/3]
+
+    """
 
     def create_empty_appstruct(self):
         """Create and return an empty list."""
@@ -116,7 +120,13 @@ class PathList(AbstractPathIterable):
 
 class PathSet(AbstractPathIterable):
 
-    """Colander type that stores multiple object paths in a set."""
+    """Set of :class:`AbsolutePath`.
+
+    The order is not preserved, duplicates are removed.
+
+    Example value: [/bluaABC, /_123/3]
+
+    """
 
     def create_empty_appstruct(self):
         """Create and return an empty set."""
