@@ -12,7 +12,8 @@ from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-from adhocracy.schema import PathList
+from adhocracy.schema import AbsolutePath
+from adhocracy.schema import AbstractReferenceIterableSchemaNode
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
@@ -27,7 +28,6 @@ from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
 from substanced.interfaces import IRoot
-from substanced.schema import IdSet
 
 import functools
 
@@ -355,7 +355,7 @@ class MetaApiView(RESTView):
     def __init__(self, context, request):
         """Create a new instance."""
         super().__init__(context, request)
-        self.resolver = DottedNameResolver()
+        self.resolv = DottedNameResolver()
 
     def _describe_resources(self, resource_types):
         """Build a description of the resources registered in the system.
@@ -435,54 +435,45 @@ class MetaApiView(RESTView):
 
                 # Only process 'field:...' definitions
                 if fieldname != key:
-                    valuetype = type(value.typ)
-                    outertype = type(value.typ)
 
-                    if issubclass(valuetype, PathList):
-                        containertype = 'list'
-                    elif issubclass(valuetype, IdSet):
-                        containertype = 'set'
-                    else:
-                        containertype = None
-                        # If the outer type is not a container and it's not
-                        # just a generic SchemaNode, we use the outer type
-                        # as "valuetype" since it provides most specific
-                        # information (e.g. "adhocracy.schema.Identifier"
-                        # instead of just "String")
-                        outertype = type(value)
-                        if outertype is not SchemaNode:
-                            valuetype = outertype
+                    valuetype = type(value)
+                    valuetyp = type(value.typ)
+                    typ = to_dotted_name(valuetyp)
+                    containertype = None
+                    targetsheet = None
 
-                    typ = to_dotted_name(valuetype)
-                    typ = strip_optional_prefix(typ, 'colander.')
+                    # If the outer type is not a container and it's not
+                    # just a generic SchemaNode, we use the outer type
+                    # as "valuetype" since it provides most specific
+                    # information (e.g. "adhocracy.schema.Identifier"
+                    # instead of just "String")
+                    if valuetype is not SchemaNode:
+                        typ = to_dotted_name(valuetype)
 
-                    # Workaround for PathList/PathSet: it's a list/set of
-                    # AbsolutePath's
-                    if typ in ('adhocracy.schema.PathList',
-                               'adhocracy.schema.PathSet'):
-                        typ = 'adhocracy.schema.AbsolutePath'
+                    if issubclass(valuetype,
+                                  AbstractReferenceIterableSchemaNode):
+                        # Workaround for AbstractPathIterable:
+                        # it's a list/set of AbsolutePath's
+                        empty_appstruct = valuetyp().create_empty_appstruct()
+                        containertype = empty_appstruct.__class__.__name__
+                        typ = to_dotted_name(AbsolutePath)
+                        # set targetsheet
+                        reftype = self.resolv.maybe_resolve(value.reftype)
+                        target_isheet = reftype.getTaggedValue('target_isheet')
+                        targetsheet = to_dotted_name(target_isheet)
+
+                    typ_stripped = strip_optional_prefix(typ, 'colander.')
 
                     fielddesc = {
                         'name': fieldname,
-                        'valuetype': typ,
+                        'valuetype': typ_stripped,
                         'createmandatory': createmandatory,
                         'readonly': readonly,
                     }
-
                     if containertype is not None:
                         fielddesc['containertype'] = containertype
-
-                    # In case of AbsolutePath's, we add the type of the
-                    # referenced sheet as 'targetsheet'
-                    if typ == 'adhocracy.schema.AbsolutePath':
-                        reftype = getattr(value, 'reftype', None)
-                        if reftype is not None:
-                            reftype = self.resolver.maybe_resolve(
-                                value.reftype)
-                            target_isheet = reftype.getTaggedValue(
-                                'target_isheet')
-                            fielddesc['targetsheet'] = to_dotted_name(
-                                target_isheet)
+                    if targetsheet is not None:
+                        fielddesc['targetsheet'] = targetsheet
 
                     fields.append(fielddesc)
 

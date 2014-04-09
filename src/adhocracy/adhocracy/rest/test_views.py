@@ -805,3 +805,22 @@ class MetaApiViewUnitTest(unittest.TestCase):
         field_metadata = sheet_metadata['fields'][0]
         assert field_metadata['containertype'] == 'set'
         assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
+
+    def test_get_sheets_with_field_adhocracy_referencelist(self):
+        from adhocracy.interfaces import ISheet
+        from adhocracy.interfaces import IResource
+        from adhocracy.interfaces import AdhocracyReferenceType
+        from adhocracy.schema import ReferenceListSchemaNode
+
+        class ISheetF(ISheet):
+            taggedValue('field:test', ReferenceListSchemaNode(
+                reftype=AdhocracyReferenceType))
+        self.resource_types.return_value = make_resource_types(
+            IResource, {'basic_sheets': set([ISheetF])})
+        inst = self.make_one(self.context, self.request)
+
+        sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
+
+        field_metadata = sheet_metadata['fields'][0]
+        assert field_metadata['containertype'] == 'list'
+        assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
