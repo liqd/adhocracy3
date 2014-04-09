@@ -46,100 +46,6 @@ interface IParagraphDetailScope<Data> extends IDocumentDetailScope<Data> {
 // FIXME: consider using isolated scopes in order to avoid inheriting
 // model data.
 
-function addParagraph(stuff: Types.Content<HasIDocumentSheet>){
-    stuff["adhocracy.sheets.document.IDocument"]
-}
-
-interface HasIDocumentSheet {
-    "adhocracy.sheets.document.IDocument": IDocumentSheet;
-}
-
-interface IDocumentSheet {
-    title: string;
-    description: string;
-    elements: string[];
-}
-
-interface MeineHeine extends Resource, HasIDocumentSheet {}
-
-class Resource {
-    content_type : string;
-    data : Object;
-    constructor(content_type: string) {
-        this.content_type = content_type;
-        this.data = {};
-    }
-    addISection(title: string, elements: string[]) {
-        this.data["adhocracy.sheets.document.ISection"] = {
-            title: title,
-            elements: elements,
-        };
-        return this;
-    }
-    addIDocument(title: string, description: string, elements: string[]) {
-        this.data["adhocracy.sheets.document.IDocument"] = {
-            title: title,
-            description: description,
-            elements: elements,
-        };
-        return this;
-    }
-    addIVersionable(follows: string[], root_version: string[]) {
-        this.data["adhocracy.sheets.versions.IVersionable"] = {
-            follows: follows,
-            root_version: root_version,
-        };
-        return this;
-    }
-    addIName(name: string) {
-        this.data["adhocracy.sheets.name.IName"] = {
-            name: name,
-        };
-        return this;
-    }
-    addIParagraph(content: string) {
-        this.data["adhocracy.sheets.document.IParagraph"] = {
-            content: content,
-        };
-        return this;
-    }
-}
-
-class Proposal extends Resource {
-    constructor(name?: string) {
-        super("adhocracy.resources.proposal.IProposal");
-        if (name !== undefined) {
-            this.addIName(name);
-        }
-    }
-}
-
-class Paragraph extends Resource {
-    constructor(name?: string) {
-        super("adhocracy.resources.paragraph.IParagraph");
-        if (name !== undefined) {
-            this.addIName(name);
-        }
-    }
-}
-
-class Section extends Resource {
-    constructor(name?: string) {
-        super("adhocracy.resources.section.ISection");
-        if (name !== undefined) {
-            this.addIName(name);
-        }
-    }
-}
-
-class SectionVersion extends Resource {
-    constructor(title: string, elements: string[], follows: string[], root_version: string[]) {
-        super("adhocracy.resources.section.ISectionVersion");
-        this.addISection(title, elements)
-            .addIVersionable(follows, root_version);
-    }
-}
-
 export function run<Data>() {
     var app = angular.module("NGAD", []);
 
@@ -166,10 +72,10 @@ export function run<Data>() {
 
     app.controller("AdhDocumentTOC",
                    ["adhHttp", "$scope",
-                    function(adhHttp  : AdhHttp.IService<HasIDocumentSheet>,
-                             $scope   : IDocumentWorkbenchScope<HasIDocumentSheet>) : void
+                    function(adhHttp  : AdhHttp.IService<Types.HasIDocumentSheet>,
+                             $scope   : IDocumentWorkbenchScope<Types.HasIDocumentSheet>) : void
     {
-        $scope.insertParagraph = function (proposalVersion: Types.Content<HasIDocumentSheet>) {
+        $scope.insertParagraph = function (proposalVersion: Types.Content<Types.HasIDocumentSheet>) {
             $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
         };
 
@@ -181,7 +87,7 @@ export function run<Data>() {
 
             // FIXME: factor out getting the head version of a DAG.
 
-            function fetchDocumentHead(n : number, dag : Types.Content<HasIDocumentSheet>) : void {
+            function fetchDocumentHead(n : number, dag : Types.Content<Types.HasIDocumentSheet>) : void {
                 var dagPS = dag.data["adhocracy.sheets.versions.IVersions"].elements;
                 if (dagPS.length > 0) {
                     var headPath = Util.newestVersion(dagPS); //FIXME: backend should have LAST
@@ -249,8 +155,8 @@ export function run<Data>() {
 
     app.controller("AdhParagraphDetail",
                    ["adhHttp", "$scope",
-                    function(adhHttp  : AdhHttp.IService<HasIDocumentSheet>,
-                             $scope   : IParagraphDetailScope<HasIDocumentSheet>) : void
+                    function(adhHttp  : AdhHttp.IService<Types.HasIDocumentSheet>,
+                             $scope   : IParagraphDetailScope<Types.HasIDocumentSheet>) : void
     {
         function update(content : Types.Content<any>) {
             console.log("par-update: " + $scope.parref.path);
@@ -323,25 +229,20 @@ export function run<Data>() {
         };
     });
 
-    function addParagraph(proposalVersion: MeineHeine, paragraphPath: string) {
-        return proposalVersion.data["adhocracy.sheets.document.IDocument"].elements.push(paragraphPath);
-    };
-
-
     function postProposal($http
                          ,$q: ng.IQService
-                         ,proposalVersion: MeineHeine
+                         ,proposalVersion: Types.MeineHeine
                          ,paragraphVersions) {
         var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 
-        return $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).then( (resp) => {
+        return $http.post("/adhocracy", new Types.Proposal(Util.normalizeName(proposalName))).then( (resp) => {
             var proposalPath = decodeURIComponent(resp.data.path);
             var proposalFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
 
-            var sectionPromiseStupid = $http.post(proposalPath, new Section());
+            var sectionPromiseStupid = $http.post(proposalPath, new Types.Section());
 
             var paragraphPromises = paragraphVersions.map( (paragraph) =>
-                $http.post(proposalPath, new Paragraph()).then( (resp) => {
+                $http.post(proposalPath, new Types.Paragraph()).then( (resp) => {
                     var paragraphPath = decodeURIComponent(resp.data.path);
                     var paragraphFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
 
@@ -350,19 +251,19 @@ export function run<Data>() {
             );
 
             var sectionVersionPromise = sectionPromiseStupid.then( respSection => {
-                return $q.all(paragraphPromises).then( (respParagraps) => {
-                    var paths = respParagraps.map( (resp) => decodeURIComponent(resp.data.path) );
+                return $q.all(paragraphPromises).then( (respParagraphs) => {
+                    var paths = respParagraphs.map( (resp) => decodeURIComponent(resp.data.path) );
 
-                    var sectionVersion = new SectionVersion(undefined, paths, [], [decodeURIComponent(respSection.data.first_version_path)]);
+                    var sectionVersion = new Types.SectionVersion(undefined, paths, [], [decodeURIComponent(respSection.data.first_version_path)]);
 
                     return $http.post(decodeURIComponent(respSection.data.path), sectionVersion);
                 })
             });
 
-            return $q.all(paragraphPromises).then( (respParagraps) => {
+            return $q.all(paragraphPromises).then( (respParagraphs) => {
                 return sectionVersionPromise.then( (respSectionVersion) => {
-                    //respParagraps.map( (resp) => addParagraph(proposalVersion, decodeURIComponent(resp.data.path)) );
-                    addParagraph(proposalVersion, decodeURIComponent(respSectionVersion.data.path));
+                    //respParagraphs.map( (resp) => Types.addParagraph(proposalVersion, decodeURIComponent(resp.data.path)) );
+                    Types.addParagraph(proposalVersion, decodeURIComponent(respSectionVersion.data.path));
 
                     proposalVersion.addIVersionable([], [proposalFirstVersionPath]);
 
@@ -380,13 +281,13 @@ export function run<Data>() {
                 onNewProposal: "="
             },  //isolates this scope, i.e. this $scope does not ihnerit from any parent $scope
             controller: function($scope) {
-                $scope.proposalVersion = (new Resource("adhocracy.resources.proposal.IProposalVersion"))
+                $scope.proposalVersion = (new Types.Resource("adhocracy.resources.proposal.IProposalVersion"))
                                               .addIDocument("", "", []);
 
                 $scope.paragraphVersions = [];
 
                 $scope.pushParagraphVersion = function () {
-                    $scope.paragraphVersions.push(new Resource("adhocracy.resources.paragraph.IParagraphVersion")
+                    $scope.paragraphVersions.push(new Types.Resource("adhocracy.resources.paragraph.IParagraphVersion")
                                                       .addIParagraph(""));
                 };
 
