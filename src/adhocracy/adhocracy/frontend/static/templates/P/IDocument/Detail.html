@@ -16,8 +16,7 @@
             <button type="button" class="reset_button" ng-click="reset()">reset</button>
             <button type="button" class="save_button" ng-click="commit()">save</button>
             <br>
-            <p>title: <input ng-model="doc.content.data['adhocracy.sheets.document.IDocument'].title" class="document_title"></input></p>
-            <small><p ng-bind="doc.content.data['adhocracy.sheets.document.IDocument'].description"></p></small>
+            <adh-edit-proposal-version-resource resource="doc.content"></adh-edit-proposal-version-resource>
         </div>
         <div ng-switch-default>
             internal error: unknown view mode: {{ doc.viewmode }}
