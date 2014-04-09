@@ -201,7 +201,7 @@ export function run<Data>() {
         };
     });
 
-    app.directive("adhEditDocumentSheet", function() {
+    app.directive("adhDocumentSheetEdit", function() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Sheets/IDocument/Edit.html",
@@ -211,7 +211,7 @@ export function run<Data>() {
         };
     });
 
-    app.directive("adhShowDocumentSheet", function() {
+    app.directive("adhDocumentSheetShow", function() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Sheets/IDocument/Show.html",
@@ -221,7 +221,7 @@ export function run<Data>() {
         };
     });
 
-    app.directive("adhEditProposalVersionResource", function() {
+    app.directive("adhProposalVersionResourceEdit", function() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IProposalVersion/Edit.html",
