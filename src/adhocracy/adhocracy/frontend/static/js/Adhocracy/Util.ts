@@ -97,9 +97,3 @@ export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
 export function normalizeName(name: string) : string {
     return name.toLowerCase().replace(/\ /g, "_");
 }
-
-
-//FIXME: backend should have LAST
-export function newestVersion(versions: string[]) {
-    return _.max(versions, (version_path) => parseInt(version_path.match(/\d*$/)[0], 10));
-}

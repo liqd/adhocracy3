@@ -13,6 +13,8 @@ import AdhHttp = require("Adhocracy/Services/Http");
 import AdhWS = require("Adhocracy/Services/WS");
 import AdhCache = require("Adhocracy/Services/Cache");
 
+import Resources = require("Adhocracy/Resources");
+
 var templatePath : string = "/frontend_static/templates";
 var appPrefix : string = "/app";
 
@@ -72,10 +74,10 @@ export function run<Data>() {
 
     app.controller("AdhDocumentTOC",
                    ["adhHttp", "$scope",
-                    function(adhHttp  : AdhHttp.IService<Types.HasIDocumentSheet>,
-                             $scope   : IDocumentWorkbenchScope<Types.HasIDocumentSheet>) : void
+                    function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>,
+                             $scope   : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>) : void
     {
-        $scope.insertParagraph = function (proposalVersion: Types.Content<Types.HasIDocumentSheet>) {
+        $scope.insertParagraph = function (proposalVersion: Types.Content<Resources.HasIDocumentSheet>) {
             $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
         };
 
@@ -87,10 +89,10 @@ export function run<Data>() {
 
             // FIXME: factor out getting the head version of a DAG.
 
-            function fetchDocumentHead(n : number, dag : Types.Content<Types.HasIDocumentSheet>) : void {
+            function fetchDocumentHead(n : number, dag : Types.Content<Resources.HasIDocumentSheet>) : void {
                 var dagPS = dag.data["adhocracy.sheets.versions.IVersions"].elements;
                 if (dagPS.length > 0) {
-                    var headPath = Util.newestVersion(dagPS); //FIXME: backend should have LAST
+                    var headPath = Resources.newestVersion(dagPS); //FIXME: backend should have LAST
                     adhHttp.get(headPath).then((headContent) => {
                         if (n in $scope.poolEntries) {
                             // leave original headContentRef intact,
@@ -155,8 +157,8 @@ export function run<Data>() {
 
     app.controller("AdhParagraphDetail",
                    ["adhHttp", "$scope",
-                    function(adhHttp  : AdhHttp.IService<Types.HasIDocumentSheet>,
-                             $scope   : IParagraphDetailScope<Types.HasIDocumentSheet>) : void
+                    function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>,
+                             $scope   : IParagraphDetailScope<Resources.HasIDocumentSheet>) : void
     {
         function update(content : Types.Content<any>) {
             console.log("par-update: " + $scope.parref.path);
@@ -229,50 +231,6 @@ export function run<Data>() {
         };
     });
 
-    function postProposal($http
-                         ,$q: ng.IQService
-                         ,proposalVersion: Types.MeineHeine
-                         ,paragraphVersions) {
-        var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
-
-        return $http.post("/adhocracy", new Types.Proposal(Util.normalizeName(proposalName))).then( (resp) => {
-            var proposalPath = decodeURIComponent(resp.data.path);
-            var proposalFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
-
-            var sectionPromiseStupid = $http.post(proposalPath, new Types.Section());
-
-            var paragraphPromises = paragraphVersions.map( (paragraph) =>
-                $http.post(proposalPath, new Types.Paragraph()).then( (resp) => {
-                    var paragraphPath = decodeURIComponent(resp.data.path);
-                    var paragraphFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
-
-                    return $http.post(paragraphPath, paragraph.addIVersionable([paragraphFirstVersionPath], [proposalPath]));
-                })
-            );
-
-            var sectionVersionPromise = sectionPromiseStupid.then( respSection => {
-                return $q.all(paragraphPromises).then( (respParagraphs) => {
-                    var paths = respParagraphs.map( (resp) => decodeURIComponent(resp.data.path) );
-
-                    var sectionVersion = new Types.SectionVersion(undefined, paths, [], [decodeURIComponent(respSection.data.first_version_path)]);
-
-                    return $http.post(decodeURIComponent(respSection.data.path), sectionVersion);
-                })
-            });
-
-            return $q.all(paragraphPromises).then( (respParagraphs) => {
-                return sectionVersionPromise.then( (respSectionVersion) => {
-                    //respParagraphs.map( (resp) => Types.addParagraph(proposalVersion, decodeURIComponent(resp.data.path)) );
-                    Types.addParagraph(proposalVersion, decodeURIComponent(respSectionVersion.data.path));
-
-                    proposalVersion.addIVersionable([], [proposalFirstVersionPath]);
-
-                    return $http.post(proposalPath, proposalVersion);
-                })
-            });
-        });
-    };
-
     app.directive("adhNewProposal", ["$http", "$q", function($http: ng.IHttpService, $q : ng.IQService) {
         return {
             restrict: "E",
@@ -281,18 +239,18 @@ export function run<Data>() {
                 onNewProposal: "="
             },  //isolates this scope, i.e. this $scope does not ihnerit from any parent $scope
             controller: function($scope) {
-                $scope.proposalVersion = (new Types.Resource("adhocracy.resources.proposal.IProposalVersion"))
+                $scope.proposalVersion = (new Resources.Resource("adhocracy.resources.proposal.IProposalVersion"))
                                               .addIDocument("", "", []);
 
                 $scope.paragraphVersions = [];
 
                 $scope.pushParagraphVersion = function () {
-                    $scope.paragraphVersions.push(new Types.Resource("adhocracy.resources.paragraph.IParagraphVersion")
+                    $scope.paragraphVersions.push(new Resources.Resource("adhocracy.resources.paragraph.IParagraphVersion")
                                                       .addIParagraph(""));
                 };
 
                 $scope.commit = function() {
-                    var proposalPromise = postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions);
+                    var proposalPromise = Resources.postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions);
                     proposalPromise.then( (resp) =>
                         $http.get(resp.data.path).then( (respGet =>
                             $scope.onNewProposal(respGet.data))
@@ -302,6 +260,7 @@ export function run<Data>() {
             }
         };
     }]);
+
 
     // get going
 
