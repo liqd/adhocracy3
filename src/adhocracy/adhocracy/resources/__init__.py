@@ -5,10 +5,12 @@ from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import ITag
+from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import get_resource_interface
+from adhocracy.sheets.tags import ITags
 from adhocracy.sheets.versions import IVersionableFollowsReference
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
@@ -39,6 +41,30 @@ def item_create_initial_content(context, registry=None):
     ResourceFactory(ITag)(context, appstructs=tag_last_data)
 
 
+def _update_last_tag(context, registry, old_version_oids):
+    """Update the LAST tag in the parent item of a new version.
+
+    Args:
+        context (IResource): the newly created resource
+        registry: the registry
+        old_version_oids (list of int): list of versions followed by the new
+            one
+
+    """
+    # Find parent item
+    parent_item = context.__parent__
+    if not IItem.providedBy(parent_item):
+        return
+
+    tag_sheet = registry.getMultiAdapter((parent_item, ITags),
+                                         IResourcePropertySheet)
+    tags = tag_sheet.get_cstruct()['elements']
+
+    if tags:
+        # TODO find and modify LAST tag
+        pass
+
+
 def itemversion_create_notify(context, registry=None, options=[]):
     """Notify referencing Items after creating a new ItemVersion.
 
@@ -55,6 +81,7 @@ def itemversion_create_notify(context, registry=None, options=[]):
         follows = list(om.targets(context, IVersionableFollowsReference))
         new_version = context
         new_version_oid = get_oid(new_version)
+        old_version_oids = []
 
         if options and isinstance(options[0], str):
             # Convert resource paths to resources
@@ -70,6 +97,7 @@ def itemversion_create_notify(context, registry=None, options=[]):
 
         for old_version in follows:
             old_version_oid = get_oid(old_version)
+            old_version_oids.append(old_version_oid)
             # Notify that an new ItemVersion is being created
             event_new = ItemNewVersionAdded(new_version.__parent__,
                                             old_version,
@@ -90,6 +118,9 @@ def itemversion_create_notify(context, registry=None, options=[]):
                         options
                     )
                     registry.notify(event_ref)
+
+        # Update LAST tag in parent item
+        _update_last_tag(context, registry, old_version_oids)
 
 
 class ResourceFactory(object):
