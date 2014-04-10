@@ -4,7 +4,6 @@ from adhocracy.interfaces import ISheet
 from functools import reduce
 from pyramid.path import DottedNameResolver
 from substanced.util import get_dotted_name
-from zope.interface import Interface
 from zope.interface import directlyProvidedBy
 from zope.interface import providedBy
 
@@ -40,18 +39,6 @@ def create_schema_from_dict(key_values, base_node=None):
         base_node.add(node)
     return base_node
 
-
-# def get_essence(context):
-#     """Get resource essence.
-#
-#     Args:
-#         context (IResource): object
-#     Returns:
-#         Set: context object and all objects in its ``essence``
-#
-#     """
-#     assert IResource.providedBy(context)
-#     essence = set()
 
 def get_resource_interface(context):
     """Get resource type interface.
@@ -107,26 +94,6 @@ def get_all_taggedvalues(iface):
     return taggedvalues
 
 
-def get_ifaces_from_module(module, base=Interface, blacklist=[]):
-    """return list with interface class objects in module.
-
-    Note: inspect.isclass is not working with interfaces,
-    so we have to do it manually
-
-    """
-    ifaces = []
-    for key in dir(module):
-        value = getattr(module, key)
-        if value in blacklist + [base]:
-            continue
-        try:
-            if issubclass(value, base):
-                ifaces.append(value)
-        except TypeError:
-            continue
-    return ifaces
-
-
 def diff_dict(old_dict, new_dict, omit=()):
     """Calculate changed keys of two dictionaries.
 
@@ -146,7 +113,7 @@ def diff_dict(old_dict, new_dict, omit=()):
     return (added, changed, removed)
 
 
-def sort_dict(d, sort_paths):
+def _sort_dict(d, sort_paths):  # pragma: no cover
     """Return sorted dictionary."""
     d2 = copy.deepcopy(d)
     for path in sort_paths:
@@ -155,9 +122,13 @@ def sort_dict(d, sort_paths):
     return d2
 
 
-def pprint_json(json_dict):
-    """Return sorted string representation of the dict."""
-    json_dict_sorted = sort_dict(json_dict)
+def pprint_json(json_dict):  # pragma: no cover
+    """Return sorted string representation of the dict.
+
+    WARN: Not used and not testet
+
+    """
+    json_dict_sorted = _sort_dict(json_dict)
     py_dict = json.dumps(json_dict_sorted, sort_keys=True,
                          indent=4, separators=(',', ': '))
     pprint.pprint(py_dict)
@@ -195,6 +166,6 @@ def to_dotted_name(obj):
 
     """
     if isinstance(obj, str):
-        return obj  # return unchanged
+        return obj
     else:
         return get_dotted_name(obj)

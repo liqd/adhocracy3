@@ -15,6 +15,8 @@ from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.sheets.versions import followed_by
 from adhocracy.sheets.versions import IVersionable
+from adhocracy.schema import AbsolutePath
+from adhocracy.schema import AbstractReferenceIterableSchemaNode
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
@@ -24,11 +26,11 @@ from copy import deepcopy
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
 from cornice.schemas import CorniceSchema
+from pyramid.path import DottedNameResolver
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
 from substanced.interfaces import IRoot
-from substanced.schema import IdSet
 
 import functools
 
@@ -394,6 +396,11 @@ class MetaApiView(RESTView):
 
     """
 
+    def __init__(self, context, request):
+        """Create a new instance."""
+        super().__init__(context, request)
+        self.resolv = DottedNameResolver()
+
     def _describe_resources(self, resource_types):
         """Build a description of the resources registered in the system.
 
@@ -493,42 +500,46 @@ class MetaApiView(RESTView):
 
                 # Only process 'field:...' definitions
                 if fieldname != key:
-                    valuetype = type(value.typ)
-                    outertype = type(value.typ)
 
-                    # FIXME: Add additional containertypes such as "list" as
-                    # the need arised
-                    if issubclass(valuetype, IdSet):
-                        containertype = 'set'
-                    else:
-                        containertype = None
-                        # If the outer type is not a container and it's not
-                        # just a generic SchemaNode, we use the outer type
-                        # as "valuetype" since it provides most specific
-                        # information (e.g. "adhocracy.schema.Identifier"
-                        # instead of just "String")
-                        outertype = type(value)
-                        if outertype is not SchemaNode:
-                            valuetype = outertype
+                    valuetype = type(value)
+                    valuetyp = type(value.typ)
+                    typ = to_dotted_name(valuetyp)
+                    containertype = None
+                    targetsheet = None
 
-                    typ = to_dotted_name(valuetype)
-                    typ = strip_optional_prefix(typ, 'colander.')
+                    # If the outer type is not a container and it's not
+                    # just a generic SchemaNode, we use the outer type
+                    # as "valuetype" since it provides most specific
+                    # information (e.g. "adhocracy.schema.Identifier"
+                    # instead of just "String")
+                    if valuetype is not SchemaNode:
+                        typ = to_dotted_name(valuetype)
 
-                    # Workaround for PathSet: it's actally a set of
-                    # AbsolutePath's
-                    if typ == 'adhocracy.schema.PathSet':
-                        typ = 'adhocracy.schema.AbsolutePath'
+                    if issubclass(valuetype,
+                                  AbstractReferenceIterableSchemaNode):
+                        # Workaround for AbstractPathIterable:
+                        # it's a list/set of AbsolutePath's
+                        empty_appstruct = valuetyp().create_empty_appstruct()
+                        containertype = empty_appstruct.__class__.__name__
+                        typ = to_dotted_name(AbsolutePath)
+                        # set targetsheet
+                        reftype = self.resolv.maybe_resolve(value.reftype)
+                        target_isheet = reftype.getTaggedValue('target_isheet')
+                        targetsheet = to_dotted_name(target_isheet)
+
+                    typ_stripped = strip_optional_prefix(typ, 'colander.')
 
                     fielddesc = {
                         'name': fieldname,
-                        'valuetype': typ,
+                        'valuetype': typ_stripped,
                         'createmandatory': createmandatory,
                         'readonly': self._sheet_field_readable(
                             sheet_name, fieldname, readonly)
                     }
-
                     if containertype is not None:
                         fielddesc['containertype'] = containertype
+                    if targetsheet is not None:
+                        fielddesc['targetsheet'] = targetsheet
 
                     fields.append(fielddesc)
 

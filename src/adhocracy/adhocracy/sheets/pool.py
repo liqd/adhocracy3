@@ -3,7 +3,7 @@ from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.sheets import ResourcePropertySheetAdapter
-from adhocracy.schema import ReferenceSetSchemaNode
+from adhocracy.schema import ReferenceListSchemaNode
 from pyramid.path import DottedNameResolver
 from pyramid.httpexceptions import HTTPNotImplemented
 from substanced.util import get_oid
@@ -25,7 +25,7 @@ class IPool(ISheet):
 
     taggedValue('readonly', True)
     taggedValue('field:elements',
-                ReferenceSetSchemaNode(
+                ReferenceListSchemaNode(
                     reftype='adhocracy.sheets.pool.IPoolElementsReference',
                 ))
 

@@ -6,6 +6,7 @@ from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
+from adhocracy.schema import ReferenceListSchemaNode
 from adhocracy.schema import ReferenceSetSchemaNode
 from pyramid.traversal import resource_path
 from substanced.util import find_objectmap
@@ -83,7 +84,7 @@ class IVersions(ISheet):
 
     taggedValue(
         'field:elements',
-        ReferenceSetSchemaNode(
+        ReferenceListSchemaNode(
             default=[],
             missing=colander.drop,
             reftype='adhocracy.sheets.versions.IVersionsElementsReference',

@@ -178,7 +178,7 @@ valuetype
     by Colander) such as "String" or "Integer", or a custom-defined type
     such as "adhocracy.schema.AbsolutePath"
 
-There also is an optional key:
+There also are some optional keys:
 
 containertype
     Only present if the field can store multiple values (each of the type
@@ -186,6 +186,42 @@ containertype
     attribute is either "list" (a list of values: order matters, duplicates
     are allowed) or "set" (a set of values: unordered, no duplicates).
 
+targetsheet
+    Only present if "valuetype" is a path
+    ("adhocracy.schema.AbsolutePath"). If present, it gives the name of the
+    sheet that all pointed-to resources will implement (they might possibly
+    be of different types, but they will always implement the given sheet
+    or they wouldn't be valid link targets).
+
+For example, the 'subsections' field of ISection is an ordered list
+pointing to other ISection's:
+
+    >>> secfields = resp_data['sheets']['adhocracy.sheets.document.ISection']['fields']
+    >>> for field in secfields:
+    ...     if field['name'] == 'subsections':
+    ...         pprint(field)
+    ...         break
+    {'containertype': 'list',
+     'createmandatory': False,
+     'name': 'subsections',
+     'readonly': False,
+     'targetsheet': 'adhocracy.sheets.document.ISection',
+     'valuetype': 'adhocracy.schema.AbsolutePath'}
+
+The 'follows' field of IVersionable is an unordered set pointing to other
+IVersionable's:
+
+    >>> verfields = resp_data['sheets']['adhocracy.sheets.versions.IVersionable']['fields']
+    >>> for field in verfields:
+    ...     if field['name'] == 'follows':
+    ...         pprint(field)
+    ...         break
+    {'containertype': 'set',
+     'createmandatory': False,
+     'name': 'follows',
+     'readonly': False,
+     'targetsheet': 'adhocracy.sheets.versions.IVersionable',
+     'valuetype': 'adhocracy.schema.AbsolutePath'}
 
 OPTIONS
 ~~~~~~~
@@ -498,11 +534,13 @@ to work ::
       'createmandatory': False,
       'name': 'followed_by',
       'readonly': True,
+      'targetsheet': 'adhocracy.sheets.versions.IVersionable',
       'valuetype': 'adhocracy.schema.AbsolutePath'},
      {'containertype': 'set',
       'createmandatory': False,
       'name': 'follows',
       'readonly': False,
+      'targetsheet': 'adhocracy.sheets.versions.IVersionable',
       'valuetype': 'adhocracy.schema.AbsolutePath'}]
 
 The 'follows' element must be set by the client when it creates a new

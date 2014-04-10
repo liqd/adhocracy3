@@ -33,21 +33,33 @@ class AbsolutePath(colander.SchemaNode):
     validator = colander.Regex(u'^/[a-zA-Z0-9\_\-\.\/]+$')
 
 
-class PathSet(IdSet):
+class AbstractPathIterable(IdSet):
 
-    """Colander Type to store object paths.
+    """Abstract Colander type to store multiple object paths.
 
     Serialize to a list of absolute object paths (['/o1/o2', '/o3']).
-    Deserialize to a list of zodb oids [123123, 4324324].
+    Deserialize to an iterable of zodb oids [123123, 4324324].
 
     Raise colander.Invalid if path or oid does not exist.
 
+    Child classes must overwrite the `create_empty_appstruct` and
+    `add_to_appstruct` methods for the specific iterable to use for
+    deserialization (e.g. list or set).
+
     """
+
+    def create_empty_appstruct(self):
+        """Create an empty iterable container."""
+        raise NotImplementedError()  # pragma: no cover
+
+    def add_to_appstruct(self, appstruct, element):
+        """Add an element to the container to used to store paths."""
+        raise NotImplementedError()  # pragma: no cover
 
     def serialize(self, node, value):
         """Serialize oid to path.
 
-        Return List with paths.
+        Return list with paths.
 
         """
         if value is colander.null:
@@ -69,7 +81,7 @@ class PathSet(IdSet):
     def deserialize(self, node, value):
         """Deserialize path to oid.
 
-        Return List with oids.
+        Return iterable with oids.
 
         """
         if value is colander.null:
@@ -77,7 +89,7 @@ class PathSet(IdSet):
         self._check_iterable(node, value)
         context = node.bindings['context']
         object_map = find_objectmap(context)
-        oids = []
+        oids = self.create_empty_appstruct()
         for path in value:
             path_tuple = tuple(str(path).split('/'))
             oid = object_map.objectid_for(path_tuple)
@@ -85,8 +97,44 @@ class PathSet(IdSet):
                 raise colander.Invalid(node,
                                        msg='This object path does not exist.',
                                        value=path)
-            oids.append(oid)
+            self.add_to_appstruct(oids, oid)
         return oids
+
+
+class PathList(AbstractPathIterable):
+
+    """List of :class:`AbsolutePath`.
+
+    Example value: [/bluaABC, /_123/3]
+
+    """
+
+    def create_empty_appstruct(self):
+        """Create and return an empty list."""
+        return []
+
+    def add_to_appstruct(self, appstruct, element):
+        """Add an element to a list."""
+        appstruct.append(element)
+
+
+class PathSet(AbstractPathIterable):
+
+    """Set of :class:`AbsolutePath`.
+
+    The order is not preserved, duplicates are removed.
+
+    Example value: [/bluaABC, /_123/3]
+
+    """
+
+    def create_empty_appstruct(self):
+        """Create and return an empty set."""
+        return set()
+
+    def add_to_appstruct(self, appstruct, element):
+        """Add an element to a set."""
+        appstruct.add(element)
 
 
 def get_all_resources(node, context):
@@ -103,11 +151,16 @@ def get_all_resources(node, context):
     #                [d for d in docs if d])
 
 
-class ReferenceSetSchemaNode(schema.MultireferenceIdSchemaNode):
+class AbstractReferenceIterableSchemaNode(schema.MultireferenceIdSchemaNode):
 
-    """Colander SchemaNode to store a set of references."""
+    """Abstract Colander SchemaNode to store multiple references.
 
-    schema_type = PathSet
+    This is is an abstract class, only subclasses that set `schema_type` to a
+    concrete subclass of `AbstractPathIterable` can be instantiated.
+
+    """
+
+    schema_type = AbstractPathIterable
 
     default = []
     missing = colander.drop
@@ -136,3 +189,17 @@ class ReferenceSetSchemaNode(schema.MultireferenceIdSchemaNode):
                     error = 'This Resource does not provide interface %s' % \
                             (isheet.__identifier__)
                     raise colander.Invalid(node, msg=error, value=oid)
+
+
+class ReferenceSetSchemaNode(AbstractReferenceIterableSchemaNode):
+
+    """Colander SchemaNode to store a set of references."""
+
+    schema_type = PathSet
+
+
+class ReferenceListSchemaNode(AbstractReferenceIterableSchemaNode):
+
+    """Colander SchemaNode to store a list of references."""
+
+    schema_type = PathList
