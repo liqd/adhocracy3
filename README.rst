@@ -9,7 +9,7 @@ Softwarestack
 
 server (backend):
 
-- `substance <http://docs.pylonsproject.org/projects/substanced/en/latest>`_ (application framework/server)
+- `substance D <http://docs.pylonsproject.org/projects/substanced/en/latest>`_ (application framework/server)
 
 - `Pyramid <http://pylonsproject.org>`_  (web framework)
 
@@ -27,10 +27,10 @@ server (backend):
 
 client (frontend):
 
-- `javascript` (programming language)
+- `JavaScript` (programming language)
 
-- `typescript` <http://www.typescriptlang.org/> (module system)
+- `TypeScript <http://www.typescriptlang.org/>`_ (module system)
 
-- `obviel` <http://www.obviel.org> (application framework)
+- `AngularJS <http://angularjs.org/>`_ (application framework)
 
-- `robotframework` <http://robotframework.org/> (acceptance and frontend tests)
+- `Robot Framework <http://robotframework.org/>`_ (acceptance and frontend tests)
