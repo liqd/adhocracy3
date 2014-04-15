@@ -151,7 +151,6 @@ class ResourceFactory(object):
             the newly created resource
 
         """
-
         res = DottedNameResolver()
         resource = self.class_()
         directlyProvides(resource, self.resource_iface)
