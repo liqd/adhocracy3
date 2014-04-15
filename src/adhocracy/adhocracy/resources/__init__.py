@@ -62,9 +62,9 @@ def _update_last_tag(context, om, registry, old_version_oids):
     taglist = tag_sheet.get_cstruct()['elements']
 
     if taglist:
-        # find LAST tag
         for tag in taglist:
-            if tag.endswith('/LAST'):
+            # find LAST tag (last part of tag name must be 'LAST')
+            if tag.split('/')[-1] == ('LAST'):
                 last_tag = om.object_for((tag,))
                 if last_tag is not None:
                     itag_sheet = registry.getMultiAdapter(
