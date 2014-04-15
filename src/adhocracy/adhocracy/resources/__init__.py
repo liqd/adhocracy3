@@ -10,7 +10,7 @@ from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import get_resource_interface
-from adhocracy.sheets.tags import ITags
+from adhocracy.sheets import tags
 from adhocracy.sheets.versions import IVersionableFollowsReference
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
@@ -41,12 +41,13 @@ def item_create_initial_content(context, registry=None):
     ResourceFactory(ITag)(context, appstructs=tag_last_data)
 
 
-def _update_last_tag(context, registry, old_version_oids):
+def _update_last_tag(context, om, registry, old_version_oids):
     """Update the LAST tag in the parent item of a new version.
 
     Args:
         context (IResource): the newly created resource
         registry: the registry
+        om: the object map
         old_version_oids (list of int): list of versions followed by the new
             one
 
@@ -56,13 +57,31 @@ def _update_last_tag(context, registry, old_version_oids):
     if not IItem.providedBy(parent_item):
         return
 
-    tag_sheet = registry.getMultiAdapter((parent_item, ITags),
+    tag_sheet = registry.getMultiAdapter((parent_item, tags.ITags),
                                          IResourcePropertySheet)
-    tags = tag_sheet.get_cstruct()['elements']
+    taglist = tag_sheet.get_cstruct()['elements']
 
-    if tags:
-        # TODO find and modify LAST tag
-        pass
+    if taglist:
+        # find LAST tag
+        for tag in taglist:
+            if tag.endswith('/LAST'):
+                last_tag = om.object_for((tag,))
+                if last_tag is not None:
+                    itag_sheet = registry.getMultiAdapter(
+                        (last_tag, tags.ITag), IResourcePropertySheet)
+                    itag_dict = itag_sheet.get()
+                    oids_before = itag_dict['elements']
+                    oids_after = []
+
+                    # Remove OIDs of our predecessors, keep the rest
+                    for oid in oids_before:
+                        if oid not in old_version_oids:
+                            oids_after.append(oid)
+
+                    # Append OID of new version to end of list
+                    oids_after.append(context.__oid__)
+                    itag_dict['elements'] = oids_after
+                    itag_sheet.set(itag_dict)
 
 
 def itemversion_create_notify(context, registry=None, options=[]):
@@ -120,7 +139,7 @@ def itemversion_create_notify(context, registry=None, options=[]):
                     registry.notify(event_ref)
 
         # Update LAST tag in parent item
-        _update_last_tag(context, registry, old_version_oids)
+        _update_last_tag(context, om, registry, old_version_oids)
 
 
 class ResourceFactory(object):
