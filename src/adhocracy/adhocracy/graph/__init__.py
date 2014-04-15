@@ -79,8 +79,8 @@ def is_in_subtree(descendant, ancestors):
         ancestors is None or empty).
 
     """
-    if not ancestors or descendant is None:
-        return False
+    assert IResource.providedBy(descendant)
+    assert isinstance(ancestors, list)
 
     descendant_oid = descendant.__oid__
 

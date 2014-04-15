@@ -6,6 +6,7 @@ from . import collect_reftypes
 from . import is_in_subtree
 
 import unittest
+import pytest
 
 ############
 #  helper  #
@@ -46,8 +47,8 @@ class GraphUnitTest(unittest.TestCase):
 
     def test_is_in_subtree_with_none_ancestor(self):
         """False if ancestors is None."""
-        result = is_in_subtree(self.child, None)
-        assert result is False
+        with pytest.raises(AssertionError):
+            is_in_subtree(self.child, None)
 
     def test_is_in_subtree_with_no_ancestors(self):
         """False if ancestors is an empty list."""
@@ -56,13 +57,13 @@ class GraphUnitTest(unittest.TestCase):
 
     def test_is_in_subtree_with_none_descendant(self):
         """False if descendant is None."""
-        result = is_in_subtree(None, [self.child])
-        assert result is False
+        with pytest.raises(AssertionError):
+            is_in_subtree(None, [self.child])
 
     def test_is_in_subtree_with_just_none(self):
         """False if ancestors and descendant are both None."""
-        result = is_in_subtree(None, None)
-        assert result is False
+        with pytest.raises(AssertionError):
+            is_in_subtree(None, None)
 
     def test_is_in_subtree_of_itself(self):
         """True if both are the same resource."""
