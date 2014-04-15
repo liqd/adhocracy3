@@ -1,6 +1,7 @@
 """Utilities for working with the version/reference graph (DAG)."""
 
 from adhocracy.interfaces import AdhocracyReferenceType
+from adhocracy.interfaces import IResource
 from adhocracy.sheets.versions import IVersionableFollowsReference
 from substanced.objectmap import find_objectmap
 
@@ -70,34 +71,29 @@ def is_in_subtree(descendant, ancestors):
          ancestors (list of IResource): the candidate ancestors
 
     Returns:
-        True iff there exists a relation from one of the `ancestors` to
+        True if there exists a relation from one of the `ancestors` to
         `descendant` that does NOT include any 'follows' links. For example,
         descendant might be an element of an element (of an element...) of an
         ancestor. Also if descendant and of the ancestors are the same node.
 
-        False otherwise (including the case that descendant is None and
-        ancestors is None or empty).
+        False otherwise.
 
     """
     assert IResource.providedBy(descendant)
     assert isinstance(ancestors, list)
 
-    descendant_oid = descendant.__oid__
-
-    for ancestor in ancestors:
-        if ancestor.__oid__ == descendant_oid:
-            return True
-
+    result = False
     objectmap = find_objectmap(descendant)
-    # We don't want any 'follows' links
-    reftypes = collect_reftypes(objectmap,
-                                [IVersionableFollowsReference])
+    reftypes = collect_reftypes(objectmap, [IVersionableFollowsReference])
+
     checked_map = {}
-
     for ancestor in ancestors:
-        found = _check_ancestry(objectmap, reftypes, ancestor, descendant,
-                                checked_map)
-        if found:
-            return True  # We're done
+        if ancestor.__oid__ == descendant.__oid__:
+            result = True
+        else:
+            result = _check_ancestry(objectmap, reftypes, ancestor, descendant,
+                                     checked_map)
+        if result:
+            break
 
-    return False  # No luck
+    return result
