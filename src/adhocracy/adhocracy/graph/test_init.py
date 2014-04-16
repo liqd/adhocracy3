@@ -2,9 +2,6 @@ from adhocracy.interfaces import IResource
 from adhocracy.interfaces import AdhocracyReferenceType
 from pyramid import testing
 
-from . import collect_reftypes
-from . import is_in_subtree
-
 import unittest
 import pytest
 
@@ -35,7 +32,11 @@ def create_dummy_resource(parent=None, iface=IResource):
 ##########
 
 
-class GraphUnitTest(unittest.TestCase):
+class IsInSubtreeUnitTest(unittest.TestCase):
+
+    def _make_one(self, descendant, ancestors):
+        from . import is_in_subtree
+        return is_in_subtree(descendant, ancestors)
 
     def setUp(self):
         from substanced.objectmap import ObjectMap
@@ -45,32 +46,32 @@ class GraphUnitTest(unittest.TestCase):
         child = create_dummy_resource(parent=context)
         self.child = child
 
-    def test_is_in_subtree_with_none_ancestor(self):
+    def test__make_one_with_none_ancestor(self):
         """False if ancestors is None."""
         with pytest.raises(AssertionError):
-            is_in_subtree(self.child, None)
+            self._make_one(self.child, None)
 
-    def test_is_in_subtree_with_no_ancestors(self):
+    def test_with_no_ancestors(self):
         """False if ancestors is an empty list."""
-        result = is_in_subtree(self.child, [])
+        result = self._make_one(self.child, [])
         assert result is False
 
-    def test_is_in_subtree_with_none_descendant(self):
+    def test_with_none_descendant(self):
         """False if descendant is None."""
         with pytest.raises(AssertionError):
-            is_in_subtree(None, [self.child])
+            self._make_one(None, [self.child])
 
-    def test_is_in_subtree_with_just_none(self):
+    def test_with_just_none(self):
         """False if ancestors and descendant are both None."""
         with pytest.raises(AssertionError):
-            is_in_subtree(None, None)
+            self._make_one(None, None)
 
-    def test_is_in_subtree_of_itself(self):
+    def test_of_itself(self):
         """True if both are the same resource."""
-        result = is_in_subtree(self.child, [self.child])
+        result = self._make_one(self.child, [self.child])
         assert result is True
 
-    def test_is_in_subtree_direct_link(self):
+    def test_direct_link(self):
         """True if direct AdhocracyReferenceType link from ancestor to
         descendent.
 
@@ -80,13 +81,13 @@ class GraphUnitTest(unittest.TestCase):
         om = self.context.__objectmap__
         om.object_for(root.__oid__)
         om.connect(root, element, AdhocracyReferenceType)
-        result = is_in_subtree(element, [root])
+        result = self._make_one(element, [root])
         assert result is True
         # Inverse relation should NOT be found
-        result = is_in_subtree(root, [element])
+        result = self._make_one(root, [element])
         assert result is False
 
-    def test_is_in_subtree_direct_follows_link(self):
+    def test_direct_follows_link(self):
         """False if direct IVersionableFollowsReference link from ancestor to
         descendent.
 
@@ -96,13 +97,13 @@ class GraphUnitTest(unittest.TestCase):
         old_version = create_dummy_resource(parent=self.context)
         om = self.context.__objectmap__
         om.connect(other_version, old_version, IVersionableFollowsReference)
-        result = is_in_subtree(old_version, [other_version])
+        result = self._make_one(old_version, [other_version])
         assert result is False
         # Inverse relation should not be found either
-        result = is_in_subtree(other_version, [old_version])
+        result = self._make_one(other_version, [old_version])
         assert result is False
 
-    def test_is_in_subtree_indirect_link(self):
+    def test_indirect_link(self):
         """True if two-level AdhocracyReferenceType link from ancestor to
         descendent.
 
@@ -113,13 +114,13 @@ class GraphUnitTest(unittest.TestCase):
         om = self.context.__objectmap__
         om.connect(grandma, dad, AdhocracyReferenceType)
         om.connect(dad, daugher, AdhocracyReferenceType)
-        result = is_in_subtree(daugher, [grandma])
+        result = self._make_one(daugher, [grandma])
         assert result is True
         # Inverse relation should NOT be found
-        result = is_in_subtree(grandma, [daugher])
+        result = self._make_one(grandma, [daugher])
         assert result is False
 
-    def test_is_in_subtree_indirect_follows_link(self):
+    def test_indirect_follows_link(self):
         """True if two-level link from ancestor to descendent that includes a
         follows relation.
 
@@ -131,10 +132,10 @@ class GraphUnitTest(unittest.TestCase):
         om = self.context.__objectmap__
         om.connect(dad, daugher, AdhocracyReferenceType)
         om.connect(step_son, daugher, IVersionableFollowsReference)
-        result = is_in_subtree(step_son, [dad])
+        result = self._make_one(step_son, [dad])
         assert result is False
         # Inverse relation should not be found either
-        result = is_in_subtree(dad, [step_son])
+        result = self._make_one(dad, [step_son])
         assert result is False
 
     def test_ancestor_list_has_multiple_elements(self):
@@ -147,51 +148,64 @@ class GraphUnitTest(unittest.TestCase):
         element = create_dummy_resource(parent=self.context)
         om = self.context.__objectmap__
         om.connect(root, element, AdhocracyReferenceType)
-        result = is_in_subtree(element, [root, not_root])
+        result = self._make_one(element, [root, not_root])
         assert result is True
-        result = is_in_subtree(element, [not_root, root])
+        result = self._make_one(element, [not_root, root])
         assert result is True
 
-    def test_collect_reftypes_with_empty_objectmap_and_default_excludes(self):
+
+class CollectReftypesUnitTest(unittest.TestCase):
+
+    def _make_one(self, objectmap, excluded_types=[]):
+        from . import collect_reftypes
+        return collect_reftypes(objectmap, excluded_types)
+
+    def setUp(self):
+        from substanced.objectmap import ObjectMap
+        context = create_dummy_resource()
+        om = ObjectMap(context)
+        context.__objectmap__ = om
+        self.context = context
+        self.objectmap = om
+
+    def test_with_empty_objectmap_and_default_excludes(self):
         """No relations in objectmap, so result should be empty."""
-        om = self.context.__objectmap__
-        result = collect_reftypes(om)
+        result = self._make_one(self.objectmap)
         assert result == []
 
-    def test_collect_reftypes_with_empty_objectmap_and_None_excludes(self):
+    def test_with_empty_objectmap_and_None_excludes(self):
         """No relations in objectmap, so result should be empty."""
-        om = self.context.__objectmap__
-        result = collect_reftypes(om, None)
+        result = self._make_one(self.objectmap, None)
         assert result == []
 
-    def test_collect_reftypes_two_types(self):
+    def test_two_types(self):
         """Two reftypes in objectmap, both should be found."""
         dad = create_dummy_resource(parent=self.context)
         daugher = create_dummy_resource(parent=self.context)
         step_son = create_dummy_resource(parent=self.context)
-        om = self.context.__objectmap__
+        om = self.objectmap
         om.connect(dad, daugher, AdhocracyReferenceType)
 
         class IOtherReferenceType(AdhocracyReferenceType):
             pass
         om.connect(step_son, daugher, IOtherReferenceType)
-        result = collect_reftypes(om)
+        result = self._make_one(om)
         assert len(result) == 2
         assert AdhocracyReferenceType in result
         assert IOtherReferenceType in result
 
-    def test_collect_reftypes_one_excluded(self):
+    def test_one_excluded(self):
         """Two reftypes in OM, one is excluded, the other should be found."""
         dad = create_dummy_resource(parent=self.context)
         daugher = create_dummy_resource(parent=self.context)
         step_son = create_dummy_resource(parent=self.context)
-        om = self.context.__objectmap__
+        om = self.objectmap
         om.connect(dad, daugher, AdhocracyReferenceType)
 
         class IOtherReferenceType(AdhocracyReferenceType):
             pass
         om.connect(step_son, daugher, IOtherReferenceType)
-        result = collect_reftypes(om, [AdhocracyReferenceType])
+        result = self._make_one(om, [AdhocracyReferenceType])
         assert len(result) == 1
         assert IOtherReferenceType in result
         assert AdhocracyReferenceType not in result
