@@ -370,15 +370,10 @@ class ItemRESTView(PoolRESTView):
         """HTTP POST. Return dictionary with PATH of new resource."""
         resource_type = self.request.validated['content_type']
         appstructs = self.request.validated.get('data', {})
-        root_versions = self.request.validated.get('root_versions', None)
-        if root_versions:
-            # pass non-empty root_versions along to resource creator
-            resource = self.registry.create(resource_type, self.context,
-                                            appstructs=appstructs,
-                                            options=root_versions)
-        else:
-            resource = self.registry.create(resource_type, self.context,
-                                            appstructs=appstructs)
+        root_versions = self.request.validated.get('root_versions', [])
+        resource = self.registry.create(resource_type, self.context,
+                                        appstructs=appstructs,
+                                        root_versions=root_versions)
         return self.build_post_response(resource)
 
 

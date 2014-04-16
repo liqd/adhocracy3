@@ -675,7 +675,7 @@ class ItemRESTViewUnitTest(unittest.TestCase):
         self.request.validated = {'content_type':
                                   IItemVersion.__identifier__,
                                   'data': {},
-                                  'root_versions': []}
+                                  'root_versions': [12333]}
         inst = self.make_one(self.context, self.request)
         response = inst.post()
 

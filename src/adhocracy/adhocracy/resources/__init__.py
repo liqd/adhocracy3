@@ -21,7 +21,7 @@ from zope.interface import alsoProvides
 import datetime
 
 
-def item_create_initial_content(context, registry=None):
+def item_create_initial_content(context, registry, options):
     """Add first version and the Tags LAST and FIRST."""
     iface = get_resource_interface(context)
     item_type = get_all_taggedvalues(iface)['item_type']
@@ -39,37 +39,29 @@ def item_create_initial_content(context, registry=None):
     ResourceFactory(ITag)(context, appstructs=tag_last_data)
 
 
-def itemversion_create_notify(context, registry=None, options=[]):
+def itemversion_create_notify(context, registry, options):
     """Notify referencing Items after creating a new ItemVersion.
 
     Args:
         context (IResource): the newly created resource
-        registry: the registry
-        options: list of root versions. Will be passed along to resources that
+        registry: the substanced registry
+        option (dict): Dict with 'root_versions', a list of
+            root resources. Will be passed along to resources that
             reference old versions so they can decide whether they should
             update themselfes.
 
     """
-    #FIXME option is dict with arbitary resource factory additional kwargs
-    # to be more meaningfull
     om = find_objectmap(context)
     if registry is not None and om is not None:
         follows = list(om.targets(context, IVersionableFollowsReference))
         new_version = context
         new_version_oid = get_oid(new_version)
 
-        if options and isinstance(options[0], str):
-            # Convert resource paths to resources
+        # Convert resource paths to resources
 
-            # FIXME make sure options alread contains a list of validated
-            # resources. Validation should happen in views.
-            root_resources = []
-            for path in options:
-                root = om.object_for((path,))
-                if root is None:
-                    raise ValueError('Not a valid resource path: ' + path)
-                root_resources.append(root)
-            options = root_resources
+        # FIXME make sure options alread contains a list of validated
+        # resources. Validation should happen in views.
+        root_versions = options.get('root_versions', [])
 
         for old_version in follows:
             old_version_oid = get_oid(old_version)
@@ -90,7 +82,7 @@ def itemversion_create_notify(context, registry=None, options=[]):
                         reftype.getTaggedValue('source_isheet_field'),
                         old_version_oid,
                         new_version_oid,
-                        options
+                        root_versions
                     )
                     registry.notify(event_ref)
 
@@ -140,18 +132,23 @@ class ResourceFactory(object):
                  appstructs={},
                  run_after_creation=True,
                  add_to_context=True,
-                 options=None
+                 **kwargs
                  ):
         """Triggered whan a ResourceFactory instance is called.
 
         Args:
+            context (IResource):
+            add_to_context (bool): make context the parent of the new resource.
+                Default is True.
             after_creation (bool): whether to invoke after_creation hooks
-            options (optional): if not None, will be passed along to
-                after_creation hooks as 3rd argument (after the newly created
-                resource and the registry)
+                Default is True.
+            appstructs (dict): key/values of sheet appstruct data. Key is an
+                identifier of a sheet interface. Value is the data to set.
+            **kwargs: arbitary keyword arguments. Will be passed along to
+                after_creation hooks as 3rd argument 'options'.
 
         Returns:
-            the newly created resource
+            object (IResource): the newly created resource
 
         """
         res = DottedNameResolver()
@@ -175,12 +172,8 @@ class ResourceFactory(object):
 
         if run_after_creation:
             registry = get_current_registry()
-            if options:
-                for call in self.after_creation:
-                    call(resource, registry, options)
-            else:
-                for call in self.after_creation:
-                    call(resource, registry)
+            for call in self.after_creation:
+                call(resource, registry, options=kwargs)
 
         return resource
 

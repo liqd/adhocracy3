@@ -298,22 +298,24 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
-        def dummy_after_create(context, registry):
-            context.test = 'aftercreate'
+        def dummy_after_create(context, registry, options):
+            context._options = options
+            context._registry = registry
 
         class IResourceType(IResource):
             taggedValue('after_creation', [dummy_after_create])
 
         inst = self.make_one(IResourceType)
-        resource = inst(self.context)
+        resource = inst(self.context, kwarg1=True)
 
-        assert resource.test == 'aftercreate'
+        assert resource._options == {"kwarg1": True}
+        assert resource._registry is self.config.registry
 
     def test_valid_no_run_after_create(self):
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
-        def dummy_after_create(context, registry):
+        def dummy_after_create(context, registry, options):
             context.test = 'aftercreate'
 
         class IResourceType(IResource):
