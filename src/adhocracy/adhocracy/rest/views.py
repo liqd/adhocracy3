@@ -329,7 +329,6 @@ class PoolRESTView(SimpleRESTView):
             the serialized response
 
         """
-
         response_schema = ResourceResponseSchema()
         struct = {}
         struct['path'] = resource_path(resource)
