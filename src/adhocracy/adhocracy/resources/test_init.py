@@ -138,20 +138,16 @@ class ItemVersionIntegrationTest(unittest.TestCase):
             follows_oid (int): OID of preceding version (follows)
 
         """
-
         from adhocracy.sheets.versions import IVersionable
-        return {
-            IVersionable.__identifier__: {
-                'follows': [follows_oid],
-                }
-            }
+        return {IVersionable.__identifier__: {'follows': [follows_oid]}}
 
     def make_one(self, iface=None, appstructs={}, root_versions=[]):
         from adhocracy.interfaces import IItemVersion
         from . import ResourceFactory
-        return ResourceFactory(iface or IItemVersion)(self.context,
-                                                      appstructs=appstructs,
-                                                      options=root_versions)
+        factory = ResourceFactory(iface or IItemVersion)
+        return factory(self.context,
+                       appstructs=appstructs,
+                       root_versions=root_versions)
 
     def test_create_without_referencing_items(self):
         from adhocracy.interfaces import IItemVersion
@@ -165,7 +161,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         old_version = self.make_one()
         new_version_data = self.make_new_version_data(old_version.__oid__)
         new_version = self.make_one(appstructs=new_version_data,
-                      root_versions=[old_version])
+                                    root_versions=[old_version])
 
         assert IItemVersion.providedBy(new_version)
         assert len(events) == 1
@@ -369,7 +365,6 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         inst = self.make_one(IResourceType)
         with pytest.raises(ValueError):
             inst(self.context, appstructs=data)
-
 
     def test_non_valid_missing_context(self):
         from adhocracy.interfaces import IResource
