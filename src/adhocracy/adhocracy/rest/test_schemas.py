@@ -3,6 +3,10 @@ import unittest
 import pytest
 
 
+###########
+#  tests  #
+###########
+
 class ResourceResponseSchemaUnitTest(unittest.TestCase):
 
     def make_one(self):
@@ -73,14 +77,28 @@ class POSTResourceRequestSchemaUnitTest(unittest.TestCase):
             inst.deserialize({})
 
 
-
 class POSTItemRequestSchemaUnitTest(unittest.TestCase):
 
     def make_one(self):
         from .schemas import POSTItemRequestSchema
         return POSTItemRequestSchema()
 
-    #FIXME test root_version deserialize with dummy objectmap
+    def test_deserialize_valid_with_no_root_versions(self):
+        inst = self.make_one()
+        result = inst.deserialize({'content_type': 'X', 'data': {}})
+        assert 'root_versions' in result
+        assert result['root_versions'] == []
+
+    def test_deserialize_valid_with_root_versions(self):
+        inst = self.make_one()
+        assert inst.deserialize({'content_type': "X", 'data': {},
+                                 'root_versions': ["/path"]})
+
+    def test_deserialize_non_valid_with_root_versions(self):
+        inst = self.make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize({'content_type': "X", 'data': {},
+                              'root_versions': ["?path"]})
 
 
 class OPTIONResourceResponeSchemaUnitTest(unittest.TestCase):

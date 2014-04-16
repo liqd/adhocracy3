@@ -94,9 +94,9 @@ class AbstractPathIterable(IdSet):
             path_tuple = tuple(str(path).split('/'))
             oid = object_map.objectid_for(path_tuple)
             if oid is None:
-                raise colander.Invalid(node,
-                                       msg='This object path does not exist.',
-                                       value=path)
+                raise colander.Invalid(
+                    node,
+                    msg='This resource path does not exist.', value=path)
             self.add_to_appstruct(oids, oid)
         return oids
 

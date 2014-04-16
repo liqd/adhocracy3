@@ -16,6 +16,7 @@ import unittest
 #  helper  #
 ############
 
+
 class IResourceX(IResource):
     pass
 
@@ -95,6 +96,13 @@ def make_resource_types(iresource, metadata):
                                        'metadata': metadata
                                        }
             }
+
+
+@patch('substanced.objectmap.ObjectMap', autospec=True)
+def make_folder_with_objectmap(dummyobjectmap=None):
+    folder = testing.DummyResource()
+    folder.__objectmap__ = dummyobjectmap.return_value
+    return folder
 
 
 ##########
@@ -406,6 +414,72 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
         assert self.request.errors != []
 
 
+class ValidatePOSTRootVersionsUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        context = make_folder_with_objectmap()
+        self.context = context
+        self.om = context.__objectmap__
+        self.request = CorniceDummyRequest()
+
+    def make_one(self, context, request):
+        from .views import validate_post_root_versions
+        validate_post_root_versions(context, request)
+
+    def test_valid_no_value(self):
+        self.make_one(self.context, self.request)
+        assert self.request.errors == []
+
+    def test_valid_empty_value(self):
+        self.make_one(self.context, self.request)
+        self.request.validated = {'root_versions': []}
+        assert self.request.errors == []
+
+    def test_valid_with_value(self):
+        from adhocracy.interfaces import IItemVersion
+        from adhocracy.interfaces import ISheet
+        root = testing.DummyResource(__provides__=(IItemVersion, ISheet))
+        self.om.object_for.return_value = root
+        self.om.objectid_for.return_value = 1
+        self.request.validated = {'root_versions': ["/root"]}
+
+        self.make_one(self.context, self.request)
+
+        assert self.request.errors == []
+        assert self.request.validated == {'root_versions': [root]}
+
+    def test_valid_with_value_but_missing_objectmap(self):
+        self.context.__objectmap__ = None
+        self.request.validated = {'root_versions': ["/root"]}
+
+        self.make_one(self.context, self.request)
+
+        assert self.request.errors == []
+        assert self.request.validated == {'root_versions': []}
+
+    def test_non_valid_value_has_wrong_iface(self):
+        from adhocracy.interfaces import ISheet
+        root = testing.DummyResource(__provides__=(IResourceX, ISheet))
+        self.om.object_for.return_value = root
+        self.om.objectid_for.return_value = 1
+        self.request.validated = {'root_versions': ["/root"]}
+
+        self.make_one(self.context, self.request)
+
+        assert self.request.errors != []
+        assert self.request.validated == {'root_versions': []}
+
+    def test_non_valid_value_does_not_exists(self):
+        self.om.object_for.return_value = None
+        self.om.objectid_for.return_value = None
+        self.request.validated = {'root_versions': ["/root"]}
+
+        self.make_one(self.context, self.request)
+
+        assert self.request.errors != []
+        assert self.request.validated == {'root_versions': []}
+
+
 class RESTViewUnitTest(unittest.TestCase):
 
     def setUp(self):
@@ -635,32 +709,34 @@ class ItemRESTViewUnitTest(unittest.TestCase):
     def test_create(self,):
         from .views import validate_post_sheet_names_and_resource_type
         from .views import validate_post_sheet_cstructs
+        from .views import validate_post_root_versions
         from .views import SimpleRESTView
         from .schemas import POSTItemRequestSchema
         inst = self.make_one(self.context, self.request)
         assert issubclass(inst.__class__, SimpleRESTView)
-        #FIXME: validate the proper root_versions are choosen
         assert inst.validation_POST ==\
             (POSTItemRequestSchema,
              [validate_post_sheet_names_and_resource_type,
-              validate_post_sheet_cstructs
+              validate_post_root_versions,
+              validate_post_sheet_cstructs,
               ])
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
     def test_post_valid(self):
-        child = testing.DummyResource(__provides__=IResourceX)
-        child.__parent__ = self.context
-        child.__name__ = 'child'
+        child = testing.DummyResource(__provides__=IResourceX,
+                                      __parent__=self.context,
+                                      __name__='child')
         self.create.return_value = child
         self.request.validated = {'content_type': IResourceX.__identifier__,
-                                  'data': {},
-                                  'root_versions': []}
+                                  'data': {}}
         inst = self.make_one(self.context, self.request)
         response = inst.post()
 
         wanted = {'path': '/child', 'content_type': IResourceX.__identifier__}
+        self.create.assert_called_with(IResourceX.__identifier__, self.context,
+                                       appstructs={}, root_versions=[])
         assert wanted == response
 
     def test_post_valid_item(self):
@@ -674,8 +750,7 @@ class ItemRESTViewUnitTest(unittest.TestCase):
         self.create.return_value = child
         self.request.validated = {'content_type':
                                   IItemVersion.__identifier__,
-                                  'data': {},
-                                  'root_versions': [12333]}
+                                  'data': {}}
         inst = self.make_one(self.context, self.request)
         response = inst.post()
 
@@ -683,7 +758,25 @@ class ItemRESTViewUnitTest(unittest.TestCase):
                   'content_type': IItem.__identifier__,
                   'first_version_path': '/child/first'}
         assert wanted == response
-        #FIXME: test create method was called with appstructs and root_version
+
+    def test_post_valid_itemversion(self):
+        from adhocracy.interfaces import IItemVersion
+        child = testing.DummyResource(__provides__=IItemVersion,
+                                      __parent__=self.context,
+                                      __name__='child')
+        root = testing.DummyResource(__provides__=IItemVersion)
+        self.create.return_value = child
+        self.request.validated = {'content_type':
+                                  IItemVersion.__identifier__,
+                                  'data': {},
+                                  'root_versions': [root]}
+        inst = self.make_one(self.context, self.request)
+        response = inst.post()
+
+        wanted = {'path': '/child',
+                  'content_type': IItemVersion.__identifier__}
+        assert self.create.call_args[1]['root_versions'] == [root]
+        assert wanted == response
 
 
 class MetaApiViewUnitTest(unittest.TestCase):
@@ -714,9 +807,9 @@ class MetaApiViewUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IResource
         self.resource_types.return_value = make_resource_types(IResource, {})
         inst = self.make_one(self.context, self.request)
-        response = inst.get()
-        assert IResource.__identifier__ in response['resources']
-        assert response['resources'][IResource.__identifier__] == {'sheets': []}
+        resp = inst.get()
+        assert IResource.__identifier__ in resp['resources']
+        assert resp['resources'][IResource.__identifier__] == {'sheets': []}
 
     def test_get_resources_with_sheets_metadata(self):
         from adhocracy.interfaces import ISheet
@@ -747,7 +840,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert IResource.__identifier__ in resources_metadata
         this_resource_metadata = resources_metadata[IResource.__identifier__]
         assert wanted_element_types == sorted(
-                this_resource_metadata['element_types'])
+            this_resource_metadata['element_types'])
         assert wanted_item_type == this_resource_metadata['item_type']
         assert wanted_sheets == this_resource_metadata['sheets']
 
