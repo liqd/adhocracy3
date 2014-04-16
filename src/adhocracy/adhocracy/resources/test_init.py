@@ -1,7 +1,5 @@
 from adhocracy.interfaces import ISheet
-from adhocracy.sheets.versions import IVersionable
 from pyramid import testing
-from zope.interface import Interface
 
 import pytest
 import unittest
@@ -177,6 +175,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
         from adhocracy.interfaces import AdhocracyReferenceType
         from adhocracy.interfaces import ISheet
+        from adhocracy.sheets.versions import IVersionable
         events = []
 
         def listener(event):
@@ -370,20 +369,6 @@ class ResourceFactoryUnitTest(unittest.TestCase):
             inst(self.context, appstructs=data)
 
 
-    # def test_valid_with_ctructs_data(self):
-    #     from adhocracy.interfaces import IResource
-    #     from zope.interface import taggedValue
-
-    #     class IResourceType(IResource):
-    #         taggedValue('basic_sheets', set([ISheetY.__identifier__]))
-
-    #     data = {ISheetY.__identifier__: {"count": 0}}
-    #     _register_dummypropertysheet_adapter(self.config)
-
-    #     inst = self.make_one(IResourceType)
-    #     resource = inst(self.context, cstructs=data)
-
-    #     assert resource['dummy_cstruct'] == data[ISheetY.__identifier__]
     def test_non_valid_missing_context(self):
         from adhocracy.interfaces import IResource
         with pytest.raises(TypeError):
