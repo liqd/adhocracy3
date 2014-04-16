@@ -639,6 +639,7 @@ class ItemRESTViewUnitTest(unittest.TestCase):
         from .schemas import POSTItemRequestSchema
         inst = self.make_one(self.context, self.request)
         assert issubclass(inst.__class__, SimpleRESTView)
+        #FIXME: validate the proper root_versions are choosen
         assert inst.validation_POST ==\
             (POSTItemRequestSchema,
              [validate_post_sheet_names_and_resource_type,
@@ -682,6 +683,7 @@ class ItemRESTViewUnitTest(unittest.TestCase):
                   'content_type': IItem.__identifier__,
                   'first_version_path': '/child/first'}
         assert wanted == response
+        #FIXME: test create method was called with appstructs and root_version
 
 
 class MetaApiViewUnitTest(unittest.TestCase):

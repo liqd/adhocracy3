@@ -50,6 +50,8 @@ def itemversion_create_notify(context, registry=None, options=[]):
             update themselfes.
 
     """
+    #FIXME option is dict with arbitary resource factory additional kwargs
+    # to be more meaningfull
     om = find_objectmap(context)
     if registry is not None and om is not None:
         follows = list(om.targets(context, IVersionableFollowsReference))
@@ -58,12 +60,13 @@ def itemversion_create_notify(context, registry=None, options=[]):
 
         if options and isinstance(options[0], str):
             # Convert resource paths to resources
-            # FIXME should we do this earlier?
+
+            # FIXME make sure options alread contains a list of validated
+            # resources. Validation should happen in views.
             root_resources = []
             for path in options:
                 root = om.object_for((path,))
                 if root is None:
-                    # FIXME how to handle this?
                     raise ValueError('Not a valid resource path: ' + path)
                 root_resources.append(root)
             options = root_resources
