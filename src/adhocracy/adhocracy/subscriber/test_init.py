@@ -59,6 +59,9 @@ class DummyObjectMap():
     def object_for(self, oid):
         return self.resource
 
+    def get_reftypes(self):
+        return []
+
 
 ###########
 #  tests  #
