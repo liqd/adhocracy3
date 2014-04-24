@@ -79,7 +79,6 @@ class IsInSubtreeUnitTest(unittest.TestCase):
         root = create_dummy_resource(parent=self.context)
         element = create_dummy_resource(parent=self.context)
         om = self.context.__objectmap__
-        om.object_for(root.__oid__)
         om.connect(root, element, AdhocracyReferenceType)
         result = self._make_one(element, [root])
         assert result is True

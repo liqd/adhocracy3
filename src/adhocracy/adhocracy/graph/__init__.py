@@ -6,39 +6,27 @@ from adhocracy.sheets.versions import IVersionableFollowsReference
 from substanced.objectmap import find_objectmap
 
 
+def _check_if_candidate_is_ancestor(objectmap, reftypes, candidate, descendant,
+                                    checked_candidates):
+    """Return True if candidate is ancestor of descendant, False otherwise."""
+    if candidate is descendant:
+        return True
 
-def _check_ancestry(objectmap, reftypes, startnode, descendant, checked_map):
-    """Helper method that recursively checks for an ancestry relation.
+    checked_candidates.add(candidate)
 
-    checked_map is a mapping from object IDs to objects that have already been
-    checked.
-
-    Returns True if an ancestry relation was found, False otherwise.
-
-    """
-    startnode_oid = startnode.__oid__
-    descendant_oid = descendant.__oid__
-    checked_map[startnode_oid] = startnode
-    unchecked_map = {}
-
-    # Check outgoing connections of the requested types
+    candidate_children_unchecked = set()
     for reftype in reftypes:
-        for node in objectmap.targets(startnode, reftype):
-            node_oid = node.__oid__
-            if node_oid == descendant_oid:
-                return True  # Got it!
-            if node_oid not in checked_map and node_oid not in unchecked_map:
-                # We'll have to check this node
-                unchecked_map[node_oid] = node
+        children = set(objectmap.targetids(candidate, reftype))
+        candidate_children_unchecked = children.difference(checked_candidates)
 
-    # Check any unchecked_children
-    for node in unchecked_map.values():
-        gotit = _check_ancestry(objectmap, reftypes, node, descendant,
-                                checked_map)
-        if gotit:
+    for candidate_child in candidate_children_unchecked:
+        if _check_if_candidate_is_ancestor(objectmap, reftypes,
+                                           candidate_child,
+                                           descendant,
+                                           checked_candidates):
             return True
 
-    return False  # Sorry, not found
+    return False
 
 
 def is_in_subtree(descendant, ancestors):
@@ -60,18 +48,13 @@ def is_in_subtree(descendant, ancestors):
     assert IResource.providedBy(descendant)
     assert isinstance(ancestors, list)
 
-    result = False
     objectmap = find_objectmap(descendant)
-    reftypes = collect_reftypes(objectmap, [IVersionableFollowsReference])
-
-    checked_map = {}
-    for ancestor in ancestors:
-        if ancestor.__oid__ == descendant.__oid__:
-            result = True
-        else:
-            result = _check_ancestry(objectmap, reftypes, ancestor, descendant,
-                                     checked_map)
-        if result:
-            break
-
-    return result
+    reftypes = get_reftypes(objectmap,
+                            excluded_types=[IVersionableFollowsReference])
+    for candidate in ancestors:
+        if _check_if_candidate_is_ancestor(objectmap, reftypes,
+                                           candidate.__oid__,
+                                           descendant.__oid__,
+                                           set()):
+            return True
+    return False

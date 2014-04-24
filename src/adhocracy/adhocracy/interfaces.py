@@ -163,7 +163,7 @@ class IItem(IPool):
                 ]))
     taggedValue(
         'after_creation',
-        ['adhocracy.resources.item_create_initial_content'])
+        ['adhocracy.resources.create_initial_content_for_item'])
     taggedValue('item_type',
                 'adhocracy.resources.IItemVersion')
     """Type of versions in this item. Subtypes have to override."""
@@ -197,7 +197,7 @@ class IItemVersion(IResource):
                 ['adhocracy.sheets.versions.IVersionable']))
     taggedValue(
         'after_creation',
-        ['adhocracy.resources.itemversion_create_notify'])
+        ['adhocracy.resources.notify_new_itemversion_created'])
 
 
 class AdhocracyReferenceClass(ReferenceClass):
