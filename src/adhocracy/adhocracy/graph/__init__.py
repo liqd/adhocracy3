@@ -1,32 +1,10 @@
 """Utilities for working with the version/reference graph (DAG)."""
 
-from adhocracy.interfaces import AdhocracyReferenceType
 from adhocracy.interfaces import IResource
+from adhocracy.utils import get_reftypes
 from adhocracy.sheets.versions import IVersionableFollowsReference
 from substanced.objectmap import find_objectmap
 
-
-def collect_reftypes(objectmap, excluded_types=[]):
-    """Collect all Adhocracy reference types except those excluded.
-
-    Args:
-        objectmap: the objectmap to consult
-        excluded_types (optional list of types): reference types listed here
-            will be skipped
-
-    Returns:
-        All Adhocracy reference types except those mentioned in
-        `excluded_types`.
-
-    """
-    result = []
-    if excluded_types is None:
-        excluded_types = []
-    for reftype in objectmap.get_reftypes():
-        if issubclass(reftype, AdhocracyReferenceType):
-            if reftype not in excluded_types:
-                result.append(reftype)
-    return result
 
 
 def _check_ancestry(objectmap, reftypes, startnode, descendant, checked_map):

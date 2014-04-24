@@ -1,6 +1,7 @@
 """Helper functions."""
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import AdhocracyReferenceType
 from functools import reduce
 from pyramid.path import DottedNameResolver
 from substanced.util import get_dotted_name
@@ -169,3 +170,27 @@ def to_dotted_name(obj):
         return obj
     else:
         return get_dotted_name(obj)
+
+
+def get_reftypes(objectmap, excluded_types=[]):
+    """Helper function to collect all Adhocracy reference types excludes types.
+
+    Args:
+        objectmap: the objectmap to consult
+        excluded_types (list of AdhocracyReferenceTypes, optional):
+            reference types listed here will be skipped
+
+    Returns:
+        list of AdhocracyReferenceTypes
+
+    """
+    result = []
+    for reftype in objectmap.get_reftypes():
+        if isinstance(reftype, str):
+            continue
+        if not issubclass(reftype, AdhocracyReferenceType):
+            continue
+        if reftype in excluded_types:
+            continue
+        result.append(reftype)
+    return result

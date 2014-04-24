@@ -1,4 +1,8 @@
+from adhocracy.interfaces import AdhocracyReferenceType
+from mock import patch
+
 import pytest
+import unittest
 
 ################
 #  test utils  #
@@ -140,3 +144,59 @@ def test_to_dotted_name_dotted_string():
     assert to_dotted_name('os.walk') == 'os.walk'
 
 
+class GetReftypesUnitTest(unittest.TestCase):
+
+    def _make_one(self, objectmap, excluded_types=[]):
+        from . import get_reftypes
+        return get_reftypes(objectmap, excluded_types)
+
+    @patch('substanced.objectmap.ObjectMap', autospec=True)
+    def setUp(self, dummy_objectmap=None):
+        self.objectmap = dummy_objectmap.return_value
+
+    def test_empty_objectmap_and_default_excludes(self):
+        """No relations in objectmap, so result should be empty."""
+        om = self.objectmap
+        om.get_reftypes.return_value = []
+        result = self._make_one(om)
+        assert result == []
+
+    def test_empty_objectmap_and_None_excludes(self):
+        """No relations in objectmap, so result should be empty."""
+        om = self.objectmap
+        om.get_reftypes.return_value = []
+        result = self._make_one(om, [])
+        assert result == []
+
+    def test_one_wrong_refernce_type(self):
+        """Wrong ReferenceType in objectmap, so result should be empty. """
+        om = self.objectmap
+        om.get_reftypes.return_value = ["NoneAdhocracyReferenceType"]
+        result = self._make_one(om, [])
+        assert result == []
+
+    def test_two_reference_types(self):
+        """Two reftypes in objectmap, both should be found."""
+
+        class IOtherReferenceType(AdhocracyReferenceType):
+            pass
+        om = self.objectmap
+        om.get_reftypes.return_value = [IOtherReferenceType,
+                                        AdhocracyReferenceType]
+        result = self._make_one(om)
+        assert len(result) == 2
+        assert AdhocracyReferenceType in result
+        assert IOtherReferenceType in result
+
+    def test_two_reference_types_one_excluded(self):
+        """Two reftypes in OM, one is excluded, the other should be found."""
+
+        class IOtherReferenceType(AdhocracyReferenceType):
+            pass
+        om = self.objectmap
+        om.get_reftypes.return_value = [IOtherReferenceType,
+                                        AdhocracyReferenceType]
+        result = self._make_one(om, [AdhocracyReferenceType])
+        assert len(result) == 1
+        assert IOtherReferenceType in result
+        assert AdhocracyReferenceType not in result
