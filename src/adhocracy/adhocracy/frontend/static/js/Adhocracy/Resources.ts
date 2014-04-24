@@ -104,11 +104,11 @@ export function addParagraph(proposalVersion: MeineHeine, paragraphPath: string)
     return proposalVersion.data["adhocracy.sheets.document.IDocument"].elements.push(paragraphPath);
 };
 
-// versions is an array of URL's to resource versions
+// takes an array of URL's to resource versions
 //FIXME: backend should have LAST
-export function newestVersion(versions: string[]) {
+export function newestVersion(versions: string[]) : string {
     return _.max(versions, (version_path) => parseInt(version_path.match(/\d*$/)[0], 10));
-}
+};
 
 export function postProposal($http
                             ,$q: ng.IQService
