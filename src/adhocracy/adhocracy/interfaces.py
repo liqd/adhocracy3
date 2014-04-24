@@ -233,12 +233,11 @@ AdhocracyReferenceType = AdhocracyReferenceClass(
     'AdhocracyReferenceType', __module__='adhocracy.interfaces')
 
 
-class IItemNewVersionAdded(IObjectEvent):
+class IItemVersionNewVersionAdded(IObjectEvent):
 
     """An event type sent when a new ItemVersion is added."""
 
-    object = Attribute('The Item to which the ItemVersion is being added')
-    old_version = Attribute('The old ItemVersion followed by the new one')
+    object = Attribute('The old ItemVersion followed by the new one')
     new_version = Attribute('The new ItemVersion')
 
 

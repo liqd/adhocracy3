@@ -151,12 +151,12 @@ class ItemVersionIntegrationTest(unittest.TestCase):
 
     def test_create_without_referencing_items(self):
         from adhocracy.interfaces import IItemVersion
-        from adhocracy.interfaces import IItemNewVersionAdded
+        from adhocracy.interfaces import IItemVersionNewVersionAdded
         events = []
 
         def listener(event):
             events.append(event)
-        self.config.add_subscriber(listener, IItemNewVersionAdded)
+        self.config.add_subscriber(listener, IItemVersionNewVersionAdded)
 
         old_version = self.make_one()
         new_version_data = self.make_new_version_data(old_version.__oid__)
@@ -165,13 +165,12 @@ class ItemVersionIntegrationTest(unittest.TestCase):
 
         assert IItemVersion.providedBy(new_version)
         assert len(events) == 1
-        assert IItemNewVersionAdded.providedBy(events[0])
+        assert IItemVersionNewVersionAdded.providedBy(events[0])
 
     def test_create_with_referencing_items(self):
         from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
         from adhocracy.interfaces import AdhocracyReferenceType
         from adhocracy.interfaces import ISheet
-        from adhocracy.sheets.versions import IVersionable
         events = []
 
         def listener(event):
@@ -186,10 +185,9 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         self.make_one(appstructs=new_version_data,
                       root_versions=[old_version])
 
-        assert len(events) == 2
+        assert len(events) == 1
         assert ISheetReferencedItemHasNewVersion.providedBy(events[0])
         assert events[0].isheet == ISheet
-        assert events[1].isheet == IVersionable
 
     def test_autoupdate_with_referencing_items(self):
         from adhocracy.interfaces import IItemVersion

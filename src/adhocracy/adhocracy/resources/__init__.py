@@ -1,5 +1,5 @@
 """Resource type configuration and default factory."""
-from adhocracy.events import ItemNewVersionAdded
+from adhocracy.events import ItemVersionNewVersionAdded
 from adhocracy.events import SheetReferencedItemHasNewVersion
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
