@@ -14,9 +14,17 @@ export interface HasIDocumentSheet {
     "adhocracy.sheets.document.IDocument": IDocumentSheet;
 }
 
+export interface HasIVersionsSheet {
+    "adhocracy.sheets.versions.IVersions": IVersionsSheet;
+}
+
 export interface IDocumentSheet {
     title: string;
     description: string;
+    elements: string[];
+}
+
+export interface IVersionsSheet {
     elements: string[];
 }
 
