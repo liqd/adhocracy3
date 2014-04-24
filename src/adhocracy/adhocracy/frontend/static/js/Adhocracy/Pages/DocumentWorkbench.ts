@@ -221,7 +221,7 @@ export function run<Data>() {
         };
     });
 
-    app.directive("adhProposalVersionResourceEdit", function() {
+    app.directive("adhProposalVersionEdit", function() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IProposalVersion/Edit.html",
