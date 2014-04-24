@@ -268,6 +268,12 @@ class ResourceRESTView(RESTView):
             struct['data'][key] = sheet.get_cstruct()
             if issubclass(IVersionable, sheet.iface):
                 # Calculate followed_by attribute of IVersionable
+
+                # FIXME: The RestView is generic and should not care
+                # for specific sheets/Resource types at all.
+                # The right place to calculate followed_by is a custom
+                # adapter for IVersionable sheets or better find an abstract
+                # way to handle backrefs - joka
                 struct['data'][key]['followed_by'] = followed_by(self.context)
         struct['path'] = resource_path(self.context)
         iresource = get_resource_interface(self.context)
