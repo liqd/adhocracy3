@@ -118,6 +118,16 @@ export function newestVersion(versions: string[]) : string {
     return _.max(versions, (version_path) => parseInt(version_path.match(/\d*$/)[0], 10));
 };
 
+export function newestVersionInContainer(container) {
+    return newestVersion(container.data.data["adhocracy.sheets.versions.IVersions"].elements);
+};
+
+export function getNewestVersion($http, path: string) : ng.IPromise<any> {
+    return $http.get(path).then( (container) =>
+        $http.get(decodeURIComponent(newestVersionInContainer(container)))
+    );
+};
+
 export function postProposal($http
                             ,$q: ng.IQService
                             ,proposalVersion: MeineHeine
@@ -160,3 +170,11 @@ export function postProposal($http
         });
     });
 };
+
+export function followNewestVersion($http, resourceVersion) {
+    return $http.get(resourceVersion.path).then( (newResourceVersion) => {
+        resourceVersion["adhocracy.sheets.versions.IVersionable"].follows = [newResourceVersion.data.path];
+        return resourceVersion;
+    });
+};
+
