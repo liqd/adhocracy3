@@ -143,7 +143,6 @@ export function postProposal($http
 
         return $q.all(paragraphPromises).then( (respParagraphs) => {
             return sectionVersionPromise.then( (respSectionVersion) => {
-                //respParagraphs.map( (resp) => addParagraph(proposalVersion, decodeURIComponent(resp.data.path)) );
                 addParagraph(proposalVersion, decodeURIComponent(respSectionVersion.data.path));
 
                 proposalVersion.addIVersionable([], [proposalFirstVersionPath]);
