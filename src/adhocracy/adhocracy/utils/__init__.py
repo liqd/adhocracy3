@@ -176,7 +176,8 @@ def get_reftypes(objectmap, excluded_types=[]):
     """Helper function to collect all Adhocracy reference types excludes types.
 
     Args:
-        objectmap: the objectmap to consult
+        objectmap or None: the objectmap to consult, None value is allowed to
+                           ease unit testing.
         excluded_types (list of AdhocracyReferenceTypes, optional):
             reference types listed here will be skipped
 
@@ -185,12 +186,13 @@ def get_reftypes(objectmap, excluded_types=[]):
 
     """
     result = []
-    for reftype in objectmap.get_reftypes():
-        if isinstance(reftype, str):
-            continue
-        if not issubclass(reftype, AdhocracyReferenceType):
-            continue
-        if reftype in excluded_types:
-            continue
-        result.append(reftype)
+    if objectmap:
+        for reftype in objectmap.get_reftypes():
+            if isinstance(reftype, str):
+                continue
+            if not issubclass(reftype, AdhocracyReferenceType):
+                continue
+            if reftype in excluded_types:
+                continue
+            result.append(reftype)
     return result
