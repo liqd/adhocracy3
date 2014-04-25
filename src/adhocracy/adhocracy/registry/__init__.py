@@ -126,9 +126,7 @@ class ResourceContentRegistry(ContentRegistry):
         types_with_sheetnames = {}
         for type_iface in addable_types:
             sheetnames = {}
-            resource = ResourceFactory(type_iface)(context,
-                                                   add_to_context=False,
-                                                   run_after_creation=False)
+            resource = ResourceFactory(type_iface)(run_after_creation=False)
             resource.__parent__ = context
             sheets = self.resource_sheets(resource, request,
                                           onlycreatable=True)

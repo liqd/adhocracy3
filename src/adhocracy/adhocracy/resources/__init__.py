@@ -25,18 +25,18 @@ def create_initial_content_for_item(context, registry, options):
     """Add first version and the Tags LAST and FIRST."""
     iface = get_resource_interface(context)
     item_type = get_all_taggedvalues(iface)['item_type']
-    first_version = ResourceFactory(item_type)(context)
+    first_version = ResourceFactory(item_type)(parent=context)
 
     first_version_oid = get_oid(first_version)
     tag_first_data = {'adhocracy.sheets.tags.ITag': {'elements':
                                                      [first_version_oid]},
                       'adhocracy.sheets.name.IName': {'name': u'FIRST'}}
-    ResourceFactory(ITag)(context, appstructs=tag_first_data)
+    ResourceFactory(ITag)(parent=context, appstructs=tag_first_data)
 
     tag_last_data = {'adhocracy.sheets.tags.ITag': {'elements':
                                                     [first_version_oid]},
                      'adhocracy.sheets.name.IName': {'name': u'LAST'}}
-    ResourceFactory(ITag)(context, appstructs=tag_last_data)
+    ResourceFactory(ITag)(parent=context, appstructs=tag_last_data)
 
 
 def _get_old_versions(context):
@@ -114,8 +114,8 @@ class ResourceFactory(object):
         self.isheets = isheets
         self.after_creation = meta['after_creation']
 
-    def add(self, context, resource, appstructs):
-        """Add to context.
+    def _add(self, parent, resource, appstructs):
+        """Add resource to context folder.
 
         Returns:
             name (String)
@@ -129,32 +129,33 @@ class ResourceFactory(object):
         name = ''
         if name_identifier in appstructs:
             name = appstructs[name_identifier]['name']
-            name = context.check_name(name)
+            name = parent.check_name(name)
             appstructs[name_identifier]['name'] = name
         if not name:
             name = datetime.datetime.now().isoformat()
         if IItemVersion.providedBy(resource):
-            name = context.next_name(resource, prefix='VERSION_')
-        context.add(name, resource, send_events=False)
+            name = parent.next_name(resource, prefix='VERSION_')
+        parent.add(name, resource, send_events=False)
 
     def __call__(self,
-                 context,
+                 parent=None,
                  appstructs={},
                  run_after_creation=True,
-                 add_to_context=True,
                  **kwargs
                  ):
         """Triggered whan a ResourceFactory instance is called.
 
         Args:
-            context (IResource):
-            add_to_context (bool): make context the parent of the new resource.
-                Default is True.
-            after_creation (bool): whether to invoke after_creation hooks
-                Default is True.
-            appstructs (dict): key/values of sheet appstruct data. Key is an
-                identifier of a sheet interface. Value is the data to set.
-            **kwargs: arbitary keyword arguments. Will be passed along to
+            parent (IPool or None): Add the new resource to this pool.
+                                    None value is allowed to create non
+                                    persistent Resources (without OID/parent).
+            appstructs (dict): Key/Values of sheet appstruct data.
+                               Key is anidentifier of a sheet interface.
+                               Value is the data to set.
+            after_creation (bool): Whether to invoke after_creation hooks,
+                                   Default is True.
+                                   If parent is None you should set this False
+            **kwargs: Arbitary keyword arguments. Will be passed along to
                 after_creation hooks as 3rd argument 'options'.
 
         Returns:
@@ -165,8 +166,8 @@ class ResourceFactory(object):
         directlyProvides(resource, self.iresource)
         alsoProvides(resource, self.isheets)
 
-        if add_to_context:
-            self.add(context, resource, appstructs)
+        if parent is not None:
+            self._add(parent, resource, appstructs)
         else:
             resource.__parent__ = None
             resource.__name__ = ''

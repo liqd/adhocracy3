@@ -277,9 +277,7 @@ class ValidatePostPropertysheetCstructsUnitTest(unittest.TestCase):
         assert self.request.validated['data']['sheet']['dummy_validated']
         assert self.resource_sheets.call_args_list[0][1] == \
             {'onlycreatable': True}
-        self.create.assert_called_with('resourcex', self.context,
-                                       add_to_context=False,
-                                       run_after_creation=False)
+        self.create.assert_called_with('resourcex', run_after_creation=False)
 
     def test_valid_missing_content_type(self):
         self.request.validated = {'data': {'sheet': {'y': 'x'}}}

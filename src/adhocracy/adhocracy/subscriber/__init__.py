@@ -33,7 +33,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
         appstructs[IVersionable.__identifier__]['follows'] = [resource.__oid__]
         appstructs[isheet.__identifier__] = appstruct
         iresource = get_resource_interface(resource)
-        return ResourceFactory(iresource)(resource.__parent__,
+        return ResourceFactory(iresource)(parent=resource.__parent__,
                                           appstructs=appstructs,
                                           options=root_versions)
 
