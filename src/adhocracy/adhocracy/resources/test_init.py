@@ -228,12 +228,32 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from . import ResourceFactory
         return ResourceFactory(iface)
 
-    def test_create(self):
+    def test_create_with_iresource_non_dotted(self):
         from adhocracy.interfaces import IResource
         inst = self.make_one(IResource)
         assert '__call__' in dir(inst)
 
-    def test_valid_IResource(self):
+    def test_create_with_iresource_dotted(self):
+        from adhocracy.interfaces import IResource
+        inst = self.make_one(IResource.__identifier__)
+        assert '__call__' in dir(inst)
+
+    def test_create_with_non_iresource(self):
+        from zope.interface import Interface
+        with pytest.raises(AssertionError):
+            self.make_one(Interface)
+
+    def test_create_with_non_iresource_dotted(self):
+        from zope.interface import Interface
+        with pytest.raises(AssertionError):
+            self.make_one(Interface.__identifier__)
+
+    def test_call_without_context(self):
+        from adhocracy.interfaces import IResource
+        with pytest.raises(TypeError):
+            self.make_one(IResource)()
+
+    def test_call_with_context(self):
         from zope.interface.verify import verifyObject
         from adhocracy.interfaces import IResource
         from persistent.interfaces import IPersistent
@@ -245,36 +265,13 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         assert IResource in directlyProvidedBy(resource)
         assert verifyObject(IResource, resource)
 
-    def test_valid_IItemVersion(self):
+    def test_call_with_context_iitemversion(self):
         from adhocracy.interfaces import IItemVersion
         inst = self.make_one(IItemVersion)
         resource = inst(self.context)
         assert IItemVersion.providedBy(resource)
 
-    def test_valid_add_to_context(self):
-        from adhocracy.interfaces import IResource
-        inst = self.make_one(IResource)
-        resource = inst(self.context)
-        assert resource.__parent__ == self.context
-        assert resource.__name__ in self.context
-        assert resource.__oid__ == 1
-
-    def test_valid_non_add_to_context(self):
-        from adhocracy.interfaces import IResource
-        inst = self.make_one(IResource)
-        resource = inst(self.context, add_to_context=False)
-        assert resource.__parent__ is None
-        assert resource.__name__ == ''
-        assert not hasattr(resource, '__oid__')
-
-    def test_valid_dotted_resource_iface(self):
-        from adhocracy.interfaces import IResource
-        from zope.interface import directlyProvidedBy
-        inst = self.make_one(IResource.__identifier__)
-        resource = inst(self.context)
-        assert IResource in directlyProvidedBy(resource)
-
-    def test_valid_non_dotted_sheet_ifaces(self):
+    def test_call_with_context_and_sheet_ifaces_non_dotted(self):
         from zope.interface import taggedValue
         from adhocracy.interfaces import IResource
 
@@ -288,7 +285,34 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         assert ISheetX.providedBy(resource)
         assert ISheetY.providedBy(resource)
 
-    def test_valid_after_create(self):
+    def test_call_with_context_and_wrong_sheet_ifaces(self):
+        from adhocracy.interfaces import IResource
+        from zope.interface import taggedValue
+        from zope.interface import Interface
+
+        class IResourceType(IResource):
+            taggedValue('basic_sheets', set([Interface]))
+
+        with pytest.raises(AssertionError):
+            self.make_one(IResourceType)
+
+    def test_call_with_context_and_add_to_context(self):
+        from adhocracy.interfaces import IResource
+        inst = self.make_one(IResource)
+        resource = inst(self.context)
+        assert resource.__parent__ == self.context
+        assert resource.__name__ in self.context
+        assert resource.__oid__ == 1
+
+    def test_call_with_context_and_no_add_to_context(self):
+        from adhocracy.interfaces import IResource
+        inst = self.make_one(IResource)
+        resource = inst(self.context, add_to_context=False)
+        assert resource.__parent__ is None
+        assert resource.__name__ == ''
+        assert not hasattr(resource, '__oid__')
+
+    def test_call_with_after_create(self):
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
@@ -305,7 +329,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         assert resource._options == {"kwarg1": True}
         assert resource._registry is self.config.registry
 
-    def test_valid_no_run_after_create(self):
+    def test_call_without_run_after_create(self):
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
@@ -320,7 +344,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         with pytest.raises(AttributeError):
             resource.test
 
-    def test_valid_with_appstructs_data(self):
+    def test_call_with_appstructs_data(self):
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
@@ -335,7 +359,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         assert resource['dummy_appstruct'] == {'count': 0}
 
-    def test_valid_with_appstructs_name_data(self):
+    def test_call_with_appstructs_name_data(self):
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
@@ -350,7 +374,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         assert resource['dummy_appstruct'] == {'name': 'child'}
 
-    def test_non_valid_with_appstructs_empty_name_data(self):
+    def test_call_with_appstructs_empty_name_data(self):
         from adhocracy.interfaces import IResource
         from zope.interface import taggedValue
 
@@ -363,25 +387,3 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         inst = self.make_one(IResourceType)
         with pytest.raises(ValueError):
             inst(self.context, appstructs=data)
-
-    def test_non_valid_missing_context(self):
-        from adhocracy.interfaces import IResource
-        with pytest.raises(TypeError):
-            self.make_one(IResource)()
-
-    def test_non_valid_wrong_iresource_iface(self):
-        from zope.interface import Interface
-
-        with pytest.raises(AssertionError):
-            self.make_one(Interface)
-
-    def test_non_valid_wrong_iproperty_iface(self):
-        from adhocracy.interfaces import IResource
-        from zope.interface import taggedValue
-        from zope.interface import Interface
-
-        class IResourceType(IResource):
-            taggedValue('basic_sheets', set([Interface]))
-
-        with pytest.raises(AssertionError):
-            self.make_one(IResourceType)
