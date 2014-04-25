@@ -102,17 +102,16 @@ class ResourceFactory(object):
 
     """Basic resource factory."""
 
-    def __init__(self, iface):
-        res = DottedNameResolver()
-        iface = res.maybe_resolve(iface)
-        assert iface.isOrExtends(IResource)
-        meta = get_all_taggedvalues(iface)
-        self.resource_iface = iface
+    def __init__(self, iresource):
+        iresource = DottedNameResolver().maybe_resolve(iresource)
+        assert iresource.isOrExtends(IResource)
+        self.iresource = iresource
+        meta = get_all_taggedvalues(iresource)
         self.class_ = meta['content_class']
-        self.prop_ifaces = []
-        for prop_iface in meta['basic_sheets'].union(meta['extended_sheets']):
-            assert prop_iface.isOrExtends(ISheet)
-            self.prop_ifaces.append(prop_iface)
+        isheets = meta['basic_sheets'].union(meta['extended_sheets'])
+        for isheet in isheets:
+            assert isheet.isOrExtends(ISheet)
+        self.isheets = isheets
         self.after_creation = meta['after_creation']
 
     def add(self, context, resource, appstructs):
@@ -162,10 +161,9 @@ class ResourceFactory(object):
             object (IResource): the newly created resource
 
         """
-        res = DottedNameResolver()
         resource = self.class_()
-        directlyProvides(resource, self.resource_iface)
-        alsoProvides(resource, self.prop_ifaces)
+        directlyProvides(resource, self.iresource)
+        alsoProvides(resource, self.isheets)
 
         if add_to_context:
             self.add(context, resource, appstructs)
@@ -175,7 +173,7 @@ class ResourceFactory(object):
 
         if appstructs:
             for key, struct in appstructs.items():
-                iface = res.maybe_resolve(key)
+                iface = DottedNameResolver().maybe_resolve(key)
                 sheet = getMultiAdapter((resource, iface),
                                         IResourcePropertySheet)
                 if not sheet.readonly:
