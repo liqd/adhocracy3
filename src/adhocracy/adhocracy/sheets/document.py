@@ -3,7 +3,7 @@ from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IIResourcePropertySheet
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
-from adhocracy.interfaces import AdhocracyReferenceType
+from adhocracy.interfaces import SheetToSheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import ReferenceListSchemaNode
 from zope.interface import provider
@@ -72,7 +72,7 @@ class IParagraph(ISheet, ISheetReferenceAutoUpdateMarker):
                 )
 
 
-class IDocumentElementsReference(AdhocracyReferenceType):
+class IDocumentElementsReference(SheetToSheet):
 
     """IDocument reference."""
 
@@ -81,7 +81,7 @@ class IDocumentElementsReference(AdhocracyReferenceType):
     target_isheet = ISection
 
 
-class ISectionElementsReference(AdhocracyReferenceType):
+class ISectionElementsReference(SheetToSheet):
 
     """Reference from a section to its direct elements, such as paragraphs."""
 
@@ -90,7 +90,7 @@ class ISectionElementsReference(AdhocracyReferenceType):
     target_isheet = IParagraph
 
 
-class ISubsectionsReference(AdhocracyReferenceType):
+class ISubsectionsReference(SheetToSheet):
 
     """Reference from a section to its subsections."""
 

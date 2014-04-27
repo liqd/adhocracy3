@@ -200,9 +200,13 @@ class IItemVersion(IResource):
         ['adhocracy.resources.notify_new_itemversion_created'])
 
 
-class AdhocracyReferenceClass(ReferenceClass):
+class SheetReferenceClass(ReferenceClass):
 
-    """ Use class attributes "target_*" and "source_*" to set tagged values."""
+    """Reference a specific ISheet for source and and target.
+
+    Uses class attributes "target_*" and "source_*" to set tagged values.
+
+    """
 
     def __init__(self, *arg, **kw):
         try:
@@ -229,8 +233,18 @@ class AdhocracyReferenceClass(ReferenceClass):
         self.setTaggedValue('target_isheet', tif)
 
 
-AdhocracyReferenceType = AdhocracyReferenceClass(
-    'AdhocracyReferenceType', __module__='adhocracy.interfaces')
+SheetReferenceType = SheetReferenceClass('SheetReferenceType',
+                                         __module__='adhocracy.interfaces')
+
+
+class SheetToSheet(SheetReferenceType):
+
+    """Base type to reference resource ISheets."""
+
+
+class NewVersionToOldVersion(SheetReferenceType):
+
+    """Base type to reference an old ItemVersion."""
 
 
 class IItemVersionNewVersionAdded(IObjectEvent):

@@ -2,7 +2,8 @@
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IIResourcePropertySheet
-from adhocracy.interfaces import AdhocracyReferenceType
+from adhocracy.interfaces import SheetToSheet
+from adhocracy.interfaces import NewVersionToOldVersion
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
@@ -55,7 +56,7 @@ class IVersionable(ISheet):
         ))
 
 
-class IVersionableFollowsReference(AdhocracyReferenceType):
+class IVersionableFollowsReference(NewVersionToOldVersion):
 
     """IVersionable reference to preceding versions."""
 
@@ -64,7 +65,7 @@ class IVersionableFollowsReference(AdhocracyReferenceType):
     target_isheet = IVersionable
 
 
-class IVersionableFollowedByReference(AdhocracyReferenceType):
+class IVersionableFollowedByReference(SheetToSheet):
 
     """IVersionable reference to subsequent versions.
 
@@ -91,7 +92,7 @@ class IVersions(ISheet):
         ))
 
 
-class IVersionsElementsReference(AdhocracyReferenceType):
+class IVersionsElementsReference(SheetToSheet):
 
     """IVersions reference."""
 

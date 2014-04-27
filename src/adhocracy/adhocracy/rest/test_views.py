@@ -911,12 +911,12 @@ class MetaApiViewUnitTest(unittest.TestCase):
     def test_get_sheets_with_field_adhocracy_referenceset(self):
         from adhocracy.interfaces import ISheet
         from adhocracy.interfaces import IResource
-        from adhocracy.interfaces import AdhocracyReferenceType
+        from adhocracy.interfaces import SheetToSheet
         from adhocracy.schema import ReferenceSetSchemaNode
 
         class ISheetF(ISheet):
             taggedValue('field:test', ReferenceSetSchemaNode(
-                reftype=AdhocracyReferenceType))
+                reftype=SheetToSheet))
         self.resource_types.return_value = make_resource_types(
             IResource, {'basic_sheets': set([ISheetF])})
         inst = self.make_one(self.context, self.request)
@@ -934,7 +934,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
         class ISheetF(ISheet):
             taggedValue('field:test', ReferenceSetSchemaNode(
-                reftype='adhocracy.interfaces.AdhocracyReferenceType'))
+                reftype='adhocracy.interfaces.SheetToSheet'))
         self.resource_types.return_value = make_resource_types(
             IResource, {'basic_sheets': set([ISheetF])})
         inst = self.make_one(self.context, self.request)
@@ -948,12 +948,12 @@ class MetaApiViewUnitTest(unittest.TestCase):
     def test_get_sheets_with_field_adhocracy_referencelist(self):
         from adhocracy.interfaces import ISheet
         from adhocracy.interfaces import IResource
-        from adhocracy.interfaces import AdhocracyReferenceType
+        from adhocracy.interfaces import SheetToSheet
         from adhocracy.schema import ReferenceListSchemaNode
 
         class ISheetF(ISheet):
             taggedValue('field:test', ReferenceListSchemaNode(
-                reftype=AdhocracyReferenceType))
+                reftype=SheetToSheet))
         self.resource_types.return_value = make_resource_types(
             IResource, {'basic_sheets': set([ISheetF])})
         inst = self.make_one(self.context, self.request)

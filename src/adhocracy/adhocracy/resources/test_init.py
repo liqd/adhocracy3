@@ -169,7 +169,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
 
     def test_create_with_referencing_items(self):
         from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
-        from adhocracy.interfaces import AdhocracyReferenceType
+        from adhocracy.interfaces import SheetToSheet
         from adhocracy.interfaces import ISheet
         events = []
 
@@ -180,7 +180,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         other_version = self.make_one()
         old_version = self.make_one()
         om = self.context.__objectmap__
-        om.connect(other_version, old_version, AdhocracyReferenceType)
+        om.connect(other_version, old_version, SheetToSheet)
         new_version_data = self.make_new_version_data(old_version.__oid__)
         self.make_one(appstructs=new_version_data,
                       root_versions=[old_version])

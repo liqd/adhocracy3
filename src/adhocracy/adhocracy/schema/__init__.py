@@ -1,5 +1,5 @@
 """Colander schema extensions."""
-from adhocracy.interfaces import AdhocracyReferenceType
+from adhocracy.interfaces import SheetReferenceType
 from pyramid.path import DottedNameResolver
 from substanced import schema
 from substanced.objectmap import reference_sourceid_property
@@ -164,7 +164,7 @@ class AbstractReferenceIterableSchemaNode(schema.MultireferenceIdSchemaNode):
 
     default = []
     missing = colander.drop
-    reftype = AdhocracyReferenceType
+    reftype = SheetReferenceType
     choices_getter = get_all_resources
 
     def _get_choices(self):
