@@ -27,12 +27,12 @@ class ISheetA(ISheet):
     pass
 
 
-def _register_propertysheet_adapter(config, context, iproperty):
+def _register_propertysheet_adapter(config, context, isheet):
     from adhocracy.sheets import ResourcePropertySheetAdapter
     from adhocracy.interfaces import IResourcePropertySheet
     from zope.interface.interfaces import IInterface
     config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (iproperty, IInterface),
+                                    (isheet, IInterface),
                                     IResourcePropertySheet)
 
 

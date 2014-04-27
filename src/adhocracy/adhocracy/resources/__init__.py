@@ -12,7 +12,6 @@ from adhocracy.utils import get_reftypes
 from adhocracy.sheets.versions import IVersionableFollowsReference
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
-from substanced.util import get_oid
 from substanced.objectmap import find_objectmap
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
@@ -26,7 +25,7 @@ def create_initial_content_for_item(context, registry, options):
     item_type = get_all_taggedvalues(iface)['item_type']
     first_version = ResourceFactory(item_type)(parent=context)
 
-    first_version_oid = get_oid(first_version)
+    first_version_oid = first_version.__oid__
     tag_first_data = {'adhocracy.sheets.tags.ITag': {'elements':
                                                      [first_version_oid]},
                       'adhocracy.sheets.name.IName': {'name': u'FIRST'}}
@@ -75,7 +74,7 @@ def notify_new_itemversion_created(context, registry, options):
 
     Args:
         context (IItemversion): the newly created resource
-        registry (pyramid registry or None): None is allowed to ease testing.
+        registry (pyramid registry):
         option (dict): Dict with 'root_versions', a list of
             root resources. Will be passed along to resources that
             reference old versions so they can decide whether they should
@@ -84,8 +83,6 @@ def notify_new_itemversion_created(context, registry, options):
         None
 
     """
-    if registry is None:
-        return None
     new_version = context
     root_versions = options.get('root_versions', [])
     old_versions = _get_old_versions(context)

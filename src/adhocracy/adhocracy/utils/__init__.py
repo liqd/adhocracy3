@@ -66,7 +66,6 @@ def get_sheet_interfaces(context):
         interfaces: list with ISheet interfaces
 
     """
-    assert IResource.providedBy(context)
     ifaces = list(providedBy(context))
     return [i for i in ifaces if i.isOrExtends(ISheet)]
 
