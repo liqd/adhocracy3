@@ -14,7 +14,6 @@ from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from substanced.util import get_oid
 from substanced.objectmap import find_objectmap
-from zope.component import getMultiAdapter
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
@@ -175,8 +174,7 @@ class ResourceFactory(object):
         if appstructs:
             for key, struct in appstructs.items():
                 iface = DottedNameResolver().maybe_resolve(key)
-                sheet = getMultiAdapter((resource, iface),
-                                        IResourcePropertySheet)
+                sheet = get_sheet(resource, iface)
                 if not sheet.readonly:
                     sheet.set(struct)
 

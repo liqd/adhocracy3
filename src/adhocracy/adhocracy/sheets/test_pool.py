@@ -63,12 +63,10 @@ class IncludemeIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def get_one(self, config, context, iface):
-        from adhocracy.interfaces import IResourcePropertySheet
+        from adhocracy.utils import get_sheet
         from zope.interface import alsoProvides
         alsoProvides(context, iface)
-        inst = config.registry.getMultiAdapter((context, iface),
-                                               IResourcePropertySheet)
-        return inst
+        return get_sheet(context, iface)
 
     def test_includeme_register_pool_adapter(self):
         from adhocracy.sheets.pool import IPool

@@ -1,26 +1,23 @@
 """adhocracy.event event subcriber to handle auto updates of resources."""
 
 from adhocracy.graph import is_in_subtree
-from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.sheets.versions import IVersionable
-from adhocracy.utils import get_sheet_interfaces
+from adhocracy.utils import get_sheet
+from adhocracy.utils import get_all_sheets
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_all_taggedvalues
 from copy import deepcopy
-from zope.component import getMultiAdapter
 
 
 def _get_not_readonly_appstructs(resource):
-    # FIXME move this to utils or better use resource registry
-    isheets = get_sheet_interfaces(resource)
+    # FIXME maybe move this to utils or better use resource registry
     appstructs = {}
-    for isheet in isheets:
-        sheet = getMultiAdapter((resource, isheet), IResourcePropertySheet)
+    for sheet in get_all_sheets(resource):
         if not sheet.readonly:
-            appstructs[isheet.__identifier__] = sheet.get()
+            appstructs[sheet.iface.__identifier__] = sheet.get()
     return appstructs
 
 
@@ -39,7 +36,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
 
 
 def _update_resource(resource, isheet, appstruct):
-    sheet = getMultiAdapter((resource, isheet), IResourcePropertySheet)
+    sheet = get_sheet(resource, isheet)
     if not sheet.readonly:
         sheet.set(appstruct)
         #FIXME: make sure modified event is send
@@ -62,7 +59,7 @@ def reference_has_new_version_subscriber(event):
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
 
     if autoupdate and not readonly:
-        sheet = getMultiAdapter((resource, isheet), IResourcePropertySheet)
+        sheet = get_sheet(resource, isheet)
         appstruct = deepcopy(sheet.get())
         field = appstruct[event.isheet_field]
         old_version_index = field.index(event.old_version_oid)
