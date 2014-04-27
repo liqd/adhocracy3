@@ -170,7 +170,6 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def test_create_with_referencing_items(self):
         from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
         from adhocracy.interfaces import SheetToSheet
-        from adhocracy.interfaces import ISheet
         events = []
 
         def listener(event):
@@ -185,9 +184,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         self.make_one(appstructs=new_version_data,
                       root_versions=[old_version])
 
-        assert len(events) == 1
-        assert ISheetReferencedItemHasNewVersion.providedBy(events[0])
-        assert events[0].isheet == ISheet
+        assert len(events) == 2
 
     def test_autoupdate_with_referencing_items(self):
         from adhocracy.interfaces import IItemVersion

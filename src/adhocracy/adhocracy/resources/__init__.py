@@ -1,18 +1,18 @@
 """Resource type configuration and default factory."""
 from adhocracy.events import ItemVersionNewVersionAdded
 from adhocracy.events import SheetReferencedItemHasNewVersion
+from adhocracy.graph import get_back_references
+from adhocracy.graph import get_references_for_isheet
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
-from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import ITag
 from adhocracy.interfaces import IItemVersion
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import get_resource_interface
-from adhocracy.utils import get_reftypes
-from adhocracy.sheets.versions import IVersionableFollowsReference
+from adhocracy.utils import get_sheet
+from adhocracy.sheets.versions import IVersionable
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
-from substanced.objectmap import find_objectmap
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
@@ -38,12 +38,8 @@ def create_initial_content_for_item(context, registry, options):
 
 
 def _get_old_versions(context):
-    #FIXME extend graph or versions sheet for this helper
-    om = find_objectmap(context)
-    old_versions = iter([])
-    if om:
-        old_versions = om.targets(context, IVersionableFollowsReference)
-    return old_versions
+    versions = get_references_for_isheet(context, IVersionable)
+    return versions.get('follows', [])
 
 
 def _notify_itemversion_has_new_version(old_version, new_version, registry):
@@ -55,18 +51,15 @@ def _notify_referencing_resources_about_new_version(old_version,
                                                     new_version,
                                                     root_versions,
                                                     registry):
-    om = find_objectmap(old_version)
-    reftypes = get_reftypes(om, [IVersionableFollowsReference])
-    for reftype in reftypes:
-        for referencing in om.sources(old_version, reftype):
-            event = SheetReferencedItemHasNewVersion(
-                referencing,
-                reftype.getTaggedValue('source_isheet'),
-                reftype.getTaggedValue('source_isheet_field'),
-                old_version.__oid__,
-                new_version.__oid__,
-                root_versions)
-            registry.notify(event)
+    references = get_back_references(old_version)
+    for referencing, isheet, isheet_field in references:
+        event = SheetReferencedItemHasNewVersion(referencing,
+                                                 isheet,
+                                                 isheet_field,
+                                                 old_version.__oid__,
+                                                 new_version.__oid__,
+                                                 root_versions)
+        registry.notify(event)
 
 
 def notify_new_itemversion_created(context, registry, options):
@@ -85,8 +78,7 @@ def notify_new_itemversion_created(context, registry, options):
     """
     new_version = context
     root_versions = options.get('root_versions', [])
-    old_versions = _get_old_versions(context)
-    for old_version in old_versions:
+    for old_version in _get_old_versions(context):
         _notify_itemversion_has_new_version(old_version, new_version, registry)
         _notify_referencing_resources_about_new_version(old_version,
                                                         new_version,
