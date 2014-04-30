@@ -1,7 +1,7 @@
 """Pool Sheet."""
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.interfaces import AdhocracyReferenceType
+from adhocracy.interfaces import SheetToSheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import ReferenceListSchemaNode
 from pyramid.path import DottedNameResolver
@@ -30,7 +30,7 @@ class IPool(ISheet):
                 ))
 
 
-class IPoolElementsReference(AdhocracyReferenceType):
+class IPoolElementsReference(SheetToSheet):
 
     """IPool reference."""
 

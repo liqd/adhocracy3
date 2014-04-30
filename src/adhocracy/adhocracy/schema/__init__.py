@@ -1,5 +1,5 @@
 """Colander schema extensions."""
-from adhocracy.interfaces import AdhocracyReferenceType
+from adhocracy.interfaces import SheetReferenceType
 from pyramid.path import DottedNameResolver
 from substanced import schema
 from substanced.objectmap import reference_sourceid_property
@@ -94,9 +94,9 @@ class AbstractPathIterable(IdSet):
             path_tuple = tuple(str(path).split('/'))
             oid = object_map.objectid_for(path_tuple)
             if oid is None:
-                raise colander.Invalid(node,
-                                       msg='This object path does not exist.',
-                                       value=path)
+                raise colander.Invalid(
+                    node,
+                    msg='This resource path does not exist.', value=path)
             self.add_to_appstruct(oids, oid)
         return oids
 
@@ -164,7 +164,7 @@ class AbstractReferenceIterableSchemaNode(schema.MultireferenceIdSchemaNode):
 
     default = []
     missing = colander.drop
-    reftype = AdhocracyReferenceType
+    reftype = SheetReferenceType
     choices_getter = get_all_resources
 
     def _get_choices(self):

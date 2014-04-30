@@ -31,6 +31,7 @@ from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
 from substanced.interfaces import IRoot
+from substanced.util import find_objectmap
 
 import functools
 
@@ -64,11 +65,36 @@ def validate_post_sheet_cstructs(context, request):
     sheets = {}
     if type_ in request.registry.content.resource_types():
         dummy = request.registry.content.create(
-            type_, context, add_to_context=False, run_after_creation=False)
+            type_, run_after_creation=False)
         dummy.__parent__ = context
         sheets = request.registry.content.resource_sheets(
             dummy, request, onlycreatable=True)
     validate_sheet_cstructs(dummy, request, sheets)
+
+
+def validate_post_root_versions(context, request):
+    """Check and transform the 'root_version' paths to resources."""
+    root_paths = request.validated.get('root_versions', [])
+    om = find_objectmap(context)
+    if not om:
+        root_paths = []
+
+    root_resources = []
+    for path in root_paths:
+        path_tuple = tuple(str(path).split('/'))
+        res = om.object_for(path_tuple)
+        if res is None:
+            error = 'This resource path does not exist: {p}'.format(p=path)
+            request.errors.add('body", "root_versions', error)
+            continue
+        if not IItemVersion.providedBy(res):
+            error = 'This resource is not a valid '\
+                    'root version: {p}'.format(p=path)
+            request.errors.add('body', 'root_versions', error)
+            continue
+        root_resources.append(res)
+
+    request.validated['root_versions'] = root_resources
 
 
 def validate_put_sheet_names(context, request):
@@ -124,8 +150,8 @@ def validate_request_data(context, request, schema=None, extra_validators=[]):
 
         """
         if schema:
-            schema = CorniceSchema.from_colander(schema)
-            validate_colander_schema(schema, request)
+            schemac = CorniceSchema.from_colander(schema)
+            validate_colander_schema(schemac, request)
         for val in extra_validators:
             val(context, request)
         if request.errors:
@@ -242,6 +268,12 @@ class ResourceRESTView(RESTView):
             struct['data'][key] = sheet.get_cstruct()
             if issubclass(IVersionable, sheet.iface):
                 # Calculate followed_by attribute of IVersionable
+
+                # FIXME: The RestView is generic and should not care
+                # for specific sheets/Resource types at all.
+                # The right place to calculate followed_by is a custom
+                # adapter for IVersionable sheets or better find an abstract
+                # way to handle backrefs - joka
                 struct['data'][key]['followed_by'] = followed_by(self.context)
         struct['path'] = resource_path(self.context)
         iresource = get_resource_interface(self.context)
@@ -363,6 +395,7 @@ class ItemRESTView(PoolRESTView):
 
     validation_POST = (POSTItemRequestSchema,
                        [validate_post_sheet_names_and_resource_type,
+                        validate_post_root_versions,
                         validate_post_sheet_cstructs])
 
     @view_config(request_method='POST')
@@ -370,15 +403,10 @@ class ItemRESTView(PoolRESTView):
         """HTTP POST. Return dictionary with PATH of new resource."""
         resource_type = self.request.validated['content_type']
         appstructs = self.request.validated.get('data', {})
-        root_versions = self.request.validated.get('root_versions', None)
-        if root_versions:
-            # pass non-empty root_versions along to resource creator
-            resource = self.registry.create(resource_type, self.context,
-                                            appstructs=appstructs,
-                                            options=root_versions)
-        else:
-            resource = self.registry.create(resource_type, self.context,
-                                            appstructs=appstructs)
+        root_versions = self.request.validated.get('root_versions', [])
+        resource = self.registry.create(resource_type, self.context,
+                                        appstructs=appstructs,
+                                        root_versions=root_versions)
         return self.build_post_response(resource)
 
 

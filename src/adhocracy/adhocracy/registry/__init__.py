@@ -1,14 +1,12 @@
 """Content registry."""
-from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.interfaces import ISheet
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import get_resource_interface
+from adhocracy.utils import get_all_sheets
 from adhocracy.resources import ResourceFactory
 from adhocracy.interfaces import IResource
 from pyramid.security import has_permission
 from pyramid.path import DottedNameResolver
 from substanced.content import ContentRegistry
-from zope.interface import providedBy
 
 
 class ResourceContentRegistry(ContentRegistry):
@@ -31,26 +29,20 @@ class ResourceContentRegistry(ContentRegistry):
 
         """
         assert IResource.providedBy(context)
-        sheets = {}
-        ifaces = [i for i in providedBy(context) if i.isOrExtends(ISheet)]
-        for iface in ifaces:
-            sheet = self.registry.getMultiAdapter((context, iface),
-                                                  IResourcePropertySheet)
-            if onlyviewable:
-                if not has_permission(sheet.permission_view, context, request):
+        wanted_sheets = {}
+        for sheet in get_all_sheets(context):
+            can_view = has_permission(sheet.permission_view, context, request)
+            can_edit = has_permission(sheet.permission_edit, context, request)
+            if onlyviewable and not can_view:
                     continue
             if onlyeditable or onlycreatable or onlymandatorycreatable:
-                if not has_permission(sheet.permission_edit, context, request):
-                    continue
-                if sheet.readonly:
+                if sheet.readonly or not can_edit:
                     continue
             if onlymandatorycreatable:
                 if not sheet.createmandatory:
                     continue
-            sheets[iface.__identifier__] = sheet
-        if 'adhocracy.sheets.versions.IVersions' in sheets:
-            sheets['adhocracy.sheets.versions.IVersions'].get()
-        return sheets
+            wanted_sheets[sheet.iface.__identifier__] = sheet
+        return wanted_sheets
 
     def resource_types(self):
         """Get dictionary with all resource types and metadata.
@@ -126,9 +118,7 @@ class ResourceContentRegistry(ContentRegistry):
         types_with_sheetnames = {}
         for type_iface in addable_types:
             sheetnames = {}
-            resource = ResourceFactory(type_iface)(context,
-                                                   add_to_context=False,
-                                                   run_after_creation=False)
+            resource = ResourceFactory(type_iface)(run_after_creation=False)
             resource.__parent__ = context
             sheets = self.resource_sheets(resource, request,
                                           onlycreatable=True)

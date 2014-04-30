@@ -7,19 +7,18 @@ import unittest
 class ItemNewVersionAddedUnitTest(unittest.TestCase):
 
     def _makeOne(self, *arg):
-        from . import ItemNewVersionAdded
-        return ItemNewVersionAdded(*arg)
+        from . import ItemVersionNewVersionAdded
+        return ItemVersionNewVersionAdded(*arg)
 
     def test_create(self):
-        from adhocracy.interfaces import IItemNewVersionAdded
-        obj = testing.DummyResource()
-        old_version = testing.DummyResource()
+        from adhocracy.interfaces import IItemVersionNewVersionAdded
+        context = testing.DummyResource()
         new_version = testing.DummyResource()
 
-        inst = self._makeOne(obj, old_version, new_version)
+        inst = self._makeOne(context, new_version)
 
-        assert IItemNewVersionAdded.providedBy(inst)
-        assert verifyObject(IItemNewVersionAdded, inst)
+        assert IItemVersionNewVersionAdded.providedBy(inst)
+        assert verifyObject(IItemVersionNewVersionAdded, inst)
 
 
 class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
@@ -31,14 +30,14 @@ class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
     def test_create(self):
         from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
         from adhocracy.interfaces import ISheet
-        obj = testing.DummyResource()
+        context = testing.DummyResource()
         isheet = ISheet
         isheet_field = 'example_field'
         old_version_oid = 5
         new_version_oid = 6
-        root_versions = [obj]
+        root_versions = [context]
 
-        inst = self._makeOne(obj, isheet, isheet_field,
+        inst = self._makeOne(context, isheet, isheet_field,
                              old_version_oid, new_version_oid,
                              root_versions)
 

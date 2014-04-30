@@ -1,65 +1,166 @@
 """Utilities for working with the version/reference graph (DAG)."""
 
-from adhocracy.interfaces import AdhocracyReferenceType
-from adhocracy.sheets.versions import IVersionableFollowsReference
-from substanced.objectmap import find_objectmap
+from adhocracy.interfaces import IResource
+from adhocracy.interfaces import SheetReferenceType
+from adhocracy.interfaces import SheetToSheet
+from adhocracy.utils import get_all_taggedvalues
+from substanced.util import find_objectmap
+from substanced.objectmap import ObjectMap
 
 
-def collect_reftypes(objectmap, excluded_types=[]):
-    """Collect all Adhocracy reference types except those excluded.
+def _get_reftypes(objectmap, base_reftype=None, source_isheet=None):
+    """Collect all used SheetReferenceTypes.
 
     Args:
-        objectmap: the objectmap to consult
-        excluded_types (optional list of types): reference types listed here
-            will be skipped
+        objectmap or None: the objectmap to consult, None value is allowed to
+                           ease unit testing.
+        base_reftype (SheetReferenceType, optional): Skip types that are not
+                                                     subclasses of reftype.
 
+        source_isheet (ISheet, optional): Skip types with a source isheet
+                                          that is not a subclass of
+                                          source_isheet.
     Returns:
-        All Adhocracy reference types except those mentioned in
-        `excluded_types`.
+        list of SheetReferenceTypes
 
     """
-    result = []
-    if excluded_types is None:
-        excluded_types = []
-    for reftype in objectmap.get_reftypes():
-        if issubclass(reftype, AdhocracyReferenceType):
-            if reftype not in excluded_types:
-                result.append(reftype)
-    return result
+    reftypes = []
+    if objectmap:
+        for reftype in objectmap.get_reftypes():
+            if isinstance(reftype, str):
+                continue
+            if not issubclass(reftype, SheetReferenceType):
+                continue
+            if base_reftype and not reftype.isOrExtends(base_reftype):
+                continue
+            if source_isheet:
+                isheet = reftype.queryTaggedValue('source_isheet')
+                if not isheet.isOrExtends(source_isheet):
+                    continue
+            reftypes.append(reftype)
+    return reftypes
 
 
-def _check_ancestry(objectmap, reftypes, startnode, descendant, checked_map):
-    """Helper method that recursively checks for an ancestry relation.
-
-    checked_map is a mapping from object IDs to objects that have already been
-    checked.
-
-    Returns True if an ancestry relation was found, False otherwise.
-
-    """
-    startnode_oid = startnode.__oid__
-    descendant_oid = descendant.__oid__
-    checked_map[startnode_oid] = startnode
-    unchecked_map = {}
-
-    # Check outgoing connections of the requested types
+def _references_template(objectmap_method, context, source_isheet=None,
+                         base_reftype=None):
+    """ Template to get reference data with objectmap methods. """
+    om = find_objectmap(context)
+    reftypes = _get_reftypes(om, base_reftype, source_isheet)
     for reftype in reftypes:
-        for node in objectmap.targets(startnode, reftype):
-            node_oid = node.__oid__
-            if node_oid == descendant_oid:
-                return True  # Got it!
-            if node_oid not in checked_map and node_oid not in unchecked_map:
-                # We'll have to check this node
-                unchecked_map[node_oid] = node
+        isheet = reftype.getTaggedValue('source_isheet')
+        isheet_field = reftype.getTaggedValue('source_isheet_field')
+        for resource in objectmap_method(om, context, reftype):
+            yield (resource, isheet, isheet_field)
 
-    # Check any unchecked_children
-    for node in unchecked_map.values():
-        gotit = _check_ancestry(objectmap, reftypes, node, descendant,
-                                checked_map)
-        if gotit:
+
+def get_back_references(resource):
+    """Get references that point to this resource.
+
+    Args:
+        resource (IResource)
+    Returns:
+        list: tuples with the following content:
+              referencing (IResource), isheet (ISheet), field_name (String)
+
+    """
+    return _references_template(ObjectMap.sources, resource)
+
+
+def get_references(resource):
+    """Get references of this resource pointing to other resources.
+
+    Args:
+        resource (IResource)
+    Returns:
+        list: tuples with the following content:
+              referenced (IResource), isheet (ISheet), field_name (String)
+
+    """
+    return _references_template(ObjectMap.targets, resource)
+
+
+def _get_fields(isheet):
+    metadata = get_all_taggedvalues(isheet)
+    fields = []
+    for key, value in metadata.items():
+        if key.startswith('field:'):
+            name = key.split(':')[1]
+            fields.append(name)
+    return fields
+
+
+def _build_dict_with_references_for_isheet(references, isheet):
+    references_isheet = {}
+    fieldnames = _get_fields(isheet)
+    for resource, isheet, isheet_field in references:
+        if isheet_field in fieldnames:
+            # FIXME we return a list of resource here, but for big data a set
+            # or generator would be much better
+            resources = references_isheet.get(isheet_field, [])
+            resources.append(resource)
+            references_isheet[isheet_field] = resources
+    return references_isheet
+
+
+def get_references_for_isheet(resource, isheet):
+    """ Get references of this resource pointing to others for one isheet only.
+
+    Args:
+        resource (IResource)
+        isheet (ISheet)
+    Returns:
+        list: dicts with the following content:
+              key - fieldname, value - referenced resrouces
+
+              References from subtypes of isheet are also listed, if the
+              field_name is part of the supertype.
+
+    """
+    references = _references_template(ObjectMap.targets, resource,
+                                      source_isheet=isheet)
+    return _build_dict_with_references_for_isheet(references, isheet)
+
+
+def get_back_references_for_isheet(resource, isheet):
+    """ Get references that point to this resource for one isheet only.
+
+    Args:
+        resource (IResource)
+        isheet (ISheet)
+    Returns:
+        list: dicts with the following content:
+              key - fieldname, value - referencing resources
+
+              References from subtypes of isheet are also listed, if the
+              field_name is part of the supertype.
+
+    """
+    references = _references_template(ObjectMap.sources, resource,
+                                      source_isheet=isheet)
+    return _build_dict_with_references_for_isheet(references, isheet)
+
+
+def _get_targets(resource, base_reftype=SheetReferenceType):
+    references = _references_template(ObjectMap.targets, resource,
+                                      base_reftype=base_reftype)
+    for reference in references:
+        yield reference[0]
+
+
+def _is_candidate_ancestor(candidate, descendant, checked_candidates):
+    """Return True if candidate is ancestor of descendant, False otherwise."""
+    if candidate is descendant:
+        return True
+    checked_candidates.add(candidate.__oid__)
+
+    children = _get_targets(candidate, base_reftype=SheetToSheet)
+    unchecked_children = [x for x in children
+                          if x.__oid__ not in checked_candidates]
+    for child in unchecked_children:
+        if _is_candidate_ancestor(child, descendant, checked_candidates):
             return True
 
-    return False  # Sorry, not found
+    return False
 
 
 def is_in_subtree(descendant, ancestors):
@@ -70,34 +171,17 @@ def is_in_subtree(descendant, ancestors):
          ancestors (list of IResource): the candidate ancestors
 
     Returns:
-        True iff there exists a relation from one of the `ancestors` to
+        True if there exists a relation from one of the `ancestors` to
         `descendant` that does NOT include any 'follows' links. For example,
         descendant might be an element of an element (of an element...) of an
         ancestor. Also if descendant and of the ancestors are the same node.
 
-        False otherwise (including the case that descendant is None and
-        ancestors is None or empty).
+        False otherwise.
 
     """
-    if not ancestors or descendant is None:
-        return False
-
-    descendant_oid = descendant.__oid__
-
-    for ancestor in ancestors:
-        if ancestor.__oid__ == descendant_oid:
+    assert IResource.providedBy(descendant)
+    assert isinstance(ancestors, list)
+    for candidate in ancestors:
+        if _is_candidate_ancestor(candidate, descendant, set(),):
             return True
-
-    objectmap = find_objectmap(descendant)
-    # We don't want any 'follows' links
-    reftypes = collect_reftypes(objectmap,
-                                [IVersionableFollowsReference])
-    checked_map = {}
-
-    for ancestor in ancestors:
-        found = _check_ancestry(objectmap, reftypes, ancestor, descendant,
-                                checked_map)
-        if found:
-            return True  # We're done
-
-    return False  # No luck
+    return False

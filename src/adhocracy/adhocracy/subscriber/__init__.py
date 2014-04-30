@@ -1,64 +1,74 @@
 """adhocracy.event event subcriber to handle auto updates of resources."""
 
 from adhocracy.graph import is_in_subtree
-from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.sheets.versions import IVersionable
-from adhocracy.utils import get_sheet_interfaces
+from adhocracy.utils import get_sheet
+from adhocracy.utils import get_all_sheets
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_all_taggedvalues
 from copy import deepcopy
-from substanced.util import get_oid
-from zope.component import getMultiAdapter
 
 
-def _update_resource(resource, isheet, appstruct, root_versions):
-    from adhocracy.resources import ResourceFactory  # make unit test mock work
-    updated_resource = resource
-    if IVersionable.providedBy(resource):
-        iresource = get_resource_interface(resource)
-        isheets_ = get_sheet_interfaces(resource)
-        appstructs = {}
-        for isheet_ in isheets_:
-            sheet_ = getMultiAdapter((resource, isheet_),
-                                     IResourcePropertySheet)
-            if sheet_.readonly:
-                continue
-            appstructs[isheet_.__identifier__] = sheet_.get()
-        oid = get_oid(resource)
-        appstructs[IVersionable.__identifier__]['follows'] = [oid]
-        appstructs[isheet.__identifier__] = appstruct
-        updated_resource = ResourceFactory(iresource)(resource.__parent__,
-                                                      appstructs=appstructs,
-                                                      options=root_versions)
-    else:
-        sheet = getMultiAdapter((resource, isheet), IResourcePropertySheet)
+def _get_not_readonly_appstructs(resource):
+    # FIXME maybe move this to utils or better use resource registry
+    appstructs = {}
+    for sheet in get_all_sheets(resource):
         if not sheet.readonly:
-            sheet.set(appstruct)
+            appstructs[sheet.iface.__identifier__] = sheet.get()
+    return appstructs
+
+
+def _update_versionable(resource, isheet, appstruct, root_versions):
+    from adhocracy.resources import ResourceFactory  # make unit test mock work
+    if root_versions and not is_in_subtree(resource, root_versions):
+        return resource
+    else:
+        appstructs = _get_not_readonly_appstructs(resource)
+        appstructs[IVersionable.__identifier__]['follows'] = [resource.__oid__]
+        appstructs[isheet.__identifier__] = appstruct
+        iresource = get_resource_interface(resource)
+        return ResourceFactory(iresource)(parent=resource.__parent__,
+                                          appstructs=appstructs,
+                                          options=root_versions)
+
+
+def _update_resource(resource, isheet, appstruct):
+    sheet = get_sheet(resource, isheet)
+    if not sheet.readonly:
+        sheet.set(appstruct)
         #FIXME: make sure modified event is send
-    return updated_resource
+    return resource
 
 
 def reference_has_new_version_subscriber(event):
-    """Auto updated resource if a referenced Item has a new version."""
+    """Auto updated resource if a referenced Item has a new version.
+
+    Args:
+        event (ISheetReferencedItemHasNewVersion)
+
+    """
     assert ISheetReferencedItemHasNewVersion.providedBy(event)
     assert IResource.providedBy(event.object)
-    readonly = get_all_taggedvalues(event.isheet)['readonly']
+    resource = event.object
+    root_versions = event.root_versions
+    isheet = event.isheet
+    readonly = get_all_taggedvalues(isheet)['readonly']
+    autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
 
-    if event.isheet.extends(ISheetReferenceAutoUpdateMarker) and not readonly\
-            and is_in_subtree(event.object, event.root_versions):
-        resource = event.object
-        sheet = getMultiAdapter((resource, event.isheet),
-                                IResourcePropertySheet)
+    if autoupdate and not readonly:
+        sheet = get_sheet(resource, isheet)
         appstruct = deepcopy(sheet.get())
         field = appstruct[event.isheet_field]
-        old_oid_index = field.index(event.old_version_oid)
-        field.pop(old_oid_index)
-        field.insert(old_oid_index, event.new_version_oid)
-        _update_resource(event.object, event.isheet, appstruct,
-                         event.root_versions)
+        old_version_index = field.index(event.old_version_oid)
+        field.pop(old_version_index)
+        field.insert(old_version_index, event.new_version_oid)
+        if IVersionable.providedBy(resource):
+            _update_versionable(resource, isheet, appstruct, root_versions)
+        else:
+            _update_resource(resource, isheet, appstruct)
 
 
 def includeme(config):

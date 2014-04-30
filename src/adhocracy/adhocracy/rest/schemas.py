@@ -50,18 +50,18 @@ class POSTResourceRequestSchema(PUTResourceRequestSchema):
     content_type = colander.SchemaNode(colander.String(), default='')
 
 
-class RootVersionsList(colander.List):
+class AbsolutePaths(colander.SequenceSchema):
 
-    """List of root versions (resource paths)."""
+    """List of resource paths."""
 
-    root_versions = colander.SchemaNode(colander.String())
+    path = AbsolutePath()
 
 
 class POSTItemRequestSchema(POSTResourceRequestSchema):
 
     """Data structure for Item and ItemVersion POST requests."""
 
-    root_versions = colander.SchemaNode(RootVersionsList(), missing=[])
+    root_versions = AbsolutePaths(missing=[])
 
 
 class POSTResourceRequestSchemaList(colander.List):
