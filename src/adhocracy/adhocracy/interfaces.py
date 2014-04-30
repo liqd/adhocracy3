@@ -163,7 +163,7 @@ class IItem(IPool):
                 ]))
     taggedValue(
         'after_creation',
-        ['adhocracy.resources.item_create_initial_content'])
+        ['adhocracy.resources.create_initial_content_for_item'])
     taggedValue('item_type',
                 'adhocracy.resources.IItemVersion')
     """Type of versions in this item. Subtypes have to override."""
@@ -197,12 +197,16 @@ class IItemVersion(IResource):
                 ['adhocracy.sheets.versions.IVersionable']))
     taggedValue(
         'after_creation',
-        ['adhocracy.resources.itemversion_create_notify'])
+        ['adhocracy.resources.notify_new_itemversion_created'])
 
 
-class AdhocracyReferenceClass(ReferenceClass):
+class SheetReferenceClass(ReferenceClass):
 
-    """ Use class attributes "target_*" and "source_*" to set tagged values."""
+    """Reference a specific ISheet for source and and target.
+
+    Uses class attributes "target_*" and "source_*" to set tagged values.
+
+    """
 
     def __init__(self, *arg, **kw):
         try:
@@ -229,16 +233,25 @@ class AdhocracyReferenceClass(ReferenceClass):
         self.setTaggedValue('target_isheet', tif)
 
 
-AdhocracyReferenceType = AdhocracyReferenceClass(
-    'AdhocracyReferenceType', __module__='adhocracy.interfaces')
+SheetReferenceType = SheetReferenceClass('SheetReferenceType',
+                                         __module__='adhocracy.interfaces')
 
 
-class IItemNewVersionAdded(IObjectEvent):
+class SheetToSheet(SheetReferenceType):
+
+    """Base type to reference resource ISheets."""
+
+
+class NewVersionToOldVersion(SheetReferenceType):
+
+    """Base type to reference an old ItemVersion."""
+
+
+class IItemVersionNewVersionAdded(IObjectEvent):
 
     """An event type sent when a new ItemVersion is added."""
 
-    object = Attribute('The Item to which the ItemVersion is being added')
-    old_version = Attribute('The old ItemVersion followed by the new one')
+    object = Attribute('The old ItemVersion followed by the new one')
     new_version = Attribute('The new ItemVersion')
 
 

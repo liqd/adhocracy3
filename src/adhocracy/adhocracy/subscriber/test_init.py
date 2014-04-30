@@ -122,7 +122,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         self._makeOne(self.event)
 
         assert factory.called
-        child_new_parent = factory.call_args[0][0]
+        child_new_parent = factory.call_args[1]['parent']
         child_new_appstructs = factory.call_args[1]['appstructs']
         assert child_new_parent is self.child.__parent__
         child_new_wanted_appstructs = dict([
@@ -154,7 +154,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         self._makeOne(self.event)
 
         assert factory.called
-        child_new_parent = factory.call_args[0][0]
+        child_new_parent = factory.call_args[1]['parent']
         child_new_appstructs = factory.call_args[1]['appstructs']
         assert child_new_parent is self.child.__parent__
         child_new_wanted_appstructs = dict([

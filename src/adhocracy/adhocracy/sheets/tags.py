@@ -2,7 +2,7 @@
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IIResourcePropertySheet
-from adhocracy.interfaces import AdhocracyReferenceType
+from adhocracy.interfaces import SheetToSheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.versions import IVersionable
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
@@ -23,7 +23,7 @@ class ITag(ISheet):
                 ))
 
 
-class ITagElementsReference(AdhocracyReferenceType):
+class ITagElementsReference(SheetToSheet):
 
     """ITag reference."""
 
@@ -43,7 +43,7 @@ class ITags(ISheet):
                 ))
 
 
-class ITagsElementsReference(AdhocracyReferenceType):
+class ITagsElementsReference(SheetToSheet):
 
     """ITags reference."""
 

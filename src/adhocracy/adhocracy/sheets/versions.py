@@ -1,15 +1,16 @@
 """Sheets to work with versionable resources."""
+from adhocracy.graph import get_back_references_for_isheet
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IIResourcePropertySheet
-from adhocracy.interfaces import AdhocracyReferenceType
+from adhocracy.interfaces import SheetToSheet
+from adhocracy.interfaces import NewVersionToOldVersion
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceListSchemaNode
 from adhocracy.schema import ReferenceSetSchemaNode
 from pyramid.traversal import resource_path
-from substanced.util import find_objectmap
 from zope.interface import provider
 from zope.interface import taggedValue
 
@@ -20,17 +21,16 @@ def followed_by(resource):
     """Determine the successors ("followed_by") of a versionable resource.
 
     Args:
-        resource (IResource that implements the IVersionable sheet)
+        resource (IResource that provides the IVersionable sheet)
 
     Returns:
         a list of resource paths to successor versions (possibly empty)
 
     """
-    om = find_objectmap(resource)
+    versions = get_back_references_for_isheet(resource, IVersionable)
     result = []
-    if om is not None:
-        for source in om.sources(resource, IVersionableFollowsReference):
-            result.append(resource_path(source))
+    for new_version in versions.get('follows', []):
+        result.append(resource_path(new_version))
     return result
 
 
@@ -55,7 +55,7 @@ class IVersionable(ISheet):
         ))
 
 
-class IVersionableFollowsReference(AdhocracyReferenceType):
+class IVersionableFollowsReference(NewVersionToOldVersion):
 
     """IVersionable reference to preceding versions."""
 
@@ -64,7 +64,7 @@ class IVersionableFollowsReference(AdhocracyReferenceType):
     target_isheet = IVersionable
 
 
-class IVersionableFollowedByReference(AdhocracyReferenceType):
+class IVersionableFollowedByReference(SheetToSheet):
 
     """IVersionable reference to subsequent versions.
 
@@ -91,7 +91,7 @@ class IVersions(ISheet):
         ))
 
 
-class IVersionsElementsReference(AdhocracyReferenceType):
+class IVersionsElementsReference(SheetToSheet):
 
     """IVersions reference."""
 

@@ -65,7 +65,7 @@ def validate_post_sheet_cstructs(context, request):
     sheets = {}
     if type_ in request.registry.content.resource_types():
         dummy = request.registry.content.create(
-            type_, context, add_to_context=False, run_after_creation=False)
+            type_, run_after_creation=False)
         dummy.__parent__ = context
         sheets = request.registry.content.resource_sheets(
             dummy, request, onlycreatable=True)

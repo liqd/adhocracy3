@@ -1,4 +1,8 @@
+from adhocracy.interfaces import SheetToSheet
+from mock import patch
+
 import pytest
+import unittest
 
 ################
 #  test utils  #
@@ -138,5 +142,6 @@ def test_to_dotted_name_module():
 def test_to_dotted_name_dotted_string():
     from . import to_dotted_name
     assert to_dotted_name('os.walk') == 'os.walk'
+
 
 

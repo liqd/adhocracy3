@@ -27,10 +27,10 @@ def make_folder_with_objectmap(dummyobjectmap=None):
 #  tests #
 ##########
 
-class AdhocracyReferenceTypeUnitTests(unittest.TestCase):
+class SheetToSheetUnitTests(unittest.TestCase):
 
     def test_create_valid(self):
-        from adhocracy.interfaces import AdhocracyReferenceType as Reference
+        from adhocracy.interfaces import SheetToSheet as Reference
         # substanced standard tagged values
         assert Reference.getTaggedValue('source_integrity') is False
         assert Reference.getTaggedValue('target_integrity') is False
@@ -42,13 +42,13 @@ class AdhocracyReferenceTypeUnitTests(unittest.TestCase):
         assert Reference.getTaggedValue('target_isheet') is ISheet
 
     def test_create_valid_custom_values(self):
-        from adhocracy.interfaces import AdhocracyReferenceType
+        from adhocracy.interfaces import SheetToSheet
         from adhocracy.interfaces import ISheet
 
         class IA(ISheet):
             pass
 
-        class Reference(AdhocracyReferenceType):
+        class Reference(SheetToSheet):
             source_integrity = True
             target_integrity = True
             target_ordered = True

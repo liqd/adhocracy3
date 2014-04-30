@@ -1,9 +1,11 @@
 """Helper functions."""
 from adhocracy.interfaces import IResource
+from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import ISheet
 from functools import reduce
 from pyramid.path import DottedNameResolver
 from substanced.util import get_dotted_name
+from zope.component import getMultiAdapter
 from zope.interface import directlyProvidedBy
 from zope.interface import providedBy
 
@@ -64,9 +66,37 @@ def get_sheet_interfaces(context):
         interfaces: list with ISheet interfaces
 
     """
-    assert IResource.providedBy(context)
     ifaces = list(providedBy(context))
     return [i for i in ifaces if i.isOrExtends(ISheet)]
+
+
+def get_sheet(context, isheet):
+    """Get sheet adapter for ISheet inteface.
+
+    Args:
+        context (IResource): object
+        isheet (IISheet): object
+    Returns:
+        object (IResourcePropertySheet)
+
+    """
+    # FIXME add Raises component error
+    return getMultiAdapter((context, isheet), IResourcePropertySheet)
+
+
+def get_all_sheets(context):
+    """Get sheet adapters for this context.
+
+    Args:
+        context (IResource): object
+    Returns:
+        iterator: IResourcePropertySheet adapters
+
+    """
+    assert IResource.providedBy(context)
+    isheets = get_sheet_interfaces(context)
+    for isheet in isheets:
+        yield(get_sheet(context, isheet))
 
 
 def get_all_taggedvalues(iface):
