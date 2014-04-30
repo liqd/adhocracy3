@@ -179,6 +179,3 @@ def includeme(config):
     """Include all resource types in this package."""
     config.include('.pool')
     config.include('.tag')
-    config.include('.paragraph')
-    config.include('.section')
-    config.include('.proposal')

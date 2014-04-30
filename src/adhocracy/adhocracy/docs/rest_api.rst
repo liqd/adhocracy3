@@ -20,7 +20,7 @@ Start Adhocracy testapp::
 
     >>> from webtest import TestApp
     >>> from adhocracy.testing import settings_functional
-    >>> from adhocracy import main
+    >>> from adhocracy_sample import main
 
     >>> if 'A3_TEST_SERVER' in os.environ and os.environ['A3_TEST_SERVER']:
     ...     print('skip')
@@ -116,7 +116,7 @@ The "resources" key points to an object whose keys are all the resources
 (content types) defined by the system::
 
     >>> sorted(resp_data['resources'].keys())
-    [...'adhocracy.resources.pool.IBasicPool', ...'adhocracy.resources.section.ISection'...]
+    [...'adhocracy.resources.pool.IBasicPool', ...'adhocracy_sample.resources.section.ISection'...]
 
 Each of these keys points to an object describing the resource. If the
 resource implements sheets (and a resource that doesn't would be
@@ -131,9 +131,9 @@ If the resource is an item, it will also have a "item_type" key whose value
 is the type of versions managed by this item (e.g. a Section will manage
 SectionVersions as main element type)::
 
-    >>> section_desc = resp_data['resources']['adhocracy.resources.section.ISection']
+    >>> section_desc = resp_data['resources']['adhocracy_sample.resources.section.ISection']
     >>> section_desc['item_type']
-    'adhocracy.resources.section.ISectionVersion'
+    'adhocracy_sample.resources.section.ISectionVersion'
 
 If the resource is a pool or item that can contain resources, it will also
 have an "element_types" key whose value is the list of all resources the
@@ -143,7 +143,7 @@ example, a pool can contain other pools; a section can contain tags. ::
     >>> basicpool_desc['element_types']
     ['adhocracy.interfaces.IPool'...]
     >>> sorted(section_desc['element_types'])
-    ['adhocracy.interfaces.ITag', ...'adhocracy.resources.section.ISectionVersion'...]
+    ['adhocracy.interfaces.ITag', ...'adhocracy_sample.resources.section.ISectionVersion'...]
 
 The "sheets" key points to an object whose keys are all the sheets
 implemented by any of the resources::
@@ -461,7 +461,7 @@ Create
 
 Create a Proposal (a subclass of Item which pools ProposalVersion's) ::
 
-    >>> pdag = {'content_type': 'adhocracy.resources.proposal.IProposal',
+    >>> pdag = {'content_type': 'adhocracy_sample.resources.proposal.IProposal',
     ...         'data': {
     ...              'adhocracy.sheets.name.IName': {
     ...                  'name': 'kommunismus'}
@@ -507,7 +507,7 @@ Fetch the first Proposal version, it is empty ::
 
 Create a new version of the proposal that follows the first version ::
 
-    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposalVersion',
+    >>> pvrs = {'content_type': 'adhocracy_sample.resources.proposal.IProposalVersion',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
     ...                     'title': 'kommunismus jetzt!',
     ...                     'description': 'blabla!',
@@ -551,7 +551,7 @@ Therefore 'followed_by' is read-only, while 'follows' is writable.
 
 Create a Section item inside the Proposal item ::
 
-    >>> sdag = {'content_type': 'adhocracy.resources.section.ISection',
+    >>> sdag = {'content_type': 'adhocracy_sample.resources.section.ISection',
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel1'},}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag)
@@ -560,7 +560,7 @@ Create a Section item inside the Proposal item ::
 
 and a second Section ::
 
-    >>> sdag = {'content_type': 'adhocracy.resources.section.ISection',
+    >>> sdag = {'content_type': 'adhocracy_sample.resources.section.ISection',
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel2'},}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag)
@@ -570,7 +570,7 @@ and a second Section ::
 Create a third Proposal version and add the two Sections in their
 initial versions ::
 
-    >>> pvrs = {'content_type': 'adhocracy.resources.proposal.IProposalVersion',
+    >>> pvrs = {'content_type': 'adhocracy_sample.resources.proposal.IProposalVersion',
     ...         'data': {'adhocracy.sheets.document.IDocument': {
     ...                     'elements': [svrs0_path, s2vrs0_path]},
     ...                  'adhocracy.sheets.versions.IVersionable': {
@@ -582,7 +582,7 @@ initial versions ::
 
 If we create a second version of kapitel1 ::
 
-    >>> svrs = {'content_type': 'adhocracy.resources.section.ISectionVersion',
+    >>> svrs = {'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
     ...         'data': {
     ...              'adhocracy.sheets.document.ISection': {
     ...                  'title': 'Kapitel Überschrift Bla',
@@ -620,7 +620,7 @@ version is automatically created along with the updated Section version::
 
 More interestingly, if we then create a second version of kapitel2::
 
-    >>> svrs = {'content_type': 'adhocracy.resources.section.ISectionVersion',
+    >>> svrs = {'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
     ...         'data': {
     ...              'adhocracy.sheets.document.ISection': {
     ...                  'title': 'on the hardness of version control',
@@ -801,14 +801,14 @@ requests!)
     ..     {
     ..         'code': 200,
     ..         'body': {
-    ..             'content_type': 'adhocracy.resources.proposal.IProposal',
+    ..             'content_type': 'adhocracy_sample.resources.proposal.IProposal',
     ..             'path': '...'
     ..         }
     ..     }
     .. ]
     .. >>> propv3 = testapp.get_json(batch_resp[2]['body']['path']).json
     .. {
-    ..     'content_type': 'adhocracy.resources.proposal.IProposal',
+    ..     'content_type': 'adhocracy_sample.resources.proposal.IProposal',
     ..     ...
     .. }
 

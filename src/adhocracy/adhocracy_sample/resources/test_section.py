@@ -26,21 +26,21 @@ class IncludemeIntegrationTest(unittest.TestCase):
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
-        self.config.include('adhocracy.resources.proposal')
+        self.config.include('adhocracy_sample.resources.section')
         self.context = DummyFolder()
 
     def tearDown(self):
         testing.tearDown()
 
     def test_includeme_registry_register_factories(self):
-        from adhocracy.resources.proposal import IProposalVersion
-        from adhocracy.resources.proposal import IProposal
+        from adhocracy_sample.resources.section import ISectionVersion
+        from adhocracy_sample.resources.section import ISection
         content_types = self.config.registry.content.factory_types
-        assert IProposal.__identifier__ in content_types
-        assert IProposalVersion.__identifier__ in content_types
+        assert ISection.__identifier__ in content_types
+        assert ISectionVersion.__identifier__ in content_types
 
     def test_includeme_registry_create_content(self):
-        from adhocracy.resources.proposal import IProposalVersion
-        res = self.config.registry.content.create(IProposalVersion.__identifier__,
+        from adhocracy_sample.resources.section import ISectionVersion
+        res = self.config.registry.content.create(ISectionVersion.__identifier__,
                                                   self.context)
-        assert IProposalVersion.providedBy(res)
+        assert ISectionVersion.providedBy(res)

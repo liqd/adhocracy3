@@ -1,4 +1,4 @@
-"""Section resource type."""
+"""Paragraph resource type."""
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import IItem
 from adhocracy.interfaces import ITag
