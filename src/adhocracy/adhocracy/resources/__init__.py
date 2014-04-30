@@ -13,6 +13,7 @@ from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_sheet
 from adhocracy.sheets import tags
 from adhocracy.sheets.versions import IVersionable
+from pyramid.traversal import find_interface
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from substanced.util import get_oid
@@ -51,12 +52,11 @@ def _update_last_tag(context, registry, old_version_oids):
             one
 
     """
-    om = find_objectmap(context)
-    # Find parent item
-    parent_item = context.__parent__
-    if not IItem.providedBy(parent_item):
+    parent_item = find_interface(context, IItem)
+    if parent_item is None:
         return
 
+    om = find_objectmap(context)
     tag_sheet = get_sheet(parent_item, tags.ITags)
     taglist = tag_sheet.get_cstruct()['elements']
 
