@@ -16,13 +16,13 @@ def make_new_version_data(follows_oid):
         follows_oid (int): OID of preceding version (follows)
 
     """
-
     from adhocracy.sheets.versions import IVersionable
     return {
         IVersionable.__identifier__: {
             'follows': [follows_oid],
             }
         }
+
 
 class ISheetY(ISheet):
     pass
@@ -179,7 +179,7 @@ class ItemIntegrationTest(unittest.TestCase):
                                                  [item_version.__oid__]},
                   'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
         assert item['FIRST']._propertysheets == wanted
-        # LAST tag should point to both new version
+        # LAST tag should point to both new versions
         wanted = {'adhocracy.sheets.tags.ITag': {'elements':
                                                  [new_version1.__oid__,
                                                   new_version2.__oid__]},
