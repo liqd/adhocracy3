@@ -135,94 +135,56 @@ class ItemIntegrationTest(unittest.TestCase):
 
     def test_update_last_tag(self):
         """Test that LAST tag is updated correctly."""
-        from adhocracy.interfaces import IItemVersion
-        from adhocracy.interfaces import ITag
         self.config.include('adhocracy.sheets.versions')
         self.config.include('adhocracy.subscriber')
 
         # Create item with auto-created first version
         item = self.make_one()
-
         item_version = item['VERSION_0000000']
-        item_version_oid = item_version.__oid__
-        first = item['FIRST']
-        last = item['LAST']
-        assert IItemVersion.providedBy(item_version)
-        assert ITag.providedBy(first)
-        assert ITag.providedBy(last)
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version_oid]},
-                  'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
-        assert first._propertysheets == wanted
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version_oid]},
-                  'adhocracy.sheets.name.IName': {'name': 'LAST'}}
-        assert last._propertysheets == wanted
 
         # Create another version
-        new_version_data = make_new_version_data(item_version_oid)
+        new_version_data = make_new_version_data(item_version.__oid__)
         new_version = self.make_version(item, appstructs=new_version_data)
-        new_version_oid = new_version.__oid__
 
-        # LAST tag should point to new version, FIRST should still point to old
-        # version
+        # FIRST should still point to the old version
         wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version_oid]},
+                                                 [item_version.__oid__]},
                   'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
-        assert first._propertysheets == wanted
+        assert item['FIRST']._propertysheets == wanted
+        # LAST tag should point to new version,
         wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [new_version_oid]},
+                                                 [new_version.__oid__]},
                   'adhocracy.sheets.name.IName': {'name': 'LAST'}}
-        assert last._propertysheets == wanted
+        assert item['LAST']._propertysheets == wanted
 
     def test_update_last_tag_two_versions(self):
         """Test that if two versions are branched off the from the same
         version, both of them get the LAST tag.
 
         """
-        from adhocracy.interfaces import IItemVersion
-        from adhocracy.interfaces import ITag
         self.config.include('adhocracy.sheets.versions')
         self.config.include('adhocracy.subscriber')
 
         # Create item with auto-created first version
         item = self.make_one()
-
         item_version = item['VERSION_0000000']
-        item_version_oid = item_version.__oid__
-        first = item['FIRST']
-        last = item['LAST']
-        assert IItemVersion.providedBy(item_version)
-        assert ITag.providedBy(first)
-        assert ITag.providedBy(last)
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version_oid]},
-                  'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
-        assert first._propertysheets == wanted
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version_oid]},
-                  'adhocracy.sheets.name.IName': {'name': 'LAST'}}
-        assert last._propertysheets == wanted
 
         # Create two other versions, but pointing to the same predecessor
-        new_version_data = make_new_version_data(item_version_oid)
+        new_version_data = make_new_version_data(item_version.__oid__)
         new_version1 = self.make_version(item, appstructs=new_version_data)
         new_version2 = self.make_version(item, appstructs=new_version_data)
-        new_version1_oid = new_version1.__oid__
-        new_version2_oid = new_version2.__oid__
-        assert new_version1_oid != new_version2_oid
 
-        # LAST tag should point to both new version, FIRST should still point
-        #to old version
+        # first tag should point to the old version
         wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version_oid]},
+                                                 [item_version.__oid__]},
                   'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
-        assert first._propertysheets == wanted
+        assert item['FIRST']._propertysheets == wanted
+        # LAST tag should point to both new version
         wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [new_version1_oid,
-                                                  new_version2_oid]},
+                                                 [new_version1.__oid__,
+                                                  new_version2.__oid__]},
                   'adhocracy.sheets.name.IName': {'name': 'LAST'}}
-        assert last._propertysheets == wanted
+        assert item['LAST']._propertysheets == wanted
 
 
 class ItemVersionIntegrationTest(unittest.TestCase):
