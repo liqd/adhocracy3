@@ -2,7 +2,6 @@
 from adhocracy.graph import get_back_references_for_isheet
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.interfaces import IIResourcePropertySheet
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import NewVersionToOldVersion
 from adhocracy.sheets import ResourcePropertySheetAdapter
@@ -11,30 +10,20 @@ from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceListSchemaNode
 from adhocracy.schema import ReferenceSetSchemaNode
 from pyramid.traversal import resource_path
+from zope.interface import implementer
 from zope.interface import provider
 from zope.interface import taggedValue
+from zope.interface.interfaces import IInterface
 
 import colander
 
 
-def followed_by(resource):
-    """Determine the successors ("followed_by") of a versionable resource.
+class IIVersionable(IInterface):
 
-    Args:
-        resource (IResource that provides the IVersionable sheet)
-
-    Returns:
-        a list of resource paths to successor versions (possibly empty)
-
-    """
-    versions = get_back_references_for_isheet(resource, IVersionable)
-    result = []
-    for new_version in versions.get('follows', []):
-        result.append(resource_path(new_version))
-    return result
+    """Marker interfaces to register the versionable propertysheet adapter."""
 
 
-@provider(IIResourcePropertySheet)
+@provider(IIVersionable)
 class IVersionable(ISheet):
 
     """Make this item versionable."""
@@ -100,10 +89,38 @@ class IVersionsElementsReference(SheetToSheet):
     target_isheet = IVersionable
 
 
+@implementer(IResourcePropertySheet)
+class IVersionableSheetAdapter(ResourcePropertySheetAdapter):
+
+    """Adapts versionable resources to substanced PropertySheet."""
+
+    def _followed_by(self, resource):
+        """Determine the successors ("followed_by") of a versionable resource.
+
+        Args:
+            resource (IResource that provides the IVersionable sheet)
+
+        Returns:
+            a list of resource paths to successor versions (possibly empty)
+
+        """
+        versions = get_back_references_for_isheet(resource, IVersionable)
+        result = []
+        for new_version in versions.get('follows', []):
+            result.append(resource_path(new_version))
+        return result
+
+    def get(self):
+        """Return data struct."""
+        struct = super().get()
+        struct['followed_by'] = self._followed_by(self.context)
+        return struct
+
+
 def includeme(config):
-    """Register adapter."""
-    config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (IVersionable, IIResourcePropertySheet),
+    """Register adapters."""
+    config.registry.registerAdapter(IVersionableSheetAdapter,
+                                    (IVersionable, IIVersionable),
                                     IResourcePropertySheet)
     config.registry.registerAdapter(PoolPropertySheetAdapter,
                                     (IVersions, IIPool),

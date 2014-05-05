@@ -13,8 +13,6 @@ from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-from adhocracy.sheets.versions import followed_by
-from adhocracy.sheets.versions import IVersionable
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import AbstractReferenceIterableSchemaNode
 from adhocracy.utils import get_resource_interface
@@ -266,15 +264,6 @@ class ResourceRESTView(RESTView):
         for sheet in sheets_view.values():
             key = sheet.iface.__identifier__
             struct['data'][key] = sheet.get_cstruct()
-            if issubclass(IVersionable, sheet.iface):
-                # Calculate followed_by attribute of IVersionable
-
-                # FIXME: The RestView is generic and should not care
-                # for specific sheets/Resource types at all.
-                # The right place to calculate followed_by is a custom
-                # adapter for IVersionable sheets or better find an abstract
-                # way to handle backrefs - joka
-                struct['data'][key]['followed_by'] = followed_by(self.context)
         struct['path'] = resource_path(self.context)
         iresource = get_resource_interface(self.context)
         struct['content_type'] = iresource.__identifier__
