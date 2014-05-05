@@ -108,7 +108,7 @@ class VersionableSheetAdapter(ResourcePropertySheetAdapter):
         result = []
         for new_version in versions.get('follows', []):
             result.append(get_oid(new_version))
-        return result
+        return set(result)
 
     def get(self):
         """Return data struct."""
