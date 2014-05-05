@@ -9,7 +9,7 @@ from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceListSchemaNode
 from adhocracy.schema import ReferenceSetSchemaNode
-from pyramid.traversal import resource_path
+from substanced.util import get_oid
 from zope.interface import implementer
 from zope.interface import provider
 from zope.interface import taggedValue
@@ -90,7 +90,7 @@ class IVersionsElementsReference(SheetToSheet):
 
 
 @implementer(IResourcePropertySheet)
-class IVersionableSheetAdapter(ResourcePropertySheetAdapter):
+class VersionableSheetAdapter(ResourcePropertySheetAdapter):
 
     """Adapts versionable resources to substanced PropertySheet."""
 
@@ -101,13 +101,13 @@ class IVersionableSheetAdapter(ResourcePropertySheetAdapter):
             resource (IResource that provides the IVersionable sheet)
 
         Returns:
-            a list of resource paths to successor versions (possibly empty)
+            a list of OIDs of successor versions (possibly empty)
 
         """
         versions = get_back_references_for_isheet(resource, IVersionable)
         result = []
         for new_version in versions.get('follows', []):
-            result.append(resource_path(new_version))
+            result.append(get_oid(new_version))
         return result
 
     def get(self):
@@ -119,7 +119,7 @@ class IVersionableSheetAdapter(ResourcePropertySheetAdapter):
 
 def includeme(config):
     """Register adapters."""
-    config.registry.registerAdapter(IVersionableSheetAdapter,
+    config.registry.registerAdapter(VersionableSheetAdapter,
                                     (IVersionable, IIVersionable),
                                     IResourcePropertySheet)
     config.registry.registerAdapter(PoolPropertySheetAdapter,
