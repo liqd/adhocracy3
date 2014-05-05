@@ -17,31 +17,35 @@ class VersionsPropertySheetUnitTest(unittest.TestCase):
     def setUp(self):
         self.context = testing.DummyResource()
 
-    def make_one(self, context, isheet):
+    def make_one(self, context):
+        from adhocracy.sheets.versions import IVersions
         from .versions import PoolPropertySheetAdapter
-        return PoolPropertySheetAdapter(context, isheet)
+        return PoolPropertySheetAdapter(context, IVersions)
 
     def test_create_valid(self):
         from adhocracy.interfaces import IResourcePropertySheet
-        from zope.interface.verify import verifyObject
         from adhocracy.sheets.pool import PoolPropertySheetAdapter
-        from adhocracy.sheets.versions import IVersions
-        inst = self.make_one(self.context, IVersions)
+        from zope.interface.verify import verifyObject
+        inst = self.make_one(self.context)
         assert verifyObject(IResourcePropertySheet, inst) is True
         assert isinstance(inst, PoolPropertySheetAdapter)
 
+    def test_get_empty(self):
+        inst = self.make_one(self.context)
+        assert inst.get() == {'elements': []}
+
     def test_get_not_empty(self):
-        from adhocracy.sheets.versions import IVersions
         from adhocracy.sheets.versions import IVersionable
-        self.context['chil'] = testing.DummyResource(__provides__=IVersionable,
-                                                     __oid__=1)
-        inst = self.make_one(self.context, IVersions)
+        versionable = testing.DummyResource(__provides__=IVersionable,
+                                            __oid__=1)
+        self.context['child'] = versionable
+        inst = self.make_one(self.context)
         assert inst.get() == {'elements': [1]}
 
     def test_get_not_empty_not_iversionable(self):
-        from adhocracy.sheets.versions import IVersions
-        self.context['chil'] = testing.DummyResource()
-        inst = self.make_one(self.context, IVersions)
+        non_versionable = testing.DummyResource()
+        self.context['child'] = non_versionable
+        inst = self.make_one(self.context)
         assert inst.get() == {'elements': []}
 
 
