@@ -6,13 +6,18 @@ from adhocracy.graph import get_references_for_isheet
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ITag
+from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_sheet
+from adhocracy.sheets import tags
 from adhocracy.sheets.versions import IVersionable
+from pyramid.traversal import find_interface
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
+from substanced.util import get_oid
+from substanced.objectmap import find_objectmap
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
@@ -35,6 +40,46 @@ def create_initial_content_for_item(context, registry, options):
                                                     [first_version_oid]},
                      'adhocracy.sheets.name.IName': {'name': u'LAST'}}
     ResourceFactory(ITag)(parent=context, appstructs=tag_last_data)
+
+
+def _update_last_tag(context, registry, old_version_oids):
+    """Update the LAST tag in the parent item of a new version.
+
+    Args:
+        context (IResource): the newly created resource
+        registry: the registry
+        old_version_oids (list of int): list of versions followed by the new
+            one
+
+    """
+    parent_item = find_interface(context, IItem)
+    if parent_item is None:
+        return
+
+    om = find_objectmap(context)
+    tag_sheet = get_sheet(parent_item, tags.ITags)
+    taglist = tag_sheet.get_cstruct()['elements']
+
+    if taglist:
+        for tag in taglist:
+            # find LAST tag (last part of tag name must be 'LAST')
+            if tag.split('/')[-1] == ('LAST'):
+                last_tag = om.object_for((tag,))
+                if last_tag is not None:
+                    itag_sheet = get_sheet(last_tag, tags.ITag)
+                    itag_dict = itag_sheet.get()
+                    oids_before = itag_dict['elements']
+                    oids_after = []
+
+                    # Remove OIDs of our predecessors, keep the rest
+                    for oid in oids_before:
+                        if oid not in old_version_oids:
+                            oids_after.append(oid)
+
+                    # Append OID of new version to end of list
+                    oids_after.append(context.__oid__)
+                    itag_dict['elements'] = oids_after
+                    itag_sheet.set(itag_dict)
 
 
 def _get_old_versions(context):
@@ -78,12 +123,17 @@ def notify_new_itemversion_created(context, registry, options):
     """
     new_version = context
     root_versions = options.get('root_versions', [])
+    old_version_oids = []
     for old_version in _get_old_versions(context):
+        old_version_oids.append(get_oid(old_version))
         _notify_itemversion_has_new_version(old_version, new_version, registry)
         _notify_referencing_resources_about_new_version(old_version,
                                                         new_version,
                                                         root_versions,
                                                         registry)
+
+        # Update LAST tag in parent item
+        _update_last_tag(context, registry, old_version_oids)
 
 
 class ResourceFactory(object):

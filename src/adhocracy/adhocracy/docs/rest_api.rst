@@ -662,20 +662,35 @@ pvrs2 (which also contains s2vrs0_path) ::
     0
 
 
+Tags
+~~~~
 
+Each Versionable has a FIRST tag that points to the initial version::
 
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/FIRST')
+    >>> pprint(resp.json)
+    {'content_type': 'adhocracy.interfaces.ITag',
+     'data': {'adhocracy.sheets.name.IName': {'name': 'FIRST'},
+              'adhocracy.sheets.tags.ITag': {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000000']}},
+     'path': '/adhocracy/Proposals/kommunismus/FIRST'}
+
+It also has a LAST tag that points to the newest versions -- any versions
+that aren't 'followed_by' any later version::
+
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/LAST')
+    >>> pprint(resp.json)
+    {'content_type': 'adhocracy.interfaces.ITag',
+     'data': {'adhocracy.sheets.name.IName': {'name': 'LAST'},
+              'adhocracy.sheets.tags.ITag': {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000004']}},
+     'path': '/adhocracy/Proposals/kommunismus/LAST'}
 
 FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
-
-FIXME: should we add a Tag TAG_LAST, to reference the last added version?
 
 FIXME: should the server tell in general where to post speccific
 content types? (like 'like', 'discussion',..)?  in other words,
 should the client to be able to ask (e.g. with an OPTIONS request)
 where to post a 'like'?
-
-FIXME: s/follows/predecessors/g; s/followed_by/successors/g;?
 
 
 Batch requests
