@@ -118,15 +118,24 @@ what to do if the client didn't show up again after 15 min/1 hour/24 hours?
 Error Messages Sent by the Server
 ---------------------------------
 
-TODO Error messages sent if the server doesn't understand a message sent by the
-client:
+If the server doesn't understand a request sent by the server, is responds with
+an error message::
 
-* Unknown action
-* Unknown resource
-* Malformed message: cannot be parsed as JSON
-* Invalid JSON: JSON message is not a dictionary; "action" or "resource" keys
-  are missing or their values aren't strings; dict contains other keys
+    { "error": "ERROR_CODE", "details:" "DETAILS" }
 
+ERROR_CODE will be one of the following:
+
+* "unknown_action" if the client asked for an action that the server doesn't
+  understand (neither "subscribe" nor "unsubscribe"). DETAILS contains the
+  unknown action.
+* "unknown_resource" if a client specified a resource path that is unknown to
+  the server. DETAILS contains the unknown resource path.
+* "malformed_message" if the client sent a message that cannot be parsed as
+  JSON. DETAILS contains a parsing error message.
+* "invalid_json" if the client sent a message this is JSON but doesn't contain
+  the expected information (for example, if it's a JSON array instead of a JSON
+  object or if "action" or "resource" keys are missing or their values aren't
+  strings). DETAILS contains a short description of the problem.
 
 Implicit Notifications
 ----------------------
