@@ -14,11 +14,11 @@ def root_factory(request, t=transaction, g=get_connection,
     It accepts a request and returns an instance of the ``Root`` content type.
 
     """
-    #FIXME: Fix substanced bug: mark_unfinished_as_finished keyqord
+    # FIXME: Fix substanced bug: mark_unfinished_as_finished keyqord
     # is not working
     conn = g(request)
     zodb_root = conn.root()
-    if not 'app_root' in zodb_root:
+    if 'app_root' not in zodb_root:
         registry = request.registry
         app_root = registry.content.create('Root')
         zodb_root['app_root'] = app_root
