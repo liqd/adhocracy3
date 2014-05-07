@@ -261,17 +261,21 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         assert len(events) == 2
 
     def test_autoupdate_with_referencing_items(self):
+        from . import ResourceFactory
         from adhocracy.interfaces import IItemVersion
         from adhocracy.sheets.document import ISection
         from adhocracy.sheets.versions import IVersionableFollowsReference
         from zope.interface import taggedValue
         # add autoupdate sheet for more tests see adhocracy.subscriber
+        self.config.include('adhocracy.registry')
         self.config.include('adhocracy.sheets.document')
         self.config.include('adhocracy.subscriber')
 
         class ISectionVersion(IItemVersion):
             taggedValue('extended_sheets', set([ISection]))
-
+        self.config.registry.content.add(ISectionVersion.__identifier__,
+                                         ISectionVersion.__identifier__,
+                                         ResourceFactory(ISectionVersion))
         child = self.make_one(iface=ISectionVersion)
         root = self.make_one(iface=ISectionVersion,
                              appstructs={ISection.__identifier__:

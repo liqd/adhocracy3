@@ -69,7 +69,8 @@ class DummyObjectMap():
 
 class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
 
-    def setUp(self):
+    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
+    def setUp(self, dummy_content_registry=None):
         from adhocracy.interfaces import IResource
         from adhocracy.sheets.versions import IVersionable
         from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
@@ -105,6 +106,9 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
                                            old_version_oid=1,
                                            new_version_oid=2,
                                            root_versions=[child])
+        # create dummy content registry
+        content_registry = dummy_content_registry.return_value
+        self.config.registry.content = content_registry
 
     def tearDown(self):
         testing.tearDown()
@@ -113,14 +117,12 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         from . import reference_has_new_version_subscriber
         return reference_has_new_version_subscriber(*args)
 
-    @patch('adhocracy.resources.ResourceFactory', autospec=True)
-    def test_call_versionable_with_autoupdate(self, dummyfactory=None):
-        factory = dummyfactory.return_value
+    def test_call_versionable_with_autoupdate(self):
+        factory = self.config.registry.content.create
         from adhocracy.sheets.versions import IVersionable
         self.event.isheet = IDummySheetAutoUpdate
 
         self._makeOne(self.event)
-
         assert factory.called
         child_new_parent = factory.call_args[1]['parent']
         child_new_appstructs = factory.call_args[1]['appstructs']
@@ -135,18 +137,15 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         ])
         assert child_new_wanted_appstructs == child_new_appstructs
 
-    @patch('adhocracy.resources.ResourceFactory', autospec=True)
-    def test_call_versionable_with_autoupdate_readonly(self, dummfactory=None):
-        factory = dummfactory.return_value
+    def test_call_versionable_with_autoupdate_readonly(self):
+        factory = self.config.registry.content.create
         self.event.isheet = IDummySheetAutoUpdate
         IDummySheetAutoUpdate.setTaggedValue('readonly', True)
         self._makeOne(self.event)
         assert not factory.called
 
-    @patch('adhocracy.resources.ResourceFactory', autospec=True)
-    def test_call_versionable_with_autoupdate_readonly_other(self,
-                                                             dummyfactor=None):
-        factory = dummyfactor.return_value
+    def test_call_versionable_with_autoupdate_readonly_other(self):
+        factory = self.config.registry.content.create
         from adhocracy.sheets.versions import IVersionable
         self.event.isheet = IDummySheetAutoUpdate
         IDummySheetNoAutoUpdate.setTaggedValue('readonly', True)
@@ -165,9 +164,8 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         ])
         assert child_new_wanted_appstructs == child_new_appstructs
 
-    @patch('adhocracy.resources.ResourceFactory', autospec=True)
-    def test_call_versionable_with_noautoupdate(self, dummyfactory=None):
-        factory = dummyfactory.return_value
+    def test_call_versionable_with_noautoupdate(self):
+        factory = self.config.registry.content.create
         self.event.isheet = IDummySheetNoAutoUpdate
         self._makeOne(self.event)
         assert not factory.called

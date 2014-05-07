@@ -2,7 +2,6 @@
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_all_sheets
-from adhocracy.resources import ResourceFactory
 from adhocracy.interfaces import IResource
 from pyramid.security import has_permission
 from pyramid.path import DottedNameResolver
@@ -118,9 +117,10 @@ class ResourceContentRegistry(ContentRegistry):
         types_with_sheetnames = {}
         for type_iface in addable_types:
             sheetnames = {}
-            resource = ResourceFactory(type_iface)(run_after_creation=False)
-            resource.__parent__ = context
-            sheets = self.resource_sheets(resource, request,
+            dummy_resource = self.create(type_iface.__identifier__,
+                                         run_after_creation=False)
+            dummy_resource.__parent__ = context
+            sheets = self.resource_sheets(dummy_resource, request,
                                           onlycreatable=True)
             sheetnames['sheets_mandatory'] = \
                 [k for k, v in sheets.items() if v.createmandatory]

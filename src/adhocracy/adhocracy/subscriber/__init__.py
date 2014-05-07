@@ -9,6 +9,7 @@ from adhocracy.utils import get_sheet
 from adhocracy.utils import get_all_sheets
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_all_taggedvalues
+from pyramid.threadlocal import get_current_registry
 from copy import deepcopy
 
 
@@ -22,17 +23,19 @@ def _get_not_readonly_appstructs(resource):
 
 
 def _update_versionable(resource, isheet, appstruct, root_versions):
-    from adhocracy.resources import ResourceFactory  # make unit test mock work
     if root_versions and not is_in_subtree(resource, root_versions):
         return resource
     else:
+        registry = get_current_registry()
         appstructs = _get_not_readonly_appstructs(resource)
         appstructs[IVersionable.__identifier__]['follows'] = [resource.__oid__]
         appstructs[isheet.__identifier__] = appstruct
         iresource = get_resource_interface(resource)
-        return ResourceFactory(iresource)(parent=resource.__parent__,
-                                          appstructs=appstructs,
-                                          options=root_versions)
+        new_resource = registry.content.create(iresource.__identifier__,
+                                               parent=resource.__parent__,
+                                               appstructs=appstructs,
+                                               options=root_versions)
+        return new_resource
 
 
 def _update_resource(resource, isheet, appstruct):

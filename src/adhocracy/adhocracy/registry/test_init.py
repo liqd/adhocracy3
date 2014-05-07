@@ -23,6 +23,10 @@ class IResourceB(IPool):
     pass
 
 
+class ISimple(IResource):
+    pass
+
+
 class ISheetA(ISheet):
     pass
 
@@ -37,7 +41,8 @@ def _register_propertysheet_adapter(config, isheet):
 
 
 def _register_content_type(registry, type):
-    registry.add(type, type, object())
+    from adhocracy.resources import ResourceFactory
+    registry.add(type, type, ResourceFactory(type))
 
 
 class TestResourceContentRegistry(unittest.TestCase):
@@ -50,7 +55,9 @@ class TestResourceContentRegistry(unittest.TestCase):
 
     def _make_one(self, registry=None):
         from . import ResourceContentRegistry
-        return ResourceContentRegistry(registry)
+        resource_registry = ResourceContentRegistry(registry)
+        resource_registry.registry = self.config.registry
+        return resource_registry
 
     def test_sheets_valid_missing_sheets(self):
         inst = self._make_one(self.config)
@@ -153,22 +160,24 @@ class TestResourceContentRegistry(unittest.TestCase):
         inst = self._make_one()
         context = testing.DummyResource(__provides__=IResourceA)
         _register_content_type(inst, IResourceA.__identifier__)
-        _register_content_type(inst, IResourceB.__identifier__)
+        _register_content_type(inst, ISimple.__identifier__)
         IResourceA.setTaggedValue('element_types',
-                                  [IResourceB.__identifier__])
-        IResourceB.setTaggedValue('basic_sheets', set())
+                                  [ISimple.__identifier__])
+        ISimple.setTaggedValue('basic_sheets', set())
 
         addables = inst.resource_addables(context, testing.DummyRequest())
 
-        wanted = {IResourceB.__identifier__: {'sheets_optional': [],
-                                              'sheets_mandatory': []}}
+        wanted = {ISimple.__identifier__: {'sheets_optional': [],
+                                           'sheets_mandatory': []}}
         assert wanted == addables
 
     def test_addables_valid_with_addables_implicit_inherit(self):
+        from adhocracy.sheets.pool import IPool
         inst = self._make_one()
         context = testing.DummyResource(__provides__=IResourceA)
         _register_content_type(inst, IResourceA.__identifier__)
         _register_content_type(inst, IResourceBA.__identifier__)
+        _register_propertysheet_adapter(self.config, IPool)
         IResourceA.setTaggedValue('element_types',
                                   [IResourceA.__identifier__])
         IResourceA.setTaggedValue('basic_sheets', set())
@@ -182,19 +191,19 @@ class TestResourceContentRegistry(unittest.TestCase):
     def test_addables_valid_with_addables_with_sheets(self):
         inst = self._make_one(self.config.registry)
         context = testing.DummyResource(__provides__=IResourceA)
-        _register_content_type(inst, IResourceA.__identifier__)
-        _register_content_type(inst, IResourceB.__identifier__)
         IResourceA.setTaggedValue('element_types',
-                                  [IResourceB.__identifier__])
-        IResourceB.setTaggedValue('basic_sheets', set([
-                                  ISheetA.__identifier__,
-                                  ISheet.__identifier__]))
+                                  [ISimple.__identifier__])
+        ISimple.setTaggedValue('basic_sheets', set([
+                               ISheetA.__identifier__,
+                               ISheet.__identifier__]))
+        _register_content_type(inst, IResourceA.__identifier__)
+        _register_content_type(inst, ISimple.__identifier__)
         ISheetA.setTaggedValue('createmandatory', True)
-        _register_propertysheet_adapter(self.config, context, ISheet)
-        _register_propertysheet_adapter(self.config, context, ISheetA)
+        _register_propertysheet_adapter(self.config, ISheet)
+        _register_propertysheet_adapter(self.config, ISheetA)
         addables = inst.resource_addables(context, testing.DummyRequest())
 
-        wanted = {IResourceB.__identifier__: {
+        wanted = {ISimple.__identifier__: {
             'sheets_optional': [ISheet.__identifier__],
             'sheets_mandatory': [ISheetA.__identifier__]}}
         assert wanted == addables
