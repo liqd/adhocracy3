@@ -27,7 +27,7 @@ class ISheetA(ISheet):
     pass
 
 
-def _register_propertysheet_adapter(config, context, isheet):
+def _register_propertysheet_adapter(config, isheet):
     from adhocracy.sheets import ResourcePropertySheetAdapter
     from adhocracy.interfaces import IResourcePropertySheet
     from zope.interface.interfaces import IInterface
@@ -62,7 +62,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         from adhocracy.sheets import ResourcePropertySheetAdapter
         inst = self._make_one(self.config.registry)
         context = testing.DummyResource(__provides__=(IResource, ISheetA))
-        _register_propertysheet_adapter(self.config, context, ISheetA)
+        _register_propertysheet_adapter(self.config, ISheetA)
 
         sheets = inst.resource_sheets(context, testing.DummyRequest())
 
@@ -73,7 +73,7 @@ class TestResourceContentRegistry(unittest.TestCase):
     def test_sheets_valid_with_sheets_no_permission(self):
         inst = self._make_one(self.config.registry)
         context = testing.DummyResource(__provides__=(IResource, ISheetA))
-        _register_propertysheet_adapter(self.config, context, ISheetA)
+        _register_propertysheet_adapter(self.config, ISheetA)
         self.config.testing_securitypolicy(userid='reader', permissive=False)
 
         sheets = inst.resource_sheets(context, testing.DummyRequest(),
@@ -83,7 +83,7 @@ class TestResourceContentRegistry(unittest.TestCase):
     def test_sheets_valid_with_sheets_onlyeditable_no_permission(self):
         inst = self._make_one(self.config.registry)
         context = testing.DummyResource(__provides__=(IResource, ISheetA))
-        _register_propertysheet_adapter(self.config, context, ISheetA)
+        _register_propertysheet_adapter(self.config, ISheetA)
         self.config.testing_securitypolicy(userid='reader', permissive=False)
 
         sheets = inst.resource_sheets(context, testing.DummyRequest(),
@@ -95,7 +95,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         ISheetA.setTaggedValue('readonly', True)
         ISheetA.setTaggedValue('createmandatory', False)
         context = testing.DummyResource(__provides__=(IResource, ISheetA))
-        _register_propertysheet_adapter(self.config, context, ISheetA)
+        _register_propertysheet_adapter(self.config, ISheetA)
 
         sheets = inst.resource_sheets(context, testing.DummyRequest(),
                                       onlyeditable=True)
@@ -106,7 +106,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         ISheetA.setTaggedValue('readonly', False)
         ISheetA.setTaggedValue('createmandatory', False)
         context = testing.DummyResource(__provides__=(IResource, ISheetA))
-        _register_propertysheet_adapter(self.config, context, ISheetA)
+        _register_propertysheet_adapter(self.config, ISheetA)
 
         sheets = inst.resource_sheets(context, testing.DummyRequest(),
                                       onlymandatorycreatable=True)
@@ -117,7 +117,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         ISheetA.setTaggedValue('readonly', False)
         ISheetA.setTaggedValue('createmandatory', True)
         context = testing.DummyResource(__provides__=(IResource, ISheetA))
-        _register_propertysheet_adapter(self.config, context, ISheetA)
+        _register_propertysheet_adapter(self.config, ISheetA)
 
         sheets = inst.resource_sheets(context, testing.DummyRequest(),
                                       onlymandatorycreatable=True)
