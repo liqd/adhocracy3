@@ -48,7 +48,7 @@ def includeme(config):
     config.include('.frontend')
 
 
-def main(global_config, **settings):
+def main(global_config, **settings):  # pragma: no cover
     """ Return a Pyramid WSGI application. """
     config = Configurator(settings=settings, root_factory=root_factory)
     includeme(config)
