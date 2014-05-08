@@ -13,10 +13,10 @@ from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_sheet
 from adhocracy.sheets import tags
 from pyramid.traversal import find_interface
+from pyramid.traversal import find_resource
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from substanced.util import get_oid
-from substanced.objectmap import find_objectmap
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
@@ -55,30 +55,28 @@ def _update_last_tag(context, registry, old_version_oids):
     if parent_item is None:
         return
 
-    om = find_objectmap(context)
     tag_sheet = get_sheet(parent_item, tags.ITags)
     taglist = tag_sheet.get_cstruct()['elements']
 
     if taglist:
         for tag in taglist:
-            # find LAST tag (last part of tag name must be 'LAST')
-            if tag.split('/')[-1] == ('LAST'):
-                last_tag = om.object_for((tag,))
-                if last_tag is not None:
-                    itag_sheet = get_sheet(last_tag, tags.ITag)
-                    itag_dict = itag_sheet.get()
-                    oids_before = itag_dict['elements']
-                    oids_after = []
+            tag_name = tag.split('/')[-1]
+            if tag_name == 'LAST':
+                last_tag = find_resource(context, tag)
+                itag_sheet = get_sheet(last_tag, tags.ITag)
+                itag_dict = itag_sheet.get()
+                oids_before = itag_dict['elements']
+                oids_after = []
 
-                    # Remove OIDs of our predecessors, keep the rest
-                    for oid in oids_before:
-                        if oid not in old_version_oids:
-                            oids_after.append(oid)
+                # Remove OIDs of our predecessors, keep the rest
+                for oid in oids_before:
+                    if oid not in old_version_oids:
+                        oids_after.append(oid)
 
-                    # Append OID of new version to end of list
-                    oids_after.append(context.__oid__)
-                    itag_dict['elements'] = oids_after
-                    itag_sheet.set(itag_dict)
+                # Append OID of new version to end of list
+                oids_after.append(context.__oid__)
+                itag_dict['elements'] = oids_after
+                itag_sheet.set(itag_dict)
 
 
 def _notify_itemversion_has_new_version(old_version, new_version, registry):

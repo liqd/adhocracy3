@@ -415,9 +415,7 @@ class ValidatePOSTPropertysheetNamesAddablesUnitTest(unittest.TestCase):
 class ValidatePOSTRootVersionsUnitTest(unittest.TestCase):
 
     def setUp(self):
-        context = make_folder_with_objectmap()
-        self.context = context
-        self.om = context.__objectmap__
+        self.context = testing.DummyResource()
         self.request = CorniceDummyRequest()
 
     def make_one(self, context, request):
@@ -437,8 +435,7 @@ class ValidatePOSTRootVersionsUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IItemVersion
         from adhocracy.interfaces import ISheet
         root = testing.DummyResource(__provides__=(IItemVersion, ISheet))
-        self.om.object_for.return_value = root
-        self.om.objectid_for.return_value = 1
+        self.context['root'] = root
         self.request.validated = {'root_versions': ["/root"]}
 
         self.make_one(self.context, self.request)
@@ -446,20 +443,10 @@ class ValidatePOSTRootVersionsUnitTest(unittest.TestCase):
         assert self.request.errors == []
         assert self.request.validated == {'root_versions': [root]}
 
-    def test_valid_with_value_but_missing_objectmap(self):
-        self.context.__objectmap__ = None
-        self.request.validated = {'root_versions': ["/root"]}
-
-        self.make_one(self.context, self.request)
-
-        assert self.request.errors == []
-        assert self.request.validated == {'root_versions': []}
-
     def test_non_valid_value_has_wrong_iface(self):
         from adhocracy.interfaces import ISheet
         root = testing.DummyResource(__provides__=(IResourceX, ISheet))
-        self.om.object_for.return_value = root
-        self.om.objectid_for.return_value = 1
+        self.context['root'] = root
         self.request.validated = {'root_versions': ["/root"]}
 
         self.make_one(self.context, self.request)
@@ -468,12 +455,8 @@ class ValidatePOSTRootVersionsUnitTest(unittest.TestCase):
         assert self.request.validated == {'root_versions': []}
 
     def test_non_valid_value_does_not_exists(self):
-        self.om.object_for.return_value = None
-        self.om.objectid_for.return_value = None
         self.request.validated = {'root_versions': ["/root"]}
-
         self.make_one(self.context, self.request)
-
         assert self.request.errors != []
         assert self.request.validated == {'root_versions': []}
 

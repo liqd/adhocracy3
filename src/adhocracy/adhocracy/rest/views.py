@@ -28,8 +28,8 @@ from pyramid.path import DottedNameResolver
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
+from pyramid.traversal import find_resource
 from substanced.interfaces import IRoot
-from substanced.util import find_objectmap
 
 import functools
 
@@ -73,15 +73,13 @@ def validate_post_sheet_cstructs(context, request):
 def validate_post_root_versions(context, request):
     """Check and transform the 'root_version' paths to resources."""
     root_paths = request.validated.get('root_versions', [])
-    om = find_objectmap(context)
-    if not om:
-        root_paths = []
-
     root_resources = []
     for path in root_paths:
         path_tuple = tuple(str(path).split('/'))
-        res = om.object_for(path_tuple)
-        if res is None:
+        res = None
+        try:
+            res = find_resource(context, path_tuple)
+        except KeyError:
             error = 'This resource path does not exist: {p}'.format(p=path)
             request.errors.add('body", "root_versions', error)
             continue
