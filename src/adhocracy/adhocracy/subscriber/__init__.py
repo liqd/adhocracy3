@@ -1,7 +1,7 @@
 """adhocracy.event event subcriber to handle auto updates of resources."""
 
 from adhocracy.graph import is_in_subtree
-from adhocracy.interfaces import IResource
+from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.sheets.versions import IVersionable
@@ -54,7 +54,6 @@ def reference_has_new_version_subscriber(event):
 
     """
     assert ISheetReferencedItemHasNewVersion.providedBy(event)
-    assert IResource.providedBy(event.object)
     resource = event.object
     root_versions = event.root_versions
     isheet = event.isheet
@@ -68,7 +67,7 @@ def reference_has_new_version_subscriber(event):
         old_version_index = field.index(event.old_version_oid)
         field.pop(old_version_index)
         field.insert(old_version_index, event.new_version_oid)
-        if IVersionable.providedBy(resource):
+        if IItemVersion.providedBy(resource):
             _update_versionable(resource, isheet, appstruct, root_versions)
         else:
             _update_resource(resource, isheet, appstruct)

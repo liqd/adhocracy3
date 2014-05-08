@@ -71,7 +71,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
 
     @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
     def setUp(self, dummy_content_registry=None):
-        from adhocracy.interfaces import IResource
+        from adhocracy.interfaces import IItemVersion
         from adhocracy.sheets.versions import IVersionable
         from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
         self.config = testing.setUp()
@@ -80,7 +80,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         # create dummy child with sheet data (ItemVersion for versionables)
         child = testing.DummyResource(__parent__=self.parent,
                                       __oid__=0,
-                                      __provides__=(IResource, IVersionable,
+                                      __provides__=(IItemVersion, IVersionable,
                                                     IDummySheetAutoUpdate,
                                                     IDummySheetNoAutoUpdate)
                                       )
@@ -173,9 +173,9 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
     @patch('adhocracy.resources.ResourceFactory', autospec=True)
     def test_call_nonversionable_with_autoupdate(self, dummyfactory=None):
         factory = dummyfactory.return_value
-        from adhocracy.sheets.versions import IVersionable
+        from adhocracy.interfaces import IItemVersion
         from zope.interface import noLongerProvides
-        noLongerProvides(self.child, IVersionable)
+        noLongerProvides(self.child, IItemVersion)
         self.event.isheet = IDummySheetAutoUpdate
 
         self._makeOne(self.event)
