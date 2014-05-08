@@ -157,6 +157,7 @@ class IItem(IPool):
                  'adhocracy.sheets.tags.ITags',
                  'adhocracy.sheets.versions.IVersions',
                  'adhocracy.sheets.pool.IPool']))
+    # FIXME: 'adhocracy.resources.IItemVersion' has moved to interfaces
     taggedValue('element_types', set([
                 'adhocracy.resources.IItemVersion',
                 'adhocracy.resources.ITag',

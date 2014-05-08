@@ -3,6 +3,7 @@
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import SheetReferenceType
 from adhocracy.interfaces import SheetToSheet
+from adhocracy.interfaces import NewVersionToOldVersion
 from adhocracy.utils import get_all_taggedvalues
 from substanced.util import find_objectmap
 from substanced.objectmap import ObjectMap
@@ -147,6 +148,13 @@ def _get_targets(resource, base_reftype=SheetReferenceType):
         yield reference[0]
 
 
+def _get_sources(resource, base_reftype=SheetReferenceType):
+    references = _references_template(ObjectMap.sources, resource,
+                                      base_reftype=base_reftype)
+    for reference in references:
+        yield reference[0]
+
+
 def _is_candidate_ancestor(candidate, descendant, checked_candidates):
     """Return True if candidate is ancestor of descendant, False otherwise."""
     if candidate is descendant:
@@ -185,3 +193,29 @@ def is_in_subtree(descendant, ancestors):
         if _is_candidate_ancestor(candidate, descendant, set(),):
             return True
     return False
+
+
+def get_follows(resource):
+    """Determine the precessors ("follows") of a versionable resource.
+
+    Args:
+        resource (IResource)
+
+    Returns:
+        a iterator of precessor versions (possibly empty)
+
+    """
+    return _get_targets(resource, base_reftype=NewVersionToOldVersion)
+
+
+def get_followed_by(resource):
+        """Determine the successors ("followed_by") of a versionable resource.
+
+        Args:
+            resource (IResource)
+
+        Returns:
+            a generator of successor versions (possibly empty)
+
+        """
+        return _get_sources(resource, base_reftype=NewVersionToOldVersion)

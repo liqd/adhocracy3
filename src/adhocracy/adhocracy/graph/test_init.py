@@ -1,5 +1,6 @@
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import SheetToSheet
+from adhocracy.interfaces import NewVersionToOldVersion
 from mock import patch
 from pyramid import testing
 from zope.interface import taggedValue
@@ -308,6 +309,66 @@ class GetBackReferencesForIsheetUnitTest(unittest.TestCase):
         assert result == wanted
 
 
+class GetFollowsUnitTest(unittest.TestCase):
+
+    def _make_one(self, context):
+        from . import get_follows
+        return get_follows(context)
+
+    def setUp(self):
+        self.context = create_dummy_resource()
+
+    @patch('adhocracy.graph._references_template', autospec=True)
+    def test_with_sucessor(self, dummy_references_template=None):
+        from substanced.objectmap import ObjectMap
+        precessor = create_dummy_resource()
+        dummy_references_template.return_value = iter([(precessor, None, None)])
+
+        result = list(self._make_one(self.context))
+
+        assert dummy_references_template.call_args[0][0] == ObjectMap.targets
+        assert dummy_references_template.call_args[0][1] == self.context
+        assert dummy_references_template.call_args[1]['base_reftype'] ==\
+            NewVersionToOldVersion
+        assert result == [precessor]
+
+    @patch('adhocracy.graph._references_template', autospec=True)
+    def test_without_sucessor(self, dummy_references_template=None):
+        dummy_references_template.return_value = iter([])
+        result = list(self._make_one(self.context))
+        assert result == []
+
+
+class GetFollowedByUnitTest(unittest.TestCase):
+
+    def _make_one(self, context):
+        from . import get_followed_by
+        return get_followed_by(context)
+
+    def setUp(self):
+        self.context = create_dummy_resource()
+
+    @patch('adhocracy.graph._references_template', autospec=True)
+    def test_with_sucessor(self, dummy_references_template=None):
+        from substanced.objectmap import ObjectMap
+        successor = create_dummy_resource()
+        dummy_references_template.return_value = iter([(successor, None, None)])
+
+        result = list(self._make_one(self.context))
+
+        assert dummy_references_template.call_args[0][0] == ObjectMap.sources
+        assert dummy_references_template.call_args[0][1] == self.context
+        assert dummy_references_template.call_args[1]['base_reftype'] ==\
+            NewVersionToOldVersion
+        assert result == [successor]
+
+    @patch('adhocracy.graph._references_template', autospec=True)
+    def test_without_sucessor(self, dummy_references_template=None):
+        dummy_references_template.return_value = iter([])
+        result = list(self._make_one(self.context))
+        assert result == []
+
+
 class GetReferencesForIsheetUnitTest(unittest.TestCase):
 
     def _make_one(self, context, isheet):
@@ -396,15 +457,14 @@ class IsInSubtreeUnitTest(unittest.TestCase):
         assert result is False
 
     def test_direct_follows_link(self):
-        """False if direct IVersionableFollowsReference link from ancestor to
+        """False if direct NewVersionToOldVersion link from ancestor to
         descendent.
 
         """
-        from adhocracy.sheets.versions import IVersionableFollowsReference
         other_version = create_dummy_resource(parent=self.context)
         old_version = create_dummy_resource(parent=self.context)
         om = self.context.__objectmap__
-        om.connect(other_version, old_version, IVersionableFollowsReference)
+        om.connect(other_version, old_version, NewVersionToOldVersion)
         result = self._make_one(old_version, [other_version])
         assert result is False
         # Inverse relation should not be found either
@@ -433,13 +493,12 @@ class IsInSubtreeUnitTest(unittest.TestCase):
         follows relation.
 
         """
-        from adhocracy.sheets.versions import IVersionableFollowsReference
         dad = create_dummy_resource(parent=self.context)
         daugher = create_dummy_resource(parent=self.context)
         step_son = create_dummy_resource(parent=self.context)
         om = self.context.__objectmap__
         om.connect(dad, daugher, SheetToSheet)
-        om.connect(step_son, daugher, IVersionableFollowsReference)
+        om.connect(step_son, daugher, NewVersionToOldVersion)
         result = self._make_one(step_son, [dad])
         assert result is False
         # Inverse relation should not be found either

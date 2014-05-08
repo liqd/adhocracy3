@@ -1,5 +1,5 @@
 """Sheets to work with versionable resources."""
-from adhocracy.graph import get_back_references_for_isheet
+from adhocracy.graph import get_followed_by
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import SheetToSheet
@@ -9,7 +9,6 @@ from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceListSchemaNode
 from adhocracy.schema import ReferenceSetSchemaNode
-from substanced.util import get_oid
 from zope.interface import implementer
 from zope.interface import provider
 from zope.interface import taggedValue
@@ -94,26 +93,11 @@ class VersionableSheetAdapter(ResourcePropertySheetAdapter):
 
     """Adapts versionable resources to substanced PropertySheet."""
 
-    def _followed_by(self, resource):
-        """Determine the successors ("followed_by") of a versionable resource.
-
-        Args:
-            resource (IResource that provides the IVersionable sheet)
-
-        Returns:
-            a list of OIDs of successor versions (possibly empty)
-
-        """
-        versions = get_back_references_for_isheet(resource, IVersionable)
-        result = []
-        for new_version in versions.get('follows', []):
-            result.append(get_oid(new_version))
-        return set(result)
-
     def get(self):
         """Return data struct."""
         struct = super().get()
-        struct['followed_by'] = self._followed_by(self.context)
+        followed_by = [x.__oid__ for x in get_followed_by(self.context)]
+        struct['followed_by'] = set(followed_by)
         return struct
 
 

@@ -2,7 +2,7 @@
 from adhocracy.events import ItemVersionNewVersionAdded
 from adhocracy.events import SheetReferencedItemHasNewVersion
 from adhocracy.graph import get_back_references
-from adhocracy.graph import get_references_for_isheet
+from adhocracy.graph import get_follows
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ITag
@@ -12,7 +12,6 @@ from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_sheet
 from adhocracy.sheets import tags
-from adhocracy.sheets.versions import IVersionable
 from pyramid.traversal import find_interface
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
@@ -82,11 +81,6 @@ def _update_last_tag(context, registry, old_version_oids):
                     itag_sheet.set(itag_dict)
 
 
-def _get_old_versions(context):
-    versions = get_references_for_isheet(context, IVersionable)
-    return versions.get('follows', [])
-
-
 def _notify_itemversion_has_new_version(old_version, new_version, registry):
     event = ItemVersionNewVersionAdded(old_version, new_version)
     registry.notify(event)
@@ -124,7 +118,7 @@ def notify_new_itemversion_created(context, registry, options):
     new_version = context
     root_versions = options.get('root_versions', [])
     old_version_oids = []
-    for old_version in _get_old_versions(context):
+    for old_version in get_follows(context):
         old_version_oids.append(get_oid(old_version))
         _notify_itemversion_has_new_version(old_version, new_version, registry)
         _notify_referencing_resources_about_new_version(old_version,
