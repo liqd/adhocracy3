@@ -10,7 +10,6 @@ from persistent.mapping import PersistentMapping
 from pyramid.compat import is_nonstr_iter
 from pyramid.path import DottedNameResolver
 from substanced.property import PropertySheet
-from substanced.util import find_objectmap
 from zope.interface import implementer
 
 import colander
@@ -38,7 +37,6 @@ class ResourcePropertySheetAdapter(PropertySheet):
         self.createmandatory = taggedvalues['createmandatory']
         schema_obj = create_schema_from_dict(taggedvalues)
         self.schema = schema_obj.bind(context=context)
-        self._objectmap = find_objectmap(self.context)
         for child in self.schema:
             assert child.default is not colander.null
             assert child.missing is colander.drop
@@ -76,6 +74,8 @@ class ResourcePropertySheetAdapter(PropertySheet):
 
     def set(self, struct, omit=()):
         """Return: read interface."""
+        # FIXME this import is temporally hack to make unit tests work
+        from adhocracy.graph import set_references
         assert isinstance(struct, Mapping)
         if not is_nonstr_iter(omit):
             omit = (omit,)
@@ -84,15 +84,14 @@ class ResourcePropertySheetAdapter(PropertySheet):
         (_, changed, _) = diff_dict(old_struct, struct, omit)
 
         for key in changed:
+            # FIXME: To store buildin lists and sets is not persistent.
+            # For references the best solution is to store them only
+            # in the objectmap.
             self._data[key] = struct[key]
-
             if key in self._references.keys():
                 reftype = self._references[key]
-                for oid in set(struct[key]) - set(old_struct[key]):
-                    self._objectmap.connect(self.context, oid, reftype)
-                for oid in set(old_struct[key]) - set(struct[key]):
-                    self._objectmap.disconnect(self.context, oid, reftype)
-
+                new_references = struct[key]
+                set_references(self.context, new_references, reftype)
         return bool(changed)
 
     def validate_cstruct(self, cstruct):

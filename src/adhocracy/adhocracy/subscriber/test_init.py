@@ -84,14 +84,18 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
                                                     IDummySheetAutoUpdate,
                                                     IDummySheetNoAutoUpdate)
                                       )
+        old_version = testing.DummyResource()
+        self.other1 = testing.DummyResource()
+        self.other2 = testing.DummyResource()
+        self.other4 = testing.DummyResource()
         _register_dummypropertysheet_adapter(self.config)
         child.dummy_appstruct = dict([
             (IDummySheetNoAutoUpdate.__identifier__,
-             {'title': u't', 'elements': [9, 1, 10]}),
+             {'title': u't', 'elements': [self.other1, self.other2]}),
             (IDummySheetAutoUpdate.__identifier__,
-             {'title': u't', 'elements': [9, 1, 10]}),
+             {'title': u't', 'elements': [self.other1, self.other2]}),
             (IVersionable.__identifier__,
-             {'follows': [-1]}),
+             {'follows': [old_version]}),
         ])
         IDummySheetAutoUpdate.setTaggedValue('readonly', False)
         self.child = child
@@ -103,8 +107,8 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
                                            object=child,
                                            isheet=IDummySheetNoAutoUpdate,
                                            isheet_field='elements',
-                                           old_version_oid=1,
-                                           new_version_oid=2,
+                                           old_version=self.other2,
+                                           new_version=self.other4,
                                            root_versions=[child])
         # create dummy content registry
         content_registry = dummy_content_registry.return_value
@@ -129,11 +133,11 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         assert child_new_parent is self.child.__parent__
         child_new_wanted_appstructs = dict([
             (IDummySheetNoAutoUpdate.__identifier__,
-             {'title': u't', 'elements': [9, 1, 10]}),
+             {'title': u't', 'elements': [self.other1, self.other2]}),
             (IDummySheetAutoUpdate.__identifier__,
-             {'title': u't', 'elements': [9, self.event.new_version_oid, 10]}),
+             {'title': u't', 'elements': [self.other1, self.event.new_version]}),
             (IVersionable.__identifier__,
-             {'follows': [self.child.__oid__]}),
+             {'follows': [self.child]}),
         ])
         assert child_new_wanted_appstructs == child_new_appstructs
 
@@ -158,9 +162,9 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         assert child_new_parent is self.child.__parent__
         child_new_wanted_appstructs = dict([
             (IDummySheetAutoUpdate.__identifier__,
-             {'title': u't', 'elements': [9, self.event.new_version_oid, 10]}),
+             {'title': u't', 'elements': [self.other1, self.event.new_version]}),
             (IVersionable.__identifier__,
-             {'follows': [self.child.__oid__]}),
+             {'follows': [self.child]}),
         ])
         assert child_new_wanted_appstructs == child_new_appstructs
 
@@ -182,7 +186,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
 
         assert not factory.called
         child_wanted_appstruct = \
-            {'title': u't', 'elements': [9, self.event.new_version_oid, 10]}
+            {'title': u't', 'elements': [self.other1, self.event.new_version]}
         key = IDummySheetAutoUpdate.__identifier__
         assert child_wanted_appstruct == self.child.dummy_appstruct[key]
 
@@ -196,7 +200,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         self._makeOne(self.event)
 
         child_wanted_appstruct = \
-            {'title': u't', 'elements': [9, self.event.old_version_oid, 10]}
+            {'title': u't', 'elements': [self.other1, self.event.old_version]}
         key = IDummySheetAutoUpdate.__identifier__
         assert child_wanted_appstruct == self.child.dummy_appstruct[key]
 
@@ -209,7 +213,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         self._makeOne(self.event)
 
         child_wanted_appstruct = \
-            {'title': u't', 'elements': [9, self.event.old_version_oid, 10]}
+            {'title': u't', 'elements': [self.other1, self.event.old_version]}
         key = IDummySheetAutoUpdate.__identifier__
         assert child_wanted_appstruct == self.child.dummy_appstruct[key]
 

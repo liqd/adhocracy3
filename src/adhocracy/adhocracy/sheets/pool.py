@@ -6,7 +6,6 @@ from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import ReferenceListSchemaNode
 from pyramid.path import DottedNameResolver
 from pyramid.httpexceptions import HTTPNotImplemented
-from substanced.util import get_oid
 from zope.interface import provider
 from zope.interface import taggedValue
 from zope.interface import implementer
@@ -54,7 +53,7 @@ class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
         isheet = reftype.getTaggedValue('target_isheet')
         for v in self.context.values():
             if isheet.providedBy(v):
-                elements.append(get_oid(v))
+                elements.append(v)
         struct['elements'] = elements
         return struct
 

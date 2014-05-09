@@ -16,13 +16,6 @@ import unittest
 ############
 
 
-@patch('substanced.objectmap.ObjectMap', autospec=True)
-def make_folder_with_objectmap(dummyobjectmap=None):
-    folder = testing.DummyResource()
-    folder.__objectmap__ = dummyobjectmap.return_value
-    return folder
-
-
 ##########
 #  tests #
 ##########
@@ -63,7 +56,6 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
 
         with pytest.raises(AssertionError):
             self.make_one(testing.DummyResource(), ISheetA)
-
 
     def test_create_non_valid_non_iproperty_iface(self):
         with pytest.raises(AssertionError):
@@ -142,45 +134,23 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         assert inst1.get() == {'count': 1}
         assert inst2.get() == {'count': 2}
 
+    @patch('adhocracy.graph.set_references', autospec=True)
     @patch('adhocracy.schema.ReferenceSetSchemaNode', autospec=True)
-    def _set_valid_references(self, old_oids, new_oids,
-                              expected_connect_oids,
-                              expected_disconnect_oids,
-                              dummy_reference_node=None):
-
-        node = dummy_reference_node.return_value
+    def test_set_valid_references(self,
+                                  dummy_node=None,
+                                  dummy_set_references=None):
+        context = testing.DummyResource()
+        target = testing.DummyResource()
+        node = dummy_node.return_value
         node.name = 'references'
-        node.deserialize.return_value = old_oids
-        #default value
-        node.serialize.return_value = []
-        context = make_folder_with_objectmap()
-        om = context.__objectmap__
+        set_references = dummy_set_references
         inst = self.make_one(context, ISheet)
-
         inst.schema.children.append(node)
 
-        inst.set({'references': new_oids})
-        reftype = inst._references['references']
-        assert om.connect.call_count == len(expected_connect_oids)
-        for oid in expected_connect_oids:
-            assert om.connect.assert_has_calls(
-                call(context, oid, reftype)) is None
-        assert om.disconnect.call_count == len(expected_disconnect_oids)
-        for oid in expected_disconnect_oids:
-            assert om.disconnect.assert_has_calls(
-                call(context, oid, reftype)) is None
+        inst.set({'references': [target]})
 
-    def test_set_valid_references_added(self):
-        self._set_valid_references({1, 3}, {1, 2, 3, 4}, {2, 4}, {})
-
-    def test_set_valid_references_removed(self):
-        self._set_valid_references({5, 6, 7, 8}, {5, 7}, {}, {6, 8})
-
-    def test_set_valid_references_added_and_removed(self):
-        self._set_valid_references({1, 2, 3, 4}, {3, 4, 5, 6}, {5, 6}, {1, 2})
-
-    def test_set_valid_references_unchanged(self):
-        self._set_valid_references({3, 4, 5}, {3, 4, 5}, {}, {})
+        assert set_references.called
+        assert set_references.call_args[0] == (context, [target], node.reftype)
 
     def test_get_cstruct_empty(self):
         inst = self.make_one(testing.DummyResource(), self.isheet_valid)

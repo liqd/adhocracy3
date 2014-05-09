@@ -264,8 +264,8 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
     isheet = Attribute('The sheet referencing the outdated ItemVersion')
     isheet_field = Attribute('The sheet field referencing the outdated '
                              'ItemVersion')
-    old_version_oid = Attribute('The referenced but outdated ItemVersion oid')
-    new_version_oid = Attribute('The follower of the outdated ItemVersion oid')
+    old_version = Attribute('The referenced but outdated ItemVersion')
+    new_version = Attribute('The follower of the outdated ItemVersion')
     root_versions = Attribute('Non-empty list of roots of the ItemVersion '
                               '(only resources that can be reached from one '
                               'of the roots should be updated)')

@@ -10,7 +10,6 @@ from adhocracy.utils import get_all_sheets
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_all_taggedvalues
 from pyramid.threadlocal import get_current_registry
-from copy import deepcopy
 
 
 def _get_not_readonly_appstructs(resource):
@@ -28,7 +27,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
     else:
         registry = get_current_registry()
         appstructs = _get_not_readonly_appstructs(resource)
-        appstructs[IVersionable.__identifier__]['follows'] = [resource.__oid__]
+        appstructs[IVersionable.__identifier__]['follows'] = [resource]
         appstructs[isheet.__identifier__] = appstruct
         iresource = get_resource_interface(resource)
         new_resource = registry.content.create(iresource.__identifier__,
@@ -62,11 +61,11 @@ def reference_has_new_version_subscriber(event):
 
     if autoupdate and not readonly:
         sheet = get_sheet(resource, isheet)
-        appstruct = deepcopy(sheet.get())
+        appstruct = sheet.get()
         field = appstruct[event.isheet_field]
-        old_version_index = field.index(event.old_version_oid)
+        old_version_index = field.index(event.old_version)
         field.pop(old_version_index)
-        field.insert(old_version_index, event.new_version_oid)
+        field.insert(old_version_index, event.new_version)
         if IItemVersion.providedBy(resource):
             _update_versionable(resource, isheet, appstruct, root_versions)
         else:

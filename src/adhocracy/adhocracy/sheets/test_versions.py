@@ -55,7 +55,7 @@ class VersionsPropertySheetUnitTest(unittest.TestCase):
                                             __oid__=1)
         self.context['child'] = versionable
         inst = self.make_one(self.context)
-        assert inst.get() == {'elements': [1]}
+        assert inst.get() == {'elements': [versionable]}
 
     def test_get_not_empty_not_iversionable(self):
         non_versionable = testing.DummyResource()
@@ -101,7 +101,7 @@ class VersionablePropertySheetUnitTest(unittest.TestCase):
         self.objectmap.connect(new, old, IVersionableFollowsReference)
         inst = self.make_one(old)
         assert inst.get() == {'follows': set(),
-                              'followed_by': set([new.__oid__])}
+                              'followed_by': set([new])}
 
 
 class IncludemeIntegrationTest(unittest.TestCase):

@@ -42,10 +42,10 @@ class PoolPropertySheetUnitTest(unittest.TestCase):
     def test_get_not_empty(self):
         from adhocracy.sheets.pool import IPool
         from adhocracy.interfaces import ISheet
-        self.context['child1'] = testing.DummyResource(__provides__=ISheet,
-                                                       __oid__=1)
+        child1 = testing.DummyResource(__provides__=ISheet, __oid__=1)
+        self.context['child1'] = child1
         inst = self.make_one(self.context, IPool)
-        assert inst.get() == {'elements': [1]}
+        assert inst.get() == {'elements': [child1]}
 
     def test_get_not_empty_not_iresource(self):
         from adhocracy.sheets.pool import IPool

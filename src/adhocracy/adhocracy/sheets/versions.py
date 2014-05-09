@@ -96,7 +96,7 @@ class VersionableSheetAdapter(ResourcePropertySheetAdapter):
     def get(self):
         """Return data struct."""
         struct = super().get()
-        followed_by = [x.__oid__ for x in get_followed_by(self.context)]
+        followed_by = get_followed_by(self.context)
         struct['followed_by'] = set(followed_by)
         return struct
 

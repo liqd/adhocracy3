@@ -33,14 +33,14 @@ class TagsPropertySheetUnitTest(unittest.TestCase):
     def test_get_not_empty(self):
         from adhocracy.sheets.tags import ITags
         from adhocracy.sheets.tags import ITag
-        self.context['chil'] = testing.DummyResource(__provides__=ITag,
-                                                     __oid__=1)
+        child = testing.DummyResource(__provides__=ITag, __oid__=1)
+        self.context['child'] = child
         inst = self.make_one(self.context, ITags)
-        assert inst.get() == {'elements': [1]}
+        assert inst.get() == {'elements': [child]}
 
     def test_get_not_empty_not_iversionable(self):
         from adhocracy.sheets.tags import ITags
-        self.context['chil'] = testing.DummyResource()
+        self.context['child'] = testing.DummyResource()
         inst = self.make_one(self.context, ITags)
         assert inst.get() == {'elements': []}
 
