@@ -55,8 +55,8 @@ def test_get_resource_interface_none_provided():
     from . import get_resource_interface
     from pyramid.testing import DummyResource
     context = DummyResource()
-    with pytest.raises(AssertionError):
-        get_resource_interface(context)
+    result = get_resource_interface(context)
+    assert result is None
 
 
 def test_get_sheet_interfaces_multiple_provided():

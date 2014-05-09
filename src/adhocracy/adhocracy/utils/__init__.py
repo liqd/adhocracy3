@@ -51,10 +51,9 @@ def get_resource_interface(context):
         Interface
 
     """
-    assert IResource.providedBy(context)
     ifaces = list(directlyProvidedBy(context))
     iresources = [i for i in ifaces if i.isOrExtends(IResource)]
-    return iresources[0]
+    return iresources[0] if iresources else None
 
 
 def get_sheet_interfaces(context):
