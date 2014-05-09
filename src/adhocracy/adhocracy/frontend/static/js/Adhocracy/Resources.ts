@@ -115,7 +115,7 @@ export function addParagraph(proposalVersion: MeineHeine, paragraphPath: string)
 // takes an array of URL's to resource versions
 //FIXME: backend should have LAST
 export function newestVersion(versions: string[]) : string {
-    return _.max(versions, (version_path) => parseInt(version_path.match(/\d*$/)[0], 10));
+    return _.max(versions, (version_path: string) => parseInt(version_path.match(/\d*$/)[0], 10)).toString();
 };
 
 export function newestVersionInContainer(container) {
