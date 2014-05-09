@@ -1,5 +1,6 @@
 """Folder content type for resources."""
 from adhocracy.interfaces import IAutoNamingManualFolder
+from adhocracy.utils import get_resource_interface
 from substanced.folder import Folder
 from zope.interface import implementer
 
@@ -24,6 +25,14 @@ class ResourcesAutolNamingFolder(Folder):
 
     _autoname_length = 7
     _autoname_last = -1
+
+    def __str__(self):
+        iresource = get_resource_interface(self) or IAutoNamingManualFolder
+        iresource_str = iresource.__identifier__
+        repr_str = repr(self)
+        oid = getattr(self, '__oid__', '')
+        id_str = str(oid) if oid else repr_str
+        return '{0}:{1}'.format(iresource_str, id_str)
 
     def next_name(self, subobject, prefix=''):
         """Generate name to add subobject.

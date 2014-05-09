@@ -21,6 +21,21 @@ class ResourcesAutolNamingFolderUnitTest(unittest.TestCase):
         inst = self._makeOne()
         assert verifyObject(IAutoNamingManualFolder, inst)
 
+    def test_to_string_without_oid(self):
+        from adhocracy.interfaces import IAutoNamingManualFolder
+        inst = self._makeOne()
+        wanted_str = '{0}:{1}'.format(IAutoNamingManualFolder.__identifier__,
+                                      repr(inst))
+        assert wanted_str == str(inst)
+
+    def test_to_string_with_oid(self):
+        from adhocracy.interfaces import IAutoNamingManualFolder
+        inst = self._makeOne()
+        inst.__oid__ = 1
+        wanted_str = '{0}:{1}'.format(IAutoNamingManualFolder.__identifier__,
+                                      str(1))
+        assert wanted_str == str(inst)
+
     def test_next_name_empty(self):
         ob = testing.DummyResource()
         inst = self._makeOne()
