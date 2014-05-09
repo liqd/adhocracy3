@@ -39,16 +39,16 @@ class DummyPropertySheetAdapter(object):
     def __init__(self, context, iface):
         self.context = context
         self.iface = iface
-        if 'dummy_appstruct' not in self.context:
-            self.context['dummy_appstruct'] = {}
-        if 'dummy_cstruct' not in self.context:
-            self.context['dummy_cstruct'] = {}
+        if not hasattr(self.context, 'dummy_appstruct'):
+            self.context.dummy_appstruct = {}
+        if not hasattr(self.context, 'dummy_cstruct'):
+            self.context.dummy_cstruct = {}
 
     def set(self, appstruct):
-        self.context['dummy_appstruct'].update(appstruct)
+        self.context.dummy_appstruct.update(appstruct)
 
     def get(self):
-        return self.context['dummy_appstruct']
+        return self.context.dummy_appstruct
 
     def set_cstruct(self, cstruct):
         self.context['dummy_cstruct'].update(cstruct)
@@ -430,7 +430,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         inst = self.make_one(IResourceType)
         resource = inst(parent=self.context, appstructs=data)
 
-        assert resource['dummy_appstruct'] == {'count': 0}
+        assert resource.dummy_appstruct == {'count': 0}
 
     def test_call_with_appstructs_name_data(self):
         from adhocracy.interfaces import IResource
@@ -445,7 +445,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         inst = self.make_one(IResourceType)
         resource = inst(parent=self.context, appstructs=data)
 
-        assert resource['dummy_appstruct'] == {'name': 'child'}
+        assert resource.dummy_appstruct == {'name': 'child'}
 
     def test_call_with_appstructs_empty_name_data(self):
         from adhocracy.interfaces import IResource

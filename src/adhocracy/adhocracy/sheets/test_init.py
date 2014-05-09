@@ -64,9 +64,6 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         with pytest.raises(AssertionError):
             self.make_one(testing.DummyResource(), ISheetA)
 
-    def test_create_non_valid_non_mapping_context(self):
-        with pytest.raises(AssertionError):
-            self.make_one(object(), ISheet)
 
     def test_create_non_valid_non_iproperty_iface(self):
         with pytest.raises(AssertionError):

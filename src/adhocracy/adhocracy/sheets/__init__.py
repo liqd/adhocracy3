@@ -24,7 +24,6 @@ class ResourcePropertySheetAdapter(PropertySheet):
     isheet = ISheet
 
     def __init__(self, context, iface):
-        assert hasattr(context, '__setitem__')
         assert iface.isOrExtends(self.isheet)
         assert (not (iface.queryTaggedValue('createmandatory', False)
                 and iface.queryTaggedValue('readonly', False)))
