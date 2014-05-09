@@ -7,6 +7,9 @@ from adhocracy.interfaces import NewVersionToOldVersion
 from adhocracy.utils import get_all_taggedvalues
 from substanced.util import find_objectmap
 from substanced.objectmap import ObjectMap
+from substanced.objectmap import Multireference
+
+import collections
 
 
 def _get_reftypes(objectmap, base_reftype=None, source_isheet=None):
@@ -78,6 +81,31 @@ def get_references(resource):
 
     """
     return _references_template(ObjectMap.targets, resource)
+
+
+def set_references(resource, targets, reftype):
+    """Set references of this resource pointing to other resources.
+
+    Args:
+        resource (IResource): the source
+        targets (iteratable of IResource):the targets iteratable,
+                                          for Sequences the order is preserved.
+        reftype (SheetReferenceType): the reference type
+
+    """
+    assert resource is not None
+    assert isinstance(targets, collections.Iterable)
+    assert issubclass(reftype, SheetReferenceType)
+
+    ordered = isinstance(targets, collections.Sequence)
+    orientation = 'source'
+    resolve = True  # return objects not oids
+    ignore_missing = True  # don't raise ValueError if targets are missing
+    om = find_objectmap(resource)
+    multireference = Multireference(resource, om, reftype, ignore_missing,
+                                    resolve, orientation, ordered)
+    multireference.clear()
+    multireference.connect(targets)
 
 
 def _get_fields(isheet):

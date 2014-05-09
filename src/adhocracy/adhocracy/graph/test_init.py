@@ -1,4 +1,5 @@
 from adhocracy.interfaces import IResource
+from adhocracy.interfaces import SheetReferenceType
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import NewVersionToOldVersion
 from mock import patch
@@ -90,6 +91,101 @@ class GetReftypesUnitTest(unittest.TestCase):
         assert len(result) == 1
         assert IOtherReferenceType in result
         assert SheetToSheet not in result
+
+
+class SetReferencesUnitTest(unittest.TestCase):
+
+    def _make_one(self, *args):
+        from . import set_references
+        return set_references(*args)
+
+    def setUp(self):
+        from substanced.objectmap import ObjectMap
+        context = create_dummy_resource()
+        context.__objectmap__ = ObjectMap(context)
+        self.source = create_dummy_resource(parent=context)
+        self.target = create_dummy_resource(parent=context)
+        self.target1 = create_dummy_resource(parent=context)
+        self.target2 = create_dummy_resource(parent=context)
+        self.objectmap = context.__objectmap__
+
+    def test_targets_not_iteratable(self):
+        with pytest.raises(AssertionError):
+            self._make_one(self.source, None, SheetReferenceType)
+
+    def test_reftype_not_sheetreferencetype(self):
+        from substanced.interfaces import ReferenceType
+        with pytest.raises(AssertionError):
+            self._make_one(self.source, [], ReferenceType)
+
+    def test_resource_no_object(self):
+        with pytest.raises(AssertionError):
+            self._make_one(None, [], SheetReferenceType)
+
+    def test_targets_empty_list(self):
+        self._make_one(self.source, [], SheetReferenceType)
+        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        wanted_refs = []
+        assert wanted_refs == list(references)
+
+    def test_targets_list(self):
+        targets = [self.target]
+        self._make_one(self.source, targets, SheetReferenceType)
+        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        wanted_references = [self.target.__oid__]
+        assert wanted_references == list(references)
+
+    def test_targets_list_ordered(self):
+        targets = [self.target, self.target1, self.target2]
+        self._make_one(self.source, targets, SheetReferenceType)
+        targets_reverse = [self.target2, self.target1, self.target]
+        self._make_one(self.source, targets_reverse, SheetReferenceType)
+
+        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        wanted_references = [x.__oid__ for x in targets_reverse]
+        assert wanted_references == list(references)
+
+    def test_targets_list_duplicated_targets(self):
+        """Duplication targets are not possible with substanced.objectmap."""
+        targets = [self.target, self.target]
+        self._make_one(self.source, targets, SheetReferenceType)
+        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        wanted_references = [self.target.__oid__]
+        assert wanted_references == list(references)
+
+    def test_targets_list_with_some_removed(self):
+        targets = [self.target, self.target1, self.target2]
+        self._make_one(self.source, targets, SheetReferenceType)
+        targets_some_removed = [self.target]
+        self._make_one(self.source, targets_some_removed, SheetReferenceType)
+
+        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        wanted_references = [x.__oid__ for x in targets_some_removed]
+        assert wanted_references == list(references)
+
+    def test_targets_set(self):
+        targets = set([self.target])
+        self._make_one(self.source, targets, SheetReferenceType)
+        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        wanted_references = [self.target.__oid__]
+        assert wanted_references == list(references)
+
+    def test_targets_set_duplicated_targets(self):
+        targets = set([self.target, self.target])
+        self._make_one(self.source, targets, SheetReferenceType)
+        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        wanted_references = [self.target.__oid__]
+        assert wanted_references == list(references)
+
+    def test_targets_set_with_some_removed(self):
+        targets = set([self.target, self.target1, self.target2])
+        self._make_one(self.source, targets, SheetReferenceType)
+        targets_some_removed = set([self.target])
+        self._make_one(self.source, targets_some_removed, SheetReferenceType)
+
+        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        wanted_references = [x.__oid__ for x in targets_some_removed]
+        assert wanted_references == list(references)
 
 
 class ReferencesTemplateUnitTest(unittest.TestCase):
