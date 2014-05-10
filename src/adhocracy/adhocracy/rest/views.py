@@ -4,7 +4,6 @@ from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISimple
 from adhocracy.interfaces import IPool
-from adhocracy.interfaces import ISheet
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
 from adhocracy.rest.schemas import POSTItemRequestSchema
@@ -18,7 +17,6 @@ from adhocracy.schema import AbstractReferenceIterableSchemaNode
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
-from adhocracy.utils import get_all_taggedvalues
 from colander import SchemaNode
 from copy import deepcopy
 from cornice.util import json_error
@@ -422,17 +420,12 @@ class MetaApiView(RESTView):
           resources_metadata (list): resource metadata
 
         Returns:
-          A 2-tuple of (resource_map, sheet_set)
-
-          resource_map is a dict (suitable for JSON serialization) that
-          describes all the resources registered in the system.
-
-          sheet_set is a set containing the names of all sheets references by
-          resources.
+          resource_map (dict): a dict (suitable for JSON serialization) that
+                               describes all the resources registered in the
+                               system.
 
         """
         resource_map = {}
-        sheet_set = set()
 
         for name, value in resource_types.items():
             prop_map = {}
@@ -445,7 +438,6 @@ class MetaApiView(RESTView):
             if 'extended_sheets' in metadata:
                 sheets.extend(metadata['extended_sheets'])
             prop_map['sheets'] = [to_dotted_name(s) for s in sheets]
-            sheet_set.update(sheets)
 
             # Main element type if this is a pool or item
             if 'item_type' in metadata:
@@ -464,7 +456,7 @@ class MetaApiView(RESTView):
 
                 prop_map['element_types'] = element_names
             resource_map[name] = prop_map
-        return resource_map, sheet_set
+        return resource_map
 
     def _sheet_field_readable(self, sheetname, fieldname, sheet_readonly):
         """Hook that allows modifying the read-only status for fields.
@@ -563,33 +555,15 @@ class MetaApiView(RESTView):
 
         return sheet_map
 
-    def _sheet_metadata(self, isheets):
-        """Get dictionary with metadata about sheets.
-
-        Expects an iterable of ISheet interface classes.
-
-        Returns a mapping from sheet identifiers (dotted names) to metadata
-        describing the sheet.
-
-        """
-        sheet_metadata = {}
-
-        for isheet in isheets:
-            if isheet.isOrExtends(ISheet):
-                metadata = get_all_taggedvalues(isheet)
-            sheet_metadata[isheet.__identifier__] = metadata
-
-        return sheet_metadata
-
     @view_config(request_method='GET')
     def get(self):
         """Return the API specification of this installation as JSON."""
         # Collect info about all resources
         resource_types = self.registry.resources_metadata()
-        resource_map, sheet_set = self._describe_resources(resource_types)
+        resource_map = self._describe_resources(resource_types)
 
         # Collect info about all sheets referenced by any of the resources
-        sheet_metadata = self._sheet_metadata(sheet_set)
+        sheet_metadata = self.registry.sheets_metadata()
         sheet_map = self._describe_sheets(sheet_metadata)
 
         struct = {

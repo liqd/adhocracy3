@@ -130,21 +130,34 @@ class TestResourceContentRegistry(unittest.TestCase):
                                       onlymandatorycreatable=True)
         assert ISheetA.__identifier__ in sheets
 
-    def test_resource_types(self):
+    def test_resources_metadata_without_resources(self):
         inst = self._make_one(self.config.registry)
-        ISheetA.setTaggedValue('readonly', False)
-        ISheetA.setTaggedValue('createmandatory', True)
-        context = testing.DummyResource(__provides__=(IResource, ISheetA))
-        _register_propertysheet_adapter(self.config, ISheetA)
+        wanted = inst.resources_metadata()
+        assert wanted == {}
 
-        sheets = inst.resource_sheets(context, testing.DummyRequest(),
-                                      onlymandatorycreatable=True)
-        assert ISheetA.__identifier__ in sheets    def test_addables_valid_context_is_not_iresource(self):
-        inst = self._make_one()
-        context = testing.DummyResource()
+    def test_resources_metadata_with_resources(self):
+        inst = self._make_one(self.config.registry)
+        _register_content_type(inst, IResource.__identifier__)
+        meta = inst.resources_metadata()
+        assert len(meta) == 1
+        assert 'iface' in meta[IResource.__identifier__]
+        assert 'name' in meta[IResource.__identifier__]
+        assert 'metadata' in meta[IResource.__identifier__]
 
-        with pytest.raises(AssertionError):
-            inst.resource_addables(context, testing.DummyRequest())
+    def test_sheets_metadata_without_resources(self):
+        inst = self._make_one(self.config.registry)
+        wanted = inst.sheets_metadata()
+        assert wanted == {}
+
+    def test_sheets_metadata_with_resources(self):
+        from adhocracy.utils import get_all_taggedvalues
+        inst = self._make_one(self.config.registry)
+        _register_content_type(inst, IResource.__identifier__)
+        tagged_values = get_all_taggedvalues(IResource)
+        IResource.setTaggedValue('basic_sheets', set([ISheet]))
+        meta = inst.sheets_metadata()
+        assert ISheet.__identifier__ in meta
+        assert meta[ISheet.__identifier__] == get_all_taggedvalues(ISheet)
 
     def test_addables_valid_context_is_not_ipool(self):
         inst = self._make_one()

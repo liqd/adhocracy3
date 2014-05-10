@@ -75,6 +75,27 @@ class ResourceContentRegistry(ContentRegistry):
                 pass
         return resource_types
 
+    def sheets_metadata(self):
+        """Get dictionary with all sheet metadata.
+
+        Returns:
+            dict: key = isheet identifier (dotted_name),
+                  value = isheet metadata
+
+        """
+        isheets = set()
+        resources = self.resources_metadata()
+        resources_meta = [x['metadata'] for x in resources.values()]
+        for resource in resources_meta:
+            isheets.update(resource['basic_sheets'])
+            isheets.update(resource['extended_sheets'])
+
+        isheets_meta = dict()
+        for isheet in isheets:
+            isheets_meta[isheet.__identifier__] = get_all_taggedvalues(isheet)
+
+        return isheets_meta
+
     def resource_addables(self, context, request):
         """Get dictionary with addable resource types.
 
