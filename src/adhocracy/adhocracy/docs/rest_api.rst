@@ -2,7 +2,7 @@
 # doctest: +NORMALIZE_WHITESPACE
 
 REST-API (with loose coupling)
-===============================
+==============================
 
 Prerequisites
 -------------

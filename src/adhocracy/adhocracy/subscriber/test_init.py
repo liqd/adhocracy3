@@ -50,19 +50,6 @@ def _register_dummypropertysheet_adapter(config):
                                     IResourcePropertySheet)
 
 
-class DummyObjectMap():
-    """Dummy object map that just returns a single resource."""
-
-    def __init__(self, resource):
-        self.resource = resource
-
-    def object_for(self, oid):
-        return self.resource
-
-    def get_reftypes(self):
-        return []
-
-
 ###########
 #  tests  #
 ###########
