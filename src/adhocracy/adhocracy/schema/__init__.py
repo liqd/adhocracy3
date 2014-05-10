@@ -113,9 +113,11 @@ class AbstractPathIterable(IdSet):
         return resources
 
 
-class PathList(AbstractPathIterable):
+class PathListSet(AbstractPathIterable):
 
     """List of :class:`AbsolutePath`.
+
+    The order is preserved, duplicates are removed.
 
     Example value: [/bluaABC, /_123/3]
 
@@ -127,7 +129,9 @@ class PathList(AbstractPathIterable):
 
     def add_to_appstruct(self, appstruct, element):
         """Add an element to a list."""
-        appstruct.append(element)
+        # FIXME this means very bad performance for long lists.
+        if element not in appstruct:
+            appstruct.append(element)
 
 
 class PathSet(AbstractPathIterable):
@@ -202,8 +206,8 @@ class ReferenceSetSchemaNode(AbstractReferenceIterableSchemaNode):
     schema_type = PathSet
 
 
-class ReferenceListSchemaNode(AbstractReferenceIterableSchemaNode):
+class ReferenceListSetSchemaNode(AbstractReferenceIterableSchemaNode):
 
-    """Colander SchemaNode to store a list of references."""
+    """Colander SchemaNode to store a list of references without duplicates."""
 
-    schema_type = PathList
+    schema_type = PathListSet

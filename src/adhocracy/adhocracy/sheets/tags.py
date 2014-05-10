@@ -7,7 +7,7 @@ from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.versions import IVersionable
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
-from adhocracy.schema import ReferenceListSchemaNode
+from adhocracy.schema import ReferenceListSetSchemaNode
 from zope.interface import provider
 from zope.interface import taggedValue
 
@@ -18,7 +18,7 @@ class ITag(ISheet):
     """List all tags for this Item."""
 
     taggedValue('field:elements',
-                ReferenceListSchemaNode(
+                ReferenceListSetSchemaNode(
                     reftype='adhocracy.sheets.tags.ITagElementsReference',
                 ))
 
@@ -38,7 +38,7 @@ class ITags(ISheet):
     """List all tags for this Item."""
 
     taggedValue('field:elements',
-                ReferenceListSchemaNode(
+                ReferenceListSetSchemaNode(
                     reftype='adhocracy.sheets.tags.ITagsElementsReference',
                 ))
 

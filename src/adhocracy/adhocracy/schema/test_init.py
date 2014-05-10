@@ -51,11 +51,11 @@ class AbsolutePath(unittest.TestCase):
             inst.validator(inst, 'blu.ABC_12-3')
 
 
-class PathListUnitTest(unittest.TestCase):
+class PathListSetUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import PathList
-        return PathList()
+        from . import PathListSet
+        return PathListSet()
 
     def setUp(self):
         self.context = testing.DummyResource()
@@ -105,6 +105,13 @@ class PathListUnitTest(unittest.TestCase):
         node = add_node_binding(colander.Mapping(), context=self.context)
         result = inst.deserialize(node, ['/child'])
         assert result == [self.child]
+
+    def test_deserialize_value_valid_path_with_duplicates(self):
+        inst = self.make_one()
+        self.context['child'] = self.child
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.serialize(node, ['/child','/child']
+        assert result == ['/child']
 
     def test_deserialize_value_none_valid_path(self):
         inst = self.make_one()

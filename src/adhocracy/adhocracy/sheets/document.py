@@ -5,7 +5,7 @@ from adhocracy.interfaces import IIResourcePropertySheet
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
-from adhocracy.schema import ReferenceListSchemaNode
+from adhocracy.schema import ReferenceListSetSchemaNode
 from zope.interface import provider
 from zope.interface import taggedValue
 
@@ -31,7 +31,7 @@ class IDocument(ISheet, ISheetReferenceAutoUpdateMarker):
                 )
     taggedValue(
         'field:elements',
-        ReferenceListSchemaNode(
+        ReferenceListSetSchemaNode(
             reftype='adhocracy.sheets.document.IDocumentElementsReference',
         ))
 
@@ -49,12 +49,12 @@ class ISection(ISheet, ISheetReferenceAutoUpdateMarker):
                 )
     taggedValue(
         'field:elements',
-        ReferenceListSchemaNode(
+        ReferenceListSetSchemaNode(
             reftype='adhocracy.sheets.document.ISectionElementsReference',
         ))
     taggedValue(
         'field:subsections',
-        ReferenceListSchemaNode(
+        ReferenceListSetSchemaNode(
             reftype='adhocracy.sheets.document.ISubsectionsReference',
         ))
 

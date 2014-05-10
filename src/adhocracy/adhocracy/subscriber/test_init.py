@@ -86,8 +86,6 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         ])
         IDummySheetAutoUpdate.setTaggedValue('readonly', False)
         self.child = child
-        objectmap = DummyObjectMap(child)
-        child.__objectmap__ = objectmap
         # create dummy event
         self.event = testing.DummyResource(__provides__=
                                            ISheetReferencedItemHasNewVersion,

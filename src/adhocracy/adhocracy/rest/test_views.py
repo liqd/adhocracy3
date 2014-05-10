@@ -932,10 +932,10 @@ class MetaApiViewUnitTest(unittest.TestCase):
         from adhocracy.interfaces import ISheet
         from adhocracy.interfaces import IResource
         from adhocracy.interfaces import SheetToSheet
-        from adhocracy.schema import ReferenceListSchemaNode
+        from adhocracy.schema import ReferenceListSetSchemaNode
 
         class ISheetF(ISheet):
-            taggedValue('field:test', ReferenceListSchemaNode(
+            taggedValue('field:test', ReferenceListSetSchemaNode(
                 reftype=SheetToSheet))
         self.resource_types.return_value = make_resource_types(
             IResource, {'basic_sheets': set([ISheetF])})
