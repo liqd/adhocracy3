@@ -43,7 +43,7 @@ class ResourceContentRegistry(ContentRegistry):
             wanted_sheets[sheet.iface.__identifier__] = sheet
         return wanted_sheets
 
-    def resource_metadata(self):
+    def resources_metadata(self):
         """Get dictionary with all resource types and metadata.
 
         Returns:
@@ -97,7 +97,7 @@ class ResourceContentRegistry(ContentRegistry):
 
         """
         assert IResource.providedBy(context)
-        all_types = self.resource_metadata()
+        all_types = self.resources_metadata()
         name = get_resource_interface(context).__identifier__
         assert name in all_types
         metadata = all_types[name]['metadata']

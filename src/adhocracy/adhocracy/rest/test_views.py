@@ -87,7 +87,7 @@ class DummyPropertysheet(object):
 def make_resource_metadata(iresource, metadata):
     """Helper method that assembles dummy resource metadata.
 
-    It returns the same structure as the resource_metadata method from
+    It returns the same structure as the resources_metadata method from
     adhocracy.registry.
 
     """
@@ -258,7 +258,7 @@ class ValidatePostPropertysheetCstructsUnitTest(unittest.TestCase):
         request.registry.content = resource_registry
         self.request = request
         self.resource_sheets = request.registry.content.resource_sheets
-        self.resource_types = request.registry.content.resource_metadata
+        self.resource_types = request.registry.content.resources_metadata
         self.create = request.registry.content.create
 
     def make_one(self, context, request):
@@ -768,7 +768,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
         request = CorniceDummyRequest()
         request.registry.content = resource_registry
         self.request = request
-        self.resource_types = request.registry.content.resource_metadata
+        self.resource_types = request.registry.content.resources_metadata
 
     def make_one(self, context, request):
         from .views import MetaApiView

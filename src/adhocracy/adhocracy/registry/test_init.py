@@ -130,7 +130,16 @@ class TestResourceContentRegistry(unittest.TestCase):
                                       onlymandatorycreatable=True)
         assert ISheetA.__identifier__ in sheets
 
-    def test_addables_valid_context_is_not_iresource(self):
+    def test_resource_types(self):
+        inst = self._make_one(self.config.registry)
+        ISheetA.setTaggedValue('readonly', False)
+        ISheetA.setTaggedValue('createmandatory', True)
+        context = testing.DummyResource(__provides__=(IResource, ISheetA))
+        _register_propertysheet_adapter(self.config, ISheetA)
+
+        sheets = inst.resource_sheets(context, testing.DummyRequest(),
+                                      onlymandatorycreatable=True)
+        assert ISheetA.__identifier__ in sheets    def test_addables_valid_context_is_not_iresource(self):
         inst = self._make_one()
         context = testing.DummyResource()
 
