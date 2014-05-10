@@ -61,7 +61,7 @@ def validate_post_sheet_cstructs(context, request):
     type_ = request.validated.get('content_type', '')
     dummy = object()
     sheets = {}
-    if type_ in request.registry.content.resource_types():
+    if type_ in request.registry.content.resource_metadata():
         dummy = request.registry.content.create(
             type_, run_after_creation=False)
         dummy.__parent__ = context
@@ -419,7 +419,7 @@ class MetaApiView(RESTView):
         """Build a description of the resources registered in the system.
 
         Args:
-          resource_types: list of resource types as returned by the registry
+          resource_metadata: list of resource types as returned by the registry
 
         Returns:
           A 2-tuple of (resource_map, sheet_set)
@@ -585,7 +585,7 @@ class MetaApiView(RESTView):
     def get(self):
         """Return the API specification of this installation as JSON."""
         # Collect info about all resources
-        resource_types = self.registry.resource_types()
+        resource_types = self.registry.resource_metadata()
         resource_map, sheet_set = self._describe_resources(resource_types)
 
         # Collect info about all sheets referenced by any of the resources

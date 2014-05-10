@@ -84,10 +84,10 @@ class DummyPropertysheet(object):
         self._dummy_appstruct = appstruct
 
 
-def make_resource_types(iresource, metadata):
+def make_resource_metadata(iresource, metadata):
     """Helper method that assembles dummy resource metadata.
 
-    It returns the same structure as the resource_types method from
+    It returns the same structure as the resource_metadata method from
     adhocracy.registry.
 
     """
@@ -258,7 +258,7 @@ class ValidatePostPropertysheetCstructsUnitTest(unittest.TestCase):
         request.registry.content = resource_registry
         self.request = request
         self.resource_sheets = request.registry.content.resource_sheets
-        self.resource_types = request.registry.content.resource_types
+        self.resource_types = request.registry.content.resource_metadata
         self.create = request.registry.content.create
 
     def make_one(self, context, request):
@@ -768,7 +768,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
         request = CorniceDummyRequest()
         request.registry.content = resource_registry
         self.request = request
-        self.resource_types = request.registry.content.resource_types
+        self.resource_types = request.registry.content.resource_metadata
 
     def make_one(self, context, request):
         from .views import MetaApiView
@@ -786,7 +786,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
     def test_get_resources(self):
         from adhocracy.interfaces import IResource
-        self.resource_types.return_value = make_resource_types(IResource, {})
+        self.resource_types.return_value = make_resource_metadata(IResource, {})
         inst = self.make_one(self.context, self.request)
         resp = inst.get()
         assert IResource.__identifier__ in resp['resources']
@@ -796,7 +796,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
         from adhocracy.interfaces import ISheet
         from adhocracy.interfaces import IResource
         self.resource_types.return_value = \
-            make_resource_types(IResource, {'basic_sheets': set([ISheet]),
+            make_resource_metadata(IResource, {'basic_sheets': set([ISheet]),
                                             'extended_sheets': set([ISheetB])})
         inst = self.make_one(self.context, self.request)
         resources_metadata = inst.get()['resources']
@@ -808,7 +808,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
     def test_get_resources_with_addables_metadata(self):
         from adhocracy.interfaces import IResource
         from adhocracy.interfaces import IItemVersion
-        self.resource_types.return_value = make_resource_types(
+        self.resource_types.return_value = make_resource_metadata(
             IResource,
             {'element_types': set([IItemVersion, IResource]),
              'item_type': IItemVersion})
@@ -828,7 +828,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
     def test_get_sheets(self):
         from adhocracy.interfaces import ISheet
         from adhocracy.interfaces import IResource
-        self.resource_types.return_value = make_resource_types(
+        self.resource_types.return_value = make_resource_metadata(
             IResource, {'basic_sheets': set([ISheet])})
 
         inst = self.make_one(self.context, self.request)
@@ -844,7 +844,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
         class ISheetF(ISheet):
             taggedValue('field:test', colander.SchemaNode(colander.Int()))
-        self.resource_types.return_value = make_resource_types(
+        self.resource_types.return_value = make_resource_metadata(
             IResource, {'basic_sheets': set([ISheetF])})
         inst = self.make_one(self.context, self.request)
 
@@ -864,7 +864,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
         class ISheetF(ISheet):
             taggedValue('field:test', colander.SchemaNode(colander.Int()))
-        self.resource_types.return_value = make_resource_types(
+        self.resource_types.return_value = make_resource_metadata(
             IResource, {'basic_sheets': set([ISheetF])})
         inst = self.make_one(self.context, self.request)
 
@@ -881,7 +881,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
         class ISheetF(ISheet):
             taggedValue('field:test', Identifier())
-        self.resource_types.return_value = make_resource_types(
+        self.resource_types.return_value = make_resource_metadata(
             IResource, {'basic_sheets': set([ISheetF])})
         inst = self.make_one(self.context, self.request)
 
@@ -900,7 +900,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
         class ISheetF(ISheet):
             taggedValue('field:test', ReferenceListSetSchemaNode(
                 reftype=SheetToSheet))
-        self.resource_types.return_value = make_resource_types(
+        self.resource_types.return_value = make_resource_metadata(
             IResource, {'basic_sheets': set([ISheetF])})
         inst = self.make_one(self.context, self.request)
 

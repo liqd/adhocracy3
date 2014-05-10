@@ -8,7 +8,6 @@ from adhocracy.sheets.versions import IVersionable
 from adhocracy.utils import get_sheet
 from adhocracy.utils import get_all_sheets
 from adhocracy.utils import get_resource_interface
-from adhocracy.utils import get_all_taggedvalues
 from pyramid.threadlocal import get_current_registry
 
 
@@ -56,11 +55,10 @@ def reference_has_new_version_subscriber(event):
     resource = event.object
     root_versions = event.root_versions
     isheet = event.isheet
-    readonly = get_all_taggedvalues(isheet)['readonly']
+    sheet = get_sheet(resource, isheet)
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
 
-    if autoupdate and not readonly:
-        sheet = get_sheet(resource, isheet)
+    if autoupdate and not sheet.readonly:
         appstruct = sheet.get()
         field = appstruct[event.isheet_field]
         old_version_index = field.index(event.old_version)
