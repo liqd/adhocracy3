@@ -891,43 +891,6 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert 'containertype' not in field_metadata
         assert field_metadata['valuetype'] == 'adhocracy.schema.Identifier'
 
-    def test_get_sheets_with_field_adhocracy_referenceset(self):
-        from adhocracy.interfaces import ISheet
-        from adhocracy.interfaces import IResource
-        from adhocracy.interfaces import SheetToSheet
-        from adhocracy.schema import ReferenceSetSchemaNode
-
-        class ISheetF(ISheet):
-            taggedValue('field:test', ReferenceSetSchemaNode(
-                reftype=SheetToSheet))
-        self.resource_types.return_value = make_resource_types(
-            IResource, {'basic_sheets': set([ISheetF])})
-        inst = self.make_one(self.context, self.request)
-
-        sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
-
-        field_metadata = sheet_metadata['fields'][0]
-        assert field_metadata['containertype'] == 'set'
-        assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
-
-    def test_get_sheets_with_field_adhocracy_referenceset_with_dotted(self):
-        from adhocracy.interfaces import ISheet
-        from adhocracy.interfaces import IResource
-        from adhocracy.schema import ReferenceSetSchemaNode
-
-        class ISheetF(ISheet):
-            taggedValue('field:test', ReferenceSetSchemaNode(
-                reftype='adhocracy.interfaces.SheetToSheet'))
-        self.resource_types.return_value = make_resource_types(
-            IResource, {'basic_sheets': set([ISheetF])})
-        inst = self.make_one(self.context, self.request)
-
-        sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
-
-        field_metadata = sheet_metadata['fields'][0]
-        assert field_metadata['containertype'] == 'set'
-        assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
-
     def test_get_sheets_with_field_adhocracy_referencelist(self):
         from adhocracy.interfaces import ISheet
         from adhocracy.interfaces import IResource

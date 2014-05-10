@@ -208,21 +208,6 @@ pointing to other ISection's:
      'targetsheet': 'adhocracy.sheets.document.ISection',
      'valuetype': 'adhocracy.schema.AbsolutePath'}
 
-The 'follows' field of IVersionable is an unordered set pointing to other
-IVersionable's:
-
-    >>> verfields = resp_data['sheets']['adhocracy.sheets.versions.IVersionable']['fields']
-    >>> for field in verfields:
-    ...     if field['name'] == 'follows':
-    ...         pprint(field)
-    ...         break
-    {'containertype': 'set',
-     'createmandatory': False,
-     'name': 'follows',
-     'readonly': False,
-     'targetsheet': 'adhocracy.sheets.versions.IVersionable',
-     'valuetype': 'adhocracy.schema.AbsolutePath'}
-
 OPTIONS
 ~~~~~~~
 
@@ -530,13 +515,13 @@ to work ::
     >>> resp = testapp.get('/meta_api')
     >>> vers_fields = resp.json['sheets']['adhocracy.sheets.versions.IVersionable']['fields']
     >>> pprint(sorted(vers_fields, key=itemgetter('name')))
-    [{'containertype': 'set',
+    [{'containertype': 'list',
       'createmandatory': False,
       'name': 'followed_by',
       'readonly': True,
       'targetsheet': 'adhocracy.sheets.versions.IVersionable',
       'valuetype': 'adhocracy.schema.AbsolutePath'},
-     {'containertype': 'set',
+     {'containertype': 'list',
       'createmandatory': False,
       'name': 'follows',
       'readonly': False,

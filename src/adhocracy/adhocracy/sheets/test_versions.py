@@ -90,8 +90,8 @@ class VersionablePropertySheetUnitTest(unittest.TestCase):
 
     def test_get_empty(self):
         inst = self.make_one(self.context)
-        assert inst.get() == {'follows': set(),
-                              'followed_by': set()}
+        assert inst.get() == {'follows': [],
+                              'followed_by': []}
 
     def test_get_with_followed_by(self):
         from .versions import IVersionable
@@ -100,8 +100,8 @@ class VersionablePropertySheetUnitTest(unittest.TestCase):
         new = create_dummy_resource(self.context, IVersionable)
         self.objectmap.connect(new, old, IVersionableFollowsReference)
         inst = self.make_one(old)
-        assert inst.get() == {'follows': set(),
-                              'followed_by': set([new])}
+        assert inst.get() == {'follows': [],
+                              'followed_by': [new]}
 
 
 class IncludemeIntegrationTest(unittest.TestCase):

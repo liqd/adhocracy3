@@ -8,7 +8,6 @@ from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceListSetSchemaNode
-from adhocracy.schema import ReferenceSetSchemaNode
 from zope.interface import implementer
 from zope.interface import provider
 from zope.interface import taggedValue
@@ -29,14 +28,14 @@ class IVersionable(ISheet):
 
     taggedValue(
         'field:follows',
-        ReferenceSetSchemaNode(
+        ReferenceListSetSchemaNode(
             default=[],
             missing=colander.drop,
             reftype='adhocracy.sheets.versions.IVersionableFollowsReference'
         ))
     taggedValue(
         'field:followed_by',
-        ReferenceSetSchemaNode(
+        ReferenceListSetSchemaNode(
             default=[],
             missing=colander.drop,
             reftype='adhocracy.sheets.versions.IVersionableFollowedByReference'
@@ -97,7 +96,7 @@ class VersionableSheetAdapter(ResourcePropertySheetAdapter):
         """Return data struct."""
         struct = super().get()
         followed_by = get_followed_by(self.context)
-        struct['followed_by'] = set(followed_by)
+        struct['followed_by'] = list(followed_by)
         return struct
 
 

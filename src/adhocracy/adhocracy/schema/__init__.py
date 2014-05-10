@@ -199,13 +199,6 @@ class AbstractReferenceIterableSchemaNode(schema.MultireferenceIdSchemaNode):
                     raise colander.Invalid(node, msg=error, value=resource)
 
 
-class ReferenceSetSchemaNode(AbstractReferenceIterableSchemaNode):
-
-    """Colander SchemaNode to store a set of references."""
-
-    schema_type = PathSet
-
-
 class ReferenceListSetSchemaNode(AbstractReferenceIterableSchemaNode):
 
     """Colander SchemaNode to store a list of references without duplicates."""

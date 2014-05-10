@@ -110,8 +110,8 @@ class PathListSetUnitTest(unittest.TestCase):
         inst = self.make_one()
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping(), context=self.context)
-        result = inst.serialize(node, ['/child','/child']
-        assert result == ['/child']
+        result = inst.deserialize(node, ['/child', '/child'])
+        assert result == [self.child]
 
     def test_deserialize_value_none_valid_path(self):
         inst = self.make_one()
@@ -185,8 +185,8 @@ class PathSetUnitTest(unittest.TestCase):
 class ReferenceSetSchemaNodeUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import ReferenceSetSchemaNode
-        return ReferenceSetSchemaNode()
+        from . import ReferenceListSetSchemaNode
+        return ReferenceListSetSchemaNode()
 
     def setUp(self):
         self.context = testing.DummyResource()
