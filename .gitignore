@@ -46,3 +46,6 @@ a3-backend-mockup
 /src/adhocracy/tests/report.html
 /src/adhocracy/tests/log.html
 /src/adhocracy/tests/output.xml
+.idea/
+adhocracy3/
+
