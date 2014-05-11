@@ -12,14 +12,14 @@ class ISectionVersion(IItemVersion):
     """Document section."""
 
     taggedValue('extended_sheets',
-                set(['adhocracy.sheets.document.ISection']))
+                {'adhocracy.sheets.document.ISection'})
 
 
 class ISection(IItem):
 
     """Section Versions Pool."""
 
-    taggedValue('element_types', set([ITag, ISectionVersion]))
+    taggedValue('element_types', {ITag, ISectionVersion})
     taggedValue('item_type', ISectionVersion)
 
 

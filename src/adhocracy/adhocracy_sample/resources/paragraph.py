@@ -12,14 +12,14 @@ class IParagraphVersion(IItemVersion):
     """Document paragraph (a leaf in the section tree)."""
 
     taggedValue('extended_sheets',
-                set(['adhocracy.sheets.document.IParagraph']))
+                {'adhocracy.sheets.document.IParagraph'})
 
 
 class IParagraph(IItem):
 
     """Paragraph Versions Pool."""
 
-    taggedValue('element_types', set([ITag, IParagraphVersion]))
+    taggedValue('element_types', {ITag, IParagraphVersion})
     taggedValue('item_type', IParagraphVersion)
 
 

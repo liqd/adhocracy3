@@ -14,18 +14,14 @@ class IProposalVersion(IItemVersion):
     """Versionable item with Document propertysheet."""
 
     taggedValue('extended_sheets',
-                set(['adhocracy.sheets.document.IDocument']))
+                {'adhocracy.sheets.document.IDocument'})
 
 
 class IProposal(IItem):
 
     """All versions of a Proposal."""
 
-    taggedValue('element_types', set([ITag,
-                                      ISection,
-                                      IParagraph,
-                                      IProposalVersion,
-                                      ]))
+    taggedValue('element_types', {ITag, ISection, IParagraph, IProposalVersion})
     taggedValue('item_type', IProposalVersion)
 
 
