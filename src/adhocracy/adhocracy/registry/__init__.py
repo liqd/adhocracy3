@@ -90,7 +90,7 @@ class ResourceContentRegistry(ContentRegistry):
             isheets.update(resource['basic_sheets'])
             isheets.update(resource['extended_sheets'])
 
-        isheets_meta = dict()
+        isheets_meta = {}
         for isheet in isheets:
             isheets_meta[isheet.__identifier__] = get_all_taggedvalues(isheet)
 

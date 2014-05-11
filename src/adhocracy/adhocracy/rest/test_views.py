@@ -798,8 +798,8 @@ class MetaApiViewUnitTest(unittest.TestCase):
         from adhocracy.interfaces import ISheet
         from adhocracy.interfaces import IResource
         self.resources_metadata.return_value = \
-            make_resource_metadata(IResource, {'basic_sheets': set([ISheet]),
-                                            'extended_sheets': set([ISheetB])})
+            make_resource_metadata(IResource, {'basic_sheets': {ISheet},
+                                            'extended_sheets': {ISheetB}})
         inst = self.make_one(self.context, self.request)
         resources_metadata = inst.get()['resources']
         wanted_resources_metadata = \
@@ -812,7 +812,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IItemVersion
         self.resources_metadata.return_value = make_resource_metadata(
             IResource,
-            {'element_types': set([IItemVersion, IResource]),
+            {'element_types': {IItemVersion, IResource},
              'item_type': IItemVersion})
         inst = self.make_one(self.context, self.request)
         resources_metadata = inst.get()['resources']

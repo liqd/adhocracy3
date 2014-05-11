@@ -260,7 +260,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         self.config.include('adhocracy.subscriber')
 
         class ISectionVersion(IItemVersion):
-            taggedValue('extended_sheets', set([ISection]))
+            taggedValue('extended_sheets', {ISection})
         self.config.registry.content.add(ISectionVersion.__identifier__,
                                          ISectionVersion.__identifier__,
                                          ResourceFactory(ISectionVersion))
@@ -316,8 +316,8 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IResource
 
         class IResourceType(IResource):
-            taggedValue('extended_sheets', set([ISheetX.__identifier__]))
-            taggedValue('basic_sheets', set([ISheetY.__identifier__]))
+            taggedValue('extended_sheets', {ISheetX.__identifier__})
+            taggedValue('basic_sheets', {ISheetY.__identifier__})
 
         inst = self.make_one(IResourceType)
         resource = inst()
@@ -331,7 +331,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from zope.interface import Interface
 
         class IResourceType(IResource):
-            taggedValue('basic_sheets', set([Interface]))
+            taggedValue('basic_sheets', {Interface})
 
         with pytest.raises(AssertionError):
             self.make_one(IResourceType)
@@ -356,8 +356,8 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IResource
 
         class IResourceType(IResource):
-            taggedValue('extended_sheets', set([ISheetX]))
-            taggedValue('basic_sheets', set([ISheetY]))
+            taggedValue('extended_sheets', {ISheetX})
+            taggedValue('basic_sheets', {ISheetY})
 
         inst = self.make_one(IResourceType)
         resource = inst()
@@ -410,7 +410,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from zope.interface import taggedValue
 
         class IResourceType(IResource):
-            taggedValue('basic_sheets', set([ISheetY]))
+            taggedValue('basic_sheets', {ISheetY})
 
         data = {ISheetY.__identifier__: {"count": 0}}
         _register_dummypropertysheet_adapter(self.config)
@@ -425,7 +425,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from zope.interface import taggedValue
 
         class IResourceType(IResource):
-            taggedValue('basic_sheets', set([ISheetY]))
+            taggedValue('basic_sheets', {ISheetY})
 
         data = {"adhocracy.sheets.name.IName": {"name": "child"}}
         _register_dummypropertysheet_adapter(self.config)
@@ -440,7 +440,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         from zope.interface import taggedValue
 
         class IResourceType(IResource):
-            taggedValue('basic_sheets', set([ISheetY]))
+            taggedValue('basic_sheets', {ISheetY})
 
         data = {"adhocracy.sheets.name.IName": {"name": "invalid"}}
         _register_dummypropertysheet_adapter(self.config)

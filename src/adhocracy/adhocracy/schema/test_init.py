@@ -150,7 +150,7 @@ class PathSetUnitTest(unittest.TestCase):
         inst = self.make_one()
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping(), context=self.context)
-        result = inst.serialize(node, set([self.child]))
+        result = inst.serialize(node, {self.child})
         assert result == ['/child']
 
     def test_serialize_value_not_location_aware(self):
@@ -160,12 +160,12 @@ class PathSetUnitTest(unittest.TestCase):
         del self.child.__name__
         node = add_node_binding(colander.Mapping(), context=self.context)
         with pytest.raises(colander.Invalid):
-            inst.serialize(node, set([self.child]))
+            inst.serialize(node, {self.child})
 
     def test_serialize_value_location_aware_without_parent_and_name(self):
         inst = self.make_one()
         node = add_node_binding(colander.Mapping(), context=self.context)
-        result = inst.serialize(node, set([self.child]))
+        result = inst.serialize(node, {self.child})
         assert result == ['/']
 
     def test_deserialize_value_valid_path(self):
@@ -173,7 +173,7 @@ class PathSetUnitTest(unittest.TestCase):
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping(), context=self.context)
         result = inst.deserialize(node, ['/child'])
-        assert result == set([self.child])
+        assert result == {self.child}
 
     def test_deserialize_value_none_valid_path(self):
         inst = self.make_one()

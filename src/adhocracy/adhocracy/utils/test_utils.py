@@ -10,7 +10,7 @@ def test_diff_dict():
     old = {'foo': 5, 'bar': 6, 'kaz': 8}
     new = {'bar': 6, 'baz': 7, 'kaz': 9, 'faz': 10}
     diff = diff_dict(old, new)
-    assert diff == (set(['baz', 'faz']), set(['kaz']), set(['foo']))
+    assert diff == ({'baz', 'faz'}, {'kaz'}, {'foo'})
 
 
 def test_diff_dict_omit():
@@ -18,7 +18,7 @@ def test_diff_dict_omit():
     old = {'foo': 5, 'bar': 6, 'kaz': 8}
     new = {'bar': 6, 'baz': 7, 'kaz': 9, 'faz': 10}
     diff = diff_dict(old, new, omit=('foo',))
-    assert diff == (set(['baz', 'faz']), set(['kaz']), set())
+    assert diff == ({'baz', 'faz'}, {'kaz'}, set())
 
 
 def test_strip_optional_prefix():
@@ -108,25 +108,25 @@ def test_get_all_taggedvalues_iitem_normalize_dotted_string_to_callable():
     class IA(IItem):
         taggedValue('item_type', Interface.__identifier__)
         taggedValue('content_class', Interface.__identifier__)
-        taggedValue('after_creation', set([Interface.__identifier__]))
-        taggedValue('basic_sheets', set([Interface.__identifier__]))
-        taggedValue('extended_sheets', set([Interface.__identifier__]))
+        taggedValue('after_creation', {Interface.__identifier__})
+        taggedValue('basic_sheets', {Interface.__identifier__})
+        taggedValue('extended_sheets', {Interface.__identifier__})
         taggedValue('element_types',
-                    set([Interface.__identifier__]))
+                    {Interface.__identifier__})
 
     metadata = get_all_taggedvalues(IA)
     assert 'after_creation' in IResource.getTaggedValueTags()
-    assert metadata['after_creation'] == set([Interface])
+    assert metadata['after_creation'] == {Interface}
     assert 'content_class' in IResource.getTaggedValueTags()
     assert metadata['content_class'] == Interface
     assert 'item_type' in IItem.getTaggedValueTags()
     assert metadata['item_type'] == Interface
     assert 'basic_sheets' in IItem.getTaggedValueTags()
-    assert metadata['basic_sheets'] == set([Interface])
+    assert metadata['basic_sheets'] == {Interface}
     assert 'extended_sheets' in IResource.getTaggedValueTags()
-    assert metadata['extended_sheets'] == set([Interface])
+    assert metadata['extended_sheets'] == {Interface}
     assert 'element_types' in IItem.getTaggedValueTags()
-    assert metadata['element_types'] == set([Interface])
+    assert metadata['element_types'] == {Interface}
 
 
 def test_to_dotted_name_module():

@@ -102,7 +102,7 @@ def get_all_taggedvalues(iface):
     """return dict with all own and all inherited taggedvalues."""
     iro = [i for i in iface.__iro__]
     iro.reverse()
-    taggedvalues = dict()
+    taggedvalues = {}
     # accumulate tagged values
     for i in iro:
         for key in i.getTaggedValueTags():

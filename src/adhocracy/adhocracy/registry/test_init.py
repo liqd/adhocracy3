@@ -153,8 +153,7 @@ class TestResourceContentRegistry(unittest.TestCase):
         from adhocracy.utils import get_all_taggedvalues
         inst = self._make_one(self.config.registry)
         _register_content_type(inst, IResource.__identifier__)
-        tagged_values = get_all_taggedvalues(IResource)
-        IResource.setTaggedValue('basic_sheets', set([ISheet]))
+        IResource.setTaggedValue('basic_sheets', {ISheet})
         meta = inst.sheets_metadata()
         assert ISheet.__identifier__ in meta
         assert meta[ISheet.__identifier__] == get_all_taggedvalues(ISheet)
@@ -215,9 +214,8 @@ class TestResourceContentRegistry(unittest.TestCase):
         context = testing.DummyResource(__provides__=IResourceA)
         IResourceA.setTaggedValue('element_types',
                                   [ISimple.__identifier__])
-        ISimple.setTaggedValue('basic_sheets', set([
-                               ISheetA.__identifier__,
-                               ISheet.__identifier__]))
+        ISimple.setTaggedValue('basic_sheets', {ISheetA.__identifier__,
+                                                ISheet.__identifier__})
         _register_content_type(inst, IResourceA.__identifier__)
         _register_content_type(inst, ISimple.__identifier__)
         ISheetA.setTaggedValue('createmandatory', True)

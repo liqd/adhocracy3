@@ -164,23 +164,23 @@ class SetReferencesUnitTest(unittest.TestCase):
         assert wanted_references == list(references)
 
     def test_targets_set(self):
-        targets = set([self.target])
+        targets = {self.target}
         self._make_one(self.source, targets, SheetReferenceType)
         references = self.objectmap.targetids(self.source, SheetReferenceType)
         wanted_references = [self.target.__oid__]
         assert wanted_references == list(references)
 
     def test_targets_set_duplicated_targets(self):
-        targets = set([self.target, self.target])
+        targets = {self.target, self.target}
         self._make_one(self.source, targets, SheetReferenceType)
         references = self.objectmap.targetids(self.source, SheetReferenceType)
         wanted_references = [self.target.__oid__]
         assert wanted_references == list(references)
 
     def test_targets_set_with_some_removed(self):
-        targets = set([self.target, self.target1, self.target2])
+        targets = {self.target, self.target1, self.target2}
         self._make_one(self.source, targets, SheetReferenceType)
-        targets_some_removed = set([self.target])
+        targets_some_removed = {self.target}
         self._make_one(self.source, targets_some_removed, SheetReferenceType)
 
         references = self.objectmap.targetids(self.source, SheetReferenceType)

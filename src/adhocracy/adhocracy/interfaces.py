@@ -135,11 +135,9 @@ class IPool(IResource, IAutoNamingFolder):
     """
 
     taggedValue('content_class', 'adhocracy.folder.ResourcesAutolNamingFolder')
-    taggedValue('basic_sheets',
-                set(['adhocracy.sheets.name.IName',
-                     'adhocracy.sheets.pool.IPool']))
-    taggedValue('element_types',
-                set(['adhocracy.interfaces.IPool']))
+    taggedValue('basic_sheets', {'adhocracy.sheets.name.IName',
+                                 'adhocracy.sheets.pool.IPool'})
+    taggedValue('element_types', {'adhocracy.interfaces.IPool'})
     """ Set addable content types, class heritage is honored"""
 
 
@@ -152,21 +150,17 @@ class IItem(IPool):
     """
 
     taggedValue('content_name', 'Item')
-    taggedValue('basic_sheets', set(
-                ['adhocracy.sheets.name.IName',
-                 'adhocracy.sheets.tags.ITags',
-                 'adhocracy.sheets.versions.IVersions',
-                 'adhocracy.sheets.pool.IPool']))
+    taggedValue('basic_sheets', {'adhocracy.sheets.name.IName',
+                                 'adhocracy.sheets.tags.ITags',
+                                 'adhocracy.sheets.versions.IVersions',
+                                 'adhocracy.sheets.pool.IPool'})
     # FIXME: 'adhocracy.resources.IItemVersion' has moved to interfaces
-    taggedValue('element_types', set([
-                'adhocracy.resources.IItemVersion',
-                'adhocracy.resources.ITag',
-                ]))
+    taggedValue('element_types', {'adhocracy.resources.IItemVersion',
+                                  'adhocracy.resources.ITag'})
     taggedValue(
         'after_creation',
         ['adhocracy.resources.create_initial_content_for_item'])
-    taggedValue('item_type',
-                'adhocracy.resources.IItemVersion')
+    taggedValue('item_type', 'adhocracy.resources.IItemVersion')
     """Type of versions in this item. Subtypes have to override."""
 
 
@@ -175,8 +169,7 @@ class ISimple(IResource):
     """Small object without versions and children."""
 
     taggedValue('content_name', 'Simple')
-    taggedValue('basic_sheets', set(
-                ['adhocracy.sheets.name.IName']))
+    taggedValue('basic_sheets', {'adhocracy.sheets.name.IName'})
 
 
 class ITag(ISimple):
@@ -184,9 +177,8 @@ class ITag(ISimple):
     """Tag to link specific versions."""
 
     taggedValue('content_name', 'Tag')
-    taggedValue('basic_sheets', set(
-                ['adhocracy.sheets.name.IName',
-                 'adhocracy.sheets.tags.ITag']))
+    taggedValue('basic_sheets', {'adhocracy.sheets.name.IName',
+                                 'adhocracy.sheets.tags.ITag'})
 
 
 class IItemVersion(IResource):
@@ -194,11 +186,9 @@ class IItemVersion(IResource):
     """Versionable object, created during a Participation Process (mainly)."""
 
     taggedValue('content_name', 'ItemVersion')
-    taggedValue('basic_sheets', set(
-                ['adhocracy.sheets.versions.IVersionable']))
-    taggedValue(
-        'after_creation',
-        ['adhocracy.resources.notify_new_itemversion_created'])
+    taggedValue('basic_sheets', {'adhocracy.sheets.versions.IVersionable'})
+    taggedValue('after_creation',
+                ['adhocracy.resources.notify_new_itemversion_created'])
 
 
 class SheetReferenceClass(ReferenceClass):
