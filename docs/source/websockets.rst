@@ -66,9 +66,22 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "child": "CHILD_RESOURCE_PATH" }
 
-  * NO notification is sent if one of the children of the resource is changed.
-    FIXME Maybe we need a *recursive* mode that sends notifications in this
-    case as well?  If so, do we need this now (definitely) or later (maybe)?
+  * If a child (sub-Pool or Item) is removed from the Pool::
+
+        { "event": "removed_child",
+          "resource": "RESOURCE_PATH",
+          "child": "CHILD_RESOURCE_PATH" }
+
+  * If a child (sub-Pool or Item) in the Pool is modified::
+
+        { "event": "modified_child",
+          "resource": "RESOURCE_PATH",
+          "child": "CHILD_RESOURCE_PATH" }
+
+  (rationale: remove and modify messages are interesting: a pool is
+  probably rendered as a table of contents, and if the title of an
+  object changes, or if an object is removed, the table of contents
+  must be re-rendered.)
 
 * If resource is an Item (e.g. a Proposal):
 
@@ -88,10 +101,11 @@ that has been subscribed.
 
   * NO notification is sent if one of the sub-Items is changed, e.g. if a new
     sub-Section or SectionVersion is added to a Section within this Item.
-    FIXME Maybe we need a *recursive* mode that sends notifications in this
-    case as well? If so, do we need this now (definitely) or later (maybe)?
+    (Usually, the top-level Item (e.g. a Proposal) will be changed every time
+    a sub-Item is changed.  If the frontend wants to keep track of isolated
+    changes in a sub-Item, it needs to subscribe to it explicitly.)
 
-* If resource is an ItemVersion:
+* If resource is an ItemVersion:  FIXME: not sure if this is needed.
 
   * If a direct successor version is created (whose "follows" link points to
     this version)::
@@ -104,19 +118,16 @@ that has been subscribed.
     a successor).
 
 
-FIXME How should we handle the case if the WS connection got accidentally
-closed (e.g. due to timeout, temporary loss of Internet connection)? Most
-simple case would be treat this just like a regular close and just remove the
-lost client from the list of subscribers. (Meaning that afterwards it'll have
-to issue new subscribe requests for all resources it's interested about, and it
-won't know what happened in the meantime.) Or you we need a queuing mechanism
-and later (after reconnect) sent all the missed events to the client? If so,
-how does the client identify itself so it will be recognized as the same? Also,
-what to do if the client didn't show up again after 15 min/1 hour/24 hours?
-
-
 Error Messages Sent by the Server
 ---------------------------------
+
+FIXME: should the server also respond with an "OK" to each subscribe /
+unsubscribe?  then the server could complain about duplicates without
+having to interrupt anything (the client will still be free to ignore
+the message).
+
+FIXME: if we don't allow subscription to ItemVersions, should there be
+a "not-ok" message?
 
 If the server doesn't understand a request sent by the server, is responds with
 an error message::
@@ -136,6 +147,28 @@ ERROR_CODE will be one of the following:
   the expected information (for example, if it's a JSON array instead of a JSON
   object or if "action" or "resource" keys are missing or their values aren't
   strings). DETAILS contains a short description of the problem.
+
+
+Re-Connects
+-----------
+
+There is no way to recover the state of a broken connection.  The
+backend handles every disconnect by discarding all subscriptions.
+
+Therefore, if the WS connection ends for any reason, the frontend must
+re-connect, flush its cache, and reload and re-subscribe to every
+resource that are still relevant.
+
+(FUTURE WORK: If WS connections prove to be unstable enough to make
+the above aproach cause too much overhead, the backend may maintain
+the session for a configurable amount of time.  If the frontend
+re-connects in that time window and presents a session key, it will
+receive a list of change notifications that it missed during the
+broken connection, and it won't have to flush its cache.  The session
+key could either be negotiated over the WS, or there may be some token
+provided by substance_d / angular / somebody that can be used for
+this.)
+
 
 Implicit Notifications
 ----------------------
