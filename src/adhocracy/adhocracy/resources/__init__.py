@@ -123,7 +123,7 @@ def notify_new_itemversion_created(context, registry, options):
         _update_last_tag(context, registry, old_versions)
 
 
-class ResourceFactory(object):
+class ResourceFactory:
 
     """Basic resource factory."""
 

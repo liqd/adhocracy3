@@ -21,7 +21,7 @@ class IDummySheetNoAutoUpdate(ISheet):
     pass
 
 
-class DummyPropertySheetAdapter(object):
+class DummyPropertySheetAdapter:
 
     readonly = False
 

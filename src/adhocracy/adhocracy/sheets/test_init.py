@@ -261,7 +261,7 @@ class ResourcePropertySheetAdapterIntegrationTest(unittest.TestCase):
         class ISheetValid(ISheet):
             pass
 
-        class OverrideAdapter(object):
+        class OverrideAdapter:
             def __init__(*args):
                 pass
 

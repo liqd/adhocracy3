@@ -179,7 +179,7 @@ def validate_request_data_decorator():
     return _dec
 
 
-class RESTView(object):
+class RESTView:
 
     """Class stub with request data validation support.
 

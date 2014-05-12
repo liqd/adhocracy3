@@ -45,7 +45,7 @@ class DummyFolder(testing.DummyResource):
 class CorniceDummyRequest(testing.DummyRequest):
 
     def __init__(self, registry=None):
-        class Dummy(object):
+        class Dummy:
             pass
         self.headers = {}
         self.body = ''
@@ -66,7 +66,7 @@ def make_mock_resource_registry(mock_registry=None):
     return mock_registry.return_value
 
 
-class DummyPropertysheet(object):
+class DummyPropertysheet:
 
     iface = None
     readonly = False

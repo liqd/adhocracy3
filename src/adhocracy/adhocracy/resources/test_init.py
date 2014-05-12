@@ -34,7 +34,7 @@ class ISheetX(ISheet):
     pass
 
 
-class DummyPropertySheetAdapter(object):
+class DummyPropertySheetAdapter:
 
     readonly = False
 

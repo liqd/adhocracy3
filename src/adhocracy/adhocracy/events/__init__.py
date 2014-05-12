@@ -12,7 +12,7 @@ from adhocracy.interfaces import ISheet
 
 
 @implementer(IItemVersionNewVersionAdded)
-class ItemVersionNewVersionAdded(object):
+class ItemVersionNewVersionAdded:
 
     """ An event sent when a new IItemVersion is being added.
 
@@ -30,7 +30,7 @@ class ItemVersionNewVersionAdded(object):
 
 
 @implementer(ISheetReferencedItemHasNewVersion)
-class SheetReferencedItemHasNewVersion(object):
+class SheetReferencedItemHasNewVersion:
 
     """ An event type sent when a referenced ItemVersion has a new follower.
 
@@ -61,7 +61,7 @@ class SheetReferencedItemHasNewVersion(object):
         self.root_versions = root_versions
 
 
-class _ISheetPredicate(object):
+class _ISheetPredicate:
 
     """Allow to register event subscriber with the 'isheet' predicate."""
 
