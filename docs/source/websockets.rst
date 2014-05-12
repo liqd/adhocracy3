@@ -78,10 +78,9 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "child": "CHILD_RESOURCE_PATH" }
 
-  (rationale: remove and modify messages are interesting: a pool is
-  probably rendered as a table of contents, and if the title of an
-  object changes, or if an object is removed, the table of contents
-  must be re-rendered.)
+    (Rationale for modify: a pool is probably rendered as a table of
+    contents, and if the title of an object changes, the table of contents
+    must be re-rendered.)
 
 * If resource is an Item (e.g. a Proposal):
 
@@ -91,7 +90,7 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "child": "CHILD_RESOURCE_PATH" }
 
-    (Same as with Pool:.)
+    (Same as with Pool.)
 
   * If a new ItemVersion is added to the Item::
 
@@ -99,13 +98,19 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "version": "VERSION_RESOURCE_PATH" }
 
-  * NO notification is sent if one of the sub-Items is changed, e.g. if a new
-    sub-Section or SectionVersion is added to a Section within this Item.
-    (Usually, the top-level Item (e.g. a Proposal) will be changed every time
-    a sub-Item is changed.  If the frontend wants to keep track of isolated
-    changes in a sub-Item, it needs to subscribe to it explicitly.)
+  * NO explicit notifications are sent if one of the sub-Items is changed,
+    e.g. if a new sub-Section or SectionVersion is added to a Section
+    within this Item. However, this should hardly matter since the
+    top-level Item (e.g. a Proposal) will usually be changed every time a
+    sub-Item is changed (changes result in a new version which is added to
+    the top-level Item). Only if the frontend wants to keep track of
+    isolated changes in a sub-Item, it needs to subscribe to it explicitly.
 
-* If resource is an ItemVersion:  FIXME: not sure if this is needed.
+* If resource is an ItemVersion: subscriptions to ItemVersions are
+  currently unsupported. This may change in the future if we see the need
+  for it.
+
+  (POSSIBLE FUTURE WORK:
 
   * If a direct successor version is created (whose "follows" link points to
     this version)::
@@ -114,9 +119,10 @@ that has been subscribed.
           "resource": "RESOURCE_PATH",
           "successor": "SUCCESSOR_RESOURCE_PATH" }
 
-  * NO notification is sent if an indirect successor is created (a successor of
-    a successor).
+  * NO notification is sent if an indirect successor is created (a
+    successor of a successor).
 
+  )
 
 Error Messages Sent by the Server
 ---------------------------------
@@ -125,9 +131,6 @@ FIXME: should the server also respond with an "OK" to each subscribe /
 unsubscribe?  then the server could complain about duplicates without
 having to interrupt anything (the client will still be free to ignore
 the message).
-
-FIXME: if we don't allow subscription to ItemVersions, should there be
-a "not-ok" message?
 
 If the server doesn't understand a request sent by the server, is responds with
 an error message::
@@ -147,47 +150,25 @@ ERROR_CODE will be one of the following:
   the expected information (for example, if it's a JSON array instead of a JSON
   object or if "action" or "resource" keys are missing or their values aren't
   strings). DETAILS contains a short description of the problem.
+* "subscribe_not_supported" if the client tried to subscribe to an ItemVersion.
+  DETAILS contains the path of resource that doesn't allow subscriptions.
 
 
 Re-Connects
 -----------
 
-There is no way to recover the state of a broken connection.  The
-backend handles every disconnect by discarding all subscriptions.
+There is no way to recover the state of a broken connection.  The backend
+handles every disconnect by discarding all subscriptions.
 
 Therefore, if the WS connection ends for any reason, the frontend must
-re-connect, flush its cache, and reload and re-subscribe to every
-resource that are still relevant.
+re-connect, flush its cache, and reload and re-subscribe to every resource that
+is still relevant.
 
-(FUTURE WORK: If WS connections prove to be unstable enough to make
-the above aproach cause too much overhead, the backend may maintain
-the session for a configurable amount of time.  If the frontend
-re-connects in that time window and presents a session key, it will
-receive a list of change notifications that it missed during the
-broken connection, and it won't have to flush its cache.  The session
-key could either be negotiated over the WS, or there may be some token
-provided by substance_d / angular / somebody that can be used for
-this.)
-
-
-Implicit Notifications
-----------------------
-
-FIXME See the FIXME's above and decide how to handle such additional/indirect
-changes. Consider the YAGNI principle: we don't want to implement anything
-unless we're sure we'll need it.
-
-there will probably be requirements about subscribing to constellations of
-objects (e.g. a proposal and all its paragraphs). for the first
-implementation, the client should do all of these by hand.
-
-that means that if i subscribe to a proposal, i will be notified if a new
-paragraph is added, but not if an old paragraph is changed.
-
-actually, this may not be what we want.  an alternative would be to always
-implicitly notify the client about changes of all sub-items (for documents:
-sections, sub-...-sections, paragraphs).
-
-i think which is better depends on how large the sub-item-structures will
-get.  the client can be implemented either way, and it would cost little to
-change from one implementation to the other later.
+(POSSIBLE FUTURE WORK: If WS connections prove to be unstable enough to make
+the above aproach cause too much overhead, the backend may maintain the session
+for a configurable amount of time.  If the frontend re-connects in that time
+window and presents a session key, it will receive a list of change
+notifications that it missed during the broken connection, and it won't have to
+flush its cache.  The session key could either be negotiated over the WS, or
+there may be some token provided by substance_d / angular / somebody that can
+be used for this.)
