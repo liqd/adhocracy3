@@ -1,4 +1,18 @@
 """Rest API views."""
+from copy import deepcopy
+import functools
+
+from colander import SchemaNode
+from cornice.util import json_error
+from cornice.schemas import validate_colander_schema
+from cornice.schemas import CorniceSchema
+from pyramid.path import DottedNameResolver
+from pyramid.view import view_config
+from pyramid.view import view_defaults
+from pyramid.traversal import resource_path
+from pyramid.traversal import find_resource
+from substanced.interfaces import IRoot
+
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
@@ -17,19 +31,6 @@ from adhocracy.schema import AbstractReferenceIterableSchemaNode
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
-from colander import SchemaNode
-from copy import deepcopy
-from cornice.util import json_error
-from cornice.schemas import validate_colander_schema
-from cornice.schemas import CorniceSchema
-from pyramid.path import DottedNameResolver
-from pyramid.view import view_config
-from pyramid.view import view_defaults
-from pyramid.traversal import resource_path
-from pyramid.traversal import find_resource
-from substanced.interfaces import IRoot
-
-import functools
 
 
 def validate_sheet_cstructs(context, request, sheets):

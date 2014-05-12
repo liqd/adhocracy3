@@ -4,10 +4,11 @@ In addition we have the normal substanced events:
 https://substanced.readthedocs.org/en/latest/api.html#module-substanced.event
 
 """
+from zope.interface import implementer
+
 from adhocracy.interfaces import IItemVersionNewVersionAdded
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.interfaces import ISheet
-from zope.interface import implementer
 
 
 @implementer(IItemVersionNewVersionAdded)

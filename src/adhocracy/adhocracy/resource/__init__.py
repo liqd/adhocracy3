@@ -1,8 +1,9 @@
 """Basic class for resources."""
 from persistent import Persistent
+from zope.interface import implementer
+
 from adhocracy.interfaces import IResource
 from adhocracy.utils import get_resource_interface
-from zope.interface import implementer
 
 
 @implementer(IResource)

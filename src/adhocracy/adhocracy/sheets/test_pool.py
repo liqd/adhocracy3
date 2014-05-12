@@ -1,6 +1,8 @@
+import unittest
+
 from pyramid import testing
 import pytest
-import unittest
+
 
 
 ############

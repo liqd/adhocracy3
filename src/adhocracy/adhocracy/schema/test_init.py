@@ -1,9 +1,8 @@
-from unittest.mock import patch
-from pyramid import testing
+import unittest
 
+from pyramid import testing
 import colander
 import pytest
-import unittest
 
 
 ############

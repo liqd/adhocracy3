@@ -1,5 +1,7 @@
 """adhocracy.event event subcriber to handle auto updates of resources."""
 
+from pyramid.threadlocal import get_current_registry
+
 from adhocracy.graph import is_in_subtree
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
@@ -8,7 +10,6 @@ from adhocracy.sheets.versions import IVersionable
 from adhocracy.utils import get_sheet
 from adhocracy.utils import get_all_sheets
 from adhocracy.utils import get_resource_interface
-from pyramid.threadlocal import get_current_registry
 
 
 def _get_not_readonly_appstructs(resource):

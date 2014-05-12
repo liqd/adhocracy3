@@ -1,7 +1,7 @@
-from pyramid import testing
-
-import colander
 import unittest
+
+from pyramid import testing
+import colander
 
 
 class HandleError400ColanderInvalidUnitTest(unittest.TestCase):

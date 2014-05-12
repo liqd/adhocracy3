@@ -1,7 +1,7 @@
+import unittest
+
 from pyramid import testing
 from zope.interface.verify import verifyObject
-
-import unittest
 
 
 class ItemNewVersionAddedUnitTest(unittest.TestCase):

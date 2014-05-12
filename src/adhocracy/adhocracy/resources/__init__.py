@@ -1,4 +1,13 @@
 """Resource type configuration and default factory."""
+import datetime
+
+from pyramid.traversal import find_interface
+from pyramid.traversal import find_resource
+from pyramid.path import DottedNameResolver
+from pyramid.threadlocal import get_current_registry
+from zope.interface import directlyProvides
+from zope.interface import alsoProvides
+
 from adhocracy.events import ItemVersionNewVersionAdded
 from adhocracy.events import SheetReferencedItemHasNewVersion
 from adhocracy.graph import get_back_references
@@ -12,14 +21,6 @@ from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_sheet
 from adhocracy.sheets import tags
-from pyramid.traversal import find_interface
-from pyramid.traversal import find_resource
-from pyramid.path import DottedNameResolver
-from pyramid.threadlocal import get_current_registry
-from zope.interface import directlyProvides
-from zope.interface import alsoProvides
-
-import datetime
 
 
 def create_initial_content_for_item(context, registry, options):

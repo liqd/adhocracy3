@@ -1,5 +1,3 @@
-from pyramid import testing
-
 import unittest
 
 

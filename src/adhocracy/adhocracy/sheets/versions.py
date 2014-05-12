@@ -1,4 +1,10 @@
 """Sheets to work with versionable resources."""
+from zope.interface import implementer
+from zope.interface import provider
+from zope.interface import taggedValue
+from zope.interface.interfaces import IInterface
+import colander
+
 from adhocracy.graph import get_followed_by
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
@@ -8,12 +14,6 @@ from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceListSetSchemaNode
-from zope.interface import implementer
-from zope.interface import provider
-from zope.interface import taggedValue
-from zope.interface.interfaces import IInterface
-
-import colander
 
 
 class IIVersionable(IInterface):

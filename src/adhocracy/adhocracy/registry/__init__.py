@@ -1,11 +1,12 @@
 """Content registry."""
+from pyramid.security import has_permission
+from pyramid.path import DottedNameResolver
+from substanced.content import ContentRegistry
+
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_all_sheets
 from adhocracy.interfaces import IResource
-from pyramid.security import has_permission
-from pyramid.path import DottedNameResolver
-from substanced.content import ContentRegistry
 
 
 class ResourceContentRegistry(ContentRegistry):

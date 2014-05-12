@@ -1,7 +1,8 @@
 """Pool resource type."""
+from substanced.content import add_content_type
+
 from adhocracy.interfaces import IPool
 from adhocracy.resources import ResourceFactory
-from substanced.content import add_content_type
 
 
 class IBasicPool(IPool):
