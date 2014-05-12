@@ -6,6 +6,10 @@ from zope.interface import taggedValue
 import pytest
 
 from adhocracy.interfaces import IResource
+from adhocracy.interfaces import SheetToSheet
+
+
+from adhocracy.interfaces import IResource
 from adhocracy.interfaces import SheetReferenceType
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import NewVersionToOldVersion
