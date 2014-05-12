@@ -39,7 +39,6 @@ Docstring formatting
 Imports
 +++++++
 
-* sort alphabetical, empty line between ``import ..`` and ``import .. from`` statements.
 * one import per line
 * don't use * to import everything from a module
 * don't use relative import paths
