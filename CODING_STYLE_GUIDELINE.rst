@@ -33,8 +33,18 @@ Docstring formatting
 ++++++++++++++++++++
 
 * pep257 (must, bei tests und zope.Interface classes should)
-* Public function/method docstring in `google style <http://sphinxcontrib-napoleon.readthedocs.org/en/latest/example_google.html>`_ (Args: Returns: Raises:). (must)
-* In Future maybe use python 3 annotations for type checking and sphinx docu generation (for example: mypy interperter or https://pypi.python.org/pypi/sphinx_typesafe/0.2)
+* python 3 type annotation (must) according to https://pypi.python.org/pypi/sphinx_annotations_autodoc and https://pypi.python.org/pypi/sphinx_typesafe
+* javadoc for parameter descriptions (should)
+* example::
+   
+    def methodx(self, a: dict, flag=False) -> str:
+        """Do something.
+
+        :param a: description for a
+        :param flag: description for flag
+       
+        """
+
 
 Imports
 +++++++
