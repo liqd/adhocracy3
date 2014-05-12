@@ -268,6 +268,8 @@ class ResourceRESTView(RESTView):
         struct['path'] = resource_path(self.context)
         iresource = get_resource_interface(self.context)
         struct['content_type'] = iresource.__identifier__
+        #  FIXME: The ItemRESTView should be responsible for the following code
+        #  or we move it to the versions sheet.
         if IItem.providedBy(self.context):
             response_schema = GETItemResponseSchema()
             for v in self.context.values():
