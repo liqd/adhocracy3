@@ -1,4 +1,7 @@
 """Sheets to work with versionable resources."""
+from zope.interface import provider
+from zope.interface import taggedValue
+
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IIResourcePropertySheet
@@ -8,8 +11,6 @@ from adhocracy.sheets.versions import IVersionable
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceListSchemaNode
-from zope.interface import provider
-from zope.interface import taggedValue
 
 
 @provider(IIResourcePropertySheet)

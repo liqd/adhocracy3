@@ -1,4 +1,8 @@
 """Sheets to store a document."""
+from zope.interface import provider
+from zope.interface import taggedValue
+import colander
+
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import IIResourcePropertySheet
@@ -6,10 +10,6 @@ from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.schema import ReferenceListSchemaNode
-from zope.interface import provider
-from zope.interface import taggedValue
-
-import colander
 
 
 @provider(IIResourcePropertySheet)

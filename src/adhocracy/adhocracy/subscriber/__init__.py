@@ -1,5 +1,7 @@
 """adhocracy.event event subcriber to handle auto updates of resources."""
 
+from copy import deepcopy
+
 from adhocracy.graph import is_in_subtree
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
@@ -9,7 +11,6 @@ from adhocracy.utils import get_sheet
 from adhocracy.utils import get_all_sheets
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_all_taggedvalues
-from copy import deepcopy
 
 
 def _get_not_readonly_appstructs(resource):

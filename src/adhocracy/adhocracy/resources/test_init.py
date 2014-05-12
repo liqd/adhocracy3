@@ -1,8 +1,10 @@
-from adhocracy.interfaces import ISheet
-from pyramid import testing
-
-import pytest
 import unittest
+
+from pyramid import testing
+import pytest
+
+from adhocracy.interfaces import ISheet
+
 
 
 #############

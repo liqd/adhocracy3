@@ -1,8 +1,4 @@
-from adhocracy.interfaces import SheetToSheet
-from mock import patch
-
 import pytest
-import unittest
 
 ################
 #  test utils  #

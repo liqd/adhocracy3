@@ -1,6 +1,6 @@
-from pyramid import testing
-
 import unittest
+
+from pyramid import testing
 
 
 class ResourcesAutolNamingFolderUnitTest(unittest.TestCase):

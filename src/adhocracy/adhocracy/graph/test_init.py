@@ -1,11 +1,13 @@
-from adhocracy.interfaces import IResource
-from adhocracy.interfaces import SheetToSheet
+import unittest
+
 from mock import patch
 from pyramid import testing
 from zope.interface import taggedValue
-
-import unittest
 import pytest
+
+from adhocracy.interfaces import IResource
+from adhocracy.interfaces import SheetToSheet
+
 
 ############
 #  helper  #

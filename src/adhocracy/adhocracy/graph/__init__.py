@@ -1,11 +1,12 @@
 """Utilities for working with the version/reference graph (DAG)."""
 
+from substanced.util import find_objectmap
+from substanced.objectmap import ObjectMap
+
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import SheetReferenceType
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.utils import get_all_taggedvalues
-from substanced.util import find_objectmap
-from substanced.objectmap import ObjectMap
 
 
 def _get_reftypes(objectmap, base_reftype=None, source_isheet=None):

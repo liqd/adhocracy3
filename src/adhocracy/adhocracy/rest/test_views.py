@@ -1,15 +1,17 @@
 """Test rest.views module."""
-from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IResource
+import unittest
+
 from cornice.util import extract_json_data
 from cornice.errors import Errors
 from mock import patch
 from pyramid import testing
 from zope.interface import taggedValue
-
 import colander
 import pytest
-import unittest
+
+from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IResource
+
 
 
 ############

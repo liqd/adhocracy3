@@ -1,4 +1,11 @@
 """Sheets to work with versionable resources."""
+from substanced.util import get_oid
+from zope.interface import implementer
+from zope.interface import provider
+from zope.interface import taggedValue
+from zope.interface.interfaces import IInterface
+import colander
+
 from adhocracy.graph import get_back_references_for_isheet
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
@@ -9,13 +16,6 @@ from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
 from adhocracy.schema import ReferenceListSchemaNode
 from adhocracy.schema import ReferenceSetSchemaNode
-from substanced.util import get_oid
-from zope.interface import implementer
-from zope.interface import provider
-from zope.interface import taggedValue
-from zope.interface.interfaces import IInterface
-
-import colander
 
 
 class IIVersionable(IInterface):

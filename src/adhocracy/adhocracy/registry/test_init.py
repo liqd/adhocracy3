@@ -1,10 +1,12 @@
+import unittest
+
+from pyramid import testing
+import pytest
+
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IPool
-from pyramid import testing
 
-import unittest
-import pytest
 
 
 ############

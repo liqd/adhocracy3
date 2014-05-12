@@ -1,10 +1,12 @@
+from unittest.mock import patch
+import unittest
+
+from pyramid import testing
+
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.utils import get_all_taggedvalues
-from pyramid import testing
-from unittest.mock import patch
 
-import unittest
 
 
 #############

@@ -1,12 +1,12 @@
 """Colander schema extensions."""
-from adhocracy.interfaces import SheetReferenceType
 from pyramid.path import DottedNameResolver
 from substanced import schema
 from substanced.objectmap import reference_sourceid_property
 from substanced.schema import IdSet
 from substanced.util import find_objectmap
-
 import colander
+
+from adhocracy.interfaces import SheetReferenceType
 
 
 class Identifier(colander.SchemaNode):
