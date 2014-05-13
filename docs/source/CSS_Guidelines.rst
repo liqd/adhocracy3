@@ -435,13 +435,12 @@ There are two ways to implement mixins in Sass: ``@mixin`` and
 ``@extend``. There are basically three differences:
 
 -  a ``@mixin``, once defined, can be used everywhere. ``@extend``\ s
-   are more picky about where they can be used.
+   are are compiled into selector groups, which may not be possible
+   depending on what you are trying to do.
 -  ``@mixin`` allows parameters and content blocks.
--  ``@extend`` produces more efficient CSS.
+-  ``@extend`` may produce more efficient (less redundant) CSS.
 
-There is no clear rule about which one should be preferred. As
-``@mixin`` is simpler to use you might by tempted to use it exlusively.
-Always stop and also consider ``@extend``.
+There is no rule about which one should be preferred.
 
 Theming
 ~~~~~~~
