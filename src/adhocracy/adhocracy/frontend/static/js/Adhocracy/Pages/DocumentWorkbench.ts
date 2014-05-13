@@ -181,7 +181,9 @@ export function run<Data>() {
                 };
 
                 $scope.reset = function() {
-                    adhHttp.get($scope.doc.content.path).then((obj) => { $scope.doc.content = obj; });
+                    adhHttp.get($scope.doc.content.path).then( (obj) => {
+                        $scope.doc.content = obj;
+                    });
                     $scope.doc.viewmode = "display";
                 };
 
@@ -216,7 +218,6 @@ export function run<Data>() {
                 $scope.proposalVersion = (new Resources.Resource("adhocracy.resources.proposal.IProposalVersion"))
                                               .addIDocument("", "", []);
 
-
                 $scope.paragraphVersions = [];
 
                 $scope.pushParagraphVersion = function () {
@@ -224,14 +225,12 @@ export function run<Data>() {
                                                       .addIParagraph(""));
                 };
 
-
                 $scope.commit = function() {
-                    var proposalPromise = Resources.postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions);
-                    proposalPromise.then( (resp) =>
-                        $http.get(resp.data.path).then( (respGet =>
-                            $scope.onNewProposal(respGet.data))
-                        )
-                    );
+                    Resources.postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions).then( (resp) => {
+                        $http.get(resp.data.path).then( (respGet) => {
+                            $scope.onNewProposal(respGet.data);
+                        });
+                    });
                 }
             }
         };
