@@ -159,7 +159,7 @@ be a widget.
 States
 ++++++
 
-Widgets or base objects may have a *state* (e.g., *hover*,
+Widgets or base objects may have one or more *states* (e.g., *hover*,
 *active*, or *hidden*). States may either be applicable to any object
 (*hidden*) or only to specific objects (*hover*, *active*).
 
