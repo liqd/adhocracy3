@@ -216,7 +216,7 @@ export function run<Data>() {
             templateUrl: templatePath + "/Resources/IProposalVersion/New.html",
             scope: {
                 onNewProposal: "="
-            },  //isolates this scope, i.e. this $scope does not ihnerit from any parent $scope
+            },
             controller: function($scope) {
                 $scope.proposalVersion = (new Resources.Resource("adhocracy.resources.proposal.IProposalVersion"))
                                               .addIDocument("", "", []);
