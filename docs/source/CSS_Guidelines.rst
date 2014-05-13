@@ -11,13 +11,9 @@ applied in any project which needs CSS code.
 -  If you are a CSS developer you should read the whole document.
 -  Anyone concerned with the frontend should read the parts about goals
    and the common language.
--  Graphic designers should also read the part about the CSS and between
-   graphic design.
--  JavaScript programmers should also read the part about CSS, HTML and
-   JavaScript.
-
-Please note that any rules laid down in this document are only proposals
-and always open for discussion.
+-  Graphic designers should also read Section 'CSS and Graphic Design'.
+-  JavaScript programmers should also read Section 'CSS, HTML and
+   JavaScript'.
 
 Goals
 -----
@@ -32,9 +28,13 @@ and rules described in this document:
 
 2. We want our code to run smoothly with very few bugs and little
    maintenance work. It should be easy to add new parts or replace
-   existing ones. It should also be easy to derive a customized theme.
+   existing ones.
 
-3. We want to deliver a great product with a flawless and accessible
+3. It should be easy to derive customized themes.  Using derived
+   themes after an upgrade of the out-of-the-box css code should be
+   easy.
+
+4. We want to deliver a great product with a flawless and accessible
    user experience (UX).
 
 Common Terminology
@@ -55,10 +55,10 @@ them easily.
 
 We think of elements in the user interface (UI) as *objects*. A typical
 object might be a link, button or a list. It is important to understand
-the difference between a specific object (e.g. "the safe button at the
+the difference between a specific object (e.g. "the safe button in the
 login view") and its *class* ("button").
 
-We distinguish multiple types of objects. There are also the related
+We distinguish several types of objects. There are also the related
 concepts *state*, *modifier*, *variable*, *mixin* and *adjustment*.
 
 Widget Objects
@@ -153,21 +153,21 @@ Element Objects
 +++++++++++++++
 
 We call objects within widgets *elements* of that widget. An element may
-be a widget itself. If an element appears in multiple widgets it should
+be a widget itself. If an element appears in more than one widget it should
 be a widget.
 
 States
 ++++++
 
-Widgets or base objects may have multiple *states* like *hover*,
-*active* or *hidden*. States may either be applicable to any object
+Widgets or base objects may have a *state* (e.g., *hover*,
+*active*, or *hidden*). States may either be applicable to any object
 (*hidden*) or only to specific objects (*hover*, *active*).
 
 Modifiers
 +++++++++
 
-There may exist modified versions of a widget. For example there might
-be a button and a *call-to-action*-button. In this case, call-to-action
+Widgets can have derived, modified versions. For example, there could
+be a button and a *call-to-action* button. In this case, call-to-action
 would be a modifier. In terms of OOP, a modifier is similar to a
 subclass.
 
