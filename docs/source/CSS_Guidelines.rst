@@ -515,7 +515,7 @@ different types of values starting from preferred.
    -  outside of variable definitions only variables and ``%`` must be
       used
 
--  0 (zero): no unit
+-  0 length: no unit
 -  line-height: no unit, ``em``, ``px``
 -  color: keyword, short hex, long hex, ``rgba``, ``hsla``
 -  generally prefer variables to keywords to numeric values
