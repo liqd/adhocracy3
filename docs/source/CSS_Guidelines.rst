@@ -271,7 +271,7 @@ JavaScript programmers.
    dead code. See the CSS typescript module
    (``/src/adhocracy/adhocracy/frontend/static/js/Adhocracy/Css.ts``)
    for more information.
--  Some CSS testing should be done in brother tests, i.e. CSS and JavaScript
+-  Some CSS testing should be done in browser tests, i.e. CSS and JavaScript
    developers should work together on this.
 
 Selectors
