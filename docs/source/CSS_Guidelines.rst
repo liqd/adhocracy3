@@ -224,8 +224,7 @@ additional themes.
 
    -  must provide values for all variables.
 
-      -  Variables are mandatory for all colors and main font sizes.
-         (FIXME: what are non-main font sizes?)
+      -  Variables are mandatory for all colors and font sizes.
 
    -  must mark up any objects, states, modifiers, variables, mixins, and
       adjustments in the designs.  (The designer produces machine-readable
