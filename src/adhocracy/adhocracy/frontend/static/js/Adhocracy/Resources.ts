@@ -28,7 +28,7 @@ export interface IVersionsSheet {
     elements: string[];
 }
 
-export interface MeineHeine extends Resource, HasIDocumentSheet {}
+export interface PartialIProposalVersion extends Resource, HasIDocumentSheet {}
 
 export class Resource {
     content_type : string;
@@ -108,7 +108,7 @@ export class SectionVersion extends Resource {
     }
 }
 
-export function addParagraph(proposalVersion: MeineHeine, paragraphPath: string) {
+export function addParagraph(proposalVersion: PartialIProposalVersion, paragraphPath: string) {
     return proposalVersion.data["adhocracy.sheets.document.IDocument"].elements.push(paragraphPath);
 };
 
@@ -130,7 +130,7 @@ export function getNewestVersion($http, path: string) : ng.IPromise<any> {
 
 export function postProposal($http
                             ,$q: ng.IQService
-                            ,proposalVersion: MeineHeine
+                            ,proposalVersion: PartialIProposalVersion
                             ,paragraphVersions) {
     var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 
@@ -177,4 +177,3 @@ export function followNewestVersion($http, resourceVersion) {
         return resourceVersion;
     });
 };
-
