@@ -172,7 +172,8 @@ would be a modifier. In terms of OOP, a modifier is similar to a
 subclass.
 
 This concept is very similar to that of states because both modify an
-object.
+object.  The rule of thumb to distinguish the two is that whereas the
+state of a widget usually changes over time, its modifiers don't.
 
 Variables
 +++++++++
