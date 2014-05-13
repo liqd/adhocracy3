@@ -519,17 +519,17 @@ different types of values starting from preferred.
 Accessibility
 +++++++++++++
 
--  be careful about hiding things (``hidden`` vs. ``visually-hidden``)
-   (see http://a11yproject.com/posts/how-to-hide-content/)
--  use `fluid and responsive
+-  Be careful about hiding things (``hidden`` vs. ``visually-hidden``)
+   (see http://a11yproject.com/posts/how-to-hide-content/).
+-  Use `fluid and responsive
    design <http://alistapart.com/article/responsive-web-design>`_
-   (relative units like ``%`` and ``em``)
--  prefer to define foreground and background colors in the same spot.
+   (relative units like ``%`` and ``em``).
+-  Prefer to define foreground and background colors in the same spot.
    Use
-   ```color-contrast`` <http://beta.compass-style.org/reference/compass/utilities/color/contrast/>`_
+   `color-contrast <http://beta.compass-style.org/reference/compass/utilities/color/contrast/>`_
    by compass.
--  while no support for IE < 9 is planned, do not introduce
-   incapabilities where not needed (robust)
+-  While no support for IE < 9 is planned, do not introduce
+   incapabilities where not needed (robust).
 
 Icons
 +++++
