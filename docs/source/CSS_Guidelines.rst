@@ -261,8 +261,11 @@ additional themes.
 
 -  CSS developers …
 
-   -  must provide a breakdown of all existing objects, states, … (style
-      guide).
+   -  must review and fine-tune technical aspects of the design output
+      (if technical decisions made by design have undesired technical
+      consequences, those need to be discussed and remedied).
+   -  must provide a breakdown of all existing objects, states, … (consult
+      style guide on how to go about this).
    -  must report implementation issues as soon as possible.
    -  must implement requested features as requested.
 
