@@ -149,17 +149,13 @@ export function run<Data>() {
                         }
                     }
 
-                    function init() {
-                        var dagRefs : string[] = pool.data["adhocracy.sheets.pool.IPool"].elements;
-                        for (var dagRefIx in dagRefs) {
-                            (function(dagRefIx : number) {
-                                var dagRefPath : string = dagRefs[dagRefIx];
-                                adhHttp.get(dagRefPath).then((dag) => fetchDocumentHead(dagRefIx, dag));
-                            })(dagRefIx);
-                        }
+                    var dagRefs : string[] = pool.data["adhocracy.sheets.pool.IPool"].elements;
+                    for (var dagRefIx in dagRefs) {
+                        (function(dagRefIx : number) {
+                            var dagRefPath : string = dagRefs[dagRefIx];
+                            adhHttp.get(dagRefPath).then((dag) => fetchDocumentHead(dagRefIx, dag));
+                        })(dagRefIx);
                     }
-
-                    init();
                 });
             }],
         };
