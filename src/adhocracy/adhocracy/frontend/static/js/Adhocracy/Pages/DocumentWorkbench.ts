@@ -123,8 +123,6 @@ export function run<Data>() {
                     $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
                 };
 
-                console.log("TOC: " + $scope.$id);
-
                 adhHttp.get(AdhHttp.jsonPrefix).then((pool) => {
                     $scope.pool = pool;
                     $scope.poolEntries = [];
@@ -188,8 +186,6 @@ export function run<Data>() {
                 };
 
                 $scope.commit = function() {
-                    console.log("doc-commit: ", $scope.doc, $scope.doc.content.path);
-
                     adhHttp.postNewVersion($scope.doc.content.path, $scope.doc.content);
 
                     $scope.$broadcast("commit");
@@ -251,12 +247,10 @@ export function run<Data>() {
                                   $scope   : IParagraphDetailScope<Resources.HasIDocumentSheet>) : void
             {
                 function update(content : Types.Content<any>) {
-                    console.log("par-update: " + $scope.parref.path);
                     $scope.parcontent = content;
                 }
 
                 function commit(event, ...args) {
-                    console.log("par-commit: " + $scope.parref.path);
                     adhHttp.postNewVersion($scope.parcontent.path, $scope.parcontent);
                 }
 
