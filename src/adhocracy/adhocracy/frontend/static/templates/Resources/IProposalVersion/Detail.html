@@ -2,14 +2,14 @@
     <div ng-switch="doc.viewmode">
         <div ng-switch-when="list">
             <a href ng-click="display()" class="document_title">
-                {{doc.content | viewFilterList}}
+                {{doc.content | documentTitle}}
             </a>
         </div>
         <div ng-switch-when="display">
             <button type="button" class="edit_button" ng-click="edit()">edit</button>
             <button type="button" class="close_button" ng-click="list()">close</button>
             <br>
-            <p class="document_title">{{ doc.content.data['adhocracy.sheets.document.IDocument'].title }}</p>
+            <p class="document_title">{{ doc.content | documentTitle }}</p>
             <small><p>{{ doc.content.data['adhocracy.sheets.document.IDocument'].description }}</p></small>
         </div>
         <div ng-switch-when="edit">

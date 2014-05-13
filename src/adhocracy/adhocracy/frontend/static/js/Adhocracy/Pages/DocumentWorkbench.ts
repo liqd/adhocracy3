@@ -102,9 +102,9 @@ export function run<Data>() {
 
     // filters
 
-    app.filter("viewFilterList", [ function() {
-        return function(obj : Types.Content<Data>) : string {
-            return obj.data["adhocracy.sheets.document.IDocument"].title;
+    app.filter("documentTitle", [ function() {
+        return function(resource : Types.Content<Data>) : string {
+            return resource.data["adhocracy.sheets.document.IDocument"].title;
         };
     }]);
 
