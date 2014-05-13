@@ -18,8 +18,8 @@ applied in any project which needs CSS code.
 Goals
 -----
 
-There are basically three goals we want to accomplish by the processes
-and rules described in this document:
+There are multiple goals we want to accomplish by the processes and rules
+described in this document:
 
 1. We want the collaboration within the project to work well. This
    includes clear responsibilities and a common language in which we can
@@ -27,14 +27,11 @@ and rules described in this document:
    into the project or the size of the team changes dramatically.
 
 2. We want our code to run smoothly with very few bugs and little
-   maintenance work. It should be easy to add new parts or replace
-   existing ones.
+   maintenance work. It should be easy to add new parts or replace existing
+   ones. It should be easy to derive customized themes.  Using derived themes
+   after an upgrade of the core CSS code should be easy.
 
-3. It should be easy to derive customized themes.  Using derived
-   themes after an upgrade of the out-of-the-box css code should be
-   easy.
-
-4. We want to deliver a great product with a flawless and accessible
+3. We want to deliver a great product with a flawless and accessible
    user experience (UX).
 
 Common Terminology
