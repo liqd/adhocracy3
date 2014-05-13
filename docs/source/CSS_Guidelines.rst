@@ -9,11 +9,10 @@ Adhocracy 3. However, it is not specific to Adhocracy 3 and can be
 applied in any project which needs CSS code.
 
 -  If you are a CSS developer you should read the whole document.
--  Anyone concerned with the frontend should read the parts about goals
-   and the common language.
--  Graphic designers should also read Section 'CSS and Graphic Design'.
--  JavaScript programmers should also read Section 'CSS, HTML, and
-   JavaScript'.
+-  Anyone concerned with the frontend should read `Goals`_ and
+   `Common Terminology`_.
+-  Graphic designers should also read `CSS and Graphic Design`_.
+-  JavaScript programmers should also read `CSS, HTML, and JavaScript`_.
 
 Goals
 -----
