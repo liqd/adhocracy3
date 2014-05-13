@@ -220,7 +220,7 @@ export function run<Data>() {
 
                 $scope.paragraphVersions = [];
 
-                $scope.pushParagraphVersion = function () {
+                $scope.addParagraphVersion = function () {
                     $scope.paragraphVersions.push(new Resources.Resource("adhocracy.resources.paragraph.IParagraphVersion")
                                                       .addIParagraph(""));
                 };
