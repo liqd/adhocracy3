@@ -3,7 +3,7 @@
         <div ng-switch-when="list">
         </div>
         <div ng-switch-when="display">
-            <p ng-bind="parcontent['data']['P.IParagraph']['text']"></p>
+            <p>{{ parcontent['data']['P.IParagraph']['text'] }}</p>
         </div>
         <div ng-switch-when="edit">
             <input class="__widget__" style="height: 5em; width: 20em;"

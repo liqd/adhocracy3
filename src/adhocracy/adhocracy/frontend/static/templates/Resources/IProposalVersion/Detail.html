@@ -9,8 +9,8 @@
             <button type="button" class="edit_button" ng-click="edit()">edit</button>
             <button type="button" class="close_button" ng-click="list()">close</button>
             <br>
-            <p ng-bind="doc.content.data['adhocracy.sheets.document.IDocument'].title" class="document_title"></p>
-            <small><p ng-bind="doc.content.data['adhocracy.sheets.document.IDocument'].description"></p></small>
+            <p class="document_title">{{ doc.content.data['adhocracy.sheets.document.IDocument'].title }}</p>
+            <small><p>{{ doc.content.data['adhocracy.sheets.document.IDocument'].description }}</p></small>
         </div>
         <div ng-switch-when="edit">
             <button type="button" class="reset_button" ng-click="reset()">reset</button>
