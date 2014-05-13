@@ -220,7 +220,7 @@ export function run<Data>() {
     app.directive("adhDocumentWorkbench", function() {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/P/IDocument/Workbench.html",
+            templateUrl: templatePath + "/Pages/DocumentWorkbench.html",
         };
     });
 
