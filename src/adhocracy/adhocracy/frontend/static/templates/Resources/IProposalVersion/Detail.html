@@ -22,5 +22,5 @@
             internal error: unknown view mode: {{ doc.viewmode }}
         </div>
     </div>
-    <adh-paragraph-detail ng-repeat="parref in doc.content.data['adhocracy.sheets.document.IDocument'].paragraphs track by $index"></adh-paragraph-detail>
+    <adh-paragraph-version-detail ng-repeat="parref in doc.content.data['adhocracy.sheets.document.IDocument'].paragraphs track by $index"></adh-paragraph-version-detail>
 </div>

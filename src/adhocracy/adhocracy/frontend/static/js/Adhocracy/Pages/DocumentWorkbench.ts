@@ -225,7 +225,7 @@ export function run<Data>() {
     });
 
 
-    app.directive("adhDocumentDetail", function() {
+    app.directive("adhProposalVersionDetail", function() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IProposalVersion/Detail.html",
@@ -233,7 +233,7 @@ export function run<Data>() {
     });
 
 
-    app.directive("adhParagraphDetail", function() {
+    app.directive("adhParagraphVersionDetail", function() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IParagraphVersion/Detail.html",
@@ -280,7 +280,7 @@ export function run<Data>() {
         };
     });
 
-    app.directive("adhNewProposal", ["$http", "$q", function($http: ng.IHttpService, $q : ng.IQService) {
+    app.directive("adhProposalVersionNew", ["$http", "$q", function($http: ng.IHttpService, $q : ng.IQService) {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IProposalVersion/New.html",
