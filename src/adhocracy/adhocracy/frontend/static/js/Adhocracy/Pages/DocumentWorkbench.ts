@@ -305,16 +305,15 @@ export function run<Data>() {
             scope: {
                 sheet: "="
             },
-            controller: function ($scope) {
-                var versionPromises = $scope.sheet.elements.map( (path) =>
-                    $http.get(decodeURIComponent(path))
-                         .then( (resp) => resp.data )
-                );
+            controller: ['$scope', function($scope) {
+                var versionPromises = $scope.sheet.elements.map( (path) => {
+                    $http.get(decodeURIComponent(path)).then( (resp) => resp.data );
+                });
 
                 $q.all(versionPromises).then( (versions) => {
                     $scope.concreteElements = versions;
                 });
-            },
+            }],
         };
     }]);
 
