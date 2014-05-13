@@ -283,7 +283,7 @@ export function run<Data>() {
     app.directive("adhNewProposal", ["$http", "$q", function($http: ng.IHttpService, $q : ng.IQService) {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/newProposal.html",
+            templateUrl: templatePath + "/Resources/IProposalVersion/New.html",
             scope: {
                 onNewProposal: "="
             },  //isolates this scope, i.e. this $scope does not ihnerit from any parent $scope
