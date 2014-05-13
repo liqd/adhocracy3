@@ -184,6 +184,11 @@ it wherever we want. We could for example define the variable
 later change that color in a single place instead of change the complete
 code wich of course improves consistency and makes theming easy.
 
+Variables are always *global*, i.e., they are visible in all CSS,
+JavaScript, and HTML code.  FIXME: should there be rules about where
+to introduce variables, so they are not getting scattered all over the
+code?
+
 Mixins
 ++++++
 
