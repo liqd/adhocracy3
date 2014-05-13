@@ -159,7 +159,7 @@ be a widget.
 States
 ++++++
 
-Widgets or base objects may have one or more *states* (e.g., *hover*,
+Widgets or base objects may have one or more *states* (e.g. *hover*,
 *active*, or *hidden*). States may either be applicable to any object
 (*hidden*) or only to specific objects (*hover*, *active*).
 
@@ -345,7 +345,7 @@ Documentation and Style Guide
 +++++++++++++++++++++++++++++
 
 A style guide in (web)design is an overview of all available colors,
-fonts and widgets (more generally: objects) used in a product. In the
+fonts, and widgets (more generally: objects) used in a product. In the
 context of CSS it can be generated from source code comments. In some
 way this is similar to doctests in python.
 
