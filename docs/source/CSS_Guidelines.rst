@@ -198,7 +198,7 @@ to use the same type of gradient, but with different colors and on
 different objects.
 
 Mixins are similar to variables in that they store something that can be
-used anywhere in the UI. But while variables store single values mixins
+used anywhere in the UI. But whereas variables store single values, mixins
 can store complex sets of rules.
 
 Adjustments
@@ -212,9 +212,9 @@ Core, Themes and Default Theme
 
 The project may create multiple CSS-themes for the software. All themes
 share a common core. Themes can theoretically overwrite every aspect of
-the core. To keep workload low it should be preferred to modify as
-little as possible. To make this possible it is advised to keep the core
-small and flexible.
+the core. Since overwrites come at a run-time cost for the browser, they
+should be kept at a minimum. To make this possible it is advised to keep
+the core small and flexible.
 
 Keeping the core small may conflict with a good UX in the default case.
 To avoid that, a default theme should be included to separate the
@@ -231,26 +231,29 @@ additional themes.
 
    -  must provide values for all variables.
 
-      -  Variable are mandatory for all colors and main font sizes.
+      -  Variables are mandatory for all colors and main font sizes.
 
    -  must mark up any objects, states, modifiers, variables, mixins and
-      adjustments in the designs.
+      adjustments in the designs.  (The designer produces machine-readable
+      HTML output.)
    -  may request new objects, states, … or the changing of existing
       ones.
 
-      -  They must state if the new object, state, … should be part of
-         core or theme.
+      -  They must decide whether the new object, state, … should be part
+         of core or theme.
       -  They must provide semantically rich names for all new features.
-         (e.g. "light-forground" instead of "grey")
-      -  They must provide all needed information and files as soon as
-         possible. This includes:
+         (e.g. "light-forground" instead of "grey"; see Robert C Martin,
+         Clean Code, Chapter 2)
+      -  They must provide all necessary information and files as soon as
+         possible (to avoid delays, preliminary dummy files may be
+         provided). This includes:
 
          -  colors
          -  fonts
          -  icons
          -  background images/logos
 
-   -  must provide the contents of a view in a linearized and therefore
+   -  must provide the contents of a view in a linearized and thus
       prioritized sequence in addition to the layout structure. This is
       needed e.g. for screen readers (assistive technology for the
       blind) and web crawlers.
@@ -274,10 +277,10 @@ JavaScript programmers.
 -  There is a mechanism to track classes used by JavaScript code. It
    should help in tracking which classes are actually used and which are
    dead code. See the CSS typescript module
-   (``/src/adhocracy/adhocracy/frontend/static/js``)
+   (``/src/adhocracy/adhocracy/frontend/static/js/Adhocracy/Css.ts``)
    for more information.
--  Some CSS testing should be done in brother tests. CSS and JavaScript
-   developers should work together on this,
+-  Some CSS testing should be done in brother tests, i.e. CSS and JavaScript
+   developers should work together on this.
 
 Selectors
 +++++++++
@@ -303,7 +306,7 @@ CSS frameworks like `bootstrap <http://getbootstrap.com/>`_ and
 `foundation <http://foundation.zurb.com>`_ have become popular in recent
 years. However we decided to not use any of them because all of those
 frameworks do more than we wanted them to do. For example they all
-include button layouts which collide with our own. This let to UI bugs
+include button layouts which collide with our own. This has led to UI bugs
 in the past.
 
 While we do not use a full framework we try to be somewhat compatible in
@@ -342,7 +345,7 @@ way this is similar to doctests in python.
 There is a long `list of style guide
 generators <http://vinspee.me/style-guide-guide/>`_. We chose to use
 `hologram <http://trulia.github.io/hologram/>`_ because it integrates
-will with our existing CSS tools.
+well with our existing CSS tools.
 
 TODO: describe hologram usage
 
@@ -378,7 +381,7 @@ It is recommended to use (modified) modules from 3rd party projects such
 as `bootstrap <https://github.com/twbs/bootstrap/tree/master/less>`_ or
 `foundation <https://github.com/zurb/foundation/tree/master/scss/foundation/components>`_.
 
-All SCSS file that should not be compiled on their own should begin with
+All SCSS files not to be compiled on their own should begin with
 an underscore (``_``). They should be structured into folders according
 to common language terms: ``widgets``, ``layout``, ``base``, ``states``
 (only global states), ``variables``, ``mixins``. Further structure may
@@ -545,7 +548,7 @@ Context
 
 One of the most complicated issues in CSS in general is whether objects
 should change depending on context. On the one hand we talk about
-*responsive design*, on the other objects should be decoupled (`Law of
+*responsive design*, on the other, objects should be decoupled (`Law of
 Demeter <http://en.wikipedia.org/wiki/Law_Of_Demeter>`_) to keep the
 code maintainable.
 
