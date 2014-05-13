@@ -226,9 +226,8 @@ additional themes.
 
       -  Variables are mandatory for all colors and font sizes.
 
-   -  must mark up any objects, states, modifiers, variables, mixins, and
-      adjustments in the designs.  (The designer produces machine-readable
-      HTML output.)
+   -  must mark any objects, states, modifiers, variables, mixins, and
+      adjustments in wireframes and designs.
    -  may request new objects, states, … or the changing of existing
       ones.
 
@@ -256,9 +255,6 @@ additional themes.
 
    -  must provide a living style guide (breakdown of all existing objects,
       states, …).
-   -  must review and fine-tune technical aspects of the design output
-      (if technical decisions made by design have undesired technical
-      consequences, those need to be discussed and remedied).
    -  must report implementation issues as soon as possible.
    -  must implement requested features as requested.
 
