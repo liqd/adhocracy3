@@ -119,7 +119,7 @@ export function run<Data>() {
                          function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>,
                                   $scope   : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>) : void
             {
-                $scope.insertParagraph = function (proposalVersion: Types.Content<Resources.HasIDocumentSheet>) {
+                $scope.insertParagraph = function(proposalVersion: Types.Content<Resources.HasIDocumentSheet>) {
                     $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
                 };
 
@@ -129,7 +129,7 @@ export function run<Data>() {
 
                     // FIXME: factor out getting the head version of a DAG.
 
-                    function fetchDocumentHead(n : number, dag : Types.Content<Resources.HasIDocumentSheet>) : void {
+                    var fetchDocumentHead = function(n : number, dag : Types.Content<Resources.HasIDocumentSheet>) : void {
                         var dagPS = dag.data["adhocracy.sheets.versions.IVersions"].elements;
                         if (dagPS.length > 0) {
                             var headPath = Resources.newestVersion(dagPS); //FIXME: backend should have LAST
@@ -223,7 +223,7 @@ export function run<Data>() {
 
                 $scope.paragraphVersions = [];
 
-                $scope.addParagraphVersion = function () {
+                $scope.addParagraphVersion = function() {
                     $scope.paragraphVersions.push(new Resources.Resource("adhocracy.resources.paragraph.IParagraphVersion")
                                                       .addIParagraph(""));
                 };
@@ -248,11 +248,11 @@ export function run<Data>() {
                          function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>,
                                   $scope   : IParagraphDetailScope<Resources.HasIDocumentSheet>) : void
             {
-                function update(content : Types.Content<any>) {
+                var update = function(content : Types.Content<any>) {
                     $scope.parcontent = content;
                 }
 
-                function commit(event, ...args) {
+                var commit = function(event, ...args) {
                     adhHttp.postNewVersion($scope.parcontent.path, $scope.parcontent);
                 }
 
