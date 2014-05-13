@@ -146,14 +146,14 @@ The layout defines the basic structure of a page. Typical layout objects
 are *header*, *main*, *aside* and *footer*. Of most layout objects there
 is only a single instance on a page (e.g. only one header and footer).
 
-The styling of layout objects should only define position and size. Any
-other styling should be applied to objects inside of the them.
+The styling of layout objects must only define position and size. Any
+other styling must be applied to objects inside of the them.
 
 Element Objects
 +++++++++++++++
 
 We call objects within widgets *elements* of that widget. An element may
-be a widget itself. If an element appears in more than one widget it should
+be a widget itself. If an element appears in more than one widget it must
 be a widget.
 
 States
@@ -217,7 +217,7 @@ should be kept at a minimum. To make this possible it is advised to keep
 the core small and flexible.
 
 Keeping the core small may conflict with a good UX in the default case.
-To avoid that, a default theme should be included to separate the
+To avoid that, a default theme is included to separate the
 default UX from the core.
 
 CSS and Graphic Design
@@ -289,7 +289,7 @@ JavaScript programmers.
 Selectors
 +++++++++
 
-This section describes which selectors should be used for different
+This section describes which selectors must be used for different
 object types. All classes are lowercase and hyphen-separated.
 
 -  widget: class (no prefix)
@@ -356,11 +356,11 @@ well with our existing CSS tools.
 
 FIXME: describe hologram usage
 
-All variables, widgets, base objects, states and modifiers should be
+All variables, widgets, base objects, states and modifiers must be
 documented (including HTML examples). Variables and mixins also need
 documentation and examples. As these do not expose selectors which could
 be used in examples it might be necessary to create
-``styleguide-*``-classes. Layout and adjustments should have some kind
+``styleguide-*``-classes. Layout and adjustments must have some kind
 of documentation though it might be hard to give HTML examples for
 those.
 
@@ -378,18 +378,18 @@ defined above.
 Modules
 ~~~~~~~
 
-A module is a SCSS file. Each widget should have its own module
+A module is a SCSS file. Each widget must have its own module
 including its states and modifiers. Multiple base objects may be
 included in a single module if they are closely related. The same goes
-for layout, variables and mixins. Adjustments should go into separate
+for layout, variables and mixins. Adjustments must go into separate
 modules.
 
 It is recommended to use (modified) modules from 3rd party projects such
 as `bootstrap <https://github.com/twbs/bootstrap/tree/master/less>`_ or
 `foundation <https://github.com/zurb/foundation/tree/master/scss/foundation/components>`_.
 
-All SCSS files not to be compiled on their own should begin with
-an underscore (``_``). They should be structured into folders according
+All SCSS files not to be compiled on their own must begin with
+an underscore (``_``). They must be structured into folders according
 to common language terms: ``widgets``, ``layout``, ``base``, ``states``
 (only global states), ``variables``, ``mixins``. Further structure may
 be added as needed.
@@ -449,12 +449,12 @@ There are two ways to implement mixins in Sass: ``@mixin`` and
 -  ``@mixin`` allows parameters and content blocks.
 -  ``@extend`` may produce more efficient (less redundant) CSS.
 
-There is no rule about which one should be preferred.
+There is no rule about which one is preferred.
 
 Theming
 ~~~~~~~
 
-Each theme replicates the directory structure of core. Sass should be
+Each theme replicates the directory structure of core. Sass must be
 configured so that both theme and core are in the import path. This
 allows to import all modules from core while making it easy to overwrite
 a module by adding a corresponding file to the theme.
@@ -498,13 +498,13 @@ Formatting
 
 -  use double quotes where quotes are needed, e.g. ``content: "foo"``.
 -  use ``/* */`` for explaining code. ``//`` is only useful for
-   copyright information and other things that should be included in the
+   copyright information and other things that are included in the
    compiled code.
 
 Units
 +++++
 
-This gives an order of preference for the units that should be used with
+This gives an order of preference for the units that must be used with
 different types of values starting from preferred.
 
 -  length:
@@ -517,7 +517,7 @@ different types of values starting from preferred.
 
 -  font-size: keyword, ``%``, ``px``
 
-   -  outside of variable definitions only variables and ``%`` should be
+   -  outside of variable definitions only variables and ``%`` must be
       used
 
 -  0 (zero): no unit
