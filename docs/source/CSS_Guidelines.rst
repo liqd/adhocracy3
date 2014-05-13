@@ -249,7 +249,6 @@ additional themes.
       prioritized sequence in addition to the layout structure. This is
       needed e.g. for screen readers (assistive technology for the
       blind) and web crawlers.
-   -  font sizes
 
 -  CSS developers …
 
