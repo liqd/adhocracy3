@@ -49,7 +49,7 @@ interface IParagraphDetailScope<Data> extends IDocumentDetailScope<Data> {
 // model data.
 
 export function run<Data>() {
-    var app = angular.module("NGAD", []);
+    var app = angular.module("adhocracy3SampleFrontend", []);
 
 
     app.factory('RecursionHelper', ['$compile', function($compile){
@@ -338,5 +338,5 @@ export function run<Data>() {
 
     // get going
 
-    angular.bootstrap(document, ["NGAD"]);
+    angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
 }
