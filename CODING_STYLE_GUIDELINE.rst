@@ -68,7 +68,7 @@ Javascript
 CSS/Compass
 -----------
 
-See :doc:`CSS Guidelines`.
+See :doc:`CSS_Guidelines`.
 
 Restructured text
 +++++++++++++++++
