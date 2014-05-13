@@ -97,11 +97,7 @@ export function run<Data>() {
 
     // services
 
-    app.factory("adhHttp",   ["$http",                                    AdhHttp.factory]);
-
-    // FIXME: web sockets and cache services are defunct
-    // app.factory("adhWS",     ["adhHttp",                                  AdhWS.factory]);
-    // app.factory("adhCache",  ["adhHttp", "adhWS", "$q", "$cacheFactory",  AdhCache.factory]);
+    app.factory("adhHttp", ["$http", AdhHttp.factory]);
 
 
     // filters

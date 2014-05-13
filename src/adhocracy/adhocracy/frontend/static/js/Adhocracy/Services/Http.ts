@@ -65,7 +65,6 @@ export function factory<Data>($http : ng.IHttpService) : IService<Data> {
     // without an argument, return a list of all known content types.
     function metaApiResource(name : string) : any {
         throw "not implemented.";
-        // return $http.get("/meta_api");
     }
 
     // query meta-api for property types.  return the json object
