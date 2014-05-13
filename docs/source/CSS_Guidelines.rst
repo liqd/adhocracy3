@@ -378,8 +378,8 @@ as `bootstrap <https://github.com/twbs/bootstrap/tree/master/less>`_ or
 `foundation <https://github.com/zurb/foundation/tree/master/scss/foundation/components>`_.
 
 All SCSS files not to be compiled on their own must begin with
-an underscore (``_``). They must be structured into folders according
-to common language terms: ``widgets``, ``layout``, ``base``, ``states``
+an underscore (``_``). They must be structured into folders reflecting
+the common terminology: ``widgets``, ``layout``, ``base``, ``states``
 (only global states), ``variables``, ``mixins``. Further structure may
 be added as needed.
 
