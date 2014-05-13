@@ -164,6 +164,9 @@ export function run<Data>() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IProposalVersion/Detail.html",
+            scope: {
+                doc: '=',
+            },
             controller: ["adhHttp", "$scope",
                          function(adhHttp  : AdhHttp.IService<Data>,
                                   $scope   : IDocumentDetailScope<Data>) : void
