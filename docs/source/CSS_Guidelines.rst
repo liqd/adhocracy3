@@ -232,6 +232,7 @@ additional themes.
    -  must provide values for all variables.
 
       -  Variables are mandatory for all colors and main font sizes.
+         (FIXME: what are non-main font sizes?)
 
    -  must mark up any objects, states, modifiers, variables, mixins and
       adjustments in the designs.  (The designer produces machine-readable
@@ -337,6 +338,9 @@ ecosystem.
 -  http://www.sitepoint.com/my-favorite-sass-tools/
 -  http://hackingui.com/front-end/10-best-scss-utilities/
 
+FIXME: this section just gives a list of options.  which do we use?
+which are optional?  everything else is disallowed!
+
 Documentation and Style Guide
 +++++++++++++++++++++++++++++
 
@@ -350,7 +354,7 @@ generators <http://vinspee.me/style-guide-guide/>`_. We chose to use
 `hologram <http://trulia.github.io/hologram/>`_ because it integrates
 well with our existing CSS tools.
 
-TODO: describe hologram usage
+FIXME: describe hologram usage
 
 All variables, widgets, base objects, states and modifiers should be
 documented (including HTML examples). Variables and mixins also need
@@ -363,7 +367,7 @@ those.
 Linting
 +++++++
 
-TODO: https://github.com/causes/scss-lint
+FIXME: https://github.com/causes/scss-lint
 
 Common Terminology Considerations
 +++++++++++++++++++++++++++++++++
