@@ -318,11 +318,14 @@ code by offering features like variables, imports, nesting, and mixins.
 Major contenders are `Sass <http://sass-lang.com/>`_,
 `Less <http://lesscss.org/>`_ and
 `Stylus <http://learnboost.github.io/stylus/>`_. We had good expiriences
-with Sass so we will stick with it.
+with Sass so we will stick with it. CSS developers must read the `Sass
+documentation <http://sass-lang.com/documentation/file.SASS_REFERENCE.html>`_.
 
-`Compass <compass-style.org>`_ is a library providing many useful mixins
-and functions for Sass. There are many more interesting projects in that
-ecosystem.
+We also use `Compass <compass-style.org>`_ — a library providing many useful mixins
+and functions for Sass.
+
+There are many more interesting projects in that ecosystem. Currently, we are
+not using any of these. But we might be using some in the future.
 
 -  https://github.com/Team-Sass/breakpoint
 -  https://github.com/simko-io/animated.sass
@@ -331,8 +334,6 @@ ecosystem.
 -  http://www.sitepoint.com/my-favorite-sass-tools/
 -  http://hackingui.com/front-end/10-best-scss-utilities/
 
-FIXME: this section just gives a list of options.  which do we use?
-which are optional?  everything else is disallowed!
 
 Documentation and Style Guide
 +++++++++++++++++++++++++++++
