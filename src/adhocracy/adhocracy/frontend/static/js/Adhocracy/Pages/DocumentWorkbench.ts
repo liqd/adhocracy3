@@ -41,7 +41,7 @@ interface IDocumentDetailScope<Data> extends IDocumentWorkbenchScope<Data> {
 }
 
 interface IParagraphDetailScope<Data> extends IDocumentDetailScope<Data> {
-    parref      : Types.Reference;
+    parpath     : string;
     parcontent  : Types.Content<Data>;
 }
 
@@ -257,7 +257,7 @@ export function run<Data>() {
                 }
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
-                adhHttp.get($scope.parref.path).then(update);
+                adhHttp.get($scope.parpath).then(update);
 
                 // save working copy on 'commit' event from containing document.
                 $scope.$on("commit", commit);
