@@ -18,7 +18,7 @@ applied in any project which needs CSS code.
 Goals
 -----
 
-There are multiple goals we want to accomplish by the processes and rules
+There are several goals we want to accomplish by the processes and rules
 described in this document:
 
 1. We want the collaboration within the project to work well. This
@@ -376,7 +376,7 @@ Modules
 ~~~~~~~
 
 A module is a SCSS file. Each widget should have its own module
-including its states and modifiers. Multiple base objects may be
+including its states and modifiers. Several base objects may be
 included in a single module if they are closely related. The same goes
 for layout, variables, and mixins. Adjustments must go into separate
 modules.
