@@ -185,9 +185,8 @@ later change that color in a single place instead of change the complete
 code wich of course improves consistency and makes theming easy.
 
 Variables are always *global*, i.e., they are visible in all CSS,
-JavaScript, and HTML code.  FIXME: should there be rules about where
-to introduce variables, so they are not getting scattered all over the
-code?
+JavaScript, and HTML code.  FIXME: is there something like a local
+variable, i.e. is there structured scope in CSS?
 
 Mixins
 ++++++
