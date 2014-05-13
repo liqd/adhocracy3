@@ -228,7 +228,7 @@ export function run<Data>() {
     app.directive("adhDocumentDetail", function() {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/P/IDocument/Detail.html",
+            templateUrl: templatePath + "/Resources/IProposalVersion/Detail.html",
         };
     });
 
@@ -236,7 +236,7 @@ export function run<Data>() {
     app.directive("adhParagraphDetail", function() {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/P/IParagraph/Detail.html",
+            templateUrl: templatePath + "/Resources/IParagraphVersion/Detail.html",
         };
     });
 
