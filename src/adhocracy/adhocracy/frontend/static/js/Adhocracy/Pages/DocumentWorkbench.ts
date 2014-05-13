@@ -52,6 +52,8 @@ export function run<Data>() {
     var app = angular.module("adhocracy3SampleFrontend", []);
 
 
+    // services
+
     app.factory('RecursionHelper', ['$compile', function($compile){
         return {
             /**
@@ -94,8 +96,6 @@ export function run<Data>() {
         };
     }]);
 
-
-    // services
 
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
 
@@ -203,64 +203,6 @@ export function run<Data>() {
         };
     });
 
-
-    app.directive("adhParagraphVersionDetail", function() {
-        return {
-            restrict: "E",
-            templateUrl: templatePath + "/Resources/IParagraphVersion/Detail.html",
-            controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>,
-                                  $scope   : IParagraphDetailScope<Resources.HasIDocumentSheet>) : void
-            {
-                function update(content : Types.Content<any>) {
-                    console.log("par-update: " + $scope.parref.path);
-                    $scope.parcontent = content;
-                }
-
-                function commit(event, ...args) {
-                    console.log("par-commit: " + $scope.parref.path);
-                    adhHttp.postNewVersion($scope.parcontent.path, $scope.parcontent);
-                }
-
-                // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
-                adhHttp.get($scope.parref.path).then(update);
-
-                // save working copy on 'commit' event from containing document.
-                $scope.$on("commit", commit);
-            }],
-        };
-    });
-
-    app.directive("adhDocumentSheetEdit", ["$http", "$q", function($http, $q) {
-        return {
-            restrict: "E",
-            templateUrl: templatePath + "/Sheets/IDocument/Edit.html",
-            scope: {
-                sheet: "=",
-            },
-            controller: function($scope) {
-                var versionPromises = $scope.sheet.elements.map( (path) =>
-                    $http.get( decodeURIComponent(path) )
-                         .then( (resp) => resp.data )
-                );
-
-                $q.all(versionPromises).then( (versions) =>
-                    $scope.sectionVersions = versions
-                );
-            },
-        };
-    }]);
-
-    app.directive("adhDocumentSheetShow", function() {
-        return {
-            restrict: "E",
-            templateUrl: templatePath + "/Sheets/IDocument/Show.html",
-            scope: {
-                sheet: "="
-            },
-        };
-    });
-
     app.directive("adhProposalVersionEdit", function() {
         return {
             restrict: "E",
@@ -304,6 +246,65 @@ export function run<Data>() {
     }]);
 
 
+    app.directive("adhParagraphVersionDetail", function() {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/Resources/IParagraphVersion/Detail.html",
+            controller: ["adhHttp", "$scope",
+                         function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>,
+                                  $scope   : IParagraphDetailScope<Resources.HasIDocumentSheet>) : void
+            {
+                function update(content : Types.Content<any>) {
+                    console.log("par-update: " + $scope.parref.path);
+                    $scope.parcontent = content;
+                }
+
+                function commit(event, ...args) {
+                    console.log("par-commit: " + $scope.parref.path);
+                    adhHttp.postNewVersion($scope.parcontent.path, $scope.parcontent);
+                }
+
+                // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
+                adhHttp.get($scope.parref.path).then(update);
+
+                // save working copy on 'commit' event from containing document.
+                $scope.$on("commit", commit);
+            }],
+        };
+    });
+
+
+    app.directive("adhDocumentSheetEdit", ["$http", "$q", function($http, $q) {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/Sheets/IDocument/Edit.html",
+            scope: {
+                sheet: "=",
+            },
+            controller: function($scope) {
+                var versionPromises = $scope.sheet.elements.map( (path) =>
+                    $http.get( decodeURIComponent(path) )
+                         .then( (resp) => resp.data )
+                );
+
+                $q.all(versionPromises).then( (versions) =>
+                    $scope.sectionVersions = versions
+                );
+            },
+        };
+    }]);
+
+    app.directive("adhDocumentSheetShow", function() {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/Sheets/IDocument/Show.html",
+            scope: {
+                sheet: "="
+            },
+        };
+    });
+
+
     app.directive("adhSectionSheetEdit", ["$http", "$q", "RecursionHelper", function($http, $q, RecursionHelper) {
         return {
             restrict: "E",
@@ -324,6 +325,7 @@ export function run<Data>() {
             },
         };
     }]);
+
 
     app.directive("adhParagraphSheetEdit", function() {
         return {
