@@ -12,7 +12,7 @@ applied in any project which needs CSS code.
 -  Anyone concerned with the frontend should read the parts about goals
    and the common language.
 -  Graphic designers should also read Section 'CSS and Graphic Design'.
--  JavaScript programmers should also read Section 'CSS, HTML and
+-  JavaScript programmers should also read Section 'CSS, HTML, and
    JavaScript'.
 
 Goals
@@ -41,7 +41,7 @@ Common Terminology
 ------------------
 
 To work together it is important to share a common language.
-Unfortunately, JavaScript programmers, CSS developers and graphic
+Unfortunately, JavaScript programmers, CSS developers, and graphic
 designers sometimes have very different angles on the same things.
 
 With the following terms I tried to find (and name) common grounds. This
@@ -59,7 +59,7 @@ the difference between a specific object (e.g. "the safe button in the
 login view") and its *class* ("button").
 
 We distinguish several types of objects. There are also the related
-concepts *state*, *modifier*, *variable*, *mixin* and *adjustment*.
+concepts *state*, *modifier*, *variable*, *mixin*, and *adjustment*.
 
 Widget Objects
 ++++++++++++++
@@ -143,7 +143,7 @@ Layout Objects
 ++++++++++++++
 
 The layout defines the basic structure of a page. Typical layout objects
-are *header*, *main*, *aside* and *footer*. Of most layout objects there
+are *header*, *main*, *aside*, and *footer*. Of most layout objects there
 is only a single instance on a page (e.g. only one header and footer).
 
 The styling of layout objects must only define position and size. Any
@@ -207,8 +207,8 @@ Adjustments
 Any code that can not be reused is called an *adjustment*. Adjustments
 should be avoided wherever possible.
 
-Core, Themes and Default Theme
-++++++++++++++++++++++++++++++
+Core, Themes, and Default Theme
++++++++++++++++++++++++++++++++
 
 The project may create multiple CSS-themes for the software. All themes
 share a common core. Themes can theoretically overwrite every aspect of
@@ -224,7 +224,7 @@ CSS and Graphic Design
 ----------------------
 
 This section describes the collaboration between CSS developers and
-graphic designers. All the rules apply to core, default theme and any
+graphic designers. All the rules apply to core, default theme, and any
 additional themes.
 
 -  Graphic designers …
@@ -234,7 +234,7 @@ additional themes.
       -  Variables are mandatory for all colors and main font sizes.
          (FIXME: what are non-main font sizes?)
 
-   -  must mark up any objects, states, modifiers, variables, mixins and
+   -  must mark up any objects, states, modifiers, variables, mixins, and
       adjustments in the designs.  (The designer produces machine-readable
       HTML output.)
    -  may request new objects, states, … or the changing of existing
@@ -270,8 +270,8 @@ additional themes.
    -  must report implementation issues as soon as possible.
    -  must implement requested features as requested.
 
-CSS, HTML and JavaScript
-------------------------
+CSS, HTML, and JavaScript
+-------------------------
 
 This section describes the collaboration between CSS developers and
 JavaScript programmers.
@@ -321,7 +321,7 @@ Preprocessor
 ++++++++++++
 
 CSS preprocessors help a great deal in writing modular, maintainable CSS
-code by offering features like variables, imports, nesting and mixins.
+code by offering features like variables, imports, nesting, and mixins.
 Major contenders are `Sass <http://sass-lang.com/>`_,
 `Less <http://lesscss.org/>`_ and
 `Stylus <http://learnboost.github.io/stylus/>`_. We had good expiriences
@@ -356,7 +356,7 @@ well with our existing CSS tools.
 
 FIXME: describe hologram usage
 
-All variables, widgets, base objects, states and modifiers must be
+All variables, widgets, base objects, states, and modifiers must be
 documented (including HTML examples). Variables and mixins also need
 documentation and examples. As these do not expose selectors which could
 be used in examples it might be necessary to create
@@ -381,7 +381,7 @@ Modules
 A module is a SCSS file. Each widget must have its own module
 including its states and modifiers. Multiple base objects may be
 included in a single module if they are closely related. The same goes
-for layout, variables and mixins. Adjustments must go into separate
+for layout, variables, and mixins. Adjustments must go into separate
 modules.
 
 It is recommended to use (modified) modules from 3rd party projects such
