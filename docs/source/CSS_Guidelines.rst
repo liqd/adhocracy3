@@ -378,7 +378,7 @@ defined above.
 Modules
 ~~~~~~~
 
-A module is a SCSS file. Each widget must have its own module
+A module is a SCSS file. Each widget should have its own module
 including its states and modifiers. Multiple base objects may be
 included in a single module if they are closely related. The same goes
 for layout, variables, and mixins. Adjustments must go into separate
@@ -498,7 +498,7 @@ Formatting
 
 -  use double quotes where quotes are needed, e.g. ``content: "foo"``.
 -  use ``/* */`` for explaining code. ``//`` is only useful for
-   copyright information and other things that are included in the
+   copyright information and other things that should be included in the
    compiled code.
 
 Units
