@@ -4,6 +4,7 @@ from zope.interface import implementer
 
 from pyramid.interfaces import ILocation
 from adhocracy.utils import get_resource_interface
+from adhocracy.utils import to_dotted_name
 
 
 @implementer(ILocation)
@@ -14,10 +15,9 @@ class Base(Persistent):
     __parent__ = None
     __name__ = None
 
-    def __str__(self):
-        iresource = get_resource_interface(self) or ILocation
-        iresource_str = iresource.__identifier__
-        repr_str = repr(self)
-        oid = getattr(self, '__oid__', '')
-        id_str = str(oid) if oid else repr_str
-        return '{0}:{1}'.format(iresource_str, id_str)
+    def __repr__(self):
+        interface = get_resource_interface(self) or self.__class__
+        interface_dotted = to_dotted_name(interface)
+        oid = getattr(self, '__oid__', None)
+        identifier = str(oid)
+        return '{0} oid: {1}'.format(interface_dotted, identifier)

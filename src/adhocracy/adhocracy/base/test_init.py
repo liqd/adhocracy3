@@ -1,4 +1,5 @@
 import unittest
+from adhocracy.utils import to_dotted_name
 
 
 class ResourceUnitTest(unittest.TestCase):
@@ -19,17 +20,17 @@ class ResourceUnitTest(unittest.TestCase):
         inst._test_attribute = None
         assert inst._test_attribute is None
 
-    def test_to_string_without_oid(self):
-        from pyramid.interfaces import ILocation
+    def test_to_string_without_oid_and_iresource(self):
         inst = self.make_one()
-        wanted_str = '{0}:{1}'.format(ILocation.__identifier__, repr(inst))
+        wanted_str = '{0} oid: {1}'.format(to_dotted_name(inst.__class__),
+                                           'None')
         assert wanted_str == str(inst)
 
     def test_to_string_with_oid(self):
-        from pyramid.interfaces import ILocation
         inst = self.make_one()
         inst.__oid__ = 1
-        wanted_str = '{0}:{1}'.format(ILocation.__identifier__, str(1))
+        wanted_str = '{0} oid: {1}'.format(to_dotted_name(inst.__class__),
+                                           str(1))
         assert wanted_str == str(inst)
 
     def test_to_string_with_iresource(self):
@@ -37,6 +38,5 @@ class ResourceUnitTest(unittest.TestCase):
         from zope.interface import directlyProvides
         inst = self.make_one()
         directlyProvides(inst, IResource)
-        inst.__oid__ = 1
-        wanted_str = '{0}:{1}'.format(IResource.__identifier__, str(1))
+        wanted_str = '{0} oid: {1}'.format(IResource.__identifier__, 'None')
         assert wanted_str == str(inst)
