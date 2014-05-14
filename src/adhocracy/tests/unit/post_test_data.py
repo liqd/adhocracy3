@@ -18,9 +18,6 @@ if 'A3_TEST_SERVER' in os.environ and os.environ['A3_TEST_SERVER']:
 else:
     server = "http://localhost:6541"
 
-rootpath = "/adhocracy/"
-null = None  # for more js-ish json representation
-
 
 def _print_request(data: str, uri: str, method: str='post') -> None:
     print('====================================================================== [REQUEST]')
@@ -43,25 +40,75 @@ def _print_response_or_give_up(response: requests.Response) -> None:
         exit(1)
 
 
-def _post_data(request_dict: dict) -> dict:
+def _post_data(path: str, request_dict: dict) -> dict:
     """"Post a JSON object to the server and return the response dictionary.
 
     Also prints the request and the resulting response for easy visual feedback.
     Gives up and exists the app if the server responds with an error.
     """
     data = json.dumps(request_dict)
-    uri = server + rootpath
+    uri = server + path
     _print_request(data, uri, method='post')
     response = requests.post(uri, data=data,
                              headers={'content-type': 'text/json',})
     _print_response_or_give_up(response)
-    return response.json
+    return response.json()
 
 
-_post_data({'content_type': 'adhocracy.resources.pool.IBasicPool',
-             'data': {
-                  'adhocracy.sheets.name.IName': {
-                      'name': 'Proposals'}}})
+# Create Proposals pool
+resp = _post_data('/adhocracy/',
+                  {'content_type': 'adhocracy.resources.pool.IBasicPool',
+                    'data': {
+                         'adhocracy.sheets.name.IName': {
+                             'name': 'Proposals'}}})
+
+# Add kommunismus IProposal to Proposals pool
+resp = _post_data('/adhocracy/Proposals',
+                  {'content_type': 'adhocracy_sample.resources.proposal.IProposal',
+                   'data': {
+                        'adhocracy.sheets.name.IName': {
+                            'name': 'kommunismus'}
+                        }
+                  })
+first_proposal_version = resp['first_version_path']
+
+# Ad another (non-empty) proposal version
+resp = _post_data('/adhocracy/Proposals/kommunismus',
+                  {'content_type': 'adhocracy_sample.resources.proposal.IProposalVersion',
+                   'data': {'adhocracy.sheets.document.IDocument': {
+                               'title': 'kommunismus jetzt!',
+                               'description': 'blabla!',
+                               'elements': []},
+                            'adhocracy.sheets.versions.IVersionable': {
+                               'follows': [first_proposal_version]}},
+                    'root_versions': [first_proposal_version]})
+second_proposal_version = resp['path']
+
+# Add two sections to the kommunismus proposal
+resp = _post_data('/adhocracy/Proposals/kommunismus',
+           {'content_type': 'adhocracy_sample.resources.section.ISection',
+             'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel1'}}})
+first_sec1_version = resp['first_version_path']
+
+resp = _post_data('/adhocracy/Proposals/kommunismus',
+                  {'content_type': 'adhocracy_sample.resources.section.ISection',
+                    'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel2'}}})
+first_sec2_version = resp['first_version_path']
+
+# Add the initial versions of these sections to a third version of the proposal
+resp = _post_data('/adhocracy/Proposals/kommunismus',
+                  {'content_type': 'adhocracy_sample.resources.proposal.IProposalVersion',
+                   'data': {'adhocracy.sheets.document.IDocument': {
+                                'elements': [first_sec1_version, first_sec2_version]},
+                            'adhocracy.sheets.versions.IVersionable': {
+                                'follows': [second_proposal_version],}
+                            },
+                     'root_versions': [second_proposal_version]})
+
+# TODO from l.582
+
+# TODO Old stuff
+exit(0)
 
 data = json.dumps({
     "data": {},
