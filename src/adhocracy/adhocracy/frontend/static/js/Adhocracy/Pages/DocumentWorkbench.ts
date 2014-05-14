@@ -56,7 +56,7 @@ export function run<Data>() {
 
     // services
 
-    app.factory('RecursionHelper', ['$compile', function($compile){
+    app.factory("RecursionHelper", ["$compile", function($compile) {
         return {
             /**
              * Manually compiles the element, fixing the recursion loop.
@@ -64,9 +64,9 @@ export function run<Data>() {
              * @param [link] A post-link function, or an object with function(s) registered via pre and post properties.
              * @returns An object containing the linking functions.
              */
-            compile: function(element, link){
+            compile: function(element, link) {
                 // Normalize the link parameter
-                if(jQuery.isFunction(link)){
+                if (jQuery.isFunction(link)) {
                     link = { post: link };
                 }
 
@@ -78,18 +78,18 @@ export function run<Data>() {
                     /**
                      * Compiles and re-adds the contents
                      */
-                    post: function(scope, element){
+                    post: function(scope, element) {
                         // Compile the contents
-                        if(!compiledContents){
+                        if (!compiledContents) {
                             compiledContents = $compile(contents);
                         }
                         // Re-add the compiled contents to the element
-                        compiledContents(scope, function(clone){
+                        compiledContents(scope, function(clone) {
                             element.append(clone);
                         });
 
                         // Call the post-linking function, if any
-                        if(link && link.post){
+                        if (link && link.post) {
                             link.post.apply(null, arguments);
                         }
                     }
@@ -147,7 +147,7 @@ export function run<Data>() {
                                 }
                             });
                         }
-                    }
+                    };
 
                     var dagRefs : string[] = pool.data["adhocracy.sheets.pool.IPool"].elements;
                     for (var dagRefIx in dagRefs) {
@@ -167,8 +167,8 @@ export function run<Data>() {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IProposalVersion/Detail.html",
             scope: {
-                content: '=',
-                viewmode: '=',
+                content: "=",
+                viewmode: "=",
             },
             controller: ["adhHttp", "$scope",
                          function(adhHttp  : AdhHttp.IService<Data>,
@@ -237,7 +237,7 @@ export function run<Data>() {
                             $scope.onNewProposal(respGet.data);
                         });
                     });
-                }
+                };
             }
         };
     }]);
@@ -249,8 +249,8 @@ export function run<Data>() {
             templateUrl: templatePath + "/Resources/ISectionVersion/Detail.html",
             compile: (element) => RecursionHelper.compile(element),
             scope: {
-                ref: '=',
-                viewmode: '=',
+                ref: "=",
+                viewmode: "=",
             },
             controller: ["adhHttp", "$scope",
                          function(adhHttp  : AdhHttp.IService<Resources.HasISectionSheet>,
@@ -258,7 +258,7 @@ export function run<Data>() {
             {
                 var commit = function(event, ...args) {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
-                }
+                };
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
                 adhHttp.get($scope.ref).then( (content) => {
@@ -277,8 +277,8 @@ export function run<Data>() {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IParagraphVersion/Detail.html",
             scope: {
-                ref: '=',
-                viewmode: '=',
+                ref: "=",
+                viewmode: "=",
             },
             controller: ["adhHttp", "$scope",
                          function(adhHttp  : AdhHttp.IService<Resources.HasIParagraphSheet>,
@@ -286,7 +286,7 @@ export function run<Data>() {
             {
                 var commit = function(event, ...args) {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
-                }
+                };
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
                 adhHttp.get($scope.ref).then( (content) => {

@@ -86,7 +86,7 @@ export function importContent<Data>(obj : Types.Content<Data>) : Types.Content<D
 
 export function exportContent<Data>(obj : Types.Content<Data>) : Types.Content<Data> {
     // FIXME: newobj should be a copy, not a reference
-    var newobj : Types.Content<Data> = obj
+    var newobj : Types.Content<Data> = obj;
 
     // FIXME: Get this list from the server!
     var readOnlyProperties = [

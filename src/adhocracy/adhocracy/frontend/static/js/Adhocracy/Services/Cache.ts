@@ -43,8 +43,12 @@ var cacheSizeInObjects = 7;
 
 // service interface
 export interface IService<Data> {
-    get          : (path : string,                            subscribe : boolean, updateModel : (obj : Types.Content<Data>) => void) => number;
-    put          : (path : string, obj : Types.Content<Data>, subscribe : boolean, updateModel : (obj : Types.Content<Data>) => void) => number;
+    get          : (path : string,
+                    subscribe : boolean,
+                    updateModel : (obj : Types.Content<Data>) => void) => number;
+    put          : (path : string, obj : Types.Content<Data>,
+                    subscribe : boolean,
+                    updateModel : (obj : Types.Content<Data>) => void) => number;
     commit       : (path : string, obj : Types.Content<Data>) => boolean;
     unsubscribe  : (path : string, ix : number) => void;
     destroy      : () => void;
@@ -120,7 +124,9 @@ export function factory<Data>(adhHttp        : AdhHttp.IService<Data>,
     }
 
     // a bit like get, but sends an object to the server first.  FIXME: document better.
-    function put(path : string, obj : Types.Content<Data>, subscribe : boolean, updateModel : (obj : Types.Content<Data>) => void) : number {
+    function put(path : string, obj : Types.Content<Data>,
+                 subscribe : boolean,
+                 updateModel : (obj : Types.Content<Data>) => void) : number {
         var item : ICacheItem<Data> = cache.get(path);
         var ix : number;
 

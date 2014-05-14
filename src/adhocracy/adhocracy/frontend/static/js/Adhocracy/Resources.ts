@@ -146,10 +146,10 @@ export function getNewestVersion($http, path: string) : ng.IPromise<any> {
     );
 };
 
-export function postProposal($http
-                            ,$q: ng.IQService
-                            ,proposalVersion: PartialIProposalVersion
-                            ,paragraphVersions) {
+export function postProposal($http,
+                             $q: ng.IQService,
+                             proposalVersion: PartialIProposalVersion,
+                             paragraphVersions) {
     var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 
     return $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).then( (resp) => {
@@ -174,7 +174,7 @@ export function postProposal($http
                 var sectionVersion = new SectionVersion(undefined, paths, [], [decodeURIComponent(respSection.data.first_version_path)]);
 
                 return $http.post(decodeURIComponent(respSection.data.path), sectionVersion);
-            })
+            });
         });
 
         return $q.all(paragraphPromises).then( (respParagraphs) => {
@@ -184,7 +184,7 @@ export function postProposal($http
                 proposalVersion.addIVersionable([], [proposalFirstVersionPath]);
 
                 return $http.post(proposalPath, proposalVersion);
-            })
+            });
         });
     });
 };
