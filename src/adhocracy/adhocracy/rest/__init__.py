@@ -1,4 +1,8 @@
 """Rest API configuration."""
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def includeme(config):  # pragma: no cover
