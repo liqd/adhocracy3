@@ -5,7 +5,7 @@ import json
 import os
 import sys
 
-# TODO how to do this correctly?
+# FIXME Is there a cleaner way to do this?
 eggs_dir = path.normpath(path.join(path.dirname(path.realpath(__file__)), '../../../../eggs'))
 sys.path[0:0] = [
     path.join(eggs_dir, 'requests-2.1.0-py3.3.egg')
