@@ -243,34 +243,6 @@ export function run<Data>() {
     }]);
 
 
-    app.directive("adhParagraphVersionDetail", function() {
-        return {
-            restrict: "E",
-            templateUrl: templatePath + "/Resources/IParagraphVersion/Detail.html",
-            scope: {
-                ref: '=',
-                viewmode: '=',
-            },
-            controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasIParagraphSheet>,
-                                  $scope   : DetailRefScope<Resources.HasIParagraphSheet>) : void
-            {
-                var commit = function(event, ...args) {
-                    adhHttp.postNewVersion($scope.content.path, $scope.content);
-                }
-
-                // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
-                adhHttp.get($scope.ref).then( (content) => {
-                    $scope.content = content;
-                });
-
-                // save working copy on 'commit' event from containing document.
-                $scope.$on("commit", commit);
-            }],
-        };
-    });
-
-
     app.directive("adhSectionVersionDetail", ["RecursionHelper", function(RecursionHelper) {
         return {
             restrict: "E",
@@ -298,6 +270,34 @@ export function run<Data>() {
             }],
         };
     }]);
+
+
+    app.directive("adhParagraphVersionDetail", function() {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/Resources/IParagraphVersion/Detail.html",
+            scope: {
+                ref: '=',
+                viewmode: '=',
+            },
+            controller: ["adhHttp", "$scope",
+                         function(adhHttp  : AdhHttp.IService<Resources.HasIParagraphSheet>,
+                                  $scope   : DetailRefScope<Resources.HasIParagraphSheet>) : void
+            {
+                var commit = function(event, ...args) {
+                    adhHttp.postNewVersion($scope.content.path, $scope.content);
+                }
+
+                // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
+                adhHttp.get($scope.ref).then( (content) => {
+                    $scope.content = content;
+                });
+
+                // save working copy on 'commit' event from containing document.
+                $scope.$on("commit", commit);
+            }],
+        };
+    });
 
 
     app.directive("adhDocumentSheetEdit", ["$http", "$q", function($http, $q) {
