@@ -32,17 +32,21 @@ interface IDocumentWorkbenchScope<Data> extends ng.IScope {
     insertParagraph : any;
 }
 
-interface IDocumentDetailScope<Data> extends IDocumentWorkbenchScope<Data> {
-    list    : () => void;
-    display : () => void;
-    edit    : () => void;
-    reset   : () => void;
-    commit  : () => void;
+interface DetailScope<Data> extends ng.IScope {
+    viewmode : string;
+    content  : Types.Content<Data>;
 }
 
-interface IParagraphDetailScope<Data> extends IDocumentDetailScope<Data> {
-    parpath     : string;
-    parcontent  : Types.Content<Data>;
+interface DetailRefScope<Data> extends DetailScope<Data> {
+    ref      : string;
+}
+
+interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
+    list     : () => void;
+    display  : () => void;
+    edit     : () => void;
+    reset    : () => void;
+    commit   : () => void;
 }
 
 
@@ -167,7 +171,9 @@ export function run<Data>() {
                 viewmode: '=',
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Data>, $scope) : void {
+                         function(adhHttp  : AdhHttp.IService<Data>,
+                                  $scope   : IProposalVersionDetailScope<Data>) : void
+            {
                 $scope.list = function() {
                     $scope.viewmode = "list";
                 };
@@ -246,7 +252,9 @@ export function run<Data>() {
                 viewmode: '=',
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>, $scope) : void {
+                         function(adhHttp  : AdhHttp.IService<Resources.HasIParagraphSheet>,
+                                  $scope   : DetailRefScope<Resources.HasIParagraphSheet>) : void
+            {
                 var commit = function(event, ...args) {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
                 }
@@ -273,7 +281,9 @@ export function run<Data>() {
                 viewmode: '=',
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>, $scope) : void {
+                         function(adhHttp  : AdhHttp.IService<Resources.HasISectionSheet>,
+                                  $scope   : DetailRefScope<Resources.HasISectionSheet>) : void
+            {
                 var commit = function(event, ...args) {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
                 }
