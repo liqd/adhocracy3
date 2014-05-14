@@ -1,4 +1,4 @@
-<div style="background:yellow" class="document_detail_ctrl">
+<div style="background:yellow" class="proposal_detail_ctrl">
     <div ng-switch="viewmode">
         <div ng-switch-when="list">
             <a href ng-click="display()" class="document_title">
@@ -6,16 +6,18 @@
             </a>
         </div>
         <div ng-switch-when="display">
-            <button type="button" class="edit_button" ng-click="edit()">edit</button>
-            <button type="button" class="close_button" ng-click="list()">close</button>
-            <br>
+            <div class="buttons_box">
+                <button type="button" class="edit_button" ng-click="edit()">edit</button>
+                <button type="button" class="close_button" ng-click="list()">close</button>
+            </div>
             <p class="document_title">{{ content | documentTitle }}</p>
             <small><p>{{ content.data['adhocracy.sheets.document.IDocument'].description }}</p></small>
         </div>
         <div ng-switch-when="edit">
-            <button type="button" class="reset_button" ng-click="reset()">reset</button>
-            <button type="button" class="save_button" ng-click="commit()">save</button>
-            <br>
+            <div class="buttons_box">
+                <button type="button" class="reset_button" ng-click="reset()">reset</button>
+                <button type="button" class="save_button" ng-click="commit()">save</button>
+            </div>
             <adh-proposal-version-edit content="content"></adh-proposal-version-edit>
         </div>
         <div ng-switch-default>
