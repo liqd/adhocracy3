@@ -6,8 +6,7 @@
             <p>{{ content.data['adhocracy.sheets.document.IParagraph'].content }}</p>
         </div>
         <div ng-switch-when="edit">
-            <input class="__widget__" style="height: 5em; width: 20em;"
-                   ng-model="content.data['adhocracy.sheets.document.IParagraph'].content"></input>
+            <adh-paragraph-sheet-edit sheet="content.data['adhocracy.sheets.document.IParagraph']"></adh-paragraph-sheet-edit>
         </div>
         <div ng-switch-default>
             internal error: unknown view mode: [{{ viewmode }}]
