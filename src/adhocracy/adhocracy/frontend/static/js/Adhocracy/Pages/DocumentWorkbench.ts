@@ -321,27 +321,6 @@ export function run<Data>() {
     });
 
 
-    app.directive("adhSectionSheetEdit", ["$http", "$q", "RecursionHelper", function($http, $q, RecursionHelper) {
-        return {
-            restrict: "E",
-            templateUrl: templatePath + "/Sheets/ISection/Edit.html",
-            compile: (element) => RecursionHelper.compile(element),
-            scope: {
-                sheet: "="
-            },
-            controller: ['$scope', function($scope) {
-                var versionPromises = $scope.sheet.elements.map( (path) => {
-                    $http.get(decodeURIComponent(path)).then( (resp) => resp.data );
-                });
-
-                $q.all(versionPromises).then( (versions) => {
-                    $scope.concreteElements = versions;
-                });
-            }],
-        };
-    }]);
-
-
     app.directive("adhParagraphSheetEdit", function() {
         return {
             restrict: "E",
