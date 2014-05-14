@@ -12,7 +12,6 @@ from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
 from substanced.interfaces import IRoot
 from substanced.util import find_objectmap
-import logging
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItem
@@ -20,6 +19,7 @@ from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISimple
 from adhocracy.interfaces import IPool
 from adhocracy.interfaces import ISheet
+from adhocracy.rest import logger
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
 from adhocracy.rest.schemas import POSTItemRequestSchema
@@ -34,9 +34,6 @@ from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
 from adhocracy.utils import get_all_taggedvalues
-
-
-LOG = logging.getLogger(__name__)
 
 
 def validate_sheet_cstructs(context, request, sheets):
@@ -168,10 +165,10 @@ def validate_request_data(context, request, schema=None, extra_validators=[]):
 
 
 def _log_request_errors(request):
-    LOG.warn('Found %i validation errors in request: <%s>',
-             len(request.errors), request.body)
+    logger.warn('Found %i validation errors in request: <%s>',
+                len(request.errors), request.body)
     for error in request.errors:
-        LOG.warn('  %s', error)
+        logger.warn('  %s', error)
 
 
 def validate_request_data_decorator():
