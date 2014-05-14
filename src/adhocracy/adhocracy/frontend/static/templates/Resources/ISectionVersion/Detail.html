@@ -1,0 +1,12 @@
+<div class="section" style="padding-left: 0.5em">
+    <adh-paragraph-version-detail
+        ng-repeat="paragraphRef in content.data['adhocracy.sheets.document.ISection'].elements"
+        ref="paragraphRef"
+        viewmode="viewmode">
+    </adh-paragraph-version-detail>
+    <adh-section-version-detail
+        ng-repeat="sectionRef in content.data['adhocracy.sheets.document.ISection'].subsections"
+        ref="sectionRef"
+        viewmode="viewmode">
+    </adh-section-version-detail>
+</div>

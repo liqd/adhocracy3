@@ -1,16 +1,16 @@
 <div class="paragraph" style="background:orange">
-    <div ng-switch="doc.viewmode">
+    <div ng-switch="viewmode">
         <div ng-switch-when="list">
         </div>
         <div ng-switch-when="display">
-            <p>{{ parcontent['data']['P.IParagraph']['text'] }}</p>
+            <p>{{ content.data['adhocracy.sheets.document.IParagraph'].content }}</p>
         </div>
         <div ng-switch-when="edit">
             <input class="__widget__" style="height: 5em; width: 20em;"
-                   ng-model="parcontent['data']['P.IParagraph']['text']"></input>
+                   ng-model="content.data['adhocracy.sheets.document.IParagraph'].content"></input>
         </div>
         <div ng-switch-default>
-            internal error: unknown view mode: [{{ doc.viewmode }}]
+            internal error: unknown view mode: [{{ viewmode }}]
         </div>
     </div>
 </div>

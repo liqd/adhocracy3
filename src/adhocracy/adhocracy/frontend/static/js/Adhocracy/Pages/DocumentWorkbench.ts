@@ -165,36 +165,35 @@ export function run<Data>() {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IProposalVersion/Detail.html",
             scope: {
-                doc: '=',
+                content: '=',
+                viewmode: '=',
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Data>,
-                                  $scope   : IDocumentDetailScope<Data>) : void
-            {
+                         function(adhHttp  : AdhHttp.IService<Data>, $scope) : void {
                 $scope.list = function() {
-                    $scope.doc.viewmode = "list";
+                    $scope.viewmode = "list";
                 };
 
                 $scope.display = function() {
-                    $scope.doc.viewmode = "display";
+                    $scope.viewmode = "display";
                 };
 
                 $scope.edit = function() {
-                    $scope.doc.viewmode = "edit";
+                    $scope.viewmode = "edit";
                 };
 
                 $scope.reset = function() {
-                    adhHttp.get($scope.doc.content.path).then( (obj) => {
-                        $scope.doc.content = obj;
+                    adhHttp.get($scope.content.path).then( (content) => {
+                        $scope.content = content;
                     });
-                    $scope.doc.viewmode = "display";
+                    $scope.viewmode = "display";
                 };
 
                 $scope.commit = function() {
-                    adhHttp.postNewVersion($scope.doc.content.path, $scope.doc.content);
+                    adhHttp.postNewVersion($scope.content.path, $scope.content);
 
                     $scope.$broadcast("commit");
-                    $scope.doc.viewmode = "display";
+                    $scope.viewmode = "display";
                 };
             }],
         };
@@ -205,7 +204,7 @@ export function run<Data>() {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IProposalVersion/Edit.html",
             scope: {
-                resource: "="
+                content: "="
             },
         };
     });
@@ -244,26 +243,53 @@ export function run<Data>() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Resources/IParagraphVersion/Detail.html",
+            scope: {
+                ref: '=',
+                viewmode: '=',
+            },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>,
-                                  $scope   : IParagraphDetailScope<Resources.HasIDocumentSheet>) : void
-            {
-                var update = function(content : Types.Content<any>) {
-                    $scope.parcontent = content;
-                }
-
+                         function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>, $scope) : void {
                 var commit = function(event, ...args) {
-                    adhHttp.postNewVersion($scope.parcontent.path, $scope.parcontent);
+                    adhHttp.postNewVersion($scope.content.path, $scope.content);
                 }
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
-                adhHttp.get($scope.parpath).then(update);
+                adhHttp.get($scope.ref).then( (content) => {
+                    $scope.content = content;
+                });
 
                 // save working copy on 'commit' event from containing document.
                 $scope.$on("commit", commit);
             }],
         };
     });
+
+
+    app.directive("adhSectionVersionDetail", ["RecursionHelper", function(RecursionHelper) {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/Resources/ISectionVersion/Detail.html",
+            compile: (element) => RecursionHelper.compile(element),
+            scope: {
+                ref: '=',
+                viewmode: '=',
+            },
+            controller: ["adhHttp", "$scope",
+                         function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>, $scope) : void {
+                var commit = function(event, ...args) {
+                    adhHttp.postNewVersion($scope.content.path, $scope.content);
+                }
+
+                // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
+                adhHttp.get($scope.ref).then( (content) => {
+                    $scope.content = content;
+                });
+
+                // save working copy on 'commit' event from containing document.
+                $scope.$on("commit", commit);
+            }],
+        };
+    }]);
 
 
     app.directive("adhDocumentSheetEdit", ["$http", "$q", function($http, $q) {
