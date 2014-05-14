@@ -93,7 +93,7 @@ export class Resource {
 
 export class Proposal extends Resource {
     constructor(name?: string) {
-        super("adhocracy.resources.proposal.IProposal");
+        super("adhocracy_sample.resources.proposal.IProposal");
         if (name !== undefined) {
             this.addIName(name);
         }
@@ -102,7 +102,7 @@ export class Proposal extends Resource {
 
 export class Paragraph extends Resource {
     constructor(name?: string) {
-        super("adhocracy.resources.paragraph.IParagraph");
+        super("adhocracy_sample.resources.paragraph.IParagraph");
         if (name !== undefined) {
             this.addIName(name);
         }
@@ -111,7 +111,7 @@ export class Paragraph extends Resource {
 
 export class Section extends Resource {
     constructor(name?: string) {
-        super("adhocracy.resources.section.ISection");
+        super("adhocracy_sample.resources.section.ISection");
         if (name !== undefined) {
             this.addIName(name);
         }
@@ -120,7 +120,7 @@ export class Section extends Resource {
 
 export class SectionVersion extends Resource {
     constructor(title: string, elements: string[], follows: string[], root_version: string[]) {
-        super("adhocracy.resources.section.ISectionVersion");
+        super("adhocracy_sample.resources.section.ISectionVersion");
         this.addISection(title, elements)
             .addIVersionable(follows, root_version);
     }

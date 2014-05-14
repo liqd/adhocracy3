@@ -221,13 +221,13 @@ export function run<Data>() {
                 onNewProposal: "="
             },
             controller: function($scope) {
-                $scope.proposalVersion = (new Resources.Resource("adhocracy.resources.proposal.IProposalVersion"))
+                $scope.proposalVersion = (new Resources.Resource("adhocracy_sample.resources.proposal.IProposalVersion"))
                                               .addIDocument("", "", []);
 
                 $scope.paragraphVersions = [];
 
                 $scope.addParagraphVersion = function() {
-                    $scope.paragraphVersions.push(new Resources.Resource("adhocracy.resources.paragraph.IParagraphVersion")
+                    $scope.paragraphVersions.push(new Resources.Resource("adhocracy_sample.resources.paragraph.IParagraphVersion")
                                                       .addIParagraph(""));
                 };
 
