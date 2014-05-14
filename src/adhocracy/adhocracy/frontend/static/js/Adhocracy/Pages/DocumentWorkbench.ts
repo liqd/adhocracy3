@@ -45,8 +45,6 @@ interface IParagraphDetailScope<Data> extends IDocumentDetailScope<Data> {
     parcontent  : Types.Content<Data>;
 }
 
-// FIXME: consider using isolated scopes in order to avoid inheriting
-// model data.
 
 export function run<Data>() {
     var app = angular.module("adhocracy3SampleFrontend", []);
