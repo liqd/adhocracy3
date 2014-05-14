@@ -5,10 +5,10 @@ from substanced.folder import Folder
 from zope.interface import implementer
 
 from adhocracy.base import Base
-from adhocracy.interfaces import IAutoNamingManualFolder
+from adhocracy.interfaces import IPool
 
 
-@implementer(IAutoNamingManualFolder)
+@implementer(IPool)
 class ResourcesAutolNamingFolder(Base, Folder):
 
     """An Auto-Naming Folder.
@@ -17,10 +17,6 @@ class ResourcesAutolNamingFolder(Base, Folder):
 
     The next_name method sequentially increments the last name:
     ``0000001``, then ``0000002``, and so on.
-
-    This class implements the
-    :class:`substanced.interfaces.IAutoNamingFolder` interface and inherits
-    from :class:`substanced.folder.Folder`.
 
     """
 
@@ -56,17 +52,14 @@ class ResourcesAutolNamingFolder(Base, Folder):
             name += '_' + timestamp
         return name
 
-    def add_next(self, subobject, send_events=True, duplicating=None,
-                 moving=None, registry=None, prefix=''):
+    def add_next(self, subobject, prefix=''):
         """Add a subobject and name it automatically.
 
         Use the name returned by this folder's ``next_name`` method.
 
         """
         name = self.next_name(subobject, prefix=prefix)
-        return self.add(name, subobject, send_events=send_events,
-                        duplicating=duplicating, moving=moving,
-                        registry=registry)
+        return self.add(name, subobject, send_events=False)
 
     def _zfill(self, name):
         return str(int(name)).zfill(self._autoname_length)

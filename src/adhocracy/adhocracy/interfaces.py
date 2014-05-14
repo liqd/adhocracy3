@@ -1,6 +1,7 @@
 """Basic Interfaces used by all packages."""
+from collections import Iterable
+
 from pyramid.interfaces import ILocation
-from substanced.interfaces import IAutoNamingFolder
 from substanced.interfaces import IPropertySheet
 from substanced.interfaces import ReferenceClass
 from zope.interface import Attribute
@@ -9,23 +10,6 @@ from zope.interface import taggedValue
 from zope.interface.interfaces import IInterface
 from zope.interface.interface import InterfaceClass
 from zope.interface.interfaces import IObjectEvent
-
-
-class IAutoNamingManualFolder(IAutoNamingFolder):
-
-    """Auto-nameing Folder that allows to set manul names in addition."""
-
-    def next_name(subobject, prefix=''):
-        """Return Name for subobject."""
-
-    def add_next(subobject,
-                 send_events=True,
-                 duplicating=None,
-                 moving=None,
-                 registry=None,
-                 prefix='',
-                 ):
-        """Add new child object and autgenerate name."""
 
 
 class IIResourcePropertySheet(IInterface):
@@ -124,7 +108,7 @@ class IResource(ILocation):
     created and the registry."""
 
 
-class IPool(IResource, IAutoNamingFolder):
+class IPool(IResource):
 
     """Folder in the object hierarchy.
 
@@ -133,6 +117,48 @@ class IPool(IResource, IAutoNamingFolder):
     added to this pool).
 
     """
+
+    def keys() -> Iterable:
+        """ Return subobject names present in this pool."""
+
+    def __iter__() -> Iterable:
+        """ An alias for ``keys``."""
+
+    def values() -> Iterable:
+        """ Return subobjects present in this pool."""
+
+    def items() -> Iterable:
+        """ Return (name, value) pairs of subobjects in the folder."""
+
+    def get(name: str, default=None) -> object:
+        """ Get subobject by name.
+
+        :raises `substanced.folder.FolderKeyError`: if name not in pool
+        """
+
+    def __contains__(name) -> bool:
+        """Check if this pool contains an subobject named by name."""
+
+    def add(name: str, other) -> str:
+        """ Add subobject other.
+
+        This method returns the name used to place the subobject in the
+        folder (a derivation of ``name``, usually the result of
+        ``self.check_name(name)``).
+        """
+
+    def check_name(name: str) -> str:
+        """ Check and modify the name passed for validity.
+
+        :return: the name (with any needed modifications).
+        :raises `substanced.folder.FolderKeyError`: if name already in pool
+        """
+
+    def next_name(subobject, prefix='') -> str:
+        """Return Name for subobject."""
+
+    def add_next(subobject, prefix='') -> str:
+        """Add new subobject and autgenerate name."""
 
     taggedValue('content_class', 'adhocracy.folder.ResourcesAutolNamingFolder')
     taggedValue('basic_sheets', {'adhocracy.sheets.name.IName',
