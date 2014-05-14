@@ -2,12 +2,12 @@
 from persistent import Persistent
 from zope.interface import implementer
 
-from adhocracy.interfaces import IResource
+from pyramid.interfaces import ILocation
 from adhocracy.utils import get_resource_interface
 
 
-@implementer(IResource)
-class Resource(Persistent):
+@implementer(ILocation)
+class Base(Persistent):
 
     """Persistent and location aware class."""
 
@@ -15,7 +15,7 @@ class Resource(Persistent):
     __name__ = None
 
     def __str__(self):
-        iresource = get_resource_interface(self) or IResource
+        iresource = get_resource_interface(self) or ILocation
         iresource_str = iresource.__identifier__
         repr_str = repr(self)
         oid = getattr(self, '__oid__', '')

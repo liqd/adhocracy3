@@ -105,7 +105,7 @@ class IResource(ILocation):
 
     taggedValue('content_name', '')
     """Human readable name, subtypes have to override"""
-    taggedValue('content_class', 'adhocracy.resource.Resource')
+    taggedValue('content_class', 'adhocracy.base.Base')
     """Class to create content objects"""
 
     taggedValue('permission_add', 'add')
