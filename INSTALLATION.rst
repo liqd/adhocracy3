@@ -82,13 +82,10 @@ updating the object structure ::
 
     ./bin/sd_evolve etc/development.ini
 
-serving the sdidemo wsgi app using pserve ::
+serving the sample wsgi app using pserve ::
 
     ./bin/pserve etc/development.ini
 
 open the javascript front-end with your web browser ::
 
     xdg-open http://localhost:6541/frontend_static/root.html
-
-
-
