@@ -12,6 +12,7 @@ from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
 from substanced.interfaces import IRoot
 from substanced.util import find_objectmap
+import logging
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItem
@@ -33,6 +34,9 @@ from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
 from adhocracy.utils import get_all_taggedvalues
+
+
+LOG = logging.getLogger(__name__)
 
 
 def validate_sheet_cstructs(context, request, sheets):
@@ -150,12 +154,24 @@ def validate_request_data(context, request, schema=None, extra_validators=[]):
         """
         if schema:
             schemac = CorniceSchema.from_colander(schema)
+            # FIXME workaround for Cornice not finding a request body
+            if (not hasattr(request, 'deserializer') and
+                    hasattr(request, 'json')):
+                request.deserializer = lambda req: req.json
             validate_colander_schema(schemac, request)
         for val in extra_validators:
             val(context, request)
         if request.errors:
             request.validated = {}
+            _log_request_errors(request)
             raise json_error(request.errors)
+
+
+def _log_request_errors(request):
+    LOG.warn('Found %i validation errors in request: <%s>',
+             len(request.errors), request.body)
+    for error in request.errors:
+        LOG.warn('  %s', error)
 
 
 def validate_request_data_decorator():

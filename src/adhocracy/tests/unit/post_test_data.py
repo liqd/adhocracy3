@@ -21,6 +21,48 @@ else:
 rootpath = "/adhocracy/"
 null = None  # for more js-ish json representation
 
+
+def _print_request(data: str, uri: str, method: str='post') -> None:
+    print('====================================================================== [REQUEST]')
+    print('  method: ' + method)
+    print('  uri: ' + uri)
+    print('  data: ' + data)
+    print('')
+
+
+def _print_response_or_give_up(response: requests.Response) -> None:
+    print('---------------------------------------------------------------------- [RESPONSE]')
+    print('  code: ' + str(response.status_code))
+    if response.status_code == 200:
+        print('  data: ' + json.dumps(response.json()))
+        print('')
+    else:
+        print('  data: ' + response.text)
+        print('')
+        print('giving up!')
+        exit(1)
+
+
+def _post_data(request_dict: dict) -> dict:
+    """"Post a JSON object to the server and return the response dictionary.
+
+    Also prints the request and the resulting response for easy visual feedback.
+    Gives up and exists the app if the server responds with an error.
+    """
+    data = json.dumps(request_dict)
+    uri = server + rootpath
+    _print_request(data, uri, method='post')
+    response = requests.post(uri, data=data,
+                             headers={'content-type': 'text/json',})
+    _print_response_or_give_up(response)
+    return response.json
+
+
+_post_data({'content_type': 'adhocracy.resources.pool.IBasicPool',
+             'data': {
+                  'adhocracy.sheets.name.IName': {
+                      'name': 'Proposals'}}})
+
 data = json.dumps({
     "data": {},
     "content_type": "adhocracy.contents.interfaces.IProposalContainer"
