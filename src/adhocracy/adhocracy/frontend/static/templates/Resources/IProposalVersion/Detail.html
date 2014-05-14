@@ -10,8 +10,7 @@
                 <button type="button" class="edit_button" ng-click="edit()">edit</button>
                 <button type="button" class="close_button" ng-click="list()">close</button>
             </div>
-            <p class="document_title">{{ content | documentTitle }}</p>
-            <small><p>{{ content.data['adhocracy.sheets.document.IDocument'].description }}</p></small>
+            <adh-document-sheet-show sheet="content.data['adhocracy.sheets.document.IDocument']"></adh-document-sheet-show>
         </div>
         <div ng-switch-when="edit">
             <div class="buttons_box">
