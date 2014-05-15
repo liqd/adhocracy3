@@ -2,7 +2,7 @@
 from substanced.content import add_content_type
 
 from adhocracy.interfaces import IItemVersion
-from adhocracy.resources import resource_meta_defaults
+from adhocracy.resources.resource import resource_meta_defaults
 from adhocracy.resources import ResourceFactory
 from adhocracy.resources import notify_new_itemversion_created
 import adhocracy.sheets.versions

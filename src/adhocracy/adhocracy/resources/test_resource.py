@@ -5,7 +5,7 @@ from adhocracy.utils import to_dotted_name
 class ResourceUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import Base
+        from adhocracy.resources.resource import Base
         return Base()
 
     def test_create(self):
@@ -22,9 +22,11 @@ class ResourceUnitTest(unittest.TestCase):
 
     def test_to_string_without_oid_and_iresource(self):
         inst = self.make_one()
-        wanted_str = '{0} oid: {1}'.format(to_dotted_name(inst.__class__),
+        inst_class = inst.__class__
+        non_iresource = object()
+        wanted_str = '{0} oid: {1}'.format(to_dotted_name(non_iresource.__class__),
                                            'None')
-        assert wanted_str == str(inst)
+        assert wanted_str == inst_class.__repr__(non_iresource)
 
     def test_to_string_with_oid(self):
         inst = self.make_one()

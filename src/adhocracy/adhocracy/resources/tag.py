@@ -2,7 +2,7 @@
 from substanced.content import add_content_type
 
 from adhocracy.interfaces import ITag
-from adhocracy.resources import resource_meta_defaults
+from adhocracy.resources.resource import resource_meta_defaults
 from adhocracy.resources import ResourceFactory
 import adhocracy.sheets.name
 import adhocracy.sheets.tags

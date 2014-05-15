@@ -133,7 +133,7 @@ Separation of Responsibility for adhocracy packages
     --------------------------------------------------------------------------------------
     registry* (provide resource/isheet metadata, create resources/isheet, ...)
     -------------------------------------------------------------------------------------------
-    base| folder | resources |  sheets  | subscriber* | user management* | search*  | graph*
+    resources |  sheets  | subscriber* | user management* | search*  | graph*
     -------------------------------------------------------------------------------------------
     interfaces |  utils  | events | schema
 
@@ -144,8 +144,6 @@ Separation of Responsibility for adhocracy packages
             must not import from same level
             may import from bottom level
             may import interfaces
-         exceptions:
-            resource can import from folder/base
 
 separation of concerns or adhocracy
 -----------------------------------

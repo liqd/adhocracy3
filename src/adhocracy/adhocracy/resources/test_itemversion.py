@@ -1,6 +1,7 @@
 import unittest
 
 from pyramid import testing
+from adhocracy.resources.pool import Pool
 
 
 class DummyFolder(testing.DummyResource):
@@ -28,14 +29,13 @@ class ItemVersionIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         from substanced.objectmap import ObjectMap
-        from adhocracy.folder import ResourcesAutolNamingFolder
         from adhocracy.resources.itemversion import itemversion_meta_defaults
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.resources')
         self.config.include('adhocracy.sheets.name')
         self.config.include('adhocracy.sheets.versions')
-        context = ResourcesAutolNamingFolder()
+        context = Pool()
         context.__objectmap__ = ObjectMap(context)
         self.context = context
         self.metadata = itemversion_meta_defaults

@@ -75,8 +75,8 @@ class DummyFolder(testing.DummyResource):
 class ResourceFactoryUnitTest(unittest.TestCase):
 
     def setUp(self):
-        from adhocracy.base import Base
-        from adhocracy.resources import resource_meta
+        from adhocracy.resources.resource import Base
+        from adhocracy.resources.resource import resource_meta
         self.config = testing.setUp()
         self.context = DummyFolder()
         self.metadata = resource_meta._replace(iresource=IResource,

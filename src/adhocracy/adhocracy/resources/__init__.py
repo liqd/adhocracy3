@@ -8,29 +8,16 @@ from pyramid.threadlocal import get_current_registry
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
-from adhocracy.base import Base
 from adhocracy.events import ItemVersionNewVersionAdded
 from adhocracy.events import SheetReferencedItemHasNewVersion
 from adhocracy.graph import get_back_references
 from adhocracy.graph import get_follows
-from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ITag
 from adhocracy.interfaces import IItem
-from adhocracy.interfaces import resource_meta
 from adhocracy.interfaces import ResourceMetadata
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_sheet
 from adhocracy.sheets import tags
-
-
-resource_meta_defaults = \
-    resource_meta._replace(
-        content_name=IResource.__identifier__,
-        iresource=IResource,
-        content_class=Base,
-        permission_add='add',
-        permission_view='view',
-    )
 
 
 def create_initial_content_for_item(context, registry, options):
