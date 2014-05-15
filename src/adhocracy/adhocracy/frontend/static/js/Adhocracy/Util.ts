@@ -1,7 +1,7 @@
 import Types = require("Adhocracy/Types");
 
 
-// Array Remove - By John Resig (MIT Licensed)
+// cut ranges out of an array - original by John Resig (MIT Licensed)
 export function cutArray(a : any[], from : number, to ?: number) : any[] {
     var rest = a.slice((to || from) + 1 || a.length);
     a.length = from < 0 ? a.length + from : from;
@@ -24,7 +24,7 @@ export function parentPath(url : string) : string {
 export function deepcp(i) {
     if (typeof(i) === "object") {
         var o : Object;
-        if (i == null) {
+        if (i === null) {
             o = null;
         } else if (i instanceof Array)  {
             o = new Array();
@@ -92,4 +92,8 @@ export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
     var deferred = $q.defer();
     deferred.resolve();
     return deferred.promise.then(() => { return obj; });
+}
+
+export function normalizeName(name: string) : string {
+    return name.toLowerCase().replace(/\ /g, "_");
 }

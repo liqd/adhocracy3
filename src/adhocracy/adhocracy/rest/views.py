@@ -18,6 +18,7 @@ from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISimple
 from adhocracy.interfaces import IPool
+from adhocracy.rest import logger
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
 from adhocracy.rest.schemas import POSTItemRequestSchema
@@ -146,12 +147,24 @@ def validate_request_data(context, request, schema=None, extra_validators=[]):
         """
         if schema:
             schemac = CorniceSchema.from_colander(schema)
+            # FIXME workaround for Cornice not finding a request body
+            if (not hasattr(request, 'deserializer') and
+                    hasattr(request, 'json')):
+                request.deserializer = lambda req: req.json
             validate_colander_schema(schemac, request)
         for val in extra_validators:
             val(context, request)
         if request.errors:
             request.validated = {}
+            _log_request_errors(request)
             raise json_error(request.errors)
+
+
+def _log_request_errors(request):
+    logger.warn('Found %i validation errors in request: <%s>',
+                len(request.errors), request.body)
+    for error in request.errors:
+        logger.warn('  %s', error)
 
 
 def validate_request_data_decorator():
@@ -264,6 +277,8 @@ class ResourceRESTView(RESTView):
         struct['path'] = resource_path(self.context)
         iresource = get_resource_interface(self.context)
         struct['content_type'] = iresource.__identifier__
+        #  FIXME: The ItemRESTView should be responsible for the following code
+        #  or we move it to the versions sheet.
         if IItem.providedBy(self.context):
             response_schema = GETItemResponseSchema()
             for v in self.context.values():
