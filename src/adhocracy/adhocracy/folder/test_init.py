@@ -16,10 +16,10 @@ class ResourcesAutolNamingFolderUnitTest(unittest.TestCase):
         return ResourcesAutolNamingFolder(d)
 
     def test_create(self):
-        from adhocracy.interfaces import IAutoNamingManualFolder
+        from adhocracy.interfaces import IPool
         from zope.interface.verify import verifyObject
         inst = self._makeOne()
-        assert verifyObject(IAutoNamingManualFolder, inst)
+        assert verifyObject(IPool, inst)
 
     def test_next_name_empty(self):
         ob = testing.DummyResource()
