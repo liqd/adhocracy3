@@ -111,6 +111,8 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
 
     content_name: Human readable name,
                   subtypes have to override
+    iresource: the resource type interface,
+               subtypes have to override
     content_class: Class to create content objects
     permission_add: Permission to add this resource to the object hierarchy.
     permission_view: Permission to view resource data and view in listings
