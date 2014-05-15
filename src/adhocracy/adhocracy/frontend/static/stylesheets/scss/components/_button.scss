@@ -1,11 +1,11 @@
 @mixin button-base {
     text-decoration: none;
     overflow: hidden;
-    display: inline-block;
+    @include inline-block;
     text-align: center;
     cursor: pointer;
     white-space: nowrap;
-    border: none;
+    border: 0;
 
     &:hover {
         text-decoration: none;
