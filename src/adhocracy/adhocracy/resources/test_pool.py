@@ -23,6 +23,7 @@ class DummyFolder(testing.DummyResource):
 class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
+        import adhocracy.resources.pool  # make config.include work
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
@@ -37,8 +38,17 @@ class IncludemeIntegrationTest(unittest.TestCase):
         content_types = self.config.registry.content.factory_types
         assert IBasicPool.__identifier__ in content_types
 
+    def test_includeme_registry_register_meta(self):
+        from adhocracy.resources.pool import IBasicPool
+        from adhocracy.resources.pool import pool_meta_defaults
+        meta = self.config.registry.content.meta
+        assert IBasicPool.__identifier__ in meta
+        assert meta[IBasicPool.__identifier__]['resource_metadata'] == pool_meta_defaults
+
+
     def test_includeme_registry_create_content(self):
         from adhocracy.resources.pool import IBasicPool
         res = self.config.registry.content.create(IBasicPool.__identifier__,
                                                   self.context)
         assert IBasicPool.providedBy(res)
+

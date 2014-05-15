@@ -434,28 +434,21 @@ class MetaApiView(RESTView):
 
             # List of sheets
             sheets = []
-            if 'basic_sheets' in metadata:
-                sheets.extend(metadata['basic_sheets'])
-            if 'extended_sheets' in metadata:
-                sheets.extend(metadata['extended_sheets'])
+            sheets.extend(metadata.basic_sheets)
+            sheets.extend(metadata.extended_sheets)
             prop_map['sheets'] = [to_dotted_name(s) for s in sheets]
 
             # Main element type if this is a pool or item
-            if 'item_type' in metadata:
-                item_type = to_dotted_name(metadata['item_type'])
-                prop_map['item_type'] = item_type
-            else:
-                item_type = None
+            if metadata.item_type:
+                prop_map['item_type'] = to_dotted_name(metadata.item_type)
 
             # Other addable element types
-            if 'element_types' in metadata:
-                element_types = metadata['element_types']
+            if metadata.element_types:
                 element_names = []
-
-                for typ in element_types:
+                for typ in metadata.element_types:
                     element_names.append(to_dotted_name(typ))
-
                 prop_map['element_types'] = element_names
+
             resource_map[name] = prop_map
         return resource_map
 

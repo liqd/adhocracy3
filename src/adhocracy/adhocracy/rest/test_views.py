@@ -14,7 +14,6 @@ from adhocracy.interfaces import IResource
 from adhocracy.utils import get_all_taggedvalues
 
 
-
 ############
 #  helper  #
 ############
@@ -87,13 +86,14 @@ class DummyPropertysheet:
         self._dummy_appstruct = appstruct
 
 
-def make_resource_metadata(iresource, metadata):
+def make_resources_metadata(metadata):
     """Helper method that assembles dummy resource metadata.
 
     It returns the same structure as the resources_metadata method from
     adhocracy.registry.
 
     """
+    iresource = metadata.iresource
     return {iresource.__identifier__: {'name': iresource.__identifier__,
                                        'iface': iresource,
                                        'metadata': metadata
@@ -766,6 +766,7 @@ class ItemRESTViewUnitTest(unittest.TestCase):
 class MetaApiViewUnitTest(unittest.TestCase):
 
     def setUp(self):
+        from adhocracy.interfaces import resource_meta
         self.context = DummyFolder()
         resource_registry = make_mock_resource_registry()
         request = CorniceDummyRequest()
@@ -773,14 +774,15 @@ class MetaApiViewUnitTest(unittest.TestCase):
         self.request = request
         self.resources_metadata = request.registry.content.resources_metadata
         self.sheets_metadata = request.registry.content.sheets_metadata
+        self.resource_meta = resource_meta._replace(iresource=IResource)
 
-    def make_one(self, context, request):
+    def make_one(self):
         from .views import MetaApiView
-        return MetaApiView(context, request)
+        return MetaApiView(self.context, self.request)
 
     def test_get_empty(self):
         self.resources_metadata.return_value = {}
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one()
 
         response = inst.get()
 
@@ -789,50 +791,51 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert response['sheets'] == {}
 
     def test_get_resources(self):
-        from adhocracy.interfaces import IResource
-        self.resources_metadata.return_value = make_resource_metadata(IResource, {})
-        inst = self.make_one(self.context, self.request)
+        metas = make_resources_metadata(self.resource_meta)
+        self.resources_metadata.return_value = metas
+        inst = self.make_one()
         resp = inst.get()
         assert IResource.__identifier__ in resp['resources']
         assert resp['resources'][IResource.__identifier__] == {'sheets': []}
 
     def test_get_resources_with_sheets_metadata(self):
-        from adhocracy.interfaces import ISheet
-        from adhocracy.interfaces import IResource
-        self.resources_metadata.return_value = \
-            make_resource_metadata(IResource, {'basic_sheets': {ISheet},
-                                            'extended_sheets': {ISheetB}})
-        inst = self.make_one(self.context, self.request)
-        resources_metadata = inst.get()['resources']
-        wanted_resources_metadata = \
-            {IResource.__identifier__:
-             {'sheets': [ISheet.__identifier__, ISheetB.__identifier__]}}
-        assert wanted_resources_metadata == resources_metadata
+        metas = make_resources_metadata(self.resource_meta._replace(
+            basic_sheets=[ISheet],
+            extended_sheets=[ISheetB]))
+        self.resources_metadata.return_value = metas
+        inst = self.make_one()
 
-    def test_get_resources_with_addables_metadata(self):
-        from adhocracy.interfaces import IResource
-        from adhocracy.interfaces import IItemVersion
-        self.resources_metadata.return_value = make_resource_metadata(
-            IResource,
-            {'element_types': {IItemVersion, IResource},
-             'item_type': IItemVersion})
-        inst = self.make_one(self.context, self.request)
-        resources_metadata = inst.get()['resources']
-        wanted_element_types = sorted([IItemVersion.__identifier__,
-                                       IResource.__identifier__])
-        wanted_item_type = IItemVersion.__identifier__
-        wanted_sheets = []
-        assert IResource.__identifier__ in resources_metadata
-        this_resource_metadata = resources_metadata[IResource.__identifier__]
-        assert wanted_element_types == sorted(
-            this_resource_metadata['element_types'])
-        assert wanted_item_type == this_resource_metadata['item_type']
-        assert wanted_sheets == this_resource_metadata['sheets']
+        resp = inst.get()['resources']
+
+        wanted_sheets = [ISheet.__identifier__, ISheetB.__identifier__]
+        assert wanted_sheets == resp[IResource.__identifier__]['sheets']
+
+    def test_get_resources_with_element_types_metadata(self):
+        metas = make_resources_metadata(self.resource_meta._replace(
+            element_types=[IResource, IResourceX]))
+        self.resources_metadata.return_value = metas
+        inst = self.make_one()
+
+        resp = inst.get()['resources']
+
+        wanted = [IResource.__identifier__, IResourceX.__identifier__]
+        assert wanted == resp[IResource.__identifier__]['element_types']
+
+    def test_get_resources_with_item_type_metadata(self):
+        metas = make_resources_metadata(self.resource_meta._replace(
+            item_type=IResourceX))
+        self.resources_metadata.return_value = metas
+        inst = self.make_one()
+
+        resp = inst.get()['resources']
+
+        wanted = IResourceX.__identifier__
+        assert wanted == resp[IResource.__identifier__]['item_type']
 
     def test_get_sheets(self):
         sheets_meta = dict([(ISheet.__identifier__, get_all_taggedvalues(ISheet))])
         self.sheets_metadata.return_value = sheets_meta
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one()
         response = inst.get()
         assert ISheet.__identifier__ in response['sheets']
         assert 'fields' in response['sheets'][ISheet.__identifier__]
@@ -843,7 +846,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
             taggedValue('field:test', colander.SchemaNode(colander.Int()))
         sheets_meta = dict([(ISheetF.__identifier__, get_all_taggedvalues(ISheetF))])
         self.sheets_metadata.return_value = sheets_meta
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one()
 
         response = inst.get()['sheets'][ISheetF.__identifier__]
 
@@ -859,7 +862,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
             taggedValue('field:test', colander.SchemaNode(colander.Int()))
         sheets_meta = dict([(ISheetF.__identifier__, get_all_taggedvalues(ISheetF))])
         self.sheets_metadata.return_value = sheets_meta
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one()
 
         response = inst.get()['sheets'][ISheetF.__identifier__]
 
@@ -874,7 +877,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
             taggedValue('field:test', Identifier())
         sheets_meta = dict([(ISheetF.__identifier__, get_all_taggedvalues(ISheetF))])
         self.sheets_metadata.return_value = sheets_meta
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one()
 
         response = inst.get()['sheets'][ISheetF.__identifier__]
 
@@ -891,7 +894,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
                 reftype=SheetToSheet))
         response = dict([(ISheetF.__identifier__, get_all_taggedvalues(ISheetF))])
         self.sheets_metadata.return_value = response
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one()
 
         sheet_metadata = inst.get()['sheets'][ISheetF.__identifier__]
 

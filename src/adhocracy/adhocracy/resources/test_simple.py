@@ -26,19 +26,19 @@ class IncludemeIntegrationTest(unittest.TestCase):
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
-        self.config.include('adhocracy.resources.tag')
+        self.config.include('adhocracy.resources.simple')
         self.context = DummyFolder()
 
     def tearDown(self):
         testing.tearDown()
 
     def test_includeme_registry_register_factories(self):
-        from adhocracy.interfaces import ITag
+        from adhocracy.interfaces import ISimple
         content_types = self.config.registry.content.factory_types
-        assert ITag.__identifier__ in content_types
+        assert ISimple.__identifier__ in content_types
 
     def test_includeme_registry_create_content(self):
-        from adhocracy.interfaces import ITag
-        res = self.config.registry.content.create(ITag.__identifier__,
+        from adhocracy.interfaces import ISimple
+        res = self.config.registry.content.create(ISimple.__identifier__,
                                                   self.context)
-        assert ITag.providedBy(res)
+        assert ISimple.providedBy(res)

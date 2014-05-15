@@ -1,25 +1,22 @@
-"""Tag resource type."""
+"""Simple resource type."""
 from substanced.content import add_content_type
 
-from adhocracy.interfaces import ITag
-from adhocracy.resources import resource_meta_defaults
-from adhocracy.resources import ResourceFactory
+from adhocracy.interfaces import ISimple
 import adhocracy.sheets.name
-import adhocracy.sheets.tags
+from adhocracy.resources import ResourceFactory
+from adhocracy.resources import resource_meta_defaults
 
-
-tag_meta_defaults = \
-    resource_meta_defaults._replace(content_name='Tag',
-                                    iresource=ITag,
+simple_meta_defaults = \
+    resource_meta_defaults._replace(content_name='Simple',
+                                    iresource=ISimple,
                                     basic_sheets=[adhocracy.sheets.name.IName,
-                                                  adhocracy.sheets.tags.ITag,
                                                   ],
                                     )
 
 
 def includeme(config):
     """Register resource type factory in substanced content registry."""
-    metadata = tag_meta_defaults
+    metadata = simple_meta_defaults
     identifier = metadata.iresource.__identifier__
     add_content_type(config,
                      identifier,

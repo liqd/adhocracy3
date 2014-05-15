@@ -12,21 +12,11 @@ from adhocracy.interfaces import IPool
 #  helper  #
 ############
 
-class IResourceA(IPool):
-    pass
-
-
-class IResourceBA(IResourceA):
-    pass
-
-
-class IResourceB(IPool):
-    pass
-
-
 class ISimple(IResource):
     pass
 
+class ISimpleSubtype(ISimple):
+    pass
 
 class ISheetA(ISheet):
     pass
@@ -41,21 +31,27 @@ def _register_propertysheet_adapter(config, isheet):
                                     IResourcePropertySheet)
 
 
-def _register_content_type(registry, type):
+def _register_content_type(registry, metadata):
     from adhocracy.resources import ResourceFactory
-    registry.add(type, type, ResourceFactory(type))
+    type = metadata.iresource.__identifier__
+    registry.add(type, type, ResourceFactory(metadata))
+    registry.meta[type]['resource_metadata'] = metadata
 
 
 class TestResourceContentRegistry(unittest.TestCase):
 
     def setUp(self):
+        from adhocracy.interfaces import resource_meta
         self.config = testing.setUp()
+        self.resource_meta = resource_meta._replace(
+            iresource=IResource,
+            content_class=testing.DummyResource)
 
     def tearDown(self):
         testing.tearDown()
 
     def _make_one(self, registry=None):
-        from . import ResourceContentRegistry
+        from adhocracy.registry import ResourceContentRegistry
         resource_registry = ResourceContentRegistry(registry)
         resource_registry.registry = self.config.registry
         return resource_registry
@@ -138,7 +134,7 @@ class TestResourceContentRegistry(unittest.TestCase):
 
     def test_resources_metadata_with_resources(self):
         inst = self._make_one(self.config.registry)
-        _register_content_type(inst, IResource.__identifier__)
+        _register_content_type(inst, self.resource_meta)
         meta = inst.resources_metadata()
         assert len(meta) == 1
         assert 'iface' in meta[IResource.__identifier__]
@@ -153,8 +149,8 @@ class TestResourceContentRegistry(unittest.TestCase):
     def test_sheets_metadata_with_resources(self):
         from adhocracy.utils import get_all_taggedvalues
         inst = self._make_one(self.config.registry)
-        _register_content_type(inst, IResource.__identifier__)
-        IResource.setTaggedValue('basic_sheets', {ISheet})
+        resource_meta = self.resource_meta._replace(basic_sheets=[ISheet])
+        _register_content_type(inst, resource_meta)
         meta = inst.sheets_metadata()
         assert ISheet.__identifier__ in meta
         assert meta[ISheet.__identifier__] == get_all_taggedvalues(ISheet)
@@ -162,7 +158,7 @@ class TestResourceContentRegistry(unittest.TestCase):
     def test_addables_valid_context_is_not_ipool(self):
         inst = self._make_one()
         context = testing.DummyResource(__provides__=IResource)
-        _register_content_type(inst, IResource.__identifier__)
+        _register_content_type(inst, self.resource_meta)
 
         addables = inst.resource_addables(context, testing.DummyRequest())
 
@@ -170,9 +166,9 @@ class TestResourceContentRegistry(unittest.TestCase):
 
     def test_addables_valid_no_addables(self):
         inst = self._make_one()
-        context = testing.DummyResource(__provides__=IResourceB)
-        _register_content_type(inst, IResourceB.__identifier__)
-        IResourceB.setTaggedValue('element_types', [])
+        context = testing.DummyResource(__provides__=IPool)
+        pool_meta = self.resource_meta._replace(iresource=IPool)
+        _register_content_type(inst, pool_meta)
 
         addables = inst.resource_addables(context, testing.DummyRequest())
 
@@ -180,12 +176,12 @@ class TestResourceContentRegistry(unittest.TestCase):
 
     def test_addables_valid_with_addables(self):
         inst = self._make_one()
-        context = testing.DummyResource(__provides__=IResourceA)
-        _register_content_type(inst, IResourceA.__identifier__)
-        _register_content_type(inst, ISimple.__identifier__)
-        IResourceA.setTaggedValue('element_types',
-                                  [ISimple.__identifier__])
-        ISimple.setTaggedValue('basic_sheets', set())
+        context = testing.DummyResource(__provides__=IPool)
+        pool_meta = self.resource_meta._replace(iresource=IPool,
+                                                element_types=[ISimple])
+        _register_content_type(inst, pool_meta)
+        simple_meta = self.resource_meta._replace(iresource=ISimple)
+        _register_content_type(inst, simple_meta)
 
         addables = inst.resource_addables(context, testing.DummyRequest())
 
@@ -194,31 +190,34 @@ class TestResourceContentRegistry(unittest.TestCase):
         assert wanted == addables
 
     def test_addables_valid_with_addables_implicit_inherit(self):
-        from adhocracy.sheets.pool import IPool
         inst = self._make_one()
-        context = testing.DummyResource(__provides__=IResourceA)
-        _register_content_type(inst, IResourceA.__identifier__)
-        _register_content_type(inst, IResourceBA.__identifier__)
+        context = testing.DummyResource(__provides__=IPool)
+        pool_meta = self.resource_meta._replace(iresource=IPool,
+                                                element_types=[ISimple])
+        _register_content_type(inst, pool_meta)
         _register_propertysheet_adapter(self.config, IPool)
-        IResourceA.setTaggedValue('element_types',
-                                  [IResourceA.__identifier__])
-        IResourceA.setTaggedValue('basic_sheets', set())
-        IResourceBA.setTaggedValue('basic_sheets', set())
-        IResourceBA.setTaggedValue('is_implicit_addable', True)
+        simple_meta = self.resource_meta._replace(iresource=ISimple)
+        _register_content_type(inst, simple_meta)
+        simple_sub_meta = self.resource_meta._replace(iresource=ISimpleSubtype,
+                                                      is_implicit_addable=True)
+        _register_content_type(inst, simple_sub_meta)
+
         addables = inst.resource_addables(context, testing.DummyRequest())
 
-        wanted = [IResourceA.__identifier__, IResourceBA.__identifier__]
+        wanted = [ISimple.__identifier__, ISimpleSubtype.__identifier__]
         assert sorted([x for x in addables.keys()]) == wanted
 
     def test_addables_valid_with_addables_with_sheets(self):
         inst = self._make_one(self.config.registry)
-        context = testing.DummyResource(__provides__=IResourceA)
-        IResourceA.setTaggedValue('element_types',
-                                  [ISimple.__identifier__])
-        ISimple.setTaggedValue('basic_sheets', {ISheetA.__identifier__,
-                                                ISheet.__identifier__})
-        _register_content_type(inst, IResourceA.__identifier__)
-        _register_content_type(inst, ISimple.__identifier__)
+        context = testing.DummyResource(__provides__=IPool)
+        pool_meta = self.resource_meta._replace(iresource=IPool,
+                                                element_types=[ISimple])
+
+        simple_meta = self.resource_meta._replace(iresource=ISimple,
+                                                  basic_sheets=[ISheetA,
+                                                                ISheet])
+        _register_content_type(inst, pool_meta)
+        _register_content_type(inst, simple_meta)
         ISheetA.setTaggedValue('createmandatory', True)
         _register_propertysheet_adapter(self.config, ISheet)
         _register_propertysheet_adapter(self.config, ISheetA)

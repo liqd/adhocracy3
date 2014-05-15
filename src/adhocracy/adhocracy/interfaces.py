@@ -1,5 +1,7 @@
 """Basic Interfaces used by all packages."""
 from collections import Iterable
+from collections import namedtuple
+from collections import OrderedDict
 
 from pyramid.interfaces import ILocation
 from substanced.interfaces import IPropertySheet
@@ -74,7 +76,7 @@ class IResourcePropertySheet(IPropertySheet):
         """ Validate ``cstruct`` data.
 
         Args:
-            cstruct (Dictionary): serialized application data (colander)
+               cstruct (Dictionary): serialized application data (colander)
         Returns:
             appstruct (Dictionary): deserialized application data (colander)
         Raises:
@@ -82,30 +84,59 @@ class IResourcePropertySheet(IPropertySheet):
 
         """
 
+RESOURCE_METADATA_FIELDS = OrderedDict({
+    'content_name': '',
+    'iresource': None,
+    'content_class': None,
+    'permission_add': '',
+    'permission_view': '',
+    'is_implicit_addable': True,
+    'basic_sheets': [],
+    'extended_sheets': [],
+    'after_creation': [],
+    'element_types': [],
+    'item_type': None,
+})
+
+
+class ResourceMetadata(namedtuple('ResourceMetadata',
+                                  RESOURCE_METADATA_FIELDS.keys())):
+
+    """Metadata to register Resource Types.
+
+    Basic fields:
+    -------------
+
+    content_name: Human readable name,
+                  subtypes have to override
+    content_class: Class to create content objects
+    permission_add: Permission to add this resource to the object hierarchy.
+    permission_view: Permission to view resource data and view in listings
+    is_implicit_addable: Make this type adddable if supertype is addable.
+    basic_sheets: Basic property interfaces to define data
+    extended_sheets: Extended property interfaces to define data,
+                     subtypes should override
+    after_creation: callables to run after creation. They are passed the
+                    instance being created and the registry.
+
+    IPool fields:
+    -------------
+
+    element_types: Set addable content types, class heritage is honored.
+
+    IItem fields:
+    -------------
+
+    item_type: Set addable content types, class heritage is honored
+
+    """
+
+resource_meta = ResourceMetadata(**RESOURCE_METADATA_FIELDS)
+
 
 class IResource(ILocation):
 
     """Marker interface with tagged values to configure a resource type."""
-
-    taggedValue('content_name', '')
-    """Human readable name, subtypes have to override"""
-    taggedValue('content_class', 'adhocracy.base.Base')
-    """Class to create content objects"""
-
-    taggedValue('permission_add', 'add')
-    """Permission to add this content object to the object hierarchy. """
-    taggedValue('permission_view', 'view')
-    """Permission to view content data and view in listings"""
-    taggedValue('is_implicit_addable', True)
-    """Make this content type adddable if supertype is addable."""
-
-    taggedValue('basic_sheets', set())
-    """Basic property interfaces to define data """
-    taggedValue('extended_sheets', set())
-    """Extended property interfaces to define data, subtypes should override"""
-    taggedValue('after_creation', [])
-    """Callables to run after creation. They are passed the instance being
-    created and the registry."""
 
 
 class IPool(IResource):
@@ -113,8 +144,6 @@ class IPool(IResource):
     """Folder in the object hierarchy.
 
     Can contain other Pools (subfolders) and Items of any kind.
-    Additional TaggedValue: 'element_types' (types of resources that can be
-    added to this pool).
 
     """
 
@@ -160,61 +189,25 @@ class IPool(IResource):
     def add_next(subobject, prefix='') -> str:
         """Add new subobject and autgenerate name."""
 
-    taggedValue('content_class', 'adhocracy.folder.ResourcesAutolNamingFolder')
-    taggedValue('basic_sheets', {'adhocracy.sheets.name.IName',
-                                 'adhocracy.sheets.pool.IPool'})
-    taggedValue('element_types', {'adhocracy.interfaces.IPool'})
-    """ Set addable content types, class heritage is honored"""
-
 
 class IItem(IPool):
 
-    """Pool for any versionable objects (DAG), tags and related Pools.
-
-    Additional TaggedValue: 'item_type'
-
-    """
-
-    taggedValue('content_name', 'Item')
-    taggedValue('basic_sheets', {'adhocracy.sheets.name.IName',
-                                 'adhocracy.sheets.tags.ITags',
-                                 'adhocracy.sheets.versions.IVersions',
-                                 'adhocracy.sheets.pool.IPool'})
-    # FIXME: 'adhocracy.resources.IItemVersion' has moved to interfaces
-    taggedValue('element_types', {'adhocracy.resources.IItemVersion',
-                                  'adhocracy.resources.ITag'})
-    taggedValue(
-        'after_creation',
-        ['adhocracy.resources.create_initial_content_for_item'])
-    taggedValue('item_type', 'adhocracy.resources.IItemVersion')
-    """Type of versions in this item. Subtypes have to override."""
+    """Pool for any versionable objects (DAG), tags and related Pools. """
 
 
 class ISimple(IResource):
 
     """Small object without versions and children."""
 
-    taggedValue('content_name', 'Simple')
-    taggedValue('basic_sheets', {'adhocracy.sheets.name.IName'})
-
 
 class ITag(ISimple):
 
     """Tag to link specific versions."""
 
-    taggedValue('content_name', 'Tag')
-    taggedValue('basic_sheets', {'adhocracy.sheets.name.IName',
-                                 'adhocracy.sheets.tags.ITag'})
 
-
-class IItemVersion(IResource):
+class IItemVersion(ISimple):
 
     """Versionable object, created during a Participation Process (mainly)."""
-
-    taggedValue('content_name', 'ItemVersion')
-    taggedValue('basic_sheets', {'adhocracy.sheets.versions.IVersionable'})
-    taggedValue('after_creation',
-                ['adhocracy.resources.notify_new_itemversion_created'])
 
 
 class SheetReferenceClass(ReferenceClass):

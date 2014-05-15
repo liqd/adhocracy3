@@ -161,9 +161,8 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         self._makeOne(self.event)
         assert not factory.called
 
-    @patch('adhocracy.resources.ResourceFactory', autospec=True)
     def test_call_nonversionable_with_autoupdate(self, dummyfactory=None):
-        factory = dummyfactory.return_value
+        factory = self.config.registry.content.create
         from adhocracy.interfaces import IItemVersion
         from zope.interface import noLongerProvides
         noLongerProvides(self.child, IItemVersion)

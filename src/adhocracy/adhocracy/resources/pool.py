@@ -1,7 +1,11 @@
 """Pool resource type."""
 from substanced.content import add_content_type
 
+import adhocracy.sheets.name
+import adhocracy.sheets.pool
+from adhocracy.folder import ResourcesAutolNamingFolder
 from adhocracy.interfaces import IPool
+from adhocracy.resources import resource_meta_defaults
 from adhocracy.resources import ResourceFactory
 
 
@@ -9,15 +13,22 @@ class IBasicPool(IPool):
 
     """Basic Pool."""
 
+pool_meta_defaults = resource_meta_defaults._replace(
+    content_name=IBasicPool.__identifier__,
+    iresource=IBasicPool,
+    content_class=ResourcesAutolNamingFolder,
+    basic_sheets=[adhocracy.sheets.name.IName,
+                  adhocracy.sheets.pool.IPool,
+                  ],
+    element_types=[IPool],
+)
+
 
 def includeme(config):
     """Register resource type factory in substanced content registry."""
-    ifaces = [IBasicPool]
-    for iface in ifaces:
-        name = iface.queryTaggedValue('content_name') or iface.__identifier__
-        meta = {'content_name': name,
-                'add_view': 'add_' + iface.__identifier__,
-                }
-        add_content_type(config, iface.__identifier__,
-                         ResourceFactory(iface),
-                         factory_type=iface.__identifier__, **meta)
+    metadata = pool_meta_defaults
+    identifier = metadata.iresource.__identifier__
+    add_content_type(config,
+                     identifier,
+                     ResourceFactory(metadata),
+                     factory_type=identifier, resource_metadata=metadata)

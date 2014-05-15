@@ -68,7 +68,7 @@ class ResourceContentRegistry(ContentRegistry):
             try:
                 iface = res.maybe_resolve(type_)
                 if iface.isOrExtends(IResource):
-                    metadata = get_all_taggedvalues(iface)
+                    metadata = self.meta[type_]['resource_metadata']
                     resource_types[type_] = {'name': type_,
                                              'iface': iface,
                                              'metadata': metadata}
@@ -88,8 +88,8 @@ class ResourceContentRegistry(ContentRegistry):
         resources = self.resources_metadata()
         resources_meta = [x['metadata'] for x in resources.values()]
         for resource in resources_meta:
-            isheets.update(resource['basic_sheets'])
-            isheets.update(resource['extended_sheets'])
+            isheets.update(resource.basic_sheets)
+            isheets.update(resource.extended_sheets)
 
         isheets_meta = {}
         for isheet in isheets:
@@ -123,15 +123,15 @@ class ResourceContentRegistry(ContentRegistry):
         name = get_resource_interface(context).__identifier__
         assert name in all_types
         metadata = all_types[name]['metadata']
-        addables = metadata.get('element_types', [])
+        addables = metadata.element_types
         #get all addable types
         addable_types = []
         for type in all_types.values():
-            is_implicit = type['metadata']['is_implicit_addable']
+            is_implicit = type['metadata'].is_implicit_addable
             for i in addables:
                 is_subtype = type['iface'].extends(i) and is_implicit
                 is_is = type['iface'] is i
-                add_permission = type['metadata']['permission_add']
+                add_permission = type['metadata'].permission_add
                 is_allowed = has_permission(add_permission, context, request)
                 if is_subtype or is_is and is_allowed:
                     addable_types.append(type['iface'])

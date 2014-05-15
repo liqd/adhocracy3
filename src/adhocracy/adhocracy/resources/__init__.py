@@ -8,36 +8,48 @@ from pyramid.threadlocal import get_current_registry
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
+from adhocracy.base import Base
 from adhocracy.events import ItemVersionNewVersionAdded
 from adhocracy.events import SheetReferencedItemHasNewVersion
 from adhocracy.graph import get_back_references
 from adhocracy.graph import get_follows
-from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ITag
 from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
-from adhocracy.utils import get_all_taggedvalues
+from adhocracy.interfaces import resource_meta
+from adhocracy.interfaces import ResourceMetadata
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_sheet
 from adhocracy.sheets import tags
 
 
+resource_meta_defaults = \
+    resource_meta._replace(
+        content_name=IResource.__identifier__,
+        iresource=IResource,
+        content_class=Base,
+        permission_add='add',
+        permission_view='view',
+    )
+
+
 def create_initial_content_for_item(context, registry, options):
     """Add first version and the Tags LAST and FIRST."""
-    iface = get_resource_interface(context)
-    item_type = get_all_taggedvalues(iface)['item_type']
-    first_version = ResourceFactory(item_type)(parent=context)
+    iresource = get_resource_interface(context)
+    metadata = registry.content.resources_metadata()[iresource.__identifier__]
+    item_type = metadata['metadata'].item_type
+    create = registry.content.create
+    first_version = create(item_type.__identifier__, parent=context)
 
     tag_first_data = {'adhocracy.sheets.tags.ITag': {'elements':
                                                      [first_version]},
                       'adhocracy.sheets.name.IName': {'name': u'FIRST'}}
-    ResourceFactory(ITag)(parent=context, appstructs=tag_first_data)
-
+    create(ITag.__identifier__, parent=context, appstructs=tag_first_data)
     tag_last_data = {'adhocracy.sheets.tags.ITag': {'elements':
                                                     [first_version]},
                      'adhocracy.sheets.name.IName': {'name': u'LAST'}}
-    ResourceFactory(ITag)(parent=context, appstructs=tag_last_data)
+    create(ITag.__identifier__, parent=context, appstructs=tag_last_data)
 
 
 def _update_last_tag(context, registry, old_versions):
@@ -127,17 +139,10 @@ class ResourceFactory:
 
     """Basic resource factory."""
 
-    def __init__(self, iresource):
-        iresource = DottedNameResolver().maybe_resolve(iresource)
-        assert iresource.isOrExtends(IResource)
-        self.iresource = iresource
-        meta = get_all_taggedvalues(iresource)
-        self.class_ = meta['content_class']
-        isheets = meta['basic_sheets'].union(meta['extended_sheets'])
-        for isheet in isheets:
-            assert isheet.isOrExtends(ISheet)
-        self.isheets = isheets
-        self.after_creation = meta['after_creation']
+    name_identifier = 'adhocracy.sheets.name.IName'
+
+    def __init__(self, metadata: ResourceMetadata):
+        self.meta = metadata
 
     def _add(self, parent, resource, appstructs):
         """Add resource to context folder.
@@ -150,12 +155,11 @@ class ResourceFactory:
 
         """
         # TODO use seperated factory for IVersionables
-        name_identifier = 'adhocracy.sheets.name.IName'
         name = ''
-        if name_identifier in appstructs:
-            name = appstructs[name_identifier]['name']
+        if self.name_identifier in appstructs:
+            name = appstructs[self.name_identifier]['name']
             name = parent.check_name(name)
-            appstructs[name_identifier]['name'] = name
+            appstructs[self.name_identifier]['name'] = name
         if not name:
             name = datetime.datetime.now().isoformat()
         if IItemVersion.providedBy(resource):
@@ -187,9 +191,10 @@ class ResourceFactory:
             object (IResource): the newly created resource
 
         """
-        resource = self.class_()
-        directlyProvides(resource, self.iresource)
-        alsoProvides(resource, self.isheets)
+        resource = self.meta.content_class()
+        directlyProvides(resource, self.meta.iresource)
+        isheets = self.meta.basic_sheets + self.meta.extended_sheets
+        alsoProvides(resource, isheets)
 
         if parent is not None:
             self._add(parent, resource, appstructs)
@@ -206,7 +211,7 @@ class ResourceFactory:
 
         if run_after_creation:
             registry = get_current_registry()
-            for call in self.after_creation:
+            for call in self.meta.after_creation:
                 call(resource, registry, options=kwargs)
 
         return resource
@@ -216,3 +221,5 @@ def includeme(config):
     """Include all resource types in this package."""
     config.include('.pool')
     config.include('.tag')
+    config.include('.itemversion')
+    config.include('.item')

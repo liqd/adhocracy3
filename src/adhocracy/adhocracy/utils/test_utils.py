@@ -96,37 +96,6 @@ def test_get_all_taggedvalues_inheritance():
     assert 'a' in metadata_ib
 
 
-def test_get_all_taggedvalues_iitem_normalize_dotted_string_to_callable():
-    from . import get_all_taggedvalues
-    from adhocracy.interfaces import IResource
-    from adhocracy.interfaces import IItem
-    from zope.interface import taggedValue
-    from zope.interface import Interface
-
-    class IA(IItem):
-        taggedValue('item_type', Interface.__identifier__)
-        taggedValue('content_class', Interface.__identifier__)
-        taggedValue('after_creation', {Interface.__identifier__})
-        taggedValue('basic_sheets', {Interface.__identifier__})
-        taggedValue('extended_sheets', {Interface.__identifier__})
-        taggedValue('element_types',
-                    {Interface.__identifier__})
-
-    metadata = get_all_taggedvalues(IA)
-    assert 'after_creation' in IResource.getTaggedValueTags()
-    assert metadata['after_creation'] == {Interface}
-    assert 'content_class' in IResource.getTaggedValueTags()
-    assert metadata['content_class'] == Interface
-    assert 'item_type' in IItem.getTaggedValueTags()
-    assert metadata['item_type'] == Interface
-    assert 'basic_sheets' in IItem.getTaggedValueTags()
-    assert metadata['basic_sheets'] == {Interface}
-    assert 'extended_sheets' in IResource.getTaggedValueTags()
-    assert metadata['extended_sheets'] == {Interface}
-    assert 'element_types' in IItem.getTaggedValueTags()
-    assert metadata['element_types'] == {Interface}
-
-
 def test_to_dotted_name_module():
     from . import to_dotted_name
     import os
