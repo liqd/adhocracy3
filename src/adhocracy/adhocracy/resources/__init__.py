@@ -16,7 +16,6 @@ from adhocracy.graph import get_follows
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ITag
 from adhocracy.interfaces import IItem
-from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import resource_meta
 from adhocracy.interfaces import ResourceMetadata
 from adhocracy.utils import get_resource_interface
@@ -162,8 +161,9 @@ class ResourceFactory:
             appstructs[self.name_identifier]['name'] = name
         if not name:
             name = datetime.datetime.now().isoformat()
-        if IItemVersion.providedBy(resource):
-            name = parent.next_name(resource, prefix='VERSION_')
+        if self.meta.use_autonaming:
+            prefix = self.meta.autonaming_prefix
+            name = parent.next_name(resource, prefix=prefix)
         parent.add(name, resource, send_events=False)
 
     def __call__(self,

@@ -179,3 +179,20 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         with pytest.raises(ValueError):
             self.make_one(meta)(parent=self.context, appstructs=appstructs)
+
+    def test_call_with_parent_and_use_autonaming(self):
+        meta = self.metadata._replace(iresource=IResource,
+                                      use_autonaming=True)
+
+        self.make_one(meta)(parent=self.context)
+
+        assert '_0000000' in self.context
+
+    def test_call_with_parent_and_use_autonaming_with_prefix(self):
+        meta = self.metadata._replace(iresource=IResource,
+                                      use_autonaming=True,
+                                      autonaming_prefix='prefix')
+
+        self.make_one(meta)(parent=self.context)
+
+        assert 'prefix_0000000' in self.context

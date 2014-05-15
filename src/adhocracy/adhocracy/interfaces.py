@@ -96,6 +96,8 @@ RESOURCE_METADATA_FIELDS = OrderedDict({
     'after_creation': [],
     'element_types': [],
     'item_type': None,
+    'use_autonaming': False,
+    'autonaming_prefix': '',
 })
 
 
@@ -118,6 +120,9 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
                      subtypes should override
     after_creation: callables to run after creation. They are passed the
                     instance being created and the registry.
+    use_autonaming: automatically generate the name if the new content object
+                    is added to the parent.
+    autonaming_prefix: uses this prefix for autonaming.
 
     IPool fields:
     -------------

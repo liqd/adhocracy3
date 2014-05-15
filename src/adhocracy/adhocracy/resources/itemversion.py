@@ -14,6 +14,8 @@ itemversion_meta_defaults = resource_meta_defaults._replace(
     basic_sheets=[adhocracy.sheets.versions.IVersionable,
                   ],
     after_creation=[notify_new_itemversion_created],
+    use_autonaming=True,
+    autonaming_prefix='VERSION_',
 )
 
 
