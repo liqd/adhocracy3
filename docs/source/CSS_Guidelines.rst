@@ -11,7 +11,7 @@ applied in any project which needs CSS code.
 -  If you are a CSS developer you should read the whole document.
 -  Everyone concerned with the frontend should read `Goals`_ and
    `Common Terminology`_.
--  Graphic designers should also read `CSS and Graphic Design`_.
+-  UI designers and graphic designers should also read `CSS and Design`_.
 -  JavaScript programmers should also read `CSS, HTML, and JavaScript`_.
 
 Goals
@@ -149,42 +149,47 @@ Keeping the core small may conflict with a good UX in the default case.
 To avoid that, a default theme is included to separate the
 default UX from the core.
 
-CSS and Graphic Design
-----------------------
+CSS and Design
+--------------
 
-This section describes the collaboration between CSS developers and
-graphic designers. All the rules apply to core, default theme, and any
-additional themes.
+This section describes the collaboration between UI designers, graphic
+designers, and frontend developers. All the rules apply to core, default theme,
+and any additional themes.
 
--  Graphic designers …
-
-   -  must provide values for all variables.
-
-      -  Variables are mandatory for all colors and font sizes.
+-  UI designers …
 
    -  must mark any objects, states, modifiers, variables, mixins, and
-      adjustments in wireframes and designs.
-   -  may request new objects, states, … or the changing of existing
-      ones.
+      adjustments in wireframes.
+
+   -  may request new objects, states, … from the team.
 
       -  They must decide whether the new object, state, … should be part
          of core or theme.
+
       -  They must provide semantically rich names for all new features.
          (e.g. "light-foreground" instead of "grey"; see Robert C Martin,
          Clean Code, Chapter 2)
-      -  They must provide all necessary information and files as soon as
-         possible (to avoid delays, preliminary dummy files may be
-         provided). This includes:
 
-         -  colors
-         -  fonts
-         -  icons
-         -  background images/logos
+      -  Variables are mandatory for all colors and font sizes.
 
    -  must provide the contents of a view in a linearized and thus
       prioritized sequence in addition to the layout structure. This is
       needed e.g. for screen readers (assistive technology for the
       blind) and web crawlers.
+
+-  Graphic designers …
+
+   -  must provide values for all variables.
+
+   -  must provide designs for all objects, states, …
+
+   -  They must provide all necessary information and files as soon as
+      possible (to avoid delays, preliminary dummy files may be
+      provided). This includes:
+
+      -  fonts
+      -  icons
+      -  background images/logos
 
 -  CSS developers …
 
