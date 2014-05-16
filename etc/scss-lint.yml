@@ -1,6 +1,9 @@
 exclude: '../src/adhocracy/adhocracy/frontend/static/stylesheets/scss/third_party/**'
 
 linters:
+    Comment:
+        enabled: false
+
     Compass::*:
         enabled: true
 
