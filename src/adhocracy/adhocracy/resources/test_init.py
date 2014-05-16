@@ -283,6 +283,51 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         assert len(root_followed_by) == 1
 
 
+class AddResourceTypeIntegrationTest(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+        self.config.include('substanced.content')
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def make_one(self, iresource, config):
+        from adhocracy.resources import add_resource_type_to_registry
+        return add_resource_type_to_registry(iresource, config)
+
+    def test_add_iresource_but_missing_content_registry(self):
+        from adhocracy.interfaces import IResource
+        del self.config.registry.content
+        with pytest.raises(AssertionError):
+            self.make_one(IResource, self.config)
+
+    def test_add_iresource_factory(self):
+        from adhocracy.interfaces import IResource
+        content_registry = self.config.registry.content
+        type_id = IResource.__identifier__
+        self.make_one(IResource, self.config)
+        resource = content_registry.create(type_id)
+        assert IResource.providedBy(resource)
+
+    def test_add_iresource_metadata(self):
+        from adhocracy.interfaces import IResource
+        content_registry = self.config.registry.content
+        type_id = IResource.__identifier__
+        self.make_one(IResource, self.config)
+        wanted = {type_id: {'add_view': 'add_' + type_id,
+                            'content_name': type_id}}
+        assert wanted == content_registry.meta
+
+    def test_add_iresource_metadata_with_name(self):
+        from adhocracy.interfaces import IResource
+        IResource.setTaggedValue('content_name', 'name')
+        content_registry = self.config.registry.content
+        type_id = IResource.__identifier__
+        self.make_one(IResource, self.config)
+        assert content_registry.meta[type_id]['content_name'] == 'name'
+
+
 class ResourceFactoryUnitTest(unittest.TestCase):
 
     def setUp(self):

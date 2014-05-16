@@ -4,7 +4,9 @@ import datetime
 from pyramid.traversal import find_interface
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
+from pyramid.registry import Registry
 from substanced.util import get_oid
+from substanced.content import add_content_type
 from substanced.objectmap import find_objectmap
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
@@ -23,6 +25,23 @@ from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_sheet
 from adhocracy.sheets import tags
 from adhocracy.sheets.versions import IVersionable
+
+
+def add_resource_type_to_registry(iresource: IResource, config: Registry):
+    """Add the `iresource` type to the content registry.
+
+    As generic factory the :class:`ResourceFactory` is used.
+    """
+    assert hasattr(config.registry, 'content')
+    name = iresource.queryTaggedValue('content_name')
+    if not name:
+        name = iresource.__identifier__
+    meta = {'content_name': name,
+            'add_view': 'add_' + iresource.__identifier__,
+            }
+    add_content_type(config, iresource.__identifier__,
+                     ResourceFactory(iresource),
+                     factory_type=iresource.__identifier__, **meta)
 
 
 def create_initial_content_for_item(context, registry, options):

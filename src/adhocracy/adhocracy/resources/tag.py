@@ -1,8 +1,6 @@
 """Tag resource type."""
-from substanced.content import add_content_type
-
 from adhocracy.interfaces import ITag
-from adhocracy.resources import ResourceFactory
+from adhocracy.resources import add_resource_type_to_registry
 
 
 class IBasicTag(ITag):
@@ -12,12 +10,4 @@ class IBasicTag(ITag):
 
 def includeme(config):
     """Register resource type factory in substanced content registry."""
-    ifaces = [IBasicTag]
-    for iface in ifaces:
-        name = iface.queryTaggedValue('content_name') or iface.__identifier__
-        meta = {'content_name': name,
-                'add_view': 'add_' + iface.__identifier__,
-                }
-        add_content_type(config, iface.__identifier__,
-                         ResourceFactory(iface),
-                         factory_type=iface.__identifier__, **meta)
+    add_resource_type_to_registry(IBasicTag, config)
