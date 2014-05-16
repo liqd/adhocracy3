@@ -57,83 +57,20 @@ login view") and its *class* ("button").
 We distinguish several types of objects. There are also the related
 concepts *state*, *modifier*, *variable*, *mixin*, and *adjustment*.
 
-Widget Objects
-++++++++++++++
-
-Widgets are the most common objects. They can be reused throughout the
-UI. A typical widget is a *button* or a *list*.
-
 Base Objects
 ++++++++++++
 
-The objects that HTML has out of the box are called *base objects*. The
-styling of these objects sets the basic tone of the design. A more or
-less complete list:
+When HTML elements are used without any special modifications, they are called
+base objects. The basic styling of these elements sets the prevailing mood for
+a product. This involves general *text styling* as well as *links*, *headings*,
+and *input boxes*.
 
--  link (a)
--  button
--  headings (h1-h6)
--  image (img)
--  thematic break (hr)
--  address
--  figure
--  layout
+Widget Objects
+++++++++++++++
 
-   -  main
-   -  header
-   -  footer
-   -  aside
-   -  navigation (nav)
-
--  structure
-
-   -  article
-   -  section
-   -  paragraph (p)
-
--  table
-
-   -  caption
-   -  legend
-
--  lists
-
-   -  ordered list (ol)
-   -  unordered list (ul)
-   -  definition list (dl)
-
--  text
-
-   -  emphasized text (em)
-   -  strongly emphasized text (strong)
-   -  marked text (mark)
-   -  pre formatted text (pre)
-   -  abbreviation (abbr)
-   -  definition (dfn)
-   -  deleted text (del)
-   -  inserted text (ins)
-   -  user input (kbd)
-   -  time
-   -  meter
-   -  code
-
--  quotes
-
-   -  blockquote
-   -  cite
-   -  quote (q)
-
--  form
-
-   -  input
-   -  label
-   -  textarea
-   -  select
-   -  output
-   -  fieldset
-
--  audio
--  video
+Widgets are the most common objects. They can be reused throughout the UI. A
+typical widget is a *button* or a *login dialog*. While base objects are
+limited to existing HTML elements we can define our own widgets.
 
 Layout Objects
 ++++++++++++++
