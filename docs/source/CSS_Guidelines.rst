@@ -341,7 +341,9 @@ generators <http://vinspee.me/style-guide-guide/>`_. We chose to use
 `hologram <http://trulia.github.io/hologram/>`_ because it integrates
 well with our existing CSS tools.
 
-FIXME: describe hologram usage
+Hologram is automatically installed when running buildout. You can use
+``bin/buildout install styleguide`` to build the style guide to
+``docs/styleguide/``.
 
 All variables, widgets, base objects, states, and modifiers must be
 documented (including HTML examples). Variables and mixins also need

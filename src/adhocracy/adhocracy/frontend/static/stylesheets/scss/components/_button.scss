@@ -71,6 +71,21 @@
     }
 }
 
+/*doc
+---
+title: Button
+name: button
+category: Buttons
+---
+
+A normal button.
+
+```html_example
+<a class="button">Link</a>
+<button>Button</button>
+<input type="submit" value="Submit" />
+```
+*/
 .button,
 button,
 input[type="reset"],
@@ -79,6 +94,17 @@ input[type="button"] {
     @include button($primary-color);
 }
 
+/*doc
+---
+title: Small Button
+name: button-small
+category: Buttons
+---
+
+```html_example
+<a class="button-small">Small Button</a>
+```
+*/
 .button_small,  // deprecated
 .button-small {
     @include button($primary-color);
