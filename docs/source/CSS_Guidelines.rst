@@ -9,7 +9,7 @@ Adhocracy 3. However, it is not specific to Adhocracy 3 and can be
 applied in any project which needs CSS code.
 
 -  If you are a CSS developer you should read the whole document.
--  Anyone concerned with the frontend should read `Goals`_ and
+-  Everyone concerned with the frontend should read `Goals`_ and
    `Common Terminology`_.
 -  Graphic designers should also read `CSS and Graphic Design`_.
 -  JavaScript programmers should also read `CSS, HTML, and JavaScript`_.
@@ -40,7 +40,7 @@ To work together it is important to share a common language.
 Unfortunately, JavaScript programmers, CSS developers, and graphic
 designers sometimes have very different angles on the same things.
 
-With the following terms I tried to find (and name) common grounds. This
+With the following terms I try to find (and name) common grounds. This
 terminology is largely based on existing systems like
 `OOCSS <https://github.com/stubbornella/oocss/wiki>`_,
 `SMACSS <http://smacss.com>`_ and
@@ -233,7 +233,7 @@ additional themes.
       -  They must decide whether the new object, state, … should be part
          of core or theme.
       -  They must provide semantically rich names for all new features.
-         (e.g. "light-forground" instead of "grey"; see Robert C Martin,
+         (e.g. "light-foreground" instead of "grey"; see Robert C Martin,
          Clean Code, Chapter 2)
       -  They must provide all necessary information and files as soon as
          possible (to avoid delays, preliminary dummy files may be
@@ -254,7 +254,7 @@ additional themes.
    -  must provide a living style guide (breakdown of all existing objects,
       states, …).
    -  must report implementation issues as soon as possible.
-   -  must implement requested features as requested.
+   -  must implement features as requested.
 
 CSS, HTML, and JavaScript
 -------------------------
@@ -549,7 +549,7 @@ Demeter <http://en.wikipedia.org/wiki/Law_Of_Demeter>`_) to keep the
 code maintainable.
 
 It is important to understand that there are two different kinds of
-context awareness are involved here:
+context awareness involved here:
 
 1. Objects inherit CSS rules from their context (e.g. ``font-family`` is
    shared across the whole document if set on the ``html`` element).
