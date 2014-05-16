@@ -466,11 +466,11 @@ with their default settings, except for the following modifications:
 
    -  ``content`` (only used on pseudo-selectors)
    -  box -- ``display``, ``float``, ``position``, ``left``, ``top``,
+   -  ``border``
       ``height``, ``width``, ``margin``, ``padding``
    -  text -- ``font-family``, ``font-size``, ``line-height``,
       ``text-transform``, ``letter-spacing``, …
    -  color -- ``background``, ``color``
-   -  ``border``
    -  other
 
 The following additional rules apply:
