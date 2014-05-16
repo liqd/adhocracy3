@@ -72,6 +72,21 @@ Widgets are the most common objects. They can be reused throughout the UI. A
 typical widget is a *button* or a *login dialog*. While base objects are
 limited to existing HTML elements we can define our own widgets.
 
+Page
+++++
+
+FIXME: definition
+
+A page does not only include all objects that are rendered to screen. It also
+contains some meta data like title, description and image that might be used by
+third part services (facebook, google, …) to render a preview.
+
+Installation
+++++++++++++
+
+An installation includes a complete installment of the product. Apart from all
+pages it also includes some global meta data like title, URL and favicon.
+
 Layout Objects
 ++++++++++++++
 
