@@ -205,6 +205,7 @@ and any additional themes.
       -  fonts
       -  icons
       -  background images/logos
+      -  FIXME: define file formats, image resolution, …
 
 -  CSS developers …
 
