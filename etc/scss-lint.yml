@@ -1,0 +1,20 @@
+exclude: '../src/adhocracy/adhocracy/frontend/static/stylesheets/scss/third_party/**'
+
+linters:
+    Compass::*:
+        enabled: true
+
+    Indentation:
+        width: 4
+
+    LeadingZero:
+        style: 'include_zero'
+
+    PropertySortOrder:
+        enabled: false
+
+    SingleLinePerSelector:
+        enabled: false
+
+    StringQuotes:
+        style: 'double_quotes'

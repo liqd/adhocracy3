@@ -353,11 +353,6 @@ be used in examples it might be necessary to create
 of documentation though it might be hard to give HTML examples for
 those.
 
-Linting
-+++++++
-
-FIXME: https://github.com/causes/scss-lint
-
 Common Terminology Considerations
 +++++++++++++++++++++++++++++++++
 
@@ -453,30 +448,21 @@ a module by adding a corresponding file to the theme.
 Formatting
 ++++++++++
 
--  similar to `pep8 <http://legacy.python.org/dev/peps/pep-0008/>`_
+We have a pre-commit hook with most of the `scss-lint linters
+<https://github.com/causes/scss-lint/blob/master/lib/scss_lint/linter/README.md>`_
+with their default settings, except for the following modifications:
 
-   -  4 space indentation
-   -  2 empty lines between top level rules
-   -  1 empty line between rules and subselectors
-   -  1 empty line where you think it helps readability
-   -  only one rule per line;
-   -  no trailing whitespace
-   -  two spaces between rule and comment, one after comment initialiser
-      (good: ``color: white;  // foo``; bad: ``color: white; //foo``)
-   -  prefer lines < 80 chars if possible
+-  4 space indentation.
 
--  each rules ends with a semicolon ``;``
--  no space between key and colon; one space between colon in value
-   (e.g. ``color: white;``)
--  comma separated selectors may or may not be split into multiple lines
--  opening bracket at the end of the last selector line
--  closing bracket in its own line
--  spaces around binary operators
--  no space before comma, exactly one after
--  avoid vendor specific prefixes/hacks in your code. You may however
-   use mixins that create compatible code for exactly one thing (e.g.
-   ``border-radius`` mixin by compass)
--  order rules in roughly the following order:
+-  Include leading zero.
+
+-  Double quotes instead of single quotes.
+
+-  Comma-separated selectors need not be on their own lines. Still this is a
+   must for composite selectors.
+
+-  A strict property sort order is not enforced. Still the properties should
+   appear in roughly the following order:
 
    -  ``content`` (only used on pseudo-selectors)
    -  box -- ``display``, ``float``, ``position``, ``left``, ``top``,
@@ -487,10 +473,22 @@ Formatting
    -  ``border``
    -  other
 
--  use double quotes where quotes are needed, e.g. ``content: "foo"``.
--  use ``/* */`` for explaining code. ``//`` is only useful for
-   copyright information and other things that should be included in the
-   compiled code.
+The following additional rules apply:
+
+-  similar to `pep8 <http://legacy.python.org/dev/peps/pep-0008/>`_
+
+   -  only one property per line;
+   -  no trailing whitespace
+   -  two spaces between rule and comment, one after comment initialiser
+      (good: ``color: white;  // foo``; bad: ``color: white; //foo``)
+   -  prefer lines < 80 chars if possible
+   -  spaces around binary operators
+
+-  opening bracket at the end of the last selector line
+-  closing bracket in its own line
+-  avoid vendor specific prefixes/hacks in your code. You may however
+   use mixins that create compatible code for exactly one thing (e.g.
+   ``border-radius`` mixin by compass)
 
 Units
 +++++
