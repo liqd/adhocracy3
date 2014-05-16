@@ -91,8 +91,6 @@ class ItemIntegrationTest(unittest.TestCase):
     def setUp(self):
         from substanced.objectmap import ObjectMap
         self.config = testing.setUp()
-        self.config.include('substanced.content')
-        self.config.include('adhocracy.resources')
         self.config.include('adhocracy.sheets.name')
         self.config.include('adhocracy.sheets.tags')
         context = DummyFolder()
@@ -196,8 +194,6 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         # TODO make unittest instead of intergration test.
         from adhocracy.folder import ResourcesAutolNamingFolder
         self.config = testing.setUp()
-        self.config.include('substanced.content')
-        self.config.include('adhocracy.resources')
         self.config.include('adhocracy.sheets.name')
         self.config.include('adhocracy.sheets.versions')
         context = ResourcesAutolNamingFolder()

@@ -6,7 +6,11 @@ from pyramid.config import Configurator
 def includeme(config):
     """Setup sample app."""
     config.include('adhocracy')
-    config.include('.resources')
+    # include default resource types
+    config.include('adhocracy.resources.tag')
+    config.include('adhocracy.resources.pool')
+    # include custom resource types
+    config.include('adhocracy_sample.resources')
 
 
 def main(global_config, **settings):
