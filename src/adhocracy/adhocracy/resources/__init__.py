@@ -82,8 +82,8 @@ def _notify_referencing_resources_about_new_version(old_version,
                                                     root_versions,
                                                     registry):
     references = get_back_references(old_version)
-    for referencing, isheet, isheet_field in references:
-        event = SheetReferencedItemHasNewVersion(referencing,
+    for source, isheet, isheet_field, target in references:
+        event = SheetReferencedItemHasNewVersion(source,
                                                  isheet,
                                                  isheet_field,
                                                  old_version,

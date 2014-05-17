@@ -85,14 +85,14 @@ class ResourcePropertySheetAdapter(PropertySheet):
         (_, changed, _) = diff_dict(old_struct, struct, omit)
 
         for key in changed:
-            # FIXME: To store buildin lists and sets is not persistent.
+            # FIXME: build in lists and sets are not persistent.
             # For references the best solution is to store them only
             # in the objectmap.
-            self._data[key] = struct[key]
+            value = struct[key]
+            self._data[key] = value
             if key in self._references.keys():
                 reftype = self._references[key]
-                new_references = struct[key]
-                set_references(self.context, new_references, reftype)
+                set_references(self.context, value, reftype)
         return bool(changed)
 
     def validate_cstruct(self, cstruct):
