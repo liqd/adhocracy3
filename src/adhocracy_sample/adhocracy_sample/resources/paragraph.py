@@ -9,6 +9,7 @@ from substanced.content import add_content_type
 
 import adhocracy.sheets.document
 
+
 class IParagraphVersion(IItemVersion):
 
     """Document paragraph (a leaf in the paragraph tree)."""
@@ -19,7 +20,7 @@ paragraphversion_meta = itemversion_meta_defaults._replace(
     iresource=IParagraphVersion,
     extended_sheets=[adhocracy.sheets.document.IParagraph,
                      ],
-    )
+)
 
 
 class IParagraph(IItem):

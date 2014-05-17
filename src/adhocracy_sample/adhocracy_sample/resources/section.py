@@ -20,7 +20,8 @@ sectionversion_meta = itemversion_meta_defaults._replace(
     iresource=ISectionVersion,
     extended_sheets=[adhocracy.sheets.document.ISection,
                      ],
-    )
+)
+
 
 class ISection(IItem):
 

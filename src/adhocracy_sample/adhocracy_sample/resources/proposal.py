@@ -24,6 +24,7 @@ proposalversion_meta = itemversion_meta_defaults._replace(
                      ],
 )
 
+
 class IProposal(IItem):
 
     """All versions of a Proposal."""
