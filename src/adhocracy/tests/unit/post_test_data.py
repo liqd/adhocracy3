@@ -99,7 +99,7 @@ first_sec2_version = resp['first_version_path']
 resp = _post_data('/adhocracy/Proposals/kommunismus',
                   {'content_type': 'adhocracy_sample.resources.proposal.IProposalVersion',
                    'data': {'adhocracy.sheets.document.IDocument': {
-                                # TODO we need to copy the title+description from the preceding version
+                                # TODO we need to preserve the title+description from the preceding version
                                 'elements': [first_sec1_version, first_sec2_version]},
                             'adhocracy.sheets.versions.IVersionable': {
                                 'follows': [second_proposal_version],}
