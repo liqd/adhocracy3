@@ -4,8 +4,7 @@ from adhocracy.interfaces import ITag
 from adhocracy.interfaces import IItem
 from adhocracy_sample.resources.section import ISection
 from adhocracy_sample.resources.paragraph import IParagraph
-from adhocracy.resources import ResourceFactory
-from substanced.content import add_content_type
+from adhocracy.resources import add_resource_type_to_registry
 from zope.interface import taggedValue
 
 
@@ -31,12 +30,5 @@ class IProposal(IItem):
 
 def includeme(config):
     """Register resource type factory in substanced content registry."""
-    ifaces = [IProposalVersion, IProposal]
-    for iface in ifaces:
-        name = iface.queryTaggedValue('content_name') or iface.__identifier__
-        meta = {'content_name': name,
-                'add_view': 'add_' + iface.__identifier__,
-                }
-        add_content_type(config, iface.__identifier__,
-                         ResourceFactory(iface),
-                         factory_type=iface.__identifier__, **meta)
+    add_resource_type_to_registry(IProposalVersion, config)
+    add_resource_type_to_registry(IProposal, config)

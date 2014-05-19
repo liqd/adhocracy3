@@ -39,7 +39,10 @@ def includeme(config):
     config.include('substanced')
     config.commit()  # commit to allow proper config overrides
     config.include('.sheets')
-    config.include('.resources')
+    # By default there are now resource types included.
+    # Your extension package needs to explicit include them.
+    # config.include('.resources.tag')
+    # config.include('.resources.pool')
     config.include('.events')
     config.include('.subscriber')
     config.include('.registry')

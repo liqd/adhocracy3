@@ -42,10 +42,14 @@ var cacheSizeInObjects = 7;
 
 
 // service interface
-export interface IService {
-    get          : (path : string,                      subscribe : boolean, updateModel : (obj : Types.Content) => void) => number;
-    put          : (path : string, obj : Types.Content, subscribe : boolean, updateModel : (obj : Types.Content) => void) => number;
-    commit       : (path : string, obj : Types.Content) => boolean;
+export interface IService<Data> {
+    get          : (path : string,
+                    subscribe : boolean,
+                    updateModel : (obj : Types.Content<Data>) => void) => number;
+    put          : (path : string, obj : Types.Content<Data>,
+                    subscribe : boolean,
+                    updateModel : (obj : Types.Content<Data>) => void) => number;
+    commit       : (path : string, obj : Types.Content<Data>) => boolean;
     unsubscribe  : (path : string, ix : number) => void;
     destroy      : () => void;
 }
@@ -57,8 +61,8 @@ export interface IService {
 // subscription handles.  (the working copy is returned via the
 // updateModel callbacks as a deep copy and maintained by the service
 // client)
-interface ICacheItem {
-    pristine       : Types.Content;
+interface ICacheItem<Data> {
+    pristine       : Types.Content<Data>;
     subscriptions  : Object;  /* { <path> : <callack>, ... } */
     freshName      : () => number;
 }
@@ -66,16 +70,16 @@ interface ICacheItem {
 
 // factory
 
-export function factory(adhHttp        : AdhHttp.IService,
-                        adhWS          : AdhWS.IService,
-                        $q             : ng.IQService,
-                        $cacheFactory  : ng.ICacheFactoryService) : IService {
+export function factory<Data>(adhHttp        : AdhHttp.IService<Data>,
+                              adhWS          : AdhWS.IService<Data>,
+                              $q             : ng.IQService,
+                              $cacheFactory  : ng.ICacheFactoryService) : IService<Data> {
 
     //////////////////////////////////////////////////////////////////////
     // private state
 
     var cache : ng.ICacheObject = $cacheFactory("1", { capacity: cacheSizeInObjects });
-    var ws : AdhWS.IService = AdhWS.factory(adhHttp);
+    var ws : AdhWS.IService<Data> = AdhWS.factory(adhHttp);
     var tickms : number = 100;  // miliseconds between two checks for updates
 
 
@@ -87,8 +91,8 @@ export function factory(adhHttp        : AdhHttp.IService,
     // after content is available with a deep copy of it.  if the
     // subscribe flag is true, call updateModel again emitting new
     // versions of the content every time the server sends an update.
-    function get(path : string, subscribe : boolean, updateModel : (obj : Types.Content) => void) : number {
-        var item : ICacheItem = cache.get(path);
+    function get(path : string, subscribe : boolean, updateModel : (obj : Types.Content<Data>) => void) : number {
+        var item : ICacheItem<Data> = cache.get(path);
         var ix : number;
 
         if (typeof item === "undefined") {
@@ -120,8 +124,10 @@ export function factory(adhHttp        : AdhHttp.IService,
     }
 
     // a bit like get, but sends an object to the server first.  FIXME: document better.
-    function put(path : string, obj : Types.Content, subscribe : boolean, updateModel : (obj : Types.Content) => void) : number {
-        var item : ICacheItem = cache.get(path);
+    function put(path : string, obj : Types.Content<Data>,
+                 subscribe : boolean,
+                 updateModel : (obj : Types.Content<Data>) => void) : number {
+        var item : ICacheItem<Data> = cache.get(path);
         var ix : number;
 
         if (typeof item === "undefined") {
@@ -149,8 +155,8 @@ export function factory(adhHttp        : AdhHttp.IService,
     // version successor and predecessor edges.)  returns a boolean
     // that states whether a new version was actually created.  if
     // path gives a cache miss, crash.
-    function commit(path : string, obj : Types.Content) : boolean {
-        var item : ICacheItem = cache.get(path);
+    function commit(path : string, obj : Types.Content<Data>) : boolean {
+        var item : ICacheItem<Data> = cache.get(path);
         var workingCopyNew : boolean;
 
         if (typeof item === "undefined") {
@@ -188,13 +194,13 @@ export function factory(adhHttp        : AdhHttp.IService,
 
     // Create item with empty content.  Subscriptions map is empty;
     // freshName is initialized to start counding at 0.
-    function createEmptyItem(path : string) : ICacheItem {
+    function createEmptyItem(path : string) : ICacheItem<Data> {
         function freshNamer() : () => number {
             var x : number = 0;
             return () => { return x++; };
         }
 
-        var item : ICacheItem = {
+        var item : ICacheItem<Data> = {
             pristine: undefined,
             subscriptions: {},
             freshName: freshNamer(),
@@ -210,7 +216,7 @@ export function factory(adhHttp        : AdhHttp.IService,
     // is dropped from the cache.)
     //
     // Return pristine content.
-    function initItem(item : ICacheItem, path : string) : (obj : Types.Content) => Types.Content {
+    function initItem(item : ICacheItem<Data>, path : string) : (obj : Types.Content<Data>) => Types.Content<Data> {
         return (obj) => {
             item.pristine = obj;
 
@@ -243,13 +249,13 @@ export function factory(adhHttp        : AdhHttp.IService,
         };
     }
 
-    function registerSubscription(item : ICacheItem, updateModel : (obj : Types.Content) => void) : number {
+    function registerSubscription(item : ICacheItem<Data>, updateModel : (obj : Types.Content<Data>) => void) : number {
         var ix = item.freshName();
         item.subscriptions[ix] = updateModel;
         return ix;
     }
 
-    function unregisterSubscription(path : string, item : ICacheItem, ix : number) : void {
+    function unregisterSubscription(path : string, item : ICacheItem<Data>, ix : number) : void {
         if (typeof item === "undefined") {
             console.log("attempt to unsubscribe unregistered path: ", path, ix);
         } else {

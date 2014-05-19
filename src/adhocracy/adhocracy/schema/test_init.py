@@ -1,10 +1,11 @@
 from unittest.mock import patch
+import unittest
+
 from zope.interface import Interface
 from pyramid import testing
-
 import colander
 import pytest
-import unittest
+
 
 
 ############

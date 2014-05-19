@@ -25,10 +25,11 @@ Installation (backend)
 
 Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
-1. python2.7
+1. python3
 2. git
-3. build-essentials libyaml-dev python-dev libncurses5-dev python-setuptools
+3. build-essential libyaml-dev python3-dev libncurses5-dev python-setuptools
 4. graphviz
+5. ruby-dev
 
 checkout source code ::
 
@@ -82,13 +83,10 @@ updating the object structure ::
 
     ./bin/sd_evolve etc/development.ini
 
-serving the sdidemo wsgi app using pserve ::
+serving the sample wsgi app using pserve ::
 
     ./bin/pserve etc/development.ini
 
 open the javascript front-end with your web browser ::
 
     xdg-open http://localhost:6541/frontend_static/root.html
-
-
-

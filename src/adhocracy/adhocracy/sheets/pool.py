@@ -1,9 +1,4 @@
 """Pool Sheet."""
-from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.interfaces import SheetToSheet
-from adhocracy.sheets import ResourcePropertySheetAdapter
-from adhocracy.schema import ReferenceListSchemaNode
 from pyramid.path import DottedNameResolver
 from pyramid.httpexceptions import HTTPNotImplemented
 from substanced.util import get_oid
@@ -11,6 +6,12 @@ from zope.interface import provider
 from zope.interface import taggedValue
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
+
+from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IResourcePropertySheet
+from adhocracy.interfaces import SheetToSheet
+from adhocracy.sheets import ResourcePropertySheetAdapter
+from adhocracy.schema import ReferenceListSchemaNode
 
 
 class IIPool(IInterface):

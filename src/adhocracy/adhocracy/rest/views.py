@@ -1,4 +1,19 @@
 """Rest API views."""
+from copy import deepcopy
+import functools
+import logging
+
+from colander import SchemaNode
+from cornice.util import json_error
+from cornice.schemas import validate_colander_schema
+from cornice.schemas import CorniceSchema
+from pyramid.path import DottedNameResolver
+from pyramid.view import view_config
+from pyramid.view import view_defaults
+from pyramid.traversal import resource_path
+from substanced.interfaces import IRoot
+from substanced.util import find_objectmap
+
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
@@ -19,19 +34,9 @@ from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
 from adhocracy.utils import get_all_taggedvalues
-from colander import SchemaNode
-from copy import deepcopy
-from cornice.util import json_error
-from cornice.schemas import validate_colander_schema
-from cornice.schemas import CorniceSchema
-from pyramid.path import DottedNameResolver
-from pyramid.view import view_config
-from pyramid.view import view_defaults
-from pyramid.traversal import resource_path
-from substanced.interfaces import IRoot
-from substanced.util import find_objectmap
 
-import functools
+
+logger = logging.getLogger(__name__)
 
 
 def validate_sheet_cstructs(context, request, sheets):
@@ -149,12 +154,24 @@ def validate_request_data(context, request, schema=None, extra_validators=[]):
         """
         if schema:
             schemac = CorniceSchema.from_colander(schema)
+            # FIXME workaround for Cornice not finding a request body
+            if (not hasattr(request, 'deserializer') and
+                    hasattr(request, 'json')):
+                request.deserializer = lambda req: req.json
             validate_colander_schema(schemac, request)
         for val in extra_validators:
             val(context, request)
         if request.errors:
             request.validated = {}
+            _log_request_errors(request)
             raise json_error(request.errors)
+
+
+def _log_request_errors(request):
+    logger.warn('Found %i validation errors in request: <%s>',
+                len(request.errors), request.body)
+    for error in request.errors:
+        logger.warn('  %s', error)
 
 
 def validate_request_data_decorator():
@@ -267,6 +284,8 @@ class ResourceRESTView(RESTView):
         struct['path'] = resource_path(self.context)
         iresource = get_resource_interface(self.context)
         struct['content_type'] = iresource.__identifier__
+        #  FIXME: The ItemRESTView should be responsible for the following code
+        #  or we move it to the versions sheet.
         if IItem.providedBy(self.context):
             response_schema = GETItemResponseSchema()
             for v in self.context.values():

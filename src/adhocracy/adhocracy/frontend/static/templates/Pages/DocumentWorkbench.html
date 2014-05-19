@@ -1,0 +1,27 @@
+<table border="1">
+    <tr>
+        <td id="document_workbench_navigate">
+            <p>document workbench navigation</p>
+        </td>
+        <td id="document_workbench_list">
+            <h3>table of contents</h3>
+
+            <ol>
+                <li ng-repeat="doc in poolEntries">
+                    <div ng-switch="doc">
+                        <div ng-switch-when="undefined">
+                            <small><tt>(empty DAG)</tt></small>
+                        </div>
+                        <div ng-switch-default>
+                            <adh-proposal-version-detail content="doc.content" viewmode="doc.viewmode"></adh-proposal-version-detail>
+                        </div>
+                    </div>
+                </li>
+            </ol>
+        </td>
+        <td id="document_workbench_participate">
+            <p>proposal workbench changes and discussion</p>
+            <adh-proposal-version-new on-new-proposal="insertParagraph"></adh-proposal-version-new>
+        </td>
+    </tr>
+</table>

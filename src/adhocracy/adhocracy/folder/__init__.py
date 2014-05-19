@@ -1,9 +1,10 @@
 """Folder content type for resources."""
-from adhocracy.interfaces import IAutoNamingManualFolder
+import datetime
+
 from substanced.folder import Folder
 from zope.interface import implementer
 
-import datetime
+from adhocracy.interfaces import IAutoNamingManualFolder
 
 
 @implementer(IAutoNamingManualFolder)

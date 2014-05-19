@@ -1,14 +1,10 @@
-from adhocracy.interfaces import ISheet
-from unittest.mock import call
 from unittest.mock import patch
-from pyramid import testing
-from zope.interface import Interface
-from zope.interface import taggedValue
-from zope.interface import provider
-
-import colander
-import pytest
 import unittest
+
+from pyramid import testing
+
+from adhocracy.interfaces import ISheet
+
 
 
 ############

@@ -9,7 +9,7 @@ Use test driven development and check code style bevore pushing commits
 
 Manually check pyflake, pep257::
 
-    bin/check_code src/adhocracy
+    bin/check_code src/adhocracy src/adhocracy_sample
 
 Example Vim config according to coding guideline::
 
@@ -19,7 +19,7 @@ Example Vim config according to coding guideline::
 Install Robotframework
 ----------------------
 
-install robotframework for accpetance testing ::
+install robotframework for acceptance testing ::
 
     cd robotframework/
     python2.7 bootstrap.py
@@ -31,25 +31,12 @@ Running the Testsuite
 
 with server setup and teardown (wsgi) ::
 
-    bin/py.test -s src/adhocracy
+    bin/py.test src/adhocracy src/adhocracy_sample
 
 run the test against already running server ::
 
-    A3_TEST_SERVER=localhost:6541 bin/py.test src/adhocracy
+    A3_TEST_SERVER=localhost:6541 bin/py.test src/adhocracy src/adhocracy_sample
 
 The second case is interesting if you want to create a few objects in
 a running backend in order to make the js front-end tests more
 colorful.
-
-
-haskell backend mockup
-----------------------
-
-Frontend test suite currently (2013-11-13) works best with haskell
-backend:
-
-    git clone https://github.com/zerobuzz/a3-backend-mockup/
-
-Installation instructions will be added soon in README.md
-
-

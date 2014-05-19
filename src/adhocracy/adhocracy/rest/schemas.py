@@ -1,7 +1,7 @@
 """Cornice colander schemas und validators to validate request data."""
-from adhocracy.schema import AbsolutePath
-
 import colander
+
+from adhocracy.schema import AbsolutePath
 
 
 class ResourceResponseSchema(colander.Schema):

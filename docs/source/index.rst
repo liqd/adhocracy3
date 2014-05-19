@@ -15,6 +15,7 @@ Contents
    rest_api
    DEVELOPMENT
    CODING_STYLE_GUIDELINE.rst
+   REFACTOR_GUIDELINE
    supergraph.rst
    supergraph-2013-11-12.rst
    instance_modelling_example.rst
