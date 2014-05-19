@@ -10,7 +10,7 @@ from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.versions import IVersionable
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
-from adhocracy.schema import ReferenceListSetSchemaNode
+from adhocracy.schema import ListOfUniqueReferencesSchemaNode
 
 
 @provider(IIResourcePropertySheet)
@@ -19,7 +19,7 @@ class ITag(ISheet):
     """List all tags for this Item."""
 
     taggedValue('field:elements',
-                ReferenceListSetSchemaNode(
+                ListOfUniqueReferencesSchemaNode(
                     reftype='adhocracy.sheets.tags.ITagElementsReference',
                 ))
 
@@ -39,7 +39,7 @@ class ITags(ISheet):
     """List all tags for this Item."""
 
     taggedValue('field:elements',
-                ReferenceListSetSchemaNode(
+                ListOfUniqueReferencesSchemaNode(
                     reftype='adhocracy.sheets.tags.ITagsElementsReference',
                 ))
 

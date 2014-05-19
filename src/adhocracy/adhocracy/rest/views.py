@@ -532,7 +532,7 @@ class MetaApiView(RESTView):
 
                     if issubclass(valuetype,
                                   AbstractReferenceIterableSchemaNode):
-                        # Workaround for AbstractPathIterable:
+                        # Workaround for AbstractIterableOfPaths:
                         # it's a list/set of AbsolutePath's
                         empty_appstruct = valuetyp().create_empty_appstruct()
                         containertype = empty_appstruct.__class__.__name__

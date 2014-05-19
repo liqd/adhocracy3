@@ -53,8 +53,8 @@ class AbsolutePath(unittest.TestCase):
 class PathListSetUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import PathListSet
-        return PathListSet()
+        from . import ListOfUniquePaths
+        return ListOfUniquePaths()
 
     def setUp(self):
         self.context = testing.DummyResource()
@@ -122,8 +122,8 @@ class PathListSetUnitTest(unittest.TestCase):
 class PathSetUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import PathSet
-        return PathSet()
+        from . import SetOfPaths
+        return SetOfPaths()
 
     def setUp(self):
         self.context = testing.DummyResource()
@@ -184,8 +184,8 @@ class PathSetUnitTest(unittest.TestCase):
 class ReferenceSetSchemaNodeUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import ReferenceListSetSchemaNode
-        return ReferenceListSetSchemaNode()
+        from . import ListOfUniqueReferencesSchemaNode
+        return ListOfUniqueReferencesSchemaNode()
 
     def setUp(self):
         self.context = testing.DummyResource()

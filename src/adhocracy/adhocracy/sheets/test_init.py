@@ -78,7 +78,7 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         with pytest.raises(AssertionError):
             self.make_one(testing.DummyResource(), ISheetA)
 
-    @patch('adhocracy.schema.ReferenceListSetSchemaNode', autospec=True)
+    @patch('adhocracy.schema.ListOfUniqueReferencesSchemaNode', autospec=True)
     def test_create_references(self, dummy_reference_node=None):
         from adhocracy.interfaces import SheetToSheet
         node = dummy_reference_node.return_value
@@ -136,7 +136,7 @@ class ResourcePropertySheetAdapterUnitTests(unittest.TestCase):
         assert inst2.get() == {'count': 2}
 
     @patch('adhocracy.graph.set_references', autospec=True)
-    @patch('adhocracy.schema.ReferenceListSetSchemaNode', autospec=True)
+    @patch('adhocracy.schema.ListOfUniqueReferencesSchemaNode', autospec=True)
     def test_set_valid_references(self,
                                   dummy_node=None,
                                   dummy_set_references=None):

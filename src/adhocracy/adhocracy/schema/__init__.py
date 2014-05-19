@@ -33,7 +33,7 @@ class AbsolutePath(colander.SchemaNode):
     validator = colander.Regex(u'^/[a-zA-Z0-9\_\-\.\/]+$')
 
 
-class AbstractPathIterable(IdSet):
+class AbstractIterableOfPaths(IdSet):
 
     """Abstract Colander type to store multiple object paths.
 
@@ -113,7 +113,7 @@ class AbstractPathIterable(IdSet):
         return resources
 
 
-class PathListSet(AbstractPathIterable):
+class ListOfUniquePaths(AbstractIterableOfPaths):
 
     """List of :class:`AbsolutePath`.
 
@@ -128,13 +128,15 @@ class PathListSet(AbstractPathIterable):
         return []
 
     def add_to_appstruct(self, appstruct, element):
-        """Add an element to a list."""
-        # FIXME this means very bad performance for long lists.
-        if element not in appstruct:
+        """Add an element to a list if it is no duplicate."""
+        if not hasattr(self, '_elements'):
+            self._elements = set()
+        if element not in self._elements:
             appstruct.append(element)
+            self._elements.add(element)
 
 
-class PathSet(AbstractPathIterable):
+class SetOfPaths(AbstractIterableOfPaths):
 
     """Set of :class:`AbsolutePath`.
 
@@ -172,11 +174,11 @@ class AbstractReferenceIterableSchemaNode(schema.MultireferenceIdSchemaNode):
     """Abstract Colander SchemaNode to store multiple references.
 
     This is is an abstract class, only subclasses that set `schema_type` to a
-    concrete subclass of `AbstractPathIterable` can be instantiated.
+    concrete subclass of `AbstractIterableOfPaths` can be instantiated.
 
     """
 
-    schema_type = AbstractPathIterable
+    schema_type = AbstractIterableOfPaths
 
     default = []
     missing = colander.drop
@@ -199,8 +201,8 @@ class AbstractReferenceIterableSchemaNode(schema.MultireferenceIdSchemaNode):
                     raise colander.Invalid(node, msg=error, value=resource)
 
 
-class ReferenceListSetSchemaNode(AbstractReferenceIterableSchemaNode):
+class ListOfUniqueReferencesSchemaNode(AbstractReferenceIterableSchemaNode):
 
     """Colander SchemaNode to store a list of references without duplicates."""
 
-    schema_type = PathListSet
+    schema_type = ListOfUniquePaths

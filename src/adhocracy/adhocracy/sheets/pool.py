@@ -10,7 +10,7 @@ from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.sheets import ResourcePropertySheetAdapter
-from adhocracy.schema import ReferenceListSetSchemaNode
+from adhocracy.schema import ListOfUniqueReferencesSchemaNode
 
 
 class IIPool(IInterface):
@@ -25,7 +25,7 @@ class IPool(ISheet):
 
     taggedValue('readonly', True)
     taggedValue('field:elements',
-                ReferenceListSetSchemaNode(
+                ListOfUniqueReferencesSchemaNode(
                     reftype='adhocracy.sheets.pool.IPoolElementsReference',
                 ))
 

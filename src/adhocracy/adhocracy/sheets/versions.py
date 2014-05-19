@@ -13,7 +13,7 @@ from adhocracy.interfaces import NewVersionToOldVersion
 from adhocracy.sheets import ResourcePropertySheetAdapter
 from adhocracy.sheets.pool import PoolPropertySheetAdapter
 from adhocracy.sheets.pool import IIPool
-from adhocracy.schema import ReferenceListSetSchemaNode
+from adhocracy.schema import ListOfUniqueReferencesSchemaNode
 
 
 class IIVersionable(IInterface):
@@ -28,14 +28,14 @@ class IVersionable(ISheet):
 
     taggedValue(
         'field:follows',
-        ReferenceListSetSchemaNode(
+        ListOfUniqueReferencesSchemaNode(
             default=[],
             missing=colander.drop,
             reftype='adhocracy.sheets.versions.IVersionableFollowsReference'
         ))
     taggedValue(
         'field:followed_by',
-        ReferenceListSetSchemaNode(
+        ListOfUniqueReferencesSchemaNode(
             default=[],
             missing=colander.drop,
             reftype='adhocracy.sheets.versions.IVersionableFollowedByReference'
@@ -71,7 +71,7 @@ class IVersions(ISheet):
 
     taggedValue(
         'field:elements',
-        ReferenceListSetSchemaNode(
+        ListOfUniqueReferencesSchemaNode(
             default=[],
             missing=colander.drop,
             reftype='adhocracy.sheets.versions.IVersionsElementsReference',

@@ -887,10 +887,10 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
     def test_get_sheets_with_field_adhocracy_referencelist(self):
         from adhocracy.interfaces import SheetToSheet
-        from adhocracy.schema import ReferenceListSetSchemaNode
+        from adhocracy.schema import ListOfUniqueReferencesSchemaNode
 
         class ISheetF(ISheet):
-            taggedValue('field:test', ReferenceListSetSchemaNode(
+            taggedValue('field:test', ListOfUniqueReferencesSchemaNode(
                 reftype=SheetToSheet))
         response = dict([(ISheetF.__identifier__, get_all_taggedvalues(ISheetF))])
         self.sheets_metadata.return_value = response
