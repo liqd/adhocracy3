@@ -1,6 +1,9 @@
 """Asynchronous client-server communication via Websockets."""
 from collections import defaultdict
+
 from substanced.util import get_oid
+
+from adhocracy.interfaces import IResource
 
 
 class ClientTracker():
@@ -13,25 +16,40 @@ class ClientTracker():
         self._clients2resource_oids = defaultdict(set)
         self._resource_oids2clients = defaultdict(set)
 
-    def subscribe(self, client, resource):
-        """Subscribe a client to a resource.
+    def is_subscribed(self, client, resource: IResource) -> bool:
+        """Check whether a client is subscribed to a resource."""
+        oid = get_oid(resource)
+        return oid in self._clients2resource_oids[client]
+
+    def subscribe(self, client, resource: IResource) -> bool:
+        """Subscribe a client to a resource, if necessary.
+
+        Returns True if the subscription was successful, False if it was
+        unnecessary (the client was already subscribed).
 
         If the client is already subscribed, this method is a no-op.
 
         """
+        if self.is_subscribed(client, resource):
+            return False
         oid = get_oid(resource)
         self._clients2resource_oids[client].add(oid)
         self._resource_oids2clients[oid].add(client)
+        return True
 
-    def unsubscribe(self, client, resource):
-        """Unsubscribe a client from a resource.
+    def unsubscribe(self, client, resource: IResource) -> bool:
+        """Unsubscribe a client from a resource, if necessary.
 
-        If the client is not subscribed, this method is a no-op.
+        Returns True if the unsubscription was successful, False if it was
+        unnecessary (the client was not subscribed).
 
         """
+        if not self.is_subscribed(client, resource):
+            return False
         oid = get_oid(resource)
         self._discard_from_multidict(self._clients2resource_oids, client, oid)
         self._discard_from_multidict(self._resource_oids2clients, oid, client)
+        return True
 
     def _discard_from_multidict(self, multidict, key, value):
         """Discard one set member from a defaultdict that has sets as values.
@@ -51,10 +69,10 @@ class ClientTracker():
             self._discard_from_multidict(self._resource_oids2clients, oid,
                                          client)
 
-    def iterate_subscribers(self, resource):
+    def iterate_subscribers(self, resource: IResource):
         """Return an iterator over all clients subscribed to a resource."""
         oid = get_oid(resource)
-        # 'if' check is necessary to avoid creating spurious empty lists
+        # 'if' check is necessary to avoid creating spurious empty sets
         if oid in self._resource_oids2clients:
             for client in self._resource_oids2clients[oid]:
                 yield client

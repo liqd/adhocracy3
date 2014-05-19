@@ -36,7 +36,8 @@ class ClientTrackerUnitTests(unittest.TestCase):
         client = self._make_client()
         resource = self._make_resource()
         oid = get_oid(resource)
-        self._tracker.subscribe(client, resource)
+        result = self._tracker.subscribe(client, resource)
+        assert result is True
         assert len(self._tracker._clients2resource_oids) == 1
         assert len(self._tracker._resource_oids2clients) == 1
         assert self._tracker._clients2resource_oids[client] == {oid}
@@ -47,8 +48,10 @@ class ClientTrackerUnitTests(unittest.TestCase):
         client = self._make_client()
         resource = self._make_resource()
         oid = get_oid(resource)
-        self._tracker.subscribe(client, resource)
-        self._tracker.subscribe(client, resource)
+        result = self._tracker.subscribe(client, resource)
+        assert result is True
+        result = self._tracker.subscribe(client, resource)
+        assert result is False
         assert len(self._tracker._clients2resource_oids) == 1
         assert len(self._tracker._resource_oids2clients) == 1
         assert self._tracker._clients2resource_oids[client] == {oid}
@@ -61,8 +64,10 @@ class ClientTrackerUnitTests(unittest.TestCase):
         resource2 = self._make_resource()
         oid1 = get_oid(resource1)
         oid2 = get_oid(resource2)
-        self._tracker.subscribe(client, resource1)
-        self._tracker.subscribe(client, resource2)
+        result1 = self._tracker.subscribe(client, resource1)
+        result2 = self._tracker.subscribe(client, resource2)
+        assert result1 is True
+        assert result2 is True
         assert len(self._tracker._clients2resource_oids) == 1
         assert len(self._tracker._resource_oids2clients) == 2
         assert self._tracker._clients2resource_oids[client] == {oid1, oid2}
@@ -75,8 +80,10 @@ class ClientTrackerUnitTests(unittest.TestCase):
         client2 = self._make_client()
         resource = self._make_resource()
         oid = get_oid(resource)
-        self._tracker.subscribe(client1, resource)
-        self._tracker.subscribe(client2, resource)
+        result1 = self._tracker.subscribe(client1, resource)
+        result2 = self._tracker.subscribe(client2, resource)
+        assert result1 is True
+        assert result2 is True
         assert len(self._tracker._clients2resource_oids) == 2
         assert len(self._tracker._resource_oids2clients) == 1
         assert self._tracker._clients2resource_oids[client1] == {oid}
