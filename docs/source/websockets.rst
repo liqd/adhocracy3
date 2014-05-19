@@ -42,6 +42,57 @@ And later::
 Server Messages
 ---------------
 
+Responses to Client Messages
+++++++++++++++++++++++++++++
+
+Status Confirmations
+~~~~~~~~~~~~~~~~~~~~
+
+If a client request was processed successfully by the server, it sends a status
+confirmation:
+
+    { "status": "STATUS", "action": "ACTION", "resource": "RESOURCE_PATH" }
+
+STATUS is either:
+
+* "ok" if the request was processed successfully and changed the internal state
+  of the server.
+* "duplicate" if the request was unnecessary since it already corresponded to
+  internal state of the server (the client tried to subscribe to a resource it
+  has already subscribed or to unsubscribe from a resource it hasn't
+  subscribed).
+
+The "action" and "resource" fields repeat the corresponding values from the
+client request.
+
+Error Messages
+~~~~~~~~~~~~~~
+
+Otherwise, if the server didn't understand a request sent by the server or
+could not handle it, is responds with an error message::
+
+    { "error": "ERROR_CODE", "details:" "DETAILS" }
+
+ERROR_CODE will be one of the following:
+
+* "unknown_action" if the client asked for an action that the server doesn't
+  understand (neither "subscribe" nor "unsubscribe"). DETAILS contains the
+  unknown action.
+* "unknown_resource" if a client specified a resource path that is unknown to
+  the server. DETAILS contains the unknown resource path.
+* "malformed_message" if the client sent a message that cannot be parsed as
+  JSON. DETAILS contains a parsing error message.
+* "invalid_json" if the client sent a message this is JSON but doesn't contain
+  the expected information (for example, if it's a JSON array instead of a JSON
+  object or if "action" or "resource" keys are missing or their values aren't
+  strings). DETAILS contains a short description of the problem.
+* "subscribe_not_supported" if the client tried to subscribe to an ItemVersion.
+  DETAILS contains the path of resource that doesn't allow subscriptions.
+
+
+Notifications
++++++++++++++
+
 Whenever one of the subscribed resources is changed, the server sends a message
 to the client.  Which messages are sent depends on the type of the resource
 that has been subscribed.
@@ -123,35 +174,6 @@ that has been subscribed.
     successor of a successor).
 
   )
-
-Error Messages Sent by the Server
----------------------------------
-
-FIXME: should the server also respond with an "OK" to each subscribe /
-unsubscribe?  then the server could complain about duplicates without
-having to interrupt anything (the client will still be free to ignore
-the message).
-
-If the server doesn't understand a request sent by the server, is responds with
-an error message::
-
-    { "error": "ERROR_CODE", "details:" "DETAILS" }
-
-ERROR_CODE will be one of the following:
-
-* "unknown_action" if the client asked for an action that the server doesn't
-  understand (neither "subscribe" nor "unsubscribe"). DETAILS contains the
-  unknown action.
-* "unknown_resource" if a client specified a resource path that is unknown to
-  the server. DETAILS contains the unknown resource path.
-* "malformed_message" if the client sent a message that cannot be parsed as
-  JSON. DETAILS contains a parsing error message.
-* "invalid_json" if the client sent a message this is JSON but doesn't contain
-  the expected information (for example, if it's a JSON array instead of a JSON
-  object or if "action" or "resource" keys are missing or their values aren't
-  strings). DETAILS contains a short description of the problem.
-* "subscribe_not_supported" if the client tried to subscribe to an ItemVersion.
-  DETAILS contains the path of resource that doesn't allow subscriptions.
 
 
 Re-Connects
