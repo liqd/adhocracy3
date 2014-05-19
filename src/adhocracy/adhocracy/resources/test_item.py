@@ -1,10 +1,9 @@
 import unittest
 
 from pyramid import testing
-import pytest
 
-from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IResource
+from adhocracy.interfaces import IItemVersion
+from adhocracy.interfaces import ITag
 
 
 
@@ -69,8 +68,8 @@ class ItemIntegrationTest(unittest.TestCase):
         return ResourceFactory(self.metadata)(parent=self.context)
 
     def test_create(self):
-        from adhocracy.interfaces import IItemVersion
-        from adhocracy.interfaces import ITag
+        from adhocracy.sheets.tags import ITag as ITag_Sheet
+        from adhocracy.graph import get_references_for_isheet
 
         inst = self.make_one()
 
@@ -80,17 +79,15 @@ class ItemIntegrationTest(unittest.TestCase):
         assert IItemVersion.providedBy(item_version)
         assert ITag.providedBy(first)
         assert ITag.providedBy(last)
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version]},
-                  'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
-        assert first._propertysheets == wanted
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version]},
-                  'adhocracy.sheets.name.IName': {'name': 'LAST'}}
-        assert last._propertysheets == wanted
+        first_references = get_references_for_isheet(last, ITag_Sheet)
+        assert first_references['elements'] == [item_version]
+        last_references = get_references_for_isheet(last, ITag_Sheet)
+        assert last_references['elements'] == [item_version]
 
     def test_update_last_tag(self):
         """Test that LAST tag is updated correctly."""
+        from adhocracy.graph import get_references_for_isheet
+        from adhocracy.sheets.tags import ITag as ITag_Sheet
         # Create item with auto-created first version
         item = self.make_one()
         item_version = item['VERSION_0000000']
@@ -99,21 +96,19 @@ class ItemIntegrationTest(unittest.TestCase):
         new_version = make_itemversion(parent=item, follows=[item_version])
 
         # FIRST should still point to the old version
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version]},
-                  'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
-        assert item['FIRST']._propertysheets == wanted
+        first_references = get_references_for_isheet(item['FIRST'], ITag_Sheet)
+        assert first_references['elements'] == [item_version]
         # LAST tag should point to new version,
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [new_version]},
-                  'adhocracy.sheets.name.IName': {'name': 'LAST'}}
-        assert item['LAST']._propertysheets == wanted
+        last_references = get_references_for_isheet(item['LAST'], ITag_Sheet)
+        assert last_references['elements'] == [new_version]
 
     def test_update_last_tag_two_versions(self):
         """Test that if two versions are branched off the from the same
         version, both of them get the LAST tag.
 
         """
+        from adhocracy.graph import get_references_for_isheet
+        from adhocracy.sheets.tags import ITag as ITag_Sheet
         self.config.include('adhocracy.sheets.versions')
         self.config.include('adhocracy.subscriber')
 
@@ -126,16 +121,11 @@ class ItemIntegrationTest(unittest.TestCase):
         new_version2 = make_itemversion(parent=item, follows=[item_version])
 
         # first tag should point to the old version
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version]},
-                  'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
-        assert item['FIRST']._propertysheets == wanted
+        first_references = get_references_for_isheet(item['FIRST'], ITag_Sheet)
+        assert first_references['elements'] == [item_version]
         # LAST tag should point to both new versions
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [new_version1,
-                                                  new_version2]},
-                  'adhocracy.sheets.name.IName': {'name': 'LAST'}}
-        assert item['LAST']._propertysheets == wanted
+        first_references = get_references_for_isheet(item['LAST'], ITag_Sheet)
+        assert first_references['elements'] == [new_version1, new_version2]
 
 
 class IncludemeIntegrationTest(unittest.TestCase):

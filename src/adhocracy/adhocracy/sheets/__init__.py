@@ -10,6 +10,7 @@ import colander
 
 from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import ISheet
+from adhocracy.graph import get_references_for_isheet
 from adhocracy.utils import get_all_taggedvalues
 from adhocracy.utils import diff_dict
 from adhocracy.utils import create_schema_from_dict
@@ -71,6 +72,11 @@ class ResourcePropertySheetAdapter(PropertySheet):
         cstruct = self.schema.serialize(self._data)
         struct_stored = self.schema.deserialize(cstruct)
         struct.update(struct_stored)
+        # add references
+        references = get_references_for_isheet(self.context, self.iface)
+        for key in struct.keys():
+            if key in references:
+                struct[key] = references[key]
         return struct
 
     def set(self, struct, omit=()):
@@ -85,14 +91,12 @@ class ResourcePropertySheetAdapter(PropertySheet):
         (_, changed, _) = diff_dict(old_struct, struct, omit)
 
         for key in changed:
-            # FIXME: build in lists and sets are not persistent.
-            # For references the best solution is to store them only
-            # in the objectmap.
             value = struct[key]
-            self._data[key] = value
             if key in self._references.keys():
                 reftype = self._references[key]
                 set_references(self.context, value, reftype)
+            else:
+                self._data[key] = value
         return bool(changed)
 
     def validate_cstruct(self, cstruct):
