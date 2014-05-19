@@ -46,7 +46,7 @@ class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
 
     def get(self):
         """Return data struct."""
-        struct = super(PoolPropertySheetAdapter, self).get()
+        struct = super().get()
         elements = []
         res = DottedNameResolver()
         reftype_ = self.schema['elements'].reftype

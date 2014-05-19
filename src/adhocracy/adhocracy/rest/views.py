@@ -304,12 +304,12 @@ class SimpleRESTView(ResourceRESTView):
     @view_config(request_method='OPTIONS')
     def options(self):
         """Handle OPTIONS requests. Return dict."""
-        return super(SimpleRESTView, self).options()
+        return super().options()
 
     @view_config(request_method='GET')
     def get(self):
         """Handle GET requests. Return dict."""
-        return super(SimpleRESTView, self).get()
+        return super().get()
 
     @view_config(request_method='PUT')
     def put(self):
@@ -343,17 +343,17 @@ class PoolRESTView(SimpleRESTView):
     @view_config(request_method='OPTIONS')
     def options(self):
         """Handle OPTIONS requests. Return dict."""
-        return super(PoolRESTView, self).options()
+        return super().options()
 
     @view_config(request_method='GET')
     def get(self):
         """Handle GET requests. Return dict."""
-        return super(PoolRESTView, self).get()
+        return super().get()
 
     @view_config(request_method='PUT')
     def put(self):
         """Handle HTTP PUT. Return dict with PATH of modified resource."""
-        return super(PoolRESTView, self).put()
+        return super().put()
 
     def build_post_response(self, resource):
         """Helper method that builds a response for a POST request.
