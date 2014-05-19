@@ -3,7 +3,7 @@ from collections import defaultdict
 from substanced.util import get_oid
 
 
-class ClientKeeper():
+class ClientTracker():
 
     """"Keeps track of the clients that want notifications."""
 
@@ -54,6 +54,7 @@ class ClientKeeper():
     def iterate_subscribers(self, resource):
         """Return an iterator over all clients subscribed to a resource."""
         oid = get_oid(resource)
+        # 'if' check is necessary to avoid creating spurious empty lists
         if oid in self._resource_oids2clients:
             for client in self._resource_oids2clients[oid]:
                 yield client
