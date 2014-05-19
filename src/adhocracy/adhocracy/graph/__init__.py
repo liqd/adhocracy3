@@ -103,8 +103,8 @@ def get_references_for_isheet(resource, isheet):
         list: dicts with the following content:
               key - fieldname, value - referenced resrouces
 
-              References from subtypes of isheet are also listed, if the
-              field_name is part of the supertype.
+              References from subtypes of isheet are also listed.
+              Fields without existing references are ignored.
 
     """
     references = get_references(resource, base_isheet=isheet)
@@ -122,8 +122,8 @@ def get_back_references_for_isheet(resource, isheet):
         list: dicts with the following content:
               key - fieldname, value - referencing resources
 
-              References from subtypes of isheet are also listed, if the
-              field_name is part of the supertype.
+              References from subtypes of isheet are also listed.
+              Fields without existing references are ignored.
 
     """
     references = get_back_references(resource, base_isheet=isheet)
@@ -134,17 +134,15 @@ def get_back_references_for_isheet(resource, isheet):
 def _build_dict_with_references_for_isheet(references, isheet,
                                            orientation='sources'):
     references_isheet = {}
-    fieldnames = _get_fields(isheet)
     for source, isheet, field, target in references:
-        if field in fieldnames:
-            # FIXME we return a list of resource here, but for big data a set
-            # or generator would be much better
-            resources = references_isheet.get(field, [])
-            if orientation == 'sources':
-                resources.append(source)
-            else:
-                resources.append(target)
-            references_isheet[field] = resources
+        # FIXME we return a list of resource here, but for big data a set
+        # or generator would be much better
+        resources = references_isheet.get(field, [])
+        if orientation == 'sources':
+            resources.append(source)
+        else:
+            resources.append(target)
+        references_isheet[field] = resources
     return references_isheet
 
 

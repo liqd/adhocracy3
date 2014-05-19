@@ -361,6 +361,12 @@ class GetBackReferencesForIsheetUnitTest(unittest.TestCase):
         self.source = create_dummy_resource(parent=context)
         self.target = create_dummy_resource(parent=context)
 
+    def test_with_isheet_but_no_rerferences(self):
+        class IASheet(ISheet):
+            taggedValue('field:name', None)
+        result = self._make_one(self.target, IASheet)
+        assert result == {}
+
     def test_with_isheet(self):
         class IASheet(ISheet):
             taggedValue('field:name', None)
@@ -423,7 +429,7 @@ class GetBackReferencesForIsheetUnitTest(unittest.TestCase):
         self.objectmap.connect(self.source, self.target, ABSheetReferenceType)
 
         result = self._make_one(self.target, IASheet)
-        assert result == {'name': [self.source]}
+        assert result == {'name': [self.source], 'othername': [self.source]}
 
 
 class GetReferencesForIsheetUnitTest(unittest.TestCase):
