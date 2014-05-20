@@ -1,10 +1,10 @@
 import unittest
-
 from mock import patch
+
 from pyramid import testing
+import pytest
 from zope.interface import taggedValue
 from zope.interface import Interface
-import pytest
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import SheetReferenceType

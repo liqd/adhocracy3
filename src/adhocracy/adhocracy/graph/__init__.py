@@ -13,7 +13,6 @@ from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import SheetReferenceType
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import NewVersionToOldVersion
-from adhocracy.utils import get_all_taggedvalues
 
 
 class Reference(namedtuple('Reference', 'source isheet field target')):
@@ -145,15 +144,6 @@ def _build_dict_with_references_for_isheet(references, isheet,
         references_isheet[field] = resources
     return references_isheet
 
-
-def _get_fields(isheet):
-    metadata = get_all_taggedvalues(isheet)
-    fields = []
-    for key, value in metadata.items():
-        if key.startswith('field:'):
-            name = key.split(':')[1]
-            fields.append(name)
-    return fields
 
 
 def is_in_subtree(descendant, ancestors):
