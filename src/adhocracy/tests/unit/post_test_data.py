@@ -104,9 +104,9 @@ resp = _post_data('/adhocracy/Proposals/kommunismus',
                             'adhocracy.sheets.versions.IVersionable': {
                                 'follows': [second_proposal_version],}
                             },
-                     'root_versions': [second_proposal_version]})
+                   'root_versions': [second_proposal_version]})
 
-# TODO from l.582
+# TODO integrate relevant stuff from rest_api.rst from line 582
 
 # TODO Old stuff
 exit(0)
