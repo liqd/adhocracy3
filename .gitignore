@@ -12,6 +12,7 @@ __pycache__
 .installed.cfg
 .mr.developer.cfg
 .sass-cache
+.idea
 /bin
 /docs/build
 /docs/styleguide/*

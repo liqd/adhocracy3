@@ -1,8 +1,9 @@
 """Tests for websockets package."""
-from substanced.util import get_oid
-from . import ClientTracker
-
 import unittest
+
+from substanced.util import get_oid
+
+from adhocracy.websockets import ClientTracker
 
 
 class DummyResource():
@@ -90,10 +91,83 @@ class ClientTrackerUnitTests(unittest.TestCase):
         assert self._tracker._clients2resource_oids[client2] == {oid}
         assert self._tracker._resource_oids2clients[oid] == {client1, client2}
 
-    # TODO test:
-    # def unsubscribe(self, client, resource):
-    # test that double unsubscription has no effect
-    # def delete_all_subscriptions(self, client):
-    # delete client subscribed to 0/1/2 resource
-    # def iterate_subscribers(self, resource):
-    # test with 0/1/2 subscribers, also with subscriber for different resource
+    def test_unsubscribe(self):
+        """Test client unsubscription."""
+        client = self._make_client()
+        resource = self._make_resource()
+        self._tracker.subscribe(client, resource)
+        result = self._tracker.unsubscribe(client, resource)
+        assert result is True
+        assert len(self._tracker._clients2resource_oids) == 0
+        assert len(self._tracker._resource_oids2clients) == 0
+
+    def test_duplicate_unsubscribe(self):
+        """Test client unsubscribing from the same resource twice."""
+        client = self._make_client()
+        resource = self._make_resource()
+        self._tracker.subscribe(client, resource)
+        result = self._tracker.unsubscribe(client, resource)
+        assert result is True
+        assert len(self._tracker._clients2resource_oids) == 0
+        assert len(self._tracker._resource_oids2clients) == 0
+        result = self._tracker.unsubscribe(client, resource)
+        assert result is False
+        assert len(self._tracker._clients2resource_oids) == 0
+        assert len(self._tracker._resource_oids2clients) == 0
+
+    def test_delete_all_subscriptions_empty(self):
+        """Test deleting all subscriptions for a client that has none."""
+        client = self._make_client()
+        self._tracker.delete_all_subscriptions(client)
+        assert len(self._tracker._clients2resource_oids) == 0
+        assert len(self._tracker._resource_oids2clients) == 0
+
+    def test_delete_all_subscriptions_two_resource(self):
+        """Test deleting all subscriptions for a client that has two."""
+        client = self._make_client()
+        resource1 = self._make_resource()
+        resource2 = self._make_resource()
+        self._tracker.subscribe(client, resource1)
+        self._tracker.subscribe(client, resource2)
+        self._tracker.delete_all_subscriptions(client)
+        assert len(self._tracker._clients2resource_oids) == 0
+        assert len(self._tracker._resource_oids2clients) == 0
+
+    def test_delete_all_subscriptions_two_clients(self):
+        """Test deleting all subscriptions for one client subscribed to the
+        same resource as another one.
+
+        """
+
+        client1 = self._make_client()
+        client2 = self._make_client()
+        resource = self._make_resource()
+        oid = get_oid(resource)
+        self._tracker.subscribe(client1, resource)
+        self._tracker.subscribe(client2, resource)
+        self._tracker.delete_all_subscriptions(client1)
+        assert len(self._tracker._clients2resource_oids) == 1
+        assert len(self._tracker._resource_oids2clients) == 1
+        assert self._tracker._clients2resource_oids[client2] == {oid}
+        assert self._tracker._resource_oids2clients[oid] == {client2}
+        assert client1 not in self._tracker._clients2resource_oids
+
+    def test_iterate_subscribers_empty(self):
+        """Test iterating subscribers for a resource that has none."""
+        resource = self._make_resource()
+        result = list(self._tracker.iterate_subscribers(resource))
+        assert len(result) == 0
+        assert len(self._tracker._clients2resource_oids) == 0
+        assert len(self._tracker._resource_oids2clients) == 0
+
+    def test_iterate_subscribers_two(self):
+        """Test iterating subscribers for a resource that has two."""
+        client1 = self._make_client()
+        client2 = self._make_client()
+        resource = self._make_resource()
+        self._tracker.subscribe(client1, resource)
+        self._tracker.subscribe(client2, resource)
+        result = list(self._tracker.iterate_subscribers(resource))
+        assert len(result) == 2
+        assert client1 in result
+        assert client2 in result

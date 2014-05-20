@@ -1,5 +1,6 @@
 """Asynchronous client-server communication via Websockets."""
 from collections import defaultdict
+from collections.abc import Iterable
 
 from substanced.util import get_oid
 
@@ -19,7 +20,8 @@ class ClientTracker():
     def is_subscribed(self, client, resource: IResource) -> bool:
         """Check whether a client is subscribed to a resource."""
         oid = get_oid(resource)
-        return oid in self._clients2resource_oids[client]
+        return (client in self._clients2resource_oids and
+                oid in self._clients2resource_oids[client])
 
     def subscribe(self, client, resource: IResource) -> bool:
         """Subscribe a client to a resource, if necessary.
@@ -62,14 +64,14 @@ class ClientTracker():
             if not multidict[key]:
                 del multidict[key]
 
-    def delete_all_subscriptions(self, client):
+    def delete_all_subscriptions(self, client) -> None:
         """Delete all subscriptions for a client."""
         oid_set = self._clients2resource_oids.pop(client, set())
         for oid in oid_set:
             self._discard_from_multidict(self._resource_oids2clients, oid,
                                          client)
 
-    def iterate_subscribers(self, resource: IResource):
+    def iterate_subscribers(self, resource: IResource) -> Iterable:
         """Return an iterator over all clients subscribed to a resource."""
         oid = get_oid(resource)
         # 'if' check is necessary to avoid creating spurious empty sets
