@@ -2,9 +2,9 @@ import unittest
 
 from pyramid import testing
 
+from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ITag
-
 
 
 #############
@@ -19,6 +19,7 @@ def make_itemversion(parent=None, follows=[]):
     return ResourceFactory(itemversion_meta_defaults)(parent=parent,
                                                       appstructs=appstructs)
 
+
 class DummyFolder(testing.DummyResource):
 
     def add(self, name, obj, **kwargs):
@@ -32,7 +33,7 @@ class DummyFolder(testing.DummyResource):
             raise ValueError
         return name
 
-    def next_name(self, obj, prefix=''):
+    def next_name(self, subobject, prefix=''):
         return prefix + '_0000000'
 
 ###########
@@ -68,64 +69,58 @@ class ItemIntegrationTest(unittest.TestCase):
         return ResourceFactory(self.metadata)(parent=self.context)
 
     def test_create(self):
-        from adhocracy.sheets.tags import ITag as ITag_Sheet
+        from adhocracy.sheets.tags import ITag as ITagS
         from adhocracy.graph import get_references_for_isheet
 
-        inst = self.make_one()
+        item = self.make_one()
 
-        item_version = inst['VERSION_0000000']
-        first = inst['FIRST']
-        last = inst['LAST']
-        assert IItemVersion.providedBy(item_version)
-        assert ITag.providedBy(first)
-        assert ITag.providedBy(last)
-        first_references = get_references_for_isheet(last, ITag_Sheet)
-        assert first_references['elements'] == [item_version]
-        last_references = get_references_for_isheet(last, ITag_Sheet)
-        assert last_references['elements'] == [item_version]
+        version0 = item['VERSION_0000000']
+        assert IItemVersion.providedBy(version0)
+        first_tag = item['FIRST']
+        assert ITag.providedBy(first_tag)
+        last_tag = item['LAST']
+        assert ITag.providedBy(last_tag)
+        first_targets = get_references_for_isheet(first_tag, ITagS)['elements']
+        assert first_targets == [version0]
+        last_targets = get_references_for_isheet(last_tag, ITagS)['elements']
+        assert last_targets == [version0]
 
     def test_update_last_tag(self):
         """Test that LAST tag is updated correctly."""
         from adhocracy.graph import get_references_for_isheet
-        from adhocracy.sheets.tags import ITag as ITag_Sheet
-        # Create item with auto-created first version
+        from adhocracy.sheets.tags import ITag as ITagS
         item = self.make_one()
-        item_version = item['VERSION_0000000']
+        version0 = item['VERSION_0000000']
 
-        # Create another version
-        new_version = make_itemversion(parent=item, follows=[item_version])
+        version1 = make_itemversion(parent=item, follows=[version0])
 
-        # FIRST should still point to the old version
-        first_references = get_references_for_isheet(item['FIRST'], ITag_Sheet)
-        assert first_references['elements'] == [item_version]
-        # LAST tag should point to new version,
-        last_references = get_references_for_isheet(item['LAST'], ITag_Sheet)
-        assert last_references['elements'] == [new_version]
+        first_tag = item['FIRST']
+        first_targets = get_references_for_isheet(first_tag, ITagS)['elements']
+        assert first_targets == [version0]
+        last_tag = item['LAST']
+        last_targets = get_references_for_isheet(last_tag, ITagS)['elements']
+        assert last_targets == [version1]
 
     def test_update_last_tag_two_versions(self):
         """Test that if two versions are branched off the from the same
         version, both of them get the LAST tag.
-
         """
         from adhocracy.graph import get_references_for_isheet
-        from adhocracy.sheets.tags import ITag as ITag_Sheet
+        from adhocracy.sheets.tags import ITag as ITagS
         self.config.include('adhocracy.sheets.versions')
         self.config.include('adhocracy.subscriber')
-
-        # Create item with auto-created first version
         item = self.make_one()
-        item_version = item['VERSION_0000000']
+        version0 = item['VERSION_0000000']
 
-        # Create two other versions, but pointing to the same predecessor
-        new_version1 = make_itemversion(parent=item, follows=[item_version])
-        new_version2 = make_itemversion(parent=item, follows=[item_version])
+        version1 = make_itemversion(parent=item, follows=[version0])
+        version2 = make_itemversion(parent=item, follows=[version0])
 
-        # first tag should point to the old version
-        first_references = get_references_for_isheet(item['FIRST'], ITag_Sheet)
-        assert first_references['elements'] == [item_version]
-        # LAST tag should point to both new versions
-        first_references = get_references_for_isheet(item['LAST'], ITag_Sheet)
-        assert first_references['elements'] == [new_version1, new_version2]
+        first_tag = item['FIRST']
+        first_targets = get_references_for_isheet(first_tag, ITagS)['elements']
+        assert first_targets == [version0]
+        last_tag = item['LAST']
+        last_targets = get_references_for_isheet(last_tag, ITagS)['elements']
+        assert last_targets == [version1, version2]
 
 
 class IncludemeIntegrationTest(unittest.TestCase):
@@ -141,12 +136,10 @@ class IncludemeIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_includeme_registry_register_factories(self):
-        from adhocracy.interfaces import IItem
         content_types = self.config.registry.content.factory_types
         assert IItem.__identifier__ in content_types
 
     def test_includeme_registry_create_content(self):
-        from adhocracy.interfaces import IItem
         res = self.config.registry.content.create(IItem.__identifier__,
                                                   parent=self.context,
                                                   run_after_creation=False)
