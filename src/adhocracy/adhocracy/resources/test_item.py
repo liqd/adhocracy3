@@ -94,9 +94,6 @@ class ItemIntegrationTest(unittest.TestCase):
 
         version1 = make_itemversion(parent=item, follows=[version0])
 
-        first_tag = item['FIRST']
-        first_targets = get_references_for_isheet(first_tag, ITagS)['elements']
-        assert first_targets == [version0]
         last_tag = item['LAST']
         last_targets = get_references_for_isheet(last_tag, ITagS)['elements']
         assert last_targets == [version1]
@@ -115,9 +112,6 @@ class ItemIntegrationTest(unittest.TestCase):
         version1 = make_itemversion(parent=item, follows=[version0])
         version2 = make_itemversion(parent=item, follows=[version0])
 
-        first_tag = item['FIRST']
-        first_targets = get_references_for_isheet(first_tag, ITagS)['elements']
-        assert first_targets == [version0]
         last_tag = item['LAST']
         last_targets = get_references_for_isheet(last_tag, ITagS)['elements']
         assert last_targets == [version1, version2]
