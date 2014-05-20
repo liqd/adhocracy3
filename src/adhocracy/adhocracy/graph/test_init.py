@@ -148,10 +148,6 @@ class SetReferencesUnitTest(unittest.TestCase):
         with pytest.raises(AssertionError):
             self._make_one(self.source, [], ReferenceType)
 
-    def test_resource_no_object(self):
-        with pytest.raises(AssertionError):
-            self._make_one(None, [], SheetReferenceType)
-
     def test_targets_empty_list(self):
         self._make_one(self.source, [], SheetReferenceType)
         references = self.objectmap.targetids(self.source, SheetReferenceType)
@@ -532,25 +528,10 @@ class IsInSubtreeUnitTest(unittest.TestCase):
         child = create_dummy_resource(parent=context)
         self.child = child
 
-    def test_with_none_ancestor(self):
-        """False if ancestors is None."""
-        with pytest.raises(AssertionError):
-            self._make_one(self.child, None)
-
     def test_with_no_ancestors(self):
         """False if ancestors is an empty list."""
         result = self._make_one(self.child, [])
         assert result is False
-
-    def test_with_none_descendant(self):
-        """False if descendant is None."""
-        with pytest.raises(AssertionError):
-            self._make_one(None, [self.child])
-
-    def test_with_just_none(self):
-        """False if ancestors and descendant are both None."""
-        with pytest.raises(AssertionError):
-            self._make_one(None, None)
 
     def test_of_itself(self):
         """True if both are the same resource."""

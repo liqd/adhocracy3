@@ -8,7 +8,6 @@ from substanced.util import find_objectmap
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import Multireference
 
-from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import SheetReferenceType
 from adhocracy.interfaces import SheetToSheet
@@ -77,10 +76,7 @@ def set_references(resource, targets, reftype):
                                 for Sequences the order is preserved.
     : param reftype: (SheetReferenceType):
     """
-    assert resource is not None
-    assert isinstance(targets, Iterable)
-    assert issubclass(reftype, SheetReferenceType)
-
+    assert SheetReferenceType.providedBy(reftype)
     ordered = isinstance(targets, Sequence)
     orientation = 'source'
     resolve = True  # return objects not oids
@@ -162,8 +158,6 @@ def is_in_subtree(descendant, ancestors):
         False otherwise.
 
     """
-    assert IResource.providedBy(descendant)
-    assert isinstance(ancestors, list)
     for candidate in ancestors:
         if _is_candidate_ancestor(candidate, descendant, set(),):
             return True
