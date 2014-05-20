@@ -18,27 +18,27 @@ class Reference(namedtuple('Reference', 'source isheet field target')):
     pass
 
 
-def get_references(resource, base_isheet=ISheet, base_reftype=SheetToSheet):
-    """Get generator with references of resource pointing to other resources.
+def get_references(source, base_isheet=ISheet, base_reftype=SheetToSheet):
+    """Get generator with references of this source.
 
     : return: generator of References
     """
-    om = find_objectmap(resource)
+    om = find_objectmap(source)
     for isheet, field, reftype in _get_reftypes(om, base_isheet, base_reftype):
-        for target in ObjectMap.targets(om, resource, reftype):
-            yield Reference(resource, isheet, field, target)
+        for target in ObjectMap.targets(om, source, reftype):
+            yield Reference(source, isheet, field, target)
 
 
-def get_back_references(resource, base_isheet=ISheet,
+def get_back_references(target, base_isheet=ISheet,
                         base_reftype=SheetReferenceType):
-    """Get generator with references of other resources pointing to resource.
+    """Get generator with references of other resources with this target.
 
     : return: generator of References
     """
-    om = find_objectmap(resource)
+    om = find_objectmap(target)
     for isheet, field, reftype in _get_reftypes(om, base_isheet, base_reftype):
-        for source in ObjectMap.sources(om, resource, reftype):
-            yield Reference(source, isheet, field, resource)
+        for source in ObjectMap.sources(om, target, reftype):
+            yield Reference(source, isheet, field, target)
 
 
 _isheet_reftype = namedtuple('ISheetReftype', 'isheet field reftype')
@@ -48,11 +48,11 @@ def _get_reftypes(objectmap, base_isheet=ISheet,
                   base_reftype=SheetReferenceType) -> [_isheet_reftype]:
     """Collect all used SheetReferenceTypes.
 
-    : parma objectmap: the objectmap to consult, None value is allowed to
+    : parm objectmap: the objectmap to consult, None value is allowed to
                        ease unit testing.
     : param base_reftype: Skip types that are not subclasses of this.
     : param base_isheet: Skip types with a source isheet that is not a
-                    subclass of this.
+                         subclass of this.
     """
     all_reftypes = objectmap.get_reftypes() if objectmap else []
     for reftype in all_reftypes:
@@ -69,69 +69,61 @@ def _get_reftypes(objectmap, base_isheet=ISheet,
         yield _isheet_reftype(isheet, field, reftype)
 
 
-def set_references(resource, targets, reftype):
-    """Set references of this resource pointing to other resources.
+def set_references(source, targets, reftype):
+    """Set references of this source.
 
-    : param targets (Iterable). the reference targets,
+    : param targets (Iterable): the reference targets,
                                 for Sequences the order is preserved.
-    : param reftype: (SheetReferenceType):
+    : param reftype (SheetReferenceType): the reftype mapping to isheet/field.
     """
     assert SheetReferenceType.providedBy(reftype)
     ordered = isinstance(targets, Sequence)
     orientation = 'source'
     resolve = True  # return objects not oids
     ignore_missing = True  # don't raise ValueError if targets are missing
-    om = find_objectmap(resource)
-    multireference = Multireference(resource, om, reftype, ignore_missing,
+    om = find_objectmap(source)
+    multireference = Multireference(source, om, reftype, ignore_missing,
                                     resolve, orientation, ordered)
     multireference.clear()
     multireference.connect(targets)
 
 
-def get_references_for_isheet(resource, isheet):
-    """ Get references of this resource pointing to others for one isheet only.
+def get_references_for_isheet(source, isheet: ISheet) -> dict:
+    """ Get references of this source for one isheet only.
 
-    Args:
-        resource (IResource)
-        isheet (ISheet)
-    Returns:
-        list: dicts with the following content:
-              key - fieldname, value - referenced resrouces
+    : return: dictionary with the following content:
+              key - isheet field name
+              value - reference targets
 
               References from subtypes of isheet are also listed.
               Fields without existing references are ignored.
-
     """
-    references = get_references(resource, base_isheet=isheet)
-    return _build_dict_with_references_for_isheet(references, isheet,
+    references = get_references(source, base_isheet=isheet)
+    return _build_dict_with_references_for_isheet(references,
                                                   orientation='targets')
 
 
-def get_back_references_for_isheet(resource, isheet):
-    """ Get references that point to this resource for one isheet only.
+def get_back_references_for_isheet(target, isheet: ISheet) -> dict:
+    """ Get references that point to this target for one isheet only.
 
-    Args:
-        resource (IResource):
-        isheet (ISheet): references of tihs isheet and all subclasses
-    Returns:
-        list: dicts with the following content:
-              key - fieldname, value - referencing resources
+    : return: dictionary with the following content:
+              key - isheet field name
+              value - references sources
 
               References from subtypes of isheet are also listed.
               Fields without existing references are ignored.
 
     """
-    references = get_back_references(resource, base_isheet=isheet)
-    return _build_dict_with_references_for_isheet(references, isheet,
+    references = get_back_references(target, base_isheet=isheet)
+    return _build_dict_with_references_for_isheet(references,
                                                   orientation='sources')
 
 
-def _build_dict_with_references_for_isheet(references, isheet,
-                                           orientation='sources'):
+def _build_dict_with_references_for_isheet(references, orientation='sources'):
     references_isheet = {}
     for source, isheet, field, target in references:
-        # FIXME we return a list of resource here, but for big data a set
-        # or generator would be much better
+        # FIXME we return a list of resources here, but for big data a
+        # generator would be much better
         resources = references_isheet.get(field, [])
         if orientation == 'sources':
             resources.append(source)
@@ -141,16 +133,12 @@ def _build_dict_with_references_for_isheet(references, isheet,
     return references_isheet
 
 
-
-def is_in_subtree(descendant, ancestors):
+def is_in_subtree(descendant, ancestors: Iterable) -> bool:
     """Check whether a resource is in a subtree below other resources.
 
-    Args:
-         descendant (IResource): the candidate descendant
-         ancestors (list of IResource): the candidate ancestors
-
-    Returns:
-        True if there exists a relation from one of the `ancestors` to
+    : param descendant: the candidate descendant
+    : param ancestors: the candidate ancestors
+    : returns: True if there exists a relation from one of the `ancestors` to
         `descendant` that does NOT include any 'follows' links. For example,
         descendant might be an element of an element (of an element...) of an
         ancestor. Also if descendant and of the ancestors are the same node.
@@ -180,31 +168,15 @@ def _is_candidate_ancestor(candidate, descendant, checked_candidates):
     return False
 
 
-def get_follows(resource):
-    """Determine the precessors ("follows") of a versionable resource.
-
-    Args:
-        resource (IResource)
-
-    Returns:
-        a generator of precessor versions (possibly empty)
-
-    """
+def get_follows(resource) -> Iterable:
+    """Get Generator of the precessors of a versionable resource."""
     precessors = get_references(resource, base_reftype=NewVersionToOldVersion)
     for reference in precessors:
         yield reference[3]
 
 
-def get_followed_by(resource):
-        """Determine the successors ("followed_by") of a versionable resource.
-
-        Args:
-            resource (IResource)
-
-        Returns:
-            a generator of successor versions (possibly empty)
-
-        """
+def get_followed_by(resource) -> Iterable:
+        """Get Generator of the successors of a versionable resource."""
         successors = get_back_references(resource,
                                          base_reftype=NewVersionToOldVersion)
         for reference in successors:
