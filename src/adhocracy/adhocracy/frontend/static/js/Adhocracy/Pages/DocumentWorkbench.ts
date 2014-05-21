@@ -15,6 +15,7 @@ import AdhCache = require("Adhocracy/Services/Cache");
 import AdhUser = require("Adhocracy/Services/User");
 
 import Resources = require("Adhocracy/Resources");
+import Widgets = require("Adhocracy/Widgets");
 
 var templatePath : string = "/frontend_static/templates";
 var appPrefix : string = "/app";
@@ -114,7 +115,12 @@ export function run<Data>() {
     }]);
 
 
-    // directives
+    // widget-based directives
+
+    app.directive("wdgListing", Widgets.Listing);
+
+
+    // application-specific directives
 
     app.directive("adhDocumentWorkbench", function() {
         return {
