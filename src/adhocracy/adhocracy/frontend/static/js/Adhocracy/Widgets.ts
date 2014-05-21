@@ -56,6 +56,10 @@ export interface ListingScope<Container, Element> {
     elements: Element[];
 }
 
+export interface ListingContainer extends Types.Content<any>, Resources.HasIPoolSheet {};
+
+export interface ListingElement extends Types.Content<any> {};
+
 export interface Listing<Container, Element> extends ng.IDirective {
     containerAccess: {
         elemRefs: (c: Container) => string[]
@@ -66,49 +70,50 @@ export interface Listing<Container, Element> extends ng.IDirective {
     };
 }
 
-interface ContainerI extends Types.Content<any>, Resources.HasIPoolSheet {};
-interface ElementI extends Types.Content<any> {};
-
 export function listing(containerPath : string) {
-    function factory($scope: ListingScope<ContainerI, ElementI>,
-                     adhHttpC: AdhHttp.IService<ContainerI>,
-                     adhHttpE: AdhHttp.IService<ElementI>
-                    ) : Listing<ContainerI, ElementI>
+    function factory() : Listing<ListingContainer, ListingElement>
     {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/Widgets/WgtListing.html",
-            controller: function() : void {
+            templateUrl: templatePath + "/Widgets/Listing.html",
+            controller: ["$scope",
+                         "adhHttp",
+                         "adhHttp",
+                         function($scope: ListingScope<ListingContainer, ListingElement>,
+                                  adhHttpC: AdhHttp.IService<ListingContainer>,
+                                  adhHttpE: AdhHttp.IService<ListingElement>
+                                 ) : void
+                {
+                    adhHttpC.get(containerPath).then((pool) => {
+                        $scope.container = pool;
+                        $scope.elements = [];
 
-                adhHttpC.get(containerPath).then((pool) => {
-                    $scope.container = pool;
-                    $scope.elements = [];
-
-                    var elemRefs : string[] = this.containerAccess.elemRefs($scope.container);
-                    for (var x in elemRefs) {
-                        (function(x : number) {
-                            adhHttpE.get(elemRefs[x]).then((element : ElementI) => $scope.elements[x] = element);
-                        })(x);
-                    }
-                })
-            },
+                        var elemRefs : string[] = this.containerAccess.elemRefs($scope.container);
+                        for (var x in elemRefs) {
+                            (function(x : number) {
+                                adhHttpE.get(elemRefs[x]).then((element : ListingElement) => $scope.elements[x] = element);
+                            })(x);
+                        }
+                    })
+                }
+            ],
             containerAccess: {
-                elemRefs: function(c: ContainerI) {
-                    return $scope.container.data["adhocracy.sheets.pool.IPool"].elements;
+                elemRefs: function(c: ListingContainer) {
+                    return c.data["adhocracy.sheets.pool.IPool"].elements;
                 }
             },
             elementAccess: {
-                name: function(e: ElementI) {
+                name: function(e: ListingElement) {
                     return "[content type " + e.content_type + ", resource " + e.path + "]"
                 },
-                path: function(e: ElementI) {
+                path: function(e: ListingElement) {
                     return e.path;
                 }
             }
         }
     }
 
-    return ["$scope", "adhHttp", "adhHttp", factory];
+    return factory;
 }
 
 

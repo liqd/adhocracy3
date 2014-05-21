@@ -1,13 +1,17 @@
 <h3>table of contents</h3>
 <ol>
-    <li ng-repeat="doc in poolEntries">
-        <div ng-switch="doc">
-            <div ng-switch-when="undefined">
-                <small><tt>(empty DAG)</tt></small>
-            </div>
-            <div ng-switch-default>
-                <adh-proposal-version-detail content="doc.content" viewmode="doc.viewmode"></adh-proposal-version-detail>
+    <li ng-repeat="element in elements">
+
+        <div ng-if="element.data.has_key('adhocracy_sample.sheets.document.IDocument')">
+            <wdg-listing-row-title document="${element.data['adhocracy_sample.sheets.document.IDocument']}"/>
+        </div>
+
+        <!-- administrative actions -->
+        <div>
+            <div ng-repeat="property_sheet in ... | filter()">
+
             </div>
         </div>
+
     </li>
 </ol>
