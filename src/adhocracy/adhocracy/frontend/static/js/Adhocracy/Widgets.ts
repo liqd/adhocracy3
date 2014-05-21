@@ -54,10 +54,6 @@ i think i like that idea good enough to implement it for listing.
 export interface ListingScope<Container, Element> {
     container: Container;
     elements: Element[];
-
-    // phantom types for easy type parameter reference
-    cPhantom: Container;
-    ePhantom: Element;
 }
 
 export interface Listing<Container, Element> extends ng.IDirective {
@@ -70,33 +66,63 @@ export interface Listing<Container, Element> extends ng.IDirective {
     };
 }
 
-export var Listing = ["$scope", function(path: string, $scope: ListingScope<Resources.HasIPoolSheet, any>)
-                                           : Listing<typeof $scope.cPhantom, typeof $scope.ePhantom>
-{
-    return {
-        restrict: "E",
-        templateUrl: templatePath + "/Widgets/WgtListing.html",
-        controller: function() {
+interface ContainerI extends Types.Content<any>, Resources.HasIPoolSheet {};
+interface ElementI extends Types.Content<any> {};
 
-            throw "wef";
+export function listing(containerPath : string) {
+    function factory($scope: ListingScope<ContainerI, ElementI>,
+                     adhHttpC: AdhHttp.IService<ContainerI>,
+                     adhHttpE: AdhHttp.IService<ElementI>
+                    ) : Listing<ContainerI, ElementI>
+    {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/Widgets/WgtListing.html",
+            controller: function() : void {
 
-        },
-        containerAccess: {
-            elemRefs: function(c: Resources.HasIPoolSheet) { throw "wef"; return ['wef'] }
-        },
-        elementAccess: {
-            name: function(e: any) {
-                return "[unknown to widget: content type " + e.content_type + ", resource " + e.path + "]"
+                adhHttpC.get(containerPath).then((pool) => {
+                    $scope.container = pool;
+                    $scope.elements = [];
+
+                    var elemRefs : string[] = this.containerAccess.elemRefs($scope.container);
+                    for (var x in elemRefs) {
+                        (function(x : number) {
+                            adhHttpE.get(elemRefs[x]).then((element : ElementI) => $scope.elements[x] = element);
+                        })(x);
+                    }
+                })
             },
-            path: function(e: any) {
-                return e.path;
+            containerAccess: {
+                elemRefs: function(c: ContainerI) {
+                    return $scope.container.data["adhocracy.sheets.pool.IPool"].elements;
+                }
+            },
+            elementAccess: {
+                name: function(e: ElementI) {
+                    return "[content type " + e.content_type + ", resource " + e.path + "]"
+                },
+                path: function(e: ElementI) {
+                    return e.path;
+                }
             }
         }
     }
-}];
+
+    return ["$scope", "adhHttp", "adhHttp", factory];
+}
 
 
 /*
+
+
+next: introduce Proposals in Listing clone, and replace
+elementAccess.name.
+
+next: introduce Proposal detail view in clone of the above, factor out
+shared code from controller into helper attribute, and replace
+controller.
+
+
 
 export function wgtListingDocument(path:       string,
                             container:  Content<HasIDocumentSheet>,
