@@ -34,7 +34,8 @@ Docstring formatting
 
 * pep257 (must, bei tests und zope.Interface classes should)
 * python 3 type annotation (must) according to https://pypi.python.org/pypi/sphinx_annotations_autodoc and https://pypi.python.org/pypi/sphinx_typesafe
-* javadoc for parameter descriptions (should)
+* javadoc-style annotations for parameter descriptions, see
+  http://sphinx-doc.org/domains.html#info-field-lists (should)
 * example::
    
     def methodx(self, a: dict, flag=False) -> str:
@@ -42,7 +43,9 @@ Docstring formatting
 
         :param a: description for a
         :param flag: description for flag
-       
+        :raise ValueError: if a is invalid
+        :return: something special
+
         """
 
 

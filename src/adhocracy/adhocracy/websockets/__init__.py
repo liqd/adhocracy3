@@ -1,9 +1,12 @@
 """Asynchronous client-server communication via Websockets."""
 from collections import defaultdict
 from collections.abc import Iterable
+from json import dumps
+from json import loads
 from logging import getLogger
 
 from autobahn.asyncio.websocket import WebSocketServerProtocol
+from autobahn.websocket.protocol import ConnectionRequest
 from substanced.util import get_oid
 
 from adhocracy.interfaces import IResource
@@ -12,30 +15,27 @@ from adhocracy.interfaces import IResource
 logger = getLogger(__name__)
 
 
-class ClientCommunicator(WebSocketServerProtocol):
+class WebSocketError(Exception):
 
-    """Communicates with a client through a Websocket connection."""
+    """An error that occurs during communication with a WebSocket client."""
 
-    def onConnect(self, request):
-        # TODO reqister myself
-        self._client = request.peer
-        logger.debug('Client connecting: %s', self._client)
+    def __init__(self, error_type: str, details: str):
+        self.error_type = error_type
+        self.details = details
 
-    def onOpen(self):
-        logger.debug('WebSocket connection to %s open', self._client)
+    def __str__(self):
+        return '{}: {}'.format(self.error_type, self.details)
 
-    def onMessage(self, payload, is_binary):
-        if is_binary:
-            print('Binary message received: {0} bytes'.format(len(payload)))
-        else:
-            print('Text message received: {0}'.format(payload.decode('utf8')))
 
-        # TODO handle message and send suitable response
-        self.sendMessage(payload, is_binary)
+class ClientRequest():
 
-    def onClose(self, was_clean, code, reason):
-        # TODO delete all subscriptions
-        print('WebSocket connection closed: {0}'.format(reason))
+    """A request received by a WebSocket client."""
+
+    def __init__(self, action, resource_path):
+        self._action = action
+        # TODO convert resource_path into resource
+        # TODO validate action and resource (path)
+        # TODO raise WebSocketError on error
 
 
 class ClientTracker():
@@ -108,6 +108,77 @@ class ClientTracker():
         if oid in self._resource_oids2clients:
             for client in self._resource_oids2clients[oid]:
                 yield client
+
+
+class ClientCommunicator(WebSocketServerProtocol):
+
+    """Communicates with a client through a WebSocket connection."""
+
+    # All instances of this class share the same tracker
+    tracker = ClientTracker()
+
+    def onConnect(self, request: ConnectionRequest):
+        self._client = request.peer
+        logger.debug('Client connecting: %s', self._client)
+
+    def onOpen(self):
+        logger.debug('WebSocket connection to %s open', self._client)
+
+    def onMessage(self, payload: bytes, is_binary: bool) -> None:
+        # TODO convert everything into a WebSocketError
+        try:
+            json_object = self._parse_message(payload, is_binary)
+        except ValueError as err:
+            self._send_error_message('malformed_message', err.args[0])
+            return
+        try:
+            request = self._convert_json_into_client_request(json_object)
+        except ValueError as err:
+            # TODO handle error and return (None)
+            return request
+        # TODO check that JSON is valid: dict with action and resource keys
+        # and strings values -> convert into ClientRequest object
+        # return invalid_json error message on errors
+        #        unknown_action if not "subscribe" nor "unsubscribe"
+        #        unknown_resource not unknown resource path
+        #        subscribe_not_supported if an ItemVersion
+        # otherwise handleClientRequest
+
+        # TODO handle message and send suitable response
+        # TODO check that result is dict
+
+    def _parse_message(self, payload: bytes, is_binary: bool) -> object:
+        """Parse a client message into a JSON object.
+
+        :raise ValueError: if the message doesn't contain UTF-8 encoded text or
+                           cannot be parsed as JSON
+
+        """
+        if is_binary:
+            raise ValueError('Message is binary')
+        text = payload.decode()
+        logger.debug('Received text message from client %s: %s',
+                     self._client, text)
+        return loads(text)
+
+    def _send_error_message(self, error: str, details: str) -> None:
+        self._send_json_message({'error': error, 'details': details})
+
+    def _send_json_message(self, json_object: dict) -> None:
+        """Send a JSON object as message to the client."""
+        text = dumps(json_object)
+        logger.debug('Sending message to client %s: %s', self._client, text)
+        self.sendMessage(text.encode())
+
+    def _convert_json_into_client_request(self, json_object):
+        # TODO implement
+        pass
+
+    def onClose(self, was_clean: bool, code: int, reason: str):
+        self.tracker.delete_all_subscriptions(self._client)
+        clean_str = 'Clean' if was_clean else 'Unclean'
+        logger.debug('%s close of WebSocket connection to %s; reason: %s',
+                     clean_str, self._client, reason)
 
 
 class EventDispatcher():
