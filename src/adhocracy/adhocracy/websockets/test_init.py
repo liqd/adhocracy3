@@ -3,8 +3,8 @@ import unittest
 
 from substanced.util import get_oid
 
+from adhocracy.websockets import ClientCommunicator
 from adhocracy.websockets import ClientTracker
-
 
 class DummyResource():
 
@@ -14,6 +14,19 @@ class DummyResource():
         """Initialize instance."""
         self.__oid__ = oid
 
+
+class ClientCommunicatorUnitTests(unittest.TestCase):
+
+    """Test the ClientCommunicator class."""
+
+    def setUp(self):
+        """Test setup."""
+        self._comm = ClientCommunicator()
+
+    def test_autobahn_installed(self):
+        """Test that Autobahn is installed."""
+        from autobahn import __version__
+        assert isinstance(__version__, str)
 
 class ClientTrackerUnitTests(unittest.TestCase):
 

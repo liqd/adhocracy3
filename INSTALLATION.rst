@@ -25,9 +25,10 @@ Installation (backend)
 
 Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
-1. python3
+1. python3 (FIXME probably not required?)
 2. git
-3. build-essential libyaml-dev python3-dev libncurses5-dev python-setuptools
+3. build-essential libbz2-dev libyaml-dev python3-dev libncurses5-dev
+   python-setuptools
 4. graphviz
 5. ruby-dev
 

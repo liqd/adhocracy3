@@ -1,7 +1,7 @@
 """Rest API views."""
 from copy import deepcopy
+from logging import getLogger
 import functools
-import logging
 
 from colander import SchemaNode
 from cornice.util import json_error
@@ -36,7 +36,7 @@ from adhocracy.utils import to_dotted_name
 from adhocracy.utils import get_all_taggedvalues
 
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 def validate_sheet_cstructs(context, request, sheets):
@@ -127,8 +127,8 @@ def validate_post_sheet_names_and_resource_type(context, request):
         wrong_sheets = set(posted) - set(optional + mandatory)
         if wrong_sheets:
             error = 'The following propertysheets are not allowed for this '\
-                    'resource type or mispelled: {names}'.format(names=
-                                                                 wrong_sheets)
+                    'resource type or mispelled: {names}'.format(
+                        names=wrong_sheets)
             request.errors.add('body', 'data', error)
         missing_sheets = set(mandatory) - set(posted)
         if missing_sheets:

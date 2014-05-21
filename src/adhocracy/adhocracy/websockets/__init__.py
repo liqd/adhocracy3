@@ -1,10 +1,41 @@
 """Asynchronous client-server communication via Websockets."""
 from collections import defaultdict
 from collections.abc import Iterable
+from logging import getLogger
 
+from autobahn.asyncio.websocket import WebSocketServerProtocol
 from substanced.util import get_oid
 
 from adhocracy.interfaces import IResource
+
+
+logger = getLogger(__name__)
+
+
+class ClientCommunicator(WebSocketServerProtocol):
+
+    """Communicates with a client through a Websocket connection."""
+
+    def onConnect(self, request):
+        # TODO reqister myself
+        self._client = request.peer
+        logger.debug('Client connecting: %s', self._client)
+
+    def onOpen(self):
+        logger.debug('WebSocket connection to %s open', self._client)
+
+    def onMessage(self, payload, is_binary):
+        if is_binary:
+            print('Binary message received: {0} bytes'.format(len(payload)))
+        else:
+            print('Text message received: {0}'.format(payload.decode('utf8')))
+
+        # TODO handle message and send suitable response
+        self.sendMessage(payload, is_binary)
+
+    def onClose(self, was_clean, code, reason):
+        # TODO delete all subscriptions
+        print('WebSocket connection closed: {0}'.format(reason))
 
 
 class ClientTracker():
@@ -13,17 +44,16 @@ class ClientTracker():
 
     def __init__(self):
         """Create a new instance."""
-        pass
         self._clients2resource_oids = defaultdict(set)
         self._resource_oids2clients = defaultdict(set)
 
-    def is_subscribed(self, client, resource: IResource) -> bool:
+    def is_subscribed(self, client: str, resource: IResource) -> bool:
         """Check whether a client is subscribed to a resource."""
         oid = get_oid(resource)
         return (client in self._clients2resource_oids and
                 oid in self._clients2resource_oids[client])
 
-    def subscribe(self, client, resource: IResource) -> bool:
+    def subscribe(self, client: str, resource: IResource) -> bool:
         """Subscribe a client to a resource, if necessary.
 
         Returns True if the subscription was successful, False if it was
@@ -39,7 +69,7 @@ class ClientTracker():
         self._resource_oids2clients[oid].add(client)
         return True
 
-    def unsubscribe(self, client, resource: IResource) -> bool:
+    def unsubscribe(self, client: str, resource: IResource) -> bool:
         """Unsubscribe a client from a resource, if necessary.
 
         Returns True if the unsubscription was successful, False if it was
@@ -64,7 +94,7 @@ class ClientTracker():
             if not multidict[key]:
                 del multidict[key]
 
-    def delete_all_subscriptions(self, client) -> None:
+    def delete_all_subscriptions(self, client: str) -> None:
         """Delete all subscriptions for a client."""
         oid_set = self._clients2resource_oids.pop(client, set())
         for oid in oid_set:

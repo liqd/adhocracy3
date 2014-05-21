@@ -104,7 +104,7 @@ class ResourceContentRegistry(ContentRegistry):
         assert name in all_types
         metadata = all_types[name]['metadata']
         addables = metadata.get('element_types', [])
-        #get all addable types
+        # get all addable types
         addable_types = []
         for type in all_types.values():
             is_implicit = type['metadata']['is_implicit_addable']
@@ -115,7 +115,7 @@ class ResourceContentRegistry(ContentRegistry):
                 is_allowed = has_permission(add_permission, context, request)
                 if is_subtype or is_is and is_allowed:
                     addable_types.append(type['iface'])
-        #add propertysheet names
+        # add propertysheet names
         types_with_sheetnames = {}
         for type_iface in addable_types:
             sheetnames = {}

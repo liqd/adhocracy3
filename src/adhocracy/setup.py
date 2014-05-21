@@ -14,6 +14,8 @@ requires = [
     'substanced',
     'pyramid_tm',
     'cornice',
+    'autobahn',
+    'asyncio',
     ]
 
 setup(name='adhocracy',
