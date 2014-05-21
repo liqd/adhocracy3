@@ -1,0 +1,13 @@
+<h3>table of contents</h3>
+<ol>
+    <li ng-repeat="doc in poolEntries">
+        <div ng-switch="doc">
+            <div ng-switch-when="undefined">
+                <small><tt>(empty DAG)</tt></small>
+            </div>
+            <div ng-switch-default>
+                <adh-proposal-version-detail content="doc.content" viewmode="doc.viewmode"></adh-proposal-version-detail>
+            </div>
+        </div>
+    </li>
+</ol>
