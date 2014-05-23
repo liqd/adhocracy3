@@ -42,6 +42,6 @@ proposal_meta = item_metadata._replace(
 
 
 def includeme(config):
-    """Register resource type factory in substanced content registry."""
+    """Add resource type to registry."""
     add_resource_type_to_registry(proposalversion_meta, config)
     add_resource_type_to_registry(proposal_meta, config)
