@@ -76,7 +76,7 @@ def set_references(source, targets, reftype):
                                 for Sequences the order is preserved.
     : param reftype (SheetReferenceType): the reftype mapping to isheet/field.
     """
-    assert SheetReferenceType.providedBy(reftype)
+    assert reftype.isOrExtends(SheetReferenceType)
     ordered = isinstance(targets, Sequence)
     orientation = 'source'
     resolve = True  # return objects not oids

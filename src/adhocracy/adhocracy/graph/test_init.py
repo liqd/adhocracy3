@@ -139,10 +139,6 @@ class SetReferencesUnitTest(unittest.TestCase):
         self.target2 = create_dummy_resource(parent=context)
         self.objectmap = context.__objectmap__
 
-    def test_targets_not_iteratable(self):
-        with pytest.raises(AssertionError):
-            self._make_one(self.source, None, SheetReferenceType)
-
     def test_reftype_not_sheetreferencetype(self):
         from substanced.interfaces import ReferenceType
         with pytest.raises(AssertionError):
