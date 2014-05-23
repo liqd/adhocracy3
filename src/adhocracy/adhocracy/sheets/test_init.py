@@ -3,17 +3,12 @@ import unittest
 
 from pyramid import testing
 from zope.interface.verify import verifyObject
-from zope.interface import alsoProvides
 import colander
 import pytest
 
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResourceSheet
 
-
-##########
-#  tests #
-##########
 
 class ResourcePropertySheetUnitTests(unittest.TestCase):
 
@@ -165,8 +160,6 @@ class AddSheetToRegistryIntegrationTest(unittest.TestCase):
         self.metadata = sheet_metadata._replace(isheet=ISheetA,
                                                 sheet_class=GenericResourceSheet,
                                                 schema_class=SheetASchema)
-        context = testing.DummyResource()
-        self.context = context
         self.config = testing.setUp()
 
     def tearDown(self):
@@ -183,12 +176,25 @@ class AddSheetToRegistryIntegrationTest(unittest.TestCase):
                                    isheet.__identifier__)
 
     def test_register_valid_sheet_metadata(self):
-        alsoProvides(self.context, self.metadata.isheet)
-
+        context = testing.DummyResource(__provides__=self.metadata.isheet)
         self._make_one(self.metadata, self.config.registry)
 
-        sheet = self._get_one(self.context, self.metadata.isheet)
+        sheet = self._get_one(context, self.metadata.isheet)
+
         assert self.metadata.isheet == sheet.meta.isheet
+
+    def test_register_valid_sheet_metadata_replace_exiting(self):
+        context = testing.DummyResource(__provides__=ISheet)
+        metadata_a = self.metadata._replace(isheet=ISheet,
+                                            permission_view='A')
+        self._make_one(metadata_a, self.config.registry)
+        metadata_b = self.metadata._replace(isheet=ISheet,
+                                            permission_view='B')
+        self._make_one(metadata_b, self.config.registry)
+
+        sheet = self._get_one(context, ISheet)
+
+        assert sheet.meta.permission_view == 'B'
 
     def test_register_non_valid_readonly_and_createmandatory(self):
         metadata = self.metadata._replace(readonly=True,
