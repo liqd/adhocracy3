@@ -1,6 +1,7 @@
 """Rest API views."""
 from copy import deepcopy
 import functools
+import logging
 
 from colander import SchemaNode
 from cornice.util import json_error
@@ -19,7 +20,6 @@ from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISimple
 from adhocracy.interfaces import IPool
 from adhocracy.interfaces import ISheet
-from adhocracy.rest import logger
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
 from adhocracy.rest.schemas import POSTItemRequestSchema
@@ -34,6 +34,9 @@ from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
 from adhocracy.utils import get_all_taggedvalues
+
+
+logger = logging.getLogger(__name__)
 
 
 def validate_sheet_cstructs(context, request, sheets):

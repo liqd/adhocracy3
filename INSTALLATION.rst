@@ -25,10 +25,11 @@ Installation (backend)
 
 Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
-1. python2.7
+1. python3
 2. git
-3. build-essentials libyaml-dev python-dev libncurses5-dev python-setuptools
+3. build-essential libyaml-dev python3-dev libncurses5-dev python-setuptools
 4. graphviz
+5. ruby-dev
 
 checkout source code ::
 

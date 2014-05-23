@@ -37,7 +37,7 @@ Variables:
 ++++++++++
 
 * define close to where there are uses
-     
+
 Function name/arguments:
 ++++++++++++++++++++++++
 
