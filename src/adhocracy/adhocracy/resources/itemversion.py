@@ -1,13 +1,13 @@
 """ItemVersion resource type."""
 from pyramid.traversal import find_interface, find_resource
-from substanced.content import add_content_type
 
-from adhocracy.events import ItemVersionNewVersionAdded, \
-    SheetReferencedItemHasNewVersion
+from adhocracy.events import ItemVersionNewVersionAdded
+from adhocracy.events import SheetReferencedItemHasNewVersion
 from adhocracy.graph import get_follows, get_back_references
-from adhocracy.interfaces import IItemVersion, IItem
 from adhocracy.resources.resource import resource_meta_defaults
-from adhocracy.resources import ResourceFactory
+from adhocracy.interfaces import IItemVersion
+from adhocracy.interfaces import IItem
+from adhocracy.resources import add_resource_type_to_registry
 from adhocracy.sheets import tags
 import adhocracy.sheets.versions
 from adhocracy.utils import get_sheet
@@ -108,10 +108,5 @@ itemversion_meta_defaults = resource_meta_defaults._replace(
 
 
 def includeme(config):
-    """Register resource type factory in substanced content registry."""
-    metadata = itemversion_meta_defaults
-    identifier = metadata.iresource.__identifier__
-    add_content_type(config,
-                     identifier,
-                     ResourceFactory(metadata),
-                     factory_type=identifier, resource_metadata=metadata)
+    """Add resource type to registry."""
+    add_resource_type_to_registry(itemversion_metadata, config)

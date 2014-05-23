@@ -75,5 +75,5 @@ pool_meta_defaults = resource_meta_defaults._replace(
 
 
 def includeme(config):
-    """Register resource type factory in substanced content registry."""
-    add_resource_type_to_registry(IBasicPool, config)
+    """Add resource type to registry."""
+    add_resource_type_to_registry(pool_metadata, config)

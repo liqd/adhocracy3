@@ -15,5 +15,5 @@ tag_meta_defaults = \
 
 
 def includeme(config):
-    """Register resource type factory in substanced content registry."""
-    add_resource_type_to_registry(IBasicTag, config)
+    """Add resource type to registry."""
+    add_resource_type_to_registry(tag_metadata, config)
