@@ -2,8 +2,8 @@
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ITag
 from adhocracy.interfaces import IItem
-from adhocracy.resources.pool import pool_meta_defaults
 from adhocracy.resources import add_resource_type_to_registry
+from adhocracy.resources.pool import pool_metadata
 import adhocracy.sheets.name
 import adhocracy.sheets.tags
 import adhocracy.sheets.pool
@@ -29,7 +29,7 @@ def create_initial_content_for_item(context, registry, options):
     create(ITag.__identifier__, parent=context, appstructs=tag_last_data)
 
 
-item_meta_defaults = pool_meta_defaults._replace(
+item_metadata = pool_metadata._replace(
     content_name='Item',
     iresource=IItem,
     basic_sheets=[adhocracy.sheets.name.IName,

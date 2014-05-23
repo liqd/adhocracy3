@@ -14,9 +14,9 @@ from adhocracy.interfaces import ITag
 def make_itemversion(parent=None, follows=[]):
     from adhocracy.resources import ResourceFactory
     from adhocracy.sheets.versions import IVersionable
-    from adhocracy.resources.itemversion import itemversion_meta_defaults
+    from adhocracy.resources.itemversion import itemversion_metadata
     appstructs = {IVersionable.__identifier__: {'follows': follows}}
-    return ResourceFactory(itemversion_meta_defaults)(parent=parent,
+    return ResourceFactory(itemversion_metadata)(parent=parent,
                                                       appstructs=appstructs)
 
 
@@ -46,7 +46,7 @@ class ItemIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         from substanced.objectmap import ObjectMap
-        from adhocracy.resources.item import item_meta_defaults
+        from adhocracy.resources.item import item_metadata
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
@@ -57,7 +57,7 @@ class ItemIntegrationTest(unittest.TestCase):
         self.config.include('adhocracy.sheets.tags')
         self.config.include('adhocracy.sheets.versions')
         self.config.include('adhocracy.subscriber')
-        self.metadata = item_meta_defaults
+        self.metadata = item_metadata
         context = DummyFolder()
         context.__objectmap__ = ObjectMap(context)
         self.context = context

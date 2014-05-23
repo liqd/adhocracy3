@@ -8,6 +8,7 @@ import adhocracy.sheets.pool
 from adhocracy.interfaces import IPool
 from adhocracy.resources import add_resource_type_to_registry
 from adhocracy.resources.resource import Base
+from adhocracy.resources.resource import resource_metadata_defaults
 
 
 class IBasicPool(IPool):
@@ -63,7 +64,7 @@ class Pool(Base, Folder):
         return str(int(name)).zfill(self._autoname_length)
 
 
-pool_meta_defaults = resource_meta_defaults._replace(
+pool_metadata = resource_metadata_defaults._replace(
     content_name=IBasicPool.__identifier__,
     iresource=IBasicPool,
     content_class=Pool,

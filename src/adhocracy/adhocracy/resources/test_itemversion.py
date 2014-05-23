@@ -109,11 +109,11 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         # for more tests see adhocracy.subscriber
         from adhocracy.sheets.document import ISection
         from adhocracy.graph import get_followed_by
-        from adhocracy.resources.itemversion import itemversion_meta_defaults
+        from adhocracy.resources.itemversion import itemversion_metadata
         self.config.include('adhocracy.sheets.document')
         self.config.include('adhocracy.subscriber')
 
-        metadata = itemversion_meta_defaults._replace(
+        metadata = itemversion_metadata._replace(
             extended_sheets=[ISection])
         _add_resource_type_to_registry(metadata, self.config.registry)
 

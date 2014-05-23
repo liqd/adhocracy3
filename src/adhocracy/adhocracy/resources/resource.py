@@ -24,7 +24,7 @@ class Base(Persistent):
         return '{0} oid: {1}'.format(interface_dotted, identifier)
 
 
-resource_meta_defaults = resource_metadata._replace(
+resource_metadata_defaults = resource_metadata._replace(
     content_name=IResource.__identifier__,
     iresource=IResource,
     content_class=Base,

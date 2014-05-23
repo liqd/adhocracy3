@@ -4,10 +4,10 @@ from pyramid.traversal import find_interface, find_resource
 from adhocracy.events import ItemVersionNewVersionAdded
 from adhocracy.events import SheetReferencedItemHasNewVersion
 from adhocracy.graph import get_follows, get_back_references
-from adhocracy.resources.resource import resource_meta_defaults
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import IItem
 from adhocracy.resources import add_resource_type_to_registry
+from adhocracy.resources.resource import resource_metadata_defaults
 from adhocracy.sheets import tags
 import adhocracy.sheets.versions
 from adhocracy.utils import get_sheet
@@ -96,7 +96,7 @@ def _update_last_tag(context, registry, old_versions):
             sheet.set(data)
 
 
-itemversion_meta_defaults = resource_meta_defaults._replace(
+itemversion_metadata = resource_metadata_defaults._replace(
     content_name='ItemVersion',
     iresource=IItemVersion,
     basic_sheets=[adhocracy.sheets.versions.IVersionable,
