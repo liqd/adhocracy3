@@ -30,7 +30,7 @@ def get_references(source, base_isheet=ISheet, base_reftype=SheetToSheet):
 
 
 def get_back_references(target, base_isheet=ISheet,
-                        base_reftype=SheetReferenceType):
+                        base_reftype=SheetToSheet):
     """Get generator with references of other resources with this target.
 
     : return: generator of References

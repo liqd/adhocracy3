@@ -331,7 +331,7 @@ class GetBackReferencesUnitTest(unittest.TestCase):
         class IASheet(ISheet):
             pass
 
-        class ASheetReferenceType(SheetReferenceType):
+        class ASheetReferenceType(SheetToSheet):
             source_isheet = IASheet
 
         self.objectmap.connect(self.resource, self.resource,
@@ -377,22 +377,22 @@ class GetBackReferencesForIsheetUnitTest(unittest.TestCase):
         assert result == {'name': [self.source]}
 
     def test_with_isheet_that_has_subclass(self):
-        from adhocracy.interfaces import SheetReferenceType
+        from adhocracy.interfaces import SheetToSheet
         from adhocracy.interfaces import ISheet
         self.objectmap.connect(self.source, self.target,
-                               SheetReferenceType)
+                               SheetToSheet)
 
         class IASheet(ISheet):
             taggedValue('field:name', None)
 
-        class ASheetReferenceType(SheetReferenceType):
+        class ASheetReferenceType(SheetToSheet):
             source_isheet = IASheet
             source_isheet_field = 'name'
 
         class IABSheet(IASheet):
             taggedValue('field:name', None)
 
-        class ABSheetReferenceType(SheetReferenceType):
+        class ABSheetReferenceType(SheetToSheet):
             source_isheet = IABSheet
             source_isheet_field = 'name'
 
@@ -403,20 +403,20 @@ class GetBackReferencesForIsheetUnitTest(unittest.TestCase):
         assert result == {'name': [self.source, self.source]}
 
     def test_with_isheet_that_has_subclass_with_extra_field(self):
-        from adhocracy.interfaces import SheetReferenceType
+        from adhocracy.interfaces import SheetToSheet
         from adhocracy.interfaces import ISheet
 
         class IASheet(ISheet):
             taggedValue('field:name', None)
 
-        class ASheetReferenceType(SheetReferenceType):
+        class ASheetReferenceType(SheetToSheet):
             source_isheet = IASheet
             source_isheet_field = 'name'
 
         class IABSheet(IASheet):
             taggedValue('field:othername', None)
 
-        class ABSheetReferenceType(SheetReferenceType):
+        class ABSheetReferenceType(SheetToSheet):
             source_isheet = IABSheet
             source_isheet_field = 'othername'
 
