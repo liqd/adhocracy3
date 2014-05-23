@@ -7,6 +7,7 @@ from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
 from adhocracy.interfaces import ResourceMetadata
+from adhocracy.sheets.name import IName
 from adhocracy.utils import get_sheet
 
 
@@ -14,7 +15,7 @@ class ResourceFactory:
 
     """Basic resource factory."""
 
-    name_identifier = 'adhocracy.sheets.name.IName'
+    name_identifier = IName.__identifier__
 
     def __init__(self, metadata: ResourceMetadata):
         self.meta = metadata
