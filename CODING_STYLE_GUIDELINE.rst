@@ -68,9 +68,7 @@ Javascript
 CSS/Compass
 -----------
 
-* 4 spaces instead of tabs (must)
-* no trailing white space (must)
-* csslint (must) (maybe exlcude some rules, TODO) https://github.com/stubbornella/csslint/wiki/Rules http://comcast.github.io/compass-csslint/
+See :doc:`CSS_Guidelines`.
 
 Restructured text
 +++++++++++++++++

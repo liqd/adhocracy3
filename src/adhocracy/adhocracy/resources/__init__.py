@@ -3,12 +3,31 @@ import datetime
 
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
+from pyramid.registry import Registry
+from substanced.content import add_content_type
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
 from adhocracy.interfaces import ResourceMetadata
 from adhocracy.sheets.name import IName
 from adhocracy.utils import get_sheet
+def add_resource_type_to_registry(iresource: IResource, config: Registry):
+    """Add the `iresource` type to the content registry.
+
+    As generic factory the :class:`ResourceFactory` is used.
+    """
+    assert hasattr(config.registry, 'content')
+    name = iresource.queryTaggedValue('content_name')
+    if not name:
+        name = iresource.__identifier__
+    meta = {'content_name': name,
+            'add_view': 'add_' + iresource.__identifier__,
+            }
+    add_content_type(config, iresource.__identifier__,
+                     ResourceFactory(iresource),
+                     factory_type=iresource.__identifier__, **meta)
+
+
 
 
 class ResourceFactory:
@@ -98,7 +117,7 @@ class ResourceFactory:
 
 def includeme(config):
     """Include all resource types in this package."""
-    config.include('.pool')
-    config.include('.tag')
+    #config.include('.pool')
+    #config.include('.tag')
     config.include('.itemversion')
     config.include('.item')

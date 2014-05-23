@@ -14,8 +14,10 @@ __pycache__
 .sass-cache
 /bin
 /docs/build
+/docs/styleguide/*
 /etc/compass.min.rb
 /etc/compass.rb
+/etc/hologram.yml
 python
 develop-eggs
 /var

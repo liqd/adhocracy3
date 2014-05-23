@@ -1,16 +1,13 @@
 """Pool resource type and zodb persistent IPool implementation."""
 import datetime
 
-from substanced.content import add_content_type
 from substanced.folder import Folder
 from zope.interface import implementer
-
 import adhocracy.sheets.name
 import adhocracy.sheets.pool
 from adhocracy.interfaces import IPool
-from adhocracy.resources.resource import resource_meta_defaults
+from adhocracy.resources import add_resource_type_to_registry
 from adhocracy.resources.resource import Base
-from adhocracy.resources import ResourceFactory
 
 
 class IBasicPool(IPool):
@@ -79,9 +76,4 @@ pool_meta_defaults = resource_meta_defaults._replace(
 
 def includeme(config):
     """Register resource type factory in substanced content registry."""
-    metadata = pool_meta_defaults
-    identifier = metadata.iresource.__identifier__
-    add_content_type(config,
-                     identifier,
-                     ResourceFactory(metadata),
-                     factory_type=identifier, resource_metadata=metadata)
+    add_resource_type_to_registry(IBasicPool, config)
