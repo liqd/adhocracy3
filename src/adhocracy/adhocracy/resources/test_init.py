@@ -76,12 +76,11 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
     def setUp(self):
         from adhocracy.resources.resource import Base
-        from adhocracy.resources.resource import resource_meta
+        from adhocracy.resources.resource import resource_metadata
         self.config = testing.setUp()
         self.context = DummyFolder()
-        self.metadata = resource_meta._replace(iresource=IResource,
-                                               content_class=Base)
-
+        self.metadata = resource_metadata._replace(iresource=IResource,
+                                                   content_class=Base)
 
     def tearDown(self):
         testing.tearDown()

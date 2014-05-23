@@ -84,7 +84,8 @@ class IResourcePropertySheet(IPropertySheet):
 
         """
 
-RESOURCE_METADATA_FIELDS = OrderedDict({
+
+RESOURCE_METADATA = OrderedDict({
     'content_name': '',
     'iresource': None,
     'content_class': None,
@@ -102,7 +103,7 @@ RESOURCE_METADATA_FIELDS = OrderedDict({
 
 
 class ResourceMetadata(namedtuple('ResourceMetadata',
-                                  RESOURCE_METADATA_FIELDS.keys())):
+                                  RESOURCE_METADATA.keys())):
 
     """Metadata to register Resource Types.
 
@@ -138,7 +139,8 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
 
     """
 
-resource_meta = ResourceMetadata(**RESOURCE_METADATA_FIELDS)
+
+resource_metadata = ResourceMetadata(**RESOURCE_METADATA)
 
 
 class IResource(ILocation):

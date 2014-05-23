@@ -2,7 +2,7 @@
 from persistent import Persistent
 from zope.interface import implementer
 
-from adhocracy.interfaces import resource_meta
+from adhocracy.interfaces import resource_metadata
 from adhocracy.interfaces import IResource
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import to_dotted_name
@@ -24,7 +24,7 @@ class Base(Persistent):
         return '{0} oid: {1}'.format(interface_dotted, identifier)
 
 
-resource_meta_defaults = resource_meta._replace(
+resource_meta_defaults = resource_metadata._replace(
     content_name=IResource.__identifier__,
     iresource=IResource,
     content_class=Base,
