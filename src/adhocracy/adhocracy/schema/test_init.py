@@ -14,6 +14,7 @@ def add_node_binding(node, context=None):
     node.bindings['context'] = context
     return node
 
+
 ###########
 #  tests  #
 ###########
@@ -184,8 +185,8 @@ class PathSetUnitTest(unittest.TestCase):
 class ReferenceSetSchemaNodeUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import ListOfUniqueReferencesSchemaNode
-        return ListOfUniqueReferencesSchemaNode()
+        from . import ListOfUniqueReferences
+        return ListOfUniqueReferences()
 
     def setUp(self):
         self.context = testing.DummyResource()

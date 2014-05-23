@@ -169,7 +169,7 @@ def get_all_resources(node, context):
     #                [d for d in docs if d])
 
 
-class AbstractReferenceIterableSchemaNode(schema.MultireferenceIdSchemaNode):
+class AbstractReferenceIterable(schema.MultireferenceIdSchemaNode):
 
     """Abstract Colander SchemaNode to store multiple references.
 
@@ -196,12 +196,12 @@ class AbstractReferenceIterableSchemaNode(schema.MultireferenceIdSchemaNode):
         isheet = reftype.getTaggedValue('target_isheet')
         for resource in value:
             if not isheet.providedBy(resource):
-                    error = 'This Resource does not provide interface %s' % \
-                            (isheet.__identifier__)
-                    raise colander.Invalid(node, msg=error, value=resource)
+                error = 'This Resource does not provide interface %s' % \
+                        (isheet.__identifier__)
+                raise colander.Invalid(node, msg=error, value=resource)
 
 
-class ListOfUniqueReferencesSchemaNode(AbstractReferenceIterableSchemaNode):
+class ListOfUniqueReferences(AbstractReferenceIterable):
 
     """Colander SchemaNode to store a list of references without duplicates."""
 
