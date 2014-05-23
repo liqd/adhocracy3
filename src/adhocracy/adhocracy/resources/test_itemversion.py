@@ -1,7 +1,16 @@
 import unittest
 
 from pyramid import testing
+
 from adhocracy.resources.pool import Pool
+from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
+from adhocracy.interfaces import SheetToSheet
+from adhocracy.interfaces import IItemVersionNewVersionAdded
+from adhocracy.interfaces import IItemVersion
+
+##########
+# Helper #
+##########
 
 
 class DummyFolder(testing.DummyResource):
@@ -13,12 +22,19 @@ class DummyFolder(testing.DummyResource):
         obj.__oid__ = 1
 
     def check_name(self, name):
-        if name == 'invalid':
-            raise ValueError
         return name
 
     def next_name(self, obj, prefix=''):
-        return prefix + '_0000000'
+        return prefix + '_0000000' + str(obj.__oid__)
+
+
+def _add_resource_type_to_registry(metadata, registry):
+    from adhocracy.resources import ResourceFactory
+    iresource = metadata.iresource
+    registry.content.add(iresource.__identifier__,
+                         iresource.__identifier__,
+                         ResourceFactory(metadata))
+
 
 ################################
 # Tests                        #
@@ -29,91 +45,84 @@ class ItemVersionIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         from substanced.objectmap import ObjectMap
-        from adhocracy.resources.itemversion import itemversion_meta_defaults
         self.config = testing.setUp()
         self.config.include('substanced.content')
-        self.config.include('adhocracy.resources')
+        self.config.include('adhocracy.registry')
         self.config.include('adhocracy.sheets.name')
         self.config.include('adhocracy.sheets.versions')
+        self.config.include('adhocracy.resources.itemversion')
         context = Pool()
         context.__objectmap__ = ObjectMap(context)
         self.context = context
-        self.metadata = itemversion_meta_defaults
+        self.objectmap = context.__objectmap__
 
     def tearDown(self):
         testing.tearDown()
 
-    def make_one(self, root_versions=[], follows=[], appstructs={}):
-        from adhocracy.resources import ResourceFactory
+    def _make_one(self, root_versions=[], follows=[], appstructs={}):
         from adhocracy.sheets.versions import IVersionable
-        if not appstructs:
-            appstructs = {}
-        if follows:
-            appstructs.update({IVersionable.__identifier__:
-                                   {'follows': follows}})
-        return ResourceFactory(self.metadata)(parent=self.context,
-                                              appstructs=appstructs,
-                                              root_versions=root_versions)
+        parent = self.context
+        follow = {IVersionable.__identifier__: {'follows': follows}}
+        appstructs = appstructs or {}
+        appstructs.update(follow)
+        itemversion = self.config.registry.content.create(
+            IItemVersion.__identifier__,
+            parent=parent,
+            appstructs=appstructs,
+            root_versions=root_versions)
+        return itemversion
 
-    def test_create_without_referencing_items(self):
-        from adhocracy.interfaces import IItemVersion
-        from adhocracy.interfaces import IItemVersionNewVersionAdded
+    def test_registry_factory(self):
+        content_types = self.config.registry.content.factory_types
+        assert IItemVersion.__identifier__ in content_types
+
+    def test_create(self):
+        version_0 = self._make_one()
+        assert IItemVersion.providedBy(version_0)
+
+    def test_create_new_version(self):
         events = []
-
-        def listener(event):
-            events.append(event)
+        listener = lambda event: events.append(event)
         self.config.add_subscriber(listener, IItemVersionNewVersionAdded)
 
-        old_version = self.make_one()
-        new_version = self.make_one(follows=[old_version],
-                                    root_versions=[old_version])
+        version_0 = self._make_one()
+        version_1 = self._make_one(follows=[version_0])
 
-        assert IItemVersion.providedBy(new_version)
         assert len(events) == 1
         assert IItemVersionNewVersionAdded.providedBy(events[0])
+        assert events[0].object == version_0
+        assert events[0].new_version == version_1
 
-    def test_create_with_referencing_items(self):
-        from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
-        from adhocracy.interfaces import SheetToSheet
+    def test_create_new_version_with_referencing_resources(self):
         events = []
-
-        def listener(event):
-            events.append(event)
+        listener = lambda event: events.append(event)
         self.config.add_subscriber(listener, ISheetReferencedItemHasNewVersion)
 
-        other_version = self.make_one()
-        old_version = self.make_one()
-        om = self.context.__objectmap__
-        om.connect(other_version, old_version, SheetToSheet)
-        self.make_one(follows=[old_version],
-                      root_versions=[old_version])
+        version_0 = self._make_one()
+        other_version_0 = self._make_one()
+        self.objectmap.connect(other_version_0, version_0, SheetToSheet)
+        self._make_one(follows=[version_0])
 
-        assert len(events) == 2
+        assert len(events) == 1
 
     def test_autoupdate_with_referencing_items(self):
-        from adhocracy.resources import ResourceFactory
-        from adhocracy.interfaces import IItemVersion
-        from adhocracy.sheets.document import ISection
-        from adhocracy.sheets.versions import IVersionableFollowsReference
         # for more tests see adhocracy.subscriber
-        self.config.include('adhocracy.registry')
+        from adhocracy.sheets.document import ISection
+        from adhocracy.graph import get_followed_by
+        from adhocracy.resources.itemversion import itemversion_meta_defaults
         self.config.include('adhocracy.sheets.document')
         self.config.include('adhocracy.subscriber')
 
-        class ISectionVersion(IItemVersion):
-            pass
-        self.metadata = self.metadata._replace(iresource=ISectionVersion,
-                                               extended_sheets=[ISection])
-        self.config.registry.content.add(ISectionVersion.__identifier__,
-                                         ISectionVersion.__identifier__,
-                                         ResourceFactory(self.metadata))
-        child = self.make_one()
-        root = self.make_one(appstructs={ISection.__identifier__:
-                                         {'subsections': [child]}})
-        self.make_one(follows=[child], root_versions=[root])
-        om = self.context.__objectmap__
-        root_followed_by = list(om.sources(root, IVersionableFollowsReference))
-        assert len(root_followed_by) == 1
+        metadata = itemversion_meta_defaults._replace(
+            extended_sheets=[ISection])
+        _add_resource_type_to_registry(metadata, self.config.registry)
+
+        child_v0 = self._make_one()
+        appstructs = {ISection.__identifier__: {'subsections': [child_v0]}}
+        root_v0 = self._make_one(appstructs=appstructs)
+        child_v1 = self._make_one(follows=[child_v0], root_versions=[root_v0])
+        root_v0_followed_by = list(get_followed_by(root_v0))
+        assert len(root_v0_followed_by) == 2
 
 
 class IncludemeIntegrationTest(unittest.TestCase):
@@ -123,18 +132,8 @@ class IncludemeIntegrationTest(unittest.TestCase):
         self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
         self.config.include('adhocracy.resources.itemversion')
-        self.context = DummyFolder()
 
     def tearDown(self):
         testing.tearDown()
 
-    def test_includeme_registry_register_factories(self):
-        from adhocracy.interfaces import IItemVersion
-        content_types = self.config.registry.content.factory_types
-        assert IItemVersion.__identifier__ in content_types
 
-    def test_includeme_registry_create_content(self):
-        from adhocracy.interfaces import IItemVersion
-        res = self.config.registry.content.create(IItemVersion.__identifier__,
-                                                  self.context)
-        assert IItemVersion.providedBy(res)

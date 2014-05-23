@@ -28,14 +28,14 @@ from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.schema import AbsolutePath
-from adhocracy.schema import AbstractReferenceIterableSchemaNode
+from adhocracy.schema import AbstractReferenceIterable
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
 
 
 def validate_sheet_cstructs(context, request, sheets):
-    """Validate propertysheet data."""
+    """Validate sheet data."""
     validated = request.validated.get('data', {})
     sheetnames_wrong = []
     for sheetname, cstruct in validated.items():
@@ -50,14 +50,14 @@ def validate_sheet_cstructs(context, request, sheets):
 
 
 def validate_put_sheet_cstructs(context, request):
-    """Validate propertysheet data for put requests."""
+    """Validate sheet data for put requests."""
     sheets = request.registry.content.resource_sheets(
         context, request, onlyeditable=True)
     validate_sheet_cstructs(context, request, sheets)
 
 
 def validate_post_sheet_cstructs(context, request):
-    """Validate propertysheet data for post requests."""
+    """Validate sheet data for post requests."""
     type_ = request.validated.get('content_type', '')
     dummy = object()
     sheets = {}
@@ -84,7 +84,7 @@ def validate_post_root_versions(context, request):
             request.errors.add('body", "root_versions', error)
             continue
         if not IItemVersion.providedBy(res):
-            error = 'This resource is not a valid '\
+            error = 'This resource is not a valid ' \
                     'root version: {p}'.format(p=path)
             request.errors.add('body', 'root_versions', error)
             continue
@@ -94,23 +94,23 @@ def validate_post_root_versions(context, request):
 
 
 def validate_put_sheet_names(context, request):
-    """Validate propertysheet names for put requests. Return None."""
+    """Validate sheet names for put requests. Return None."""
     sheets = request.registry.content.resource_sheets(
         context, request, onlyeditable=True)
     puted = request.validated.get('data', {}).keys()
     wrong_sheets = set(puted) - set(sheets)
     if wrong_sheets:
-        error = 'The following propertysheets are mispelled or you do not '\
+        error = 'The following sheets are mispelled or you do not ' \
                 'have the edit permission: {names}'.format(names=wrong_sheets)
         request.errors.add('body', 'data', error)
 
 
 def validate_post_sheet_names_and_resource_type(context, request):
-    """Validate addable propertysheet names for post requests."""
+    """Validate addable sheet names for post requests."""
     addables = request.registry.content.resource_addables(context, request)
     content_type = request.validated.get('content_type', '')
     if content_type not in addables:
-        error = 'The following resource type is not '\
+        error = 'The following resource type is not ' \
                 'addable: {iresource} '.format(iresource=content_type)
         request.errors.add('body', 'content_type', error)
     else:
@@ -119,45 +119,45 @@ def validate_post_sheet_names_and_resource_type(context, request):
         posted = request.validated.get('data', {}).keys()
         wrong_sheets = set(posted) - set(optional + mandatory)
         if wrong_sheets:
-            error = 'The following propertysheets are not allowed for this '\
+            error = 'The following sheets are not allowed for this ' \
                     'resource type or mispelled: {names}'.format(names=
                                                                  wrong_sheets)
             request.errors.add('body', 'data', error)
         missing_sheets = set(mandatory) - set(posted)
         if missing_sheets:
-            error = 'The following propertysheets are mandatory to create '\
+            error = 'The following sheets are mandatory to create ' \
                     'this resource: {names}'.format(names=missing_sheets)
             request.errors.add('body', 'data', error)
 
 
 def validate_request_data(context, request, schema=None, extra_validators=[]):
-        """ Validate request data.
+    """ Validate request data.
 
-        Args:
-            context (class): context passed to validator functions
-            request (IRequest): request object passed to validator functions
-            schema (colander.Schema): Schema to validate request body with json
-                data, request url parameters or headers (based on Cornice).
-            extra_validators (List): validator functions with parameter context
-                and request.
+    Args:
+        context (class): context passed to validator functions
+        request (IRequest): request object passed to validator functions
+        schema (colander.Schema): Schema to validate request body with json
+            data, request url parameters or headers (based on Cornice).
+        extra_validators (List): validator functions with parameter context
+            and request.
 
-        Raises:
-            _JSONError: HTTP 400 error based on Cornice if bad request data.
+    Raises:
+        _JSONError: HTTP 400 error based on Cornice if bad request data.
 
-        """
-        if schema:
-            schemac = CorniceSchema.from_colander(schema)
-            # FIXME workaround for Cornice not finding a request body
-            if (not hasattr(request, 'deserializer') and
-                    hasattr(request, 'json')):
-                request.deserializer = lambda req: req.json
-            validate_colander_schema(schemac, request)
-        for val in extra_validators:
-            val(context, request)
-        if request.errors:
-            request.validated = {}
-            _log_request_errors(request)
-            raise json_error(request.errors)
+    """
+    if schema:
+        schemac = CorniceSchema.from_colander(schema)
+        # FIXME workaround for Cornice not finding a request body
+        if (not hasattr(request, 'deserializer') and
+                hasattr(request, 'json')):
+            request.deserializer = lambda req: req.json
+        validate_colander_schema(schemac, request)
+    for val in extra_validators:
+        val(context, request)
+    if request.errors:
+        request.validated = {}
+        _log_request_errors(request)
+        raise json_error(request.errors)
 
 
 def _log_request_errors(request):
@@ -188,7 +188,9 @@ def validate_request_data_decorator():
             validate_request_data(context, request, schema=vals[0],
                                   extra_validators=vals[1])
             return f(context, request)
+
         return wrapper
+
     return _dec
 
 
@@ -272,7 +274,7 @@ class ResourceRESTView(RESTView):
         response_schema = GETResourceResponseSchema()
         struct = {'data': {}}
         for sheet in sheets_view.values():
-            key = sheet.iface.__identifier__
+            key = sheet.meta.isheet.__identifier__
             struct['data'][key] = sheet.get_cstruct()
         struct['path'] = resource_path(self.context)
         iresource = get_resource_interface(self.context)
@@ -505,58 +507,55 @@ class MetaApiView(RESTView):
             # (The _sheet_field_readable method already allows overwriting the
             # readable flag on a field-by-field basis, but it's somewhat
             # ad-hoc.)
-            createmandatory = metadata['createmandatory']
-            readonly = metadata['readonly']
+            createmandatory = metadata.createmandatory
+            readonly = metadata.readonly
             fields = []
 
             # Create field definitions
-            for key, value in metadata.items():
-                fieldname = strip_optional_prefix(key, 'field:')
+            for node in metadata.schema_class().children:
 
-                # Only process 'field:...' definitions
-                if fieldname != key:
+                fieldname = node.name
+                valuetype = type(node)
+                valuetyp = type(node.typ)
+                typ = to_dotted_name(valuetyp)
+                containertype = None
+                targetsheet = None
 
-                    valuetype = type(value)
-                    valuetyp = type(value.typ)
-                    typ = to_dotted_name(valuetyp)
-                    containertype = None
-                    targetsheet = None
+                # If the outer type is not a container and it's not
+                # just a generic SchemaNode, we use the outer type
+                # as "valuetype" since it provides most specific
+                # information (e.g. "adhocracy.schema.Identifier"
+                # instead of just "String")
+                if valuetype is not SchemaNode:
+                    typ = to_dotted_name(valuetype)
 
-                    # If the outer type is not a container and it's not
-                    # just a generic SchemaNode, we use the outer type
-                    # as "valuetype" since it provides most specific
-                    # information (e.g. "adhocracy.schema.Identifier"
-                    # instead of just "String")
-                    if valuetype is not SchemaNode:
-                        typ = to_dotted_name(valuetype)
+                if issubclass(valuetype,
+                              AbstractReferenceIterable):
+                    # Workaround for AbstractIterableOfPaths:
+                    # it's a list/set of AbsolutePath's
+                    empty_appstruct = valuetyp().create_empty_appstruct()
+                    containertype = empty_appstruct.__class__.__name__
+                    typ = to_dotted_name(AbsolutePath)
+                    # set targetsheet
+                    reftype = self.resolv.maybe_resolve(node.reftype)
+                    target_isheet = reftype.getTaggedValue('target_isheet')
+                    targetsheet = to_dotted_name(target_isheet)
 
-                    if issubclass(valuetype,
-                                  AbstractReferenceIterableSchemaNode):
-                        # Workaround for AbstractIterableOfPaths:
-                        # it's a list/set of AbsolutePath's
-                        empty_appstruct = valuetyp().create_empty_appstruct()
-                        containertype = empty_appstruct.__class__.__name__
-                        typ = to_dotted_name(AbsolutePath)
-                        # set targetsheet
-                        reftype = self.resolv.maybe_resolve(value.reftype)
-                        target_isheet = reftype.getTaggedValue('target_isheet')
-                        targetsheet = to_dotted_name(target_isheet)
+                typ_stripped = strip_optional_prefix(typ, 'colander.')
 
-                    typ_stripped = strip_optional_prefix(typ, 'colander.')
+                fielddesc = {
+                    'name': fieldname,
+                    'valuetype': typ_stripped,
+                    'createmandatory': createmandatory,
+                    'readonly': self._sheet_field_readable(
+                        sheet_name, fieldname, readonly)
+                }
+                if containertype is not None:
+                    fielddesc['containertype'] = containertype
+                if targetsheet is not None:
+                    fielddesc['targetsheet'] = targetsheet
 
-                    fielddesc = {
-                        'name': fieldname,
-                        'valuetype': typ_stripped,
-                        'createmandatory': createmandatory,
-                        'readonly': self._sheet_field_readable(
-                            sheet_name, fieldname, readonly)
-                    }
-                    if containertype is not None:
-                        fielddesc['containertype'] = containertype
-                    if targetsheet is not None:
-                        fielddesc['targetsheet'] = targetsheet
-
-                    fields.append(fielddesc)
+                fields.append(fielddesc)
 
             # For now, each sheet definition only contains a 'fields' attribute
             # listing the defined fields

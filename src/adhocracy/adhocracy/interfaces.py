@@ -8,40 +8,48 @@ from substanced.interfaces import IPropertySheet
 from substanced.interfaces import ReferenceClass
 from zope.interface import Attribute
 from zope.interface import Interface
-from zope.interface import taggedValue
-from zope.interface.interfaces import IInterface
 from zope.interface.interface import InterfaceClass
 from zope.interface.interfaces import IObjectEvent
 
 
-class IIResourcePropertySheet(IInterface):
-
-    """Marker interfaces to register the default propertysheet adapter."""
-
-
 class ISheet(Interface):
 
-    """Interface with tagged values to define resource data."""
+    """Marker interface for resources to enable a specific sheet type."""
 
-    taggedValue('schema', 'colander.MappingSchema')
-    """Reference colander data schema.
 
-    This schema has to define the facade to work with this resource.
-    To set/get the data you can adapt to IPropertySheet objects.
+SHEET_METADATA = {'isheet': None,
+                  'sheet_class': None,
+                  'schema_class': None,
+                  'permission_view': '',
+                  'permission_edit': '',
+                  'readonly': False,
+                  'createmandatory': False,
+                  }
 
-    Subtype has to override.
+
+class SheetMetadata(namedtuple('SheetMetadata', SHEET_METADATA.keys())):
+
+    """Metadata to register a sheet type to set/get resource data.
+
+    Fields:
+    -------
+
+    isheet: Marker interface for this sheet type, a subtype of :class ISheet:.
+            Subtype has to override.
+    sheet_class: :class IResourceSheet: implementation for this sheet
+    schema_class: :class colander.MappingSchema: to define the data structure
+                  for this sheet.
+                  Subtype must preserve the super type data structure.
+    permission_view: Permission to view or index this data.
+                     Subtype should override.
+    permission_edit: Permission to edit this data.
+                     Subtype should override.
+    readonly: This Sheet may not be used to set data
 
     """
-    taggedValue('key', '')
-    """Key to store the schema data, defaults to IProperyXY.__identifier__"""
-    taggedValue('permission_view', 'view')
-    """Permission to view or index this data. Subtype should override."""
-    taggedValue('permission_edit', 'edit')
-    """Permission to edit this data. Subtype should override."""
-    taggedValue('readonly', False)
-    """This propertysheet may not be used to set data."""
-    taggedValue('createmandatory', False)
-    """This propertysheet is mandatory when creating a new resource."""
+
+
+sheet_metadata = SheetMetadata(**SHEET_METADATA)
 
 
 class ISheetReferenceAutoUpdateMarker(ISheet):
@@ -54,33 +62,21 @@ class ISheetReferenceAutoUpdateMarker(ISheet):
     """
 
 
-class IResourcePropertySheet(IPropertySheet):
+class IResourceSheet(IPropertySheet):
 
-    """PropertySheet object to set/get resource data.
+    """Sheet for resources to get/set the sheet data structure."""
 
-    It uses the ISheet ``schema``  taggedvalue to get the wanted data
-    schema. The data store must prevent attribute name conflicts.
+    meta = Attribute('SheetMetadata')
 
-    """
+    def get_cstruct() -> dict:
+        """ Return a serialized dictionary representing the sheet state."""
 
-    iface = Attribute('The ISheet interface used to configure this Sheet.')
-    key = Attribute('Internal dictionary key to store the schema data.')
-    readonly = Attribute('Bool to indicate you should not set data.')
-    createmandatory = Attribute('Bool to indicate you should set data when '
-                                'creating a new resource.')
-
-    def get_cstruct():
-        """ Return a serialized dictionary representing the property state."""
-
-    def validate_cstruct(cstruct):
+    def validate_cstruct(cstruct: dict) -> dict:
         """ Validate ``cstruct`` data.
 
-        Args:
-               cstruct (Dictionary): serialized application data (colander)
-        Returns:
-            appstruct (Dictionary): deserialized application data (colander)
-        Raises:
-            colander.Invalid
+        : param cstruct: serialized application data (colander)
+        : return: appstruct: deserialized application data (colander)
+        : raises: :class colander.Invalid:
 
         """
 

@@ -1,12 +1,13 @@
 """Content registry."""
 from pyramid.security import has_permission
 from pyramid.path import DottedNameResolver
+from pyramid.testing import DummyResource
 from substanced.content import ContentRegistry
 
-from adhocracy.utils import get_all_taggedvalues
+from adhocracy.interfaces import IResource
 from adhocracy.utils import get_resource_interface
 from adhocracy.utils import get_all_sheets
-from adhocracy.interfaces import IResource
+from adhocracy.utils import get_sheet
 
 
 class ResourceContentRegistry(ContentRegistry):
@@ -31,17 +32,19 @@ class ResourceContentRegistry(ContentRegistry):
         assert IResource.providedBy(context)
         wanted_sheets = {}
         for sheet in get_all_sheets(context):
-            can_view = has_permission(sheet.permission_view, context, request)
-            can_edit = has_permission(sheet.permission_edit, context, request)
+            can_view = has_permission(sheet.meta.permission_view, context,
+                                      request)
+            can_edit = has_permission(sheet.meta.permission_edit, context,
+                                      request)
             if onlyviewable and not can_view:
-                    continue
+                continue
             if onlyeditable or onlycreatable or onlymandatorycreatable:
-                if sheet.readonly or not can_edit:
+                if sheet.meta.readonly or not can_edit:
                     continue
             if onlymandatorycreatable:
-                if not sheet.createmandatory:
+                if not sheet.meta.createmandatory:
                     continue
-            wanted_sheets[sheet.iface.__identifier__] = sheet
+            wanted_sheets[sheet.meta.isheet.__identifier__] = sheet
         return wanted_sheets
 
     def resources_metadata(self):
@@ -93,7 +96,9 @@ class ResourceContentRegistry(ContentRegistry):
 
         isheets_meta = {}
         for isheet in isheets:
-            isheets_meta[isheet.__identifier__] = get_all_taggedvalues(isheet)
+            dummy_context = DummyResource(__provides__=isheet)
+            sheet = get_sheet(dummy_context, isheet)
+            isheets_meta[isheet.__identifier__] = sheet.meta
 
         return isheets_meta
 
@@ -145,9 +150,9 @@ class ResourceContentRegistry(ContentRegistry):
             sheets = self.resource_sheets(dummy_resource, request,
                                           onlycreatable=True)
             sheetnames['sheets_mandatory'] = \
-                [k for k, v in sheets.items() if v.createmandatory]
+                [k for k, v in sheets.items() if v.meta.createmandatory]
             sheetnames['sheets_optional'] = \
-                [k for k, v in sheets.items() if not v.createmandatory]
+                [k for k, v in sheets.items() if not v.meta.createmandatory]
             types_with_sheetnames[type_iface.__identifier__] = sheetnames
 
         return types_with_sheetnames

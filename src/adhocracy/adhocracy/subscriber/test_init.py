@@ -4,9 +4,10 @@ import unittest
 from pyramid import testing
 
 from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IItemVersion
+from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
-from adhocracy.utils import get_all_taggedvalues
-
+from adhocracy.sheets.versions import IVersionable
 
 
 #############
@@ -21,35 +22,45 @@ class IDummySheetNoAutoUpdate(ISheet):
     pass
 
 
-class DummyPropertySheetAdapter:
+class DummySheet:
 
-    readonly = False
+    _data = {}
 
-    def __init__(self, context, iface):
+    def __init__(self, metadata, context):
+        self.meta = metadata
         self.context = context
-        self.iface = iface
-        self.key = self.iface.__identifier__
-        self.metadata = get_all_taggedvalues(iface)
-        self.readonly = self.metadata['readonly']
-        if not hasattr(self.context, 'dummy_appstruct'):
-            self.context.dummy_appstruct = {}
-        if self.key not in self.context.dummy_appstruct:
-            self.context.dummy_appstruct[self.key] = {}
 
     def set(self, appstruct):
-        self.context.dummy_appstruct[self.key].update(appstruct)
+        self._data.update(appstruct)
 
     def get(self):
-        return self.context.dummy_appstruct[self.key]
+        return self._data
 
 
-def _register_dummypropertysheet_adapter(config):
-    from adhocracy.interfaces import IResourcePropertySheet
-    from adhocracy.interfaces import ISheet
-    from zope.interface.interfaces import IInterface
-    config.registry.registerAdapter(DummyPropertySheetAdapter,
-                                    (ISheet, IInterface),
-                                    IResourcePropertySheet)
+def _create_and_register_dummy_sheet(context, isheet):
+    from pyramid.threadlocal import get_current_registry
+    from zope.interface import alsoProvides
+    from adhocracy.interfaces import IResourceSheet
+    from adhocracy.interfaces import sheet_metadata
+    registry = get_current_registry(context)
+    metadata = sheet_metadata._replace(isheet=isheet)
+    alsoProvides(context, isheet)
+    sheet = DummySheet(metadata, context)
+    registry.registerAdapter(lambda x: sheet, (isheet,),
+                             IResourceSheet,
+                             isheet.__identifier__)
+    return sheet
+
+
+def _create_new_version_event_with_isheet(context, isheet):
+    return testing.DummyResource(__provides__=
+                                 ISheetReferencedItemHasNewVersion,
+                                 object=context,
+                                 isheet=isheet,
+                                 isheet_field='elements',
+                                 old_version=testing.DummyResource(),
+                                 new_version=testing.DummyResource(),
+                                 root_versions=[])
 
 
 ###########
@@ -59,149 +70,85 @@ def _register_dummypropertysheet_adapter(config):
 class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
 
     @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
-    def setUp(self, dummy_content_registry=None):
-        from adhocracy.interfaces import IItemVersion
-        from adhocracy.sheets.versions import IVersionable
-        from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
+    def setUp(self, dummy_resource_registry=None):
         self.config = testing.setUp()
-        # create dummy parent (Item for versionables)
-        self.parent = testing.DummyResource()
-        # create dummy child with sheet data (ItemVersion for versionables)
-        child = testing.DummyResource(__parent__=self.parent,
-                                      __oid__=0,
-                                      __provides__=(IItemVersion, IVersionable,
-                                                    IDummySheetAutoUpdate,
-                                                    IDummySheetNoAutoUpdate)
-                                      )
-        old_version = testing.DummyResource()
-        self.other1 = testing.DummyResource()
-        self.other2 = testing.DummyResource()
-        self.other4 = testing.DummyResource()
-        _register_dummypropertysheet_adapter(self.config)
-        child.dummy_appstruct = dict([
-            (IDummySheetNoAutoUpdate.__identifier__,
-             {'title': u't', 'elements': [self.other1, self.other2]}),
-            (IDummySheetAutoUpdate.__identifier__,
-             {'title': u't', 'elements': [self.other1, self.other2]}),
-            (IVersionable.__identifier__,
-             {'follows': [old_version]}),
-        ])
-        IDummySheetAutoUpdate.setTaggedValue('readonly', False)
-        self.child = child
-        # create dummy event
-        self.event = testing.DummyResource(__provides__=
-                                           ISheetReferencedItemHasNewVersion,
-                                           object=child,
-                                           isheet=IDummySheetNoAutoUpdate,
-                                           isheet_field='elements',
-                                           old_version=self.other2,
-                                           new_version=self.other4,
-                                           root_versions=[child])
-        # create dummy content registry
-        content_registry = dummy_content_registry.return_value
-        self.config.registry.content = content_registry
+        resource_registry = dummy_resource_registry.return_value
+        self.config.registry.content = resource_registry
 
     def tearDown(self):
         testing.tearDown()
 
     def _makeOne(self, *args):
-        from . import reference_has_new_version_subscriber
+        from adhocracy.subscriber import reference_has_new_version_subscriber
         return reference_has_new_version_subscriber(*args)
 
-    def test_call_versionable_with_autoupdate(self):
-        factory = self.config.registry.content.create
-        from adhocracy.sheets.versions import IVersionable
-        self.event.isheet = IDummySheetAutoUpdate
+    def test_call_versionable_with_autoupdate_sheet(self):
+        context = testing.DummyResource(__provides__=IItemVersion,
+                                        __parent__=object())
+        isheet = IDummySheetAutoUpdate
+        event = _create_new_version_event_with_isheet(context, isheet)
+        sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
+        sheet_autoupdate._data = {'elements': [event.old_version]}
+        sheet_versionable = _create_and_register_dummy_sheet(event.object,
+                                                             IVersionable)
+        sheet_versionable._data = {'follows': []}
 
-        self._makeOne(self.event)
+        self._makeOne(event)
+
+        factory = self.config.registry.content.create
         assert factory.called
-        child_new_parent = factory.call_args[1]['parent']
-        child_new_appstructs = factory.call_args[1]['appstructs']
-        assert child_new_parent is self.child.__parent__
-        child_new_wanted_appstructs = dict([
-            (IDummySheetNoAutoUpdate.__identifier__,
-             {'title': u't', 'elements': [self.other1, self.other2]}),
-            (IDummySheetAutoUpdate.__identifier__,
-             {'title': u't', 'elements': [self.other1, self.event.new_version]}),
-            (IVersionable.__identifier__,
-             {'follows': [self.child]}),
-        ])
-        assert child_new_wanted_appstructs == child_new_appstructs
+        parent = factory.call_args[1]['parent']
+        assert parent is context.__parent__
+        appstructs = factory.call_args[1]['appstructs']
+        assert appstructs[isheet.__identifier__] == \
+               {'elements': [event.new_version]}
+        assert appstructs[IVersionable.__identifier__] == {'follows': [context]}
 
-    def test_call_versionable_with_autoupdate_readonly(self):
+    def test_call_versionable_with_autoupdate_sheet_but_readonly(self):
+        context = testing.DummyResource(__provides__=IItemVersion)
+        isheet = IDummySheetAutoUpdate
+        event = _create_new_version_event_with_isheet(context, isheet)
+        sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
+        sheet_autoupdate.meta = sheet_autoupdate.meta._replace(readonly=True)
+
+        self._makeOne(event)
+
         factory = self.config.registry.content.create
-        self.event.isheet = IDummySheetAutoUpdate
-        IDummySheetAutoUpdate.setTaggedValue('readonly', True)
-        self._makeOne(self.event)
         assert not factory.called
 
-    def test_call_versionable_with_autoupdate_readonly_other(self):
+    def test_call_versionable_without_autoupdate_sheet(self):
+        context = testing.DummyResource(__provides__=IItemVersion)
+        isheet = IDummySheetNoAutoUpdate
+        event = _create_new_version_event_with_isheet(context, isheet)
+        _create_and_register_dummy_sheet(context, isheet)
+
+        self._makeOne(event)
+
         factory = self.config.registry.content.create
-        from adhocracy.sheets.versions import IVersionable
-        self.event.isheet = IDummySheetAutoUpdate
-        IDummySheetNoAutoUpdate.setTaggedValue('readonly', True)
-
-        self._makeOne(self.event)
-
-        assert factory.called
-        child_new_parent = factory.call_args[1]['parent']
-        child_new_appstructs = factory.call_args[1]['appstructs']
-        assert child_new_parent is self.child.__parent__
-        child_new_wanted_appstructs = dict([
-            (IDummySheetAutoUpdate.__identifier__,
-             {'title': u't', 'elements': [self.other1, self.event.new_version]}),
-            (IVersionable.__identifier__,
-             {'follows': [self.child]}),
-        ])
-        assert child_new_wanted_appstructs == child_new_appstructs
-
-    def test_call_versionable_with_noautoupdate(self):
-        factory = self.config.registry.content.create
-        self.event.isheet = IDummySheetNoAutoUpdate
-        self._makeOne(self.event)
         assert not factory.called
 
-    def test_call_nonversionable_with_autoupdate(self, dummyfactory=None):
-        factory = self.config.registry.content.create
-        from adhocracy.interfaces import IItemVersion
-        from zope.interface import noLongerProvides
-        noLongerProvides(self.child, IItemVersion)
-        self.event.isheet = IDummySheetAutoUpdate
+    def test_call_nonversionable_with_autoupdate_sheet(self):
+        context = testing.DummyResource()
+        isheet = IDummySheetAutoUpdate
+        event = _create_new_version_event_with_isheet(context, isheet)
+        sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
+        sheet_autoupdate._data = {'elements': [event.old_version]}
 
-        self._makeOne(self.event)
+        self._makeOne(event)
 
-        assert not factory.called
-        child_wanted_appstruct = \
-            {'title': u't', 'elements': [self.other1, self.event.new_version]}
-        key = IDummySheetAutoUpdate.__identifier__
-        assert child_wanted_appstruct == self.child.dummy_appstruct[key]
+        assert sheet_autoupdate._data == {'elements': [event.new_version]}
 
     def test_call_noversionable_with_autoupdate_readonly(self):
-        from adhocracy.sheets.versions import IVersionable
-        from zope.interface import noLongerProvides
-        noLongerProvides(self.child, IVersionable)
-        self.event.isheet = IDummySheetAutoUpdate
-        IDummySheetAutoUpdate.setTaggedValue('readonly', True)
+        context = testing.DummyResource(__provides__=IItemVersion)
+        isheet = IDummySheetAutoUpdate
+        event = _create_new_version_event_with_isheet(context, isheet)
+        sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
+        sheet_autoupdate.meta = sheet_autoupdate.meta._replace(readonly=True)
+        sheet_autoupdate._data = {'elements': [event.old_version]}
 
-        self._makeOne(self.event)
+        self._makeOne(event)
 
-        child_wanted_appstruct = \
-            {'title': u't', 'elements': [self.other1, self.event.old_version]}
-        key = IDummySheetAutoUpdate.__identifier__
-        assert child_wanted_appstruct == self.child.dummy_appstruct[key]
-
-    def test_call_noversionable_with_noautoupdate(self):
-        from adhocracy.sheets.versions import IVersionable
-        from zope.interface import noLongerProvides
-        noLongerProvides(self.child, IVersionable)
-        self.event.isheet = IDummySheetNoAutoUpdate
-
-        self._makeOne(self.event)
-
-        child_wanted_appstruct = \
-            {'title': u't', 'elements': [self.other1, self.event.old_version]}
-        key = IDummySheetAutoUpdate.__identifier__
-        assert child_wanted_appstruct == self.child.dummy_appstruct[key]
+        assert sheet_autoupdate._data == {'elements': [event.old_version]}
 
 
 class IncludemeIntegrationTest(unittest.TestCase):
@@ -215,7 +162,7 @@ class IncludemeIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_register_versions_adapter(self):
-        from . import reference_has_new_version_subscriber
+        from adhocracy.subscriber import reference_has_new_version_subscriber
         handlers = [x.handler.__name__ for x
                     in self.config.registry.registeredHandlers()]
         assert len(handlers) >= 1

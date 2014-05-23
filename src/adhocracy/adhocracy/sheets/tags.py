@@ -1,63 +1,78 @@
 """Sheets to work with versionable resources."""
-from zope.interface import provider
-from zope.interface import taggedValue
+import colander
 
 from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.interfaces import IIResourcePropertySheet
 from adhocracy.interfaces import SheetToSheet
-from adhocracy.sheets import ResourcePropertySheetAdapter
+from adhocracy.sheets import add_sheet_to_registry
+from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets.versions import IVersionable
-from adhocracy.sheets.pool import PoolPropertySheetAdapter
-from adhocracy.sheets.pool import IIPool
-from adhocracy.schema import ListOfUniqueReferencesSchemaNode
+from adhocracy.sheets.pool import PoolSheet
+from adhocracy.schema import ListOfUniqueReferences
 
 
-@provider(IIResourcePropertySheet)
 class ITag(ISheet):
 
-    """List all tags for this Item."""
-
-    taggedValue('field:elements',
-                ListOfUniqueReferencesSchemaNode(
-                    reftype='adhocracy.sheets.tags.ITagElementsReference',
-                ))
+    """Marker interface for the tag sheet."""
 
 
 class ITagElementsReference(SheetToSheet):
 
-    """ITag reference."""
+    """Tag sheet elements reference."""
 
     source_isheet = ITag
     source_isheet_field = 'elements'
     target_isheet = IVersionable
 
 
-@provider(IIPool)
+class TagSchema(colander.MappingSchema):
+
+    """Tag sheet data structure.
+
+    `elements`: Resources with this Tag
+
+    """
+
+    elements = ListOfUniqueReferences(reftype=ITagElementsReference)
+
+
+tag_metadata = sheet_metadata_defaults._replace(isheet=ITag,
+                                                schema_class=TagSchema,
+                                                )
+
+
 class ITags(ISheet):
 
-    """List all tags for this Item."""
-
-    taggedValue('field:elements',
-                ListOfUniqueReferencesSchemaNode(
-                    reftype='adhocracy.sheets.tags.ITagsElementsReference',
-                ))
+    """Marker interface for the tag sheet."""
 
 
 class ITagsElementsReference(SheetToSheet):
 
-    """ITags reference."""
+    """Tags sheet elements reference."""
 
     source_isheet = ITags
     source_isheet_field = 'elements'
     target_isheet = ITag
 
 
+class TagsSchema(colander.MappingSchema):
+
+    """Tags sheet data structure.
+
+    `elements`: Tags in this Pool
+
+    """
+
+    elements = ListOfUniqueReferences(
+        reftype=ITagsElementsReference)
+
+
+tags_metadata = sheet_metadata_defaults._replace(isheet=ITags,
+                                                 schema_class=TagsSchema,
+                                                 sheet_class=PoolSheet,
+                                                 )
+
+
 def includeme(config):
-    """Register adapter."""
-    config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (ITag, IIResourcePropertySheet),
-                                    IResourcePropertySheet)
-    config.registry.registerAdapter(PoolPropertySheetAdapter,
-                                    (ITags, IIPool),
-                                    IResourcePropertySheet)
+    """Register sheets."""
+    add_sheet_to_registry(tag_metadata, config.registry)
+    add_sheet_to_registry(tags_metadata, config.registry)

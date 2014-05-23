@@ -16,8 +16,8 @@ def _get_not_readonly_appstructs(resource):
     # FIXME maybe move this to utils or better use resource registry
     appstructs = {}
     for sheet in get_all_sheets(resource):
-        if not sheet.readonly:
-            appstructs[sheet.iface.__identifier__] = sheet.get()
+        if not sheet.meta.readonly:
+            appstructs[sheet.meta.isheet.__identifier__] = sheet.get()
     return appstructs
 
 
@@ -39,7 +39,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
 
 def _update_resource(resource, isheet, appstruct):
     sheet = get_sheet(resource, isheet)
-    if not sheet.readonly:
+    if not sheet.meta.readonly:
         sheet.set(appstruct)
         #FIXME: make sure modified event is send
     return resource
@@ -53,13 +53,14 @@ def reference_has_new_version_subscriber(event):
 
     """
     assert ISheetReferencedItemHasNewVersion.providedBy(event)
+    from adhocracy.utils import get_sheet
     resource = event.object
     root_versions = event.root_versions
     isheet = event.isheet
     sheet = get_sheet(resource, isheet)
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
 
-    if autoupdate and not sheet.readonly:
+    if autoupdate and not sheet.meta.readonly:
         appstruct = sheet.get()
         field = appstruct[event.isheet_field]
         old_version_index = field.index(event.old_version)

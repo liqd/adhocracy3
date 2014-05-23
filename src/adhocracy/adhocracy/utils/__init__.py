@@ -5,13 +5,13 @@ import json
 import pprint
 
 from substanced.util import get_dotted_name
-from zope.component import getMultiAdapter
+from zope.component import getAdapter
 from zope.interface import directlyProvidedBy
 from zope.interface import providedBy
 import colander
 
 from adhocracy.interfaces import IResource
-from adhocracy.interfaces import IResourcePropertySheet
+from adhocracy.interfaces import IResourceSheet
 from adhocracy.interfaces import ISheet
 
 
@@ -76,11 +76,11 @@ def get_sheet(context, isheet):
         context (IResource): object
         isheet (IISheet): object
     Returns:
-        object (IResourcePropertySheet)
+        object (IResourceSheet)
 
     """
     # FIXME add Raises component error
-    return getMultiAdapter((context, isheet), IResourcePropertySheet)
+    return getAdapter(context, IResourceSheet, name=isheet.__identifier__)
 
 
 def get_all_sheets(context):

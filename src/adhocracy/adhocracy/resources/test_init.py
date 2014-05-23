@@ -1,5 +1,6 @@
 import unittest
 
+from mock import patch
 from pyramid import testing
 import pytest
 
@@ -19,35 +20,13 @@ class ISheetX(ISheet):
     pass
 
 
-class DummyPropertySheetAdapter:
-
-    readonly = False
-
-    def __init__(self, context, iface):
-        self.context = context
-        self.iface = iface
-        if not hasattr(self.context, 'dummy_appstruct'):
-            self.context.dummy_appstruct = {}
-        if not hasattr(self.context, 'dummy_cstruct'):
-            self.context.dummy_cstruct = {}
-
-    def set(self, appstruct):
-        self.context.dummy_appstruct.update(appstruct)
-
-    def get(self):
-        return self.context.dummy_appstruct
-
-    def set_cstruct(self, cstruct):
-        self.context['dummy_cstruct'].update(cstruct)
-
-
-def _register_dummypropertysheet_adapter(config):
-    from adhocracy.interfaces import IResourcePropertySheet
-    from adhocracy.interfaces import ISheet
-    from zope.interface.interfaces import IInterface
-    config.registry.registerAdapter(DummyPropertySheetAdapter,
-                                    (ISheet, IInterface),
-                                    IResourcePropertySheet)
+@patch('adhocracy.sheets.GenericResourceSheet')
+def _create_dummy_sheet_adapter(registry, isheet, sheet_dummy=None):
+    from adhocracy.interfaces import IResourceSheet
+    registry.registerAdapter(sheet_dummy, (isheet,),
+                             IResourceSheet,
+                             isheet.__identifier__)
+    return sheet_dummy
 
 
 class DummyFolder(testing.DummyResource):
@@ -100,6 +79,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         class IResourceX(IResource):
             pass
+
         meta = self.metadata._replace(iresource=IResourceX)
 
         inst = self.make_one(meta)()
@@ -130,6 +110,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         def dummy_after_create(context, registry, options):
             context._options = options
             context._registry = registry
+
         meta = self.metadata._replace(iresource=IResource,
                                       after_creation=[dummy_after_create])
 
@@ -142,6 +123,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         def dummy_after_create(context, registry, options):
             context._options = options
             context._registry = registry
+
         meta = self.metadata._replace(iresource=IResource,
                                       after_creation=[dummy_after_create])
 
@@ -153,28 +135,30 @@ class ResourceFactoryUnitTest(unittest.TestCase):
     def test_call_with_appstructs_data(self):
         meta = self.metadata._replace(iresource=IResource,
                                       basic_sheets=[ISheetY])
+        dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, ISheetY)
         appstructs = {ISheetY.__identifier__: {'count': 0}}
-        _register_dummypropertysheet_adapter(self.config)
 
         inst = self.make_one(meta)(appstructs=appstructs)
 
-        assert inst.dummy_appstruct == {'count': 0}
+        assert dummy_sheet.called
 
     def test_call_with_parent_and_appstructs_name_data(self):
+        from adhocracy.sheets.name import IName
         meta = self.metadata._replace(iresource=IResource,
-                                      basic_sheets=[ISheetY])
-        appstructs = {'adhocracy.sheets.name.IName': {'name': 'child'}}
-        _register_dummypropertysheet_adapter(self.config)
+                                      basic_sheets=[IName])
+        dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, IName)
+        appstructs = {IName.__identifier__: {'name': 'child'}}
 
         self.make_one(meta)(parent=self.context, appstructs=appstructs)
 
         assert 'child' in self.context
+        assert dummy_sheet.called
 
     def test_call_with_parent_and_appstructs_empty_name_data(self):
         meta = self.metadata._replace(iresource=IResource,
                                       basic_sheets=[ISheetY])
         appstructs = {'adhocracy.sheets.name.IName': {'name': 'invalid'}}
-        _register_dummypropertysheet_adapter(self.config)
+        _create_dummy_sheet_adapter(self.config.registry, ISheetY)
 
         with pytest.raises(ValueError):
             self.make_one(meta)(parent=self.context, appstructs=appstructs)

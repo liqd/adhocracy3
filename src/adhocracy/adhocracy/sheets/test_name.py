@@ -2,9 +2,10 @@ import unittest
 
 from pyramid import testing
 
+from adhocracy.utils import get_sheet
 
 
-class NamePropertySheetAdapterIntegrationTest(unittest.TestCase):
+class NameSheetIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
@@ -13,13 +14,9 @@ class NamePropertySheetAdapterIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def get_one(self, config, context, iface):
-        from adhocracy.utils import get_sheet
-        from zope.interface import alsoProvides
-        alsoProvides(context, iface)
-        return get_sheet(context, iface)
+    def test_includeme_add_name_sheet_to_registry(self):
 
-    def test_includeme_register_ipropertysheet_adapter_iname(self):
         from adhocracy.sheets.name import IName
-        inst = self.get_one(self.config, testing.DummyResource(), IName)
-        assert inst.iface is IName
+        context = testing.DummyResource(__provides__=IName)
+        inst = get_sheet(context, IName)
+        assert inst.meta.isheet is IName
