@@ -176,8 +176,8 @@ def get_follows(resource) -> Iterable:
 
 
 def get_followed_by(resource) -> Iterable:
-        """Get Generator of the successors of a versionable resource."""
-        successors = get_back_references(resource,
-                                         base_reftype=NewVersionToOldVersion)
-        for reference in successors:
-            yield reference[0]
+    """Get Generator of the successors of a versionable resource."""
+    successors = get_back_references(resource,
+                                     base_reftype=NewVersionToOldVersion)
+    for reference in successors:
+        yield reference[0]

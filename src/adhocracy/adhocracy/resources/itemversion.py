@@ -1,10 +1,10 @@
 """ItemVersion resource type."""
 from pyramid.traversal import find_interface, find_resource
 from substanced.content import add_content_type
+
 from adhocracy.events import ItemVersionNewVersionAdded, \
     SheetReferencedItemHasNewVersion
 from adhocracy.graph import get_follows, get_back_references
-
 from adhocracy.interfaces import IItemVersion, IItem
 from adhocracy.resources.resource import resource_meta_defaults
 from adhocracy.resources import ResourceFactory

@@ -143,16 +143,12 @@ resource_meta = ResourceMetadata(**RESOURCE_METADATA_FIELDS)
 
 class IResource(ILocation):
 
-    """Marker interface with tagged values to configure a resource type."""
+    """Basic resource type."""
 
 
 class IPool(IResource):
 
-    """Folder in the object hierarchy.
-
-    Can contain other Pools (subfolders) and Items of any kind.
-
-    """
+    """Resource with children - a folder in the object hierarchy. """
 
     def keys() -> Iterable:
         """ Return subobject names present in this pool."""
@@ -204,7 +200,7 @@ class IItem(IPool):
 
 class ISimple(IResource):
 
-    """Small object without versions and children."""
+    """Simple resource without versions and children."""
 
 
 class ITag(ISimple):
@@ -214,7 +210,7 @@ class ITag(ISimple):
 
 class IItemVersion(ISimple):
 
-    """Versionable object, created during a Participation Process (mainly)."""
+    """Versionable resource, created during a Participation Process."""
 
 
 class SheetReferenceClass(ReferenceClass):

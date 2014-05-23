@@ -23,7 +23,6 @@ class DummyFolder(testing.DummyResource):
 class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        import adhocracy.resources.pool  # make config.include work
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.registry')

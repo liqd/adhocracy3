@@ -11,12 +11,6 @@ import pytest
 from adhocracy.interfaces import ISheet
 
 
-
-############
-#  helper  #
-############
-
-
 ##########
 #  tests #
 ##########

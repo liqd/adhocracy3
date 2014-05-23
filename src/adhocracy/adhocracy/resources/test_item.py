@@ -36,6 +36,7 @@ class DummyFolder(testing.DummyResource):
     def next_name(self, subobject, prefix=''):
         return prefix + '_0000000'
 
+
 ###########
 #  tests  #
 ###########

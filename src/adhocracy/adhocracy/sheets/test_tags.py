@@ -4,16 +4,6 @@ from pyramid import testing
 
 
 
-############
-#  helper  #
-############
-
-
-##########
-#  tests #
-##########
-
-
 class TagsPropertySheetUnitTest(unittest.TestCase):
 
     def setUp(self):

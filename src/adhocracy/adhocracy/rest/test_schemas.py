@@ -4,11 +4,6 @@ import colander
 import pytest
 
 
-
-###########
-#  tests  #
-###########
-
 class ResourceResponseSchemaUnitTest(unittest.TestCase):
 
     def make_one(self):

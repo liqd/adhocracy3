@@ -4,10 +4,6 @@ from pyramid import testing
 
 
 
-##########
-#  tests #
-##########
-
 class NamePropertySheetAdapterIntegrationTest(unittest.TestCase):
 
     def setUp(self):

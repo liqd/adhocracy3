@@ -1,4 +1,5 @@
 import unittest
+
 from adhocracy.utils import to_dotted_name
 
 
