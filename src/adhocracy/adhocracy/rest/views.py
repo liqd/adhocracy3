@@ -7,7 +7,6 @@ from colander import SchemaNode
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
 from cornice.schemas import CorniceSchema
-from pyramid.path import DottedNameResolver
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
@@ -432,7 +431,6 @@ class MetaApiView(RESTView):
     def __init__(self, context, request):
         """Create a new instance."""
         super().__init__(context, request)
-        self.resolv = DottedNameResolver()
 
     def _describe_resources(self, resource_types):
         """Build a description of the resources registered in the system.
@@ -540,7 +538,7 @@ class MetaApiView(RESTView):
                     containertype = empty_appstruct.__class__.__name__
                     typ = to_dotted_name(AbsolutePath)
                     # set targetsheet
-                    reftype = self.resolv.maybe_resolve(node.reftype)
+                    reftype = node.reftype
                     target_isheet = reftype.getTaggedValue('target_isheet')
                     targetsheet = to_dotted_name(target_isheet)
 

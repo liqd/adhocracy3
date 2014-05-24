@@ -1,5 +1,4 @@
 """Colander schema extensions."""
-from pyramid.path import DottedNameResolver
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
 from substanced import schema
@@ -191,8 +190,7 @@ class AbstractReferenceIterable(schema.MultireferenceIdSchemaNode):
 
     def validator(self, node, value):
         """Validate."""
-        res = DottedNameResolver()
-        reftype = res.maybe_resolve(self.reftype)
+        reftype = self.reftype
         isheet = reftype.getTaggedValue('target_isheet')
         for resource in value:
             if not isheet.providedBy(resource):

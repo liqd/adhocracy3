@@ -66,14 +66,14 @@ class ResourceContentRegistry(ContentRegistry):
 
         """
         resource_types = {}
-        res = DottedNameResolver()
+        resolve = DottedNameResolver()
         for type_ in self.all():
             try:
-                iface = res.maybe_resolve(type_)
-                if iface.isOrExtends(IResource):
+                iresource = resolve.maybe_resolve(type_)
+                if iresource.isOrExtends(IResource):
                     metadata = self.meta[type_]['resource_metadata']
                     resource_types[type_] = {'name': type_,
-                                             'iface': iface,
+                                             'iface': iresource,
                                              'metadata': metadata}
             except (ValueError, ImportError):
                 pass

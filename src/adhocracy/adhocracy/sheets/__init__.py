@@ -2,7 +2,6 @@
 from persistent.mapping import PersistentMapping
 import colander
 from pyramid.compat import is_nonstr_iter
-from pyramid.path import DottedNameResolver
 from pyramid.registry import Registry
 from substanced.property import PropertySheet
 from zope.interface import implementer
@@ -45,10 +44,9 @@ class GenericResourceSheet(PropertySheet):
     @property
     def _references(self):
         refs = {}
-        resolver = DottedNameResolver()
         for child in self.schema:
             if isinstance(child, AbstractReferenceIterable):
-                refs[child.name] = resolver.maybe_resolve(child.reftype)
+                refs[child.name] = child.reftype
         return refs
 
     def get(self) -> dict:
