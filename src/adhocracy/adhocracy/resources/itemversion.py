@@ -3,7 +3,6 @@ from pyramid.traversal import find_interface, find_resource
 
 from adhocracy.events import ItemVersionNewVersionAdded
 from adhocracy.events import SheetReferencedItemHasNewVersion
-from adhocracy.graph import get_follows, get_back_references
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import IItem
 from adhocracy.resources import add_resource_type_to_registry
@@ -11,6 +10,7 @@ from adhocracy.resources.resource import resource_metadata_defaults
 from adhocracy.sheets import tags
 import adhocracy.sheets.versions
 from adhocracy.utils import get_sheet
+from adhocracy.utils import find_graph
 
 
 def notify_new_itemversion_created(context, registry, options):
@@ -30,7 +30,8 @@ def notify_new_itemversion_created(context, registry, options):
     new_version = context
     root_versions = options.get('root_versions', [])
     old_versions = []
-    for old_version in get_follows(context):
+    graph = find_graph(context)
+    for old_version in graph.get_follows(context):
         old_versions.append(old_version)
         _notify_itemversion_has_new_version(old_version, new_version, registry)
         _notify_referencing_resources_about_new_version(old_version,
@@ -51,7 +52,8 @@ def _notify_referencing_resources_about_new_version(old_version,
                                                     new_version,
                                                     root_versions,
                                                     registry):
-    references = get_back_references(old_version)
+    graph = find_graph(old_version)
+    references = graph.get_back_references(old_version)
     for source, isheet, isheet_field, target in references:
         event = SheetReferencedItemHasNewVersion(source,
                                                  isheet,

@@ -44,6 +44,7 @@ def _add_resource_type_to_registry(metadata, registry):
 class ItemVersionIntegrationTest(unittest.TestCase):
 
     def setUp(self):
+        from adhocracy.graph import Graph
         from substanced.objectmap import ObjectMap
         self.config = testing.setUp()
         self.config.include('substanced.content')
@@ -53,8 +54,10 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         self.config.include('adhocracy.resources.itemversion')
         context = Pool()
         context.__objectmap__ = ObjectMap(context)
+        context.__graph__ = Graph(context)
         self.context = context
         self.objectmap = context.__objectmap__
+        self.graph = context.__graph__
 
     def tearDown(self):
         testing.tearDown()
@@ -108,7 +111,6 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def test_autoupdate_with_referencing_items(self):
         # for more tests see adhocracy.subscriber
         from adhocracy.sheets.document import ISection
-        from adhocracy.graph import get_followed_by
         from adhocracy.resources.itemversion import itemversion_metadata
         self.config.include('adhocracy.sheets.document')
         self.config.include('adhocracy.subscriber')
@@ -121,7 +123,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         appstructs = {ISection.__identifier__: {'subsections': [child_v0]}}
         root_v0 = self._make_one(appstructs=appstructs)
         child_v1 = self._make_one(follows=[child_v0], root_versions=[root_v0])
-        root_v0_followed_by = list(get_followed_by(root_v0))
+        root_v0_followed_by = list(self.graph.get_followed_by(root_v0))
         assert len(root_v0_followed_by) == 2
 
 

@@ -47,6 +47,7 @@ def includeme(config):
     config.include('.subscriber')
     config.include('.registry')
     config.include('.evolution')
+    config.include('.graph')
     config.include('.rest')
     config.include('.frontend')
 

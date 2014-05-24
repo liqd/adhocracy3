@@ -7,11 +7,11 @@ from pyramid.registry import Registry
 from substanced.property import PropertySheet
 from zope.interface import implementer
 
+from adhocracy.utils import find_graph
 from adhocracy.interfaces import IResourceSheet
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import sheet_metadata
 from adhocracy.interfaces import SheetMetadata
-from adhocracy.graph import get_references_for_isheet
 from adhocracy.schema import AbstractReferenceIterable
 
 
@@ -32,6 +32,7 @@ class GenericResourceSheet(PropertySheet):
         self.context = context
         self.meta = metadata
         self._data_key = self.meta.isheet.__identifier__
+        self._graph = find_graph(context)
 
     @property
     def _data(self):
@@ -74,7 +75,11 @@ class GenericResourceSheet(PropertySheet):
 
     def _get_reference_appstruct(self):
         appstruct = {}
-        references = get_references_for_isheet(self.context, self.meta.isheet)
+        references = {}
+        if self._graph:
+            references = self._graph.get_references_for_isheet(
+                self.context,
+                self.meta.isheet)
         default = self._get_default_appstruct()
         for key, default_value in default.items():
             if key in self._references:
@@ -101,13 +106,12 @@ class GenericResourceSheet(PropertySheet):
         return copy
 
     def _store_references(self, appstruct):
-        # FIXME this import is a temporally hack to make unit tests work
-        from adhocracy.graph import set_references
-
+        if not self._graph:
+            return
         for key, targets in appstruct.items():
             if key in self._references:
                 reftyp = self._references[key]
-                set_references(self.context, targets, reftyp)
+                self._graph.set_references(self.context, targets, reftyp)
 
     def _store_non_references(self, appstruct):
         self._data.update(appstruct)

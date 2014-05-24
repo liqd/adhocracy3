@@ -23,11 +23,16 @@ class DummyFolder(testing.DummyResource):
 class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
+        from adhocracy.graph import Graph
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
         self.config.include('adhocracy_sample.resources.section')
-        self.context = DummyFolder()
+        context = DummyFolder()
+        context.__graph__ = Graph(context)
+        self.context = context
+
+
 
     def tearDown(self):
         testing.tearDown()

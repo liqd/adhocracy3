@@ -62,12 +62,10 @@ class VersionableSheet(GenericResourceSheet):
 
     def get(self):
         """Return appstruct."""
-        #FIXME: import is temporally workaround to make unit test mocking work
-        from adhocracy.graph import get_followed_by
-        from adhocracy.graph import get_follows
         struct = super().get()
-        struct['followed_by'] = get_followed_by(self.context)
-        struct['follows'] = get_follows(self.context)
+        if self._graph:
+            struct['followed_by'] = self._graph.get_followed_by(self.context)
+            struct['follows'] = self._graph.get_follows(self.context)
         return struct
 
 

@@ -5,6 +5,7 @@ import json
 import pprint
 
 from substanced.util import get_dotted_name
+from substanced.util import acquire
 from zope.component import getAdapter
 from zope.interface import directlyProvidedBy
 from zope.interface import providedBy
@@ -13,6 +14,15 @@ import colander
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourceSheet
 from adhocracy.interfaces import ISheet
+
+
+def find_graph(context):
+    """ Get the graph object to handle references.
+
+    :return (adhocracy.graph.Graph): Graph for the root object in the
+                                     lineage of the ``context`` or None.
+    """
+    return acquire(context, '__graph__', None)
 
 
 def create_schema_from_dict(key_values, base_node=None):

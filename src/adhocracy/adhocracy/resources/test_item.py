@@ -46,6 +46,7 @@ class ItemIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         from substanced.objectmap import ObjectMap
+        from adhocracy.graph import Graph
         from adhocracy.resources.item import item_metadata
         self.config = testing.setUp()
         self.config.include('substanced.content')
@@ -60,7 +61,9 @@ class ItemIntegrationTest(unittest.TestCase):
         self.metadata = item_metadata
         context = DummyFolder()
         context.__objectmap__ = ObjectMap(context)
+        context.__graph__ = Graph(context)
         self.context = context
+        self.graph = context.__graph__
 
     def tearDown(self):
         testing.tearDown()
@@ -71,7 +74,6 @@ class ItemIntegrationTest(unittest.TestCase):
 
     def test_create(self):
         from adhocracy.sheets.tags import ITag as ITagS
-        from adhocracy.graph import get_references_for_isheet
 
         item = self.make_one()
 
@@ -81,14 +83,13 @@ class ItemIntegrationTest(unittest.TestCase):
         assert ITag.providedBy(first_tag)
         last_tag = item['LAST']
         assert ITag.providedBy(last_tag)
-        first_targets = get_references_for_isheet(first_tag, ITagS)['elements']
+        first_targets = self.graph.get_references_for_isheet(first_tag, ITagS)['elements']
         assert first_targets == [version0]
-        last_targets = get_references_for_isheet(last_tag, ITagS)['elements']
+        last_targets = self.graph.get_references_for_isheet(last_tag, ITagS)['elements']
         assert last_targets == [version0]
 
     def test_update_last_tag(self):
         """Test that LAST tag is updated correctly."""
-        from adhocracy.graph import get_references_for_isheet
         from adhocracy.sheets.tags import ITag as ITagS
         item = self.make_one()
         version0 = item['VERSION_0000000']
@@ -96,14 +97,13 @@ class ItemIntegrationTest(unittest.TestCase):
         version1 = make_itemversion(parent=item, follows=[version0])
 
         last_tag = item['LAST']
-        last_targets = get_references_for_isheet(last_tag, ITagS)['elements']
+        last_targets = self.graph.get_references_for_isheet(last_tag, ITagS)['elements']
         assert last_targets == [version1]
 
     def test_update_last_tag_two_versions(self):
         """Test that if two versions are branched off the from the same
         version, both of them get the LAST tag.
         """
-        from adhocracy.graph import get_references_for_isheet
         from adhocracy.sheets.tags import ITag as ITagS
         self.config.include('adhocracy.sheets.versions')
         self.config.include('adhocracy.subscriber')
@@ -114,7 +114,7 @@ class ItemIntegrationTest(unittest.TestCase):
         version2 = make_itemversion(parent=item, follows=[version0])
 
         last_tag = item['LAST']
-        last_targets = get_references_for_isheet(last_tag, ITagS)['elements']
+        last_targets = self.graph.get_references_for_isheet(last_tag, ITagS)['elements']
         assert last_targets == [version1, version2]
 
 

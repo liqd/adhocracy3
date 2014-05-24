@@ -123,22 +123,22 @@ class ResourcePropertySheetUnitTests(unittest.TestCase):
         with pytest.raises(colander.Invalid):
             inst.validate_cstruct({'count': 'wrongnumber'})
 
-    @patch('adhocracy.graph.set_references', autospec=True)
+    @patch('adhocracy.graph.Graph')
     @patch('adhocracy.schema.ListOfUniqueReferences', autospec=True)
     def test_set_valid_references(self,
                                   dummy_node=None,
-                                  dummy_set_references=None):
+                                  dummy_graph=None):
         target = testing.DummyResource()
         node = dummy_node.return_value
         node.name = 'references'
         inst = self.make_one(self.metadata, self.context)
         inst.schema.children.append(node)
+        inst._graph = dummy_graph.return_value
 
         inst.set({'references': [target]})
 
-        set_references = dummy_set_references
-        assert set_references.called
-        assert set_references.call_args[0] \
+        assert inst._graph.set_references.called
+        assert inst._graph.set_references.call_args[0] \
             == (self.context, [target], node.reftype)
 
 

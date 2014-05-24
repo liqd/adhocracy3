@@ -64,27 +64,21 @@ class VersionableSheetUnitTest(unittest.TestCase):
         assert list(data['follows']) == []
         assert list(data['followed_by']) == []
 
-    @patch('adhocracy.graph.get_followed_by')
-    def test_get_with_followed_by(self, followed_by_dummy=None):
+    @patch('adhocracy.graph.Graph')
+    def test_get_with_followed_by(self, graph_dummy=None):
         successor = testing.DummyResource()
-        followed_by_dummy.return_value = iter([successor])
         inst = self._make_one(self.metadata, self.context)
+        inst._graph = graph_dummy.return_value
+        inst._graph.get_followed_by.return_value = iter([successor])
         data = inst.get()
         assert list(data['followed_by']) == [successor]
 
-    @patch('adhocracy.graph.get_followed_by')
-    def test_get_with_followed_by(self, followed_by_dummy=None):
-        successor = testing.DummyResource()
-        followed_by_dummy.return_value = iter([successor])
-        inst = self._make_one(self.metadata, self.context)
-        data = inst.get()
-        assert list(data['followed_by']) == [successor]
-
-    @patch('adhocracy.graph.get_follows')
-    def test_get_with_follows(self, follows_dummy=None):
+    @patch('adhocracy.graph.Graph')
+    def test_get_with_follows(self, graph_dummy=None):
         precessor = testing.DummyResource()
-        follows_dummy.return_value = iter([precessor])
         inst = self._make_one(self.metadata, self.context)
+        inst._graph = graph_dummy.return_value
+        inst._graph.get_follows.return_value = iter([precessor])
         data = inst.get()
         assert list(data['follows']) == [precessor]
 

@@ -2,7 +2,6 @@
 
 from pyramid.threadlocal import get_current_registry
 
-from adhocracy.graph import is_in_subtree
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
@@ -10,6 +9,7 @@ from adhocracy.sheets.versions import IVersionable
 from adhocracy.utils import get_sheet
 from adhocracy.utils import get_all_sheets
 from adhocracy.utils import get_resource_interface
+from adhocracy.utils import find_graph
 
 
 def _get_not_readonly_appstructs(resource):
@@ -22,7 +22,8 @@ def _get_not_readonly_appstructs(resource):
 
 
 def _update_versionable(resource, isheet, appstruct, root_versions):
-    if root_versions and not is_in_subtree(resource, root_versions):
+    graph = find_graph(resource)
+    if root_versions and not graph.is_in_subtree(resource, root_versions):
         return resource
     else:
         registry = get_current_registry()
