@@ -104,6 +104,28 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
                {'elements': [event.new_version]}
         assert appstructs[IVersionable.__identifier__] == {'follows': [context]}
 
+    @patch('adhocracy.graph.Graph')
+    def test_call_versionable_with_autoupdate_sheet_and_root_versions_and_not_is_insubtree(self,
+                                                                                           dummy_graph):
+        graph = dummy_graph.return_value
+        graph.is_in_subtree.return_value = False
+        context = testing.DummyResource(__provides__=IItemVersion,
+                                        __parent__=object(),
+                                        __graph__=graph)
+        isheet = IDummySheetAutoUpdate
+        event = _create_new_version_event_with_isheet(context, isheet)
+        event.root_versions = [context]
+        sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
+        sheet_autoupdate._data = {'elements': [event.old_version]}
+        sheet_versionable = _create_and_register_dummy_sheet(event.object,
+                                                             IVersionable)
+        sheet_versionable._data = {'follows': []}
+
+        self._makeOne(event)
+
+        factory = self.config.registry.content.create
+        assert not factory.called
+
     def test_call_versionable_with_autoupdate_sheet_but_readonly(self):
         context = testing.DummyResource(__provides__=IItemVersion)
         isheet = IDummySheetAutoUpdate
