@@ -101,6 +101,14 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
         self.context = testing.DummyResource()
         setattr(self.request, 'errors', Errors(self.request))
 
+    def test_valid_with_schema_and_request_has_json_data_but_missing_deserializer(self):
+        data = {'data': True}
+        self.request.json =  data
+        self._make_one(self.context, self.request, colander.MappingSchema)
+        assert hasattr(self.request, 'deserializer')
+        data_deserialized = self.request.deserializer(self.request)
+        assert data_deserialized
+
     def test_valid_wrong_method_with_data(self):
         self.request.body = '{"wilddata": "1"}'
         self.request.method = 'wrong_method'
@@ -851,6 +859,21 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert field_metadata['name'] == 'test'
         assert 'valuetype' in field_metadata
 
+    def test_get_followed_by_field_of_versionable_sheet(self):
+        from adhocracy.sheets.versions import IVersionable
+
+        class SchemaF(self.sheet_meta.schema_class):
+            followed_by = colander.SchemaNode(colander.List())
+        sheet_meta = self.sheet_meta._replace(schema_class=SchemaF)
+        sheet_name = IVersionable.__identifier__
+        self.sheets_metadata.return_value = {sheet_name: sheet_meta}
+        inst = self.make_one()
+
+        response = inst.get()['sheets'][sheet_name]
+
+        field_metadata = response['fields'][0]
+        assert field_metadata['readonly'] is True
+
     def test_get_sheets_with_field_colander_noniteratable(self):
         class SchemaF(self.sheet_meta.schema_class):
             test = colander.SchemaNode(colander.Int())
@@ -897,3 +920,30 @@ class MetaApiViewUnitTest(unittest.TestCase):
         field_metadata = sheet_metadata['fields'][0]
         assert field_metadata['containertype'] == 'list'
         assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
+
+
+class ValidateRequestDataDecoratorUnitTest(unittest.TestCase):
+
+    def test_decorates_rest_method(self):
+        from adhocracy.rest.views import validate_request_data_decorator
+        request = testing.DummyRequest(method='GET',
+                                       errors=[])
+        request.registry.content = testing.DummyResource()
+        context = testing.DummyResource()
+        def dummy_validate(context, request):
+            request.validated = {'data': True}
+        class DummyOriginalView:
+            validation_GET = (None, [dummy_validate])
+        @validate_request_data_decorator()
+        class DummyView(testing.DummyResource):
+            __original_view__ = DummyOriginalView
+
+        DummyView(context, request)
+
+        assert request.validated == {'data': True}
+
+
+
+
+
+
