@@ -99,6 +99,12 @@ class PathListSetUnitTest(unittest.TestCase):
         result = inst.serialize(node, [self.child])
         assert result == ['/']
 
+    def test_deserialize_value_null(self):
+        inst = self.make_one()
+        node = colander.Mapping()
+        result = inst.deserialize(node, colander.null)
+        assert result == colander.null
+
     def test_deserialize_value_valid_path(self):
         inst = self.make_one()
         self.context['child'] = self.child

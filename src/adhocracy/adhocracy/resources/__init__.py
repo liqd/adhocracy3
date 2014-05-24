@@ -18,6 +18,7 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
     """Add the `resource` type specified in metadata to the content registry.
 
     As generic factory the :class:`ResourceFactory` is used.
+
     """
     assert hasattr(config.registry, 'content')
     iresource = metadata.iresource
@@ -118,5 +119,5 @@ def includeme(config):
     """Include all resource types in this package."""
     #config.include('.pool')
     #config.include('.tag')
-    config.include('.itemversion')
-    config.include('.item')
+    #config.include('.itemversion')
+    #config.include('.item')

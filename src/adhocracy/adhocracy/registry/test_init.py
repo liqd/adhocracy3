@@ -148,8 +148,14 @@ class TestResourceContentRegistry(unittest.TestCase):
                                       onlymandatorycreatable=True)
         assert ISheet.__identifier__ in sheets
 
-    def test_resources_metadata_without_resources(self):
+    def test_resources_metadata_without_content_type(self):
         inst = self._make_one()
+        wanted = inst.resources_metadata()
+        assert wanted == {}
+
+    def test_resources_metadata_with_non_iresource_content_types(self):
+        inst = self._make_one()
+        inst.add("wrong", "wrong", lambda x: x)
         wanted = inst.resources_metadata()
         assert wanted == {}
 

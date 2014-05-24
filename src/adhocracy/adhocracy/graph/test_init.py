@@ -77,12 +77,20 @@ class TestGraphGetReferencesUnitTest(unittest.TestCase):
         graph._objectmap = self.objectmap
         return Graph.get_reftypes(graph, **kwargs)
 
+    def test_get_reftypes_no_objectmap(self):
+        self.objectmap = None
+        assert list(self._make_one()) == []
+
     def test_get_reftypes_no_reftpyes(self):
         self.objectmap.get_reftypes.return_value = []
         assert list(self._make_one()) == []
 
-    def test_get_reftypes_one_wrong_reftype(self):
+    def test_get_reftypes_one_wrong_str_reftype(self):
         self.objectmap.get_reftypes.return_value = ["NoneSheetToSheet"]
+        assert list(self._make_one()) == []
+
+    def test_get_reftypes_one_wrong_no_sheetreference_reftype(self):
+        self.objectmap.get_reftypes.return_value = [Interface]
         assert list(self._make_one()) == []
 
     def test_get_reftypes_one_wrong_source_isheet(self):

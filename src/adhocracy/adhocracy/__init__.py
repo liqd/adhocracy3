@@ -8,7 +8,7 @@ import transaction
 
 
 def root_factory(request, t=transaction, g=get_connection,
-                 mark_unfinished_as_finished=False):
+                 mark_unfinished_as_finished=False):  # pragma: no cover
     """ A function which can be used as a Pyramid ``root_factory``.
 
     It accepts a request and returns an instance of the ``Root`` content type.
@@ -29,7 +29,7 @@ def root_factory(request, t=transaction, g=get_connection,
     return zodb_root['app_root']
 
 
-def includeme(config):
+def includeme(config):  # pragma: no cover
     """Setup basic adhocracy."""
     # FIXME: Fix substanced.sdi bug: you need to register the authorisation
     # utility first, # then the auhentication.

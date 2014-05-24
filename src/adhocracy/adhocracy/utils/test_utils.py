@@ -1,6 +1,22 @@
+from pyramid import testing
+
 ################
 #  test utils  #
 ################
+
+
+def test_find_graph_graph_exists():
+    from adhocracy.utils import find_graph
+    dummy_graph = object()
+    parent = testing.DummyResource(__graph__=dummy_graph)
+    child = testing.DummyResource(__parent__=parent)
+    assert find_graph(child) is dummy_graph
+
+
+def test_find_graph_graph_does_not_exists():
+    from adhocracy.utils import find_graph
+    child = testing.DummyResource()
+    assert find_graph(child) is None
 
 
 def test_diff_dict():
