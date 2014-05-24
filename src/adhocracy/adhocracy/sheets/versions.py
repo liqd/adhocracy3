@@ -16,7 +16,7 @@ class IVersionable(ISheet):
     """Maker interface for resources with the versionable sheeet."""
 
 
-class IVersionableFollowsReference(NewVersionToOldVersion):
+class VersionableFollowsReference(NewVersionToOldVersion):
 
     """versionable sheet reference to preceding versions."""
 
@@ -25,9 +25,9 @@ class IVersionableFollowsReference(NewVersionToOldVersion):
     target_isheet = IVersionable
 
 
-class IVersionableFollowedByReference(SheetToSheet):
+class VersionableFollowedByReference(SheetToSheet):
 
-    """BackReference for the IVersionableFollowsReference, not stored."""
+    """BackReference for the VersionableFollowsReference, not stored."""
 
     source_isheet = IVersionable
     source_isheet_field = 'followed_by'
@@ -43,9 +43,9 @@ class VersionableSchema(colander.MappingSchema):
 
     """
 
-    follows = ListOfUniqueReferences(reftype=IVersionableFollowsReference)
+    follows = ListOfUniqueReferences(reftype=VersionableFollowsReference)
     followed_by = ListOfUniqueReferences(
-        reftype=IVersionableFollowedByReference)
+        reftype=VersionableFollowedByReference)
 
 
 class VersionableSheet(GenericResourceSheet):

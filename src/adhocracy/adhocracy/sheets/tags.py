@@ -15,7 +15,7 @@ class ITag(ISheet):
     """Marker interface for the tag sheet."""
 
 
-class ITagElementsReference(SheetToSheet):
+class TagElementsReference(SheetToSheet):
 
     """Tag sheet elements reference."""
 
@@ -32,7 +32,7 @@ class TagSchema(colander.MappingSchema):
 
     """
 
-    elements = ListOfUniqueReferences(reftype=ITagElementsReference)
+    elements = ListOfUniqueReferences(reftype=TagElementsReference)
 
 
 tag_metadata = sheet_metadata_defaults._replace(isheet=ITag,
@@ -45,7 +45,7 @@ class ITags(ISheet):
     """Marker interface for the tag sheet."""
 
 
-class ITagsElementsReference(SheetToSheet):
+class TagsElementsReference(SheetToSheet):
 
     """Tags sheet elements reference."""
 
@@ -63,7 +63,7 @@ class TagsSchema(colander.MappingSchema):
     """
 
     elements = ListOfUniqueReferences(
-        reftype=ITagsElementsReference)
+        reftype=TagsElementsReference)
 
 
 tags_metadata = sheet_metadata_defaults._replace(isheet=ITags,

@@ -213,7 +213,7 @@ class IItemVersion(ISimple):
 
 class SheetReferenceClass(ReferenceClass):
 
-    """Reference a specific ISheet for source and and target.
+    """Reference a source and target with a specific ISheet interface.
 
     Uses class attributes "target_*" and "source_*" to set tagged values.
 
@@ -244,16 +244,16 @@ class SheetReferenceClass(ReferenceClass):
         self.setTaggedValue('target_isheet', tif)
 
 
-SheetReferenceType = SheetReferenceClass('SheetReferenceType',
-                                         __module__='adhocracy.interfaces')
+SheetReference = SheetReferenceClass('SheetReference',
+                                     __module__='adhocracy.interfaces')
 
 
-class SheetToSheet(SheetReferenceType):
+class SheetToSheet(SheetReference):
 
     """Base type to reference resource ISheets."""
 
 
-class NewVersionToOldVersion(SheetReferenceType):
+class NewVersionToOldVersion(SheetReference):
 
     """Base type to reference an old ItemVersion."""
 

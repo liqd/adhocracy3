@@ -7,7 +7,7 @@ from zope.interface import taggedValue
 from zope.interface import Interface
 
 from adhocracy.interfaces import IResource
-from adhocracy.interfaces import SheetReferenceType
+from adhocracy.interfaces import SheetReference
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import NewVersionToOldVersion
@@ -162,67 +162,67 @@ class GraphSetReferencesUnitTest(unittest.TestCase):
             self._make_one(self.source, [], ReferenceType)
 
     def test_targets_empty_list(self):
-        self._make_one(self.source, [], SheetReferenceType)
-        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        self._make_one(self.source, [], SheetReference)
+        references = self.objectmap.targetids(self.source, SheetReference)
         wanted_refs = []
         assert wanted_refs == list(references)
 
     def test_targets_list(self):
         targets = [self.target]
-        self._make_one(self.source, targets, SheetReferenceType)
-        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        self._make_one(self.source, targets, SheetReference)
+        references = self.objectmap.targetids(self.source, SheetReference)
         wanted_references = [self.target.__oid__]
         assert wanted_references == list(references)
 
     def test_targets_list_ordered(self):
         targets = [self.target, self.target1, self.target2]
-        self._make_one(self.source, targets, SheetReferenceType)
+        self._make_one(self.source, targets, SheetReference)
         targets_reverse = [self.target2, self.target1, self.target]
-        self._make_one(self.source, targets_reverse, SheetReferenceType)
+        self._make_one(self.source, targets_reverse, SheetReference)
 
-        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        references = self.objectmap.targetids(self.source, SheetReference)
         wanted_references = [x.__oid__ for x in targets_reverse]
         assert wanted_references == list(references)
 
     def test_targets_list_duplicated_targets(self):
         """Duplication targets are not possible with substanced.objectmap."""
         targets = [self.target, self.target]
-        self._make_one(self.source, targets, SheetReferenceType)
-        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        self._make_one(self.source, targets, SheetReference)
+        references = self.objectmap.targetids(self.source, SheetReference)
         wanted_references = [self.target.__oid__]
         assert wanted_references == list(references)
 
     def test_targets_list_with_some_removed(self):
         targets = [self.target, self.target1, self.target2]
-        self._make_one(self.source, targets, SheetReferenceType)
+        self._make_one(self.source, targets, SheetReference)
         targets_some_removed = [self.target]
-        self._make_one(self.source, targets_some_removed, SheetReferenceType)
+        self._make_one(self.source, targets_some_removed, SheetReference)
 
-        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        references = self.objectmap.targetids(self.source, SheetReference)
         wanted_references = [x.__oid__ for x in targets_some_removed]
         assert wanted_references == list(references)
 
     def test_targets_set(self):
         targets = {self.target}
-        self._make_one(self.source, targets, SheetReferenceType)
-        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        self._make_one(self.source, targets, SheetReference)
+        references = self.objectmap.targetids(self.source, SheetReference)
         wanted_references = [self.target.__oid__]
         assert wanted_references == list(references)
 
     def test_targets_set_duplicated_targets(self):
         targets = {self.target, self.target}
-        self._make_one(self.source, targets, SheetReferenceType)
-        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        self._make_one(self.source, targets, SheetReference)
+        references = self.objectmap.targetids(self.source, SheetReference)
         wanted_references = [self.target.__oid__]
         assert wanted_references == list(references)
 
     def test_targets_set_with_some_removed(self):
         targets = {self.target, self.target1, self.target2}
-        self._make_one(self.source, targets, SheetReferenceType)
+        self._make_one(self.source, targets, SheetReference)
         targets_some_removed = {self.target}
-        self._make_one(self.source, targets_some_removed, SheetReferenceType)
+        self._make_one(self.source, targets_some_removed, SheetReference)
 
-        references = self.objectmap.targetids(self.source, SheetReferenceType)
+        references = self.objectmap.targetids(self.source, SheetReference)
         wanted_references = [x.__oid__ for x in targets_some_removed]
         assert wanted_references == list(references)
 
@@ -260,16 +260,16 @@ class GraphGetReferencesUnitTest(unittest.TestCase):
 
         source, isheet, field, target = result.__next__()
         assert source == self.resource
-        assert isheet == SheetReferenceType.getTaggedValue('source_isheet')
-        assert field == SheetReferenceType.getTaggedValue('source_isheet_field')
+        assert isheet == SheetReference.getTaggedValue('source_isheet')
+        assert field == SheetReference.getTaggedValue('source_isheet_field')
         assert target == self.resource2
 
     def test_sheetreferences_with_base_reftype(self):
-        class ASheetReferenceType(SheetReferenceType):
+        class ASheetReferenceType(SheetReference):
             pass
 
         self.objectmap.connect(self.resource, self.resource,
-                               SheetReferenceType)
+                               SheetReference)
         self.objectmap.connect(self.resource, self.resource,
                                ASheetReferenceType)
 
@@ -284,7 +284,7 @@ class GraphGetReferencesUnitTest(unittest.TestCase):
             source_isheet = IASheet
 
         self.objectmap.connect(self.resource, self.resource,
-                               SheetReferenceType)
+                               SheetReference)
         self.objectmap.connect(self.resource, self.resource,
                                ASheetReferenceType)
 
@@ -331,13 +331,13 @@ class GraphGetBackReferencesUnitTest(unittest.TestCase):
         assert target == self.resource2
 
     def test_sheetreferences_and_base_reftype(self):
-        from adhocracy.interfaces import SheetReferenceType
+        from adhocracy.interfaces import SheetReference
 
-        class ASheetReferenceType(SheetReferenceType):
+        class ASheetReferenceType(SheetReference):
             pass
 
         self.objectmap.connect(self.resource, self.resource,
-                               SheetReferenceType)
+                               SheetReference)
         self.objectmap.connect(self.resource, self.resource,
                                ASheetReferenceType)
 
@@ -352,7 +352,7 @@ class GraphGetBackReferencesUnitTest(unittest.TestCase):
             source_isheet = IASheet
 
         self.objectmap.connect(self.resource, self.resource,
-                               SheetReferenceType)
+                               SheetReference)
         self.objectmap.connect(self.resource, self.resource,
                                ASheetReferenceType)
 
@@ -439,7 +439,7 @@ class GraphGetBackReferencesForIsheetUnitTest(unittest.TestCase):
             source_isheet = IABSheet
             source_isheet_field = 'othername'
 
-        self.objectmap.connect(self.source, self.target, SheetReferenceType)
+        self.objectmap.connect(self.source, self.target, SheetReference)
         self.objectmap.connect(self.source, self.target, ASheetReferenceType)
         self.objectmap.connect(self.source, self.target, ABSheetReferenceType)
 

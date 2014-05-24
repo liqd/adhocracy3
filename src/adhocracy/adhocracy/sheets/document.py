@@ -24,7 +24,7 @@ class IParagraph(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for the paragraph sheet."""
 
 
-class IDocumentElementsReference(SheetToSheet):
+class DocumentElementsReference(SheetToSheet):
 
     """Document elements reference."""
 
@@ -33,7 +33,7 @@ class IDocumentElementsReference(SheetToSheet):
     target_isheet = ISection
 
 
-class ISectionElementsReference(SheetToSheet):
+class SectionElementsReference(SheetToSheet):
 
     """Section element reference."""
 
@@ -42,7 +42,7 @@ class ISectionElementsReference(SheetToSheet):
     target_isheet = IParagraph
 
 
-class ISubsectionsReference(SheetToSheet):
+class SectionSubsectionsReference(SheetToSheet):
 
     """Section subsection reference."""
 
@@ -65,7 +65,7 @@ class DocumentSchema(colander.MappingSchema):
                                 missing=colander.drop)
     description = colander.SchemaNode(colander.String(), default='',
                                       missing=colander.drop)
-    elements = ListOfUniqueReferences(reftype=IDocumentElementsReference)
+    elements = ListOfUniqueReferences(reftype=DocumentElementsReference)
 
 
 document_meta = sheet_metadata_defaults._replace(isheet=IDocument,
@@ -84,8 +84,8 @@ class SectionSchema(colander.MappingSchema):
 
     title = colander.SchemaNode(colander.String(), default='',
                                 missing=colander.drop)
-    elements = ListOfUniqueReferences(reftype=ISectionElementsReference)
-    subsections = ListOfUniqueReferences(reftype=ISubsectionsReference)
+    elements = ListOfUniqueReferences(reftype=SectionElementsReference)
+    subsections = ListOfUniqueReferences(reftype=SectionSubsectionsReference)
 
 
 section_meta = sheet_metadata_defaults._replace(isheet=ISection,

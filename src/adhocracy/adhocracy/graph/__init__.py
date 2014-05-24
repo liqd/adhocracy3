@@ -10,7 +10,7 @@ from substanced.objectmap import ObjectMap
 from substanced.objectmap import Multireference
 
 from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import SheetReferenceType
+from adhocracy.interfaces import SheetReference
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import NewVersionToOldVersion
 
@@ -36,7 +36,7 @@ class Graph(Persistent):
         self._objectmap = find_objectmap(root)
 
     def get_reftypes(self, base_isheet=ISheet,
-                     base_reftype=SheetReferenceType) -> [_isheet_reftype]:
+                     base_reftype=SheetReference) -> [_isheet_reftype]:
         """Collect all used SheetReferenceTypes.
 
         : parm objectmap: the objectmap to consult, None value is allowed to
@@ -51,7 +51,7 @@ class Graph(Persistent):
         for reftype in all_reftypes:
             if isinstance(reftype, str):
                 continue
-            if not issubclass(reftype, SheetReferenceType):
+            if not issubclass(reftype, SheetReference):
                 continue
             if not reftype.isOrExtends(base_reftype):
                 continue
@@ -69,7 +69,7 @@ class Graph(Persistent):
         : param reftype (SheetReferenceType): the reftype mapping to one
                                               isheet field.
         """
-        assert reftype.isOrExtends(SheetReferenceType)
+        assert reftype.isOrExtends(SheetReference)
         ordered = isinstance(targets, Sequence)
         orientation = 'source'
         resolve = True  # return objects not oids

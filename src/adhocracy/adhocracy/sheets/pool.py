@@ -40,7 +40,7 @@ class IPool(ISheet):
     """Marker interface for the pool sheet."""
 
 
-class IPoolElementsReference(SheetToSheet):
+class PoolElementsReference(SheetToSheet):
 
     """Pool sheet elements reference."""
 
@@ -57,7 +57,7 @@ class PoolSchema(colander.MappingSchema):
 
     """
 
-    elements = ListOfUniqueReferences(reftype=IPoolElementsReference)
+    elements = ListOfUniqueReferences(reftype=PoolElementsReference)
 
 
 pool_metadata = sheet_metadata_defaults._replace(isheet=IPool,

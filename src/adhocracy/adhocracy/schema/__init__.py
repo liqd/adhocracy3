@@ -6,7 +6,7 @@ from substanced import schema
 from substanced.schema import IdSet
 import colander
 
-from adhocracy.interfaces import SheetReferenceType
+from adhocracy.interfaces import SheetReference
 
 
 class Identifier(colander.SchemaNode):
@@ -182,7 +182,7 @@ class AbstractReferenceIterable(schema.MultireferenceIdSchemaNode):
 
     default = []
     missing = colander.drop
-    reftype = SheetReferenceType
+    reftype = SheetReference
     choices_getter = get_all_resources
 
     def _get_choices(self):
