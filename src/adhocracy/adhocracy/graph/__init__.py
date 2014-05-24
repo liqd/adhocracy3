@@ -129,7 +129,7 @@ class Graph(Persistent):
         """
         references = self.get_back_references(target, base_isheet=isheet)
         return self._make_references_for_isheet(references,
-                                                orientation='targets')
+                                                orientation='sources')
 
     def _make_references_for_isheet(self, references, orientation='sources'):
         references_isheet = {}
