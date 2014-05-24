@@ -9,7 +9,6 @@ from substanced.util import acquire
 from zope.component import getAdapter
 from zope.interface import directlyProvidedBy
 from zope.interface import providedBy
-import colander
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourceSheet
@@ -21,35 +20,9 @@ def find_graph(context):
 
     :return (adhocracy.graph.Graph): Graph for the root object in the
                                      lineage of the ``context`` or None.
+
     """
     return acquire(context, '__graph__', None)
-
-
-def create_schema_from_dict(key_values, base_node=None):
-    """Create colander.SchemaNode instance from dictionary.
-
-    Args:
-         key_values (dict): Dictionary with colander schema names and nodes.
-                            The key is the name and has to start with
-                            "field:", has to be an instance of
-                            colander.SchemaNode.
-
-         base_node (colander.SchemaNode): Base Node to add the nodes to.
-                                          Defaults to Mapping SchemaNode.
-    Returns:
-         colander.SchemaNode
-
-    """
-    if not base_node:
-        base_node = colander.SchemaNode(colander.Mapping())
-    for key, node in key_values.items():
-        if not key.startswith('field:'):
-            continue
-        assert isinstance(node, colander.SchemaNode)
-        name = key.split(':')[1]
-        node.name = name
-        base_node.add(node)
-    return base_node
 
 
 def get_resource_interface(context):
