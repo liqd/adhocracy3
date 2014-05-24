@@ -49,7 +49,7 @@ def test_strip_optional_prefix():
 
 
 def test_get_resource_interface_multiple_provided():
-    from . import get_resource_interface
+    from . import get_iresource
     from adhocracy.interfaces import IResource
     from zope.interface import directlyProvides
     from pyramid.testing import DummyResource
@@ -62,19 +62,19 @@ def test_get_resource_interface_multiple_provided():
         pass
 
     directlyProvides(context, IA, IB)
-    assert get_resource_interface(context) == IA
+    assert get_iresource(context) == IA
 
 
 def test_get_resource_interface_none_provided():
-    from . import get_resource_interface
+    from . import get_iresource
     from pyramid.testing import DummyResource
     context = DummyResource()
-    result = get_resource_interface(context)
+    result = get_iresource(context)
     assert result is None
 
 
 def test_get_sheet_interfaces_multiple_provided():
-    from . import get_sheet_interfaces
+    from . import get_isheets
     from adhocracy.interfaces import ISheet
     from adhocracy.interfaces import IResource
     from pyramid.testing import DummyResource
@@ -86,15 +86,15 @@ def test_get_sheet_interfaces_multiple_provided():
         pass
 
     context = DummyResource(__provides__=(IResource, IA, IB))
-    assert get_sheet_interfaces(context) == [IA, IB]
+    assert get_isheets(context) == [IA, IB]
 
 
 def test_get_sheet_interfaces_none_provided():
-    from . import get_sheet_interfaces
+    from . import get_isheets
     from adhocracy.interfaces import IResource
     from pyramid.testing import DummyResource
     context = DummyResource(__provides__=IResource)
-    assert get_sheet_interfaces(context) == []
+    assert get_isheets(context) == []
 
 
 def test_get_all_taggedvalues_inheritance():

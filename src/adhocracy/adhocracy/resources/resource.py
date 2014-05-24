@@ -4,7 +4,7 @@ from zope.interface import implementer
 
 from adhocracy.interfaces import resource_metadata
 from adhocracy.interfaces import IResource
-from adhocracy.utils import get_resource_interface
+from adhocracy.utils import get_iresource
 from adhocracy.utils import to_dotted_name
 
 
@@ -17,7 +17,7 @@ class Base(Persistent):
     __name__ = None
 
     def __repr__(self):
-        interface = get_resource_interface(self) or self.__class__
+        interface = get_iresource(self) or self.__class__
         interface_dotted = to_dotted_name(interface)
         oid = getattr(self, '__oid__', None)
         identifier = str(oid)

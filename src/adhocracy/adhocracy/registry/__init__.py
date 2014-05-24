@@ -5,7 +5,7 @@ from pyramid.testing import DummyResource
 from substanced.content import ContentRegistry
 
 from adhocracy.interfaces import IResource
-from adhocracy.utils import get_resource_interface
+from adhocracy.utils import get_iresource
 from adhocracy.utils import get_all_sheets
 from adhocracy.utils import get_sheet
 
@@ -125,7 +125,7 @@ class ResourceContentRegistry(ContentRegistry):
         """
         assert IResource.providedBy(context)
         all_types = self.resources_metadata()
-        name = get_resource_interface(context).__identifier__
+        name = get_iresource(context).__identifier__
         assert name in all_types
         metadata = all_types[name]['metadata']
         addables = metadata.element_types

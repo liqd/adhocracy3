@@ -8,7 +8,7 @@ from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.sheets.versions import IVersionable
 from adhocracy.utils import get_sheet
 from adhocracy.utils import get_all_sheets
-from adhocracy.utils import get_resource_interface
+from adhocracy.utils import get_iresource
 from adhocracy.utils import find_graph
 
 
@@ -30,7 +30,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
         appstructs = _get_not_readonly_appstructs(resource)
         appstructs[IVersionable.__identifier__]['follows'] = [resource]
         appstructs[isheet.__identifier__] = appstruct
-        iresource = get_resource_interface(resource)
+        iresource = get_iresource(resource)
         new_resource = registry.content.create(iresource.__identifier__,
                                                parent=resource.__parent__,
                                                appstructs=appstructs,

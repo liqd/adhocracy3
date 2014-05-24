@@ -28,7 +28,7 @@ from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import AbstractReferenceIterable
-from adhocracy.utils import get_resource_interface
+from adhocracy.utils import get_iresource
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
 
@@ -279,7 +279,7 @@ class ResourceRESTView(RESTView):
             key = sheet.meta.isheet.__identifier__
             struct['data'][key] = sheet.get_cstruct()
         struct['path'] = resource_path(self.context)
-        iresource = get_resource_interface(self.context)
+        iresource = get_iresource(self.context)
         struct['content_type'] = iresource.__identifier__
         #  FIXME: The ItemRESTView should be responsible for the following code
         #  or we move it to the versions sheet.
@@ -326,7 +326,7 @@ class SimpleRESTView(ResourceRESTView):
             sheet.set(appstruct)
         struct = {}
         struct['path'] = resource_path(self.context)
-        iresource = get_resource_interface(self.context)
+        iresource = get_iresource(self.context)
         struct['content_type'] = iresource.__identifier__
         return ResourceResponseSchema().serialize(struct)
 
@@ -369,7 +369,7 @@ class PoolRESTView(SimpleRESTView):
         response_schema = ResourceResponseSchema()
         struct = {}
         struct['path'] = resource_path(resource)
-        iresource = get_resource_interface(resource)
+        iresource = get_iresource(resource)
         struct['content_type'] = iresource.__identifier__
         if IItem.providedBy(resource):
             response_schema = ItemResponseSchema()

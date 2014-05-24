@@ -9,6 +9,7 @@ from substanced.util import acquire
 from zope.component import getAdapter
 from zope.interface import directlyProvidedBy
 from zope.interface import providedBy
+from zope.interface.interfaces import IInterface
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourceSheet
@@ -25,13 +26,10 @@ def find_graph(context):
     return acquire(context, '__graph__', None)
 
 
-def get_resource_interface(context):
+def get_iresource(context) -> IInterface:
     """Get resource type interface.
 
-    Args:
-        context (IResource): object
-    Returns:
-        Interface
+    :return: The :class:`IResource` interface or None
 
     """
     ifaces = list(directlyProvidedBy(context))
@@ -39,15 +37,8 @@ def get_resource_interface(context):
     return iresources[0] if iresources else None
 
 
-def get_sheet_interfaces(context):
-    """Get sheet interfaces.
-
-    Args:
-        context (IResource): object
-    Returns:
-        interfaces: list with ISheet interfaces
-
-    """
+def get_isheets(context) -> [IInterface]:
+    """Get the :class:`ISheet` interfaces. """
     ifaces = list(providedBy(context))
     return [i for i in ifaces if i.isOrExtends(ISheet)]
 
@@ -76,7 +67,7 @@ def get_all_sheets(context):
 
     """
     assert IResource.providedBy(context)
-    isheets = get_sheet_interfaces(context)
+    isheets = get_isheets(context)
     for isheet in isheets:
         yield(get_sheet(context, isheet))
 

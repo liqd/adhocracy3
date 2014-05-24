@@ -8,12 +8,12 @@ import adhocracy.sheets.name
 import adhocracy.sheets.tags
 import adhocracy.sheets.pool
 import adhocracy.sheets.versions
-from adhocracy.utils import get_resource_interface
+from adhocracy.utils import get_iresource
 
 
 def create_initial_content_for_item(context, registry, options):
     """Add first version and the Tags LAST and FIRST."""
-    iresource = get_resource_interface(context)
+    iresource = get_iresource(context)
     metadata = registry.content.resources_metadata()[iresource.__identifier__]
     item_type = metadata['metadata'].item_type
     create = registry.content.create
