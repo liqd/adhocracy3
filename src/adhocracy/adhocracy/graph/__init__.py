@@ -61,13 +61,13 @@ class Graph(Persistent):
             field = reftype.queryTaggedValue('source_isheet_field')
             yield _isheet_reftype(isheet, field, reftype)
 
-    def set_references(self, source, targets, reftype):
+    def set_references(self, source, targets: Iterable,
+                       reftype: SheetReference):
         """Set references of this source.
 
-        : param targets (Iterable): the reference targets,
-                                    for Sequences the order is preserved.
-        : param reftype (SheetReferenceType): the reftype mapping to one
-                                              isheet field.
+        : param targets: the reference targets, for Sequences the order
+                         is preserved.
+        : param reftype: the reftype mapping to one isheet field.
         """
         assert reftype.isOrExtends(SheetReference)
         ordered = isinstance(targets, Sequence)
@@ -81,22 +81,16 @@ class Graph(Persistent):
         multireference.connect(targets)
 
     def get_references(self, source, base_isheet=ISheet,
-                       base_reftype=SheetToSheet):
-        """Get generator with references of this source.
-
-        : return: generator of References
-        """
+                       base_reftype=SheetToSheet) -> [Reference]:
+        """Get generator with :class:`References`s of this source."""
         for isheet, field, reftype in self.get_reftypes(base_isheet,
                                                         base_reftype):
             for target in ObjectMap.targets(self._objectmap, source, reftype):
                 yield Reference(source, isheet, field, target)
 
     def get_back_references(self, target, base_isheet=ISheet,
-                            base_reftype=SheetToSheet):
-        """Get generator with references of other resources with this target.
-
-        : return: generator of References
-        """
+                            base_reftype=SheetToSheet) -> [Reference]:
+        """Get generator with :class:`Reference`s with this target."""
         for isheet, field, reftype in self.get_reftypes(base_isheet,
                                                         base_reftype):
             for source in ObjectMap.sources(self._objectmap, target, reftype):
@@ -131,7 +125,8 @@ class Graph(Persistent):
         return self._make_references_for_isheet(references,
                                                 orientation='sources')
 
-    def _make_references_for_isheet(self, references, orientation='sources'):
+    def _make_references_for_isheet(self, references: [Reference],
+                                    orientation='sources') -> dict:
         references_isheet = {}
         for source, isheet, field, target in references:
             # FIXME we return a list of resources here, but for big data a
@@ -164,7 +159,7 @@ class Graph(Persistent):
         return False
 
     def _is_candidate_ancestor(self, candidate, descendant,
-                               checked_candidates):
+                               checked_candidates: {int}) -> bool:
         """Return True if candidate is ancestor of descendant."""
         if candidate is descendant:
             return True
