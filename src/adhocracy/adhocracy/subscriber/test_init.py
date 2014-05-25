@@ -69,7 +69,7 @@ def _create_new_version_event_with_isheet(context, isheet):
 
 class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
 
-    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
+    @patch('adhocracy.registry.ResourceContentRegistry')
     def setUp(self, dummy_resource_registry=None):
         self.config = testing.setUp()
         resource_registry = dummy_resource_registry.return_value

@@ -59,7 +59,7 @@ class CorniceDummyRequest(testing.DummyRequest):
         self.errors = Errors(self)
 
 
-@patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
+@patch('adhocracy.registry.ResourceContentRegistry')
 def make_mock_resource_registry(mock_registry=None):
     return mock_registry.return_value
 
