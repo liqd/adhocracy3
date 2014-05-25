@@ -31,6 +31,8 @@ class Graph(Persistent):
 
     """
 
+    # FIXME: add interface for graph implementations
+
     def __init__(self, root):
         self._root = root
         self._objectmap = find_objectmap(root)
