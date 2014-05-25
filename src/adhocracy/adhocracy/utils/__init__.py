@@ -17,63 +17,49 @@ from adhocracy.interfaces import ISheet
 
 
 def find_graph(context) -> object:
-    """Get the graph object to handle references.
+    """:Returns: the Graph object in the lineage of `context` or None.
 
-    :rtype adhocracy.graph.Grahp
-    :returns: Graph for the root object in the
-    lineage of the ``context`` or None.
+    :rtype: :class:`adhocracy.graph.Graph`
 
     """
     return acquire(context, '__graph__', None)
 
 
 def get_iresource(context) -> IInterface:
-    """Get resource type interface.
-
-    :returns: The :class:`IResource` interface or None
-
-    """
+    """:Returns: the :class:IResource` interface of `context` or None."""
     ifaces = list(directlyProvidedBy(context))
     iresources = [i for i in ifaces if i.isOrExtends(IResource)]
     return iresources[0] if iresources else None
 
 
 def get_isheets(context) -> [IInterface]:
-    """Get the :class:`ISheet` interfaces. """
+    """:Returns: the :class:`adhocracy.interfaces.ISheet` interfaces."""
     ifaces = list(providedBy(context))
     return [i for i in ifaces if i.isOrExtends(ISheet)]
 
 
-def get_sheet(context, isheet):
-    """Get sheet adapter for ISheet inteface.
+def get_sheet(context, isheet: IInterface) -> IResourceSheet:
+    """Get sheet adapter for the `isheet` interface.
 
-    Args:
-        context (IResource): object
-        isheet (IISheet): object
-    Returns:
-        object (IResourceSheet)
+    :raises: `zope.component.ComponentLookupError`
 
     """
-    # FIXME add Raises component error
     return getAdapter(context, IResourceSheet, name=isheet.__identifier__)
 
 
-def get_all_sheets(context):
-    """Get sheet adapters for this context.
+def get_all_sheets(context) -> [IResourceSheet]:
+    """Get the sheet adapters for all ISheet interfaces of `context`.
 
-    Args:
-        context (IResource): object
-    Returns:
-        iterator: IResourcePropertySheet adapters
+    :rtype: :class:`types.GeneratorType`
+    :raises: `zope.component.ComponentLookupError`
 
     """
-    assert IResource.providedBy(context)
     isheets = get_isheets(context)
     for isheet in isheets:
         yield(get_sheet(context, isheet))
 
 
-def get_all_taggedvalues(iface):
+def get_all_taggedvalues(iface: IInterface) -> dict:
     """Return dict with all own and all inherited taggedvalues."""
     iro = [i for i in iface.__iro__]
     iro.reverse()
@@ -143,19 +129,9 @@ def strip_optional_prefix(s, prefix):
         return s
 
 
-def to_dotted_name(obj):
-    """Return the dotted name of a type object.
-
-    Args:
-      obj (str or type)
-
-    Returns:
-      The dotted name of `obj`, if it's a type.
-      If `obj` is a string, it is returned as is (since we suppose that it
-      already represents a type name).
-
-    """
-    if isinstance(obj, str):
-        return obj
+def to_dotted_name(context) -> str:
+    """:returns: The dotted name of `obj`, if it's a type.  """
+    if isinstance(context, str):
+        return context
     else:
-        return get_dotted_name(obj)
+        return get_dotted_name(context)
