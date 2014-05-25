@@ -1,17 +1,17 @@
-adhocracy.utils package
-=======================
+adhocracy.subscriber package
+============================
 
 Submodules
 ----------
 
 .. toctree::
 
-   adhocracy.utils.test_utils
+   adhocracy.subscriber.test_init
 
 Module contents
 ---------------
 
-.. automodule:: adhocracy.utils
+.. automodule:: adhocracy.subscriber
     :members:
     :undoc-members:
     :show-inheritance:

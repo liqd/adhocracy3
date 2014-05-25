@@ -74,9 +74,9 @@ class IResourceSheet(IPropertySheet):
     def validate_cstruct(cstruct: dict) -> dict:
         """ Validate ``cstruct`` data.
 
-        : param cstruct: serialized application data (colander)
-        : return: appstruct: deserialized application data (colander)
-        : raises: :class colander.Invalid:
+        :param cstruct: serialized application data (colander)
+        :returns: appstruct: deserialized application data (colander)
+        :raises: :class colander.Invalid:
 
         """
 
@@ -172,7 +172,7 @@ class IPool(IResource):
     def add(name: str, other) -> str:
         """ Add subobject other.
 
-        This method returns the name used to place the subobject in the
+        :returns: The name used to place the subobject in the
         folder (a derivation of ``name``, usually the result of
         ``self.check_name(name)``).
         """
@@ -180,8 +180,8 @@ class IPool(IResource):
     def check_name(name: str) -> str:
         """ Check and modify the name passed for validity.
 
-        :return: the name (with any needed modifications).
-        :raises `substanced.folder.FolderKeyError`: if name already in pool
+        :returns: The name (with any needed modifications).
+        :raises: :class:`substanced.folder.FolderKeyError`
         """
 
     def next_name(subobject, prefix='') -> str:

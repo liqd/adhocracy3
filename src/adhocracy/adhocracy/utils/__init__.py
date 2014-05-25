@@ -16,11 +16,12 @@ from adhocracy.interfaces import IResourceSheet
 from adhocracy.interfaces import ISheet
 
 
-def find_graph(context):
+def find_graph(context) -> object:
     """ Get the graph object to handle references.
 
-    :return (adhocracy.graph.Graph): Graph for the root object in the
-                                     lineage of the ``context`` or None.
+    :rtype adhocracy.graph.Grahp
+    :returns: Graph for the root object in the
+              lineage of the ``context`` or None.
 
     """
     return acquire(context, '__graph__', None)
@@ -29,7 +30,7 @@ def find_graph(context):
 def get_iresource(context) -> IInterface:
     """Get resource type interface.
 
-    :return: The :class:`IResource` interface or None
+    :returns: The :class:`IResource` interface or None
 
     """
     ifaces = list(directlyProvidedBy(context))
@@ -73,7 +74,7 @@ def get_all_sheets(context):
 
 
 def get_all_taggedvalues(iface):
-    """return dict with all own and all inherited taggedvalues."""
+    """Return dict with all own and all inherited taggedvalues."""
     iro = [i for i in iface.__iro__]
     iro.reverse()
     taggedvalues = {}

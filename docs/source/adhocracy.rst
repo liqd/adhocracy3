@@ -6,26 +6,24 @@ Subpackages
 
 .. toctree::
 
+    adhocracy.events
     adhocracy.evolution
-    adhocracy.folder
     adhocracy.frontend
+    adhocracy.graph
     adhocracy.registry
     adhocracy.resources
     adhocracy.rest
     adhocracy.schema
     adhocracy.sheets
+    adhocracy.subscriber
     adhocracy.utils
 
 Submodules
 ----------
 
-adhocracy.interfaces module
----------------------------
+.. toctree::
 
-.. automodule:: adhocracy.interfaces
-    :members:
-    :undoc-members:
-    
+   adhocracy.interfaces
 
 Module contents
 ---------------
@@ -33,4 +31,4 @@ Module contents
 .. automodule:: adhocracy
     :members:
     :undoc-members:
-    
+    :show-inheritance:

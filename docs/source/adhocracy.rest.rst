@@ -4,30 +4,14 @@ adhocracy.rest package
 Submodules
 ----------
 
-adhocracy.rest.exceptions module
---------------------------------
+.. toctree::
 
-.. automodule:: adhocracy.rest.exceptions
-    :members:
-    :undoc-members:
-    
-
-adhocracy.rest.schemas module
------------------------------
-
-.. automodule:: adhocracy.rest.schemas
-    :members:
-    :undoc-members:
-    
-
-adhocracy.rest.views module
----------------------------
-
-.. automodule:: adhocracy.rest.views
-    :members:
-    :undoc-members:
-    
-
+   adhocracy.rest.exceptions
+   adhocracy.rest.schemas
+   adhocracy.rest.test_exceptions
+   adhocracy.rest.test_schemas
+   adhocracy.rest.test_views
+   adhocracy.rest.views
 
 Module contents
 ---------------
@@ -35,4 +19,4 @@ Module contents
 .. automodule:: adhocracy.rest
     :members:
     :undoc-members:
-    
+    :show-inheritance:

@@ -1,17 +1,17 @@
-adhocracy.utils package
-=======================
+adhocracy.events package
+========================
 
 Submodules
 ----------
 
 .. toctree::
 
-   adhocracy.utils.test_utils
+   adhocracy.events.test_init
 
 Module contents
 ---------------
 
-.. automodule:: adhocracy.utils
+.. automodule:: adhocracy.events
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,4 +1,4 @@
-adhocracy.utils package
+adhocracy.graph package
 =======================
 
 Submodules
@@ -6,12 +6,12 @@ Submodules
 
 .. toctree::
 
-   adhocracy.utils.test_utils
+   adhocracy.graph.evolve
 
 Module contents
 ---------------
 
-.. automodule:: adhocracy.utils
+.. automodule:: adhocracy.graph
     :members:
     :undoc-members:
     :show-inheritance:

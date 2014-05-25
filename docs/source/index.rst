@@ -21,15 +21,6 @@ Contents
    instance_modelling_example.rst
    no_patches.rst
    adhocracy
-   adhocracy.evolution
-   adhocracy.frontend
-   adhocracy.properties
-   adhocracy.registry
-   adhocracy.resources
-   adhocracy.rest
-   adhocracy.schema
-   adhocracy.utils
-
 
 
 Indices and tables

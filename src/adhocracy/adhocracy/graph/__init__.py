@@ -41,11 +41,9 @@ class Graph(Persistent):
                      base_reftype=SheetReference) -> [_isheet_reftype]:
         """Collect all used SheetReferenceTypes.
 
-        : parm objectmap: the objectmap to consult, None value is allowed to
-                           ease unit testing.
-        : param base_reftype: Skip types that are not subclasses of this.
-        : param base_isheet: Skip types with a source isheet that is not a
-                             subclass of this.
+        :param base_reftype: Skip types that are not subclasses of this.
+        :param base_isheet: Skip types with a source isheet that is not a
+                            subclass of this.
         """
         if not self._objectmap:
             return []
@@ -67,9 +65,9 @@ class Graph(Persistent):
                        reftype: SheetReference):
         """Set references of this source.
 
-        : param targets: the reference targets, for Sequences the order
+        :param targets: the reference targets, for Sequences the order
                          is preserved.
-        : param reftype: the reftype mapping to one isheet field.
+        :param reftype: the reftype mapping to one isheet field.
         """
         assert reftype.isOrExtends(SheetReference)
         ordered = isinstance(targets, Sequence)
@@ -101,7 +99,7 @@ class Graph(Persistent):
     def get_references_for_isheet(self, source, isheet: ISheet) -> dict:
         """ Get references of this source for one isheet only.
 
-        : return: dictionary with the following content:
+        :returns: dictionary with the following content:
                   key - isheet field name
                   value - reference targets
 
@@ -144,9 +142,9 @@ class Graph(Persistent):
     def is_in_subtree(self, descendant, ancestors: Iterable) -> bool:
         """Check whether a resource is in a subtree below other resources.
 
-        : param descendant: the candidate descendant
-        : param ancestors: the candidate ancestors
-        : returns: True if there exists a relation from one of the `ancestors`
+        :param descendant: the candidate descendant
+        :param ancestors: the candidate ancestors
+        :returns: True if there exists a relation from one of the `ancestors`
             to `descendant` that does NOT include any 'follows' links.
             For example, descendant might be an element of an element
             (of an element...) of an ancestor.
