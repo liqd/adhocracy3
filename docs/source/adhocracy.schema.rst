@@ -4,10 +4,6 @@ adhocracy.schema package
 Submodules
 ----------
 
-.. toctree::
-
-   adhocracy.schema.test_init
-
 Module contents
 ---------------
 

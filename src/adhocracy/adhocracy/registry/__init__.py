@@ -2,6 +2,7 @@
 from pyramid.security import has_permission
 from pyramid.path import DottedNameResolver
 from pyramid.testing import DummyResource
+from pyramid.request import Request
 from substanced.content import ContentRegistry
 
 from adhocracy.interfaces import IResource
@@ -47,22 +48,20 @@ class ResourceContentRegistry(ContentRegistry):
             wanted_sheets[sheet.meta.isheet.__identifier__] = sheet
         return wanted_sheets
 
-    def resources_metadata(self):
+    def resources_metadata(self) -> dict:
         """Get dictionary with all resource types and metadata.
 
-        Returns:
-            dict: resource types
+        :returns: resource types dictionary
 
-            example::
+        example ::
 
-                {'adhocracy.resources.IResourceA':
-                  {
-                    'name': "adhocracy.resources.IResourceA",
-                    'iface': adhocracy.resource.interface.IResourceA.__class__,
-                    'metadata': {"element_types": [...], ...}
-                  }
-                  ...
+            {'adhocracy.resources.IResourceA':
+                {
+                'name': "adhocracy.resources.IResourceA",
+                'iface': adhocracy.resource.interface.IResourceA.__class__,
+                'metadata': {"element_types": ..}
                 }
+            }
 
         """
         resource_types = {}
@@ -102,25 +101,23 @@ class ResourceContentRegistry(ContentRegistry):
 
         return isheets_meta
 
-    def resource_addables(self, context, request):
+    def resource_addables(self, context, request: Request) -> dict:
         """Get dictionary with addable resource types.
 
-        Args:
-            context (IResource): parent of the wanted child content
-            request (IRequest or None): request object for permission checks
+        :param context: parent of the wanted child content
+        :param request: request or None for permission checks
 
-        Returns:
-            dic: resource types with property sheet names
+        :returns: resource types with sheet identifier
 
-            The list is generated based on the 'element_types'
-            taggedValue, resource type interface inheritage and permissions.
+        The  sheet identifiers are generated based on the 'element_types'
+        resource type metadata, resource type inheritage and local permissions.
 
-            example::
+        example ::
 
-                {'adhocracy.resources.IResourceA':
-                    'sheets_mandatory': ['adhocracy.sheets.example.IA']
-                    'sheets_optional': ['adhocracy.sheets.example.IB']
-                }
+            {'adhocracy.resources.IResourceA':
+                'sheets_mandatory': ['adhocracy.sheets.example.IA']
+                'sheets_optional': ['adhocracy.sheets.example.IB']
+            }
 
         """
         assert IResource.providedBy(context)

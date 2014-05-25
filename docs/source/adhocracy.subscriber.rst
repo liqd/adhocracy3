@@ -4,10 +4,6 @@ adhocracy.subscriber package
 Submodules
 ----------
 
-.. toctree::
-
-   adhocracy.subscriber.test_init
-
 Module contents
 ---------------
 

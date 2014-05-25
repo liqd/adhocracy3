@@ -17,11 +17,11 @@ from adhocracy.interfaces import ISheet
 
 
 def find_graph(context) -> object:
-    """ Get the graph object to handle references.
+    """Get the graph object to handle references.
 
     :rtype adhocracy.graph.Grahp
     :returns: Graph for the root object in the
-              lineage of the ``context`` or None.
+    lineage of the ``context`` or None.
 
     """
     return acquire(context, '__graph__', None)

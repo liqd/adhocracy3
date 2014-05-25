@@ -4,10 +4,6 @@ adhocracy.registry package
 Submodules
 ----------
 
-.. toctree::
-
-   adhocracy.registry.test_init
-
 Module contents
 ---------------
 

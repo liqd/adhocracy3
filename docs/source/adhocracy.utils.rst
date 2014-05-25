@@ -4,10 +4,6 @@ adhocracy.utils package
 Submodules
 ----------
 
-.. toctree::
-
-   adhocracy.utils.test_utils
-
 Module contents
 ---------------
 

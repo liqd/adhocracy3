@@ -4,10 +4,6 @@ adhocracy.events package
 Submodules
 ----------
 
-.. toctree::
-
-   adhocracy.events.test_init
-
 Module contents
 ---------------
 

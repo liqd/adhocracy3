@@ -34,17 +34,22 @@ class SheetMetadata(namedtuple('SheetMetadata', SHEET_METADATA.keys())):
     Fields:
     -------
 
-    isheet: Marker interface for this sheet type, a subtype of :class ISheet:.
-            Subtype has to override.
-    sheet_class: :class IResourceSheet: implementation for this sheet
-    schema_class: :class colander.MappingSchema: to define the data structure
-                  for this sheet.
-                  Subtype must preserve the super type data structure.
-    permission_view: Permission to view or index this data.
-                     Subtype should override.
-    permission_edit: Permission to edit this data.
-                     Subtype should override.
-    readonly: This Sheet may not be used to set data
+    isheet:
+        Marker interface for this sheet type, a subtype of :class:`ISheet`.
+        Subtype has to override.
+    sheet_class:
+        :class:`IResourceSheet` implementation for this sheet
+    schema_class:
+        :class:`colander.MappingSchema` to define the sheet data structure.
+        Subtype must preserve the super type data structure.
+    permission_view:
+        Permission to view or index this data.
+        Subtype should override.
+    permission_edit:
+        Permission to edit this data.
+        Subtype should override.
+    readonly:
+        This Sheet may not be used to set data
 
     """
 
@@ -76,7 +81,7 @@ class IResourceSheet(IPropertySheet):
 
         :param cstruct: serialized application data (colander)
         :returns: appstruct: deserialized application data (colander)
-        :raises: :class colander.Invalid:
+        :raises: :class:`colander.Invalid`
 
         """
 
@@ -106,32 +111,45 @@ class ResourceMetadata(namedtuple('ResourceMetadata',
     Basic fields:
     -------------
 
-    content_name: Human readable name,
-                  subtypes have to override
-    iresource: the resource type interface,
-               subtypes have to override
-    content_class: Class to create content objects
-    permission_add: Permission to add this resource to the object hierarchy.
-    permission_view: Permission to view resource data and view in listings
-    is_implicit_addable: Make this type adddable if supertype is addable.
-    basic_sheets: Basic property interfaces to define data
-    extended_sheets: Extended property interfaces to define data,
-                     subtypes should override
-    after_creation: callables to run after creation. They are passed the
-                    instance being created and the registry.
-    use_autonaming: automatically generate the name if the new content object
-                    is added to the parent.
-    autonaming_prefix: uses this prefix for autonaming.
+    content_name:
+        Human readable name,
+        subtypes have to override
+    iresource:
+        Resource type interface,
+        subtypes have to override
+    content_class:
+        Class to create content objects
+    permission_add:
+        Permission to add this resource to the object hierarchy.
+    permission_view:
+        Permission to view resource data and view in listings
+    is_implicit_addable:
+        Make this type adddable if supertype is addable.
+    basic_sheets:
+        Basic property interfaces to define data
+    extended_sheets:
+            Extended property interfaces to define data,
+            subtypes should override
+    after_creation:
+        Callables to run after creation. They are passed the instance being
+        created and the registry.
+    use_autonaming:
+        Automatically generate the name if the new content object is added
+        to the parent.
+    autonaming_prefix:
+        uses this prefix for autonaming.
 
     IPool fields:
     -------------
 
-    element_types: Set addable content types, class heritage is honored.
+    element_types:
+        Set addable content types, class heritage is honored.
 
     IItem fields:
     -------------
 
-    item_type: Set addable content types, class heritage is honored
+    item_type:
+        Set addable content types, class heritage is honored
 
     """
 
@@ -163,7 +181,7 @@ class IPool(IResource):
     def get(name: str, default=None) -> object:
         """ Get subobject by name.
 
-        :raises `substanced.folder.FolderKeyError`: if name not in pool
+        :raises: :class:`substanced.folder.FolderKeyError` if name not in pool
         """
 
     def __contains__(name) -> bool:

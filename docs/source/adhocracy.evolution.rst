@@ -4,10 +4,6 @@ adhocracy.evolution package
 Submodules
 ----------
 
-.. toctree::
-
-   adhocracy.evolution.test_init
-
 Module contents
 ---------------
 
