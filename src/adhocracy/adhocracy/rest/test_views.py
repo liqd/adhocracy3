@@ -78,13 +78,6 @@ def make_resources_metadata(metadata):
             }
 
 
-@patch('substanced.objectmap.ObjectMap', autospec=True)
-def make_folder_with_objectmap(dummyobjectmap=None):
-    folder = testing.DummyResource()
-    folder.__objectmap__ = dummyobjectmap.return_value
-    return folder
-
-
 ##########
 #  tests #
 ##########

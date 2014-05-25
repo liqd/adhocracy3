@@ -1,26 +1,9 @@
-from unittest.mock import patch
 import unittest
 
 from pyramid import testing
 
 from adhocracy.interfaces import ISheet
 
-
-############
-#  helper  #
-############
-
-
-@patch('substanced.objectmap.ObjectMap', autospec=True)
-def make_folder_with_objectmap(dummyobjectmap=None):
-    folder = testing.DummyResource()
-    folder.__objectmap__ = dummyobjectmap.return_value
-    return folder
-
-
-##########
-#  tests #
-##########
 
 class SheetToSheetUnitTests(unittest.TestCase):
 
