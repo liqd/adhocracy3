@@ -38,7 +38,7 @@ class VersionableSchema(colander.MappingSchema):
 
     """ Versionable sheet data structure.
 
-    Set/get precssor (`follows`) and get successor (`followed_by`) versions
+    Set/get predecessor (`follows`) and get successor (`followed_by`) versions
     of this resource.
 
     """

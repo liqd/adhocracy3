@@ -153,7 +153,7 @@ class Graph(Persistent):
             to `descendant` that does NOT include any 'follows' links.
             For example, descendant might be an element of an element
             (of an element...) of an ancestor.
-            Also if descendant and of the ancestors are the same node.
+            Also if descendant and one of the ancestors are the same node.
 
             False otherwise.
 

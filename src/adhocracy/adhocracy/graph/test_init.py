@@ -497,7 +497,7 @@ class GetFollowsUnitTest(unittest.TestCase):
         graph = self.graph
         return Graph.get_follows(graph, context)
 
-    def test_precssors(self):
+    def test_predecessor(self):
         old = testing.DummyResource()
         self.graph.get_references.return_value = iter([(None, None, None, old)])
         follows = list(self._make_one(self.context))
@@ -506,7 +506,7 @@ class GetFollowsUnitTest(unittest.TestCase):
             == NewVersionToOldVersion
         assert follows == [old]
 
-    def test_no_precssors(self):
+    def test_no_predecessor(self):
         self.graph.get_references.return_value = iter([])
         follows = list(self._make_one(self.context))
         assert follows == []
