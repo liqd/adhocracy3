@@ -25,9 +25,9 @@ export interface ListingScope<Container, Element> {
 }
 
 export class ListingContainerAdapter {
-    static ContainerType: Types.Content<Resources.HasIPoolSheet>;
+    public ContainerType : Types.Content<Resources.HasIPoolSheet>;
 
-    static elemRefs(c: typeof ListingContainerAdapter.ContainerType) {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
+    public elemRefs(c : Types.Content<Resources.HasIPoolSheet>) : string[] {
         return c.data["adhocracy.sheets.pool.IPool"].elements;
     }
 }
@@ -45,7 +45,7 @@ export class ListingElementAdapter {
 
 export class Listing<Container extends ListingContainerAdapter, Element extends ListingElementAdapter> {
 
-    static templateUrl = "/Widgets/Listing.html";
+    static templateUrl: string = "/Widgets/Listing.html";
 
     constructor(private containerPath: string) {}
 
@@ -56,25 +56,25 @@ export class Listing<Container extends ListingContainerAdapter, Element extends 
             controller: ["$scope",
                          "adhHttp",
                          "adhHttp",  // FIXME(?): do we really want to duplicate adhHttp for the type system?
-                         function($scope: ListingScope<Container.ContainerType, Element.ElementType>  // FIXME: this refuses to typecheck.  :(
+                         function(// $scope: ListingScope<Container.ContainerType, Element.ElementType>  // FIXME: this refuses to typecheck.  :(
                                   // adhHttpC: AdhHttp.IService<>,
                                   // adhHttpE: AdhHttp.IService<>
                                  ) : void
                          {
-                                 /*
+                             /*
                              adhHttpC.get(this.containerPath).then((pool) => {
                                  $scope.container = pool;
                                  $scope.elements = [];
 
-                                   var elemRefs : string[] = containerAccess.elemRefs($scope.container);
-                                   for (var x in elemRefs) {
-                                   (function(x : number) {
-                                   adhHttpE.get(elemRefs[x]).then((element : Element)
-                                   => $scope.elements[x] = element);
-                                   })(x);
-                                   }
+                                 var elemRefs : string[] = containerAccess.elemRefs($scope.container);
+                                 for (var x in elemRefs) {
+                                     (function(x : number) {
+                                         adhHttpE.get(elemRefs[x]).then((element : Element)
+                                                                        => $scope.elements[x] = element);
+                                     })(x);
+                                 }
                              })
-                                 */
+                             */
                          }
                         ]
         }
