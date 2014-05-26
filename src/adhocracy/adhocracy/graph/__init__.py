@@ -170,7 +170,7 @@ class Graph(Persistent):
             return True
         checked_candidates.add(candidate.__oid__)
 
-        children = [r[3] for r in self.get_references(candidate)]
+        children = [ref.target for ref in self.get_references(candidate)]
         unchecked_children = [x for x in children
                               if x.__oid__ not in checked_candidates]
         for child in unchecked_children:
@@ -185,7 +185,7 @@ class Graph(Persistent):
         precessors = self.get_references(resource,
                                          base_reftype=NewVersionToOldVersion)
         for reference in precessors:
-            yield reference[3]
+            yield reference.target
 
     def get_followed_by(self, resource) -> Iterable:
         """Get Generator of the successors of a versionable resource."""
@@ -193,7 +193,7 @@ class Graph(Persistent):
             resource,
             base_reftype=NewVersionToOldVersion)
         for reference in successors:
-            yield reference[0]
+            yield reference.source
 
 
 def includeme(config):  # pragma: no cover

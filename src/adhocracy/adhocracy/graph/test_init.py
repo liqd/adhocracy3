@@ -498,8 +498,10 @@ class GetFollowsUnitTest(unittest.TestCase):
         return Graph.get_follows(graph, context)
 
     def test_predecessor(self):
+        from adhocracy.graph import Reference
         old = testing.DummyResource()
-        self.graph.get_references.return_value = iter([(None, None, None, old)])
+        self.graph.get_references.return_value = iter(
+            [Reference(None, None, None, old)])
         follows = list(self._make_one(self.context))
         assert self.graph.get_references.call_args[0][0] == self.context
         assert self.graph.get_references.call_args[1]['base_reftype']\
@@ -525,9 +527,10 @@ class GetFollowedByUnitTest(unittest.TestCase):
         return Graph.get_followed_by(graph, context)
 
     def test_sucessors(self):
+        from adhocracy.graph import Reference
         new = testing.DummyResource()
-        self.graph.get_back_references.return_value = iter([(new, None, None,
-                                                             None)])
+        self.graph.get_back_references.return_value = iter(
+            [Reference(new, None, None, None)])
         follows_by = list(self._make_one(self.context))
         assert self.graph.get_back_references.call_args[0][0] == self.context
         assert self.graph.get_back_references.call_args[1]['base_reftype'] ==\
@@ -535,7 +538,6 @@ class GetFollowedByUnitTest(unittest.TestCase):
         assert follows_by == [new]
 
     def test_no_sucessors(self):
-        new = testing.DummyResource()
         self.graph.get_back_references.return_value = iter([])
         follows_by = list(self._make_one(self.context))
         assert follows_by == []
