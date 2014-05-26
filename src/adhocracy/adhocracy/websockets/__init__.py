@@ -8,8 +8,10 @@ from logging import getLogger
 from autobahn.asyncio.websocket import WebSocketServerProtocol
 from autobahn.websocket.protocol import ConnectionRequest
 from substanced.util import get_oid
+import colander
 
 from adhocracy.interfaces import IResource
+from adhocracy.schema import AutomaticAbsolutePath
 
 
 logger = getLogger(__name__)
@@ -27,9 +29,22 @@ class WebSocketError(Exception):
         return '{}: {}'.format(self.error_type, self.details)
 
 
-class ClientRequest():
+class Action(colander.SchemaNode):
 
-    """A request received by a WebSocket client."""
+    """An action requested by a client."""
+
+    schema_type = colander.String
+    validator = colander.OneOf(['subscribe', 'unsubscribe'])
+
+
+class ClientRequestSchema(colander.Schema):
+
+    """Data structure for client requests."""
+
+    action = Action()
+    resource_path = AutomaticAbsolutePath()
+
+    # TODO convert resource paths to resources, cf. AbstractIterableOfPaths
 
     def __init__(self, action, resource_path):
         self._action = action
