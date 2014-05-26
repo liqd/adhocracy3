@@ -48,10 +48,7 @@ export class Listing<Container extends ListingContainerAdapter, Element extends 
 
     static templateUrl = "/Widgets/Listing.html";
 
-    // public containerPath : string;
-
-    constructor(path: string) {
-        // containerPath = path;
+    constructor(private containerPath: string) {
     }
 
     public factory = function() : ng.IDirective {
@@ -67,7 +64,7 @@ export class Listing<Container extends ListingContainerAdapter, Element extends 
                                  ) : void
                          {
                                  /*
-                             adhHttpC.get(containerPath).then((pool) => {
+                             adhHttpC.get(this.containerPath).then((pool) => {
                                  $scope.container = pool;
                                  $scope.elements = [];
 
