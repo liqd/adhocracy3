@@ -9,6 +9,7 @@ class NameDummySheetIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
+        self.config.include('adhocracy.sheets')
         self.config.include('adhocracy_sample.sheets.sample_sheets')
 
     def tearDown(self):
