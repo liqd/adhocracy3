@@ -134,7 +134,7 @@ def to_dotted_name(context) -> str:
     """Get the dotted name of `context`.
 
     :returns:
-        The dotted name of `context`, if it's a type.  If `context` is a string,
+        The dotted name of `context`, if it's a type.  If `context` is a string
         it is returned as is (since we suppose that it already
         represents a type name).
 
