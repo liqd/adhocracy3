@@ -43,7 +43,8 @@ def get_isheets(context) -> [IInterface]:
 def get_sheet(context, isheet: IInterface) -> IResourceSheet:
     """Get sheet adapter for the `isheet` interface.
 
-    :raises: `zope.component.ComponentLookupError`
+    :raises zope.component.ComponentLookupError:
+        if there is no sheet adapter registered for `isheet`.
 
     """
     return getAdapter(context, IResourceSheet, name=isheet.__identifier__)
@@ -53,7 +54,7 @@ def get_all_sheets(context) -> Iterator:
     """Get the sheet adapters for all ISheet interfaces of `context`.
 
     :returns: generator of :class:`adhocracy.interfaces.IResourceSheet` objects
-    :raises: `zope.component.ComponentLookupError`
+    :raises zope.component.ComponentLookupError:
 
     """
     isheets = get_isheets(context)

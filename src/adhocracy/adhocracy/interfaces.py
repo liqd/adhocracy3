@@ -81,7 +81,7 @@ class IResourceSheet(IPropertySheet):
 
         :param cstruct: serialized application data (colander)
         :returns: appstruct: deserialized application data (colander)
-        :raises: :class:`colander.Invalid`
+        :raises colander.Invalid:
 
         """
 
@@ -181,7 +181,7 @@ class IPool(IResource):
     def get(name: str, default=None) -> object:
         """ Get subobject by name.
 
-        :raises: :class:`substanced.folder.FolderKeyError` if name not in pool
+        :raises substanced.folder.FolderKeyError: if `name` is not in this pool
         """
 
     def __contains__(name) -> bool:
@@ -199,14 +199,15 @@ class IPool(IResource):
         """ Check and modify the name passed for validity.
 
         :returns: The name (with any needed modifications).
-        :raises: :class:`substanced.folder.FolderKeyError`
+        :raises substanced.folder.FolderKeyError:
+            if 'name' already exists in this pool.
         """
 
     def next_name(subobject, prefix='') -> str:
         """Return Name for subobject."""
 
     def add_next(subobject, prefix='') -> str:
-        """Add new subobject and autgenerate name."""
+        """Add new subobject and auto generate name."""
 
 
 class IItem(IPool):
