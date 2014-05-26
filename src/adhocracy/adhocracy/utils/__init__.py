@@ -3,6 +3,7 @@ from functools import reduce
 import copy
 import json
 import pprint
+from collections.abc import Iterator
 
 from pyramid.compat import is_nonstr_iter
 from substanced.util import get_dotted_name
@@ -48,10 +49,10 @@ def get_sheet(context, isheet: IInterface) -> IResourceSheet:
     return getAdapter(context, IResourceSheet, name=isheet.__identifier__)
 
 
-def get_all_sheets(context) -> [IResourceSheet]:
+def get_all_sheets(context) -> Iterator:
     """Get the sheet adapters for all ISheet interfaces of `context`.
 
-    :rtype: :class:`types.GeneratorType`
+    :returns: generator of :class:`adhocracy.interfaces.IResourceSheet` objects
     :raises: `zope.component.ComponentLookupError`
 
     """

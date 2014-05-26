@@ -3,6 +3,7 @@
 from collections import Sequence
 from collections import Iterable
 from collections import namedtuple
+from collections.abc import Iterator
 
 from persistent import Persistent
 from substanced.util import find_objectmap
@@ -15,11 +16,14 @@ from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import NewVersionToOldVersion
 
 
-_isheet_reftype = namedtuple('ISheetReftype', 'isheet field reftype')
+class SheetReftype(namedtuple('ISheetReftype', 'isheet field reftype')):
+
+    """Fields: isheet field reftype."""
 
 
 class Reference(namedtuple('Reference', 'source isheet field target')):
-    pass
+
+    """Fields: source isheet field target."""
 
 
 class Graph(Persistent):
@@ -38,12 +42,13 @@ class Graph(Persistent):
         self._objectmap = find_objectmap(root)
 
     def get_reftypes(self, base_isheet=ISheet,
-                     base_reftype=SheetReference) -> [_isheet_reftype]:
+                     base_reftype=SheetReference) -> Iterator:
         """Collect all used SheetReferenceTypes.
 
         :param base_reftype: Skip types that are not subclasses of this.
         :param base_isheet: Skip types with a source isheet that is not a
                             subclass of this.
+        :returns: Generator of :class:`adhocracy.graph.SheetReftype`
         """
         if not self._objectmap:
             return []
@@ -59,7 +64,7 @@ class Graph(Persistent):
             if not isheet.isOrExtends(base_isheet):
                 continue
             field = reftype.queryTaggedValue('source_isheet_field')
-            yield _isheet_reftype(isheet, field, reftype)
+            yield SheetReftype(isheet, field, reftype)
 
     def set_references(self, source, targets: Iterable,
                        reftype: SheetReference):
@@ -81,16 +86,16 @@ class Graph(Persistent):
         multireference.connect(targets)
 
     def get_references(self, source, base_isheet=ISheet,
-                       base_reftype=SheetToSheet) -> [Reference]:
-        """Get generator with :class:`References`s of this source."""
+                       base_reftype=SheetToSheet) -> Iterator:
+        """Get generator of :class:`Reference` with this `source`."""
         for isheet, field, reftype in self.get_reftypes(base_isheet,
                                                         base_reftype):
             for target in ObjectMap.targets(self._objectmap, source, reftype):
                 yield Reference(source, isheet, field, target)
 
     def get_back_references(self, target, base_isheet=ISheet,
-                            base_reftype=SheetToSheet) -> [Reference]:
-        """Get generator with :class:`Reference`s with this target."""
+                            base_reftype=SheetToSheet) -> Iterator:
+        """Get generator of :class:`Reference` with this `target`."""
         for isheet, field, reftype in self.get_reftypes(base_isheet,
                                                         base_reftype):
             for source in ObjectMap.sources(self._objectmap, target, reftype):
@@ -125,7 +130,7 @@ class Graph(Persistent):
         return self._make_references_for_isheet(references,
                                                 orientation='sources')
 
-    def _make_references_for_isheet(self, references: [Reference],
+    def _make_references_for_isheet(self, references: Iterable,
                                     orientation='sources') -> dict:
         references_isheet = {}
         for source, isheet, field, target in references:
@@ -159,7 +164,7 @@ class Graph(Persistent):
         return False
 
     def _is_candidate_ancestor(self, candidate, descendant,
-                               checked_candidates: {int}) -> bool:
+                               checked_candidates: set) -> bool:
         """Return True if candidate is ancestor of descendant."""
         if candidate is descendant:
             return True
