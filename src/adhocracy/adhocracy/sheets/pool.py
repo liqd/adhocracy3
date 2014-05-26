@@ -14,25 +14,18 @@ class PoolSheet(GenericResourceSheet):
 
     """Pool resource sheet."""
 
-    def get(self):
-        """Get appstruct."""
-        struct = super().get()
-        elements = []
-        reftype = self.schema['elements'].reftype
+    def _get_reference_appstruct(self):
+        struct = {'elements': []}
+        reftype = self._key_reftype_map['elements']
         target_isheet = reftype.getTaggedValue('target_isheet')
         for child in self.context.values():
             if target_isheet.providedBy(child):
-                elements.append(child)
-        struct['elements'] = elements
+                struct['elements'].append(child)
         return struct
 
-    def set(self, struct, omit=()):
+    def set(self, appstruct, omit=()):
         """Store appstruct."""
-        raise HTTPNotImplemented()
-
-    def validate_cstruct(self, cstruct):
-        """Return None."""
-        raise HTTPNotImplemented()
+        raise HTTPNotImplemented
 
 
 class IPool(ISheet):

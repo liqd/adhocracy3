@@ -42,7 +42,7 @@ class GenericResourceSheet(PropertySheet):
         return self.context._propertysheets[self._data_key]
 
     @property
-    def _references(self):
+    def _key_reftype_map(self):
         refs = {}
         for child in self.schema:
             if isinstance(child, AbstractReferenceIterable):
@@ -67,7 +67,7 @@ class GenericResourceSheet(PropertySheet):
         appstruct = {}
         default = self._get_default_appstruct()
         for key, default_value in default.items():
-            if key not in self._references:
+            if key not in self._key_reftype_map:
                 appstruct[key] = self._data.get(key, default_value)
         return appstruct
 
@@ -80,7 +80,7 @@ class GenericResourceSheet(PropertySheet):
                 self.meta.isheet)
         default = self._get_default_appstruct()
         for key, default_value in default.items():
-            if key in self._references:
+            if key in self._key_reftype_map:
                 appstruct[key] = references.get(key, default_value)
         return appstruct
 
@@ -107,8 +107,8 @@ class GenericResourceSheet(PropertySheet):
         if not self._graph:
             return
         for key, targets in appstruct.items():
-            if key in self._references:
-                reftyp = self._references[key]
+            if key in self._key_reftype_map:
+                reftyp = self._key_reftype_map[key]
                 self._graph.set_references(self.context, targets, reftyp)
 
     def _store_non_references(self, appstruct):

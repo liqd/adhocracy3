@@ -28,8 +28,6 @@ class PoolSheetUnitTest(unittest.TestCase):
         assert isinstance(inst, PoolSheet)
         assert verifyObject(IResourceSheet, inst) is True
         with pytest.raises(HTTPNotImplemented):
-            inst.validate_cstruct({})
-        with pytest.raises(HTTPNotImplemented):
             inst.set({})
 
     def test_get_empty(self):
