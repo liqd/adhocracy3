@@ -26,60 +26,78 @@ export interface ListingScope<Container, Element> {
 
 export class ListingContainerAdapter {
     public ContainerType : Types.Content<Resources.HasIPoolSheet>;
+    static ContainerType : Types.Content<Resources.HasIPoolSheet>;  // FIXME: this is silly!
 
-    public elemRefs(c : Types.Content<Resources.HasIPoolSheet>) : string[] {
+    public elemRefs(c : typeof ListingContainerAdapter.ContainerType) : string[] {  // FIXME: argument type should be something like 'self.ContainerType'.
         return c.data["adhocracy.sheets.pool.IPool"].elements;
     }
 }
 
 export class ListingElementAdapter {
+    public ElementType: Types.Content<any>;
     static ElementType: Types.Content<any>;
 
-    static name(e: typeof ListingElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
+    public name(e: typeof ListingElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
         return "[content type " + e.content_type + ", resource " + e.path + "]"
     }
-    static path(e: typeof ListingElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
+    public path(e: typeof ListingElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
         return e.path;
     }
 }
 
-export class Listing<Container extends ListingContainerAdapter, Element extends ListingElementAdapter> {
+export class Listing<ContainerAdapter extends ListingContainerAdapter, ElementAdapter extends ListingElementAdapter> {
 
     static templateUrl: string = "/Widgets/Listing.html";
 
     constructor(private containerPath: string) {}
 
-    public factory = function() : ng.IDirective {  // FIXME: factory might be misinterpreted as "ListingFactory"
+    public factory = function() : ng.IDirective {
+        // FIXME: "factory" might be misinterpreted as "ListingFactory".
+        // possible solutions: (1) rename; (2) implement Listing class
+        // such that the instance type is '() => IDirective', and no
+        // factory method is needed.
+
+        var containerAdapter: ContainerAdapter = null;  // FIXME: i want to instantiate this, but i don't know how!
+        var elementAdapter: ElementAdapter = null;
+
         return {
             restrict: "E",
             templateUrl: templatePath + "/" + Listing.templateUrl,  // FIXME: "s/Listing./self./"?
             controller: ["$scope",
                          "adhHttp",
                          "adhHttp",  // FIXME(?): do we really want to duplicate adhHttp for the type system?
-                         function(// $scope: ListingScope<Container.ContainerType, Element.ElementType>  // FIXME: this refuses to typecheck.  :(
-                                  // adhHttpC: AdhHttp.IService<>,
-                                  // adhHttpE: AdhHttp.IService<>
+                         function($scope: ListingScope<typeof containerAdapter.ContainerType, typeof elementAdapter.ElementType>,
+                                  adhHttpC: AdhHttp.IService<typeof containerAdapter.ContainerType>,
+                                  adhHttpE: AdhHttp.IService<typeof elementAdapter.ElementType>
                                  ) : void
                          {
-                             /*
                              adhHttpC.get(this.containerPath).then((pool) => {
                                  $scope.container = pool;
                                  $scope.elements = [];
 
-                                 var elemRefs : string[] = containerAccess.elemRefs($scope.container);
+                                 var elemRefs : string[] = containerAdapter.elemRefs($scope.container);
                                  for (var x in elemRefs) {
                                      (function(x : number) {
-                                         adhHttpE.get(elemRefs[x]).then((element : Element)
+                                         adhHttpE.get(elemRefs[x]).then((element: typeof elementAdapter.ElementType)
                                                                         => $scope.elements[x] = element);
                                      })(x);
                                  }
                              })
-                             */
                          }
                         ]
         }
     }
 }
+
+
+
+@@ // next: don't pass adapter *types* to class, but adapter *values*
+   // to class constructor method.  this resolves the problem that
+   // right now we cannot instantiate the adapters, which is required
+   // to get to the instance attributes.
+   //
+   // that still leaves a bunch of inheritance issues unresolved, but
+   // one problem at a time...
 
 
 
