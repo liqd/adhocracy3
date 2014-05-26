@@ -125,9 +125,16 @@ export function wgtListingDocument(path:       string,
 
 // FIXME: with the current design, if we want to change the element
 // template / directive, we need to change the container template,
-// because the element directive is used there as a constant.  i don't
-// see any way to avoid this, but we should think about it some more.
-// -mf
+// because the element directive is used there as a constant.
+//
+// there should be a good solution to this.  possible options: (1) the
+// element adapter needs to provide an injection function that takes
+// the template and string-replaces the directive name in the template
+// with one that suis the adapter.  (2) the adapter has a method that
+// registers a new directive <listing-row element={element}>
+// (preferably locally).  the listing template is only rendered after
+// that directive is registered.  (3) ...?
+
 
 
 // FIXME: heterogenous lists?
