@@ -2,16 +2,9 @@
 <ol>
     <li ng-repeat="element in elements">
 
-        <div ng-if="element.data.has_key('adhocracy_sample.sheets.document.IDocument')">
-            <wdg-listing-row-title document="${element.data['adhocracy_sample.sheets.document.IDocument']}"/>
-        </div>
+        <a hef="${ListingElementAdapter.path(element)}">${ListingElementAdapter.name(element)}</a>
 
-        <!-- administrative actions -->
-        <div>
-            <div ng-repeat="property_sheet in ... | filter()">
-
-            </div>
-        </div>
-
+        <!-- FIXME: ListingElementAdapter is not the place to find methods name and path! -->
+        <!-- FIXME: move row rendering to separate widget! -->
     </li>
 </ol>

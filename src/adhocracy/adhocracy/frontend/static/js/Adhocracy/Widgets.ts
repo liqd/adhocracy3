@@ -1,3 +1,4 @@
+
 /// <reference path="../../submodules/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../submodules/DefinitelyTyped/underscore/underscore.d.ts"/>
@@ -15,40 +16,7 @@ import AdhCache = require("Adhocracy/Services/Cache");
 
 import Resources = require("Adhocracy/Resources");
 
-var templatePath : string = "/frontend_static/templates";
-
-
-
-/*
-
-  widgets are directive factories.  sort of...
-
-  in:
-     path to pool
-       easy
-  out:
-     directive object
-       also  contains accessor methods for content.  then those could be
-       overloaded.
-
-i think i like that idea good enough to implement it for listing.
-
-*/
-
-   // ok, type system trouble.  but it's clear why: the controller
-   // must not see the content types, but call the accessor methods
-   // and put whatever it finds there into a scope that always has the
-   // same type.
-   //
-   // if, the widget is cloned and should change acceptable content
-   // types, only the accessor methods need to be overloaded.  if the
-   // behaviour should be changed, only controller and/or templateUrl
-   // need to be overloaded.  (what if i want to recycle most of the
-   // controller, but still extend it?)
-   //
-   // how can the type system be used to elegantly require a certain
-   // set of mandatory (and, ideally, a certain set of optional)
-   // property sheets?
+var templatePath : string = "/frontend_static/templates";  // FIXME: move this to config file.
 
 
 export interface ListingScope<Container, Element> {
@@ -56,65 +24,68 @@ export interface ListingScope<Container, Element> {
     elements: Element[];
 }
 
-export interface ListingContainer extends Types.Content<any>, Resources.HasIPoolSheet {};
+export class ListingContainerAdapter {
+    static ContainerType: Types.Content<Resources.HasIPoolSheet>;
 
-export interface ListingElement extends Types.Content<any> {};
-
-export interface Listing<Container, Element> extends ng.IDirective {
-    containerAccess: {
-        elemRefs: (c: Container) => string[]
-    };
-    elementAccess: {
-        name: (e: Element) => string;
-        path: (e: Element) => string;
-    };
+    static elemRefs(c: typeof ListingContainerAdapter.ContainerType) {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
+        return c.data["adhocracy.sheets.pool.IPool"].elements;
+    }
 }
 
-export function listing(containerPath : string) {
-    function factory() : Listing<ListingContainer, ListingElement>
-    {
-        return {
-            restrict: "E",
-            templateUrl: templatePath + "/Widgets/Listing.html",
-            controller: ["$scope",
-                         "adhHttp",
-                         "adhHttp",
-                         function($scope: ListingScope<ListingContainer, ListingElement>,
-                                  adhHttpC: AdhHttp.IService<ListingContainer>,
-                                  adhHttpE: AdhHttp.IService<ListingElement>
-                                 ) : void
-                {
-                    adhHttpC.get(containerPath).then((pool) => {
-                        $scope.container = pool;
-                        $scope.elements = [];
+export class ListingElementAdapter {
+    static ElementType: Types.Content<any>;
 
-                        var elemRefs : string[] = this.containerAccess.elemRefs($scope.container);
-                        for (var x in elemRefs) {
-                            (function(x : number) {
-                                adhHttpE.get(elemRefs[x]).then((element : ListingElement) => $scope.elements[x] = element);
-                            })(x);
-                        }
-                    })
-                }
-            ],
-            containerAccess: {
-                elemRefs: function(c: ListingContainer) {
-                    return c.data["adhocracy.sheets.pool.IPool"].elements;
-                }
-            },
-            elementAccess: {
-                name: function(e: ListingElement) {
-                    return "[content type " + e.content_type + ", resource " + e.path + "]"
-                },
-                path: function(e: ListingElement) {
-                    return e.path;
-                }
-            }
-        }
+    static name(e: typeof ListingElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
+        return "[content type " + e.content_type + ", resource " + e.path + "]"
+    }
+    static path(e: typeof ListingElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
+        return e.path;
+    }
+}
+
+export class Listing<Container extends ListingContainerAdapter, Element extends ListingElementAdapter> {
+    self: ng.IDirective;
+
+    static templateUrl = "/Widgets/Listing.html";
+
+    // public containerPath : string;
+
+    constructor(path: string) {
+        // containerPath = path;
     }
 
-    return factory;
+    public factory = function() : ng.IDirective {
+        return {
+            restrict: "E",
+            templateUrl: templatePath + "/" + Listing.templateUrl,  // FIXME: "s/Listing./self./"?
+            controller: ["$scope",
+                         "adhHttp",
+                         "adhHttp",  // FIXME(?): do we really want to duplicate adhHttp for the type system?
+                         function($scope: ListingScope<Container.ContainerType, Element.ElementType>  // FIXME: this refuses to typecheck.  :(
+                                  // adhHttpC: AdhHttp.IService<>,
+                                  // adhHttpE: AdhHttp.IService<>
+                                 ) : void
+                         {
+                                 /*
+                             adhHttpC.get(containerPath).then((pool) => {
+                                 $scope.container = pool;
+                                 $scope.elements = [];
+
+                                   var elemRefs : string[] = containerAccess.elemRefs($scope.container);
+                                   for (var x in elemRefs) {
+                                   (function(x : number) {
+                                   adhHttpE.get(elemRefs[x]).then((element : Element)
+                                   => $scope.elements[x] = element);
+                                   })(x);
+                                   }
+                             })
+                                 */
+                         }
+                        ]
+        }
+    }
 }
+
 
 
 /*
@@ -148,3 +119,32 @@ export function wgtListingDocument(path:       string,
 }
 
 */
+
+
+
+
+// FIXME: with the current design, if we want to change the element
+// template / directive, we need to change the container template,
+// because the element directive is used there as a constant.  i don't
+// see any way to avoid this, but we should think about it some more.
+// -mf
+
+
+// FIXME: heterogenous lists?
+//
+// rationale: on the one hand, we want to be able to restrict element
+// types in the implementation of the listing and row widgets.  this
+// has the benefit of giving concise implementations for specific
+// container and element types, and makes the task of deriving new
+// such types much less complex and much more robust.
+//
+// on the other hand, we want to allow for lists that contain a wide
+// range of different elements in different rows, and we want to
+// dispatch a different widget for each row individually.  this is the
+// idea of hetergenous containers, and it can be easily implemented
+// with a class HeterogenousListingElementAdapter that extends
+// ListingElementAdapter.
+
+
+// FIXME: good dynamic type error handling?
+
