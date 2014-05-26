@@ -49,7 +49,7 @@ export class Listing<Container extends ListingContainerAdapter, Element extends 
 
     constructor(private containerPath: string) {}
 
-    public factory = function() : ng.IDirective {
+    public factory = function() : ng.IDirective {  // FIXME: factory might be misinterpreted as "ListingFactory"
         return {
             restrict: "E",
             templateUrl: templatePath + "/" + Listing.templateUrl,  // FIXME: "s/Listing./self./"?
