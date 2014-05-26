@@ -122,4 +122,20 @@ def test_to_dotted_name_dotted_string():
     from . import to_dotted_name
     assert to_dotted_name('os.walk') == 'os.walk'
 
+
+def test_remove_keys_from_dict_with_keys_to_remove():
+    from adhocracy.utils import remove_keys_from_dict
+    dictionary = {'key': 'value',
+                  'other_key': 'value'}
+    assert remove_keys_from_dict(dictionary, keys_to_remove=('key',))\
+        == {'other_key': 'value'}
+
+
+def test_remove_keys_from_dict_with_single_key_to_remove():
+    from adhocracy.utils import remove_keys_from_dict
+    dictionary = {'key': 'value',
+                  'other_key': 'value'}
+    assert remove_keys_from_dict(dictionary, keys_to_remove='key')\
+        == {'other_key': 'value'}
+
 #FIXME tests for get_sheet, get_all_sheets are missing

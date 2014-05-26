@@ -1,7 +1,6 @@
 """Adhocarcy sheets."""
 from persistent.mapping import PersistentMapping
 import colander
-from pyramid.compat import is_nonstr_iter
 from pyramid.registry import Registry
 from substanced.property import PropertySheet
 from zope.interface import implementer
@@ -12,6 +11,7 @@ from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import sheet_metadata
 from adhocracy.interfaces import SheetMetadata
 from adhocracy.schema import AbstractReferenceIterable
+from adhocracy.utils import remove_keys_from_dict
 
 
 @implementer(IResourceSheet)
@@ -86,22 +86,11 @@ class GenericResourceSheet(PropertySheet):
 
     def set(self, appstruct: dict, omit=()) -> bool:
         """Store appstruct."""
-        struct = self._omit_keys_from_dict(appstruct, omit)
+        struct = remove_keys_from_dict(appstruct, keys_to_remove=omit)
         self._store_references(struct)
         self._store_non_references(struct)
         # FIXME: only store struct if values have changed
         return bool(struct)
-
-    def _omit_keys_from_dict(self, dictionary: dict, omit=()) -> dict:
-        copy = {}
-        # The interface for the set method allows the omit parameter to be
-        # a tuple or a str. So we have to check this.
-        if not is_nonstr_iter(omit):
-            omit = (omit,)
-        for key, value in dictionary.items():
-            if key not in omit:
-                copy[key] = value
-        return copy
 
     def _store_references(self, appstruct):
         if not self._graph:
@@ -115,7 +104,7 @@ class GenericResourceSheet(PropertySheet):
         self._data.update(appstruct)
 
     def validate_cstruct(self, cstruct: dict) -> dict:
-        """Valiate schema :term:`cstruct`."""
+        """Validate schema :term:`cstruct`."""
         # FIXME: this method does not validate, it`s deserializing instead.
         for child in self.schema:
             if getattr(child, 'readonly', False):

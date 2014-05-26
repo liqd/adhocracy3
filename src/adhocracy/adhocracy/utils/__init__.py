@@ -4,6 +4,7 @@ import copy
 import json
 import pprint
 
+from pyramid.compat import is_nonstr_iter
 from substanced.util import get_dotted_name
 from substanced.util import acquire
 from zope.component import getAdapter
@@ -135,3 +136,18 @@ def to_dotted_name(context) -> str:
         return context
     else:
         return get_dotted_name(context)
+
+
+def remove_keys_from_dict(dictionary: dict, keys_to_remove=()) -> dict:
+    """Remove keys from `dictionary`.
+
+    :param keys_to_remove: Tuple with keys or one key
+
+    """
+    if not is_nonstr_iter(keys_to_remove):
+        keys_to_remove = (keys_to_remove,)
+    dictionary_copy = {}
+    for key, value in dictionary.items():
+        if key not in keys_to_remove:
+            dictionary_copy[key] = value
+    return dictionary_copy
