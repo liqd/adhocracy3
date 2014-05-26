@@ -1,44 +1,46 @@
 """adhocracy.event event subcriber to handle auto updates of resources."""
 
-from copy import deepcopy
+from pyramid.threadlocal import get_current_registry
 
-from adhocracy.graph import is_in_subtree
-from adhocracy.interfaces import IResource
+from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.sheets.versions import IVersionable
 from adhocracy.utils import get_sheet
 from adhocracy.utils import get_all_sheets
-from adhocracy.utils import get_resource_interface
-from adhocracy.utils import get_all_taggedvalues
+from adhocracy.utils import get_iresource
+from adhocracy.utils import find_graph
 
 
 def _get_not_readonly_appstructs(resource):
     # FIXME maybe move this to utils or better use resource registry
     appstructs = {}
     for sheet in get_all_sheets(resource):
-        if not sheet.readonly:
-            appstructs[sheet.iface.__identifier__] = sheet.get()
+        if not sheet.meta.readonly:
+            appstructs[sheet.meta.isheet.__identifier__] = sheet.get()
     return appstructs
 
 
 def _update_versionable(resource, isheet, appstruct, root_versions):
-    from adhocracy.resources import ResourceFactory  # make unit test mock work
-    if root_versions and not is_in_subtree(resource, root_versions):
+    graph = find_graph(resource)
+    if root_versions and not graph.is_in_subtree(resource, root_versions):
         return resource
     else:
+        registry = get_current_registry()
         appstructs = _get_not_readonly_appstructs(resource)
-        appstructs[IVersionable.__identifier__]['follows'] = [resource.__oid__]
+        appstructs[IVersionable.__identifier__]['follows'] = [resource]
         appstructs[isheet.__identifier__] = appstruct
-        iresource = get_resource_interface(resource)
-        return ResourceFactory(iresource)(parent=resource.__parent__,
-                                          appstructs=appstructs,
-                                          options=root_versions)
+        iresource = get_iresource(resource)
+        new_resource = registry.content.create(iresource.__identifier__,
+                                               parent=resource.__parent__,
+                                               appstructs=appstructs,
+                                               options=root_versions)
+        return new_resource
 
 
 def _update_resource(resource, isheet, appstruct):
     sheet = get_sheet(resource, isheet)
-    if not sheet.readonly:
+    if not sheet.meta.readonly:
         sheet.set(appstruct)
         # FIXME: make sure modified event is send
     return resource
@@ -52,21 +54,20 @@ def reference_has_new_version_subscriber(event):
 
     """
     assert ISheetReferencedItemHasNewVersion.providedBy(event)
-    assert IResource.providedBy(event.object)
+    from adhocracy.utils import get_sheet
     resource = event.object
     root_versions = event.root_versions
     isheet = event.isheet
-    readonly = get_all_taggedvalues(isheet)['readonly']
+    sheet = get_sheet(resource, isheet)
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
 
-    if autoupdate and not readonly:
-        sheet = get_sheet(resource, isheet)
-        appstruct = deepcopy(sheet.get())
+    if autoupdate and not sheet.meta.readonly:
+        appstruct = sheet.get()
         field = appstruct[event.isheet_field]
-        old_version_index = field.index(event.old_version_oid)
+        old_version_index = field.index(event.old_version)
         field.pop(old_version_index)
-        field.insert(old_version_index, event.new_version_oid)
-        if IVersionable.providedBy(resource):
+        field.insert(old_version_index, event.new_version)
+        if IItemVersion.providedBy(resource):
             _update_versionable(resource, isheet, appstruct, root_versions)
         else:
             _update_resource(resource, isheet, appstruct)

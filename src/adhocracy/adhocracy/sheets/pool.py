@@ -1,75 +1,64 @@
 """Pool Sheet."""
-from pyramid.path import DottedNameResolver
+import colander
 from pyramid.httpexceptions import HTTPNotImplemented
-from substanced.util import get_oid
-from zope.interface import provider
-from zope.interface import taggedValue
-from zope.interface import implementer
-from zope.interface.interfaces import IInterface
 
 from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import SheetToSheet
-from adhocracy.sheets import ResourcePropertySheetAdapter
-from adhocracy.schema import ReferenceListSchemaNode
+from adhocracy.sheets import GenericResourceSheet
+from adhocracy.sheets import sheet_metadata_defaults
+from adhocracy.sheets import add_sheet_to_registry
+from adhocracy.schema import ListOfUniqueReferences
 
 
-class IIPool(IInterface):
+class PoolSheet(GenericResourceSheet):
 
-    """Marker interfaces to register the pool propertysheet adapter."""
+    """Pool resource sheet."""
+
+    def _get_reference_appstruct(self):
+        struct = {'elements': []}
+        reftype = self._key_reftype_map['elements']
+        target_isheet = reftype.getTaggedValue('target_isheet')
+        for child in self.context.values():
+            if target_isheet.providedBy(child):
+                struct['elements'].append(child)
+        return struct
+
+    def set(self, appstruct, omit=()):
+        """Store appstruct."""
+        raise HTTPNotImplemented
 
 
-@provider(IIPool)
 class IPool(ISheet):
 
-    """Get listing with child objects of this resource."""
-
-    taggedValue('readonly', True)
-    taggedValue('field:elements',
-                ReferenceListSchemaNode(
-                    reftype='adhocracy.sheets.pool.IPoolElementsReference',
-                ))
+    """Marker interface for the pool sheet."""
 
 
-class IPoolElementsReference(SheetToSheet):
+class PoolElementsReference(SheetToSheet):
 
-    """IPool reference."""
+    """Pool sheet elements reference."""
 
     source_isheet = IPool
     source_isheet_field = 'elements'
     target_isheet = ISheet
 
 
-@implementer(IResourcePropertySheet)
-class PoolPropertySheetAdapter(ResourcePropertySheetAdapter):
+class PoolSchema(colander.MappingSchema):
 
-    """Adapts Pool resource  to substanced PropertySheet."""
+    """Pool sheet data structure.
 
-    def get(self):
-        """Return data struct."""
-        struct = super(PoolPropertySheetAdapter, self).get()
-        elements = []
-        res = DottedNameResolver()
-        reftype_ = self.schema['elements'].reftype
-        reftype = res.maybe_resolve(reftype_)
-        isheet = reftype.getTaggedValue('target_isheet')
-        for v in self.context.values():
-            if isheet.providedBy(v):
-                elements.append(get_oid(v))
-        struct['elements'] = elements
-        return struct
+    `elements`: children of this resource (object hierarchy).
 
-    def set(self, struct, omit=()):
-        """Return None."""
-        raise HTTPNotImplemented()
+    """
 
-    def validate_cstruct(self, cstruct):
-        """Return None."""
-        raise HTTPNotImplemented()
+    elements = ListOfUniqueReferences(reftype=PoolElementsReference)
+
+
+pool_metadata = sheet_metadata_defaults._replace(isheet=IPool,
+                                                 schema_class=PoolSchema,
+                                                 sheet_class=PoolSheet,
+                                                 readonly=True)
 
 
 def includeme(config):
     """Register adapter."""
-    config.registry.registerAdapter(PoolPropertySheetAdapter,
-                                    (IPool, IIPool),
-                                    IResourcePropertySheet)
+    add_sheet_to_registry(pool_metadata, config.registry)

@@ -1,4 +1,4 @@
-adhocracy.folder package
+adhocracy.events package
 ========================
 
 Submodules
@@ -7,7 +7,7 @@ Submodules
 Module contents
 ---------------
 
-.. automodule:: adhocracy.folder
+.. automodule:: adhocracy.events
     :members:
     :undoc-members:
-    
+    :show-inheritance:

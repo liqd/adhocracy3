@@ -33,8 +33,9 @@ Docstring formatting
 ++++++++++++++++++++
 
 * pep257 (must, bei tests und zope.Interface classes should)
-* python 3 type annotation (must) according to https://pypi.python.org/pypi/sphinx_annotations_autodoc and https://pypi.python.org/pypi/sphinx_typesafe
-* javadoc-style annotations for parameter descriptions, see
+* python 3 type annotation (must) according to
+  https://pypi.python.org/pypi/sphinx_typesafe
+* javadoc-style parameter descriptions, see
   http://sphinx-doc.org/domains.html#info-field-lists (should)
 * example::
    

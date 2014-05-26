@@ -1,12 +1,11 @@
 """Colander schema extensions."""
-from pyramid.path import DottedNameResolver
+from pyramid.traversal import resource_path
+from pyramid.traversal import find_resource
 from substanced import schema
-from substanced.objectmap import reference_sourceid_property
 from substanced.schema import IdSet
-from substanced.util import find_objectmap
 import colander
 
-from adhocracy.interfaces import SheetReferenceType
+from adhocracy.interfaces import SheetReference
 
 
 class Identifier(colander.SchemaNode):
@@ -33,14 +32,14 @@ class AbsolutePath(colander.SchemaNode):
     validator = colander.Regex(u'^/[a-zA-Z0-9\_\-\.\/]+$')
 
 
-class AbstractPathIterable(IdSet):
+class AbstractIterableOfPaths(IdSet):
 
     """Abstract Colander type to store multiple object paths.
 
-    Serialize to a list of absolute object paths (['/o1/o2', '/o3']).
-    Deserialize to an iterable of zodb oids [123123, 4324324].
+    Serialize a list of ILocation aware objects to paths (['/o1/o2', '/o3']).
+    Deserialize to an iterable of objects.
 
-    Raise colander.Invalid if path or oid does not exist.
+    Raise colander.Invalid if path does not exist.
 
     Child classes must overwrite the `create_empty_appstruct` and
     `add_to_appstruct` methods for the specific iterable to use for
@@ -56,8 +55,12 @@ class AbstractPathIterable(IdSet):
         """Add an element to the container to used to store paths."""
         raise NotImplementedError()  # pragma: no cover
 
+    def _raise_attribute_error_if_not_location_aware(self, context):
+        context.__parent__
+        context.__name__
+
     def serialize(self, node, value):
-        """Serialize oid to path.
+        """Serialize object to path with 'pyramid.traveral.resource_path'.
 
         Return list with paths.
 
@@ -65,45 +68,49 @@ class AbstractPathIterable(IdSet):
         if value is colander.null:
             return value
         self._check_iterable(node, value)
-        context = node.bindings['context']
-        object_map = find_objectmap(context)
         paths = []
-        for oid in value:
-            path_tuple = object_map.path_for(oid)
-            if path_tuple is None:
-                raise colander.Invalid(node,
-                                       msg='This oid does not exist.',
-                                       value=oid)
-            path = '/'.join(path_tuple)
+        for resource in value:
+            try:
+                self._raise_attribute_error_if_not_location_aware(resource)
+                path = resource_path(resource)
+            except AttributeError:
+                raise colander.Invalid(
+                    node,
+                    msg='This resource is not location aware', value=resource)
             paths.append(path)
         return paths
 
     def deserialize(self, node, value):
-        """Deserialize path to oid.
+        """Deserialize path to object.
 
-        Return iterable with oids.
+        Return iterable with objects.
+
+        Raises:
+            KeyError: if path cannot be traversed to an ILocation aware object.
 
         """
         if value is colander.null:
             return value
         self._check_iterable(node, value)
         context = node.bindings['context']
-        object_map = find_objectmap(context)
-        oids = self.create_empty_appstruct()
+        resources = self.create_empty_appstruct()
         for path in value:
-            path_tuple = tuple(str(path).split('/'))
-            oid = object_map.objectid_for(path_tuple)
-            if oid is None:
+            try:
+                resource = find_resource(context, path)
+                self._raise_attribute_error_if_not_location_aware(resource)
+            except (KeyError, AttributeError):
                 raise colander.Invalid(
                     node,
                     msg='This resource path does not exist.', value=path)
-            self.add_to_appstruct(oids, oid)
-        return oids
+            self.add_to_appstruct(resources, resource)
+        return resources
 
 
-class PathList(AbstractPathIterable):
+class ListOfUniquePaths(AbstractIterableOfPaths):
 
     """List of :class:`AbsolutePath`.
+
+    The order is preserved, duplicates are removed.
 
     Example value: [/bluaABC, /_123/3]
 
@@ -114,11 +121,15 @@ class PathList(AbstractPathIterable):
         return []
 
     def add_to_appstruct(self, appstruct, element):
-        """Add an element to a list."""
-        appstruct.append(element)
+        """Add an element to a list if it is no duplicate."""
+        if not hasattr(self, '_elements'):
+            self._elements = set()
+        if element not in self._elements:
+            appstruct.append(element)
+            self._elements.add(element)
 
 
-class PathSet(AbstractPathIterable):
+class SetOfPaths(AbstractIterableOfPaths):
 
     """Set of :class:`AbsolutePath`.
 
@@ -151,55 +162,39 @@ def get_all_resources(node, context):
     #                [d for d in docs if d])
 
 
-class AbstractReferenceIterableSchemaNode(schema.MultireferenceIdSchemaNode):
+class AbstractReferenceIterable(schema.MultireferenceIdSchemaNode):
 
     """Abstract Colander SchemaNode to store multiple references.
 
     This is is an abstract class, only subclasses that set `schema_type` to a
-    concrete subclass of `AbstractPathIterable` can be instantiated.
+    concrete subclass of `AbstractIterableOfPaths` can be instantiated.
 
     """
 
-    schema_type = AbstractPathIterable
+    schema_type = AbstractIterableOfPaths
 
     default = []
     missing = colander.drop
-    reftype = SheetReferenceType
+    reftype = SheetReference
     choices_getter = get_all_resources
 
     def _get_choices(self):
         context = self.bindings['context']
         return self.choices_getter(context)
 
-    @property
-    def property_object(self):
-        """Return property object to store reference values."""
-        return reference_sourceid_property(self.reftype)
-
     def validator(self, node, value):
         """Validate."""
-        context = node.bindings['context']
-        object_map = find_objectmap(context)
-        res = DottedNameResolver()
-        reftype = res.maybe_resolve(self.reftype)
+        reftype = self.reftype
         isheet = reftype.getTaggedValue('target_isheet')
-        for oid in value:
-            resource = object_map.object_for(oid)
+        for resource in value:
             if not isheet.providedBy(resource):
-                    error = 'This Resource does not provide interface %s' % \
-                            (isheet.__identifier__)
-                    raise colander.Invalid(node, msg=error, value=oid)
+                error = 'This Resource does not provide interface %s' % \
+                        (isheet.__identifier__)
+                raise colander.Invalid(node, msg=error, value=resource)
 
 
-class ReferenceSetSchemaNode(AbstractReferenceIterableSchemaNode):
+class ListOfUniqueReferences(AbstractReferenceIterable):
 
-    """Colander SchemaNode to store a set of references."""
+    """Colander SchemaNode to store a list of references without duplicates."""
 
-    schema_type = PathSet
-
-
-class ReferenceListSchemaNode(AbstractReferenceIterableSchemaNode):
-
-    """Colander SchemaNode to store a list of references."""
-
-    schema_type = PathList
+    schema_type = ListOfUniquePaths

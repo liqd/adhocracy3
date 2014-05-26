@@ -1,118 +1,168 @@
 """Adhocarcy sheets."""
-from collections.abc import Mapping
-
 from persistent.mapping import PersistentMapping
-from pyramid.compat import is_nonstr_iter
-from pyramid.path import DottedNameResolver
-from substanced.property import PropertySheet
-from substanced.util import find_objectmap
-from zope.interface import implementer
 import colander
+from pyramid.registry import Registry
+from substanced.property import PropertySheet
+from zope.interface import implementer
 
-from adhocracy.interfaces import IResourcePropertySheet
+from adhocracy.utils import find_graph
+from adhocracy.interfaces import IResourceSheet
 from adhocracy.interfaces import ISheet
-from adhocracy.utils import get_all_taggedvalues
-from adhocracy.utils import diff_dict
-from adhocracy.utils import create_schema_from_dict
-from adhocracy.schema import AbstractReferenceIterableSchemaNode
+from adhocracy.interfaces import sheet_metadata
+from adhocracy.interfaces import SheetMetadata
+from adhocracy.schema import AbstractReferenceIterable
+from adhocracy.utils import remove_keys_from_dict
 
 
-@implementer(IResourcePropertySheet)
-class ResourcePropertySheetAdapter(PropertySheet):
+@implementer(IResourceSheet)
+class GenericResourceSheet(PropertySheet):
 
-    """Read interface.."""
+    """Generic sheet for resources to get/set the sheet data structure."""
 
-    isheet = ISheet
+    context = None  # resource to adapt
+    request = None  # pyramid request object, just to fullfill the interface
+    schema = None  # colander.MappingSchema object to define the data structure
+    meta = None  # SheetMetadata
+    _data_key = ''  # identifier to store data
 
-    def __init__(self, context, iface):
-        assert hasattr(context, '__setitem__')
-        assert iface.isOrExtends(self.isheet)
-        assert (not (iface.queryTaggedValue('createmandatory', False)
-                and iface.queryTaggedValue('readonly', False)))
+    def __init__(self, metadata, context):
+        schema = metadata.schema_class()
+        self.schema = schema.bind(context=context)
         self.context = context
-        self.request = None  # just to fullfill the interface
-        self.iface = iface
-        taggedvalues = get_all_taggedvalues(iface)
-        self.key = taggedvalues.get('key') or iface.__identifier__
-        self.permission_view = taggedvalues['permission_view']
-        self.permission_edit = taggedvalues['permission_edit']
-        self.readonly = taggedvalues['readonly']
-        self.createmandatory = taggedvalues['createmandatory']
-        schema_obj = create_schema_from_dict(taggedvalues)
-        self.schema = schema_obj.bind(context=context)
-        self._objectmap = find_objectmap(self.context)
-        for child in self.schema:
-            assert child.default is not colander.null
-            assert child.missing is colander.drop
-        self.res = DottedNameResolver()
+        self.meta = metadata
+        self._data_key = self.meta.isheet.__identifier__
+        self._graph = find_graph(context)
 
     @property
     def _data(self):
         if not hasattr(self.context, '_propertysheets'):
             self.context._propertysheets = PersistentMapping()
-        if self.key not in self.context._propertysheets:
-            self.context._propertysheets[self.key] = PersistentMapping()
-        return self.context._propertysheets[self.key]
+        if self._data_key not in self.context._propertysheets:
+            self.context._propertysheets[self._data_key] = PersistentMapping()
+        return self.context._propertysheets[self._data_key]
 
     @property
-    def _references(self):
+    def _key_reftype_map(self):
         refs = {}
         for child in self.schema:
-            if isinstance(child, AbstractReferenceIterableSchemaNode):
-                refs[child.name] = self.res.maybe_resolve(child.reftype)
+            if isinstance(child, AbstractReferenceIterable):
+                refs[child.name] = child.reftype
         return refs
 
-    def get(self):
-        """Return: read interface."""
-        # fet default values
-        cstruct_default = self.schema.serialize()
-        # default == '' is ignored FIXME: this is  ugly
-        items_empty_strs = [x for x in cstruct_default.items() if x[1] == '']
-        struct = self.schema.deserialize(cstruct_default)
-        struct.update(items_empty_strs)
-        # merge stored values with default values
-        cstruct = self.schema.serialize(self._data)
-        struct_stored = self.schema.deserialize(cstruct)
-        struct.update(struct_stored)
-        return struct
+    def get(self) -> dict:
+        """Return appstruct."""
+        appstruct = {}
+        appstruct.update(self._get_non_reference_appstruct())
+        appstruct.update(self._get_reference_appstruct())
+        return appstruct
 
-    def set(self, struct, omit=()):
-        """Return: read interface."""
-        assert isinstance(struct, Mapping)
-        if not is_nonstr_iter(omit):
-            omit = (omit,)
+    def _get_default_appstruct(self) -> dict:
+        appstruct = {}
+        for child in self.schema.children:
+            assert hasattr(child, 'default')
+            appstruct[child.name] = child.default
+        return appstruct
 
-        old_struct = self.get()
-        (_, changed, _) = diff_dict(old_struct, struct, omit)
+    def _get_non_reference_appstruct(self):
+        appstruct = {}
+        default = self._get_default_appstruct()
+        for key, default_value in default.items():
+            if key not in self._key_reftype_map:
+                appstruct[key] = self._data.get(key, default_value)
+        return appstruct
 
-        for key in changed:
-            self._data[key] = struct[key]
+    def _get_reference_appstruct(self):
+        appstruct = {}
+        references = {}
+        if self._graph:
+            references = self._graph.get_references_for_isheet(
+                self.context,
+                self.meta.isheet)
+        default = self._get_default_appstruct()
+        for key, default_value in default.items():
+            if key in self._key_reftype_map:
+                appstruct[key] = references.get(key, default_value)
+        return appstruct
 
-            if key in self._references.keys():
-                reftype = self._references[key]
-                for oid in set(struct[key]) - set(old_struct[key]):
-                    self._objectmap.connect(self.context, oid, reftype)
-                for oid in set(old_struct[key]) - set(struct[key]):
-                    self._objectmap.disconnect(self.context, oid, reftype)
+    def set(self, appstruct: dict, omit=()) -> bool:
+        """Store appstruct."""
+        struct = remove_keys_from_dict(appstruct, keys_to_remove=omit)
+        self._store_references(struct)
+        self._store_non_references(struct)
+        # FIXME: only store struct if values have changed
+        return bool(struct)
 
-        return bool(changed)
+    def _store_references(self, appstruct):
+        if not self._graph:
+            return
+        for key, targets in appstruct.items():
+            if key in self._key_reftype_map:
+                reftyp = self._key_reftype_map[key]
+                self._graph.set_references(self.context, targets, reftyp)
 
-    def validate_cstruct(self, cstruct):
-        """Return: read interface."""
+    def _store_non_references(self, appstruct):
+        self._data.update(appstruct)
+
+    def validate_cstruct(self, cstruct: dict) -> dict:
+        """Validate schema :term:`cstruct`."""
+        # FIXME: this method does not validate, it`s deserializing instead.
         for child in self.schema:
             if getattr(child, 'readonly', False):
                 raise colander.Invalid(child, msg=u'This key is readonly')
-        struct = self.schema.deserialize(cstruct)
-        return struct
+        appstruct = self.schema.deserialize(cstruct)
+        return appstruct
 
-    def get_cstruct(self):
-        """Return: read interface."""
+    def get_cstruct(self) -> dict:
+        """Return schema :term:`cstruct`."""
         struct = self.get()
         cstruct = self.schema.serialize(struct)
         return cstruct
 
 
-def includeme(config):
+sheet_metadata_defaults = sheet_metadata._replace(
+    isheet=ISheet,
+    sheet_class=GenericResourceSheet,
+    schema_class=colander.MappingSchema,
+    permission_view='view',
+    permission_edit='edit',
+)
+
+
+def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
+    """Add sheet type to registry."""
+    assert metadata.isheet.isOrExtends(ISheet)
+    assert not (metadata.readonly and metadata.createmandatory)
+    schema = metadata.schema_class()
+    for child in schema.children:
+        assert child.default != colander.null
+        assert child.missing == colander.drop
+    assert issubclass(schema.__class__, colander.MappingSchema)
+    _assert_schema_preserves_super_type_data_structure(schema)
+
+    def generic_resource_property_sheet_adapter(context):
+        return metadata.sheet_class(metadata, context)
+
+    registry.registerAdapter(generic_resource_property_sheet_adapter,
+                             required=(metadata.isheet,),
+                             provided=IResourceSheet,
+                             name=metadata.isheet.__identifier__
+                             )
+
+
+def _assert_schema_preserves_super_type_data_structure(
+        schema: colander.MappingSchema):
+    super_defaults = []
+    for super_schema in schema.__class__.__bases__:
+        for child in super_schema().children:
+            super_defaults.append((child.name, child.default))
+    class_defaults = []
+    for child in schema.children:
+        class_defaults.append((child.name, child.default))
+    for name, value in super_defaults:
+        assert (name, value) in class_defaults
+
+
+def includeme(config):  # pragma: no cover
     """Include all sheets in this package."""
     config.include('.name')
     config.include('.pool')

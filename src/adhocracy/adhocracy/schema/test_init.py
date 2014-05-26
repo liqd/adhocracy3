@@ -1,35 +1,17 @@
-from unittest.mock import patch
 import unittest
 
-from zope.interface import Interface
 from pyramid import testing
 import colander
 import pytest
-
 
 
 ############
 #  helper  #
 ############
 
-class InterfaceY(Interface):
-
-    """Useless Interface for testing"""
-
-
-@patch('substanced.objectmap.ObjectMap', autospec=True)
-def make_folder_with_objectmap(dummyobjectmap=None):
-    folder = testing.DummyResource()
-    folder.__objectmap__ = dummyobjectmap.return_value
-    return folder
-
-
-def add_node_binding(node, context=None, request=None):
-    request = request if request is not None else testing.DummyRequest()
-    context = context if context is not None else testing.DummyResource()
+def add_node_binding(node, context=None):
     node.bindings = dict()
     node.bindings['context'] = context
-    node.bindings['request'] = request
     return node
 
 
@@ -69,109 +51,152 @@ class AbsolutePath(unittest.TestCase):
             inst.validator(inst, 'blu.ABC_12-3')
 
 
-class PathListUnitTest(unittest.TestCase):
+class PathListSetUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import PathList
-        return PathList()
+        from . import ListOfUniquePaths
+        return ListOfUniquePaths()
 
-    def test_serialize_valid_null(self):
+    def setUp(self):
+        self.context = testing.DummyResource()
+        self.child = testing.DummyResource()
+
+    def test_serialize_colander_null(self):
         inst = self.make_one()
         result = inst.serialize(None, colander.null)
         assert result == colander.null
 
-    def test_serialize_valid_non_null(self):
-        inst = self.make_one()
-        context = make_folder_with_objectmap()
-        context.__objectmap__.path_for.return_value = ('', 'o1')
-        node = add_node_binding(colander.Mapping(), context=context)
-        result = inst.serialize(node, [1])
-        assert result == ['/o1']
-
-    def test_serialize_non_valid_noniterable(self):
+    def test_serialize_noniterable(self):
         inst = self.make_one()
         with pytest.raises(colander.Invalid):
             inst.serialize(None, None)
 
-    def test_serialize_non_valid_non_null(self):
+    def test_serialize_iterable(self):
         inst = self.make_one()
-        context = make_folder_with_objectmap()
-        context.__objectmap__.path_for.return_value = None
-        node = add_node_binding(colander.Mapping(), context=context)
-        with pytest.raises(colander.Invalid):
-            inst.serialize(node, [0])
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.serialize(node, [])
+        assert result == []
 
-    def test_deserialize_valid_non_null(self):
+    def test_serialize_value_location_aware(self):
         inst = self.make_one()
-        context = make_folder_with_objectmap()
-        context.__objectmap__.objectid_for.return_value = 1
-        node = add_node_binding(colander.Mapping(), context=context)
-        result = inst.deserialize(node, ['/o1'])
-        assert result == [1]
+        self.context['child'] = self.child
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.serialize(node, [self.child])
+        assert result == ['/child']
 
-    def test_deserialize_non_valid_non_null(self):
+    def test_serialize_value_not_location_aware(self):
         inst = self.make_one()
-        context = make_folder_with_objectmap()
-        context.__objectmap__.objectid_for.return_value = None
-        node = add_node_binding(colander.Mapping(), context=context)
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        del self.child.__parent__
+        del self.child.__name__
+        node = add_node_binding(colander.Mapping(), context=self.context)
         with pytest.raises(colander.Invalid):
-            inst.deserialize(node, ['/wrong_path'])
+            inst.serialize(node, [self.child])
+
+    def test_serialize_value_location_aware_without_parent_and_name(self):
+        inst = self.make_one()
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.serialize(node, [self.child])
+        assert result == ['/']
+
+    def test_deserialize_value_null(self):
+        inst = self.make_one()
+        node = colander.Mapping()
+        result = inst.deserialize(node, colander.null)
+        assert result == colander.null
+
+    def test_deserialize_value_valid_path(self):
+        inst = self.make_one()
+        self.context['child'] = self.child
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.deserialize(node, ['/child'])
+        assert result == [self.child]
+
+    def test_deserialize_value_valid_path_with_duplicates(self):
+        inst = self.make_one()
+        self.context['child'] = self.child
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.deserialize(node, ['/child', '/child'])
+        assert result == [self.child]
+
+    def test_deserialize_value_none_valid_path(self):
+        inst = self.make_one()
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        with pytest.raises(colander.Invalid):
+            inst.deserialize(node, ['/wrong_child'])
 
 
 class PathSetUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import PathSet
-        return PathSet()
+        from . import SetOfPaths
+        return SetOfPaths()
 
-    def test_serialize_valid_null(self):
+    def setUp(self):
+        self.context = testing.DummyResource()
+        self.child = testing.DummyResource()
+
+    def test_serialize_colander_null(self):
         inst = self.make_one()
         result = inst.serialize(None, colander.null)
         assert result == colander.null
 
-    def test_serialize_valid_non_null(self):
-        inst = self.make_one()
-        context = make_folder_with_objectmap()
-        context.__objectmap__.path_for.return_value = ('', 'o1')
-        node = add_node_binding(colander.Mapping(), context=context)
-        result = inst.serialize(node, {1})
-        assert result == ['/o1']
-
-    def test_serialize_non_valid_noniterable(self):
+    def test_serialize_noniterable(self):
         inst = self.make_one()
         with pytest.raises(colander.Invalid):
             inst.serialize(None, None)
 
-    def test_serialize_non_valid_non_null(self):
+    def test_serialize_iterable(self):
         inst = self.make_one()
-        context = make_folder_with_objectmap()
-        context.__objectmap__.path_for.return_value = None
-        node = add_node_binding(colander.Mapping(), context=context)
-        with pytest.raises(colander.Invalid):
-            inst.serialize(node, {0})
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.serialize(node, set())
+        assert result == []
 
-    def test_deserialize_valid_non_null(self):
+    def test_serialize_value_location_aware(self):
         inst = self.make_one()
-        context = make_folder_with_objectmap()
-        context.__objectmap__.objectid_for.return_value = 1
-        node = add_node_binding(colander.Mapping(), context=context)
-        result = inst.deserialize(node, ['/o1'])
-        assert result == {1}
+        self.context['child'] = self.child
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.serialize(node, {self.child})
+        assert result == ['/child']
 
-    def test_deserialize_non_valid_non_null(self):
+    def test_serialize_value_not_location_aware(self):
         inst = self.make_one()
-        context = make_folder_with_objectmap()
-        context.__objectmap__.objectid_for.return_value = None
-        node = add_node_binding(colander.Mapping(), context=context)
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        del self.child.__parent__
+        del self.child.__name__
+        node = add_node_binding(colander.Mapping(), context=self.context)
         with pytest.raises(colander.Invalid):
-            inst.deserialize(node, ['/wrong_path'])
+            inst.serialize(node, {self.child})
+
+    def test_serialize_value_location_aware_without_parent_and_name(self):
+        inst = self.make_one()
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.serialize(node, {self.child})
+        assert result == ['/']
+
+    def test_deserialize_value_valid_path(self):
+        inst = self.make_one()
+        self.context['child'] = self.child
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.deserialize(node, ['/child'])
+        assert result == {self.child}
+
+    def test_deserialize_value_none_valid_path(self):
+        inst = self.make_one()
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        with pytest.raises(colander.Invalid):
+            inst.deserialize(node, ['/wrong_child'])
 
 
 class ReferenceSetSchemaNodeUnitTest(unittest.TestCase):
 
     def make_one(self):
-        from . import ReferenceSetSchemaNode
-        return ReferenceSetSchemaNode()
+        from . import ListOfUniqueReferences
+        return ListOfUniqueReferences()
+
+    def setUp(self):
+        self.context = testing.DummyResource()
+        self.target = testing.DummyResource()
 
     def test_default(self):
         inst = self.make_one()
@@ -185,16 +210,12 @@ class ReferenceSetSchemaNodeUnitTest(unittest.TestCase):
         from zope.interface import alsoProvides
         inst = self.make_one()
         isheet = inst.reftype.getTaggedValue('target_isheet')
-        context = make_folder_with_objectmap()
-        alsoProvides(context, isheet)
-        context.__objectmap__.object_for.return_value = context
-        inst = add_node_binding(node=inst, context=context)
-        assert inst.validator(inst, [1]) is None
+        alsoProvides(self.target, isheet)
+        inst = add_node_binding(node=inst, context=self.context)
+        assert inst.validator(inst, [self.target]) is None
 
     def test_nonvalid_interface(self):
         inst = self.make_one()
-        context = make_folder_with_objectmap()
-        context.__objectmap__.object_for.return_value = context
-        inst = add_node_binding(node=inst, context=context)
+        inst = add_node_binding(node=inst, context=self.context)
         with pytest.raises(colander.Invalid):
-            inst.validator(inst, [1])
+            inst.validator(inst, [self.target])

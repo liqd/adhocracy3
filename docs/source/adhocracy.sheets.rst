@@ -4,46 +4,13 @@ adhocracy.sheets package
 Submodules
 ----------
 
-adhocracy.sheets.document module
---------------------------------
+.. toctree::
 
-.. automodule:: adhocracy.sheets.document
-    :members:
-    :undoc-members:
-    
-
-adhocracy.sheets.name module
-----------------------------
-
-.. automodule:: adhocracy.sheets.name
-    :members:
-    :undoc-members:
-    
-
-adhocracy.sheets.pool module
-----------------------------
-
-.. automodule:: adhocracy.sheets.pool
-    :members:
-    :undoc-members:
-    
-
-adhocracy.sheets.tags module
-----------------------------
-
-.. automodule:: adhocracy.sheets.tags
-    :members:
-    :undoc-members:
-    
-
-adhocracy.sheets.versions module
---------------------------------
-
-.. automodule:: adhocracy.sheets.versions
-    :members:
-    :undoc-members:
-    
-
+   adhocracy.sheets.document
+   adhocracy.sheets.name
+   adhocracy.sheets.pool
+   adhocracy.sheets.tags
+   adhocracy.sheets.versions
 
 Module contents
 ---------------
@@ -51,4 +18,4 @@ Module contents
 .. automodule:: adhocracy.sheets
     :members:
     :undoc-members:
-    
+    :show-inheritance:

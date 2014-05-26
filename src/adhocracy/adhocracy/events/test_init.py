@@ -33,12 +33,12 @@ class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
         context = testing.DummyResource()
         isheet = ISheet
         isheet_field = 'example_field'
-        old_version_oid = 5
-        new_version_oid = 6
+        old_version = testing.DummyResource()
+        new_version = testing.DummyResource()
         root_versions = [context]
 
         inst = self._makeOne(context, isheet, isheet_field,
-                             old_version_oid, new_version_oid,
+                             old_version, new_version,
                              root_versions)
 
         assert ISheetReferencedItemHasNewVersion.providedBy(inst)

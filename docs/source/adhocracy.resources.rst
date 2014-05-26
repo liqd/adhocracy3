@@ -4,13 +4,14 @@ adhocracy.resources package
 Submodules
 ----------
 
-adhocracy.resources.interfaces module
--------------------------------------
+.. toctree::
 
-.. automodule:: adhocracy.resources.interfaces
-    :members:
-    :undoc-members:
-    
+   adhocracy.resources.item
+   adhocracy.resources.itemversion
+   adhocracy.resources.pool
+   adhocracy.resources.resource
+   adhocracy.resources.simple
+   adhocracy.resources.tag
 
 Module contents
 ---------------
@@ -18,4 +19,4 @@ Module contents
 .. automodule:: adhocracy.resources
     :members:
     :undoc-members:
-    
+    :show-inheritance:

@@ -3,125 +3,73 @@ from functools import reduce
 import copy
 import json
 import pprint
+from collections.abc import Iterator
 
-from pyramid.path import DottedNameResolver
+from pyramid.compat import is_nonstr_iter
 from substanced.util import get_dotted_name
-from zope.component import getMultiAdapter
+from substanced.util import acquire
+from zope.component import getAdapter
 from zope.interface import directlyProvidedBy
 from zope.interface import providedBy
-import colander
+from zope.interface.interfaces import IInterface
 
 from adhocracy.interfaces import IResource
-from adhocracy.interfaces import IResourcePropertySheet
+from adhocracy.interfaces import IResourceSheet
 from adhocracy.interfaces import ISheet
 
 
-def create_schema_from_dict(key_values, base_node=None):
-    """Create colander.SchemaNode instance from dictionary.
+def find_graph(context) -> object:
+    """Get the Graph object in the lineage of `context` or None.
 
-    Args:
-         key_values (dict): Dictionary with colander schema names and nodes.
-                            The key is the name and has to start with
-                            "field:", has to be an instance of
-                            colander.SchemaNode.
-
-         base_node (colander.SchemaNode): Base Node to add the nodes to.
-                                          Defaults to Mapping SchemaNode.
-    Returns:
-         colander.SchemaNode
+    :rtype: :class:`adhocracy.graph.Graph`
 
     """
-    if not base_node:
-        base_node = colander.SchemaNode(colander.Mapping())
-    for key, node in key_values.items():
-        if not key.startswith('field:'):
-            continue
-        assert isinstance(node, colander.SchemaNode)
-        name = key.split(':')[1]
-        node.name = name
-        base_node.add(node)
-    return base_node
+    return acquire(context, '__graph__', None)
 
 
-def get_resource_interface(context):
-    """Get resource type interface.
-
-    Args:
-        context (IResource): object
-    Returns:
-        Interface
-
-    """
-    assert IResource.providedBy(context)
+def get_iresource(context) -> IInterface:
+    """Get the :class:`adhocracy.interfaces.IResource` interface or None."""
     ifaces = list(directlyProvidedBy(context))
     iresources = [i for i in ifaces if i.isOrExtends(IResource)]
-    return iresources[0]
+    return iresources[0] if iresources else None
 
 
-def get_sheet_interfaces(context):
-    """Get sheet interfaces.
-
-    Args:
-        context (IResource): object
-    Returns:
-        interfaces: list with ISheet interfaces
-
-    """
+def get_isheets(context) -> [IInterface]:
+    """Get the :class:`adhocracy.interfaces.ISheet` interfaces of `context`."""
     ifaces = list(providedBy(context))
     return [i for i in ifaces if i.isOrExtends(ISheet)]
 
 
-def get_sheet(context, isheet):
-    """Get sheet adapter for ISheet inteface.
+def get_sheet(context, isheet: IInterface) -> IResourceSheet:
+    """Get sheet adapter for the `isheet` interface.
 
-    Args:
-        context (IResource): object
-        isheet (IISheet): object
-    Returns:
-        object (IResourcePropertySheet)
+    :raises zope.component.ComponentLookupError:
+        if there is no sheet adapter registered for `isheet`.
 
     """
-    # FIXME add Raises component error
-    return getMultiAdapter((context, isheet), IResourcePropertySheet)
+    return getAdapter(context, IResourceSheet, name=isheet.__identifier__)
 
 
-def get_all_sheets(context):
-    """Get sheet adapters for this context.
+def get_all_sheets(context) -> Iterator:
+    """Get the sheet adapters for all ISheet interfaces of `context`.
 
-    Args:
-        context (IResource): object
-    Returns:
-        iterator: IResourcePropertySheet adapters
+    :returns: generator of :class:`adhocracy.interfaces.IResourceSheet` objects
+    :raises zope.component.ComponentLookupError:
 
     """
-    assert IResource.providedBy(context)
-    isheets = get_sheet_interfaces(context)
+    isheets = get_isheets(context)
     for isheet in isheets:
         yield(get_sheet(context, isheet))
 
 
-def get_all_taggedvalues(iface):
-    """return dict with all own and all inherited taggedvalues."""
+def get_all_taggedvalues(iface: IInterface) -> dict:
+    """Get dict with all own and all inherited taggedvalues."""
     iro = [i for i in iface.__iro__]
     iro.reverse()
-    taggedvalues = dict()
-    # accumulate tagged values
+    taggedvalues = {}
     for i in iro:
         for key in i.getTaggedValueTags():
             taggedvalues[key] = i.getTaggedValue(key)
-    # normalise tagged values with python callables
-    res = DottedNameResolver()
-    for key, value in taggedvalues.items():
-        if key in ['basic_sheets',
-                   'extended_sheets',
-                   'element_types',
-                   'after_creation']:
-            value_ = set([res.maybe_resolve(x) for x in value])
-            taggedvalues[key] = value_
-        if key in ['item_type',
-                   'content_class']:
-            value_ = res.maybe_resolve(value)
-            taggedvalues[key] = value_
     return taggedvalues
 
 
@@ -184,19 +132,31 @@ def strip_optional_prefix(s, prefix):
         return s
 
 
-def to_dotted_name(obj):
-    """Return the dotted name of a type object.
+def to_dotted_name(context) -> str:
+    """Get the dotted name of `context`.
 
-    Args:
-      obj (str or type)
-
-    Returns:
-      The dotted name of `obj`, if it's a type.
-      If `obj` is a string, it is returned as is (since we suppose that it
-      already represents a type name).
+    :returns:
+        The dotted name of `context`, if it's a type.  If `context` is a string
+        it is returned as is (since we suppose that it already
+        represents a type name).
 
     """
-    if isinstance(obj, str):
-        return obj
+    if isinstance(context, str):
+        return context
     else:
-        return get_dotted_name(obj)
+        return get_dotted_name(context)
+
+
+def remove_keys_from_dict(dictionary: dict, keys_to_remove=()) -> dict:
+    """Remove keys from `dictionary`.
+
+    :param keys_to_remove: Tuple with keys or one key
+
+    """
+    if not is_nonstr_iter(keys_to_remove):
+        keys_to_remove = (keys_to_remove,)
+    dictionary_copy = {}
+    for key, value in dictionary.items():
+        if key not in keys_to_remove:
+            dictionary_copy[key] = value
+    return dictionary_copy

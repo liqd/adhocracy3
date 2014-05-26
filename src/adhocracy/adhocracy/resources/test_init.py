@@ -1,30 +1,16 @@
 import unittest
 
+from mock import patch
 from pyramid import testing
 import pytest
 
 from adhocracy.interfaces import ISheet
-
+from adhocracy.interfaces import IResource
 
 
 #############
 #  helpers  #
 #############
-
-def make_new_version_data(follows_oid):
-    """Create a versionable sheet with follows field.
-
-    Args:
-        follows_oid (int): OID of preceding version (follows)
-
-    """
-    from adhocracy.sheets.versions import IVersionable
-    return {
-        IVersionable.__identifier__: {
-            'follows': [follows_oid],
-            }
-        }
-
 
 class ISheetY(ISheet):
     pass
@@ -34,35 +20,13 @@ class ISheetX(ISheet):
     pass
 
 
-class DummyPropertySheetAdapter(object):
-
-    readonly = False
-
-    def __init__(self, context, iface):
-        self.context = context
-        self.iface = iface
-        if 'dummy_appstruct' not in self.context:
-            self.context['dummy_appstruct'] = {}
-        if 'dummy_cstruct' not in self.context:
-            self.context['dummy_cstruct'] = {}
-
-    def set(self, appstruct):
-        self.context['dummy_appstruct'].update(appstruct)
-
-    def get(self):
-        return self.context['dummy_appstruct']
-
-    def set_cstruct(self, cstruct):
-        self.context['dummy_cstruct'].update(cstruct)
-
-
-def _register_dummypropertysheet_adapter(config):
-    from adhocracy.interfaces import IResourcePropertySheet
-    from adhocracy.interfaces import ISheet
-    from zope.interface.interfaces import IInterface
-    config.registry.registerAdapter(DummyPropertySheetAdapter,
-                                    (ISheet, IInterface),
-                                    IResourcePropertySheet)
+@patch('adhocracy.sheets.GenericResourceSheet')
+def _create_dummy_sheet_adapter(registry, isheet, sheet_dummy=None):
+    from adhocracy.interfaces import IResourceSheet
+    registry.registerAdapter(sheet_dummy, (isheet,),
+                             IResourceSheet,
+                             isheet.__identifier__)
+    return sheet_dummy
 
 
 class DummyFolder(testing.DummyResource):
@@ -86,416 +50,175 @@ class DummyFolder(testing.DummyResource):
 #  tests  #
 ###########
 
-class ItemIntegrationTest(unittest.TestCase):
-
-    def setUp(self):
-        from substanced.objectmap import ObjectMap
-        self.config = testing.setUp()
-        self.config.include('adhocracy.sheets.name')
-        self.config.include('adhocracy.sheets.tags')
-        context = DummyFolder()
-        context.__objectmap__ = ObjectMap(context)
-        self.context = context
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def make_one(self):
-        from adhocracy.interfaces import IItem
-        from . import ResourceFactory
-        return ResourceFactory(IItem)(self.context)
-
-    def make_version(self, item, appstructs={}):
-        from adhocracy.interfaces import IItemVersion
-        from . import ResourceFactory
-        return ResourceFactory(IItemVersion)(item,
-                                             appstructs=appstructs)
-
-    def test_create(self):
-        from adhocracy.interfaces import IItemVersion
-        from adhocracy.interfaces import ITag
-
-        inst = self.make_one()
-
-        item_version = inst['VERSION_0000000']
-        item_version_oid = item_version.__oid__
-        first = inst['FIRST']
-        last = inst['LAST']
-        assert IItemVersion.providedBy(item_version)
-        assert ITag.providedBy(first)
-        assert ITag.providedBy(last)
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version_oid]},
-                  'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
-        assert first._propertysheets == wanted
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version_oid]},
-                  'adhocracy.sheets.name.IName': {'name': 'LAST'}}
-        assert last._propertysheets == wanted
-
-    def test_update_last_tag(self):
-        """Test that LAST tag is updated correctly."""
-        self.config.include('adhocracy.sheets.versions')
-        self.config.include('adhocracy.subscriber')
-
-        # Create item with auto-created first version
-        item = self.make_one()
-        item_version = item['VERSION_0000000']
-
-        # Create another version
-        new_version_data = make_new_version_data(item_version.__oid__)
-        new_version = self.make_version(item, appstructs=new_version_data)
-
-        # FIRST should still point to the old version
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version.__oid__]},
-                  'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
-        assert item['FIRST']._propertysheets == wanted
-        # LAST tag should point to new version,
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [new_version.__oid__]},
-                  'adhocracy.sheets.name.IName': {'name': 'LAST'}}
-        assert item['LAST']._propertysheets == wanted
-
-    def test_update_last_tag_two_versions(self):
-        """Test that if two versions are branched off the from the same
-        version, both of them get the LAST tag.
-
-        """
-        self.config.include('adhocracy.sheets.versions')
-        self.config.include('adhocracy.subscriber')
-
-        # Create item with auto-created first version
-        item = self.make_one()
-        item_version = item['VERSION_0000000']
-
-        # Create two other versions, but pointing to the same predecessor
-        new_version_data = make_new_version_data(item_version.__oid__)
-        new_version1 = self.make_version(item, appstructs=new_version_data)
-        new_version2 = self.make_version(item, appstructs=new_version_data)
-
-        # first tag should point to the old version
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [item_version.__oid__]},
-                  'adhocracy.sheets.name.IName': {'name': 'FIRST'}}
-        assert item['FIRST']._propertysheets == wanted
-        # LAST tag should point to both new versions
-        wanted = {'adhocracy.sheets.tags.ITag': {'elements':
-                                                 [new_version1.__oid__,
-                                                  new_version2.__oid__]},
-                  'adhocracy.sheets.name.IName': {'name': 'LAST'}}
-        assert item['LAST']._propertysheets == wanted
-
-
-class ItemVersionIntegrationTest(unittest.TestCase):
-
-    def setUp(self):
-        from substanced.objectmap import ObjectMap
-        # TODO make unittest instead of intergration test.
-        from adhocracy.folder import ResourcesAutolNamingFolder
-        self.config = testing.setUp()
-        self.config.include('adhocracy.sheets.name')
-        self.config.include('adhocracy.sheets.versions')
-        context = ResourcesAutolNamingFolder()
-        context.__objectmap__ = ObjectMap(context)
-        self.context = context
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def make_new_version_data(self, follows_oid):
-        """Create a versionable sheet with follows field.
-
-        Args:
-            follows_oid (int): OID of preceding version (follows)
-
-        """
-        from adhocracy.sheets.versions import IVersionable
-        return {IVersionable.__identifier__: {'follows': [follows_oid]}}
-
-    def make_one(self, iface=None, appstructs={}, root_versions=[]):
-        from adhocracy.interfaces import IItemVersion
-        from . import ResourceFactory
-        factory = ResourceFactory(iface or IItemVersion)
-        return factory(self.context,
-                       appstructs=appstructs,
-                       root_versions=root_versions)
-
-    def test_create_without_referencing_items(self):
-        from adhocracy.interfaces import IItemVersion
-        from adhocracy.interfaces import IItemVersionNewVersionAdded
-        events = []
-
-        def listener(event):
-            events.append(event)
-        self.config.add_subscriber(listener, IItemVersionNewVersionAdded)
-
-        old_version = self.make_one()
-        new_version_data = make_new_version_data(old_version.__oid__)
-        new_version = self.make_one(appstructs=new_version_data,
-                                    root_versions=[old_version])
-
-        assert IItemVersion.providedBy(new_version)
-        assert len(events) == 1
-        assert IItemVersionNewVersionAdded.providedBy(events[0])
-
-    def test_create_with_referencing_items(self):
-        from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
-        from adhocracy.interfaces import SheetToSheet
-        events = []
-
-        def listener(event):
-            events.append(event)
-        self.config.add_subscriber(listener, ISheetReferencedItemHasNewVersion)
-
-        other_version = self.make_one()
-        old_version = self.make_one()
-        om = self.context.__objectmap__
-        om.connect(other_version, old_version, SheetToSheet)
-        new_version_data = self.make_new_version_data(old_version.__oid__)
-        self.make_one(appstructs=new_version_data,
-                      root_versions=[old_version])
-
-        assert len(events) == 2
-
-    def test_autoupdate_with_referencing_items(self):
-        from adhocracy.interfaces import IItemVersion
-        from adhocracy.sheets.document import ISection
-        from adhocracy.sheets.versions import IVersionableFollowsReference
-        from zope.interface import taggedValue
-        # add autoupdate sheet for more tests see adhocracy.subscriber
-        self.config.include('adhocracy.sheets.document')
-        self.config.include('adhocracy.subscriber')
-
-        class ISectionVersion(IItemVersion):
-            taggedValue('extended_sheets', set([ISection]))
-
-        child = self.make_one(iface=ISectionVersion)
-        root = self.make_one(iface=ISectionVersion,
-                             appstructs={ISection.__identifier__:
-                                         {"subsections": [child.__oid__]}})
-        new_version_data = make_new_version_data(child.__oid__)
-        self.make_one(iface=ISectionVersion,
-                      appstructs=new_version_data,
-                      root_versions=[root])
-        om = self.context.__objectmap__
-        root_followed_by = list(om.sources(root, IVersionableFollowsReference))
-        assert len(root_followed_by) == 1
 
 
 class AddResourceTypeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
+        from adhocracy.interfaces import resource_metadata
+        from adhocracy.resources.resource import Base
         self.config = testing.setUp()
         self.config.include('substanced.content')
+        self.content_registry = self.config.registry.content
+        self.resource_metadata = resource_metadata._replace(iresource=IResource,
+                                                            content_class=Base)
 
     def tearDown(self):
         testing.tearDown()
 
-    def make_one(self, iresource, config):
+    def make_one(self, *args):
         from adhocracy.resources import add_resource_type_to_registry
-        return add_resource_type_to_registry(iresource, config)
+        return add_resource_type_to_registry(*args)
 
     def test_add_iresource_but_missing_content_registry(self):
-        from adhocracy.interfaces import IResource
         del self.config.registry.content
         with pytest.raises(AssertionError):
-            self.make_one(IResource, self.config)
+            self.make_one(self.resource_metadata, self.config)
 
-    def test_add_iresource_factory(self):
-        from adhocracy.interfaces import IResource
-        content_registry = self.config.registry.content
-        type_id = IResource.__identifier__
-        self.make_one(IResource, self.config)
-        resource = content_registry.create(type_id)
+    def test_add_resource_type(self):
+        self.make_one(self.resource_metadata, self.config)
+        resource = self.content_registry.create(IResource.__identifier__)
         assert IResource.providedBy(resource)
 
-    def test_add_iresource_metadata(self):
-        from adhocracy.interfaces import IResource
-        content_registry = self.config.registry.content
+    def test_add_resource_type_metadata(self):
         type_id = IResource.__identifier__
-        self.make_one(IResource, self.config)
-        wanted = {type_id: {'add_view': 'add_' + type_id,
-                            'content_name': type_id}}
-        assert wanted == content_registry.meta
+        self.make_one(self.resource_metadata, self.config)
+        assert self.content_registry.meta[type_id]['content_name'] == type_id
+        assert self.content_registry.meta[type_id]['resource_metadata']\
+            == self.resource_metadata
 
-    def test_add_iresource_metadata_with_name(self):
-        from adhocracy.interfaces import IResource
-        IResource.setTaggedValue('content_name', 'name')
-        content_registry = self.config.registry.content
+    def test_add_resource_type_metadata_with_content_name(self):
         type_id = IResource.__identifier__
-        self.make_one(IResource, self.config)
-        assert content_registry.meta[type_id]['content_name'] == 'name'
+        metadata_a = self.resource_metadata._replace(content_name='Name')
+        self.make_one(metadata_a, self.config)
+        assert self.content_registry.meta[type_id]['content_name'] == 'Name'
 
 
 class ResourceFactoryUnitTest(unittest.TestCase):
 
     def setUp(self):
+        from adhocracy.resources.resource import Base
+        from adhocracy.resources.resource import resource_metadata
         self.config = testing.setUp()
-        context = DummyFolder()
-        self.context = context
+        self.context = DummyFolder()
+        self.metadata = resource_metadata._replace(iresource=IResource,
+                                                   content_class=Base)
 
     def tearDown(self):
         testing.tearDown()
 
-    def make_one(self, iface):
-        from . import ResourceFactory
-        return ResourceFactory(iface)
+    def make_one(self, metadata):
+        from adhocracy.resources import ResourceFactory
+        return ResourceFactory(metadata)
 
-    def test_create_with_iresource_non_dotted(self):
-        from adhocracy.interfaces import IResource
-        inst = self.make_one(IResource)
+    def test_create(self):
+        inst = self.make_one(self.metadata)
         assert '__call__' in dir(inst)
 
-    def test_create_with_iresource_dotted(self):
-        from adhocracy.interfaces import IResource
-        inst = self.make_one(IResource.__identifier__)
-        assert '__call__' in dir(inst)
-
-    def test_create_with_non_iresource(self):
-        from zope.interface import Interface
-        with pytest.raises(AssertionError):
-            self.make_one(Interface)
-
-    def test_create_with_non_iresource_dotted(self):
-        from zope.interface import Interface
-        with pytest.raises(AssertionError):
-            self.make_one(Interface.__identifier__)
-
-    def test_create_with_isheets_dotted(self):
-        from zope.interface import taggedValue
-        from adhocracy.interfaces import IResource
-
-        class IResourceType(IResource):
-            taggedValue('extended_sheets', set([ISheetX.__identifier__]))
-            taggedValue('basic_sheets', set([ISheetY.__identifier__]))
-
-        inst = self.make_one(IResourceType)
-        resource = inst()
-
-        assert ISheetX.providedBy(resource)
-        assert ISheetY.providedBy(resource)
-
-    def test_create_with_none_isheets(self):
-        from adhocracy.interfaces import IResource
-        from zope.interface import taggedValue
-        from zope.interface import Interface
-
-        class IResourceType(IResource):
-            taggedValue('basic_sheets', set([Interface]))
-
-        with pytest.raises(AssertionError):
-            self.make_one(IResourceType)
-
-    def test_call(self):
+    def test_call_with_iresource(self):
         from zope.interface.verify import verifyObject
         from adhocracy.interfaces import IResource
-        from persistent.interfaces import IPersistent
         from zope.interface import directlyProvidedBy
-        inst = self.make_one(IResource)
-        resource = inst()
 
-        assert IPersistent.providedBy(resource)
-        assert IResource in directlyProvidedBy(resource)
-        assert verifyObject(IResource, resource)
-        assert resource.__parent__ is None
-        assert resource.__name__ == ''
-        assert not hasattr(resource, '__oid__')
+        class IResourceX(IResource):
+            pass
 
-    def test_call_with_isheets_none_dotted(self):
-        from zope.interface import taggedValue
-        from adhocracy.interfaces import IResource
+        meta = self.metadata._replace(iresource=IResourceX)
 
-        class IResourceType(IResource):
-            taggedValue('extended_sheets', set([ISheetX]))
-            taggedValue('basic_sheets', set([ISheetY]))
+        inst = self.make_one(meta)()
 
-        inst = self.make_one(IResourceType)
-        resource = inst()
+        assert IResourceX in directlyProvidedBy(inst)
+        assert verifyObject(IResourceX, inst)
+        assert inst.__parent__ is None
+        assert inst.__name__ == ''
+        assert not hasattr(inst, '__oid__')
 
-        assert ISheetX.providedBy(resource)
-        assert ISheetY.providedBy(resource)
+    def test_call_with_isheets(self):
+        metadata = self.metadata._replace(basic_sheets=[ISheetY],
+                                          extended_sheets=[ISheetX])
+        inst = self.make_one(metadata)()
+
+        assert ISheetX.providedBy(inst)
+        assert ISheetY.providedBy(inst)
 
     def test_call_with_parent(self):
-        from adhocracy.interfaces import IResource
-        inst = self.make_one(IResource)
-        resource = inst(parent=self.context)
-        assert resource.__parent__ == self.context
-        assert resource.__name__ in self.context
-        assert resource.__oid__ == 1
+        meta = self.metadata
+        inst = self.make_one(meta)(parent=self.context)
+
+        assert inst.__parent__ == self.context
+        assert inst.__name__ in self.context
+        assert inst.__oid__ == 1
 
     def test_call_with_after_create(self):
-        from adhocracy.interfaces import IResource
-        from zope.interface import taggedValue
-
         def dummy_after_create(context, registry, options):
             context._options = options
             context._registry = registry
 
-        class IResourceType(IResource):
-            taggedValue('after_creation', [dummy_after_create])
+        meta = self.metadata._replace(iresource=IResource,
+                                      after_creation=[dummy_after_create])
 
-        inst = self.make_one(IResourceType)
-        resource = inst(parent=self.context, kwarg1=True)
+        inst = self.make_one(meta)(kwarg1=True)
 
-        assert resource._options == {"kwarg1": True}
-        assert resource._registry is self.config.registry
+        assert inst._options == {'kwarg1': True}
+        assert inst._registry is self.config.registry
 
     def test_call_without_run_after_create(self):
-        from adhocracy.interfaces import IResource
-        from zope.interface import taggedValue
-
         def dummy_after_create(context, registry, options):
-            context.test = 'aftercreate'
+            context._options = options
+            context._registry = registry
 
-        class IResourceType(IResource):
-            taggedValue('after_creation', [dummy_after_create])
+        meta = self.metadata._replace(iresource=IResource,
+                                      after_creation=[dummy_after_create])
 
-        inst = self.make_one(IResourceType)
-        resource = inst(parent=self.context, run_after_creation=False)
+        inst = self.make_one(meta)(run_after_create=False)
+
         with pytest.raises(AttributeError):
-            resource.test
+            inst.test
 
     def test_call_with_appstructs_data(self):
-        from adhocracy.interfaces import IResource
-        from zope.interface import taggedValue
+        meta = self.metadata._replace(iresource=IResource,
+                                      basic_sheets=[ISheetY])
+        dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, ISheetY)
+        appstructs = {ISheetY.__identifier__: {'count': 0}}
 
-        class IResourceType(IResource):
-            taggedValue('basic_sheets', set([ISheetY]))
+        inst = self.make_one(meta)(appstructs=appstructs)
 
-        data = {ISheetY.__identifier__: {"count": 0}}
-        _register_dummypropertysheet_adapter(self.config)
+        assert dummy_sheet.called
 
-        inst = self.make_one(IResourceType)
-        resource = inst(parent=self.context, appstructs=data)
+    def test_call_with_parent_and_appstructs_name_data(self):
+        from adhocracy.sheets.name import IName
+        meta = self.metadata._replace(iresource=IResource,
+                                      basic_sheets=[IName])
+        dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, IName)
+        appstructs = {IName.__identifier__: {'name': 'child'}}
 
-        assert resource['dummy_appstruct'] == {'count': 0}
+        self.make_one(meta)(parent=self.context, appstructs=appstructs)
 
-    def test_call_with_appstructs_name_data(self):
-        from adhocracy.interfaces import IResource
-        from zope.interface import taggedValue
+        assert 'child' in self.context
+        assert dummy_sheet.called
 
-        class IResourceType(IResource):
-            taggedValue('basic_sheets', set([ISheetY]))
+    def test_call_with_parent_and_appstructs_empty_name_data(self):
+        meta = self.metadata._replace(iresource=IResource,
+                                      basic_sheets=[ISheetY])
+        appstructs = {'adhocracy.sheets.name.IName': {'name': 'invalid'}}
+        _create_dummy_sheet_adapter(self.config.registry, ISheetY)
 
-        data = {"adhocracy.sheets.name.IName": {"name": "child"}}
-        _register_dummypropertysheet_adapter(self.config)
-
-        inst = self.make_one(IResourceType)
-        resource = inst(parent=self.context, appstructs=data)
-
-        assert resource['dummy_appstruct'] == {'name': 'child'}
-
-    def test_call_with_appstructs_empty_name_data(self):
-        from adhocracy.interfaces import IResource
-        from zope.interface import taggedValue
-
-        class IResourceType(IResource):
-            taggedValue('basic_sheets', set([ISheetY]))
-
-        data = {"adhocracy.sheets.name.IName": {"name": "invalid"}}
-        _register_dummypropertysheet_adapter(self.config)
-
-        inst = self.make_one(IResourceType)
         with pytest.raises(ValueError):
-            inst(parent=self.context, appstructs=data)
+            self.make_one(meta)(parent=self.context, appstructs=appstructs)
+
+    def test_call_with_parent_and_use_autonaming(self):
+        meta = self.metadata._replace(iresource=IResource,
+                                      use_autonaming=True)
+
+        self.make_one(meta)(parent=self.context)
+
+        assert '_0000000' in self.context
+
+    def test_call_with_parent_and_use_autonaming_with_prefix(self):
+        meta = self.metadata._replace(iresource=IResource,
+                                      use_autonaming=True,
+                                      autonaming_prefix='prefix')
+
+        self.make_one(meta)(parent=self.context)
+
+        assert 'prefix_0000000' in self.context

@@ -33,12 +33,12 @@ class IncludemeIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_includeme_registry_register_factories(self):
-        from adhocracy.resources.tag import IBasicTag
+        from adhocracy.interfaces import ITag
         content_types = self.config.registry.content.factory_types
-        assert IBasicTag.__identifier__ in content_types
+        assert ITag.__identifier__ in content_types
 
     def test_includeme_registry_create_content(self):
-        from adhocracy.resources.tag import IBasicTag
-        res = self.config.registry.content.create(IBasicTag.__identifier__,
+        from adhocracy.interfaces import ITag
+        res = self.config.registry.content.create(ITag.__identifier__,
                                                   self.context)
-        assert IBasicTag.providedBy(res)
+        assert ITag.providedBy(res)

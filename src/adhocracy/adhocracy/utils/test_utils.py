@@ -1,8 +1,22 @@
-import pytest
+from pyramid import testing
 
 ################
 #  test utils  #
 ################
+
+
+def test_find_graph_graph_exists():
+    from adhocracy.utils import find_graph
+    dummy_graph = object()
+    parent = testing.DummyResource(__graph__=dummy_graph)
+    child = testing.DummyResource(__parent__=parent)
+    assert find_graph(child) is dummy_graph
+
+
+def test_find_graph_graph_does_not_exists():
+    from adhocracy.utils import find_graph
+    child = testing.DummyResource()
+    assert find_graph(child) is None
 
 
 def test_diff_dict():
@@ -10,7 +24,7 @@ def test_diff_dict():
     old = {'foo': 5, 'bar': 6, 'kaz': 8}
     new = {'bar': 6, 'baz': 7, 'kaz': 9, 'faz': 10}
     diff = diff_dict(old, new)
-    assert diff == (set(['baz', 'faz']), set(['kaz']), set(['foo']))
+    assert diff == ({'baz', 'faz'}, {'kaz'}, {'foo'})
 
 
 def test_diff_dict_omit():
@@ -18,7 +32,7 @@ def test_diff_dict_omit():
     old = {'foo': 5, 'bar': 6, 'kaz': 8}
     new = {'bar': 6, 'baz': 7, 'kaz': 9, 'faz': 10}
     diff = diff_dict(old, new, omit=('foo',))
-    assert diff == (set(['baz', 'faz']), set(['kaz']), set())
+    assert diff == ({'baz', 'faz'}, {'kaz'}, set())
 
 
 def test_strip_optional_prefix():
@@ -35,7 +49,7 @@ def test_strip_optional_prefix():
 
 
 def test_get_resource_interface_multiple_provided():
-    from . import get_resource_interface
+    from . import get_iresource
     from adhocracy.interfaces import IResource
     from zope.interface import directlyProvides
     from pyramid.testing import DummyResource
@@ -48,19 +62,19 @@ def test_get_resource_interface_multiple_provided():
         pass
 
     directlyProvides(context, IA, IB)
-    assert get_resource_interface(context) == IA
+    assert get_iresource(context) == IA
 
 
 def test_get_resource_interface_none_provided():
-    from . import get_resource_interface
+    from . import get_iresource
     from pyramid.testing import DummyResource
     context = DummyResource()
-    with pytest.raises(AssertionError):
-        get_resource_interface(context)
+    result = get_iresource(context)
+    assert result is None
 
 
 def test_get_sheet_interfaces_multiple_provided():
-    from . import get_sheet_interfaces
+    from . import get_isheets
     from adhocracy.interfaces import ISheet
     from adhocracy.interfaces import IResource
     from pyramid.testing import DummyResource
@@ -72,15 +86,15 @@ def test_get_sheet_interfaces_multiple_provided():
         pass
 
     context = DummyResource(__provides__=(IResource, IA, IB))
-    assert get_sheet_interfaces(context) == [IA, IB]
+    assert get_isheets(context) == [IA, IB]
 
 
 def test_get_sheet_interfaces_none_provided():
-    from . import get_sheet_interfaces
+    from . import get_isheets
     from adhocracy.interfaces import IResource
     from pyramid.testing import DummyResource
     context = DummyResource(__provides__=IResource)
-    assert get_sheet_interfaces(context) == []
+    assert get_isheets(context) == []
 
 
 def test_get_all_taggedvalues_inheritance():
@@ -98,37 +112,6 @@ def test_get_all_taggedvalues_inheritance():
     assert 'a' in metadata_ib
 
 
-def test_get_all_taggedvalues_iitem_normalize_dotted_string_to_callable():
-    from . import get_all_taggedvalues
-    from adhocracy.interfaces import IResource
-    from adhocracy.interfaces import IItem
-    from zope.interface import taggedValue
-    from zope.interface import Interface
-
-    class IA(IItem):
-        taggedValue('item_type', Interface.__identifier__)
-        taggedValue('content_class', Interface.__identifier__)
-        taggedValue('after_creation', set([Interface.__identifier__]))
-        taggedValue('basic_sheets', set([Interface.__identifier__]))
-        taggedValue('extended_sheets', set([Interface.__identifier__]))
-        taggedValue('element_types',
-                    set([Interface.__identifier__]))
-
-    metadata = get_all_taggedvalues(IA)
-    assert 'after_creation' in IResource.getTaggedValueTags()
-    assert metadata['after_creation'] == set([Interface])
-    assert 'content_class' in IResource.getTaggedValueTags()
-    assert metadata['content_class'] == Interface
-    assert 'item_type' in IItem.getTaggedValueTags()
-    assert metadata['item_type'] == Interface
-    assert 'basic_sheets' in IItem.getTaggedValueTags()
-    assert metadata['basic_sheets'] == set([Interface])
-    assert 'extended_sheets' in IResource.getTaggedValueTags()
-    assert metadata['extended_sheets'] == set([Interface])
-    assert 'element_types' in IItem.getTaggedValueTags()
-    assert metadata['element_types'] == set([Interface])
-
-
 def test_to_dotted_name_module():
     from . import to_dotted_name
     import os
@@ -140,4 +123,19 @@ def test_to_dotted_name_dotted_string():
     assert to_dotted_name('os.walk') == 'os.walk'
 
 
+def test_remove_keys_from_dict_with_keys_to_remove():
+    from adhocracy.utils import remove_keys_from_dict
+    dictionary = {'key': 'value',
+                  'other_key': 'value'}
+    assert remove_keys_from_dict(dictionary, keys_to_remove=('key',))\
+        == {'other_key': 'value'}
 
+
+def test_remove_keys_from_dict_with_single_key_to_remove():
+    from adhocracy.utils import remove_keys_from_dict
+    dictionary = {'key': 'value',
+                  'other_key': 'value'}
+    assert remove_keys_from_dict(dictionary, keys_to_remove='key')\
+        == {'other_key': 'value'}
+
+#FIXME tests for get_sheet, get_all_sheets are missing

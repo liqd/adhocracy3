@@ -9,7 +9,7 @@ requires = [
     'adhocracy',
     ]
 
-setup(name='adhocracy-sample',
+setup(name='adhocracy_sample',
       version='0.0',
       description='adhocracy sample app',
       long_description=README,

@@ -1,12 +1,16 @@
 import unittest
-
 from mock import patch
+
 from pyramid import testing
-from zope.interface import taggedValue
 import pytest
+from zope.interface import taggedValue
+from zope.interface import Interface
 
 from adhocracy.interfaces import IResource
+from adhocracy.interfaces import SheetReference
 from adhocracy.interfaces import SheetToSheet
+from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import NewVersionToOldVersion
 
 
 ############
@@ -15,7 +19,7 @@ from adhocracy.interfaces import SheetToSheet
 
 
 def create_dummy_resource(parent=None, iface=IResource):
-    """Create dummy resrouce and add it to the parent objectmap."""
+    """Create dummy resource and add it to the parent objectmap."""
     from pyramid.traversal import resource_path_tuple
     from substanced.util import find_objectmap
     res = testing.DummyResource(__parent__=parent,
@@ -35,69 +39,203 @@ def create_dummy_resource(parent=None, iface=IResource):
 #  tests #
 ##########
 
-class GetReftypesUnitTest(unittest.TestCase):
+class TestGraphUnitTest(unittest.TestCase):
 
-    def _make_one(self, objectmap, base_reftype=None):
-        from . import _get_reftypes
-        return _get_reftypes(objectmap, base_reftype=base_reftype)
+    def _make_one(self, *args):
+        from adhocracy.graph import Graph
+        return Graph(*args)
+
+    def test_create(self):
+        from persistent import Persistent
+        dummy_objectmap = object()
+        root = testing.DummyResource(__objectmap__=dummy_objectmap)
+        graph = self._make_one(root)
+        assert issubclass(graph.__class__, Persistent)
+        assert graph._root is root
+        assert graph._objectmap is root.__objectmap__
+
+    def test_create_with_missing_objectmap(self):
+        root = testing.DummyResource()
+        graph = self._make_one(root)
+        assert graph._objectmap is None
+
+    def test_create_with_root_is_none(self):
+        root = None
+        graph = self._make_one(root)
+        assert graph._root is None
+
+
+class TestGraphGetReferencesUnitTest(unittest.TestCase):
 
     @patch('substanced.objectmap.ObjectMap', autospec=True)
     def setUp(self, dummy_objectmap=None):
         self.objectmap = dummy_objectmap.return_value
 
-    def test_empty_objectmap_and_default_excludes(self):
-        """No relations in objectmap, so result should be empty."""
-        om = self.objectmap
-        om.get_reftypes.return_value = []
-        result = self._make_one(om)
-        assert result == []
+    def _make_one(self, **kwargs):
+        from adhocracy.graph import Graph
+        graph = Graph(None)
+        graph._objectmap = self.objectmap
+        return Graph.get_reftypes(graph, **kwargs)
 
-    def test_empty_objectmap_and_no_base_type(self):
-        """No relations in objectmap, so result should be empty."""
-        om = self.objectmap
-        om.get_reftypes.return_value = []
-        result = self._make_one(om, [])
-        assert result == []
+    def test_get_reftypes_no_objectmap(self):
+        self.objectmap = None
+        assert list(self._make_one()) == []
 
-    def test_one_wrong_refernce_type(self):
-        """Wrong ReferenceType in objectmap, so result should be empty. """
-        om = self.objectmap
-        om.get_reftypes.return_value = ["NoneSheetToSheet"]
-        result = self._make_one(om, [])
-        assert result == []
+    def test_get_reftypes_no_reftpyes(self):
+        self.objectmap.get_reftypes.return_value = []
+        assert list(self._make_one()) == []
 
-    def test_two_reference_types(self):
-        """Two reftypes in objectmap, both should be found."""
+    def test_get_reftypes_one_wrong_str_reftype(self):
+        self.objectmap.get_reftypes.return_value = ["NoneSheetToSheet"]
+        assert list(self._make_one()) == []
 
-        class IOtherReferenceType(SheetToSheet):
+    def test_get_reftypes_one_wrong_no_sheetreference_reftype(self):
+        self.objectmap.get_reftypes.return_value = [Interface]
+        assert list(self._make_one()) == []
+
+    def test_get_reftypes_one_wrong_source_isheet(self):
+        class SubSheetToSheet(SheetToSheet):
+            source_isheet = Interface
+        self.objectmap.get_reftypes.return_value = [SubSheetToSheet]
+        assert list(self._make_one()) == []
+
+    def test_get_reftypes_one_valid_reftype(self):
+        self.objectmap.get_reftypes.return_value = [SheetToSheet]
+        reftypes = list(self._make_one())
+        assert len(reftypes) == 1
+        assert reftypes[0] == (ISheet, '', SheetToSheet)
+
+    def test_get_reftypes_with_base_reftype(self):
+        class SubSheetToSheet(SheetToSheet):
             pass
-        om = self.objectmap
-        om.get_reftypes.return_value = [IOtherReferenceType,
-                                        SheetToSheet]
-        result = self._make_one(om)
-        assert len(result) == 2
-        assert SheetToSheet in result
-        assert IOtherReferenceType in result
+        self.objectmap.get_reftypes.return_value = [SubSheetToSheet,
+                                                    SheetToSheet]
+        reftypes = list(self._make_one(base_reftype=SubSheetToSheet))
+        assert len(reftypes) == 1
 
-    def test_two_reference_types_with_base_reftype(self):
-        """Two reftypes in OM, one is excluded, the other should be found."""
-
-        class IOtherReferenceType(SheetToSheet):
+    def test_get_reftypes_with_base_reftype_that_has_subclass(self):
+        class SubSheetToSheet(SheetToSheet):
             pass
-        om = self.objectmap
-        om.get_reftypes.return_value = [IOtherReferenceType,
-                                        SheetToSheet]
-        result = self._make_one(om, base_reftype=IOtherReferenceType)
-        assert len(result) == 1
-        assert IOtherReferenceType in result
-        assert SheetToSheet not in result
+        self.objectmap.get_reftypes.return_value = [SubSheetToSheet,
+                                                    SheetToSheet]
+        reftypes = list(self._make_one(base_reftype=SheetToSheet))
+        assert len(reftypes) == 2
+
+    def test_get_reftypes_with_base_isheet(self):
+        class ISheetA(ISheet):
+            pass
+
+        class SubSheetToSheet(SheetToSheet):
+            source_isheet = ISheetA
+
+        self.objectmap.get_reftypes.return_value = [SubSheetToSheet,
+                                                    SheetToSheet]
+        reftypes = list(self._make_one(base_isheet=ISheetA))
+        assert len(reftypes) == 1
+
+    def test_get_reftypes_with_base_isheet_that_has_subclass(self):
+        class ISheetA(ISheet):
+            pass
+
+        class SubSheetToSheet(SheetToSheet):
+            source_isheet = ISheetA
+
+        self.objectmap.get_reftypes.return_value = [SubSheetToSheet,
+                                                    SheetToSheet]
+        reftypes = list(self._make_one(base_isheet=ISheet))
+        assert len(reftypes) == 2
 
 
-class ReferencesTemplateUnitTest(unittest.TestCase):
+class GraphSetReferencesUnitTest(unittest.TestCase):
 
-    def _make_one(self, objectmap_method, context, **kwargs):
-        from . import _references_template
-        return _references_template(objectmap_method, context, **kwargs)
+    def setUp(self):
+        from substanced.objectmap import ObjectMap
+        context = create_dummy_resource()
+        context.__objectmap__ = ObjectMap(context)
+        self.source = create_dummy_resource(parent=context)
+        self.target = create_dummy_resource(parent=context)
+        self.target1 = create_dummy_resource(parent=context)
+        self.target2 = create_dummy_resource(parent=context)
+        self.objectmap = context.__objectmap__
+
+    def _make_one(self, *args):
+        from adhocracy.graph import Graph
+        graph = Graph(None)
+        graph._objectmap = self.objectmap
+        return Graph.set_references(graph, *args)
+
+    def test_reftype_not_sheetreferencetype(self):
+        from substanced.interfaces import ReferenceType
+        with pytest.raises(AssertionError):
+            self._make_one(self.source, [], ReferenceType)
+
+    def test_targets_empty_list(self):
+        self._make_one(self.source, [], SheetReference)
+        references = self.objectmap.targetids(self.source, SheetReference)
+        wanted_refs = []
+        assert wanted_refs == list(references)
+
+    def test_targets_list(self):
+        targets = [self.target]
+        self._make_one(self.source, targets, SheetReference)
+        references = self.objectmap.targetids(self.source, SheetReference)
+        wanted_references = [self.target.__oid__]
+        assert wanted_references == list(references)
+
+    def test_targets_list_ordered(self):
+        targets = [self.target, self.target1, self.target2]
+        self._make_one(self.source, targets, SheetReference)
+        targets_reverse = [self.target2, self.target1, self.target]
+        self._make_one(self.source, targets_reverse, SheetReference)
+
+        references = self.objectmap.targetids(self.source, SheetReference)
+        wanted_references = [x.__oid__ for x in targets_reverse]
+        assert wanted_references == list(references)
+
+    def test_targets_list_duplicated_targets(self):
+        """Duplication targets are not possible with substanced.objectmap."""
+        targets = [self.target, self.target]
+        self._make_one(self.source, targets, SheetReference)
+        references = self.objectmap.targetids(self.source, SheetReference)
+        wanted_references = [self.target.__oid__]
+        assert wanted_references == list(references)
+
+    def test_targets_list_with_some_removed(self):
+        targets = [self.target, self.target1, self.target2]
+        self._make_one(self.source, targets, SheetReference)
+        targets_some_removed = [self.target]
+        self._make_one(self.source, targets_some_removed, SheetReference)
+
+        references = self.objectmap.targetids(self.source, SheetReference)
+        wanted_references = [x.__oid__ for x in targets_some_removed]
+        assert wanted_references == list(references)
+
+    def test_targets_set(self):
+        targets = {self.target}
+        self._make_one(self.source, targets, SheetReference)
+        references = self.objectmap.targetids(self.source, SheetReference)
+        wanted_references = [self.target.__oid__]
+        assert wanted_references == list(references)
+
+    def test_targets_set_duplicated_targets(self):
+        targets = {self.target, self.target}
+        self._make_one(self.source, targets, SheetReference)
+        references = self.objectmap.targetids(self.source, SheetReference)
+        wanted_references = [self.target.__oid__]
+        assert wanted_references == list(references)
+
+    def test_targets_set_with_some_removed(self):
+        targets = {self.target, self.target1, self.target2}
+        self._make_one(self.source, targets, SheetReference)
+        targets_some_removed = {self.target}
+        self._make_one(self.source, targets_some_removed, SheetReference)
+
+        references = self.objectmap.targetids(self.source, SheetReference)
+        wanted_references = [x.__oid__ for x in targets_some_removed]
+        assert wanted_references == list(references)
+
+
+class GraphGetReferencesUnitTest(unittest.TestCase):
 
     def setUp(self):
         from substanced.objectmap import ObjectMap
@@ -106,127 +244,131 @@ class ReferencesTemplateUnitTest(unittest.TestCase):
         self.objectmap_method = ObjectMap.sources
         self.objectmap = context.__objectmap__
         self.resource = create_dummy_resource(parent=context)
+        self.resource2 = create_dummy_resource(parent=context)
+
+    def _make_one(self, resource, **kwargs):
+        from adhocracy.graph import Graph
+        graph = Graph(None)
+        graph._objectmap = self.objectmap
+        return Graph.get_references(graph, resource, **kwargs)
 
     def test_no_reference(self):
-        result = self._make_one(self.objectmap_method, self.resource)
+        result = self._make_one(self.resource)
         assert list(result) == []
 
     def test_no_sheetreferences(self):
-        from substanced.interfaces import ReferenceType
-        self.objectmap.connect(self.resource, self.resource, ReferenceType)
-        result = self._make_one(self.objectmap_method, self.resource)
+        self.objectmap.connect(self.resource, self.resource, 'NoSheetReference')
+        result = self._make_one(self.resource)
         assert list(result) == []
 
     def test_sheetreferences(self):
-        from adhocracy.interfaces import SheetReferenceType
-        self.objectmap.connect(self.resource, self.resource,
-                               SheetReferenceType)
+        self.objectmap.connect(self.resource, self.resource2, SheetToSheet)
 
-        result = self._make_one(self.objectmap_method, self.resource)
+        result = self._make_one(self.resource)
 
-        resource, isheet, isheet_field = result.__next__()
-        assert resource == self.resource
-        assert isheet == SheetReferenceType.getTaggedValue('source_isheet')
-        assert isheet_field == \
-            SheetReferenceType.getTaggedValue('source_isheet_field')
+        source, isheet, field, target = result.__next__()
+        assert source == self.resource
+        assert isheet == SheetReference.getTaggedValue('source_isheet')
+        assert field == SheetReference.getTaggedValue('source_isheet_field')
+        assert target == self.resource2
 
-    def test_with_base_reftype(self):
-        from adhocracy.interfaces import SheetReferenceType
-
-        class ASheetReferenceType(SheetReferenceType):
+    def test_sheetreferences_with_base_reftype(self):
+        class ASheetReferenceType(SheetReference):
             pass
 
-        class ABSheetReferenceType(ASheetReferenceType):
-            pass
         self.objectmap.connect(self.resource, self.resource,
-                               SheetReferenceType)
-        self.objectmap.connect(self.resource, self.resource,
-                               ASheetReferenceType)
-        self.objectmap.connect(self.resource, self.resource,
-                               ABSheetReferenceType)
-
-        result = self._make_one(self.objectmap_method, self.resource,
-                                base_reftype=ASheetReferenceType)
-        assert len(list(result)) == 2
-
-    def test_with_source_isheet(self):
-        from adhocracy.interfaces import SheetReferenceType
-        from adhocracy.interfaces import ISheet
-
-        class IASheet(ISheet):
-            pass
-
-        class ASheetReferenceType(SheetReferenceType):
-            source_isheet = IASheet
-
-        self.objectmap.connect(self.resource, self.resource,
-                               SheetReferenceType)
+                               SheetReference)
         self.objectmap.connect(self.resource, self.resource,
                                ASheetReferenceType)
 
-        result = self._make_one(self.objectmap_method, self.resource,
-                                source_isheet=IASheet)
+        result = self._make_one(self.resource, base_reftype=ASheetReferenceType)
         assert len(list(result)) == 1
 
-    def test_with_source_isheet_that_has_subclass(self):
-        from adhocracy.interfaces import SheetReferenceType
-        from adhocracy.interfaces import ISheet
-
+    def test_sheetreferences_with_base_isheet(self):
         class IASheet(ISheet):
             pass
 
-        class ASheetReferenceType(SheetReferenceType):
+        class ASheetReferenceType(SheetToSheet):
             source_isheet = IASheet
 
         self.objectmap.connect(self.resource, self.resource,
-                               SheetReferenceType)
+                               SheetReference)
         self.objectmap.connect(self.resource, self.resource,
                                ASheetReferenceType)
 
-        result = self._make_one(self.objectmap_method, self.resource,
-                                source_isheet=ISheet)
-        assert len(list(result)) == 2
+        result = self._make_one(self.resource, base_isheet=IASheet)
+        assert len(list(result)) == 1
 
 
-class GetReferencesUnitTest(unittest.TestCase):
-
-    def _make_one(self, context):
-        from . import get_references
-        return get_references(context)
+class GraphGetBackReferencesUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.context = create_dummy_resource()
-
-    @patch('adhocracy.graph._references_template', autospec=True)
-    def test_with_resource(self, dummy_references_template=None):
         from substanced.objectmap import ObjectMap
-        self._make_one(self.context)
-        assert dummy_references_template.call_args[0][0] == ObjectMap.targets
-        assert dummy_references_template.call_args[0][1] == self.context
+        context = create_dummy_resource()
+        context.__objectmap__ = ObjectMap(context)
+        self.objectmap_method = ObjectMap.sources
+        self.objectmap = context.__objectmap__
+        self.resource = create_dummy_resource(parent=context)
+        self.resource2 = create_dummy_resource(parent=context)
+
+    def _make_one(self, resource, **kwargs):
+        from adhocracy.graph import Graph
+        graph = Graph(None)
+        graph._objectmap = self.objectmap
+        return Graph.get_back_references(graph, resource, **kwargs)
+
+    def test_no_reference(self):
+        result = self._make_one(self.resource)
+        assert list(result) == []
+
+    def test_no_sheetreferences(self):
+        self.objectmap.connect(self.resource, self.resource, 'NoSheetReference')
+        result = self._make_one(self.resource)
+        assert list(result) == []
+
+    def test_sheetreferences(self):
+        self.objectmap.connect(self.resource, self.resource2,
+                               SheetToSheet)
+
+        result = self._make_one(self.resource2)
+
+        source, isheet, field, target = result.__next__()
+        assert source == self.resource
+        assert isheet == SheetToSheet.getTaggedValue('source_isheet')
+        assert field == SheetToSheet.getTaggedValue('source_isheet_field')
+        assert target == self.resource2
+
+    def test_sheetreferences_and_base_reftype(self):
+        from adhocracy.interfaces import SheetReference
+
+        class ASheetReferenceType(SheetReference):
+            pass
+
+        self.objectmap.connect(self.resource, self.resource,
+                               SheetReference)
+        self.objectmap.connect(self.resource, self.resource,
+                               ASheetReferenceType)
+
+        result = self._make_one(self.resource, base_reftype=ASheetReferenceType)
+        assert len(list(result)) == 1
+
+    def test_sheetreferences_and_base_isheet(self):
+        class IASheet(ISheet):
+            pass
+
+        class ASheetReferenceType(SheetToSheet):
+            source_isheet = IASheet
+
+        self.objectmap.connect(self.resource, self.resource,
+                               SheetReference)
+        self.objectmap.connect(self.resource, self.resource,
+                               ASheetReferenceType)
+
+        result = self._make_one(self.resource, base_isheet=IASheet)
+        assert len(list(result)) == 1
 
 
-class GetBackReferencesUnitTest(unittest.TestCase):
-
-    def _make_one(self, context):
-        from . import get_back_references
-        return get_back_references(context)
-
-    def setUp(self):
-        self.context = create_dummy_resource()
-
-    @patch('adhocracy.graph._references_template', autospec=True)
-    def test_with_resource(self, dummy_references_template=None):
-        from substanced.objectmap import ObjectMap
-        self._make_one(self.context)
-        assert dummy_references_template.call_args[0][0] == ObjectMap.sources
-        assert dummy_references_template.call_args[0][1] == self.context
-
-
-class GetBackReferencesForIsheetUnitTest(unittest.TestCase):
-
-    def _make_one(self, context, isheet):
-        from . import get_back_references_for_isheet
-        return get_back_references_for_isheet(context, isheet)
+class GraphGetBackReferencesForIsheetUnitTest(unittest.TestCase):
 
     def setUp(self):
         from substanced.objectmap import ObjectMap
@@ -236,41 +378,48 @@ class GetBackReferencesForIsheetUnitTest(unittest.TestCase):
         self.source = create_dummy_resource(parent=context)
         self.target = create_dummy_resource(parent=context)
 
-    def test_with_isheet(self):
-        from adhocracy.interfaces import SheetReferenceType
-        from adhocracy.interfaces import ISheet
+    def _make_one(self, context, isheet):
+        from adhocracy.graph import Graph
+        graph = Graph(None)
+        graph._objectmap = self.objectmap
+        return Graph.get_back_references_for_isheet(graph, context, isheet)
 
+    def test_with_isheet_but_no_rerferences(self):
+        class IASheet(ISheet):
+            taggedValue('field:name', None)
+        result = self._make_one(self.target, IASheet)
+        assert result == {}
+
+    def test_with_isheet(self):
         class IASheet(ISheet):
             taggedValue('field:name', None)
 
-        class ASheetReferenceType(SheetReferenceType):
+        class ASheetToSheet(SheetToSheet):
             source_isheet = IASheet
             source_isheet_field = 'name'
-        self.objectmap.connect(self.source, self.target, ASheetReferenceType)
+        self.objectmap.connect(self.source, self.target, ASheetToSheet)
 
         result = self._make_one(self.target, IASheet)
 
-        wanted = {ASheetReferenceType.getTaggedValue('source_isheet_field'):
-                  [self.source]}
-        assert result == wanted
+        assert result == {'name': [self.source]}
 
     def test_with_isheet_that_has_subclass(self):
-        from adhocracy.interfaces import SheetReferenceType
+        from adhocracy.interfaces import SheetToSheet
         from adhocracy.interfaces import ISheet
         self.objectmap.connect(self.source, self.target,
-                               SheetReferenceType)
+                               SheetToSheet)
 
         class IASheet(ISheet):
             taggedValue('field:name', None)
 
-        class ASheetReferenceType(SheetReferenceType):
+        class ASheetReferenceType(SheetToSheet):
             source_isheet = IASheet
             source_isheet_field = 'name'
 
         class IABSheet(IASheet):
             taggedValue('field:name', None)
 
-        class ABSheetReferenceType(SheetReferenceType):
+        class ABSheetReferenceType(SheetToSheet):
             source_isheet = IABSheet
             source_isheet_field = 'name'
 
@@ -278,43 +427,35 @@ class GetBackReferencesForIsheetUnitTest(unittest.TestCase):
         self.objectmap.connect(self.source, self.target, ABSheetReferenceType)
 
         result = self._make_one(self.target, IASheet)
-        wanted = {ASheetReferenceType.getTaggedValue('source_isheet_field'):
-                  [self.source, self.source]}
-        assert result == wanted
+        assert result == {'name': [self.source, self.source]}
 
     def test_with_isheet_that_has_subclass_with_extra_field(self):
-        from adhocracy.interfaces import SheetReferenceType
+        from adhocracy.interfaces import SheetToSheet
         from adhocracy.interfaces import ISheet
 
         class IASheet(ISheet):
             taggedValue('field:name', None)
 
-        class ASheetReferenceType(SheetReferenceType):
+        class ASheetReferenceType(SheetToSheet):
             source_isheet = IASheet
             source_isheet_field = 'name'
 
         class IABSheet(IASheet):
             taggedValue('field:othername', None)
 
-        class ABSheetReferenceType(SheetReferenceType):
+        class ABSheetReferenceType(SheetToSheet):
             source_isheet = IABSheet
             source_isheet_field = 'othername'
 
-        self.objectmap.connect(self.source, self.target, SheetReferenceType)
+        self.objectmap.connect(self.source, self.target, SheetReference)
         self.objectmap.connect(self.source, self.target, ASheetReferenceType)
         self.objectmap.connect(self.source, self.target, ABSheetReferenceType)
 
         result = self._make_one(self.target, IASheet)
-        wanted = {ASheetReferenceType.getTaggedValue('source_isheet_field'):
-                  [self.source]}
-        assert result == wanted
+        assert result == {'name': [self.source], 'othername': [self.source]}
 
 
-class GetReferencesForIsheetUnitTest(unittest.TestCase):
-
-    def _make_one(self, context, isheet):
-        from . import get_references_for_isheet
-        return get_references_for_isheet(context, isheet)
+class GraphGetReferencesForIsheetUnitTest(unittest.TestCase):
 
     def setUp(self):
         from substanced.objectmap import ObjectMap
@@ -324,58 +465,102 @@ class GetReferencesForIsheetUnitTest(unittest.TestCase):
         self.source = create_dummy_resource(parent=context)
         self.target = create_dummy_resource(parent=context)
 
-    def test_with_isheet(self):
-        from adhocracy.interfaces import SheetReferenceType
-        from adhocracy.interfaces import ISheet
+    def _make_one(self, context, isheet):
+        from adhocracy.graph import Graph
+        graph = Graph(None)
+        graph._objectmap = self.objectmap
+        return Graph.get_references_for_isheet(graph, context, isheet)
 
+    def test_with_isheet(self):
         class IASheet(ISheet):
             taggedValue('field:name', None)
 
-        class ASheetReferenceType(SheetReferenceType):
+        class ASheetToSheet(SheetToSheet):
             source_isheet = IASheet
             source_isheet_field = 'name'
-        self.objectmap.connect(self.source, self.target, ASheetReferenceType)
+        self.objectmap.connect(self.source, self.target, ASheetToSheet)
 
         result = self._make_one(self.source, IASheet)
 
-        wanted = {ASheetReferenceType.getTaggedValue('source_isheet_field'):
-                  [self.target]}
-        assert result == wanted
+        assert result == {'name': [self.target]}
 
 
-class IsInSubtreeUnitTest(unittest.TestCase):
+class GetFollowsUnitTest(unittest.TestCase):
 
-    def _make_one(self, descendant, ancestors):
-        from . import is_in_subtree
-        return is_in_subtree(descendant, ancestors)
+    @patch('adhocracy.graph.Graph')
+    def setUp(self, dummy_graph=None):
+        self.context = testing.DummyResource()
+        self.graph = dummy_graph.return_value
+
+    def _make_one(self, context):
+        from adhocracy.graph import Graph
+        graph = self.graph
+        return Graph.get_follows(graph, context)
+
+    def test_predecessor(self):
+        old = testing.DummyResource()
+        self.graph.get_references.return_value = iter([(None, None, None, old)])
+        follows = list(self._make_one(self.context))
+        assert self.graph.get_references.call_args[0][0] == self.context
+        assert self.graph.get_references.call_args[1]['base_reftype']\
+            == NewVersionToOldVersion
+        assert follows == [old]
+
+    def test_no_predecessor(self):
+        self.graph.get_references.return_value = iter([])
+        follows = list(self._make_one(self.context))
+        assert follows == []
+
+
+class GetFollowedByUnitTest(unittest.TestCase):
+
+    @patch('adhocracy.graph.Graph')
+    def setUp(self, dummy_graph=None):
+        self.context = create_dummy_resource()
+        self.graph = dummy_graph.return_value
+
+    def _make_one(self, context):
+        from adhocracy.graph import Graph
+        graph = self.graph
+        return Graph.get_followed_by(graph, context)
+
+    def test_sucessors(self):
+        new = testing.DummyResource()
+        self.graph.get_back_references.return_value = iter([(new, None, None,
+                                                             None)])
+        follows_by = list(self._make_one(self.context))
+        assert self.graph.get_back_references.call_args[0][0] == self.context
+        assert self.graph.get_back_references.call_args[1]['base_reftype'] ==\
+            NewVersionToOldVersion
+        assert follows_by == [new]
+
+    def test_no_sucessors(self):
+        new = testing.DummyResource()
+        self.graph.get_back_references.return_value = iter([])
+        follows_by = list(self._make_one(self.context))
+        assert follows_by == []
+
+
+class GraphIsInSubtreeUnitTest(unittest.TestCase):
 
     def setUp(self):
         from substanced.objectmap import ObjectMap
         context = create_dummy_resource()
         context.__objectmap__ = ObjectMap(context)
         self.context = context
-        child = create_dummy_resource(parent=context)
-        self.child = child
+        self.child = create_dummy_resource(parent=context)
+        self.objectmap = context.__objectmap__
 
-    def test_with_none_ancestor(self):
-        """False if ancestors is None."""
-        with pytest.raises(AssertionError):
-            self._make_one(self.child, None)
+    def _make_one(self, descendant, ancestors):
+        from adhocracy.graph import Graph
+        graph = Graph(None)
+        graph._objectmap = self.objectmap
+        return Graph.is_in_subtree(graph, descendant, ancestors)
 
     def test_with_no_ancestors(self):
         """False if ancestors is an empty list."""
         result = self._make_one(self.child, [])
         assert result is False
-
-    def test_with_none_descendant(self):
-        """False if descendant is None."""
-        with pytest.raises(AssertionError):
-            self._make_one(None, [self.child])
-
-    def test_with_just_none(self):
-        """False if ancestors and descendant are both None."""
-        with pytest.raises(AssertionError):
-            self._make_one(None, None)
 
     def test_of_itself(self):
         """True if both are the same resource."""
@@ -385,7 +570,6 @@ class IsInSubtreeUnitTest(unittest.TestCase):
     def test_direct_link(self):
         """True if direct SheetToSheet link from ancestor to
         descendent.
-
         """
         root = create_dummy_resource(parent=self.context)
         element = create_dummy_resource(parent=self.context)
@@ -398,15 +582,13 @@ class IsInSubtreeUnitTest(unittest.TestCase):
         assert result is False
 
     def test_direct_follows_link(self):
-        """False if direct IVersionableFollowsReference link from ancestor to
+        """False if direct NewVersionToOldVersion link from ancestor to
         descendent.
-
         """
-        from adhocracy.sheets.versions import IVersionableFollowsReference
         other_version = create_dummy_resource(parent=self.context)
         old_version = create_dummy_resource(parent=self.context)
         om = self.context.__objectmap__
-        om.connect(other_version, old_version, IVersionableFollowsReference)
+        om.connect(other_version, old_version, NewVersionToOldVersion)
         result = self._make_one(old_version, [other_version])
         assert result is False
         # Inverse relation should not be found either
@@ -416,7 +598,6 @@ class IsInSubtreeUnitTest(unittest.TestCase):
     def test_indirect_link(self):
         """True if two-level SheetToSheet link from ancestor to
         descendent.
-
         """
         grandma = create_dummy_resource(parent=self.context)
         dad = create_dummy_resource(parent=self.context)
@@ -433,15 +614,13 @@ class IsInSubtreeUnitTest(unittest.TestCase):
     def test_indirect_follows_link(self):
         """True if two-level link from ancestor to descendent that includes a
         follows relation.
-
         """
-        from adhocracy.sheets.versions import IVersionableFollowsReference
         dad = create_dummy_resource(parent=self.context)
         daugher = create_dummy_resource(parent=self.context)
         step_son = create_dummy_resource(parent=self.context)
         om = self.context.__objectmap__
         om.connect(dad, daugher, SheetToSheet)
-        om.connect(step_son, daugher, IVersionableFollowsReference)
+        om.connect(step_son, daugher, NewVersionToOldVersion)
         result = self._make_one(step_son, [dad])
         assert result is False
         # Inverse relation should not be found either
@@ -451,7 +630,6 @@ class IsInSubtreeUnitTest(unittest.TestCase):
     def test_ancestor_list_has_multiple_elements(self):
         """True if ancestors is a two-element list and one of them is the right
         one.
-
         """
         root = create_dummy_resource(parent=self.context)
         not_root = create_dummy_resource(parent=self.context)
@@ -462,6 +640,3 @@ class IsInSubtreeUnitTest(unittest.TestCase):
         assert result is True
         result = self._make_one(element, [not_root, root])
         assert result is True
-
-
-

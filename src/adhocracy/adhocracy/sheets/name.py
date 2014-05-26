@@ -1,25 +1,32 @@
 """Name Sheet."""
-from zope.interface import provider
-from zope.interface import taggedValue
 import colander
 
 from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IIResourcePropertySheet
-from adhocracy.interfaces import IResourcePropertySheet
-from adhocracy.sheets import ResourcePropertySheetAdapter
+from adhocracy.sheets import add_sheet_to_registry
+from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.schema import Identifier
 
 
-@provider(IIResourcePropertySheet)
 class IName(ISheet):
 
-    """Human readable resource Identifier, used to build object paths."""
+    """Market interface for the name sheet."""
 
-    taggedValue('field:name', Identifier(default='', missing=colander.drop))
+
+class NameSchema(colander.MappingSchema):
+
+    """Name sheet data structure.
+
+    `name`: a human readable resource Identifier
+
+    """
+
+    name = Identifier(default='', missing=colander.drop)
+
+
+name_metadata = sheet_metadata_defaults._replace(isheet=IName,
+                                                 schema_class=NameSchema)
 
 
 def includeme(config):
-    """Register adapter."""
-    config.registry.registerAdapter(ResourcePropertySheetAdapter,
-                                    (IName, IIResourcePropertySheet),
-                                    IResourcePropertySheet)
+    """Register sheets."""
+    add_sheet_to_registry(name_metadata, config.registry)

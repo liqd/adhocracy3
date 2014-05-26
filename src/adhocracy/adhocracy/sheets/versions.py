@@ -1,127 +1,115 @@
 """Sheets to work with versionable resources."""
-from substanced.util import get_oid
-from zope.interface import implementer
-from zope.interface import provider
-from zope.interface import taggedValue
-from zope.interface.interfaces import IInterface
 import colander
 
-from adhocracy.graph import get_back_references_for_isheet
 from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import IResourcePropertySheet
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import NewVersionToOldVersion
-from adhocracy.sheets import ResourcePropertySheetAdapter
-from adhocracy.sheets.pool import PoolPropertySheetAdapter
-from adhocracy.sheets.pool import IIPool
-from adhocracy.schema import ReferenceListSchemaNode
-from adhocracy.schema import ReferenceSetSchemaNode
+from adhocracy.sheets import GenericResourceSheet
+from adhocracy.sheets import add_sheet_to_registry
+from adhocracy.sheets import sheet_metadata_defaults
+from adhocracy.sheets.pool import PoolSheet
+from adhocracy.schema import ListOfUniqueReferences
 
 
-class IIVersionable(IInterface):
-
-    """Marker interfaces to register the versionable propertysheet adapter."""
-
-
-@provider(IIVersionable)
 class IVersionable(ISheet):
 
-    """Make this item versionable."""
-
-    taggedValue(
-        'field:follows',
-        ReferenceSetSchemaNode(
-            default=[],
-            missing=colander.drop,
-            reftype='adhocracy.sheets.versions.IVersionableFollowsReference'
-        ))
-    taggedValue(
-        'field:followed_by',
-        ReferenceSetSchemaNode(
-            default=[],
-            missing=colander.drop,
-            reftype='adhocracy.sheets.versions.IVersionableFollowedByReference'
-        ))
+    """Maker interface for resources with the versionable sheeet."""
 
 
-class IVersionableFollowsReference(NewVersionToOldVersion):
+class VersionableFollowsReference(NewVersionToOldVersion):
 
-    """IVersionable reference to preceding versions."""
+    """versionable sheet reference to preceding versions."""
 
     source_isheet = IVersionable
     source_isheet_field = 'follows'
     target_isheet = IVersionable
 
 
-class IVersionableFollowedByReference(SheetToSheet):
+class VersionableFollowedByReference(SheetToSheet):
 
-    """IVersionable reference to subsequent versions.
-
-    Not stored in DB, but auto-calculated on demand.
-
-    """
+    """BackReference for the VersionableFollowsReference, not stored."""
 
     source_isheet = IVersionable
     source_isheet_field = 'followed_by'
     target_isheet = IVersionable
 
 
-@provider(IIPool)
+class VersionableSchema(colander.MappingSchema):
+
+    """ Versionable sheet data structure.
+
+    Set/get predecessor (`follows`) and get successor (`followed_by`) versions
+    of this resource.
+
+    """
+
+    follows = ListOfUniqueReferences(reftype=VersionableFollowsReference)
+    followed_by = ListOfUniqueReferences(
+        reftype=VersionableFollowedByReference)
+
+
+class VersionableSheet(GenericResourceSheet):
+
+    """Sheet to set/get the versionable data structure."""
+
+    isheet = IVersionable
+    schema_class = VersionableSchema
+
+    def set(self, appstruct, omit=()):
+        if 'followed_by' in appstruct:
+            del appstruct['followed_by']
+        super().set(appstruct, omit)
+
+    def get(self):
+        """Return appstruct."""
+        struct = super().get()
+        if self._graph:
+            struct['followed_by'] = self._graph.get_followed_by(self.context)
+            struct['follows'] = self._graph.get_follows(self.context)
+        return struct
+
+
+versionable_metadata = sheet_metadata_defaults._replace(
+    isheet=IVersionable,
+    sheet_class=VersionableSheet,
+    schema_class=VersionableSchema,
+)
+
+
 class IVersions(ISheet):
 
-    """Dag for collecting all versions of one item."""
-
-    taggedValue(
-        'field:elements',
-        ReferenceListSchemaNode(
-            default=[],
-            missing=colander.drop,
-            reftype='adhocracy.sheets.versions.IVersionsElementsReference',
-        ))
+    """Marker interface for the versions sheet."""
 
 
 class IVersionsElementsReference(SheetToSheet):
 
-    """IVersions reference."""
+    """version sheet elements reference."""
 
     source_isheet = IVersions
     source_isheet_field = 'elements'
     target_isheet = IVersionable
 
 
-@implementer(IResourcePropertySheet)
-class VersionableSheetAdapter(ResourcePropertySheetAdapter):
+class VersionsSchema(colander.MappingSchema):
 
-    """Adapts versionable resources to substanced PropertySheet."""
+    """Versions sheet data structure.
 
-    def _followed_by(self, resource):
-        """Determine the successors ("followed_by") of a versionable resource.
+    `elements`: Dag for collecting all versions of one item.
 
-        Args:
-            resource (IResource that provides the IVersionable sheet)
+    """
 
-        Returns:
-            a list of OIDs of successor versions (possibly empty)
+    elements = ListOfUniqueReferences(
+        reftype=IVersionsElementsReference)
 
-        """
-        versions = get_back_references_for_isheet(resource, IVersionable)
-        result = []
-        for new_version in versions.get('follows', []):
-            result.append(get_oid(new_version))
-        return set(result)
 
-    def get(self):
-        """Return data struct."""
-        struct = super().get()
-        struct['followed_by'] = self._followed_by(self.context)
-        return struct
+versions_metadata = sheet_metadata_defaults._replace(
+    isheet=IVersions,
+    sheet_class=PoolSheet,
+    schema_class=VersionsSchema,
+)
 
 
 def includeme(config):
-    """Register adapters."""
-    config.registry.registerAdapter(VersionableSheetAdapter,
-                                    (IVersionable, IIVersionable),
-                                    IResourcePropertySheet)
-    config.registry.registerAdapter(PoolPropertySheetAdapter,
-                                    (IVersions, IIPool),
-                                    IResourcePropertySheet)
+    """Register sheets."""
+    add_sheet_to_registry(versionable_metadata, config.registry)
+    add_sheet_to_registry(versions_metadata, config.registry)

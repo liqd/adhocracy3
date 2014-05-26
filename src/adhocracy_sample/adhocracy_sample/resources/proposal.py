@@ -5,30 +5,43 @@ from adhocracy.interfaces import IItem
 from adhocracy_sample.resources.section import ISection
 from adhocracy_sample.resources.paragraph import IParagraph
 from adhocracy.resources import add_resource_type_to_registry
-from zope.interface import taggedValue
+from adhocracy.resources.itemversion import itemversion_metadata
+from adhocracy.resources.item import item_metadata
+
+import adhocracy.sheets.document
 
 
 class IProposalVersion(IItemVersion):
 
     """Versionable item with Document propertysheet."""
 
-    taggedValue('extended_sheets',
-                set(['adhocracy.sheets.document.IDocument']))
+
+proposalversion_meta = itemversion_metadata._replace(
+    content_name='ProposalVersion',
+    iresource=IProposalVersion,
+    extended_sheets=[adhocracy.sheets.document.IDocument,
+                     ],
+)
 
 
 class IProposal(IItem):
 
     """All versions of a Proposal."""
 
-    taggedValue('element_types', set([ITag,
-                                      ISection,
-                                      IParagraph,
-                                      IProposalVersion,
-                                      ]))
-    taggedValue('item_type', IProposalVersion)
+
+proposal_meta = item_metadata._replace(
+    content_name='Proposal',
+    iresource=IProposal,
+    element_types=[ITag,
+                   ISection,
+                   IParagraph,
+                   IProposalVersion,
+                   ],
+    item_type=IProposalVersion,
+)
 
 
 def includeme(config):
-    """Register resource type factory in substanced content registry."""
-    add_resource_type_to_registry(IProposalVersion, config)
-    add_resource_type_to_registry(IProposal, config)
+    """Add resource type to registry."""
+    add_resource_type_to_registry(proposalversion_meta, config)
+    add_resource_type_to_registry(proposal_meta, config)
