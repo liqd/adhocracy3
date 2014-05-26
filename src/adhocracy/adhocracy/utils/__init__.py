@@ -18,7 +18,7 @@ from adhocracy.interfaces import ISheet
 
 
 def find_graph(context) -> object:
-    """:Returns: the Graph object in the lineage of `context` or None.
+    """Get the Graph object in the lineage of `context` or None.
 
     :rtype: :class:`adhocracy.graph.Graph`
 
@@ -27,14 +27,14 @@ def find_graph(context) -> object:
 
 
 def get_iresource(context) -> IInterface:
-    """:Returns: the :class:IResource` interface of `context` or None."""
+    """Get the :class:`adhocracy.interfaces.IResource` interface or None."""
     ifaces = list(directlyProvidedBy(context))
     iresources = [i for i in ifaces if i.isOrExtends(IResource)]
     return iresources[0] if iresources else None
 
 
 def get_isheets(context) -> [IInterface]:
-    """:Returns: the :class:`adhocracy.interfaces.ISheet` interfaces."""
+    """Get the :class:`adhocracy.interfaces.ISheet` interfaces of `context`."""
     ifaces = list(providedBy(context))
     return [i for i in ifaces if i.isOrExtends(ISheet)]
 
@@ -61,7 +61,7 @@ def get_all_sheets(context) -> [IResourceSheet]:
 
 
 def get_all_taggedvalues(iface: IInterface) -> dict:
-    """Return dict with all own and all inherited taggedvalues."""
+    """Get dict with all own and all inherited taggedvalues."""
     iro = [i for i in iface.__iro__]
     iro.reverse()
     taggedvalues = {}
@@ -131,7 +131,14 @@ def strip_optional_prefix(s, prefix):
 
 
 def to_dotted_name(context) -> str:
-    """:returns: The dotted name of `obj`, if it's a type.  """
+    """Get the dotted name of `context`.
+
+    :returns:
+        The dotted name of `context`, if it's a type.  If `context` is a string,
+        it is returned as is (since we suppose that it already
+        represents a type name).
+
+    """
     if isinstance(context, str):
         return context
     else:
