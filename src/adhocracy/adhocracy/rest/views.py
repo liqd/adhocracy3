@@ -121,13 +121,12 @@ def validate_post_sheet_names_and_resource_type(context, request):
         posted = request.validated.get('data', {}).keys()
         wrong_sheets = set(posted) - set(optional + mandatory)
         if wrong_sheets:
-            error = 'The following sheets are not allowed for this ' \
-                    'resource type or mispelled: {names}'.format(names=
-                                                                 wrong_sheets)
+            error = 'The following sheets are not allowed for this resource '\
+                    'type or misspelled: {names}'.format(names=wrong_sheets)
             request.errors.add('body', 'data', error)
         missing_sheets = set(mandatory) - set(posted)
         if missing_sheets:
-            error = 'The following sheets are mandatory to create ' \
+            error = 'The following sheets are mandatory to create '\
                     'this resource: {names}'.format(names=missing_sheets)
             request.errors.add('body', 'data', error)
 

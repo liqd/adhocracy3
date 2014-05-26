@@ -117,7 +117,7 @@ class ResourceFactory:
 
 def includeme(config):
     """Include all resource types in this package."""
-    #config.include('.pool')
-    #config.include('.tag')
-    #config.include('.itemversion')
-    #config.include('.item')
+    # config.include('.pool')
+    # config.include('.tag')
+    # config.include('.itemversion')
+    # config.include('.item')

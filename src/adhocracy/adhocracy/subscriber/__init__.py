@@ -42,7 +42,7 @@ def _update_resource(resource, isheet, appstruct):
     sheet = get_sheet(resource, isheet)
     if not sheet.meta.readonly:
         sheet.set(appstruct)
-        #FIXME: make sure modified event is send
+        # FIXME: make sure modified event is send
     return resource
 
 

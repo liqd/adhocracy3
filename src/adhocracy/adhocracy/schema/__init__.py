@@ -151,7 +151,7 @@ class SetOfPaths(AbstractIterableOfPaths):
 def get_all_resources(node, context):
     """Return List with all resources."""
     return []
-    #FIXME: we need this to make the sdi work
+    # FIXME: we need this to make the sdi work
     # interfaces = [node.interfaces]
     # catalog = find_catalog(context, 'system')
     # if catalog:
