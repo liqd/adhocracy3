@@ -55,15 +55,9 @@ class AbstractIterableOfPaths(IdSet):
         """Add an element to the container to used to store paths."""
         raise NotImplementedError()  # pragma: no cover
 
-    def _is_location_aware(self, resource):
-        """Check that resource is location aware.
-
-        Raises:
-            AttributeError
-
-        """
-        resource.__parent__
-        resource.__name__
+    def _raise_attribute_error_if_not_location_aware(self, context):
+        context.__parent__
+        context.__name__
 
     def serialize(self, node, value):
         """Serialize object to path with 'pyramid.traveral.resource_path'.
@@ -77,8 +71,8 @@ class AbstractIterableOfPaths(IdSet):
         paths = []
         for resource in value:
             try:
+                self._raise_attribute_error_if_not_location_aware(resource)
                 path = resource_path(resource)
-                self._is_location_aware(resource)
             except AttributeError:
                 raise colander.Invalid(
                     node,
@@ -103,7 +97,7 @@ class AbstractIterableOfPaths(IdSet):
         for path in value:
             try:
                 resource = find_resource(context, path)
-                self._is_location_aware(resource)
+                self._raise_attribute_error_if_not_location_aware(resource)
             except (KeyError, AttributeError):
                 raise colander.Invalid(
                     node,
