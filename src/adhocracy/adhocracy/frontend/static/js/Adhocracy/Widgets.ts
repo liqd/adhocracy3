@@ -44,12 +44,10 @@ export class ListingElementAdapter {
 }
 
 export class Listing<Container extends ListingContainerAdapter, Element extends ListingElementAdapter> {
-    self: ng.IDirective;
 
     static templateUrl = "/Widgets/Listing.html";
 
-    constructor(private containerPath: string) {
-    }
+    constructor(private containerPath: string) {}
 
     public factory = function() : ng.IDirective {
         return {

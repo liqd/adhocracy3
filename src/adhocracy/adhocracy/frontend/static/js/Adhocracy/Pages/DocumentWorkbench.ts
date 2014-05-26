@@ -117,7 +117,7 @@ export function run<Data>() {
 
     // widget-based directives
 
-    app.directive("wdgProposalListing", new Widgets.Listing<Widgets.ListingContainerAdapter, Widgets.ListingElementAdapter>("/adhocracy"));
+    app.directive("wdgProposalListing", new Widgets.Listing<Widgets.ListingContainerAdapter, Widgets.ListingElementAdapter>("/adhocracy").factory);
 
 
     // application-specific directives
