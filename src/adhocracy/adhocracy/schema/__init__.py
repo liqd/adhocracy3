@@ -86,11 +86,12 @@ class AutomaticAbsolutePath(AbsolutePath):
 
     """Absolute path that automatically deserialized itself to a resource."""
 
-    def serialize(self, node, value):
-        return serialize_path(node, value)
+    def serialize(self, value):
+        return serialize_path(self, value)
 
-    def deserialize(self, node, value):
-        return deserialize_path(node, value)
+    def deserialize(self, value):
+        # TODO now to get the binding??
+        return deserialize_path(self, value)
 
 
 class AbstractIterableOfPaths(IdSet):

@@ -1,6 +1,7 @@
 """Tests for websockets package."""
 import unittest
 
+from pyramid import testing
 from substanced.util import get_oid
 
 from adhocracy.websockets import ClientCommunicator
@@ -14,7 +15,6 @@ class DummyResource():
         """Initialize instance."""
         self.__oid__ = oid
 
-
 class ClientCommunicatorUnitTests(unittest.TestCase):
 
     """Test the ClientCommunicator class."""
@@ -27,6 +27,43 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         """Test that Autobahn is installed."""
         from autobahn import __version__
         assert isinstance(__version__, str)
+
+
+class ClientRequestSchemaUnitTests(unittest.TestCase):
+
+    """Test ClientRequestSchema deserialization."""
+
+    def setUp(self):
+        self.context = testing.DummyResource()
+        self.child = testing.DummyResource()
+
+    def _make_one(self):
+        from adhocracy.websockets import ClientRequestSchema
+        schema = ClientRequestSchema()
+        schema.bind(context=self.context)
+        return schema
+
+    def test_deserialize_subscribe(self):
+        inst = self._make_one()
+        result = inst.deserialize(
+            { 'action': 'subscribe', 'resource': '/child' })
+        assert result == { 'action': 'subscribe', 'resource': '/child' }
+
+    # TODO valid messages:
+    #
+    # { 'action': 'unsubscribe', 'resource': '/child' }
+
+    # TODO invalid messages:
+    # { 'action': 'blah', 'resource': '/child' }
+    # { 'action': 'subscribe', 'resource': '/wrong_child' }
+    # { 'action': 'subscribe' }
+    # { 'resource': '/child' }
+    # {}
+    # { 'action': 'subscribe', 'resource': '/child', 'extra': 'something' }
+    # { 'action': 7, 'resource': '/child' }
+    # ['subscribe']
+    # ''
+
 
 class ClientTrackerUnitTests(unittest.TestCase):
 

@@ -37,20 +37,13 @@ class Action(colander.SchemaNode):
     validator = colander.OneOf(['subscribe', 'unsubscribe'])
 
 
-class ClientRequestSchema(colander.Schema):
+class ClientRequestSchema(colander.MappingSchema):
 
     """Data structure for client requests."""
 
     action = Action()
-    resource_path = AutomaticAbsolutePath()
 
-    # TODO convert resource paths to resources, cf. AbstractIterableOfPaths
-
-    def __init__(self, action, resource_path):
-        self._action = action
-        # TODO convert resource_path into resource
-        # TODO validate action and resource (path)
-        # TODO raise WebSocketError on error
+    resource = AutomaticAbsolutePath()
 
 
 class ClientTracker():
@@ -132,6 +125,11 @@ class ClientCommunicator(WebSocketServerProtocol):
     # All instances of this class share the same tracker
     tracker = ClientTracker()
 
+    def __init__(self, context):
+        """Create a new instance."""
+        self._client_request_schema = ClientRequestSchema()
+        self._client_request_schema.bind(context=context)
+
     def onConnect(self, request: ConnectionRequest):
         self._client = request.peer
         logger.debug('Client connecting: %s', self._client)
@@ -140,43 +138,43 @@ class ClientCommunicator(WebSocketServerProtocol):
         logger.debug('WebSocket connection to %s open', self._client)
 
     def onMessage(self, payload: bytes, is_binary: bool) -> None:
-        # TODO convert everything into a WebSocketError
-        try:
-            json_object = self._parse_message(payload, is_binary)
-        except ValueError as err:
-            self._send_error_message('malformed_message', err.args[0])
-            return
-        try:
-            request = self._convert_json_into_client_request(json_object)
-        except ValueError as err:
-            # TODO handle error and return (None)
-            return request
-        # TODO check that JSON is valid: dict with action and resource keys
-        # and strings values -> convert into ClientRequest object
-        # return invalid_json error message on errors
-        #        unknown_action if not "subscribe" nor "unsubscribe"
-        #        unknown_resource not unknown resource path
-        #        subscribe_not_supported if an ItemVersion
-        # otherwise handleClientRequest
+        json_object = self._parse_message(payload, is_binary)
+        request = self._convert_json_into_client_request(json_object)
 
+        # TODO handle_client_request -- throw subscribe_not_supported if an ItemVersion
+
+        # TODO convert everything into a WebSocketError
         # TODO handle message and send suitable response
         # TODO check that result is dict
 
     def _parse_message(self, payload: bytes, is_binary: bool) -> object:
         """Parse a client message into a JSON object.
 
-        :raise ValueError: if the message doesn't contain UTF-8 encoded text or
-                           cannot be parsed as JSON
+        :raise WebSocketError: if the message doesn't contain UTF-8 encoded
+                               text or cannot be parsed as JSON
 
         """
         if is_binary:
-            raise ValueError('Message is binary')
-        text = payload.decode()
-        logger.debug('Received text message from client %s: %s',
-                     self._client, text)
-        return loads(text)
+            raise WebSocketError('malformed_message', 'message is binary')
+        try:
+            text = payload.decode()
+            logger.debug('Received text message from client %s: %s',
+                         self._client, text)
+            return loads(text)
+        except ValueError as err:
+            raise WebSocketError('malformed_message', err.args[0])
+
+    def _convert_json_into_client_request(self, json_object):
+        try:
+            return self._client_request_schema.deserialize(json_object)
+        except colander.Invalid as err:
+            details = ' / '.join(err.messages())
+            raise WebSocketError('invalid_json', details)
+            # TODO 'unknown_action' and 'unknown_resource' should be reported
+            # as distinct error types
 
     def _send_error_message(self, error: str, details: str) -> None:
+        # TODO serialize WebSocketError instead
         self._send_json_message({'error': error, 'details': details})
 
     def _send_json_message(self, json_object: dict) -> None:
@@ -184,10 +182,6 @@ class ClientCommunicator(WebSocketServerProtocol):
         text = dumps(json_object)
         logger.debug('Sending message to client %s: %s', self._client, text)
         self.sendMessage(text.encode())
-
-    def _convert_json_into_client_request(self, json_object):
-        # TODO implement
-        pass
 
     def onClose(self, was_clean: bool, code: int, reason: str):
         self.tracker.delete_all_subscriptions(self._client)
