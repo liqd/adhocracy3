@@ -24,7 +24,8 @@ export interface ListingScope<Container, Element> {
 }
 
 export class ListingContainerAdapter {
-    static ContainerType : Types.Content<Resources.HasIPoolSheet>;
+    static ContainerType : Types.Content<Resources.HasIPoolSheet>;  // FIXME: (for elemRefs sig)
+    public ContainerType : Types.Content<Resources.HasIPoolSheet>;  // FIXME: (for typeof sigs in controller)
 
     public elemRefs(c : typeof ListingContainerAdapter.ContainerType) : string[] {  // FIXME: argument type should be something like 'self.ContainerType'.
         return c.data["adhocracy.sheets.pool.IPool"].elements;
@@ -32,7 +33,8 @@ export class ListingContainerAdapter {
 }
 
 export class ListingElementAdapter {
-    static ElementType: Types.Content<any>;
+    static ElementType: Types.Content<any>;  // FIXME (see ListingContainerAdapter)
+    public ElementType: Types.Content<any>;
 
     public name(e: typeof ListingElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
         return "[content type " + e.content_type + ", resource " + e.path + "]"
@@ -42,14 +44,14 @@ export class ListingElementAdapter {
     }
 }
 
-export class Listing {
+export class Listing<ContainerAdapter extends ListingContainerAdapter, ElementAdapter extends ListingElementAdapter> {
 
     static templateUrl: string = "/Widgets/Listing.html";
 
     constructor(private containerPath: string,
-                public containerAdapter: ListingContainerAdapter,
-                public elementAdapter: ListingElementAdapter)
-    {}
+                public containerAdapter: ContainerAdapter,
+                public elementAdapter: ElementAdapter)
+    { }
 
     public factory = function() : ng.IDirective {
         // FIXME: "factory" might be misinterpreted as "ListingFactory".
@@ -57,26 +59,44 @@ export class Listing {
         // such that the instance type is '() => IDirective', and no
         // factory method is needed.
 
+// FIXME FIRST: if this function is extracted from the object and
+// passed to app.directive, it is stuck into a new object before it is
+// called.  that makes "this" invalid.  (if the factory method is
+// invoked, 'this' is intact, but we want to return a factory, not the
+// invoked factory.)
+
+        // FIXME: is there a way to use typescript's "typeof" on
+        // this.*?  that would make these local variables unnecessary.
+
+        debugger;
+
+        var ca = this.containerAdapter;
+        var ea = this.elementAdapter;
+
         return {
             restrict: "E",
             templateUrl: templatePath + "/" + Listing.templateUrl,  // FIXME: "s/Listing./self./"?
+            scope: { },
             controller: ["$scope",
                          "adhHttp",
                          "adhHttp",  // FIXME(?): do we really want to duplicate adhHttp for the type system?
-                         function($scope: ListingScope<typeof ListingContainerAdapter.ContainerType, typeof ListingElementAdapter.ElementType>,
-                                  adhHttpC: AdhHttp.IService<typeof ListingContainerAdapter.ContainerType>,
-                                  adhHttpE: AdhHttp.IService<typeof ListingElementAdapter.ElementType>
-                                  // FIXME: can we get to the dynamic subclass here?  i think not.
+                         function($scope: ListingScope<typeof ca.ContainerType, typeof ea.ElementType>,
+                                  adhHttpC: AdhHttp.IService<typeof ca.ContainerType>,
+                                  adhHttpE: AdhHttp.IService<typeof ea.ElementType>
                                  ) : void
                          {
+                             debugger;
+
                              adhHttpC.get(this.containerPath).then((pool) => {
                                  $scope.container = pool;
                                  $scope.elements = [];
 
-                                 var elemRefs : string[] = this.containerAdapter.elemRefs($scope.container);
+                                 debugger;
+
+                                 var elemRefs : string[] = this.elementAdapter.elemRefs($scope.container);
                                  for (var x in elemRefs) {
                                      (function(x : number) {
-                                         adhHttpE.get(elemRefs[x]).then((element: typeof ListingElementAdapter.ElementType)
+                                         adhHttpE.get(elemRefs[x]).then((element: typeof ea.ElementType)
                                                                         => $scope.elements[x] = element);
                                      })(x);
                                  }
@@ -92,6 +112,17 @@ export class Listing {
 // specific type, because that woudl require to change the references
 // to ListingContainerAdapter all over the controller implementation.
 // what now?
+//
+// pass type to class *and* instance to construtor?
+//
+// pass http and scope services to constructor as well?  (type
+// annotation in line 79 could just be dropped.)
+//
+// am i right that i can't use the concrete type of ContainerAdapter
+// (if it's a class template parameter), because it is unknown at
+// compile time?  WAIT: the only thing we need is that
+// ContainerAdapter is the same type all over.  we don't need to know
+// what type exactly it is.  it should be possible to fix this!
 
 
 /*
