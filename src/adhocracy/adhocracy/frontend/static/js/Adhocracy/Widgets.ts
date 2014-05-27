@@ -148,12 +148,8 @@ export class Listing<ContainerAdapter extends ListingContainerAdapter, ElementAd
                                      (function(x : number) {
                                          adhHttpE.get(elemRefs[x])
                                              .then((element: typeof _this.elementAdapter.ElementType) => {
-                                                 console.log('then1');
-                                                 console.log(element);
                                                  _this.elementAdapter.name(element)
                                                      .then((name: string) => {
-                                                         console.log('then2');
-                                                         console.log(name);
                                                          $scope.elements[x] = { name: name,
                                                                                 path: _this.elementAdapter.path(element) };
                                                      });
@@ -172,12 +168,13 @@ export class Listing<ContainerAdapter extends ListingContainerAdapter, ElementAd
 
 
 // next steps:
-// 1. extend ListingElementAdapter to ListingDocumentElementAdapter
-// 2. extend listingcontaineradapter to something that has no
-//    ipoolsheet!
-// 3. detail view
-// 4. think about what else we want to do with generic widgets
+// 1. detail view
+// 2. think about what else we want to do with generic widgets
 
+
+
+// FIXME: extend ListingContainerAdapter to something that has no
+// IPoolSheet.
 
 
 // FIXME: with the current design, if we want to change the element
