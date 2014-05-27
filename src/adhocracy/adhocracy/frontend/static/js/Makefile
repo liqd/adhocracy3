@@ -8,10 +8,14 @@ FIX_TSLINT_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\[(\d+),\s*(\d+)\]:(.*)/) { 
 compile:
 	$(TSC) --module amd --sourcemap --out Adhocracy.js Adhocracy.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 
+description:
+	$(TSC) -d --module amd --sourcemap --out Adhocracy.js Adhocracy.ts
+
 clean:
 	find . -name '*~' -exec rm {} \;
 	find . -name '*.js' -exec rm {} \;
 	find . -name '*.js.map' -exec rm {} \;
+	find . -name '[^_]*.d.ts' -exec rm {} \;
 
 wc:
 	find . -name '*.ts' | xargs wc
