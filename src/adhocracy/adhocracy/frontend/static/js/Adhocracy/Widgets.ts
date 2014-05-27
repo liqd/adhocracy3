@@ -18,45 +18,42 @@ import Resources = require("Adhocracy/Resources");
 var templatePath : string = "/frontend_static/templates";  // FIXME: move this to config file.
 
 
-/*
+export class AbsListingContainerAdapter<T> {
+    public ContainerType : T;
+    public elemRefs(c : T) : string[] {
+        return [];
+    }
+}
 
-reference types of (static and public) class attributes:
- - static: i think this is not possible, and not urgently needed because it does not inherit.
- - public: would be really, really nice.  perhaps an issue with 'this'?
-
-then:
- - why no type error if we stick elements of wrong type into scope?
-
-*/
-
-
-export class ListingContainerAdapter {
-    static ContainerType : Types.Content<Resources.HasIPoolSheet>;  // FIXME: (for elemRefs sig)
-    public ContainerType : Types.Content<Resources.HasIPoolSheet>;  // FIXME: (for typeof sigs in controller)
-
-    public elemRefs(c : typeof ListingContainerAdapter.ContainerType) : string[] {  // FIXME: argument type should be something like 'self.ContainerType'.
+export class ListingContainerAdapter extends AbsListingContainerAdapter<Types.Content<Resources.HasIPoolSheet>> {
+    public elemRefs(c) {  // FIXME: derived type of c appears to be 'any', should be 'Types.Content<Resources.HasIPoolSheet>'!
         return c.data["adhocracy.sheets.pool.IPool"].elements;
     }
 }
 
-export class ListingElementAdapter {
-    static ElementType: Types.Content<any>;  // FIXME (see ListingContainerAdapter)
-    public ElementType: Types.Content<any>;
+export class AbsListingElementAdapter<T> {
+    public ElementType: T;
 
-    public name(e: typeof ListingElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
-        return "[content type " + e.content_type + ", resource " + e.path + "]"
+    public name(e: T) : string {
+        return "";
     }
-    public path(e: typeof ListingElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
+    public path(e: T) : string {
+        return "";
+    }
+}
+
+export class ListingElementAdapter extends AbsListingElementAdapter<Types.Content<any>> {
+    public name(e) {
+        return "[content type " + e.content_type + ", resource " + e.path + "]";
+    }
+    public path(e) {
         return e.path;
     }
 }
 
-export class ListingTiteledElementAdapter {
-    static ElementType: Types.Content<Resources.HasIDocumentSheet>;  // FIXME (see ListingContainerAdapter)
-    public ElementType: Types.Content<Resources.HasIDocumentSheet>;
-
-    public name(e: typeof ListingTiteledElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
-        return 'e.data["adhocracy.sheets.document.IDocument"].title';
+export class ListingTiteledElementAdapter extends AbsListingElementAdapter<Types.Content<Resources.HasIDocumentSheet>> {
+    public name(e) {
+        return e.data["adhocracy.sheets.document.IDocument"].title;
 
         // FIXME: this fails because the document sheet is contained
         // in the version, not the item.  to fix this, we need to
@@ -67,7 +64,7 @@ export class ListingTiteledElementAdapter {
         // the retrieved object does not match.
 
     }
-    public path(e: typeof ListingTiteledElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
+    public path(e) {
         return e.path;
     }
 }
