@@ -44,7 +44,7 @@ export class ListingTiteledElementAdapter {
     public ElementType: Types.Content<Resources.HasIDocumentSheet>;
 
     public name(e: typeof ListingTiteledElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
-        return e.data["adhocracy.sheets.document.IDocument"].title;
+        return 'e.data["adhocracy.sheets.document.IDocument"].title';
 
         // FIXME: this fails because the document sheet is contained
         // in the version, not the item.  to fix this, we need to
