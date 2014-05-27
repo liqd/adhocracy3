@@ -32,7 +32,7 @@ def add_app_root_permissions(root):
     set_acl(app_root, acl)
 
 
-def includeme(config):
+def includeme(config):  # pragma: no cover
     """Run pyramid configuration."""
     config.add_evolution_step(add_app_root_element)
     config.add_evolution_step(

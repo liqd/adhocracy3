@@ -67,7 +67,7 @@ class ISheetReferenceAutoUpdateMarker(ISheet):
     """
 
 
-class IResourceSheet(IPropertySheet):
+class IResourceSheet(IPropertySheet):  # pragma: no cover
 
     """Sheet for resources to get/set the sheet data structure."""
 
@@ -162,7 +162,7 @@ class IResource(ILocation):
     """Basic resource type."""
 
 
-class IPool(IResource):
+class IPool(IResource):  # pragma: no cover
 
     """Resource with children - a folder in the object hierarchy. """
 

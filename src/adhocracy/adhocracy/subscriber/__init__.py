@@ -12,12 +12,13 @@ from adhocracy.utils import get_iresource
 from adhocracy.utils import find_graph
 
 
-def _get_not_readonly_appstructs(resource):
+def _get_editable_appstructs(resource):
     # FIXME maybe move this to utils or better use resource registry
+    sheets = get_all_sheets(resource)
+    editable_sheets = [s for s in sheets if not s.meta.readonly]
     appstructs = {}
-    for sheet in get_all_sheets(resource):
-        if not sheet.meta.readonly:
-            appstructs[sheet.meta.isheet.__identifier__] = sheet.get()
+    for sheet in editable_sheets:
+        appstructs[sheet.meta.isheet.__identifier__] = sheet.get()
     return appstructs
 
 
@@ -27,7 +28,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
         return resource
     else:
         registry = get_current_registry()
-        appstructs = _get_not_readonly_appstructs(resource)
+        appstructs = _get_editable_appstructs(resource)
         appstructs[IVersionable.__identifier__]['follows'] = [resource]
         appstructs[isheet.__identifier__] = appstruct
         iresource = get_iresource(resource)
@@ -40,9 +41,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
 
 def _update_resource(resource, isheet, appstruct):
     sheet = get_sheet(resource, isheet)
-    if not sheet.meta.readonly:
-        sheet.set(appstruct)
-        # FIXME: make sure modified event is send
+    sheet.set(appstruct)  # FIXME: make sure modified event is send
     return resource
 
 

@@ -160,7 +160,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
 
         assert sheet_autoupdate._data == {'elements': [event.new_version]}
 
-    def test_call_noversionable_with_autoupdate_readonly(self):
+    def test_call_nonversionable_with_autoupdate_readonly(self):
         context = testing.DummyResource(__provides__=IItemVersion)
         isheet = IDummySheetAutoUpdate
         event = _create_new_version_event_with_isheet(context, isheet)

@@ -554,19 +554,6 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
         wanted = {ISheetB.__identifier__: 'dummy_cstruct'}
         assert wanted == response['data']
 
-    def test_get_item_valid_no_sheets(self):
-        from adhocracy.interfaces import IItem
-        from adhocracy.interfaces import IItemVersion
-        context = testing.DummyResource(__provides__=IItem)
-        context['firt'] = testing.DummyResource(__provides__=IItemVersion)
-
-        inst = self.make_one(context, self.request)
-
-        wanted = {'path': '/', 'data': {},
-                  'content_type': IItem.__identifier__,
-                  'first_version_path': '/firt'}
-        assert inst.get() == wanted
-
 
 class SimpleRESTViewUnitTest(unittest.TestCase):
 
@@ -678,15 +665,16 @@ class ItemRESTViewUnitTest(unittest.TestCase):
         self.create = request.registry.content.create
 
     def make_one(self, context, request):
-        from .views import ItemRESTView
+        from adhocracy.rest.views import ItemRESTView
         return ItemRESTView(context, request)
 
     def test_create(self, ):
-        from .views import validate_post_sheet_names_and_resource_type
-        from .views import validate_post_sheet_cstructs
-        from .views import validate_post_root_versions
-        from .views import SimpleRESTView
-        from .schemas import POSTItemRequestSchema
+        from adhocracy.rest.views import\
+            validate_post_sheet_names_and_resource_type
+        from adhocracy.rest.views import validate_post_sheet_cstructs
+        from adhocracy.rest.views import validate_post_root_versions
+        from adhocracy.rest.views import SimpleRESTView
+        from adhocracy.rest.schemas import POSTItemRequestSchema
         inst = self.make_one(self.context, self.request)
         assert issubclass(inst.__class__, SimpleRESTView)
         assert inst.validation_POST == \
@@ -698,6 +686,31 @@ class ItemRESTViewUnitTest(unittest.TestCase):
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
+
+    def test_get_item_with_first_version(self):
+        from adhocracy.interfaces import IItem
+        from adhocracy.interfaces import IItemVersion
+        context = testing.DummyResource(__provides__=IItem)
+        context['first'] = testing.DummyResource(__provides__=IItemVersion)
+
+        inst = self.make_one(context, self.request)
+
+        wanted = {'path': '/', 'data': {},
+                  'content_type': IItem.__identifier__,
+                  'first_version_path': '/first'}
+        assert inst.get() == wanted
+
+    def test_get_item_without_first_version(self):
+        from adhocracy.interfaces import IItem
+        context = testing.DummyResource(__provides__=IItem)
+        context['non_first'] = testing.DummyResource()
+
+        inst = self.make_one(context, self.request)
+
+        wanted = {'path': '/', 'data': {},
+                  'content_type': IItem.__identifier__,
+                  'first_version_path': ''}
+        assert inst.get() == wanted
 
     def test_post_valid(self):
         child = testing.DummyResource(__provides__=IResourceX,

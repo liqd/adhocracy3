@@ -1,6 +1,7 @@
 import unittest
 
 from pyramid import testing
+from zope.interface import Interface
 
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
@@ -153,9 +154,16 @@ class TestResourceContentRegistry(unittest.TestCase):
         wanted = inst.resources_metadata()
         assert wanted == {}
 
-    def test_resources_metadata_with_non_iresource_content_types(self):
+    def test_resources_metadata_with_non_wrong_content_types(self):
         inst = self._make_one()
         inst.add("wrong", "wrong", lambda x: x)
+        wanted = inst.resources_metadata()
+        assert wanted == {}
+
+    def test_resources_metadata_with_non_iresource_content_types(self):
+        inst = self._make_one()
+        inst.add(Interface.__identifier__, Interface.__identifier__,
+                 lambda x: x)
         wanted = inst.resources_metadata()
         assert wanted == {}
 
