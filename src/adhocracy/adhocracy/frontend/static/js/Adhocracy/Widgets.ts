@@ -26,7 +26,10 @@ export class AbsListingContainerAdapter<T> {
 }
 
 export class ListingContainerAdapter extends AbsListingContainerAdapter<Types.Content<Resources.HasIPoolSheet>> {
-    public elemRefs(c) {  // FIXME: derived type of c appears to be 'any', should be 'Types.Content<Resources.HasIPoolSheet>'!
+    public elemRefs(c) {
+        // FIXME: derived type of argument c appears to be 'any',
+        // should be 'Types.Content<Resources.HasIPoolSheet>'!
+        // http://stackoverflow.com/questions/23893372/expecting-type-error-when-extending-and-generic-class
         return c.data["adhocracy.sheets.pool.IPool"].elements;
     }
 }
