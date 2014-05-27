@@ -18,6 +18,18 @@ import Resources = require("Adhocracy/Resources");
 var templatePath : string = "/frontend_static/templates";  // FIXME: move this to config file.
 
 
+/*
+
+reference types of (static and public) class attributes:
+ - static: i think this is not possible, and not urgently needed because it does not inherit.
+ - public: would be really, really nice.  perhaps an issue with 'this'?
+
+then:
+ - why no type error if we stick elements of wrong type into scope?
+
+*/
+
+
 export class ListingContainerAdapter {
     static ContainerType : Types.Content<Resources.HasIPoolSheet>;  // FIXME: (for elemRefs sig)
     public ContainerType : Types.Content<Resources.HasIPoolSheet>;  // FIXME: (for typeof sigs in controller)
