@@ -120,7 +120,7 @@ export function run<Data>() {
     app.directive("wdgProposalListing", new Widgets.Listing("/adhocracy",
                                                             new Widgets.ListingContainerAdapter(),
                                                             new Widgets.ListingElementAdapter()
-                                                           ).factory);
+                                                           ).factory());
 
 
     // application-specific directives

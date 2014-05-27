@@ -18,11 +18,6 @@ import Resources = require("Adhocracy/Resources");
 var templatePath : string = "/frontend_static/templates";  // FIXME: move this to config file.
 
 
-export interface ListingScope<Container, Element> {
-    container: Container;
-    elements: Element[];
-}
-
 export class ListingContainerAdapter {
     static ContainerType : Types.Content<Resources.HasIPoolSheet>;  // FIXME: (for elemRefs sig)
     public ContainerType : Types.Content<Resources.HasIPoolSheet>;  // FIXME: (for typeof sigs in controller)
@@ -44,6 +39,13 @@ export class ListingElementAdapter {
     }
 }
 
+export interface ListingScope<Container> {
+    container: Container;
+    elements: { name: string;
+                path: string;
+              }[];
+}
+
 export class Listing<ContainerAdapter extends ListingContainerAdapter, ElementAdapter extends ListingElementAdapter> {
 
     static templateUrl: string = "/Widgets/Listing.html";
@@ -53,110 +55,77 @@ export class Listing<ContainerAdapter extends ListingContainerAdapter, ElementAd
                 public elementAdapter: ElementAdapter)
     { }
 
-    public factory = function() : ng.IDirective {
+    public factory = function() {
         // FIXME: "factory" might be misinterpreted as "ListingFactory".
         // possible solutions: (1) rename; (2) implement Listing class
         // such that the instance type is '() => IDirective', and no
         // factory method is needed.
 
-// FIXME FIRST: if this function is extracted from the object and
-// passed to app.directive, it is stuck into a new object before it is
-// called.  that makes "this" invalid.  (if the factory method is
-// invoked, 'this' is intact, but we want to return a factory, not the
-// invoked factory.)
+        var _this = this;
 
-        // FIXME: is there a way to use typescript's "typeof" on
-        // this.*?  that would make these local variables unnecessary.
-
-        debugger;
-
-        var ca = this.containerAdapter;
-        var ea = this.elementAdapter;
-
-        return {
+        return function() {
+          return {
             restrict: "E",
             templateUrl: templatePath + "/" + Listing.templateUrl,  // FIXME: "s/Listing./self./"?
             scope: { },
             controller: ["$scope",
                          "adhHttp",
-                         "adhHttp",  // FIXME(?): do we really want to duplicate adhHttp for the type system?
-                         function($scope: ListingScope<typeof ca.ContainerType, typeof ea.ElementType>,
-                                  adhHttpC: AdhHttp.IService<typeof ca.ContainerType>,
-                                  adhHttpE: AdhHttp.IService<typeof ea.ElementType>
+                         "adhHttp",  // FIXME(?): do we really want to duplicate adhHttp for the type system?  (mf thinks we do!)
+                         function($scope: ListingScope<typeof _this.containerAdapter.ContainerType>,
+                                  adhHttpC: AdhHttp.IService<typeof _this.containerAdapter.ContainerType>,
+                                  adhHttpE: AdhHttp.IService<typeof _this.elementAdapter.ElementType>
                                  ) : void
                          {
-                             debugger;
-
-                             adhHttpC.get(this.containerPath).then((pool) => {
+                             adhHttpC.get(_this.containerPath).then((pool: typeof _this.containerAdapter.ContainerType) => {
                                  $scope.container = pool;
                                  $scope.elements = [];
 
-                                 debugger;
+                                 var elemRefs : string[] = _this.containerAdapter.elemRefs($scope.container);
 
-                                 var elemRefs : string[] = this.elementAdapter.elemRefs($scope.container);
+                                 for (var x in elemRefs) {
+                                     $scope.elements[x] = {name: x, path: x};
+                                     // FIXME: this is a workaround.
+                                     // if we don't do this, the last
+                                     // in a long array of elements
+                                     // may be initialized first in
+                                     // the next loop, and then all
+                                     // previous elements are
+                                     // 'undefined' when the template
+                                     // is rendered for the first
+                                     // time.  this will result in
+                                     // duplicate errors during
+                                     // template rendering.  this loop
+                                     // avoids that by initializing
+                                     // the elements in order.  the
+                                     // correct solution would be to
+                                     // postpone rendering until all
+                                     // elements have been downloaded.
+                                 }
+
                                  for (var x in elemRefs) {
                                      (function(x : number) {
-                                         adhHttpE.get(elemRefs[x]).then((element: typeof ea.ElementType)
-                                                                        => $scope.elements[x] = element);
+                                         adhHttpE.get(elemRefs[x]).then((element: typeof _this.elementAdapter.ElementType)
+                                                                        => $scope.elements[x] = {name: _this.elementAdapter.name(element),
+                                                                                                 path: _this.elementAdapter.path(element)});
+                                                                                // FIXME: if i replace "{name..}" with "elements", there is on type error!
                                      })(x);
                                  }
                              })
                          }
                         ]
+          }
         }
     }
 }
 
 
-// FIXME: now i can't derive from ListingContainerAdapter with a more
-// specific type, because that woudl require to change the references
-// to ListingContainerAdapter all over the controller implementation.
-// what now?
-//
-// pass type to class *and* instance to construtor?
-//
-// pass http and scope services to constructor as well?  (type
-// annotation in line 79 could just be dropped.)
-//
-// am i right that i can't use the concrete type of ContainerAdapter
-// (if it's a class template parameter), because it is unknown at
-// compile time?  WAIT: the only thing we need is that
-// ContainerAdapter is the same type all over.  we don't need to know
-// what type exactly it is.  it should be possible to fix this!
 
-
-/*
-
-
-next: introduce Proposals in Listing clone, and replace
-elementAccess.name.
-
-next: introduce Proposal detail view in clone of the above, factor out
-shared code from controller into helper attribute, and replace
-controller.
-
-
-
-export function wgtListingDocument(path:       string,
-                            container:  Content<HasIDocumentSheet>,
-                            element:    Content<HasIDocumentSheet>
-                           ) : Directive
-{
-    return {
-        restrict: "E"
-        templateUrl: templatePath + "/Widgets/Listing.html",
-        controller: ["$scope",
-                     function($scope : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>)
-
-
-
-                     {
-                     }]
-    }
-}
-
-*/
-
+// next steps:
+// 1. extend ListingElementAdapter to ListingDocumentElementAdapter
+// 2. extend listingcontaineradapter to something that has no
+//    ipoolsheet!
+// 3. detail view
+// 4. think about what else we want to do with generic widgets
 
 
 
@@ -190,5 +159,6 @@ export function wgtListingDocument(path:       string,
 // ListingElementAdapter.
 
 
-// FIXME: good dynamic type error handling?
 
+// FIXME: good dynamic type error handling?  (this should go to Http
+// service.)

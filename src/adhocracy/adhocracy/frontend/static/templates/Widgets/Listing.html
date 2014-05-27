@@ -2,7 +2,7 @@
 <ol>
     <li ng-repeat="element in elements">
 
-        <a hef="${ListingElementAdapter.path(element)}">${ListingElementAdapter.name(element)}</a>
+        <a href="{{element.path}}">{{element.name}}</a>
 
         <!-- FIXME: ListingElementAdapter is not the place to find methods name and path! -->
         <!-- FIXME: move row rendering to separate widget! -->
