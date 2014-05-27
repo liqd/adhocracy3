@@ -39,6 +39,27 @@ export class ListingElementAdapter {
     }
 }
 
+export class ListingTiteledElementAdapter {
+    static ElementType: Types.Content<Resources.HasIDocumentSheet>;  // FIXME (see ListingContainerAdapter)
+    public ElementType: Types.Content<Resources.HasIDocumentSheet>;
+
+    public name(e: typeof ListingTiteledElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
+        return e.data["adhocracy.sheets.document.IDocument"].title;
+
+        // FIXME: this fails because the document sheet is contained
+        // in the version, not the item.  to fix this, we need to
+        // initialize another http service or two here to retrieve
+        // LAST of item.  this is getting really awkward...
+
+        // FIXME: the http service should throw an exception because
+        // the retrieved object does not match.
+
+    }
+    public path(e: typeof ListingTiteledElementAdapter.ElementType) : string {  // FIXME: s/ListingContainerAdapter./self./ does not work.  what does?
+        return e.path;
+    }
+}
+
 export interface ListingScope<Container> {
     container: Container;
     elements: { name: string;
