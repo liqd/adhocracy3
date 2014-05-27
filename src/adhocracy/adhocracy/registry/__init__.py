@@ -126,7 +126,7 @@ class ResourceContentRegistry(ContentRegistry):
         assert name in all_types
         metadata = all_types[name]['metadata']
         addables = metadata.element_types
-        #get all addable types
+        # get all addable types
         addable_types = []
         for type in all_types.values():
             is_implicit = type['metadata'].is_implicit_addable
