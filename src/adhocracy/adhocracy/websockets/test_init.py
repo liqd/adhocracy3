@@ -3,6 +3,8 @@ import unittest
 
 from pyramid import testing
 from substanced.util import get_oid
+import colander
+import pytest
 
 from adhocracy.websockets import ClientCommunicator
 from adhocracy.websockets import ClientTracker
@@ -37,6 +39,7 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
     def setUp(self):
         self.context = testing.DummyResource()
         self.child = testing.DummyResource()
+        self.context['child'] = self.child
 
     def _make_one(self):
         from adhocracy.websockets import ClientRequestSchema
@@ -46,25 +49,51 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
 
     def test_deserialize_subscribe(self):
         inst = self._make_one()
-        self.context['child'] = self.child
         result = inst.deserialize(
-            { 'action': 'subscribe', 'resource': '/child' })
-        assert result == { 'action': 'subscribe', 'resource': self.child }
+            {'action': 'subscribe', 'resource': '/child'})
+        assert result == {'action': 'subscribe', 'resource': self.child}
 
-    # TODO valid messages:
-    #
-    # { 'action': 'unsubscribe', 'resource': '/child' }
+    def test_deserialize_unsubscribe(self):
+        inst = self._make_one()
+        result = inst.deserialize(
+            {'action': 'unsubscribe', 'resource': '/child'})
+        assert result == {'action': 'unsubscribe', 'resource': self.child}
 
-    # TODO invalid messages:
-    # { 'action': 'blah', 'resource': '/child' }
-    # { 'action': 'subscribe', 'resource': '/wrong_child' }
-    # { 'action': 'subscribe' }
-    # { 'resource': '/child' }
-    # {}
-    # { 'action': 'subscribe', 'resource': '/child', 'extra': 'something' }
-    # { 'action': 7, 'resource': '/child' }
-    # ['subscribe']
-    # ''
+    def test_deserialize_invalid_action(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize({'action': 'blah', 'resource': '/child'})
+
+    def test_deserialize_invalid_resource(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize(
+                {'action': 'subscribe', 'resource': '/wrong_child'})
+
+    def test_deserialize_no_action(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize({'resource': '/child'})
+
+    def test_deserialize_no_resource(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize({'action': 'subscribe'})
+
+    def test_deserialize_empty_dict(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize({})
+
+    def test_deserialize_wrong_inner_type(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize({'action': 7, 'resource': '/child'})
+
+    def test_deserialize_wrong_outer_type(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize(['subscribe'])
 
 
 class ClientTrackerUnitTests(unittest.TestCase):

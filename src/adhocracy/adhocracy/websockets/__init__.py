@@ -172,7 +172,9 @@ class ClientCommunicator(WebSocketServerProtocol):
             details = ' / '.join(err.messages())
             raise WebSocketError('invalid_json', details)
             # TODO 'unknown_action' and 'unknown_resource' should be reported
-            # as distinct error types
+            # as distinct error types: check whether err.asdict() has 'action'
+            # or 'resource' key (provided the field actually exists and is a
+            # string; as long as it's the only error
 
     def _send_error_message(self, error: str, details: str) -> None:
         # TODO serialize WebSocketError instead
