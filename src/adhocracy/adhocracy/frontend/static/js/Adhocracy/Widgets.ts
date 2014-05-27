@@ -60,21 +60,22 @@ export class ListingElementAdapter extends AbsListingElementAdapter<Types.Conten
     }
 }
 
-export class ListingTiteledElementAdapter extends AbsListingElementAdapter<Types.Content<Resources.HasIDocumentSheet>> {
-    public name(e) {
-        var deferred = this.$q.defer();
-        deferred.resolve('e.data["adhocracy.sheets.document.IDocument"].title');
-        return deferred.promise;
-
-        // FIXME: this fails because the document sheet is contained
-        // in the version, not the item.  to fix this, we need to
-        // initialize another http service or two here to retrieve
-        // LAST of item.  this is getting really awkward...
-
-        // FIXME: the http service should throw an exception because
-        // the retrieved object does not match.
-
+export class ListingTiteledElementAdapter extends AbsListingElementAdapter<Types.Content<Resources.HasIVersionsSheet>> {
+    constructor(public $q: ng.IQService,
+                public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>) {
+        super($q);
     }
+
+    public name(e) {
+        var versionPaths: string[] = e.data["adhocracy.sheets.versions.IVersions"].elements;
+        var lastVersionPath: string = versionPaths[versionPaths.length-1];
+
+        return this.adhHttp.get(lastVersionPath)
+            .then((lastVersion) => {
+                return lastVersion.data["adhocracy.sheets.document.IDocument"].title;
+            });
+    }
+
     public path(e) {
         return e.path;
     }

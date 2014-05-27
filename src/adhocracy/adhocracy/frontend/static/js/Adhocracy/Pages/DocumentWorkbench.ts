@@ -123,10 +123,10 @@ export function run<Data>() {
                                                              new Widgets.ListingElementAdapter($q)
                                                             ).factory()()]);
 
-    app.directive("wdgProposalListing", ["$q", ($q) =>
+    app.directive("wdgProposalListing", ["$q", "adhHttp", ($q, adhHttp) =>
                                          new Widgets.Listing("/adhocracy",
                                                              new Widgets.ListingContainerAdapter(),
-                                                             new Widgets.ListingTiteledElementAdapter($q)
+                                                             new Widgets.ListingTiteledElementAdapter($q, adhHttp)
                                                             ).factory()()]);
 
 
