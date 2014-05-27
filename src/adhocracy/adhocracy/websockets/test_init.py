@@ -21,7 +21,8 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
 
     def setUp(self):
         """Test setup."""
-        self._comm = ClientCommunicator()
+        context = testing.DummyResource()
+        self._comm = ClientCommunicator(context)
 
     def test_autobahn_installed(self):
         """Test that Autobahn is installed."""
@@ -40,14 +41,15 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
     def _make_one(self):
         from adhocracy.websockets import ClientRequestSchema
         schema = ClientRequestSchema()
-        schema.bind(context=self.context)
+        schema = schema.bind(context=self.context)
         return schema
 
     def test_deserialize_subscribe(self):
         inst = self._make_one()
+        self.context['child'] = self.child
         result = inst.deserialize(
             { 'action': 'subscribe', 'resource': '/child' })
-        assert result == { 'action': 'subscribe', 'resource': '/child' }
+        assert result == { 'action': 'subscribe', 'resource': self.child }
 
     # TODO valid messages:
     #

@@ -11,7 +11,7 @@ from substanced.util import get_oid
 import colander
 
 from adhocracy.interfaces import IResource
-from adhocracy.schema import AutomaticAbsolutePath
+from adhocracy.schema import ResourceObject
 
 
 logger = getLogger(__name__)
@@ -43,7 +43,7 @@ class ClientRequestSchema(colander.MappingSchema):
 
     action = Action()
 
-    resource = AutomaticAbsolutePath()
+    resource = colander.SchemaNode(ResourceObject())
 
 
 class ClientTracker():
@@ -141,7 +141,8 @@ class ClientCommunicator(WebSocketServerProtocol):
         json_object = self._parse_message(payload, is_binary)
         request = self._convert_json_into_client_request(json_object)
 
-        # TODO handle_client_request -- throw subscribe_not_supported if an ItemVersion
+        # TODO handle_client_request -- throw subscribe_not_supported if an
+        # ItemVersion
 
         # TODO convert everything into a WebSocketError
         # TODO handle message and send suitable response

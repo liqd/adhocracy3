@@ -51,11 +51,11 @@ class AbsolutePath(unittest.TestCase):
             inst.validator(inst, 'blu.ABC_12-3')
 
 
-class AutomaticAbsolutePathUnitTests(unittest.TestCase):
+class ResourceObjectUnitTests(unittest.TestCase):
 
     def make_one(self):
-        from adhocracy.schema import AutomaticAbsolutePath
-        return AutomaticAbsolutePath()
+        from adhocracy.schema import ResourceObject
+        return ResourceObject()
 
     def setUp(self):
         self.context = testing.DummyResource()

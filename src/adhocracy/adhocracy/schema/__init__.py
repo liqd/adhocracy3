@@ -82,16 +82,19 @@ class AbsolutePath(colander.SchemaNode):
     validator = colander.Regex(u'^/[a-zA-Z0-9\_\-\.\/]+$')
 
 
-class AutomaticAbsolutePath(AbsolutePath):
+class ResourceObject(colander.SchemaType):
 
-    """Absolute path that automatically deserialized itself to a resource."""
+    """Resource object that automatically deserialized itself to a path.
 
-    def serialize(self, value):
-        return serialize_path(self, value)
+    Example value: like AbsolutePath, e.g. '/bluaABC/_123/3'
 
-    def deserialize(self, value):
-        # TODO now to get the binding??
-        return deserialize_path(self, value)
+    """
+
+    def serialize(self, node, value):
+        return serialize_path(node, value)
+
+    def deserialize(self, node, value):
+        return deserialize_path(node, value)
 
 
 class AbstractIterableOfPaths(IdSet):
