@@ -34,8 +34,12 @@ export class ListingContainerAdapter extends AbsListingContainerAdapter<Types.Co
 export class AbsListingElementAdapter<T> {
     public ElementType: T;
 
-    public name(e: T) : string {
-        return "";
+    constructor(public $q: ng.IQService) { }
+
+    public name(e: T) : ng.IPromise<string> {
+        var deferred = this.$q.defer();
+        deferred.resolve("");
+        return deferred.promise;
     }
     public path(e: T) : string {
         return "";
@@ -44,7 +48,9 @@ export class AbsListingElementAdapter<T> {
 
 export class ListingElementAdapter extends AbsListingElementAdapter<Types.Content<any>> {
     public name(e) {
-        return "[content type " + e.content_type + ", resource " + e.path + "]";
+        var deferred = this.$q.defer();
+        deferred.resolve("[content type " + e.content_type + ", resource " + e.path + "]");
+        return deferred.promise;
     }
     public path(e) {
         return e.path;
@@ -53,7 +59,9 @@ export class ListingElementAdapter extends AbsListingElementAdapter<Types.Conten
 
 export class ListingTiteledElementAdapter extends AbsListingElementAdapter<Types.Content<Resources.HasIDocumentSheet>> {
     public name(e) {
-        return e.data["adhocracy.sheets.document.IDocument"].title;
+        var deferred = this.$q.defer();
+        deferred.resolve('e.data["adhocracy.sheets.document.IDocument"].title');
+        return deferred.promise;
 
         // FIXME: this fails because the document sheet is contained
         // in the version, not the item.  to fix this, we need to
@@ -134,10 +142,19 @@ export class Listing<ContainerAdapter extends ListingContainerAdapter, ElementAd
 
                                  for (var x in elemRefs) {
                                      (function(x : number) {
-                                         adhHttpE.get(elemRefs[x]).then((element: typeof _this.elementAdapter.ElementType)
-                                                                        => $scope.elements[x] = {name: _this.elementAdapter.name(element),
-                                                                                                 path: _this.elementAdapter.path(element)});
-                                                                                // FIXME: if i replace "{name..}" with "elements", there is on type error!
+                                         adhHttpE.get(elemRefs[x])
+                                             .then((element: typeof _this.elementAdapter.ElementType) => {
+                                                 console.log('then1');
+                                                 console.log(element);
+                                                 _this.elementAdapter.name(element)
+                                                     .then((name: string) => {
+                                                         console.log('then2');
+                                                         console.log(name);
+                                                         $scope.elements[x] = { name: name,
+                                                                                path: _this.elementAdapter.path(element) };
+                                                     });
+                                             })
+                                         // FIXME: if i write anything at all into $scope.elements[x], there is no type error!
                                      })(x);
                                  }
                              })

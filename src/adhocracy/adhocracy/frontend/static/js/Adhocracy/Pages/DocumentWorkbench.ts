@@ -117,15 +117,17 @@ export function run<Data>() {
 
     // widget-based directives
 
-    app.directive("wdgAbstractListing", new Widgets.Listing("/adhocracy",
-                                                            new Widgets.ListingContainerAdapter(),
-                                                            new Widgets.ListingElementAdapter()
-                                                           ).factory());
+    app.directive("wdgAbstractListing", ["$q", ($q) =>
+                                         new Widgets.Listing("/adhocracy",
+                                                             new Widgets.ListingContainerAdapter(),
+                                                             new Widgets.ListingElementAdapter($q)
+                                                            ).factory()()]);
 
-    app.directive("wdgProposalListing", new Widgets.Listing("/adhocracy",
-                                                            new Widgets.ListingContainerAdapter(),
-                                                            new Widgets.ListingTiteledElementAdapter()
-                                                           ).factory());
+    app.directive("wdgProposalListing", ["$q", ($q) =>
+                                         new Widgets.Listing("/adhocracy",
+                                                             new Widgets.ListingContainerAdapter(),
+                                                             new Widgets.ListingTiteledElementAdapter($q)
+                                                            ).factory()()]);
 
 
     // application-specific directives
