@@ -91,7 +91,7 @@ export interface ListingScope<Container> {
 
 export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<{}>, ElementAdapter extends AbstractListingElementAdapter<{}>> {
 
-    static templateUrl: string = "/Widgets/Listing.html";
+    public static templateUrl: string = "/Widgets/Listing.html";
 
     constructor(public containerAdapter: ContainerAdapter,
                 public elementAdapter: ElementAdapter)
