@@ -7,11 +7,14 @@ from logging import getLogger
 
 from autobahn.asyncio.websocket import WebSocketServerProtocol
 from autobahn.websocket.protocol import ConnectionRequest
+from pyramid.traversal import resource_path
 from substanced.util import get_oid
 import colander
 
+from adhocracy.websockets.schemas import ClientRequestSchema
+from adhocracy.websockets.schemas import StatusConfirmation
 from adhocracy.interfaces import IResource
-from adhocracy.schema import ResourceObject
+from adhocracy.interfaces import IItemVersion
 
 
 logger = getLogger(__name__)
@@ -27,23 +30,6 @@ class WebSocketError(Exception):
 
     def __str__(self):
         return '{}: {}'.format(self.error_type, self.details)
-
-
-class Action(colander.SchemaNode):
-
-    """An action requested by a client."""
-
-    schema_type = colander.String
-    validator = colander.OneOf(['subscribe', 'unsubscribe'])
-
-
-class ClientRequestSchema(colander.MappingSchema):
-
-    """Data structure for client requests."""
-
-    action = Action()
-
-    resource = colander.SchemaNode(ResourceObject())
 
 
 class ClientTracker():
@@ -66,8 +52,6 @@ class ClientTracker():
 
         Returns True if the subscription was successful, False if it was
         unnecessary (the client was already subscribed).
-
-        If the client is already subscribed, this method is a no-op.
         """
         if self.is_subscribed(client, resource):
             return False
@@ -120,12 +104,14 @@ class ClientCommunicator(WebSocketServerProtocol):
     """Communicates with a client through a WebSocket connection."""
 
     # All instances of this class share the same tracker
-    tracker = ClientTracker()
+    _tracker = ClientTracker()
 
     def __init__(self, context):
         """Create a new instance."""
         self._client_request_schema = ClientRequestSchema()
         self._client_request_schema.bind(context=context)
+        self._status_confirmation = StatusConfirmation()
+        self._status_confirmation.bind(context=context)
 
     def onConnect(self, request: ConnectionRequest):  # noqa
         self._client = request.peer
@@ -137,13 +123,8 @@ class ClientCommunicator(WebSocketServerProtocol):
     def onMessage(self, payload: bytes, is_binary: bool) -> None:    # noqa
         json_object = self._parse_message(payload, is_binary)
         request = self._convert_json_into_client_request(json_object)
-
-        # TODO handle_client_request -- throw subscribe_not_supported if an
-        # ItemVersion
-
-        # TODO convert everything into a WebSocketError
-        # TODO handle message and send suitable response
-        # TODO check that result is dict
+        self._handle_client_request_and_send_response(request)
+        # TODO catch and handle WebSocketError
 
     def _parse_message(self, payload: bytes, is_binary: bool) -> object:
         """Parse a client message into a JSON object.
@@ -188,22 +169,56 @@ class ClientCommunicator(WebSocketServerProtocol):
             if isinstance(value, str):
                 return value
 
-    def _raise_from_colander_error(self, err: colander.Invalid) -> None:
+    def _raise_invalid_json(self, err: colander.Invalid) -> None:
         """Raise a 'invalid_json' WebSocketError from a colander error."""
         errdict = err.asdict()
         errlist = ['{}: {}'.format(k, errdict[k]) for k in errdict.keys()]
         details = ' / '.join(sorted(errlist))
         raise WebSocketError('invalid_json', details)
 
+    def _handle_client_request_and_send_response(self, request: dict):
+        action = request['action']
+        resource = request['resource']
+        self._raise_if_forbidden_request(action, resource)
+        update_was_necessary = self._update_resource_subscription(action,
+                                                                  resource)
+        self._send_status_confirmation(update_was_necessary, action, resource)
+
+    def _raise_if_forbidden_request(self, action: str,
+                                    resource: IResource) -> None:
+        """Raise an error if a client tries to subscribe to an ItemVersion."""
+        if action == 'subscribe' and IItemVersion.providedBy(resource):
+            raise WebSocketError('subscribe_not_supported',
+                                 resource_path(resource))
+
+    def _update_resource_subscription(self, action: str,
+                                      resource: str) -> bool:
+        """(Un)subscribe a client to/from a resource.
+
+        :return: True if the request was necessary, False if it was an
+                 unnecessary no-op
+        """
+        if action == 'subscribe':
+            return self._tracker.subscribe(self._client, resource)
+        else:
+            return self._tracker.unsubscribe(self._client, resource)
+
+    def _send_status_confirmation(self, update_was_necessary: bool,
+                                  action: str, resource: IResource):
+        status = 'ok' if update_was_necessary else 'duplicate'
+        json_message = self._status_confirmation.serialize(
+            {'status': status, 'action': action, 'resource': resource})
+        self._send_json_message(json_message)
+
+    def _send_json_message(self, json_message: dict) -> None:
+        """Send a JSON object as message to the client."""
+        text = dumps(json_message)
+        logger.debug('Sending message to client %s: %s', self._client, text)
+        self.sendMessage(text.encode())
+
     def _send_error_message(self, error: str, details: str) -> None:
         # TODO serialize WebSocketError instead
         self._send_json_message({'error': error, 'details': details})
-
-    def _send_json_message(self, json_object: dict) -> None:
-        """Send a JSON object as message to the client."""
-        text = dumps(json_object)
-        logger.debug('Sending message to client %s: %s', self._client, text)
-        self.sendMessage(text.encode())
 
     def onClose(self, was_clean: bool, code: int, reason: str):  # noqa
         self.tracker.delete_all_subscriptions(self._client)
