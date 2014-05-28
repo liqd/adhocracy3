@@ -18,14 +18,14 @@ import Resources = require("Adhocracy/Resources");
 var templatePath : string = "/frontend_static/templates";  // FIXME: move this to config file.
 
 
-export class AbsListingContainerAdapter<T> {
+export class AbstractListingContainerAdapter<T> {
     public ContainerType : T;
     public elemRefs(c : T) : string[] {
         return [];
     }
 }
 
-export class ListingContainerAdapter extends AbsListingContainerAdapter<Types.Content<Resources.HasIPoolSheet>> {
+export class ListingContainerAdapter extends AbstractListingContainerAdapter<Types.Content<Resources.HasIPoolSheet>> {
     public elemRefs(c) {
         // FIXME: derived type of argument c appears to be 'any',
         // should be 'Types.Content<Resources.HasIPoolSheet>'!
@@ -34,7 +34,7 @@ export class ListingContainerAdapter extends AbsListingContainerAdapter<Types.Co
     }
 }
 
-export class AbsListingElementAdapter<T> {
+export class AbstractListingElementAdapter<T> {
     public ElementType: T;
 
     constructor(public $q: ng.IQService) { }
@@ -49,7 +49,7 @@ export class AbsListingElementAdapter<T> {
     }
 }
 
-export class ListingElementAdapter extends AbsListingElementAdapter<Types.Content<any>> {
+export class ListingElementAdapter extends AbstractListingElementAdapter<Types.Content<any>> {
     public name(e) {
         var deferred = this.$q.defer();
         deferred.resolve("[content type " + e.content_type + ", resource " + e.path + "]");
@@ -60,7 +60,7 @@ export class ListingElementAdapter extends AbsListingElementAdapter<Types.Conten
     }
 }
 
-export class ListingTiteledElementAdapter extends AbsListingElementAdapter<Types.Content<Resources.HasIVersionsSheet>> {
+export class ListingTiteledElementAdapter extends AbstractListingElementAdapter<Types.Content<Resources.HasIVersionsSheet>> {
     constructor(public $q: ng.IQService,
                 public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>) {
         super($q);
