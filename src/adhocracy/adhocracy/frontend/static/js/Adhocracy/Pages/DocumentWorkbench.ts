@@ -117,17 +117,26 @@ export function run<Data>() {
 
     // widget-based directives
 
-    app.directive("wdgAbstractListing", ["$q", ($q) =>
-                                         new Widgets.Listing("/adhocracy",
-                                                             new Widgets.ListingContainerAdapter(),
-                                                             new Widgets.ListingElementAdapter($q)
-                                                            ).factory()()]);
+    app.directive("wdgAbstractListing",
+                  ["$q", ($q) =>
+                   new Widgets.Listing("/adhocracy",
+                                       new Widgets.ListingContainerAdapter(),
+                                       new Widgets.ListingElementAdapter($q)
+                                      ).factory()()]);
 
-    app.directive("wdgProposalListing", ["$q", "adhHttp", ($q, adhHttp) =>
-                                         new Widgets.Listing("/adhocracy",
-                                                             new Widgets.ListingContainerAdapter(),
-                                                             new Widgets.ListingTiteledElementAdapter($q, adhHttp)
-                                                            ).factory()()]);
+    app.directive("wdgProposalListing",
+                  ["$q", "adhHttp", ($q, adhHttp) =>
+                   new Widgets.Listing("/adhocracy",
+                                       new Widgets.ListingContainerAdapter(),
+                                       new Widgets.ListingTiteledElementAdapter($q, adhHttp)
+                                      ).factory()()]);
+
+//    app.directive("wdgProposalListingWithDetails",
+//                  ["$q", "adhHttp", ($q, adhHttp) =>
+//                   new Widgets.ProposalListing("/adhocracy",
+//                                       new Widgets.ListingContainerAdapter(),
+//                                       new Widgets.ListingDocumentAdapter($q, adhHttp)
+//                                      ).factory()()]);
 
 
     // application-specific directives
