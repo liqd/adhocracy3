@@ -4,12 +4,13 @@ from collections import namedtuple
 from collections import OrderedDict
 
 from pyramid.interfaces import ILocation
-from substanced.interfaces import IPropertySheet
-from substanced.interfaces import ReferenceClass
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface.interface import InterfaceClass
 from zope.interface.interfaces import IObjectEvent
+
+from substanced.interfaces import IPropertySheet
+from substanced.interfaces import ReferenceClass
 
 
 class ISheet(Interface):
@@ -22,8 +23,11 @@ SHEET_METADATA = {'isheet': None,
                   'schema_class': None,
                   'permission_view': '',
                   'permission_edit': '',
-                  'readonly': False,
-                  'createmandatory': False,
+                  'permission_create': '',
+                  'readable': True,
+                  'editable': True,
+                  'creatable': True,
+                  'create_mandatory': False,
                   }
 
 
@@ -48,9 +52,14 @@ class SheetMetadata(namedtuple('SheetMetadata', SHEET_METADATA.keys())):
     permission_edit:
         Permission to edit this data.
         Subtype should override.
-    readonly:
-        This Sheet may not be used to set data
-
+    readable:
+        The sheet data is readable
+    editable:
+        The sheet data is editable
+    creatable:
+        The sheet data can be set if you create (post) a new resource
+    create_mandatory:
+        This Sheet must be set if you create (post) a new resource
     """
 
 

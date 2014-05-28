@@ -12,11 +12,14 @@ from adhocracy.utils import get_iresource
 from adhocracy.utils import find_graph
 
 
-def _get_not_readonly_appstructs(resource):
+def _get_writable_appstructs(resource):
     # FIXME maybe move this to utils or better use resource registry
     appstructs = {}
     for sheet in get_all_sheets(resource):
-        if not sheet.meta.readonly:
+        editable = sheet.meta.editable
+        creatable = sheet.meta.creatable
+        writable = editable or creatable
+        if writable:
             appstructs[sheet.meta.isheet.__identifier__] = sheet.get()
     return appstructs
 
@@ -27,7 +30,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
         return resource
     else:
         registry = get_current_registry()
-        appstructs = _get_not_readonly_appstructs(resource)
+        appstructs = _get_writable_appstructs(resource)
         appstructs[IVersionable.__identifier__]['follows'] = [resource]
         appstructs[isheet.__identifier__] = appstruct
         iresource = get_iresource(resource)
@@ -38,11 +41,8 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
         return new_resource
 
 
-def _update_resource(resource, isheet, appstruct):
-    sheet = get_sheet(resource, isheet)
-    if not sheet.meta.readonly:
-        sheet.set(appstruct)
-        # FIXME: make sure modified event is send
+def _update_resource(resource, sheet, appstruct):
+    sheet.set(appstruct)  # FIXME: make sure modified event is send
     return resource
 
 
@@ -54,14 +54,14 @@ def reference_has_new_version_subscriber(event):
 
     """
     assert ISheetReferencedItemHasNewVersion.providedBy(event)
-    from adhocracy.utils import get_sheet
     resource = event.object
     root_versions = event.root_versions
     isheet = event.isheet
     sheet = get_sheet(resource, isheet)
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
+    editable = sheet.meta.editable
 
-    if autoupdate and not sheet.meta.readonly:
+    if autoupdate and editable:
         appstruct = sheet.get()
         field = appstruct[event.isheet_field]
         old_version_index = field.index(event.old_version)
@@ -70,7 +70,7 @@ def reference_has_new_version_subscriber(event):
         if IItemVersion.providedBy(resource):
             _update_versionable(resource, isheet, appstruct, root_versions)
         else:
-            _update_resource(resource, isheet, appstruct)
+            _update_resource(resource, sheet, appstruct)
 
 
 def includeme(config):

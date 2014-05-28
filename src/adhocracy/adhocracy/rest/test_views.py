@@ -847,8 +847,8 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
         assert len(response['fields']) == 1
         field_metadata = response['fields'][0]
-        assert field_metadata['createmandatory'] is False
-        assert field_metadata['readonly'] is False
+        assert field_metadata['create_mandatory'] is False
+        assert field_metadata['readable'] is True
         assert field_metadata['name'] == 'test'
         assert 'valuetype' in field_metadata
 
@@ -865,7 +865,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
         response = inst.get()['sheets'][sheet_name]
 
         field_metadata = response['fields'][0]
-        assert field_metadata['readonly'] is True
+        assert field_metadata['readable'] is True
 
     def test_get_sheets_with_field_colander_noniteratable(self):
         class SchemaF(self.sheet_meta.schema_class):

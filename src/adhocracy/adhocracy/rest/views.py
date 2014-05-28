@@ -469,23 +469,22 @@ class MetaApiView(RESTView):
             resource_map[name] = prop_map
         return resource_map
 
-    def _sheet_field_readable(self, sheetname, fieldname, sheet_readonly):
+    def _sheet_field_creatable_or_editable(self, sheetname: str,
+                                           fieldname: str,
+                                           default: bool) -> bool:
         """Hook that allows modifying the read-only status for fields.
 
-        This allows setting a field read-only even if the whole sheet is
-        writeable in the backend.
-
-        Returns True or False.
+        This allows setting a field none editable and none creatable even
+        if the  whole sheet is editable/creatable in the backend.
 
         FIXME: this is just a cosmetic ad-hoc solution since the read-only
         status in the backend is not affected.
-
         """
         if (sheetname, fieldname) == ('adhocracy.sheets.versions.IVersionable',
                                       'followed_by'):
-            return True
+            return False
         else:
-            return sheet_readonly
+            return default
 
     def _describe_sheets(self, sheet_metadata):
         """Build a description of the sheets used in the system.
@@ -501,14 +500,12 @@ class MetaApiView(RESTView):
         """
         sheet_map = {}
         for sheet_name, metadata in sheet_metadata.items():
-            # readonly and createmandatory flags are currently defined for
+            # readable and create_mandatory flags are currently defined for
             # the whole sheet, but we copy them as attributes into each field
             # definition, since this might change in the future.
             # (The _sheet_field_readable method already allows overwriting the
             # readable flag on a field-by-field basis, but it's somewhat
             # ad-hoc.)
-            createmandatory = metadata.createmandatory
-            readonly = metadata.readonly
             fields = []
 
             # Create field definitions
@@ -543,12 +540,17 @@ class MetaApiView(RESTView):
 
                 typ_stripped = strip_optional_prefix(typ, 'colander.')
 
+                editable = self._sheet_field_creatable_or_editable(
+                    sheet_name, fieldname, metadata.editable)
+                creatable = self._sheet_field_creatable_or_editable(
+                    sheet_name, fieldname, metadata.creatable)
                 fielddesc = {
                     'name': fieldname,
                     'valuetype': typ_stripped,
-                    'createmandatory': createmandatory,
-                    'readonly': self._sheet_field_readable(
-                        sheet_name, fieldname, readonly)
+                    'create_mandatory': metadata.create_mandatory,
+                    'editable': editable,
+                    'creatable': creatable,
+                    'readable': metadata.readable,
                 }
                 if containertype is not None:
                     fielddesc['containertype'] = containertype
