@@ -349,8 +349,6 @@ class PoolRESTView(SimpleRESTView):
         """Handle HTTP PUT. Return dict with PATH of modified resource."""
         return super().put()  # pragma: no cover
 
-
-
     def build_post_response(self, resource):
         """Helper method that builds a response for a POST request.
 
