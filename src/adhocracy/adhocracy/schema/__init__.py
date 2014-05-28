@@ -21,6 +21,18 @@ class Identifier(colander.SchemaNode):
     validator = colander.Regex(u'^[a-zA-Z0-9\_\-\.]+$')
 
 
+class Email(colander.SchemaNode):
+
+    """String with email address.
+
+    Example value: test@test.de
+
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+    validator = colander.Email()
 
 
 _ZONES = pytz.all_timezones
@@ -37,6 +49,8 @@ class TimeZoneName(colander.SchemaNode):
     default = 'UTC'
     missing = colander.drop
     validator = colander.OneOf(_ZONES)
+
+
 class AbsolutePath(colander.SchemaNode):
 
     """Absolute path made with  Identifier Strings.
