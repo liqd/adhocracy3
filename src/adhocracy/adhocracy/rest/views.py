@@ -435,9 +435,8 @@ class MetaApiView(RESTView):
         """
         resource_map = {}
 
-        for name, value in resource_types.items():
+        for name, metadata in resource_types.items():
             prop_map = {}
-            metadata = value['metadata']
 
             # List of sheets
             sheets = []
