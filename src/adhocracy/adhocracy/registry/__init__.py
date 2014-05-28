@@ -54,21 +54,7 @@ class ResourceContentRegistry(ContentRegistry):
         return wanted_sheets
 
     def resources_metadata(self) -> dict:
-        """Get dictionary with all resource types and metadata.
-
-        :returns: resource types dictionary
-
-        example ::
-
-            {'adhocracy.resources.IResourceA':
-                {
-                'name': "adhocracy.resources.IResourceA",
-                'iface': adhocracy.resource.interface.IResourceA.__class__,
-                'metadata': {"element_types": ..}
-                }
-            }
-
-        """
+        """Get resource types with resource_metadata."""
         resource_types = {}
         resolve = DottedNameResolver()
         for type_id, type_metadata in self.meta.items():
@@ -76,9 +62,7 @@ class ResourceContentRegistry(ContentRegistry):
                 iresource = resolve.maybe_resolve(type_id)
                 if iresource.isOrExtends(IResource):
                     metadata = type_metadata['resource_metadata']
-                    resource_types[type_id] = {'name': type_id,
-                                               'iface': iresource,
-                                               'metadata': metadata}
+                    resource_types[type_id] = metadata
             except (ValueError, ImportError):
                 pass
         return resource_types
@@ -92,11 +76,9 @@ class ResourceContentRegistry(ContentRegistry):
 
         """
         isheets = set()
-        resources = self.resources_metadata()
-        resources_meta = [x['metadata'] for x in resources.values()]
-        for resource in resources_meta:
-            isheets.update(resource.basic_sheets)
-            isheets.update(resource.extended_sheets)
+        for resource_meta in self.resources_metadata().values():
+            isheets.update(resource_meta.basic_sheets)
+            isheets.update(resource_meta.extended_sheets)
 
         isheets_meta = {}
         for isheet in isheets:
@@ -128,21 +110,21 @@ class ResourceContentRegistry(ContentRegistry):
         iresource = get_iresource(context)
         if iresource is None:
             return {}
-        all_types = self.resources_metadata()
-        assert iresource.__identifier__ in all_types
-        metadata = all_types[iresource.__identifier__]['metadata']
+        resources_metadata = self.resources_metadata()
+        assert iresource.__identifier__ in resources_metadata
+        metadata = resources_metadata[iresource.__identifier__]
         addables = metadata.element_types
         # get all addable types
         addable_types = []
-        for type in all_types.values():
-            is_implicit = type['metadata'].is_implicit_addable
-            for i in addables:
-                is_subtype = type['iface'].extends(i) and is_implicit
-                is_is = type['iface'] is i
-                add_permission = type['metadata'].permission_add
+        for metdata in resources_metadata.values():
+            is_implicit = metdata.is_implicit_addable
+            for addable in addables:
+                is_subtype = is_implicit and metdata.iresource.extends(addable)
+                is_is = metdata.iresource is addable
+                add_permission = metdata.permission_add
                 is_allowed = has_permission(add_permission, context, request)
                 if is_subtype or is_is and is_allowed:
-                    addable_types.append(type['iface'])
+                    addable_types.append(metdata.iresource)
         # add propertysheet names
         types_with_sheetnames = {}
         for type_iface in addable_types:

@@ -162,9 +162,8 @@ class TestResourceContentRegistryResourcesMetadata(unittest.TestCase):
             {type_id: {'resource_metadata': self.resource_meta}}
         resources = self._make_one()
         assert len(resources) == 1
-        assert 'iface' in resources[type_id]
-        assert 'name' in resources[type_id]
-        assert 'metadata' in resources[type_id]
+        assert type_id in resources
+        assert resources[type_id] == self.resource_meta
 
 
 class TestResourceContentRegistrySheetsMetadata(unittest.TestCase):
@@ -183,9 +182,7 @@ class TestResourceContentRegistrySheetsMetadata(unittest.TestCase):
     def _add_resource_metadata(self, metadata):
         type_id = metadata.iresource.__identifier__
         self.resource_registry.resources_metadata.return_value = \
-            {type_id: {'name': type_id,
-                       'iface': metadata.iresource,
-                       'metadata': metadata}}
+            {type_id: metadata}
 
     def _make_one(self):
         from adhocracy.registry import ResourceContentRegistry
@@ -231,11 +228,7 @@ class TestResourceContentRegistryResourceAddables(unittest.TestCase):
         resources = {}
         for metadata in metadatas:
             type_id = metadata.iresource.__identifier__
-            resources.update(
-                {type_id: {'name': type_id,
-                           'iface': metadata.iresource,
-                           'metadata': metadata}}
-            )
+            resources.update({type_id: metadata})
         self.resource_registry.resources_metadata.return_value = resources
 
     def _make_one(self, *args):

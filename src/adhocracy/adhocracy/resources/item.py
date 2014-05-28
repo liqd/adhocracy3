@@ -15,7 +15,7 @@ def create_initial_content_for_item(context, registry, options):
     """Add first version and the Tags LAST and FIRST."""
     iresource = get_iresource(context)
     metadata = registry.content.resources_metadata()[iresource.__identifier__]
-    item_type = metadata['metadata'].item_type
+    item_type = metadata.item_type
     create = registry.content.create
     first_version = create(item_type.__identifier__, parent=context)
 
