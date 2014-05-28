@@ -35,6 +35,26 @@ class IdentifierUnitTest(unittest.TestCase):
             inst.validator(inst, 'blu./ABC_12-3')
 
 
+class TimeZoneNameUnitTest(unittest.TestCase):
+
+    def make_one(self):
+        from adhocracy.schema import TimeZoneName
+        return TimeZoneName()
+
+    def test_valid(self):
+        inst = self.make_one()
+        assert inst.validator(inst, 'Europe/Berlin') is None
+
+    def test_non_valid(self):
+        inst = self.make_one()
+        with pytest.raises(colander.Invalid):
+            inst.validator(inst, 'wrong')
+
+    def test_default(self):
+        inst = self.make_one()
+        assert inst.default == 'UTC'
+
+
 class AbsolutePath(unittest.TestCase):
 
     def make_one(self):

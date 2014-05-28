@@ -4,6 +4,7 @@ from pyramid.traversal import find_resource
 from substanced import schema
 from substanced.schema import IdSet
 import colander
+import pytz
 
 from adhocracy.interfaces import SheetReference
 
@@ -20,6 +21,22 @@ class Identifier(colander.SchemaNode):
     validator = colander.Regex(u'^[a-zA-Z0-9\_\-\.]+$')
 
 
+
+
+_ZONES = pytz.all_timezones
+
+
+class TimeZoneName(colander.SchemaNode):
+
+    """String with time zone.
+
+    Example value: UTC
+    """
+
+    schema_type = colander.String
+    default = 'UTC'
+    missing = colander.drop
+    validator = colander.OneOf(_ZONES)
 class AbsolutePath(colander.SchemaNode):
 
     """Absolute path made with  Identifier Strings.
