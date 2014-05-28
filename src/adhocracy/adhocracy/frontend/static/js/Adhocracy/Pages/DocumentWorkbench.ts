@@ -119,15 +119,13 @@ export function run<Data>() {
 
     app.directive("wdgAbstractListing",
                   ["$q", ($q) =>
-                   new Widgets.Listing("/adhocracy",
-                                       new Widgets.ListingContainerAdapter(),
+                   new Widgets.Listing(new Widgets.ListingContainerAdapter(),
                                        new Widgets.ListingElementAdapter($q)
                                       ).factory()()]);
 
     app.directive("wdgProposalListing",
                   ["$q", "adhHttp", ($q, adhHttp) =>
-                   new Widgets.Listing("/adhocracy",
-                                       new Widgets.ListingContainerAdapter(),
+                   new Widgets.Listing(new Widgets.ListingContainerAdapter(),
                                        new Widgets.ListingTiteledElementAdapter($q, adhHttp)
                                       ).factory()()]);
 

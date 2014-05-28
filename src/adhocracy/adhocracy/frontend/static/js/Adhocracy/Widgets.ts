@@ -86,14 +86,14 @@ export interface ListingScope<Container> {
     elements: { name: string;
                 path: string;
               }[];
+    path: string;
 }
 
 export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<{}>, ElementAdapter extends AbstractListingElementAdapter<{}>> {
 
     static templateUrl: string = "/Widgets/Listing.html";
 
-    constructor(private containerPath: string,
-                public containerAdapter: ContainerAdapter,
+    constructor(public containerAdapter: ContainerAdapter,
                 public elementAdapter: ElementAdapter)
     { }
 
@@ -109,7 +109,7 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<{}
           return {
             restrict: "E",
             templateUrl: templatePath + "/" + Listing.templateUrl,  // FIXME: "s/Listing./self./"?
-            scope: { },
+            scope: { path: '@path' },
             controller: ["$scope",
                          "adhHttp",
                          "adhHttp",  // FIXME(?): do we really want to duplicate adhHttp for the type system?  (mf thinks we do!)
@@ -119,7 +119,7 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<{}
                                   // FIXME: how can i see the value of these 'typeof' expressions?
                                  ) : void
                          {
-                             adhHttpC.get(_this.containerPath).then((pool: typeof _this.containerAdapter.ContainerType) => {
+                             adhHttpC.get($scope.path).then((pool: typeof _this.containerAdapter.ContainerType) => {
                                  $scope.container = pool;
                                  $scope.elements = [];
 
