@@ -115,9 +115,12 @@ class ResourceFactory:
         return resource
 
 
-def includeme(config):
-    """Include all resource types in this package."""
-    # config.include('.pool')
-    # config.include('.tag')
-    # config.include('.itemversion')
-    # config.include('.item')
+def includeme(config):  # pragma: no cover
+    """Include all resource types in this package.
+
+    Example include:
+        config.include('.pool')
+        config.include('.tag')
+        config.include('.itemversion')
+        config.include('.item')
+    """

@@ -272,7 +272,6 @@ class ResourceRESTView(RESTView):
         """Handle GET requests. Return dict with resource data structure."""
         sheets_view = self.registry.resource_sheets(self.context, self.request,
                                                     onlyviewable=True)
-        response_schema = GETResourceResponseSchema()
         struct = {'data': {}}
         for sheet in sheets_view.values():
             key = sheet.meta.isheet.__identifier__
@@ -280,15 +279,7 @@ class ResourceRESTView(RESTView):
         struct['path'] = resource_path(self.context)
         iresource = get_iresource(self.context)
         struct['content_type'] = iresource.__identifier__
-        #  FIXME: The ItemRESTView should be responsible for the following code
-        #  or we move it to the versions sheet.
-        if IItem.providedBy(self.context):
-            response_schema = GETItemResponseSchema()
-            for v in self.context.values():
-                if IItemVersion.providedBy(v):
-                    struct['first_version_path'] = resource_path(v)
-                    break
-        return response_schema.serialize(struct)
+        return GETResourceResponseSchema().serialize(struct)
 
 
 @view_defaults(
@@ -358,6 +349,8 @@ class PoolRESTView(SimpleRESTView):
         """Handle HTTP PUT. Return dict with PATH of modified resource."""
         return super().put()  # pragma: no cover
 
+
+
     def build_post_response(self, resource):
         """Helper method that builds a response for a POST request.
 
@@ -365,18 +358,22 @@ class PoolRESTView(SimpleRESTView):
             the serialized response
 
         """
-        response_schema = ResourceResponseSchema()
         struct = {}
         struct['path'] = resource_path(resource)
         iresource = get_iresource(resource)
         struct['content_type'] = iresource.__identifier__
         if IItem.providedBy(resource):
-            response_schema = ItemResponseSchema()
-            for v in resource.values():
-                if IItemVersion.providedBy(v):
-                    struct['first_version_path'] = resource_path(v)
-                    break
-        return response_schema.serialize(struct)
+            struct.update(self._get_dict_with_first_version_path(resource))
+            return ItemResponseSchema().serialize(struct)
+        else:
+            return ResourceResponseSchema().serialize(struct)
+
+    def _get_dict_with_first_version_path(self, item: IItem) -> dict:
+        first_path = ''
+        for child in item.values():
+            if IItemVersion.providedBy(child):
+                first_path = resource_path(child)
+        return {'first_version_path': first_path}
 
     @view_config(request_method='POST')
     def post(self):
@@ -401,6 +398,12 @@ class ItemRESTView(PoolRESTView):
                        [validate_post_sheet_names_and_resource_type,
                         validate_post_root_versions,
                         validate_post_sheet_cstructs])
+
+    @view_config(request_method='GET')
+    def get(self):
+        struct = super().get()
+        struct.update(self._get_dict_with_first_version_path(self.context))
+        return GETItemResponseSchema().serialize(struct)
 
     @view_config(request_method='POST')
     def post(self):
