@@ -68,7 +68,6 @@ class ClientTracker():
         unnecessary (the client was already subscribed).
 
         If the client is already subscribed, this method is a no-op.
-
         """
         if self.is_subscribed(client, resource):
             return False
@@ -82,7 +81,6 @@ class ClientTracker():
 
         Returns True if the unsubscription was successful, False if it was
         unnecessary (the client was not subscribed).
-
         """
         if not self.is_subscribed(client, resource):
             return False
@@ -95,7 +93,6 @@ class ClientTracker():
         """Discard one set member from a defaultdict that has sets as values.
 
         If the resulting set is empty, it is removed from the multidict.
-
         """
         if key in multidict:
             multidict[key].discard(value)
@@ -130,14 +127,14 @@ class ClientCommunicator(WebSocketServerProtocol):
         self._client_request_schema = ClientRequestSchema()
         self._client_request_schema.bind(context=context)
 
-    def onConnect(self, request: ConnectionRequest):
+    def onConnect(self, request: ConnectionRequest):  # noqa
         self._client = request.peer
         logger.debug('Client connecting: %s', self._client)
 
-    def onOpen(self):
+    def onOpen(self):  # noqa
         logger.debug('WebSocket connection to %s open', self._client)
 
-    def onMessage(self, payload: bytes, is_binary: bool) -> None:
+    def onMessage(self, payload: bytes, is_binary: bool) -> None:    # noqa
         json_object = self._parse_message(payload, is_binary)
         request = self._convert_json_into_client_request(json_object)
 
@@ -153,7 +150,6 @@ class ClientCommunicator(WebSocketServerProtocol):
 
         :raise WebSocketError: if the message doesn't contain UTF-8 encoded
                                text or cannot be parsed as JSON
-
         """
         if is_binary:
             raise WebSocketError('malformed_message', 'message is binary')
@@ -169,12 +165,35 @@ class ClientCommunicator(WebSocketServerProtocol):
         try:
             return self._client_request_schema.deserialize(json_object)
         except colander.Invalid as err:
-            details = ' / '.join(err.messages())
-            raise WebSocketError('invalid_json', details)
-            # TODO 'unknown_action' and 'unknown_resource' should be reported
-            # as distinct error types: check whether err.asdict() has 'action'
-            # or 'resource' key (provided the field actually exists and is a
-            # string; as long as it's the only error
+            self._raise_if_unknown_field_value('action', err, json_object)
+            self._raise_if_unknown_field_value('resource', err, json_object)
+            self._raise_invalid_json(err)
+
+    def _raise_if_unknown_field_value(
+            self, field_name: str, err: colander.Invalid, json_object) -> None:
+        """Raise an 'unknown_xxx' WebSocketError error if appropriate."""
+        errdict = err.asdict()
+        if self._is_only_key(errdict, field_name):
+            field_value = self._return_value_from_dict_if_string(
+                json_object, field_name)
+            if field_value is not None:
+                raise WebSocketError('unknown_' + field_name, field_value)
+
+    def _is_only_key(self, d: dict, key: str) -> bool:
+        return key in d and len(d) == 1
+
+    def _return_value_from_dict_if_string(self, d: dict, key: str) -> str:
+        if isinstance(d, dict) and key in d:
+            value = d[key]
+            if isinstance(value, str):
+                return value
+
+    def _raise_from_colander_error(self, err: colander.Invalid) -> None:
+        """Raise a 'invalid_json' WebSocketError from a colander error."""
+        errdict = err.asdict()
+        errlist = ['{}: {}'.format(k, errdict[k]) for k in errdict.keys()]
+        details = ' / '.join(sorted(errlist))
+        raise WebSocketError('invalid_json', details)
 
     def _send_error_message(self, error: str, details: str) -> None:
         # TODO serialize WebSocketError instead
@@ -186,7 +205,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         logger.debug('Sending message to client %s: %s', self._client, text)
         self.sendMessage(text.encode())
 
-    def onClose(self, was_clean: bool, code: int, reason: str):
+    def onClose(self, was_clean: bool, code: int, reason: str):  # noqa
         self.tracker.delete_all_subscriptions(self._client)
         clean_str = 'Clean' if was_clean else 'Unclean'
         logger.debug('%s close of WebSocket connection to %s; reason: %s',
