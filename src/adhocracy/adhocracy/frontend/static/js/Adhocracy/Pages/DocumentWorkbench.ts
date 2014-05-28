@@ -121,20 +121,20 @@ export function run<Data>() {
                   ["$q", ($q) =>
                    new Widgets.Listing(new Widgets.ListingContainerAdapter(),
                                        new Widgets.ListingElementAdapter($q)
-                                      ).factory()()]);
+                                      ).factory()]);
 
     app.directive("wdgProposalListing",
                   ["$q", "adhHttp", ($q, adhHttp) =>
                    new Widgets.Listing(new Widgets.ListingContainerAdapter(),
                                        new Widgets.ListingTiteledElementAdapter($q, adhHttp)
-                                      ).factory()()]);
+                                      ).factory()]);
 
 //    app.directive("wdgProposalListingWithDetails",
 //                  ["$q", "adhHttp", ($q, adhHttp) =>
 //                   new Widgets.ProposalListing("/adhocracy",
 //                                       new Widgets.ListingContainerAdapter(),
 //                                       new Widgets.ListingDocumentAdapter($q, adhHttp)
-//                                      ).factory()()]);
+//                                      ).factory()]);
 
 
     // application-specific directives
