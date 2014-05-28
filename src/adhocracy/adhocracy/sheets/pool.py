@@ -56,7 +56,9 @@ class PoolSchema(colander.MappingSchema):
 pool_metadata = sheet_metadata_defaults._replace(isheet=IPool,
                                                  schema_class=PoolSchema,
                                                  sheet_class=PoolSheet,
-                                                 readonly=True)
+                                                 editable=False,
+                                                 creatable=False,
+                                                 )
 
 
 def includeme(config):

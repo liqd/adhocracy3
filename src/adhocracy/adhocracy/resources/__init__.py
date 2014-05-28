@@ -102,9 +102,7 @@ class ResourceFactory:
             for key, struct in appstructs.items():
                 isheet = DottedNameResolver().maybe_resolve(key)
                 sheet = get_sheet(resource, isheet)
-                if sheet.meta.readonly:
-                    continue
-                else:
+                if sheet.meta.creatable:
                     sheet.set(struct)
 
         if run_after_creation:

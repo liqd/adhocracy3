@@ -156,9 +156,11 @@ these objects has a "fields" key whose value is a list of objects
 describing the fields defined by the sheet:
 
     >>> pprint(resp_data['sheets']['adhocracy.sheets.name.IName']['fields'][0])
-    {'createmandatory': False,
+    {'creatable': True,
+     'create_mandatory': False,
+     'editable': True,
      'name': 'name',
-     'readonly': False,
+     'readable': True,
      'valuetype': 'adhocracy.schema.Identifier'}
 
 Each field definition has the following keys:
@@ -166,12 +168,20 @@ Each field definition has the following keys:
 name
     The field name
 
-createmandatory
+create_mandatory
     Flag specifying whether the field must be set if the sheet is created
+    (post requests).
 
-readonly
-    Flag specifying whether the field can be set by the user (if true, it's
-    automatically set by the server)
+readable
+    Flag specifying whether the field can be read (get requests).
+
+editable
+    Flag specifying whether the field can be set to edit an existing sheet
+    (put requests).
+
+creatable
+    Flag specifying whether the field can be set if the sheet is created
+    (post requests).
 
 valuetype
     The type of values stored in the field, either a basic type (as defined
@@ -202,9 +212,11 @@ pointing to other ISection's:
     ...         pprint(field)
     ...         break
     {'containertype': 'list',
-     'createmandatory': False,
+     'creatable': True,
+     'create_mandatory': False,
+     'editable': True,
      'name': 'subsections',
-     'readonly': False,
+     'readable': True,
      'targetsheet': 'adhocracy.sheets.document.ISection',
      'valuetype': 'adhocracy.schema.AbsolutePath'}
 
@@ -217,9 +229,11 @@ IVersionable's:
 ...    ...         pprint(field)
 ...    ...         break
 ...    {'containertype': 'set',
-...     'createmandatory': False,
+...     'creatable': True,
+...     'create_mandatory': False,
 ...     'name': 'follows',
-...     'readonly': False,
+...     'editable': True,
+...     'readable': True,
 ...     'targetsheet': 'adhocracy.sheets.versions.IVersionable',
 ...     'valuetype': 'adhocracy.schema.AbsolutePath'}
 
@@ -531,15 +545,19 @@ to work ::
     >>> vers_fields = resp.json['sheets']['adhocracy.sheets.versions.IVersionable']['fields']
     >>> pprint(sorted(vers_fields, key=itemgetter('name')))
     [{'containertype': 'list',
-      'createmandatory': False,
+      'creatable': False,
+      'create_mandatory': False,
+      'editable': False,
       'name': 'followed_by',
-      'readonly': True,
+      'readable': True,
       'targetsheet': 'adhocracy.sheets.versions.IVersionable',
       'valuetype': 'adhocracy.schema.AbsolutePath'},
      {'containertype': 'list',
-      'createmandatory': False,
+      'creatable': True,
+      'create_mandatory': False,
+      'editable': True,
       'name': 'follows',
-      'readonly': False,
+      'readable': True,
       'targetsheet': 'adhocracy.sheets.versions.IVersionable',
       'valuetype': 'adhocracy.schema.AbsolutePath'}]
 

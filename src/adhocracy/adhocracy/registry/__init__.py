@@ -30,20 +30,25 @@ class ResourceContentRegistry(ContentRegistry):
             dic: key - sheet name (interface identifier), value - sheet object.
 
         """
-        assert IResource.providedBy(context)
         wanted_sheets = {}
         for sheet in get_all_sheets(context):
             can_view = has_permission(sheet.meta.permission_view, context,
                                       request)
+            if onlyviewable:
+                if not sheet.meta.readable or not can_view:
+                    continue
             can_edit = has_permission(sheet.meta.permission_edit, context,
                                       request)
-            if onlyviewable and not can_view:
-                continue
-            if onlyeditable or onlycreatable or onlymandatorycreatable:
-                if sheet.meta.readonly or not can_edit:
+            if onlyeditable:
+                if not sheet.meta.editable or not can_edit:
+                    continue
+            can_create = has_permission(sheet.meta.permission_create, context,
+                                        request)
+            if onlycreatable:
+                if not sheet.meta.creatable or not can_create:
                     continue
             if onlymandatorycreatable:
-                if not sheet.meta.createmandatory:
+                if not sheet.meta.create_mandatory:
                     continue
             wanted_sheets[sheet.meta.isheet.__identifier__] = sheet
         return wanted_sheets
@@ -66,14 +71,14 @@ class ResourceContentRegistry(ContentRegistry):
         """
         resource_types = {}
         resolve = DottedNameResolver()
-        for type_ in self.all():
+        for type_id, type_metadata in self.meta.items():
             try:
-                iresource = resolve.maybe_resolve(type_)
+                iresource = resolve.maybe_resolve(type_id)
                 if iresource.isOrExtends(IResource):
-                    metadata = self.meta[type_]['resource_metadata']
-                    resource_types[type_] = {'name': type_,
-                                             'iface': iresource,
-                                             'metadata': metadata}
+                    metadata = type_metadata['resource_metadata']
+                    resource_types[type_id] = {'name': type_id,
+                                               'iface': iresource,
+                                               'metadata': metadata}
             except (ValueError, ImportError):
                 pass
         return resource_types
@@ -120,11 +125,12 @@ class ResourceContentRegistry(ContentRegistry):
             }
 
         """
-        assert IResource.providedBy(context)
+        iresource = get_iresource(context)
+        if iresource is None:
+            return {}
         all_types = self.resources_metadata()
-        name = get_iresource(context).__identifier__
-        assert name in all_types
-        metadata = all_types[name]['metadata']
+        assert iresource.__identifier__ in all_types
+        metadata = all_types[iresource.__identifier__]['metadata']
         addables = metadata.element_types
         # get all addable types
         addable_types = []
@@ -147,9 +153,9 @@ class ResourceContentRegistry(ContentRegistry):
             sheets = self.resource_sheets(dummy_resource, request,
                                           onlycreatable=True)
             sheetnames['sheets_mandatory'] = \
-                [k for k, v in sheets.items() if v.meta.createmandatory]
+                [k for k, v in sheets.items() if v.meta.create_mandatory]
             sheetnames['sheets_optional'] = \
-                [k for k, v in sheets.items() if not v.meta.createmandatory]
+                [k for k, v in sheets.items() if not v.meta.create_mandatory]
             types_with_sheetnames[type_iface.__identifier__] = sheetnames
 
         return types_with_sheetnames
