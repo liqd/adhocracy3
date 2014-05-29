@@ -39,6 +39,7 @@ export class ListingContainerAdapter extends AbstractListingContainerAdapter<Typ
 
 export interface ListingScope<Container> {
     path: string;
+    title: string;
     container: Container;
     elements: string[];
 }
@@ -61,7 +62,10 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
         return {
             restrict: "E",
             templateUrl: templatePath + "/" + Listing.templateUrl,  // FIXME: "s/Listing./self./"?
-            scope: { path: '@path' },
+            scope: {
+                path: '@path',
+                title: '@title'
+            },
             controller: ["$scope",
                          "adhHttp",
                          function($scope: ListingScope<typeof _this.containerAdapter.ContainerType>,
