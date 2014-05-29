@@ -881,10 +881,10 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert field_metadata['valuetype'] == 'Integer'
 
     def test_get_sheets_with_field_adhocracy_noniteratable(self):
-        from adhocracy.schema import Identifier
+        from adhocracy.schema import Name
 
         class SchemaF(self.sheet_meta.schema_class):
-            test = colander.SchemaNode(Identifier())
+            test = colander.SchemaNode(Name())
 
         sheet_meta = self.sheet_meta._replace(schema_class=SchemaF)
         self.sheets_metadata.return_value = {ISheet.__identifier__: sheet_meta}
@@ -894,7 +894,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
         field_metadata = response['fields'][0]
         assert 'containertype' not in field_metadata
-        assert field_metadata['valuetype'] == 'adhocracy.schema.Identifier'
+        assert field_metadata['valuetype'] == 'adhocracy.schema.Name'
 
     def test_get_sheets_with_field_adhocracy_referencelist(self):
         from adhocracy.interfaces import SheetToSheet

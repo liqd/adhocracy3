@@ -157,11 +157,11 @@ describing the fields defined by the sheet:
 
     >>> pprint(resp_data['sheets']['adhocracy.sheets.name.IName']['fields'][0])
     {'creatable': True,
-     'create_mandatory': False,
+     'create_mandatory': True,
      'editable': False,
      'name': 'name',
      'readable': True,
-     'valuetype': 'adhocracy.schema.Identifier'}
+     'valuetype': 'adhocracy.schema.Name'}
 
 Each field definition has the following keys:
 
@@ -292,8 +292,8 @@ If the current user has the right to modify the resource in-place, the
 "request_body" sub-key returned for PUT gives a stub view of how the actual
 request should look like::
 
-     >>> pprint(resp_data['PUT']['request_body'])
-     {'data': {...'adhocracy.sheets.name.IName': {}...}}
+...     >>> pprint(resp_data['PUT']['request_body'])
+...     {'data': {...'adhocracy.sheets.name.IName': {}...}}
 
 The "response_body" sub-key gives, as usual, a stub view of the resulting
 response body::
@@ -350,18 +350,21 @@ PUT
 
 Modify data of an existing resource ::
 
-    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
-    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'proposals'}}}
-    >>> resp_data = testapp.put_json("/adhocracy/Proposals", data).json
-    >>> pprint(resp_data)
-    {'content_type': 'adhocracy.resources.pool.IBasicPool',
-     'path': '/adhocracy/Proposals'}
+FIXME: The put example is temporally disabled because the IName sheet is longer
+       editable.
+
+...    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
+...    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'proposals'}}}
+...    >>> resp_data = testapp.put_json("/adhocracy/Proposals", data).json
+...    >>> pprint(resp_data)
+...    {'content_type': 'adhocracy.resources.pool.IBasicPool',
+...     'path': '/adhocracy/Proposals'}
 
 Check the changed resource ::
 
-    >>> resp_data = testapp.get("/adhocracy/Proposals").json
-    >>> resp_data["data"]["adhocracy.sheets.name.IName"]["name"]
-    'proposals'
+...   >>> resp_data = testapp.get("/adhocracy/Proposals").json
+...   >>> resp_data["data"]["adhocracy.sheets.name.IName"]["name"]
+...   'proposals'
 
 FIXME: write test cases for attributes with "create_mandatory", "editable",
 and possibly others.  (those work the same in PUT and POST, and on any

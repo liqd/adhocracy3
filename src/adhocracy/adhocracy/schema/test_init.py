@@ -19,20 +19,53 @@ def add_node_binding(node, context=None):
 #  tests  #
 ###########
 
-class IdentifierUnitTest(unittest.TestCase):
+class NameUnitTest(unittest.TestCase):
 
-    def make_one(self):
-        from . import Identifier
-        return Identifier()
+    def setUp(self):
+        self.parent = testing.DummyResource()
+        self.context = testing.DummyResource(__parent__=self.parent)
+
+    def _make_one(self):
+        from adhocracy.schema import Name
+        inst = Name()
+        return inst.bind(context=self.context)
 
     def test_valid(self):
-        inst = self.make_one()
-        assert inst.validator(inst, 'blu.ABC_12-3') is None
+        inst = self._make_one()
+        assert inst.deserialize('blu.ABC_12-3')
 
-    def test_non_valid(self):
-        inst = self.make_one()
+    def test_no_valid_missing_context_binding(self):
+        inst = self._make_one()
+        inst_no_context = inst.bind()
+        with pytest.raises(AttributeError):
+            inst_no_context.deserialize('blu.ABC_123')
+
+    def test_no_valid_parent_is_none(self):
+        inst = self._make_one()
+        self.context.__parent__ = None
         with pytest.raises(colander.Invalid):
-            inst.validator(inst, 'blu./ABC_12-3')
+            inst.deserialize('blu.ABC_123')
+
+    def test_non_valid_empty(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.validator(inst, '')
+
+    def test_non_valid_to_long(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.validator(inst, 'x' * 101)
+
+    def test_non_valid_wrong_characters(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.validator(inst, 'ä')
+
+    def test_non_valid_not_unique(self):
+        inst = self._make_one()
+        self.context.__parent__['name'] = testing.DummyRequest()
+        with pytest.raises(colander.Invalid):
+            inst.validator(inst, 'name')
 
 
 class EmailUnitTest(unittest.TestCase):

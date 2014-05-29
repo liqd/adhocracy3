@@ -69,8 +69,11 @@ class ItemIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def make_one(self):
+        from adhocracy.sheets.name import IName
         from adhocracy.resources import ResourceFactory
-        return ResourceFactory(self.metadata)(parent=self.context)
+        appstructs = {IName.__identifier__: {'name': 'name'}}
+        return ResourceFactory(self.metadata)(parent=self.context,
+                                              appstructs=appstructs)
 
     def test_create(self):
         from adhocracy.sheets.tags import ITag as ITagS
@@ -136,6 +139,5 @@ class IncludemeIntegrationTest(unittest.TestCase):
 
     def test_includeme_registry_create_content(self):
         res = self.config.registry.content.create(IItem.__identifier__,
-                                                  parent=self.context,
                                                   run_after_creation=False)
         assert IItem.providedBy(res)

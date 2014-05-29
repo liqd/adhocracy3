@@ -142,14 +142,6 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         assert ISheetX.providedBy(inst)
         assert ISheetY.providedBy(inst)
 
-    def test_call_with_parent(self):
-        meta = self.metadata
-        inst = self.make_one(meta)(parent=self.context)
-
-        assert inst.__parent__ == self.context
-        assert inst.__name__ in self.context
-        assert inst.__oid__ == 1
-
     def test_call_with_after_create(self):
         def dummy_after_create(context, registry, options):
             context._options = options
@@ -175,6 +167,13 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         with pytest.raises(AttributeError):
             inst.test
+
+    def test_call_with_non_exisiting_sheet_appstructs_data(self):
+        from zope.component import ComponentLookupError
+        meta = self.metadata
+        appstructs = {ISheetY.__identifier__: {'count': 0}}
+        with pytest.raises(ComponentLookupError):
+            self.make_one(meta)(appstructs=appstructs)
 
     def test_call_with_creatable_appstructs_data(self):
         meta = self.metadata._replace(iresource=IResource,
@@ -211,13 +210,43 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         assert 'child' in self.context
         assert dummy_sheet.return_value.set.called
 
-    def test_call_with_parent_and_appstructs_empty_name_data(self):
-        meta = self.metadata._replace(iresource=IResource,
-                                      basic_sheets=[ISheetY])
-        appstructs = {'adhocracy.sheets.name.IName': {'name': 'invalid'}}
-        _create_dummy_sheet_adapter(self.config.registry, ISheetY)
+    def test_call_with_parent_and_no_name_appstruct(self):
+        meta = self.metadata
+        with pytest.raises(KeyError):
+            self.make_one(meta)(parent=self.context, appstructs={})
 
-        with pytest.raises(ValueError):
+    def test_call_with_parent_and_name_appstruct(self):
+        from adhocracy.sheets.name import IName
+        meta = self.metadata._replace(iresource=IResource,
+                                      basic_sheets=[IName])
+        appstructs = {IName.__identifier__: {'name': 'name'}}
+        _create_dummy_sheet_adapter(self.config.registry, IName)
+        inst = self.make_one(meta)(parent=self.context, appstructs=appstructs)
+
+        assert inst.__parent__ == self.context
+        assert inst.__name__ in self.context
+        assert inst.__name__ == 'name'
+        assert inst.__oid__ == 1
+
+    def test_call_with_parent_and_non_unique_name_appstruct(self):
+        from adhocracy.sheets.name import IName
+        meta = self.metadata._replace(iresource=IResource,
+                                      basic_sheets=[IName])
+        appstructs = {IName.__identifier__: {'name': 'name'}}
+        _create_dummy_sheet_adapter(self.config.registry, IName)
+        self.context['name'] = testing.DummyResource()
+
+        with pytest.raises(KeyError):
+            self.make_one(meta)(parent=self.context, appstructs=appstructs)
+
+    def test_call_with_parent_and_empty_name_data(self):
+        from adhocracy.sheets.name import IName
+        meta = self.metadata._replace(iresource=IResource,
+                                      basic_sheets=[IName])
+        appstructs = {'adhocracy.sheets.name.IName': {'name': ''}}
+        _create_dummy_sheet_adapter(self.config.registry, IName)
+
+        with pytest.raises(KeyError):
             self.make_one(meta)(parent=self.context, appstructs=appstructs)
 
     def test_call_with_parent_and_use_autonaming(self):

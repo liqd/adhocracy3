@@ -105,7 +105,7 @@ class GenericResourceSheet(PropertySheet):
 
     def validate_cstruct(self, cstruct: dict) -> dict:
         """Validate schema :term:`cstruct`."""
-        # FIXME: this method does not validate, it`s deserializing instead.
+        # FIXME: misleading name, it does not validate but deserialize.
         for child in self.schema:
             editable = getattr(child, 'editable', True)
             creatable = getattr(child, 'creatable', True)
