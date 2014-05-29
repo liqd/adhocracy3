@@ -1,6 +1,6 @@
 <h3>{{title}}</h3>
 <ol>
     <li ng-repeat="element in elements track by $id(element)">
-        <a href="{{element.path}}">{{element.name}}</a>
+        <span ng-transclude></span>
     </li>
 </ol>

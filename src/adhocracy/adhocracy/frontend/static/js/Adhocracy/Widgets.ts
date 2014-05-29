@@ -66,6 +66,7 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
                 path: '@path',
                 title: '@title'
             },
+            transclude: true,
             controller: ["$scope",
                          "adhHttp",
                          function($scope: ListingScope<typeof _this.containerAdapter.ContainerType>,
@@ -157,18 +158,20 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
         // such that the instance type is '() => IDirective', and no
         // factory method is needed.
 
-        var _this = this;
+        var _this = this;  // FIXME: can we use () => {} syntax instead of this explicit declaration?
 
         return {
             restrict: "E",
             templateUrl: templatePath + "/" + ListingElement.templateUrl,  // FIXME: "s/ListingElement./self./"?
-            scope: { path: '@path' },
+            // scope: { path: '@element' },  // FIXME: this scope restriction causes @element to be dropped!
             controller: ["$scope",
                          "adhHttp",
                          function($scope: ListingElementScope<typeof _this.elementAdapter.ElementType>,
                                   adhHttpE: AdhHttp.IService<typeof _this.elementAdapter.ElementType>
                                  ) : void
                          {
+                             $scope.path = "/adhocracy/zz";  // FIXME!  (see $scope)
+
                              adhHttpE.get($scope.path)
                                  .then(_this.elementAdapter.name)
                                  .then((name) => $scope.name = name);
@@ -224,4 +227,4 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
 
 
 // FIXME: good dynamic type error handling?  (this should go to Http
-// service.)
+// service.)  also: dynamic handling of 404-errors and others.
