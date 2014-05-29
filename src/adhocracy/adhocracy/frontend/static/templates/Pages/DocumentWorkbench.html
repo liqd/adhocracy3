@@ -4,11 +4,11 @@
     <tr>
         <td id="document_workbench_navigate">
 
-            <wdg-listing path="/adhocracy" title="a listing of proposals (abstract)">
+            <wdg-listing path="/adhocracy" title="proposals listing (abstract)">
                 <wdg-listing-element></wdg-listing-element>
             </wdg-listing>
 
-            <wdg-listing path="/adhocracy" title="a listing of proposals (by titles)">
+            <wdg-listing path="/adhocracy" title="proposals listing (by titles)">
                 <wdg-listing-element-title></wdg-listing-element-title>
             </wdg-listing>
 
@@ -16,6 +16,7 @@
         <td id="document_workbench_list">
             <h3>table of contents</h3>
 
+<!--
             <ol>
                 <li ng-repeat="doc in poolEntries">
                     <div ng-switch="doc">
@@ -28,6 +29,7 @@
                     </div>
                 </li>
             </ol>
+-->
         </td>
         <td id="document_workbench_participate">
             <div ng-if="user.can('proposal.create')">

@@ -63,8 +63,8 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
             restrict: "E",
             templateUrl: templatePath + "/" + Listing.templateUrl,  // FIXME: "s/Listing./self./"?
             scope: {
-                path: '@path',
-                title: '@title'
+                path: '@',
+                title: '@'
             },
             transclude: true,
             controller: ["$scope",
@@ -156,11 +156,6 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
     }
 
     public factory() {
-        // FIXME: "factory" might be misinterpreted as "ListingFactory".
-        // possible solutions: (1) rename; (2) implement Listing class
-        // such that the instance type is '() => IDirective', and no
-        // factory method is needed.
-
         var _this = this;  // FIXME: can we use () => {} syntax instead of this explicit declaration?
 
         return {
