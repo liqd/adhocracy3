@@ -96,6 +96,9 @@ password_metadata = sheet_metadata_defaults._replace(
     isheet=IPasswordAuthentication,
     schema_class=PasswordAuthenticationSchema,
     sheet_class=PasswordAuthenticationSheet,
+    readable=False,
+    creatable=True,
+    editable=True,
 )
 
 
