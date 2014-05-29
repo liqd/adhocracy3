@@ -24,7 +24,9 @@ class NameSchema(colander.MappingSchema):
 
 
 name_metadata = sheet_metadata_defaults._replace(isheet=IName,
-                                                 schema_class=NameSchema)
+                                                 schema_class=NameSchema,
+                                                 editable=False,
+                                                 )
 
 
 def includeme(config):

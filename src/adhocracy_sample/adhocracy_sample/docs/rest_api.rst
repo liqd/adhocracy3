@@ -158,7 +158,7 @@ describing the fields defined by the sheet:
     >>> pprint(resp_data['sheets']['adhocracy.sheets.name.IName']['fields'][0])
     {'creatable': True,
      'create_mandatory': False,
-     'editable': True,
+     'editable': False,
      'name': 'name',
      'readable': True,
      'valuetype': 'adhocracy.schema.Identifier'}
@@ -363,7 +363,7 @@ Check the changed resource ::
     >>> resp_data["data"]["adhocracy.sheets.name.IName"]["name"]
     'proposals'
 
-FIXME: write test cases for attributes with "required", "read-only",
+FIXME: write test cases for attributes with "create_mandatory", "editable",
 and possibly others.  (those work the same in PUT and POST, and on any
 attribute in the json tree.)
 
