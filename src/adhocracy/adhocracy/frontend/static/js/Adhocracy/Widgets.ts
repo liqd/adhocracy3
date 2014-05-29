@@ -143,6 +143,9 @@ export class ListingElementTitleAdapter extends AbstractListingElementAdapter<Ty
 export interface ListingElementScope<Container> {
     path: string;
     name: string;
+
+    element: string;  // FIXME: remove this once bug concerning
+                      // ListingElement scope attribute is fixed.
 }
 
 export class ListingElement<ElementAdapter extends AbstractListingElementAdapter<Types.Content<any>>>
@@ -163,14 +166,25 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
         return {
             restrict: "E",
             templateUrl: templatePath + "/" + ListingElement.templateUrl,  // FIXME: "s/ListingElement./self./"?
-            // scope: { path: '@element' },  // FIXME: this scope restriction causes @element to be dropped!
+            // scope: { path: '=element' },
+            //
+            // FIXME: the above scope attribute is supposed to
+            // generate a new isolated child scop and import 'element'
+            // from the parent scope as 'path'.  this results in path
+            // being undefined, but if the scope is not isolated at
+            // all, $scope.element contains the expected value (see
+            // below).  my best idea so far is that this is because
+            // there are two scopes between this one and the one that
+            // defines 'element', and '=element' only searches the
+            // parent scope, not all ancestor scopes.  not sure what
+            // to do about this.  (mf)
             controller: ["$scope",
                          "adhHttp",
                          function($scope: ListingElementScope<typeof _this.elementAdapter.ElementType>,
                                   adhHttpE: AdhHttp.IService<typeof _this.elementAdapter.ElementType>
                                  ) : void
                          {
-                             $scope.path = "/adhocracy/zz";  // FIXME!  (see $scope)
+                             $scope.path = $scope.element;  // FIXME see issue in scope attribute above.
 
                              adhHttpE.get($scope.path)
                                  .then(_this.elementAdapter.name)
