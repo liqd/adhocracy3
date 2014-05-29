@@ -72,58 +72,66 @@ class TestResourceContentRegistrySheets(unittest.TestCase):
         resource_registry = ResourceContentRegistry(dummy_registry)
         return resource_registry.resource_sheets(*args, **kwargs)
 
-    def test_sheets_valid_missing_sheets(self):
+    def test_sheets_without_sheets(self):
         request = None
         context = testing.DummyResource()
         sheets = self._make_one(context, request)
         assert sheets == {}
 
-    def test_sheets_valid_with_sheets(self):
+    def test_sheets_with_sheets(self):
         sheets = self._make_one(self.context, self.request)
         assert ISheet.__identifier__ in sheets
         assert sheets[ISheet.__identifier__].meta.isheet == ISheet
 
-    def test_sheets_valid_with_sheets_no_permission(self):
+    def test_sheets_with_sheets_onlyviewable_readable(self):
+        sheets = self._make_one(self.context, self.request, onlyviewable=True)
+        assert ISheet.__identifier__ in sheets
+
+    def test_sheets_with_sheets_onlyviewable_no_permission(self):
         self.config.testing_securitypolicy(userid='reader', permissive=False)
         sheets = self._make_one(self.context, self.request, onlyviewable=True)
         assert sheets == {}
 
-    def test_sheets_valid_with_sheets_onlyeditable_no_permission(self):
+    def test_sheets_with_sheets_onlyviewable_not_readable(self):
+        self.sheet.meta = self.sheet.meta._replace(readable=False)
+        sheets = self._make_one(self.context, self.request, onlyviewable=True)
+        assert sheets == {}
+
+    def test_sheets_with_sheets_onlyeditable_editable(self):
+        sheets = self._make_one(self.context, self.request, onlyeditable=True)
+        assert ISheet.__identifier__ in sheets
+
+    def test_sheets_with_sheets_onlyeditable_no_permission(self):
         self.config.testing_securitypolicy(userid='reader', permissive=False)
         sheets = self._make_one(self.context, self.request, onlyeditable=True)
         assert sheets == {}
 
-    def test_sheets_valid_with_sheets_onlyeditable_readonly(self):
-        self.sheet.meta = self.sheet.meta._replace(editable=False,
-                                                   creatable=False)
+    def test_sheets_with_sheets_onlyeditable_not_readable(self):
+        self.sheet.meta = self.sheet.meta._replace(editable=False)
         sheets = self._make_one(self.context, self.request, onlyeditable=True)
         assert sheets == {}
 
-    def test_sheets_valid_with_sheets_onlycreatable_no_permission(self):
-        self.config.testing_securitypolicy(userid='reader', permissive=False)
-        sheets = self._make_one(self.context, self.request, onlycreatable=True)
-        assert sheets == {}
-
-    def test_sheets_valid_with_sheets_onlcreatable_readonly(self):
-        self.sheet.meta = self.sheet.meta._replace(editable=False,
-                                                   creatable=False)
-        sheets = self._make_one(self.context, self.request, onlycreatable=True)
-        assert sheets == {}
-
-    def test_sheets_valid_with_sheets_onlcreatable_creatable(self):
-        self.sheet.meta = self.sheet.meta._replace(editable=False,
-                                                   creatable=True)
+    def test_sheets_with_sheets_onlycreatable_creatable(self):
         sheets = self._make_one(self.context, self.request, onlycreatable=True)
         assert ISheet.__identifier__ in sheets
 
-    def test_sheets_valid_with_sheets_onlymandatory_with_createmandatory(self):
-        self.sheet.meta = self.sheet.meta._replace(create_mandatory=True,
-                                                   creatable=True)
+    def test_sheets_with_sheets_onlycreatable_no_permission(self):
+        self.config.testing_securitypolicy(userid='reader', permissive=False)
+        sheets = self._make_one(self.context, self.request, onlycreatable=True)
+        assert sheets == {}
+
+    def test_sheets_with_sheets_onlcreatable_not_createable(self):
+        self.sheet.meta = self.sheet.meta._replace(creatable=False)
+        sheets = self._make_one(self.context, self.request, onlycreatable=True)
+        assert sheets == {}
+
+    def test_sheets_with_sheets_onlymandatory_createmandatory(self):
+        self.sheet.meta = self.sheet.meta._replace(create_mandatory=True)
         sheets = self._make_one(self.context, self.request,
                                 onlymandatorycreatable=True)
         assert ISheet.__identifier__ in sheets
 
-    def test_sheets_valid_with_sheets_onlymandatory_no_createmandatory(self):
+    def test_sheets_with_sheets_onlymandatory_not_createmandatory(self):
         self.sheet.meta = self.sheet.meta._replace(create_mandatory=False)
         sheets = self._make_one(self.context, self.request,
                                 onlymandatorycreatable=True)
@@ -151,12 +159,18 @@ class TestResourceContentRegistryResourcesMetadata(unittest.TestCase):
         resources = self._make_one()
         assert resources == {}
 
-    def test_resources_metadata_with_non_iresource_content_types(self):
-        self.resource_registry.meta = {"wrong": {}}
+    def test_resources_metadata_with_unresolvable_content_type(self):
+        self.resource_registry.meta = {"unresolvable": {}}
         resources = self._make_one()
         assert resources == {}
 
-    def test_resources_metadata_with_resources(self):
+    def test_resources_metadata_with_non_iresource_content_types(self):
+        from zope.interface import Interface
+        self.resource_registry.meta = {Interface.__identifier__: {}}
+        resources = self._make_one()
+        assert resources == {}
+
+    def test_resources_metadata_with_iresource_content_types(self):
         type_id = IResource.__identifier__
         self.resource_registry.meta = \
             {type_id: {'resource_metadata': self.resource_meta}}

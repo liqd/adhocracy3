@@ -82,9 +82,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         from adhocracy.subscriber import reference_has_new_version_subscriber
         return reference_has_new_version_subscriber(*args)
 
-    def test_call_versionable_with_autoupdate_sheet(self):
-        context = testing.DummyResource(__provides__=IItemVersion,
-                                        __parent__=object())
+    def _create_new_version_event_for_autoupdate_sheet(self, context):
         isheet = IDummySheetAutoUpdate
         event = _create_new_version_event_with_isheet(context, isheet)
         sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
@@ -92,6 +90,12 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         sheet_versionable = _create_and_register_dummy_sheet(event.object,
                                                              IVersionable)
         sheet_versionable._data = {'follows': []}
+        return event
+
+    def test_call_versionable_with_autoupdate_sheet(self):
+        context = testing.DummyResource(__provides__=IItemVersion,
+                                        __parent__=object())
+        event = self._create_new_version_event_for_autoupdate_sheet(context)
 
         self._makeOne(event)
 
@@ -100,7 +104,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         parent = factory.call_args[1]['parent']
         assert parent is context.__parent__
         appstructs = factory.call_args[1]['appstructs']
-        assert appstructs[isheet.__identifier__] == \
+        assert appstructs[event.isheet.__identifier__] == \
                {'elements': [event.new_version]}
         assert appstructs[IVersionable.__identifier__] == {'follows': [context]}
 
@@ -112,14 +116,8 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         context = testing.DummyResource(__provides__=IItemVersion,
                                         __parent__=object(),
                                         __graph__=graph)
-        isheet = IDummySheetAutoUpdate
-        event = _create_new_version_event_with_isheet(context, isheet)
+        event = self._create_new_version_event_for_autoupdate_sheet(context)
         event.root_versions = [context]
-        sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
-        sheet_autoupdate._data = {'elements': [event.old_version]}
-        sheet_versionable = _create_and_register_dummy_sheet(event.object,
-                                                             IVersionable)
-        sheet_versionable._data = {'follows': []}
 
         self._makeOne(event)
 
@@ -139,6 +137,20 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
 
         factory = self.config.registry.content.create
         assert not factory.called
+
+    def test_call_versionable_with_autoupdate_sheet_and_other_sheet_readonly(self):
+        context = testing.DummyResource(__provides__=IItemVersion)
+        event = self._create_new_version_event_for_autoupdate_sheet(context)
+        isheet_readonly = IDummySheetNoAutoUpdate
+        sheet_readonly = _create_and_register_dummy_sheet(context, isheet_readonly)
+        sheet_readonly.meta = sheet_readonly.meta._replace(editable=False,
+                                                           creatable=False)
+
+        self._makeOne(event)
+
+        factory = self.config.registry.content.create
+        assert factory.called
+        assert isheet_readonly.__identifier__ not in factory.call_args[1]['appstructs']
 
     def test_call_versionable_without_autoupdate_sheet(self):
         context = testing.DummyResource(__provides__=IItemVersion)

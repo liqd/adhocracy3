@@ -65,20 +65,19 @@ class PasswordAuthenticationSheet(GenericResourceSheet):
     The `check_plaintext_password` method can be used to validate passwords.
     """
 
-    def __init__(self, metadata, context):
-        super().__init__(metadata, context)
-        if not hasattr(context, 'pwd_manager'):
-            self.context.pwd_manager = BCRYPTPasswordManager()
-        if not hasattr(context, 'password'):
-            self.context.password = ''
-
     def _store_non_references(self, appstruct):
         password = appstruct.get('password', '')
-        if password:
-            self.context.password = self.context.pwd_manager.encode(password)
+        if not password:
+            return
+        if not hasattr(self.context, 'password'):
+            self.context.password = ''
+        if not hasattr(self.context, 'pwd_manager'):
+            self.context.pwd_manager = BCRYPTPasswordManager()
+        self.context.password = self.context.pwd_manager.encode(password)
 
     def _get_non_reference_appstruct(self):
-        return {'password': self.context.password}
+        password = getattr(self.context, 'password', '')
+        return {'password': password}
 
     def check_plaintext_password(self, password: str) -> bool:
         """ Check if `password` matches the stored encrypted password.

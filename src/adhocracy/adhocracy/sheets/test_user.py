@@ -23,10 +23,27 @@ class PasswordSheetUnitTest(unittest.TestCase):
         inst.set({'password': 'test'})
         assert len(inst.context.password) == 60
 
+    def test_reset_password(self):
+        inst = self._makeOne(self.metadata, self.context)
+        inst.set({'password': 'test'})
+        password_old = inst.context.password
+        inst.set({'password': 'test'})
+        password_new = inst.context.password
+        assert password_new != password_old
+
+    def test_set_empty_password(self):
+        inst = self._makeOne(self.metadata, self.context)
+        inst.set({'password': ''})
+        assert not hasattr(inst.context, 'password')
+
     def test_get_password(self):
         inst = self._makeOne(self.metadata, self.context)
         inst.context.password = 'test'
         assert inst.get()['password'] == 'test'
+
+    def test_get_empty_password(self):
+        inst = self._makeOne(self.metadata, self.context)
+        assert inst.get()['password'] == ''
 
     def test_check_password_valid(self):
         inst = self._makeOne(self.metadata, self.context)
