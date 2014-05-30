@@ -148,7 +148,7 @@ export function run() {
                     var fetchDocumentHead = function(n : number, dag : Types.Content<Resources.HasIDocumentSheet>) : void {
                         var dagPS = dag.data["adhocracy.sheets.versions.IVersions"].elements;
                         if (dagPS.length > 0) {
-                            var headPath = Resources.newestVersion(dagPS); //FIXME: backend should have LAST
+                            var headPath = Resources.newestVersion(dagPS); // FIXME: backend should have LAST
                             adhHttp.get(headPath).then((headContent) => {
                                 if (n in $scope.poolEntries) {
                                     // leave original headContentRef intact,
