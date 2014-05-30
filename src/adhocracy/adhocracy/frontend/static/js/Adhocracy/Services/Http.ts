@@ -36,7 +36,6 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
     function assertResponse(msg : string, path : string) {
         return (resp) => {
             if (resp.status !== 200) {
-                console.log(resp);
                 throw (msg + ": http error " + resp.status.toString() + " on path " + path);
             }
             return importContent(resp.data);

@@ -51,7 +51,6 @@ export function factory() : IService {
 
         ws.onmessage = function(event) {
             var path = event.data;
-            console.log("WS message: " + path);
 
             if (path in subscriptions) {
                 subscriptions[path]();
@@ -59,7 +58,7 @@ export function factory() : IService {
         };
 
         ws.onerror = function(event) {
-            console.log("WS error: ", event);
+            return;
         };
 
         ws.onopen = function() {
