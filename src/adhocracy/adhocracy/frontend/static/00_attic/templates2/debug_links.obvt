@@ -1,5 +1,0 @@
-<tt>
-Links for debugging:<br/>
-<a href="{path}">{path}</a><br/>
-<a href="/manage{path}">/manage{path}</a><br/>
-</tt>
