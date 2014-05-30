@@ -1,6 +1,3 @@
-import Types = require("Adhocracy/Types");
-
-
 // cut ranges out of an array - original by John Resig (MIT Licensed)
 export function cutArray(a : any[], from : number, to ?: number) : any[] {
     var rest = a.slice((to || from) + 1 || a.length);

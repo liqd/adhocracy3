@@ -3,7 +3,6 @@
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import Types = require("Adhocracy/Types");
-import Util = require("Adhocracy/Util");
 import AdhHttp = require("Adhocracy/Services/Http");
 
 

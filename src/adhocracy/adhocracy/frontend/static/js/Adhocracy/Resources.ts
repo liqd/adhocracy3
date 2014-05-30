@@ -3,10 +3,8 @@
 /// <reference path="../../submodules/DefinitelyTyped/underscore/underscore.d.ts"/>
 /// <reference path="../_all.d.ts"/>
 
-import angular = require("angular");
 import _ = require("underscore");
 
-import Types = require("Adhocracy/Types");
 import Util = require("Adhocracy/Util");
 
 

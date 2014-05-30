@@ -4,14 +4,9 @@
 /// <reference path="../../_all.d.ts"/>
 
 import angular = require("angular");
-import _ = require("underscore");
 
 import Types = require("Adhocracy/Types");
-import Util = require("Adhocracy/Util");
-import Css = require("Adhocracy/Css");
 import AdhHttp = require("Adhocracy/Services/Http");
-import AdhWS = require("Adhocracy/Services/WS");
-import AdhUser = require("Adhocracy/Services/User");
 
 import Resources = require("Adhocracy/Resources");
 import Widgets = require("Adhocracy/Widgets");
