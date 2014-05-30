@@ -195,7 +195,6 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
 
 
 // next steps:
-// 0. ask stackoverflow about {Listing,self}.templateUrl problem.  (am i using the wrong pattern?)
 // 1. detail view
 // 2. think about what else we want to do with generic widgets
 
