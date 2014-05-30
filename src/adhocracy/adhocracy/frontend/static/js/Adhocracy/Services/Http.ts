@@ -98,7 +98,9 @@ export function exportContent<Content extends Types.Content<any>>(obj : Content)
     ];
 
     for (var ro in readOnlyProperties) {
-        delete newobj.data[readOnlyProperties[ro]];
+        if (readOnlyProperties.hasOwnProperty(ro)) {
+            delete newobj.data[readOnlyProperties[ro]];
+        }
     }
 
     delete newobj.path;

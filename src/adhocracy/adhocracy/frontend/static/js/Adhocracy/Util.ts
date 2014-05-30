@@ -32,7 +32,11 @@ export function deepcp(i) {
             o = new Object();
         }
 
-        for (var x in i) { o[x] = deepcp(i[x]); }
+        for (var x in i) {
+            if (i.hasOwnProperty(x)) {
+                o[x] = deepcp(i[x]);
+            }
+        }
         return o;
     } else {
         return i;
@@ -49,10 +53,14 @@ export function deepoverwrite(source, target) {
     var k;
     try {
         for (k in target) {
-            delete target[k];
+            if (target.hasOwnProperty(k)) {
+                delete target[k];
+            }
         }
         for (k in source) {
-            target[k] = deepcp(source[k]);
+            if (source.hasOwnProperty(k)) {
+                target[k] = deepcp(source[k]);
+            }
         }
     } catch (e) {
         throw ("Util.deepoverwrite: " + [source, target, e]);
@@ -74,12 +82,16 @@ export function deepeq(a : any, b : any) : boolean {
         }
 
         for (var x in a) {
-            if (!(x in b))           { return false; }
-            if (!deepeq(a[x], b[x])) { return false; }
+            if (a.hasOwnProperty(x)) {
+                if (!(x in b))           { return false; }
+                if (!deepeq(a[x], b[x])) { return false; }
+            }
         }
 
         for (var y in b) {
-            if (!(y in a)) { return false; }
+            if (b.hasOwnProperty(y)) {
+                if (!(y in a)) { return false; }
+            }
         }
     }
 

@@ -169,11 +169,11 @@ export function run() {
                     };
 
                     var dagRefs : string[] = pool.data["adhocracy.sheets.pool.IPool"].elements;
-                    for (var dagRefIx in dagRefs) {
+                    for (var i = 0; i < dagRefs.length; i++) {
                         (function(dagRefIx : number) {
                             var dagRefPath : string = dagRefs[dagRefIx];
                             adhHttp.get(dagRefPath).then((dag) => fetchDocumentHead(dagRefIx, dag));
-                        })(dagRefIx);
+                        })(i);
                     }
                 });
             }]
