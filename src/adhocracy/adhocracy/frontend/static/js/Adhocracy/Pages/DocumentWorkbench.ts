@@ -12,7 +12,6 @@ import Resources = require("Adhocracy/Resources");
 import Widgets = require("Adhocracy/Widgets");
 
 var templatePath : string = "/frontend_static/templates";
-var appPrefix : string = "/app";
 
 
 // contents of the resource with view mode.
