@@ -81,6 +81,6 @@ export function factory() : IService {
     return {
         subscribe: subscribeWs,
         unsubscribe: unsubscribeWs,
-        destroy: closeWs,
+        destroy: closeWs
     };
 }

@@ -66,7 +66,7 @@ export class Resource {
     addISection(title: string, elements: string[]) {
         this.data["adhocracy.sheets.document.ISection"] = {
             title: title,
-            elements: elements,
+            elements: elements
         };
         return this;
     }
@@ -74,26 +74,26 @@ export class Resource {
         this.data["adhocracy.sheets.document.IDocument"] = {
             title: title,
             description: description,
-            elements: elements,
+            elements: elements
         };
         return this;
     }
     addIVersionable(follows: string[], root_version: string[]) {
         this.data["adhocracy.sheets.versions.IVersionable"] = {
             follows: follows,
-            root_version: root_version,
+            root_version: root_version
         };
         return this;
     }
     addIName(name: string) {
         this.data["adhocracy.sheets.name.IName"] = {
-            name: name,
+            name: name
         };
         return this;
     }
     addIParagraph(content: string) {
         this.data["adhocracy.sheets.document.IParagraph"] = {
-            content: content,
+            content: content
         };
         return this;
     }

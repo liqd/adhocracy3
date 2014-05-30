@@ -176,7 +176,7 @@ export function run() {
                         })(dagRefIx);
                     }
                 });
-            }],
+            }]
         };
     });
 
@@ -187,7 +187,7 @@ export function run() {
             templateUrl: templatePath + "/Resources/IProposalVersion/Detail.html",
             scope: {
                 content: "=",
-                viewmode: "=",
+                viewmode: "="
             },
             controller: ["adhHttp", "$scope",
                          function(adhHttp  : AdhHttp.IService<Types.Content<any>>,
@@ -218,7 +218,7 @@ export function run() {
                     $scope.$broadcast("commit");
                     $scope.viewmode = "display";
                 };
-            }],
+            }]
         };
     });
 
@@ -228,7 +228,7 @@ export function run() {
             templateUrl: templatePath + "/Resources/IProposalVersion/Edit.html",
             scope: {
                 content: "="
-            },
+            }
         };
     });
 
@@ -269,7 +269,7 @@ export function run() {
             compile: (element) => RecursionHelper.compile(element),
             scope: {
                 ref: "=",
-                viewmode: "=",
+                viewmode: "="
             },
             controller: ["adhHttp", "$scope",
                          function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasISectionSheet>>,
@@ -286,7 +286,7 @@ export function run() {
 
                 // save working copy on 'commit' event from containing document.
                 $scope.$on("commit", commit);
-            }],
+            }]
         };
     }]);
 
@@ -297,7 +297,7 @@ export function run() {
             templateUrl: templatePath + "/Resources/IParagraphVersion/Detail.html",
             scope: {
                 ref: "=",
-                viewmode: "=",
+                viewmode: "="
             },
             controller: ["adhHttp", "$scope",
                          function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasIParagraphSheet>>,
@@ -314,7 +314,7 @@ export function run() {
 
                 // save working copy on 'commit' event from containing document.
                 $scope.$on("commit", commit);
-            }],
+            }]
         };
     });
 
@@ -324,7 +324,7 @@ export function run() {
             restrict: "E",
             templateUrl: templatePath + "/Sheets/IDocument/Edit.html",
             scope: {
-                sheet: "=",
+                sheet: "="
             },
             controller: function($scope) {
                 var versionPromises = $scope.sheet.elements.map( (path) =>
@@ -335,7 +335,7 @@ export function run() {
                 $q.all(versionPromises).then( (versions) =>
                     $scope.sectionVersions = versions
                 );
-            },
+            }
         };
     }]);
 
@@ -345,7 +345,7 @@ export function run() {
             templateUrl: templatePath + "/Sheets/IDocument/Show.html",
             scope: {
                 sheet: "="
-            },
+            }
         };
     });
 
@@ -356,7 +356,7 @@ export function run() {
             templateUrl: templatePath + "/Sheets/IParagraph/Edit.html",
             scope: {
                 sheet: "="
-            },
+            }
         };
     });
 

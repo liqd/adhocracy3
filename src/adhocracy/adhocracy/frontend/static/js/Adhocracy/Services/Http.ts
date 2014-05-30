@@ -55,7 +55,7 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
         var dagPath = Util.parentPath(oldVersionPath);
         var config = {
             headers: { follows: oldVersionPath },
-            params: {},
+            params: {}
         };
         return $http.post(dagPath, exportContent(obj), config).then(assertResponse("adhHttp.postNewVersion", dagPath));
     }
