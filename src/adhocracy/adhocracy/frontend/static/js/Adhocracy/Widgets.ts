@@ -58,10 +58,11 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
         // factory method is needed.
 
         var _this = this;
+        var _class = (<any>_this).constructor;
 
         return {
             restrict: "E",
-            templateUrl: templatePath + "/" + Listing.templateUrl,  // FIXME: "s/Listing./self./"?
+            templateUrl: templatePath + "/" + _class.templateUrl,
             scope: {
                 path: '@',
                 title: '@'
@@ -157,10 +158,11 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
 
     public factory() {
         var _this = this;  // FIXME: can we use () => {} syntax instead of this explicit declaration?
+        var _class = (<any>this).constructor;
 
         return {
             restrict: "E",
-            templateUrl: templatePath + "/" + ListingElement.templateUrl,  // FIXME: "s/ListingElement./self./"?
+            templateUrl: templatePath + "/" + _class.templateUrl,
             // scope: { path: '=element' },
             //
             // FIXME: the above scope attribute is supposed to
