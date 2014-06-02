@@ -23,17 +23,13 @@ export class User {
     }
 }
 
-export var factory = function() : User {
-    return new User();
-};
-
-export var loginDirective = function() {
+var loginDirective = function($$user : User) {
     return {
         restrict: "E",
         templateUrl: "/frontend_static/templates" + "/Util/login.html",
         scope: {},
-        controller: ["$scope", "adhUser", function($scope, adhUser : User) : void {
-            $scope.user = adhUser;
+        controller: ["$scope", function($scope) : void {
+            $scope.user = $$user;
             $scope.credentials = {
                 name: "",
                 password: ""
@@ -52,4 +48,11 @@ export var loginDirective = function() {
             };
         }]
     };
+};
+
+export var register = function(app, serviceName : string, loginDirectiveName : string) {
+    app.factory(serviceName, function() : User {
+        return new User();
+    });
+    app.directive(loginDirectiveName, [serviceName, loginDirective]);
 };

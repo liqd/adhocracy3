@@ -55,6 +55,7 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
 export function run<Data>() {
     var app = angular.module("adhocracy3SampleFrontend", []);
 
+    AdhUser.register(app, 'adhUser', 'adhLogin');
 
     // services
 
@@ -102,7 +103,6 @@ export function run<Data>() {
 
 
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
-    app.factory("adhUser", [AdhUser.factory]);
 
 
     // filters
@@ -115,8 +115,6 @@ export function run<Data>() {
 
 
     // directives
-
-    app.directive("adhLogin", AdhUser.loginDirective);
 
     app.directive("adhDocumentWorkbench", function() {
         return {
