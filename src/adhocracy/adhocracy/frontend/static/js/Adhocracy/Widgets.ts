@@ -181,7 +181,7 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
                                   adhHttpE: AdhHttp.IService<typeof _this.elementAdapter.ElementType>
                                  ) : void
                          {
-                             $scope.path = $scope.element;  // FIXME see issue in scope attribute above.
+                             $scope.path = $scope.element;  // FIXME: see issue in scope attribute above.
 
                              adhHttpE.get($scope.path)
                                  .then(_this.elementAdapter.name)
@@ -194,32 +194,7 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
 
 
 
-// next steps:
+// FIXME: next steps:
 // 1. detail view
-// 2. think about what else we want to do with generic widgets
-
-
-
-// FIXME: extend ListingContainerAdapter to something that has no
-// IPoolSheet.
-
-
-// a note on heterogenous lists.
-//
-// rationale: on the one hand, we want to be able to restrict element
-// types in the implementation of the listing and row widgets.  this
-// has the benefit of giving concise implementations for specific
-// container and element types, and makes the task of deriving new
-// such types much less complex and much more robust.
-//
-// on the other hand, we want to allow for lists that contain a wide
-// range of different elements in different rows, and we want to
-// dispatch a different widget for each row individually.  this is the
-// idea of hetergenous containers, and it can be easily implemented
-// with a class HeterogenousListingElementAdapter that extends
-// ListingElementAdapter.
-
-
-
-// FIXME: good dynamic type error handling?  (this should go to Http
-// service.)  also: dynamic handling of 404-errors and others.
+// 2. extend ListingContainerAdapter to something that has no IPoolSheet.
+// 3. any other things we want to write proofs of concept for?
