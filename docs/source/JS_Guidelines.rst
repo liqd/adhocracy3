@@ -86,7 +86,7 @@ TypeScript
 
 -  imports at top
 
-   -  separate external and internal
+   -  all internal identifiers must be defined after all external identifiers
    -  only import from lower level
 
 -  allow nested types ``Foo<Bar<Baz>>`` (how deep?)
