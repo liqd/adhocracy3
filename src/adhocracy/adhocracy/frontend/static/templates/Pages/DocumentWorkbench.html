@@ -15,10 +15,8 @@
         </td>
         <td id="document_workbench_list">
             <h3>table of contents</h3>
-
-<!--
             <ol>
-                <li ng-repeat="doc in poolEntries">
+                <li ng-repeat="doc in poolEntries track by $id(doc)">
                     <div ng-switch="doc">
                         <div ng-switch-when="undefined">
                             <small><tt>(empty DAG)</tt></small>
@@ -29,7 +27,6 @@
                     </div>
                 </li>
             </ol>
--->
         </td>
         <td id="document_workbench_participate">
             <div ng-if="user.can('proposal.create')">
