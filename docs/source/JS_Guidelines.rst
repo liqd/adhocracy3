@@ -24,8 +24,9 @@ General JavaScript
 ------------------
 
 -  strict mode
--  strict comparisons
--  semicolons
+-  strict comparisons (``===`` and not ``==``)
+-  no implicit boolean conversions: ``if (typeof x === "undefined")`` instead of ``if (!x)``
+-  semicolons: always.  (tslint and strict tell you the specifics)
 -  4 space indentation
 
 TODO:
@@ -34,61 +35,67 @@ TODO:
 
    -  https://github.com/palantir/tslint
 
--  allow chaining?  [YES! ~~mf]
+-  chaining:
 
-   -  where it might be useful:
+   -  chaining is to be preferred.
 
-      -  promises (``.then()``)
-      -  angular registration
+   -  if chain elements are many lines long, it is ok to avoid
+      chaining.  in this case, if chaining is used, newlines and
+      comments between chain elements are encouraged.
 
-   -  if chaining is allowed: how should it be indented?
-      [each '.' starts a new line.  the first line (without a '.') is indented at n+0, all '.' lines at n+4  ~~mf]
+   -  layout: each '.' (also the first one) starts a new line.  the
+      first line (without a '.') is indented at n+0, all '.' lines at
+      n+1 (4 spaces deeper).
 
--  single or mutliple ``var``\ s  [multiple vars are disallowed.  each new identfier has its own 'var'.  ~~mf]
--  when to return promises
+-  single or mutliple ``var``\ s  rule: each new identfier has its own 'var'.  (rationale: git diff / conflicts)
 
-   -  wherever it might someday be useful
-   -  only where absolutely needed
-   [neither, but where it makes sense semantically.  not sure if we need a rule for that?  ~~mf]
+-  when to return promises (this point may need to go to another place in this doc?)
 
--  consistent alias for ``this``  [``_this`` is used by typescript in compiled code and is disallowed in typescript source in some places.  ``xthis``?  ~~mf]
--  alignment::
+   - only when needed directly, or when expected to be needed in e.g. subclass.
 
-       foo = {a: 1,
-              b: 2,
-              c: 3}
+-  consistent alias for ``this``: ``self`` (as in knockout).
+   (``_this`` is used by typescript in compiled code and is disallowed
+   in typescript source in e.g. class instance methods.)
 
-   or::
+   if more than one nested self is needed, re-assign outer selves
+   locally.
 
-       foo = { a: 1,
-               b: 2,
-               c: 3 }
-
-   or::
-
-       foo = { a: 1
-             , b: 2
-             , c: 3
-             }
-
-   or::
+-  alignment.  general rule is "no alignment".  details::
 
        foo = {
            a: 1,
-           b: 2,
-           c: 3,
+           boeifj: 2,
+           cfhe: 3}
+
+       foo = [
+           138,
+           281128]
+
+   (single-line option is always allowed if reasonably short.)
+
+   function definitions::
+
+       var foo = (
+           arg: number,
+           otherarg: Class) =>
+       {
+           return;
        }
 
-   (there might be more options) (also applies to lists and function
-   parameters)
-   [i'm willing to settle for a compromise with what our IDEs are capable of indenting automatically.  ~~mf]
+       var foo = (arg: number) => {
+           return;
+       }
+
+   (single-line argument declarations *enforce* opening ``{`` in same
+   line.)
+
 -  named/anonyoumus functions
 
    -  There are three ways of defining a function
 
       1. var a = function() {}
-      2. function b() {}
-      3. var a = function b() {}
+      2. function b() {}            -- not allowed
+      3. var a = function b() {}        -- insane
 
    -  tl;dr: The first version is least confusing and should be
       preferred.
@@ -102,56 +109,71 @@ TypeScript
 
 -  imports at top
 
-   -  standard libs first (if such a thing ever exists), then external modules, then a3-internal modules
-   -  only import from lower level
+   -  standard libs first (if such a thing ever exists), then external
+      modules, then a3-internal modules.
 
--  allow nested types ``Foo<Bar<Baz>>`` (how deep?)
--  when to use ``() => x`` instead of ``function () {}``
+   -  only import from lower level.  ("lower level" does not mean file
+      directory hierarchy, but something to be clarified.  this rule
+      is to be re-evaluated at some point.)
 
-   [``() => {}`` has the benefit over ``function() {}`` that its
-   'this' is a bit more sane.  also, i prefer the syntax from an
-   asthetic point of view.  ~~mf]
+-  nested types are allowed up to 2 levels (``Foo<Bar<Baz>>``).  1
+   level is to be preferred where possible.
 
--  how strictly enforce types?
+-  ``() => x`` instead of ``function() {}`` is only allowed for expressions::
+
+     ``() => 3 + 4`` instead of ``function() { return 3 + 4; }``
+
+-  how strictly to enforce types?
 
 Angular
 -------
 
--  prefere isolated scope in directives
--  where is direct DOM manipulation/jQuery allowed?
+-  prefer isolated scope in directives.  (exception: ``ngRepeat``)
+
+-  where is direct DOM manipulation/jQuery allowed?  -- only inside directives.
+
 -  dependency injection
 
-   -  always use ``['$q', function($q) {…}]`` style
+   -  always use ``["$q", function($q) {…}]`` style
 
--  which syntax do we use for directives?
 
-   -  ``<adh-foo>``
-   -  ``<div adh-foo>``
-   -  ``<x-adh-foo>``  (this is good because it's xHTML-compliant)
-   -  ``<data-adh-foo>``  (this is good because it's HTML5-compliant)
-   -  ``<adh:foo>``
-   -  ``<div class="adh-foo">``  no (i think this is only for compatibility with very old browsers)
-
--  compability
+-  compatibility
 
    -  https://docs.angularjs.org/guide/ie
 
--  do not use $ in your variable names (leave it to angular)
+-  do not use ``$`` in your variable names (leave it to angular).
+
 -  prefix
 
-   -  one or multiple?
-   -  adh? a3?
+   - directives: 'adh.*' for all directives declared in a3.  (in the
+     future, this prefix may be split up in several ones, making
+     refactoring necessary.  client-specific prefices may be added
+     without the need for refactoring.)
 
-   [don't we want to use this code in a4 as well?  :)  what about liq?  ~~mf]
+   - service registration: '"adhHttp"'.  (services must be implemented
+     so that they don't care if they are registered under another
+     name.)
+
+   - service module import: 'import Http = require("Adhocracy/Services/Http");'.
+     rationale: when using service modules, the fact that they provide
+     services is obvious.
 
 Template
 ~~~~~~~~
 
--  prefere ``{{…}}`` over ``ngBind`` (except for root template)
--  valid XHTML5
+-  which syntax do we use for directives?
+
+   -  ``<adh:foo>`` or ``<x-adh-foo>``?
+
+   -  what about element/directive attributes?
+
+-  valid XHTML5: we use an html checker.  (which one?  does that work
+   statically, or do we have to check dynamically rendered dom trees?)
+
+-  prefer ``{{…}}`` over ``ngBind`` (except for root template).
+   check that ``{{…}}`` is never rendered temporarily!
+
 -  when to apply which classes (should be in balance with CSS
    Guidelines)
 
    -  apply classes w/o a specific need/by default?
-
-
