@@ -34,7 +34,7 @@ TODO:
 
    -  https://github.com/palantir/tslint
 
--  allow chaining?
+-  allow chaining?  [YES! ~~mf]
 
    -  where it might be useful:
 
@@ -42,19 +42,34 @@ TODO:
       -  angular registration
 
    -  if chaining is allowed: how should it be indented?
+      [each '.' starts a new line.  the first line (without a '.') is indented at n+0, all '.' lines at n+4  ~~mf]
 
--  single or mutliple ``var``\ s
+-  single or mutliple ``var``\ s  [multiple vars are disallowed.  each new identfier has its own 'var'.  ~~mf]
 -  when to return promises
 
    -  wherever it might someday be useful
    -  only where absolutely needed
+   [neither, but where it makes sense semantically.  not sure if we need a rule for that?  ~~mf]
 
--  consistent alias for ``this``
+-  consistent alias for ``this``  [``_this`` is used by typescript in compiled code and is disallowed in typescript source in some places.  ``xthis``?  ~~mf]
 -  alignment::
 
        foo = {a: 1,
               b: 2,
               c: 3}
+
+   or::
+
+       foo = { a: 1,
+               b: 2,
+               c: 3 }
+
+   or::
+
+       foo = { a: 1
+             , b: 2
+             , c: 3
+             }
 
    or::
 
@@ -66,6 +81,7 @@ TODO:
 
    (there might be more options) (also applies to lists and function
    parameters)
+   [i'm willing to settle for a compromise with what our IDEs are capable of indenting automatically.  ~~mf]
 -  named/anonyoumus functions
 
    -  There are three ways of defining a function
@@ -91,6 +107,11 @@ TypeScript
 
 -  allow nested types ``Foo<Bar<Baz>>`` (how deep?)
 -  when to use ``() => x`` instead of ``function () {}``
+
+   [``() => {}`` has the benefit over ``function() {}`` that its
+   'this' is a bit more sane.  also, i prefer the syntax from an
+   asthetic point of view.  ~~mf]
+
 -  how strictly enforce types?
 
 Angular
@@ -106,9 +127,10 @@ Angular
 
    -  ``<adh-foo>``
    -  ``<div adh-foo>``
-   -  ``<x-adh-foo>``
+   -  ``<x-adh-foo>``  (this is good because it's xHTML-compliant)
+   -  ``<data-adh-foo>``  (this is good because it's HTML5-compliant)
    -  ``<adh:foo>``
-   -  ``<div class="adh-foo">``
+   -  ``<div class="adh-foo">``  no (i think this is only for compatibility with very old browsers)
 
 -  compability
 
@@ -119,6 +141,8 @@ Angular
 
    -  one or multiple?
    -  adh? a3?
+
+   [don't we want to use this code in a4 as well?  :)  what about liq?  ~~mf]
 
 Template
 ~~~~~~~~
