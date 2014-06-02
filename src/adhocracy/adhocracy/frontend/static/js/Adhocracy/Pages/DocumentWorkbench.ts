@@ -12,6 +12,7 @@ import Css = require("Adhocracy/Css");
 import AdhHttp = require("Adhocracy/Services/Http");
 import AdhWS = require("Adhocracy/Services/WS");
 import AdhCache = require("Adhocracy/Services/Cache");
+import AdhUser = require("Adhocracy/Services/User");
 
 import Resources = require("Adhocracy/Resources");
 
@@ -100,6 +101,7 @@ export function run<Data>() {
 
 
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
+    app.factory("adhUser", [AdhUser.factory]);
 
 
     // filters
@@ -112,6 +114,8 @@ export function run<Data>() {
 
 
     // directives
+
+    app.directive("adhLogin", AdhUser.loginDirective);
 
     app.directive("adhDocumentWorkbench", function() {
         return {
