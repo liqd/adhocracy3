@@ -4,8 +4,7 @@ from pyramid import testing
 import colander
 import pytest
 
-from adhocracy.websockets.schemas import ClientRequestSchema
-from adhocracy.websockets.schemas import StatusConfirmation
+from adhocracy.websockets.schemas import *
 
 
 class ClientRequestSchemaUnitTests(unittest.TestCase):
@@ -69,6 +68,7 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
         with pytest.raises(colander.Invalid):
             inst.deserialize(['subscribe'])
 
+
 class StatusConfirmationUnitTests(unittest.TestCase):
 
     """Test StatusConfirmation serialization."""
@@ -107,3 +107,45 @@ class StatusConfirmationUnitTests(unittest.TestCase):
         assert result == {'status': 'ok',
                           'action': 'subscribe',
                           'resource': '/child'}
+
+
+class NotificationUnitTests(unittest.TestCase):
+
+    """Test serialization of Notification and its subclasses."""
+
+    def setUp(self):
+        self.context = testing.DummyResource()
+        self.parent = testing.DummyResource()
+        self.context['parent'] = self.parent
+
+    def _bind(self, schema: Notification) -> Notification:
+        return schema.bind(context=self.context)
+
+    def test_serialize_notification(self):
+        schema = Notification()
+        inst = self._bind(schema)
+        result = inst.serialize({'event': 'modified', 'resource': self.parent})
+        assert result == {'event': 'modified', 'resource': '/parent'}
+
+    def test_serialize_child_notification(self):
+        self.child = testing.DummyResource('child', self.parent)
+        schema = ChildNotification()
+        inst = self._bind(schema)
+        result = inst.serialize({'event': 'removed_child',
+                                 'resource': self.parent,
+                                 'child': self.child})
+        assert result == {'event': 'removed_child',
+                          'resource': '/parent',
+                          'child': '/parent/child'}
+
+    def test_serialize_version_notification(self):
+        self.version = testing.DummyResource('version', self.parent)
+        schema = VersionNotification()
+        inst = self._bind(schema)
+        result = inst.serialize({'event': 'removed_child',
+                                 'resource': self.parent,
+                                 'version': self.version})
+        assert result == {'event': 'removed_child',
+                          'resource': '/parent',
+                          'version': '/parent/version'}
+

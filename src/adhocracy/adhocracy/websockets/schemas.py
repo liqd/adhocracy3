@@ -34,3 +34,38 @@ class StatusConfirmation(ClientRequestSchema):
     """Data structure for status confirmations sent to the client."""
 
     status = Status()
+
+
+class Event(colander.SchemaNode):
+
+    """The type of event notifications sent to the client."""
+
+    schema_type = colander.String
+    validator = colander.OneOf(['modified',
+                                'new_child',
+                                'removed_child',
+                                'modified_child',
+                                'new_version'])
+    default = 'modified'
+
+
+class Notification(colander.MappingSchema):
+
+    """Notification sent to a client if a resource has changed."""
+
+    event = Event()
+    resource = colander.SchemaNode(ResourceObject())
+
+
+class ChildNotification(Notification):
+
+    """Notification involving a child resource."""
+
+    child = colander.SchemaNode(ResourceObject())
+
+
+class VersionNotification(Notification):
+
+    """Notification involving a version."""
+
+    version = colander.SchemaNode(ResourceObject())

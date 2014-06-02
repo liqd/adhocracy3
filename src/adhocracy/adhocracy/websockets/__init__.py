@@ -121,10 +121,12 @@ class ClientCommunicator(WebSocketServerProtocol):
         logger.debug('WebSocket connection to %s open', self._client)
 
     def onMessage(self, payload: bytes, is_binary: bool) -> None:    # noqa
-        json_object = self._parse_message(payload, is_binary)
-        request = self._convert_json_into_client_request(json_object)
-        self._handle_client_request_and_send_response(request)
-        # TODO catch and handle WebSocketError
+        try:
+            json_object = self._parse_message(payload, is_binary)
+            request = self._convert_json_into_client_request(json_object)
+            self._handle_client_request_and_send_response(request)
+        except WebSocketError as err:
+            self._send_error_message(err)
 
     def _parse_message(self, payload: bytes, is_binary: bool) -> object:
         """Parse a client message into a JSON object.
@@ -216,9 +218,9 @@ class ClientCommunicator(WebSocketServerProtocol):
         logger.debug('Sending message to client %s: %s', self._client, text)
         self.sendMessage(text.encode())
 
-    def _send_error_message(self, error: str, details: str) -> None:
-        # TODO serialize WebSocketError instead
-        self._send_json_message({'error': error, 'details': details})
+    def _send_error_message(self, err: WebSocketError) -> None:
+        self._send_json_message({'error': err.error_type,
+                                 'details': err.details})
 
     def onClose(self, was_clean: bool, code: int, reason: str):  # noqa
         self.tracker.delete_all_subscriptions(self._client)
