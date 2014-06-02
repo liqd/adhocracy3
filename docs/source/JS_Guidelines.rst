@@ -78,9 +78,8 @@ TODO:
       preferred.
    -  Further reading
 
-      -
-http://stackoverflow.com/questions/336859/var-functionname-function-vs-function-functionname
-      -  http://kangax.github.io/nfe/#expr-vs-decl
+      - http://stackoverflow.com/questions/336859/var-functionname-function-vs-function-functionname
+      - http://kangax.github.io/nfe/#expr-vs-decl
 
 TypeScript
 ----------
