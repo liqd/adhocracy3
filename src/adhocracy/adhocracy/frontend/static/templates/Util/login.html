@@ -1,0 +1,11 @@
+<div class="login" ng-switch="user.loggedIn">
+    <div ng-switch-when="true">
+        <span>{{ user.displayName }}</span>
+        <input type="submit" value="LogOut" ng-click="logOut()" />
+    </div>
+    <div ng-switch-default>
+        <input type="text" placeholder="name" ng-model="credentials.name" />
+        <input type="password" placeholder="password" ng-model="credentials.password" />
+        <input type="submit" value="LogIn" ng-click="logIn()" />
+    </div>
+</div>
