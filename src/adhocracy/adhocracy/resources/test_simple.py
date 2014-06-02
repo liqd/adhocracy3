@@ -39,6 +39,5 @@ class IncludemeIntegrationTest(unittest.TestCase):
 
     def test_includeme_registry_create_content(self):
         from adhocracy.interfaces import ISimple
-        res = self.config.registry.content.create(ISimple.__identifier__,
-                                                  self.context)
+        res = self.config.registry.content.create(ISimple.__identifier__)
         assert ISimple.providedBy(res)

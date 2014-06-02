@@ -1,6 +1,4 @@
 """Resource type configuration and default factory."""
-import datetime
-
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from pyramid.config import Configurator
@@ -53,13 +51,13 @@ class ResourceFactory:
         name = ''
         if self.name_identifier in appstructs:
             name = appstructs[self.name_identifier]['name']
-            name = parent.check_name(name)
-            appstructs[self.name_identifier]['name'] = name
-        if not name:
-            name = datetime.datetime.now().isoformat()
         if self.meta.use_autonaming:
             prefix = self.meta.autonaming_prefix
             name = parent.next_name(resource, prefix=prefix)
+        if name in parent:
+            raise KeyError
+        if name == '':
+            raise KeyError
         parent.add(name, resource, send_events=False)
 
     def __call__(self,
@@ -68,7 +66,7 @@ class ResourceFactory:
                  run_after_creation=True,
                  **kwargs
                  ):
-        """Triggered whan a ResourceFactory instance is called.
+        """Triggered when a ResourceFactory instance is called.
 
         Args:
             parent (IPool or None): Add the new resource to this pool.
@@ -86,6 +84,14 @@ class ResourceFactory:
         Returns:
             object (IResource): the newly created resource
 
+        Raises:
+            KeyError: if self.metadata.use_autonaming is False and the
+                      `resource name` is not given or already used in the
+                      `parent` pool.
+                      You can set the `resource name` with appstruct data
+                      for the name sheet (:mod:`adhocracy.sheets.name`).
+            ComponentLookupError: if `appstructs` contains sheet data
+                                  for non existing sheets.
         """
         resource = self.meta.content_class()
         directlyProvides(resource, self.meta.iresource)
@@ -102,9 +108,7 @@ class ResourceFactory:
             for key, struct in appstructs.items():
                 isheet = DottedNameResolver().maybe_resolve(key)
                 sheet = get_sheet(resource, isheet)
-                if sheet.meta.readonly:
-                    continue
-                else:
+                if sheet.meta.creatable:
                     sheet.set(struct)
 
         if run_after_creation:

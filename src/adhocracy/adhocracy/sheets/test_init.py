@@ -28,7 +28,10 @@ class ResourcePropertySheetUnitTests(unittest.TestCase):
             pass
 
         self.metadata = sheet_metadata._replace(isheet=ISheetA,
-                                                schema_class=SheetASchema)
+                                                schema_class=SheetASchema,
+                                                readable=True,
+                                                editable=True,
+                                                creatable=True)
         self.context = testing.DummyResource()
 
     def test_create_valid(self):
@@ -114,7 +117,8 @@ class ResourcePropertySheetUnitTests(unittest.TestCase):
 
     def test_validate_cstruct_non_valid_readonly(self):
         inst = self.make_one(self.metadata, self.context)
-        inst.schema.children[0].readonly = True
+        inst.schema.children[0].editable = False
+        inst.schema.children[0].creatable = False
         with pytest.raises(colander.Invalid):
             inst.validate_cstruct({'count': 1})
 
@@ -197,8 +201,9 @@ class AddSheetToRegistryIntegrationTest(unittest.TestCase):
         assert sheet.meta.permission_view == 'B'
 
     def test_register_non_valid_readonly_and_createmandatory(self):
-        metadata = self.metadata._replace(readonly=True,
-                                          createmandatory=True)
+        metadata = self.metadata._replace(editable=False,
+                                          creatable=False,
+                                          create_mandatory=True)
         with pytest.raises(AssertionError):
             self._make_one(metadata, self.config.registry)
 

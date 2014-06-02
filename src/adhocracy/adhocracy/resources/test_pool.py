@@ -47,8 +47,7 @@ class IncludemeIntegrationTest(unittest.TestCase):
 
     def test_includeme_registry_create_content(self):
         from adhocracy.resources.pool import IBasicPool
-        res = self.config.registry.content.create(IBasicPool.__identifier__,
-                                                  self.context)
+        res = self.config.registry.content.create(IBasicPool.__identifier__)
         assert IBasicPool.providedBy(res)
 
 

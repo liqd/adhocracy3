@@ -64,20 +64,6 @@ def make_mock_resource_registry(mock_registry=None):
     return mock_registry.return_value
 
 
-def make_resources_metadata(metadata):
-    """Helper method that assembles dummy resource metadata.
-
-    It returns the same structure as the resources_metadata method from
-    adhocracy.registry.
-
-    """
-    iresource = metadata.iresource
-    return {iresource.__identifier__: {'name': iresource.__identifier__,
-                                       'iface': iresource,
-                                       'metadata': metadata}
-            }
-
-
 ##########
 #  tests #
 ##########
@@ -798,7 +784,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert response['sheets'] == {}
 
     def test_get_resources(self):
-        metas = make_resources_metadata(self.resource_meta)
+        metas = {IResource.__identifier__: self.resource_meta}
         self.resources_metadata.return_value = metas
         inst = self.make_one()
         resp = inst.get()
@@ -806,9 +792,9 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert resp['resources'][IResource.__identifier__] == {'sheets': []}
 
     def test_get_resources_with_sheets_metadata(self):
-        metas = make_resources_metadata(self.resource_meta._replace(
+        metas = {IResource.__identifier__: self.resource_meta._replace(
             basic_sheets=[ISheet],
-            extended_sheets=[ISheetB]))
+            extended_sheets=[ISheetB])}
         self.resources_metadata.return_value = metas
         inst = self.make_one()
 
@@ -818,8 +804,8 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert wanted_sheets == resp[IResource.__identifier__]['sheets']
 
     def test_get_resources_with_element_types_metadata(self):
-        metas = make_resources_metadata(self.resource_meta._replace(
-            element_types=[IResource, IResourceX]))
+        metas = {IResource.__identifier__: self.resource_meta._replace(
+            element_types=[IResource, IResourceX])}
         self.resources_metadata.return_value = metas
         inst = self.make_one()
 
@@ -829,8 +815,8 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert wanted == resp[IResource.__identifier__]['element_types']
 
     def test_get_resources_with_item_type_metadata(self):
-        metas = make_resources_metadata(self.resource_meta._replace(
-            item_type=IResourceX))
+        metas = {IResource.__identifier__: self.resource_meta._replace(
+            item_type=IResourceX)}
         self.resources_metadata.return_value = metas
         inst = self.make_one()
 
@@ -860,8 +846,8 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
         assert len(response['fields']) == 1
         field_metadata = response['fields'][0]
-        assert field_metadata['createmandatory'] is False
-        assert field_metadata['readonly'] is False
+        assert field_metadata['create_mandatory'] is False
+        assert field_metadata['readable'] is True
         assert field_metadata['name'] == 'test'
         assert 'valuetype' in field_metadata
 
@@ -878,7 +864,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
         response = inst.get()['sheets'][sheet_name]
 
         field_metadata = response['fields'][0]
-        assert field_metadata['readonly'] is True
+        assert field_metadata['readable'] is True
 
     def test_get_sheets_with_field_colander_noniteratable(self):
         class SchemaF(self.sheet_meta.schema_class):
@@ -895,10 +881,10 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert field_metadata['valuetype'] == 'Integer'
 
     def test_get_sheets_with_field_adhocracy_noniteratable(self):
-        from adhocracy.schema import Identifier
+        from adhocracy.schema import Name
 
         class SchemaF(self.sheet_meta.schema_class):
-            test = colander.SchemaNode(Identifier())
+            test = colander.SchemaNode(Name())
 
         sheet_meta = self.sheet_meta._replace(schema_class=SchemaF)
         self.sheets_metadata.return_value = {ISheet.__identifier__: sheet_meta}
@@ -908,7 +894,7 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
         field_metadata = response['fields'][0]
         assert 'containertype' not in field_metadata
-        assert field_metadata['valuetype'] == 'adhocracy.schema.Identifier'
+        assert field_metadata['valuetype'] == 'adhocracy.schema.Name'
 
     def test_get_sheets_with_field_adhocracy_referencelist(self):
         from adhocracy.interfaces import SheetToSheet
