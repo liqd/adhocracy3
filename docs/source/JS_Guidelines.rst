@@ -9,7 +9,7 @@ General considerations
    -  general JavaScript
    -  Typescript
    -  Angular
-             
+
       -  Angular templates
 
    -  Adhocracy 3
@@ -27,7 +27,7 @@ General JavaScript
 -  strict comparisons
 -  semicolons
 -  4 space indentation
-                               
+
 TODO:
 
 -  tsLint configuration
@@ -37,9 +37,9 @@ TODO:
 -  allow chaining?
 
    -  where it might be useful:
-                               
+
       -  promises (``.then()``)
-      -  angular registration  
+      -  angular registration
 
    -  if chaining is allowed: how should it be indented?
 
@@ -51,34 +51,34 @@ TODO:
 
 -  consistent alias for ``this``
 -  alignment::
-              
+
        foo = {a: 1,
               b: 2,
               c: 3}
 
    or::
-       
+
        foo = {
-           a: 1,                                 
+           a: 1,
            b: 2,
            c: 3,
-       }        
+       }
 
    (there might be more options) (also applies to lists and function
    parameters)
 -  named/anonyoumus functions
-                     
+
    -  There are three ways of defining a function
-                                                 
-      1. var a = function() {}                   
-      2. function b() {}      
+
+      1. var a = function() {}
+      2. function b() {}
       3. var a = function b() {}
 
    -  tl;dr: The first version is least confusing and should be
-      preferred.                                               
+      preferred.
    -  Further reading
-                     
-      -              
+
+      -
 http://stackoverflow.com/questions/336859/var-functionname-function-vs-function-functionname
       -  http://kangax.github.io/nfe/#expr-vs-decl
 
