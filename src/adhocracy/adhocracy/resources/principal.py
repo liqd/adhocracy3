@@ -94,7 +94,7 @@ class UserPool(Pool):
 user_metadata = pool_metadata._replace(
     iresource=IUserPool,
     content_class=UserPool,
-    element_types=[]  # we don't the frontend to post resources here
+    element_types=[]  # we don't want the frontend to post resources here
 )
 
 
