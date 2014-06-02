@@ -22,8 +22,10 @@
             </ol>
         </td>
         <td id="document_workbench_participate">
-            <p>proposal workbench changes and discussion</p>
-            <adh-proposal-version-new on-new-proposal="insertParagraph"></adh-proposal-version-new>
+            <div ng-if="user.can('proposal.create')">
+                <p>proposal workbench changes and discussion</p>
+                <adh-proposal-version-new on-new-proposal="insertParagraph"></adh-proposal-version-new>
+            </div>
         </td>
     </tr>
 </table>

@@ -31,6 +31,7 @@ interface IDocumentWorkbenchScope<Data> extends ng.IScope {
     poolEntries     : IDocument<Data>[];
     doc             : IDocument<Data>;  // (iterates over document list with ng-repeat)
     insertParagraph : any;
+    user            : AdhUser.User;
 }
 
 interface DetailScope<Data> extends ng.IScope {
@@ -121,9 +122,10 @@ export function run<Data>() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Pages/DocumentWorkbench.html",
-            controller: ["adhHttp", "$scope",
+            controller: ["adhHttp", "$scope", "adhUser",
                          function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>,
-                                  $scope   : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>) : void
+                                  $scope   : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>,
+                                  user     : AdhUser.User) : void
             {
                 $scope.insertParagraph = function(proposalVersion: Types.Content<Resources.HasIDocumentSheet>) {
                     $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
@@ -132,6 +134,7 @@ export function run<Data>() {
                 adhHttp.get(AdhHttp.jsonPrefix).then((pool) => {
                     $scope.pool = pool;
                     $scope.poolEntries = [];
+                    $scope.user = user;
 
                     // FIXME: factor out getting the head version of a DAG.
 
