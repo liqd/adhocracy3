@@ -102,7 +102,7 @@ TypeScript
 
 -  imports at top
 
-   -  all internal identifiers must be defined after all external identifiers
+   -  standard libs first (if such a thing ever exists), then external modules, then a3-internal modules
    -  only import from lower level
 
 -  allow nested types ``Foo<Bar<Baz>>`` (how deep?)
