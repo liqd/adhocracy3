@@ -117,6 +117,7 @@ export function run<Data>() {
 
     // widget-based directives
 
+    // REVIEW: please do not use prefixes other than 'adh'
     app.directive("wdgListing",
                   () => new Widgets.Listing(new Widgets.ListingContainerAdapter()).factory());
 

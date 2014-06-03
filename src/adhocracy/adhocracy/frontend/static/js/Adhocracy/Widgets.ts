@@ -21,19 +21,21 @@ var templatePath : string = "/frontend_static/templates";  // FIXME: move this t
 //////////////////////////////////////////////////////////////////////
 // Listings
 
-export class AbstractListingContainerAdapter<T> {
-    public ContainerType : T;
-    public elemRefs(c : T) : string[] {
+export class AbstractListingContainerAdapter<Type> {
+    public ContainerType : Type;
+    public elemRefs(c : Type) : string[] {
         return [];
     }
 }
 
+// REVIEW: This should be renamed to something with "Pool"
 export class ListingContainerAdapter extends AbstractListingContainerAdapter<Types.Content<Resources.HasIPoolSheet>> {
-    public elemRefs(c) {
+    public elemRefs(container) {
+        // REVIEW: please resolve this FIXME (or remove)
         // FIXME: derived type of argument c appears to be 'any',
         // should be 'Types.Content<Resources.HasIPoolSheet>'!
         // http://stackoverflow.com/questions/23893372/expecting-type-error-when-extending-and-generic-class
-        return c.data["adhocracy.sheets.pool.IPool"].elements;
+        return container.data["adhocracy.sheets.pool.IPool"].elements;
     }
 }
 
@@ -52,17 +54,19 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
     }
 
     public factory() {
+        // REVIEW: please resolve this FIXME (or remove)
         // FIXME: "factory" might be misinterpreted as "ListingFactory".
         // possible solutions: (1) rename; (2) implement Listing class
         // such that the instance type is '() => IDirective', and no
         // factory method is needed.
 
         var _this = this;
+        // REVIEW: this looks strange. I guess there is a more "natural" way to do this. Maybe something with `prototype`.
         var _class = (<any>_this).constructor;
 
         return {
             restrict: "E",
-            templateUrl: templatePath + "/" + _class.templateUrl,
+            templateUrl: templatePath + "/" + _class.templateUrl,  // REVIEW: to many slashes
             scope: {
                 path: "@",
                 title: "@"
@@ -71,7 +75,9 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
             controller: ["$scope",
                          "adhHttp",
                          function($scope: ListingScope<typeof _this.containerAdapter.ContainerType>,
+                                  // REVIEW: why is this called adhHttpC instead of adhHttp? there is no other adhHttp in this scope
                                   adhHttpC: AdhHttp.IService<typeof _this.containerAdapter.ContainerType>
+                                  // REVIEW: please resolve this fixme (or remove)
                                   // FIXME: how can i see the value of these 'typeof' expressions?
                                  ) : void
                          {
@@ -89,45 +95,48 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
 //////////////////////////////////////////////////////////////////////
 // Elements
 
-export class AbstractListingElementAdapter<T> {
-    public ElementType: T;
+export class AbstractListingElementAdapter<Type> {
+    public ElementType: Type;
 
     constructor(public $q: ng.IQService) { }
 
-    public name: (e: T) => ng.IPromise<string> = (e) => {
+    public name: (element: Type) => ng.IPromise<string> = (element) => {
         var deferred = this.$q.defer();
         deferred.resolve("");
         return deferred.promise;
     };
-    public path: (e: T) => string = () => {
+    public path: (element: Type) => string = () => {
         return "";
     };
 }
 
 export class ListingElementAdapter extends AbstractListingElementAdapter<Types.Content<any>> {
+    // REVIEW: I believe this is not necessary and should therefore be removed.
     constructor(public $q: ng.IQService) {
         super($q);
     }
 
-    public name = (e) => {
+    // REVIEW: why is there no type in the signature
+    public name = (element) => {
         var deferred = this.$q.defer();
-        deferred.resolve("[content type " + e.content_type + ", resource " + e.path + "]");
+        deferred.resolve("[content type " + element.content_type + ", resource " + element.path + "]");
         return deferred.promise;
     };
-    public path = (e) => {
-        return e.path;
+    public path = (element) => {
+        return element.path;
     };
 }
 
 export class ListingElementTitleAdapter extends AbstractListingElementAdapter<Types.Content<Resources.HasIVersionsSheet>> {
+    // REVIEW: please resolve this FIXME (or remove)
     // FIXME: should the type constraint here say anything about the document sheet in the version resource?
     constructor(public $q: ng.IQService,
                 public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>) {
         super($q);
     }
 
-    public name = (e) => {
-        var versionPaths: string[] = e.data["adhocracy.sheets.versions.IVersions"].elements;
+    public name = (element) => {
+        var versionPaths: string[] = element.data["adhocracy.sheets.versions.IVersions"].elements;
         var lastVersionPath: string = versionPaths[versionPaths.length - 1];
 
         return this.adhHttp.get(lastVersionPath)
@@ -136,8 +145,8 @@ export class ListingElementTitleAdapter extends AbstractListingElementAdapter<Ty
             });
     };
 
-    public path = (e) => {
-        return e.path;
+    public path = (element) => {
+        return element.path;
     };
 }
 
@@ -145,6 +154,7 @@ export interface ListingElementScope<Container> {
     path: string;
     name: string;
 
+    // REVIEW: please resolve this FIXME
     element: string;  // FIXME: remove this once bug concerning
                       // ListingElement scope attribute is fixed.
 }
@@ -157,12 +167,14 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
     }
 
     public factory() {
+        // REVIEW: please resolve this fixme (or remove)
         var _this = this;  // FIXME: can we use () => {} syntax instead of this explicit declaration?
+        // REVIEW: see Listing
         var _class = (<any>this).constructor;
 
         return {
             restrict: "E",
-            templateUrl: templatePath + "/" + _class.templateUrl,
+            templateUrl: templatePath + "/" + _class.templateUrl,  // REVIEW: multiple slashes
             // scope: { path: '=element' },
             //
             // FIXME: the above scope attribute is supposed to
@@ -175,14 +187,20 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
             // defines 'element', and '=element' only searches the
             // parent scope, not all ancestor scopes.  not sure what
             // to do about this.  (mf)
+
+            // REVIEW: AFAIK you the variable is not pulled in from the
+            // surrounding scope automatically. Instead, you need to pass it as
+            // an alement attribute (e.g. ``<adhFoo path="elementPath">``)
             controller: ["$scope",
                          "adhHttp",
                          function($scope: ListingElementScope<typeof _this.elementAdapter.ElementType>,
                                   adhHttpE: AdhHttp.IService<typeof _this.elementAdapter.ElementType>
                                  ) : void
                          {
+                             // REVIEW: please resolve this fixme (or remove)
                              $scope.path = $scope.element;  // FIXME: see issue in scope attribute above.
 
+                             // REVIEW: why is this called adhHttpE instead of adhHttp? there is no other adhHttp in this scope
                              adhHttpE.get($scope.path)
                                  .then(_this.elementAdapter.name)
                                  .then((name) => $scope.name = name);
@@ -193,7 +211,7 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
 }
 
 
-
+// REVIEW: please resolve this fixme (or remove)
 // FIXME: next steps:
 // 1. detail view
 // 2. extend ListingContainerAdapter to something that has no IPoolSheet.
