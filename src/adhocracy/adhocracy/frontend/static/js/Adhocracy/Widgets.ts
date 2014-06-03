@@ -116,6 +116,7 @@ export class Listing<ContainerAdapter extends ListingContainerAdapter, ElementAd
                          function($scope: ListingScope<typeof _this.containerAdapter.ContainerType>,
                                   adhHttpC: AdhHttp.IService<typeof _this.containerAdapter.ContainerType>,
                                   adhHttpE: AdhHttp.IService<typeof _this.elementAdapter.ElementType>
+                                  // FIXME: how can i see the value of these 'typeof' expressions?
                                  ) : void
                          {
                              adhHttpC.get(_this.containerPath).then((pool: typeof _this.containerAdapter.ContainerType) => {
