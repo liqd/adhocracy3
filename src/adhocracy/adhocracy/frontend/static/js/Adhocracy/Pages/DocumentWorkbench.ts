@@ -175,7 +175,7 @@ export function run() {
                 viewmode: "=",
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<any>,
+                         function(adhHttp  : AdhHttp.IService<Types.Content<any>>,
                                   $scope   : IProposalVersionDetailScope<any>) : void
             {
                 $scope.list = function() {

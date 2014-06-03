@@ -8,6 +8,10 @@ import Util = require("Adhocracy/Util");
 
 // send and receive objects with adhocracy data model awareness
 
+// FIXME: This service should be able to handle any type, not just subtypes of
+// ``Types.Content``.  Methods like ``postNewVersion`` may need additional
+// constraints (e.g. by moving them to subclasses).
+
 export var jsonPrefix : string = "/adhocracy";
 
 export interface IService<Content extends Types.Content<any>> {
