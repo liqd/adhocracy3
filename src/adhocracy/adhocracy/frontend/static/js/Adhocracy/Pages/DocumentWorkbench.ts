@@ -11,7 +11,6 @@ import Util = require("Adhocracy/Util");
 import Css = require("Adhocracy/Css");
 import AdhHttp = require("Adhocracy/Services/Http");
 import AdhWS = require("Adhocracy/Services/WS");
-import AdhCache = require("Adhocracy/Services/Cache");
 import AdhUser = require("Adhocracy/Services/User");
 
 import Resources = require("Adhocracy/Resources");
