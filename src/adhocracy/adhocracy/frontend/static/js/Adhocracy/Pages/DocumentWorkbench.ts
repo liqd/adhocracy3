@@ -11,7 +11,6 @@ import Util = require("Adhocracy/Util");
 import Css = require("Adhocracy/Css");
 import AdhHttp = require("Adhocracy/Services/Http");
 import AdhWS = require("Adhocracy/Services/WS");
-import AdhCache = require("Adhocracy/Services/Cache");
 import AdhUser = require("Adhocracy/Services/User");
 
 import Resources = require("Adhocracy/Resources");
@@ -53,7 +52,7 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
 }
 
 
-export function run<Data>() {
+export function run() {
     var app = angular.module("adhocracy3SampleFrontend", []);
 
     AdhUser.register(app, "adhUser", "adhLogin");
@@ -109,7 +108,7 @@ export function run<Data>() {
     // filters
 
     app.filter("documentTitle", [ function() {
-        return function(resource : Types.Content<Data>) : string {
+        return function(resource : Types.Content<Resources.HasIDocumentSheet>) : string {
             return resource.data["adhocracy.sheets.document.IDocument"].title;
         };
     }]);
@@ -137,7 +136,7 @@ export function run<Data>() {
             restrict: "E",
             templateUrl: templatePath + "/Pages/DocumentWorkbench.html",
             controller: ["adhHttp", "$scope", "adhUser",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>,
+                         function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>,
                                   $scope   : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>,
                                   user     : AdhUser.User) : void
             {
@@ -192,8 +191,8 @@ export function run<Data>() {
                 viewmode: "=",
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Data>,
-                                  $scope   : IProposalVersionDetailScope<Data>) : void
+                         function(adhHttp  : AdhHttp.IService<Types.Content<any>>,
+                                  $scope   : IProposalVersionDetailScope<any>) : void
             {
                 $scope.list = function() {
                     $scope.viewmode = "list";
@@ -274,7 +273,7 @@ export function run<Data>() {
                 viewmode: "=",
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasISectionSheet>,
+                         function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasISectionSheet>>,
                                   $scope   : DetailRefScope<Resources.HasISectionSheet>) : void
             {
                 var commit = function(event, ...args) {
@@ -302,7 +301,7 @@ export function run<Data>() {
                 viewmode: "=",
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasIParagraphSheet>,
+                         function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasIParagraphSheet>>,
                                   $scope   : DetailRefScope<Resources.HasIParagraphSheet>) : void
             {
                 var commit = function(event, ...args) {
