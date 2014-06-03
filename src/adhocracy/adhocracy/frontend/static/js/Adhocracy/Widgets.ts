@@ -30,7 +30,6 @@ export class AbstractListingContainerAdapter<Type> {
 
 export class ListingPoolAdapter extends AbstractListingContainerAdapter<Types.Content<Resources.HasIPoolSheet>> {
     public elemRefs(container) {
-        // REVIEW: please resolve this FIXME (or remove)
         // FIXME: derived type of argument c appears to be 'any',
         // should be 'Types.Content<Resources.HasIPoolSheet>'!
         // http://stackoverflow.com/questions/23893372/expecting-type-error-when-extending-and-generic-class
@@ -75,13 +74,13 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
         // such that the instance type is '() => IDirective', and no
         // factory method is needed.
 
-        var _this = this;
+        var _this = this;  // REVIEW: can we use () => {} syntax instead of this explicit declaration?
         // REVIEW: this looks strange. I guess there is a more "natural" way to do this. Maybe something with `prototype`.
         var _class = (<any>_this).constructor;
 
         return {
             restrict: "E",
-            templateUrl: templatePath + "/" + _class.templateUrl,  // REVIEW: to many slashes
+            templateUrl: templatePath + "/" + _class.templateUrl,
             scope: {
                 path: "@",
                 title: "@"
@@ -90,13 +89,11 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
             controller: ["$scope",
                          "adhHttp",
                          function($scope: ListingScope<typeof _this.containerAdapter.ContainerType>,
-                                  // REVIEW: why is this called adhHttpC instead of adhHttp? there is no other adhHttp in this scope
-                                  adhHttpC: AdhHttp.IService<typeof _this.containerAdapter.ContainerType>
-                                  // REVIEW: please resolve this fixme (or remove)
-                                  // FIXME: how can i see the value of these 'typeof' expressions?
+                                  adhHttp: AdhHttp.IService<typeof _this.containerAdapter.ContainerType>
+                                  // FIXME: i think these all evaluate to 'any' statically.
                                  ) : void
                          {
-                             adhHttpC.get($scope.path).then((pool: typeof _this.containerAdapter.ContainerType) => {
+                             adhHttp.get($scope.path).then((pool: typeof _this.containerAdapter.ContainerType) => {
                                  $scope.container = pool;
                                  $scope.elements = _this.containerAdapter.elemRefs($scope.container);
                              });
@@ -126,12 +123,6 @@ export class AbstractListingElementAdapter<Type> {
 }
 
 export class ListingElementAdapter extends AbstractListingElementAdapter<Types.Content<any>> {
-    // REVIEW: I believe this is not necessary and should therefore be removed.
-    constructor(public $q: ng.IQService) {
-        super($q);
-    }
-
-    // REVIEW: why is there no type in the signature
     public name = (element) => {
         var deferred = this.$q.defer();
         deferred.resolve("[content type " + element.content_type + ", resource " + element.path + "]");
@@ -143,8 +134,6 @@ export class ListingElementAdapter extends AbstractListingElementAdapter<Types.C
 }
 
 export class ListingElementTitleAdapter extends AbstractListingElementAdapter<Types.Content<Resources.HasIVersionsSheet>> {
-    // REVIEW: please resolve this FIXME (or remove)
-    // FIXME: should the type constraint here say anything about the document sheet in the version resource?
     constructor(public $q: ng.IQService,
                 public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>) {
         super($q);
@@ -177,26 +166,24 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
     constructor(public elementAdapter: ElementAdapter) {
     }
 
-    public factory() {
-        // REVIEW: please resolve this fixme (or remove)
-        var _this = this;  // FIXME: can we use () => {} syntax instead of this explicit declaration?
+    public factory() {   // REVIEW: see Listing
+        var _this = this;  // REVIEW: see Listing
         // REVIEW: see Listing
         var _class = (<any>this).constructor;
 
         return {
             restrict: "E",
-            templateUrl: templatePath + "/" + _class.templateUrl,  // REVIEW: multiple slashes
+            templateUrl: templatePath + "/" + _class.templateUrl,
             scope: {
                 path: "@"
             },
             controller: ["$scope",
                          "adhHttp",
                          function($scope: ListingElementScope<typeof _this.elementAdapter.ElementType>,
-                                  adhHttpE: AdhHttp.IService<typeof _this.elementAdapter.ElementType>
+                                  adhHttp: AdhHttp.IService<typeof _this.elementAdapter.ElementType>
                                  ) : void
                          {
-                             // REVIEW: why is this called adhHttpE instead of adhHttp? there is no other adhHttp in this scope
-                             adhHttpE.get($scope.path)
+                             adhHttp.get($scope.path)
                                  .then(_this.elementAdapter.name)
                                  .then((name) => $scope.name = name);
                          }
@@ -204,10 +191,3 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
         };
     }
 }
-
-
-// REVIEW: please resolve this fixme (or remove)
-// FIXME: next steps:
-// 1. detail view
-// 2. extend ListingPoolAdapter to something that has no IPoolSheet.
-// 3. any other things we want to write proofs of concept for?
