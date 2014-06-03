@@ -64,8 +64,8 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
             restrict: "E",
             templateUrl: templatePath + "/" + _class.templateUrl,
             scope: {
-                path: '@',
-                title: '@'
+                path: "@",
+                title: "@"
             },
             transclude: true,
             controller: ["$scope",
@@ -78,10 +78,10 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
                              adhHttpC.get($scope.path).then((pool: typeof _this.containerAdapter.ContainerType) => {
                                  $scope.container = pool;
                                  $scope.elements = _this.containerAdapter.elemRefs($scope.container);
-                             })
+                             });
                          }
                         ]
-        }
+        };
     }
 }
 
@@ -98,10 +98,10 @@ export class AbstractListingElementAdapter<T> {
         var deferred = this.$q.defer();
         deferred.resolve("");
         return deferred.promise;
-    }
+    };
     public path: (e: T) => string = () => {
         return "";
-    }
+    };
 }
 
 export class ListingElementAdapter extends AbstractListingElementAdapter<Types.Content<any>> {
@@ -113,14 +113,14 @@ export class ListingElementAdapter extends AbstractListingElementAdapter<Types.C
         var deferred = this.$q.defer();
         deferred.resolve("[content type " + e.content_type + ", resource " + e.path + "]");
         return deferred.promise;
-    }
+    };
     public path = (e) => {
         return e.path;
-    }
+    };
 }
 
 export class ListingElementTitleAdapter extends AbstractListingElementAdapter<Types.Content<Resources.HasIVersionsSheet>> {
-                                           // FIXME: should the type constraint here say anything about the document sheet in the version resource?
+    // FIXME: should the type constraint here say anything about the document sheet in the version resource?
     constructor(public $q: ng.IQService,
                 public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>) {
         super($q);
@@ -128,17 +128,17 @@ export class ListingElementTitleAdapter extends AbstractListingElementAdapter<Ty
 
     public name = (e) => {
         var versionPaths: string[] = e.data["adhocracy.sheets.versions.IVersions"].elements;
-        var lastVersionPath: string = versionPaths[versionPaths.length-1];
+        var lastVersionPath: string = versionPaths[versionPaths.length - 1];
 
         return this.adhHttp.get(lastVersionPath)
             .then((lastVersion) => {
                 return lastVersion.data["adhocracy.sheets.document.IDocument"].title;
             });
-    }
+    };
 
     public path = (e) => {
         return e.path;
-    }
+    };
 }
 
 export interface ListingElementScope<Container> {
@@ -188,8 +188,8 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
                                  .then((name) => $scope.name = name);
                          }
                         ]
-        }
-    }
+        };
+    };
 }
 
 
