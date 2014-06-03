@@ -23,13 +23,12 @@ var templatePath : string = "/frontend_static/templates";  // FIXME: move this t
 
 export class AbstractListingContainerAdapter<Type> {
     public ContainerType : Type;
-    public elemRefs(c : Type) : string[] {
+    public elemRefs(container : Type) : string[] {
         return [];
     }
 }
 
-// REVIEW: This should be renamed to something with "Pool"
-export class ListingContainerAdapter extends AbstractListingContainerAdapter<Types.Content<Resources.HasIPoolSheet>> {
+export class ListingPoolAdapter extends AbstractListingContainerAdapter<Types.Content<Resources.HasIPoolSheet>> {
     public elemRefs(container) {
         // REVIEW: please resolve this FIXME (or remove)
         // FIXME: derived type of argument c appears to be 'any',
@@ -214,5 +213,5 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
 // REVIEW: please resolve this fixme (or remove)
 // FIXME: next steps:
 // 1. detail view
-// 2. extend ListingContainerAdapter to something that has no IPoolSheet.
+// 2. extend ListingPoolAdapter to something that has no IPoolSheet.
 // 3. any other things we want to write proofs of concept for?

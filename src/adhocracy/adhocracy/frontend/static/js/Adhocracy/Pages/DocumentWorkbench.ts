@@ -119,7 +119,7 @@ export function run<Data>() {
 
     // REVIEW: please do not use prefixes other than 'adh'
     app.directive("wdgListing",
-                  () => new Widgets.Listing(new Widgets.ListingContainerAdapter()).factory());
+                  () => new Widgets.Listing(new Widgets.ListingPoolAdapter()).factory());
 
     app.directive("wdgListingElement",
                   ["$q", ($q) =>
