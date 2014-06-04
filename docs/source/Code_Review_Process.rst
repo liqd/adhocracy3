@@ -271,8 +271,11 @@ Asynchronous Process
 
 0. The author has completed a personalized branch for review.
 
-1. *(create pull request)* The author sends an email to a3-dev with
-   subject ``[PR] bloo``, where ``bloo`` is the name of the branch.
+1. *(create pull request)* (PR) The author sends an email to a3-dev with
+   subject ``[PR] bloo (audience)``, where ``bloo`` is the name of
+   the branch and ``audience`` is a descirption of possible reviewers
+   (e.g. names or the name of the subsystem).
+
    All documentation of the pull request must be contained in the
    commit log (short and long commit messages).  Any documentation to
    the PR as a whole is appended to the commit log in an empty commit
