@@ -14,6 +14,7 @@ import AdhWS = require("Adhocracy/Services/WS");
 import AdhUser = require("Adhocracy/Services/User");
 
 import Resources = require("Adhocracy/Resources");
+import Widgets = require("Adhocracy/Widgets");
 
 var templatePath : string = "/frontend_static/templates";
 var appPrefix : string = "/app";
@@ -54,7 +55,7 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
 export function run() {
     var app = angular.module("adhocracy3SampleFrontend", []);
 
-    AdhUser.register(app, 'adhUser', 'adhLogin');
+    AdhUser.register(app, "adhUser", "adhLogin");
 
     // services
 
@@ -113,7 +114,21 @@ export function run() {
     }]);
 
 
-    // directives
+    // widget-based directives
+
+    app.directive("adhListing",
+                  () => new Widgets.Listing(new Widgets.ListingPoolAdapter()).createDirective());
+
+    app.directive("adhListingElement",
+                  ["$q", ($q) =>
+                   new Widgets.ListingElement(new Widgets.ListingElementAdapter($q)).createDirective()]);
+
+    app.directive("adhListingElementTitle",
+                  ["$q", "adhHttp", ($q, adhHttp) =>
+                   new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective()]);
+
+
+    // application-specific directives
 
     app.directive("adhDocumentWorkbench", function() {
         return {
