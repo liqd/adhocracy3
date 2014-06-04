@@ -353,9 +353,9 @@ author needs to process.  These comments must match the regex::
     ^# REVIEW: .*
 
 Depending on the language of the file under review, the ``#`` must be
-replaced by the respective comment lexeme (``#`` for python, ``//``
-for javascript and typescript, ``<!--`` for html (with the extra
-``-->`` at the end), and so on).
+replaced by the respective comment lexeme (``#`` for python and yaml,
+``//`` for javascript, typescript and SCSS, ``<!--`` for html (with
+the extra ``-->`` at the end), ``..`` for rst, and so on).
 
 Further lines may be added after this.  Those just need to match
 ``^# `` or corresponding.  Note the whitespace in both the first and
