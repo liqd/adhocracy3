@@ -319,7 +319,7 @@ Asynchronous Process
 
 2. *(assign pull request)* A reviewer sends a response to the PR on
    a3-dev with subject ``Re: [PR] ...`` and an optional message in the
-   body (e.g. "I'll do they review tomorrow").  If several reviewers
+   body (e.g. "I'll do the review tomorrow").  If several reviewers
    respond simultaneously, they resolve the conflict outside this
    process.
 
