@@ -212,6 +212,11 @@ must happen according to *+n-branch logic*::
    REVIEW[tb]: do not agree. My version should be simple enough to remember
    and I prefer to know what I am doing
 
+..
+   REVIEW[nidi]: Don't understand the BRANCHPOINT issue here. If your branch
+   branches from master, simply do `git rebase master` on the +1 branch. You
+   don't need the two or three argument rebase form.
+
 Remarks:
 
 - the un-rebased branch has no +n suffix, the first rebase has '+1',
