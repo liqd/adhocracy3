@@ -135,7 +135,7 @@ Fix branches (``YYYY-MM-fix-[-a-z]+``)
 
 Personalized branches (``YYYY-MM-DEV-[-a-z]+``)
    Developers create personalized branches in order to work on tasks.
-   Personalized branches may be based anywhere.  It is NOT allowed
+   Personalized branches may be based anywhere.  It is **not** allowed
    to ``push --force`` a personalized branch.
 
 Volatile branches (``YYYY-MM-_DEV-[-a-z]+``)
