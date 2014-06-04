@@ -345,6 +345,9 @@ Asynchronous Process
       REVIEW[tb]: I would prefer if the complete review process was public,
       i.e. all mails are send to a3-dev.
 
+   ..
+      REVIEW[nidi]: Me too.
+
 
 Recipes
 ~~~~~~~
