@@ -198,7 +198,7 @@ Remarks::
     @nidi, can you fill that in here?  i think you've explained this
     to me once.]
 
-  - if you call ``git rebase -i --onto $BRANCHPOINT $BRANCHPOINT``,
+  - if you call ``git rebase -i $BRANCHPOINT``,
     you can do rebase magic without actually changing the branch
     point.
 
