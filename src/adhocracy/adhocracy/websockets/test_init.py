@@ -1,8 +1,13 @@
 """Tests for websockets package."""
+from json import dumps
+from json import loads
 import unittest
 
 from pyramid import testing
 from substanced.util import get_oid
+from zope.interface import alsoProvides
+
+from adhocracy.interfaces import IItemVersion
 from adhocracy.websockets import ClientCommunicator
 from adhocracy.websockets import ClientTracker
 
@@ -14,20 +19,152 @@ class DummyResource():
         """Initialize instance."""
         self.__oid__ = oid
 
+
+class DummyConnectionRequest():
+
+    def __init__(self, peer: str):
+        self.peer = peer
+
+class QueueingClientCommunicator(ClientCommunicator):
+
+    """ClientCommunicator that adds outgoing messages to an internal queue."""
+
+    def __init__(self, context):
+        super().__init__(context)
+        self.queue = []
+
+    def sendMessage(self, payload: bytes):
+        """Decode message back into JSON object and add it to the queue."""
+        json_message = loads(payload.decode())
+        self.queue.append(json_message)
+
+
 class ClientCommunicatorUnitTests(unittest.TestCase):
 
     """Test the ClientCommunicator class."""
 
     def setUp(self):
         """Test setup."""
-        context = testing.DummyResource()
-        self._comm = ClientCommunicator(context)
+        self._next_oid = 1
+        context = self._make_resource()
+        self._child = self._make_resource()
+        context['child'] = self._child
+        self._comm = QueueingClientCommunicator(context)
+        self._peer = "websocket peer"
+        self._connect()
+
+    def tearDown(self):
+        self._comm.onClose(True, 0, 'teardown')
+
+    def _make_resource(self):
+        resource = testing.DummyResource()
+        resource.__oid__ = self._next_oid
+        self._next_oid += 1
+        return resource
 
     def test_autobahn_installed(self):
         """Test that Autobahn is installed."""
         from autobahn import __version__
         assert isinstance(__version__, str)
 
+    def test_onConnect(self):
+        self._connect()
+        assert self._comm._client == self._peer
+        assert len(self._comm.queue) == 0
+
+    def _connect(self):
+        request = DummyConnectionRequest(self._peer)
+        self._comm.onConnect(request)
+
+    def test_onOpen(self):
+        self._comm.onOpen()
+        assert len(self._comm.queue) == 0
+
+    def test_onMessage_valid_subscribe(self):
+        msg = self._build_message({'action': 'subscribe',
+                                   'resource': '/child'})
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'status': 'ok',
+                                       'action': 'subscribe',
+                                       'resource': '/child'}
+
+    def _build_message(self, json_message: dict) -> bytes:
+        return dumps(json_message).encode()
+
+    def test_onMessage_valid_unsubscribe(self):
+        msg = self._build_message({'action': 'subscribe',
+                                   'resource': '/child'})
+        self._comm.onMessage(msg, False)
+        msg = self._build_message({'action': 'unsubscribe',
+                                   'resource': '/child'})
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 2
+        assert self._comm.queue[-1] == {'status': 'ok',
+                                        'action': 'unsubscribe',
+                                        'resource': '/child'}
+
+    def test_onMessage_duplicate_subscribe(self):
+        msg = self._build_message({'action': 'subscribe',
+                                   'resource': '/child'})
+        self._comm.onMessage(msg, False)
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 2
+        assert self._comm.queue[-1] == {'status': 'duplicate',
+                                        'action': 'subscribe',
+                                        'resource': '/child'}
+
+    def test_onMessage_resubscribe_after_unsubscribe(self):
+        msg = self._build_message({'action': 'subscribe',
+                                   'resource': '/child'})
+        self._comm.onMessage(msg, False)
+        msg = self._build_message({'action': 'unsubscribe',
+                                   'resource': '/child'})
+        self._comm.onMessage(msg, False)
+        msg = self._build_message({'action': 'subscribe',
+                                   'resource': '/child'})
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 3
+        assert self._comm.queue[-1] == {'status': 'ok',
+                                        'action': 'subscribe',
+                                        'resource': '/child'}
+
+    def test_onMessage_subscribe_item_version(self):
+        alsoProvides(self._child, IItemVersion)
+        msg = self._build_message({'action': 'subscribe',
+                                   'resource': '/child'})
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'error': 'subscribe_not_supported',
+                                       'details': '/child'}
+
+    def test_onMessage_with_binary_message(self):
+        self._comm.onMessage(b'DEADBEEF', True)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'error': 'malformed_message',
+                                       'details': 'message is binary'}
+
+    def test_onMessage_with_invalid_json(self):
+        self._comm.onMessage('This is not a JSON dict'.encode(), False)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'error': 'malformed_message',
+           'details': 'No JSON object could be decoded'}
+
+    def test_onMessage_with_invalid_action(self):
+        msg = self._build_message({'action': 'just do it!',
+                                   'resource': '/child'})
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'error': 'unknown_action',
+                                       'details': 'just do it!'}
+
+    def test_onMessage_with_invalid_resource(self):
+        msg = self._build_message({'action': 'subscribe',
+                                   'resource': '/wrong_child'})
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'error': 'unknown_resource',
+                                       'details': '/wrong_child'}
 
 class ClientTrackerUnitTests(unittest.TestCase):
 

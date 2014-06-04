@@ -71,7 +71,7 @@ Error Messages
 Otherwise, if the server didn't understand a request sent by the server or
 could not handle it, is responds with an error message::
 
-    { "error": "ERROR_CODE", "details:" "DETAILS" }
+    { "error": "ERROR_CODE", "details": "DETAILS" }
 
 ERROR_CODE will be one of the following:
 

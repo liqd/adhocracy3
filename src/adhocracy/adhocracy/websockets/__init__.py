@@ -11,8 +11,11 @@ from pyramid.traversal import resource_path
 from substanced.util import get_oid
 import colander
 
+from adhocracy.websockets.schemas import ChildNotification
 from adhocracy.websockets.schemas import ClientRequestSchema
+from adhocracy.websockets.schemas import Notification
 from adhocracy.websockets.schemas import StatusConfirmation
+from adhocracy.websockets.schemas import VersionNotification
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItemVersion
 
@@ -108,10 +111,19 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def __init__(self, context):
         """Create a new instance."""
-        self._client_request_schema = ClientRequestSchema()
-        self._client_request_schema.bind(context=context)
-        self._status_confirmation = StatusConfirmation()
-        self._status_confirmation.bind(context=context)
+        self._client_request_schema = self._bind_schema(ClientRequestSchema(),
+                                                        context)
+        self._status_confirmation = self._bind_schema(StatusConfirmation(),
+                                                      context)
+        self._notification = self._bind_schema(Notification(), context)
+        self._child_notification = self._bind_schema(ChildNotification(),
+                                                     context)
+        self._version_notification = self._bind_schema(VersionNotification(),
+                                                       context)
+
+    def _bind_schema(self, schema: colander.MappingSchema,
+                     context) -> colander.MappingSchema:
+        return schema.bind(context=context)
 
     def onConnect(self, request: ConnectionRequest):  # noqa
         self._client = request.peer
@@ -222,8 +234,32 @@ class ClientCommunicator(WebSocketServerProtocol):
         self._send_json_message({'error': err.error_type,
                                  'details': err.details})
 
+    def send_modified_notification(self, resource: IResource) -> None:
+        """Send notification about a modified resource."""
+        self._send_json_message(self._notification.serialize(
+            {'event': 'modified', 'resource': resource}))
+
+    def send_child_notification(self, status: str, resource: IResource,
+                                child: IResource) -> None:
+        """Send notification concerning a child resource.
+
+        :param status: should be 'new', 'removed', or 'modified'
+        """
+        self._send_json_message(self._child_notification.serialize(
+            {'event': status + '_child',
+             'resource': resource,
+             'child': child}))
+
+    def send_new_version_notification(self, resource: IResource,
+                                      new_version: IResource) -> None:
+        """Send notification if a new version has been added."""
+        self._send_json_message(self._version_notification.serialize(
+            {'event': 'new_version',
+             'resource': resource,
+             'version': new_version}))
+
     def onClose(self, was_clean: bool, code: int, reason: str):  # noqa
-        self.tracker.delete_all_subscriptions(self._client)
+        self._tracker.delete_all_subscriptions(self._client)
         clean_str = 'Clean' if was_clean else 'Unclean'
         logger.debug('%s close of WebSocket connection to %s; reason: %s',
                      clean_str, self._client, reason)
