@@ -56,8 +56,8 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
     def tearDown(self):
         self._comm.onClose(True, 0, 'teardown')
 
-    def _make_resource(self):
-        resource = testing.DummyResource()
+    def _make_resource(self, *args):
+        resource = testing.DummyResource(*args)
         resource.__oid__ = self._next_oid
         self._next_oid += 1
         return resource
@@ -174,6 +174,29 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert self._comm.queue[0] == {'error': 'invalid_json',
             'details': 'coercing to str: need bytes, bytearray or '
                        'buffer-like object, int found'}
+
+    def test_send_modified_notification(self):
+        self._comm.send_modified_notification(self._child)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'event': 'modified',
+                                       'resource': '/child'}
+
+    def test_send_child_notification(self):
+        grandchild = self._make_resource('grandchild', self._child)
+        self._comm.send_child_notification('new', self._child, grandchild)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'event': 'new_child',
+                                       'resource': '/child',
+                                       'child': '/child/grandchild'}
+
+    def test_send_new_version_notification(self):
+        new_version = self._make_resource('version_007', self._child)
+        self._comm.send_new_version_notification(self._child, new_version)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'event': 'new_version',
+                                       'resource': '/child',
+                                       'version': '/child/version_007'}
+
 
 class ClientTrackerUnitTests(unittest.TestCase):
 
