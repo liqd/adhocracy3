@@ -305,20 +305,27 @@ As above, first do something like::
 
 To see which files have changed::
 
+    git diff $BRANCHPOINT --stat
+
+If file paths are shortened you might want to specify a width like this::
+
     git diff $BRANCHPOINT --stat=3000
 
 To see all changes in a branch in one diff::
 
     git diff $BRANCHPOINT
 
+To see all changes to an individual file::
+
+    git diff $BRANCHPOINT -- <path>
+
 To see all changes, organised by commits and enriched with commit
 messages::
 
     git whatchanged -p $BRANCHPOINT..
 
-If you prefer a curses interface for something similar::
-
-    git log --graph | tig
+To get a richer interface you can pipe the output of all of these
+commands into `tig`_
 
 
 Markup language
@@ -383,3 +390,4 @@ do line numbers in every line in diff?]
 .. _gerrit: https://code.google.com/p/gerrit/
 .. _gitissues: https://github.com/duplys/git-issues
 .. _reviewboard: http://www.reviewboard.org/
+.. _tig: https://github.com/jonas/tig
