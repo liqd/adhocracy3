@@ -274,7 +274,7 @@ not a strong rule.
 
 All changes and comments that the reviewer makes are either made
 directly in the code (see Section 'Markup language' below), or in a
-file called ``REVIEW.txt`` and located in the working copy root.
+file called ``REVIEW.txt`` located in the working copy root.
 Reviewer and reviewee should agree on which option is preferred for
 what.
 
@@ -319,7 +319,7 @@ Asynchronous Process
 
 2. *(assign pull request)* A reviewer sends a response to the PR on
    a3-dev with subject ``Re: [PR] ...`` and an optional message in the
-   body (e.g. "I'll do they review tomorrow").  If several reviewers
+   body (e.g. "I'll do the review tomorrow").  If several reviewers
    respond simultaneously, they resolve the conflict outside this
    process.
 
