@@ -227,11 +227,17 @@ Dos and Don'ts
    into the parent branch.  [FIXME: if there is a way to configure
    this in ~/.gitconfig, explain it here.]
 
+   [REVIEW[cs]: But merging master into story branches without ``--no-ff``
+   is OK and maybe even encouraged, right?]]
+
 4. Merging ancestor branches into a current branch is ok.  This makes
    it feasible to keep up to date with changes in a parent branch in
    long-living feature branches.  The merge commit will be eliminated
    if the current branch is rebased on the ancestor branch HEAD at any
    point in time after the merge.
+
+   [REVIEW[cs]: what's a "feature branch"? The term is not used or defined
+   elsewhere in this document.]
 
    [FIXME: check: verschwinden merges bei rebase?]
 
@@ -273,6 +279,11 @@ Synchronous Process
 5. The branch is merged into its base (the story branch or the parent
    personalized branch).
 
+   [REVIEW[cs]: Personalized branch can be branched off from master
+   according to this document. If master is the parent branch, it should be
+   OK to merge them into master as well. Not every personal branch will be
+   part of a story (branch).]
+
 
 Asynchronous Process
 ~~~~~~~~~~~~~~~~~~~~
@@ -299,6 +310,9 @@ Asynchronous Process
    ..
       REVIEW[tb]: I do not want to rely on the possibility of
       off-line communication
+
+   [REVIEW[cs]: Non-empty body (e.g. "I'll do they review tomorrow.")
+   should be OK as well).]
 
 3. The reviewer checks out the branch to be reviewed, makes any
    changes and comments in the working copy, and adds them to the
@@ -402,6 +416,13 @@ A branch must not be merged as long as ``REVIEW`` comments remain.
 
 ``FIXME``s are discouraged in master.  For now, they are allowed, but
 we should find a more fancy bug tracking approach.  (redmine?)
+
+[REVIEW[cs]: Personally, I mostly use FIXME for "this works as is, but it
+is a hack/inelegant/inefficient, so if we could find a better solution that
+would be great", NOT for bugs. For bugs and things that really need to be
+resolved to make the code function as it's supposed to, I use TODO and
+ensure that all TODOs are indeed handled and deleted before merging into
+master.]
 
 [FIXME: ``git notes --help`` may be relevant, but I haven't looked at
 it yet.]
