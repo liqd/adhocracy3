@@ -30,66 +30,66 @@ the requirements are inconsistent, the following sections necessarily
 constitute a compromise (and not necessarily the optimum in any
 metric).
 
- - low-footprint, trivial to adopt.
+- low-footprint, trivial to adopt.
 
- - no need to adjust work habits to yet another new application
-   software / UI.
+- no need to adjust work habits to yet another new application software /
+  UI.
 
- - offline use (no need to have IP connectivity while working).
+- offline use (no need to have IP connectivity while working).
 
- - git repo contains all review history in the resp. branches (to the
-   extend those branches have not been deleted).
+- git repo contains all review history in the resp. branches (to the extend
+  those branches have not been deleted).
 
- - allow for synchronous review (talk the branch through together on
-   the same physical display).
+- allow for synchronous review (talk the branch through together on the
+  same physical display).
 
- - allow for asynchronous review (pass comments and little fractional
-   changes back and forth between reviewer and reviewee through
-   something as convenient as email or a web page).
+- allow for asynchronous review (pass comments and little fractional
+  changes back and forth between reviewer and reviewee through something as
+  convenient as email or a web page).
 
- - passing a branch back and forth between reviewer and reviewee
-   during the review process should be trivial.
+- passing a branch back and forth between reviewer and reviewee during the
+  review process should be trivial.
 
- - the reviewer can make changes (e.g. small typos) herself, not only
-   ask the reviewee to do them.  (all changes by the reviewer of
-   course need to be double-checked by the reviewee.)
+- the reviewer can make changes (e.g. small typos) herself, not only ask
+  the reviewee to do them.  (all changes by the reviewer of course need to
+  be double-checked by the reviewee.)
 
- - comments can be attached to
-    - the branch
-    - lines in the full diff
-    - individual commits
-    - lines in commit diffs
+- comments can be attached to
 
- - review comments can contain links into web / other code locations /
-   other commits / ...
+  - the branch
+  - lines in the full diff
+  - individual commits
+  - lines in commit diffs
 
- - review comments and code should be separated, e.g. in a file called
-   ``REVIEW.txt`` in the root directory of the repository that can be
-   easily removed before the merge.
+- review comments can contain links into web / other code locations / other
+  commits / ...
 
- - review comments should be contained in the code as comments,
-   probably in a special mark-up form that can be pruned automatically
-   before the merge.
+- review comments and code should be separated, e.g. in a file called
+  ``REVIEW.txt`` in the root directory of the repository that can be easily
+  removed before the merge.
 
- - github-style pull requests
+- review comments should be contained in the code as comments, probably in
+  a special mark-up form that can be pruned automatically before the merge.
 
- - email notifications for
+- github-style pull requests
 
-     - branches ready for review
+- email notifications for
 
-     - passing a branch back and forth between reviewer and reviewee.
+  - branches ready for review
+
+  - passing a branch back and forth between reviewer and reviewee.
 
    emails should contain context and links.
 
- - allow to rebase a branch (or a clone of the branch) during the
-   review process.
+- allow to rebase a branch (or a clone of the branch) during the review
+  process.
 
 
 Tool Candidates
 ---------------
 
 Should we decide in the future to use software on top of git, this is
-an incomplete list of options::
+an incomplete list of options:
 
 - `bugseverwhere`_
 - `gerrit`_
@@ -109,7 +109,7 @@ branch lists automatically.  The pattern consists of year (``YYYY``),
 month (``MM``), a developer name shortcut (``DEV``), keywords (small
 letter words), and descriptive free text (``[-a-z]+``).
 
-The following branch types exist::
+The following branch types exist:
 
 - *Story branches* (``YYYY-MM-story-[-a-z]+``).  For each user story,
   there is a story branch that must be based on ``master``.  Story
@@ -161,20 +161,19 @@ before they are merged into their parents.  (Volatile branches may
 always be rebased, because there is no guarantee that they behave in
 any way as branches should.)
 
-Rebasing has two advantages::
+Rebasing has two advantages:
 
-  - it shrinks the diff between the parent branch and the HEAD of the
-    new branch;
+- it shrinks the diff between the parent branch and the HEAD of the new
+  branch;
 
-    .. REVIEW[tb]: the diff should not change during a rebase
+  .. REVIEW[tb]: the diff should not change during a rebase
 
-  - You can move your branch to the HEAD of the target branch as an
-    alternative to merging.  This way you keep a near-linear commit
-    history.
+- You can move your branch to the HEAD of the target branch as an
+  alternative to merging.  This way you keep a near-linear commit history.
 
-  - with the ``-i`` option, rebasing allows to re-order and clean up
-    individual commits, and thus make the life of the reviewer (and
-    anyone else looking at the history) easier.
+- with the ``-i`` option, rebasing allows to re-order and clean up
+  individual commits, and thus make the life of the reviewer (and anyone
+  else looking at the history) easier.
 
 In order to avoid that ``rebase`` changes repository state
 destructively (instead of just adding additional commits), the rebase
@@ -190,25 +189,24 @@ must happen according to *+n-branch logic*::
     git push -v origin 2014-05-mf-bleep+1
 
 [FIXME: we probably want to have a shell or python script for this.]
+
 ..
    REVIEW[tb]: do not agree. My version should be simple enough to remember
    and I prefer to know what I am doing
 
-Remarks::
+Remarks:
 
-  - the un-rebased branch has no +n suffix, the first rebase has '+1',
-    the second '+2' and so on.
+- the un-rebased branch has no +n suffix, the first rebase has '+1', the
+  second '+2' and so on.
 
-  - if you call rebase with argument ``-i``, you can do a lot of
-    rebase magic (squashing and dropping and reordering and all that).
-    This feature is quite self-explanatory -- just try it!  [FIXME:
-    there was an oddity when you are in the editor and want to cancel.
-    @nidi, can you fill that in here?  i think you've explained this
-    to me once.]
+- if you call rebase with argument ``-i``, you can do a lot of rebase magic
+  (squashing and dropping and reordering and all that). This feature is
+  quite self-explanatory -- just try it!  [FIXME: there was an oddity when
+  you are in the editor and want to cancel. @nidi, can you fill that in
+  here?  i think you've explained this to me once.]
 
-  - if you call ``git rebase -i $BRANCHPOINT``,
-    you can do rebase magic without actually changing the branch
-    point.
+- if you call ``git rebase -i $BRANCHPOINT``, you can do rebase magic
+  without actually changing the branch point.
 
 
 Dos and Don'ts
@@ -307,6 +305,7 @@ Asynchronous Process
    a3-dev with subject ``Re: [PR] ...`` and empty body.  If several
    reviewers respond simultaneously, they resolve the conflict
    off-line.
+
    ..
       REVIEW[tb]: I do not want to rely on the possibility of
       off-line communication
@@ -391,7 +390,7 @@ replaced by the respective comment lexeme (``#`` for python and yaml,
 the extra ``-->`` at the end), ``..`` for rst, and so on).
 
 Further lines may be added after this.  Those just need to match
-``^# `` or corresponding.  Note the whitespace in both the first and
+"^# " or corresponding.  Note the whitespace in both the first and
 all following lines.
 
 Debates may emerge as author and reviewer realize they disagree.  In
@@ -414,8 +413,8 @@ Dos and Don'ts
 
 A branch must not be merged as long as ``REVIEW`` comments remain.
 
-``FIXME``s are discouraged in master.  For now, they are allowed, but
-we should find a more fancy bug tracking approach.  (redmine?)
+``FIXME``\ s are discouraged in master.  For now, they are allowed, but we
+should find a more fancy bug tracking approach.  (redmine?)
 
 [REVIEW[cs]: Personally, I mostly use FIXME for "this works as is, but it
 is a hack/inelegant/inefficient, so if we could find a better solution that
