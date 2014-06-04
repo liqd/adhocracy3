@@ -305,16 +305,10 @@ Asynchronous Process
    .. REVIEW[tb]: This should also apply to the synchronous process
 
 2. *(assign pull request)* A reviewer sends a response to the PR on
-   a3-dev with subject ``Re: [PR] ...`` and empty body.  If several
-   reviewers respond simultaneously, they resolve the conflict
-   off-line.
-
-   ..
-      REVIEW[tb]: I do not want to rely on the possibility of
-      off-line communication
-
-   [REVIEW[cs]: Non-empty body (e.g. "I'll do they review tomorrow.")
-   should be OK as well).]
+   a3-dev with subject ``Re: [PR] ...`` and an optional message in the
+   body (e.g. "I'll do they review tomorrow").  If several reviewers
+   respond simultaneously, they resolve the conflict outside this
+   process.
 
 3. The reviewer checks out the branch to be reviewed, makes any
    changes and comments in the working copy, and adds them to the
