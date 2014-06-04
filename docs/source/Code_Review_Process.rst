@@ -153,6 +153,13 @@ The commit message can be found here::
     git show `git show-branch HEAD master | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'`
 
 
+..
+   REVIEW[tb]: This should work equally well and looks simpler
+   to me (the ``--topo-order`` might not event be necessary)::
+
+       git show `git rev-list HEAD ^master --topo-order | tail -n 1`~1
+
+
 Rebase and +n-branch logic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
