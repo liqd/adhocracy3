@@ -160,7 +160,7 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
 
     public factory() {   // REVIEW: see Listing
         var _self = this;
-        var _class = (<any>this).constructor;  // REVIEW: see Listing
+        var _class = (<any>_self).constructor;  // REVIEW: see Listing
 
         return {
             restrict: "E",
