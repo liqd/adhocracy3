@@ -283,13 +283,7 @@ Synchronous Process
    additional commits are made by the author or by author and reviewer
    in pair programming mode.
 
-5. The branch is merged into its base (the story branch or the parent
-   personalized branch).
-
-   [REVIEW[cs]: Personalized branch can be branched off from master
-   according to this document. If master is the parent branch, it should be
-   OK to merge them into master as well. Not every personal branch will be
-   part of a story (branch).]
+5. The branch is merged into its base branch.
 
 
 Asynchronous Process
