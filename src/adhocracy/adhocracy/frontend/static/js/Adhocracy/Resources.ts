@@ -6,6 +6,7 @@
 import _ = require("underscore");
 
 import Util = require("Adhocracy/Util");
+import Http = require("Adhocracy/Services/Http");
 
 
 export interface HasIPoolSheet {
@@ -163,22 +164,22 @@ export function postProposal($http,
     "use strict";
     var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 
-    return $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).then( (resp) => {
+    return $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).success( (resp) => {
         var proposalPath = decodeURIComponent(resp.data.path);
         var proposalFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
 
         var sectionPromiseStupid = $http.post(proposalPath, new Section());
 
         var paragraphPromises = paragraphVersions.map( (paragraph) =>
-            $http.post(proposalPath, new Paragraph()).then( (resp) => {
+            $http.post(proposalPath, new Paragraph()).success( (resp) => {
                 var paragraphPath = decodeURIComponent(resp.data.path);
                 var paragraphFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
 
                 return $http.post(paragraphPath, paragraph.addIVersionable([paragraphFirstVersionPath], [proposalPath]));
-            })
+            }).error(Http.logBackendError)
         );
 
-        var sectionVersionPromise = sectionPromiseStupid.then( respSection => {
+        var sectionVersionPromise = sectionPromiseStupid.success( respSection => {
             return $q.all(paragraphPromises).then( (respParagraphs) => {
                 var paths = respParagraphs.map( (resp) => decodeURIComponent(resp.data.path) );
 
@@ -186,18 +187,18 @@ export function postProposal($http,
 
                 return $http.post(decodeURIComponent(respSection.data.path), sectionVersion);
             });
-        });
+        }).error(Http.logBackendError);
 
         return $q.all(paragraphPromises).then( (respParagraphs) => {
-            return sectionVersionPromise.then( (respSectionVersion) => {
+            return sectionVersionPromise.success( (respSectionVersion) => {
                 addParagraph(proposalVersion, decodeURIComponent(respSectionVersion.data.path));
 
                 proposalVersion.addIVersionable([], [proposalFirstVersionPath]);
 
                 return $http.post(proposalPath, proposalVersion);
-            });
+            }).error(Http.logBackendError);
         });
-    });
+    }).error(Http.logBackendError);
 };
 
 export function followNewestVersion($http, resourceVersion) {

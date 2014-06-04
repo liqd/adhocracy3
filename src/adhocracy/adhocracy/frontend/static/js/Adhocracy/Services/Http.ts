@@ -108,3 +108,26 @@ export function exportContent<Content extends Types.Content<any>>(obj : Content)
     delete newobj.path;
     return newobj;
 };
+
+
+// error handling
+
+export interface IBackendError {
+    status: string;
+    errors: string[][];
+}
+
+export var logBackendError = (data: IBackendError, status: number, headers, config) => {
+    console.log("http response with error status: " + status);
+
+    for (var e in data.errors) {
+        console.log("error #" + e);
+        console.log("where: " + data.errors[e][0] + ", " + data.errors[e][1]);
+        console.log("what:  " + data.errors[e][2]);
+    }
+
+    console.log(config);
+    console.log(data);
+
+    throw ("adhHttp: exit code " + status + "!");
+};
