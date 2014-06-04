@@ -69,9 +69,9 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
         // such that the instance type is '() => IDirective', and no
         // factory method is needed.
 
-        var _this = this;  // REVIEW: can we use () => {} syntax instead of this explicit declaration?
+        var _self = this;
         // REVIEW: this looks strange. I guess there is a more "natural" way to do this. Maybe something with `prototype`.
-        var _class = (<any>_this).constructor;
+        var _class = (<any>_self).constructor;
 
         return {
             restrict: "E",
@@ -89,7 +89,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                          {
                              adhHttp.get($scope.path).then((pool: Container) => {
                                  $scope.container = pool;
-                                 $scope.elements = _this.containerAdapter.elemRefs($scope.container);
+                                 $scope.elements = _self.containerAdapter.elemRefs($scope.container);
                              });
                          }
                         ]
@@ -159,9 +159,8 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
     }
 
     public factory() {   // REVIEW: see Listing
-        var _this = this;  // REVIEW: see Listing
-        // REVIEW: see Listing
-        var _class = (<any>this).constructor;
+        var _self = this;
+        var _class = (<any>this).constructor;  // REVIEW: see Listing
 
         return {
             restrict: "E",
@@ -176,7 +175,7 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
                                  ) : void
                          {
                              adhHttp.get($scope.path)
-                                 .then(_this.elementAdapter.name)
+                                 .then(_self.elementAdapter.name)
                                  .then((name) => $scope.name = name);
                          }
                         ]
