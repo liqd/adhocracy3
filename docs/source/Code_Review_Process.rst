@@ -111,25 +111,25 @@ letter words), and descriptive free text (``[-a-z]+``).
 
 The following branch types exist:
 
-- Story branches (``YYYY-MM-story-[-a-z]+``)
-  For each user story, there is a story branch that must be based on
-  ``master``.  Story branches may sprout personalized or volatile
-  branches (see below).
+Story branches (``YYYY-MM-story-[-a-z]+``)
+   For each user story, there is a story branch that must be based on
+   ``master``.  Story branches may sprout personalized or volatile
+   branches (see below).
 
-- Fix branches (``YYYY-MM-fix-[-a-z]+``)
-  For each bug on the story board, a fix branch is created.  It must
-  be based on ``master``.
+Fix branches (``YYYY-MM-fix-[-a-z]+``)
+   For each bug on the story board, a fix branch is created.  It must
+   be based on ``master``.
 
-- Personalized branches (``YYYY-MM-DEV-[-a-z]+``)
-  Developers create personalized branches in order to work on tasks.
-  Personalized branches may be based anywhere.  It is NOT allowed
-  to ``push --force`` a personalized branch.
+Personalized branches (``YYYY-MM-DEV-[-a-z]+``)
+   Developers create personalized branches in order to work on tasks.
+   Personalized branches may be based anywhere.  It is NOT allowed
+   to ``push --force`` a personalized branch.
 
-- Volatile branches (``YYYY-MM-_DEV-[-a-z]+``)
-  Personalized branches with ``push --force`` option.  The developer
-  must announce that this branch may change arbitrarily by adding an
-  underscore mark before the developer name shortcut in the branch
-  name.  Volatile branches may be based anywhere.
+Volatile branches (``YYYY-MM-_DEV-[-a-z]+``)
+   Personalized branches with ``push --force`` option.  The developer
+   must announce that this branch may change arbitrarily by adding an
+   underscore mark before the developer name shortcut in the branch
+   name.  Volatile branches may be based anywhere.
 
 
 Finding branch points
