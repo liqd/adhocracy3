@@ -232,12 +232,14 @@ Dos and Don'ts
    with +n-branch logic is allowed in personalized branches and
    allowed-but-discouraged in story branches.
 
-3. Always use ``git merge`` with ``--no-ff`` when merging a feature
-   into the parent branch.  [FIXME: if there is a way to configure
+3. Always use ``git merge`` with ``--no-ff`` when merging a branch
+   into its base branch.  [FIXME: if there is a way to configure
    this in ~/.gitconfig, explain it here.]
 
-   [REVIEW[cs]: But merging master into story branches without ``--no-ff``
-   is OK and maybe even encouraged, right?]]
+   (When merging the base branch into a story or personalized branch
+   to benefit from code recently added elsewhere, fast-forward is
+   usually not possible since the histories of two merged branches
+   have diverged.  ``--no-ff`` usually does not apply in this case.)
 
 4. Merging ancestor branches into a current branch is ok.  This makes
    it feasible to keep up to date with changes in a parent branch in
