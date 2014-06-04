@@ -218,8 +218,7 @@ Dos and Don'ts
 2. ``rebase`` is generally forbidden on published branches.
    Exceptions: ``rebase`` is allowed in volatile branches; ``rebase``
    with +n-branch logic is allowed in personalized branches and
-   allowed-but-discouraged in story
-   branches.
+   allowed-but-discouraged in story branches.
 
 3. Always use ``git merge`` with ``--no-ff`` when merging a feature
    into the parent branch.  [FIXME: if there is a way to configure
