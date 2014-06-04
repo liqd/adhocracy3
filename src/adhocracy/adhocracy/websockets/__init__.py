@@ -137,7 +137,7 @@ class ClientCommunicator(WebSocketServerProtocol):
             json_object = self._parse_message(payload, is_binary)
             request = self._convert_json_into_client_request(json_object)
             self._handle_client_request_and_send_response(request)
-        except WebSocketError as err:
+        except Exception as err:
             self._send_error_message(err)
 
     def _parse_message(self, payload: bytes, is_binary: bool) -> object:
@@ -162,7 +162,9 @@ class ClientCommunicator(WebSocketServerProtocol):
         except colander.Invalid as err:
             self._raise_if_unknown_field_value('action', err, json_object)
             self._raise_if_unknown_field_value('resource', err, json_object)
-            self._raise_invalid_json(err)
+            self._raise_invalid_json_from_colander_invalid(err)
+        except Exception as err:
+            self._raise_invalid_json_from_exception(err)
 
     def _raise_if_unknown_field_value(
             self, field_name: str, err: colander.Invalid, json_object) -> None:
@@ -183,12 +185,17 @@ class ClientCommunicator(WebSocketServerProtocol):
             if isinstance(value, str):
                 return value
 
-    def _raise_invalid_json(self, err: colander.Invalid) -> None:
+    def _raise_invalid_json_from_colander_invalid(self,
+            err: colander.Invalid) -> None:
         """Raise a 'invalid_json' WebSocketError from a colander error."""
         errdict = err.asdict()
         errlist = ['{}: {}'.format(k, errdict[k]) for k in errdict.keys()]
         details = ' / '.join(sorted(errlist))
         raise WebSocketError('invalid_json', details)
+
+    def _raise_invalid_json_from_exception(self, err: Exception) -> None:
+        """Raise a 'invalid_json' WebSocketError from a generic exception."""
+        raise WebSocketError('invalid_json', str(err))
 
     def _handle_client_request_and_send_response(self, request: dict):
         action = request['action']
@@ -230,9 +237,14 @@ class ClientCommunicator(WebSocketServerProtocol):
         logger.debug('Sending message to client %s: %s', self._client, text)
         self.sendMessage(text.encode())
 
-    def _send_error_message(self, err: WebSocketError) -> None:
-        self._send_json_message({'error': err.error_type,
-                                 'details': err.details})
+    def _send_error_message(self, err: Exception) -> None:
+        if isinstance(err, WebSocketError):
+            error = err.error_type
+            details = err.details
+        else:
+            error = 'internal_error'
+            details = str(err)
+        self._send_json_message({'error': error, 'details': details})
 
     def send_modified_notification(self, resource: IResource) -> None:
         """Send notification about a modified resource."""

@@ -166,6 +166,15 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert self._comm.queue[0] == {'error': 'unknown_resource',
                                        'details': '/wrong_child'}
 
+    def test_onMessage_with_invalid_json_type(self):
+        msg = self._build_message({'action': 'subscribe',
+                                   'resource': 7})
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'error': 'invalid_json',
+            'details': 'coercing to str: need bytes, bytearray or '
+                       'buffer-like object, int found'}
+
 class ClientTrackerUnitTests(unittest.TestCase):
 
     """Test the ClientTracker class."""

@@ -88,7 +88,9 @@ ERROR_CODE will be one of the following:
   strings). DETAILS contains a short description of the problem.
 * "subscribe_not_supported" if the client tried to subscribe to an ItemVersion.
   DETAILS contains the path of resource that doesn't allow subscriptions.
-
+* "internal_error" if an internal error occurred at the server. DETAILS
+  contains a short description of the problem. In an ideal world,
+  this will never happen.
 
 Notifications
 +++++++++++++
