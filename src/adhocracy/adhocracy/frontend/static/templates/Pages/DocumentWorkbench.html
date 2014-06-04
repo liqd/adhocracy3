@@ -26,12 +26,7 @@
                 -->
                 <li ng-repeat="doc in poolEntries track by $id(doc)">
                     <div ng-switch="doc">
-                        <div ng-switch-when="undefined">
-                            <small><tt>(empty DAG)</tt></small>
-                        </div>
-                        <div ng-switch-default>
-                            <adh-proposal-version-detail content="doc.content" viewmode="doc.viewmode"></adh-proposal-version-detail>
-                        </div>
+                        <adh-proposal-version-detail content="doc.content" viewmode="doc.viewmode"></adh-proposal-version-detail>
                     </div>
                 </li>
             </ol>
