@@ -384,7 +384,7 @@ replaced by the respective comment lexeme (``#`` for python and yaml,
 the extra ``-->`` at the end), ``..`` for rst, and so on).
 
 Further lines may be added after this.  Those just need to match
-``^# `` or corresponding.  Note the whitespace in both the first and
+``^#\s`` or corresponding.  Note the whitespace in both the first and
 all following lines.
 
 Debates may emerge as author and reviewer realize they disagree.  In
@@ -407,7 +407,7 @@ Dos and Don'ts
 
 A branch must not be merged as long as ``REVIEW`` comments remain.
 
-``FIXME``s are discouraged in master.  For now, they are allowed, but
+``FIXMEs`` are discouraged in master.  For now, they are allowed, but
 we should find a more fancy bug tracking approach.  (redmine?)
 
 [FIXME: ``git notes --help`` may be relevant, but I haven't looked at
