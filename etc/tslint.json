@@ -55,7 +55,7 @@
     "use-strict": [true,
         "check-module"
     ],
-    "variable-name": true,
+    "variable-name": [true, "allow-leading-underscore"],
     "whitespace": [true,
         "check-branch",
         "check-decl",
