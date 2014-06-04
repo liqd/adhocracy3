@@ -70,7 +70,6 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
         // factory method is needed.
 
         var _self = this;
-        // REVIEW: this looks strange. I guess there is a more "natural" way to do this. Maybe something with `prototype`.
         var _class = (<any>_self).constructor;
 
         return {
@@ -160,7 +159,7 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
 
     public factory() {   // REVIEW: see Listing
         var _self = this;
-        var _class = (<any>_self).constructor;  // REVIEW: see Listing
+        var _class = (<any>_self).constructor;
 
         return {
             restrict: "E",
