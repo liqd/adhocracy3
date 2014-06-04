@@ -105,11 +105,11 @@ branch types
 ~~~~~~~~~~~~
 
 Branch naming follows a pattern that makes it easier to process
-branche lists automatically.  The pattern consists of year (``YYYY``),
+branch lists automatically.  The pattern consists of year (``YYYY``),
 month (``MM``), a developer name shortcut (``DEV``), keywords (small
 letter words), and descriptive free text (``[-a-z]+``).
 
-The following branche types exist::
+The following branch types exist::
 
 - *Story branches* (``YYYY-MM-story-[-a-z]+``).  For each user story,
   there is a story branch that must be based on ``master``.  Story
@@ -258,7 +258,7 @@ Synchronous Process
 
 0. The author has completed a personalized branch for review.
 
-1. The author choses a reviewer and contacts her in person or by
+1. The author chooses a reviewer and contacts her in person or by
    any means preferred by both.
 
 2. The reviewer checks out the branch to be reviewed, and makes
@@ -281,7 +281,7 @@ Asynchronous Process
 
 1. *(create pull request)* (PR) The author sends an email to a3-dev with
    subject ``[PR] bloo (audience)``, where ``bloo`` is the name of
-   the branch and ``audience`` is a descirption of possible reviewers
+   the branch and ``audience`` is a description of possible reviewers
    (e.g. names or the name of the subsystem).
 
    All documentation of the pull request must be contained in the
@@ -320,8 +320,8 @@ Asynchronous Process
       i.e. all mails are send to a3-dev.
 
 
-Recipies
-~~~~~~~~
+Recipes
+~~~~~~~
 
 As above, first do something like::
 
@@ -358,7 +358,7 @@ Markup language
 
 The file REVIEW.txt may contain any free text.  (A format for what is
 in there may emerge in the future; there may also be tools in the
-future to process it.)  For example it may be usefull to add commit
+future to process it.)  For example it may be useful to add commit
 lines that can be interpreted by tig (see
 https://github.com/jonas/tig/issues/299).
 
@@ -386,7 +386,7 @@ an empty line with::
 
     ^# REVIEW[mf]: .*
 
-where ``mf`` is the delevloper shortcut of the developer that adds the
+where ``mf`` is the developer shortcut of the developer that adds the
 comment.  While this information may also be available from ``git blame``
 it is convenient to have it right there.
 
