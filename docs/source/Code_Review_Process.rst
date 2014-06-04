@@ -32,44 +32,44 @@ metric).
 
 - low-footprint, trivial to adopt.
 
-- no need to adjust work habits to yet another new application software /
-  UI.
+- no need to adjust work habits to yet another new application
+  software / UI.
 
-- offline use (no need to have IP connectivity while working).
+- offline use (no need having IP connectivity while working).
 
-- git repo contains all review history in the resp. branches (to the extend
-  those branches have not been deleted).
+- git repo contains all review history in the resp. branches (to the
+  extend those branches have not been deleted).
 
-- allow for synchronous review (talk the branch through together on the
-  same physical display).
+- allow for synchronous review (talk the branch through together on
+  the same physical display).
 
 - allow for asynchronous review (pass comments and little fractional
-  changes back and forth between reviewer and reviewee through something as
-  convenient as email or a web page).
+  changes back and forth between reviewer and reviewee through
+  something as convenient as email or a web page).
 
-- passing a branch back and forth between reviewer and reviewee during the
-  review process should be trivial.
+- passing a branch back and forth between reviewer and reviewee
+  during the review process should be trivial.
 
-- the reviewer can make changes (e.g. small typos) herself, not only ask
-  the reviewee to do them.  (all changes by the reviewer of course need to
-  be double-checked by the reviewee.)
+- the reviewer can make changes (e.g. small typos) herself, not only
+  ask the reviewee to do them.  (all changes by the reviewer of
+  course need to be double-checked by the reviewee.)
 
 - comments can be attached to
-
   - the branch
   - lines in the full diff
   - individual commits
   - lines in commit diffs
 
-- review comments can contain links into web / other code locations / other
-  commits / ...
+- review comments can contain links into web / other code locations /
+  other commits / ...
 
 - review comments and code should be separated, e.g. in a file called
-  ``REVIEW.txt`` in the root directory of the repository that can be easily
-  removed before the merge.
+  ``REVIEW.txt`` in the root directory of the repository that can be
+  easily removed before the merge.
 
-- review comments should be contained in the code as comments, probably in
-  a special mark-up form that can be pruned automatically before the merge.
+- review comments should be contained in the code as comments,
+  probably in a special mark-up form that can be pruned automatically
+  before the merge.
 
 - github-style pull requests
 
@@ -79,10 +79,10 @@ metric).
 
   - passing a branch back and forth between reviewer and reviewee.
 
-   emails should contain context and links.
+  emails should contain context and links.
 
-- allow to rebase a branch (or a clone of the branch) during the review
-  process.
+- allow to rebase a branch (or a clone of the branch) during the
+  review process.
 
 
 Tool Candidates
@@ -111,23 +111,25 @@ letter words), and descriptive free text (``[-a-z]+``).
 
 The following branch types exist:
 
-- *Story branches* (``YYYY-MM-story-[-a-z]+``).  For each user story,
-  there is a story branch that must be based on ``master``.  Story
-  branches may sprout personalized or volatile branches (see below).
+- Story branches (``YYYY-MM-story-[-a-z]+``)
+  For each user story, there is a story branch that must be based on
+  ``master``.  Story branches may sprout personalized or volatile
+  branches (see below).
 
-- *Fix branches* (``YYYY-MM-fix-[-a-z]+``).  For each bug on the story
-  board, a fix branch is created.  It must be based on ``master``.
+- Fix branches (``YYYY-MM-fix-[-a-z]+``)
+  For each bug on the story board, a fix branch is created.  It must
+  be based on ``master``.
 
-- *Personalized branches* (``YYYY-MM-DEV-[-a-z]+``).  Developers
-  create personalized branches in order to work on tasks.
+- Personalized branches (``YYYY-MM-DEV-[-a-z]+``)
+  Developers create personalized branches in order to work on tasks.
   Personalized branches may be based anywhere.  It is not allowed
   to ``push --force`` a personalized branch.
 
-- *Volatile branches* (``YYYY-MM-_DEV-[-a-z]+``).  Personalized
-  branches with ``push --force`` option.  The developer must announce
-  that this branch may change arbitrarily by adding an underscore mark
-  before the developer name shortcut in the branch name.  Volatile
-  branches may be based anywhere.
+- Volatile branches (``YYYY-MM-_DEV-[-a-z]+``)
+  Personalized branches with ``push --force`` option.  The developer
+  must announce that this branch may change arbitrarily by adding an
+  underscore mark before the developer name shortcut in the branch
+  name.  Volatile branches may be based anywhere.
 
 
 Finding branch points
@@ -153,6 +155,13 @@ The commit message can be found here::
     git show `git show-branch HEAD master | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'`
 
 
+..
+   REVIEW[tb]: This should work equally well and looks simpler
+   to me (the ``--topo-order`` might not event be necessary)::
+
+       git show `git rev-list HEAD ^master --topo-order | tail -n 1`~1
+
+
 Rebase and +n-branch logic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -163,17 +172,18 @@ any way as branches should.)
 
 Rebasing has two advantages:
 
-- it shrinks the diff between the parent branch and the HEAD of the new
-  branch;
+- it shrinks the diff between the parent branch and the HEAD of the
+  new branch;
 
   .. REVIEW[tb]: the diff should not change during a rebase
 
 - You can move your branch to the HEAD of the target branch as an
-  alternative to merging.  This way you keep a near-linear commit history.
+  alternative to merging.  This way you keep a near-linear commit
+  history.
 
 - with the ``-i`` option, rebasing allows to re-order and clean up
-  individual commits, and thus make the life of the reviewer (and anyone
-  else looking at the history) easier.
+  individual commits, and thus make the life of the reviewer (and
+  anyone else looking at the history) easier.
 
 In order to avoid that ``rebase`` changes repository state
 destructively (instead of just adding additional commits), the rebase
@@ -196,17 +206,19 @@ must happen according to *+n-branch logic*::
 
 Remarks:
 
-- the un-rebased branch has no +n suffix, the first rebase has '+1', the
-  second '+2' and so on.
+- the un-rebased branch has no +n suffix, the first rebase has '+1',
+  the second '+2' and so on.
 
-- if you call rebase with argument ``-i``, you can do a lot of rebase magic
-  (squashing and dropping and reordering and all that). This feature is
-  quite self-explanatory -- just try it!  [FIXME: there was an oddity when
-  you are in the editor and want to cancel. @nidi, can you fill that in
-  here?  i think you've explained this to me once.]
+- if you call rebase with argument ``-i``, you can do a lot of
+  rebase magic (squashing and dropping and reordering and all that).
+  This feature is quite self-explanatory -- just try it!  [FIXME:
+  there was an oddity when you are in the editor and want to cancel.
+  @nidi, can you fill that in here?  i think you've explained this
+  to me once.]
 
-- if you call ``git rebase -i $BRANCHPOINT``, you can do rebase magic
-  without actually changing the branch point.
+- if you call ``git rebase -i $BRANCHPOINT``,
+  you can do rebase magic without actually changing the branch
+  point.
 
 
 Dos and Don'ts
@@ -389,7 +401,7 @@ replaced by the respective comment lexeme (``#`` for python and yaml,
 the extra ``-->`` at the end), ``..`` for rst, and so on).
 
 Further lines may be added after this.  Those just need to match
-"^# " or corresponding.  Note the whitespace in both the first and
+``^#\s`` or corresponding.  Note the whitespace in both the first and
 all following lines.
 
 Debates may emerge as author and reviewer realize they disagree.  In
