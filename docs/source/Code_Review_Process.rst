@@ -35,7 +35,7 @@ metric).
  - no need to adjust work habits to yet another new application
    software / UI.
 
- - offline use (no need having IP connectivity while working).
+ - offline use (no need to have IP connectivity while working).
 
  - git repo contains all review history in the resp. branches (to the
    extend those branches have not been deleted).
