@@ -25,8 +25,7 @@ def name_is_unique_validator(node: colander.SchemaNode, value: str):
               ' unique'
         raise colander.Invalid(node, msg)
     if value in parent:
-        msg = 'The name "{0}" already exists in the '
-        'parent pool.'.format(value)
+        msg = 'The name "{0}" already exists in the parent pool.'.format(value)
         raise colander.Invalid(node, msg)
 
 
