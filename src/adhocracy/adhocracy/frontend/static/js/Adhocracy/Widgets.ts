@@ -153,7 +153,7 @@ export class ListingElementTitleAdapter extends AbstractListingElementAdapter<Ty
     };
 }
 
-export interface ListingElementScope<Container> {
+export interface ListingElementScope {
     path: string;
     name: string;
 }
@@ -178,7 +178,7 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
             },
             controller: ["$scope",
                          "adhHttp",
-                         function($scope: ListingElementScope<typeof _this.elementAdapter.ElementType>,
+                         function($scope: ListingElementScope,
                                   adhHttp: AdhHttp.IService<typeof _this.elementAdapter.ElementType>
                                  ) : void
                          {
