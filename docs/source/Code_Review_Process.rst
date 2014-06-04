@@ -135,8 +135,8 @@ the points in the repository where a branch branched off other
 branches in the past.  We call these points *branch points*.
 
 Note that the information at which point a branch branched off its
-direct parent branch is not maintained by git
-[http://stackoverflow.com/questions/17581026/branch-length-where-does-a-branch-start-in-git].
+direct parent branch is `not maintained by git
+<http://stackoverflow.com/questions/17581026/branch-length-where-does-a-branch-start-in-git>`_.
 This does not make the question of the direct parent branch any less
 meaningful, but it makes it tricky to answer.
 
