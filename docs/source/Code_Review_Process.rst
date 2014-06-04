@@ -341,7 +341,9 @@ Markup language
 
 The file REVIEW.txt may contain any free text.  (A format for what is
 in there may emerge in the future; there may also be tools in the
-future to process it.)
+future to process it.)  For example it may be usefull to add commit
+lines that can be interpreted by tig (see
+https://github.com/jonas/tig/issues/299).
 
 The reviewer may make any changes to the code, including comments, in
 the hope that the author will like them and keep them in the final
