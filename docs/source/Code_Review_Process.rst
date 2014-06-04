@@ -449,3 +449,18 @@ do line numbers in every line in diff?]
 .. _gitissues: https://github.com/duplys/git-issues
 .. _reviewboard: http://www.reviewboard.org/
 .. _tig: https://github.com/jonas/tig
+
+
+.. REVIEW[tb]: following things might be useful additions:
+
+   - commit message formats (e.g. "fixup …")
+
+   - what should/must be done before creating a pull request
+     - only one feature per pull request
+       - only include changes that are really needed; do refacotoring
+         in a separate pull request
+       - small fixes and library updates should be done in or near master,
+         not inside of larger feature branches. This allows everyone to
+         profit sooner. In cases where the fix/update would have been done
+         in mutliple branches, this also avoids merge conflicts.
+     - be prepared to explain every single change.
