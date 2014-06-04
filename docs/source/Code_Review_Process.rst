@@ -165,14 +165,14 @@ The commit message can be found here::
 Rebase and +n-branch logic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To keep the code history clean, personalized branches may be rebased
-before they are merged into their parents.  (Volatile branches may
+To keep the code history clean, a personalized branch may be rebased
+before it is merged into its base.  (Volatile branches may
 always be rebased, because there is no guarantee that they behave in
 any way as branches should.)
 
 Rebasing has two advantages:
 
-- You can move your branch to the HEAD of the target branch as an
+- You can move your branch to the HEAD of the base branch as an
   alternative to merging.  This way you keep a near-linear commit
   history;
 
