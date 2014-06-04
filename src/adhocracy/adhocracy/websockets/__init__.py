@@ -185,8 +185,8 @@ class ClientCommunicator(WebSocketServerProtocol):
             if isinstance(value, str):
                 return value
 
-    def _raise_invalid_json_from_colander_invalid(self,
-            err: colander.Invalid) -> None:
+    def _raise_invalid_json_from_colander_invalid(self, err:
+                                                  colander.Invalid) -> None:
         """Raise a 'invalid_json' WebSocketError from a colander error."""
         errdict = err.asdict()
         errlist = ['{}: {}'.format(k, errdict[k]) for k in errdict.keys()]
