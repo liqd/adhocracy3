@@ -55,10 +55,10 @@ export interface IVersionsSheet {
 export interface PartialIProposalVersion extends Resource, HasIDocumentSheet {}
 
 export class Resource {
-    content_type : string;
+    contentType : string;
     data : Object;
-    constructor(content_type: string) {
-        this.content_type = content_type;
+    constructor(contentType: string) {
+        this.contentType = contentType;
         this.data = {};
     }
     addISection(title: string, elements: string[]) {
@@ -76,10 +76,10 @@ export class Resource {
         };
         return this;
     }
-    addIVersionable(follows: string[], root_version: string[]) {
+    addIVersionable(follows: string[], rootVersion: string[]) {
         this.data["adhocracy.sheets.versions.IVersionable"] = {
             follows: follows,
-            root_version: root_version
+            root_version: rootVersion
         };
         return this;
     }
@@ -125,10 +125,10 @@ export class Section extends Resource {
 }
 
 export class SectionVersion extends Resource {
-    constructor(title: string, elements: string[], follows: string[], root_version: string[]) {
+    constructor(title: string, elements: string[], follows: string[], rootVersion: string[]) {
         super("adhocracy_sample.resources.section.ISectionVersion");
         this.addISection(title, elements)
-            .addIVersionable(follows, root_version);
+            .addIVersionable(follows, rootVersion);
     }
 }
 
@@ -139,7 +139,7 @@ export function addParagraph(proposalVersion: PartialIProposalVersion, paragraph
 // takes an array of URL's to resource versions
 // FIXME: backend should have LAST
 export function newestVersion(versions: string[]) : string {
-    return _.max(versions, (version_path: string) => parseInt(version_path.match(/\d*$/)[0], 10)).toString();
+    return _.max(versions, (versionPath: string) => parseInt(versionPath.match(/\d*$/)[0], 10)).toString();
 };
 
 export function newestVersionInContainer(container) {
