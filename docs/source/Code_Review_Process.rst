@@ -101,7 +101,7 @@ Git Conventions
 ---------------
 
 
-branch types
+Branch types
 ~~~~~~~~~~~~
 
 Branch naming follows a pattern that makes it easier to process
@@ -130,7 +130,7 @@ The following branch types exist::
   branches may be based anywhere.
 
 
-finding branch points
+Finding branch points
 ~~~~~~~~~~~~~~~~~~~~~
 
 For the processes defined in this document, it is interesting to find
