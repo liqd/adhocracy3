@@ -172,14 +172,9 @@ any way as branches should.)
 
 Rebasing has two advantages:
 
-- it shrinks the diff between the parent branch and the HEAD of the
-  new branch;
-
-  .. REVIEW[tb]: the diff should not change during a rebase
-
 - You can move your branch to the HEAD of the target branch as an
   alternative to merging.  This way you keep a near-linear commit
-  history.
+  history;
 
 - with the ``-i`` option, rebasing allows to re-order and clean up
   individual commits, and thus make the life of the reviewer (and
