@@ -20,18 +20,14 @@ var templatePath : string = "/frontend_static/templates";  // FIXME: move this t
 //////////////////////////////////////////////////////////////////////
 // Listings
 
-export class AbstractListingContainerAdapter<Type> {
-    public ContainerType : Type;
-    public elemRefs(container : Type) : string[] {
+export class AbstractListingContainerAdapter {
+    public elemRefs(container : any) : string[] {
         return [];
     }
 }
 
-export class ListingPoolAdapter extends AbstractListingContainerAdapter<Types.Content<Resources.HasIPoolSheet>> {
-    public elemRefs(container) {
-        // FIXME: derived type of argument c appears to be 'any',
-        // should be 'Types.Content<Resources.HasIPoolSheet>'!
-        // http://stackoverflow.com/questions/23893372/expecting-type-error-when-extending-and-generic-class
+export class ListingPoolAdapter extends AbstractListingContainerAdapter {
+    public elemRefs(container : Types.Content<Resources.HasIPoolSheet>) {
         return container.data["adhocracy.sheets.pool.IPool"].elements;
     }
 }
@@ -59,7 +55,7 @@ export interface ListingScope<Container> {
 //
 // and implicitly know that Listing propagates the identifier
 // ``element`` to the element's scope.
-export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Types.Content<any>>>
+export class Listing<Container extends Types.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter>
 {
     public static templateUrl: string = "/Widgets/Listing.html";
 
@@ -87,12 +83,11 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
             transclude: true,
             controller: ["$scope",
                          "adhHttp",
-                         function($scope: ListingScope<typeof _this.containerAdapter.ContainerType>,
-                                  adhHttp: AdhHttp.IService<typeof _this.containerAdapter.ContainerType>
-                                  // FIXME: i think these all evaluate to 'any' statically.
+                         function($scope: ListingScope<Container>,
+                                  adhHttp: AdhHttp.IService<Container>
                                  ) : void
                          {
-                             adhHttp.get($scope.path).then((pool: typeof _this.containerAdapter.ContainerType) => {
+                             adhHttp.get($scope.path).then((pool: Container) => {
                                  $scope.container = pool;
                                  $scope.elements = _this.containerAdapter.elemRefs($scope.container);
                              });
@@ -106,39 +101,37 @@ export class Listing<ContainerAdapter extends AbstractListingContainerAdapter<Ty
 //////////////////////////////////////////////////////////////////////
 // Elements
 
-export class AbstractListingElementAdapter<Type> {
-    public ElementType: Type;
-
+export class AbstractListingElementAdapter {
     constructor(public $q: ng.IQService) { }
 
-    public name: (element: Type) => ng.IPromise<string> = (element) => {
+    public name: (element: any) => ng.IPromise<string> = (element) => {
         var deferred = this.$q.defer();
         deferred.resolve("");
         return deferred.promise;
     };
-    public path: (element: Type) => string = () => {
+    public path: (element: any) => string = (element) => {
         return "";
     };
 }
 
-export class ListingElementAdapter extends AbstractListingElementAdapter<Types.Content<any>> {
-    public name = (element) => {
+export class ListingElementAdapter extends AbstractListingElementAdapter {
+    public name: (element: Types.Content<any>) => ng.IPromise<string> = (element) => {
         var deferred = this.$q.defer();
         deferred.resolve("[content type " + element.content_type + ", resource " + element.path + "]");
         return deferred.promise;
     };
-    public path = (element) => {
+    public path: (element: Types.Content<any>) => string = (element) => {
         return element.path;
     };
 }
 
-export class ListingElementTitleAdapter extends AbstractListingElementAdapter<Types.Content<Resources.HasIVersionsSheet>> {
+export class ListingElementTitleAdapter extends AbstractListingElementAdapter {
     constructor(public $q: ng.IQService,
                 public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>) {
         super($q);
     }
 
-    public name = (element) => {
+    public name: (element: Types.Content<Resources.HasIVersionsSheet>) => ng.IPromise<string> = (element) => {
         var versionPaths: string[] = element.data["adhocracy.sheets.versions.IVersions"].elements;
         var lastVersionPath: string = versionPaths[versionPaths.length - 1];
 
@@ -148,7 +141,7 @@ export class ListingElementTitleAdapter extends AbstractListingElementAdapter<Ty
             });
     };
 
-    public path = (element) => {
+    public path: (element: Types.Content<Resources.HasIVersionsSheet>) => string = (element) => {
         return element.path;
     };
 }
@@ -158,7 +151,7 @@ export interface ListingElementScope {
     name: string;
 }
 
-export class ListingElement<ElementAdapter extends AbstractListingElementAdapter<Types.Content<any>>>
+export class ListingElement<Element extends Types.Content<any>, ElementAdapter extends AbstractListingElementAdapter>
 {
     public static templateUrl: string = "/Widgets/ListingElement.html";
 
@@ -179,7 +172,7 @@ export class ListingElement<ElementAdapter extends AbstractListingElementAdapter
             controller: ["$scope",
                          "adhHttp",
                          function($scope: ListingElementScope,
-                                  adhHttp: AdhHttp.IService<typeof _this.elementAdapter.ElementType>
+                                  adhHttp: AdhHttp.IService<Element>
                                  ) : void
                          {
                              adhHttp.get($scope.path)
