@@ -212,6 +212,11 @@ must happen according to *+n-branch logic*::
    REVIEW[tb]: do not agree. My version should be simple enough to remember
    and I prefer to know what I am doing
 
+..
+   REVIEW[nidi]: Don't understand the BRANCHPOINT issue here. If your branch
+   branches from master, simply do `git rebase master` on the +1 branch. You
+   don't need the two or three argument rebase form.
+
 Remarks:
 
 - the un-rebased branch has no +n suffix, the first rebase has '+1',
@@ -259,8 +264,6 @@ Dos and Don'ts
    if the current branch is rebased on the ancestor branch HEAD at any
    point in time after the merge.
 
-   [FIXME: check: verschwinden merges bei rebase?]
-
 
 Code Review
 -----------
@@ -274,7 +277,7 @@ not a strong rule.
 
 All changes and comments that the reviewer makes are either made
 directly in the code (see Section 'Markup language' below), or in a
-file called ``REVIEW.txt`` and located in the working copy root.
+file called ``REVIEW.txt`` located in the working copy root.
 Reviewer and reviewee should agree on which option is preferred for
 what.
 
@@ -341,6 +344,9 @@ Asynchronous Process
    ..
       REVIEW[tb]: I would prefer if the complete review process was public,
       i.e. all mails are send to a3-dev.
+
+   ..
+      REVIEW[nidi]: Me too.
 
 
 Recipes
