@@ -117,15 +117,15 @@ export function run() {
     // widget-based directives
 
     app.directive("adhListing",
-                  () => new Widgets.Listing(new Widgets.ListingPoolAdapter()).factory());
+                  () => new Widgets.Listing(new Widgets.ListingPoolAdapter()).createDirective());
 
     app.directive("adhListingElement",
                   ["$q", ($q) =>
-                   new Widgets.ListingElement(new Widgets.ListingElementAdapter($q)).factory()]);
+                   new Widgets.ListingElement(new Widgets.ListingElementAdapter($q)).createDirective()]);
 
     app.directive("adhListingElementTitle",
                   ["$q", "adhHttp", ($q, adhHttp) =>
-                   new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).factory()]);
+                   new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective()]);
 
 
     // application-specific directives

@@ -62,13 +62,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
     constructor(public containerAdapter: ContainerAdapter) {
     }
 
-    public factory() {
-        // REVIEW: please resolve this FIXME (or remove)
-        // FIXME: "factory" might be misinterpreted as "ListingFactory".
-        // possible solutions: (1) rename; (2) implement Listing class
-        // such that the instance type is '() => IDirective', and no
-        // factory method is needed.
-
+    public createDirective() {
         var _self = this;
         var _class = (<any>_self).constructor;
 
@@ -157,7 +151,7 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
     constructor(public elementAdapter: ElementAdapter) {
     }
 
-    public factory() {   // REVIEW: see Listing
+    public createDirective() {
         var _self = this;
         var _class = (<any>_self).constructor;
 
