@@ -259,8 +259,6 @@ Dos and Don'ts
    if the current branch is rebased on the ancestor branch HEAD at any
    point in time after the merge.
 
-   [FIXME: check: verschwinden merges bei rebase?]
-
 
 Code Review
 -----------
