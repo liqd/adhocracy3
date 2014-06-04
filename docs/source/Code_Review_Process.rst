@@ -53,10 +53,10 @@ metric).
    course need to be double-checked by the reviewee.)
 
  - comments can be attached to
-    - source code lines
-    - lines in the commit diff
-    - commits
-    - sets of commits
+    - the branch
+    - lines in the full diff
+    - individual commits
+    - lines in commit diffs
 
  - review comments can contain links into web / other code locations /
    other commits / ...
@@ -78,6 +78,9 @@ metric).
      - passing a branch back and forth between reviewer and reviewee.
 
    emails should contain context and links.
+
+ - allow to rebase a branch (or a clone of the branch) during the
+   review process.
 
 
 Tool Candidates
