@@ -89,10 +89,10 @@ Tool Candidates
 Should we decide in the future to use software on top of git, this is
 an incomplete list of options::
 
-- bugseverwhere.org
-- gerrit
-- gitissues
-- reviewboard
+- `bugseverwhere`_
+- `gerrit`_
+- `gitissues`_
+- `reviewboard`_
 
 
 Git Conventions
@@ -378,3 +378,9 @@ here.)]
 
 [FIXME: line numbers!  we want code line numbers everywhere!  can git
 do line numbers in every line in diff?]
+
+
+.. _bugseverwhere: http://bugseverywhere.org/
+.. _gerrit: https://code.google.com/p/gerrit/
+.. _gitissues: https://github.com/duplys/git-issues
+.. _reviewboard: http://www.reviewboard.org/
