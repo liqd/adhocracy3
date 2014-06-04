@@ -233,13 +233,17 @@ Dos and Don'ts
    allowed-but-discouraged in story branches.
 
 3. Always use ``git merge`` with ``--no-ff`` when merging a branch
-   into its base branch.  [FIXME: if there is a way to configure
-   this in ~/.gitconfig, explain it here.]
+   into its base branch.
 
    (When merging the base branch into a story or personalized branch
    to benefit from code recently added elsewhere, fast-forward is
    usually not possible since the histories of two merged branches
    have diverged.  ``--no-ff`` usually does not apply in this case.)
+
+   If you want to make ``--no-ff`` the default (you can still
+   explicitly enable it with ``--ff``)::
+
+     git config --global merge.ff true
 
 4. Merging ancestor branches into a current branch is ok.  This makes
    it feasible to keep up to date with changes in a parent branch in
