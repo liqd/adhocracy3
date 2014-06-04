@@ -16,15 +16,7 @@
         <td id="document_workbench_list">
             <h3>table of contents</h3>
             <ol>
-                <!-- REVIEW:
-                from `angular docs <https://docs.angularjs.org/api/ng/directive/ngRepeat>`:
-
-                    `item in items` is equivalent to `item in items track by $id(item)`.
-
-                So I guess we can omit the `track by` here.
-                Same applies to templates/Widgets/Listing.html
-                -->
-                <li ng-repeat="doc in poolEntries track by $id(doc)">
+                <li ng-repeat="doc in poolEntries track by $index">
                     <div ng-switch="doc">
                         <adh-proposal-version-detail content="doc.content" viewmode="doc.viewmode"></adh-proposal-version-detail>
                     </div>
