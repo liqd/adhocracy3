@@ -118,7 +118,8 @@ The following branche types exist::
 
 - *Personalized branches* (``YYYY-MM-DEV-[-a-z]+``).  Developers
   create personalized branches in order to work on tasks.
-  Personalized branches may be based anywhere.
+  Personalized branches may be based anywhere.  It is not allowed
+  to ``push --force`` a personalized branch.
 
 - *Volatile branches* (``YYYY-MM-_DEV-[-a-z]+``).  Personalized
   branches with ``push --force`` option.  The developer must announce
@@ -163,8 +164,9 @@ Rebasing has two advantages::
   - it shrinks the diff between the parent branch and the HEAD of the
     new branch;
 
-  - with the ``-i`` option, it allows to re-order and clean up
-    individual commits, and thus make the life of the reviewer easier.
+  - with the ``-i`` option, rebasing allows to re-order and clean up
+    individual commits, and thus make the life of the reviewer (and
+    anyone else looking at the history) easier.
 
 In order to avoid that ``rebase`` changes repository state
 destructively (instead of just adding additional commits), the rebase
@@ -207,13 +209,15 @@ Dos and Don'ts
 1. ``push --force`` is forbidden.  The only exception are volatile
    branches.
 
-2. ``rebase`` is forbidden.  Exceptions: ``rebase`` is allowed in
-   volatile branches; ``rebase`` with +n-branch logic is allowed in
-   personalized branches and allowed-but-discouraged in story
+2. ``rebase`` is generally forbidden on published branches.
+   Exceptions: ``rebase`` is allowed in volatile branches; ``rebase``
+   with +n-branch logic is allowed in personalized branches and
+   allowed-but-discouraged in story
    branches.
 
-3. Always use ``git merge`` with ``--no-ff``.  [FIXME: if there is a
-   way to configure this in ~/.gitconfig, explain it here.]
+3. Always use ``git merge`` with ``--no-ff`` when merging a feature
+   into the parent branch.  [FIXME: if there is a way to configure
+   this in ~/.gitconfig, explain it here.]
 
 4. Merging ancestor branches into a current branch is ok.  This makes
    it feasible to keep up to date with changes in a parent branch in
@@ -286,7 +290,8 @@ Asynchronous Process
    start with ``[R]`` for review.
 
 4. *(merge)* If there are no more review comments or changes, the
-   reviewer merges the branch into its base.
+   reviewer merges the branch into its base.  The branch must not be
+   merged until all review comments are resolved.
 
 5. *(re-assign)* If there are changes, the reviewer sends a response
    to the PR to the author alone (not to a3-dev).  Body may be empty
@@ -360,7 +365,8 @@ an empty line with::
     ^# REVIEW[mf]: .*
 
 where ``mf`` is the delevloper shortcut of the developer that adds the
-comment.
+comment.  While this information may also be available from ``git blame``
+it is convenient to have it right there.
 
 During the review phase, ``REVIEW`` comments may either be removed
 manually or transformed into helpful comments to be imported into the
