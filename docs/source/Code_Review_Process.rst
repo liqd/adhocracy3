@@ -282,10 +282,15 @@ Asynchronous Process
    (``git commit --allow-empty``).  The commit log (or the last
    commit) may be contained in the email body.
 
+   .. REVIEW[tb]: This should also apply to the synchronous process
+
 2. *(assign pull request)* A reviewer sends a response to the PR on
    a3-dev with subject ``Re: [PR] ...`` and empty body.  If several
    reviewers respond simultaneously, they resolve the conflict
    off-line.
+   ..
+      REVIEW[tb]: I do not want to rely on the possibility of
+      off-line communication
 
 3. The reviewer checks out the branch to be reviewed, makes any
    changes and comments in the working copy, and adds them to the
@@ -301,6 +306,10 @@ Asynchronous Process
    or contain the commit log.  At this point, reviewer and author
    change roles, and the author becomes the reviewee.  Proceed at
    step 3.
+
+   ..
+      REVIEW[tb]: I would prefer if the complete review process was public,
+      i.e. all mails are send to a3-dev.
 
 
 Recipies
