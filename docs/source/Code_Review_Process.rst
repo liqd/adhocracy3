@@ -175,15 +175,14 @@ must happen according to *+n-branch logic*::
     git push -v
     export BRANCHPOINT=`git show-branch HEAD master | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'`  # (see last section)
 
-    git rebase --onto 2014-04-story-bleeps-and-bloops $BRANCHPOINT
-
     git checkout -b 2014-05-mf-bleep+1
+    git rebase --onto 2014-04-story-bleeps-and-bloops $BRANCHPOINT
     git push -v origin 2014-05-mf-bleep+1
-    git checkout master
-    git branch -D 2014-05-mf-bleep  # this step is important to keep local and remote repo in sync!
-    git fetch
 
 [FIXME: we probably want to have a shell or python script for this.]
+..
+   REVIEW[tb]: do not agree. My version should be simple enough to remember
+   and I prefer to know what I am doing
 
 Remarks::
 
