@@ -18,6 +18,8 @@ in the sprint starting on 2014-07-14, a decision will be made on which
 parts of this document will remain valid.  [FIXME: @tobi,nico: ist das
 sinnvoll als versuchsphase?  kürzer?  länger?]
 
+.. REVIEW[tb]: ich find's sinnvoll
+
 
 Requirements
 ------------
@@ -163,6 +165,12 @@ Rebasing has two advantages::
 
   - it shrinks the diff between the parent branch and the HEAD of the
     new branch;
+
+    .. REVIEW[tb]: the diff should not change during a rebase
+
+  - You can move your branch to the HEAD of the target branch as an
+    alternative to merging.  This way you keep a near-linear commit
+    history.
 
   - with the ``-i`` option, rebasing allows to re-order and clean up
     individual commits, and thus make the life of the reviewer (and
