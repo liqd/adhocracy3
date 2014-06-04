@@ -13,8 +13,8 @@ Status of this document
 -----------------------
 
 This document should be read as request for comments (RFC).  It will
-be used for a trial period of two sprints (starting from 2014-06-09);
-in the sprint starting on 2014-07-14, a decision will be made on which
+be used for a trial period of two sprints (starting from 2014-06-10);
+in the sprint starting on 2014-07-21, a decision will be made on which
 parts of this document will remain valid.  [FIXME: @tobi,nico: ist das
 sinnvoll als versuchsphase?  kürzer?  länger?]
 
