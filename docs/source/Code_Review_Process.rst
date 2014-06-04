@@ -195,7 +195,7 @@ must happen according to *+n-branch logic*::
     export BRANCHPOINT=`git show-branch HEAD master | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'`  # (see last section)
 
     git checkout -b 2014-05-mf-bleep+1
-    git rebase --onto 2014-04-story-bleeps-and-bloops $BRANCHPOINT
+    git rebase --onto master $BRANCHPOINT
     git push -v origin 2014-05-mf-bleep+1
 
 [FIXME: we probably want to have a shell or python script for this.]
