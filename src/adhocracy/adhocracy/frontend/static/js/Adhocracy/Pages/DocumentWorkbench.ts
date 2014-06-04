@@ -116,15 +116,14 @@ export function run() {
 
     // widget-based directives
 
-    // REVIEW: please do not use prefixes other than 'adh'
-    app.directive("wdgListing",
+    app.directive("adhListing",
                   () => new Widgets.Listing(new Widgets.ListingPoolAdapter()).factory());
 
-    app.directive("wdgListingElement",
+    app.directive("adhListingElement",
                   ["$q", ($q) =>
                    new Widgets.ListingElement(new Widgets.ListingElementAdapter($q)).factory()]);
 
-    app.directive("wdgListingElementTitle",
+    app.directive("adhListingElementTitle",
                   ["$q", "adhHttp", ($q, adhHttp) =>
                    new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).factory()]);
 
