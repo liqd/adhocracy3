@@ -219,7 +219,7 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def _send_status_confirmation(self, update_was_necessary: bool,
                                   action: str, resource: IResource):
-        status = 'ok' if update_was_necessary else 'duplicate'
+        status = 'ok' if update_was_necessary else 'redundant'
         json_message = self._status_confirmation.serialize(
             {'status': status, 'action': action, 'resource': resource})
         self._send_json_message(json_message)

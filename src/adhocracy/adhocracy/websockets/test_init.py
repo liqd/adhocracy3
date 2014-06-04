@@ -104,13 +104,13 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
                                         'action': 'unsubscribe',
                                         'resource': '/child'}
 
-    def test_onMessage_duplicate_subscribe(self):
+    def test_onMessage_redundant_subscribe(self):
         msg = self._build_message({'action': 'subscribe',
                                    'resource': '/child'})
         self._comm.onMessage(msg, False)
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 2
-        assert self._comm.queue[-1] == {'status': 'duplicate',
+        assert self._comm.queue[-1] == {'status': 'redundant',
                                         'action': 'subscribe',
                                         'resource': '/child'}
 
@@ -195,7 +195,7 @@ class ClientTrackerUnitTests(unittest.TestCase):
         assert self._tracker._clients2resource_oids[client] == {oid}
         assert self._tracker._resource_oids2clients[oid] == {client}
 
-    def test_duplicate_subscribe(self):
+    def test_redundant_subscribe(self):
         """Test client subscribing same resource twice."""
         client = self._make_client()
         resource = self._make_resource()
@@ -252,7 +252,7 @@ class ClientTrackerUnitTests(unittest.TestCase):
         assert len(self._tracker._clients2resource_oids) == 0
         assert len(self._tracker._resource_oids2clients) == 0
 
-    def test_duplicate_unsubscribe(self):
+    def test_redundant_unsubscribe(self):
         """Test client unsubscribing from the same resource twice."""
         client = self._make_client()
         resource = self._make_resource()

@@ -90,13 +90,13 @@ class StatusConfirmationUnitTests(unittest.TestCase):
                           'action': 'subscribe',
                           'resource': '/child'}
 
-    def test_serialize_duplicate(self):
+    def test_serialize_redundant(self):
         inst = self._make_one()
         result = inst.serialize(
-            {'status': 'duplicate',
+            {'status': 'redundant',
              'action': 'unsubscribe',
              'resource': self.child})
-        assert result == {'status': 'duplicate',
+        assert result == {'status': 'redundant',
                           'action': 'unsubscribe',
                           'resource': '/child'}
 

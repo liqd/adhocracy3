@@ -57,7 +57,7 @@ STATUS is either:
 
 * "ok" if the request was processed successfully and changed the internal state
   of the server.
-* "duplicate" if the request was unnecessary since it already corresponded to
+* "redundant" if the request was unnecessary since it already corresponded to
   internal state of the server (the client tried to subscribe to a resource it
   has already subscribed or to unsubscribe from a resource it hasn't
   subscribed).

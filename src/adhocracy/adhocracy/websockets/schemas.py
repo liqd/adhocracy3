@@ -25,7 +25,7 @@ class Status(colander.SchemaNode):
     """A status sent to the client."""
 
     schema_type = colander.String
-    validator = colander.OneOf(['ok', 'duplicate'])
+    validator = colander.OneOf(['ok', 'redundant'])
     default = 'ok'
 
 
