@@ -101,6 +101,19 @@ Git Conventions
 ---------------
 
 
+Terminology
+~~~~~~~~~~~
+
+If branch A is branched from branch B, then B is called A's *base
+branch*.
+
+A branch is called *published* if it has been pushed to a repository
+that is accessed by more than one user.  Usually, this means the
+project-specific central upstream repository, but a branch is also
+considered published if one developer has pushed changes to another
+developer's laptop.)
+
+
 Branch types
 ~~~~~~~~~~~~
 
