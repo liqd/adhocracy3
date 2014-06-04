@@ -140,12 +140,12 @@ the points in the repository where a branch branched off other
 branches in the past.  We call these points *branch points*.
 
 Note that the information at which point a branch branched off its
-direct parent branch is `not maintained by git
+direct base branch is `not maintained by git
 <http://stackoverflow.com/questions/17581026/branch-length-where-does-a-branch-start-in-git>`_.
-This does not make the question of the direct parent branch any less
+This does not make the question of the direct base branch any less
 meaningful, but it makes it tricky to answer.
 
-If the parent branch is ``master``, then you can get a reference to
+If the base branch is ``master``, then you can get a reference to
 the current branch like this::
 
     git show-branch HEAD master | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'
@@ -241,13 +241,10 @@ Dos and Don'ts
      git config --global merge.ff true
 
 4. Merging ancestor branches into a current branch is ok.  This makes
-   it feasible to keep up to date with changes in a parent branch in
-   long-living feature branches.  The merge commit will be eliminated
+   it feasible to keep up to date with changes in a base branch in
+   long-living story or personalized branches.  The merge commit will be eliminated
    if the current branch is rebased on the ancestor branch HEAD at any
    point in time after the merge.
-
-   [REVIEW[cs]: what's a "feature branch"? The term is not used or defined
-   elsewhere in this document.]
 
    [FIXME: check: verschwinden merges bei rebase?]
 
@@ -417,7 +414,7 @@ it is convenient to have it right there.
 
 During the review phase, ``REVIEW`` comments may either be removed
 manually or transformed into helpful comments to be imported into the
-parent branch.
+base branch.
 
 
 Dos and Don'ts
