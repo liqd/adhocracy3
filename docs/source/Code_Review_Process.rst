@@ -158,7 +158,7 @@ before they are merged into their parents.  (Volatile branches may
 always be rebased, because there is no guarantee that they behave in
 any way as branches should.)
 
-Rebasing has to advantages::
+Rebasing has two advantages::
 
   - it shrinks the diff between the parent branch and the HEAD of the
     new branch;
@@ -343,7 +343,7 @@ replaced by the respective comment lexeme (``#`` for python, ``//``
 for javascript and typescript, ``<!--`` for html (with the extra
 ``-->`` at the end), and so on).
 
-Further lines may be added after the this.  Those just need to match
+Further lines may be added after this.  Those just need to match
 ``^# `` or corresponding.  Note the whitespace in both the first and
 all following lines.
 
