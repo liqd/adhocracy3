@@ -36,7 +36,7 @@ Example::
         }
     }
 
-Both adpaters provide a method ``elemRefs`` that consume a container
+Both adapters provide a method ``elemRefs`` that consume a container
 resource of a given content type, and return a list of paths to more
 resources, namely the elements in the container.
 
@@ -141,7 +141,7 @@ rich semantics can then be used without interfering with the two.
 This makes the directive ``<adh-listing>`` available.  The ``Listing``
 constructor (in this example) takes one class parameter, namely an
 adapter instance that expects injection of the asynchronicity service
-``$q``.  In order to inject the service into the class paramter's
+``$q``.  In order to inject the service into the class parameter's
 constructor, an extra function call is wrapped around createDirective.
 
 There are several ways in which behavior of existing widgets can be
@@ -253,11 +253,11 @@ Misc Ideas and Remarks
 ----------------------
 
 
-Heterogenous Listings
-~~~~~~~~~~~~~~~~~~~~~
+Heterogeneous Listings
+~~~~~~~~~~~~~~~~~~~~~~
 
 If we wanted to specify search results that contain a range of
-hetergenuous objects, writing the adapter is slightly more
+heterogeneous objects, writing the adapter is slightly more
 challenging: On the one hand, we may want to do something specific
 where possible, such as allowing for inline-comments::
 
@@ -287,5 +287,5 @@ The solution is to resort to dynamic checks::
 So the idea of statically typed adapter hierarchies works, but can be
 extended to dynamically typed ones that are arbitrarily flexible.
 When maintaining and developing adhocracy, you can always pick the
-adpater closest to what you need, and you will get less code that is
+adapter closest to what you need, and you will get less code that is
 more robust and easier to read.
