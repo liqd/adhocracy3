@@ -1,17 +1,291 @@
-
-    // a note on heterogenous lists.
-    //
-    // rationale: on the one hand, we want to be able to restrict element
-    // types in the implementation of the listing and row widgets.  this
-    // has the benefit of giving concise implementations for specific
-    // container and element types, and makes the task of deriving new
-    // such types much less complex and much more robust.
-    //
-    // on the other hand, we want to allow for lists that contain a wide
-    // range of different elements in different rows, and we want to
-    // dispatch a different widget for each row individually.  this is the
-    // idea of hetergenous containers, and it can be easily implemented
-    // with a class HeterogenousListingElementAdapter that extends
-    // ListingElementAdapter.
+Adhocracy Generic Widgets
+=========================
 
 
+Introduction
+------------
+
+In the context of the adhocracy software project, a *widget* is a
+class for creating angular directives dedicated to rendering
+resources.  Each widget handles a specific (set of) content type(s)
+and UI context(s).  They are called *generic* because the set of
+content types and contexts can be configured quite flexibly.
+
+This document outlines implementation and usage of widgets.  It
+assumes some familiarity with angularjs and typescript.
+
+
+Adapters Classes
+----------------
+
+An adapter class provides a uniform interface to resources of
+different content types that share some structure (in the most common
+case, property sheets).
+
+Example::
+
+    export class AbstractListingContainerAdapter {
+        public elemRefs(container : any) : string[] {
+            return [];
+        }
+    }
+
+    export class ListingPoolAdapter extends AbstractListingContainerAdapter {
+        public elemRefs(container : Types.Content<Resources.HasIPoolSheet>) {
+            return container.data["adhocracy.sheets.pool.IPool"].elements;
+        }
+    }
+
+Both adpaters provide a method ``elemRefs`` that consume a container
+resource of a given content type, and return a list of paths to more
+resources, namely the elements in the container.
+
+The first class does not expect anything from the container it gets
+passed and always returns the empty string.
+
+The second requires the container to have the ``Pool`` sheet and gets
+the element paths from there.
+
+(Adapter classes should not be generic, as that makes using them
+properly in widget classes something between awkward, less secure, and
+impossible.)
+
+
+Scope Interfaces
+----------------
+
+Widget scopes must be typed in the controller.  The concrete type may
+depend on type parameters of the generic Widget class type.
+
+Example::
+
+    export interface ListingScope<Container> {
+        path: string;
+        title: string;
+    }
+
+    export class Listing<Container ...>
+        [...]
+        scope: {
+            path: "@",
+            title: "@"
+        },
+        transclude: true,
+        controller: [
+            "$scope",
+            function($scope: ListingScope<Container>) : void
+            {
+                [...]
+            }
+
+Since templates (1) ideally are to be maintained by designers rather
+than software developers, and (2) are not type-checked by typescript,
+they must contain as little code as possible.  Everything that can be
+written down in the widget class, should be.
+
+
+Widget Classes
+--------------
+
+A simple widget class has the following form::
+
+    export class WidgetName<TypeParamters ...>
+    {
+        public static ...
+
+        constructor(
+            injectedService1,
+            injectedService1,
+            public classParameter
+        ) {
+            ...
+        }
+
+        public createDirective() {
+            var _self = this;
+            var _class = (<any>_self).constructor;
+
+            return {
+                restrict: ...
+                templateUrl: ...
+                scope: ...
+                controller: [
+                    "$scope",
+                    "adhHttp",
+                    (
+                        $scope: TypeParameter,
+                        ...
+                    ) =>
+                    {
+                        ...
+                    }
+                ];
+            };
+        }
+    }
+
+The declaration of ``_self`` and ``_class`` should be used like this
+in all instance methods that make use of them.  ``this`` with all its
+rich semantics can then be used without interfering with the two.
+
+``createDirective`` is used for registering a new directive::
+
+    app.directive(
+        "adhListing",
+        [
+            "$q",
+            ($q) => new Widgets.Listing(new Widgets.ListingElementAdapter($q)).createDirective()
+        ]
+    );
+
+This makes the directive ``<adh-listing>`` available.  The ``Listing``
+constructor (in this example) takes one class parameter, namely an
+adapter instance that expects injection of the asynchronicity service
+``$q``.  In order to inject the service into the class paramter's
+constructor, an extra function call is wrapped around createDirective.
+
+There are several ways in which behavior of existing widgets can be
+changed to adapt to new requirements.
+
+
+Static class attributes and extension
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Example::
+
+    export class SomeWidget
+    {
+        public static templateUrl: string = "/Widgets/Listing.html";
+
+        ...
+
+        public createDirective() {
+            var _self = this;
+            var _class = (<any>_self).constructor;
+
+            return {
+                templateUrl: _class.templateUrl;
+                ...
+
+Directives constructed from ``SomeWidget`` will always use the same
+template, no matter where used.  If you want to change the template,
+write the following trivial extension class::
+
+    export class SomeWidgetForSomeFancyClient extends SomeWidget
+    {
+        public static templateUrl: string = "/Widgets/FancyListing.html";
+    }
+
+
+Constructor Params
+~~~~~~~~~~~~~~~~~~
+
+If you want to decide on behavior every time you register a directive,
+you can add constructor parameters::
+
+    export class SomeWidget
+    {
+        constructor(public title: string) {
+            return;
+        }
+
+        public createDirective() {
+            var _self = this;
+            var _class = (<any>_self).constructor;
+
+            return {
+                controller: ($scope) =>
+                    {
+                        $scope.title = _self.title;
+                        ...
+
+
+Directive element attributes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can pass data from the xml element in the template, and the widget
+can find it in the ``$scope``.
+
+In the template::
+
+    <adh-listing path="/adhocracy/Proposals">
+    </adh-listing>
+
+In the controller::
+
+    return {
+        scope: {
+            path: "@"
+        }
+        controller: ($scope) =>
+            {
+                $http.get($scope.path).success(...);
+                ....
+
+
+Directive element body
+~~~~~~~~~~~~~~~~~~~~~~
+
+The angular directive ``ngRepeat`` copies its body once for every
+element in an array, and inserts all copies into the dom tree rendered
+from the template.  You can do this with adhocracy widgets as well.
+As above and very similar to ``ngRepeat``, assume we have a listing
+widget that lists every element in a form outlined in the body.
+
+The listing template will contain::
+
+    <span ng-transclude></span>
+
+The object returned by ``createDirective`` in the widget class must
+have the following attribute::
+
+    transclude: true
+
+And finally, the widget caller must add something to the element
+body::
+
+    <adh-listing path="/adhocracy/Proposals">
+        <adh-element></adh-element>
+    </adh-listing>
+
+
+Misc Ideas and Remarks
+----------------------
+
+
+Heterogenous Listings
+~~~~~~~~~~~~~~~~~~~~~
+
+If we wanted to specify search results that contain a range of
+hetergenuous objects, writing the adapter is slightly more
+challenging: On the one hand, we may want to do something specific
+where possible, such as allowing for inline-comments::
+
+    export class ListingElementWithCommentsAdapter extends ... {
+        public renderCommentButton: ... = ...
+        ...
+    }
+
+On the other, we want do not want to insist that it is possible for
+all elements.
+
+The solution is to resort to dynamic checks::
+
+    export class ArbitraryListingElementAdapter extends ... {
+        public renderItAll(...) {
+            ...
+            if('comments' in self) {
+                ...
+            } else {
+                ...  // (do some padding where the comment button is missing)
+            }
+            if('votes' in self) {
+                ...
+            }
+            ...
+
+So the idea of statically typed adapter hierarchies works, but can be
+extended to dynamically typed ones that are arbitrarily flexible.
+When maintaining and developing adhocracy, you can always pick the
+adpater closest to what you need, and you will get less code that is
+more robust and easier to read.
