@@ -104,6 +104,30 @@ export function deepeq(a : any, b : any) : boolean {
 }
 
 
+// in a way another function in the deep* family: check that _super
+// has only attributes also available in _sub.  also check recursively
+// (if _super has an object attribute, its counterpart in _sub must
+// have the same attributes, and so on).
+export function subtypeof(_sub, _super) {
+    if (typeof _sub !== typeof _super) {
+        return false;
+    }
+
+    if (typeof(_sub) === "object") {
+        if (_sub === null || _super === null) {
+            return true;
+        }
+
+        for (var x in _super) {
+            if (!(x in _sub)) { return false; }
+            if (!subtypeof(_sub[x], _super[x])) { return false; }
+        }
+    }
+
+    return true;
+}
+
+
 // sugar for angular
 export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
     "use strict";

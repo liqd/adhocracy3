@@ -82,7 +82,21 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
 
 export function importContent<Content extends Types.Content<any>>(obj : Content) : Content {
     "use strict";
-    return obj;
+
+    // FIXME: it would be nice if this function could throw an
+    // exception at run-time if the type of obj does not match
+    // Content.  however, not only is Content a compile-time entity,
+    // but it may very well be based on an interface that has no
+    // run-time entity anywhere.  two options:
+    //
+    // (1) http://stackoverflow.com/questions/24056019/is-there-a-way-to-check-instanceof-on-types-dynamically
+    //
+    // (2) typescript language feature request! :)
+
+    // (at least check if it's falsy...)
+    if (obj) {
+        return obj;
+    }
 }
 
 export function exportContent<Content extends Types.Content<any>>(obj : Content) : Content {
