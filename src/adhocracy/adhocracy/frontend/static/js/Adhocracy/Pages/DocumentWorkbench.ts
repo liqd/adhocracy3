@@ -7,6 +7,7 @@ import angular = require("angular");
 
 import Types = require("Adhocracy/Types");
 import AdhHttp = require("Adhocracy/Services/Http");
+import AdhUser = require("Adhocracy/Services/User");
 
 import Resources = require("Adhocracy/Resources");
 import Widgets = require("Adhocracy/Widgets");
