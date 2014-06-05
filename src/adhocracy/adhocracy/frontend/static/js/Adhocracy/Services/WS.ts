@@ -27,6 +27,8 @@ export interface IService {
 }
 
 export function factory() : IService {
+    "use strict";
+
     var ws = openWs();
     var subscriptions = {};
 

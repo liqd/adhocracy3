@@ -53,7 +53,8 @@
         ["indexSignature", "space"]
     ],
     "use-strict": [true,
-        "check-module"
+        "check-module",
+        "check-function"
     ],
     "variable-name": [true, "allow-leading-underscore"],
     "whitespace": [true,

@@ -47,6 +47,8 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
 
 
 export function run() {
+    "use strict";
+
     var app = angular.module("adhocracy3SampleFrontend", []);
 
     AdhUser.register(app, "adhUser", "adhLogin");

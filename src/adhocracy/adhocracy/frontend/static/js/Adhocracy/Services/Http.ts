@@ -24,6 +24,8 @@ export interface IService<Content extends Types.Content<any>> {
 }
 
 export function factory<Content extends Types.Content<any>>($http : ng.IHttpService) : IService<Content> {
+    "use strict";
+
     var adhHttp : IService<Content> = {
         get: get,
         put: put,
@@ -84,10 +86,13 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
 // transform objects on the way in and out
 
 export function importContent<Content extends Types.Content<any>>(obj : Content) : Content {
+    "use strict";
     return obj;
 }
 
 export function exportContent<Content extends Types.Content<any>>(obj : Content) : Content {
+    "use strict";
+
     // FIXME: newobj should be a copy, not a reference
     var newobj : Content = obj;
 

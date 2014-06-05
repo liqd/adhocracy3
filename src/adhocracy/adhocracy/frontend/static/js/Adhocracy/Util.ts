@@ -1,5 +1,6 @@
 // cut ranges out of an array - original by John Resig (MIT Licensed)
 export function cutArray(a : any[], from : number, to ?: number) : any[] {
+    "use strict";
     var rest = a.slice((to || from) + 1 || a.length);
     a.length = from < 0 ? a.length + from : from;
     a.push.apply(a, rest);
@@ -7,10 +8,12 @@ export function cutArray(a : any[], from : number, to ?: number) : any[] {
 };
 
 export function isInfixOf(needle : any, hay : any[]) : boolean {
+    "use strict";
     return hay.indexOf(needle) !== -1;
 };
 
 export function parentPath(url : string) : string {
+    "use strict";
     return url.substring(0, url.lastIndexOf("/"));
 };
 
@@ -19,6 +22,8 @@ export function parentPath(url : string) : string {
 // not share sub-structures as the original.  (I think instances of
 // classes other than Object, Array are not treated properly either.)
 export function deepcp(i) {
+    "use strict";
+
     if (typeof(i) === "object") {
         var o : Object;
         if (i === null) {
@@ -47,6 +52,8 @@ export function deepcp(i) {
 // object are copied using deepcp().  Crashes if target is not an
 // object.
 export function deepoverwrite(source, target) {
+    "use strict";
+
     var k;
     try {
         for (k in target) {
@@ -69,6 +76,7 @@ export function deepoverwrite(source, target) {
 // are equal.  (This is likely to be an approximation, but it should
 // work at least for json objects.)
 export function deepeq(a : any, b : any) : boolean {
+    "use strict";
     if (typeof a !== typeof b) {
         return false;
     }
@@ -98,11 +106,14 @@ export function deepeq(a : any, b : any) : boolean {
 
 // sugar for angular
 export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
+    "use strict";
+
     var deferred = $q.defer();
     deferred.resolve();
     return deferred.promise.then(() => { return obj; });
 }
 
 export function normalizeName(name: string) : string {
+    "use strict";
     return name.toLowerCase().replace(/\ /g, "_");
 }
