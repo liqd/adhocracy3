@@ -3,6 +3,8 @@
 *.swo
 *.pyc
 *.pyo
+*.d.ts
+!src/adhocracy/adhocracy/frontend/static/js/_all.d.ts
 __pycache__
 /eggs
 /parts
@@ -50,4 +52,3 @@ a3-backend-mockup
 /src/adhocracy/tests/output.xml
 .idea/
 adhocracy3/
-
