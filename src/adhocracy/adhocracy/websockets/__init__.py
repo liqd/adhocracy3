@@ -1,5 +1,6 @@
 """Asynchronous client-server communication via Websockets."""
 from collections import defaultdict
+from collections.abc import Hashable
 from collections.abc import Iterable
 from json import dumps
 from json import loads
@@ -44,13 +45,13 @@ class ClientTracker():
         self._clients2resource_oids = defaultdict(set)
         self._resource_oids2clients = defaultdict(set)
 
-    def is_subscribed(self, client: str, resource: IResource) -> bool:
+    def is_subscribed(self, client: Hashable, resource: IResource) -> bool:
         """Check whether a client is subscribed to a resource."""
         oid = get_oid(resource)
         return (client in self._clients2resource_oids and
                 oid in self._clients2resource_oids[client])
 
-    def subscribe(self, client: str, resource: IResource) -> bool:
+    def subscribe(self, client: Hashable, resource: IResource) -> bool:
         """Subscribe a client to a resource, if necessary.
 
         Returns True if the subscription was successful, False if it was
@@ -63,7 +64,7 @@ class ClientTracker():
         self._resource_oids2clients[oid].add(client)
         return True
 
-    def unsubscribe(self, client: str, resource: IResource) -> bool:
+    def unsubscribe(self, client: Hashable, resource: IResource) -> bool:
         """Unsubscribe a client from a resource, if necessary.
 
         Returns True if the unsubscription was successful, False if it was
@@ -85,7 +86,7 @@ class ClientTracker():
         if not multidict[key]:
             del multidict[key]
 
-    def delete_all_subscriptions(self, client: str) -> None:
+    def delete_all_subscriptions(self, client: Hashable) -> None:
         """Delete all subscriptions for a client."""
         oid_set = self._clients2resource_oids.pop(client, set())
         for oid in oid_set:
@@ -106,7 +107,7 @@ class ClientCommunicator(WebSocketServerProtocol):
     """Communicates with a client through a WebSocket connection."""
 
     # All instances of this class share the same tracker
-    _tracker = ClientTracker()
+    tracker = ClientTracker()
 
     def __init__(self, context):
         """Create a new instance."""
@@ -206,15 +207,15 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def _update_resource_subscription(self, action: str,
                                       resource: str) -> bool:
-        """(Un)subscribe a client to/from a resource.
+        """(Un)subscribe this instance to/from a resource.
 
         :return: True if the request was necessary, False if it was an
                  unnecessary no-op
         """
         if action == 'subscribe':
-            return self._tracker.subscribe(self._client, resource)
+            return self.tracker.subscribe(self, resource)
         else:
-            return self._tracker.unsubscribe(self._client, resource)
+            return self.tracker.unsubscribe(self, resource)
 
     def _send_status_confirmation(self, update_was_necessary: bool,
                                   action: str, resource: IResource):
@@ -263,14 +264,17 @@ class ClientCommunicator(WebSocketServerProtocol):
              'version': new_version}))
 
     def onClose(self, was_clean: bool, code: int, reason: str):  # noqa
-        self._tracker.delete_all_subscriptions(self._client)
+        self.tracker.delete_all_subscriptions(self)
         clean_str = 'Clean' if was_clean else 'Unclean'
         logger.debug('%s close of WebSocket connection to %s; reason: %s',
                      clean_str, self._client, reason)
 
 
-class EventDispatcher():
+def resource_modified(resource: IResource) -> None:
+    """Notify subscribers if a resource has been modified.
 
-    """Dispatches events to interested clients."""
-
-    # TODO define and implement required methods
+    :param resource: a Simple that has been changed or a Pool whose metadata
+                     has been changed
+    """
+    for client in ClientCommunicator.tracker.iterate_subscribers(resource):
+        client.send_modified_notification(resource)
