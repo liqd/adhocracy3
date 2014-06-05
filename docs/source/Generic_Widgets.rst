@@ -248,6 +248,9 @@ body::
         <adh-element></adh-element>
     </adh-listing>
 
+[FIXME: document scope propagation; see FIXME near class
+Widget.Listing.]
+
 
 Misc Ideas and Remarks
 ----------------------
