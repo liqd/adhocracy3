@@ -49,6 +49,7 @@ def includeme(config):  # pragma: no cover
     config.include('.evolution')
     config.include('.graph')
     config.include('.rest')
+    config.include('.websockets')
     config.include('.frontend')
 
 

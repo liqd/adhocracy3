@@ -6,6 +6,8 @@ from json import dumps
 from json import loads
 from logging import getLogger
 
+import asyncio
+from autobahn.asyncio.websocket import WebSocketServerFactory
 from autobahn.asyncio.websocket import WebSocketServerProtocol
 from autobahn.websocket.protocol import ConnectionRequest
 from pyramid.traversal import resource_path
@@ -323,3 +325,14 @@ def notify_new_version(resource: IResource, new_version: IItemVersion) -> None:
     """
     for client in ClientCommunicator.tracker.iterate_subscribers(resource):
         client.send_new_version_notification(resource, new_version)
+
+
+def includeme(config):
+    """Open WebSocket connection on port 8080."""
+    port = 8080
+    factory = WebSocketServerFactory('ws://localhost:{}'.format(port))
+    factory.protocol = ClientCommunicator
+    loop = asyncio.get_event_loop()
+    coro = loop.create_server(factory, '127.0.0.1', port)
+    loop.run_until_complete(coro)
+    logger.debug('Started WebSocket server listening on port %i', port)
