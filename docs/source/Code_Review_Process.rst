@@ -158,15 +158,11 @@ meaningful, but it makes it tricky to answer.
 If the base branch is ``master``, then you can get a reference to
 the branch point of the current branch like this::
 
-    git show-branch HEAD master | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'
+    export BRANCHPOINT=`git rev-list HEAD ^master --topo-order | tail -n 1`~1
+    git show $BRANCHPOINT
 
-The commit message can be found here::
-
-    git show `git show-branch HEAD master | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'`
-
-or, equivalently and more elegantly::
-
-    git show `git rev-list HEAD ^master --topo-order | tail -n 1`~1
+(``git show-branch`` yields more relevant data, but in a less
+machine-readable form.)
 
 
 Rebase and +n-branch logic
@@ -194,19 +190,11 @@ must happen according to *+n-branch logic*::
     # (complete work on branch, say, 2014-05-mf-bleep based on, say, master)
     # (make sure that upstream is set to origin/2014-05-mf-bleep)
     git push -v
-    export BRANCHPOINT=`git show-branch HEAD master | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'`  # (see last section)
-
     git checkout -b 2014-05-mf-bleep+1
-    git rebase --onto master $BRANCHPOINT
+    git rebase master
     git push -v origin 2014-05-mf-bleep+1
 
 Remarks:
-
-- Usually you don't strictly need the $BRANCHPOINT argument, and could
-  simply write ``git rebase master`` instead that reasonably finds the
-  most recent branch point and uses that.  The above lines have the
-  benefit of being more explicit, and thus easier to inspect and
-  modify.
 
 - the un-rebased branch has no +n suffix, the first rebase has '+1',
   the second '+2' and so on.
@@ -266,7 +254,7 @@ not a strong rule.
 
 All changes and comments that the reviewer makes are either made
 directly in the code (see Section 'Markup language' below), or in a
-file called ``REVIEW.txt`` and located in the working copy root.
+file called ``REVIEW.txt`` located in the working copy root.
 Reviewer and reviewee should agree on which option is preferred for
 what.
 
@@ -338,7 +326,7 @@ Recipes
 As above, first do something like::
 
     git checkout branch-to-be-reviewed
-    export BRANCHPOINT=`git show-branch HEAD base-branch | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'`
+    export BRANCHPOINT=...  (see above)
 
 To see which files have changed::
 
