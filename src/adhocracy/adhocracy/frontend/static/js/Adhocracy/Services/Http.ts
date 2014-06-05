@@ -33,21 +33,12 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
         metaApiSheet: metaApiSheet
     };
 
-    function assertResponse(msg : string, path : string) {
-        return (resp) => {
-            if (resp.status !== 200) {
-                throw (msg + ": http error " + resp.status.toString() + " on path " + path);
-            }
-            return importContent(resp.data);
-        };
-    }
-
     function get(path : string) : ng.IPromise<Content> {
-        return $http.get(path).then(assertResponse("adhHttp.get", path));
+        return $http.get(path).success(importContent).error(logBackendError);
     }
 
     function put(path : string, obj : Content) : ng.IPromise<Content> {
-        return $http.put(path, obj).then(assertResponse("adhHttp.put", path));
+        return $http.put(path, obj).success(importContent).error(logBackendError);
     }
 
     function postNewVersion(oldVersionPath : string, obj : Content) : ng.IPromise<Content> {
@@ -56,11 +47,17 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
             headers: { follows: oldVersionPath },
             params: {}
         };
-        return $http.post(dagPath, exportContent(obj), config).then(assertResponse("adhHttp.postNewVersion", dagPath));
+        return $http
+            .post(dagPath, exportContent(obj), config)
+            .success(importContent)
+            .error(logBackendError);
     }
 
     function postToPool(poolPath : string, obj : Content) : ng.IPromise<Content> {
-        return $http.post(poolPath, exportContent(obj)).then(assertResponse("adhHttp.postToPool", poolPath));
+        return $http
+            .post(poolPath, exportContent(obj))
+            .success(importContent)
+            .error(logBackendError);
     }
 
     // query meta-api for resource content types.  return the json
