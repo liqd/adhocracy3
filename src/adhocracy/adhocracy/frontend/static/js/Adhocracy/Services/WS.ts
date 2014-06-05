@@ -3,7 +3,6 @@
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import Types = require("Adhocracy/Types");
-import AdhHttp = require("Adhocracy/Services/Http");
 
 
 // web sockets
@@ -18,15 +17,13 @@ import AdhHttp = require("Adhocracy/Services/Http");
 // FIXME: the upstream should be used for sending 'ADD' and 'REMOVE'
 // requests to the server, so we won't get any subscriberless content.
 
-var wsuri : string = "ws://" + window.location.host + AdhHttp.jsonPrefix + "?ws=all";
-
 export interface IService {
     subscribe: (path : string, update : () => void) => void;
     unsubscribe: (path : string) => void;
     destroy: () => void;
 }
 
-export function factory() : IService {
+export function factory(adhConfig) : IService {
     "use strict";
 
     var ws = openWs();
@@ -49,7 +46,7 @@ export function factory() : IService {
     }
 
     function openWs() {
-        ws = new WebSocket(wsuri);
+        ws = new WebSocket(adhConfig.wsuri);
 
         ws.onmessage = function(event) {
             var path = event.data;

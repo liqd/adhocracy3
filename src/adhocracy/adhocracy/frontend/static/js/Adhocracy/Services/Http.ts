@@ -12,8 +12,6 @@ import Util = require("Adhocracy/Util");
 // ``Types.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
 
-export var jsonPrefix : string = "/adhocracy";
-
 export interface IService<Content extends Types.Content<any>> {
     get : (path : string) => ng.IPromise<Content>;
     put : (path : string, obj : Content) => ng.IPromise<Content>;

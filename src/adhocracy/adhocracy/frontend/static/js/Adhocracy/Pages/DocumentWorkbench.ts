@@ -8,11 +8,10 @@ import angular = require("angular");
 import Types = require("Adhocracy/Types");
 import AdhHttp = require("Adhocracy/Services/Http");
 import AdhUser = require("Adhocracy/Services/User");
+import AdhConfig = require("Adhocracy/Services/Config");
 
 import Resources = require("Adhocracy/Resources");
 import Widgets = require("Adhocracy/Widgets");
-
-var templatePath : string = "/frontend_static/templates";
 
 
 // contents of the resource with view mode.
@@ -53,6 +52,7 @@ export function run() {
     var app = angular.module("adhocracy3SampleFrontend", []);
 
     AdhUser.register(app, "adhUser", "adhLogin");
+    AdhConfig.register(app, "adhConfig");
 
     // services
 
@@ -114,23 +114,24 @@ export function run() {
     // widget-based directives
 
     app.directive("adhListing",
-                  () => new Widgets.Listing(new Widgets.ListingPoolAdapter()).createDirective());
+                  ["adhConfig", (adhConfig) =>
+                   new Widgets.Listing(new Widgets.ListingPoolAdapter()).createDirective(adhConfig)]);
 
     app.directive("adhListingElement",
-                  ["$q", ($q) =>
-                   new Widgets.ListingElement(new Widgets.ListingElementAdapter($q)).createDirective()]);
+                  ["$q", "adhConfig", ($q, adhConfig) =>
+                   new Widgets.ListingElement(new Widgets.ListingElementAdapter($q)).createDirective(adhConfig)]);
 
     app.directive("adhListingElementTitle",
-                  ["$q", "adhHttp", ($q, adhHttp) =>
-                   new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective()]);
+                  ["$q", "adhHttp", "adhConfig", ($q, adhHttp, adhConfig) =>
+                   new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective(adhConfig)]);
 
 
     // application-specific directives
 
-    app.directive("adhDocumentWorkbench", function() {
+    app.directive("adhDocumentWorkbench", ["adhConfig", function(adhConfig) {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/Pages/DocumentWorkbench.html",
+            templateUrl: adhConfig.templatePath + "/Pages/DocumentWorkbench.html",
             controller: ["adhHttp", "$scope", "adhUser",
                          function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>,
                                   $scope   : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>,
@@ -140,7 +141,7 @@ export function run() {
                     $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
                 };
 
-                adhHttp.get(AdhHttp.jsonPrefix).then((pool) => {
+                adhHttp.get(adhConfig.jsonPrefix).then((pool) => {
                     $scope.pool = pool;
                     $scope.poolEntries = [];
                     $scope.user = user;
@@ -175,13 +176,13 @@ export function run() {
                 });
             }]
         };
-    });
+    }]);
 
 
-    app.directive("adhProposalVersionDetail", function() {
+    app.directive("adhProposalVersionDetail", ["adhConfig", function(adhConfig) {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/Resources/IProposalVersion/Detail.html",
+            templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/Detail.html",
             scope: {
                 content: "=",
                 viewmode: "="
@@ -217,22 +218,22 @@ export function run() {
                 };
             }]
         };
-    });
+    }]);
 
-    app.directive("adhProposalVersionEdit", function() {
+    app.directive("adhProposalVersionEdit", ["adhConfig", function(adhConfig) {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/Resources/IProposalVersion/Edit.html",
+            templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/Edit.html",
             scope: {
                 content: "="
             }
         };
-    });
+    }]);
 
-    app.directive("adhProposalVersionNew", ["$http", "$q", function($http: ng.IHttpService, $q : ng.IQService) {
+    app.directive("adhProposalVersionNew", ["$http", "$q", "adhConfig", function($http: ng.IHttpService, $q : ng.IQService, adhConfig) {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/Resources/IProposalVersion/New.html",
+            templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/New.html",
             scope: {
                 onNewProposal: "="
             },
@@ -259,10 +260,10 @@ export function run() {
     }]);
 
 
-    app.directive("adhSectionVersionDetail", ["RecursionHelper", function(RecursionHelper) {
+    app.directive("adhSectionVersionDetail", ["adhConfig", "RecursionHelper", function(adhConfig, RecursionHelper) {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/Resources/ISectionVersion/Detail.html",
+            templateUrl: adhConfig.templatePath + "/Resources/ISectionVersion/Detail.html",
             compile: (element) => RecursionHelper.compile(element),
             scope: {
                 ref: "=",
@@ -288,10 +289,10 @@ export function run() {
     }]);
 
 
-    app.directive("adhParagraphVersionDetail", function() {
+    app.directive("adhParagraphVersionDetail", ["adhConfig", function(adhConfig) {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/Resources/IParagraphVersion/Detail.html",
+            templateUrl: adhConfig.templatePath + "/Resources/IParagraphVersion/Detail.html",
             scope: {
                 ref: "=",
                 viewmode: "="
@@ -313,13 +314,13 @@ export function run() {
                 $scope.$on("commit", commit);
             }]
         };
-    });
+    }]);
 
 
-    app.directive("adhDocumentSheetEdit", ["$http", "$q", function($http, $q) {
+    app.directive("adhDocumentSheetEdit", ["$http", "$q", "adhConfig", function($http, $q, adhConfig) {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/Sheets/IDocument/Edit.html",
+            templateUrl: adhConfig.templatePath + "/Sheets/IDocument/Edit.html",
             scope: {
                 sheet: "="
             },
@@ -336,26 +337,26 @@ export function run() {
         };
     }]);
 
-    app.directive("adhDocumentSheetShow", function() {
+    app.directive("adhDocumentSheetShow", ["adhConfig", function(adhConfig) {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/Sheets/IDocument/Show.html",
+            templateUrl: adhConfig.templatePath + "/Sheets/IDocument/Show.html",
             scope: {
                 sheet: "="
             }
         };
-    });
+    }]);
 
 
-    app.directive("adhParagraphSheetEdit", function() {
+    app.directive("adhParagraphSheetEdit", ["adhConfig", function(adhConfig) {
         return {
             restrict: "E",
-            templateUrl: templatePath + "/Sheets/IParagraph/Edit.html",
+            templateUrl: adhConfig.templatePath + "/Sheets/IParagraph/Edit.html",
             scope: {
                 sheet: "="
             }
         };
-    });
+    }]);
 
 
     // get going
