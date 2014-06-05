@@ -15,10 +15,7 @@ Status of this document
 This document should be read as request for comments (RFC).  It will
 be used for a trial period of two sprints (starting from 2014-06-10);
 in the sprint starting on 2014-07-21, a decision will be made on which
-parts of this document will remain valid.  [FIXME: @tobi,nico: ist das
-sinnvoll als versuchsphase?  kürzer?  länger?]
-
-.. REVIEW[tb]: ich find's sinnvoll
+parts of this document will remain valid.
 
 
 Requirements
@@ -159,7 +156,7 @@ This does not make the question of the direct base branch any less
 meaningful, but it makes it tricky to answer.
 
 If the base branch is ``master``, then you can get a reference to
-the current branch like this::
+the branch point of the current branch like this::
 
     git show-branch HEAD master | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'
 
@@ -167,12 +164,9 @@ The commit message can be found here::
 
     git show `git show-branch HEAD master | tail -1 | perl -ne '/\[(HEAD\~\d+)\]/ && print "$1\n"'`
 
+or, equivalently and more elegantly::
 
-..
-   REVIEW[tb]: This should work equally well and looks simpler
-   to me (the ``--topo-order`` might not event be necessary)::
-
-       git show `git rev-list HEAD ^master --topo-order | tail -n 1`~1
+    git show `git rev-list HEAD ^master --topo-order | tail -n 1`~1
 
 
 Rebase and +n-branch logic
@@ -206,18 +200,13 @@ must happen according to *+n-branch logic*::
     git rebase --onto master $BRANCHPOINT
     git push -v origin 2014-05-mf-bleep+1
 
-[FIXME: we probably want to have a shell or python script for this.]
-
-..
-   REVIEW[tb]: do not agree. My version should be simple enough to remember
-   and I prefer to know what I am doing
-
-..
-   REVIEW[nidi]: Don't understand the BRANCHPOINT issue here. If your branch
-   branches from master, simply do `git rebase master` on the +1 branch. You
-   don't need the two or three argument rebase form.
-
 Remarks:
+
+- Usually you don't strictly need the $BRANCHPOINT argument, and could
+  simply write ``git rebase msater`` instead that reasonably finds the
+  most recent branch point and uses that.  The above lines have the
+  benefit of being more explicit, and thus easier to inspect and
+  modify.
 
 - the un-rebased branch has no +n suffix, the first rebase has '+1',
   the second '+2' and so on.
@@ -290,6 +279,11 @@ Synchronous Process
 1. The author chooses a reviewer and contacts her in person or by
    any means preferred by both.
 
+   All documentation of the pull request must be contained in the
+   commit log (short and long commit messages).  Any documentation to
+   the PR as a whole is appended to the commit log in an empty commit
+   (``git commit --allow-empty``).
+
 2. The reviewer checks out the branch to be reviewed, and makes
    changes and comments in the working copy.
 
@@ -313,12 +307,8 @@ Asynchronous Process
    (e.g. names or the name of the subsystem).
 
    All documentation of the pull request must be contained in the
-   commit log (short and long commit messages).  Any documentation to
-   the PR as a whole is appended to the commit log in an empty commit
-   (``git commit --allow-empty``).  The commit log (or the last
+   commit log (see synchronous process).  The commit log (or the last
    commit) may be contained in the email body.
-
-   .. REVIEW[tb]: This should also apply to the synchronous process
 
 2. *(assign pull request)* A reviewer sends a response to the PR on
    a3-dev with subject ``Re: [PR] ...`` and an optional message in the
@@ -336,17 +326,10 @@ Asynchronous Process
    merged until all review comments are resolved.
 
 5. *(re-assign)* If there are changes, the reviewer sends a response
-   to the PR to the author alone (not to a3-dev).  Body may be empty
+   to the PR to a3-dev.  Body may be empty
    or contain the commit log.  At this point, reviewer and author
    change roles, and the author becomes the reviewee.  Proceed at
    step 3.
-
-   ..
-      REVIEW[tb]: I would prefer if the complete review process was public,
-      i.e. all mails are send to a3-dev.
-
-   ..
-      REVIEW[nidi]: Me too.
 
 
 Recipes
@@ -385,7 +368,7 @@ commands into `tig`_
 Markup language
 ~~~~~~~~~~~~~~~
 
-The file REVIEW.txt may contain any free text.  (A format for what is
+The file ``REVIEW.txt`` may contain any free text.  (A format for what is
 in there may emerge in the future; there may also be tools in the
 future to process it.)  For example it may be useful to add commit
 lines that can be interpreted by tig (see
@@ -432,22 +415,36 @@ A branch must not be merged as long as ``REVIEW`` comments remain.
 ``FIXMEs`` are discouraged in master.  For now, they are allowed, but we
 should find a more fancy bug tracking approach.  (redmine?)
 
-[REVIEW[cs]: Personally, I mostly use FIXME for "this works as is, but it
+FIXME[cs]: Personally, I mostly use FIXME for "this works as is, but it
 is a hack/inelegant/inefficient, so if we could find a better solution that
 would be great", NOT for bugs. For bugs and things that really need to be
 resolved to make the code function as it's supposed to, I use TODO and
 ensure that all TODOs are indeed handled and deleted before merging into
-master.]
+master.
 
-[FIXME: ``git notes --help`` may be relevant, but I haven't looked at
-it yet.]
+FIXME[mf]: ``git notes --help`` may be relevant, but I haven't looked at
+it yet.
 
-[FIXME: we want the commit hook to work on staged copy, not working
+FIXME[nd]: we want the commit hook to work on staged copy, not working
 copy.  (where should we move this point?  i don't think it belongs
-here.)]
+here.)
 
-[FIXME: line numbers!  we want code line numbers everywhere!  can git
-do line numbers in every line in diff?]
+FIXME[mf]: line numbers!  we want code line numbers everywhere!  can git
+do line numbers in every line in diff?
+
+FIXME[tb]: following things might be useful additions:
+
+- commit message formats (e.g. "fixup …")
+
+- what should/must be done before creating a pull request
+     - only one feature per pull request
+         - only include changes that are really needed; do refacotoring
+           in a separate pull request
+         - small fixes and library updates should be done in or near master,
+           not inside of larger feature branches. This allows everyone to
+           profit sooner. In cases where the fix/update would have been done
+           in mutliple branches, this also avoids merge conflicts.
+     - be prepared to explain every single change.
 
 
 .. _bugseverwhere: http://bugseverywhere.org/
@@ -455,18 +452,3 @@ do line numbers in every line in diff?]
 .. _gitissues: https://github.com/duplys/git-issues
 .. _reviewboard: http://www.reviewboard.org/
 .. _tig: https://github.com/jonas/tig
-
-
-.. REVIEW[tb]: following things might be useful additions:
-
-   - commit message formats (e.g. "fixup …")
-
-   - what should/must be done before creating a pull request
-     - only one feature per pull request
-       - only include changes that are really needed; do refacotoring
-         in a separate pull request
-       - small fixes and library updates should be done in or near master,
-         not inside of larger feature branches. This allows everyone to
-         profit sooner. In cases where the fix/update would have been done
-         in mutliple branches, this also avoids merge conflicts.
-     - be prepared to explain every single change.
