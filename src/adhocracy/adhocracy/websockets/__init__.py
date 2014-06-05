@@ -270,11 +270,56 @@ class ClientCommunicator(WebSocketServerProtocol):
                      clean_str, self._client, reason)
 
 
-def resource_modified(resource: IResource) -> None:
+def notify_resource_modified(resource: IResource) -> None:
     """Notify subscribers if a resource has been modified.
 
     :param resource: a Simple that has been changed or a Pool whose metadata
-                     has been changed
+                     has been changed; all subscribers to this resource will be
+                     notified
     """
     for client in ClientCommunicator.tracker.iterate_subscribers(resource):
         client.send_modified_notification(resource)
+
+
+def notify_new_child(resource: IResource, child: IResource) -> None:
+    """Notify subscribers if a child has been added to a pool or item.
+
+    :param resource: the Pool or Item; all subscribers to this resource will be
+                     notified
+    :param child: the new child
+    """
+    for client in ClientCommunicator.tracker.iterate_subscribers(resource):
+        client.send_child_notification('new', resource, child)
+
+
+def notify_removed_child(resource: IResource, child: IResource) -> None:
+    """Notify subscribers if a child has been removed from a pool.
+
+    :param resource: the Pool; all subscribers to this resource will be
+                     notified
+    :param child: the removed child
+    """
+    for client in ClientCommunicator.tracker.iterate_subscribers(resource):
+        client.send_child_notification('removed', resource, child)
+
+
+def notify_modified_child(resource: IResource, child: IResource) -> None:
+    """Notify subscribers if a child in a pool has been modified.
+
+    :param resource: the Pool; all subscribers to this resource will be
+                     notified
+    :param child: the modified child
+    """
+    for client in ClientCommunicator.tracker.iterate_subscribers(resource):
+        client.send_child_notification('modified', resource, child)
+
+
+def notify_new_version(resource: IResource, new_version: IItemVersion) -> None:
+    """Notify subscribers if a new version has been added to an item.
+
+    :param resource: the Item; all subscribers to this resource will be
+                     notified
+    :param new_version: the new item version
+    """
+    for client in ClientCommunicator.tracker.iterate_subscribers(resource):
+        client.send_new_version_notification(resource, new_version)
