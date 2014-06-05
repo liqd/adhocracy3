@@ -203,7 +203,7 @@ must happen according to *+n-branch logic*::
 Remarks:
 
 - Usually you don't strictly need the $BRANCHPOINT argument, and could
-  simply write ``git rebase msater`` instead that reasonably finds the
+  simply write ``git rebase master`` instead that reasonably finds the
   most recent branch point and uses that.  The above lines have the
   benefit of being more explicit, and thus easier to inspect and
   modify.
@@ -438,12 +438,12 @@ FIXME[tb]: following things might be useful additions:
 
 - what should/must be done before creating a pull request
      - only one feature per pull request
-         - only include changes that are really needed; do refacotoring
+         - only include changes that are really needed; do refactoring
            in a separate pull request
          - small fixes and library updates should be done in or near master,
            not inside of larger feature branches. This allows everyone to
            profit sooner. In cases where the fix/update would have been done
-           in mutliple branches, this also avoids merge conflicts.
+           in multiple branches, this also avoids merge conflicts.
      - be prepared to explain every single change.
 
 
