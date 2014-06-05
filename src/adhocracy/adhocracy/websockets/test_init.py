@@ -10,6 +10,8 @@ from zope.interface import alsoProvides
 from adhocracy.interfaces import IItemVersion
 from adhocracy.websockets import ClientCommunicator
 from adhocracy.websockets import ClientTracker
+from adhocracy.websockets import WebSocketError
+
 
 class DummyResource():
 
@@ -25,6 +27,7 @@ class DummyConnectionRequest():
     def __init__(self, peer: str):
         self.peer = peer
 
+
 class QueueingClientCommunicator(ClientCommunicator):
 
     """ClientCommunicator that adds outgoing messages to an internal queue."""
@@ -37,6 +40,15 @@ class QueueingClientCommunicator(ClientCommunicator):
         """Decode message back into JSON object and add it to the queue."""
         json_message = loads(payload.decode())
         self.queue.append(json_message)
+
+
+class WebSocketErrorUnitTests(unittest.TestCase):
+
+    """Test the WebSocketError class."""
+
+    def test_str(self):
+        err = WebSocketError('malformed_message', 'message is binary')
+        assert str(err) == 'malformed_message: message is binary'
 
 
 class ClientCommunicatorUnitTests(unittest.TestCase):
@@ -150,6 +162,14 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert self._comm.queue[0] == {'error': 'malformed_message',
            'details': 'No JSON object could be decoded'}
 
+    def test_onMessage_with_json_array(self):
+        msg = self._build_message(['This', 'is an array', 'not a dict'])
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 1
+        last_message = self._comm.queue[0]
+        assert last_message['error'] == 'invalid_json'
+        assert 'not a mapping type' in last_message['details']
+
     def test_onMessage_with_invalid_action(self):
         msg = self._build_message({'action': 'just do it!',
                                    'resource': '/child'})
@@ -165,6 +185,16 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'error': 'unknown_resource',
                                        'details': '/wrong_child'}
+
+    def test_onMessage_with_both_invalid(self):
+        msg = self._build_message({'action': 'just do it!',
+                                   'resource': '/wrong_child'})
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 1
+        last_message = self._comm.queue[0]
+        assert last_message['error'] == 'invalid_json'
+        assert 'action' in last_message['details']
+        assert 'resource' in last_message['details']
 
     def test_onMessage_with_invalid_json_type(self):
         msg = self._build_message({'action': 'subscribe',
@@ -354,3 +384,4 @@ class ClientTrackerUnitTests(unittest.TestCase):
         assert len(result) == 2
         assert client1 in result
         assert client2 in result
+

@@ -81,10 +81,9 @@ class ClientTracker():
 
         If the resulting set is empty, it is removed from the multidict.
         """
-        if key in multidict:
-            multidict[key].discard(value)
-            if not multidict[key]:
-                del multidict[key]
+        multidict[key].discard(value)
+        if not multidict[key]:
+            del multidict[key]
 
     def delete_all_subscriptions(self, client: str) -> None:
         """Delete all subscriptions for a client."""
@@ -166,24 +165,17 @@ class ClientCommunicator(WebSocketServerProtocol):
         except Exception as err:
             self._raise_invalid_json_from_exception(err)
 
-    def _raise_if_unknown_field_value(
-            self, field_name: str, err: colander.Invalid, json_object) -> None:
+    def _raise_if_unknown_field_value(self, field_name: str,
+                                      err: colander.Invalid,
+                                      json_object: dict) -> None:
         """Raise an 'unknown_xxx' WebSocketError error if appropriate."""
         errdict = err.asdict()
         if self._is_only_key(errdict, field_name):
-            field_value = self._return_value_from_dict_if_string(
-                json_object, field_name)
-            if field_value is not None:
-                raise WebSocketError('unknown_' + field_name, field_value)
+            field_value = json_object[field_name]
+            raise WebSocketError('unknown_' + field_name, field_value)
 
     def _is_only_key(self, d: dict, key: str) -> bool:
         return key in d and len(d) == 1
-
-    def _return_value_from_dict_if_string(self, d: dict, key: str) -> str:
-        if isinstance(d, dict) and key in d:
-            value = d[key]
-            if isinstance(value, str):
-                return value
 
     def _raise_invalid_json_from_colander_invalid(self, err:
                                                   colander.Invalid) -> None:
@@ -241,7 +233,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         if isinstance(err, WebSocketError):
             error = err.error_type
             details = err.details
-        else:
+        else:  # pragma: no cover
             error = 'internal_error'
             details = str(err)
         self._send_json_message({'error': error, 'details': details})
