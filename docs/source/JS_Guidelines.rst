@@ -23,86 +23,76 @@ General considerations
 General JavaScript
 ------------------
 
--  strict mode
--  strict comparisons (``===`` and not ``==``)
--  no implicit boolean conversions: ``if (typeof x === "undefined")`` instead of ``if (!x)``
--  semicolons: always.  (tslint and strict tell you the specifics)
--  4 space indentation
+We follow most rules proposed by tslint (see tslint config for details).
+However, there are some rules we want to adhere to that can not (yet) be
+checked with tslint.
 
-TODO:
+-  Use `strict mode`_ everywhere
 
--  tsLint configuration
+   .. FIXME describe problems
 
-   -  https://github.com/palantir/tslint
+-  No implicit boolean conversions: ``if (typeof x === "undefined")`` instead
+   of ``if (!x)``
 
--  chaining:
+-  Chaining is to be preferred.
 
-   -  chaining is to be preferred.
-
-   -  if chain elements are many lines long, it is ok to avoid
-      chaining.  in this case, if chaining is used, newlines and
+   -  If chain elements are many lines long, it is ok to avoid
+      chaining.  In this case, if chaining is used, newlines and
       comments between chain elements are encouraged.
 
-   -  layout: each '.' (also the first one) starts a new line.  the
-      first line (without a '.') is indented at n+0, all '.' lines at
+   -  Layout: Each function (also the first one) starts a new line.  The
+      first line (without a ``.``) is indented at n+0, all functions at
       n+1 (4 spaces deeper).
 
--  single or mutliple ``var``\ s  rule: each new identfier has its own 'var'.  (rationale: git diff / conflicts)
+-  Each new identfier has its own ``var``. (rationale: ``git diff`` / conflicts)
+
+-  Do not align your code. Use the following indentation rules instead
+   (single-line option is always allowed if reasonably short.):
+
+   -  objects::
+
+         foo = {
+             a: 1,
+             boeifj: 2,
+             cfhe: 3}
+
+   -  lists::
+
+         foo = [
+             138,
+             281128]
+
+   -  function definitions::
+
+          var foo(a : number) : number => a + 1;
+
+          var foo = (arg : number) : void => {
+              return;
+          }
+
+          var foo = (
+              arg: number,
+              otherarg: Class) : void =>
+          {
+              return;
+          }
+
+-  Do not use named functions. Assign anonymous functions to variables instead.
+   This is less confusing. `Further reading
+   <http://kangax.github.io/nfe/#expr-vs-decl>`_
+
+FIXME:
 
 -  when to return promises (this point may need to go to another place in this doc?)
 
    - only when needed directly, or when expected to be needed in e.g. subclass.
 
--  consistent alias for ``this``: ``self`` (as in knockout).
+-  If you need an alias for ``this``, always use ``self`` (as in knockout).
    (``_this`` is used by typescript in compiled code and is disallowed
    in typescript source in e.g. class instance methods.)
 
-   if more than one nested self is needed, re-assign outer selves
+   if more than one nested self is needed, re-assign outer ``self``\ s
    locally.
-
--  alignment.  general rule is "no alignment".  details::
-
-       foo = {
-           a: 1,
-           boeifj: 2,
-           cfhe: 3}
-
-       foo = [
-           138,
-           281128]
-
-   (single-line option is always allowed if reasonably short.)
-
-   function definitions::
-
-       var foo = (
-           arg: number,
-           otherarg: Class) =>
-       {
-           return;
-       }
-
-       var foo = (arg: number) => {
-           return;
-       }
-
-   (single-line argument declarations *enforce* opening ``{`` in same
-   line.)
-
--  named/anonyoumus functions
-
-   -  There are three ways of defining a function
-
-      1. var a = function() {}
-      2. function b() {}            -- not allowed
-      3. var a = function b() {}        -- insane
-
-   -  tl;dr: The first version is least confusing and should be
-      preferred.
-   -  Further reading
-
-      - http://stackoverflow.com/questions/336859/var-functionname-function-vs-function-functionname
-      - http://kangax.github.io/nfe/#expr-vs-decl
 
 TypeScript
 ----------
@@ -119,6 +109,13 @@ TypeScript
 -  nested types are allowed up to 2 levels (``Foo<Bar<Baz>>``).  1
    level is to be preferred where possible.
 
+-  Type the functions, not the variables they are assigned to.
+
+-  TypeScript has its own lambda syntax::
+
+      var fn = (x) => x.attr;
+
+-  Use ``Array<type>`` rather than ``type[]``
 -  use ``() => x`` instead of ``function() {}``.
    rationale: ``() => ...`` has two benefits over ``function() {}``:
 
@@ -133,7 +130,7 @@ TypeScript
 
      3. using two syntaxes for the same concept is bad.
 
-   reasons against using ``=>``-notation::
+   possible reasons against using ``=>``-notation::
 
          -  javascript developers will be confused.  (objection: this
             is good, because they need to understand that there is a
@@ -155,14 +152,14 @@ TypeScript
 Angular
 -------
 
--  prefer isolated scope in directives.  (exception: ``ngRepeat``)
+-  prefer isolated scope in directives and pass in variables
+   explicitly.
 
--  where is direct DOM manipulation/jQuery allowed?  -- only inside directives.
+-  direct DOM manipulation/jQuery is only allowed inside directives.
 
 -  dependency injection
 
    -  always use ``["$q", function($q) {…}]`` style
-
 
 -  compatibility
 
@@ -198,7 +195,7 @@ Template
    statically, or do we have to check dynamically rendered dom trees?)
 
 -  prefer ``{{…}}`` over ``ngBind`` (except for root template).
-   check that ``{{…}}`` is never rendered temporarily!
+   FIXME: check that ``{{…}}`` is never rendered temporarily!
 
 -  when to apply which classes (should be in balance with CSS
    Guidelines)
@@ -206,4 +203,5 @@ Template
    -  apply classes w/o a specific need/by default?
 
 
+.. _strict mode: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode
 .. _tslint: https://github.com/palantir/tslint
