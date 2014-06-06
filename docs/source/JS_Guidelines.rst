@@ -114,43 +114,70 @@ TypeScript
 
 -  Type the functions, not the variables they are assigned to.
 
--  TypeScript has its own lambda syntax::
-
-      var fn = (x) => x.attr;
-
 -  Use ``Array<type>`` rather than ``type[]``
--  use ``() => x`` instead of ``function() {}``.
-   rationale: ``() => ...`` has two benefits over ``function() {}``:
-
-     1. lexical scoping: ``=>``-style functions are wrapped with a ``var
-        _this = this;``, all occurrances of ``this`` in the body are
-        replaced by ``_this``.  this is a deviation from javascript
-        syntax, but leads to much clearer code, since the meaning of
-        ``this`` is appearent from the context of the function definition,
-        not the function call.
-
-     2. ``() => 3 + 4`` is shorter than ``function() { return 3 + 4; }``
-
-     3. using two syntaxes for the same concept is bad.
-
-   possible reasons against using ``=>``-notation::
-
-         -  javascript developers will be confused.  (objection: this
-            is good, because they need to understand that there is a
-            difference between the two, namely lexical scoping.)
-
-         -  it deviates from javascript.  (objection: this is good,
-            because dynamic scoping is inherently hard to understand
-            and debug.)
-
-         -  vim does not support ``=>`` syntax highlighting.
-            (objection: there is a blogpost that provides a typescript
-            mode for vim:
-            http://blogs.msdn.com/b/interoperability/archive/2012/10/01/sublime-text-vi-emacs-typescript-enabled.aspx.
-            if that does not solve this issue, a rule should be easy
-            enough to add.)
 
 -  how strictly to enforce types?
+
+Lambdas
+~~~~~~~
+
+TypeScript has its own lambda syntax. It has two differences from
+JavaScript's functions:
+
+-  The result of the final statement is returned automatically.
+-  ``this`` is the ``this`` from the enclosing scope.
+
+Example::
+
+    var lambda = () => {
+        var nested_fn = function() {
+             return this;
+        };
+        var nested_lambda = () => this;
+    }
+
+    var fn = function() {
+        var nested_fn = function() {
+             return this;
+        };
+        var nested_lambda = () => this;
+    }
+
+is compiled to::
+
+    var _this = this;
+    var lambda = function () {
+        var nested_fn = function () {
+            return this;
+        };
+        var nested_lambda = function () {
+            return _this;
+        };
+    };
+
+    var fn = function () {
+        var _this = this;
+        var nested_fn = function () {
+            return this;
+        };
+        var nested_lambda = function () {
+            return _this;
+        };
+    };
+
+These lambdas *should always be preferred* over functions because
+they avoid common mistakes like this::
+
+    class Greeter {
+        greeting = "Hello";
+
+        greet = function() {
+            alert(this.greeting);
+        };
+    }
+
+    var greeter = new Greeter();
+    setTimeout(greeter.greet, 1000);  // will alert 'undefined'
 
 Angular
 -------
