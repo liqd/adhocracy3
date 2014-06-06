@@ -7,7 +7,7 @@ General considerations
 -  this document is split in multiple sections
 
    -  general JavaScript
-   -  Typescript
+   -  TypeScript
    -  Angular
 
       -  Angular templates
@@ -29,7 +29,8 @@ checked with tslint.
 
 -  Use `strict mode`_ everywhere
 
-   -  There seem to be multiple issues with strict mode and Typescript
+   -  There seem to be multiple issues with strict mode and TypeScript
+
       -  http://typescript.codeplex.com/workitem/2003
       -  http://typescript.codeplex.com/workitem/2176
 
@@ -171,18 +172,18 @@ Angular
 
 -  prefix
 
-   - directives: 'adh.*' for all directives declared in a3.  (in the
-     future, this prefix may be split up in several ones, making
-     refactoring necessary.  Client-specific prefices may be added
-     without the need for refactoring.)
+   -  directives: 'adh.*' for all directives declared in a3.  (in the
+      future, this prefix may be split up in several ones, making
+      refactoring necessary.  Client-specific prefices may be added
+      without the need for refactoring.)
 
-   - service registration: '"adhHttp"'.  (services must be implemented
-     so that they don't care if they are registered under another
-     name.)
+   -  service registration: '"adhHttp"'.  (services must be implemented
+      so that they don't care if they are registered under another
+      name.)
 
-   - service module import: 'import Http = require("Adhocracy/Services/Http");'.
-     rationale: When using service modules, the fact that they provide
-     services is obvious.
+   -  service module import: 'import Http = require("Adhocracy/Services/Http");'.
+      rationale: When using service modules, the fact that they provide
+      services is obvious.
 
 Template
 ~~~~~~~~
@@ -193,8 +194,8 @@ Template
 
    -  what about element/directive attributes?
 
--  valid XHTML5: we use an html checker.  (which one?  does that work
-   statically, or do we have to check dynamically rendered dom trees?)
+-  valid XHTML5: we use an HTML checker.  (which one?  does that work
+   statically, or do we have to check dynamically rendered DOM trees?)
 
 -  prefer ``{{…}}`` over ``ngBind`` (except for root template).
    FIXME: check that ``{{…}}`` is never rendered temporarily!
@@ -208,9 +209,10 @@ Documentation
 ~~~~~~~~~~~~~
 
 -  Use `jsdoc`_-style comments in your code.
+
    -  Currently, no tool seems to be available to include JSDoc
       comments in sphinx.
-   -  `Typescript has only limited JSDoc support
+   -  `TypeScript has only limited JSDoc support
       <http://typescript.codeplex.com/workitem/504>`_
 
 
