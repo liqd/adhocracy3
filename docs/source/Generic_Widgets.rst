@@ -5,11 +5,11 @@ Adhocracy Generic Widgets
 Introduction
 ------------
 
-In the context of the adhocracy software project, a *widget* is a
-class for creating angular directives dedicated to rendering
-resources.  Each widget handles a specific (set of) content type(s)
-and UI context(s).  They are called *generic* because the set of
-content types and contexts can be configured quite flexibly.
+In the context of the adhocracy software project, a *widget* is an
+element of the UI. In the JavaScript frontend, this is implemented
+as a class for creating angular directives.  Widgets are called
+*generic* because the set of content types and UI contexts they can
+be used with can be configured quite flexibly.
 
 This document outlines implementation and usage of widgets.  It
 assumes some familiarity with angularjs and typescript.
@@ -20,7 +20,8 @@ Adapters Classes
 
 An adapter class provides a uniform interface to resources of
 different content types that share some structure (in the most common
-case, property sheets).
+case, property sheets).  It can be considered the *glue* between
+widgets and resources.
 
 Example::
 
