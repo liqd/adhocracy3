@@ -105,18 +105,18 @@ TypeScript
    -  standard libs first (if such a thing ever exists), then external
       modules, then a3-internal modules.
 
-   -  only import from lower level.  ("lower level" does not mean file
+   -  only import from lower level.  (FIXME: "lower level" does not mean file
       directory hierarchy, but something to be clarified.  this rule
       is to be re-evaluated at some point.)
 
 -  nested types are allowed up to 2 levels (``Foo<Bar<Baz>>``).  1
    level is to be preferred where possible.
 
--  Type the functions, not the variables they are assigned to.
+-  Type functions, not the variables they are assigned to.
 
 -  Use ``Array<type>`` rather than ``type[]``
 
--  how strictly to enforce types?
+-  FIXME: how strictly to enforce types?
 
 Lambdas
 ~~~~~~~
@@ -191,7 +191,7 @@ Angular
 
    -  always use ``["$q", function($q) {…}]`` style
 
--  compatibility
+-  FIXME: compatibility
 
    -  https://docs.angularjs.org/guide/ie
 
@@ -215,19 +215,19 @@ Angular
 Template
 ~~~~~~~~
 
--  which syntax do we use for directives?
+-  FIXME: which syntax do we use for directives?
 
    -  ``<adh:foo>`` or ``<x-adh-foo>``?
 
    -  what about element/directive attributes?
 
--  valid XHTML5: we use an HTML checker.  (which one?  does that work
+-  valid XHTML5: we use an HTML checker.  (FIXME: which one?  does that work
    statically, or do we have to check dynamically rendered DOM trees?)
 
 -  prefer ``{{…}}`` over ``ngBind`` (except for root template).
    FIXME: check that ``{{…}}`` is never rendered temporarily!
 
--  when to apply which classes (should be in balance with CSS
+-  FIXME: when to apply which classes (should be in balance with CSS
    Guidelines)
 
    -  apply classes w/o a specific need/by default?
