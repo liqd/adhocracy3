@@ -29,7 +29,9 @@ checked with tslint.
 
 -  Use `strict mode`_ everywhere
 
-   .. FIXME describe problems
+   -  There seem to be multiple issues with strict mode and Typescript
+      -  http://typescript.codeplex.com/workitem/2003
+      -  http://typescript.codeplex.com/workitem/2176
 
 -  No implicit boolean conversions: ``if (typeof x === "undefined")`` instead
    of ``if (!x)``
