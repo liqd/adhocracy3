@@ -51,6 +51,8 @@ the element paths from there.
 properly in widget classes something between awkward, less secure, and
 impossible.)
 
+.. REVIEW: can you please explain that
+
 
 Scope Interfaces
 ----------------
@@ -83,6 +85,9 @@ Since templates (1) ideally are to be maintained by designers rather
 than software developers, and (2) are not type-checked by typescript,
 they must contain as little code as possible.  Everything that can be
 written down in the widget class, should be.
+
+.. REVIEW: I do not think this section belongs here. Scope interfaces
+   are not specific to widgets
 
 
 Widget Classes
@@ -128,6 +133,10 @@ A simple widget class has the following form::
 The declaration of ``_self`` and ``_class`` should be used like this
 in all instance methods that make use of them.  ``this`` with all its
 rich semantics can then be used without interfering with the two.
+
+.. REVIEW: I do not think the note about _self and_class belongs here.
+   It is not specific to widgets. They should also be removed from the
+   code examples.
 
 ``createDirective`` is used for registering a new directive::
 
@@ -223,6 +232,8 @@ In the controller::
                 $http.get($scope.path).success(...);
                 ....
 
+.. REVIEW: This is described in the angular docu and is not specific to
+   adhocracy
 
 Directive element body
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -236,6 +247,8 @@ widget that lists every element in a form outlined in the body.
 The listing template will contain::
 
     <span ng-transclude></span>
+
+.. REVIEW: not sure why this is used as an attribute rather than an element
 
 The object returned by ``createDirective`` in the widget class must
 have the following attribute::
@@ -251,6 +264,9 @@ body::
 
 [FIXME: document scope propagation; see FIXME near class
 Widget.Listing.]
+
+.. REVIEW: This is described in the angular docu and is not specific to
+   adhocracy
 
 
 Misc Ideas and Remarks
