@@ -202,6 +202,16 @@ Template
 
    -  apply classes w/o a specific need/by default?
 
+Documentation
+~~~~~~~~~~~~~
+
+-  Use `jsdoc`_-style comments in your code.
+   -  Currently, no tool seems to be available to include JSDoc
+      comments in sphinx.
+   -  `Typescript has only limited JSDoc support
+      <http://typescript.codeplex.com/workitem/504>`_
+
 
 .. _strict mode: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode
 .. _tslint: https://github.com/palantir/tslint
+.. _jsdoc: http://usejsdoc.org/
