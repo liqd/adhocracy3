@@ -143,7 +143,7 @@ TypeScript
             because dynamic scoping is inherently hard to understand
             and debug.)
 
-         -  vim does not suppor ``=>`` syntax highlighting.
+         -  vim does not support ``=>`` syntax highlighting.
             (objection: there is a blogpost that provides a typescript
             mode for vim:
             http://blogs.msdn.com/b/interoperability/archive/2012/10/01/sublime-text-vi-emacs-typescript-enabled.aspx.
@@ -174,7 +174,7 @@ Angular
 
    - directives: 'adh.*' for all directives declared in a3.  (in the
      future, this prefix may be split up in several ones, making
-     refactoring necessary.  client-specific prefices may be added
+     refactoring necessary.  Client-specific prefices may be added
      without the need for refactoring.)
 
    - service registration: '"adhHttp"'.  (services must be implemented
@@ -182,7 +182,7 @@ Angular
      name.)
 
    - service module import: 'import Http = require("Adhocracy/Services/Http");'.
-     rationale: when using service modules, the fact that they provide
+     rationale: When using service modules, the fact that they provide
      services is obvious.
 
 Template
