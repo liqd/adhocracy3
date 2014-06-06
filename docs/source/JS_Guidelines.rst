@@ -15,7 +15,7 @@ General considerations
    -  Adhocracy 3
    -  Tests
 
--  We prefer conventions set by 3rd party tools (e.g. tsLint) over our
+-  We prefer conventions set by 3rd party tools (e.g. `tslint`_) over our
    own preferences.
 -  We try to be consistend with other guidelines from the adhocracy3
    project
@@ -204,3 +204,6 @@ Template
    Guidelines)
 
    -  apply classes w/o a specific need/by default?
+
+
+.. _tslint: https://github.com/palantir/tslint
