@@ -92,6 +92,7 @@ an incomplete list of options:
 - `gerrit`_
 - `gitissues`_
 - `reviewboard`_
+- `phabricator`_
 
 
 Git Conventions
@@ -439,4 +440,5 @@ FIXME[tb]: following things might be useful additions:
 .. _gerrit: https://code.google.com/p/gerrit/
 .. _gitissues: https://github.com/duplys/git-issues
 .. _reviewboard: http://www.reviewboard.org/
+.. _phabricator: https://secure.phabricator.com/book/phabricator/article/introduction/
 .. _tig: https://github.com/jonas/tig
