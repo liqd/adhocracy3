@@ -41,7 +41,7 @@ resource of a given content type, and return a list of paths to more
 resources, namely the elements in the container.
 
 The first class does not expect anything from the container it gets
-passed and always returns the empty string.
+passed and always returns the empty list.
 
 The second requires the container to have the ``Pool`` sheet and gets
 the element paths from there.
@@ -95,7 +95,7 @@ A simple widget class has the following form::
 
         constructor(
             injectedService1,
-            injectedService1,
+            injectedService2,
             public classParameter
         ) {
             ...
@@ -203,7 +203,7 @@ you can add constructor parameters::
 Directive element attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can pass data from the xml element in the template, and the widget
+You can pass data from the XML element in the template, and the widget
 can find it in the ``$scope``.
 
 In the template::
@@ -227,7 +227,7 @@ Directive element body
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The angular directive ``ngRepeat`` copies its body once for every
-element in an array, and inserts all copies into the dom tree rendered
+element in an array, and inserts all copies into the DOM tree rendered
 from the template.  You can do this with adhocracy widgets as well.
 As above and very similar to ``ngRepeat``, assume we have a listing
 widget that lists every element in a form outlined in the body.
