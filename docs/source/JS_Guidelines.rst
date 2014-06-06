@@ -225,7 +225,6 @@ Template
    statically, or do we have to check dynamically rendered DOM trees?)
 
 -  prefer ``{{…}}`` over ``ngBind`` (except for root template).
-   FIXME: check that ``{{…}}`` is never rendered temporarily!
 
 -  FIXME: when to apply which classes (should be in balance with CSS
    Guidelines)
