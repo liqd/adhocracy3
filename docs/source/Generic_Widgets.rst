@@ -242,7 +242,8 @@ The listing template will contain::
 
     <span ng-transclude></span>
 
-.. REVIEW: not sure why this is used as an attribute rather than an element
+(Whether by accident or by design, ``ngTransclude`` is restricted to
+``AC``, so it can only occur as an XML attribute, not as an element.)
 
 The object returned by ``createDirective`` in the widget class must
 have the following attribute::
