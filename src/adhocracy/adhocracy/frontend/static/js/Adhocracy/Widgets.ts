@@ -5,6 +5,7 @@
 
 import Types = require("Adhocracy/Types");
 import AdhHttp = require("Adhocracy/Services/Http");
+import AdhConfig = require("Adhocracy/Services/Config");
 
 import Resources = require("Adhocracy/Resources");
 
@@ -54,7 +55,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
     constructor(public containerAdapter: ContainerAdapter) {
     }
 
-    public createDirective(adhConfig) {
+    public createDirective(adhConfig: AdhConfig.Type) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
@@ -143,7 +144,7 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
     constructor(public elementAdapter: ElementAdapter) {
     }
 
-    public createDirective(adhConfig) {
+    public createDirective(adhConfig: AdhConfig.Type) {
         var _self = this;
         var _class = (<any>_self).constructor;
 

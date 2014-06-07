@@ -3,6 +3,7 @@
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import Types = require("Adhocracy/Types");
+import AdhConfig = require("Adhocracy/Services/Config");
 
 
 // web sockets
@@ -23,7 +24,7 @@ export interface IService {
     destroy: () => void;
 }
 
-export function factory(adhConfig) : IService {
+export function factory(adhConfig: AdhConfig.Type) : IService {
     "use strict";
 
     var ws = openWs();

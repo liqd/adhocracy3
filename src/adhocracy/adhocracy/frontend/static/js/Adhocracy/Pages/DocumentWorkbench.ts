@@ -128,7 +128,7 @@ export function run() {
 
     // application-specific directives
 
-    app.directive("adhDocumentWorkbench", ["adhConfig", function(adhConfig) {
+    app.directive("adhDocumentWorkbench", ["adhConfig", function(adhConfig: AdhConfig.Type) {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Pages/DocumentWorkbench.html",
@@ -179,7 +179,7 @@ export function run() {
     }]);
 
 
-    app.directive("adhProposalVersionDetail", ["adhConfig", function(adhConfig) {
+    app.directive("adhProposalVersionDetail", ["adhConfig", function(adhConfig: AdhConfig.Type) {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/Detail.html",
@@ -220,7 +220,7 @@ export function run() {
         };
     }]);
 
-    app.directive("adhProposalVersionEdit", ["adhConfig", function(adhConfig) {
+    app.directive("adhProposalVersionEdit", ["adhConfig", function(adhConfig: AdhConfig.Type) {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/Edit.html",
@@ -230,7 +230,8 @@ export function run() {
         };
     }]);
 
-    app.directive("adhProposalVersionNew", ["$http", "$q", "adhConfig", function($http: ng.IHttpService, $q : ng.IQService, adhConfig) {
+    app.directive("adhProposalVersionNew", ["$http", "$q", "adhConfig",
+                                            function($http: ng.IHttpService, $q : ng.IQService, adhConfig: AdhConfig.Type) {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/New.html",
@@ -260,7 +261,7 @@ export function run() {
     }]);
 
 
-    app.directive("adhSectionVersionDetail", ["adhConfig", "RecursionHelper", function(adhConfig, RecursionHelper) {
+    app.directive("adhSectionVersionDetail", ["adhConfig", "RecursionHelper", function(adhConfig: AdhConfig.Type, RecursionHelper) {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/ISectionVersion/Detail.html",
@@ -289,7 +290,7 @@ export function run() {
     }]);
 
 
-    app.directive("adhParagraphVersionDetail", ["adhConfig", function(adhConfig) {
+    app.directive("adhParagraphVersionDetail", ["adhConfig", function(adhConfig: AdhConfig.Type) {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/IParagraphVersion/Detail.html",
@@ -317,7 +318,7 @@ export function run() {
     }]);
 
 
-    app.directive("adhDocumentSheetEdit", ["$http", "$q", "adhConfig", function($http, $q, adhConfig) {
+    app.directive("adhDocumentSheetEdit", ["$http", "$q", "adhConfig", function($http, $q, adhConfig: AdhConfig.Type) {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Sheets/IDocument/Edit.html",
@@ -337,7 +338,7 @@ export function run() {
         };
     }]);
 
-    app.directive("adhDocumentSheetShow", ["adhConfig", function(adhConfig) {
+    app.directive("adhDocumentSheetShow", ["adhConfig", function(adhConfig: AdhConfig.Type) {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Sheets/IDocument/Show.html",
