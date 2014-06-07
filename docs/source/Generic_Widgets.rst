@@ -47,12 +47,6 @@ passed and always returns the empty list.
 The second requires the container to have the ``Pool`` sheet and gets
 the element paths from there.
 
-(Adapter classes should not be generic, as that makes using them
-properly in widget classes something between awkward, less secure, and
-impossible.)
-
-.. REVIEW: can you please explain that
-
 
 Scope Interfaces
 ----------------
