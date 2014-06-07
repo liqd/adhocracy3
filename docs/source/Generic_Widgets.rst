@@ -83,6 +83,20 @@ written down in the widget class, should be.
 .. REVIEW: I do not think this section belongs here. Scope interfaces
    are not specific to widgets
 
+.. REVIEW[mf]: (answer to all REVIEW markers in this file and commit.)
+   i want to believe that the documentation has some value,
+   independetly of the questions whether it belongs into this
+   particular file or whether it is redundant.  i would like to not
+   remove anything, but i realized that perhaps we should merge this
+   file and the JS_Policy file, and make it a considerably larger
+   thing more suitably called "a hacker's guide to the a3 frontend
+   code"?  if there are no objections, I propose to (1) merge this PR
+   into master, (2) rebase 2014-05-mf-js-guidelines+1 behind it,
+   and (3) re-organize both JS_Guidelines.rst and this file into a
+   more coherent Frontend_Guide.rst as part of
+   2014-05-mf-js-guidelines+1.  (we could also postpone this, and
+   leave it as a FIXME in JS_Guidelines for now.)
+
 
 Widget Classes
 --------------
@@ -258,7 +272,9 @@ body::
     </adh-listing>
 
 [FIXME: document scope propagation; see FIXME near class
-Widget.Listing.]
+Widget.Listing.  i think in order to get this done, we need to write
+our own transclude function and inject it to the directive's link
+attribute.]
 
 .. REVIEW: This is described in the angular docu and is not specific to
    adhocracy
