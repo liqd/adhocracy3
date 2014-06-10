@@ -242,6 +242,11 @@ Dos and Don'ts
    if the current branch is rebased on the ancestor branch HEAD at any
    point in time after the merge.
 
+5. Fixes to trivial issues may be committed by a developer directly to
+   master without branching.  The commit must be at least mentioned to
+   one more developer, who must check whether the issue qualifies as
+   trivial and the commit is sound.
+
 
 Code Review
 -----------
