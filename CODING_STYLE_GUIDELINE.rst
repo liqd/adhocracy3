@@ -70,12 +70,19 @@ Therefore:
 
 * Referring to other commits can be done by using their hash ID.
 
-* TODO: We may want to introduce commit message naming conventions, such as
-  starting the message with "Fix:", "Refactor:" or similar. I don't have an
-  opinion on this; I'd like to be able to state "Revert hash" and "Fixup hash".
-  Note that there's already standard messages for commits created by git
-  (Revert "...") and conventions for review commits (``[R] prefix``) as as
-  described in the code review guidelines.
+
+Descriptive summary prefix keywords are encouraged, but there is no
+strict rule as to which keywords exist and where to use them.  Here is
+a list of options::
+
+* Refactor (followed by a commit hash)
+* Fixup (followed by a commit hash to squash this one into)
+* Fix (for repair work that you may want to keep in a separate commit)
+* Whitespace (for alignment etc.)
+
+Note that there's already standard messages for commits created by git
+(Revert "...") and conventions for review commits (``[R] prefix``) as
+as described in the code review guidelines.
 
 
 Git branches
