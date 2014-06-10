@@ -123,7 +123,7 @@ groups_metadata = pool_metadata._replace(
 
 class IPasswordResetsPool(IPool):
 
-    """Pool for Groups."""
+    """Pool for Password Resets."""
 
 
 passwordresets_metadata = pool_metadata._replace(
