@@ -7,6 +7,7 @@ import angular = require("angular");
 
 import Types = require("../Types");
 import AdhHttp = require("../Services/Http");
+import AdhWS = require("../Services/WS");
 import AdhUser = require("../Services/User");
 import AdhConfig = require("../Services/Config");
 
@@ -102,6 +103,7 @@ export var run = () => {
 
 
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
+    app.factory("adhWS", ["adhConfig", AdhWS.factory]);
 
 
     // filters

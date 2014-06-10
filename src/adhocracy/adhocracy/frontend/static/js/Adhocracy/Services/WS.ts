@@ -6,81 +6,355 @@ import Types = require("../Types");
 import AdhConfig = require("./Config");
 
 
-// web sockets
+// The Web Sockets Service
 
-// first draft, using a primitive global (to the factory) web socket
-// handle, and an equally primitive dictionary for registering objs
-// interested in updates.  (i don't think this is what we actually
-// want to do once the application gets more complex, but i want to
-// find out how well it works anyway.  see also angularjs github wiki,
-// section 'best practice'.)
+// This module provides a callback-based API to the consumer modules
+// for keeping up to date with relevant changes on the server side.
+// The network protocol is specified in ./docs/source/websockets.rst.
 
-// FIXME: the upstream should be used for sending 'ADD' and 'REMOVE'
-// requests to the server, so we won't get any subscriberless content.
 
-export interface IService {
-    subscribe: (path : string, update : () => void) => void;
-    unsubscribe: (path : string) => void;
-    destroy: () => void;
+export interface Type {
+    // Send subscribe message to server.  If the response is
+    // 'redundant', an exception is thrown asynchronously.
+    //
+    // The message passed to the callback will contain the path passed
+    // to the subscribe function earlier, plus additional information
+    // like "child_modified" (see rest api documentation).
+    //
+    // This function is a rough equivalent to $.on(), but it only
+    // allows to register one handler at a time.  (Should we ever need
+    // more than one concurrent handlers, we should think about a
+    // better way to unsubscribe them than jquery could come up with.)
+    subscribe: (path: string, update: (event: ServerEvent) => void) => void;
+
+    // Send unsubscribe message to server.  If the response is
+    // 'redundant', an exception is thrown asynchronously.
+    //
+    // Roughly equivalent to $.off() (see comment above).
+    unsubscribe: (path: string) => void;
 }
 
-export var factory = (adhConfig: AdhConfig.Type) : IService => {
+export interface ServerEvent {
+    event?: string;
+    resource?: string;
+    child?: string;
+    version?: string;
+}
+
+
+// internal rest-api types
+
+interface Request {
+    action: string;
+    resource: string;
+}
+
+interface ResponseOk {
+    status?: string;
+    action?: string;
+    resource?: string;
+}
+
+interface ResponseError {
+    error?: string;
+    details?: string;
+}
+
+interface ServerMessage extends ResponseOk, ResponseError, ServerEvent {};
+
+
+export var factory = (adhConfig: AdhConfig.Type) : Type => {
     "use strict";
 
-    var ws;
-    var subscriptions = {};
+    // the socket handle
+    var _ws;
 
-    var subscribeWs = (path : string, update : (obj: Types.Content<any>) => void) : void => {
-        if (path in subscriptions) {
+    // a distionary of all callbacks, stored under their
+    // resp. resources.
+    var _subscriptions: { [name: string]: (event: ServerEvent) => void } = {};
+
+    // same type as _subscriptions, but these are still waiting for
+    // being sent over the wire.  this is necessary because when _ws
+    // is initialized and the adhWS handle returned to the consumer,
+    // the consumer may start subscribing to stuff, but the web socket
+    // is not in connected state yet.
+    var _pendingSubscriptions: { [name: string]: (event: ServerEvent) => void } = {};
+
+    // request queue.  we append all requests to the end of this list,
+    // and pop them from the beginning as the responses come in.
+    // rationale: "ok" responses contain a copy of the request data,
+    // but "error" responses do not (the request may have been broken
+    // json and not contain any valid data).  so it is necessary to
+    // rely on the responses coming back in the same order in which
+    // the frontend send the requests.
+    var _requests: Request[] = [];
+
+
+    // function declarations
+    var subscribe: (path: string, update: (event: ServerEvent) => void) => void;
+    var subscribeSync: (path: string, update: (event: ServerEvent) => void) => void;
+    var unsubscribe: (path: string) => void;
+    var sendRequest: (req: Request) => void;
+
+    var onmessage: (event: any) => void;
+    var onerror: (event: any) => void;
+    var onopen: (event: any) => void;
+    var onclose: (event: any) => void;
+
+    var open: () => any;
+
+
+    // register a new callback asynchronously (to _subscriptions if
+    // connected; to _pendingSubscription otherwise).  if one is
+    // already registered, crash.
+    subscribe = (
+        path: string,
+        update: (event: ServerEvent) => void
+    ) : void => {
+        if (_subscriptions.hasOwnProperty(path) ||
+            _pendingSubscriptions.hasOwnProperty(path)) {
             throw "WS: subscribe: attempt to subscribe to " + path + " twice!";
         } else {
-            subscriptions[path] = update;
-        }
-    };
-
-    var unsubscribeWs = (path : string) : void => {
-        if (path in subscriptions) {
-            delete subscriptions[path];
-        } else {
-            throw "WS: unsubscribe: no subscription for " + path + "!";
-        }
-    };
-
-    var openWs = () => {
-        var ws = new WebSocket(adhConfig.wsuri);
-
-        ws.onmessage = (event) => {
-            var path = event.data;
-
-            if (path in subscriptions) {
-                subscriptions[path]();
+            if (_ws.readyState === _ws.OPEN) {
+                subscribeSync(path, update);
+            } else {
+                _pendingSubscriptions[path] = update;
             }
-        };
-
-        ws.onerror = (event) => {
-            return;
-        };
-
-        ws.onopen = () => {
-            return;
-        };
-
-        ws.onclose = () => {
-            ws = openWs();
-        };
-
-        return ws;
+        }
     };
 
-    var closeWs = () : void => {
-        ws.close();
+    // register a new callback synchronously.
+    subscribeSync = (
+        path: string,
+        update: (event: ServerEvent) => void
+    ) : void => {
+        sendRequest({action: "subscribe", resource: path});
+        _subscriptions[path] = update;
     };
 
-    ws = openWs();
+    // unregister callback.  if it is not registered, crash.
+    unsubscribe = (
+        path: string
+    ) : void => {
+        if (!(_subscriptions.hasOwnProperty(path) ||
+              _pendingSubscriptions.hasOwnProperty(path))) {
+            throw "WS: unsubscribe: no subscription for " + path + "!";
+        } else {
+            if (_ws.readyState === _ws.OPEN) {
+                sendRequest({action: "unsubscribe", resource: path});
+            }
+
+            // the case that _ws is not OPEN is silently ignored: the
+            // server is expected to have forgotten anyway.
+
+            delete _subscriptions[path];
+            delete _pendingSubscriptions[path];
+        }
+    };
+
+    // Send Request object (subscribe or unsubscribe); push it to
+    // _requests; do some exception handling and logging.
+    sendRequest = (
+        req: Request
+    ) : void => {
+        var reqString: string = JSON.stringify(req);
+        console.log("WS: sending " + reqString);  // FIXME: remove this when it is tested.
+
+        if (_ws.readyState !== _ws.OPEN) {
+            throw "WS: attempt to write to non-OPEN websocket!";
+        } else {
+            _ws.send(reqString);
+            _requests.push(req);
+        }
+    };
+
+    // event handlers and open
+    onmessage = (event) : void => {
+        var msg: ServerMessage = event.data;
+        console.log(msg); console.log(JSON.stringify(msg));  // FIXME: remove this when it is tested.
+
+        // ServerEvent: something happened in the backend data!
+        if (msg.hasOwnProperty("event")) {
+            if (_subscriptions.hasOwnProperty(msg.resource)) {
+                _subscriptions[msg.resource](msg);
+            }
+        } else {
+            // if it is not an event, remove the matching request from
+            // the queue and check for errors (server or client, user
+            // or internal).
+            var req: Request = _requests.shift();
+
+            // ResponseOk: request successfully processed!
+            if (msg.hasOwnProperty("status")) {
+                var checkCompare = (req: Request, resp: ResponseOk) => {
+                    if (req.action !== resp.action || req.resource !== resp.resource) {
+                        throw ("WS: onmessage: response does not match request!\n"
+                            + req.toString() + "\n"
+                            + resp.toString());
+                    }
+                };
+
+                var checkRedundant = (resp: ResponseOk) => {
+                    throw ("WS: onmessage: received 'redundant' response.  this should not happen!\n"
+                        + resp.toString());
+                };
+
+                switch (msg.status) {
+                case "ok":
+                    checkCompare(req, msg);
+                    break;
+
+                case "redundant":
+                    checkCompare(req, msg);
+                    checkRedundant(msg);
+                    break;
+                }
+            }
+
+            // ResponseError: request failed!
+            if (msg.hasOwnProperty("error")) {
+                switch (msg.error) {
+                case "unknown_action":
+                case "unknown_resource":
+                case "malformed_message":
+                case "invalid_json":
+                case "subscribe_not_supported":
+                case "internal_error":
+                    throw ("WS: onmessage: received error message.\n"
+                        + msg.error + "\n"
+                        + req.toString() + "\n"
+                        + msg.toString());
+
+                default:
+                    throw ("WS: onmessage: received **unknown** error message.  this should not happen!\n"
+                        + msg.error + "\n"
+                        + req.toString() + "\n"
+                        + msg.toString());
+                }
+            }
+        }
+    };
+
+    onerror = (event) => {
+        console.log("WS: error!");
+        console.log(event);
+        throw "WS: error!";
+    };
+
+    onopen = (event) => {
+        for (var path in _pendingSubscriptions) {
+            if (_pendingSubscriptions.hasOwnProperty(path)) {
+                subscribeSync(path, _pendingSubscriptions[path]);
+                delete _pendingSubscriptions[path];
+            }
+        }
+    };
+
+    onclose = (event) => {
+        // _ws = open();
+
+        console.log("WS: close!  (see source code for things to fix here.)");
+        console.log(event);
+
+        // FIXME: this is bad because it invalidates all previous
+        // subscriptions, but adhWS is not aware of that.
+        //
+        // if you fix this, also check unsubscribe (currently if
+        // called in unconnected state, it clears out _subscriptions
+        // and _pendingSubscriptions and just assumes the server has
+        // unsusbcribed everything already.
+
+        throw "WS: close!";
+    };
+
+    open = () => {
+        var _ws = new WebSocket(adhConfig.wsuri);
+
+        _ws.onmessage = onmessage;
+        _ws.onerror = onerror;
+        _ws.onopen = onopen;
+        _ws.onclose = onclose;
+
+        return _ws;
+    };
+
+    // (main)
+    _ws = open();
 
     return {
-        subscribe: subscribeWs,
-        unsubscribe: unsubscribeWs,
-        destroy: closeWs
+        subscribe: subscribe,
+        unsubscribe: unsubscribe
     };
 };
+
+
+
+//////////////////////////////////////////////////////////////////////
+// test widget
+
+/**
+ * FIXME: this should go to some test module.
+ *
+ * Take a maximum delay time, an array of arguments and a function.
+ * Generate random delays for each and calls the function
+ * asynchronously (out of order) on each element of the array.  Ignore
+ * return values of f.
+ */
+var trickle = <T>($timeout: ng.ITimeoutService, maxdelay: number, xs: T[], f: (T) => void): void => {
+    xs.map((x) => $timeout(() => f(x), Math.random() * maxdelay, true));
+};
+
+
+interface WebSocketTestScope extends ng.IScope {
+    messages: ServerMessage[];
+    rawPaths: string;
+}
+
+
+/**
+ * A simple test widget that dumps all relevant messages coming in
+ * over the web socket to <pre> elements in the UI.
+ */
+export class WebSocketTest {
+
+    public createDirective = ($timeout: ng.ITimeoutService, adhConfig: AdhConfig.Type, adhWS: Type) : ng.IDirective => {
+        var _self = this;
+
+        return {
+            restrict: "E",
+            templateUrl: adhConfig.templatePath + "/Widgets/WebSocketTest.html",
+            scope: {
+                rawPaths: "@paths"
+            },
+            transclude: true,
+            controller: ["$scope", "$timeout", ($scope: WebSocketTestScope) => {
+                $scope.messages = [];
+                var paths = JSON.parse($scope.rawPaths);
+                paths.map((path) => {
+                    adhWS.subscribe(path, (serverEvent) => $scope.messages.push(serverEvent));
+                });
+
+                // FIXME: just for debugging, we send some ourselves.
+                trickle($timeout, 5000, paths, (path) => $scope.messages.push({ "event": "modified", "resource": path }));
+                trickle($timeout, 10000, paths, (path) => $scope.messages.push({ "event": "modified", "resource": path }));
+            }]
+        };
+    };
+}
+
+
+/**
+ * A button that is inactive as long as no changes are reported.  If a
+ * change message is recieved via the web socket, the button is
+ * activated and changes its appearance.  Incoming change messages are
+ * collected and can be used in the rendering of the button (e.g. for
+ * the message "there are N changes").  On button click, an angular
+ * event is sent to all registered scopes.
+ */
+
+/*
+export class WebSocketTrackerButton {
+    ...
+}
+
+*/
