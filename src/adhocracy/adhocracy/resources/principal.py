@@ -76,13 +76,14 @@ principals_metadata = pool_metadata._replace(
 )
 
 
-class IUserPool(IPool):
+class IUser(IPool):
 
-    """Pool for Groups."""
+    """User resource. This inherits from IPool in order to allow to use this
+    resource as a namespace for user objects. """
 
 
-@implementer(IUserPool)
-class UserPool(Pool):
+@implementer(IUser)
+class User(Pool):
 
     """User pool."""
 
@@ -92,8 +93,8 @@ class UserPool(Pool):
 
 
 user_metadata = pool_metadata._replace(
-    iresource=IUserPool,
-    content_class=UserPool,
+    iresource=IUser,
+    content_class=User,
     element_types=[]  # we don't want the frontend to post resources here
 )
 
@@ -105,7 +106,7 @@ class IUsersPool(IPool):
 
 users_metadata = pool_metadata._replace(
     iresource=IUsersPool,
-    element_types=[IUserPool]
+    element_types=[IUser]
 )
 
 
