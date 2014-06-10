@@ -112,13 +112,13 @@ Docstring formatting
 * javadoc-style parameter descriptions, see
   http://sphinx-doc.org/domains.html#info-field-lists (should)
 * example::
-   
+
     def methodx(self, a: dict, flag=False) -> str:
         """Do something.
 
         :param a: description for a
         :param flag: description for flag
-       
+
         """
 
 
