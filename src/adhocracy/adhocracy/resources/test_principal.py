@@ -41,7 +41,8 @@ class PrincipalIntegrationTest(unittest.TestCase):
         from adhocracy.resources.principal import IGroupsPool
         from adhocracy.resources.principal import IPasswordResetsPool
 
-        inst = self.config.registry.content.create(IPrincipalsPool.__identifier__)
+        inst = self.config.registry.content.create(
+            IPrincipalsPool.__identifier__)
 
         assert IPrincipalsPool.providedBy(inst)
         assert 'users' in inst
