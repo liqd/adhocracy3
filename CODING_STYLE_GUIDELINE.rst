@@ -11,6 +11,80 @@ Testing
   * unit test examples substanced code, http://www.diveintopython.net/unit_testing/
   * testdriven concept: http://www.c2.com/cgi/wiki?TestDrivenDevelopment)
 
+
+Git commits
+-----------
+
+Git commits serve different purposes:
+
+* Allow reviewers to quickly go through your changes.
+* Help developers in the future to understand the intention of your change
+  using ``git blame``.
+* Use the break of writing a commit message as an opportunity to reflect on
+  what you have just coded.
+
+
+Therefore:
+
+* Aim at making small commits containing only one semantic change.
+
+  In order to that, you may want to use it helper tools such as
+  `tig <https://redmine.liqd.net/issues/1184>`_,
+  `git-cola <https://git-cola.github.io/>`_ or plain ``git add --interactive``
+  or ``git add --patch``, allowing for easy line-by-line staging. Interactive
+  rebasing (``git rebase -i``) may help with cleaning up history in retrospect,
+  i.e. splitting / combining / reordering commits. Be aware of not pushing
+  published non-volatile branches (as described in the code review process
+  document).
+
+* The test suite should run through successfully on every commit. Test coverage
+  doesn't necessarily need to be 100% on each commit, as some developers may
+  want to split commits in functional code and testing code and write the
+  latter later. Of course writing the tests first is preferred.
+
+* For the actual commit message, we follow the rules, which are codified
+  `as an example <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_
+  by tpope::
+
+    Capitalized, short (50 chars or less) summary
+
+    More detailed explanatory text, if necessary.  Wrap it to about 72
+    characters or so.  In some contexts, the first line is treated as the
+    subject of an email and the rest of the text as the body.  The blank
+    line separating the summary from the body is critical (unless you omit
+    the body entirely); tools like rebase can get confused if you run the
+    two together.
+
+    Write your commit message in the imperative: "Fix bug" and not "Fixed bug"
+    or "Fixes bug."  This convention matches up with commit messages generated
+    by commands like git merge and git revert.
+
+    Further paragraphs come after blank lines.
+
+    1. Bullet points are okay, too
+
+    2. Typically a hyphen or asterisk is used for the bullet, preceded by a
+       single space, with blank lines in between, but conventions vary here
+
+    3. Use a hanging indent
+
+* Referring to other commits can be done by using their hash ID.
+
+* TODO: We may want to introduce commit message naming conventions, such as
+  starting the message with "Fix:", "Refactor:" or similar. I don't have an
+  opinion on this; I'd like to be able to state "Revert hash" and "Fixup hash".
+  Note that there's already standard messages for commits created by git
+  (Revert "...") and conventions for review commits (``[R] prefix``) as as
+  described in the code review guidelines.
+
+
+Git branches
+------------
+
+Use and naming of git branches is explained in the code review process
+document.
+
+
 Python
 ------
 
