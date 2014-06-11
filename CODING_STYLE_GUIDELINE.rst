@@ -75,10 +75,17 @@ Descriptive summary prefix keywords are encouraged, but there is no
 strict rule as to which keywords exist and where to use them.  Here is
 a list of options::
 
-* Refactor (followed by a commit hash)
-* Fixup (followed by a commit hash to squash this one into)
+* Refactor (optionaly followed by a commit hash)
+
+* Fixup (optionally followed by a commit hash to squash this one into;
+  defaults to previous commit)::
+
+    Fixup a93bhd34: typo
+
 * Fix (for repair work that you may want to keep in a separate commit)
-* Whitespace (for alignment etc.)
+
+* Gardening (for changes that do not significantly change the meaning
+  or structure of the code, such as style guide fixes)
 
 Note that there's already standard messages for commits created by git
 (Revert "...") and conventions for review commits (``[R] prefix``) as
