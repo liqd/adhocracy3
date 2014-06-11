@@ -111,8 +111,18 @@ class ClientCommunicator(WebSocketServerProtocol):
     # All instances of this class share the same tracker
     tracker = ClientTracker()
 
-    def __init__(self, context):
-        """Create a new instance."""
+    def __init__(self, context=None):
+        """Create a new instance.
+
+        :param context: the root context; if `None`, the `init_context` must
+                        invoked separately before this instance is ready to
+                        be used
+        """
+        if context is not None:
+            self.init_context(context)
+
+    def init_context(self, context):
+        """Initialize Colander schemas using the root context."""
         self._client_request_schema = self._bind_schema(ClientRequestSchema(),
                                                         context)
         self._status_confirmation = self._bind_schema(StatusConfirmation(),
@@ -328,11 +338,25 @@ def notify_new_version(resource: IResource, new_version: IItemVersion) -> None:
 
 
 def includeme(config):
-    """Open WebSocket connection on port 8080."""
+    """Configure WebSockets server."""
+    # FIXME implement as necessary
+
+
+def start():
+    """Start WebSockets server on port 8080."""
+    # FIXME adapt as necessary
     port = 8080
     factory = WebSocketServerFactory('ws://localhost:{}'.format(port))
     factory.protocol = ClientCommunicator
     loop = asyncio.get_event_loop()
     coro = loop.create_server(factory, '127.0.0.1', port)
-    loop.run_until_complete(coro)
     logger.debug('Started WebSocket server listening on port %i', port)
+    server = loop.run_until_complete(coro)
+
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.close()
+        loop.close()
