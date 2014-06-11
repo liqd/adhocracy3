@@ -22,6 +22,7 @@ Git commits serve different purposes:
   using ``git blame``.
 * Use the break of writing a commit message as an opportunity to reflect on
   what you have just coded.
+* Backup what you did and allow reverting to an earlier state, if necessary.
 
 
 Therefore:
