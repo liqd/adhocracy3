@@ -91,7 +91,7 @@ FIXME:
    - only when needed directly, or when expected to be needed in e.g. subclass.
 
 -  If you need an alias for ``this``, always use ``self`` (as in knockout).
-   (``_this`` is used by typescript in compiled code and is disallowed
+   (``_this`` is used by TypeScript in compiled code and is disallowed
    in typescript source in e.g. class instance methods.)
 
    if more than one nested self is needed, re-assign outer ``self``\ s
@@ -234,7 +234,7 @@ Template
 Documentation
 ~~~~~~~~~~~~~
 
--  Use `jsdoc`_-style comments in your code.
+-  Use `JSDoc`_-style comments in your code.
 
    -  Currently, no tool seems to be available to include JSDoc
       comments in sphinx.
