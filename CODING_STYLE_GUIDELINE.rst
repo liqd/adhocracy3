@@ -28,7 +28,7 @@ Therefore:
 
 * Aim at making small commits containing only one semantic change.
 
-  In order to that, you may want to use it helper tools such as
+  In order to that, you may want to use helper tools such as
   `tig <https://redmine.liqd.net/issues/1184>`_,
   `git-cola <https://git-cola.github.io/>`_ or plain ``git add --interactive``
   or ``git add --patch``, allowing for easy line-by-line staging. Interactive
@@ -44,7 +44,7 @@ Therefore:
 
 * For the actual commit message, we follow the rules, which are codified
   `as an example <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_
-  by tpope::
+  by tpope:
 
     Capitalized, short (50 chars or less) summary
 
@@ -73,7 +73,7 @@ Therefore:
 
 Descriptive summary prefix keywords are encouraged, but there is no
 strict rule as to which keywords exist and where to use them.  Here is
-a list of options::
+a list of options:
 
 * Refactor (optionaly followed by a commit hash)
 
@@ -89,7 +89,7 @@ a list of options::
 
 Note that there's already standard messages for commits created by git
 (Revert "...") and conventions for review commits (``[R] prefix``) as
-as described in the code review guidelines.
+described in the code review guidelines.
 
 
 Git branches
