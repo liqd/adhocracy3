@@ -14,7 +14,7 @@ def root_factory(request, t=transaction, g=get_connection,
     It accepts a request and returns an instance of the ``Root`` content type.
 
     """
-    # FIXME: Fix substanced bug: mark_unfinished_as_finished keyqord
+    # FIXME: Fix substanced bug: mark_unfinished_as_finished keyword
     # is not working
     conn = g(request)
     zodb_root = conn.root()
@@ -32,7 +32,7 @@ def root_factory(request, t=transaction, g=get_connection,
 def includeme(config):  # pragma: no cover
     """Setup basic adhocracy."""
     # FIXME: Fix substanced.sdi bug: you need to register the authorisation
-    # utility first, # then the auhentication.
+    # utility first, then the authentication.
     authz_policy = ACLAuthorizationPolicy()
     config.set_authorization_policy(authz_policy)
     # now we can proceed
