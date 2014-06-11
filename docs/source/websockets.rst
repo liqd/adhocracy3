@@ -92,6 +92,13 @@ ERROR_CODE will be one of the following:
   contains a short description of the problem. In an ideal world,
   this will never happen.
 
+Note that it is not always possible to provice action and resource of
+the respective request (e.g. wtih "invalid_jason").  The client needs
+to keep track of the order in which it sends the requests, and has to
+associate the responses with that list.  Responses (errors or not) are
+guaranteed to be sent to the frontend in the same order the requests
+are sent to the backend.
+
 Notifications
 +++++++++++++
 
