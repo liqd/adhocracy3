@@ -210,8 +210,7 @@ Template
 
          <span data-ng-bind="foo"></span>
 
-   -  FIXME: include HTML checker for automated tests (does that work
-      statically, or do we have to check dynamically rendered DOM trees?)
+   -  FIXME: include HTML checker for automated tests.
 
    -  Exception: The preferred way to use angular directives is the
       element syntax::
