@@ -34,8 +34,7 @@ Therefore:
   or ``git add --patch``, allowing for easy line-by-line staging. Interactive
   rebasing (``git rebase -i``) may help with cleaning up history in retrospect,
   i.e. splitting / combining / reordering commits. Be aware of not pushing
-  published non-volatile branches (as described in the code review process
-  document).
+  published non-volatile branches (as described in :doc:`Code_Review_Process`).
 
 * The test suite should run through successfully on every commit. Test coverage
   doesn't necessarily need to be 100% on each commit, as some developers may
@@ -90,7 +89,7 @@ a list of options:
 
 Note that there's already standard messages for commits created by git
 (Revert "...") and conventions for review commits (``[R] prefix``) as
-described in the code review guidelines.
+described in the :doc:`Code_Review_Process`.
 
 
 Git branches
