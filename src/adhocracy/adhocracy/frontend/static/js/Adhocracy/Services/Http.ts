@@ -8,19 +8,23 @@ import Util = require("Adhocracy/Util");
 
 // send and receive objects with adhocracy data model awareness
 
+// FIXME: This service should be able to handle any type, not just subtypes of
+// ``Types.Content``.  Methods like ``postNewVersion`` may need additional
+// constraints (e.g. by moving them to subclasses).
+
 export var jsonPrefix : string = "/adhocracy";
 
-export interface IService<Data> {
-    get : (path : string) => ng.IPromise<Types.Content<Data>>;
-    put : (path : string, obj : Types.Content<Data>) => ng.IPromise<Types.Content<Data>>;
-    postNewVersion : (oldVersionPath : string, obj : Types.Content<Data>) => ng.IPromise<Types.Content<Data>>;
-    postToPool : (poolPath : string, obj : Types.Content<Data>) => ng.IPromise<Types.Content<Data>>;
+export interface IService<Content extends Types.Content<any>> {
+    get : (path : string) => ng.IPromise<Content>;
+    put : (path : string, obj : Content) => ng.IPromise<Content>;
+    postNewVersion : (oldVersionPath : string, obj : Content) => ng.IPromise<Content>;
+    postToPool : (poolPath : string, obj : Content) => ng.IPromise<Content>;
     metaApiResource : (name : string) => any;
     metaApiSheet : (name : string) => any;
 }
 
-export function factory<Data>($http : ng.IHttpService) : IService<Data> {
-    var adhHttp : IService<Data> = {
+export function factory<Content extends Types.Content<any>>($http : ng.IHttpService) : IService<Content> {
+    var adhHttp : IService<Content> = {
         get: get,
         put: put,
         postNewVersion: postNewVersion,
@@ -39,15 +43,15 @@ export function factory<Data>($http : ng.IHttpService) : IService<Data> {
         };
     }
 
-    function get(path : string) : ng.IPromise<Types.Content<Data>> {
+    function get(path : string) : ng.IPromise<Content> {
         return $http.get(path).then(assertResponse("adhHttp.get", path));
     }
 
-    function put(path : string, obj : Types.Content<Data>) : ng.IPromise<Types.Content<Data>> {
+    function put(path : string, obj : Content) : ng.IPromise<Content> {
         return $http.put(path, obj).then(assertResponse("adhHttp.put", path));
     }
 
-    function postNewVersion(oldVersionPath : string, obj : Types.Content<Data>) : ng.IPromise<Types.Content<Data>> {
+    function postNewVersion(oldVersionPath : string, obj : Content) : ng.IPromise<Content> {
         var dagPath = Util.parentPath(oldVersionPath);
         var config = {
             headers: { follows: oldVersionPath },
@@ -56,7 +60,7 @@ export function factory<Data>($http : ng.IHttpService) : IService<Data> {
         return $http.post(dagPath, exportContent(obj), config).then(assertResponse("adhHttp.postNewVersion", dagPath));
     }
 
-    function postToPool(poolPath : string, obj : Types.Content<Data>) : ng.IPromise<Types.Content<Data>> {
+    function postToPool(poolPath : string, obj : Content) : ng.IPromise<Content> {
         return $http.post(poolPath, exportContent(obj)).then(assertResponse("adhHttp.postToPool", poolPath));
     }
 
@@ -80,13 +84,13 @@ export function factory<Data>($http : ng.IHttpService) : IService<Data> {
 
 // transform objects on the way in and out
 
-export function importContent<Data>(obj : Types.Content<Data>) : Types.Content<Data> {
+export function importContent<Content extends Types.Content<any>>(obj : Content) : Content {
     return obj;
 }
 
-export function exportContent<Data>(obj : Types.Content<Data>) : Types.Content<Data> {
+export function exportContent<Content extends Types.Content<any>>(obj : Content) : Content {
     // FIXME: newobj should be a copy, not a reference
-    var newobj : Types.Content<Data> = obj;
+    var newobj : Content = obj;
 
     // FIXME: Get this list from the server!
     var readOnlyProperties = [

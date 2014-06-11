@@ -17,6 +17,19 @@ class EvolveUnitTest(unittest.TestCase):
         assert isinstance(graph, Graph)
 
 
+    def test_add_graph_to_root_element_graph_already_exists(self):
+        from adhocracy.graph import Graph
+        from adhocracy.graph.evolve import add_graph_to_root_element
+        from adhocracy.utils import find_graph
+        root = testing.DummyResource()
+        root.__graph__ = Graph(root)
+
+        add_graph_to_root_element(root)
+
+        graph = find_graph(root)
+        assert isinstance(graph, Graph)
+
+
 class EvolveIntegrationTest(unittest.TestCase):
 
     def setUp(self):

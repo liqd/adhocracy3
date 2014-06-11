@@ -105,9 +105,12 @@ class GenericResourceSheet(PropertySheet):
 
     def validate_cstruct(self, cstruct: dict) -> dict:
         """Validate schema :term:`cstruct`."""
-        # FIXME: this method does not validate, it`s deserializing instead.
+        # FIXME: misleading name, it does not validate but deserialize.
         for child in self.schema:
-            if getattr(child, 'readonly', False):
+            editable = getattr(child, 'editable', True)
+            creatable = getattr(child, 'creatable', True)
+            writable = editable or creatable
+            if not writable:
                 raise colander.Invalid(child, msg=u'This key is readonly')
         appstruct = self.schema.deserialize(cstruct)
         return appstruct
@@ -125,13 +128,15 @@ sheet_metadata_defaults = sheet_metadata._replace(
     schema_class=colander.MappingSchema,
     permission_view='view',
     permission_edit='edit',
+    permission_create='create',
 )
 
 
 def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
     """Add sheet type to registry."""
     assert metadata.isheet.isOrExtends(ISheet)
-    assert not (metadata.readonly and metadata.createmandatory)
+    if metadata.create_mandatory:
+        assert metadata.creatable and metadata.create_mandatory
     schema = metadata.schema_class()
     for child in schema.children:
         assert child.default != colander.null

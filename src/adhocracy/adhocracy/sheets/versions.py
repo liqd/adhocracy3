@@ -56,6 +56,7 @@ class VersionableSheet(GenericResourceSheet):
     schema_class = VersionableSchema
 
     def set(self, appstruct, omit=()):
+        """Store appstruct, except non-persistent followed_by attribute."""
         if 'followed_by' in appstruct:
             del appstruct['followed_by']
         super().set(appstruct, omit)

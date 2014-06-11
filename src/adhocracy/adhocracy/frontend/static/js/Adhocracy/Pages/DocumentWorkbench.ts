@@ -11,9 +11,10 @@ import Util = require("Adhocracy/Util");
 import Css = require("Adhocracy/Css");
 import AdhHttp = require("Adhocracy/Services/Http");
 import AdhWS = require("Adhocracy/Services/WS");
-import AdhCache = require("Adhocracy/Services/Cache");
+import AdhUser = require("Adhocracy/Services/User");
 
 import Resources = require("Adhocracy/Resources");
+import Widgets = require("Adhocracy/Widgets");
 
 var templatePath : string = "/frontend_static/templates";
 var appPrefix : string = "/app";
@@ -30,6 +31,7 @@ interface IDocumentWorkbenchScope<Data> extends ng.IScope {
     poolEntries     : IDocument<Data>[];
     doc             : IDocument<Data>;  // (iterates over document list with ng-repeat)
     insertParagraph : any;
+    user            : AdhUser.User;
 }
 
 interface DetailScope<Data> extends ng.IScope {
@@ -50,9 +52,10 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
 }
 
 
-export function run<Data>() {
+export function run() {
     var app = angular.module("adhocracy3SampleFrontend", []);
 
+    AdhUser.register(app, "adhUser", "adhLogin");
 
     // services
 
@@ -105,21 +108,36 @@ export function run<Data>() {
     // filters
 
     app.filter("documentTitle", [ function() {
-        return function(resource : Types.Content<Data>) : string {
+        return function(resource : Types.Content<Resources.HasIDocumentSheet>) : string {
             return resource.data["adhocracy.sheets.document.IDocument"].title;
         };
     }]);
 
 
-    // directives
+    // widget-based directives
+
+    app.directive("adhListing",
+                  () => new Widgets.Listing(new Widgets.ListingPoolAdapter()).createDirective());
+
+    app.directive("adhListingElement",
+                  ["$q", ($q) =>
+                   new Widgets.ListingElement(new Widgets.ListingElementAdapter($q)).createDirective()]);
+
+    app.directive("adhListingElementTitle",
+                  ["$q", "adhHttp", ($q, adhHttp) =>
+                   new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective()]);
+
+
+    // application-specific directives
 
     app.directive("adhDocumentWorkbench", function() {
         return {
             restrict: "E",
             templateUrl: templatePath + "/Pages/DocumentWorkbench.html",
-            controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasIDocumentSheet>,
-                                  $scope   : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>) : void
+            controller: ["adhHttp", "$scope", "adhUser",
+                         function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>,
+                                  $scope   : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>,
+                                  user     : AdhUser.User) : void
             {
                 $scope.insertParagraph = function(proposalVersion: Types.Content<Resources.HasIDocumentSheet>) {
                     $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
@@ -128,6 +146,7 @@ export function run<Data>() {
                 adhHttp.get(AdhHttp.jsonPrefix).then((pool) => {
                     $scope.pool = pool;
                     $scope.poolEntries = [];
+                    $scope.user = user;
 
                     // FIXME: factor out getting the head version of a DAG.
 
@@ -171,8 +190,8 @@ export function run<Data>() {
                 viewmode: "=",
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Data>,
-                                  $scope   : IProposalVersionDetailScope<Data>) : void
+                         function(adhHttp  : AdhHttp.IService<Types.Content<any>>,
+                                  $scope   : IProposalVersionDetailScope<any>) : void
             {
                 $scope.list = function() {
                     $scope.viewmode = "list";
@@ -253,7 +272,7 @@ export function run<Data>() {
                 viewmode: "=",
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasISectionSheet>,
+                         function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasISectionSheet>>,
                                   $scope   : DetailRefScope<Resources.HasISectionSheet>) : void
             {
                 var commit = function(event, ...args) {
@@ -281,7 +300,7 @@ export function run<Data>() {
                 viewmode: "=",
             },
             controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Resources.HasIParagraphSheet>,
+                         function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasIParagraphSheet>>,
                                   $scope   : DetailRefScope<Resources.HasIParagraphSheet>) : void
             {
                 var commit = function(event, ...args) {

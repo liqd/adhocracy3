@@ -43,6 +43,13 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
         add_app_root_element(root)
         assert 'adhocracy' in root
 
+    def test_add_root_element_root_already_exists(self):
+        from adhocracy.evolution import add_app_root_element
+        root = DummyFolder()
+        root['adhocracy'] = DummyFolder()
+        add_app_root_element(root)
+        assert 'adhocracy' in root
+
     def test_add_app_root_permissions(self):
         from adhocracy.evolution import add_app_root_permissions
         root = testing.DummyResource()

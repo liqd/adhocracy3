@@ -10,6 +10,10 @@ import Types = require("Adhocracy/Types");
 import Util = require("Adhocracy/Util");
 
 
+export interface HasIPoolSheet {
+    "adhocracy.sheets.pool.IPool": IPoolSheet;
+}
+
 export interface HasIDocumentSheet {
     "adhocracy.sheets.document.IDocument": IDocumentSheet;
 }
@@ -24,6 +28,10 @@ export interface HasIParagraphSheet {
 
 export interface HasIVersionsSheet {
     "adhocracy.sheets.versions.IVersions": IVersionsSheet;
+}
+
+export interface IPoolSheet {
+    elements: string[];
 }
 
 export interface IDocumentSheet {

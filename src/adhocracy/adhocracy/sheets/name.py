@@ -4,7 +4,7 @@ import colander
 from adhocracy.interfaces import ISheet
 from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.sheets import sheet_metadata_defaults
-from adhocracy.schema import Identifier
+from adhocracy.schema import Name
 
 
 class IName(ISheet):
@@ -17,14 +17,16 @@ class NameSchema(colander.MappingSchema):
     """Name sheet data structure.
 
     `name`: a human readable resource Identifier
-
     """
 
-    name = Identifier(default='', missing=colander.drop)
+    name = Name()
 
 
 name_metadata = sheet_metadata_defaults._replace(isheet=IName,
-                                                 schema_class=NameSchema)
+                                                 schema_class=NameSchema,
+                                                 editable=False,
+                                                 create_mandatory=True,
+                                                 )
 
 
 def includeme(config):

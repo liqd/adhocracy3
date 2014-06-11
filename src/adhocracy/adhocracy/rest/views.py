@@ -4,9 +4,11 @@ from logging import getLogger
 import functools
 
 from colander import SchemaNode
+from colander import MappingSchema
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
 from cornice.schemas import CorniceSchema
+from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
@@ -36,7 +38,7 @@ from adhocracy.utils import to_dotted_name
 logger = getLogger(__name__)
 
 
-def validate_sheet_cstructs(context, request, sheets):
+def validate_sheet_cstructs(context, request: Request, sheets=[]):
     """Validate sheet data."""
     validated = request.validated.get('data', {})
     sheetnames_wrong = []
@@ -51,14 +53,14 @@ def validate_sheet_cstructs(context, request, sheets):
         del validated[sheetname]
 
 
-def validate_put_sheet_cstructs(context, request):
+def validate_put_sheet_cstructs(context, request: Request, sheets=[]):
     """Validate sheet data for put requests."""
     sheets = request.registry.content.resource_sheets(
         context, request, onlyeditable=True)
     validate_sheet_cstructs(context, request, sheets)
 
 
-def validate_post_sheet_cstructs(context, request):
+def validate_post_sheet_cstructs(context, request: Request):
     """Validate sheet data for post requests."""
     type_ = request.validated.get('content_type', '')
     dummy = object()
@@ -72,7 +74,7 @@ def validate_post_sheet_cstructs(context, request):
     validate_sheet_cstructs(dummy, request, sheets)
 
 
-def validate_post_root_versions(context, request):
+def validate_post_root_versions(context, request: Request):
     """Check and transform the 'root_version' paths to resources."""
     root_paths = request.validated.get('root_versions', [])
     root_resources = []
@@ -95,8 +97,8 @@ def validate_post_root_versions(context, request):
     request.validated['root_versions'] = root_resources
 
 
-def validate_put_sheet_names(context, request):
-    """Validate sheet names for put requests. Return None."""
+def validate_put_sheet_names(context, request: Request):
+    """Validate sheet names for put requests."""
     sheets = request.registry.content.resource_sheets(
         context, request, onlyeditable=True)
     puted = request.validated.get('data', {}).keys()
@@ -107,7 +109,7 @@ def validate_put_sheet_names(context, request):
         request.errors.add('body', 'data', error)
 
 
-def validate_post_sheet_names_and_resource_type(context, request):
+def validate_post_sheet_names_and_resource_type(context, request: Request):
     """Validate addable sheet names for post requests."""
     addables = request.registry.content.resource_addables(context, request)
     content_type = request.validated.get('content_type', '')
@@ -131,28 +133,28 @@ def validate_post_sheet_names_and_resource_type(context, request):
             request.errors.add('body', 'data', error)
 
 
-def validate_request_data(context, request, schema=None, extra_validators=[]):
+def validate_request_data(context, request: Request, schema=MappingSchema,
+                          extra_validators=[]):
     """ Validate request data.
 
-    Args:
-        context (class): context passed to validator functions
-        request (IRequest): request object passed to validator functions
-        schema (colander.Schema): Schema to validate request body with json
-            data, request url parameters or headers (based on Cornice).
-        extra_validators (List): validator functions with parameter context
-            and request.
+    :param context: passed to validator functions
+    :param request: passed to validator functions
+    :param schema: Schema to validate the request data with
+        :func:`cornice.schemas.validate_colander_schema`.
+        `None` value is allowed.
+    :extra_validators: additionale validator functions. The have to accept
+        the arguments `context` and `request`.
 
-    Raises:
-        _JSONError: HTTP 400 error based on Cornice if bad request data.
+    :raises _JSONError: HTTP 400 for bad request data.
 
     """
     if schema:
-        schemac = CorniceSchema.from_colander(schema)
+        schema_cornice = CorniceSchema.from_colander(schema)
         # FIXME workaround for Cornice not finding a request body
         if (not hasattr(request, 'deserializer') and
                 hasattr(request, 'json')):
             request.deserializer = lambda req: req.json
-        validate_colander_schema(schemac, request)
+        validate_colander_schema(schema_cornice, request)
     for val in extra_validators:
         val(context, request)
     if request.errors:
@@ -161,7 +163,7 @@ def validate_request_data(context, request, schema=None, extra_validators=[]):
         raise json_error(request.errors)
 
 
-def _log_request_errors(request):
+def _log_request_errors(request: Request):
     logger.warn('Found %i validation errors in request: <%s>',
                 len(request.errors), request.body)
     for error in request.errors:
@@ -171,14 +173,10 @@ def _log_request_errors(request):
 def validate_request_data_decorator():
     """Validate request data for every http method of your RESTView class.
 
-    Runs validate_request_data with schema and validators set in the attribute
-    `validation_<http method>`.
+    Run :func:`validate_request_data* with schema and additional validators
+    from the class attribute `validation_<http method>`.
 
-    Returns:
-        class: view class
-    Raises:
-        _JSONError: HTTP 400 error based on Cornice if bad request data.
-
+    :returns: decorated method
     """
     def _dec(f):
         @functools.wraps(f)
@@ -241,13 +239,8 @@ class ResourceRESTView(RESTView):
     """Default view for Resources, implements get and options."""
 
     @view_config(request_method='OPTIONS')
-    def options(self):
-        """Handle OPTIONS requests.
-
-        Return dictionary describing the available request and response
-        data structures.
-
-        """
+    def options(self) -> dict:
+        """Get possible request/response data structures and http methods."""
         addables = self.registry.resource_addables(self.context, self.request)
         sheets_view = self.registry.resource_sheets(self.context, self.request,
                                                     onlyviewable=True)
@@ -268,8 +261,8 @@ class ResourceRESTView(RESTView):
         return cstruct
 
     @view_config(request_method='GET')
-    def get(self):
-        """Handle GET requests. Return dict with resource data structure."""
+    def get(self) -> dict:
+        """Get resource data."""
         sheets_view = self.registry.resource_sheets(self.context, self.request,
                                                     onlyviewable=True)
         struct = {'data': {}}
@@ -296,18 +289,18 @@ class SimpleRESTView(ResourceRESTView):
                        validate_put_sheet_cstructs])
 
     @view_config(request_method='OPTIONS')
-    def options(self):
-        """Handle OPTIONS requests. Return dict."""
+    def options(self) -> dict:
+        """Get possible request/response data structures and http methods."""
         return super().options()  # pragma: no cover
 
     @view_config(request_method='GET')
-    def get(self):
-        """Handle GET requests. Return dict."""
+    def get(self) -> dict:
+        """Get resource data."""
         return super().get()  # pragma: no cover
 
     @view_config(request_method='PUT')
-    def put(self):
-        """Handle HTTP PUT. Return dict with PATH of modified resource."""
+    def put(self) -> dict:
+        """Edit resource and get response data."""
         sheets = self.registry.resource_sheets(self.context, self.request,
                                                onlyeditable=True)
         appstructs = self.request.validated.get('data', {})
@@ -335,27 +328,22 @@ class PoolRESTView(SimpleRESTView):
                         validate_post_sheet_cstructs])
 
     @view_config(request_method='OPTIONS')
-    def options(self):
-        """Handle OPTIONS requests. Return dict."""
+    def options(self) -> dict:
+        """Get possible request/response data structures and http methods."""
         return super().options()  # pragma: no cover
 
     @view_config(request_method='GET')
-    def get(self):
-        """Handle GET requests. Return dict."""
+    def get(self) -> dict:
+        """Get resource data."""
         return super().get()  # pragma: no cover
 
     @view_config(request_method='PUT')
-    def put(self):
-        """Handle HTTP PUT. Return dict with PATH of modified resource."""
+    def put(self) -> dict:
+        """Edit resource and get response data."""
         return super().put()  # pragma: no cover
 
-    def build_post_response(self, resource):
-        """Helper method that builds a response for a POST request.
-
-        Returns:
-            the serialized response
-
-        """
+    def build_post_response(self, resource) -> dict:
+        """Build response data structure for a POST request. """
         struct = {}
         struct['path'] = resource_path(resource)
         iresource = get_iresource(resource)
@@ -374,8 +362,8 @@ class PoolRESTView(SimpleRESTView):
         return {'first_version_path': first_path}
 
     @view_config(request_method='POST')
-    def post(self):
-        """HTTP POST. Return dictionary with PATH of new resource."""
+    def post(self) -> dict:
+        """Create new resource and get response data."""
         resource_type = self.request.validated['content_type']
         appstructs = self.request.validated.get('data', {})
         resource = self.registry.create(resource_type, self.context,
@@ -398,14 +386,15 @@ class ItemRESTView(PoolRESTView):
                         validate_post_sheet_cstructs])
 
     @view_config(request_method='GET')
-    def get(self):
+    def get(self) -> dict:
+        """Get resource data."""
         struct = super().get()
         struct.update(self._get_dict_with_first_version_path(self.context))
         return GETItemResponseSchema().serialize(struct)
 
     @view_config(request_method='POST')
     def post(self):
-        """HTTP POST. Return dictionary with PATH of new resource."""
+        """Create new resource and get response data."""
         resource_type = self.request.validated['content_type']
         appstructs = self.request.validated.get('data', {})
         root_versions = self.request.validated.get('root_versions', [])
@@ -446,9 +435,8 @@ class MetaApiView(RESTView):
         """
         resource_map = {}
 
-        for name, value in resource_types.items():
+        for name, metadata in resource_types.items():
             prop_map = {}
-            metadata = value['metadata']
 
             # List of sheets
             sheets = []
@@ -470,23 +458,22 @@ class MetaApiView(RESTView):
             resource_map[name] = prop_map
         return resource_map
 
-    def _sheet_field_readable(self, sheetname, fieldname, sheet_readonly):
+    def _sheet_field_creatable_or_editable(self, sheetname: str,
+                                           fieldname: str,
+                                           default: bool) -> bool:
         """Hook that allows modifying the read-only status for fields.
 
-        This allows setting a field read-only even if the whole sheet is
-        writeable in the backend.
-
-        Returns True or False.
+        This allows setting a field none editable and none creatable even
+        if the  whole sheet is editable/creatable in the backend.
 
         FIXME: this is just a cosmetic ad-hoc solution since the read-only
         status in the backend is not affected.
-
         """
         if (sheetname, fieldname) == ('adhocracy.sheets.versions.IVersionable',
                                       'followed_by'):
-            return True
+            return False
         else:
-            return sheet_readonly
+            return default
 
     def _describe_sheets(self, sheet_metadata):
         """Build a description of the sheets used in the system.
@@ -502,14 +489,12 @@ class MetaApiView(RESTView):
         """
         sheet_map = {}
         for sheet_name, metadata in sheet_metadata.items():
-            # readonly and createmandatory flags are currently defined for
+            # readable and create_mandatory flags are currently defined for
             # the whole sheet, but we copy them as attributes into each field
             # definition, since this might change in the future.
             # (The _sheet_field_readable method already allows overwriting the
             # readable flag on a field-by-field basis, but it's somewhat
             # ad-hoc.)
-            createmandatory = metadata.createmandatory
-            readonly = metadata.readonly
             fields = []
 
             # Create field definitions
@@ -544,12 +529,17 @@ class MetaApiView(RESTView):
 
                 typ_stripped = strip_optional_prefix(typ, 'colander.')
 
+                editable = self._sheet_field_creatable_or_editable(
+                    sheet_name, fieldname, metadata.editable)
+                creatable = self._sheet_field_creatable_or_editable(
+                    sheet_name, fieldname, metadata.creatable)
                 fielddesc = {
                     'name': fieldname,
                     'valuetype': typ_stripped,
-                    'createmandatory': createmandatory,
-                    'readonly': self._sheet_field_readable(
-                        sheet_name, fieldname, readonly)
+                    'create_mandatory': metadata.create_mandatory,
+                    'editable': editable,
+                    'creatable': creatable,
+                    'readable': metadata.readable,
                 }
                 if containertype is not None:
                     fielddesc['containertype'] = containertype
@@ -565,8 +555,8 @@ class MetaApiView(RESTView):
         return sheet_map
 
     @view_config(request_method='GET')
-    def get(self):
-        """Return the API specification of this installation as JSON."""
+    def get(self) -> dict:
+        """Get the API specification of this installation as JSON."""
         # Collect info about all resources
         resource_types = self.registry.resources_metadata()
         resource_map = self._describe_resources(resource_types)

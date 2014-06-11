@@ -4,6 +4,7 @@ from pyramid.traversal import find_resource
 from substanced import schema
 from substanced.schema import IdSet
 import colander
+import pytz
 
 from adhocracy.interfaces import SheetReference
 
@@ -58,16 +59,72 @@ def deserialize_path(node, value):
     return resource
 
 
-class Identifier(colander.SchemaNode):
+def name_is_unique_validator(node: colander.SchemaNode, value: str):
+    """Validate if `value` is name that does not exists in the parent object.
 
-    """Alpha/numeric/_/-/. String.
+    Node must a have a `context` binding object with an __parent__ attribute
+    that points to a dictionary like object.
+
+    :raises colander.Invalid: if `name` already exists in the parent or parent
+                              is None.
+    """
+    context = node.bindings.get('context')
+    parent = context.__parent__
+    if parent is None:
+        msg = 'This resource has no parent pool to validate that the name is'\
+              ' unique'
+        raise colander.Invalid(node, msg)
+    if value in parent:
+        msg = 'The name "{0}" already exists in the parent pool.'.format(value)
+        raise colander.Invalid(node, msg)
+
+
+class Name(colander.SchemaNode):
+
+    """ The unique `name` of a resource inside the parent pool.
+
+    Allowed characters are: "alpha" "numeric" "_"  "-" "."
+    The maximal length is 100 characters, the minimal length 1.
 
     Example value: blu.ABC_12-3
+    """
+
+    schema_type = colander.String
+    default = '',
+    missing = colander.drop
+    validator = colander.All(colander.Regex(u'^[a-zA-Z0-9\_\-\.]+$'),
+                             colander.Length(min=1, max=100),
+                             name_is_unique_validator)
+
+
+class Email(colander.SchemaNode):
+
+    """String with email address.
+
+    Example value: test@test.de
 
     """
 
     schema_type = colander.String
-    validator = colander.Regex(u'^[a-zA-Z0-9\_\-\.]+$')
+    default = ''
+    missing = colander.drop
+    validator = colander.Email()
+
+
+_ZONES = pytz.all_timezones
+
+
+class TimeZoneName(colander.SchemaNode):
+
+    """String with time zone.
+
+    Example value: UTC
+    """
+
+    schema_type = colander.String
+    default = 'UTC'
+    missing = colander.drop
+    validator = colander.OneOf(_ZONES)
 
 
 class AbsolutePath(colander.SchemaNode):
