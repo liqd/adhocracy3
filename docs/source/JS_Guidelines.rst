@@ -41,6 +41,7 @@ checked with tslint.
 
    -  If chain elements are many lines long, it is ok to avoid
       chaining.  In this case, if chaining is used, newlines and
+      chaining.  In this case, if chaining is used anyway, newlines and
       comments between chain elements are encouraged.
 
    -  Layout: Each function (also the first one) starts a new line.  The
