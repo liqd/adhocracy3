@@ -1,1 +1,0 @@
-../../REFACTOR_GUIDELINE.rst
