@@ -48,51 +48,6 @@ The second requires the container to have the ``Pool`` sheet and gets
 the element paths from there.
 
 
-Scope Interfaces
-----------------
-
-Widget scopes must be typed in the controller.  The concrete type may
-depend on type parameters of the generic Widget class type.
-
-Example::
-
-    export interface ListingScope<Container> {
-        path: string;
-        title: string;
-    }
-
-    export class Listing<Container ...>
-        [...]
-        scope: {
-            path: "@",
-            title: "@"
-        },
-        transclude: true,
-        controller: [
-            "$scope",
-            function($scope: ListingScope<Container>) : void
-            {
-                [...]
-            }
-
-.. REVIEW: I do not think this section belongs here. Scope interfaces
-   are not specific to widgets
-
-.. REVIEW[mf]: (answer to all REVIEW markers in this file and commit.)
-   i want to believe that the documentation has some value,
-   independetly of the questions whether it belongs into this
-   particular file or whether it is redundant.  i would like to not
-   remove anything, but i realized that perhaps we should merge this
-   file and the JS_Policy file, and make it a considerably larger
-   thing more suitably called "a hacker's guide to the a3 frontend
-   code"?  if there are no objections, I propose to (1) merge this PR
-   into master, (2) rebase 2014-05-mf-js-guidelines+1 behind it,
-   and (3) re-organize both JS_Guidelines.rst and this file into a
-   more coherent Frontend_Guide.rst as part of
-   2014-05-mf-js-guidelines+1.  (we could also postpone this, and
-   leave it as a FIXME in JS_Guidelines for now.)
-
-
 Widget Classes
 --------------
 

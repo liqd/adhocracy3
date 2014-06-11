@@ -200,6 +200,8 @@ Angular
       rationale: When using service modules, the fact that they provide
       services is obvious.
 
+-  angular scopes must be typed with interfaces.
+
 Template
 ~~~~~~~~
 
