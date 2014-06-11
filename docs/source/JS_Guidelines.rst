@@ -84,12 +84,6 @@ checked with tslint.
    This is less confusing. `Further reading
    <http://kangax.github.io/nfe/#expr-vs-decl>`_
 
-FIXME:
-
--  when to return promises (this point may need to go to another place in this doc?)
-
-   - only when needed directly, or when expected to be needed in e.g. subclass.
-
 -  If you need an alias for ``this``, always use ``self`` (as in knockout).
    (``_this`` is used by TypeScript in compiled code and is disallowed
    in typescript source in e.g. class instance methods.)
@@ -115,8 +109,6 @@ TypeScript
 -  Type functions, not the variables they are assigned to.
 
 -  Use ``Array<type>`` rather than ``type[]``
-
--  FIXME: how strictly to enforce types?
 
 Lambdas
 ~~~~~~~
