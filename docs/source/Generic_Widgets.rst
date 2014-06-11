@@ -218,31 +218,6 @@ you can add constructor parameters::
                         ...
 
 
-Directive element attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can pass data from the XML element in the template, and the widget
-can find it in the ``$scope``.
-
-In the template::
-
-    <adh-listing path="/adhocracy/Proposals">
-    </adh-listing>
-
-In the controller::
-
-    return {
-        scope: {
-            path: "@"
-        }
-        controller: ($scope) =>
-            {
-                $http.get($scope.path).success(...);
-                ....
-
-.. REVIEW: This is described in the angular docu and is not specific to
-   adhocracy
-
 Directive element body
 ~~~~~~~~~~~~~~~~~~~~~~
 

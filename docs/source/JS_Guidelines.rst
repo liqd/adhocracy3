@@ -174,7 +174,7 @@ they avoid common mistakes like this::
 Angular
 -------
 
--  prefer isolated scope in directives and pass in variables
+-  prefer `isolated scope`_ in directives and pass in variables
    explicitly.
 
 -  direct DOM manipulation/jQuery is only allowed inside directives.
@@ -244,3 +244,4 @@ Documentation
 .. _strict mode: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode
 .. _tslint: https://github.com/palantir/tslint
 .. _jsdoc: http://usejsdoc.org/
+.. _isolated scope: https://docs.angularjs.org/guide/directive#isolating-the-scope-of-a-directive
