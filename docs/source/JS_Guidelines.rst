@@ -230,6 +230,11 @@ Template
 -  CSS and JavaScript are not allwed in templates.  This includes
    `ngStyle <https://docs.angularjs.org/api/ng/directive/ngStyle>`_.
 
+-  Since templates (1) ideally are to be maintained by designers rather
+   than software developers, and (2) are not type-checked by typescript,
+   they must contain as little code as possible.
+
+
 Documentation
 ~~~~~~~~~~~~~
 

@@ -75,11 +75,6 @@ Example::
                 [...]
             }
 
-Since templates (1) ideally are to be maintained by designers rather
-than software developers, and (2) are not type-checked by typescript,
-they must contain as little code as possible.  Everything that can be
-written down in the widget class, should be.
-
 .. REVIEW: I do not think this section belongs here. Scope interfaces
    are not specific to widgets
 
