@@ -68,7 +68,8 @@ Therefore:
 
     3. Use a hanging indent
 
-* Referring to other commits can be done by using their hash ID.
+* Referring to other commits can be done by using their hash ID.  Be aware
+  that the hash ID changes on rebase.
 
 
 Descriptive summary prefix keywords are encouraged, but there is no
