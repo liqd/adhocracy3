@@ -11,14 +11,14 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   INSTALLATION
+   installation
    rest_api
-   DEVELOPMENT
-   CODING_STYLE_GUIDELINE.rst
-   REFACTOR_GUIDELINE
+   development
+   coding_style_guideline
+   refactor_guideline
    supergraph.rst
-   supergraph-2013-11-12.rst
-   instance_modelling_example.rst
+   supergraph-2013-11-12
+   instance_modelling_example
    no_patches.rst
    adhocracy
 
