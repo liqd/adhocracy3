@@ -21,6 +21,7 @@ Contents
    instance_modelling_example
    no_patches.rst
    adhocracy
+   CHANGES
 
 
 Indices and tables
