@@ -24,8 +24,15 @@ Git commits serve different purposes:
   what you have just coded.
 * Backup what you did and allow reverting to an earlier state, if necessary.
 
+These goals may be in conflict with other goals (such as "have more
+time for writing tests and code"), and sometimes even with each other
+("small commits" vs. "test suite always works").  Therefore, this
+section does not contain any strict rules, but suggestions.  The
+reader is encouraged to decide in which contexts they make sense.  (In
+particular, "should" is not the RFC-all-caps "SHOULD", but something
+to consider.)
 
-Therefore:
+Suggestions:
 
 * Aim at making small commits containing only one semantic change.
 
