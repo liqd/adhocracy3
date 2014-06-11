@@ -40,7 +40,6 @@ checked with tslint.
 -  Chaining is to be preferred.
 
    -  If chain elements are many lines long, it is ok to avoid
-      chaining.  In this case, if chaining is used, newlines and
       chaining.  In this case, if chaining is used anyway, newlines and
       comments between chain elements are encouraged.
 
