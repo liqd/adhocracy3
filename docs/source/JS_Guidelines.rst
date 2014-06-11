@@ -108,7 +108,7 @@ TypeScript
 
 -  Type functions, not the variables they are assigned to.
 
--  Use ``Array<type>`` rather than ``type[]``
+-  Use ``type[]`` rather than ``Array<type>``.
 
 Lambdas
 ~~~~~~~
