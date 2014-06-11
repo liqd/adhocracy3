@@ -49,7 +49,7 @@ Status Confirmations
 ~~~~~~~~~~~~~~~~~~~~
 
 If a client request was processed successfully by the server, it sends a status
-confirmation:
+confirmation::
 
     { "status": "STATUS", "action": "ACTION", "resource": "RESOURCE_PATH" }
 
