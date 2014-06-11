@@ -28,14 +28,13 @@ Therefore:
 
 * Aim at making small commits containing only one semantic change.
 
-  In order to that, you may want to use it helper tools such as
+  In order to that, you may want to use helper tools such as
   `tig <https://redmine.liqd.net/issues/1184>`_,
   `git-cola <https://git-cola.github.io/>`_ or plain ``git add --interactive``
   or ``git add --patch``, allowing for easy line-by-line staging. Interactive
   rebasing (``git rebase -i``) may help with cleaning up history in retrospect,
   i.e. splitting / combining / reordering commits. Be aware of not pushing
-  published non-volatile branches (as described in the code review process
-  document).
+  published non-volatile branches (as described in :doc:`Code_Review_Process`).
 
 * The test suite should run through successfully on every commit. Test coverage
   doesn't necessarily need to be 100% on each commit, as some developers may
@@ -44,7 +43,7 @@ Therefore:
 
 * For the actual commit message, we follow the rules, which are codified
   `as an example <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_
-  by tpope::
+  by tpope:
 
     Capitalized, short (50 chars or less) summary
 
@@ -68,12 +67,13 @@ Therefore:
 
     3. Use a hanging indent
 
-* Referring to other commits can be done by using their hash ID.
+* Referring to other commits can be done by using their hash ID.  Be aware
+  that the hash ID changes on rebase.
 
 
 Descriptive summary prefix keywords are encouraged, but there is no
 strict rule as to which keywords exist and where to use them.  Here is
-a list of options::
+a list of options:
 
 * Refactor (optionaly followed by a commit hash)
 
@@ -89,7 +89,7 @@ a list of options::
 
 Note that there's already standard messages for commits created by git
 (Revert "...") and conventions for review commits (``[R] prefix``) as
-as described in the code review guidelines.
+described in the :doc:`Code_Review_Process`.
 
 
 Git branches
