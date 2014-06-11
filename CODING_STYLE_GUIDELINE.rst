@@ -90,8 +90,6 @@ a list of options:
 
     Fixup a93bhd34: typo
 
-* Fix (for repair work that you may want to keep in a separate commit)
-
 * Gardening (for changes that do not significantly change the meaning
   or structure of the code, such as style guide fixes)
 
