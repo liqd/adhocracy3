@@ -1,1 +1,0 @@
-../../CODING_STYLE_GUIDELINE.rst

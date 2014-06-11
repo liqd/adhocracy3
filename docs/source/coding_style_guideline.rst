@@ -156,10 +156,7 @@ Imports
 Javascript
 ----------
 
-* 4 spaces instead of tabs (must)
-* no trailing white space (must)
-* jshint formatting rules (should)
-* `tslint <https://github.com/palantir/tslint>`_ (must)
+See :doc:`JS_Guidelines`.
 
 CSS/Compass
 -----------
