@@ -168,41 +168,21 @@ you can add constructor parameters::
                         ...
 
 
-Directive element body
-~~~~~~~~~~~~~~~~~~~~~~
+Transclusion
+~~~~~~~~~~~~~
 
-The angular directive ``ngRepeat`` copies its body once for every
-element in an array, and inserts all copies into the DOM tree rendered
-from the template.  You can do this with adhocracy widgets as well.
-As above and very similar to ``ngRepeat``, assume we have a listing
-widget that lists every element in a form outlined in the body.
-
-The listing template will contain::
-
-    <span ng-transclude></span>
-
-(Whether by accident or by design, ``ngTransclude`` is restricted to
-``AC``, so it can only occur as an XML attribute, not as an element.)
-
-The object returned by ``createDirective`` in the widget class must
-have the following attribute::
-
-    transclude: true
-
-And finally, the widget caller must add something to the element
-body::
+You can use angular's `transclusion
+<https://docs.angularjs.org/guide/directive#creating-a-directive-that-wraps-other-elements>`_
+feature to pass a template snippet to the widget::
 
     <adh-listing path="/adhocracy/Proposals">
-        <adh-element></adh-element>
+        <adh-element path="{{element}}"></adh-element>
     </adh-listing>
 
 [FIXME: document scope propagation; see FIXME near class
 Widget.Listing.  i think in order to get this done, we need to write
 our own transclude function and inject it to the directive's link
 attribute.]
-
-.. REVIEW: This is described in the angular docu and is not specific to
-   adhocracy
 
 
 Misc Ideas and Remarks
