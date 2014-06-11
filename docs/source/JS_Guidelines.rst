@@ -183,10 +183,6 @@ Angular
 
    -  always use ``["$q", function($q) {…}]`` style
 
--  FIXME: compatibility
-
-   -  https://docs.angularjs.org/guide/ie
-
 -  do not use ``$`` in your variable names (leave it to angular).
 
 -  prefix
@@ -207,21 +203,33 @@ Angular
 Template
 ~~~~~~~~
 
--  FIXME: which syntax do we use for directives?
+-  write
+   `polyglot HTML5 <http://dev.w3.org/html5/html-author/#polyglot-documents>`_.
 
-   -  ``<adh:foo>`` or ``<x-adh-foo>``?
+   -  prefix any angular-specific attributes with ``data-``::
 
-   -  what about element/directive attributes?
+         <span data-ng-bind="foo"></span>
 
--  valid XHTML5: we use an HTML checker.  (FIXME: which one?  does that work
-   statically, or do we have to check dynamically rendered DOM trees?)
+   -  FIXME: include HTML checker for automated tests (does that work
+      statically, or do we have to check dynamically rendered DOM trees?)
+
+   -  Exception: The preferred way to use angular directives is the
+      element syntax::
+
+         <adh-proposal data-path="/adhocracy/proposal/1"></adh-proposal>
+
+      -  This needs special care in IE8 and below. See
+         https://docs.angularjs.org/guide/ie
 
 -  prefer ``{{…}}`` over ``ngBind`` (except for root template).
 
--  FIXME: when to apply which classes (should be in balance with CSS
-   Guidelines)
+-  FIXME: when to apply which classes (should be in balance with
+   :doc:`CSS_Guidelines`)
 
    -  apply classes w/o a specific need/by default?
+
+-  CSS and JavaScript are not allwed in templates.  This includes
+   `ngStyle <https://docs.angularjs.org/api/ng/directive/ngStyle>`_.
 
 Documentation
 ~~~~~~~~~~~~~
