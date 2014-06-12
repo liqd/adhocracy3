@@ -46,7 +46,7 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
     function postNewVersion(oldVersionPath : string, obj : Content) : ng.IPromise<Content> {
         var dagPath = Util.parentPath(oldVersionPath);
         var config = {
-            headers: { follows: oldVersionPath },
+            headers: {follows: oldVersionPath},
             params: {}
         };
         return $http

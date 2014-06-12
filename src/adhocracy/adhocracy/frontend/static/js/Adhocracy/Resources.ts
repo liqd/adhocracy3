@@ -154,7 +154,7 @@ export function newestVersionInContainer(container) {
 
 export function getNewestVersion($http, path: string) : ng.IPromise<any> {
     "use strict";
-    return $http.get(path).then( (container) =>
+    return $http.get(path).then((container) =>
         $http.get(decodeURIComponent(newestVersionInContainer(container)))
     );
 };
@@ -168,14 +168,14 @@ export function postProposal(
     "use strict";
     var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 
-    return $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).success( (resp) => {
+    return $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).success((resp) => {
         var proposalPath = decodeURIComponent(resp.data.path);
         var proposalFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
 
         var sectionPromiseStupid = $http.post(proposalPath, new Section());
 
-        var paragraphPromises = paragraphVersions.map( (paragraph) =>
-            $http.post(proposalPath, new Paragraph()).success( (resp) => {
+        var paragraphPromises = paragraphVersions.map((paragraph) =>
+            $http.post(proposalPath, new Paragraph()).success((resp) => {
                 var paragraphPath = decodeURIComponent(resp.data.path);
                 var paragraphFirstVersionPath = decodeURIComponent(resp.data.first_version_path);
 
@@ -183,9 +183,9 @@ export function postProposal(
             }).error(Http.logBackendError)
         );
 
-        var sectionVersionPromise = sectionPromiseStupid.success( respSection => {
-            return $q.all(paragraphPromises).then( (respParagraphs) => {
-                var paths = respParagraphs.map( (resp) => decodeURIComponent(resp.data.path) );
+        var sectionVersionPromise = sectionPromiseStupid.success(respSection => {
+            return $q.all(paragraphPromises).then((respParagraphs) => {
+                var paths = respParagraphs.map((resp) => decodeURIComponent(resp.data.path) );
 
                 var sectionVersion = new SectionVersion(undefined, paths, [], [decodeURIComponent(respSection.data.first_version_path)]);
 
@@ -193,8 +193,8 @@ export function postProposal(
             });
         }).error(Http.logBackendError);
 
-        return $q.all(paragraphPromises).then( (respParagraphs) => {
-            return sectionVersionPromise.success( (respSectionVersion) => {
+        return $q.all(paragraphPromises).then((respParagraphs) => {
+            return sectionVersionPromise.success((respSectionVersion) => {
                 addParagraph(proposalVersion, decodeURIComponent(respSectionVersion.data.path));
 
                 proposalVersion.addIVersionable([], [proposalFirstVersionPath]);
@@ -207,7 +207,7 @@ export function postProposal(
 
 export function followNewestVersion($http, resourceVersion) {
     "use strict";
-    return $http.get(resourceVersion.path).then( (newResourceVersion) => {
+    return $http.get(resourceVersion.path).then((newResourceVersion) => {
         resourceVersion["adhocracy.sheets.versions.IVersionable"].follows = [newResourceVersion.data.path];
         return resourceVersion;
     });

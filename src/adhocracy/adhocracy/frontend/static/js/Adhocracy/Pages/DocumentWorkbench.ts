@@ -69,7 +69,7 @@ export function run() {
             compile: function(element, link) {
                 // Normalize the link parameter
                 if (jQuery.isFunction(link)) {
-                    link = { post: link };
+                    link = {post: link};
                 }
 
                 // Break the recursion loop by removing the contents
@@ -106,7 +106,7 @@ export function run() {
 
     // filters
 
-    app.filter("documentTitle", [ function() {
+    app.filter("documentTitle", [function() {
         return function(resource : Types.Content<Resources.HasIDocumentSheet>) : string {
             return resource.data["adhocracy.sheets.document.IDocument"].title;
         };
@@ -140,7 +140,7 @@ export function run() {
                 user : AdhUser.User
             ) : void {
                 $scope.insertParagraph = function(proposalVersion: Types.Content<Resources.HasIDocumentSheet>) {
-                    $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
+                    $scope.poolEntries.push({viewmode: "list", content: proposalVersion});
                 };
 
                 adhHttp.get(adhConfig.jsonPrefix).then((pool) => {
@@ -162,7 +162,7 @@ export function run() {
                                     $scope.poolEntries[n].content = headContent;
                                 } else {
                                     // bind original headContentRef to model.
-                                    $scope.poolEntries[n] = { viewmode: "list", content: headContent };
+                                    $scope.poolEntries[n] = {viewmode: "list", content: headContent};
                                 }
                             });
                         }
@@ -206,7 +206,7 @@ export function run() {
                 };
 
                 $scope.reset = function() {
-                    adhHttp.get($scope.content.path).then( (content) => {
+                    adhHttp.get($scope.content.path).then((content) => {
                         $scope.content = content;
                     });
                     $scope.viewmode = "display";
@@ -255,8 +255,8 @@ export function run() {
                 };
 
                 $scope.commit = function() {
-                    Resources.postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions).then( (resp) => {
-                        $http.get(resp.data.path).then( (respGet) => {
+                    Resources.postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions).then((resp) => {
+                        $http.get(resp.data.path).then((respGet) => {
                             $scope.onNewProposal(respGet.data);
                         });
                     });
@@ -284,7 +284,7 @@ export function run() {
                 };
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
-                adhHttp.get($scope.ref).then( (content) => {
+                adhHttp.get($scope.ref).then((content) => {
                     $scope.content = content;
                 });
 
@@ -312,7 +312,7 @@ export function run() {
                 };
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
-                adhHttp.get($scope.ref).then( (content) => {
+                adhHttp.get($scope.ref).then((content) => {
                     $scope.content = content;
                 });
 
@@ -331,12 +331,12 @@ export function run() {
                 sheet: "="
             },
             controller: function($scope) {
-                var versionPromises = $scope.sheet.elements.map( (path) =>
-                    $http.get( decodeURIComponent(path) )
-                         .then( (resp) => resp.data )
+                var versionPromises = $scope.sheet.elements.map((path) =>
+                    $http.get(decodeURIComponent(path))
+                         .then((resp) => resp.data)
                 );
 
-                $q.all(versionPromises).then( (versions) =>
+                $q.all(versionPromises).then((versions) =>
                     $scope.sectionVersions = versions
                 );
             }

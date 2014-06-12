@@ -52,8 +52,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
 {
     public static templateUrl: string = "/Widgets/Listing.html";
 
-    constructor(public containerAdapter: ContainerAdapter) {
-    }
+    constructor(public containerAdapter: ContainerAdapter) {}
 
     public createDirective(adhConfig: AdhConfig.Type) {
         var _self = this;
@@ -85,7 +84,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
 // Elements
 
 export class AbstractListingElementAdapter {
-    constructor(public $q: ng.IQService) { }
+    constructor(public $q: ng.IQService) {}
 
     public name: (element: any) => ng.IPromise<string> = (element) => {
         var deferred = this.$q.defer();
@@ -140,8 +139,7 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
 {
     public static templateUrl: string = "/Widgets/ListingElement.html";
 
-    constructor(public elementAdapter: ElementAdapter) {
-    }
+    constructor(public elementAdapter: ElementAdapter) {}
 
     public createDirective(adhConfig: AdhConfig.Type) {
         var _self = this;

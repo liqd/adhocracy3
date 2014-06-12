@@ -124,7 +124,7 @@ export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
 
     var deferred = $q.defer();
     deferred.resolve();
-    return deferred.promise.then(() => { return obj; });
+    return deferred.promise.then(() => obj);
 }
 
 export function normalizeName(name: string) : string {
