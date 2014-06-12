@@ -84,6 +84,12 @@ updating the object structure ::
 
     ./bin/sd_evolve etc/development.ini
 
+starting the Websockets server (in background)::
+
+    ./bin/start_ws_server etc/development.ini &
+
+Output will be logged to ``adhocracy-ws.log``.
+
 serving the sample wsgi app using pserve ::
 
     ./bin/pserve etc/development.ini
