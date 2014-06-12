@@ -3,8 +3,7 @@
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import Types = require("Adhocracy/Types");
-import Util = require("Adhocracy/Util");
-import AdhHttp = require("Adhocracy/Services/Http");
+import AdhConfig = require("Adhocracy/Services/Config");
 
 
 // web sockets
@@ -19,15 +18,15 @@ import AdhHttp = require("Adhocracy/Services/Http");
 // FIXME: the upstream should be used for sending 'ADD' and 'REMOVE'
 // requests to the server, so we won't get any subscriberless content.
 
-var wsuri : string = "ws://" + window.location.host + AdhHttp.jsonPrefix + "?ws=all";
-
 export interface IService {
     subscribe: (path : string, update : () => void) => void;
     unsubscribe: (path : string) => void;
     destroy: () => void;
 }
 
-export function factory() : IService {
+export function factory(adhConfig: AdhConfig.Type) : IService {
+    "use strict";
+
     var ws = openWs();
     var subscriptions = {};
 
@@ -48,11 +47,10 @@ export function factory() : IService {
     }
 
     function openWs() {
-        ws = new WebSocket(wsuri);
+        ws = new WebSocket(adhConfig.wsuri);
 
         ws.onmessage = function(event) {
             var path = event.data;
-            console.log("WS message: " + path);
 
             if (path in subscriptions) {
                 subscriptions[path]();
@@ -60,7 +58,7 @@ export function factory() : IService {
         };
 
         ws.onerror = function(event) {
-            console.log("WS error: ", event);
+            return;
         };
 
         ws.onopen = function() {
@@ -81,6 +79,6 @@ export function factory() : IService {
     return {
         subscribe: subscribeWs,
         unsubscribe: unsubscribeWs,
-        destroy: closeWs,
+        destroy: closeWs
     };
 }

@@ -18,10 +18,9 @@
                 src="/frontend_static/jquery-1.7.2.js"></script>  <!-- only needed for $(document in this html file) -->
 
         <script type="text/javascript">
-            require(['Adhocracy/Pages/DocumentWorkbench'], function(AdhDWB) {
+            require(['Adhocracy'], function(Adh) {
                 $(document).ready(function() {
-                    AdhDWB.run();
-                    console.log('on page ready: done');
+                    Adh.init();
                 });
 
                 $(document).load(function() {

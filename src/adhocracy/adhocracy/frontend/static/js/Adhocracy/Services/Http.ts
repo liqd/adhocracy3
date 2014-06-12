@@ -12,8 +12,6 @@ import Util = require("Adhocracy/Util");
 // ``Types.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
 
-export var jsonPrefix : string = "/adhocracy";
-
 export interface IService<Content extends Types.Content<any>> {
     get : (path : string) => ng.IPromise<Content>;
     put : (path : string, obj : Content) => ng.IPromise<Content>;
@@ -24,6 +22,8 @@ export interface IService<Content extends Types.Content<any>> {
 }
 
 export function factory<Content extends Types.Content<any>>($http : ng.IHttpService) : IService<Content> {
+    "use strict";
+
     var adhHttp : IService<Content> = {
         get: get,
         put: put,
@@ -36,7 +36,6 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
     function assertResponse(msg : string, path : string) {
         return (resp) => {
             if (resp.status !== 200) {
-                console.log(resp);
                 throw (msg + ": http error " + resp.status.toString() + " on path " + path);
             }
             return importContent(resp.data);
@@ -55,7 +54,7 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
         var dagPath = Util.parentPath(oldVersionPath);
         var config = {
             headers: { follows: oldVersionPath },
-            params: {},
+            params: {}
         };
         return $http.post(dagPath, exportContent(obj), config).then(assertResponse("adhHttp.postNewVersion", dagPath));
     }
@@ -85,10 +84,13 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
 // transform objects on the way in and out
 
 export function importContent<Content extends Types.Content<any>>(obj : Content) : Content {
+    "use strict";
     return obj;
 }
 
 export function exportContent<Content extends Types.Content<any>>(obj : Content) : Content {
+    "use strict";
+
     // FIXME: newobj should be a copy, not a reference
     var newobj : Content = obj;
 
@@ -98,7 +100,9 @@ export function exportContent<Content extends Types.Content<any>>(obj : Content)
     ];
 
     for (var ro in readOnlyProperties) {
-        delete newobj.data[readOnlyProperties[ro]];
+        if (readOnlyProperties.hasOwnProperty(ro)) {
+            delete newobj.data[readOnlyProperties[ro]];
+        }
     }
 
     delete newobj.path;

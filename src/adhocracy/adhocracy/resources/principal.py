@@ -35,40 +35,6 @@ def create_initial_content_for_principals(context: IPool, registry: Registry,
     context.add('resets', resets)
 
 
-# @implementer(IPrincipalsPool)
-# class PrincipalsPool(Pool):
-#     """Service object representing a collection of principals."""
-#
-#     def add_user(self, login: str, registry=None) -> object:
-#         """ Add a user to this principal service with the id `login`."""
-#         registry = registry or get_current_registry()
-#         user = registry.content.create('User')
-#         self['users'][login] = user  # FIXME don`t override users
-#         return user
-#
-#     def add_group(self, name: str, registry=None) -> object:
-#         """ Add a group to this principal service using the name ``name``."""
-#         registry = registry or get_current_registry()
-#         group = registry.content.create('Group')  # FIXME don`t overrideusers
-#         self['groups'][name] = group
-#         return group
-#
-#     def add_reset(self, user, registry=None) -> object:
-#         """ Add a password reset to this principal service for the user
-#         ``user`` (either a user object or a user id).  ``name``. """
-#         registry = registry or get_current_registry()
-#         token = ''
-#         while True:
-#             token = _gen_random_token()
-#             if not token in self:
-#                 break
-#         reset = registry.content.create('Password Reset')
-#         self['resets'][token] = reset
-#         objectmap = find_objectmap(self)
-#         objectmap.connect(user, reset, UserToPasswordReset)
-#         return reset
-
-
 principals_metadata = pool_metadata._replace(
     iresource=IPrincipalsPool,
     after_creation=[create_initial_content_for_principals],
@@ -76,15 +42,24 @@ principals_metadata = pool_metadata._replace(
 )
 
 
-class IUserPool(IPool):
+class IUser(IPool):
 
-    """Pool for Groups."""
+    """User resource.
+
+    This inherits from IPool in order to allow to use this resource as a
+    namespace for user objects.
+
+    """
 
 
-@implementer(IUserPool)
-class UserPool(Pool):
+@implementer(IUser)
+class User(Pool):
 
-    """User pool."""
+    """User implementation.
+
+    With attributes to be compatible with :class:`substanced.prinipals.User`
+
+    """
 
     tzname = 'UTC'
     password = ''
@@ -92,8 +67,8 @@ class UserPool(Pool):
 
 
 user_metadata = pool_metadata._replace(
-    iresource=IUserPool,
-    content_class=UserPool,
+    iresource=IUser,
+    content_class=User,
     element_types=[]  # we don't want the frontend to post resources here
 )
 
@@ -105,7 +80,7 @@ class IUsersPool(IPool):
 
 users_metadata = pool_metadata._replace(
     iresource=IUsersPool,
-    element_types=[IUserPool]
+    element_types=[IUser]
 )
 
 
@@ -122,7 +97,7 @@ groups_metadata = pool_metadata._replace(
 
 class IPasswordResetsPool(IPool):
 
-    """Pool for Groups."""
+    """Pool for Password Resets."""
 
 
 passwordresets_metadata = pool_metadata._replace(

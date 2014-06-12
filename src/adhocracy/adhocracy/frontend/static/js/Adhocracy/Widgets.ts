@@ -3,18 +3,11 @@
 /// <reference path="../../submodules/DefinitelyTyped/underscore/underscore.d.ts"/>
 /// <reference path="../_all.d.ts"/>
 
-import angular = require("angular");
-import _ = require("underscore");
-
 import Types = require("Adhocracy/Types");
-import Util = require("Adhocracy/Util");
-import Css = require("Adhocracy/Css");
 import AdhHttp = require("Adhocracy/Services/Http");
-import AdhWS = require("Adhocracy/Services/WS");
+import AdhConfig = require("Adhocracy/Services/Config");
 
 import Resources = require("Adhocracy/Resources");
-
-var templatePath : string = "/frontend_static/templates";  // FIXME: move this to config file.
 
 
 //////////////////////////////////////////////////////////////////////
@@ -62,13 +55,13 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
     constructor(public containerAdapter: ContainerAdapter) {
     }
 
-    public createDirective() {
+    public createDirective(adhConfig: AdhConfig.Type) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
         return {
             restrict: "E",
-            templateUrl: templatePath + "/" + _class.templateUrl,
+            templateUrl: adhConfig.templatePath + "/" + _class.templateUrl,
             scope: {
                 path: "@",
                 title: "@"
@@ -151,13 +144,13 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
     constructor(public elementAdapter: ElementAdapter) {
     }
 
-    public createDirective() {
+    public createDirective(adhConfig: AdhConfig.Type) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
         return {
             restrict: "E",
-            templateUrl: templatePath + "/" + _class.templateUrl,
+            templateUrl: adhConfig.templatePath + "/" + _class.templateUrl,
             scope: {
                 path: "@"
             },

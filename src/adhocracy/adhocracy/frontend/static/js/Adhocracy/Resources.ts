@@ -3,10 +3,8 @@
 /// <reference path="../../submodules/DefinitelyTyped/underscore/underscore.d.ts"/>
 /// <reference path="../_all.d.ts"/>
 
-import angular = require("angular");
 import _ = require("underscore");
 
-import Types = require("Adhocracy/Types");
 import Util = require("Adhocracy/Util");
 
 
@@ -57,16 +55,16 @@ export interface IVersionsSheet {
 export interface PartialIProposalVersion extends Resource, HasIDocumentSheet {}
 
 export class Resource {
-    content_type : string;
+    contentType : string;
     data : Object;
-    constructor(content_type: string) {
-        this.content_type = content_type;
+    constructor(contentType: string) {
+        this.contentType = contentType;
         this.data = {};
     }
     addISection(title: string, elements: string[]) {
         this.data["adhocracy.sheets.document.ISection"] = {
             title: title,
-            elements: elements,
+            elements: elements
         };
         return this;
     }
@@ -74,26 +72,26 @@ export class Resource {
         this.data["adhocracy.sheets.document.IDocument"] = {
             title: title,
             description: description,
-            elements: elements,
+            elements: elements
         };
         return this;
     }
-    addIVersionable(follows: string[], root_version: string[]) {
+    addIVersionable(follows: string[], rootVersion: string[]) {
         this.data["adhocracy.sheets.versions.IVersionable"] = {
             follows: follows,
-            root_version: root_version,
+            root_version: rootVersion
         };
         return this;
     }
     addIName(name: string) {
         this.data["adhocracy.sheets.name.IName"] = {
-            name: name,
+            name: name
         };
         return this;
     }
     addIParagraph(content: string) {
         this.data["adhocracy.sheets.document.IParagraph"] = {
-            content: content,
+            content: content
         };
         return this;
     }
@@ -127,28 +125,32 @@ export class Section extends Resource {
 }
 
 export class SectionVersion extends Resource {
-    constructor(title: string, elements: string[], follows: string[], root_version: string[]) {
+    constructor(title: string, elements: string[], follows: string[], rootVersion: string[]) {
         super("adhocracy_sample.resources.section.ISectionVersion");
         this.addISection(title, elements)
-            .addIVersionable(follows, root_version);
+            .addIVersionable(follows, rootVersion);
     }
 }
 
 export function addParagraph(proposalVersion: PartialIProposalVersion, paragraphPath: string) {
+    "use strict";
     return proposalVersion.data["adhocracy.sheets.document.IDocument"].elements.push(paragraphPath);
 };
 
 // takes an array of URL's to resource versions
-//FIXME: backend should have LAST
+// FIXME: backend should have LAST
 export function newestVersion(versions: string[]) : string {
-    return _.max(versions, (version_path: string) => parseInt(version_path.match(/\d*$/)[0], 10)).toString();
+    "use strict";
+    return _.max(versions, (versionPath: string) => parseInt(versionPath.match(/\d*$/)[0], 10)).toString();
 };
 
 export function newestVersionInContainer(container) {
+    "use strict";
     return newestVersion(container.data.data["adhocracy.sheets.versions.IVersions"].elements);
 };
 
 export function getNewestVersion($http, path: string) : ng.IPromise<any> {
+    "use strict";
     return $http.get(path).then( (container) =>
         $http.get(decodeURIComponent(newestVersionInContainer(container)))
     );
@@ -158,6 +160,7 @@ export function postProposal($http,
                              $q: ng.IQService,
                              proposalVersion: PartialIProposalVersion,
                              paragraphVersions) {
+    "use strict";
     var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 
     return $http.post("/adhocracy", new Proposal(Util.normalizeName(proposalName))).then( (resp) => {
@@ -198,6 +201,7 @@ export function postProposal($http,
 };
 
 export function followNewestVersion($http, resourceVersion) {
+    "use strict";
     return $http.get(resourceVersion.path).then( (newResourceVersion) => {
         resourceVersion["adhocracy.sheets.versions.IVersionable"].follows = [newResourceVersion.data.path];
         return resourceVersion;

@@ -41,7 +41,8 @@ class PrincipalIntegrationTest(unittest.TestCase):
         from adhocracy.resources.principal import IGroupsPool
         from adhocracy.resources.principal import IPasswordResetsPool
 
-        inst = self.config.registry.content.create(IPrincipalsPool.__identifier__)
+        inst = self.config.registry.content.create(
+            IPrincipalsPool.__identifier__)
 
         assert IPrincipalsPool.providedBy(inst)
         assert 'users' in inst
@@ -52,20 +53,20 @@ class PrincipalIntegrationTest(unittest.TestCase):
         assert IPasswordResetsPool.providedBy(inst['resets'])
 
     def test_create_user(self):
-        from adhocracy.resources.principal import IUserPool
-        from adhocracy.resources.principal import UserPool
+        from adhocracy.resources.principal import IUser
+        from adhocracy.resources.principal import User
 
-        inst = self.config.registry.content.create(IUserPool.__identifier__)
+        inst = self.config.registry.content.create(IUser.__identifier__)
 
-        assert IUserPool.providedBy(inst)
-        assert isinstance(inst, UserPool)
+        assert IUser.providedBy(inst)
+        assert isinstance(inst, User)
 
 
 class UserUnitTest(unittest.TestCase):
 
     def _makeOne(self):
-        from adhocracy.resources.principal import UserPool
-        return UserPool()
+        from adhocracy.resources.principal import User
+        return User()
 
     def test_create(self):
         user = self._makeOne()
