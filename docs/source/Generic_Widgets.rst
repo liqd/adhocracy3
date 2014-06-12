@@ -57,7 +57,7 @@ A simple widget class has the following form::
     {
         public static ...
 
-        constructor(...adapters) {
+        constructor(...adapters, ...parameters) {
             ...
         }
 
@@ -89,10 +89,8 @@ There are some interesting parts to note in this example:
     accomplish this.
 -   By convention, all services required by ``Listing`` are passed to
     ``createDirective``.
--   By convention, all adapters are passed to the constructor.
--   By convention, nothing else is passed to ``createDirective`` or the
-    constructor. Use static variables instead and overwrite them in
-    subclasses.
+-   By convention, all adapters and additional parameters are passed
+    to the constructor.
 -   It would be possible to use a single function and pass both adapters and
     services to that. But that would not allow subclassing.
 -   It would be possible to have a single static method on the widget class
