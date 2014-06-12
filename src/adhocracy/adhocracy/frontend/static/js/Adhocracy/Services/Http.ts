@@ -163,6 +163,14 @@ export interface IBackendError {
     errors: string[][];
 }
 
+// FIXME: logBackendError is called from above in this file, so tslint
+// will complain if we refactor this into
+//
+//    'export var logBackendError = (...) => ...'
+//
+// solution (i think -mf): move all 'export var <name>;' lines to the
+// beginning of the module (declaration part), then follow those lines
+// with '<name> = ...' (implementation part).
 export function logBackendError(data: IBackendError, status: number, headers, config) {
     "use strict";
 
