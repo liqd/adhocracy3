@@ -129,6 +129,10 @@ export var run = () => {
         return new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective(adhConfig);
     }]);
 
+    app.directive("adhWebSocketTest",
+                  ["adhConfig", "adhWS", (adhConfig, adhWS) =>
+                   new AdhWS.WebSocketTest().createDirective(adhConfig, adhWS)]);
+
 
     // application-specific directives
 
