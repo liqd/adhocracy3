@@ -66,9 +66,6 @@ A simple widget class has the following form::
         }
 
         public createDirective() {
-            var _self = this;
-            var _class = (<any>_self).constructor;
-
             return {
                 restrict: ...
                 templateUrl: ...
@@ -87,14 +84,6 @@ A simple widget class has the following form::
             };
         }
     }
-
-The declaration of ``_self`` and ``_class`` should be used like this
-in all instance methods that make use of them.  ``this`` with all its
-rich semantics can then be used without interfering with the two.
-
-.. REVIEW: I do not think the note about _self and_class belongs here.
-   It is not specific to widgets. They should also be removed from the
-   code examples.
 
 ``createDirective`` is used for registering a new directive::
 

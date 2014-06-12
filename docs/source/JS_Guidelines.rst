@@ -84,11 +84,12 @@ checked with tslint.
    This is less confusing. `Further reading
    <http://kangax.github.io/nfe/#expr-vs-decl>`_
 
--  If you need an alias for ``this``, always use ``self`` (as in knockout).
+-  If you need an alias for ``this``, always use ``self`` (as in knockout)
+   or ``_self`` (in TypeScript classes).
    (``_this`` is used by TypeScript in compiled code and is disallowed
    in typescript source in e.g. class instance methods.)
 
-   if more than one nested self is needed, re-assign outer ``self``\ s
+   If more than one nested self is needed, re-assign outer ``self``\ s
    locally.
 
 TypeScript
@@ -170,6 +171,24 @@ they avoid common mistakes like this::
 
     var greeter = new Greeter();
     setTimeout(greeter.greet, 1000);  // will alert 'undefined'
+
+Still you should not use this behaviour extensively. Prefer to use
+the explicit aliases ``_self`` and ``_class`` in class methods::
+
+    class Greeter {
+        public static greeting = "Hello";
+
+        constructor(public name) {}
+
+        greet = function() {
+            var _self = this;
+            var _class = (<any>_self).constructor;
+
+            setTimeout(() => {
+                console.log(_class.greeting + " " + _self.name + "!");
+            }, 1000);
+        }
+    }
 
 Angular
 -------
