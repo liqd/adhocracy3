@@ -48,8 +48,7 @@ export interface ListingScope<Container> {
 //
 // and implicitly know that Listing propagates the identifier
 // ``element`` to the element's scope.
-export class Listing<Container extends Types.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter>
-{
+export class Listing<Container extends Types.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter> {
     public static templateUrl: string = "/Widgets/Listing.html";
 
     constructor(public containerAdapter: ContainerAdapter) {}
@@ -135,8 +134,7 @@ export interface ListingElementScope {
     name: string;
 }
 
-export class ListingElement<Element extends Types.Content<any>, ElementAdapter extends AbstractListingElementAdapter>
-{
+export class ListingElement<Element extends Types.Content<any>, ElementAdapter extends AbstractListingElementAdapter> {
     public static templateUrl: string = "/Widgets/ListingElement.html";
 
     constructor(public elementAdapter: ElementAdapter) {}
