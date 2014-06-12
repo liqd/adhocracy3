@@ -28,8 +28,10 @@ def main(args: list) -> int:
     config = _read_config(args)
     _configure_logger(config)
     app_root = _connect_to_zeo_server_and_return_app_root(config)
+    root_context = app_root['adhocracy']
     factory = WebSocketServerFactory('ws://localhost:{}'.format(PORT))
     factory.protocol = ClientCommunicator
+    ClientCommunicator.bind_schemas(root_context)
     loop = asyncio.get_event_loop()
     coro = loop.create_server(factory, '127.0.0.1', PORT)
     logger.debug('Started WebSocket server listening on port %i', PORT)

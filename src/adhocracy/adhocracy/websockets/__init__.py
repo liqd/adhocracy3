@@ -104,34 +104,30 @@ class ClientTracker():
 
 class ClientCommunicator(WebSocketServerProtocol):
 
-    """Communicates with a client through a WebSocket connection."""
+    """Communicates with a client through a WebSocket connection.
+
+    Note that the `bind_schemas` class method **must** be called before
+    instances of this class can be used!
+    """
 
     # All instances of this class share the same tracker
     tracker = ClientTracker()
 
-    def __init__(self, context=None):
-        """Create a new instance.
-
-        :param context: the root context; if `None`, the `init_context` must
-                        invoked separately before this instance is ready to
-                        be used
-        """
-        if context is not None:
-            self.init_context(context)
-
-    def init_context(self, context):
-        """Initialize Colander schemas using the root context."""
-        self._client_request_schema = self._bind_schema(ClientRequestSchema(),
-                                                        context)
-        self._status_confirmation = self._bind_schema(StatusConfirmation(),
+    @classmethod
+    def bind_schemas(cls, context):
+        """Initialize Colander schemas using a context resource."""
+        cls._client_request_schema = cls._bind_schema(ClientRequestSchema(),
                                                       context)
-        self._notification = self._bind_schema(Notification(), context)
-        self._child_notification = self._bind_schema(ChildNotification(),
+        cls._status_confirmation = cls._bind_schema(StatusConfirmation(),
+                                                    context)
+        cls._notification = cls._bind_schema(Notification(), context)
+        cls._child_notification = cls._bind_schema(ChildNotification(),
+                                                   context)
+        cls._version_notification = cls._bind_schema(VersionNotification(),
                                                      context)
-        self._version_notification = self._bind_schema(VersionNotification(),
-                                                       context)
 
-    def _bind_schema(self, schema: colander.MappingSchema,
+    @classmethod
+    def _bind_schema(cls, schema: colander.MappingSchema,
                      context) -> colander.MappingSchema:
         return schema.bind(context=context)
 

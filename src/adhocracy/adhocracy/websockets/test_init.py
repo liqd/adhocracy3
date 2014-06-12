@@ -32,8 +32,8 @@ class QueueingClientCommunicator(ClientCommunicator):
 
     """ClientCommunicator that adds outgoing messages to an internal queue."""
 
-    def __init__(self, context):
-        super().__init__(context)
+    def __init__(self):
+        super().__init__()
         self.queue = []
 
     def sendMessage(self, payload: bytes):
@@ -61,7 +61,8 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         context = self._make_resource()
         self._child = self._make_resource()
         context['child'] = self._child
-        self._comm = QueueingClientCommunicator(context)
+        self._comm = QueueingClientCommunicator()
+        QueueingClientCommunicator.bind_schemas(context)
         self._peer = "websocket peer"
         self._connect()
 
