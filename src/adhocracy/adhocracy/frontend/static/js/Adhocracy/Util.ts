@@ -88,14 +88,20 @@ export function deepeq(a : any, b : any) : boolean {
 
         for (var x in a) {
             if (a.hasOwnProperty(x)) {
-                if (!(x in b))           { return false; }
-                if (!deepeq(a[x], b[x])) { return false; }
+                if (!(x in b)) {
+                    return false;
+                }
+                if (!deepeq(a[x], b[x])) {
+                    return false;
+                }
             }
         }
 
         for (var y in b) {
             if (b.hasOwnProperty(y)) {
-                if (!(y in a)) { return false; }
+                if (!(y in a)) {
+                    return false;
+                }
             }
         }
     }
