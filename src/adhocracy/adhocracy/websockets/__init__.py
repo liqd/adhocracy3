@@ -4,10 +4,8 @@ from collections.abc import Hashable
 from collections.abc import Iterable
 from json import dumps
 from json import loads
-from logging import getLogger
+import logging
 
-import asyncio
-from autobahn.asyncio.websocket import WebSocketServerFactory
 from autobahn.asyncio.websocket import WebSocketServerProtocol
 from autobahn.websocket.protocol import ConnectionRequest
 from pyramid.traversal import resource_path
@@ -23,7 +21,7 @@ from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItemVersion
 
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class WebSocketError(Exception):
@@ -340,23 +338,3 @@ def notify_new_version(resource: IResource, new_version: IItemVersion) -> None:
 def includeme(config):
     """Configure WebSockets server."""
     # FIXME implement as necessary
-
-
-def start():
-    """Start WebSockets server on port 8080."""
-    # FIXME adapt as necessary
-    port = 8080
-    factory = WebSocketServerFactory('ws://localhost:{}'.format(port))
-    factory.protocol = ClientCommunicator
-    loop = asyncio.get_event_loop()
-    coro = loop.create_server(factory, '127.0.0.1', port)
-    logger.debug('Started WebSocket server listening on port %i', port)
-    server = loop.run_until_complete(coro)
-
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        server.close()
-        loop.close()
