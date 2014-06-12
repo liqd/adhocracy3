@@ -92,11 +92,11 @@ ERROR_CODE will be one of the following:
   contains a short description of the problem. In an ideal world,
   this will never happen.
 
-Note that it is not always possible to provice action and resource of
-the respective request (e.g. wtih "invalid_jason").  The client needs
+Note that it is not always possible to provide action and resource of
+the respective request (e.g. with "invalid_jason").  The client needs
 to keep track of the order in which it sends the requests, and has to
 associate the responses with that list.  Responses (errors or not) are
-guaranteed to be sent to the frontend in the same order the requests
+guaranteed to be sent to the frontend in the same order as requests
 are sent to the backend.
 
 Notifications
@@ -196,9 +196,9 @@ re-connect, flush its cache, and reload and re-subscribe to every resource that
 is still relevant.
 
 (POSSIBLE FUTURE WORK: If WS connections prove to be unstable enough to make
-the above aproach cause too much overhead, the backend may maintain the session
-for a configurable amount of time.  If the frontend re-connects in that time
-window and presents a session key, it will receive a list of change
+the above approach cause too much overhead, the backend may maintain the
+session for a configurable amount of time.  If the frontend re-connects in
+that time window and presents a session key, it will receive a list of change
 notifications that it missed during the broken connection, and it won't have to
 flush its cache.  The session key could either be negotiated over the WS, or
 there may be some token provided by substance_d / angular / somebody that can
