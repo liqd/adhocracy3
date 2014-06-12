@@ -156,6 +156,8 @@ export function exportContent<Content extends Types.Content<any>>(obj : Content)
 
 // error handling
 
+// Error responses in the Adhocracy REST API contain json objects in
+// the body that have the following form:
 export interface IBackendError {
     status: string;
     errors: string[][];
