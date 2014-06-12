@@ -83,7 +83,7 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
 export function importContent<Content extends Types.Content<any>>(obj : Content) : Content {
     "use strict";
 
-    if (typeof obj === 'object') {
+    if (typeof obj === "object") {
         return obj;
     } else {
         throw ("unexpected type: " + (typeof obj).toString() + " " + obj.toString());
@@ -163,13 +163,17 @@ export interface IBackendError {
     errors: string[][];
 }
 
-export var logBackendError = (data: IBackendError, status: number, headers, config) => {
+export function logBackendError(data: IBackendError, status: number, headers, config) {
+    "use strict";
+
     console.log("http response with error status: " + status);
 
     for (var e in data.errors) {
-        console.log("error #" + e);
-        console.log("where: " + data.errors[e][0] + ", " + data.errors[e][1]);
-        console.log("what:  " + data.errors[e][2]);
+        if (data.errors.hasOwnProperty(e)) {
+            console.log("error #" + e);
+            console.log("where: " + data.errors[e][0] + ", " + data.errors[e][1]);
+            console.log("what:  " + data.errors[e][2]);
+        }
     }
 
     console.log(config);
