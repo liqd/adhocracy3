@@ -4,8 +4,14 @@ Adhocracy3 Prototype
 An `Adhocracy2 <https://adhocracy.de/>`_ rewrite  based on "The Supergraph"
 conceptual work and with extensibility in mind.
 
+Further reading
+---------------
+
+- ./docs/source/installation.rst
+
+
 Softwarestack
---------------
+-------------
 
 server (backend):
 
@@ -29,7 +35,9 @@ client (frontend):
 
 - `JavaScript` (programming language)
 
-- `TypeScript <http://www.typescriptlang.org/>`_ (module system)
+- `TypeScript <http://www.typescriptlang.org/>`_ (programming language)
+
+- `RequireJS <http://requirejs.org/>`_ (module system)
 
 - `AngularJS <http://angularjs.org/>`_ (application framework)
 
