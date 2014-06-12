@@ -157,10 +157,12 @@ export function getNewestVersion($http, path: string) : ng.IPromise<any> {
     );
 };
 
-export function postProposal($http,
-                             $q: ng.IQService,
-                             proposalVersion: PartialIProposalVersion,
-                             paragraphVersions) {
+export function postProposal(
+    $http,
+    $q: ng.IQService,
+    proposalVersion: PartialIProposalVersion,
+    paragraphVersions
+) {
     "use strict";
     var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 

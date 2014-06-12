@@ -17,32 +17,32 @@ import Widgets = require("Adhocracy/Widgets");
 // contents of the resource with view mode.
 interface IDocument<Data> {
     viewmode : string;
-    content  : Types.Content<Data>;
+    content : Types.Content<Data>;
 }
 
 interface IDocumentWorkbenchScope<Data> extends ng.IScope {
-    pool            : Types.Content<Data>;
-    poolEntries     : IDocument<Data>[];
-    doc             : IDocument<Data>;  // (iterates over document list with ng-repeat)
+    pool : Types.Content<Data>;
+    poolEntries : IDocument<Data>[];
+    doc : IDocument<Data>;  // (iterates over document list with ng-repeat)
     insertParagraph : any;
-    user            : AdhUser.User;
+    user : AdhUser.User;
 }
 
 interface DetailScope<Data> extends ng.IScope {
     viewmode : string;
-    content  : Types.Content<Data>;
+    content : Types.Content<Data>;
 }
 
 interface DetailRefScope<Data> extends DetailScope<Data> {
-    ref      : string;
+    ref : string;
 }
 
 interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
-    list     : () => void;
-    display  : () => void;
-    edit     : () => void;
-    reset    : () => void;
-    commit   : () => void;
+    list : () => void;
+    display : () => void;
+    edit : () => void;
+    reset : () => void;
+    commit : () => void;
 }
 
 
@@ -113,17 +113,17 @@ export function run() {
 
     // widget-based directives
 
-    app.directive("adhListing",
-                  ["adhConfig", (adhConfig) =>
-                   new Widgets.Listing(new Widgets.ListingPoolAdapter()).createDirective(adhConfig)]);
+    app.directive("adhListing", ["adhConfig", (adhConfig) => {
+        return new Widgets.Listing(new Widgets.ListingPoolAdapter()).createDirective(adhConfig);
+    }]);
 
-    app.directive("adhListingElement",
-                  ["$q", "adhConfig", ($q, adhConfig) =>
-                   new Widgets.ListingElement(new Widgets.ListingElementAdapter($q)).createDirective(adhConfig)]);
+    app.directive("adhListingElement", ["$q", "adhConfig", ($q, adhConfig) => {
+        return new Widgets.ListingElement(new Widgets.ListingElementAdapter($q)).createDirective(adhConfig);
+    }]);
 
-    app.directive("adhListingElementTitle",
-                  ["$q", "adhHttp", "adhConfig", ($q, adhHttp, adhConfig) =>
-                   new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective(adhConfig)]);
+    app.directive("adhListingElementTitle", ["$q", "adhHttp", "adhConfig", ($q, adhHttp, adhConfig) => {
+        return new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective(adhConfig);
+    }]);
 
 
     // application-specific directives
@@ -132,11 +132,11 @@ export function run() {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Pages/DocumentWorkbench.html",
-            controller: ["adhHttp", "$scope", "adhUser",
-                         function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>,
-                                  $scope   : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>,
-                                  user     : AdhUser.User) : void
-            {
+            controller: ["adhHttp", "$scope", "adhUser", function(
+                adhHttp : AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>,
+                $scope : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>,
+                user : AdhUser.User
+            ) : void {
                 $scope.insertParagraph = function(proposalVersion: Types.Content<Resources.HasIDocumentSheet>) {
                     $scope.poolEntries.push({ viewmode: "list", content: proposalVersion });
                 };
@@ -187,10 +187,10 @@ export function run() {
                 content: "=",
                 viewmode: "="
             },
-            controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Types.Content<any>>,
-                                  $scope   : IProposalVersionDetailScope<any>) : void
-            {
+            controller: ["adhHttp", "$scope", function(
+                adhHttp : AdhHttp.IService<Types.Content<any>>,
+                $scope : IProposalVersionDetailScope<any>
+            ) : void {
                 $scope.list = function() {
                     $scope.viewmode = "list";
                 };
@@ -230,8 +230,11 @@ export function run() {
         };
     }]);
 
-    app.directive("adhProposalVersionNew", ["$http", "$q", "adhConfig",
-                                            function($http: ng.IHttpService, $q : ng.IQService, adhConfig: AdhConfig.Type) {
+    app.directive("adhProposalVersionNew", ["$http", "$q", "adhConfig", function(
+        $http: ng.IHttpService,
+        $q : ng.IQService,
+        adhConfig: AdhConfig.Type
+    ) {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/New.html",
@@ -270,10 +273,10 @@ export function run() {
                 ref: "=",
                 viewmode: "="
             },
-            controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasISectionSheet>>,
-                                  $scope   : DetailRefScope<Resources.HasISectionSheet>) : void
-            {
+            controller: ["adhHttp", "$scope", function(
+                adhHttp : AdhHttp.IService<Types.Content<Resources.HasISectionSheet>>,
+                $scope : DetailRefScope<Resources.HasISectionSheet>
+            ) : void {
                 var commit = function(event, ...args) {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
                 };
@@ -298,10 +301,10 @@ export function run() {
                 ref: "=",
                 viewmode: "="
             },
-            controller: ["adhHttp", "$scope",
-                         function(adhHttp  : AdhHttp.IService<Types.Content<Resources.HasIParagraphSheet>>,
-                                  $scope   : DetailRefScope<Resources.HasIParagraphSheet>) : void
-            {
+            controller: ["adhHttp", "$scope", function(
+                adhHttp : AdhHttp.IService<Types.Content<Resources.HasIParagraphSheet>>,
+                $scope : DetailRefScope<Resources.HasIParagraphSheet>
+            ) : void {
                 var commit = function(event, ...args) {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
                 };

@@ -67,18 +67,15 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                 title: "@"
             },
             transclude: true,
-            controller: ["$scope",
-                         "adhHttp",
-                         function($scope: ListingScope<Container>,
-                                  adhHttp: AdhHttp.IService<Container>
-                                 ) : void
-                         {
-                             adhHttp.get($scope.path).then((pool: Container) => {
-                                 $scope.container = pool;
-                                 $scope.elements = _self.containerAdapter.elemRefs($scope.container);
-                             });
-                         }
-                        ]
+            controller: ["$scope", "adhHttp", function(
+                $scope: ListingScope<Container>,
+                adhHttp: AdhHttp.IService<Container>
+            ) : void {
+                adhHttp.get($scope.path).then((pool: Container) => {
+                    $scope.container = pool;
+                    $scope.elements = _self.containerAdapter.elemRefs($scope.container);
+                });
+            }]
         };
     }
 }
@@ -112,8 +109,10 @@ export class ListingElementAdapter extends AbstractListingElementAdapter {
 }
 
 export class ListingElementTitleAdapter extends AbstractListingElementAdapter {
-    constructor(public $q: ng.IQService,
-                public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>) {
+    constructor(
+        public $q: ng.IQService,
+        public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>
+    ) {
         super($q);
     }
 
@@ -154,17 +153,14 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
             scope: {
                 path: "@"
             },
-            controller: ["$scope",
-                         "adhHttp",
-                         function($scope: ListingElementScope,
-                                  adhHttp: AdhHttp.IService<Element>
-                                 ) : void
-                         {
-                             adhHttp.get($scope.path)
-                                 .then(_self.elementAdapter.name)
-                                 .then((name) => $scope.name = name);
-                         }
-                        ]
+            controller: ["$scope", "adhHttp", function(
+                $scope: ListingElementScope,
+                adhHttp: AdhHttp.IService<Element>
+            ) : void {
+                adhHttp.get($scope.path)
+                    .then(_self.elementAdapter.name)
+                    .then((name) => $scope.name = name);
+            }]
         };
     }
 }
