@@ -6,7 +6,9 @@ import Types = require("Adhocracy/Types");
 import Util = require("Adhocracy/Util");
 
 
-// send and receive objects with adhocracy data model awareness
+/**
+ * send and receive objects with adhocracy data model awareness
+ */
 
 // FIXME: This service should be able to handle any type, not just subtypes of
 // ``Types.Content``.  Methods like ``postNewVersion`` may need additional
@@ -60,16 +62,20 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
             .error(logBackendError);
     }
 
-    // query meta-api for resource content types.  return the json
-    // object explaining the content type of a resource.  if called
-    // without an argument, return a list of all known content types.
+    /**
+     * query meta-api for resource content types.  return the json
+     * object explaining the content type of a resource.  if called
+     * without an argument, return a list of all known content types.
+     */
     function metaApiResource(name : string) : any {
         throw "not implemented.";
     }
 
-    // query meta-api for property types.  return the json object
-    // explaining the type of a property sheet.  if called without an
-    // argument, return a list of all known property sheets.
+    /**
+     * query meta-api for property types.  return the json object
+     * explaining the type of a property sheet.  if called without an
+     * argument, return a list of all known property sheets.
+     */
     function metaApiSheet(name : string) : any {
         throw "not implemented.";
     }
@@ -78,8 +84,9 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
 }
 
 
-// transform objects on the way in and out
-
+/**
+ * transform objects on the way in and out
+ */
 export function importContent<Content extends Types.Content<any>>(obj : Content) : Content {
     "use strict";
 

@@ -14,7 +14,9 @@ import Resources = require("Adhocracy/Resources");
 import Widgets = require("Adhocracy/Widgets");
 
 
-// contents of the resource with view mode.
+/**
+ * contents of the resource with view mode.
+ */
 interface IDocument<Data> {
     viewmode : string;
     content : Types.Content<Data>;

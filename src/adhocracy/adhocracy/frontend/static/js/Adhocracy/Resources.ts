@@ -138,8 +138,10 @@ export function addParagraph(proposalVersion: PartialIProposalVersion, paragraph
     return proposalVersion.data["adhocracy.sheets.document.IDocument"].elements.push(paragraphPath);
 };
 
-// takes an array of URL's to resource versions
 // FIXME: backend should have LAST
+/**
+ * takes an array of URL's to resource versions
+ */
 export function newestVersion(versions: string[]) : string {
     "use strict";
     return _.max(versions, (versionPath: string) => parseInt(versionPath.match(/\d*$/)[0], 10)).toString();
