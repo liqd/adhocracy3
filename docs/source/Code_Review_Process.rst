@@ -428,8 +428,6 @@ do line numbers in every line in diff?
 
 FIXME[tb]: following things might be useful additions:
 
-- commit message formats (e.g. "fixup …")
-
 - what should/must be done before creating a pull request
      - only one feature per pull request
          - only include changes that are really needed; do refactoring
