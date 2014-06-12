@@ -15,7 +15,7 @@ export interface Type {
 var config : Type = {
     templatePath: "/frontend_static/templates",
     jsonPrefix: "/adhocracy",
-    wsuri:  "ws://" + window.location.host + "/adhocracy?ws=all"
+    wsuri:  "ws://localhost:8080/"
 };
 
 
