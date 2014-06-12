@@ -53,53 +53,51 @@ Widget Classes
 
 A simple widget class has the following form::
 
-    export class WidgetName<TypeParamters ...>
+    export class WidgetName<...Types>
     {
         public static ...
 
-        constructor(
-            injectedService1,
-            injectedService2,
-            public classParameter
-        ) {
+        constructor(...adapters) {
             ...
         }
 
-        public createDirective() {
+        public createDirective(...services) {
             return {
                 restrict: ...
                 templateUrl: ...
                 scope: ...
-                controller: [
-                    "$scope",
-                    "adhHttp",
-                    (
-                        $scope: TypeParameter,
-                        ...
-                    ) =>
-                    {
-                        ...
-                    }
-                ];
             };
         }
     }
 
-``createDirective`` is used for registering a new directive::
+A directive ``<adh-listing>`` based on a widget ``Listing`` can then be
+registered like so::
 
     app.directive(
         "adhListing",
         [
-            "$q",
-            ($q) => new Widgets.Listing(new Widgets.ListingElementAdapter($q)).createDirective()
+            "$q", "adhHttp",
+            ($q, adhHttp) => new Listing(new ListingAdapter($q)).createDirective(adhHttp)
         ]
     );
 
-This makes the directive ``<adh-listing>`` available.  The ``Listing``
-constructor (in this example) takes one class parameter, namely an
-adapter instance that expects injection of the asynchronicity service
-``$q``.  In order to inject the service into the class parameter's
-constructor, an extra function call is wrapped around createDirective.
+There are some interesting parts to note in this example:
+
+-   The type variables to ``Listing`` are inferred.
+-   Some services are passed to adapters, while others are passed to
+    ``createDirective``. The whole thing is wrapped in a lambda to
+    accomplish this.
+-   By convention, all services required by ``Listing`` are passed to
+    ``createDirective``.
+-   By convention, all adapters are passed to the constructor.
+-   By convention, nothing else is passed to ``createDirective`` or the
+    constructor. Use static variables instead and overwrite them in
+    subclasses.
+-   It would be possible to use a single function and pass both adapters and
+    services to that. But that would not allow subclassing.
+-   It would be possible to have a single static method on the widget class
+    and pass both adapters and services to that. But that would not allow
+    a strict separation of the two.
 
 There are several ways in which behavior of existing widgets can be
 changed to adapt to new requirements.
