@@ -98,6 +98,38 @@ export function importContent<Content extends Types.Content<any>>(obj : Content)
     // (1) http://stackoverflow.com/questions/24056019/is-there-a-way-to-check-instanceof-on-types-dynamically
     //
     // (2) typescript language feature request! :)
+    //
+    //
+    // the following function would be useful if the problem of
+    // turning abstract types into runtime objects could be solved.
+    // (for the time being, it has been removed from the Util module
+    // where it belongs.)
+    //
+    //
+    //   // in a way another function in the deep* family: check that _super
+    //   // has only attributes also available in _sub.  also check recursively
+    //   // (if _super has an object attribute, its counterpart in _sub must
+    //   // have the same attributes, and so on).
+    //
+    //   // FIXME: untested!
+    //   export function subtypeof(_sub, _super) {
+    //       if (typeof _sub !== typeof _super) {
+    //           return false;
+    //       }
+    //
+    //       if (typeof(_sub) === "object") {
+    //           if (_sub === null || _super === null) {
+    //               return true;
+    //           }
+    //
+    //           for (var x in _super) {
+    //               if (!(x in _sub)) { return false; }
+    //               if (!subtypeof(_sub[x], _super[x])) { return false; }
+    //           }
+    //       }
+    //
+    //       return true;
+    //   }
 }
 
 export function exportContent<Content extends Types.Content<any>>(obj : Content) : Content {
