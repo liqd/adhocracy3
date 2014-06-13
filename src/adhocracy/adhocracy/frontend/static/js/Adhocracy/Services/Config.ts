@@ -19,6 +19,6 @@ var config : Type = {
 };
 
 
-export var register = function(app, serviceName) {
+export var register = (app, serviceName) => {
     app.factory(serviceName, () => config);
 };

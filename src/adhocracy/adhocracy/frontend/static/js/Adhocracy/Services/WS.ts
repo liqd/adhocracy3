@@ -57,15 +57,15 @@ export function factory(adhConfig: AdhConfig.Type) : IService {
             }
         };
 
-        ws.onerror = function(event) {
+        ws.onerror = (event) => {
             return;
         };
 
-        ws.onopen = function() {
+        ws.onopen = () => {
             return;
         };
 
-        ws.onclose = function() {
+        ws.onclose = () => {
             ws = openWs();
         };
 

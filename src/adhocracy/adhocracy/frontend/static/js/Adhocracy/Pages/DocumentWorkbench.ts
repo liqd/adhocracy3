@@ -58,7 +58,7 @@ export function run() {
 
     // services
 
-    app.factory("RecursionHelper", ["$compile", function($compile) {
+    app.factory("RecursionHelper", ["$compile", ($compile) => {
         return {
             /**
              * Manually compiles the element, fixing the recursion loop.
@@ -66,7 +66,7 @@ export function run() {
              * @param [link] A post-link function, or an object with function(s) registered via pre and post properties.
              * @returns An object containing the linking functions.
              */
-            compile: function(element, link) {
+            compile: (element, link) => {
                 // Normalize the link parameter
                 if (jQuery.isFunction(link)) {
                     link = {post: link};
@@ -80,13 +80,13 @@ export function run() {
                     /**
                      * Compiles and re-adds the contents
                      */
-                    post: function(scope, element) {
+                    post: (scope, element) => {
                         // Compile the contents
                         if (!compiledContents) {
                             compiledContents = $compile(contents);
                         }
                         // Re-add the compiled contents to the element
-                        compiledContents(scope, function(clone) {
+                        compiledContents(scope, (clone) => {
                             element.append(clone);
                         });
 
@@ -106,8 +106,8 @@ export function run() {
 
     // filters
 
-    app.filter("documentTitle", [function() {
-        return function(resource : Types.Content<Resources.HasIDocumentSheet>) : string {
+    app.filter("documentTitle", [() => {
+        return (resource : Types.Content<Resources.HasIDocumentSheet>) : string => {
             return resource.data["adhocracy.sheets.document.IDocument"].title;
         };
     }]);
@@ -130,16 +130,16 @@ export function run() {
 
     // application-specific directives
 
-    app.directive("adhDocumentWorkbench", ["adhConfig", function(adhConfig: AdhConfig.Type) {
+    app.directive("adhDocumentWorkbench", ["adhConfig", (adhConfig: AdhConfig.Type) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Pages/DocumentWorkbench.html",
-            controller: ["adhHttp", "$scope", "adhUser", function(
+            controller: ["adhHttp", "$scope", "adhUser", (
                 adhHttp : AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>,
                 $scope : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>,
                 user : AdhUser.User
-            ) : void {
-                $scope.insertParagraph = function(proposalVersion: Types.Content<Resources.HasIDocumentSheet>) {
+            ) : void => {
+                $scope.insertParagraph = (proposalVersion: Types.Content<Resources.HasIDocumentSheet>) => {
                     $scope.poolEntries.push({viewmode: "list", content: proposalVersion});
                 };
 
@@ -150,7 +150,7 @@ export function run() {
 
                     // FIXME: factor out getting the head version of a DAG.
 
-                    var fetchDocumentHead = function(n : number, dag : Types.Content<Resources.HasIDocumentSheet>) : void {
+                    var fetchDocumentHead = (n : number, dag : Types.Content<Resources.HasIDocumentSheet>) : void => {
                         var dagPS = dag.data["adhocracy.sheets.versions.IVersions"].elements;
                         if (dagPS.length > 0) {
                             var headPath = Resources.newestVersion(dagPS); // FIXME: backend should have LAST
@@ -170,7 +170,7 @@ export function run() {
 
                     var dagRefs : string[] = pool.data["adhocracy.sheets.pool.IPool"].elements;
                     for (var i = 0; i < dagRefs.length; i++) {
-                        (function(dagRefIx : number) {
+                        ((dagRefIx : number) => {
                             var dagRefPath : string = dagRefs[dagRefIx];
                             adhHttp.get(dagRefPath).then((dag) => fetchDocumentHead(dagRefIx, dag));
                         })(i);
@@ -181,7 +181,7 @@ export function run() {
     }]);
 
 
-    app.directive("adhProposalVersionDetail", ["adhConfig", function(adhConfig: AdhConfig.Type) {
+    app.directive("adhProposalVersionDetail", ["adhConfig", (adhConfig: AdhConfig.Type) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/Detail.html",
@@ -189,30 +189,30 @@ export function run() {
                 content: "=",
                 viewmode: "="
             },
-            controller: ["adhHttp", "$scope", function(
+            controller: ["adhHttp", "$scope", (
                 adhHttp : AdhHttp.IService<Types.Content<any>>,
                 $scope : IProposalVersionDetailScope<any>
-            ) : void {
-                $scope.list = function() {
+            ) : void => {
+                $scope.list = () => {
                     $scope.viewmode = "list";
                 };
 
-                $scope.display = function() {
+                $scope.display = () => {
                     $scope.viewmode = "display";
                 };
 
-                $scope.edit = function() {
+                $scope.edit = () => {
                     $scope.viewmode = "edit";
                 };
 
-                $scope.reset = function() {
+                $scope.reset = () => {
                     adhHttp.get($scope.content.path).then((content) => {
                         $scope.content = content;
                     });
                     $scope.viewmode = "display";
                 };
 
-                $scope.commit = function() {
+                $scope.commit = () => {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
 
                     $scope.$broadcast("commit");
@@ -222,7 +222,7 @@ export function run() {
         };
     }]);
 
-    app.directive("adhProposalVersionEdit", ["adhConfig", function(adhConfig: AdhConfig.Type) {
+    app.directive("adhProposalVersionEdit", ["adhConfig", (adhConfig: AdhConfig.Type) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/Edit.html",
@@ -232,29 +232,29 @@ export function run() {
         };
     }]);
 
-    app.directive("adhProposalVersionNew", ["$http", "$q", "adhConfig", function(
+    app.directive("adhProposalVersionNew", ["$http", "$q", "adhConfig", (
         $http: ng.IHttpService,
         $q : ng.IQService,
         adhConfig: AdhConfig.Type
-    ) {
+    ) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/New.html",
             scope: {
                 onNewProposal: "="
             },
-            controller: function($scope) {
+            controller: ($scope) => {
                 $scope.proposalVersion = (new Resources.Resource("adhocracy_sample.resources.proposal.IProposalVersion"))
                                               .addIDocument("", "", []);
 
                 $scope.paragraphVersions = [];
 
-                $scope.addParagraphVersion = function() {
+                $scope.addParagraphVersion = () => {
                     $scope.paragraphVersions.push(new Resources.Resource("adhocracy_sample.resources.paragraph.IParagraphVersion")
                                                       .addIParagraph(""));
                 };
 
-                $scope.commit = function() {
+                $scope.commit = () => {
                     Resources.postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions).then((resp) => {
                         $http.get(resp.data.path).then((respGet) => {
                             $scope.onNewProposal(respGet.data);
@@ -266,7 +266,7 @@ export function run() {
     }]);
 
 
-    app.directive("adhSectionVersionDetail", ["adhConfig", "RecursionHelper", function(adhConfig: AdhConfig.Type, RecursionHelper) {
+    app.directive("adhSectionVersionDetail", ["adhConfig", "RecursionHelper", (adhConfig: AdhConfig.Type, RecursionHelper) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/ISectionVersion/Detail.html",
@@ -275,11 +275,11 @@ export function run() {
                 ref: "=",
                 viewmode: "="
             },
-            controller: ["adhHttp", "$scope", function(
+            controller: ["adhHttp", "$scope", (
                 adhHttp : AdhHttp.IService<Types.Content<Resources.HasISectionSheet>>,
                 $scope : DetailRefScope<Resources.HasISectionSheet>
-            ) : void {
-                var commit = function(event, ...args) {
+            ) : void => {
+                var commit = (event, ...args) => {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
                 };
 
@@ -295,7 +295,7 @@ export function run() {
     }]);
 
 
-    app.directive("adhParagraphVersionDetail", ["adhConfig", function(adhConfig: AdhConfig.Type) {
+    app.directive("adhParagraphVersionDetail", ["adhConfig", (adhConfig: AdhConfig.Type) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Resources/IParagraphVersion/Detail.html",
@@ -303,11 +303,11 @@ export function run() {
                 ref: "=",
                 viewmode: "="
             },
-            controller: ["adhHttp", "$scope", function(
+            controller: ["adhHttp", "$scope", (
                 adhHttp : AdhHttp.IService<Types.Content<Resources.HasIParagraphSheet>>,
                 $scope : DetailRefScope<Resources.HasIParagraphSheet>
-            ) : void {
-                var commit = function(event, ...args) {
+            ) : void => {
+                var commit = (event, ...args) => {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
                 };
 
@@ -323,14 +323,14 @@ export function run() {
     }]);
 
 
-    app.directive("adhDocumentSheetEdit", ["$http", "$q", "adhConfig", function($http, $q, adhConfig: AdhConfig.Type) {
+    app.directive("adhDocumentSheetEdit", ["$http", "$q", "adhConfig", ($http, $q, adhConfig: AdhConfig.Type) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Sheets/IDocument/Edit.html",
             scope: {
                 sheet: "="
             },
-            controller: function($scope) {
+            controller: ($scope) => {
                 var versionPromises = $scope.sheet.elements.map((path) =>
                     $http.get(decodeURIComponent(path))
                          .then((resp) => resp.data)
@@ -343,7 +343,7 @@ export function run() {
         };
     }]);
 
-    app.directive("adhDocumentSheetShow", ["adhConfig", function(adhConfig: AdhConfig.Type) {
+    app.directive("adhDocumentSheetShow", ["adhConfig", (adhConfig: AdhConfig.Type) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Sheets/IDocument/Show.html",
@@ -354,7 +354,7 @@ export function run() {
     }]);
 
 
-    app.directive("adhParagraphSheetEdit", ["adhConfig", function(adhConfig) {
+    app.directive("adhParagraphSheetEdit", ["adhConfig", (adhConfig) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Sheets/IParagraph/Edit.html",
