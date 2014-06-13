@@ -82,6 +82,13 @@ checked with tslint.
               return;
           }
 
+-  The last item in a list or in function parameters may by split across
+   multiple lines::
+
+       app.directive('myDirective', ["$q", "$http", ($q, $http) => {
+           ...
+       }]);
+
 -  Do not use named functions. Assign anonymous functions to variables instead.
    This is less confusing. `Further reading
    <http://kangax.github.io/nfe/#expr-vs-decl>`_
