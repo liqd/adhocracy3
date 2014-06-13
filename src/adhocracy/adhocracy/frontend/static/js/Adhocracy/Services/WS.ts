@@ -47,7 +47,7 @@ export function factory(adhConfig: AdhConfig.Type) : IService {
     }
 
     function openWs() {
-        ws = new WebSocket(adhConfig.wsuri);
+        var ws = new WebSocket(adhConfig.wsuri);
 
         ws.onmessage = function(event) {
             var path = event.data;
