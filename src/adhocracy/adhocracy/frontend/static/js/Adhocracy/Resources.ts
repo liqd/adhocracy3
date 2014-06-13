@@ -133,7 +133,7 @@ export class SectionVersion extends Resource {
     }
 }
 
-export function addParagraph(proposalVersion: PartialIProposalVersion, paragraphPath: string) {
+export var addParagraph = (proposalVersion: PartialIProposalVersion, paragraphPath: string) => {
     "use strict";
     return proposalVersion.data["adhocracy.sheets.document.IDocument"].elements.push(paragraphPath);
 };
@@ -142,29 +142,29 @@ export function addParagraph(proposalVersion: PartialIProposalVersion, paragraph
 /**
  * takes an array of URL's to resource versions
  */
-export function newestVersion(versions: string[]) : string {
+export var newestVersion = (versions: string[]) : string => {
     "use strict";
     return _.max(versions, (versionPath: string) => parseInt(versionPath.match(/\d*$/)[0], 10)).toString();
 };
 
-export function newestVersionInContainer(container) {
+export var newestVersionInContainer = (container) => {
     "use strict";
     return newestVersion(container.data.data["adhocracy.sheets.versions.IVersions"].elements);
 };
 
-export function getNewestVersion($http, path: string) : ng.IPromise<any> {
+export var getNewestVersion = ($http, path: string) : ng.IPromise<any> => {
     "use strict";
     return $http.get(path).then((container) =>
         $http.get(decodeURIComponent(newestVersionInContainer(container)))
     );
 };
 
-export function postProposal(
+export var postProposal = (
     $http,
     $q: ng.IQService,
     proposalVersion: PartialIProposalVersion,
     paragraphVersions
-) {
+) => {
     "use strict";
     var proposalName = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
 
@@ -205,7 +205,7 @@ export function postProposal(
     }).error(Http.logBackendError);
 };
 
-export function followNewestVersion($http, resourceVersion) {
+export var followNewestVersion = ($http, resourceVersion) => {
     "use strict";
     return $http.get(resourceVersion.path).then((newResourceVersion) => {
         resourceVersion["adhocracy.sheets.versions.IVersionable"].follows = [newResourceVersion.data.path];

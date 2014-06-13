@@ -48,7 +48,7 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
 }
 
 
-export function run() {
+export var run = () => {
     "use strict";
 
     var app = angular.module("adhocracy3SampleFrontend", []);
@@ -368,4 +368,4 @@ export function run() {
     // get going
 
     angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
-}
+};

@@ -54,7 +54,7 @@ var dict = {
  *
  * (in general, we want to report statistics on all these cases.)
  */
-export function cls(className) {
+export var cls = (className) => {
     "use strict";
 
     if (className in dict) {
@@ -64,7 +64,7 @@ export function cls(className) {
     }
 };
 
-export function clsd(className) {
+export var clsd = (className) => {
     "use strict";
 
     if (className in dict) {
@@ -78,7 +78,7 @@ export function clsd(className) {
  * Return the documentation associated with a class name, not the name
  * itself.  (Not sure whether this is all that useful?)
  */
-export function cssClassDescription(className) {
+export var cssClassDescription = (className) => {
     "use strict";
 
     if (className in dict) {
@@ -91,7 +91,7 @@ export function cssClassDescription(className) {
 /**
  * Return all registered class names in an array.
  */
-export function cssAllClassNames() {
+export var cssAllClassNames = () => {
     "use strict";
 
     Object.keys(dict);
