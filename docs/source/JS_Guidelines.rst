@@ -49,6 +49,12 @@ checked with tslint.
 
 -  Each new identfier has its own ``var``. (rationale: ``git diff`` / conflicts)
 
+-  No whitespace immediately inside parentheses, brackets or braces (this
+   includes empty blocks)::
+
+       Yes: spam(ham[1], {eggs: 2})
+       No:  spam( ham[ 1 ], { eggs: 2 } )
+
 -  Do not align your code. Use the following indentation rules instead
    (single-line option is always allowed if reasonably short.):
 
