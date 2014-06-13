@@ -57,13 +57,15 @@ checked with tslint.
          foo = {
              a: 1,
              boeifj: 2,
-             cfhe: 3}
+             cfhe: 3
+         }
 
    -  lists::
 
          foo = [
              138,
-             281128]
+             281128
+         ]
 
    -  function definitions::
 
@@ -75,8 +77,8 @@ checked with tslint.
 
           var foo = (
               arg: number,
-              otherarg: Class) : void =>
-          {
+              otherarg: Class
+          ) : void => {
               return;
           }
 
