@@ -5,6 +5,11 @@
 import Types = require("Adhocracy/Types");
 import Util = require("Adhocracy/Util");
 
+export var factory;
+export var importContent;
+export var exportContent;
+export var logBackendError;
+
 
 /**
  * send and receive objects with adhocracy data model awareness
@@ -23,7 +28,7 @@ export interface IService<Content extends Types.Content<any>> {
     metaApiSheet : (name : string) => any;
 }
 
-export function factory<Content extends Types.Content<any>>($http : ng.IHttpService) : IService<Content> {
+factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IService<Content> => {
     "use strict";
 
     var adhHttp : IService<Content> = {
@@ -81,13 +86,13 @@ export function factory<Content extends Types.Content<any>>($http : ng.IHttpServ
     }
 
     return adhHttp;
-}
+};
 
 
 /**
  * transform objects on the way in and out
  */
-export function importContent<Content extends Types.Content<any>>(obj : Content) : Content {
+importContent = <Content extends Types.Content<any>>(obj : Content) : Content => {
     "use strict";
 
     if (typeof obj === "object") {
@@ -137,9 +142,9 @@ export function importContent<Content extends Types.Content<any>>(obj : Content)
     //
     //       return true;
     //   }
-}
+};
 
-export function exportContent<Content extends Types.Content<any>>(obj : Content) : Content {
+exportContent = <Content extends Types.Content<any>>(obj : Content) : Content => {
     "use strict";
 
     // FIXME: newobj should be a copy, not a reference
@@ -170,7 +175,7 @@ export interface IBackendError {
     errors: string[][];
 }
 
-export function logBackendError(data: IBackendError, status: number, headers, config) {
+logBackendError = (data: IBackendError, status: number, headers, config) : void => {
     "use strict";
 
     console.log("http response with error status: " + status);
