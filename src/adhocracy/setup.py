@@ -17,6 +17,10 @@ requires = [
     'cornice',
     ]
 
+test_requires = [
+    'selenium',
+]
+
 setup(name='adhocracy',
       version='0.0',
       description='adhocracy',
@@ -35,7 +39,9 @@ setup(name='adhocracy',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      tests_require=requires,
+      tests_require=test_requires,
+      extras_require={
+          "testing": test_requires },
       test_suite="adhocracy",
       entry_points="""\
       [paste.app_factory]
