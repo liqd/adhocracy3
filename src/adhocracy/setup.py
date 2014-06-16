@@ -10,6 +10,7 @@ requires = [
     'pyramid_chameleon',
     'pyramid',
     'pyramid_debugtoolbar',
+    'pyramid_exclog',
     'waitress',
     'substanced',
     'pyramid_tm',
