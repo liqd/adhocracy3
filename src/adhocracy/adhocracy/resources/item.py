@@ -40,7 +40,8 @@ item_metadata = pool_metadata._replace(
     element_types=[IItemVersion,
                    ITag,
                    ],
-    after_creation=[create_initial_content_for_item],
+    after_creation=[create_initial_content_for_item] +
+    pool_metadata.after_creation,
     item_type=IItemVersion,
 )
 

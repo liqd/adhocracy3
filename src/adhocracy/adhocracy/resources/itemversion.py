@@ -103,7 +103,8 @@ itemversion_metadata = resource_metadata_defaults._replace(
     iresource=IItemVersion,
     basic_sheets=[adhocracy.sheets.versions.IVersionable,
                   ],
-    after_creation=[notify_new_itemversion_created],
+    after_creation=[notify_new_itemversion_created] +
+    resource_metadata_defaults.after_creation,
     use_autonaming=True,
     autonaming_prefix='VERSION_',
 )
