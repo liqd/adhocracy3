@@ -127,6 +127,13 @@ class NotificationUnitTests(unittest.TestCase):
         result = inst.serialize({'event': 'modified', 'resource': self.parent})
         assert result == {'event': 'modified', 'resource': '/parent'}
 
+    def test_deserialize_notification(self):
+        schema = Notification()
+        inst = self._bind(schema)
+        result = inst.deserialize(
+            {'event': 'created', 'resource': '/parent'})
+        assert result == {'event': 'created', 'resource': self.parent}
+
     def test_serialize_child_notification(self):
         self.child = testing.DummyResource('child', self.parent)
         schema = ChildNotification()

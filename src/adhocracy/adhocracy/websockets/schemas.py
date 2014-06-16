@@ -45,7 +45,9 @@ class Event(colander.SchemaNode):
                                 'new_child',
                                 'removed_child',
                                 'modified_child',
-                                'new_version'])
+                                'new_version',
+                                'created',   # Only sent internally from
+                                'deleted'])  # the Pyramid WS client
     default = 'modified'
 
 

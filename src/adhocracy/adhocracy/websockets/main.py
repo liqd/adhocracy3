@@ -11,6 +11,7 @@ import asyncio
 from adhocracy.websockets import ClientCommunicator
 
 
+# FIXME We probably should make the port configurable
 PORT = 8080
 LOG_FILE_NAME = 'adhocracy-ws.log'
 LOG_LEVEL = logging.DEBUG
