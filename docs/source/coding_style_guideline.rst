@@ -138,7 +138,8 @@ Docstring formatting
 
         :param a: description for a
         :param flag: description for flag
-
+        :return: something special
+        :raise ValueError: if a is invalid
         """
 
 

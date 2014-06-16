@@ -48,12 +48,10 @@ export interface ListingScope<Container> {
 //
 // and implicitly know that Listing propagates the identifier
 // ``element`` to the element's scope.
-export class Listing<Container extends Types.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter>
-{
+export class Listing<Container extends Types.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter> {
     public static templateUrl: string = "/Widgets/Listing.html";
 
-    constructor(public containerAdapter: ContainerAdapter) {
-    }
+    constructor(public containerAdapter: ContainerAdapter) {}
 
     public createDirective(adhConfig: AdhConfig.Type) {
         var _self = this;
@@ -67,18 +65,15 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                 title: "@"
             },
             transclude: true,
-            controller: ["$scope",
-                         "adhHttp",
-                         function($scope: ListingScope<Container>,
-                                  adhHttp: AdhHttp.IService<Container>
-                                 ) : void
-                         {
-                             adhHttp.get($scope.path).then((pool: Container) => {
-                                 $scope.container = pool;
-                                 $scope.elements = _self.containerAdapter.elemRefs($scope.container);
-                             });
-                         }
-                        ]
+            controller: ["$scope", "adhHttp", (
+                $scope: ListingScope<Container>,
+                adhHttp: AdhHttp.IService<Container>
+            ) : void => {
+                adhHttp.get($scope.path).then((pool: Container) => {
+                    $scope.container = pool;
+                    $scope.elements = _self.containerAdapter.elemRefs($scope.container);
+                });
+            }]
         };
     }
 }
@@ -88,7 +83,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
 // Elements
 
 export class AbstractListingElementAdapter {
-    constructor(public $q: ng.IQService) { }
+    constructor(public $q: ng.IQService) {}
 
     public name: (element: any) => ng.IPromise<string> = (element) => {
         var deferred = this.$q.defer();
@@ -112,8 +107,10 @@ export class ListingElementAdapter extends AbstractListingElementAdapter {
 }
 
 export class ListingElementTitleAdapter extends AbstractListingElementAdapter {
-    constructor(public $q: ng.IQService,
-                public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>) {
+    constructor(
+        public $q: ng.IQService,
+        public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>
+    ) {
         super($q);
     }
 
@@ -137,12 +134,10 @@ export interface ListingElementScope {
     name: string;
 }
 
-export class ListingElement<Element extends Types.Content<any>, ElementAdapter extends AbstractListingElementAdapter>
-{
+export class ListingElement<Element extends Types.Content<any>, ElementAdapter extends AbstractListingElementAdapter> {
     public static templateUrl: string = "/Widgets/ListingElement.html";
 
-    constructor(public elementAdapter: ElementAdapter) {
-    }
+    constructor(public elementAdapter: ElementAdapter) {}
 
     public createDirective(adhConfig: AdhConfig.Type) {
         var _self = this;
@@ -154,17 +149,14 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
             scope: {
                 path: "@"
             },
-            controller: ["$scope",
-                         "adhHttp",
-                         function($scope: ListingElementScope,
-                                  adhHttp: AdhHttp.IService<Element>
-                                 ) : void
-                         {
-                             adhHttp.get($scope.path)
-                                 .then(_self.elementAdapter.name)
-                                 .then((name) => $scope.name = name);
-                         }
-                        ]
+            controller: ["$scope", "adhHttp", (
+                $scope: ListingElementScope,
+                adhHttp: AdhHttp.IService<Element>
+            ) : void => {
+                adhHttp.get($scope.path)
+                    .then(_self.elementAdapter.name)
+                    .then((name) => $scope.name = name);
+            }]
         };
     }
 }

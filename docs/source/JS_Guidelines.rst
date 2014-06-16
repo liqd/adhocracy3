@@ -49,6 +49,12 @@ checked with tslint.
 
 -  Each new identfier has its own ``var``. (rationale: ``git diff`` / conflicts)
 
+-  No whitespace immediately inside parentheses, brackets or braces (this
+   includes empty blocks)::
+
+       Yes: spam(ham[1], {eggs: 2})
+       No:  spam( ham[ 1 ], { eggs: 2 } )
+
 -  Do not align your code. Use the following indentation rules instead
    (single-line option is always allowed if reasonably short.):
 
@@ -57,13 +63,15 @@ checked with tslint.
          foo = {
              a: 1,
              boeifj: 2,
-             cfhe: 3}
+             cfhe: 3
+         }
 
    -  lists::
 
          foo = [
              138,
-             281128]
+             281128
+         ]
 
    -  function definitions::
 
@@ -75,20 +83,28 @@ checked with tslint.
 
           var foo = (
               arg: number,
-              otherarg: Class) : void =>
-          {
+              otherarg: Class
+          ) : void => {
               return;
           }
+
+-  The last item in a list or in function parameters may by split across
+   multiple lines::
+
+       app.directive('myDirective', ["$q", "$http", ($q, $http) => {
+           ...
+       }]);
 
 -  Do not use named functions. Assign anonymous functions to variables instead.
    This is less confusing. `Further reading
    <http://kangax.github.io/nfe/#expr-vs-decl>`_
 
--  If you need an alias for ``this``, always use ``self`` (as in knockout).
+-  If you need an alias for ``this``, always use ``self`` (as in knockout)
+   or ``_self`` (in TypeScript classes).
    (``_this`` is used by TypeScript in compiled code and is disallowed
    in typescript source in e.g. class instance methods.)
 
-   if more than one nested self is needed, re-assign outer ``self``\ s
+   If more than one nested self is needed, re-assign outer ``self``\ s
    locally.
 
 TypeScript
@@ -171,10 +187,28 @@ they avoid common mistakes like this::
     var greeter = new Greeter();
     setTimeout(greeter.greet, 1000);  // will alert 'undefined'
 
+Still you should not use this behaviour extensively. Prefer to use
+the explicit aliases ``_self`` and ``_class`` in class methods::
+
+    class Greeter {
+        public static greeting = "Hello";
+
+        constructor(public name) {}
+
+        greet = function() {
+            var _self = this;
+            var _class = (<any>_self).constructor;
+
+            setTimeout(() => {
+                console.log(_class.greeting + " " + _self.name + "!");
+            }, 1000);
+        }
+    }
+
 Angular
 -------
 
--  prefer isolated scope in directives and pass in variables
+-  prefer `isolated scope`_ in directives and pass in variables
    explicitly.
 
 -  direct DOM manipulation/jQuery is only allowed inside directives.
@@ -199,6 +233,8 @@ Angular
    -  service module import: 'import Http = require("Adhocracy/Services/Http");'.
       rationale: When using service modules, the fact that they provide
       services is obvious.
+
+-  angular scopes must be typed with interfaces.
 
 Template
 ~~~~~~~~
@@ -230,6 +266,11 @@ Template
 -  CSS and JavaScript are not allwed in templates.  This includes
    `ngStyle <https://docs.angularjs.org/api/ng/directive/ngStyle>`_.
 
+-  Since templates (1) ideally are to be maintained by designers rather
+   than software developers, and (2) are not type-checked by typescript,
+   they must contain as little code as possible.
+
+
 Documentation
 ~~~~~~~~~~~~~
 
@@ -244,3 +285,4 @@ Documentation
 .. _strict mode: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode
 .. _tslint: https://github.com/palantir/tslint
 .. _jsdoc: http://usejsdoc.org/
+.. _isolated scope: https://docs.angularjs.org/guide/directive#isolating-the-scope-of-a-directive

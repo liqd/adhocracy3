@@ -1,4 +1,6 @@
-// cut ranges out of an array - original by John Resig (MIT Licensed)
+/**
+ * cut ranges out of an array - original by John Resig (MIT Licensed)
+ */
 export function cutArray(a : any[], from : number, to ?: number) : any[] {
     "use strict";
     var rest = a.slice((to || from) + 1 || a.length);
@@ -18,9 +20,11 @@ export function parentPath(url : string) : string {
 };
 
 
-// Do a deep copy on any javascript object.  The resuling object does
-// not share sub-structures as the original.  (I think instances of
-// classes other than Object, Array are not treated properly either.)
+/**
+ * Do a deep copy on any javascript object.  The resuling object does
+ * not share sub-structures as the original.  (I think instances of
+ * classes other than Object, Array are not treated properly either.)
+ */
 export function deepcp(i) {
     "use strict";
 
@@ -46,11 +50,13 @@ export function deepcp(i) {
 }
 
 
-// Do a deep copy of a javascript source object into a target object.
-// References to the target object are not severed; rather, all fields
-// in the target object are deleted, and all fields in the source
-// object are copied using deepcp().  Crashes if target is not an
-// object.
+/**
+ * Do a deep copy of a javascript source object into a target object.
+ * References to the target object are not severed; rather, all fields
+ * in the target object are deleted, and all fields in the source
+ * object are copied using deepcp().  Crashes if target is not an
+ * object.
+ */
 export function deepoverwrite(source, target) {
     "use strict";
 
@@ -72,9 +78,11 @@ export function deepoverwrite(source, target) {
 }
 
 
-// Compare two objects, and return a boolen that states whether they
-// are equal.  (This is likely to be an approximation, but it should
-// work at least for json objects.)
+/**
+ * Compare two objects, and return a boolen that states whether they
+ * are equal.  (This is likely to be an approximation, but it should
+ * work at least for json objects.)
+ */
 export function deepeq(a : any, b : any) : boolean {
     "use strict";
     if (typeof a !== typeof b) {
@@ -88,14 +96,20 @@ export function deepeq(a : any, b : any) : boolean {
 
         for (var x in a) {
             if (a.hasOwnProperty(x)) {
-                if (!(x in b))           { return false; }
-                if (!deepeq(a[x], b[x])) { return false; }
+                if (!(x in b)) {
+                    return false;
+                }
+                if (!deepeq(a[x], b[x])) {
+                    return false;
+                }
             }
         }
 
         for (var y in b) {
             if (b.hasOwnProperty(y)) {
-                if (!(y in a)) { return false; }
+                if (!(y in a)) {
+                    return false;
+                }
             }
         }
     }
@@ -110,7 +124,7 @@ export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
 
     var deferred = $q.defer();
     deferred.resolve();
-    return deferred.promise.then(() => { return obj; });
+    return deferred.promise.then(() => obj);
 }
 
 export function normalizeName(name: string) : string {

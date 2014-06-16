@@ -24,32 +24,32 @@ export interface IService {
     destroy: () => void;
 }
 
-export function factory(adhConfig: AdhConfig.Type) : IService {
+export var factory = (adhConfig: AdhConfig.Type) : IService => {
     "use strict";
 
-    var ws = openWs();
+    var ws;
     var subscriptions = {};
 
-    function subscribeWs(path : string, update : (obj: Types.Content<any>) => void) : void {
+    var subscribeWs = (path : string, update : (obj: Types.Content<any>) => void) : void => {
         if (path in subscriptions) {
             throw "WS: subscribe: attempt to subscribe to " + path + " twice!";
         } else {
             subscriptions[path] = update;
         }
-    }
+    };
 
-    function unsubscribeWs(path : string) : void {
+    var unsubscribeWs = (path : string) : void => {
         if (path in subscriptions) {
             delete subscriptions[path];
         } else {
             throw "WS: unsubscribe: no subscription for " + path + "!";
         }
-    }
+    };
 
-    function openWs() {
-        ws = new WebSocket(adhConfig.wsuri);
+    var openWs = () => {
+        var ws = new WebSocket(adhConfig.wsuri);
 
-        ws.onmessage = function(event) {
+        ws.onmessage = (event) => {
             var path = event.data;
 
             if (path in subscriptions) {
@@ -57,28 +57,30 @@ export function factory(adhConfig: AdhConfig.Type) : IService {
             }
         };
 
-        ws.onerror = function(event) {
+        ws.onerror = (event) => {
             return;
         };
 
-        ws.onopen = function() {
+        ws.onopen = () => {
             return;
         };
 
-        ws.onclose = function() {
+        ws.onclose = () => {
             ws = openWs();
         };
 
         return ws;
-    }
+    };
 
-    function closeWs() : void {
+    var closeWs = () : void => {
         ws.close();
-    }
+    };
+
+    ws = openWs();
 
     return {
         subscribe: subscribeWs,
         unsubscribe: unsubscribeWs,
         destroy: closeWs
     };
-}
+};
