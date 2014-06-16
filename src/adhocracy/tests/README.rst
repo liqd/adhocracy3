@@ -35,6 +35,10 @@ https://github.com/tntim96/JSCover
   - jenkins plugin.
   - runs its own web server, or a proxy.
 
+https://github.com/yui/yuitest/
+  - looks interesting
+  - some old open pull requests
+
 http://siliconforks.com/jscoverage/
   - predecessor of JSCover (obsolete)
 
