@@ -1,4 +1,7 @@
-"""Functional testing helpers."""
+"""Public py.test fixtures: http://pytest.org/latest/fixture.html. """
+
+
+import pytest
 
 
 def settings_functional():
@@ -15,3 +18,13 @@ def settings_functional():
                      'zodbconn.uri': 'memory://',
                      })
     return settings
+
+
+@pytest.fixture()
+def config():
+    """Return the adhocracy configuration object."""
+    from adhocracy import root_factory
+    from pyramid.config import Configurator
+    settings = settings_functional()
+    config = Configurator(settings=settings, root_factory=root_factory)
+    return config

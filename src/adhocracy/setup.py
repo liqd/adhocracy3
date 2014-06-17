@@ -50,6 +50,8 @@ setup(name='adhocracy',
       entry_points="""\
       [paste.app_factory]
       main = adhocracy:main
+      [pytest11]
+      adhocracy = adhocracy.testing
       """,
       )
 

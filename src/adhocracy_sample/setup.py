@@ -32,5 +32,7 @@ setup(name='adhocracy_sample',
       entry_points="""\
       [paste.app_factory]
       main = adhocracy_sample:main
+      [pytest11]
+      adhocracy_sample = adhocracy_sample.testing
       """,
       )

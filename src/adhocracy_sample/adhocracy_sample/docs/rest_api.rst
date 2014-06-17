@@ -19,10 +19,7 @@ Some imports to work with rest api calls::
 Start Adhocracy testapp::
 
     >>> from webtest import TestApp
-    >>> from adhocracy.testing import settings_functional
-    >>> from adhocracy_sample import main
-
-    >>> app = main({}, **settings_functional())
+    >>> app = getfixture('app_adhocracy_sample')
     Executin...
     >>> testapp = TestApp(app)
 
