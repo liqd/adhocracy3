@@ -16,6 +16,24 @@ export function isInfixOf(needle : any, hay : any[]) : boolean {
     return hay.indexOf(needle) !== -1;
 };
 
+/**
+ * this function is a workaround for the weirdness of the javscript
+ * 'in' keyword.  use it if you want to test a string array for
+ * memberships.  does not work on other types!  if you would relax the
+ * type signature:
+ *
+ *   stringInArrayMember(null, ['null']) ==> true
+ *
+ * (nobody should use javascript, really.)
+ */
+export function stringIsArrayMember(member: string, array: string[]): boolean {
+    var obj = {};
+    for (var ix in array) {
+        obj[array[ix]] = '';
+    }
+    return obj.hasOwnProperty(member);
+}
+
 export function parentPath(url : string) : string {
     "use strict";
     return url.substring(0, url.lastIndexOf("/"));
