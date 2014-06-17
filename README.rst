@@ -19,7 +19,10 @@ server (backend):
 
 - `Pyramid <http://pylonsproject.org>`_  (web framework)
 
-- `Autobahn|Python <http://autobahn.ws/python/>`_ (websockets)
+- `Autobahn|Python <http://autobahn.ws/python/>`_ (websocket servers)
+
+- `websocket-client <https://github.com/liris/websocket-client>`_ (websocket
+  client)
 
 - `asyncio <https://pypi.python.org/pypi/asyncio>`_ (required in Python 3.3
   for Autobahn; comes pre-packaged with Python 3.4)
