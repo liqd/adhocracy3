@@ -177,7 +177,8 @@ class ClientCommunicator(WebSocketServerProtocol):
                                       json_object: dict) -> None:
         """Raise an 'unknown_xxx' WebSocketError error if appropriate."""
         errdict = err.asdict()
-        if self._is_only_key(errdict, field_name):
+        if (self._is_only_key(errdict, field_name) and
+                field_name in json_object):
             field_value = json_object[field_name]
             raise WebSocketError('unknown_' + field_name, field_value)
 
@@ -241,8 +242,10 @@ class ClientCommunicator(WebSocketServerProtocol):
             error = err.error_type
             details = err.details
         else:  # pragma: no cover
+            logger.exception(
+                'Unexpected error while handling Websocket request')
             error = 'internal_error'
-            details = str(err)
+            details = '{}: {}'.format(err.__class__.__name__, err)
         self._send_json_message({'error': error, 'details': details})
 
     def send_modified_notification(self, resource: IResource) -> None:

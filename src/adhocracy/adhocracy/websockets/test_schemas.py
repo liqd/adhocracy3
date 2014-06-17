@@ -58,6 +58,11 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
         with pytest.raises(colander.Invalid):
             inst.deserialize({})
 
+    def test_deserialize_wrong_field(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize({'event': 'created', 'resource': '/child'})
+
     def test_deserialize_wrong_inner_type(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
