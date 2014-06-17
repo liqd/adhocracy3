@@ -96,5 +96,5 @@ Run frontend test suite
 
 in order to run both unit and acceptance tests ::
 
-    find ./src/adhocracy/adhocracy/frontend/tests/ -name 'test_*.py' -exec ./bin/py.test {} \;
+    ./bin/py.test ./src/adhocracy/adhocracy/frontend/tests/
 
