@@ -332,5 +332,5 @@ def notify_new_version(resource: IResource, new_version: IItemVersion) -> None:
 
 
 def includeme(config):
-    """Configure WebSockets server."""
-    # FIXME implement as necessary
+    """Configure WebSockets client."""
+    config.include('.client')

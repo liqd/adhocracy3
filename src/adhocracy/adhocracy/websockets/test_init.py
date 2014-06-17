@@ -1,4 +1,3 @@
-"""Tests for websockets package."""
 from json import dumps
 from json import loads
 import unittest
