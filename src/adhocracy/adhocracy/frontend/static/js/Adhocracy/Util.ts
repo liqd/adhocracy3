@@ -27,15 +27,20 @@ export function isInfixOf(needle : any, hay : any[]) : boolean {
  * (nobody should use javascript, really.)
  */
 export function stringIsArrayMember(member: string, array: string[]): boolean {
+    "use strict";
+
     var obj = {};
     for (var ix in array) {
-        obj[array[ix]] = '';
+        if (array.hasOwnProperty(ix)) {
+            obj[array[ix]] = "";
+        }
     }
     return obj.hasOwnProperty(member);
 }
 
 export function parentPath(url : string) : string {
     "use strict";
+
     return url.substring(0, url.lastIndexOf("/"));
 };
 
@@ -105,6 +110,7 @@ export function deepoverwrite(source, target) {
  */
 export function deepeq(a : any, b : any) : boolean {
     "use strict";
+
     if (typeof a !== typeof b) {
         return false;
     }
@@ -150,5 +156,6 @@ export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
 
 export function normalizeName(name: string) : string {
     "use strict";
+
     return name.toLowerCase().replace(/\ /g, "_");
 }
