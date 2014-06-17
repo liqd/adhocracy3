@@ -150,10 +150,6 @@ def validate_request_data(context, request: Request, schema=MappingSchema,
     """
     if schema:
         schema_cornice = CorniceSchema.from_colander(schema)
-        # FIXME workaround for Cornice not finding a request body
-        if (not hasattr(request, 'deserializer') and
-                hasattr(request, 'json')):
-            request.deserializer = lambda req: req.json
         validate_colander_schema(schema_cornice, request)
     for val in extra_validators:
         val(context, request)
@@ -298,7 +294,8 @@ class SimpleRESTView(ResourceRESTView):
         """Get resource data."""
         return super().get()  # pragma: no cover
 
-    @view_config(request_method='PUT')
+    @view_config(request_method='PUT',
+                 content_type='application/json')
     def put(self) -> dict:
         """Edit resource and get response data."""
         sheets = self.registry.resource_sheets(self.context, self.request,
@@ -337,7 +334,8 @@ class PoolRESTView(SimpleRESTView):
         """Get resource data."""
         return super().get()  # pragma: no cover
 
-    @view_config(request_method='PUT')
+    @view_config(request_method='PUT',
+                 content_type='application/json')
     def put(self) -> dict:
         """Edit resource and get response data."""
         return super().put()  # pragma: no cover
@@ -361,7 +359,8 @@ class PoolRESTView(SimpleRESTView):
                 first_path = resource_path(child)
         return {'first_version_path': first_path}
 
-    @view_config(request_method='POST')
+    @view_config(request_method='POST',
+                 content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
         resource_type = self.request.validated['content_type']
@@ -392,7 +391,8 @@ class ItemRESTView(PoolRESTView):
         struct.update(self._get_dict_with_first_version_path(self.context))
         return GETItemResponseSchema().serialize(struct)
 
-    @view_config(request_method='POST')
+    @view_config(request_method='POST',
+                 content_type='application/json')
     def post(self):
         """Create new resource and get response data."""
         resource_type = self.request.validated['content_type']
