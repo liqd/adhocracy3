@@ -6,5 +6,6 @@ sass_dir = "${adhocracy:frontend.static_dir}/stylesheets/scss"
 images_dir = "${adhocracy:frontend.static_dir}/images"
 javascripts_dir = "${adhocracy:frontend.static_dir}/js"
 environment = :production
+sourcemap = true
 
 add_import_path "${adhocracy:frontend.static_dir}/stylesheets/scss"
