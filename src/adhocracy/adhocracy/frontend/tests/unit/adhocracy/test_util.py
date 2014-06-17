@@ -35,20 +35,23 @@ class TestDeepCp(unittest.TestCase):
     def tearDown(self):
         self.driver.close()
 
-    def _test_any(self, obj_in):
-        obj_out = self.driver.execute_script(
+    def _call_fut(self, obj_in):
+        return self.driver.execute_script(
             """
             var U = require('Adhocracy/Util');
             return U.deepcp(arguments[0]);
             """,
             obj_in);
-        self.assertEqual(obj_in, obj_out)
 
-    def test_null(self):
-        self._test_any(None)
+    def test_equal(self):
+        value = None
+        assert self._call_fut(value) == value
 
     def test_empty_obj(self):
-        self._test_any({})
+        value = {}
+        assert self._call_fut(value) == value
 
     def test_some_obj(self):
-        self._test_any({u"a": 3, u"b": [None]})
+        value = {'a': 3, 'b': None, 'c': [None]}
+        assert self._call_fut(value) == value
+
