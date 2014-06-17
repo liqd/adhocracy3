@@ -43,19 +43,21 @@ class TestDirectiveLogin(unittest.TestCase):
     def _test_login(self, user):
         time.sleep(0.8)  # FIXME: there are better ways!
 
-        input_elem_directive = self.driver.find_element_by_xpath('//adh-login')
-        input_elem_name = input_elem_directive.find_element_by_xpath("//input[contains(@ng-model,'credentials.name')]")
-        input_elem_password = input_elem_directive.find_element_by_xpath("//input[contains(@ng-model,'credentials.password')]")
-        input_elem_button = input_elem_directive.find_element_by_xpath("//input[contains(@ng-click,'logIn()')]")
+        # attempt login
+        directive = self.driver.find_element_by_xpath('//adh-login')
+        name = directive.find_element_by_xpath("//input[contains(@ng-model,'credentials.name')]")
+        password = directive.find_element_by_xpath("//input[contains(@ng-model,'credentials.password')]")
+        button = directive.find_element_by_xpath("//input[contains(@ng-click,'logIn()')]")
 
-        input_elem_name.send_keys(user['name'])
-        input_elem_password.send_keys(user['password'])
-        input_elem_button.click()
+        name.send_keys(user['name'])
+        password.send_keys(user['password'])
+        button.click()
 
+        # check if login succeeded
         try:
             time.sleep(0.8)  # FIXME: there are better ways!
-            input_elem_directive.find_element_by_xpath("//span[text()='"+user['name']+"']")  # FIXME: user['name'] must be checked for "'"
-            input_elem_directive.find_element_by_xpath("//input[contains(@ng-click,'logOut()')]")
+            directive.find_element_by_xpath("//span[text()='"+user['name']+"']")  # FIXME: user['name'] must be checked for "'"
+            directive.find_element_by_xpath("//input[contains(@ng-click,'logOut()')]")
         except NoSuchElementException:
             return False
 
