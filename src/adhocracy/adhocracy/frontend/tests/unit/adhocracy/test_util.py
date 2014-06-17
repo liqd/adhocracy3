@@ -7,9 +7,6 @@ import time
 
 import unittest
 
-import ipdb
-#ipdb.set_trace()
-
 
 def start_adh_session():
     capabilities = {
@@ -39,7 +36,12 @@ class TestDeepCp(unittest.TestCase):
         self.driver.close()
 
     def _test_any(self, obj_in):
-        obj_out = self.driver.execute_script("var U = require('Adhocracy/Util'); return U.deepcp(arguments[0]);", obj_in);
+        obj_out = self.driver.execute_script(
+            """
+            var U = require('Adhocracy/Util');
+            return U.deepcp(arguments[0]);
+            """,
+            obj_in);
         self.assertEqual(obj_in, obj_out)
 
     def test_null(self):
