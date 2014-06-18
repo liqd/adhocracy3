@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>adhocracy 3 frontend tests</title>
+
+    <script type="text/javascript" src="/frontend_static/submodules/requirejs/require.js"></script>
+    <script type="text/javascript" src="/frontend_static/require-config.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="js/jasmine/jasmine.css">
+    <script type="text/javascript" src="js/jasmine/jasmine.js"></script>
+    <script type="text/javascript" src="js/jasmine/jasmine-html.js"></script>
+
+    <script type="text/javascript">
+      (function() {
+        var jasmineEnv = jasmine.getEnv();
+        jasmineEnv.updateInterval = 1000;
+
+        var htmlReporter = new jasmine.HtmlReporter();
+
+        jasmineEnv.addReporter(htmlReporter);
+        /* this is just for our automated tests */
+        window.jasmine_phantom_reporter = new jasmine.ConsoleReporter;
+        jasmineEnv.addReporter(jasmine_phantom_reporter);
+
+        jasmineEnv.specFilter = function(spec) {
+          return htmlReporter.specFilter(spec);
+        };
+
+        var currentWindowOnload = window.onload;
+
+        window.onload = function() {
+          if (currentWindowOnload) {
+            currentWindowOnload();
+          }
+          execJasmine();
+        };
+
+        function execJasmine() {
+          jasmineEnv.execute();
+        }
+      })();
+    </script>
+</head>
+
+<body>
+    <script type="text/javascript">
+        require(['AdhocracyTest'], function(test) {
+            test.suite();
+        });
+    </script>
+</body>
+</html>
