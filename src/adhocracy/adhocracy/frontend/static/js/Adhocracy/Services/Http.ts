@@ -2,8 +2,8 @@
 /// <reference path="../../../submodules/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import Types = require("Adhocracy/Types");
-import Util = require("Adhocracy/Util");
+import Types = require("../Types");
+import Util = require("../Util");
 
 export var factory;
 export var importContent;

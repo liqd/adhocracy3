@@ -1,6 +1,6 @@
 /// <reference path="../../submodules/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import Util = require("Adhocracy/Util");
+import Util = require("./Util");
 
 export var register = () => {
     describe("Util", () => {
