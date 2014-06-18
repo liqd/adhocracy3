@@ -5,13 +5,13 @@
 
 import angular = require("angular");
 
-import Types = require("Adhocracy/Types");
-import AdhHttp = require("Adhocracy/Services/Http");
-import AdhUser = require("Adhocracy/Services/User");
-import AdhConfig = require("Adhocracy/Services/Config");
+import Types = require("../Types");
+import AdhHttp = require("../Services/Http");
+import AdhUser = require("../Services/User");
+import AdhConfig = require("../Services/Config");
 
-import Resources = require("Adhocracy/Resources");
-import Widgets = require("Adhocracy/Widgets");
+import Resources = require("../Resources");
+import Widgets = require("../Widgets");
 
 
 /**

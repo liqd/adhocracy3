@@ -2,8 +2,8 @@
 /// <reference path="../../../submodules/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import Types = require("Adhocracy/Types");
-import AdhConfig = require("Adhocracy/Services/Config");
+import Types = require("../Types");
+import AdhConfig = require("./Config");
 
 
 // web sockets

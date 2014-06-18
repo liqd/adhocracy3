@@ -1,3 +1,5 @@
+/// <reference path="../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
+
 /**
  * cut ranges out of an array - original by John Resig (MIT Licensed)
  */
