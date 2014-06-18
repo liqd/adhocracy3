@@ -45,8 +45,7 @@ setup(name='adhocracy',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      extras_require={
-          'test': test_requires },
+      extras_require={'test': test_requires},
       entry_points="""\
       [paste.app_factory]
       main = adhocracy:main

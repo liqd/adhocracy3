@@ -9,6 +9,10 @@ requires = [
     'adhocracy',
     ]
 
+test_requires = [
+    'adhocracy[test]',
+    ]
+
 setup(name='adhocracy_sample',
       version='0.0',
       description='adhocracy sample app',
@@ -27,8 +31,7 @@ setup(name='adhocracy_sample',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      tests_require=requires,
-      test_suite='adhocracy_sample',
+      extras_require={'test': test_requires},
       entry_points="""\
       [paste.app_factory]
       main = adhocracy_sample:main
