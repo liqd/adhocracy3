@@ -35,6 +35,9 @@ def includeme(config):  # pragma: no cover
     # utility first, then the authentication.
     authz_policy = ACLAuthorizationPolicy()
     config.set_authorization_policy(authz_policy)
+    # handle exceptions in productive installations
+    # read; http://docs.pylonsproject.org/projects/pyramid-exclog
+    config.include('pyramid_exclog')
     # now we can proceed
     config.include('substanced')
     config.commit()  # commit to allow proper config overrides

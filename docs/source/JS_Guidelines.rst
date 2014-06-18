@@ -99,6 +99,10 @@ checked with tslint.
    This is less confusing. `Further reading
    <http://kangax.github.io/nfe/#expr-vs-decl>`_
 
+   .. FIXME: This does collide with some other rules because it implies that
+      a function is defined above its first use. Until this conflict can be
+      solved, this rule remains inactive.
+
 -  If you need an alias for ``this``, always use ``self`` (as in knockout)
    or ``_self`` (in TypeScript classes).
    (``_this`` is used by TypeScript in compiled code and is disallowed

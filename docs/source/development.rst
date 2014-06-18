@@ -32,11 +32,3 @@ Running the Testsuite
 with server setup and teardown (wsgi) ::
 
     bin/py.test src/adhocracy src/adhocracy_sample
-
-run the test against already running server ::
-
-    A3_TEST_SERVER=localhost:6541 bin/py.test src/adhocracy src/adhocracy_sample
-
-The second case is interesting if you want to create a few objects in
-a running backend in order to make the js front-end tests more
-colorful.

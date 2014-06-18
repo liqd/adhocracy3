@@ -1,9 +1,13 @@
 """Rest API exceptions."""
+import logging
+
 from cornice.util import _JSONError
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
-
 import colander
+
+
+logger = logging.getLogger(__name__)
 
 
 @view_config(
@@ -27,4 +31,5 @@ def handle_error_500_exception(error, request):
     args = str(error.args)
     msg = getattr(error, 'msg', '')
     error = ('internal', args, msg)
+    logger.exception('internal')
     return _JSONError([error], 500)
