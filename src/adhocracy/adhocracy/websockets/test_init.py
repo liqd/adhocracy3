@@ -10,6 +10,7 @@ from adhocracy.interfaces import IItemVersion
 from adhocracy.websockets import ClientCommunicator
 from adhocracy.websockets import ClientTracker
 from adhocracy.websockets import WebSocketError
+# REVIEW code to test should be import in the unit test
 
 
 class DummyResource():

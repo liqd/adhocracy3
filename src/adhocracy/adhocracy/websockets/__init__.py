@@ -41,7 +41,6 @@ class ClientTracker():
     """"Keeps track of the clients that want notifications."""
 
     def __init__(self):
-        """Create a new instance."""
         self._clients2resource_oids = defaultdict(set)
         self._resource_oids2clients = defaultdict(set)
 
@@ -54,7 +53,7 @@ class ClientTracker():
     def subscribe(self, client: Hashable, resource: IResource) -> bool:
         """Subscribe a client to a resource, if necessary.
 
-        Returns True if the subscription was successful, False if it was
+        :return: True if the subscription was successful, False if it was
         unnecessary (the client was already subscribed).
         """
         if self.is_subscribed(client, resource):
@@ -67,7 +66,7 @@ class ClientTracker():
     def unsubscribe(self, client: Hashable, resource: IResource) -> bool:
         """Unsubscribe a client from a resource, if necessary.
 
-        Returns True if the unsubscription was successful, False if it was
+        :return: True if the unsubscription was successful, False if it was
         unnecessary (the client was not subscribed).
         """
         if not self.is_subscribed(client, resource):
@@ -82,6 +81,9 @@ class ClientTracker():
 
         If the resulting set is empty, it is removed from the multidict.
         """
+        # REVIEW: the name 'mulitidict' in the method name and parameter is
+        # misleading. Multidicts are dicts with non unique keys, instead we
+        # expect a dict with set values.
         multidict[key].discard(value)
         if not multidict[key]:
             del multidict[key]
@@ -252,6 +254,8 @@ class ClientCommunicator(WebSocketServerProtocol):
         errlist = ['{}: {}'.format(k, errdict[k]) for k in errdict.keys()]
         details = ' / '.join(sorted(errlist))
         raise WebSocketError('invalid_json', details)
+    # REVIEW: the docstring is not necessary, the method name gives you the
+    # same information.
 
     def _raise_invalid_json_from_exception(self, err: Exception) -> None:
         """Raise a 'invalid_json' WebSocketError from a generic exception."""

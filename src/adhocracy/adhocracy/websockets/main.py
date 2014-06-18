@@ -1,4 +1,6 @@
 """Start Websocket server as main application."""
+# REVIEW maybe rename this module to scripts.py or start_ws_server.py then its
+# more clear what modules is doing.
 import sys
 from configparser import ConfigParser
 from os import path
@@ -12,8 +14,10 @@ import asyncio
 from adhocracy.websockets import ClientCommunicator
 
 
-# FIXME We probably should make the port configurable
+# FIXME make the port configurable
 PORT = 8080
+# REVIEW just log to stdout,
+# this way other tools can take care for log file creation and logrotaion
 LOG_FILE_NAME = 'adhocracy-ws.log'
 LOG_LEVEL = logging.DEBUG
 
