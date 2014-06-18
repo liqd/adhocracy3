@@ -25,13 +25,13 @@ export interface Type {
     // allows to register one handler at a time.  (Should we ever need
     // more than one concurrent handlers, we should think about a
     // better way to unsubscribe them than jquery could come up with.)
-    subscribe: (path: string, update: (event: ServerEvent) => void) => void;
+    subscribe: (path: string, callback: (event: ServerEvent) => void) => number;
 
     // Send unsubscribe message to server.  If the response is
     // 'redundant', an exception is thrown asynchronously.
     //
     // Roughly equivalent to $.off() (see comment above).
-    unsubscribe: (path: string) => void;
+    unsubscribe: (path: string, id: number) => void;
 }
 
 export interface ServerEvent {
@@ -91,9 +91,9 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
 
 
     // function declarations
-    var subscribe: (path: string, update: (event: ServerEvent) => void) => void;
-    var subscribeSync: (path: string, update: (event: ServerEvent) => void) => void;
-    var unsubscribe: (path: string) => void;
+    var subscribe: (path: string, callback: (event: ServerEvent) => void) => number;
+    var subscribeSync: (path: string, callback: (event: ServerEvent) => void) => void;
+    var unsubscribe: (path: string, id: number) => void;
     var sendRequest: (req: Request) => void;
 
     var onmessage: (event: any) => void;
@@ -109,16 +109,16 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
     // already registered, crash.
     subscribe = (
         path: string,
-        update: (event: ServerEvent) => void
+        callback: (event: ServerEvent) => number
     ) : void => {
         if (_subscriptions.hasOwnProperty(path) ||
             _pendingSubscriptions.hasOwnProperty(path)) {
             throw "WS: subscribe: attempt to subscribe to " + path + " twice!";
         } else {
             if (_ws.readyState === _ws.OPEN) {
-                subscribeSync(path, update);
+                subscribeSync(path, callback);
             } else {
-                _pendingSubscriptions[path] = update;
+                _pendingSubscriptions[path] = callback;
             }
         }
     };
@@ -126,10 +126,10 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
     // register a new callback synchronously.
     subscribeSync = (
         path: string,
-        update: (event: ServerEvent) => void
+        callback: (event: ServerEvent) => void
     ) : void => {
         sendRequest({action: "subscribe", resource: path});
-        _subscriptions[path] = update;
+        _subscriptions[path] = callback;
     };
 
     // unregister callback.  if it is not registered, crash.
