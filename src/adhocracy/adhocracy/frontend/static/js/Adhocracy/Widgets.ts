@@ -80,12 +80,18 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                     adhHttp.get($scope.path).then(getHandler);
                 };
 
-                // the order is important!
+                // (The call order is important: *fist* subscribe to
+                // the updates, *then* get an initial copy.)
+
                 try {
                     adhWS.subscribe($scope.path, wsHandler);
-                } catch(e) {
+
+                    // FIXME: subscribe returns an id, and we need to
+                    // unsubscribe when the listing is shut down.  how
+                    // do we know if we are shut down here?
+                } catch (e) {
                     console.log(e);
-                    console.log("will continue on resource " + $scope.path + " without server bind.");
+                    console.log("Will continue on resource " + $scope.path + " without server bind.");
                 }
                 adhHttp.get($scope.path).then(getHandler);
             }]
