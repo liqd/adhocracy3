@@ -11,6 +11,7 @@ import asyncio
 from adhocracy.websockets import ClientCommunicator
 
 
+# FIXME We probably should make the port configurable
 PORT = 8080
 LOG_FILE_NAME = 'adhocracy-ws.log'
 LOG_LEVEL = logging.DEBUG
@@ -33,7 +34,7 @@ def main(args: list) -> int:
     factory.protocol = ClientCommunicator
     ClientCommunicator.bind_schemas(root_context)
     loop = asyncio.get_event_loop()
-    coro = loop.create_server(factory, '127.0.0.1', PORT)
+    coro = loop.create_server(factory, port=PORT)
     logger.debug('Started WebSocket server listening on port %i', PORT)
     server = loop.run_until_complete(coro)
     _run_loop_until_interrupted(loop, server)

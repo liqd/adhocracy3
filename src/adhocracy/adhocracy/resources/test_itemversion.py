@@ -46,6 +46,8 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def setUp(self):
         from adhocracy.graph import Graph
         from substanced.objectmap import ObjectMap
+        import adhocracy.websockets.client as wsclient
+        wsclient.disable()
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.registry')

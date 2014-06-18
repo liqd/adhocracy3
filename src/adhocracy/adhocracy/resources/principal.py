@@ -37,7 +37,8 @@ def create_initial_content_for_principals(context: IPool, registry: Registry,
 
 principals_metadata = pool_metadata._replace(
     iresource=IPrincipalsPool,
-    after_creation=[create_initial_content_for_principals],
+    after_creation=[create_initial_content_for_principals] +
+    pool_metadata.after_creation,
     element_types=[]  # we don't want the frontend to post resources here
 )
 

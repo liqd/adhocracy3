@@ -58,6 +58,11 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
         with pytest.raises(colander.Invalid):
             inst.deserialize({})
 
+    def test_deserialize_wrong_field(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize({'event': 'created', 'resource': '/child'})
+
     def test_deserialize_wrong_inner_type(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
@@ -126,6 +131,13 @@ class NotificationUnitTests(unittest.TestCase):
         inst = self._bind(schema)
         result = inst.serialize({'event': 'modified', 'resource': self.parent})
         assert result == {'event': 'modified', 'resource': '/parent'}
+
+    def test_deserialize_notification(self):
+        schema = Notification()
+        inst = self._bind(schema)
+        result = inst.deserialize(
+            {'event': 'created', 'resource': '/parent'})
+        assert result == {'event': 'created', 'resource': self.parent}
 
     def test_serialize_child_notification(self):
         self.child = testing.DummyResource('child', self.parent)

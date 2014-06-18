@@ -1,4 +1,3 @@
-"""Tests for websockets package."""
 from json import dumps
 from json import loads
 import unittest
@@ -170,6 +169,14 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         last_message = self._comm.queue[0]
         assert last_message['error'] == 'invalid_json'
         assert 'not a mapping type' in last_message['details']
+
+    def test_onMessage_with_wrong_field(self):
+        msg = self._build_message({'event': 'created',
+                                   'resource': '/child'})
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'error': 'invalid_json',
+                                       'details': 'action: Required'}
 
     def test_onMessage_with_invalid_action(self):
         msg = self._build_message({'action': 'just do it!',

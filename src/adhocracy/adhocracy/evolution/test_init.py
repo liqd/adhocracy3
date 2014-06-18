@@ -35,6 +35,8 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
 
     def test_add_root_element(self):
         from adhocracy.evolution import add_app_root_element
+        import adhocracy.websockets.client as wsclient
+        wsclient.disable()
         self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
         self.config.include('adhocracy.resources.pool')

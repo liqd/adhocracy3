@@ -17,6 +17,7 @@ requires = [
     'cornice',
     'autobahn',
     'asyncio',
+    'websocket-client-py3',
     ]
 
 setup(name='adhocracy',

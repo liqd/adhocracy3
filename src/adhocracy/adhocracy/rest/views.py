@@ -164,10 +164,10 @@ def validate_request_data(context, request: Request, schema=MappingSchema,
 
 
 def _log_request_errors(request: Request):
-    logger.warn('Found %i validation errors in request: <%s>',
-                len(request.errors), request.body)
+    logger.warning('Found %i validation errors in request: <%s>',
+                   len(request.errors), request.body)
     for error in request.errors:
-        logger.warn('  %s', error)
+        logger.warning('  %s', error)
 
 
 def validate_request_data_decorator():
