@@ -2,7 +2,7 @@
 
 import Util = require("Adhocracy/Util");
 
-export var suite = () => {
+export var register = () => {
     describe("Util", () => {
         describe("parentPath", () => {
             it("should return '/foo' for '/foo/bar'", () => {
