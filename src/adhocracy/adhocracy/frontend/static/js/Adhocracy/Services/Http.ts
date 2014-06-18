@@ -41,11 +41,11 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
     };
 
     function get(path : string) : ng.IPromise<Content> {
-        return $http.get(path).success(importContent).error(logBackendError);
+        return $http.get(path).then(importContent, logBackendError);
     }
 
     function put(path : string, obj : Content) : ng.IPromise<Content> {
-        return $http.put(path, obj).success(importContent).error(logBackendError);
+        return $http.put(path, obj).then(importContent, logBackendError);
     }
 
     function postNewVersion(oldVersionPath : string, obj : Content) : ng.IPromise<Content> {
@@ -56,15 +56,13 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
         };
         return $http
             .post(dagPath, exportContent(obj), config)
-            .success(importContent)
-            .error(logBackendError);
+            .then(importContent, logBackendError);
     }
 
     function postToPool(poolPath : string, obj : Content) : ng.IPromise<Content> {
         return $http
             .post(poolPath, exportContent(obj))
-            .success(importContent)
-            .error(logBackendError);
+            .then(importContent, logBackendError);
     }
 
     /**
@@ -92,8 +90,10 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
 /**
  * transform objects on the way in and out
  */
-importContent = <Content extends Types.Content<any>>(obj : Content) : Content => {
+importContent = <Content extends Types.Content<any>>(resp: {data: Content}) : Content => {
     "use strict";
+
+    var obj = resp.data;
 
     if (typeof obj === "object") {
         return obj;
