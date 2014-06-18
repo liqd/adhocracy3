@@ -24,6 +24,7 @@ test_requires = [
     'webtest',
     'pytest-splinter',
     'pytest-quickcheck',
+    'pytest-pyramid',
 ]
 
 
