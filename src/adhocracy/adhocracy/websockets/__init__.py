@@ -4,6 +4,7 @@ from collections.abc import Hashable
 from collections.abc import Iterable
 from json import dumps
 from json import loads
+from time import sleep
 import logging
 
 from autobahn.asyncio.websocket import WebSocketServerProtocol
@@ -138,7 +139,7 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def _client_runs_on_localhost(self):
         return any(self._client.startswith(prefix) for prefix in
-                   ('localhost:', '127.0.0.1:', '[::1]'))
+                   ('localhost:', '127.0.0.1:', '::1:'))
 
     def onOpen(self):  # noqa
         logger.debug('WebSocket connection to %s open', self._client)
@@ -178,6 +179,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         """
         if (self._client_may_send_notifications and
                 self._looks_like_event_notification(json_object)):
+            self._sleep_one_second()
             notification = self._parse_json_via_schema(json_object,
                                                        self._notification)
             self._dispatch_event_notification_to_subscribers(notification)
@@ -217,6 +219,12 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def _looks_like_event_notification(self, json_object) -> bool:
         return isinstance(json_object, dict) and 'event' in json_object
+
+    def _sleep_one_second(self) -> None:
+        """Sleep a second, to give Pyramid time to complete its transaction."""
+        # FIXME A better solution would be to only send event notifications
+        # from our Pyramid client after the transaction has been committed
+        sleep(1)
 
     def _dispatch_event_notification_to_subscribers(self, notification:
                                                     dict) -> None:
