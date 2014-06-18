@@ -225,7 +225,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         if event == 'created':
             self._dispatch_created_event(resource)
         elif event == 'modified':
-            self._dispatch_dispatch_modified_event(resource)
+            self._dispatch_modified_event(resource)
         elif event == 'deleted':
             self._dispatch_deleted_event(resource)
         else:
@@ -297,7 +297,7 @@ class ClientCommunicator(WebSocketServerProtocol):
             else:
                 self._notify_new_child(parent, resource)
 
-    def _dispatch_dispatch_modified_event(self, resource: IResource) -> None:
+    def _dispatch_modified_event(self, resource: IResource) -> None:
         self._notify_resource_modified(resource)
         parent = self._get_parent(resource)
         if parent is not None:
