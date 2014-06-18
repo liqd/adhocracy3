@@ -5,6 +5,7 @@
 
 import Types = require("./Types");
 import AdhHttp = require("./Services/Http");
+import AdhWS = require("./Services/WS");
 import AdhConfig = require("./Services/Config");
 
 import Resources = require("./Resources");
@@ -65,14 +66,28 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                 title: "@"
             },
             transclude: true,
-            controller: ["$scope", "adhHttp", (
+            controller: ["$scope", "adhHttp", "adhWS", (
                 $scope: ListingScope<Container>,
-                adhHttp: AdhHttp.IService<Container>
+                adhHttp: AdhHttp.IService<Container>,
+                adhWS: AdhWS.Type
             ) : void => {
-                adhHttp.get($scope.path).then((pool: Container) => {
+                var getHandler = (pool: Container): void => {
                     $scope.container = pool;
                     $scope.elements = _self.containerAdapter.elemRefs($scope.container);
-                });
+                };
+
+                var wsHandler = (event: AdhWS.ServerEvent): void => {
+                    adhHttp.get($scope.path).then(getHandler);
+                };
+
+                // the order is important!
+                try {
+                    adhWS.subscribe($scope.path, wsHandler);
+                } catch(e) {
+                    console.log(e);
+                    console.log("will continue on resource " + $scope.path + " without server bind.");
+                }
+                adhHttp.get($scope.path).then(getHandler);
             }]
         };
     }
