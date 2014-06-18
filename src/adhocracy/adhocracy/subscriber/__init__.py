@@ -3,6 +3,7 @@
 from pyramid.threadlocal import get_current_registry
 
 from adhocracy.interfaces import IItemVersion
+from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.sheets.versions import IVersionable
@@ -10,6 +11,12 @@ from adhocracy.utils import get_sheet
 from adhocracy.utils import get_all_sheets
 from adhocracy.utils import get_iresource
 from adhocracy.utils import find_graph
+from adhocracy.websockets.client import notify_ws_server_of_modified_resource
+
+
+def notify_resource_modified(context: IResource) -> None:
+    """Notify listeners that a resource has been modified."""
+    notify_ws_server_of_modified_resource(context)
 
 
 def _get_writable_appstructs(resource):
@@ -42,7 +49,8 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
 
 
 def _update_resource(resource, sheet, appstruct):
-    sheet.set(appstruct)  # FIXME: make sure modified event is send
+    sheet.set(appstruct)
+    notify_resource_modified(resource)
     return resource
 
 
