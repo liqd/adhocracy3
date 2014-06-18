@@ -111,7 +111,7 @@ class ClientCommunicator(WebSocketServerProtocol):
     """
 
     # All instances of this class share the same tracker
-    tracker = ClientTracker()
+    _tracker = ClientTracker()
 
     @classmethod
     def bind_schemas(cls, context):
@@ -133,7 +133,12 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def onConnect(self, request: ConnectionRequest):  # noqa
         self._client = request.peer
+        self._client_may_send_notifications = self._client_runs_on_localhost()
         logger.debug('Client connecting: %s', self._client)
+
+    def _client_runs_on_localhost(self):
+        return any(self._client.startswith(prefix) for prefix in
+                   ('localhost:', '127.0.0.1:', '[::1]'))
 
     def onOpen(self):  # noqa
         logger.debug('WebSocket connection to %s open', self._client)
@@ -141,7 +146,10 @@ class ClientCommunicator(WebSocketServerProtocol):
     def onMessage(self, payload: bytes, is_binary: bool) -> None:    # noqa
         try:
             json_object = self._parse_message(payload, is_binary)
-            request = self._convert_json_into_client_request(json_object)
+            if self._handle_if_event_notification(json_object):
+                return
+            request = self._parse_json_via_schema(json_object,
+                                                  self._client_request_schema)
             self._handle_client_request_and_send_response(request)
         except Exception as err:
             self._send_error_message(err)
@@ -162,15 +170,67 @@ class ClientCommunicator(WebSocketServerProtocol):
         except ValueError as err:
             raise WebSocketError('malformed_message', err.args[0])
 
-    def _convert_json_into_client_request(self, json_object):
+    def _handle_if_event_notification(self, json_object) -> bool:
+        """Handle message if it's a notifications from our Pyramid app.
+
+        :return: True if the message is a valid event notification from our
+                 Pyramid app and has been handled; False otherwise
+        """
+        if (self._client_may_send_notifications and
+                self._looks_like_event_notification(json_object)):
+            notification = self._parse_json_via_schema(json_object,
+                                                       self._notification)
+            self._dispatch_event_notification_to_subscribers(notification)
+            return True
+        else:
+            return False
+
+    def _parse_json_via_schema(self, json_object, schema:
+                               colander.MappingSchema) -> dict:
         try:
-            return self._client_request_schema.deserialize(json_object)
+            return schema.deserialize(json_object)
         except colander.Invalid as err:
             self._raise_if_unknown_field_value('action', err, json_object)
             self._raise_if_unknown_field_value('resource', err, json_object)
             self._raise_invalid_json_from_colander_invalid(err)
         except Exception as err:
             self._raise_invalid_json_from_exception(err)
+
+    def _handle_client_request_and_send_response(self, request: dict) -> None:
+        action = request['action']
+        resource = request['resource']
+        self._raise_if_forbidden_request(action, resource)
+        update_was_necessary = self._update_resource_subscription(action,
+                                                                  resource)
+        self._send_status_confirmation(update_was_necessary, action, resource)
+
+    def _send_error_message(self, err: Exception) -> None:
+        if isinstance(err, WebSocketError):
+            error = err.error_type
+            details = err.details
+        else:  # pragma: no cover
+            logger.exception(
+                'Unexpected error while handling Websocket request')
+            error = 'internal_error'
+            details = '{}: {}'.format(err.__class__.__name__, err)
+        self._send_json_message({'error': error, 'details': details})
+
+    def _looks_like_event_notification(self, json_object) -> bool:
+        return isinstance(json_object, dict) and 'event' in json_object
+
+    def _dispatch_event_notification_to_subscribers(self, notification:
+                                                    dict) -> None:
+        event = notification['event']
+        resource = notification['resource']
+        if event == 'created':
+            self._dispatch_created_event(resource)
+        elif event == 'modified':
+            self._dispatch_dispatch_modified_event(resource)
+        elif event == 'deleted':
+            self._dispatch_deleted_event(resource)
+        else:
+            details = 'unknown event: {}'.format(event)
+            raise WebSocketError('invalid_json', details)
 
     def _raise_if_unknown_field_value(self, field_name: str,
                                       err: colander.Invalid,
@@ -197,14 +257,6 @@ class ClientCommunicator(WebSocketServerProtocol):
         """Raise a 'invalid_json' WebSocketError from a generic exception."""
         raise WebSocketError('invalid_json', str(err))
 
-    def _handle_client_request_and_send_response(self, request: dict):
-        action = request['action']
-        resource = request['resource']
-        self._raise_if_forbidden_request(action, resource)
-        update_was_necessary = self._update_resource_subscription(action,
-                                                                  resource)
-        self._send_status_confirmation(update_was_necessary, action, resource)
-
     def _raise_if_forbidden_request(self, action: str,
                                     resource: IResource) -> None:
         """Raise an error if a client tries to subscribe to an ItemVersion."""
@@ -220,9 +272,9 @@ class ClientCommunicator(WebSocketServerProtocol):
                  unnecessary no-op
         """
         if action == 'subscribe':
-            return self.tracker.subscribe(self, resource)
+            return self._tracker.subscribe(self, resource)
         else:
-            return self.tracker.unsubscribe(self, resource)
+            return self._tracker.unsubscribe(self, resource)
 
     def _send_status_confirmation(self, update_was_necessary: bool,
                                   action: str, resource: IResource):
@@ -237,16 +289,64 @@ class ClientCommunicator(WebSocketServerProtocol):
         logger.debug('Sending message to client %s: %s', self._client, text)
         self.sendMessage(text.encode())
 
-    def _send_error_message(self, err: Exception) -> None:
-        if isinstance(err, WebSocketError):
-            error = err.error_type
-            details = err.details
-        else:  # pragma: no cover
-            logger.exception(
-                'Unexpected error while handling Websocket request')
-            error = 'internal_error'
-            details = '{}: {}'.format(err.__class__.__name__, err)
-        self._send_json_message({'error': error, 'details': details})
+    def _dispatch_created_event(self, resource: IResource) -> None:
+        parent = self._get_parent(resource)
+        if parent is not None:
+            if IItemVersion.providedBy(resource):
+                self._notify_new_version(parent, resource)
+            else:
+                self._notify_new_child(parent, resource)
+
+    def _dispatch_dispatch_modified_event(self, resource: IResource) -> None:
+        self._notify_resource_modified(resource)
+        parent = self._get_parent(resource)
+        if parent is not None:
+            self._notify_modified_child(parent, resource)
+
+    def _dispatch_deleted_event(self, resource: IResource) -> None:
+        # FIXME Should we also notify subscribers of the deleted resource?
+        # That's currently not part of the API.
+        parent = self._get_parent(resource)
+        if parent is not None:
+            self._notify_removed_child(parent, resource)
+
+    def _get_parent(self, resource: IResource) -> IResource:
+        """Return the parent of a resource.
+
+        If no parent exists, None is returned and a warning is logged.
+        """
+        parent = getattr(resource, '__parent__', None)
+        if parent is None:
+            logger.warning('Resource has no parent: %s',
+                           resource_path(resource))
+
+    def _notify_new_version(self, parent: IResource,
+                            new_version: IItemVersion) -> None:
+        """Notify subscribers if a new version has been added to an item."""
+        for client in self._tracker.iterate_subscribers(parent):
+            client.send_new_version_notification(parent, new_version)
+
+    def _notify_new_child(self, parent: IResource, child: IResource) -> None:
+        """Notify subscribers if a child has been added to a pool or item."""
+        for client in self._tracker.iterate_subscribers(parent):
+            client.send_child_notification('new', parent, child)
+
+    def _notify_resource_modified(self, resource: IResource) -> None:
+        """Notify subscribers if a resource has been modified."""
+        for client in self._tracker.iterate_subscribers(resource):
+            client.send_modified_notification(resource)
+
+    def _notify_modified_child(self, parent: IResource,
+                               child: IResource) -> None:
+        """Notify subscribers if a child in a pool has been modified."""
+        for client in self._tracker.iterate_subscribers(parent):
+            client.send_child_notification('modified', parent, child)
+
+    def _notify_removed_child(self, parent: IResource,
+                              child: IResource) -> None:
+        """Notify subscribers if a child has been removed from a pool."""
+        for client in self._tracker.iterate_subscribers(parent):
+            client.send_child_notification('removed', parent, child)
 
     def send_modified_notification(self, resource: IResource) -> None:
         """Send notification about a modified resource."""
@@ -273,65 +373,10 @@ class ClientCommunicator(WebSocketServerProtocol):
              'version': new_version}))
 
     def onClose(self, was_clean: bool, code: int, reason: str):  # noqa
-        self.tracker.delete_all_subscriptions(self)
+        self._tracker.delete_all_subscriptions(self)
         clean_str = 'Clean' if was_clean else 'Unclean'
         logger.debug('%s close of WebSocket connection to %s; reason: %s',
                      clean_str, self._client, reason)
-
-
-def notify_resource_modified(resource: IResource) -> None:
-    """Notify subscribers if a resource has been modified.
-
-    :param resource: a Simple that has been changed or a Pool whose metadata
-                     has been changed; all subscribers to this resource will be
-                     notified
-    """
-    for client in ClientCommunicator.tracker.iterate_subscribers(resource):
-        client.send_modified_notification(resource)
-
-
-def notify_new_child(resource: IResource, child: IResource) -> None:
-    """Notify subscribers if a child has been added to a pool or item.
-
-    :param resource: the Pool or Item; all subscribers to this resource will be
-                     notified
-    :param child: the new child
-    """
-    for client in ClientCommunicator.tracker.iterate_subscribers(resource):
-        client.send_child_notification('new', resource, child)
-
-
-def notify_removed_child(resource: IResource, child: IResource) -> None:
-    """Notify subscribers if a child has been removed from a pool.
-
-    :param resource: the Pool; all subscribers to this resource will be
-                     notified
-    :param child: the removed child
-    """
-    for client in ClientCommunicator.tracker.iterate_subscribers(resource):
-        client.send_child_notification('removed', resource, child)
-
-
-def notify_modified_child(resource: IResource, child: IResource) -> None:
-    """Notify subscribers if a child in a pool has been modified.
-
-    :param resource: the Pool; all subscribers to this resource will be
-                     notified
-    :param child: the modified child
-    """
-    for client in ClientCommunicator.tracker.iterate_subscribers(resource):
-        client.send_child_notification('modified', resource, child)
-
-
-def notify_new_version(resource: IResource, new_version: IItemVersion) -> None:
-    """Notify subscribers if a new version has been added to an item.
-
-    :param resource: the Item; all subscribers to this resource will be
-                     notified
-    :param new_version: the new item version
-    """
-    for client in ClientCommunicator.tracker.iterate_subscribers(resource):
-        client.send_new_version_notification(resource, new_version)
 
 
 def includeme(config):
