@@ -129,12 +129,10 @@ export var run = () => {
         return new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective(adhConfig);
     }]);
 
-    var webSocketTest = new AdhWS.WebSocketTest("/adhocracy", "/adhocracy/prop1");
+    var webSocketTest = new AdhWS.WebSocketTest();
     app.directive("adhWebSocketTest",
                   ["$timeout", "adhConfig", "adhWS", ($timeout, adhConfig, adhWS) =>
                    webSocketTest.createDirective($timeout, adhConfig, adhWS)]);
-    webSocketTest.subscribe("/adhocracy/parp", "/arr");
-    webSocketTest.unsubscribe("/adhocracy/prop1");
 
 
     // application-specific directives

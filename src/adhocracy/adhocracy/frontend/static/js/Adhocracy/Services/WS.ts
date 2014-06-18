@@ -171,7 +171,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
     // event handlers and open
     onmessage = (event) : void => {
         var msg: ServerMessage = event.data;
-        console.log(msg); console.log(JSON.stringify(msg));  // FIXME: remove this when it is tested.
+        console.log("WS: onmessage:"); console.log(msg);  // FIXME: remove this when it is tested.
 
         // ServerEvent: something happened in the backend data!
         if (msg.hasOwnProperty("event")) {
