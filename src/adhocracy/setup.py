@@ -55,6 +55,8 @@ setup(name='adhocracy',
       main = adhocracy:main
       [pytest11]
       adhocracy = adhocracy.testing
+      [console_scripts]
+      start_ws_server = adhocracy.websockets.main:main
       """,
       )
 
