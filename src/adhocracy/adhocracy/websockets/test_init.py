@@ -84,8 +84,10 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert self._comm._client == self._peer
         assert len(self._comm.queue) == 0
 
-    def _connect(self):
-        request = DummyConnectionRequest(self._peer)
+    def _connect(self, peer=None):
+        if peer == None:
+            peer = self._peer
+        request = DummyConnectionRequest(peer)
         self._comm.onConnect(request)
 
     def test_onOpen(self):
@@ -234,6 +236,18 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert self._comm.queue[0] == {'event': 'new_version',
                                        'resource': '/child',
                                        'version': '/child/version_007'}
+
+    def test_client_may_send_notifications_if_localhost(self):
+        self._connect('localhost:1234')
+        assert self._comm._client_may_send_notifications is True
+
+    def test_client_may_send_notifications_if_localhost_ipv4(self):
+        self._connect('127.0.0.1:1234')
+        assert self._comm._client_may_send_notifications is True
+
+    def test_client_may_not_send_notifications_if_not_localhost(self):
+        self._connect('78.46.75.118:1234')
+        assert self._comm._client_may_send_notifications is False
 
 
 class ClientTrackerUnitTests(unittest.TestCase):

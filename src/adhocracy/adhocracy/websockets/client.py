@@ -95,6 +95,30 @@ def notify_ws_server_of_created_resource(resource: IResource) -> None:
                                          'resource': resource}))
 
 
+def notify_ws_server_of_modified_resource(resource: IResource) -> None:
+    """Notify the WS server of a modified resource.
+
+    :param resource: the modified resource
+    """
+    schema = Notification().bind(context=resource)
+    _send_json_message(schema.serialize({'event': 'modified',
+                                         'resource': resource}))
+
+
+def notify_ws_server_of_deleted_resource(resource: IResource) -> None:
+    """Notify the WS server of a deleted resource.
+
+    :param resource: the deleted resource
+    """
+    # FIXME This method is currently never called since we don't delete
+    # resources yet. Once it's integrated we must ensure that 'deleted'
+    # resources still somehow exist in the DB so we can map them from/to
+    # paths.
+    schema = Notification().bind(context=resource)
+    _send_json_message(schema.serialize({'event': 'deleted',
+                                         'resource': resource}))
+
+
 def _send_json_message(json_message: dict) -> None:
     """Send a JSON object as message to the server."""
     if ENABLED:
