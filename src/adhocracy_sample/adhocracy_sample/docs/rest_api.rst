@@ -22,15 +22,8 @@ Start Adhocracy testapp::
     >>> from adhocracy.testing import settings_functional
     >>> from adhocracy_sample import main
 
-    >>> if 'A3_TEST_SERVER' in os.environ and os.environ['A3_TEST_SERVER']:
-    ...     print('skip')
-    ...     from tests.http2wsgi import http2wsgi
-    ...     app = http2wsgi(os.environ['A3_TEST_SERVER'])
-    ... else:
-    ...     print('skip')
-    ...     app = main({}, **settings_functional())
-    skip...
-
+    >>> app = main({}, **settings_functional())
+    Executin...
     >>> testapp = TestApp(app)
 
 

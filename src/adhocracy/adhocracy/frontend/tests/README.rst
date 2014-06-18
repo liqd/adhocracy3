@@ -1,9 +1,34 @@
 
 
-
 This document contains project-specific documentation of the testing
 tool chain and setup.
 
+
+python + webdriver + unittest
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - unit test code can be written in typescript and posted via webdriver
+ - UI tests (dom event handling / dom inspection) can be written in python
+ - trivial to automate
+ - flexible: you can write anything in python
+
+
+karma / jasmine
+~~~~~~~~~~~~~~~
+
+ - newer, impressive demo, endorsed by google
+ - highly angular-compatible
+ - probably: faster
+ - probably: dom manipulation not as straight-forward
+
+
+ [1] https://github.com/karma-runner/karma
+ [2] http://www.sitepoint.com/unit-and-e2e-testing-in-angularjs/
+ [3] http://www.portlandwebworks.com/blog/testing-angularjs-directives-handling-external-templates
+ [4] https://innovatorsdelight.wordpress.com/2014/05/05/collecting-javascript-code-coverage-during-a-selenium-automation-test-run/
+ [5] http://selenium.googlecode.com/svn/trunk/docs/api/py/index.html
+ [6] http://paulhammant.com/2012/02/01/angular-and-selenium/
+ [7] https://github.com/angular/angularjs-batarang
 
 
 code coverage tools for css
@@ -20,7 +45,6 @@ dust me / roundup
 
 pagespeed
   - google project for page tuning; does a bit more than css code coverage.
-
 
 
 code coverage tools for js

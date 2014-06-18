@@ -80,14 +80,6 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
         self.context = testing.DummyResource()
         setattr(self.request, 'errors', Errors(self.request))
 
-    def test_valid_with_schema_and_request_has_json_data_but_missing_deserializer(self):
-        data = {'data': True}
-        self.request.json =  data
-        self._make_one(self.context, self.request, colander.MappingSchema)
-        assert hasattr(self.request, 'deserializer')
-        data_deserialized = self.request.deserializer(self.request)
-        assert data_deserialized
-
     def test_valid_wrong_method_with_data(self):
         self.request.body = '{"wilddata": "1"}'
         self.request.method = 'wrong_method'
