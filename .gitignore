@@ -53,3 +53,5 @@ a3-backend-mockup
 .idea/
 adhocracy3/
 jasmine
+*.js.map
+*.css.map
