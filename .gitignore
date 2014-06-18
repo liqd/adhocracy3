@@ -52,3 +52,4 @@ a3-backend-mockup
 /src/adhocracy/tests/output.xml
 .idea/
 adhocracy3/
+jasmine
