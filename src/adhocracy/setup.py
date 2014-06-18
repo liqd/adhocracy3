@@ -1,6 +1,7 @@
 import os
 
-from setuptools import setup, find_packages
+from setuptools import setup
+from setuptools import find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, '../../README.rst')).read()
@@ -18,8 +19,14 @@ requires = [
     ]
 
 test_requires = [
+    'pytest',
     'selenium',
+    'webtest',
+    'pytest-splinter',
+    'pytest-quickcheck',
+    'pytest-pyramid',
 ]
+
 
 setup(name='adhocracy',
       version='0.0',
@@ -39,13 +46,12 @@ setup(name='adhocracy',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      tests_require=test_requires,
-      extras_require={
-          "testing": test_requires },
-      test_suite="adhocracy",
+      extras_require={'test': test_requires},
       entry_points="""\
       [paste.app_factory]
       main = adhocracy:main
+      [pytest11]
+      adhocracy = adhocracy.testing
       """,
       )
 
