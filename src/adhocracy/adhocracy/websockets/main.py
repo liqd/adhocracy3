@@ -1,4 +1,5 @@
 """Start Websocket server as main application."""
+import sys
 from configparser import ConfigParser
 from os import path
 import logging
@@ -19,13 +20,15 @@ LOG_LEVEL = logging.DEBUG
 logger = logging.getLogger(__name__)
 
 
-def main(args: list) -> int:
+def main(args=[]) -> int:
     """Start WebSockets server.
 
     :param args: the command-line arguments -- we expect just one: the
                  config file to use
     :return: 0 on success
     """
+    if not args:
+        args = sys.argv[1:]
     config = _read_config(args)
     _configure_logger(config)
     app_root = _connect_to_zeo_server_and_return_app_root(config)
