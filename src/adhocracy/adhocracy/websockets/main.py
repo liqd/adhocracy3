@@ -1,6 +1,7 @@
 """Start Websocket server as main application."""
 # REVIEW maybe rename this module to scripts.py or start_ws_server.py then its
 # more clear what modules is doing.
+import os
 import sys
 from configparser import ConfigParser
 from os import path
@@ -20,6 +21,8 @@ PORT = 8080
 # this way other tools can take care for log file creation and logrotaion
 LOG_FILE_NAME = 'adhocracy-ws.log'
 LOG_LEVEL = logging.DEBUG
+# FIXME make pid file path configurable
+PID_FILE = 'var/WS_SERVER.pid'
 
 logger = logging.getLogger(__name__)
 
@@ -35,16 +38,34 @@ def main(args=[]) -> int:
         args = sys.argv[1:]
     config = _read_config(args)
     _configure_logger(config)
-    app_root = _connect_to_zeo_server_and_return_app_root(config)
-    root_context = app_root['adhocracy']
-    factory = WebSocketServerFactory('ws://localhost:{}'.format(PORT))
-    factory.protocol = ClientCommunicator
-    ClientCommunicator.bind_schemas(root_context)
-    loop = asyncio.get_event_loop()
-    coro = loop.create_server(factory, port=PORT)
-    logger.debug('Started WebSocket server listening on port %i', PORT)
-    server = loop.run_until_complete(coro)
-    _run_loop_until_interrupted(loop, server)
+    _check_and_write_pid_file()
+    try:
+        app_root = _connect_to_zeo_server_and_return_app_root(config)
+        root_context = app_root['adhocracy']
+        factory = WebSocketServerFactory('ws://localhost:{}'.format(PORT))
+        factory.protocol = ClientCommunicator
+        ClientCommunicator.bind_schemas(root_context)
+        loop = asyncio.get_event_loop()
+        coro = loop.create_server(factory, port=PORT)
+        logger.debug('Started WebSocket server listening on port %i', PORT)
+        server = loop.run_until_complete(coro)
+        _run_loop_until_interrupted(loop, server)
+    finally:
+        _remove_pid_file()
+
+
+def _check_and_write_pid_file():
+    if os.path.isfile(PID_FILE):
+        raise RuntimeError("Pidfile already exists: " + PID_FILE)
+    pid = os.getpid()
+    pidfile = open(PID_FILE, 'w')
+    pidfile.write("%s" % os.getpid())
+    pidfile.close
+
+
+def _remove_pid_file():
+    if os.path.isfile(PID_FILE):
+        os.unlink(PID_FILE)
 
 
 def _run_loop_until_interrupted(loop, server) -> None:
