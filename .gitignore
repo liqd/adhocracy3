@@ -28,6 +28,7 @@ develop-eggs
 /local/
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js.map
+/src/adhocracy/adhocracy/frontend/static/js/lib
 /src/adhocracy/adhocracy/frontend/static/stylesheets/.sass-cache/
 /src/adhocracy/adhocracy/frontend/static/stylesheets/a3.css
 /src/adhocracy/adhocracy/frontend/static/stylesheets/min/
