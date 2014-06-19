@@ -3,11 +3,11 @@
 /// <reference path="../../submodules/DefinitelyTyped/underscore/underscore.d.ts"/>
 /// <reference path="../_all.d.ts"/>
 
-import Types = require("Adhocracy/Types");
-import AdhHttp = require("Adhocracy/Services/Http");
-import AdhConfig = require("Adhocracy/Services/Config");
+import Types = require("./Types");
+import AdhHttp = require("./Services/Http");
+import AdhConfig = require("./Services/Config");
 
-import Resources = require("Adhocracy/Resources");
+import Resources = require("./Resources");
 
 
 //////////////////////////////////////////////////////////////////////
