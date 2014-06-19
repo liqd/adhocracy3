@@ -25,6 +25,7 @@ test_requires = [
     'pytest-splinter',
     'pytest-quickcheck',
     'pytest-pyramid',
+    'requests',
 ]
 
 
