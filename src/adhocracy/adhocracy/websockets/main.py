@@ -56,10 +56,10 @@ def main(args=[]) -> int:
 
 def _check_and_write_pid_file():
     if os.path.isfile(PID_FILE):
-        raise RuntimeError("Pidfile already exists: " + PID_FILE)
+        raise RuntimeError('Pidfile already exists: ' + PID_FILE)
     pid = os.getpid()
     pidfile = open(PID_FILE, 'w')
-    pidfile.write("%s" % os.getpid())
+    pidfile.write('%s' % pid)
     pidfile.close
 
 

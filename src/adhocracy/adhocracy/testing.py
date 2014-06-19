@@ -25,6 +25,9 @@ def config(request) -> Configurator:
 @pytest.fixture()
 def zeo(request) -> bool:
     """Start the test zeo server."""
+    is_running = os.path.isfile('var/test_zeodata/ZEO.pid')
+    if is_running:
+        return True
     subprocess.call(['mkdir', 'var/test_zeodata'])
     process = subprocess.Popen('bin/runzeo -Cetc/test_zeo.conf', shell=True,
                                stderr=subprocess.STDOUT)
@@ -32,10 +35,37 @@ def zeo(request) -> bool:
     def fin():
         print('teardown zeo server')
         process.kill()
-        zeo_pid = open('var/test_zeodata/ZEO.pid').read().strip()
-        zeo_pid_int = int(zeo_pid)
-        os.kill(zeo_pid_int, 15)
+        _kill_pid_in_file('var/test_zeodata/ZEO.pid')
         subprocess.call(['rm', '-fr', 'var/test_zeodata'])
 
     request.addfinalizer(fin)
     return True
+
+
+@pytest.fixture()
+def websocket(request, zeo) -> bool:
+    """Start websocket server."""
+    is_running = os.path.isfile('var/WS_SERVER.pid')
+    if is_running:
+        return True
+    config_file = request.config.getvalue('pyramid_config')
+    process = subprocess.Popen('bin/start_ws_server ' + config_file,
+                               shell=True,
+                               stderr=subprocess.STDOUT)
+
+    def fin():
+        print('teardown zeo server')
+        process.kill()
+        _kill_pid_in_file('var/WS_SERVER.pid')
+
+    request.addfinalizer(fin)
+    return True
+
+
+def _kill_pid_in_file(path_to_pid_file):
+    zeo_pid = open(path_to_pid_file).read().strip()
+    zeo_pid_int = int(zeo_pid)
+    os.kill(zeo_pid_int, 15)
+    # FIXME start_ws_server does not remove the pid file properly
+    if os.path.isfile(path_to_pid_file):
+        subprocess.call(['rm', path_to_pid_file])
