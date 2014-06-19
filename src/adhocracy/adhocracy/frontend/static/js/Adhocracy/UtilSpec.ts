@@ -76,7 +76,7 @@ export var register = () => {
                 });
             });
             it("should output an object that shares no members with the input object", () => {
-                var input = samples[samples.length - 1];
+                var input: {point: {x: number}} = <any>(samples[samples.length - 1]);
                 var output = Util.deepcp(input);
                 output.point.x = 1;
                 expect(input.point.x).not.toBe(1);
@@ -89,8 +89,9 @@ export var register = () => {
                     foo: 2,
                     bar: 3
                 };
-                var _target = {
+                var _target: {foo: number; baz: number; bar: number} = {
                     foo: 1,
+                    bar: undefined,
                     baz: 4
                 };
                 Util.deepoverwrite(source, _target);
