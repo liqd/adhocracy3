@@ -1,6 +1,6 @@
-/// <reference path="../../../submodules/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../../submodules/DefinitelyTyped/jquery/jquery.d.ts"/>
-/// <reference path="../../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
+/// <reference path="../../lib/DefinitelyTyped/jquery/jquery.d.ts"/>
+/// <reference path="../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import Types = require("../Types");
 import Util = require("../Util");
