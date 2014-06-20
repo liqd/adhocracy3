@@ -5,6 +5,7 @@ import subprocess
 
 from pyramid.config import Configurator
 import pytest
+from webtest.http import StopableWSGIServer
 
 from adhocracy import root_factory
 
@@ -69,3 +70,24 @@ def _kill_pid_in_file(path_to_pid_file):
     # FIXME start_ws_server does not remove the pid file properly
     if os.path.isfile(path_to_pid_file):
         subprocess.call(['rm', path_to_pid_file])
+
+
+@pytest.fixture()
+def app(zeo, config):
+    """Return the adhocracy wsgi application."""
+    from adhocracy import includeme
+    includeme(config)
+    return config.make_wsgi_app()
+
+
+@pytest.fixture()
+def server(request, app, websocket) -> StopableWSGIServer:
+    """Return a http server with the adhocracy wsgi application."""
+    server = StopableWSGIServer.create(app)
+
+    def fin():
+        print('teardown adhocracy http server')
+        server.shutdown()
+
+    request.addfinalizer(fin)
+    return server

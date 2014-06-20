@@ -42,10 +42,9 @@ def includeme(config):  # pragma: no cover
     config.include('substanced')
     config.commit()  # commit to allow proper config overrides
     config.include('.sheets')
-    # By default there are now resource types included.
+    # By default only the pool resource type is included.
     # Your extension package needs to explicit include them.
-    # config.include('.resources.tag')
-    # config.include('.resources.pool')
+    config.include('.resources.pool')
     config.include('.events')
     config.include('.subscriber')
     config.include('.registry')
