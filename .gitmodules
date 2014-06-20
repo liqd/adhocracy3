@@ -4,9 +4,3 @@
 [submodule "src/substanced"]
 	path = src/substanced
 	url = https://github.com/Pylons/substanced.git
-[submodule "src/adhocracy/adhocracy/frontend/static/submodules/requirejs"]
-	path = src/adhocracy/adhocracy/frontend/static/submodules/requirejs
-	url = https://github.com/jrburke/requirejs
-[submodule "src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped"]
-	path = src/adhocracy/adhocracy/frontend/static/submodules/DefinitelyTyped
-	url = https://github.com/borisyankov/DefinitelyTyped
