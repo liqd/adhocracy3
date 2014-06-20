@@ -89,14 +89,13 @@ export var register = () => {
                     foo: 2,
                     bar: 3
                 };
-                var _target: {foo: number; baz: number; bar: number} = {
+                var _target = {
                     foo: 1,
-                    bar: undefined,
                     baz: 4
                 };
                 Util.deepoverwrite(source, _target);
                 expect(_target.foo).toBe(2);
-                expect(_target.bar).toBe(3);
+                expect((<any>_target).bar).toBe(3);
                 expect(_target.baz).toBeUndefined();
             });
             xit("should crash if target is not an object", () => {
