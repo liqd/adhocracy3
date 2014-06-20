@@ -91,6 +91,10 @@ class ClientTracker():
 
     def delete_all_subscriptions(self, client: Hashable) -> None:
         """Delete all subscriptions for a client."""
+        # REVIEW [joka]: Annotating the return value None is not a usefull
+        # information because all callables have None as default return value.
+        # In addition if we start doing this here we also have to do it for all
+        # other callables and this means  work.
         oid_set = self._clients2resource_oids.pop(client, set())
         for oid in oid_set:
             self._discard_from_multidict(self._resource_oids2clients, oid,

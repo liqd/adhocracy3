@@ -282,17 +282,35 @@ class ClientTrackerUnitTests(unittest.TestCase):
 
     def test_redundant_subscribe(self):
         """Test client subscribing same resource twice."""
+        # REVIEW:
+        # The docstring is redundant, the method name shows the same
+        # information and docstrings are not need for tests anyway.
+        # The method name should start with 'subscribe' like the other tests
+        # testing the same method and clean code naming.
         client = self._make_client()
         resource = self._make_resource()
         oid = get_oid(resource)
         result = self._tracker.subscribe(client, resource)
+        # REVIEW: The following assert is not what we want to test here.
         assert result is True
+        # REVIEW: Actually this is what we are testing
         result = self._tracker.subscribe(client, resource)
         assert result is False
+        # REVIEW: The following asserts are also redundant (its already testet above)
         assert len(self._tracker._clients2resource_oids) == 1
         assert len(self._tracker._resource_oids2clients) == 1
         assert self._tracker._clients2resource_oids[client] == {oid}
         assert self._tracker._resource_oids2clients[oid] == {client}
+
+        # REVIEW [joka]:
+        # Unit tests should follow the 'if when then' pattern
+        # and test one 'thing' only (ideally only one assert).
+        # This is part of the  unit test concept and our clean code guideline.
+        # It makes refactoring and reading much faster.
+
+        # I don't say we have to rewrite the tests beforge merge. I just want
+        # that we have a common understanding when we refactore or extend
+        # these tests.
 
     def test_subscribe_two_resources(self):
         """Test client subscribing to two resources."""
