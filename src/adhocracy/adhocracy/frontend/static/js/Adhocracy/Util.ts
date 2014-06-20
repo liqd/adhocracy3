@@ -114,9 +114,10 @@ export function deepeq(a : any, b : any) : boolean {
                 }
             }
         }
+        return true;
+    } else {
+        return a === b;
     }
-
-    return a === b;
 }
 
 

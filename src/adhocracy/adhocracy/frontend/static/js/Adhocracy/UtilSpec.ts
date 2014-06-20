@@ -131,7 +131,7 @@ export var register = () => {
                     expect(Util.deepeq(ob, "completelyDifferent")).toBe(false);
                 });
             });
-            it("returns false for equal objects that are not identical", () => {
+            it("returns true for equal objects that are not identical", () => {
                 var a = {
                     point: {
                         x: 0,
@@ -146,7 +146,7 @@ export var register = () => {
                     },
                     foo: "bar"
                 };
-                expect(Util.deepeq(a, b)).toBe(false);
+                expect(Util.deepeq(a, b)).toBe(true);
             });
             it("returns false for similar objects with differing values", () => {
                 var a = {
