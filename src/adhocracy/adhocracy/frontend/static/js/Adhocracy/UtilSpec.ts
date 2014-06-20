@@ -5,19 +5,19 @@ import Util = require("./Util");
 export var register = () => {
     describe("Util", () => {
         describe("cutArray", () => {
-            it("should remove single items", () => {
+            it("removes single items", () => {
                 expect(Util.cutArray([1, 2, 3, 4], 0)).toEqual([2, 3, 4]);
                 expect(Util.cutArray([1, 2, 3, 4], 1)).toEqual([1, 3, 4]);
                 expect(Util.cutArray([1, 2, 3, 4], -1)).toEqual([1, 2, 3]);
                 expect(Util.cutArray([1, 2, 3, 4], -2)).toEqual([1, 2, 4]);
             });
-            it("should remove single items if 'from' and 'to' are equal", () => {
+            it("removes single items if 'from' and 'to' are equal", () => {
                 expect(Util.cutArray([1, 2, 3, 4], 0, 0)).toEqual([2, 3, 4]);
                 expect(Util.cutArray([1, 2, 3, 4], 1, 1)).toEqual([1, 3, 4]);
                 expect(Util.cutArray([1, 2, 3, 4], -1, -1)).toEqual([1, 2, 3]);
                 expect(Util.cutArray([1, 2, 3, 4], -2, -2)).toEqual([1, 2, 4]);
             });
-            it("should remove ranges", () => {
+            it("removes ranges", () => {
                 expect(Util.cutArray([1, 2, 3, 4], 0, -1)).toEqual([]);
                 expect(Util.cutArray([1, 2, 3, 4], 0, 3)).toEqual([]);
                 expect(Util.cutArray([1, 2, 3, 4], 1, 3)).toEqual([1]);
@@ -28,28 +28,28 @@ export var register = () => {
         });
 
         describe("isInfixOf", () => {
-            it("should return false for an empty list", () => {
+            it("returns false for an empty list", () => {
                 expect(Util.isInfixOf(0, [])).toBe(false);
             });
-            it("should return false if needle is not in hay", () => {
+            it("returns false if needle is not in hay", () => {
                 expect(Util.isInfixOf("needle", ["hay", "stack"])).toBe(false);
                 expect(Util.isInfixOf(0, [1, 2, 3])).toBe(false);
             });
-            it("should return true if needle is in hay", () => {
+            it("returns true if needle is in hay", () => {
                 expect(Util.isInfixOf("hay", ["hay", "stack"])).toBe(true);
                 expect(Util.isInfixOf(2, [1, 2, 3])).toBe(true);
             });
-            it("should not return true for list properties that are not list items (such as length)", () => {
+            it("returns false for list properties that are not list items (such as length)", () => {
                 expect(Util.isInfixOf("length", ["hay", "stack"])).toBe(false);
                 expect(Util.isInfixOf(0, ["hay", "stack"])).toBe(false);
             });
         });
 
         describe("parentPath", () => {
-            it("should return '/foo' for '/foo/bar'", () => {
+            it("returns '/foo' for '/foo/bar'", () => {
                 expect(Util.parentPath("/foo/bar")).toBe("/foo");
             });
-            it("should return '' for '/'", () => {
+            it("returns '' for '/'", () => {
                 expect(Util.parentPath("/")).toBe("");
             });
         });
@@ -70,12 +70,12 @@ export var register = () => {
                 }
             ];
 
-            it("should output something that equals input", () => {
+            it("outputs something that equals input", () => {
                 samples.forEach((ob) => {
                     expect(Util.deepcp(ob)).toEqual(ob);
                 });
             });
-            it("should output an object that shares no members with the input object", () => {
+            it("outputs an object that shares no members with the input object", () => {
                 var input: {point: {x: number}} = <any>(samples[samples.length - 1]);
                 var output = Util.deepcp(input);
                 output.point.x = 1;
@@ -84,7 +84,7 @@ export var register = () => {
         });
 
         describe("deepoverwrite", () => {
-            it("should copy all properties of source to target", () => {
+            it("copies all properties of source to target", () => {
                 var source = {
                     foo: 2,
                     bar: 3
@@ -98,7 +98,7 @@ export var register = () => {
                 expect((<any>_target).bar).toBe(3);
                 expect(_target.baz).toBeUndefined();
             });
-            xit("should crash if target is not an object", () => {
+            xit("crashes if target is not an object", () => {
                 expect(() => Util.deepoverwrite({}, 1)).toThrow();
                 expect(() => Util.deepoverwrite({}, "test")).toThrow();
                 expect(() => Util.deepoverwrite({}, [])).toThrow();
@@ -121,17 +121,17 @@ export var register = () => {
                 }
             ];
 
-            it("should report an object to be equal to itself", () => {
+            it("reports an object to be equal to itself", () => {
                 samples.forEach((ob) => {
                     expect(Util.deepeq(ob, ob)).toBe(true);
                 });
             });
-            it("should report an object to not be equal to something completely different", () => {
+            it("reports an object to not be equal to something completely different", () => {
                 samples.forEach((ob) => {
                     expect(Util.deepeq(ob, "completelyDifferent")).toBe(false);
                 });
             });
-            it("should return false for equal objects that are not identical", () => {
+            it("returns false for equal objects that are not identical", () => {
                 var a = {
                     point: {
                         x: 0,
@@ -148,7 +148,7 @@ export var register = () => {
                 };
                 expect(Util.deepeq(a, b)).toBe(false);
             });
-            it("should return false for similar objects with differing values", () => {
+            it("returns false for similar objects with differing values", () => {
                 var a = {
                     point: {
                         x: 0,
@@ -165,7 +165,7 @@ export var register = () => {
                 };
                 expect(Util.deepeq(a, b)).toBe(false);
             });
-            it("should return false for similar objects with missing keys", () => {
+            it("returns false for similar objects with missing keys", () => {
                 var a = {
                     point: {
                         x: 0,
@@ -181,7 +181,7 @@ export var register = () => {
                 };
                 expect(Util.deepeq(a, b)).toBe(false);
             });
-            it("should return false for similar objects with additional keys", () => {
+            it("returns false for similar objects with additional keys", () => {
                 var a = {
                     point: {
                         x: 0,
@@ -202,10 +202,10 @@ export var register = () => {
         });
 
         describe("normalizeName", () => {
-            it("should return 'foo_bar' for 'Foo Bar'", () => {
+            it("returns 'foo_bar' for 'Foo Bar'", () => {
                 expect(Util.normalizeName("Foo Bar")).toBe("foo_bar");
             });
-            it("should be idempotent", () => {
+            it("is idempotent", () => {
                 ["asdkj", "#!8 sajd ksalkjad\n", "foo bar", "Foo Bar", "foo_bar"].forEach((s) => {
                     var normalized = Util.normalizeName(s);
                     expect(Util.normalizeName(normalized)).toBe(normalized);
