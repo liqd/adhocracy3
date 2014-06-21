@@ -42,11 +42,10 @@ def main(args=[]) -> int:
     _configure_logger(config)
     _check_and_write_pid_file()
     try:
-        app_root = _connect_to_zeo_server_and_return_app_root(config)
-        root_context = app_root['adhocracy']
+        connection = _get_zodb_connection(config)
+        ClientCommunicator.zodb_connection = connection
         factory = WebSocketServerFactory('ws://localhost:{}'.format(PORT))
         factory.protocol = ClientCommunicator
-        ClientCommunicator.bind_schemas(root_context)
         loop = asyncio.get_event_loop()
         coro = loop.create_server(factory, port=PORT)
         logger.debug('Started WebSocket server listening on port %i', PORT)
@@ -101,15 +100,13 @@ def _configure_logger(config: ConfigParser) -> None:
                             format=fmt)
 
 
-def _connect_to_zeo_server_and_return_app_root(config: ConfigParser) -> dict:
+def _get_zodb_connection(config: ConfigParser) -> dict:
     zodb_uri = config['app:main']['zodbconn.uri']
     logging.debug('Opening ZEO database on {}'.format(zodb_uri))
     storage_factory, dbkw = resolve_uri(zodb_uri)
     storage = storage_factory()
     db = DB(storage, **dbkw)
-    conn = db.open()
-    zodb_root = conn.root()
-    return zodb_root['app_root']
+    return db.open()
 
 
 def _inject_here_variable(config: ConfigParser, config_file: str) -> None:

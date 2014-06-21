@@ -28,6 +28,18 @@ class DummyConnectionRequest():
         self.peer = peer
 
 
+class DummyZODBConnection():
+
+    def __init__(self, zodb_root=None):
+        self.zodb_root = zodb_root
+
+    def sync(self):
+        pass
+
+    def root(self):
+        return self.zodb_root or {}
+
+
 class QueueingClientCommunicator(ClientCommunicator):
 
     """ClientCommunicator that adds outgoing messages to an internal queue."""
@@ -58,11 +70,16 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
     def setUp(self):
         """Test setup."""
         self._next_oid = 1
-        context = self._make_resource()
         self._child = self._make_resource()
-        context['child'] = self._child
+        app_root = self._make_resource()
+        app_root['child'] = self._child
+        zodb_root = self._make_resource()
+        zodb_root['app_root'] = app_root
+        app_root.__parent__ = None
+        app_root.__name__ = None
+        QueueingClientCommunicator.zodb_connection = DummyZODBConnection(
+            zodb_root=zodb_root)
         self._comm = QueueingClientCommunicator()
-        QueueingClientCommunicator.bind_schemas(context)
         self._peer = "websocket peer"
         self._connect()
 

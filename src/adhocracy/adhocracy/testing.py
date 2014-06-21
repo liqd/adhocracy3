@@ -64,16 +64,17 @@ def websocket(request, zeo) -> bool:
 
 
 def _kill_pid_in_file(path_to_pid_file):
-    zeo_pid = open(path_to_pid_file).read().strip()
-    zeo_pid_int = int(zeo_pid)
-    os.kill(zeo_pid_int, 15)
-    # FIXME start_ws_server does not remove the pid file properly
     if os.path.isfile(path_to_pid_file):
-        subprocess.call(['rm', path_to_pid_file])
+        zeo_pid = open(path_to_pid_file).read().strip()
+        zeo_pid_int = int(zeo_pid)
+        os.kill(zeo_pid_int, 15)
+        # FIXME start_ws_server does not remove the pid file properly
+        if os.path.isfile(path_to_pid_file):
+            subprocess.call(['rm', path_to_pid_file])
 
 
 @pytest.fixture()
-def app(zeo, config):
+def app(zeo, config, websocket):
     """Return the adhocracy wsgi application."""
     from adhocracy import includeme
     includeme(config)
@@ -81,7 +82,7 @@ def app(zeo, config):
 
 
 @pytest.fixture()
-def server(request, app, websocket) -> StopableWSGIServer:
+def server(request, app) -> StopableWSGIServer:
     """Return a http server with the adhocracy wsgi application."""
     server = StopableWSGIServer.create(app)
 

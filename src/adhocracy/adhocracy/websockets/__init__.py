@@ -13,14 +13,13 @@ from pyramid.traversal import resource_path
 from substanced.util import get_oid
 import colander
 
+from adhocracy.interfaces import IItemVersion
+from adhocracy.interfaces import IResource
 from adhocracy.websockets.schemas import ChildNotification
 from adhocracy.websockets.schemas import ClientRequestSchema
 from adhocracy.websockets.schemas import Notification
 from adhocracy.websockets.schemas import StatusConfirmation
 from adhocracy.websockets.schemas import VersionNotification
-from adhocracy.interfaces import IResource
-from adhocracy.interfaces import IItemVersion
-
 
 logger = logging.getLogger(__name__)
 
@@ -113,30 +112,28 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     """Communicates with a client through a WebSocket connection.
 
-    Note that the `bind_schemas` class method **must** be called before
+    Note that the `zodb_connection` attribute **must** be set
     instances of this class can be used!
     """
 
+    # All instances of this class share the same zdob connection object
+    zodb_connection = None
     # All instances of this class share the same tracker
     _tracker = ClientTracker()
 
-    @classmethod
-    def bind_schemas(cls, context):
-        """Initialize Colander schemas using a context resource."""
-        cls._client_request_schema = cls._bind_schema(ClientRequestSchema(),
-                                                      context)
-        cls._status_confirmation = cls._bind_schema(StatusConfirmation(),
-                                                    context)
-        cls._notification = cls._bind_schema(Notification(), context)
-        cls._child_notification = cls._bind_schema(ChildNotification(),
-                                                   context)
-        cls._version_notification = cls._bind_schema(VersionNotification(),
-                                                     context)
+    _client = None
+    _client_may_send_notifications = None
 
-    @classmethod
-    def _bind_schema(cls, schema: colander.MappingSchema,
-                     context) -> colander.MappingSchema:
-        return schema.bind(context=context)
+    def get_context(self):
+        """Get a context object to resolve resource paths.
+
+        :raises KeyError: if the zodb root has no app_root child.
+        :raises AttributeError: if the `zodb_connection` attribute is None.
+
+        """
+        self.zodb_connection.sync()
+        root = self.zodb_connection.root()
+        return root['app_root']
 
     def onConnect(self, request: ConnectionRequest):  # noqa
         self._client = request.peer
@@ -155,8 +152,10 @@ class ClientCommunicator(WebSocketServerProtocol):
             json_object = self._parse_message(payload, is_binary)
             if self._handle_if_event_notification(json_object):
                 return
+            context = self.get_context()
             request = self._parse_json_via_schema(json_object,
-                                                  self._client_request_schema)
+                                                  ClientRequestSchema,
+                                                  context)
             self._handle_client_request_and_send_response(request)
         except Exception as err:
             self._send_error_message(err)
@@ -186,17 +185,20 @@ class ClientCommunicator(WebSocketServerProtocol):
         if (self._client_may_send_notifications and
                 self._looks_like_event_notification(json_object)):
             self._sleep_one_second()
+            context = self.get_context()
             notification = self._parse_json_via_schema(json_object,
-                                                       self._notification)
+                                                       Notification,
+                                                       context,)
             self._dispatch_event_notification_to_subscribers(notification)
             return True
         else:
             return False
 
     def _parse_json_via_schema(self, json_object, schema:
-                               colander.MappingSchema) -> dict:
+                               colander.MappingSchema, context) -> dict:
         try:
-            return schema.deserialize(json_object)
+            schema_with_context = schema().bind(context=context)
+            return schema_with_context.deserialize(json_object)
         except colander.Invalid as err:
             self._raise_if_unknown_field_value('action', err, json_object)
             self._raise_if_unknown_field_value('resource', err, json_object)
@@ -295,7 +297,9 @@ class ClientCommunicator(WebSocketServerProtocol):
     def _send_status_confirmation(self, update_was_necessary: bool,
                                   action: str, resource: IResource):
         status = 'ok' if update_was_necessary else 'redundant'
-        json_message = self._status_confirmation.serialize(
+        context = self.get_context()
+        schema = StatusConfirmation().bind(context=context)
+        json_message = schema.serialize(
             {'status': status, 'action': action, 'resource': resource})
         self._send_json_message(json_message)
 
@@ -366,8 +370,10 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def send_modified_notification(self, resource: IResource) -> None:
         """Send notification about a modified resource."""
-        self._send_json_message(self._notification.serialize(
-            {'event': 'modified', 'resource': resource}))
+        context = self.get_context()
+        schema = Notification().bind(context=context)
+        data = schema.serialize({'event': 'modified', 'resource': resource})
+        self._send_json_message(data)
 
     def send_child_notification(self, status: str, resource: IResource,
                                 child: IResource) -> None:
@@ -375,18 +381,22 @@ class ClientCommunicator(WebSocketServerProtocol):
 
         :param status: should be 'new', 'removed', or 'modified'
         """
-        self._send_json_message(self._child_notification.serialize(
-            {'event': status + '_child',
-             'resource': resource,
-             'child': child}))
+        context = self.get_context()
+        schema = ChildNotification().bind(context=context)
+        data = schema.serialize({'event': status + '_child',
+                                 'resource': resource,
+                                 'child': child})
+        self._send_json_message(data)
 
     def send_new_version_notification(self, resource: IResource,
                                       new_version: IResource) -> None:
         """Send notification if a new version has been added."""
-        self._send_json_message(self._version_notification.serialize(
-            {'event': 'new_version',
-             'resource': resource,
-             'version': new_version}))
+        context = self.get_context()
+        schema = VersionNotification().bind(context=context)
+        data = schema.serialize({'event': 'new_version',
+                                 'resource': resource,
+                                 'version': new_version})
+        self._send_json_message(data)
 
     def onClose(self, was_clean: bool, code: int, reason: str):  # noqa
         self._tracker.delete_all_subscriptions(self)

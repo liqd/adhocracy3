@@ -5,7 +5,7 @@ import pytest
 
 
 @pytest.fixture()
-def app_sample(zeo, config):
+def app_sample(zeo, config, websocket):
     """Return the adhocracy wsgi application."""
     from adhocracy_sample import includeme
     includeme(config)
@@ -13,7 +13,7 @@ def app_sample(zeo, config):
 
 
 @pytest.fixture()
-def server_sample(request, app_sample, websocket) -> StopableWSGIServer:
+def server_sample(request, app_sample) -> StopableWSGIServer:
     """Return a http server with the adhocracy_sample wsgi application."""
     server = StopableWSGIServer.create(app_sample)
 
