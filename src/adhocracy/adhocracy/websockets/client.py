@@ -2,10 +2,12 @@
 from json import dumps
 from threading import Thread
 import logging
+import time
 
 from websocket import ABNF
 from websocket import create_connection
 from websocket import WebSocketException
+from websocket import WebSocketConnectionClosedException
 
 from adhocracy.interfaces import IResource
 from adhocracy.websockets.main import PORT
@@ -43,6 +45,7 @@ def _connect_to_server() -> None:
     if ENABLED:
         global ws
         try:
+            time.sleep(2)
             ws = create_connection('ws://localhost:{}'.format(PORT))
         except (WebSocketException, ConnectionError):
             logger.exception('Error opening connection to Websocket server')
@@ -64,8 +67,11 @@ def _receive_and_log_messages_and_keep_connection_alive():
     Also answer to ping messages to keep the connection alive.
     """
     while ENABLED:
-        frame = ws.recv_frame()
-        _process_frame(frame)
+        try:
+            frame = ws.recv_frame()
+            _process_frame(frame)
+        except WebSocketConnectionClosedException:
+            _connect_to_server()
 
 
 def _process_frame(frame: ABNF) -> None:
