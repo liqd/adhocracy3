@@ -443,3 +443,30 @@ class ClientTrackerUnitTests(unittest.TestCase):
         assert client1 in result
         assert client2 in result
 
+
+class TestFunctionalClientCommunicator:
+
+    def _get_ws_connection_and_subscribe(self, server):
+        from websocket import create_connection
+        connection = create_connection("ws://localhost:8080")
+        connection.send( '{"resource": "/adhocracy", "action": "subscribe"}'  )
+        connection.recv()
+        return connection
+
+    def _add_pool(self, server, path, name):
+        import json
+        import requests
+        from adhocracy.resources.pool import IBasicPool
+        url = server.application_url + 'adhocracy' + path
+        data = {'content_type': IBasicPool.__identifier__,
+                'data': {'adhocracy.sheets.name.IName': {'name': name}}}
+        requests.post(url, data=json.dumps(data),
+                      headers = {'content-type': 'application/json'})
+
+    def test_send_child_notification(self, server):
+        ws = self._get_ws_connection_and_subscribe(server)
+        self._add_pool(server, "/", 'Proposals')
+        # FIXME make the websocket server notify this client
+        #assert 'Proposals' in ws.recv()
+        assert False
+
