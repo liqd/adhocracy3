@@ -42,6 +42,13 @@ def _close_connection():
 
 def _connect_to_server() -> None:
     """Connect to the Websocket server."""
+    # REVIEW:
+    # This function is not only connecting, it also disables the
+    # websocket client, this behavior should be somewhere else.
+    # All those globals variables are not nice, a connection object would
+    # be better.
+    # The client implementation should be a plugable dependency
+    # (like the zodb connection,..).
     if ENABLED:
         global ws
         try:
