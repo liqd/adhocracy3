@@ -1,6 +1,8 @@
 """Start Websocket server as main application."""
 # REVIEW maybe rename this module to scripts.py or start_ws_server.py then its
 # more clear what modules is doing.
+# REVIEW [joka]: maybe the follwing structure is more readable:
+#   client.py server.py start_ws_server.py __init__.py(only for setup stuff)
 import os
 import sys
 from configparser import ConfigParser
