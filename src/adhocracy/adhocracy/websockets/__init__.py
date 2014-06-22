@@ -408,3 +408,4 @@ class ClientCommunicator(WebSocketServerProtocol):
 def includeme(config):
     """Configure WebSockets client."""
     config.include('.client')
+    config.include('.subscriber')

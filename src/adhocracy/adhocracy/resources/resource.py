@@ -1,19 +1,11 @@
 """Basic zodb persistent implementation for IResrouce."""
 from persistent import Persistent
-from pyramid.registry import Registry
 from zope.interface import implementer
 
 from adhocracy.interfaces import resource_metadata
 from adhocracy.interfaces import IResource
 from adhocracy.utils import get_iresource
 from adhocracy.utils import to_dotted_name
-from adhocracy.websockets.client import notify_ws_server_of_created_resource
-
-
-def notify_resource_created(context: IResource, registry: Registry,
-                            options: dict) -> None:
-    """Notify listeners that a new resource has been created."""
-    notify_ws_server_of_created_resource(context)
 
 
 @implementer(IResource)
@@ -38,5 +30,5 @@ resource_metadata_defaults = resource_metadata._replace(
     content_class=Base,
     permission_add='add',
     permission_view='view',
-    after_creation=[notify_resource_created],
+    after_creation=[],
 )

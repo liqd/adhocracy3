@@ -23,8 +23,6 @@ class DummyFolder(testing.DummyResource):
 class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        import adhocracy.websockets.client as wsclient
-        wsclient.disable()
         self.config = testing.setUp()
         self.config.include('substanced.content')
         self.config.include('adhocracy.registry')

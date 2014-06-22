@@ -30,7 +30,6 @@ from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import AbstractReferenceIterable
-from adhocracy.subscriber import notify_resource_modified
 from adhocracy.utils import get_iresource
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
@@ -305,7 +304,6 @@ class SimpleRESTView(ResourceRESTView):
         for sheetname, appstruct in appstructs.items():
             sheet = sheets[sheetname]
             sheet.set(appstruct)
-        notify_resource_modified(self.context)
         struct = {}
         struct['path'] = resource_path(self.context)
         iresource = get_iresource(self.context)
