@@ -26,7 +26,18 @@ def root_factory(request, t=transaction, g=get_connection,
         if mark_unfinished_as_finished:  # pragma: no cover
             markunf(app_root, registry, t)
         t.commit()
+    add_after_commit_hooks(request)
     return zodb_root['app_root']
+
+
+def add_after_commit_hooks(request):
+    """Add after commit hook to notify the websocket server."""
+    # FIXME this is a quick hack
+    from adhocracy.websockets.client import send_messages_after_commit_hook
+    current_transaction = transaction.get()
+    registry = request.registry
+    current_transaction.addAfterCommitHook(send_messages_after_commit_hook,
+                                           args=(registry,))
 
 
 def includeme(config):  # pragma: no cover
