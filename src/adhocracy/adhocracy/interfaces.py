@@ -82,6 +82,12 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
     meta = Attribute('SheetMetadata')
 
+    def set(appstruct, omit=(), send_event=True) -> bool:
+        """ Store ``appstruct`` dictionary data."""
+
+    def get() -> dict:
+        """ Get ``appstruct`` dictionary data."""
+
     def get_cstruct() -> dict:
         """ Return a serialized dictionary representing the sheet state."""
 
@@ -284,6 +290,22 @@ class SheetToSheet(SheetReference):
 class NewVersionToOldVersion(SheetReference):
 
     """Base type to reference an old ItemVersion."""
+
+
+class IResourceSheetModified(IObjectEvent):
+
+    """An event type sent when a resource sheet is modified."""
+
+    object = Attribute('The modified resource')
+    isheet = Attribute('The modified sheet interface of the resource')
+
+
+class IResourceCreatedAndAdded(IObjectEvent):
+
+    """An event type sent when a new IResource is created and added."""
+
+    object = Attribute('The new resource')
+    parent = Attribute('The parent of the new resource')
 
 
 class IItemVersionNewVersionAdded(IObjectEvent):

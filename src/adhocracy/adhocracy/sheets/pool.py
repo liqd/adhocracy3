@@ -23,7 +23,7 @@ class PoolSheet(GenericResourceSheet):
                 struct['elements'].append(child)
         return struct
 
-    def set(self, appstruct, omit=()):
+    def set(self, appstruct, omit=(), send_event=True):
         """Store appstruct."""
         raise HTTPNotImplemented
 

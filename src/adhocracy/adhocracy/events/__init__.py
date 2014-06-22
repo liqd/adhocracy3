@@ -8,7 +8,42 @@ from zope.interface import implementer
 
 from adhocracy.interfaces import IItemVersionNewVersionAdded
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
+from adhocracy.interfaces import IResourceCreatedAndAdded
+from adhocracy.interfaces import IResourceSheetModified
 from adhocracy.interfaces import ISheet
+
+
+@implementer(IResourceCreatedAndAdded)
+class ResourceCreatedAndAdded:
+
+    """An event type sent when a new IResource is created and added.
+
+    Args:
+        object(IResource)
+    """
+
+    def __init__(self,
+                 object,
+                 parent):
+        self.object = object
+        self.parent = parent
+
+
+@implementer(IResourceSheetModified)
+class ResourceSheetModified:
+
+    """An event type sent when a resource sheet is modified.
+
+    Args:
+        object(IResource)
+        isheet(ISheet)
+    """
+
+    def __init__(self,
+                 object,
+                 isheet):
+        self.object = object
+        self.isheet = isheet
 
 
 @implementer(IItemVersionNewVersionAdded)
