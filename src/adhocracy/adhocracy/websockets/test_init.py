@@ -1,6 +1,7 @@
 from json import dumps
 from json import loads
 import unittest
+import pytest
 
 from pyramid import testing
 from substanced.util import get_oid
@@ -446,11 +447,18 @@ class ClientTrackerUnitTests(unittest.TestCase):
 
 class TestFunctionalClientCommunicator:
 
-    def _get_ws_connection_and_subscribe(self, server):
+    @pytest.fixture(scope='function')
+    def websocket_connection(self, request, server):
         from websocket import create_connection
         connection = create_connection("ws://localhost:8080")
-        connection.send( '{"resource": "/adhocracy", "action": "subscribe"}'  )
+        connection.send('{"resource": "/adhocracy", "action": "subscribe"}')
         connection.recv()
+
+        def tearDown():
+            print('teardown websocket conneciton')
+            connection.close()
+        request.addfinalizer(tearDown)
+
         return connection
 
     def _add_pool(self, server, path, name):
@@ -463,10 +471,10 @@ class TestFunctionalClientCommunicator:
         requests.post(url, data=json.dumps(data),
                       headers = {'content-type': 'application/json'})
 
-    def test_send_child_notification(self, server):
-        ws = self._get_ws_connection_and_subscribe(server)
+    def test_send_child_notification(self, server, websocket_connection):
         self._add_pool(server, "/", 'Proposals')
         # FIXME make the websocket server notify this client
-        #assert 'Proposals' in ws.recv()
+        #import ipdb;ipdb.set_trace()
+        #assert 'Proposals' in websocket_connection.recv()
         assert False
 
