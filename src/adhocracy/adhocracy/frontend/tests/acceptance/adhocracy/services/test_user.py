@@ -1,48 +1,39 @@
-from selenium import webdriver
-from selenium.webdriver.common import proxy
-from selenium.webdriver.support import wait
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.common.keys import Keys
-import time
-
-import unittest
+import pytest
 
 
-def test_login_success(server_sample, browser):
+@pytest.fixture()
+def browser_root(browser, server_sample):
     url = server_sample.application_url + 'frontend_static/root.html'
     browser.visit(url)
-    # TODO ...
-    #browser.browser.fill_form({'credentials.name': 'mr.nice',
-    #                           'credentials.password': 'gandalf'})
-    #import ipdb; ipdb.set_trace()
+    return browser
 
 
-class TestDirectiveLogin(unittest.TestCase):
-    def setUp(self):
-        self.bad_user = {"name": "mr.evil", "password": "getoutofmyway"}
+class TestUserLogin:
 
-    def _test_login(self, user):
-        time.sleep(0.8)  # FIXME: there are better ways!
+    def test_login_valid(self, browser_root):
+        fill_input(browser_root, 'credentials.password', 'password')
+        fill_input(browser_root, 'credentials.name', 'name')
+        click_button(browser_root, 'logIn()')
+        assert is_logged_in(browser_root)
 
-        # attempt login
-        directive = self.driver.find_element_by_xpath('//adh-login')
-        name = directive.find_element_by_xpath("//input[contains(@ng-model,'credentials.name')]")
-        password = directive.find_element_by_xpath("//input[contains(@ng-model,'credentials.password')]")
-        button = directive.find_element_by_xpath("//input[contains(@ng-click,'logIn()')]")
+    def test_login_non_valid(self, browser_root):
+        fill_input(browser_root, 'credentials.password', 'getoutofmyway')
+        fill_input(browser_root, 'credentials.name', 'mr.evil')
+        click_button(browser_root, 'logIn()')
+        assert not is_logged_in(browser_root)
 
-        name.send_keys(user['name'])
-        password.send_keys(user['password'])
-        button.click()
 
-        # check if login succeeded
-        try:
-            time.sleep(0.8)  # FIXME: there are better ways!
-            directive.find_element_by_xpath("//span[text()='"+user['name']+"']")  # FIXME: user['name'] must be checked for "'"
-            directive.find_element_by_xpath("//input[contains(@ng-click,'logOut()')]")
-        except NoSuchElementException:
-            return False
+def fill_input(browser_root, ng_model_attr, value):
+        xpath = '//input[contains(@ng-model, "{0}")]'.format(ng_model_attr)
+        element = browser_root.browser.find_by_xpath(xpath).first
+        element.fill(value)
 
-        return True
 
-    def test_login_failure(self):
-        self.assertFalse(self._test_login(self.bad_user))
+def click_button(browser_root, ng_click_attr):
+        xpath = '//input[contains(@ng-click, "{0}")]'.format(ng_click_attr)
+        element = browser_root.browser.find_by_xpath(xpath).first
+        element.click()
+
+
+def is_logged_in(browser_root):
+    return browser_root.browser.is_element_present_by_value('LogOut')
