@@ -4,12 +4,27 @@ import os
 import subprocess
 
 from pyramid.config import Configurator
+from pyramid import testing
+from webtest.http import StopableWSGIServer
 import pytest
+import time
 
 from adhocracy import root_factory
 
 
 @pytest.fixture()
+def dummy_config(request):
+    """Return pyramid dummy config."""
+    config = testing.setUp()
+
+    def fin():
+        testing.tearDown()
+
+    request.addfinalizer(fin)
+    return config
+
+
+@pytest.fixture(scope='class')
 def config(request) -> Configurator:
     """Return the adhocracy configuration."""
     config_parser = ConfigParser()
@@ -22,20 +37,56 @@ def config(request) -> Configurator:
     return configuration
 
 
-@pytest.fixture()
+@pytest.fixture(scope='class')
 def zeo(request) -> bool:
     """Start the test zeo server."""
-    subprocess.call(['mkdir', 'var/test_zeodata'])
+    is_running = os.path.isfile('var/test_zeodata/ZEO.pid')
+    if is_running:
+        return True
     process = subprocess.Popen('bin/runzeo -Cetc/test_zeo.conf', shell=True,
                                stderr=subprocess.STDOUT)
+    time.sleep(2)
 
     def fin():
         print('teardown zeo server')
         process.kill()
-        zeo_pid = open('var/test_zeodata/ZEO.pid').read().strip()
-        zeo_pid_int = int(zeo_pid)
-        os.kill(zeo_pid_int, 15)
-        subprocess.call(['rm', '-fr', 'var/test_zeodata'])
+        _kill_pid_in_file('var/test_zeodata/ZEO.pid')
+        subprocess.call(['rm', '-f', 'var/test_zeodata/Data.fs'])
+        subprocess.call(['rm', '-f', 'var/test_zeodata/Data.fs.index'])
+        subprocess.call(['rm', '-f', 'var/test_zeodata/Data.fs.lock'])
+        subprocess.call(['rm', '-f', 'var/test_zeodata/Data.fs.tmp'])
 
     request.addfinalizer(fin)
     return True
+
+
+def _kill_pid_in_file(path_to_pid_file):
+    if os.path.isfile(path_to_pid_file):
+        pid = open(path_to_pid_file).read().strip()
+        pid_int = int(pid)
+        os.kill(pid_int, 15)
+        time.sleep(1)
+        # FIXME start_ws_server does not remove the pid file properly
+        if os.path.isfile(path_to_pid_file):
+            subprocess.call(['rm', path_to_pid_file])
+
+
+@pytest.fixture(scope='class')
+def app(zeo, config):
+    """Return the adhocracy wsgi application."""
+    from adhocracy import includeme
+    includeme(config)
+    return config.make_wsgi_app()
+
+
+@pytest.fixture(scope='class')
+def server(request, app) -> StopableWSGIServer:
+    """Return a http server with the adhocracy wsgi application."""
+    server = StopableWSGIServer.create(app)
+
+    def fin():
+        print('teardown adhocracy http server')
+        server.shutdown()
+
+    request.addfinalizer(fin)
+    return server
