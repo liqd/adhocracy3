@@ -28,8 +28,8 @@
 
         jasmineEnv.addReporter(htmlReporter);
         /* this is just for our automated tests */
-        window.jasmine_phantom_reporter = new jasmine.ConsoleReporter;
-        jasmineEnv.addReporter(jasmine_phantom_reporter);
+        window.jsApiReporter = new jasmine.JsApiReporter();
+        jasmineEnv.addReporter(jsApiReporter);
 
         jasmineEnv.specFilter = function(spec) {
           return htmlReporter.specFilter(spec);
