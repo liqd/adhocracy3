@@ -115,13 +115,10 @@ class ClientCommunicator(WebSocketServerProtocol):
     instances of this class can be used!
     """
 
-    # All instances of this class share the same zdob connection object
+    # All instances of this class share the same zodb connection object
     zodb_connection = None
     # All instances of this class share the same tracker
     _tracker = ClientTracker()
-
-    _client = None
-    _client_may_send_notifications = None
 
     def get_context(self):
         """Get a context object to resolve resource paths.
