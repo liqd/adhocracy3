@@ -67,7 +67,10 @@ export var register = () => {
                         x: 0,
                         y: 0
                     }
-                }
+                },
+                [null],  // (interesting because it breaks webdriver
+                         // array transport through executeJS)
+                {"a": 3, "b": null, "c": [null]}
             ];
 
             it("outputs something that equals input", () => {
