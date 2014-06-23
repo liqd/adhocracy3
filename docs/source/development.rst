@@ -29,6 +29,14 @@ install robotframework for acceptance testing ::
 Running the Testsuite
 ---------------------
 
-with server setup and teardown (wsgi) ::
+backend ::
 
     bin/py.test src/adhocracy src/adhocracy_sample
+
+frontend tests::
+
+    ./bin/py.test ./src/adhocracy/adhocracy/frontend/tests/
+
+acceptance tests::
+
+    bin/py.test tests_acceptance

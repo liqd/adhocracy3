@@ -102,10 +102,4 @@ open the javascript front-end with your web browser ::
 
     xdg-open http://localhost:6541/frontend_static/root.html
 
-Run frontend test suite
------------------------
-
-in order to run both unit and acceptance tests ::
-
-    ./bin/py.test ./tests_acceptance ./src/adhocracy/adhocracy/frontend/tests/
 
