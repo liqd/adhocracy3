@@ -10,10 +10,10 @@ class TestDeepCp:
         return browser
 
     def _call_fut(self, browser, obj_in):
-        code ="""
-        var U = require('Adhocracy/Util');
-        U.deepcp({0});
-        """.format(str(obj_in))
+        code = """
+               var U = require('Adhocracy/Util');
+               U.deepcp({0});
+               """.format(str(obj_in))
         return browser.evaluate_script(code)
 
     def test_equal(self, browser_root):
