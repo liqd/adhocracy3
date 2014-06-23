@@ -73,7 +73,7 @@ def websocket(request, zeo) -> bool:
     time.sleep(2)
 
     def fin():
-        print('teardown zeo server')
+        print('teardown websocket server')
         process.kill()
         _kill_pid_in_file('var/WS_SERVER.pid')
 
