@@ -65,14 +65,17 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                 title: "@"
             },
             transclude: true,
-            controller: ["$scope", "adhHttp", (
+            controller: ["$scope", "adhHttp", "adhDone", (
                 $scope: ListingScope<Container>,
-                adhHttp: AdhHttp.IService<Container>
+                adhHttp: AdhHttp.IService<Container>,
+                adhDone
             ) : void => {
-                adhHttp.get($scope.path).then((pool: Container) => {
-                    $scope.container = pool;
-                    $scope.elements = _self.containerAdapter.elemRefs($scope.container);
-                });
+                adhHttp.get($scope.path)
+                    .then((pool: Container) => {
+                        $scope.container = pool;
+                        $scope.elements = _self.containerAdapter.elemRefs($scope.container);
+                    })
+                    .then(adhDone);
             }]
         };
     }
@@ -149,13 +152,15 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
             scope: {
                 path: "@"
             },
-            controller: ["$scope", "adhHttp", (
+            controller: ["$scope", "adhHttp", "adhDone", (
                 $scope: ListingElementScope,
-                adhHttp: AdhHttp.IService<Element>
+                adhHttp: AdhHttp.IService<Element>,
+                adhDone
             ) : void => {
                 adhHttp.get($scope.path)
                     .then(_self.elementAdapter.name)
-                    .then((name) => $scope.name = name);
+                    .then((name) => $scope.name = name)
+                    .then(adhDone);
             }]
         };
     }
