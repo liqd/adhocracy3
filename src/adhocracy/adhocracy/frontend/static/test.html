@@ -25,8 +25,8 @@
         jasmineEnv.updateInterval = 1000;
 
         var htmlReporter = new jasmine.HtmlReporter();
-
         jasmineEnv.addReporter(htmlReporter);
+
         /* this is just for our automated tests */
         window.jsApiReporter = new jasmine.JsApiReporter();
         jasmineEnv.addReporter(jsApiReporter);
@@ -41,12 +41,8 @@
           if (currentWindowOnload) {
             currentWindowOnload();
           }
-          execJasmine();
-        };
-
-        function execJasmine() {
           jasmineEnv.execute();
-        }
+        };
       })();
     </script>
 </head>
