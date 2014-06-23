@@ -9,20 +9,17 @@ class TestDeepCp:
         browser.visit(url)
         return browser
 
-    def _call_fut(self, browser, obj_in):
+    @pytest.mark.parametrize("input,expected",
+                             [(None, None),
+                              ({}, {}),
+                              ])
+    def test_deepcp(self, browser_root, input, expected):
         code = """
                var U = require('Adhocracy/Util');
                U.deepcp({0});
-               """.format(str(obj_in))
-        return browser.evaluate_script(code)
-
-    def test_equal(self, browser_root):
-        value = None
-        assert self._call_fut(browser_root, value) == value
-
-    def test_empty_obj(self, browser_root):
-        value = {}
-        assert self._call_fut(browser_root, value) == value
+               """.format(input)
+        result = browser_root.browser.evaluate_script(code)
+        assert result == expected
 
     # deactivated: webdriver swallows trailing null values in
     # javascript arrays, so this test breaks.  FIXME: need to fix
