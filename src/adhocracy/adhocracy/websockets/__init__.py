@@ -53,7 +53,7 @@ class ClientTracker():
         """Subscribe a client to a resource, if necessary.
 
         :return: True if the subscription was successful, False if it was
-        unnecessary (the client was already subscribed).
+                 unnecessary (the client was already subscribed).
         """
         if self.is_subscribed(client, resource):
             return False
@@ -66,7 +66,7 @@ class ClientTracker():
         """Unsubscribe a client from a resource, if necessary.
 
         :return: True if the unsubscription was successful, False if it was
-        unnecessary (the client was not subscribed).
+                 unnecessary (the client was not subscribed).
         """
         if not self.is_subscribed(client, resource):
             return False
