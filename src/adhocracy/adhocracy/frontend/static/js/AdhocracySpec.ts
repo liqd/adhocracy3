@@ -1,4 +1,5 @@
 import UtilSpec = require("./Adhocracy/UtilSpec");
+import WidgetsSpec = require("./Adhocracy/WidgetsSpec");
 
 /**
  * This module includes all frontend unit tests.
@@ -7,3 +8,4 @@ import UtilSpec = require("./Adhocracy/UtilSpec");
  */
 
 UtilSpec.register();
+WidgetsSpec.register();
