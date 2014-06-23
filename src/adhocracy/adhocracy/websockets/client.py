@@ -127,7 +127,7 @@ class Client:
         message = schema.serialize({'event': 'created', 'resource': resource})
         self._messages_to_send.add(json.dumps(message))
 
-    def add_mesage_resource_modified(self, resource: ILocation):
+    def add_message_resource_modified(self, resource: ILocation):
         """Notify the WS server of a modified resource."""
         schema = Notification().bind(context=resource)
         message = schema.serialize({'event': 'modified', 'resource': resource})
@@ -155,7 +155,7 @@ def send_messages_after_commit_hook(success, registry):
 
 
 def includeme(config):
-    """Add websocket client (`ws_client`) to the registry to.
+    """Add websocket client (`ws_client`) to the registry.
 
     You need to set the ws server url in your settings to make this work::
 

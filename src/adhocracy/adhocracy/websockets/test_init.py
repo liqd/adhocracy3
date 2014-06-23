@@ -472,9 +472,6 @@ class TestFunctionalClientCommunicator:
                       headers = {'content-type': 'application/json'})
 
     def test_send_child_notification(self, server, websocket_connection):
-        self._add_pool(server, "/", 'Proposals')
-        # FIXME make the websocket server notify this client
-        #import ipdb;ipdb.set_trace()
-        #assert 'Proposals' in websocket_connection.recv()
-        assert False
+        self._add_pool(server, '/', 'Proposals')
+        assert 'Proposals' in websocket_connection.recv()
 

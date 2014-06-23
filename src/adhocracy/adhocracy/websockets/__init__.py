@@ -4,7 +4,6 @@ from collections.abc import Hashable
 from collections.abc import Iterable
 from json import dumps
 from json import loads
-from time import sleep
 import logging
 
 from autobahn.asyncio.websocket import WebSocketServerProtocol
@@ -184,7 +183,6 @@ class ClientCommunicator(WebSocketServerProtocol):
         """
         if (self._client_may_send_notifications and
                 self._looks_like_event_notification(json_object)):
-            self._sleep_one_second()
             context = self.get_context()
             notification = self._parse_json_via_schema(json_object,
                                                        Notification,
@@ -227,12 +225,6 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def _looks_like_event_notification(self, json_object) -> bool:
         return isinstance(json_object, dict) and 'event' in json_object
-
-    def _sleep_one_second(self) -> None:
-        """Sleep a second, to give Pyramid time to complete its transaction."""
-        # FIXME A better solution would be to only send event notifications
-        # from our Pyramid client after the transaction has been committed
-        sleep(1)
 
     def _dispatch_event_notification_to_subscribers(self, notification:
                                                     dict) -> None:
@@ -339,6 +331,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         if parent is None:
             logger.warning('Resource has no parent: %s',
                            resource_path(resource))
+        return parent
 
     def _notify_new_version(self, parent: IResource,
                             new_version: IItemVersion) -> None:

@@ -27,7 +27,7 @@ class TestFunctionalClient:
         assert not inst.is_running
         assert not inst._ws_connection.connected
 
-    def test__send_messages(self, websocket_client):
+    def test_send_messages(self, websocket_client):
         inst = websocket_client
         inst._messages_to_send.add('dummy message')
         inst._send_messages()
