@@ -46,11 +46,9 @@ class Client:
                 logger.exception('Error connecting to the websocket server')
                 self.is_running = False
                 time.sleep(2)
-                continue
             except WebSocketException:
                 logger.exception('Error communicating with websocket server')
                 time.sleep(2)
-                continue
 
     def _connect_and_receive_and_log_messages(self):
         self._connect_to_server()
@@ -110,6 +108,7 @@ class Client:
 
     def _send_messages(self):
         for message in self._messages_to_send:
+            # FIXME ensure that created and modified events aren't send twice
             logger.debug('Try sending message to Websocket server: %s',
                          message)
             self._ws_connection.send(message)
