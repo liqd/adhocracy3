@@ -56,10 +56,10 @@ export interface IVersionsSheet {
 export interface PartialIProposalVersion extends Resource, HasIDocumentSheet {}
 
 export class Resource {
-    contentType : string;
+    content_type : string;
     data : Object;
-    constructor(contentType: string) {
-        this.contentType = contentType;
+    constructor(content_type: string) {
+        this.content_type = content_type;
         this.data = {};
     }
     addISection(title: string, elements: string[]) {
