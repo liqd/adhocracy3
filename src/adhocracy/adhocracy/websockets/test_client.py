@@ -1,37 +1,38 @@
-import pytest
-
-
 class TestFunctionalClient:
 
-    @pytest.fixture(scope='class')
-    def websocket_client(self, request, websocket):
+    # FIXME why didn't this work with a fixture instead of setUp/tearDown?
+    def setUp(self):
         from adhocracy.websockets.client import Client
-        from adhocracy.websockets.client import URL
-        client = Client.create(ws_url=URL)
+        self.client = Client(ws_url='ws://localhost:8080')
 
-        def tearDown():
-            print('teardown websocket client')
-            client._ws_connection.close()
-        request.addfinalizer(tearDown)
+    def tearDown(self):
+        self.client.stop()
 
-        return client
+    def test_create(self, websocket):
+        try:
+            self.setUp()
+            assert self.client.is_running
+            assert self.client._ws_connection.connected
+        finally:
+            self.tearDown()
 
-    def test_create(self, websocket_client):
-        inst = websocket_client
-        assert inst.is_running
-        assert inst._ws_connection.connected
+    def test_stop(self, websocket):
+        try:
+            self.setUp()
+            self.client.stop()
+            assert not self.client.is_running
+            assert not self.client._ws_connection.connected
+        finally:
+            self.tearDown()
 
-    def test_stop(self, websocket_client):
-        inst = websocket_client
-        inst.stop()
-        assert not inst.is_running
-        assert not inst._ws_connection.connected
-
-    def test_send_messages(self, websocket_client):
-        inst = websocket_client
-        inst._messages_to_send.add('dummy message')
-        inst._send_messages()
-        assert 'dummy message' not in inst._messages_to_send
+    def test_send_messages(self, websocket):
+        try:
+            self.setUp()
+            self.client._messages_to_send.add('dummy message')
+            self.client._send_messages()
+            assert 'dummy message' not in self.client._messages_to_send
+        finally:
+            self.tearDown()
 
 
 class TestIntegrationClient:
@@ -48,5 +49,3 @@ class TestIntegrationClient:
         dummy_config.registry.settings['adhocracy.ws_url'] = 'ws://localhost:8080'
         includeme(dummy_config)
         assert isinstance(dummy_config.registry.ws_client, Client)
-
-

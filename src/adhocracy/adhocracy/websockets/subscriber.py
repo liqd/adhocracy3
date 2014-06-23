@@ -11,6 +11,7 @@ def resource_created_and_added_subscriber(event):
     if ws_client:
         resource = event.object
         ws_client.add_message_resource_created(resource)
+        # FIXME also subscribe resource_modified events (also in includeme)
 
 
 def includeme(config):

@@ -19,40 +19,27 @@ logger = logging.getLogger(__name__)
 
 class Client:
 
-    """Websocket Client.
+    """Websocket Client."""
 
-    Use the `create` class method to get an instance with running
-    connection thread.
-    """
-
-    is_running = False
-    is_stopped = False
-    runner = None  # The thread that keeps alive the ws connection
-    _ws_url = None
-    _ws_connection = None
-    _messages_to_send = None
-
-    def __init__(self, ws_url=None):
+    def __init__(self, ws_url):
+        """Create instance with running thread that talks to the server."""
         self._ws_url = ws_url
         self._messages_to_send = set()
-
-    @classmethod
-    def create(cls, ws_url=None):
-        """Get instance with running thread that talks to the server."""
-        client = cls(ws_url)
-        client.runner = Thread(target=client.run)
-        client.runner.daemon = True
-        client.runner.start()
+        self._ws_connection = None
+        self.is_running = False
+        self.is_stopped = False
+        # Init thread that keeps the WS connection alive
+        self.runner = Thread(target=self.run)
+        self.runner.daemon = True
+        self.runner.start()
+        # FIXME better wait till self.is_running is True
         time.sleep(2)  # give the websocket client time to connect
-        return client
 
     def run(self):
         """Start and keep alive connection to the websocket server."""
-        if not self._ws_url:  # FIXME do we really want this behavior?
-            return None
+        assert self._ws_url
         while not self.is_stopped:
             try:
-                self.is_running = True
                 self._connect_and_receive_and_log_messages()
             except (WebSocketConnectionClosedException, ConnectionError,
                     OSError):
@@ -71,12 +58,16 @@ class Client:
         self._process_frame(frame)
 
     def _connect_to_server(self):
-        if self._ws_connection is None or not self._ws_connection.connected:
+        if not self._is_connected():
             logger.debug('Try connecting to the Websocket server at '
                          + self._ws_url)
             self._ws_connection = create_connection(self._ws_url)
-            self.is_connected = True
+            self.is_running = True
             logger.debug('Connected to the Websocket server')
+
+    def _is_connected(self):
+        return (self._ws_connection is not None and
+                self._ws_connection.connected)
 
     def _process_frame(self, frame: ABNF):
         if not frame:
@@ -86,13 +77,18 @@ class Client:
             logger.debug('Received text message from Websocket server: %s',
                          frame.data)
         elif frame.opcode == ABNF.OPCODE_CLOSE:
-            self._ws_connection.send_close()
+            self._close_connection(b'server triggered close')
             logger.error('Websocket server closed the connection!')
         elif frame.opcode == ABNF.OPCODE_PING:
             self._ws_connection.pong('Hi!')
         else:
             logger.warning('Received unexpected frame from Websocket server: '
                            'opcode=%s, data="%s"', frame.opcode, frame.data)
+
+    def _close_connection(self, reason: bytes):
+            self._ws_connection.send_close(reason=reason)
+            self._ws_connection.close()
+            self.is_running = False
 
     def send_messages(self):
         """Send all added messages to the server.
@@ -102,7 +98,7 @@ class Client:
 
         """
         if not self.is_running:
-            return None
+            return
         try:
             self._send_messages()
         except WebSocketTimeoutException:
@@ -118,7 +114,7 @@ class Client:
                          message)
             self._ws_connection.send(message)
             logger.debug('Send message to the websocket server')
-        # FIXME if an exception is raised, messages are send twice, thats bad.
+        # FIXME if an exception is raised, messages are send twice, that's bad.
         self._messages_to_send.clear()
 
     def add_message_resource_created(self, resource: ILocation):
@@ -134,12 +130,13 @@ class Client:
         self._messages_to_send.add(json.dumps(message))
 
     def stop(self):
+        self.is_stopped = True
         try:
-            self._ws_connection.close()
-            logger.debug('Websocket client closed')
+            if self._is_connected():
+                self._close_connection(b'done')
+                logger.debug('Websocket client closed')
         except WebSocketException:
             logger.exception('Error closing connection to Websocket server')
-        self.is_running = False
 
 
 def get_ws_client(registry) -> Client:
@@ -165,5 +162,5 @@ def includeme(config):
     settings = config.registry.settings
     ws_url = settings.get('adhocracy.ws_url', '')
     if ws_url:
-        ws_client = Client.create(ws_url=ws_url)
+        ws_client = Client(ws_url=ws_url)
         config.registry.ws_client = ws_client

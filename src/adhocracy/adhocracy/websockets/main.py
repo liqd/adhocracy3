@@ -52,6 +52,7 @@ def main(args=[]) -> int:
         server = loop.run_until_complete(coro)
         _run_loop_until_interrupted(loop, server)
     finally:
+        logging.debug('Stopped WebSocket server')
         _remove_pid_file()
 
 

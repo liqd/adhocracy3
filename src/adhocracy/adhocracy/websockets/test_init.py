@@ -455,7 +455,7 @@ class TestFunctionalClientCommunicator:
         connection.recv()
 
         def tearDown():
-            print('teardown websocket conneciton')
+            print('teardown websocket connection')
             connection.close()
         request.addfinalizer(tearDown)
 
