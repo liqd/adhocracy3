@@ -11,7 +11,7 @@ class TestFunctionalClient:
     def test_create(self, websocket):
         try:
             self.setUp()
-            assert self.client.is_running
+            assert self.client._is_running
             assert self.client._ws_connection.connected
         finally:
             self.tearDown()
@@ -20,7 +20,7 @@ class TestFunctionalClient:
         try:
             self.setUp()
             self.client.stop()
-            assert not self.client.is_running
+            assert not self.client._is_running
             assert not self.client._ws_connection.connected
         finally:
             self.tearDown()

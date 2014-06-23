@@ -26,25 +26,25 @@ class Client:
         self._ws_url = ws_url
         self._messages_to_send = set()
         self._ws_connection = None
-        self.is_running = False
-        self.is_stopped = False
+        self._is_running = False
+        self._is_stopped = False
         # Init thread that keeps the WS connection alive
-        self.runner = Thread(target=self.run)
-        self.runner.daemon = True
-        self.runner.start()
-        # FIXME better wait till self.is_running is True
+        runner = Thread(target=self.run)
+        runner.daemon = True
+        runner.start()
+        # FIXME better wait till self._is_running is True
         time.sleep(2)  # give the websocket client time to connect
 
     def run(self):
         """Start and keep alive connection to the websocket server."""
         assert self._ws_url
-        while not self.is_stopped:
+        while not self._is_stopped:
             try:
                 self._connect_and_receive_and_log_messages()
             except (WebSocketConnectionClosedException, ConnectionError,
                     OSError):
                 logger.exception('Error connecting to the websocket server')
-                self.is_running = False
+                self._is_running = False
                 time.sleep(2)
             except WebSocketException:
                 logger.exception('Error communicating with websocket server')
@@ -60,7 +60,7 @@ class Client:
             logger.debug('Try connecting to the Websocket server at '
                          + self._ws_url)
             self._ws_connection = create_connection(self._ws_url)
-            self.is_running = True
+            self._is_running = True
             logger.debug('Connected to the Websocket server')
 
     def _is_connected(self):
@@ -86,7 +86,7 @@ class Client:
     def _close_connection(self, reason: bytes):
             self._ws_connection.send_close(reason=reason)
             self._ws_connection.close()
-            self.is_running = False
+            self._is_running = False
 
     def send_messages(self):
         """Send all added messages to the server.
@@ -95,7 +95,7 @@ class Client:
         will be solved when you run this method again.
 
         """
-        if not self.is_running:
+        if not self._is_running:
             return
         try:
             self._send_messages()
@@ -129,7 +129,7 @@ class Client:
         self._messages_to_send.add(json.dumps(message))
 
     def stop(self):
-        self.is_stopped = True
+        self._is_stopped = True
         try:
             if self._is_connected():
                 self._close_connection(b'done')
