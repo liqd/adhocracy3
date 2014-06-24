@@ -79,7 +79,7 @@ export var register = () => {
                 });
             });
             it("outputs an object that shares no members with the input object", () => {
-                var input: {point: {x: number}} = <any>(samples[samples.length - 1]);
+                var input: {point: {x: number}} = <any>(samples[4]);
                 var output = Util.deepcp(input);
                 output.point.x = 1;
                 expect(input.point.x).not.toBe(1);
