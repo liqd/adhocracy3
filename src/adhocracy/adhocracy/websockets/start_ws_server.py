@@ -70,7 +70,7 @@ def _remove_pid_file():
         os.unlink(PID_FILE)
 
 
-def _run_loop_until_interrupted(loop, server) -> None:
+def _run_loop_until_interrupted(loop, server):
     try:
         loop.run_forever()
     except KeyboardInterrupt:
@@ -97,7 +97,7 @@ def _get_zodb_connection(config: ConfigParser) -> dict:
     return db.open()
 
 
-def _inject_here_variable(config: ConfigParser, config_file: str) -> None:
+def _inject_here_variable(config: ConfigParser, config_file: str):
     """Inject the %(here) variable into a config."""
     dir_containing_config_file = path.dirname(config_file)
     config['app:main']['here'] = dir_containing_config_file

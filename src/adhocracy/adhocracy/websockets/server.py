@@ -61,32 +61,27 @@ class ClientTracker():
         if not self.is_subscribed(client, resource):
             return False
         oid = get_oid(resource)
-        self._discard_from_multidict(self._clients2resource_oids, client, oid)
-        self._discard_from_multidict(self._resource_oids2clients, oid, client)
+        self._discard_from_set_valued_dict(self._clients2resource_oids, client,
+                                           oid)
+        self._discard_from_set_valued_dict(self._resource_oids2clients, oid,
+                                           client)
         return True
 
-    def _discard_from_multidict(self, multidict, key, value):
+    def _discard_from_set_valued_dict(self, set_valued_dict, key, value):
         """Discard one set member from a defaultdict that has sets as values.
 
-        If the resulting set is empty, it is removed from the multidict.
+        If the resulting set is empty, it is removed from the set_valued_dict.
         """
-        # REVIEW: the name 'mulitidict' in the method name and parameter is
-        # misleading. Multidicts are dicts with non unique keys, instead we
-        # expect a dict with set values.
-        multidict[key].discard(value)
-        if not multidict[key]:
-            del multidict[key]
+        set_valued_dict[key].discard(value)
+        if not set_valued_dict[key]:
+            del set_valued_dict[key]
 
-    def delete_all_subscriptions(self, client: Hashable) -> None:
+    def delete_all_subscriptions(self, client: Hashable):
         """Delete all subscriptions for a client."""
-        # REVIEW [joka]: Annotating the return value None is not a usefull
-        # information because all callables have None as default return value.
-        # In addition if we start doing this here we also have to do it for all
-        # other callables and this means  work.
         oid_set = self._clients2resource_oids.pop(client, set())
         for oid in oid_set:
-            self._discard_from_multidict(self._resource_oids2clients, oid,
-                                         client)
+            self._discard_from_set_valued_dict(self._resource_oids2clients,
+                                               oid, client)
 
     def iterate_subscribers(self, resource: IResource) -> Iterable:
         """Return an iterator over all clients subscribed to a resource."""
@@ -110,7 +105,7 @@ class ClientCommunicator(WebSocketServerProtocol):
     # All instances of this class share the same tracker
     _tracker = ClientTracker()
 
-    def get_context(self):
+    def _get_context(self):
         """Get a context object to resolve resource paths.
 
         :raises KeyError: if the zodb root has no app_root child.
@@ -133,12 +128,12 @@ class ClientCommunicator(WebSocketServerProtocol):
     def onOpen(self):  # noqa
         logger.debug('WebSocket connection to %s open', self._client)
 
-    def onMessage(self, payload: bytes, is_binary: bool) -> None:    # noqa
+    def onMessage(self, payload: bytes, is_binary: bool):    # noqa
         try:
             json_object = self._parse_message(payload, is_binary)
             if self._handle_if_event_notification(json_object):
                 return
-            context = self.get_context()
+            context = self._get_context()
             request = self._parse_json_via_schema(json_object,
                                                   ClientRequestSchema,
                                                   context)
@@ -170,7 +165,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         """
         if (self._client_may_send_notifications and
                 self._looks_like_event_notification(json_object)):
-            context = self.get_context()
+            context = self._get_context()
             notification = self._parse_json_via_schema(json_object,
                                                        Notification,
                                                        context,)
@@ -191,7 +186,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         except Exception as err:
             self._raise_invalid_json_from_exception(err)
 
-    def _handle_client_request_and_send_response(self, request: dict) -> None:
+    def _handle_client_request_and_send_response(self, request: dict):
         action = request['action']
         resource = request['resource']
         self._raise_if_forbidden_request(action, resource)
@@ -199,7 +194,7 @@ class ClientCommunicator(WebSocketServerProtocol):
                                                                   resource)
         self._send_status_confirmation(update_was_necessary, action, resource)
 
-    def _send_error_message(self, err: Exception) -> None:
+    def _send_error_message(self, err: Exception):
         if isinstance(err, WebSocketError):
             error = err.error_type
             details = err.details
@@ -213,8 +208,7 @@ class ClientCommunicator(WebSocketServerProtocol):
     def _looks_like_event_notification(self, json_object) -> bool:
         return isinstance(json_object, dict) and 'event' in json_object
 
-    def _dispatch_event_notification_to_subscribers(self, notification:
-                                                    dict) -> None:
+    def _dispatch_event_notification_to_subscribers(self, notification: dict):
         event = notification['event']
         resource = notification['resource']
         if event == 'created':
@@ -229,7 +223,7 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def _raise_if_unknown_field_value(self, field_name: str,
                                       err: colander.Invalid,
-                                      json_object: dict) -> None:
+                                      json_object: dict):
         """Raise an 'unknown_xxx' WebSocketError error if appropriate."""
         errdict = err.asdict()
         if (self._is_only_key(errdict, field_name) and
@@ -240,22 +234,16 @@ class ClientCommunicator(WebSocketServerProtocol):
     def _is_only_key(self, d: dict, key: str) -> bool:
         return key in d and len(d) == 1
 
-    def _raise_invalid_json_from_colander_invalid(self, err:
-                                                  colander.Invalid) -> None:
-        """Raise a 'invalid_json' WebSocketError from a colander error."""
+    def _raise_invalid_json_from_colander_invalid(self, err: colander.Invalid):
         errdict = err.asdict()
         errlist = ['{}: {}'.format(k, errdict[k]) for k in errdict.keys()]
         details = ' / '.join(sorted(errlist))
         raise WebSocketError('invalid_json', details)
-    # REVIEW: the docstring is not necessary, the method name gives you the
-    # same information.
 
-    def _raise_invalid_json_from_exception(self, err: Exception) -> None:
-        """Raise a 'invalid_json' WebSocketError from a generic exception."""
+    def _raise_invalid_json_from_exception(self, err: Exception):
         raise WebSocketError('invalid_json', str(err))
 
-    def _raise_if_forbidden_request(self, action: str,
-                                    resource: IResource) -> None:
+    def _raise_if_forbidden_request(self, action: str, resource: IResource):
         """Raise an error if a client tries to subscribe to an ItemVersion."""
         if action == 'subscribe' and IItemVersion.providedBy(resource):
             raise WebSocketError('subscribe_not_supported',
@@ -276,19 +264,19 @@ class ClientCommunicator(WebSocketServerProtocol):
     def _send_status_confirmation(self, update_was_necessary: bool,
                                   action: str, resource: IResource):
         status = 'ok' if update_was_necessary else 'redundant'
-        context = self.get_context()
+        context = self._get_context()
         schema = StatusConfirmation().bind(context=context)
         json_message = schema.serialize(
             {'status': status, 'action': action, 'resource': resource})
         self._send_json_message(json_message)
 
-    def _send_json_message(self, json_message: dict) -> None:
+    def _send_json_message(self, json_message: dict):
         """Send a JSON object as message to the client."""
         text = dumps(json_message)
         logger.debug('Sending message to client %s: %s', self._client, text)
         self.sendMessage(text.encode())
 
-    def _dispatch_created_event(self, resource: IResource) -> None:
+    def _dispatch_created_event(self, resource: IResource):
         parent = self._get_parent(resource)
         if parent is not None:
             if IItemVersion.providedBy(resource):
@@ -296,13 +284,13 @@ class ClientCommunicator(WebSocketServerProtocol):
             else:
                 self._notify_new_child(parent, resource)
 
-    def _dispatch_modified_event(self, resource: IResource) -> None:
+    def _dispatch_modified_event(self, resource: IResource):
         self._notify_resource_modified(resource)
         parent = self._get_parent(resource)
         if parent is not None:
             self._notify_modified_child(parent, resource)
 
-    def _dispatch_deleted_event(self, resource: IResource) -> None:
+    def _dispatch_deleted_event(self, resource: IResource):
         # FIXME Should we also notify subscribers of the deleted resource?
         # That's currently not part of the API.
         parent = self._get_parent(resource)
@@ -321,47 +309,45 @@ class ClientCommunicator(WebSocketServerProtocol):
         return parent
 
     def _notify_new_version(self, parent: IResource,
-                            new_version: IItemVersion) -> None:
+                            new_version: IItemVersion):
         """Notify subscribers if a new version has been added to an item."""
         for client in self._tracker.iterate_subscribers(parent):
             client.send_new_version_notification(parent, new_version)
 
-    def _notify_new_child(self, parent: IResource, child: IResource) -> None:
+    def _notify_new_child(self, parent: IResource, child: IResource):
         """Notify subscribers if a child has been added to a pool or item."""
         for client in self._tracker.iterate_subscribers(parent):
             client.send_child_notification('new', parent, child)
 
-    def _notify_resource_modified(self, resource: IResource) -> None:
+    def _notify_resource_modified(self, resource: IResource):
         """Notify subscribers if a resource has been modified."""
         for client in self._tracker.iterate_subscribers(resource):
             client.send_modified_notification(resource)
 
-    def _notify_modified_child(self, parent: IResource,
-                               child: IResource) -> None:
+    def _notify_modified_child(self, parent: IResource, child: IResource):
         """Notify subscribers if a child in a pool has been modified."""
         for client in self._tracker.iterate_subscribers(parent):
             client.send_child_notification('modified', parent, child)
 
-    def _notify_removed_child(self, parent: IResource,
-                              child: IResource) -> None:
+    def _notify_removed_child(self, parent: IResource, child: IResource):
         """Notify subscribers if a child has been removed from a pool."""
         for client in self._tracker.iterate_subscribers(parent):
             client.send_child_notification('removed', parent, child)
 
-    def send_modified_notification(self, resource: IResource) -> None:
+    def send_modified_notification(self, resource: IResource):
         """Send notification about a modified resource."""
-        context = self.get_context()
+        context = self._get_context()
         schema = Notification().bind(context=context)
         data = schema.serialize({'event': 'modified', 'resource': resource})
         self._send_json_message(data)
 
     def send_child_notification(self, status: str, resource: IResource,
-                                child: IResource) -> None:
+                                child: IResource):
         """Send notification concerning a child resource.
 
         :param status: should be 'new', 'removed', or 'modified'
         """
-        context = self.get_context()
+        context = self._get_context()
         schema = ChildNotification().bind(context=context)
         data = schema.serialize({'event': status + '_child',
                                  'resource': resource,
@@ -369,9 +355,9 @@ class ClientCommunicator(WebSocketServerProtocol):
         self._send_json_message(data)
 
     def send_new_version_notification(self, resource: IResource,
-                                      new_version: IResource) -> None:
+                                      new_version: IResource):
         """Send notification if a new version has been added."""
-        context = self.get_context()
+        context = self._get_context()
         schema = VersionNotification().bind(context=context)
         data = schema.serialize({'event': 'new_version',
                                  'resource': resource,
