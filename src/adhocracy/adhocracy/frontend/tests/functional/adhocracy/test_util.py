@@ -46,6 +46,8 @@ class TestDeepCp:
     #   selenium.common.exceptions.WebDriverException: Message:
     #   'Module name "Adhocracy/Util" has not been loaded yet for context: _.
     #   Use require([])  http://requirejs.org/docs/errors.html#notloaded'
+    # REVIEW[joka]: maybe the javascript needs more time to start properly?
+    #               that's a job vor tb, mf
     @pytest.mark.parametrize("input,expected",
                              [(None, None),
                               ({}, {}),
