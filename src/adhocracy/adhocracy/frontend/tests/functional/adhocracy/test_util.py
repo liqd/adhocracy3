@@ -3,6 +3,37 @@ import json
 import pytest
 
 
+def compile_js_code(body, **kwargs):
+    """Generate a single JavaScript expression from complex code.
+
+    This is accomplished by wrapping the code in a JavaScript function
+    and passing any key word arguments to that function.  All arguments
+    will be JSON encoded.
+
+    :param body: any JavaScript code
+    :param kwargs: arguments that will be passed to the wrapper function
+
+    :returns: a string containing a single JavaScript expression suitable
+        for consumption by splinter's ``evaluate_script``
+
+    >>> code = "var a = 1; test.y = a; return test;"
+    >>> compile_js_code(code, test={"x": 2})
+    '(function(test) {var a = 1; test.y = a; return test;})({"x": 2})'
+
+    """
+    # make sure keys and values are in the same order
+    keys = []
+    values = []
+    for key in kwargs:
+        keys.append(key)
+        values.append(kwargs[key])
+
+    keys = ', '.join(keys)
+    values = ', '.join((json.dumps(v) for v in values))
+
+    return "(function({}) {{{}}})({})".format(keys, body, values)
+
+
 class TestDeepCp:
 
     @pytest.fixture()
@@ -16,7 +47,11 @@ class TestDeepCp:
                               ({}, {}),
                               ])
     def test_deepcp(self, browser_root, input, expected):
-        code = "require('Adhocracy/Util').deepcp({})".format(json.dumps(input))
+        body = """
+               var U = require('Adhocracy/Util');
+               return U.deepcp(input);
+               """
+        code = compile_js_code(body, input=input)
         result = browser_root.evaluate_script(code)
         assert result == expected
 
