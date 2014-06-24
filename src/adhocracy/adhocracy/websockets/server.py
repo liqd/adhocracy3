@@ -277,36 +277,19 @@ class ClientCommunicator(WebSocketServerProtocol):
         self.sendMessage(text.encode())
 
     def _dispatch_created_event(self, resource: IResource):
-        parent = self._get_parent(resource)
-        if parent is not None:
-            if IItemVersion.providedBy(resource):
-                self._notify_new_version(parent, resource)
-            else:
-                self._notify_new_child(parent, resource)
+        if IItemVersion.providedBy(resource):
+            self._notify_new_version(resource.__parent__, resource)
+        else:
+            self._notify_new_child(resource.__parent__, resource)
 
     def _dispatch_modified_event(self, resource: IResource):
         self._notify_resource_modified(resource)
-        parent = self._get_parent(resource)
-        if parent is not None:
-            self._notify_modified_child(parent, resource)
+        self._notify_modified_child(resource.__parent__, resource)
 
     def _dispatch_deleted_event(self, resource: IResource):
         # FIXME Should we also notify subscribers of the deleted resource?
         # That's currently not part of the API.
-        parent = self._get_parent(resource)
-        if parent is not None:
-            self._notify_removed_child(parent, resource)
-
-    def _get_parent(self, resource: IResource) -> IResource:
-        """Return the parent of a resource.
-
-        If no parent exists, None is returned and a warning is logged.
-        """
-        parent = getattr(resource, '__parent__', None)
-        if parent is None:
-            logger.warning('Resource has no parent: %s',
-                           resource_path(resource))
-        return parent
+        self._notify_removed_child(resource.__parent__, resource)
 
     def _notify_new_version(self, parent: IResource,
                             new_version: IItemVersion):
