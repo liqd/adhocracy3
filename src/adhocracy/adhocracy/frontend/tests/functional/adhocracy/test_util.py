@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 
@@ -14,11 +16,8 @@ class TestDeepCp:
                               ({}, {}),
                               ])
     def test_deepcp(self, browser_root, input, expected):
-        code = """
-               var U = require('Adhocracy/Util');
-               U.deepcp({0});
-               """.format(input)
-        result = browser_root.browser.evaluate_script(code)
+        code = "require('Adhocracy/Util').deepcp({})".format(json.dumps(input))
+        result = browser_root.evaluate_script(code)
         assert result == expected
 
     # deactivated: webdriver swallows trailing null values in
