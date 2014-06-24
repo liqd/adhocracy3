@@ -52,6 +52,7 @@ class TestDeepCp:
                               42,
                               {"foo": "bar"},
                               [None],
+                              {'a': 3, 'b': None, 'c': [None]}
                               ])
     def test_deepcp(self, browser_root, value):
         body = """
@@ -61,11 +62,3 @@ class TestDeepCp:
         code = compile_js_code(body, input=value)
         result = browser_root.evaluate_script(code)
         assert result == value
-
-    # deactivated: webdriver swallows trailing null values in
-    # javascript arrays, so this test breaks.  FIXME: need to fix
-    # webdriver or find a work-around.  we need to be able to pass
-    # arrays!
-    #def test_some_obj(self):
-    #    value = {'a': 3, 'b': None, 'c': [None]}
-    #    assert self._call_fut(value) == value
