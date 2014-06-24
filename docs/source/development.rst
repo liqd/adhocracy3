@@ -35,7 +35,7 @@ backend ::
 
 frontend tests::
 
-    ./bin/py.test ./src/adhocracy/adhocracy/frontend/tests/
+    bin/py.test ./src/adhocracy/adhocracy/frontend/tests/
 
 acceptance tests::
 
