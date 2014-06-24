@@ -27,7 +27,7 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
 1. python3
 2. git
-3. build-essential libyaml-dev python3-dev libncurses5-dev python-setuptools python-virtualenv
+3. build-essential libyaml-dev python3-dev libncurses5-dev python-setuptools
 4. graphviz
 5. ruby-dev
 
@@ -50,17 +50,6 @@ install adhocracy ::
 
     ./python/python-3.3/bin/python ./bootstrap.py
     ./bin/buildout
-
-install adhocracy ::
-
-    ./python/python-3.3/bin/python ./bootstrap.py
-    ./bin/buildout
-
-
-install jasmin testrunner for frontend unit tests ::
-
-   virtualenv-2.7 jasmine
-   jasmine/bin/pip install Jasmine
 
 update your shell environment::
 
