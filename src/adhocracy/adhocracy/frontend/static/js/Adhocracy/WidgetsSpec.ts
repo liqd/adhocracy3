@@ -10,6 +10,9 @@ import q = require("q");
 // the module under test
 import Widgets = require("./Widgets");
 
+// FIXME: DefinitelyTyped is not yet compatible with jasmine 2.0.0
+declare var beforeEach : (any) => void;
+
 
 var config : Config.Type = {
     templatePath: "mock",
@@ -80,7 +83,7 @@ export var register = () => {
                 };
 
                 var adapter = <any>jasmine.createSpyObj("adapter", ["elemRefs"]);
-                adapter.elemRefs.andReturn(elements);
+                adapter.elemRefs.and.returnValue(elements);
 
                 var listing = new Widgets.Listing(adapter);
                 var directive: ng.IDirective = listing.createDirective(config);
@@ -92,51 +95,28 @@ export var register = () => {
                 });
 
                 describe("controller", () => {
-                    var adhHttpMock = createAdhHttpMock();
-                    adhHttpMock.get.andCallFake(() => Util.mkPromise(q, container));
+                    var adhHttpMock;
+                    var scope;
 
-                    it("sets scope.container", () => {
-                        var asyncFlag = false;
+                    beforeEach((done) => {
+                        adhHttpMock = createAdhHttpMock();
+                        adhHttpMock.get.and.callFake(() => Util.mkPromise(q, container));
 
-                        var scope = {
+                        scope = {
                             container: undefined,
                             elements: undefined
                         };
 
-                        runs(() => {
-                            var controller = directive.controller[3];
-                            controller(scope, adhHttpMock, () => {
-                                asyncFlag = true;
-                            });
-                        });
+                        var controller = directive.controller[3];
+                        controller(scope, adhHttpMock, done);
+                    });
 
-                        waitsFor(() => asyncFlag, "timed out", 20);
-
-                        runs(() => {
-                            expect(scope.container).toEqual(container);
-                        });
+                    it("sets scope.container", () => {
+                        expect(scope.container).toEqual(container);
                     });
 
                     it("sets scope.elements", () => {
-                        var asyncFlag = false;
-
-                        var scope = {
-                            container: undefined,
-                            elements: undefined
-                        };
-
-                        runs(() => {
-                            var controller = directive.controller[3];
-                            controller(scope, adhHttpMock, () => {
-                                asyncFlag = true;
-                            });
-                        });
-
-                        waitsFor(() => asyncFlag, "timed out", 20);
-
-                        runs(() => {
-                            expect(scope.elements).toEqual(elements);
-                        });
+                        expect(scope.elements).toEqual(elements);
                     });
                 });
             });
@@ -146,22 +126,17 @@ export var register = () => {
             var adapter = new Widgets.AbstractListingElementAdapter(q);
 
             describe("name", () => {
+                var ret;
+
+                beforeEach((done) => {
+                    adapter.name({}).then((value) => {
+                        ret = value;
+                        done();
+                    });
+                });
+
                 it("always promises ''", () => {
-                    var asyncFlag = false;
-                    var ret;
-
-                    runs(() => {
-                        adapter.name({}).then((value) => {
-                            ret = value;
-                            asyncFlag = true;
-                        });
-                    });
-
-                    waitsFor(() => asyncFlag, "timed out", 20);
-
-                    runs(() => {
-                        expect(ret).toBe("");
-                    });
+                    expect(ret).toBe("");
                 });
             });
 
@@ -182,22 +157,17 @@ export var register = () => {
             };
 
             describe("name", () => {
+                var ret;
+
+                beforeEach((done) => {
+                    adapter.name(element).then((value) => {
+                        ret = value;
+                        done();
+                    });
+                });
+
                 it("promises the right name", () => {
-                    var asyncFlag = false;
-                    var ret;
-
-                    runs(() => {
-                        adapter.name(element).then((value) => {
-                            ret = value;
-                            asyncFlag = true;
-                        });
-                    });
-
-                    waitsFor(() => asyncFlag, "timed out", 20);
-
-                    runs(() => {
-                        expect(ret).toBe("[content type test, resource /this/is/a/path]");
-                    });
+                    expect(ret).toBe("[content type test, resource /this/is/a/path]");
                 });
             });
 
@@ -231,28 +201,25 @@ export var register = () => {
             };
 
             describe("name", () => {
+                var ret;
+                var adhHttpMock;
+                var adapter;
+
+                beforeEach((done) => {
+                    adhHttpMock = createAdhHttpMock();
+                    adhHttpMock.get.and.returnValue(Util.mkPromise(q, version));
+
+                    adapter = new Widgets.ListingElementTitleAdapter(q, adhHttpMock);
+
+                    adapter.name(resource).then((value) => {
+                        ret = value;
+                        done();
+                    });
+                });
+
                 it("promises the title of the last document version", () => {
-                    var asyncFlag = false;
-                    var ret;
-
-                    var adhHttpMock = createAdhHttpMock();
-                    adhHttpMock.get.andReturn(Util.mkPromise(q, version));
-
-                    var adapter = new Widgets.ListingElementTitleAdapter(q, adhHttpMock);
-
-                    runs(() => {
-                        adapter.name(resource).then((value) => {
-                            ret = value;
-                            asyncFlag = true;
-                        });
-                    });
-
-                    waitsFor(() => asyncFlag, "timed out", 20);
-
-                    runs(() => {
-                        expect(ret).toBe(_title);
-                        expect(adhHttpMock.get).toHaveBeenCalledWith(latestVersionPath);
-                    });
+                    expect(ret).toBe(_title);
+                    expect(adhHttpMock.get).toHaveBeenCalledWith(latestVersionPath);
                 });
             });
 
@@ -272,7 +239,7 @@ export var register = () => {
             });
             describe("createDirective", () => {
                 var elementAdapterMock = <any>jasmine.createSpyObj("elementAdapterMock", ["name"]);
-                elementAdapterMock.name.andCallFake((path) => path);
+                elementAdapterMock.name.and.callFake((path) => path);
 
                 var listingElement = new Widgets.ListingElement(<any>elementAdapterMock);
                 var directive: ng.IDirective = listingElement.createDirective(config);
@@ -280,31 +247,24 @@ export var register = () => {
                 registerDirectiveSpec(directive);
 
                 describe("controller", () => {
+                    var path = "/this/is/a/path";
+                    var scope = {
+                        path: path,
+                        name: ""
+                    };
+                    var adhHttpMock;
+
+                    beforeEach((done) => {
+                        adhHttpMock = createAdhHttpMock();
+                        adhHttpMock.get.and.returnValue(Util.mkPromise(q, path));
+
+                        var controller = <any>directive.controller[3];
+                        controller(scope, adhHttpMock, done);
+                    });
+
                     it("sets name in scope", () => {
-                        var asyncFlag = false;
-
-                        var path = "/this/is/a/path";
-                        var scope = {
-                            path: path,
-                            name: ""
-                        };
-
-                        var adhHttpMock = createAdhHttpMock();
-                        adhHttpMock.get.andReturn(Util.mkPromise(q, path));
-
-                        runs(() => {
-                            var controller = <any>directive.controller[3];
-                            controller(scope, adhHttpMock, () => {
-                                asyncFlag = true;
-                            });
-                        });
-
-                        waitsFor(() => asyncFlag, "timed out", 20);
-
-                        runs(() => {
-                            expect(scope.name).toEqual(path);
-                            expect(adhHttpMock.get).toHaveBeenCalledWith(path);
-                        });
+                        expect(scope.name).toEqual(path);
+                        expect(adhHttpMock.get).toHaveBeenCalledWith(path);
                     });
                 });
             });
