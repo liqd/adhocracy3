@@ -45,6 +45,9 @@ class TestDeepCp:
     @pytest.mark.parametrize("input,expected",
                              [(None, None),
                               ({}, {}),
+                              (42, 42),
+                              ({"foo": "bar"}, {"foo": "bar"}),
+                              ([None], [None]),
                               ])
     def test_deepcp(self, browser_root, input, expected):
         body = """
