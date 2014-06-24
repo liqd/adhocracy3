@@ -119,6 +119,7 @@ class Client:
     def add_message_resource_created(self, resource: ILocation):
         """Notify the WS server of a newly created resource."""
         schema = Notification().bind(context=resource)
+        # FIXME better serialize messages later
         message = schema.serialize({'event': 'created', 'resource': resource})
         self._messages_to_send.add(json.dumps(message))
 
