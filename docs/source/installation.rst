@@ -86,25 +86,27 @@ build sphinx documentation ::
 Run the application
 -------------------
 
-running the zodb server (in background) ::
+Running the zodb server (in background) ::
 
     ./bin/runzeo -C etc/zeo.conf &
 
-updating the object structure ::
+Updating the object structure ::
 
     ./bin/sd_evolve etc/development.ini
 
-starting the Websockets server (in background)::
+Starting the Websocket server (in background)::
 
     ./bin/start_ws_server etc/development.ini &
 
-Output will be logged to ``adhocracy-ws.log``.
+The Websocket server logs to stderr. You can redirect this to a file::
 
-serving the sample wsgi app using pserve ::
+    ./bin/start_ws_server etc/development.ini 2> adhocracy-ws.log &
+
+Serving the sample wsgi app using pserve ::
 
     ./bin/pserve etc/development.ini
 
-open the javascript front-end with your web browser ::
+Open the javascript front-end with your web browser ::
 
     xdg-open http://localhost:6541/frontend_static/root.html
 

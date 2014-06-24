@@ -1,9 +1,10 @@
 """Start Websocket server as main application."""
-import os
-import sys
 from configparser import ConfigParser
+from logging.config import fileConfig
 from os import path
 import logging
+import os
+import sys
 
 from autobahn.asyncio.websocket import WebSocketServerFactory
 from ZODB import DB
@@ -14,10 +15,6 @@ import asyncio
 
 # FIXME make the port configurable
 PORT = 8080
-# REVIEW just log to stdout,
-# this way other tools can take care for log file creation and logrotation
-LOG_FILE_NAME = 'adhocracy-ws.log'
-LOG_LEVEL = logging.DEBUG
 # FIXME make pid file path configurable
 PID_FILE = 'var/WS_SERVER.pid'
 
@@ -33,9 +30,26 @@ def main(args=[]) -> int:
     """
     if not args:
         args = sys.argv[1:]
-    config = _read_config(args)
-    _configure_logger(config)
+    if len(args) != 1:
+        raise ValueError('Expected 1 command-line argument (the config file), '
+                         'but got {}'.format(len(args)))
+    config_file = args[0]
+    fileConfig(config_file)
+    config = _read_config(config_file)
     _check_and_write_pid_file()
+    _start_loop(config)
+
+
+def _check_and_write_pid_file():
+    if os.path.isfile(PID_FILE):
+        raise RuntimeError('Pidfile already exists: ' + PID_FILE)
+    pid = os.getpid()
+    pidfile = open(PID_FILE, 'w')
+    pidfile.write('%s\n' % pid)
+    pidfile.close
+
+
+def _start_loop(config: ConfigParser):
     try:
         connection = _get_zodb_connection(config)
         ClientCommunicator.zodb_connection = connection
@@ -49,15 +63,6 @@ def main(args=[]) -> int:
     finally:
         logging.debug('Stopped WebSocket server')
         _remove_pid_file()
-
-
-def _check_and_write_pid_file():
-    if os.path.isfile(PID_FILE):
-        raise RuntimeError('Pidfile already exists: ' + PID_FILE)
-    pid = os.getpid()
-    pidfile = open(PID_FILE, 'w')
-    pidfile.write('%s' % pid)
-    pidfile.close
 
 
 def _remove_pid_file():
@@ -76,24 +81,11 @@ def _run_loop_until_interrupted(loop, server) -> None:
         return 0
 
 
-def _read_config(args: list) -> ConfigParser:
-    if len(args) != 1:
-        raise ValueError('Excepted 1 command-line argument (the config file), '
-                         'but got {}'.format(len(args)))
-    config_file = args[0]
+def _read_config(config_file: str) -> ConfigParser:
     config = ConfigParser()
     config.read(config_file)
     _inject_here_variable(config, config_file)
     return config
-
-
-def _configure_logger(config: ConfigParser) -> None:
-    fmt = config['formatter_generic'].get('format', raw=True)
-    if format is None:
-        logging.basicConfig(filename=LOG_FILE_NAME, level=LOG_LEVEL)
-    else:
-        logging.basicConfig(filename=LOG_FILE_NAME, level=LOG_LEVEL,
-                            format=fmt)
 
 
 def _get_zodb_connection(config: ConfigParser) -> dict:
