@@ -10,47 +10,23 @@
     <link rel="stylesheet" type="text/css" href="lib/jasmine/lib/jasmine-core/jasmine.css">
     <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/jasmine.js"></script>
     <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+    <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/boot.js"></script>
 
     <script
         src="lib/blanket/dist/qunit/blanket.js"
-        data-cover-adapter="lib/blanket/dist/jasmine/blanket_jasmine.js"
+        data-cover-adapter="js/jasmine-2.x-blanket.js"
         data-cover-only="js/Adhocracy/"
         data-cover-never="//spec$/i"
         data-cover-flags="branchTracking"
         type="text/javascript">
     </script>
-
-    <script type="text/javascript">
-      (function() {
-        var jasmineEnv = jasmine.getEnv();
-        jasmineEnv.updateInterval = 1000;
-
-        var htmlReporter = new jasmine.HtmlReporter();
-        jasmineEnv.addReporter(htmlReporter);
-
-        /* this is just for our automated tests */
-        window.jsApiReporter = new jasmine.JsApiReporter();
-        jasmineEnv.addReporter(jsApiReporter);
-
-        jasmineEnv.specFilter = function(spec) {
-          return htmlReporter.specFilter(spec);
-        };
-
-        var currentWindowOnload = window.onload;
-
-        window.onload = function() {
-          if (currentWindowOnload) {
-            currentWindowOnload();
-          }
-          jasmineEnv.execute();
-        };
-      })();
-    </script>
 </head>
 
 <body>
     <script type="text/javascript">
-        require(['AdhocracySpec'], function(spec) {});
+        require(['AdhocracySpec'], function(spec) {
+            jasmine.getEnv().execute()
+        });
     </script>
 </body>
 </html>
