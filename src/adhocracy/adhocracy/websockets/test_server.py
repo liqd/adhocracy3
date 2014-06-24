@@ -7,10 +7,7 @@ from substanced.util import get_oid
 from zope.interface import alsoProvides
 import pytest
 
-from adhocracy.interfaces import IItemVersion
-from adhocracy.websockets.server import ClientTracker
 from adhocracy.websockets.server import ClientCommunicator
-# REVIEW code to test should be import in the unit test
 
 
 class DummyResource():
@@ -18,7 +15,6 @@ class DummyResource():
     """Dummy resource for testing."""
 
     def __init__(self, oid):
-        """Initialize instance."""
         self.__oid__ = oid
 
 
@@ -54,14 +50,9 @@ class QueueingClientCommunicator(ClientCommunicator):
         self.queue.append(json_message)
 
 
-
-
 class ClientCommunicatorUnitTests(unittest.TestCase):
 
-    """Test the ClientCommunicator class."""
-
     def setUp(self):
-        """Test setup."""
         self._next_oid = 1
         self._child = self._make_resource()
         app_root = self._make_resource()
@@ -73,7 +64,7 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         QueueingClientCommunicator.zodb_connection = DummyZODBConnection(
             zodb_root=zodb_root)
         self._comm = QueueingClientCommunicator()
-        self._peer = "websocket peer"
+        self._peer = 'websocket peer'
         self._connect()
 
     def tearDown(self):
@@ -86,7 +77,6 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         return resource
 
     def test_autobahn_installed(self):
-        """Test that Autobahn is installed."""
         from autobahn import __version__
         assert isinstance(__version__, str)
 
@@ -96,7 +86,7 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert len(self._comm.queue) == 0
 
     def _connect(self, peer=None):
-        if peer == None:
+        if peer is None:
             peer = self._peer
         request = DummyConnectionRequest(peer)
         self._comm.onConnect(request)
@@ -155,6 +145,7 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
                                         'resource': '/child'}
 
     def test_onMessage_subscribe_item_version(self):
+        from adhocracy.interfaces import IItemVersion
         alsoProvides(self._child, IItemVersion)
         msg = self._build_message({'action': 'subscribe',
                                    'resource': '/child'})
@@ -263,8 +254,6 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
 
 class ClientTrackerUnitTests(unittest.TestCase):
 
-    """Test the ClientTracker class."""
-
     def _make_client(self):
         return object()
 
@@ -274,12 +263,11 @@ class ClientTrackerUnitTests(unittest.TestCase):
         return resource
 
     def setUp(self):
-        """Test setup."""
+        from adhocracy.websockets.server import ClientTracker
         self._tracker = ClientTracker()
         self._next_oid = 1
 
     def test_subscribe(self):
-        """Test client subscription."""
         client = self._make_client()
         resource = self._make_resource()
         oid = get_oid(resource)
@@ -290,37 +278,13 @@ class ClientTrackerUnitTests(unittest.TestCase):
         assert self._tracker._clients2resource_oids[client] == {oid}
         assert self._tracker._resource_oids2clients[oid] == {client}
 
-    def test_redundant_subscribe(self):
+    def test_subscribe_redundant(self):
         """Test client subscribing same resource twice."""
-        # REVIEW:
-        # The docstring is redundant, the method name shows the same
-        # information and docstrings are not need for tests anyway.
-        # The method name should start with 'subscribe' like the other tests
-        # testing the same method and clean code naming.
         client = self._make_client()
         resource = self._make_resource()
-        oid = get_oid(resource)
-        result = self._tracker.subscribe(client, resource)
-        # REVIEW: The following assert is not what we want to test here.
-        assert result is True
-        # REVIEW: Actually this is what we are testing
+        self._tracker.subscribe(client, resource)
         result = self._tracker.subscribe(client, resource)
         assert result is False
-        # REVIEW: The following asserts are also redundant (its already testet above)
-        assert len(self._tracker._clients2resource_oids) == 1
-        assert len(self._tracker._resource_oids2clients) == 1
-        assert self._tracker._clients2resource_oids[client] == {oid}
-        assert self._tracker._resource_oids2clients[oid] == {client}
-
-        # REVIEW [joka]:
-        # Unit tests should follow the 'if when then' pattern
-        # and test one 'thing' only (ideally only one assert).
-        # This is part of the  unit test concept and our clean code guideline.
-        # It makes refactoring and reading much faster.
-
-        # I don't say we have to rewrite the tests beforge merge. I just want
-        # that we have a common understanding when we refactore or extend
-        # these tests.
 
     def test_subscribe_two_resources(self):
         """Test client subscribing to two resources."""
@@ -356,7 +320,6 @@ class ClientTrackerUnitTests(unittest.TestCase):
         assert self._tracker._resource_oids2clients[oid] == {client1, client2}
 
     def test_unsubscribe(self):
-        """Test client unsubscription."""
         client = self._make_client()
         resource = self._make_resource()
         self._tracker.subscribe(client, resource)
@@ -365,19 +328,14 @@ class ClientTrackerUnitTests(unittest.TestCase):
         assert len(self._tracker._clients2resource_oids) == 0
         assert len(self._tracker._resource_oids2clients) == 0
 
-    def test_redundant_unsubscribe(self):
+    def test_unsubscribe_redundant(self):
         """Test client unsubscribing from the same resource twice."""
         client = self._make_client()
         resource = self._make_resource()
         self._tracker.subscribe(client, resource)
-        result = self._tracker.unsubscribe(client, resource)
-        assert result is True
-        assert len(self._tracker._clients2resource_oids) == 0
-        assert len(self._tracker._resource_oids2clients) == 0
+        self._tracker.unsubscribe(client, resource)
         result = self._tracker.unsubscribe(client, resource)
         assert result is False
-        assert len(self._tracker._clients2resource_oids) == 0
-        assert len(self._tracker._resource_oids2clients) == 0
 
     def test_delete_all_subscriptions_empty(self):
         """Test deleting all subscriptions for a client that has none."""
@@ -400,9 +358,7 @@ class ClientTrackerUnitTests(unittest.TestCase):
     def test_delete_all_subscriptions_two_clients(self):
         """Test deleting all subscriptions for one client subscribed to the
         same resource as another one.
-
         """
-
         client1 = self._make_client()
         client2 = self._make_client()
         resource = self._make_resource()
@@ -442,7 +398,7 @@ class TestFunctionalClientCommunicator:
     @pytest.fixture(scope='function')
     def websocket_connection(self, request, server):
         from websocket import create_connection
-        connection = create_connection("ws://localhost:8080")
+        connection = create_connection('ws://localhost:8080')
         connection.send('{"resource": "/adhocracy", "action": "subscribe"}')
         connection.recv()
 
@@ -461,7 +417,7 @@ class TestFunctionalClientCommunicator:
         data = {'content_type': IBasicPool.__identifier__,
                 'data': {'adhocracy.sheets.name.IName': {'name': name}}}
         requests.post(url, data=json.dumps(data),
-                      headers = {'content-type': 'application/json'})
+                      headers={'content-type': 'application/json'})
 
     def test_send_child_notification(self, server, websocket_connection):
         self._add_pool(server, '/', 'Proposals')

@@ -46,6 +46,7 @@ class TestIntegrationClient:
     def test_includeme_with_ws_url_setting(self, websocket, dummy_config):
         from adhocracy.websockets.client import includeme
         from adhocracy.websockets.client import Client
-        dummy_config.registry.settings['adhocracy.ws_url'] = 'ws://localhost:8080'
+        settings = dummy_config.registry.settings
+        settings['adhocracy.ws_url'] = 'ws://localhost:8080'
         includeme(dummy_config)
         assert isinstance(dummy_config.registry.ws_client, Client)

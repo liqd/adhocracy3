@@ -4,7 +4,7 @@ from pyramid import testing
 import colander
 import pytest
 
-from adhocracy.websockets.schemas import *
+from adhocracy.websockets.schemas import Notification
 
 
 class ClientRequestSchemaUnitTests(unittest.TestCase):
@@ -17,6 +17,7 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
         self.context['child'] = self.child
 
     def _make_one(self):
+        from adhocracy.websockets.schemas import ClientRequestSchema
         schema = ClientRequestSchema()
         return schema.bind(context=self.context)
 
@@ -84,6 +85,7 @@ class StatusConfirmationUnitTests(unittest.TestCase):
         self.context['child'] = self.child
 
     def _make_one(self):
+        from adhocracy.websockets.schemas import StatusConfirmation
         schema = StatusConfirmation()
         return schema.bind(context=self.context)
 
@@ -141,6 +143,7 @@ class NotificationUnitTests(unittest.TestCase):
 
     def test_serialize_child_notification(self):
         self.child = testing.DummyResource('child', self.parent)
+        from adhocracy.websockets.schemas import ChildNotification
         schema = ChildNotification()
         inst = self._bind(schema)
         result = inst.serialize({'event': 'removed_child',
@@ -151,6 +154,7 @@ class NotificationUnitTests(unittest.TestCase):
                           'child': '/parent/child'}
 
     def test_serialize_version_notification(self):
+        from adhocracy.websockets.schemas import VersionNotification
         self.version = testing.DummyResource('version', self.parent)
         schema = VersionNotification()
         inst = self._bind(schema)
@@ -160,4 +164,3 @@ class NotificationUnitTests(unittest.TestCase):
         assert result == {'event': 'removed_child',
                           'resource': '/parent',
                           'version': '/parent/version'}
-
