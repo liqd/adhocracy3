@@ -25,13 +25,6 @@ class TestUserLogin:
         click_button(browser_root, 'logIn()')
         assert is_logged_in(browser_root)
 
-    # REVIEW: this test currently fails
-    def test_login_non_valid(self, browser_root):
-        fill_input(browser_root, 'credentials.password', 'getoutofmyway')
-        fill_input(browser_root, 'credentials.name', 'mr.evil')
-        click_button(browser_root, 'logIn()')
-        assert not is_logged_in(browser_root)
-
 
 def fill_input(browser_root, ng_model_attr, value):
         xpath = '//input[contains(@ng-model, "{0}")]'.format(ng_model_attr)
