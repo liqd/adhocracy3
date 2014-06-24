@@ -46,21 +46,21 @@ class TestDeepCp:
     #   selenium.common.exceptions.WebDriverException: Message:
     #   'Module name "Adhocracy/Util" has not been loaded yet for context: _.
     #   Use require([])  http://requirejs.org/docs/errors.html#notloaded'
-    @pytest.mark.parametrize("input,expected",
-                             [(None, None),
-                              ({}, {}),
-                              (42, 42),
-                              ({"foo": "bar"}, {"foo": "bar"}),
-                              ([None], [None]),
+    @pytest.mark.parametrize("value",
+                             [None,
+                              {},
+                              42,
+                              {"foo": "bar"},
+                              [None],
                               ])
-    def test_deepcp(self, browser_root, input, expected):
+    def test_deepcp(self, browser_root, value):
         body = """
                var U = require('Adhocracy/Util');
                return U.deepcp(input);
                """
-        code = compile_js_code(body, input=input)
+        code = compile_js_code(body, input=value)
         result = browser_root.evaluate_script(code)
-        assert result == expected
+        assert result == value
 
     # deactivated: webdriver swallows trailing null values in
     # javascript arrays, so this test breaks.  FIXME: need to fix
