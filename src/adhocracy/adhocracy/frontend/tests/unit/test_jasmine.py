@@ -11,13 +11,6 @@ class TestJasmine:
         browser.visit(url)
         return browser
 
-    def format_msg(self, msg):
-        return str(msg)
-
-    def format_msgs(self, msgs):
-        for msg in msgs:
-            yield self.format_msg(msg)
-
     def test_all(self, browser_test):
         while not browser_test.evaluate_script('jsApiReporter.finished'):
             sleep(0.1)
