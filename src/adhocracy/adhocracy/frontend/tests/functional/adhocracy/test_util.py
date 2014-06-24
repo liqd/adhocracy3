@@ -42,6 +42,10 @@ class TestDeepCp:
         browser.visit(url)
         return browser
 
+    # REVIEW: This test fails non-deterministically with the following error:
+    #   selenium.common.exceptions.WebDriverException: Message:
+    #   'Module name "Adhocracy/Util" has not been loaded yet for context: _.
+    #   Use require([])  http://requirejs.org/docs/errors.html#notloaded'
     @pytest.mark.parametrize("input,expected",
                              [(None, None),
                               ({}, {}),

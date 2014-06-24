@@ -2,6 +2,12 @@ from splinter import Browser
 import pytest
 
 
+# REVIEW: the elements that we interact with should be identified by
+# name or class, not by angular directives or parameters to angular directives.
+# Those are implementation details and are likely to change while the names
+# and classes are part of a public API that is also used for CSS and is
+# therefore more or less stable.
+
 class TestUserLogin:
 
     """User wants to login."""
@@ -19,6 +25,7 @@ class TestUserLogin:
         click_button(browser_root, 'logIn()')
         assert is_logged_in(browser_root)
 
+    # REVIEW: this test currently fails
     def test_login_non_valid(self, browser_root):
         fill_input(browser_root, 'credentials.password', 'getoutofmyway')
         fill_input(browser_root, 'credentials.name', 'mr.evil')
