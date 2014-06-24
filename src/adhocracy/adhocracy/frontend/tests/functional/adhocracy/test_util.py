@@ -1,5 +1,4 @@
 import json
-
 import pytest
 
 
@@ -40,12 +39,14 @@ class TestDeepCp:
     def browser_root(self, browser, server_sample):
         url = server_sample.application_url + 'frontend_static/root.html'
         browser.visit(url)
+        # The splinter browser has no general "wait for page load" function:
+        # https://github.com/cobrateam/splinter/issues/237
+        def is_page_loaded(browser):
+            code = 'document.readyState === "complete";'
+            return browser.evaluate_script(code)
+        browser.wait_for_condition(is_page_loaded, 5)
         return browser
 
-    # REVIEW: This test fails non-deterministically with the following error:
-    #   selenium.common.exceptions.WebDriverException: Message:
-    #   'Module name "Adhocracy/Util" has not been loaded yet for context: _.
-    #   Use require([])  http://requirejs.org/docs/errors.html#notloaded'
     @pytest.mark.parametrize("value",
                              [None,
                               {},
