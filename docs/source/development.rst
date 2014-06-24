@@ -50,7 +50,7 @@ There are actually three ways to run the frontend unit tests:
 
 2.  In browser (``/frontend_static/test.html``)
 
-3.  With node.js: For that you need to install jasmine-node and
-    compile both ``Adhocracy.ts`` and ``AdhocracySpec.ts`` with
-    ``--module commonjs``. Then run jasmine-node on
-    ``./src/adhocracy/adhocracy/frontent/static/js/``.
+3.  With node.js::
+
+        bin/tsc -m commonjs ./src/adhocracy/adhocracy/frontend/static/js/Adhocracy*.ts
+        bin/jasmine-node ./src/adhocracy/adhocracy/frontend/static/js/
