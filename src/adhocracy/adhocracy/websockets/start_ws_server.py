@@ -1,8 +1,4 @@
 """Start Websocket server as main application."""
-# REVIEW maybe rename this module to scripts.py or start_ws_server.py then its
-# more clear what modules is doing.
-# REVIEW [joka]: maybe the follwing structure is more readable:
-#   client.py server.py start_ws_server.py __init__.py(only for setup stuff)
 import os
 import sys
 from configparser import ConfigParser
@@ -11,16 +7,15 @@ import logging
 
 from autobahn.asyncio.websocket import WebSocketServerFactory
 from ZODB import DB
+from adhocracy.websockets.server import ClientCommunicator
 from zodburi import resolve_uri
 import asyncio
-
-from adhocracy.websockets import ClientCommunicator
 
 
 # FIXME make the port configurable
 PORT = 8080
 # REVIEW just log to stdout,
-# this way other tools can take care for log file creation and logrotaion
+# this way other tools can take care for log file creation and logrotation
 LOG_FILE_NAME = 'adhocracy-ws.log'
 LOG_LEVEL = logging.DEBUG
 # FIXME make pid file path configurable
