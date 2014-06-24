@@ -40,3 +40,15 @@ frontend tests::
 acceptance tests::
 
     bin/py.test tests_acceptance
+
+
+There are actually three ways to run the frontend unit tests:
+
+1.  Integrated with py.test::
+
+        bin/py.test ./src/adhocracy/adhocracy/frontend/tests/unit/
+
+2.  In browser (``/frontend_static/test.html``)
+
+3.  With node.js: For that you need to install jasmine-node and run
+    it on ``./src/adhocracy/adhocracy/frontent/static/js/``.
