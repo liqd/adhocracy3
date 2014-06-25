@@ -42,6 +42,7 @@ export var register = () => {
                 it("always returns an empty list", () => {
                     var adapter = new Widgets.AbstractListingContainerAdapter();
                     expect(adapter.elemRefs(undefined)).toEqual([]);
+                    expect(adapter.elemRefs({'a': true})).toEqual([]);
                 });
             });
         });
