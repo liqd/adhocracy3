@@ -3,6 +3,15 @@ import unittest
 from websocket import ABNF
 
 
+class DummyClient():
+
+    def __init__(self):
+        self.messages_sent = False
+
+    def send_messages(self):
+        self.messages_sent = True
+
+
 class DummyWSConnection():
 
     def __init__(self, dummy_frame: ABNF):
@@ -26,6 +35,25 @@ class DummyWSConnection():
     def pong(self, text):
         self.nothing_sent = False
         self.pong_text = text
+
+
+class FunctionUnitTests(unittest.TestCase):
+
+    def setUp(self):
+        from pyramid.testing import DummyResource
+        self._client = DummyClient()
+        self._registry = DummyResource()
+        self._registry.ws_client = self._client
+
+    def test_send_messages_after_commit_hook_success(self):
+        from adhocracy.websockets.client import send_messages_after_commit_hook
+        send_messages_after_commit_hook(success=True, registry=self._registry)
+        assert self._client.messages_sent is True
+
+    def test_send_messages_after_commit_hook_no_success(self):
+        from adhocracy.websockets.client import send_messages_after_commit_hook
+        send_messages_after_commit_hook(success=False, registry=self._registry)
+        assert self._client.messages_sent is False
 
 
 class ClientUnitTests(unittest.TestCase):
@@ -58,6 +86,19 @@ class ClientUnitTests(unittest.TestCase):
         client._connect_and_receive_and_log_messages()
         assert self._dummy_connection.nothing_sent is False
         assert self._dummy_connection.pong_text == 'Hi!'
+
+    def test_receive_unexpected_frame(self):
+        frame = ABNF(opcode=ABNF.OPCODE_BINARY, data='hello')
+        client = self._make_one(frame)
+        client._connect_and_receive_and_log_messages()
+        assert self._dummy_connection.nothing_sent is True
+        assert self._dummy_connection.connected is True
+
+    def test_receive_none_frame(self):
+        client = self._make_one(None)
+        client._connect_and_receive_and_log_messages()
+        assert self._dummy_connection.nothing_sent is True
+        assert self._dummy_connection.connected is True
 
 
 class TestFunctionalClient:
