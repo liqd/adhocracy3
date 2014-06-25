@@ -9,10 +9,10 @@ from websocket import create_connection
 from websocket import WebSocketException
 from websocket import WebSocketConnectionClosedException
 from websocket import WebSocketTimeoutException
-
 from pyramid.interfaces import ILocation
-from adhocracy.websockets.schemas import Notification
 
+from adhocracy.utils import exception_to_str
+from adhocracy.websockets.schemas import Notification
 
 logger = logging.getLogger(__name__)
 
@@ -22,32 +22,42 @@ class Client:
     """Websocket Client."""
 
     def __init__(self, ws_url):
-        """Create instance with running thread that talks to the server."""
+        """Create instance with running thread that talks to the server.
+
+        :param ws_url: the URL of the websocket server to connect to;
+               if None, no connection will be set up (useful for testing)
+        """
         self._ws_url = ws_url
         self._messages_to_send = set()
         self._ws_connection = None
         self._is_running = False
         self._is_stopped = False
-        # Init thread that keeps the WS connection alive
-        runner = Thread(target=self.run)
+        if ws_url is not None:
+            self._init_listener_thread()
+
+    def _init_listener_thread(self):
+        """Init thread that keeps the connection alive."""
+        runner = Thread(target=self._run)
         runner.daemon = True
         runner.start()
         # FIXME better wait till self._is_running is True
         time.sleep(2)  # give the websocket client time to connect
 
-    def run(self):
+    def _run(self):
         """Start and keep alive connection to the websocket server."""
         assert self._ws_url
         while not self._is_stopped:
             try:
                 self._connect_and_receive_and_log_messages()
             except (WebSocketConnectionClosedException, ConnectionError,
-                    OSError):
-                logger.exception('Error connecting to the websocket server')
+                    OSError) as err:
+                logger.warning('Error connecting to the Websocket server: %s',
+                               exception_to_str(err))
                 self._is_running = False
                 time.sleep(2)
-            except WebSocketException:
-                logger.exception('Error communicating with websocket server')
+            except WebSocketException as err:  # pragma: no cover
+                logger.warning('Error communicating with Websocket server: %s',
+                               exception_to_str(err))
                 time.sleep(2)
 
     def _connect_and_receive_and_log_messages(self):
@@ -99,10 +109,10 @@ class Client:
             return
         try:
             self._send_messages()
-        except WebSocketTimeoutException:
-            logger.warning('Counld not send message, connection timeout,'
+        except WebSocketTimeoutException:  # pragma: no cover
+            logger.warning('Could not send message, connection timeout,'
                            ' try again later')
-        except OSError:
+        except OSError:  # pragma: no cover
             logger.warning('Could not send message, connection is broken,'
                            ' try again later')
 
@@ -112,7 +122,7 @@ class Client:
             logger.debug('Try sending message to Websocket server: %s',
                          message)
             self._ws_connection.send(message)
-            logger.debug('Send message to the websocket server')
+            logger.debug('Sent message to Websocket server')
         # FIXME if an exception is raised, messages are send twice, that's bad.
         self._messages_to_send.clear()
 
@@ -135,8 +145,9 @@ class Client:
             if self._is_connected():
                 self._close_connection(b'done')
                 logger.debug('Websocket client closed')
-        except WebSocketException:
-            logger.exception('Error closing connection to Websocket server')
+        except WebSocketException as err:  # pragma: no cover
+            logger.warning('Error closing connection to Websocket server: %s',
+                           exception_to_str(err))
 
 
 def get_ws_client(registry) -> Client:
