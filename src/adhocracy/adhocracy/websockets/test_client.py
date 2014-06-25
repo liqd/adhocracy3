@@ -39,6 +39,8 @@ class DummyWSConnection():
 
 class FunctionUnitTests(unittest.TestCase):
 
+    """Test the functions defined by the client module."""
+
     def setUp(self):
         from pyramid.testing import DummyResource
         self._client = DummyClient()
