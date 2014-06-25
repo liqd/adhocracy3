@@ -10,7 +10,7 @@ def resource_created_and_added_subscriber(event):
     """Send message to websocket server about the new resource."""
     registry = get_current_registry(event.object)
     ws_client = get_ws_client(registry)
-    if ws_client:
+    if ws_client is not None:
         resource = event.object
         ws_client.add_message_resource_created(resource)
 
@@ -19,7 +19,7 @@ def resource_modified_subscriber(event):
     """Send message to websocket server about the modified resource."""
     registry = get_current_registry(event.object)
     ws_client = get_ws_client(registry)
-    if ws_client:
+    if ws_client is not None:
         resource = event.object
         ws_client.add_message_resource_modified(resource)
 
