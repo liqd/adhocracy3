@@ -4,17 +4,18 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>adhocracy 3 frontend tests</title>
 
-    <script type="text/javascript" src="/frontend_static/submodules/requirejs/require.js"></script>
+    <script type="text/javascript" src="/frontend_static/lib/requirejs/require.js"></script>
     <script type="text/javascript" src="/frontend_static/require-config.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="js/jasmine/jasmine.css">
-    <script type="text/javascript" src="js/jasmine/jasmine.js"></script>
-    <script type="text/javascript" src="js/jasmine/jasmine-html.js"></script>
+    <link rel="stylesheet" type="text/css" href="lib/jasmine/lib/jasmine-core/jasmine.css">
+    <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/jasmine.js"></script>
+    <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/jasmine-html.js"></script>
 
     <script
-        src="js/jasmine/blanket.min.js"
-        data-cover-adapter="js/jasmine/jasmine-blanket.js"
+        src="lib/blanket/dist/qunit/blanket.js"
+        data-cover-adapter="lib/blanket/dist/jasmine/blanket_jasmine.js"
         data-cover-only="js/Adhocracy/"
+        data-cover-never="//spec$/i"
         data-cover-flags="branchTracking"
         type="text/javascript">
     </script>
@@ -25,11 +26,11 @@
         jasmineEnv.updateInterval = 1000;
 
         var htmlReporter = new jasmine.HtmlReporter();
-
         jasmineEnv.addReporter(htmlReporter);
+
         /* this is just for our automated tests */
-        window.jasmine_phantom_reporter = new jasmine.ConsoleReporter;
-        jasmineEnv.addReporter(jasmine_phantom_reporter);
+        window.jsApiReporter = new jasmine.JsApiReporter();
+        jasmineEnv.addReporter(jsApiReporter);
 
         jasmineEnv.specFilter = function(spec) {
           return htmlReporter.specFilter(spec);
@@ -41,12 +42,8 @@
           if (currentWindowOnload) {
             currentWindowOnload();
           }
-          execJasmine();
-        };
-
-        function execJasmine() {
           jasmineEnv.execute();
-        }
+        };
       })();
     </script>
 </head>

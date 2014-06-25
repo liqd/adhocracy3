@@ -1,4 +1,4 @@
-/// <reference path="../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 /**
  * cut ranges out of an array - original by John Resig (MIT Licensed)
@@ -114,9 +114,10 @@ export function deepeq(a : any, b : any) : boolean {
                 }
             }
         }
+        return true;
+    } else {
+        return a === b;
     }
-
-    return a === b;
 }
 
 

@@ -1,6 +1,6 @@
-/// <reference path="../../submodules/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../submodules/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../../submodules/DefinitelyTyped/underscore/underscore.d.ts"/>
+/// <reference path="../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
+/// <reference path="../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
 /// <reference path="../_all.d.ts"/>
 
 import _ = require("underscore");
@@ -56,10 +56,10 @@ export interface IVersionsSheet {
 export interface PartialIProposalVersion extends Resource, HasIDocumentSheet {}
 
 export class Resource {
-    contentType : string;
+    content_type : string;
     data : Object;
-    constructor(contentType: string) {
-        this.contentType = contentType;
+    constructor(content_type: string) {
+        this.content_type = content_type;
         this.data = {};
     }
     addISection(title: string, elements: string[]) {

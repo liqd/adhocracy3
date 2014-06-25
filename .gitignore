@@ -4,8 +4,6 @@
 *.pyc
 *.pyo
 *.log
-*.d.ts
-!src/adhocracy/adhocracy/frontend/static/js/_all.d.ts
 __pycache__
 /eggs
 /parts
@@ -30,6 +28,9 @@ develop-eggs
 /local/
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js.map
+/src/adhocracy/adhocracy/frontend/static/js/**/*.d.ts
+!/src/adhocracy/adhocracy/frontend/static/js/_all.d.ts
+/src/adhocracy/adhocracy/frontend/static/lib/
 /src/adhocracy/adhocracy/frontend/static/stylesheets/.sass-cache/
 /src/adhocracy/adhocracy/frontend/static/stylesheets/a3.css
 /src/adhocracy/adhocracy/frontend/static/stylesheets/min/
@@ -53,6 +54,5 @@ a3-backend-mockup
 /src/adhocracy/tests/log.html
 /src/adhocracy/tests/output.xml
 adhocracy3/
-jasmine
 *.js.map
 *.css.map

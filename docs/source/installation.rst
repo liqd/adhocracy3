@@ -51,17 +51,6 @@ install adhocracy ::
     ./python/python-3.3/bin/python ./bootstrap.py
     ./bin/buildout
 
-install adhocracy ::
-
-    ./python/python-3.3/bin/python ./bootstrap.py
-    ./bin/buildout
-
-
-install jasmin testrunner for frontend unit tests ::
-
-   virtualenv-2.7 jasmine
-   jasmine/bin/pip install Jasmine
-
 update your shell environment::
 
     source ./source_env
@@ -110,10 +99,4 @@ Open the javascript front-end with your web browser ::
 
     xdg-open http://localhost:6541/frontend_static/root.html
 
-Run frontend test suite
------------------------
-
-in order to run both unit and acceptance tests ::
-
-    ./bin/py.test ./src/adhocracy/adhocracy/frontend/tests/
 
