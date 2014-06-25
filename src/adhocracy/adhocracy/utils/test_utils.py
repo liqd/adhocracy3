@@ -1,5 +1,7 @@
 from pyramid import testing
 
+# FIXME Shouldn't the name of this file be  'test_init.py'?
+
 ################
 #  test utils  #
 ################
@@ -138,4 +140,33 @@ def test_remove_keys_from_dict_with_single_key_to_remove():
     assert remove_keys_from_dict(dictionary, keys_to_remove='key')\
         == {'other_key': 'value'}
 
-#FIXME tests for get_sheet, get_all_sheets are missing
+
+def test_exception_to_str_index_error():
+    from adhocracy.utils import exception_to_str
+    try:
+        l = []
+        l[1]
+        assert False
+    except IndexError as err:
+        err_string = exception_to_str(err)
+        assert err_string == 'IndexError: list index out of range'
+
+
+def test_exception_to_str_key_error():
+    from adhocracy.utils import exception_to_str
+    try:
+        d = {}
+        d['key']
+        assert False
+    except KeyError as err:
+        err_string = exception_to_str(err)
+        assert err_string == "KeyError: 'key'"
+
+
+def test_exception_to_str_runtime_error():
+    from adhocracy.utils import exception_to_str
+    err_string = exception_to_str(RuntimeError())
+    assert err_string == 'RuntimeError'
+
+
+# FIXME tests for get_sheet, get_all_sheets are missing
