@@ -375,19 +375,6 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
 //////////////////////////////////////////////////////////////////////
 // test widget
 
-/**
- * FIXME: this should go to some test module.
- *
- * Take a maximum delay time, an array of arguments and a function.
- * Generate random delays for each and calls the function
- * asynchronously (out of order) on each element of the array.  Ignore
- * return values of f.
- */
-var trickle = <T>($timeout: ng.ITimeoutService, maxdelay: number, xs: T[], f: (T) => void): void => {
-    xs.map((x) => $timeout(() => f(x), Math.random() * maxdelay, true));
-};
-
-
 interface WebSocketTestScope extends ng.IScope {
     messages: ServerMessage[];
     rawPaths: string;
@@ -416,10 +403,6 @@ export class WebSocketTest {
                 paths.map((path) => {
                     adhWS.subscribe(path, (serverEvent) => $scope.messages.push(serverEvent));
                 });
-
-                // FIXME: just for debugging, we send some ourselves.
-                trickle($timeout, 5000, paths, (path) => $scope.messages.push({ "event": "modified", "resource": path }));
-                trickle($timeout, 10000, paths, (path) => $scope.messages.push({ "event": "modified", "resource": path }));
             }]
         };
     };

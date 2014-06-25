@@ -159,3 +159,17 @@ export function normalizeName(name: string) : string {
 
     return name.toLowerCase().replace(/\ /g, "_");
 }
+
+/**
+ * Take a maximum delay time, an array of arguments and a function.
+ * Generate random delays (in ms) for each and calls the function
+ * asynchronously (out of order) on each element of the array.  Ignore
+ * return values of f.
+ *
+ * Example:
+ *
+ * | trickle($timeout, 5000, paths, (path) => $scope.messages.push({ "event": "modified", "resource": path }));
+ */
+var trickle = <T>($timeout: ng.ITimeoutService, maxdelay: number, xs: T[], f: (T) => void): void => {
+    xs.map((x) => $timeout(() => f(x), Math.random() * maxdelay, true));
+};
