@@ -170,6 +170,6 @@ export function normalizeName(name: string) : string {
  *
  * | trickle($timeout, 5000, paths, (path) => $scope.messages.push({ "event": "modified", "resource": path }));
  */
-var trickle = <T>($timeout: ng.ITimeoutService, maxdelay: number, xs: T[], f: (T) => void): void => {
+export var trickle = <T>($timeout: ng.ITimeoutService, maxdelay: number, xs: T[], f: (T) => void): void => {
     xs.map((x) => $timeout(() => f(x), Math.random() * maxdelay, true));
 };
