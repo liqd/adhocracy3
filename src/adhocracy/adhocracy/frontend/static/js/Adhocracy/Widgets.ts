@@ -80,7 +80,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                     adhHttp.get($scope.path).then(getHandler);
                 };
 
-                // (The call order is important: *fist* subscribe to
+                // (The call order is important: *first* subscribe to
                 // the updates, *then* get an initial copy.)
 
                 try {
