@@ -9,8 +9,8 @@ from websocket import create_connection
 from websocket import WebSocketException
 from websocket import WebSocketConnectionClosedException
 from websocket import WebSocketTimeoutException
-from pyramid.interfaces import ILocation
 
+from adhocracy.interfaces import IResource
 from adhocracy.utils import exception_to_str
 from adhocracy.websockets.schemas import Notification
 
@@ -28,7 +28,8 @@ class Client:
                if None, no connection will be set up (useful for testing)
         """
         self._ws_url = ws_url
-        self._messages_to_send = set()
+        self._created_resources = set()
+        self._modified_resources = set()
         self._ws_connection = None
         self._is_running = False
         self._is_stopped = False
@@ -40,8 +41,7 @@ class Client:
         runner = Thread(target=self._run)
         runner.daemon = True
         runner.start()
-        # FIXME better wait till self._is_running is True
-        time.sleep(2)  # give the websocket client time to connect
+        self._wait_a_bit_until_connected()
 
     def _run(self):
         """Start and keep alive connection to the websocket server."""
@@ -51,14 +51,22 @@ class Client:
                 self._connect_and_receive_and_log_messages()
             except (WebSocketConnectionClosedException, ConnectionError,
                     OSError) as err:
-                logger.warning('Error connecting to the Websocket server: %s',
+                logger.warning('Problem connecting to Websocket server: %s',
                                exception_to_str(err))
                 self._is_running = False
                 time.sleep(2)
             except WebSocketException as err:  # pragma: no cover
-                logger.warning('Error communicating with Websocket server: %s',
-                               exception_to_str(err))
+                logger.warning(
+                    'Problem communicating with Websocket server: %s',
+                    exception_to_str(err))
                 time.sleep(2)
+
+    def _wait_a_bit_until_connected(self):
+        """Wait until the connection has been set up, but at most 2.5 secs."""
+        for i in range(25):  # pragma: no branch
+            if self._is_running:
+                break
+            time.sleep(.1)
 
     def _connect_and_receive_and_log_messages(self):
         self._connect_to_server()
@@ -117,27 +125,33 @@ class Client:
                            ' try again later')
 
     def _send_messages(self):
-        for message in self._messages_to_send:
-            # FIXME ensure that created and modified events aren't send twice
-            logger.debug('Try sending message to Websocket server: %s',
-                         message)
-            self._ws_connection.send(message)
-            logger.debug('Sent message to Websocket server')
-        # FIXME if an exception is raised, messages are send twice, that's bad.
-        self._messages_to_send.clear()
+        handled_resources = set()
 
-    def add_message_resource_created(self, resource: ILocation):
+        while self._created_resources:
+            resource = self._created_resources.pop()
+            handled_resources.add(resource)
+            self.send_resource_event(resource, 'created')
+
+        while self._modified_resources:
+            resource = self._modified_resources.pop()
+            if resource not in handled_resources:
+                handled_resources.add(resource)
+                self.send_resource_event(resource, 'modified')
+
+    def send_resource_event(self, resource: IResource, event_type: str):
+        schema = Notification().bind(context=resource)
+        message = schema.serialize({'event': event_type, 'resource': resource})
+        message_text = json.dumps(message)
+        logger.debug('Sending message to Websocket server: %s', message_text)
+        self._ws_connection.send(message_text)
+
+    def add_message_resource_created(self, resource: IResource):
         """Notify the WS server of a newly created resource."""
-        schema = Notification().bind(context=resource)
-        # FIXME better serialize messages later
-        message = schema.serialize({'event': 'created', 'resource': resource})
-        self._messages_to_send.add(json.dumps(message))
+        self._created_resources.add(resource)
 
-    def add_message_resource_modified(self, resource: ILocation):
+    def add_message_resource_modified(self, resource: IResource):
         """Notify the WS server of a modified resource."""
-        schema = Notification().bind(context=resource)
-        message = schema.serialize({'event': 'modified', 'resource': resource})
-        self._messages_to_send.add(json.dumps(message))
+        self._modified_resources.add(resource)
 
     def stop(self):
         self._is_stopped = True

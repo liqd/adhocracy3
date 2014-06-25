@@ -20,9 +20,14 @@ class DummyWSConnection():
         self.nothing_sent = True
         self.close_reason = None
         self.pong_text = None
+        self.queue = []
 
     def recv_frame(self):
         return self.dummy_frame
+
+    def send(self, message):
+        self.nothing_sent = False
+        self.queue.append(message)
 
     def send_close(self, reason: bytes):
         self.nothing_sent = False
@@ -67,6 +72,13 @@ class ClientUnitTests(unittest.TestCase):
         client._ws_connection = self._dummy_connection
         return client
 
+    def _make_resource(self, name='child'):
+        from pyramid.testing import DummyResource
+        context = DummyResource()
+        resource = DummyResource()
+        context[name] = resource
+        return resource
+
     def test_receive_text_frame(self):
         frame = ABNF(opcode=ABNF.OPCODE_TEXT, data='hello dear')
         client = self._make_one(frame)
@@ -102,6 +114,69 @@ class ClientUnitTests(unittest.TestCase):
         assert self._dummy_connection.nothing_sent is True
         assert self._dummy_connection.connected is True
 
+    def test_send_messages_empty_queue(self):
+        client = self._make_one(None)
+        client._is_running = True
+        client.send_messages()
+        assert self._dummy_connection.nothing_sent is True
+
+    def test_send_messages_nonempty_queue(self):
+        client = self._make_one(None)
+        client._is_running = True
+        child = self._make_resource()
+        client.add_message_resource_created(child)
+        client.send_messages()
+        assert self._dummy_connection.nothing_sent is False
+        assert len(self._dummy_connection.queue) == 1
+        assert 'created' in self._dummy_connection.queue[0]
+
+    def test_send_messages_if_not_running(self):
+        client = self._make_one(None)
+        client._is_running = False
+        child = self._make_resource()
+        client.add_message_resource_created(child)
+        client.send_messages()
+        assert self._dummy_connection.nothing_sent is True
+
+    def test_send_messages_duplicate_modified(self):
+        """If a resource has been modified (or created) twice, only one
+        event should be sent.
+        """
+        client = self._make_one(None)
+        client._is_running = True
+        child = self._make_resource()
+        client.add_message_resource_modified(child)
+        client.add_message_resource_modified(child)
+        client.send_messages()
+        assert self._dummy_connection.nothing_sent is False
+        assert len(self._dummy_connection.queue) == 1
+        assert 'modified' in self._dummy_connection.queue[0]
+
+    def test_send_messages_created_and_modified(self):
+        """If a resource has been created and then modified, only a
+        'created' event should be sent.
+        """
+        client = self._make_one(None)
+        client._is_running = True
+        child = self._make_resource()
+        client.add_message_resource_created(child)
+        client.add_message_resource_modified(child)
+        client.send_messages()
+        assert self._dummy_connection.nothing_sent is False
+        assert len(self._dummy_connection.queue) == 1
+        assert 'created' in self._dummy_connection.queue[0]
+
+    def test_send_messages_two_resources(self):
+        client = self._make_one(None)
+        client._is_running = True
+        child = self._make_resource()
+        child2 = self._make_resource('child2')
+        client.add_message_resource_created(child)
+        client.add_message_resource_created(child2)
+        client.send_messages()
+        assert self._dummy_connection.nothing_sent is False
+        assert len(self._dummy_connection.queue) == 2
+
 
 class TestFunctionalClient:
 
@@ -133,9 +208,14 @@ class TestFunctionalClient:
     def test_send_messages(self, websocket):
         try:
             self.setUp()
-            self.client._messages_to_send.add('dummy message')
+            from pyramid.testing import DummyResource
+            context = DummyResource()
+            child = DummyResource()
+            context['child'] = child
+            self.client.add_message_resource_created(child)
+            assert child in self.client._created_resources
             self.client._send_messages()
-            assert 'dummy message' not in self.client._messages_to_send
+            assert child not in self.client._created_resources
         finally:
             self.tearDown()
 
