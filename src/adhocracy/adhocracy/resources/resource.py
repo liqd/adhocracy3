@@ -30,4 +30,5 @@ resource_metadata_defaults = resource_metadata._replace(
     content_class=Base,
     permission_add='add',
     permission_view='view',
+    after_creation=[],
 )

@@ -120,6 +120,62 @@ class AbsolutePath(unittest.TestCase):
             inst.validator(inst, 'blu.ABC_12-3')
 
 
+class ResourceObjectUnitTests(unittest.TestCase):
+
+    def make_one(self):
+        from adhocracy.schema import ResourceObject
+        return ResourceObject()
+
+    def setUp(self):
+        self.context = testing.DummyResource()
+        self.child = testing.DummyResource()
+
+    def test_serialize_colander_null(self):
+        inst = self.make_one()
+        result = inst.serialize(None, colander.null)
+        assert result == colander.null
+
+    def test_serialize_value_location_aware(self):
+        inst = self.make_one()
+        self.context['child'] = self.child
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.serialize(node, self.child)
+        assert result == '/child'
+
+    def test_serialize_value_not_location_aware(self):
+        inst = self.make_one()
+        del self.child.__parent__
+        del self.child.__name__
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        with pytest.raises(colander.Invalid):
+            inst.serialize(node, self.child)
+
+    def test_serialize_value_location_aware_without_parent_and_name(self):
+        inst = self.make_one()
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.serialize(node, self.child)
+        assert result == '/'
+
+    def test_deserialize_value_null(self):
+        inst = self.make_one()
+        node = colander.Mapping()
+        result = inst.deserialize(node, colander.null)
+        assert result == colander.null
+
+    def test_deserialize_value_valid_path(self):
+        inst = self.make_one()
+        self.context['child'] = self.child
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.deserialize(node, '/child')
+        assert result == self.child
+
+    def test_deserialize_value_invalid_path(self):
+        inst = self.make_one()
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        with pytest.raises(colander.Invalid):
+            inst.deserialize(node, ['/wrong_child'])
+
+
 class PathListSetUnitTest(unittest.TestCase):
 
     def make_one(self):

@@ -160,3 +160,19 @@ def remove_keys_from_dict(dictionary: dict, keys_to_remove=()) -> dict:
         if key not in keys_to_remove:
             dictionary_copy[key] = value
     return dictionary_copy
+
+
+def exception_to_str(err: Exception):
+    """Convert an exception to a string.
+
+    :param err: the exception
+    :return: "{type}: {str}", where {type} is the class name of the exception
+              and {str} is the result of calling `str(err)`; or just "{type}"
+              if {str} is empty
+    """
+    name = err.__class__.__name__
+    desc = str(err)
+    if desc:
+        return '{}: {}'.format(name, desc)
+    else:
+        return name

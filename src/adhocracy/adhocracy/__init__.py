@@ -14,7 +14,7 @@ def root_factory(request, t=transaction, g=get_connection,
     It accepts a request and returns an instance of the ``Root`` content type.
 
     """
-    # FIXME: Fix substanced bug: mark_unfinished_as_finished keyqord
+    # FIXME: Fix substanced bug: mark_unfinished_as_finished keyword
     # is not working
     conn = g(request)
     zodb_root = conn.root()
@@ -26,13 +26,24 @@ def root_factory(request, t=transaction, g=get_connection,
         if mark_unfinished_as_finished:  # pragma: no cover
             markunf(app_root, registry, t)
         t.commit()
+    add_after_commit_hooks(request)
     return zodb_root['app_root']
+
+
+def add_after_commit_hooks(request):
+    """Add after commit hook to notify the websocket server."""
+    # FIXME this is a quick hack
+    from adhocracy.websockets.client import send_messages_after_commit_hook
+    current_transaction = transaction.get()
+    registry = request.registry
+    current_transaction.addAfterCommitHook(send_messages_after_commit_hook,
+                                           args=(registry,))
 
 
 def includeme(config):  # pragma: no cover
     """Setup basic adhocracy."""
     # FIXME: Fix substanced.sdi bug: you need to register the authorisation
-    # utility first, # then the auhentication.
+    # utility first, then the authentication.
     authz_policy = ACLAuthorizationPolicy()
     config.set_authorization_policy(authz_policy)
     # handle exceptions in productive installations
@@ -42,16 +53,16 @@ def includeme(config):  # pragma: no cover
     config.include('substanced')
     config.commit()  # commit to allow proper config overrides
     config.include('.sheets')
-    # By default there are now resource types included.
+    # By default only the pool resource type is included.
     # Your extension package needs to explicit include them.
-    # config.include('.resources.tag')
-    # config.include('.resources.pool')
+    config.include('.resources.pool')
     config.include('.events')
     config.include('.subscriber')
     config.include('.registry')
     config.include('.evolution')
     config.include('.graph')
     config.include('.rest')
+    config.include('.websockets')
     config.include('.frontend')
 
 

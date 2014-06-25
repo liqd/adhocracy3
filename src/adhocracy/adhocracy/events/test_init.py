@@ -4,6 +4,40 @@ from pyramid import testing
 from zope.interface.verify import verifyObject
 
 
+class ResourceCreatedAndAddedUnitTest(unittest.TestCase):
+
+    def _makeOne(self, *arg):
+        from adhocracy.events import ResourceCreatedAndAdded
+        return ResourceCreatedAndAdded(*arg)
+
+    def test_create(self):
+        from adhocracy.interfaces import IResourceCreatedAndAdded
+        context = testing.DummyResource()
+        parent = testing.DummyResource()
+
+        inst = self._makeOne(context, parent)
+
+        assert IResourceCreatedAndAdded.providedBy(inst)
+        assert verifyObject(IResourceCreatedAndAdded, inst)
+
+
+class ResourceSheetModifiedUnitTest(unittest.TestCase):
+
+    def _makeOne(self, *arg):
+        from adhocracy.events import ResourceSheetModified
+        return ResourceSheetModified(*arg)
+
+    def test_create(self):
+        from adhocracy.interfaces import IResourceSheetModified
+        context = testing.DummyResource()
+        parent = testing.DummyResource()
+
+        inst = self._makeOne(context, parent)
+
+        assert IResourceSheetModified.providedBy(inst)
+        assert verifyObject(IResourceSheetModified, inst)
+
+
 class ItemNewVersionAddedUnitTest(unittest.TestCase):
 
     def _makeOne(self, *arg):

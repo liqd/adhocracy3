@@ -1,7 +1,7 @@
 """Rest API views."""
 from copy import deepcopy
+from logging import getLogger
 import functools
-import logging
 
 from colander import SchemaNode
 from colander import MappingSchema
@@ -35,7 +35,7 @@ from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
 
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 def validate_sheet_cstructs(context, request: Request, sheets=[]):
@@ -160,10 +160,10 @@ def validate_request_data(context, request: Request, schema=MappingSchema,
 
 
 def _log_request_errors(request: Request):
-    logger.warn('Found %i validation errors in request: <%s>',
-                len(request.errors), request.body)
+    logger.warning('Found %i validation errors in request: <%s>',
+                   len(request.errors), request.body)
     for error in request.errors:
-        logger.warn('  %s', error)
+        logger.warning('  %s', error)
 
 
 def validate_request_data_decorator():

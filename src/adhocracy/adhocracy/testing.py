@@ -60,6 +60,27 @@ def zeo(request) -> bool:
     return True
 
 
+@pytest.fixture(scope='class')
+def websocket(request, zeo) -> bool:
+    """Start websocket server."""
+    is_running = os.path.isfile('var/WS_SERVER.pid')
+    if is_running:
+        return True
+    config_file = request.config.getvalue('pyramid_config')
+    process = subprocess.Popen('bin/start_ws_server ' + config_file,
+                               shell=True,
+                               stderr=subprocess.STDOUT)
+    time.sleep(2)
+
+    def fin():
+        print('teardown websocket server')
+        process.kill()
+        _kill_pid_in_file('var/WS_SERVER.pid')
+
+    request.addfinalizer(fin)
+    return True
+
+
 def _kill_pid_in_file(path_to_pid_file):
     if os.path.isfile(path_to_pid_file):
         pid = open(path_to_pid_file).read().strip()
@@ -72,7 +93,7 @@ def _kill_pid_in_file(path_to_pid_file):
 
 
 @pytest.fixture(scope='class')
-def app(zeo, config):
+def app(zeo, config, websocket):
     """Return the adhocracy wsgi application."""
     from adhocracy import includeme
     includeme(config)

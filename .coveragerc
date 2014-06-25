@@ -2,4 +2,6 @@
 branch = True
 omit =
     *test*py
+    # indirectly tested via websocket fixture:
+    src/adhocracy/adhocracy/websockets/start_ws_server.py
 

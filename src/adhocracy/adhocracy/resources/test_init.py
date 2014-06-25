@@ -7,6 +7,7 @@ import pytest
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import sheet_metadata
+from adhocracy.interfaces import IResourceCreatedAndAdded
 
 
 #############
@@ -184,7 +185,8 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         self.make_one(meta)(appstructs=appstructs)
 
-        assert dummy_sheet.return_value.set.called
+        assert dummy_sheet.return_value.set.call_args[0] == ({'count': 0},)
+        assert dummy_sheet.return_value.set.call_args[1]['send_event'] is False
 
     def test_call_with_not_creatable_appstructs_data(self):
         meta = self.metadata._replace(iresource=IResource,
@@ -265,3 +267,17 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         self.make_one(meta)(parent=self.context)
 
         assert 'prefix_0000000' in self.context
+
+    def test_notify_new_resource_created_and_added(self):
+        events = []
+        listener = lambda event: events.append(event)
+        self.config.add_subscriber(listener, IResourceCreatedAndAdded)
+
+        meta = self.metadata._replace(iresource=IResource,
+                                      use_autonaming=True)
+
+        resource = self.make_one(meta)(parent=self.context)
+
+        assert IResourceCreatedAndAdded.providedBy(events[0])
+        assert events[0].object == resource
+        assert events[0].parent == self.context

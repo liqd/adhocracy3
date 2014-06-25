@@ -42,7 +42,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions):
 
 
 def _update_resource(resource, sheet, appstruct):
-    sheet.set(appstruct)  # FIXME: make sure modified event is send
+    sheet.set(appstruct)
     return resource
 
 

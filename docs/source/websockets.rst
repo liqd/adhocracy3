@@ -1,0 +1,205 @@
+Asynchronous Backend-Frontend Communication Via Web Sockets
+===========================================================
+
+The basic idea is very simple: clients need to be able to subscribe and
+unsubscribe to (changes of) a given object.  If an object changes and a client
+is subscribed to it, that client will receive a notification.
+
+We implement this by opening one web-socket per client (= frontend) at the
+beginning of a session.  Subscribe and unsubscribe requests are sent from
+client to server (= backend), and change notifications are sent from server to
+client.  The client is responsible to handle and dispatch each particular
+change to the parts of the GUI that care about it.
+
+
+Client Messages
+---------------
+
+Both client and server send messages in JSON format.
+
+Client messages have the following structure::
+
+    { "action": "ACTION", "resource": "RESOURCE_PATH" }
+
+ACTION is one of:
+
+* "subscribe" to start receiving updates about a resource. If the client has
+  already sent an earlier subscribe request for that resource, the new request
+  is silently ignored.
+* "unsubscribe" to stop receiving updates about a resource. If the client
+  is not currently subscribed to that resource, the request is silently
+  ignored.
+
+For example::
+
+    { "action": "subscribe", "resource": "/adhocracy/prop1/" }
+
+And later::
+
+    { "action": "unsubscribe", "resource": "/adhocracy/prop1/" }
+
+
+Server Messages
+---------------
+
+Responses to Client Messages
+++++++++++++++++++++++++++++
+
+Status Confirmations
+~~~~~~~~~~~~~~~~~~~~
+
+If a client request was processed successfully by the server, it sends a status
+confirmation::
+
+    { "status": "STATUS", "action": "ACTION", "resource": "RESOURCE_PATH" }
+
+STATUS is either:
+
+* "ok" if the request was processed successfully and changed the internal state
+  of the server.
+* "redundant" if the request was unnecessary since it already corresponded to
+  internal state of the server (the client tried to subscribe to a resource it
+  has already subscribed or to unsubscribe from a resource it hasn't
+  subscribed).
+
+The "action" and "resource" fields repeat the corresponding values from the
+client request.
+
+Error Messages
+~~~~~~~~~~~~~~
+
+Otherwise, if the server didn't understand a request sent by the server or
+could not handle it, is responds with an error message::
+
+    { "error": "ERROR_CODE", "details": "DETAILS" }
+
+ERROR_CODE will be one of the following:
+
+* "unknown_action" if the client asked for an action that the server doesn't
+  understand (neither "subscribe" nor "unsubscribe"). DETAILS contains the
+  unknown action.
+* "unknown_resource" if a client specified a resource path that is unknown to
+  the server. DETAILS contains the unknown resource path.
+* "malformed_message" if the client sent a message that cannot be parsed as
+  JSON. DETAILS contains a parsing error message.
+* "invalid_json" if the client sent a message this is JSON but doesn't contain
+  the expected information (for example, if it's a JSON array instead of a JSON
+  object or if "action" or "resource" keys are missing or their values aren't
+  strings). DETAILS contains a short description of the problem.
+* "subscribe_not_supported" if the client tried to subscribe to an ItemVersion.
+  DETAILS contains the path of resource that doesn't allow subscriptions.
+* "internal_error" if an internal error occurred at the server. DETAILS
+  contains a short description of the problem. In an ideal world,
+  this will never happen.
+
+Note that it is not always possible to provide action and resource of
+the respective request (e.g. with "invalid_jason").  The client needs
+to keep track of the order in which it sends the requests, and has to
+associate the responses with that list.  Responses (errors or not) are
+guaranteed to be sent to the frontend in the same order as requests
+are sent to the backend.
+
+Notifications
++++++++++++++
+
+Whenever one of the subscribed resources is changed, the server sends a message
+to the client.  Which messages are sent depends on the type of the resource
+that has been subscribed.
+
+* If resource is a Simple (e.g. a Tag):
+
+  * If the value of the Simple has changed::
+
+        { "event": "modified", "resource": "RESOURCE_PATH" }
+
+* If resource is a Pool:
+
+  * If some of the Pool's metadata has changed (e.g. its title)::
+
+        { "event": "modified", "resource": "RESOURCE_PATH" }
+
+    (Same as with Simples.)
+
+  * If a new child (sub-Pool or Item) is added to the Pool::
+
+        { "event": "new_child",
+          "resource": "RESOURCE_PATH",
+          "child": "CHILD_RESOURCE_PATH" }
+
+  * If a child (sub-Pool or Item) is removed from the Pool::
+
+        { "event": "removed_child",
+          "resource": "RESOURCE_PATH",
+          "child": "CHILD_RESOURCE_PATH" }
+
+  * If a child (sub-Pool or Item) in the Pool is modified::
+
+        { "event": "modified_child",
+          "resource": "RESOURCE_PATH",
+          "child": "CHILD_RESOURCE_PATH" }
+
+    (Rationale for modify: a pool is probably rendered as a table of
+    contents, and if the title of an object changes, the table of contents
+    must be re-rendered.)
+
+* If resource is an Item (e.g. a Proposal):
+
+  * If a new sub-Item is added to the Item (e.g. a Section)::
+
+        { "event": "new_child",
+          "resource": "RESOURCE_PATH",
+          "child": "CHILD_RESOURCE_PATH" }
+
+    (Same as with Pool.)
+
+  * If a new ItemVersion is added to the Item::
+
+        { "event": "new_version",
+          "resource": "RESOURCE_PATH",
+          "version": "VERSION_RESOURCE_PATH" }
+
+  * NO explicit notifications are sent if one of the sub-Items is changed,
+    e.g. if a new sub-Section or SectionVersion is added to a Section
+    within this Item. However, this should hardly matter since the
+    top-level Item (e.g. a Proposal) will usually be changed every time a
+    sub-Item is changed (changes result in a new version which is added to
+    the top-level Item). Only if the frontend wants to keep track of
+    isolated changes in a sub-Item, it needs to subscribe to it explicitly.
+
+* If resource is an ItemVersion: subscriptions to ItemVersions are
+  currently unsupported. This may change in the future if we see the need
+  for it.
+
+  (POSSIBLE FUTURE WORK:
+
+  * If a direct successor version is created (whose "follows" link points to
+    this version)::
+
+        { "event": "new_successor",
+          "resource": "RESOURCE_PATH",
+          "successor": "SUCCESSOR_RESOURCE_PATH" }
+
+  * NO notification is sent if an indirect successor is created (a
+    successor of a successor).
+
+  )
+
+
+Re-Connects
+-----------
+
+There is no way to recover the state of a broken connection.  The backend
+handles every disconnect by discarding all subscriptions.
+
+Therefore, if the WS connection ends for any reason, the frontend must
+re-connect, flush its cache, and reload and re-subscribe to every resource that
+is still relevant.
+
+(POSSIBLE FUTURE WORK: If WS connections prove to be unstable enough to make
+the above approach cause too much overhead, the backend may maintain the
+session for a configurable amount of time.  If the frontend re-connects in
+that time window and presents a session key, it will receive a list of change
+notifications that it missed during the broken connection, and it won't have to
+flush its cache.  The session key could either be negotiated over the WS, or
+there may be some token provided by substance_d / angular / somebody that can
+be used for this.)

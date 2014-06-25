@@ -16,6 +16,9 @@ requires = [
     'substanced',
     'pyramid_tm',
     'cornice',
+    'autobahn',
+    'asyncio',
+    'websocket-client-py3',
     ]
 
 test_requires = [
@@ -53,6 +56,8 @@ setup(name='adhocracy',
       main = adhocracy:main
       [pytest11]
       adhocracy = adhocracy.testing
+      [console_scripts]
+      start_ws_server = adhocracy.websockets.start_ws_server:main
       """,
       )
 

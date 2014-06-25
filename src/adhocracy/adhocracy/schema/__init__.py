@@ -9,6 +9,56 @@ import pytz
 from adhocracy.interfaces import SheetReference
 
 
+def raise_attribute_error_if_not_location_aware(context) -> None:
+    """Ensure that the argument is location-aware.
+
+    :raise AttributeError: if it isn't
+
+    """
+    context.__parent__
+    context.__name__
+
+
+def serialize_path(node, value):
+    """Serialize object to path with 'pyramid.traveral.resource_path'.
+
+    :param node: the Colander node
+    :param value: the resource to serialize
+    :return: the path of that resource
+
+    """
+    if value is colander.null:
+        return value
+    try:
+        raise_attribute_error_if_not_location_aware(value)
+        return resource_path(value)
+    except AttributeError:
+        raise colander.Invalid(
+            node,
+            msg='This resource is not location aware', value=value)
+
+
+def deserialize_path(node, value):
+    """Deserialize path to object.
+
+    :param node: the Colander node
+    :param value: the path to deserialize
+    :return: the resource registered under that path
+
+    """
+    if value is colander.null:
+        return value
+    context = node.bindings['context']
+    try:
+        resource = find_resource(context, value)
+        raise_attribute_error_if_not_location_aware(resource)
+    except (KeyError, AttributeError):
+        raise colander.Invalid(
+            node,
+            msg='This resource path does not exist.', value=value)
+    return resource
+
+
 def name_is_unique_validator(node: colander.SchemaNode, value: str):
     """Validate if `value` is name that does not exists in the parent object.
 
@@ -89,6 +139,21 @@ class AbsolutePath(colander.SchemaNode):
     validator = colander.Regex(u'^/[a-zA-Z0-9\_\-\.\/]+$')
 
 
+class ResourceObject(colander.SchemaType):
+
+    """Resource object that automatically deserialized itself to a path.
+
+    Example value: like AbsolutePath, e.g. '/bluaABC/_123/3'
+
+    """
+
+    def serialize(self, node, value):
+        return serialize_path(node, value)
+
+    def deserialize(self, node, value):
+        return deserialize_path(node, value)
+
+
 class AbstractIterableOfPaths(IdSet):
 
     """Abstract Colander type to store multiple object paths.
@@ -112,10 +177,6 @@ class AbstractIterableOfPaths(IdSet):
         """Add an element to the container to used to store paths."""
         raise NotImplementedError()  # pragma: no cover
 
-    def _raise_attribute_error_if_not_location_aware(self, context):
-        context.__parent__
-        context.__name__
-
     def serialize(self, node, value):
         """Serialize object to path with 'pyramid.traveral.resource_path'.
 
@@ -127,14 +188,7 @@ class AbstractIterableOfPaths(IdSet):
         self._check_iterable(node, value)
         paths = []
         for resource in value:
-            try:
-                self._raise_attribute_error_if_not_location_aware(resource)
-                path = resource_path(resource)
-            except AttributeError:
-                raise colander.Invalid(
-                    node,
-                    msg='This resource is not location aware', value=resource)
-            paths.append(path)
+            paths.append(serialize_path(node, resource))
         return paths
 
     def deserialize(self, node, value):
@@ -149,16 +203,9 @@ class AbstractIterableOfPaths(IdSet):
         if value is colander.null:
             return value
         self._check_iterable(node, value)
-        context = node.bindings['context']
         resources = self.create_empty_appstruct()
         for path in value:
-            try:
-                resource = find_resource(context, path)
-                self._raise_attribute_error_if_not_location_aware(resource)
-            except (KeyError, AttributeError):
-                raise colander.Invalid(
-                    node,
-                    msg='This resource path does not exist.', value=path)
+            resource = deserialize_path(node, path)
             self.add_to_appstruct(resources, resource)
         return resources
 

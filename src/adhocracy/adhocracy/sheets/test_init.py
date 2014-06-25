@@ -146,6 +146,37 @@ class ResourcePropertySheetUnitTests(unittest.TestCase):
             == (self.context, [target], node.reftype)
 
 
+class ResourcePropertyIntegrationTests(unittest.TestCase):
+
+    def _make_one(self, *args):
+        from adhocracy.sheets import GenericResourceSheet
+        return GenericResourceSheet(*args)
+
+    def setUp(self):
+        from adhocracy.sheets import sheet_metadata
+        self.config = testing.setUp()
+        self.context = testing.DummyResource()
+        self.metadata = sheet_metadata._replace(isheet=ISheet,
+                                                schema_class=colander.MappingSchema,
+                                                readable=True,
+                                                editable=True,
+                                                creatable=True)
+
+    def tearDown(self):
+            testing.tearDown()
+
+    def test_notify_resource_sheet_modified(self):
+        from adhocracy.interfaces import IResourceSheetModified
+        events = []
+        listener = lambda event: events.append(event)
+        self.config.add_subscriber(listener, IResourceSheetModified)
+        inst = self._make_one(self.metadata, self.context)
+
+        inst.set({'dummy': 'data'})
+
+        assert IResourceSheetModified.providedBy(events[0])
+        assert events[0].object == self.context
+
 class AddSheetToRegistryIntegrationTest(unittest.TestCase):
 
     def setUp(self):
@@ -242,3 +273,5 @@ class AddSheetToRegistryIntegrationTest(unittest.TestCase):
 
         with pytest.raises(AssertionError):
             self._make_one(metadata_b, self.config.registry)
+
+

@@ -5,7 +5,7 @@ import pytest
 
 
 @pytest.fixture(scope='class')
-def app_sample(zeo, config):
+def app_sample(zeo, config, websocket):
     """Return the adhocracy wsgi application."""
     from adhocracy_sample import includeme
     includeme(config)

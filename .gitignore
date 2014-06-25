@@ -3,6 +3,7 @@
 *.swo
 *.pyc
 *.pyo
+*.log
 __pycache__
 /eggs
 /parts
@@ -12,6 +13,7 @@ __pycache__
 .installed.cfg
 .mr.developer.cfg
 .sass-cache
+.idea
 /bin
 /docs/build
 /docs/styleguide/*
@@ -51,7 +53,6 @@ a3-backend-mockup
 /src/adhocracy/tests/report.html
 /src/adhocracy/tests/log.html
 /src/adhocracy/tests/output.xml
-.idea/
 adhocracy3/
 *.js.map
 *.css.map

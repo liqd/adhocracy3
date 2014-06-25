@@ -2,10 +2,12 @@
 from persistent.mapping import PersistentMapping
 import colander
 from pyramid.registry import Registry
+from pyramid.threadlocal import get_current_registry
 from substanced.property import PropertySheet
 from zope.interface import implementer
 
 from adhocracy.utils import find_graph
+from adhocracy.events import ResourceSheetModified
 from adhocracy.interfaces import IResourceSheet
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import sheet_metadata
@@ -84,12 +86,13 @@ class GenericResourceSheet(PropertySheet):
                 appstruct[key] = references.get(key, default_value)
         return appstruct
 
-    def set(self, appstruct: dict, omit=()) -> bool:
+    def set(self, appstruct: dict, omit=(), send_event=True) -> bool:
         """Store appstruct."""
         struct = remove_keys_from_dict(appstruct, keys_to_remove=omit)
         self._store_references(struct)
         self._store_non_references(struct)
         # FIXME: only store struct if values have changed
+        self._notify_resource_sheet_modified(send_event)
         return bool(struct)
 
     def _store_references(self, appstruct):
@@ -102,6 +105,12 @@ class GenericResourceSheet(PropertySheet):
 
     def _store_non_references(self, appstruct):
         self._data.update(appstruct)
+
+    def _notify_resource_sheet_modified(self, send_event):
+        registry = get_current_registry(self.context)
+        if send_event and registry is not None:
+            event = ResourceSheetModified(self.context, self.meta.isheet)
+            registry.notify(event)
 
     def validate_cstruct(self, cstruct: dict) -> dict:
         """Validate schema :term:`cstruct`."""

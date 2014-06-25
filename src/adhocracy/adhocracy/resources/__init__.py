@@ -7,6 +7,7 @@ from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
 from adhocracy.interfaces import ResourceMetadata
+from adhocracy.events import ResourceCreatedAndAdded
 from adhocracy.sheets.name import IName
 from adhocracy.utils import get_sheet
 
@@ -60,6 +61,14 @@ class ResourceFactory:
             raise KeyError
         parent.add(name, resource, send_events=False)
 
+    def _notify_new_resource_created_and_added(self, resource):
+        registry = get_current_registry(resource.__parent__)
+        has_parent = resource.__parent__ is not None
+        if has_parent and registry is not None:
+            event = ResourceCreatedAndAdded(object=resource,
+                                            parent=resource.__parent__)
+            registry.notify(event)
+
     def __call__(self,
                  parent=None,
                  appstructs={},
@@ -109,22 +118,12 @@ class ResourceFactory:
                 isheet = DottedNameResolver().maybe_resolve(key)
                 sheet = get_sheet(resource, isheet)
                 if sheet.meta.creatable:
-                    sheet.set(struct)
+                    sheet.set(struct, send_event=False)
 
         if run_after_creation:
             registry = get_current_registry()
             for call in self.meta.after_creation:
                 call(resource, registry, options=kwargs)
 
+        self._notify_new_resource_created_and_added(resource)
         return resource
-
-
-def includeme(config):  # pragma: no cover
-    """Include all resource types in this package.
-
-    Example include:
-        config.include('.pool')
-        config.include('.tag')
-        config.include('.itemversion')
-        config.include('.item')
-    """
