@@ -19,9 +19,13 @@ var config : Config.Type = {
 
 var createAdhHttpMock = () => {
     return <any>jasmine.createSpyObj("adhHttpMock", ["get"]);
+
+    // FIXME: typescript should know from description file that
+    // jasmine has this method!  (there are other instances of the
+    // same issue further down.)
 };
 
-var registerDirectiveSpec = (directive) => {
+var registerDirectiveSpec = (directive: ng.IDirective): void => {
     it("has an isolated scope", () => {
         expect(directive.scope).toBeDefined();
     });
@@ -78,7 +82,7 @@ export var register = () => {
                 adapter.elemRefs.andReturn(elements);
 
                 var listing = new Widgets.Listing(adapter);
-                var directive = listing.createDirective(config);
+                var directive: ng.IDirective = listing.createDirective(config);
 
                 registerDirectiveSpec(directive);
 
@@ -99,7 +103,7 @@ export var register = () => {
                         };
 
                         runs(() => {
-                            var controller = <any>directive.controller[3];
+                            var controller = directive.controller[3];
                             controller(scope, adhHttpMock, () => {
                                 asyncFlag = true;
                             });
@@ -121,7 +125,7 @@ export var register = () => {
                         };
 
                         runs(() => {
-                            var controller = <any>directive.controller[3];
+                            var controller = directive.controller[3];
                             controller(scope, adhHttpMock, () => {
                                 asyncFlag = true;
                             });
@@ -270,7 +274,7 @@ export var register = () => {
                 elementAdapterMock.name.andCallFake((path) => path);
 
                 var listingElement = new Widgets.ListingElement(<any>elementAdapterMock);
-                var directive = listingElement.createDirective(config);
+                var directive: ng.IDirective = listingElement.createDirective(config);
 
                 registerDirectiveSpec(directive);
 
