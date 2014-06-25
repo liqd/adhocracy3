@@ -3,7 +3,8 @@ require.config({
     paths: {
         jquery: '../lib/jquery/jquery',
         angular: '../lib/angular/angular',
-        underscore: '../lib/underscore/underscore'
+        underscore: '../lib/underscore/underscore',
+        q: '../lib/q/q'
     },
     shim: {
         jquery: {

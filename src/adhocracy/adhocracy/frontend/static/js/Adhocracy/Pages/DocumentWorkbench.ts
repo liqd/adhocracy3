@@ -9,6 +9,7 @@ import Types = require("../Types");
 import AdhHttp = require("../Services/Http");
 import AdhUser = require("../Services/User");
 import AdhConfig = require("../Services/Config");
+import AdhDone = require("../Services/Done");
 
 import Resources = require("../Resources");
 import Widgets = require("../Widgets");
@@ -55,6 +56,7 @@ export var run = () => {
 
     AdhUser.register(app, "adhUser", "adhLogin");
     AdhConfig.register(app, "adhConfig");
+    AdhDone.register(app, "adhDone");
 
     // services
 
