@@ -48,8 +48,11 @@ class Formatter(object):
 
     def format_suite(self, suite):
         """Format a jasmine suite into a string."""
-        result = self.results[str(suite['id'])]
-        result_s = self.format_result(result)
+        if suite['type'] == 'spec':
+            result = self.results[str(suite['id'])]
+            result_s = self.format_result(result)
+        else:
+            result_s = ''
         children = suite['children']
         children_s = '\n\n'.join((self.format_suite(c) for c in children))
         if result_s and children_s:
