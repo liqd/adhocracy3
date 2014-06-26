@@ -56,8 +56,13 @@ export interface IVersionsSheet {
 export interface PartialIProposalVersion extends Resource, HasIDocumentSheet {}
 
 export class Resource {
+    /* This data will be sent directly to the server. So we need
+     * to ignore some formatting conventions here. */
+    /* tslint:disable:variable-name */
     content_type : string;
     data : Object;
+    /* tslint:enable:variable-name */
+
     constructor(content_type: string) {
         this.content_type = content_type;
         this.data = {};
