@@ -68,8 +68,8 @@ client request.
 Error Messages
 ~~~~~~~~~~~~~~
 
-Otherwise, if the server didn't understand a request sent by the server or
-could not handle it, is responds with an error message::
+Otherwise, if the server didn't understand a request sent by the client or
+could not handle it, it responds with an error message::
 
     { "error": "ERROR_CODE", "details": "DETAILS" }
 
@@ -82,7 +82,7 @@ ERROR_CODE will be one of the following:
   the server. DETAILS contains the unknown resource path.
 * "malformed_message" if the client sent a message that cannot be parsed as
   JSON. DETAILS contains a parsing error message.
-* "invalid_json" if the client sent a message this is JSON but doesn't contain
+* "invalid_json" if the client sent a message that is JSON but doesn't contain
   the expected information (for example, if it's a JSON array instead of a JSON
   object or if "action" or "resource" keys are missing or their values aren't
   strings). DETAILS contains a short description of the problem.
