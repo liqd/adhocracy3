@@ -48,14 +48,17 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
         return $http.put(path, obj).then(importContent, logBackendError);
     }
 
-    function postNewVersion(oldVersionPath : string, obj : Content) : ng.IPromise<Content> {
+    function postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
         var dagPath = Util.parentPath(oldVersionPath);
-        var config = {
-            headers: {follows: oldVersionPath},
-            params: {}
+        var _obj = exportContent(obj);
+        _obj.data["adhocracy.sheets.versions.IVersionable"] = {
+            follows: [oldVersionPath]
         };
+        if (typeof rootVersions !== "undefined") {
+            _obj.root_versions = rootVersions;
+        }
         return $http
-            .post(dagPath, exportContent(obj), config)
+            .post(dagPath, _obj)
             .then(importContent, logBackendError);
     }
 
