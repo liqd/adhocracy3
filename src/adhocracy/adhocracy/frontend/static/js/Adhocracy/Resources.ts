@@ -161,34 +161,30 @@ export var postProposal = (
 ) => {
     "use strict";
 
-    var proposal;
-    var section;
-    var paragraphs = {};
-
     var sectionVersion = new Resource("adhocracy_sample.resources.section.ISectionVersion");
     sectionVersion.addISection("single section", []);
 
     var name = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
     name = Util.normalizeName(name);
 
-    var postProposal = (path: string, name: string) : ng.IPromise<void> => {
+    var postProposal = (path: string, name: string, scope: {proposal?: any}) : ng.IPromise<void> => {
         return adhHttp.postToPool(path, new Proposal(name))
-            .then((ret) => proposal = ret, Http.logBackendError);
+            .then((ret) => scope.proposal = ret, Http.logBackendError);
     };
-    var postSection = (path: string, name: string) : ng.IPromise<void> => {
+    var postSection = (path: string, name: string, scope: {section?: any}) : ng.IPromise<void> => {
         return adhHttp.postToPool(path, new Section(name))
-            .then((ret) => section = ret, Http.logBackendError);
+            .then((ret) => scope.section = ret, Http.logBackendError);
     };
-    var postParagraph = (path: string, name: string) : ng.IPromise<void> => {
+    var postParagraph = (path: string, name: string, scope: {paragraphs}) : ng.IPromise<void> => {
         return adhHttp.postToPool(path, new Paragraph(name))
-            .then((ret) => paragraphs[name] = ret, Http.logBackendError);
+            .then((ret) => scope.paragraphs[name] = ret, Http.logBackendError);
     };
-    var postParagraphs = (path: string, names: string[]) : ng.IPromise<void> => {
+    var postParagraphs = (path: string, names: string[], scope) : ng.IPromise<void> => {
         // we need to post the paragraph versions one after another in order to guarantee
         // the right order
         if (names.length > 0) {
-            return postParagraph(path, names[0])
-                .then(() => postParagraphs(path, names.slice(1)));
+            return postParagraph(path, names[0], scope)
+                .then(() => postParagraphs(path, names.slice(1), scope));
         } else {
             return Util.mkPromise($q, undefined);
         }
@@ -198,7 +194,7 @@ export var postProposal = (
             .then((versionPath) => adhHttp.postNewVersion(versionPath, data), Http.logBackendError)
             .then((ret) => ret, Http.logBackendError);
     };
-    var postProposalVersion = (proposal, data, sections) : ng.IPromise<void> => {
+    var postProposalVersion = (proposal, data, sections, scope) : ng.IPromise<void> => {
         return $q.all(sections.map((section) => getNewestVersionPath(adhHttp, section.path)))
             .then((sectionVersionPaths) => {
                 var _data = Util.deepcp(data);
@@ -206,7 +202,7 @@ export var postProposal = (
                 return postVersion(proposal.path, _data);
             });
     };
-    var postSectionVersion = (section, data, paragraphs) : ng.IPromise<void> => {
+    var postSectionVersion = (section, data, paragraphs, scope) : ng.IPromise<void> => {
         return $q.all(paragraphs.map((paragraph) => getNewestVersionPath(adhHttp, paragraph.path)))
             .then((paragraphVersionPaths) => {
                 var _data = Util.deepcp(data);
@@ -214,33 +210,59 @@ export var postProposal = (
                 return postVersion(section.path, _data);
             });
     };
-    var postParagraphVersion = (paragraph, data) : ng.IPromise<void> => {
-        return getNewestVersionPath(adhHttp, proposal.path)
+    var postParagraphVersion = (paragraph, data, scope: {proposal: any}) : ng.IPromise<void> => {
+        return getNewestVersionPath(adhHttp, scope.proposal.path)
             .then((proposalVersionPath) => {
                 var _data = Util.deepcp(data);
                 _data.root_versions = [proposalVersionPath];
                 return postVersion(paragraph.path, _data);
             });
     };
-    var postParagraphVersions = (paragraphs: any[], datas: any[]) : ng.IPromise<void> => {
+    var postParagraphVersions = (paragraphs: any[], datas: any[], scope) : ng.IPromise<void> => {
         // we need to post the paragraph versions one after another in order to guarantee
         // that the final section version contains all new proposal versions
         if (paragraphs.length > 0) {
-            return postParagraphVersion(paragraphs[0], datas[0])
-                .then(() => postParagraphVersions(paragraphs.slice(1), datas.slice(1)));
+            return postParagraphVersion(paragraphs[0], datas[0], scope)
+                .then(() => postParagraphVersions(paragraphs.slice(1), datas.slice(1), scope));
         } else {
             return Util.mkPromise($q, undefined);
         }
     };
 
-    return postProposal("/adhocracy", name)
-        .then(() => postSection(proposal.path, "section"))
-        .then(() => postParagraphs(proposal.path, paragraphVersions.map((paragraphVersion, i) => "paragraph" + i)))
-        .then(() => postProposalVersion(proposal, proposalVersion, [section]))
-        .then(() => postSectionVersion(section, sectionVersion, _.values(paragraphs)))
-        .then(() => postParagraphVersions(paragraphVersions.map((paragraphVersion, i) => paragraphs["paragraph" + i]), paragraphVersions))
+    var scope : {proposal?: any; section?: any; paragraphs: {}} = {
+        paragraphs: {}
+    };
+
+    return postProposal("/adhocracy", name, scope)
+        .then(() => postSection(
+            scope.proposal.path,
+            "section",
+            scope
+        ))
+        .then(() => postParagraphs(
+            scope.proposal.path,
+            paragraphVersions.map((paragraphVersion, i) => "paragraph" + i),
+            scope
+        ))
+        .then(() => postProposalVersion(
+            scope.proposal,
+            proposalVersion,
+            [scope.section],
+            scope
+        ))
+        .then(() => postSectionVersion(
+            scope.section,
+            sectionVersion,
+            _.values(scope.paragraphs),
+            scope
+        ))
+        .then(() => postParagraphVersions(
+            paragraphVersions.map((paragraphVersion, i) => scope.paragraphs["paragraph" + i]),
+            paragraphVersions,
+            scope
+        ))
 
         // return the latest proposal Version
-        .then(() => getNewestVersionPath(adhHttp, proposal.path))
+        .then(() => getNewestVersionPath(adhHttp, scope.proposal.path))
         .then((proposalVersionPath) => adhHttp.get(proposalVersionPath));
 };
