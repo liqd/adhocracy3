@@ -24,4 +24,4 @@ class TestJasmine:
         formatter.results = results
         print(formatter.format())
 
-        assert len(results.failed()) == 0
+        assert len(list(results.failed())) == 0
