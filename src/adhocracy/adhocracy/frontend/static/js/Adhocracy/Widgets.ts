@@ -5,6 +5,7 @@
 
 import Types = require("./Types");
 import AdhHttp = require("./Services/Http");
+import AdhWS = require("./Services/WS");
 import AdhConfig = require("./Services/Config");
 
 import Resources = require("./Resources");
@@ -65,16 +66,36 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                 title: "@"
             },
             transclude: true,
-            controller: ["$scope", "adhHttp", "adhDone", (
+            controller: ["$scope", "adhHttp", "adhWS", "adhDone", (
                 $scope: ListingScope<Container>,
                 adhHttp: AdhHttp.IService<Container>,
+                adhWS: AdhWS.Type,
                 adhDone
             ) : void => {
+                var getHandler = (pool: Container): void => {
+                    $scope.container = pool;
+                    $scope.elements = _self.containerAdapter.elemRefs($scope.container);
+                };
+
+                var wsHandler = (event: AdhWS.ServerEvent): void => {
+                    adhHttp.get($scope.path).then(getHandler);
+                };
+
+                // (The call order is important: *first* subscribe to
+                // the updates, *then* get an initial copy.)
+
+                try {
+                    adhWS.register($scope.path, wsHandler);
+
+                    // FIXME: subscribe returns an id, and we need to
+                    // unsubscribe when the listing is shut down.  how
+                    // do we know if we are shut down here?
+                } catch (e) {
+                    console.log(e);
+                    console.log("Will continue on resource " + $scope.path + " without server bind.");
+                }
                 adhHttp.get($scope.path)
-                    .then((pool: Container) => {
-                        $scope.container = pool;
-                        $scope.elements = _self.containerAdapter.elemRefs($scope.container);
-                    })
+                    .then(getHandler)
                     .then(adhDone);
             }]
         };

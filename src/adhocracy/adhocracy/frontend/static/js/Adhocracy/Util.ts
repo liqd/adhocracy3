@@ -16,8 +16,31 @@ export function isInfixOf(needle : any, hay : any[]) : boolean {
     return hay.indexOf(needle) !== -1;
 };
 
+/**
+ * this function is a workaround for the weirdness of the javscript
+ * 'in' keyword.  use it if you want to test a string array for
+ * memberships.  does not work on other types!  if you would relax the
+ * type signature:
+ *
+ *   stringInArrayMember(null, ['null']) ==> true
+ *
+ * (nobody should use javascript, really.)
+ */
+export function stringIsArrayMember(member: string, array: string[]): boolean {
+    "use strict";
+
+    var obj = {};
+    for (var ix in array) {
+        if (array.hasOwnProperty(ix)) {
+            obj[array[ix]] = "";
+        }
+    }
+    return obj.hasOwnProperty(member);
+}
+
 export function parentPath(url : string) : string {
     "use strict";
+
     return url.substring(0, url.lastIndexOf("/"));
 };
 
@@ -87,6 +110,7 @@ export function deepoverwrite(source, target) {
  */
 export function deepeq(a : any, b : any) : boolean {
     "use strict";
+
     if (typeof a !== typeof b) {
         return false;
     }
@@ -132,5 +156,20 @@ export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
 
 export function normalizeName(name: string) : string {
     "use strict";
+
     return name.toLowerCase().replace(/\ /g, "_");
 }
+
+/**
+ * Take a maximum delay time, an array of arguments and a function.
+ * Generate random delays (in ms) for each and calls the function
+ * asynchronously (out of order) on each element of the array.  Ignore
+ * return values of f.
+ *
+ * Example:
+ *
+ * | trickle($timeout, 5000, paths, (path) => $scope.messages.push({ "event": "modified", "resource": path }));
+ */
+export var trickle = <T>($timeout: ng.ITimeoutService, maxdelay: number, xs: T[], f: (T) => void): void => {
+    xs.map((x) => $timeout(() => f(x), Math.random() * maxdelay, true));
+};

@@ -7,6 +7,7 @@ import angular = require("angular");
 
 import Types = require("../Types");
 import AdhHttp = require("../Services/Http");
+import AdhWS = require("../Services/WS");
 import AdhUser = require("../Services/User");
 import AdhConfig = require("../Services/Config");
 import AdhDone = require("../Services/Done");
@@ -104,6 +105,7 @@ export var run = () => {
 
 
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
+    app.factory("adhWS", ["adhConfig", AdhWS.factory]);
 
 
     // filters
@@ -128,6 +130,11 @@ export var run = () => {
     app.directive("adhListingElementTitle", ["$q", "adhHttp", "adhConfig", ($q, adhHttp, adhConfig) => {
         return new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective(adhConfig);
     }]);
+
+    var webSocketTest = new AdhWS.WebSocketTest();
+    app.directive("adhWebSocketTest",
+                  ["$timeout", "adhConfig", "adhWS", ($timeout, adhConfig, adhWS) =>
+                   webSocketTest.createDirective($timeout, adhConfig, adhWS)]);
 
 
     // application-specific directives
