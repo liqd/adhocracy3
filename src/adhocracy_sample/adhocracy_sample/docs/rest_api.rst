@@ -673,6 +673,11 @@ pvrs2 (which also contains s2vrs0_path) ::
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     0
 
+.. FIXME: If two frontends post competing sections simultaneously,
+   neither knows which proposal version belongs to whom.  Proposed
+   solution: the post response must tell the frontend the changed
+   ``root_version``.
+
 
 Tags
 ~~~~
