@@ -40,3 +40,7 @@ frontend functional tests::
 frontend acceptance tests::
 
     bin/py.test tests_acceptance
+
+run all tests::
+
+    bin/py.test_run_all
