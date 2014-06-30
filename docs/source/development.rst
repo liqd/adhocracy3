@@ -16,41 +16,31 @@ Example Vim config according to coding guideline::
     https://github.com/liqd/vim_config
 
 
-Install Robotframework
-----------------------
-
-install robotframework for acceptance testing ::
-
-    cd robotframework/
-    python2.7 bootstrap.py
-    bin/buildout
-
-
 Running the Testsuite
 ---------------------
 
-backend ::
+backend unit, integration and acceptance tests::
 
     bin/py.test src/adhocracy src/adhocracy_sample
 
-frontend tests::
+frontend unit tests:
 
-    bin/py.test ./src/adhocracy/adhocracy/frontend/tests/
+    A.  Integrated with py.test::
 
-acceptance tests::
+            bin/py.test ./src/adhocracy/adhocracy/frontend/tests/unit/
+
+    B.  In browser ::
+    
+        xdg-open http://localhost:6541/frontend_static/test.html
+
+frontend functional tests::
+
+    bin/py.test ./src/adhocracy/adhocracy/frontend/tests/functional
+
+frontend acceptance tests::
 
     bin/py.test tests_acceptance
 
+run all tests::
 
-There are actually three ways to run the frontend unit tests:
-
-1.  Integrated with py.test::
-
-        bin/py.test ./src/adhocracy/adhocracy/frontend/tests/unit/
-
-2.  In browser (``/frontend_static/test.html``)
-
-3.  With node.js: For that you need to install jasmine-node and
-    compile both ``Adhocracy.ts`` and ``AdhocracySpec.ts`` with
-    ``--module commonjs``. Then run jasmine-node on
-    ``./src/adhocracy/adhocracy/frontent/static/js/``.
+    bin/py.test_run_all
