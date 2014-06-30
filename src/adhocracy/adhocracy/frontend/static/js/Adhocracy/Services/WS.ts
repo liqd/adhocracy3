@@ -165,6 +165,7 @@ class Subscriptions {
             _dict[resource] = {};
         }
 
+        // FIXME: Why is the first condition here?
         if (id !== null && _dict[resource].hasOwnProperty(id)) {
             throw ("WS: attempt to Subscription().add under an existing path / id: " + JSON.stringify(id));
         }
