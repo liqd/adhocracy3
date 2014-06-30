@@ -84,7 +84,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                 // the updates, *then* get an initial copy.)
 
                 try {
-                    adhWS.subscribe($scope.path, wsHandler);
+                    adhWS.register($scope.path, wsHandler);
 
                     // FIXME: subscribe returns an id, and we need to
                     // unsubscribe when the listing is shut down.  how

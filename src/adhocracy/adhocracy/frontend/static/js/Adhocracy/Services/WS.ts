@@ -5,32 +5,41 @@
 import AdhConfig = require("./Config");
 
 
-// The Web Sockets Service
+// FIXME: consider refactoring this service into several smaller
+// services ("do one thing").
 
-// This module provides a callback-based API to the consumer modules
-// for keeping up to date with relevant changes on the server side.
-// The network protocol is specified in ./docs/source/websockets.rst.
 
+/**
+ * The Web Sockets Service
+ *
+ * This module provides a callback-based API to the consumer modules
+ * for keeping up to date with relevant changes on the server side.
+ * The network protocol is specified in ./docs/source/websockets.rst.
+ */
+
+
+/**
+ * exported types
+ */
 
 export interface Type {
-    // Send subscribe message to server.  If the response is
-    // 'redundant', an exception is thrown asynchronously.
-    //
-    // The message passed to the callback will contain the path passed
-    // to the subscribe function earlier, plus additional information
-    // like "child_modified" (see rest api documentation).
-    //
-    // This function is a rough equivalent to $.on(), but it only
-    // allows to register one handler at a time.  (Should we ever need
-    // more than one concurrent handlers, we should think about a
-    // better way to unsubscribe them than jquery could come up with.)
-    subscribe: (path: string, callback: (event: ServerEvent) => void) => string;
+    /**
+     * Register a callback to a resource.  If no other callbacks are
+     * registered under this resource, send subscribe message to
+     * server.
+     *
+     * This function is a rough equivalent to $.on(), but handles
+     * unregistrations differently.
+     */
+    register: (path: string, callback: (event: ServerEvent) => void) => string;
 
-    // Send unsubscribe message to server.  If the response is
-    // 'redundant', an exception is thrown asynchronously.
-    //
-    // Roughly equivalent to $.off() (see comment above).
-    unsubscribe: (path: string, id: string) => void;
+    /**
+     * Unregister a callback from a resource.  If no other callbacks
+     * are registered, send unsubscribe message to server.
+     *
+     * Roughly equivalent to $.off() (see comment above).
+     */
+    unregister: (path: string, id: string) => void;
 }
 
 export interface ServerEvent {
@@ -41,7 +50,9 @@ export interface ServerEvent {
 }
 
 
-// internal rest-api types
+/**
+ * internal rest-api types
+ */
 
 interface Request {
     action: string;
@@ -67,6 +78,7 @@ interface ServerMessage extends ResponseOk, ResponseError, ServerEvent {};
  * maps a resource to all its subscribed callbacks; the second maps
  * callback identifiers to actual callbacks.
  */
+
 class Subscriptions {
     constructor(private _createCallbackId: () => string) {
         return;
@@ -189,33 +201,44 @@ class Subscriptions {
 export var factory = (adhConfig: AdhConfig.Type) : Type => {
     "use strict";
 
-    // the socket handle
+    /**
+     * the socket handle
+     */
     var _ws;
 
-    // a distionary of all callbacks, stored under their
-    // resp. resources.
+    /**
+     * a distionary of all callbacks, stored under their
+     * resp. resources.
+     */
     var _subscriptions: Subscriptions;
 
-    // same type as _subscriptions, but these are still waiting for
-    // being sent over the wire.  this is necessary because when _ws
-    // is initialized and the adhWS handle returned to the consumer,
-    // the consumer may start subscribing to stuff, but the web socket
-    // is not in connected state yet.
+    /**
+     * same type as _subscriptions, but these are still waiting for
+     * being sent over the wire.  this is necessary because when _ws
+     * is initialized and the adhWS handle returned to the consumer,
+     * the consumer may start subscribing to stuff, but the web socket
+     * is not in connected state yet.
+     */
     var _pendingSubscriptions: Subscriptions;
 
-    // request queue.  we append all requests to the end of this list,
-    // and pop them from the beginning as the responses come in.
-    // rationale: "ok" responses contain a copy of the request data,
-    // but "error" responses do not (the request may have been broken
-    // json and not contain any valid data).  so it is necessary to
-    // rely on the responses coming back in the same order in which
-    // the frontend send the requests.
+    /**
+     * request queue.  we append all requests to the end of this list,
+     * and pop them from the beginning as the responses come in.
+     * rationale: "ok" responses contain a copy of the request data,
+     * but "error" responses do not (the request may have been broken
+     * json and not contain any valid data).  so it is necessary to
+     * rely on the responses coming back in the same order in which
+     * the frontend send the requests.
+     */
     var _requests: Request[] = [];
 
 
-    // function declarations
-    var subscribe: (path: string, callback: (event: ServerEvent) => void) => string;
-    var unsubscribe: (path: string, id: string) => void;
+    /**
+     * function declarations
+     */
+
+    var register: (path: string, callback: (event: ServerEvent) => void) => string;
+    var unregister: (path: string, id: string) => void;
     var sendRequest: (req: Request) => void;
 
     var onmessage: (event: any) => void;
@@ -225,11 +248,14 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
 
     var open: () => any;
 
+    // FIXME: all of the above must be outside of the factory and testable.
 
-    // register a new callback asynchronously (to _subscriptions if
-    // connected; to _pendingSubscription otherwise).  if one is
-    // already registered, crash.
-    subscribe = (
+    /**
+     * register a new callback asynchronously (to _subscriptions if
+     * connected; to _pendingSubscription otherwise).  if one is
+     * already registered, crash.
+     */
+    register = (
         path: string,
         callback: (event: ServerEvent) => void
     ) : string => {
@@ -240,8 +266,10 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         }
     };
 
-    // unregister callback.  if it is not registered, crash.
-    unsubscribe = (
+    /**
+     * unregister callback.  if it is not registered, crash.
+     */
+    unregister = (
         path: string,
         id: string
     ) : void => {
@@ -260,8 +288,10 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         }
     };
 
-    // Send Request object (subscribe or unsubscribe); push it to
-    // _requests; do some exception handling and logging.
+    /**
+     * Send Request object (subscribe or unsubscribe); push it to
+     * _requests; do some exception handling and logging.
+     */
     sendRequest = (
         req: Request
     ) : void => {
@@ -276,7 +306,9 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         }
     };
 
-    // event handlers and open
+    /**
+     * event handlers and open
+     */
     onmessage = (event) : void => {
         var msg: ServerMessage = JSON.parse(event.data);
         console.log("WS: onmessage:"); console.log(msg);  // FIXME: remove this when it is tested.
@@ -285,6 +317,9 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         if (msg.hasOwnProperty("event")) {
             _subscriptions.notify(msg);
         } else {
+
+            // FIXME: move error handling to its own function.
+
             // if it is not an event, remove the matching request from
             // the queue and check for errors (server or client, user
             // or internal).
@@ -390,19 +425,22 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         return _ws;
     };
 
-    // (main)
+    /**
+     * (main)
+     */
     _ws = open();
 
     return {
-        subscribe: subscribe,
-        unsubscribe: unsubscribe
+        register: register,
+        unregister: unregister
     };
 };
 
 
 
-//////////////////////////////////////////////////////////////////////
-// test widget
+/**
+ * test widget
+ */
 
 interface WebSocketTestScope extends ng.IScope {
     messages: ServerMessage[];
@@ -430,7 +468,7 @@ export class WebSocketTest {
                 $scope.messages = [];
                 var paths = JSON.parse($scope.rawPaths);
                 paths.map((path) => {
-                    adhWS.subscribe(path, (serverEvent) => $scope.messages.push(serverEvent));
+                    adhWS.register(path, (serverEvent) => $scope.messages.push(serverEvent));
                 });
             }]
         };
