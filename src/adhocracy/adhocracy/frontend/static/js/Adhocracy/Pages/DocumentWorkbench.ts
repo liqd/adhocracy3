@@ -152,11 +152,10 @@ export var run = () => {
 
                     // FIXME: factor out getting the head version of a DAG.
 
-                    var fetchDocumentHead = (n : number, dag : Types.Content<Resources.HasIDocumentSheet>) : void => {
-                        var dagPS = dag.data["adhocracy.sheets.versions.IVersions"].elements;
-                        if (dagPS.length > 0) {
-                            var headPath = Resources.newestVersion(dagPS); // FIXME: backend should have LAST
-                            adhHttp.get(headPath).then((headContent) => {
+                    var fetchDocumentHead = (n : number, dag : Types.Content<Resources.HasIDocumentSheet>) : ng.IPromise<void> => {
+                        return Resources.getNewestVersionPath(adhHttp, dag.path)
+                            .then((headPath) => adhHttp.get(headPath))
+                            .then((headContent) => {
                                 if (n in $scope.poolEntries) {
                                     // leave original headContentRef intact,
                                     // just replace subscription handle and
@@ -167,7 +166,6 @@ export var run = () => {
                                     $scope.poolEntries[n] = {viewmode: "list", content: headContent};
                                 }
                             });
-                        }
                     };
 
                     var dagRefs : string[] = pool.data["adhocracy.sheets.pool.IPool"].elements;
@@ -234,8 +232,8 @@ export var run = () => {
         };
     }]);
 
-    app.directive("adhProposalVersionNew", ["$http", "$q", "adhConfig", (
-        $http: ng.IHttpService,
+    app.directive("adhProposalVersionNew", ["adhHttp", "$q", "adhConfig", (
+        adhHttp: ng.IHttpService,
         $q : ng.IQService,
         adhConfig: AdhConfig.Type
     ) => {
@@ -257,9 +255,9 @@ export var run = () => {
                 };
 
                 $scope.commit = () => {
-                    Resources.postProposal($http, $q, $scope.proposalVersion, $scope.paragraphVersions).then((resp) => {
-                        $http.get(resp.data.path).then((respGet) => {
-                            $scope.onNewProposal(respGet.data);
+                    Resources.postProposal(adhHttp, $q, $scope.proposalVersion, $scope.paragraphVersions).then((resp) => {
+                        adhHttp.get(resp.path).then((respGet) => {
+                            $scope.onNewProposal(respGet);
                         });
                     });
                 };
@@ -325,7 +323,7 @@ export var run = () => {
     }]);
 
 
-    app.directive("adhDocumentSheetEdit", ["$http", "$q", "adhConfig", ($http, $q, adhConfig: AdhConfig.Type) => {
+    app.directive("adhDocumentSheetEdit", ["adhHttp", "$q", "adhConfig", (adhHttp, $q, adhConfig: AdhConfig.Type) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Sheets/IDocument/Edit.html",
@@ -334,7 +332,7 @@ export var run = () => {
             },
             controller: ($scope) => {
                 var versionPromises = $scope.sheet.elements.map((path) =>
-                    $http.get(decodeURIComponent(path))
+                    adhHttp.get(decodeURIComponent(path))
                          .then((resp) => resp.data)
                 );
 
