@@ -173,6 +173,23 @@ def send_messages_after_commit_hook(success, registry):
     """Commit hook that gets the websocket client and sends all messages."""
     ws_client = get_ws_client(registry)
     if success and ws_client is not None:
+        # FIXME this is not ideal: if a transaction fails, created/modified
+        # resources will remain queued and a spurious messages about them
+        # may be sent once the next transaction succeeds. A more robust
+        # solution might be:
+        #
+        # * Make ws_client._created|modified_resources dicts from
+        #   transaction ID to sets of resources instead of just sets
+        # * Only send notifications about resources created/modified by the
+        #   current transaction
+        # * If a transaction fails (success == False?), delete its entries
+        #   from both dicts
+        #
+        # For now, we tolerate the current imperfect solution since failures
+        # should be rare and can only lead to some spurious "modified"
+        # notifications sent out to the frontend. (There can't be any
+        # spurious "created" notifications since the WS server won't find
+        # the non-existent resource and will just log an error.)
         ws_client.send_messages()
 
 
