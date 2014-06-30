@@ -14,8 +14,10 @@ class TestJasmine:
         return browser
 
     def test_all(self, browser_test):
-        while not browser_test.evaluate_script('jsApiReporter.finished'):
-            sleep(0.1)
+        def jasmineFinished():
+            js = 'jsApiReporter.finished'
+            return browser_test.evaluate_script(js)
+        browser_test.wait_for_condition(jasmineFinished(), 5)
         data = browser_test.evaluate_script('jsApiReporter.specs()')
 
         formatter = Formatter([])
