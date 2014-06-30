@@ -205,7 +205,7 @@ class TestFunctionalClient:
         finally:
             self.tearDown()
 
-    def test_send_messages(self, websocket):
+    def test_queue_and_send_messages(self, websocket):
         try:
             self.setUp()
             from pyramid.testing import DummyResource
