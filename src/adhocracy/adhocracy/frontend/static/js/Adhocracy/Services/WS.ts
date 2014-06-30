@@ -165,8 +165,8 @@ class Subscriptions {
             _dict[resource] = {};
         }
 
-        if (_dict[resource].hasOwnProperty(id)) {
-            throw "WS: attempt to Subscription().add under an existing path / id!";
+        if (id !== null && _dict[resource].hasOwnProperty(id)) {
+            throw ("WS: attempt to Subscription().add under an existing path / id: " + JSON.stringify(id));
         }
 
         _dict[resource][id] = callback;
