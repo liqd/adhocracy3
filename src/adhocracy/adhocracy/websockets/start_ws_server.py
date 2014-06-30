@@ -4,6 +4,8 @@ from logging.config import fileConfig
 from os import path
 import logging
 import os
+from signal import signal
+from signal import SIGTERM
 import sys
 
 from autobahn.asyncio.websocket import WebSocketServerFactory
@@ -21,6 +23,11 @@ PID_FILE = 'var/WS_SERVER.pid'
 logger = logging.getLogger(__name__)
 
 
+class KillSignal(Exception):
+
+    """Exception throw when a kill signal (SIGTERM) is received."""
+
+
 def main(args=[]) -> int:
     """Start WebSockets server.
 
@@ -36,6 +43,7 @@ def main(args=[]) -> int:
     config_file = args[0]
     fileConfig(config_file)
     config = _read_config(config_file)
+    signal(SIGTERM, _handle_term_signal)
     _check_and_write_pid_file()
     _start_loop(config)
 
@@ -47,6 +55,11 @@ def _check_and_write_pid_file():
     pidfile = open(PID_FILE, 'w')
     pidfile.write('%s\n' % pid)
     pidfile.close
+
+
+def _handle_term_signal(signal, frame):
+    """Handler to intercept the SIGTERM signal ('kill' command)."""
+    raise KillSignal()
 
 
 def _start_loop(config: ConfigParser):
@@ -61,7 +74,7 @@ def _start_loop(config: ConfigParser):
         server = loop.run_until_complete(coro)
         _run_loop_until_interrupted(loop, server)
     finally:
-        logging.debug('Stopped WebSocket server')
+        logger.info('Stopped WebSocket server')
         _remove_pid_file()
 
 
@@ -74,7 +87,9 @@ def _run_loop_until_interrupted(loop, server):
     try:
         loop.run_forever()
     except KeyboardInterrupt:
-        logging.debug('Exiting due to keyboard interrupt (Ctrl-C)')
+        logger.debug('Exiting due to keyboard interrupt (Ctrl-C)')
+    except KillSignal:
+        logger.debug('Kill signal (SIGTERM) received, exiting')
     finally:
         server.close()
         loop.close()
@@ -90,7 +105,7 @@ def _read_config(config_file: str) -> ConfigParser:
 
 def _get_zodb_connection(config: ConfigParser) -> dict:
     zodb_uri = config['app:main']['zodbconn.uri']
-    logging.debug('Opening ZEO database on {}'.format(zodb_uri))
+    logger.info('Opening ZEO database on {}'.format(zodb_uri))
     storage_factory, dbkw = resolve_uri(zodb_uri)
     storage = storage_factory()
     db = DB(storage, **dbkw)
