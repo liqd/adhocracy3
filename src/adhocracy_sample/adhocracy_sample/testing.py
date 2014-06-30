@@ -1,6 +1,6 @@
 """Public py.test fixtures."""
-
 from webtest.http import StopableWSGIServer
+from splinter import Browser
 import pytest
 
 
@@ -23,3 +23,11 @@ def server_sample(request, app_sample) -> StopableWSGIServer:
 
     request.addfinalizer(fin)
     return server
+
+
+@pytest.fixture()
+def browser_sample_root(browser, server_sample) -> Browser:
+    """Start sample application and go to the root html page."""
+    url = server_sample.application_url + 'frontend_static/root.html'
+    browser.visit(url)
+    return browser
