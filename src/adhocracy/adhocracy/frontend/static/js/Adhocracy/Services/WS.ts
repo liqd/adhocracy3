@@ -296,7 +296,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         req: Request
     ) : void => {
         var reqString: string = JSON.stringify(req);
-        console.log("WS: sending " + reqString);  // FIXME: remove this when it is tested.
+        console.log("WS: sending " + JSON.stringify(req, null, 2));  // FIXME: introduce a log service for this stuff.
 
         if (_ws.readyState !== _ws.OPEN) {
             throw "WS: attempt to write to non-OPEN websocket!";
@@ -311,7 +311,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
      */
     onmessage = (event) : void => {
         var msg: ServerMessage = JSON.parse(event.data);
-        console.log("WS: onmessage:"); console.log(msg);  // FIXME: remove this when it is tested.
+        console.log("WS: onmessage:"); console.log(JSON.stringify(msg, null, 2));  // FIXME: introduce a log service for this stuff.
 
         // ServerEvent: something happened to the backend data!
         if (msg.hasOwnProperty("event")) {
