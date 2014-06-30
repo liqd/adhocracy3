@@ -29,9 +29,14 @@ frontend unit tests:
 
             bin/py.test ./src/adhocracy/adhocracy/frontend/tests/unit/
 
-    B.  In browser ::
-    
+    B.  In browser::
+
         xdg-open http://localhost:6541/frontend_static/test.html
+
+    C.  With node.js::
+
+        bin/tsc -m commonjs ./src/adhocracy/adhocracy/frontend/static/js/Adhocracy*.ts
+        bin/jasmine-node ./src/adhocracy/adhocracy/frontend/static/js/
 
 frontend functional tests::
 
