@@ -79,6 +79,8 @@ export var register = () => {
                     }
                 };
 
+                var adhWSMock = <any>jasmine.createSpyObj("WSMock", ["register", "unregister"]);
+
                 var adapter = <any>jasmine.createSpyObj("adapter", ["elemRefs"]);
                 adapter.elemRefs.andReturn(elements);
 
@@ -104,8 +106,8 @@ export var register = () => {
                         };
 
                         runs(() => {
-                            var controller = directive.controller[3];
-                            controller(scope, adhHttpMock, () => {
+                            var controller = directive.controller[4];
+                            controller(scope, adhHttpMock, adhWSMock, () => {
                                 asyncFlag = true;
                             });
                         });
@@ -126,8 +128,8 @@ export var register = () => {
                         };
 
                         runs(() => {
-                            var controller = directive.controller[3];
-                            controller(scope, adhHttpMock, () => {
+                            var controller = directive.controller[4];
+                            controller(scope, adhHttpMock, adhWSMock, () => {
                                 asyncFlag = true;
                             });
                         });
