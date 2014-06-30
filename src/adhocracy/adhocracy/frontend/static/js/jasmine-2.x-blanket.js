@@ -1,4 +1,9 @@
-/** slightly modified from https://github.com/alex-seville/blanket/pull/419 */
+/**
+ * There currently is no jasmine 2.0 support in blanket. However, there are
+ * multiple pull requests adding this feature.
+ * This code is taken from  https://github.com/alex-seville/blanket/pull/419
+ * There is a small modification near line 86.
+ */
 
 (function() {
 
@@ -77,6 +82,8 @@
         callback:function(){
             jasmine.getEnv().addReporter(new jasmine.BlanketReporter());
             jasmine.getEnv().execute = originalJasmineExecute;
+            // this would not find our specs
+            // jasmine.getEnv().execute();
         }
     });
 })();
