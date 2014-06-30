@@ -423,7 +423,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
 
         var createCallbackId = (() => {
             var x : number = 0;
-            return () => { return (x++).toString(); };
+            return () => (x++).toString();
         })();
 
         _subscriptions = new Subscriptions(createCallbackId);
