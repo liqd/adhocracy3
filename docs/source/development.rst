@@ -19,7 +19,7 @@ Example Vim config according to coding guideline::
 Running the Testsuite
 ---------------------
 
-backend unit, intergration and acceptance tests::
+backend unit, integration and acceptance tests::
 
     bin/py.test src/adhocracy src/adhocracy_sample
 
