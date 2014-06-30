@@ -240,6 +240,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
     var register: (path: string, callback: (event: ServerEvent) => void) => string;
     var unregister: (path: string, id: string) => void;
     var sendRequest: (req: Request) => void;
+    var handleResponseMessage: (msg: ServerMessage) => void;
 
     var onmessage: (event: any) => void;
     var onerror: (event: any) => void;
@@ -248,7 +249,11 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
 
     var open: () => any;
 
-    // FIXME: all of the above must be outside of the factory and testable.
+    // FIXME: all of the above should be testable, but are local
+    // definitions in the factory function body.  rethink the factory
+    // idiom!  perhaps using a class constructor instead would allow
+    // to access instance methods in tests while instance methods
+    // still have access to local state?  (do we even want that?)
 
     /**
      * register a new callback asynchronously (to _subscriptions if
@@ -307,8 +312,65 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
     };
 
     /**
-     * event handlers and open
+     * handle responses to requests
+     *
+     * if message is not an event, remove the matching request from
+     * the queue and check for errors (server or client, user or
+     * internal).
      */
+    handleResponseMessage = (msg: ServerMessage): void => {
+        var req: Request = _requests.shift();
+
+        // ResponseOk: request successfully processed!
+        if (msg.hasOwnProperty("status")) {
+            var checkCompare = (req: Request, resp: ResponseOk) => {
+                if (req.action !== resp.action || req.resource !== resp.resource) {
+                    throw ("WS: onmessage: response does not match request!\n"
+                           + req.toString() + "\n"
+                           + resp.toString());
+                }
+            };
+
+            var checkRedundant = (resp: ResponseOk) => {
+                throw ("WS: onmessage: received 'redundant' response.  this should not happen!\n"
+                       + resp.toString());
+            };
+
+            switch (msg.status) {
+            case "ok":
+                checkCompare(req, msg);
+                break;
+
+            case "redundant":
+                checkCompare(req, msg);
+                checkRedundant(msg);
+                break;
+            }
+        }
+
+        // ResponseError: request failed!
+        if (msg.hasOwnProperty("error")) {
+            switch (msg.error) {
+            case "unknown_action":
+            case "unknown_resource":
+            case "malformed_message":
+            case "invalid_json":
+            case "subscribe_not_supported":
+            case "internal_error":
+                throw ("WS: onmessage: received error message.\n"
+                       + msg.error + "\n"
+                       + req.toString() + "\n"
+                       + msg.toString());
+
+            default:
+                throw ("WS: onmessage: received **unknown** error message.  this should not happen!\n"
+                       + msg.error + "\n"
+                       + req.toString() + "\n"
+                       + msg.toString());
+            }
+        }
+    };
+
     onmessage = (event) : void => {
         var msg: ServerMessage = JSON.parse(event.data);
         console.log("WS: onmessage:"); console.log(JSON.stringify(msg, null, 2));  // FIXME: introduce a log service for this stuff.
@@ -317,62 +379,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         if (msg.hasOwnProperty("event")) {
             _subscriptions.notify(msg);
         } else {
-
-            // FIXME: move error handling to its own function.
-
-            // if it is not an event, remove the matching request from
-            // the queue and check for errors (server or client, user
-            // or internal).
-            var req: Request = _requests.shift();
-
-            // ResponseOk: request successfully processed!
-            if (msg.hasOwnProperty("status")) {
-                var checkCompare = (req: Request, resp: ResponseOk) => {
-                    if (req.action !== resp.action || req.resource !== resp.resource) {
-                        throw ("WS: onmessage: response does not match request!\n"
-                            + req.toString() + "\n"
-                            + resp.toString());
-                    }
-                };
-
-                var checkRedundant = (resp: ResponseOk) => {
-                    throw ("WS: onmessage: received 'redundant' response.  this should not happen!\n"
-                        + resp.toString());
-                };
-
-                switch (msg.status) {
-                case "ok":
-                    checkCompare(req, msg);
-                    break;
-
-                case "redundant":
-                    checkCompare(req, msg);
-                    checkRedundant(msg);
-                    break;
-                }
-            }
-
-            // ResponseError: request failed!
-            if (msg.hasOwnProperty("error")) {
-                switch (msg.error) {
-                case "unknown_action":
-                case "unknown_resource":
-                case "malformed_message":
-                case "invalid_json":
-                case "subscribe_not_supported":
-                case "internal_error":
-                    throw ("WS: onmessage: received error message.\n"
-                        + msg.error + "\n"
-                        + req.toString() + "\n"
-                        + msg.toString());
-
-                default:
-                    throw ("WS: onmessage: received **unknown** error message.  this should not happen!\n"
-                        + msg.error + "\n"
-                        + req.toString() + "\n"
-                        + msg.toString());
-                }
-            }
+            handleResponseMessage(msg);
         }
     };
 
