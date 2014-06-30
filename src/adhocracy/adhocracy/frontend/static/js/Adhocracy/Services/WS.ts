@@ -385,7 +385,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
 
     onerror = (event) => {
         console.log("WS: error!");
-        console.log(event);
+        console.log(JSON.stringify(event, null, 2));
         throw "WS: error!";
     };
 
@@ -400,7 +400,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         // _ws = open();
 
         console.log("WS: close!  (see source code for things to fix here.)");
-        console.log(event);
+        console.log(JSON.stringify(event, null, 2));
 
         // FIXME: this is bad because it invalidates all previous
         // subscriptions, but adhWS is not aware of that.
