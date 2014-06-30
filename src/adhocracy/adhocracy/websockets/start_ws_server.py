@@ -2,10 +2,10 @@
 from configparser import ConfigParser
 from logging.config import fileConfig
 from os import path
-import logging
-import os
 from signal import signal
 from signal import SIGTERM
+import logging
+import os
 import sys
 
 from autobahn.asyncio.websocket import WebSocketServerFactory
@@ -23,11 +23,6 @@ PID_FILE = 'var/WS_SERVER.pid'
 logger = logging.getLogger(__name__)
 
 
-class KillSignal(Exception):
-
-    """Exception throw when a kill signal (SIGTERM) is received."""
-
-
 def main(args=[]) -> int:
     """Start WebSockets server.
 
@@ -43,8 +38,8 @@ def main(args=[]) -> int:
     config_file = args[0]
     fileConfig(config_file)
     config = _read_config(config_file)
-    signal(SIGTERM, _handle_term_signal)
     _check_and_write_pid_file()
+    _register_sigterm_handler()
     _start_loop(config)
 
 
@@ -57,9 +52,17 @@ def _check_and_write_pid_file():
     pidfile.close
 
 
-def _handle_term_signal(signal, frame):
-    """Handler to intercept the SIGTERM signal ('kill' command)."""
-    raise KillSignal()
+def _register_sigterm_handler():
+    """Register handler for the SIGTERM signal ('kill' command).
+
+    The new handler will remove the PID file and exit.
+    """
+    def sigterm_handler(sig, frame):
+        logger.info('Kill signal (SIGTERM) received, exiting')
+        _remove_pid_file()
+        sys.exit()
+
+    signal(SIGTERM, sigterm_handler)
 
 
 def _start_loop(config: ConfigParser):
@@ -88,8 +91,6 @@ def _run_loop_until_interrupted(loop, server):
         loop.run_forever()
     except KeyboardInterrupt:
         logger.debug('Exiting due to keyboard interrupt (Ctrl-C)')
-    except KillSignal:
-        logger.debug('Kill signal (SIGTERM) received, exiting')
     finally:
         server.close()
         loop.close()
