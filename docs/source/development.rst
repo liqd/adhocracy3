@@ -41,7 +41,10 @@ frontend unit tests:
         indiviually and repeatedly and enter the debugger.
 
         **HINT:** in the debugger, it helps to disable the script tag
-        about blanket in test.html.
+        about blanket in test.html.  You can do this thusly:
+
+            make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser test_no_blanket
+            xdg-open http://localhost:6541/frontend_static/test-no-blanket.html
 
     C.  With node.js::
 
