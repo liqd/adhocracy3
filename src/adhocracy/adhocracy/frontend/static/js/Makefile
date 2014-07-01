@@ -1,8 +1,7 @@
-# requirement:
-# npm install -g typescript
-# more info on tsc at http://www.typescriptlang.org/
 TSC=tsc
+# (for more info on tsc, see http://www.typescriptlang.org/)
 FIX_TSC_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\((\d+),(\d+)\):(.*)/) { print "$$1:$$2:$$3:\n$$4\n\n"; } else { print "$$_\n"; }'
+# (this line makes tsc output work for IDEs that expect gcc error message syntax.)
 
 compile:
 	$(TSC) --module amd --sourcemap --out Adhocracy.js Adhocracy.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
@@ -10,8 +9,11 @@ compile:
 AdhocracySpec.ts: .dummy
 	./AdhocracySpec.sh > AdhocracySpec.ts
 
-compile_tests: AdhocracySpec.ts
+compile_tests_browser: AdhocracySpec.ts
 	$(TSC) --module amd --sourcemap AdhocracySpec.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
+
+compile_tests_node: AdhocracySpec.ts
+	$(TSC) --module commonjs AdhocracySpec.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 
 description:
 	$(TSC) -d --module amd --sourcemap --out Adhocracy.js Adhocracy.ts
