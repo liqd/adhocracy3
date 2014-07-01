@@ -66,6 +66,12 @@ export interface RawWebSocket {
  */
 export var factoryRaw = () => ((uri: string): RawWebSocket => new WebSocket(uri));
 
+/**
+ * structure of the parameter called to the consumer callbacks.  (this
+ * type is slightly more general than would be nice due to
+ * technicalities of the adhocracy websocket protocol and the lack of
+ * disjunctive types in typescript.)
+ */
 export interface ServerEvent {
     event?: string;
     resource?: string;

@@ -105,8 +105,8 @@ export var run = () => {
 
 
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
-    app.factory("adhRawWS", [AdhWS.factoryRaw]);
-    app.factory("adhWS", ["adhConfig", "adhRawWS", AdhWS.factory]);
+    app.factory("constructRawWebSocket", [AdhWS.factoryRaw]);
+    app.factory("adhWS", ["adhConfig", "constructRawWebSocket", AdhWS.factory]);
 
 
     // filters
