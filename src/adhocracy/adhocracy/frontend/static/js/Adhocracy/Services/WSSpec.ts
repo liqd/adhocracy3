@@ -38,6 +38,13 @@ export var register = () => {
             expect(wsRaw.send.calls.count()).toEqual(2);
         });
 
+        it("second registration to same resource only sends subscription to server once", () => {
+            var resource = "/adhocracy/sidty";
+            ws.register(resource, () => null); var before2nd = wsRaw.send.calls.count();
+            ws.register(resource, () => null); var after2nd = wsRaw.send.calls.count();
+            expect(before2nd).toEqual(after2nd);
+        });
+
         it("callbacks should be called only between being registered and being unregistered", () => {
             // register spy object as callback
             var cb = {
