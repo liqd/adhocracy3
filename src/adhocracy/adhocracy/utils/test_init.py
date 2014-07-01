@@ -1,10 +1,6 @@
 from pyramid import testing
 
-# FIXME Shouldn't the name of this file be  'test_init.py'?
-
-################
-#  test utils  #
-################
+import pytest
 
 
 def test_find_graph_graph_exists():
@@ -37,17 +33,21 @@ def test_diff_dict_omit():
     assert diff == ({'baz', 'faz'}, {'kaz'}, set())
 
 
-def test_strip_optional_prefix():
+
+@pytest.mark.parametrize('string,prefix,expected_output', [
+    ('footile', 'foo', 'tile'),
+    ('futile', 'foo' , 'futile'),
+    ('footile', 'oot' , 'footile'),
+    ('footile', 'ile' , 'footile'),
+    ('', 'foo' , ''),
+    ('footile', '' , 'footile'),
+    (' footile ', 'foo' , ' footile '),
+    ('foo', 'foo' , ''),
+    ('foo', 'foot' , 'foo'),
+])
+def test_strip_optional_prefix(string, prefix, expected_output):
     from . import strip_optional_prefix
-    assert strip_optional_prefix('footile', 'foo') == 'tile'
-    assert strip_optional_prefix('futile', 'foo') == 'futile'
-    assert strip_optional_prefix('footile', 'oot') == 'footile'
-    assert strip_optional_prefix('footile', 'ile') == 'footile'
-    assert strip_optional_prefix('', 'foo') == ''
-    assert strip_optional_prefix('footile', '') == 'footile'
-    assert strip_optional_prefix(' footile ', 'foo') == ' footile '
-    assert strip_optional_prefix('foo', 'foo') == ''
-    assert strip_optional_prefix('foo', 'foot') == 'foo'
+    assert strip_optional_prefix(string, prefix) == expected_output
 
 
 def test_get_resource_interface_multiple_provided():
@@ -169,4 +169,46 @@ def test_exception_to_str_runtime_error():
     assert err_string == 'RuntimeError'
 
 
-# FIXME tests for get_sheet, get_all_sheets are missing
+def test_get_sheet_adapter_exists(dummy_config):
+    from zope.interface import Interface
+
+    class IDummy(Interface):
+        pass
+    dummy_adapter = testing.DummyResource(__provides__=IDummy)
+    context = testing.DummyResource()
+    dummy_config.registry.registerAdapter(lambda x: dummy_adapter,
+                                          (Interface,), IDummy)
+    assert IDummy(context) == dummy_adapter
+
+
+def test_get_sheet_adapter_exists(dummy_config):
+    from adhocracy.interfaces import IResourceSheet
+    from adhocracy.interfaces import ISheet
+    from . import get_sheet
+    adapter = testing.DummyResource(__provides__=IResourceSheet)
+    context = testing.DummyResource(__provides__=ISheet)
+    dummy_config.registry.registerAdapter(lambda x: adapter,
+                                          (ISheet,), IResourceSheet,
+                                          ISheet.__identifier__)
+    assert get_sheet(context, ISheet) is adapter
+
+
+def test_get_sheet_adapter_does_not_exists(dummy_config):
+    from adhocracy.interfaces import ISheet
+    from zope.component import ComponentLookupError
+    from . import get_sheet
+    context = testing.DummyResource()
+    with pytest.raises(ComponentLookupError):
+        get_sheet(context, ISheet)
+
+
+def test_get_all_sheets_adapter_exists(dummy_config):
+    from adhocracy.interfaces import IResourceSheet
+    from adhocracy.interfaces import ISheet
+    from . import get_all_sheets
+    adapter = testing.DummyResource(__provides__=IResourceSheet)
+    context = testing.DummyResource(__provides__=ISheet)
+    dummy_config.registry.registerAdapter(lambda x: adapter,
+                                          (ISheet,), IResourceSheet,
+                                          ISheet.__identifier__)
+    assert adapter in get_all_sheets(context)
