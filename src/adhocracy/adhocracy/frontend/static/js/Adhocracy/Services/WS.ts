@@ -189,7 +189,7 @@ class Subscriptions {
             notifyServer();
         }
 
-        if (typeof id === "undefined") {
+        if (id === null || typeof id === "undefined") {
             id = _self._createCallbackId();
         }
 
@@ -197,9 +197,9 @@ class Subscriptions {
             _dict[resource] = {};
         }
 
-        // FIXME: Why is the first condition here?
-        if (id !== null && _dict[resource].hasOwnProperty(id)) {
-            throw ("WS: attempt to Subscription().add under an existing path / id: " + JSON.stringify(id));
+        if (_dict[resource].hasOwnProperty(id)) {
+            console.log(id, JSON.stringify(id));
+            throw ("WS: attempt to Subscription().add under an existing path / id: " + id);
         }
 
         _dict[resource][id] = callback;
