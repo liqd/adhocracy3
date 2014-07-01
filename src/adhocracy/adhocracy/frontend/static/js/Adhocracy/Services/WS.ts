@@ -490,7 +490,6 @@ export var factory = (
 };
 
 
-
 /**
  * test widget
  */
