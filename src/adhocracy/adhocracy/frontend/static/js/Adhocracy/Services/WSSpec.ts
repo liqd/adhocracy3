@@ -47,7 +47,7 @@ export var register = () => {
                 cb: (event) => null
             };
             (<any>spyOn(cb, "cb")).and.callThrough();
-            var handle = ws.register("/adhocracy/somethingactive", cb.cb);
+            var handle: string = ws.register("/adhocracy/somethingactive", cb.cb);
 
             expect((<any>cb.cb).calls.count()).toEqual(0);
 

@@ -193,8 +193,6 @@ class Subscriptions {
         var _self = this;
         var _dict = _self._dict;
 
-        console.log("add", JSON.stringify(_dict, null, 2));
-
         // if there are no other subscriptions under this resource
         // yet, notify server (if applicable).
         if (!_self.alive(resource) && typeof notifyServer === "function") {
@@ -210,7 +208,6 @@ class Subscriptions {
         }
 
         if (_dict[resource].hasOwnProperty(id)) {
-            console.log(id, JSON.stringify(id));
             throw ("WS: attempt to Subscription().add under an existing path / id: " + id);
         }
 
@@ -341,7 +338,7 @@ export var factory = (
     ) : void => {
         console.log("unregister", path);
         if (!(_subscriptions.alive(path, id) || _pendingSubscriptions.alive(path, id))) {
-            throw "WS: unsubscribe: no subscription for " + path + "!";
+            throw "WS: unsubscribe: no subscription for " + JSON.stringify(path) + "!";
         } else {
             _subscriptions.del(path, id, () => {
                 if (_ws.readyState === _ws.OPEN) {
