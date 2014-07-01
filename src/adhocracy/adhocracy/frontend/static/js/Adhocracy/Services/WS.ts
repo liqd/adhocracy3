@@ -158,15 +158,27 @@ class Subscriptions {
     };
 
     /**
-     * Are there subscriptions on a resource?  We need to know
-     * before we notify the server of an (un-) subscription.
+     * Are there subscriptions on a resource?  (We need to know before
+     * we notify the server of an (un-) subscription.)  If id is
+     * given, only check if this particular id contains a callback.
+     * (needed for detection of redundant calls to unregister.)
      */
-    private alive = (resource: string): boolean => {
+    public alive = (resource: string, id?: string): boolean => {
         var _self = this;
+        var _dict = _self._dict;
 
-        return (
-            _self._dict.hasOwnProperty(resource) &&
-                Object.keys(_self._dict[resource]).length > 0);
+        if (id === null) {
+            return (
+                _dict.hasOwnProperty(resource) &&
+                    Object.keys(_dict[resource]).length > 0);
+        } else {
+            if (_dict.hasOwnProperty(resource)) {
+                if (_dict[resource].hasOwnProperty(id)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     };
 
     /**
@@ -324,8 +336,7 @@ export var factory = (
         id: string
     ) : void => {
         console.log("unregister", path);
-        if (!(_subscriptions.hasOwnProperty(path) ||
-              _pendingSubscriptions.hasOwnProperty(path))) {
+        if (!(_subscriptions.alive(path, id) || _pendingSubscriptions.alive(path, id))) {
             throw "WS: unsubscribe: no subscription for " + path + "!";
         } else {
             _subscriptions.del(path, id, () => {
