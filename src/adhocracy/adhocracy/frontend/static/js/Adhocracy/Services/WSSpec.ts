@@ -15,10 +15,19 @@ export var register = () => {
             wsuri: "mock"
         };
 
-        var constructRawWebSocket = (uri: string): WS.RawWebSocket =>
-            <any>jasmine.createSpyObj("RawWebSocketMock", ["send", "onmessage", "onerror", "onopen", "onclose"]);
+        // constructor for a mock raw web socket that leaks the
+        // constructee for inspection.
+        var wsRaw: any;
+        var constructRawWebSocket = (uri: string): WS.RawWebSocket => {
+            wsRaw = <any>jasmine.createSpyObj("RawWebSocketMock", ["send", "onmessage", "onerror", "onopen", "onclose"]);
+            return wsRaw;
+        };
 
         var ws = WS.factory(config, constructRawWebSocket);
+
+        it("at this point, the send method of web socket should never have been called", () => {
+            expect(wsRaw.send.calls.any()).toEqual(false);
+        });
 
         it("first registration yields '0' as callback handle", () => {
             expect(ws.register("/adhocracy", () => null)).toEqual("0");
@@ -26,6 +35,10 @@ export var register = () => {
 
         it("second registration yields '1' as callback handle", () => {
             expect(ws.register("/adhocracy/somethingelse", () => null)).toEqual("1");
+        });
+
+        it("at this point, the send method of web socket should have been called twice", () => {
+            expect(wsRaw.send.calls.count()).toEqual(2);
         });
 
         xit("un-registration of a existing handle makes callback vanish", () => {
