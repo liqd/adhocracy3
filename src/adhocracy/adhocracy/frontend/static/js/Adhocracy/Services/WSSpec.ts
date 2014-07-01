@@ -41,13 +41,36 @@ export var register = () => {
             expect(wsRaw.send.calls.count()).toEqual(2);
         });
 
-        xit("un-registration of a existing handle makes callback vanish", () => {
+        it("callbacks should be called only between being registered and being unregistered", () => {
             // register spy object as callback
+            var cb = {
+                cb: (event) => null
+            };
+            (<any>spyOn(cb, "cb")).and.callThrough();
+            var handle = ws.register("/adhocracy/somethingactive", cb.cb);
+
+            expect((<any>cb.cb).calls.count()).toEqual(0);
+
             // trigger event
-            // ask spy object for callback count
-            // trigger event
-            // ask spy object for callback count again
-            // both counts should be 1
+            wsRaw.onmessage({ data: JSON.stringify({
+                resource: "/adhocracy/somethingactive",
+                event: "new_child",
+                child: "/adhocracy/somethingactive/fiyudt8y"
+            }, null, 2)});
+
+            expect((<any>cb.cb).calls.count()).toEqual(1);
+
+            // unregister callback
+            ws.unregister("/adhocracy/somethingactive", handle);
+
+            // trigger another event
+            wsRaw.onmessage({ data: JSON.stringify({
+                resource: "/adhocracy/somethingactive",
+                event: "new_child",
+                child: "/adhocracy/somethingactive/q2u7"
+            }, null, 2)});
+
+            expect((<any>cb.cb).calls.count()).toEqual(1);
         });
 
         xit("un-registration of a non-existing handle triggers an exception", () => {
