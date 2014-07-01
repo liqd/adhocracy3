@@ -42,6 +42,30 @@ export interface Type {
     unregister: (path: string, id: string) => void;
 }
 
+/**
+ * this is the websocket as provided by the browser.  it has to be
+ * passed to the WS factory as a separate service in order to make
+ * unit testing possible (see below).
+ */
+export interface RawWebSocket {
+    send: (msg: string) => void;
+    onmessage: (event: any) => void;
+    onerror: (event: any) => void;
+    onopen: (event: any) => void;
+    onclose: (event: any) => void;
+    readyState: number;
+    CONNECTING: number;
+    OPEN: number;
+    CLOSING: number;
+    CLOSED: number;
+}
+
+/**
+ * trivial RawWebSocket constructor factory that returns the built-in
+ * thing.  (replace this for unit testing.)
+ */
+export var factoryRaw = () => ((uri: string): RawWebSocket => new WebSocket(uri));
+
 export interface ServerEvent {
     event?: string;
     resource?: string;
@@ -201,13 +225,24 @@ class Subscriptions {
 }
 
 
-export var factory = (adhConfig: AdhConfig.Type) : Type => {
+/**
+ * The WS factory takes a config service and a RawWebSocket generator
+ * service.  The last one is a bit peculiar: web wockets have no
+ * "reopen" method, so after every "close", the object has to be
+ * reconstructed.  Therefore, the service has to be a RawWebSocket
+ * constructor factory that yields web socket constructors rather than
+ * web socket objects.
+ */
+export var factory = (
+    adhConfig: AdhConfig.Type,
+    constructRawWebSocket: (uri) => RawWebSocket
+) : Type => {
     "use strict";
 
     /**
      * the socket handle
      */
-    var _ws;
+    var _ws: RawWebSocket;
 
     /**
      * a distionary of all callbacks, stored under their
@@ -419,7 +454,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
     };
 
     open = () => {
-        var _ws = new WebSocket(adhConfig.wsuri);
+        var _ws = constructRawWebSocket(adhConfig.wsuri);
 
         _ws.onmessage = onmessage;
         _ws.onerror = onerror;
