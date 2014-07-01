@@ -7,7 +7,10 @@ FIX_TSC_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\((\d+),(\d+)\):(.*)/) { print 
 compile:
 	$(TSC) --module amd --sourcemap --out Adhocracy.js Adhocracy.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 
-compile_tests:
+AdhocracySpec.ts: .dummy
+	./AdhocracySpec.sh > AdhocracySpec.ts
+
+compile_tests: AdhocracySpec.ts
 	$(TSC) --module amd --sourcemap AdhocracySpec.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 
 description:
@@ -21,3 +24,5 @@ clean:
 
 wc:
 	find . -name '*.ts' | xargs wc
+
+.dummy:
