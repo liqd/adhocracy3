@@ -1,9 +1,5 @@
 import pytest
 
-# override default fixtures
-from adhocracy.testing import splinter_browser_load_condition
-from adhocracy.testing import browser_instance
-
 
 class TestDeepCp:
 

@@ -2,9 +2,6 @@
    `adhocracy_sample.testing.
 """
 
-# override defauld fixtures
-from adhocracy_sample.testing import browser_sample_root
-
 
 class TestUserLogin:
 
