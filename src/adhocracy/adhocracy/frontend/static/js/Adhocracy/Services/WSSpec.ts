@@ -73,8 +73,8 @@ export var register = () => {
             expect((<any>cb.cb).calls.count()).toEqual(1);
         });
 
-        xit("un-registration of a non-existing handle triggers an exception", () => {
-            expect(ws.unregister("/adhocracy/somethingelse", '81')).toThrow();
+        it("un-registration of a non-existing handle triggers an exception", () => {
+            expect(() => ws.unregister("/adhocracy/somethingelse", "81")).toThrow();
         });
     });
 };
