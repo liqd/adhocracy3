@@ -229,9 +229,13 @@ class Subscriptions {
         var _self = this;
         var _dict = _self._dict;
 
-        delete _dict[resource][id];
-        if (_dict[resource] === {}) {
-            delete _dict[resource];
+        if (_dict.hasOwnProperty(resource)) {
+            if (_dict[resource].hasOwnProperty(id)) {
+                delete _dict[resource][id];
+            }
+            if (_dict[resource] === {}) {
+                delete _dict[resource];
+            }
         }
 
         // if there are no other subscriptions under this resource
