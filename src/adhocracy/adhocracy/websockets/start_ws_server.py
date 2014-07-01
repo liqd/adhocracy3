@@ -15,11 +15,6 @@ from zodburi import resolve_uri
 import asyncio
 
 
-# FIXME make the port configurable
-PORT = 8080
-# FIXME make pid file path configurable
-PID_FILE = 'var/WS_SERVER.pid'
-
 logger = logging.getLogger(__name__)
 
 
@@ -38,52 +33,74 @@ def main(args=[]) -> int:
     config_file = args[0]
     fileConfig(config_file)
     config = _read_config(config_file)
-    _check_and_write_pid_file()
-    _register_sigterm_handler()
-    _start_loop(config)
+    port = _read_config_variable_or_die(config, 'port', is_int=True)
+    pid_file = _read_config_variable_or_die(config, 'pid_file')
+    _check_and_write_pid_file(pid_file)
+    _register_sigterm_handler(pid_file)
+    _start_loop(config, port, pid_file)
 
 
-def _check_and_write_pid_file():
-    if os.path.isfile(PID_FILE):
-        raise RuntimeError('Pidfile already exists: ' + PID_FILE)
+def _read_config_variable_or_die(config: ConfigParser, name: str,
+                                 is_int: bool=False):
+    """Read a variable from the [websockets] section of `config`.
+
+    :raise RuntimeError: if the variable does not exist or doesn't have the
+                         expected type
+    """
+    result = config.get('websockets', name, fallback=None)
+    if not result:
+        raise RuntimeError('Config entry "{}" in [websockets] section '
+                           'missing or empty'.format(name))
+    if is_int:
+        try:
+            result = int(result)
+        except ValueError:
+            raise RuntimeError('Config entry "{}" in [websockets] section is '
+                               'not an integer: {}'.format(name, result))
+    return result
+
+
+def _check_and_write_pid_file(pid_file: str):
+    if os.path.isfile(pid_file):
+        raise RuntimeError('Pidfile already exists: ' + pid_file)
     pid = os.getpid()
-    pidfile = open(PID_FILE, 'w')
+    pidfile = open(pid_file, 'w')
     pidfile.write('%s\n' % pid)
     pidfile.close
 
 
-def _register_sigterm_handler():
+def _register_sigterm_handler(pid_file: str):
     """Register handler for the SIGTERM signal ('kill' command).
 
     The new handler will remove the PID file and exit.
     """
     def sigterm_handler(sig, frame):
         logger.info('Kill signal (SIGTERM) received, exiting')
-        _remove_pid_file()
+        _remove_pid_file(pid_file)
         sys.exit()
 
     signal(SIGTERM, sigterm_handler)
 
 
-def _start_loop(config: ConfigParser):
+def _start_loop(config: ConfigParser, port: int, pid_file: str):
     try:
         connection = _get_zodb_connection(config)
         ClientCommunicator.zodb_connection = connection
-        factory = WebSocketServerFactory('ws://localhost:{}'.format(PORT))
+        factory = WebSocketServerFactory('ws://localhost:{}'.format(port))
         factory.protocol = ClientCommunicator
         loop = asyncio.get_event_loop()
-        coro = loop.create_server(factory, port=PORT)
-        logger.debug('Started WebSocket server listening on port %i', PORT)
+        coro = loop.create_server(factory, port=port)
+        logger.debug('Started WebSocket server listening on port %i', port)
         server = loop.run_until_complete(coro)
         _run_loop_until_interrupted(loop, server)
     finally:
         logger.info('Stopped WebSocket server')
-        _remove_pid_file()
+        _remove_pid_file(pid_file)
 
 
-def _remove_pid_file():
-    if os.path.isfile(PID_FILE):
-        os.unlink(PID_FILE)
+def _remove_pid_file(pid_file: str):
+    if os.path.isfile(pid_file):
+        os.unlink(pid_file)
 
 
 def _run_loop_until_interrupted(loop, server):
