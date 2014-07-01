@@ -172,12 +172,9 @@ class Subscriptions {
                 _dict.hasOwnProperty(resource) &&
                     Object.keys(_dict[resource]).length > 0);
         } else {
-            if (_dict.hasOwnProperty(resource)) {
-                if (_dict[resource].hasOwnProperty(id)) {
-                    return true;
-                }
-            }
-            return false;
+            return (
+                _dict.hasOwnProperty(resource) &&
+                    _dict[resource].hasOwnProperty(id));
         }
     };
 
