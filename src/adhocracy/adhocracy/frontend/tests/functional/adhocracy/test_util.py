@@ -5,7 +5,7 @@ class TestDeepCp:
 
     @pytest.fixture()
     def browser_root(self, browser, server_static):
-        url = server_static.application_url + 'frontend_static/test.html'
+        url = server_static.application_url + 'frontend_static/root.html'
         browser.visit(url)
         return browser
 
