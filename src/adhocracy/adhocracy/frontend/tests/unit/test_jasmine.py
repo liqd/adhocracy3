@@ -1,9 +1,8 @@
-from time import sleep
-
 import pytest
 
-from console import Parser
-from console import Formatter
+from adhocracy.frontend.tests.unit.console import Parser
+from adhocracy.frontend.tests.unit.console import Formatter
+
 
 class TestJasmine:
 
