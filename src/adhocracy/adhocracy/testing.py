@@ -93,7 +93,6 @@ def _kill_pid_in_file(path_to_pid_file):
         pid_int = int(pid)
         os.kill(pid_int, 15)
         time.sleep(1)
-        # FIXME start_ws_server does not remove the pid file properly
         if os.path.isfile(path_to_pid_file):
             subprocess.call(['rm', path_to_pid_file])
 

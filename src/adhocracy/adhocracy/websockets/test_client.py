@@ -1,6 +1,7 @@
 import unittest
 
 from websocket import ABNF
+import pytest
 
 
 class DummyClient():
@@ -42,9 +43,7 @@ class DummyWSConnection():
         self.pong_text = text
 
 
-class FunctionUnitTests(unittest.TestCase):
-
-    """Test the functions defined by the client module."""
+class SendMessageAfterCommitUnitTests(unittest.TestCase):
 
     def setUp(self):
         from pyramid.testing import DummyResource
@@ -180,44 +179,35 @@ class ClientUnitTests(unittest.TestCase):
 
 class TestFunctionalClient:
 
-    # FIXME why didn't this work with a fixture instead of setUp/tearDown?
-    def setUp(self):
+    @pytest.fixture()
+    def websocket_client(self, request, websocket):
         from adhocracy.websockets.client import Client
-        self.client = Client(ws_url='ws://localhost:8080')
+        client = Client(ws_url='ws://localhost:8080')
 
-    def tearDown(self):
-        self.client.stop()
+        def fin():
+            client.stop()
+        request.addfinalizer(fin)
 
-    def test_create(self, websocket):
-        try:
-            self.setUp()
-            assert self.client._is_running
-            assert self.client._ws_connection.connected
-        finally:
-            self.tearDown()
+        return client
 
-    def test_stop(self, websocket):
-        try:
-            self.setUp()
-            self.client.stop()
-            assert not self.client._is_running
-            assert not self.client._ws_connection.connected
-        finally:
-            self.tearDown()
+    def test_create(self, websocket_client):
+        assert websocket_client._is_running
+        assert websocket_client._ws_connection.connected
 
-    def test_queue_and_send_messages(self, websocket):
-        try:
-            self.setUp()
-            from pyramid.testing import DummyResource
-            context = DummyResource()
-            child = DummyResource()
-            context['child'] = child
-            self.client.add_message_resource_created(child)
-            assert child in self.client._created_resources
-            self.client._send_messages()
-            assert child not in self.client._created_resources
-        finally:
-            self.tearDown()
+    def test_stop(self, websocket_client):
+        websocket_client.stop()
+        assert not websocket_client._is_running
+        assert not websocket_client._ws_connection.connected
+
+    def test_queue_and_send_messages(self, websocket_client):
+        from pyramid.testing import DummyResource
+        context = DummyResource()
+        child = DummyResource()
+        context['child'] = child
+        websocket_client.add_message_resource_created(child)
+        assert child in websocket_client._created_resources
+        websocket_client._send_messages()
+        assert child not in websocket_client._created_resources
 
 
 class TestIntegrationClient:
