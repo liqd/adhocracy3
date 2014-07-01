@@ -49,7 +49,7 @@ export interface Type {
  */
 export interface RawWebSocket {
     send: (msg: string) => void;
-    onmessage: (event: any) => void;
+    onmessage: (event: { data: string}) => void;
     onerror: (event: any) => void;
     onopen: (event: any) => void;
     onclose: (event: any) => void;
@@ -286,7 +286,7 @@ export var factory = (
     var sendRequest: (req: Request) => void;
     var handleResponseMessage: (msg: ServerMessage) => void;
 
-    var onmessage: (event: any) => void;
+    var onmessage: (event: { data: string }) => void;
     var onerror: (event: any) => void;
     var onopen: (event: any) => void;
     var onclose: (event: any) => void;
@@ -417,7 +417,7 @@ export var factory = (
         }
     };
 
-    onmessage = (event) : void => {
+    onmessage = (event: { data: string }) : void => {
         var msg: ServerMessage = JSON.parse(event.data);
         console.log("WS: onmessage:"); console.log(JSON.stringify(msg, null, 2));  // FIXME: introduce a log service for this stuff.
 
