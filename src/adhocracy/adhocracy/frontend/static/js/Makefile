@@ -33,6 +33,25 @@ test: tslint tslint compile_tests_node test_node
 tslint:
 	../../../../../../bin/tslint_check_adhocracy | $(FIX_TSLINT_ERROR_FORMAT)
 
+tslint_fast:
+	@echo "\n\nThis rule only works with https://github.com/palantir/tslint/pull/176 in your path.\n\n"
+	tslint -c ../../../../../../etc/tslint.json \
+		-f ./Adhocracy/Resources.ts \
+		-f ./Adhocracy/Util.ts \
+		-f ./Adhocracy/Pages/DocumentWorkbench.ts \
+		-f ./Adhocracy/Widgets.ts \
+		-f ./Adhocracy/WidgetsSpec.ts \
+		-f ./Adhocracy/Css.ts \
+		-f ./Adhocracy/Types.ts \
+		-f ./Adhocracy/Services/Http.ts \
+		-f ./Adhocracy/Services/WS.ts \
+		-f ./Adhocracy/Services/Done.ts \
+		-f ./Adhocracy/Services/Config.ts \
+		-f ./Adhocracy/Services/User.ts \
+		-f ./Adhocracy/UtilSpec.ts \
+		-f ./AdhocracySpec.ts \
+		-f ./Adhocracy.ts
+
 test_node:
 	../../../../../../bin/jasmine-node .
 	@echo "NOTE: leaving commonjs modules in place."
