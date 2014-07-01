@@ -2,10 +2,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/q/Q.d.ts"/>
 
 import Config = require("./Config");
-import Util = require("../Util");
 import WS = require("./WS");
-
-declare var beforeEach : (any) => void;
 
 export var register = () => {
     describe("Services/WS", () => {
