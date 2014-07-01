@@ -209,9 +209,6 @@ class TestFunctionalClient:
         websocket_client._send_messages()
         assert child not in websocket_client._created_resources
 
-
-class TestIntegrationClient:
-
     def test_includeme_without_ws_url_setting(self, dummy_config):
         from adhocracy.websockets.client import includeme
         dummy_config.registry.settings['adhocracy.ws_url'] = ''

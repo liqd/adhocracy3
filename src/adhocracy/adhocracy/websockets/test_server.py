@@ -475,16 +475,16 @@ class ClientTrackerUnitTests(unittest.TestCase):
 
 class TestFunctionalClientCommunicator:
 
-    @pytest.fixture(scope='function')
-    def websocket_connection(self, request, server):
+    @pytest.fixture()
+    def connection(self, request, server):
         from websocket import create_connection
         connection = create_connection('ws://localhost:8080')
-        connection.send('{"resource": "/adhocracy", "action": "subscribe"}')
-        connection.recv()
 
         def tearDown():
             print('teardown websocket connection')
-            connection.close()
+            if connection.connected:
+                connection.send_close(reason=b'done')
+                connection.close()
         request.addfinalizer(tearDown)
 
         return connection
@@ -499,6 +499,8 @@ class TestFunctionalClientCommunicator:
         requests.post(url, data=json.dumps(data),
                       headers={'content-type': 'application/json'})
 
-    def test_send_child_notification(self, server, websocket_connection):
+    def test_send_child_notification(self, server, connection):
+        connection.send('{"resource": "/adhocracy", "action": "subscribe"}')
+        connection.recv()
         self._add_pool(server, '/', 'Proposals')
-        assert 'Proposals' in websocket_connection.recv()
+        assert 'Proposals' in connection.recv()
