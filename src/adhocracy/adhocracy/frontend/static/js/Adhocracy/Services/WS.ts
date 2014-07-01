@@ -151,6 +151,8 @@ class Subscriptions {
         var _self = this;
         var _dict = _self._dict;
 
+        console.log("add", JSON.stringify(_dict, null, 2));
+
         // if there are no other subscriptions under this resource
         // yet, notify server (if applicable).
         if (!_self.alive(resource) && typeof notifyServer === "function") {
@@ -265,6 +267,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         path: string,
         callback: (event: ServerEvent) => void
     ) : string => {
+        console.log("register", path);
         if (_ws.readyState === _ws.OPEN) {
             return _subscriptions.add(path, callback, null, () => sendRequest({action: "subscribe", resource: path}));
         } else {
@@ -279,6 +282,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         path: string,
         id: string
     ) : void => {
+        console.log("unregister", path);
         if (!(_subscriptions.hasOwnProperty(path) ||
               _pendingSubscriptions.hasOwnProperty(path))) {
             throw "WS: unsubscribe: no subscription for " + path + "!";
