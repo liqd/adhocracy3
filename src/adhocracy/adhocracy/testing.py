@@ -118,6 +118,24 @@ def server(request, app) -> StopableWSGIServer:
     return server
 
 
+@pytest.fixture(scope='session')
+def server_static(request) -> StopableWSGIServer:
+    """Return a http server that only serves the static files."""
+    from adhocracy.frontend import includeme
+    config = Configurator(settings={})
+    includeme(config)
+    app = config.make_wsgi_app()
+
+    server = StopableWSGIServer.create(app)
+
+    def fin():
+        print('teardown static http server')
+        server.shutdown()
+
+    request.addfinalizer(fin)
+    return server
+
+
 class SplinterBrowser(PytestSplinterBrowser):
 
     """ Extended Splinter browser."""

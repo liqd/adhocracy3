@@ -3,6 +3,12 @@ import pytest
 
 class TestDeepCp:
 
+    @pytest.fixture()
+    def browser_root(self, browser, server_static):
+        url = server_static.application_url + 'frontend_static/test.html'
+        browser.visit(url)
+        return browser
+
     @pytest.mark.parametrize("value",
                              [None,
                               {},

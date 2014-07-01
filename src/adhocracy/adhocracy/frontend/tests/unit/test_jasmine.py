@@ -7,8 +7,8 @@ from adhocracy.frontend.tests.unit.console import Formatter
 class TestJasmine:
 
     @pytest.fixture()
-    def browser_test(self, browser, server_sample):
-        url = server_sample.application_url + 'frontend_static/test.html'
+    def browser_test(self, browser, server_static):
+        url = server_static.application_url + 'frontend_static/test.html'
         browser.visit(url)
         return browser
 
