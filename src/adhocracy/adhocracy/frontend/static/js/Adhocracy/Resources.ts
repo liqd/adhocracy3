@@ -144,7 +144,7 @@ export var addParagraph = (proposalVersion: PartialIProposalVersion, paragraphPa
     return proposalVersion.data["adhocracy.sheets.document.IDocument"].elements.push(paragraphPath);
 };
 
-export var getNewestVersionPath = (adhHttp: Http.IService<Types.Content<any>>, path: string) : ng.IPromise<any> => {
+export var getNewestVersionPath = (adhHttp: Http.Type<Types.Content<any>>, path: string) : ng.IPromise<any> => {
     "use strict";
     // FIXME conceptually, there is no single newest version.  Versions have a tree
     // structure and there can be many leafs to that tree.  This is not a technical

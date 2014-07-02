@@ -19,7 +19,7 @@ export var logBackendError;
 // ``Types.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
 
-export interface IService<Content extends Types.Content<any>> {
+export interface Type<Content extends Types.Content<any>> {
     get : (path : string) => ng.IPromise<Content>;
     put : (path : string, obj : Content) => ng.IPromise<Content>;
     postNewVersion : (oldVersionPath : string, obj : Content) => ng.IPromise<Content>;
@@ -28,10 +28,10 @@ export interface IService<Content extends Types.Content<any>> {
     metaApiSheet : (name : string) => any;
 }
 
-factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IService<Content> => {
+factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : Type<Content> => {
     "use strict";
 
-    var adhHttp : IService<Content> = {
+    var adhHttp : Type<Content> = {
         get: get,
         put: put,
         postNewVersion: postNewVersion,
