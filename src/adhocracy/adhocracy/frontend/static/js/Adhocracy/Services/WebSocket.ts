@@ -18,9 +18,8 @@ import AdhConfig = require("./Config");
  */
 
 
-/**
- * exported types
- */
+//////////////////////////////////////////////////////////////////////
+// exported Types
 
 export interface Type {
     /**
@@ -61,12 +60,6 @@ export interface RawWebSocket {
 }
 
 /**
- * trivial RawWebSocket constructor factory that returns the built-in
- * thing.  (replace this for unit testing.)
- */
-export var factoryRaw = () => ((uri: string): RawWebSocket => new WebSocket(uri));
-
-/**
  * structure of the parameter called to the consumer callbacks.  (this
  * type is slightly more general than would be nice due to
  * technicalities of the adhocracy websocket protocol and the lack of
@@ -80,9 +73,8 @@ export interface ServerEvent {
 }
 
 
-/**
- * internal rest-api types
- */
+//////////////////////////////////////////////////////////////////////
+// internal Types
 
 interface Request {
     action: string;
@@ -103,8 +95,11 @@ interface ResponseError {
 interface ServerMessage extends ResponseOk, ResponseError, ServerEvent {};
 
 
+//////////////////////////////////////////////////////////////////////
+// the Subscriptions class
+
 /**
- * A Subscription instance is a dictionary of dictionaries.  The first
+ * A Subscriptions instance is a dictionary of dictionaries.  The first
  * maps a resource to all its subscribed callbacks; the second maps
  * callback identifiers to actual callbacks.
  */
@@ -240,6 +235,9 @@ class Subscriptions {
     };
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// factory functions
 
 /**
  * The WebSocket factory takes a config service and a RawWebSocket generator
@@ -498,6 +496,15 @@ export var factory = (
     };
 };
 
+/**
+ * trivial RawWebSocket constructor factory that returns the built-in
+ * thing.  (replace this for unit testing.)
+ */
+export var factoryRaw = () => ((uri: string): RawWebSocket => new WebSocket(uri));
+
+
+//////////////////////////////////////////////////////////////////////
+// Widgets
 
 /**
  * test widget
