@@ -5,6 +5,11 @@ import Config = require("./Config");
 import WS = require("./WS");
 
 export var register = () => {
+    // FIXME: This should be ``describe("WS")`` and should be wrapped in a
+    // ``describe("Services")`` to mirror the module structure. This is not
+    // currently possible because the script that generates AdhocracySpec.ts
+    // includes all *Spec.ts modules.
+
     describe("Services/WS", () => {
         var config: Config.Type = {
             templatePath: "mock",
