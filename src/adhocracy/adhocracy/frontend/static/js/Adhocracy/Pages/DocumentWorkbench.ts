@@ -7,7 +7,7 @@ import angular = require("angular");
 
 import Types = require("../Types");
 import AdhHttp = require("../Services/Http");
-import AdhWS = require("../Services/WS");
+import AdhWebSocket = require("../Services/WebSocket");
 import AdhUser = require("../Services/User");
 import AdhConfig = require("../Services/Config");
 import AdhDone = require("../Services/Done");
@@ -105,8 +105,8 @@ export var run = () => {
 
 
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
-    app.factory("constructRawWebSocket", [AdhWS.factoryRaw]);
-    app.factory("adhWS", ["adhConfig", "constructRawWebSocket", AdhWS.factory]);
+    app.factory("constructRawWebSocket", [AdhWebSocket.factoryRaw]);
+    app.factory("adhWebSocket", ["adhConfig", "constructRawWebSocket", AdhWebSocket.factory]);
 
 
     // filters
@@ -132,10 +132,10 @@ export var run = () => {
         return new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective(adhConfig);
     }]);
 
-    var webSocketTest = new AdhWS.WebSocketTest();
+    var webSocketTest = new AdhWebSocket.WebSocketTest();
     app.directive("adhWebSocketTest",
-                  ["$timeout", "adhConfig", "adhWS", ($timeout, adhConfig, adhWS) =>
-                   webSocketTest.createDirective($timeout, adhConfig, adhWS)]);
+                  ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>
+                   webSocketTest.createDirective($timeout, adhConfig, adhWebSocket)]);
 
 
     // application-specific directives

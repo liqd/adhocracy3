@@ -5,7 +5,7 @@
 
 import Types = require("./Types");
 import AdhHttp = require("./Services/Http");
-import AdhWS = require("./Services/WS");
+import AdhWebSocket = require("./Services/WebSocket");
 import AdhConfig = require("./Services/Config");
 
 import Resources = require("./Resources");
@@ -66,10 +66,10 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                 title: "@"
             },
             transclude: true,
-            controller: ["$scope", "adhHttp", "adhWS", "adhDone", (
+            controller: ["$scope", "adhHttp", "adhWebSocket", "adhDone", (
                 $scope: ListingScope<Container>,
                 adhHttp: AdhHttp.Type<Container>,
-                adhWS: AdhWS.Type,
+                adhWebSocket: AdhWebSocket.Type,
                 adhDone
             ) : void => {
                 var getHandler = (pool: Container): void => {
@@ -77,7 +77,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                     $scope.elements = _self.containerAdapter.elemRefs($scope.container);
                 };
 
-                var wsHandler = (event: AdhWS.ServerEvent): void => {
+                var wsHandler = (event: AdhWebSocket.ServerEvent): void => {
                     adhHttp.get($scope.path).then(getHandler);
                 };
 
@@ -85,7 +85,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                 // the updates, *then* get an initial copy.)
 
                 try {
-                    adhWS.register($scope.path, wsHandler);
+                    adhWebSocket.register($scope.path, wsHandler);
 
                     // FIXME: subscribe returns an id, and we need to
                     // unsubscribe when the listing is shut down.  how

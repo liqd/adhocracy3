@@ -44,7 +44,7 @@ export interface Type {
 
 /**
  * this is the websocket as provided by the browser.  it has to be
- * passed to the WS factory as a separate service in order to make
+ * passed to the WebSocket factory as a separate service in order to make
  * unit testing possible (see below).
  */
 export interface RawWebSocket {
@@ -134,7 +134,7 @@ class Subscriptions {
                 }
             }
         } else {
-            throw "WS: got notification of event that i haven't subscribed!";
+            throw "WebSocket: got notification of event that i haven't subscribed!";
         }
     };
 
@@ -205,7 +205,7 @@ class Subscriptions {
         }
 
         if (_dict[resource].hasOwnProperty(id)) {
-            throw ("WS: attempt to Subscription().add under an existing path / id: " + id);
+            throw ("WebSocket: attempt to Subscription().add under an existing path / id: " + id);
         }
 
         _dict[resource][id] = callback;
@@ -242,7 +242,7 @@ class Subscriptions {
 
 
 /**
- * The WS factory takes a config service and a RawWebSocket generator
+ * The WebSocket factory takes a config service and a RawWebSocket generator
  * service.  The last one is a bit peculiar: web sockets have no
  * "reopen" method, so after every "close", the object has to be
  * reconstructed.  Therefore, the service has to be a RawWebSocket
@@ -269,7 +269,7 @@ export var factory = (
     /**
      * same type as _subscriptions, but these are still waiting for
      * being sent over the wire.  this is necessary because when _ws
-     * is initialized and the adhWS handle returned to the consumer,
+     * is initialized and the adhWebSocket handle returned to the consumer,
      * the consumer may start subscribing to stuff, but the web socket
      * is not in connected state yet.
      */
@@ -335,7 +335,7 @@ export var factory = (
     ) : void => {
         console.log("unregister", path);
         if (!(_subscriptions.alive(path, id) || _pendingSubscriptions.alive(path, id))) {
-            throw "WS: unsubscribe: no subscription for " + JSON.stringify(path) + "!";
+            throw "WebSocket: unsubscribe: no subscription for " + JSON.stringify(path) + "!";
         } else {
             _subscriptions.del(path, id, () => {
                 if (_ws.readyState === _ws.OPEN) {
@@ -356,10 +356,10 @@ export var factory = (
         req: Request
     ) : void => {
         var reqString: string = JSON.stringify(req);
-        console.log("WS: sending " + JSON.stringify(req, null, 2));  // FIXME: introduce a log service for this stuff.
+        console.log("WebSocket: sending " + JSON.stringify(req, null, 2));  // FIXME: introduce a log service for this stuff.
 
         if (_ws.readyState !== _ws.OPEN) {
-            throw "WS: attempt to write to non-OPEN websocket!";
+            throw "WebSocket: attempt to write to non-OPEN websocket!";
         } else {
             _ws.send(reqString);
             _requests.push(req);
@@ -380,14 +380,14 @@ export var factory = (
         if (msg.hasOwnProperty("status")) {
             var checkCompare = (req: Request, resp: ResponseOk) => {
                 if (req.action !== resp.action || req.resource !== resp.resource) {
-                    throw ("WS: onmessage: response does not match request!\n"
+                    throw ("WebSocket: onmessage: response does not match request!\n"
                            + req.toString() + "\n"
                            + resp.toString());
                 }
             };
 
             var checkRedundant = (resp: ResponseOk) => {
-                throw ("WS: onmessage: received 'redundant' response.  this should not happen!\n"
+                throw ("WebSocket: onmessage: received 'redundant' response.  this should not happen!\n"
                        + resp.toString());
             };
 
@@ -412,13 +412,13 @@ export var factory = (
             case "invalid_json":
             case "subscribe_not_supported":
             case "internal_error":
-                throw ("WS: onmessage: received error message.\n"
+                throw ("WebSocket: onmessage: received error message.\n"
                        + msg.error + "\n"
                        + req.toString() + "\n"
                        + msg.toString());
 
             default:
-                throw ("WS: onmessage: received **unknown** error message.  this should not happen!\n"
+                throw ("WebSocket: onmessage: received **unknown** error message.  this should not happen!\n"
                        + msg.error + "\n"
                        + req.toString() + "\n"
                        + msg.toString());
@@ -428,7 +428,7 @@ export var factory = (
 
     onmessage = (event: { data: string }) : void => {
         var msg: ServerMessage = JSON.parse(event.data);
-        console.log("WS: onmessage:"); console.log(JSON.stringify(msg, null, 2));  // FIXME: introduce a log service for this stuff.
+        console.log("WebSocket: onmessage:"); console.log(JSON.stringify(msg, null, 2));  // FIXME: introduce a log service for this stuff.
 
         // ServerEvent: something happened to the backend data!
         if (msg.hasOwnProperty("event")) {
@@ -439,9 +439,9 @@ export var factory = (
     };
 
     onerror = (event) => {
-        console.log("WS: error!");
+        console.log("WebSocket: error!");
         console.log(JSON.stringify(event, null, 2));
-        throw "WS: error!";
+        throw "WebSocket: error!";
     };
 
     onopen = (event) => {
@@ -454,18 +454,18 @@ export var factory = (
     onclose = (event) => {
         // _ws = open();
 
-        console.log("WS: close!  (see source code for things to fix here.)");
+        console.log("WebSocket: close!  (see source code for things to fix here.)");
         console.log(JSON.stringify(event, null, 2));
 
         // FIXME: this is bad because it invalidates all previous
-        // subscriptions, but adhWS is not aware of that.
+        // subscriptions, but adhWebSocket is not aware of that.
         //
         // if you fix this, also check unsubscribe (currently if
         // called in unconnected state, it clears out _subscriptions
         // and _pendingSubscriptions and just assumes the server has
         // unsusbcribed everything already.
 
-        throw "WS: close!";
+        throw "WebSocket: close!";
     };
 
     open = () => {
@@ -515,7 +515,7 @@ interface WebSocketTestScope extends ng.IScope {
  */
 export class WebSocketTest {
 
-    public createDirective = ($timeout: ng.ITimeoutService, adhConfig: AdhConfig.Type, adhWS: Type) : ng.IDirective => {
+    public createDirective = ($timeout: ng.ITimeoutService, adhConfig: AdhConfig.Type, adhWebSocket: Type) : ng.IDirective => {
         var _self = this;
 
         return {
@@ -529,7 +529,7 @@ export class WebSocketTest {
                 $scope.messages = [];
                 var paths = JSON.parse($scope.rawPaths);
                 paths.map((path) => {
-                    adhWS.register(path, (serverEvent) => $scope.messages.push(serverEvent));
+                    adhWebSocket.register(path, (serverEvent) => $scope.messages.push(serverEvent));
                 });
             }]
         };
