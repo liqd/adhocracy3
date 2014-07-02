@@ -27,7 +27,7 @@ export var register = () => {
         var ws;
 
         beforeEach(() => {
-            ws = WebSocket.factory(config, constructRawWebSocket);
+            ws = WebSocket.factoryType(config, constructRawWebSocket);
         });
 
         it("does not initially call the send method of web socket", () => {

@@ -247,7 +247,7 @@ class Subscriptions {
  * constructor factory that yields web socket constructors rather than
  * web socket objects.
  */
-export var factory = (
+export var factoryType = (
     adhConfig: AdhConfig.Type,
     constructRawWebSocket: (uri) => RawWebSocket
 ) : Type => {
@@ -500,7 +500,14 @@ export var factory = (
  * trivial RawWebSocket constructor factory that returns the built-in
  * thing.  (replace this for unit testing.)
  */
-export var factoryRaw = () => ((uri: string): RawWebSocket => new WebSocket(uri));
+export var factoryRawWebSocket = () => ((uri: string): RawWebSocket => new WebSocket(uri));
+
+/**
+ * factory for export to consumer modules.  it combines
+ * factoryRawWebSocket and factoryType in the way it is almost always
+ * used (besides in unit tests).
+ */
+export var factory = (adhConfig: AdhConfig.Type): Type => factoryType(adhConfig, factoryRawWebSocket());
 
 
 //////////////////////////////////////////////////////////////////////
