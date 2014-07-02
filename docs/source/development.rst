@@ -77,3 +77,8 @@ frontend acceptance tests::
 run all tests::
 
     bin/py.test_run_all
+
+delete database (works best on development systems without valuable data!)::
+
+    rm -f ./var/Data.*
+    supervisorctl reload
