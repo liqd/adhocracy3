@@ -1,4 +1,5 @@
-
+Frontend Testing
+----------------
 
 This document contains project-specific documentation of the testing
 tool chain and setup.
