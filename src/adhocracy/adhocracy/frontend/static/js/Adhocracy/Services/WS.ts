@@ -42,6 +42,36 @@ export interface Type {
     unregister: (path: string, id: string) => void;
 }
 
+/**
+ * this is the websocket as provided by the browser.  it has to be
+ * passed to the WS factory as a separate service in order to make
+ * unit testing possible (see below).
+ */
+export interface RawWebSocket {
+    send: (msg: string) => void;
+    onmessage: (event: { data: string}) => void;
+    onerror: (event: any) => void;
+    onopen: (event: any) => void;
+    onclose: (event: any) => void;
+    readyState: number;
+    CONNECTING: number;
+    OPEN: number;
+    CLOSING: number;
+    CLOSED: number;
+}
+
+/**
+ * trivial RawWebSocket constructor factory that returns the built-in
+ * thing.  (replace this for unit testing.)
+ */
+export var factoryRaw = () => ((uri: string): RawWebSocket => new WebSocket(uri));
+
+/**
+ * structure of the parameter called to the consumer callbacks.  (this
+ * type is slightly more general than would be nice due to
+ * technicalities of the adhocracy websocket protocol and the lack of
+ * disjunctive types in typescript.)
+ */
 export interface ServerEvent {
     event?: string;
     resource?: string;
@@ -128,15 +158,24 @@ class Subscriptions {
     };
 
     /**
-     * Are there subscriptions on a resource?  We need to know
-     * before we notify the server of an (un-) subscription.
+     * Are there subscriptions on a resource?  (We need to know before
+     * we notify the server of an (un-) subscription.)  If id is
+     * given, only check if this particular id contains a callback.
+     * (needed for detection of redundant calls to unregister.)
      */
-    private alive = (resource: string): boolean => {
+    public alive = (resource: string, id?: string): boolean => {
         var _self = this;
+        var _dict = _self._dict;
 
-        return (
-            _self._dict.hasOwnProperty(resource) &&
-                Object.keys(_self._dict[resource]).length > 0);
+        if (id === null || typeof id === "undefined") {
+            return (
+                _dict.hasOwnProperty(resource) &&
+                    Object.keys(_dict[resource]).length > 0);
+        } else {
+            return (
+                _dict.hasOwnProperty(resource) &&
+                    _dict[resource].hasOwnProperty(id));
+        }
     };
 
     /**
@@ -157,7 +196,7 @@ class Subscriptions {
             notifyServer();
         }
 
-        if (typeof id === "undefined") {
+        if (id === null || typeof id === "undefined") {
             id = _self._createCallbackId();
         }
 
@@ -165,9 +204,8 @@ class Subscriptions {
             _dict[resource] = {};
         }
 
-        // FIXME: Why is the first condition here?
-        if (id !== null && _dict[resource].hasOwnProperty(id)) {
-            throw ("WS: attempt to Subscription().add under an existing path / id: " + JSON.stringify(id));
+        if (_dict[resource].hasOwnProperty(id)) {
+            throw ("WS: attempt to Subscription().add under an existing path / id: " + id);
         }
 
         _dict[resource][id] = callback;
@@ -185,9 +223,13 @@ class Subscriptions {
         var _self = this;
         var _dict = _self._dict;
 
-        delete _dict[resource][id];
-        if (_dict[resource] === {}) {
-            delete _dict[resource];
+        if (_dict.hasOwnProperty(resource)) {
+            if (_dict[resource].hasOwnProperty(id)) {
+                delete _dict[resource][id];
+            }
+            if (_dict[resource] === {}) {
+                delete _dict[resource];
+            }
         }
 
         // if there are no other subscriptions under this resource
@@ -199,13 +241,24 @@ class Subscriptions {
 }
 
 
-export var factory = (adhConfig: AdhConfig.Type) : Type => {
+/**
+ * The WS factory takes a config service and a RawWebSocket generator
+ * service.  The last one is a bit peculiar: web sockets have no
+ * "reopen" method, so after every "close", the object has to be
+ * reconstructed.  Therefore, the service has to be a RawWebSocket
+ * constructor factory that yields web socket constructors rather than
+ * web socket objects.
+ */
+export var factory = (
+    adhConfig: AdhConfig.Type,
+    constructRawWebSocket: (uri) => RawWebSocket
+) : Type => {
     "use strict";
 
     /**
      * the socket handle
      */
-    var _ws;
+    var _ws: RawWebSocket;
 
     /**
      * a distionary of all callbacks, stored under their
@@ -243,7 +296,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
     var sendRequest: (req: Request) => void;
     var handleResponseMessage: (msg: ServerMessage) => void;
 
-    var onmessage: (event: any) => void;
+    var onmessage: (event: { data: string }) => void;
     var onerror: (event: any) => void;
     var onopen: (event: any) => void;
     var onclose: (event: any) => void;
@@ -265,6 +318,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         path: string,
         callback: (event: ServerEvent) => void
     ) : string => {
+        console.log("register", path);
         if (_ws.readyState === _ws.OPEN) {
             return _subscriptions.add(path, callback, null, () => sendRequest({action: "subscribe", resource: path}));
         } else {
@@ -279,9 +333,9 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         path: string,
         id: string
     ) : void => {
-        if (!(_subscriptions.hasOwnProperty(path) ||
-              _pendingSubscriptions.hasOwnProperty(path))) {
-            throw "WS: unsubscribe: no subscription for " + path + "!";
+        console.log("unregister", path);
+        if (!(_subscriptions.alive(path, id) || _pendingSubscriptions.alive(path, id))) {
+            throw "WS: unsubscribe: no subscription for " + JSON.stringify(path) + "!";
         } else {
             _subscriptions.del(path, id, () => {
                 if (_ws.readyState === _ws.OPEN) {
@@ -372,7 +426,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         }
     };
 
-    onmessage = (event) : void => {
+    onmessage = (event: { data: string }) : void => {
         var msg: ServerMessage = JSON.parse(event.data);
         console.log("WS: onmessage:"); console.log(JSON.stringify(msg, null, 2));  // FIXME: introduce a log service for this stuff.
 
@@ -415,7 +469,7 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
     };
 
     open = () => {
-        var _ws = new WebSocket(adhConfig.wsuri);
+        var _ws = constructRawWebSocket(adhConfig.wsuri);
 
         _ws.onmessage = onmessage;
         _ws.onerror = onerror;
@@ -443,7 +497,6 @@ export var factory = (adhConfig: AdhConfig.Type) : Type => {
         unregister: unregister
     };
 };
-
 
 
 /**
