@@ -28,7 +28,7 @@ description:
 
 # run tests
 
-test: tslint tslint compile_tests_node test_node
+test: tslint compile_tests_node test_node
 
 tslint:
 	../../../../../../bin/tslint_check_adhocracy | $(FIX_TSLINT_ERROR_FORMAT)
