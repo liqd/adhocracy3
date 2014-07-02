@@ -471,7 +471,7 @@ export var factoryIService = (
     };
 
     open = () => {
-        var _ws = constructRawWebSocket(adhConfig.wsuri);
+        var _ws = constructRawWebSocket(adhConfig.wsUrl);
 
         _ws.onmessage = onmessage;
         _ws.onerror = onerror;

@@ -13,8 +13,8 @@ export var register = () => {
     describe("Services/WebSocket", () => {
         var config: Config.Type = {
             templatePath: "mock",
-            jsonPrefix: "mock",
-            wsuri: "mock"
+            rootPath: "mock",
+            wsUrl: "mock"
         };
 
         // constructor for a mock raw web socket that leaks the

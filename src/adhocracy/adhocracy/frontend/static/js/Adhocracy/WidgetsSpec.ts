@@ -16,8 +16,8 @@ declare var beforeEach : (any) => void;
 
 var config : Config.Type = {
     templatePath: "mock",
-    jsonPrefix: "mock",
-    wsuri: "mock"
+    rootPath: "mock",
+    wsUrl: "mock"
 };
 
 var createAdhHttpMock = () => {

@@ -7,13 +7,19 @@
  */
 
 export interface Type {
+    rootPath: string;
     templatePath: string;
-    jsonPrefix: string;
-    wsuri: string;
+    wsUrl: string;
 }
 
-export var config : Type = {
+var config : Type = {
+    rootPath: "/adhocracy",
     templatePath: "/frontend_static/templates",
-    jsonPrefix: "/adhocracy",
-    wsuri: "ws://localhost:8080/"
+    wsUrl: "ws://localhost:8080/"
 };
+
+
+export var register = (app, serviceName) => {
+    app.factory(serviceName, () => config);
+};
+
