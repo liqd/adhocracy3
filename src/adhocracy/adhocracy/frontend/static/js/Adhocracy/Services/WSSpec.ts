@@ -22,30 +22,30 @@ export var register = () => {
 
         var ws = WS.factory(config, constructRawWebSocket);
 
-        it("at this point, the send method of web socket should never have been called", () => {
+        it("does not initially call the send method of web socket", () => {
             expect(wsRaw.send.calls.any()).toEqual(false);
         });
 
-        it("first registration yields '0' as callback handle", () => {
+        it("returns '0' as callback handle on first registration", () => {
             expect(ws.register("/adhocracy", () => null)).toEqual("0");
         });
 
-        it("second registration yields '1' as callback handle", () => {
+        it("returns '1' as callback handle on second registration", () => {
             expect(ws.register("/adhocracy/somethingelse", () => null)).toEqual("1");
         });
 
-        it("at this point, the send method of web socket should have been called twice", () => {
+        it("calls the send method of web socket on every register to different resources", () => {
             expect(wsRaw.send.calls.count()).toEqual(2);
         });
 
-        it("second registration to same resource only sends subscription to server once", () => {
+        it("sends only one subscription for multiple registrations to same resource", () => {
             var resource = "/adhocracy/sidty";
             ws.register(resource, () => null); var before2nd = wsRaw.send.calls.count();
             ws.register(resource, () => null); var after2nd = wsRaw.send.calls.count();
             expect(before2nd).toEqual(after2nd);
         });
 
-        it("callbacks should be called only between being registered and being unregistered", () => {
+        it("calls callbacks only between being registered and being unregistered", () => {
             // register spy object as callback
             var cb = {
                 cb: (event) => null
@@ -77,7 +77,7 @@ export var register = () => {
             expect((<any>cb.cb).calls.count()).toEqual(1);
         });
 
-        it("un-registration of a non-existing handle triggers an exception", () => {
+        it("throws an exception on un-registration of a non-existing handle", () => {
             expect(() => ws.unregister("/adhocracy/somethingelse", "81")).toThrow();
         });
     });
