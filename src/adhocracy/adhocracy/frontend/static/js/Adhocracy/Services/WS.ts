@@ -167,7 +167,7 @@ class Subscriptions {
         var _self = this;
         var _dict = _self._dict;
 
-        if (id === null || typeof id === 'undefined') {
+        if (id === null || typeof id === "undefined") {
             return (
                 _dict.hasOwnProperty(resource) &&
                     Object.keys(_dict[resource]).length > 0);
