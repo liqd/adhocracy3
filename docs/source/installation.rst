@@ -75,28 +75,25 @@ build sphinx documentation ::
 Run the application
 -------------------
 
-Running the zodb server (in background) ::
+Start supervisor (which manages the ZODB database, the Pyramid application
+and the Autobahn websocket server)::
 
-    ./bin/runzeo -C etc/zeo.conf &
+    ./bin/supervisord
 
-Updating the object structure ::
+Check that everything is running smoothly::
+
+    ./bin/supervisorctl status
+
+
+Updating the object structure::
 
     ./bin/sd_evolve etc/development.ini
 
-Starting the Websocket server (in background)::
-
-    ./bin/start_ws_server etc/development.ini &
-
-The Websocket server logs to stderr. You can redirect this to a file::
-
-    ./bin/start_ws_server etc/development.ini 2> adhocracy-ws.log &
-
-Serving the sample wsgi app using pserve ::
-
-    ./bin/pserve etc/development.ini
-
-Open the javascript front-end with your web browser ::
+Open the javascript front-end with your web browser::
 
     xdg-open http://localhost:6541/frontend_static/root.html
 
 
+Shutdown everything nicely::
+
+    ./bin/supervisorctl shutdown
