@@ -1,43 +1,60 @@
+# doctest: +ELLIPSIS
+# doctest: +NORMALIZE_WHITESPACE
+
 User Registration and Login
 ===========================
 
-User Registration
------------------
+Prerequisites
+-------------
 
-To register a new user, the frontend sends a JSON request to the URL
-``/register`` with the following fields::
+Start Adhocracy testapp::
 
-    { "username": "<arbitrary non-empty string>",
-      "email": "<e-mail address>",
-      "password": "<arbitrary non-empty string>"
-    }
+    >>> from webtest import TestApp
+    >>> app = getfixture('app_sample')
+    Executin...
+    >>> websocket = getfixture('websocket')
+    >>> testapp = TestApp(app)
 
-In the general case, both the "username" and the "email" fields are
-optional, but **one** of them must be present. *Note:* in the future, some
-Adhocracy installations may require a valid email address; in that case,
-the "email" field would be required.
 
-"username" is a non-empty string that can contain any characters except '@'
-(to make usernames distinguishable from email addresses). The username must
-not contain any whitespace except single spaces, preceded and followed by
-non-whitespace (no whitespace at begin or end, multiple subsequent spaces
-are forbidden, tabs and newlines are forbidden).
+User Creation (Registration)
+----------------------------
 
-"email" must looks like a valid email address.
+FIXME all the doctests in the document don't work yet.
+
+A new user is registered by creating a user object under the
+``/principals/users`` pool. On success, the response contains the path of
+the new user.
+
+    >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
+    ...         'data': {
+    ...              'adhocracy.sheets.user.UserBasicSchema': {
+    ...                  'name': 'Anna Müller',
+    ...                  'email': 'anna@example.org'},
+    ...              'adhocracy.sheets.user.IPasswordAuthentication': {
+    ...                  'password': 'EckVocUbs3'}}}
+    >>> resp_data = testapp.post_json("/principals/users", prop).json
+    >>> resp_data["adhocracy.resources.principal.IUser"]
+    'adhocracy.resources.pool.IBasicPool'
+    >>> resp_data["path"].startswith('/principals/users/')
+    True
+
+The "name" field in the "UserBasicSchema" schema is a non-empty string that
+can contain any characters except '@' (to make user names distinguishable
+from email addresses). The username must not contain any whitespace except
+single spaces, preceded and followed by non-whitespace (no whitespace at
+begin or end, multiple subsequent spaces are forbidden,
+tabs and newlines are forbidden).
+
+The "email" field must looks like a valid email address.
 
 *Note:* for now, we **don't validate** email addresses to ensure that they
 exist and really belong to the user -- email verification is part of a
 future story.
 
-On success, the backend responds with::
+Creating a new user will not automatically log them in. The frontend need to
+send an explicit login request afterwards.
 
-    { "status": "success" }
-
-The user exists but it not yet logged in. FIXME or should they be logged
-in?
-
-FIXME Should there be another response or any more info in the response?
-
+TODO Convert rest of document into doctest.
 On failure, the backend responds with::
 
     { "status": "error", "errors": [<errors>] }
