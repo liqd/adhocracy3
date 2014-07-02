@@ -24,9 +24,9 @@ class UserBasicSchema(colander.MappingSchema):
     """
 
     email = Email()
-    display_name = colander.SchemaNode(colander.String(),
-                                       missing=colander.drop,
-                                       default='')
+    name = colander.SchemaNode(colander.String(),
+                               missing=colander.drop,
+                               default='')
     tzname = TimeZoneName()
 
 
