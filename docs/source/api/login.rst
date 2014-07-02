@@ -79,13 +79,13 @@ User Login
 ----------
 
 To login an existing user via password, the frontend sends a JSON request
-to the URL ``login/password`` with either the following fields::
+to the URL ``login_username`` with the following fields::
 
     { "username": "<arbitrary non-empty string>",
       "password": "<arbitrary non-empty string>"
     }
 
-Or::
+Or ``login_email``::
 
     { "email": "<e-mail address>",
       "password": "<arbitrary non-empty string>"
@@ -96,7 +96,10 @@ registered user and the "password" field must contain their password.
 
 On success, the backend responds with::
 
-   { "status": "success", "user_token": "<arbitrary non-empty string>" }
+   { "status": "success", 
+     "user_path": "/principals/users/1" , 
+     "user_token": "<arbitrary non-empty string>"
+     }
 
 User Authentication
 -------------------
@@ -112,8 +115,8 @@ If the token is not valid or expired, the backend responds with ::
     { "status": "error",
       "errors": [
         { "location": "header",
-          "name": "invalid_user_token",
-          "description": ""
+          "name": "X-User-Token",
+          "description": "invalid user token"
         }
       ]
     }
