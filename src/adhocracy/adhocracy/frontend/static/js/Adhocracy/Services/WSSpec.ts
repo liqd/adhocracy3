@@ -19,8 +19,11 @@ export var register = () => {
             wsRaw = <any>jasmine.createSpyObj("RawWebSocketMock", ["send", "onmessage", "onerror", "onopen", "onclose"]);
             return wsRaw;
         };
+        var ws;
 
-        var ws = WS.factory(config, constructRawWebSocket);
+        beforeEach(() => {
+            ws = WS.factory(config, constructRawWebSocket);
+        });
 
         it("does not initially call the send method of web socket", () => {
             expect(wsRaw.send.calls.any()).toEqual(false);
@@ -31,18 +34,25 @@ export var register = () => {
         });
 
         it("returns '1' as callback handle on second registration", () => {
+            ws.register("/adhocracy", () => null);
             expect(ws.register("/adhocracy/somethingelse", () => null)).toEqual("1");
         });
 
         it("calls the send method of web socket on every register to different resources", () => {
+            expect(wsRaw.send.calls.count()).toEqual(0);
+            ws.register("/adhocracy", () => null);
+            expect(wsRaw.send.calls.count()).toEqual(1);
+            ws.register("/adhocracy/somethingelse", () => null);
             expect(wsRaw.send.calls.count()).toEqual(2);
         });
 
         it("sends only one subscription for multiple registrations to same resource", () => {
             var resource = "/adhocracy/sidty";
-            ws.register(resource, () => null); var before2nd = wsRaw.send.calls.count();
-            ws.register(resource, () => null); var after2nd = wsRaw.send.calls.count();
-            expect(before2nd).toEqual(after2nd);
+            ws.register(resource, () => null);
+            ws.register(resource, () => null);
+            expect(wsRaw.send.calls.count()).toEqual(1);
+            ws.register(resource, () => null);
+            expect(wsRaw.send.calls.count()).toEqual(1);
         });
 
         it("calls callbacks only between being registered and being unregistered", () => {
