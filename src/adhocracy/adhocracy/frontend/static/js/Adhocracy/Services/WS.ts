@@ -243,7 +243,7 @@ class Subscriptions {
 
 /**
  * The WS factory takes a config service and a RawWebSocket generator
- * service.  The last one is a bit peculiar: web wockets have no
+ * service.  The last one is a bit peculiar: web sockets have no
  * "reopen" method, so after every "close", the object has to be
  * reconstructed.  Therefore, the service has to be a RawWebSocket
  * constructor factory that yields web socket constructors rather than
