@@ -1,6 +1,7 @@
 require.config({
     baseUrl: '/frontend_static/js/',
     paths: {
+        text: '../lib/requirejs-text/text',
         jquery: '../lib/jquery/jquery',
         angular: '../lib/angular/angular',
         underscore: '../lib/underscore/underscore',

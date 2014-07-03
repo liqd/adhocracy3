@@ -18,11 +18,10 @@
                 src="/frontend_static/lib/jquery/jquery.js"></script>  <!-- only needed for $(document in this html file) -->
 
         <script type="text/javascript">
-            require(['Adhocracy'], function(Adh) {
+            require(['Adhocracy', 'text!/frontend_config.json'], function(Adh, config_string) {
+                var config = JSON.parse(config_string);
                 $(document).ready(function() {
-                    $.ajax('/frontend_config.json').done(function(config) {
-                        Adh.init(config);
-                    });
+                    Adh.init(config);
                 });
 
                 $(document).load(function() {
