@@ -1,9 +1,9 @@
 /**
- * simple config mechanism.  exported as a service to allow for
- * injecting an alternative config object in tests.  (there are many
- * obvious design changes, but that is future work: without more
- * sophisticated requirements, not much can be gained from
- * implementing them.)
+ * The configuration is actually created by the server and provided
+ * as a json file at `/frontend_config.json`.  It is then injected
+ * as a service.
+ *
+ * This module only holds the interface for type-checking.
  */
 
 export interface Type {
@@ -11,15 +11,4 @@ export interface Type {
     template_path: string;
     ws_url: string;
 }
-
-var config : Type = {
-    rootPath: "/adhocracy",
-    templatePath: "/frontend_static/templates",
-    wsUrl: "ws://localhost:8080/"
-};
-
-
-export var register = (app, serviceName) => {
-    app.factory(serviceName, () => config);
-};
 
