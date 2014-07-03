@@ -230,11 +230,11 @@ export var adhProposalVersionNew = (
     };
 };
 
-export var adhSectionVersionDetail = (adhConfig: AdhConfig.Type, RecursionHelper) => {
+export var adhSectionVersionDetail = (adhConfig: AdhConfig.Type, recursionHelper) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.templatePath + "/Resources/ISectionVersion/Detail.html",
-        compile: (element) => RecursionHelper.compile(element),
+        compile: (element) => recursionHelper.compile(element),
         scope: {
             ref: "=",
             viewmode: "="
@@ -338,7 +338,6 @@ export var run = () => {
     app.factory("adhDone", AdhDone.factory);
 
     app.factory("recursionHelper", ["$compile", recursionHelper]);
-
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
     app.factory("adhWebSocket", ["adhConfig", AdhWebSocket.factory]);
 
