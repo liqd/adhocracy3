@@ -50,7 +50,7 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
 }
 
 
-export var RecursionHelper = ($compile) => {
+export var recursionHelper = ($compile) => {
     return {
         /**
          * Manually compiles the element, fixing the recursion loop.
@@ -92,7 +92,7 @@ export var RecursionHelper = ($compile) => {
     };
 };
 
-export var documentTitle = () => {
+export var filterDocumentTitle = () => {
     return (resource : Types.Content<Resources.HasIDocumentSheet>) : string => {
         return resource.data["adhocracy.sheets.document.IDocument"].title;
     };
@@ -335,12 +335,12 @@ export var run = () => {
     AdhConfig.register(app, "adhConfig");
     AdhDone.register(app, "adhDone");
 
-    app.factory("RecursionHelper", ["$compile", RecursionHelper]);
+    app.factory("recursionHelper", ["$compile", recursionHelper]);
 
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
     app.factory("adhWebSocket", ["adhConfig", AdhWebSocket.factory]);
 
-    app.filter("documentTitle", [documentTitle]);
+    app.filter("documentTitle", [filterDocumentTitle]);
 
     app.directive("adhListing",
         ["adhConfig", (adhConfig) =>
@@ -365,7 +365,7 @@ export var run = () => {
     app.directive("adhProposalVersionDetail", ["adhConfig", adhProposalVersionDetail]);
     app.directive("adhProposalVersionEdit", ["adhConfig", adhProposalVersionEdit]);
     app.directive("adhProposalVersionNew", ["adhHttp", "$q", "adhConfig", adhProposalVersionNew]);
-    app.directive("adhSectionVersionDetail", ["adhConfig", "RecursionHelper", adhSectionVersionDetail]);
+    app.directive("adhSectionVersionDetail", ["adhConfig", "recursionHelper", adhSectionVersionDetail]);
     app.directive("adhParagraphVersionDetail", ["adhConfig", adhParagraphVersionDetail]);
     app.directive("adhDocumentSheetEdit", ["adhHttp", "$q", "adhConfig", adhDocumentSheetEdit]);
     app.directive("adhDocumentSheetShow", ["adhConfig", adhDocumentSheetShow]);
