@@ -63,6 +63,9 @@ test_node:
 	@echo "NOTE: leaving commonjs modules in place."
 	@echo "      'make compile_tests_browser' if you need to run js code in browser again!"
 
+test_py:
+	../../../../../../bin/py.test ../../tests/unit
+
 
 # cleanup, word count, aux
 
