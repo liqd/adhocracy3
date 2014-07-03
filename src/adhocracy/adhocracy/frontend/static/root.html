@@ -20,7 +20,9 @@
         <script type="text/javascript">
             require(['Adhocracy'], function(Adh) {
                 $(document).ready(function() {
-                    Adh.init();
+                    $.ajax('/frontend_config.json').done(function(config) {
+                        Adh.init(config);
+                    });
                 });
 
                 $(document).load(function() {

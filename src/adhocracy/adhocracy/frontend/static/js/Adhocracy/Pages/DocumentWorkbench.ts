@@ -325,16 +325,15 @@ export var adhParagraphSheetEdit = (adhConfig) => {
     };
 };
 
-export var run = () => {
+export var run = (config) => {
     "use strict";
 
     var app = angular.module("adhocracy3SampleFrontend", []);
 
     app.service("adhResources", Resources.Service);
-
     app.service("adhUser", AdhUser.User);
     app.directive("adhLogin", ["adhUser", AdhUser.loginDirective]);
-    app.factory("adhConfig", () => AdhConfig.config);
+    app.value("adhConfig", config);
     app.factory("adhDone", AdhDone.factory);
 
     app.factory("recursionHelper", ["$compile", recursionHelper]);
