@@ -101,7 +101,7 @@ export var filterDocumentTitle = () => {
 export var adhDocumentWorkbench = (adhConfig: AdhConfig.Type, adhResources: Resources.Service) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.templatePath + "/Pages/DocumentWorkbench.html",
+        templateUrl: adhConfig.template_path + "/Pages/DocumentWorkbench.html",
         controller: ["adhHttp", "$scope", "adhUser", (
             adhHttp : AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>,
             $scope : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>,
@@ -111,7 +111,7 @@ export var adhDocumentWorkbench = (adhConfig: AdhConfig.Type, adhResources: Reso
                 $scope.poolEntries.push({viewmode: "list", content: proposalVersion});
             };
 
-            adhHttp.get(adhConfig.jsonPrefix).then((pool) => {
+            adhHttp.get(adhConfig.root_path).then((pool) => {
                 $scope.pool = pool;
                 $scope.poolEntries = [];
                 $scope.user = user;
@@ -149,7 +149,7 @@ export var adhDocumentWorkbench = (adhConfig: AdhConfig.Type, adhResources: Reso
 export var adhProposalVersionDetail = (adhConfig: AdhConfig.Type) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/Detail.html",
+        templateUrl: adhConfig.template_path + "/Resources/IProposalVersion/Detail.html",
         scope: {
             content: "=",
             viewmode: "="
@@ -190,7 +190,7 @@ export var adhProposalVersionDetail = (adhConfig: AdhConfig.Type) => {
 export var adhProposalVersionEdit = (adhConfig: AdhConfig.Type) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/Edit.html",
+        templateUrl: adhConfig.template_path + "/Resources/IProposalVersion/Edit.html",
         scope: {
             content: "="
         }
@@ -204,7 +204,7 @@ export var adhProposalVersionNew = (
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.templatePath + "/Resources/IProposalVersion/New.html",
+        templateUrl: adhConfig.template_path + "/Resources/IProposalVersion/New.html",
         scope: {
             onNewProposal: "="
         },
@@ -233,7 +233,7 @@ export var adhProposalVersionNew = (
 export var adhSectionVersionDetail = (adhConfig: AdhConfig.Type, recursionHelper) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.templatePath + "/Resources/ISectionVersion/Detail.html",
+        templateUrl: adhConfig.template_path + "/Resources/ISectionVersion/Detail.html",
         compile: (element) => recursionHelper.compile(element),
         scope: {
             ref: "=",
@@ -261,7 +261,7 @@ export var adhSectionVersionDetail = (adhConfig: AdhConfig.Type, recursionHelper
 export var adhParagraphVersionDetail = (adhConfig: AdhConfig.Type) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.templatePath + "/Resources/IParagraphVersion/Detail.html",
+        templateUrl: adhConfig.template_path + "/Resources/IParagraphVersion/Detail.html",
         scope: {
             ref: "=",
             viewmode: "="
@@ -288,7 +288,7 @@ export var adhParagraphVersionDetail = (adhConfig: AdhConfig.Type) => {
 export var adhDocumentSheetEdit = (adhHttp, $q, adhConfig: AdhConfig.Type) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.templatePath + "/Sheets/IDocument/Edit.html",
+        templateUrl: adhConfig.template_path + "/Sheets/IDocument/Edit.html",
         scope: {
             sheet: "="
         },
@@ -308,7 +308,7 @@ export var adhDocumentSheetEdit = (adhHttp, $q, adhConfig: AdhConfig.Type) => {
 export var adhDocumentSheetShow = (adhConfig: AdhConfig.Type) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.templatePath + "/Sheets/IDocument/Show.html",
+        templateUrl: adhConfig.template_path + "/Sheets/IDocument/Show.html",
         scope: {
             sheet: "="
         }
@@ -318,7 +318,7 @@ export var adhDocumentSheetShow = (adhConfig: AdhConfig.Type) => {
 export var adhParagraphSheetEdit = (adhConfig) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.templatePath + "/Sheets/IParagraph/Edit.html",
+        templateUrl: adhConfig.template_path + "/Sheets/IParagraph/Edit.html",
         scope: {
             sheet: "="
         }

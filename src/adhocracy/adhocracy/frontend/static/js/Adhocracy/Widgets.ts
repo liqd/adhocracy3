@@ -60,7 +60,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.templatePath + "/" + _class.templateUrl,
+            templateUrl: adhConfig.template_path + "/" + _class.templateUrl,
             scope: {
                 path: "@",
                 title: "@"
@@ -169,7 +169,7 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.templatePath + "/" + _class.templateUrl,
+            templateUrl: adhConfig.template_path + "/" + _class.templateUrl,
             scope: {
                 path: "@"
             },

@@ -471,7 +471,7 @@ export var factoryIService = (
     };
 
     open = () => {
-        var _ws = constructRawWebSocket(adhConfig.wsUrl);
+        var _ws = constructRawWebSocket(adhConfig.ws_url);
 
         _ws.onmessage = onmessage;
         _ws.onerror = onerror;
@@ -538,7 +538,7 @@ export class WebSocketTest {
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.templatePath + "/Widgets/WebSocketTest.html",
+            templateUrl: adhConfig.template_path + "/Widgets/WebSocketTest.html",
             scope: {
                 rawPaths: "@paths"
             },

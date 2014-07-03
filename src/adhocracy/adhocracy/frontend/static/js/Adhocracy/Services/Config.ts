@@ -7,9 +7,9 @@
  */
 
 export interface Type {
-    rootPath: string;
-    templatePath: string;
-    wsUrl: string;
+    root_path: string;
+    template_path: string;
+    ws_url: string;
 }
 
 var config : Type = {
