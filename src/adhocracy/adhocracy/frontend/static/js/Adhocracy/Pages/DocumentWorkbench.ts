@@ -331,9 +331,10 @@ export var run = () => {
 
     var app = angular.module("adhocracy3SampleFrontend", []);
 
-    AdhUser.register(app, "adhUser", "adhLogin");
-    AdhConfig.register(app, "adhConfig");
-    AdhDone.register(app, "adhDone");
+    app.factory("adhUser", () => new AdhUser.User());
+    app.directive("adhLogin", ["adhUser", AdhUser.loginDirective]);
+    app.factory("adhConfig", () => AdhConfig.config);
+    app.factory("adhDone", () => (() => null));
 
     app.factory("recursionHelper", ["$compile", recursionHelper]);
 

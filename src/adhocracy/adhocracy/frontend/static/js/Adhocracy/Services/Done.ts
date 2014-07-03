@@ -6,7 +6,3 @@
 var done = () => {
     return;
 };
-
-export var register = (app, serviceName : string) => {
-    app.factory(serviceName, () => done);
-};

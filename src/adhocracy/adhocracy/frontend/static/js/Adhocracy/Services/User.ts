@@ -23,7 +23,7 @@ export class User {
     }
 }
 
-var loginDirective = ($$user : User) => {
+export var loginDirective = ($$user : User) => {
     return {
         restrict: "E",
         templateUrl: "/frontend_static/templates" + "/Util/login.html",
@@ -48,9 +48,4 @@ var loginDirective = ($$user : User) => {
             };
         }]
     };
-};
-
-export var register = (app, serviceName : string, loginDirectiveName : string) => {
-    app.factory(serviceName, () : User => new User());
-    app.directive(loginDirectiveName, [serviceName, loginDirective]);
 };

@@ -12,13 +12,8 @@ export interface Type {
     wsuri: string;
 }
 
-var config : Type = {
+export var config : Type = {
     templatePath: "/frontend_static/templates",
     jsonPrefix: "/adhocracy",
     wsuri:  "ws://localhost:8080/"
-};
-
-
-export var register = (app, serviceName) => {
-    app.factory(serviceName, () => config);
 };
