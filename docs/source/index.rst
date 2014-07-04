@@ -12,14 +12,10 @@ Contents
    :maxdepth: 2
 
    installation
-   rest_api
    development
-   coding_style_guideline
-   refactor_guideline
-   supergraph.rst
-   supergraph-2013-11-12
-   instance_modelling_example
-   no_patches.rst
+   api/index
+   style_guide/index
+   attic/index
    adhocracy
    CHANGES
 
