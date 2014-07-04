@@ -61,6 +61,8 @@ export var run = () => {
 
     // services
 
+    app.service("adhResources", Resources.Service);
+
     app.factory("RecursionHelper", ["$compile", ($compile) => {
         return {
             /**
@@ -140,7 +142,7 @@ export var run = () => {
 
     // application-specific directives
 
-    app.directive("adhDocumentWorkbench", ["adhConfig", (adhConfig: AdhConfig.Type) => {
+    app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", (adhConfig: AdhConfig.Type, adhResources: Resources.Service) => {
         return {
             restrict: "E",
             templateUrl: adhConfig.templatePath + "/Pages/DocumentWorkbench.html",
@@ -161,7 +163,7 @@ export var run = () => {
                     // FIXME: factor out getting the head version of a DAG.
 
                     var fetchDocumentHead = (n : number, dag : Types.Content<Resources.HasIDocumentSheet>) : ng.IPromise<void> => {
-                        return Resources.getNewestVersionPath(adhHttp, dag.path)
+                        return adhResources.getNewestVersionPath(dag.path)
                             .then((headPath) => adhHttp.get(headPath))
                             .then((headContent) => {
                                 if (n in $scope.poolEntries) {
@@ -240,10 +242,10 @@ export var run = () => {
         };
     }]);
 
-    app.directive("adhProposalVersionNew", ["adhHttp", "$q", "adhConfig", (
+    app.directive("adhProposalVersionNew", ["adhHttp", "adhConfig", "adhResources", (
         adhHttp: ng.IHttpService,
-        $q : ng.IQService,
-        adhConfig: AdhConfig.Type
+        adhConfig: AdhConfig.Type,
+        adhResources: Resources.Service
     ) => {
         return {
             restrict: "E",
@@ -263,7 +265,7 @@ export var run = () => {
                 };
 
                 $scope.commit = () => {
-                    Resources.postProposal(adhHttp, $q, $scope.proposalVersion, $scope.paragraphVersions).then((resp) => {
+                    adhResources.postProposalWithParagraphs($scope.proposalVersion, $scope.paragraphVersions).then((resp) => {
                         adhHttp.get(resp.path).then((respGet) => {
                             $scope.onNewProposal(respGet);
                         });
