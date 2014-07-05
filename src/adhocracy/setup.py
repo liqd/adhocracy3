@@ -16,6 +16,7 @@ requires = [
     'substanced',
     'pyramid_tm',
     'cornice',
+    'colander',
     'autobahn',
     'asyncio',
     'websocket-client-py3',

@@ -13,7 +13,7 @@ from adhocracy.schema import ListOfUniqueReferences
 
 class IVersionable(ISheet):
 
-    """Maker interface for resources with the versionable sheeet."""
+    """Maker interface for resources with the versionable sheet."""
 
 
 class VersionableFollowsReference(NewVersionToOldVersion):
@@ -40,7 +40,6 @@ class VersionableSchema(colander.MappingSchema):
 
     Set/get predecessor (`follows`) and get successor (`followed_by`) versions
     of this resource.
-
     """
 
     follows = ListOfUniqueReferences(reftype=VersionableFollowsReference)
@@ -96,7 +95,6 @@ class VersionsSchema(colander.MappingSchema):
     """Versions sheet data structure.
 
     `elements`: Dag for collecting all versions of one item.
-
     """
 
     elements = ListOfUniqueReferences(

@@ -47,7 +47,6 @@ class PoolSchema(colander.MappingSchema):
     """Pool sheet data structure.
 
     `elements`: children of this resource (object hierarchy).
-
     """
 
     elements = ListOfUniqueReferences(reftype=PoolElementsReference)
