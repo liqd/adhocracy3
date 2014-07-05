@@ -61,12 +61,12 @@ class ResourceFactory:
             raise KeyError
         parent.add(name, resource, send_events=False)
 
-    def _notify_new_resource_created_and_added(self, resource):
-        registry = get_current_registry(resource.__parent__)
+    def _notify_new_resource_created_and_added(self, resource, registry):
         has_parent = resource.__parent__ is not None
         if has_parent and registry is not None:
             event = ResourceCreatedAndAdded(object=resource,
-                                            parent=resource.__parent__)
+                                            parent=resource.__parent__,
+                                            registry=registry)
             registry.notify(event)
 
     def __call__(self,
@@ -120,10 +120,10 @@ class ResourceFactory:
                 if sheet.meta.creatable:
                     sheet.set(struct, send_event=False)
 
+        registry = get_current_registry()
         if run_after_creation:
-            registry = get_current_registry()
             for call in self.meta.after_creation:
                 call(resource, registry, options=kwargs)
 
-        self._notify_new_resource_created_and_added(resource)
+        self._notify_new_resource_created_and_added(resource, registry)
         return resource

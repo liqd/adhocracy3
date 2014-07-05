@@ -109,7 +109,9 @@ class GenericResourceSheet(PropertySheet):
     def _notify_resource_sheet_modified(self, send_event):
         registry = get_current_registry(self.context)
         if send_event and registry is not None:
-            event = ResourceSheetModified(self.context, self.meta.isheet)
+            event = ResourceSheetModified(self.context,
+                                          self.meta.isheet,
+                                          registry)
             registry.notify(event)
 
     def validate_cstruct(self, cstruct: dict) -> dict:

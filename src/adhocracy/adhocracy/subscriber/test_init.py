@@ -52,7 +52,7 @@ def _create_and_register_dummy_sheet(context, isheet):
     return sheet
 
 
-def _create_new_version_event_with_isheet(context, isheet):
+def _create_new_version_event_with_isheet(context, isheet, registry):
     return testing.DummyResource(__provides__=
                                  ISheetReferencedItemHasNewVersion,
                                  object=context,
@@ -60,6 +60,7 @@ def _create_new_version_event_with_isheet(context, isheet):
                                  isheet_field='elements',
                                  old_version=testing.DummyResource(),
                                  new_version=testing.DummyResource(),
+                                 registry=registry,
                                  root_versions=[])
 
 
@@ -78,13 +79,14 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _makeOne(self, *args):
+    def _make_one(self, *args):
         from adhocracy.subscriber import reference_has_new_version_subscriber
         return reference_has_new_version_subscriber(*args)
 
     def _create_new_version_event_for_autoupdate_sheet(self, context):
         isheet = IDummySheetAutoUpdate
-        event = _create_new_version_event_with_isheet(context, isheet)
+        registry = self.config.registry
+        event = _create_new_version_event_with_isheet(context, isheet, registry)
         sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
         sheet_autoupdate._data = {'elements': [event.old_version]}
         sheet_versionable = _create_and_register_dummy_sheet(event.object,
@@ -97,7 +99,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
                                         __parent__=object())
         event = self._create_new_version_event_for_autoupdate_sheet(context)
 
-        self._makeOne(event)
+        self._make_one(event)
 
         factory = self.config.registry.content.create
         assert factory.called
@@ -119,7 +121,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         event = self._create_new_version_event_for_autoupdate_sheet(context)
         event.root_versions = [context]
 
-        self._makeOne(event)
+        self._make_one(event)
 
         factory = self.config.registry.content.create
         assert not factory.called
@@ -127,13 +129,14 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
     def test_call_versionable_with_autoupdate_sheet_but_readonly(self):
         context = testing.DummyResource(__provides__=IItemVersion)
         isheet = IDummySheetAutoUpdate
-        event = _create_new_version_event_with_isheet(context, isheet)
+        registry = self.config.registry
+        event = _create_new_version_event_with_isheet(context, isheet, registry)
         sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
         sheet_autoupdate.meta = sheet_autoupdate.meta._replace(
             editable=False,
             creatable=False)
 
-        self._makeOne(event)
+        self._make_one(event)
 
         factory = self.config.registry.content.create
         assert not factory.called
@@ -146,7 +149,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         sheet_readonly.meta = sheet_readonly.meta._replace(editable=False,
                                                            creatable=False)
 
-        self._makeOne(event)
+        self._make_one(event)
 
         factory = self.config.registry.content.create
         assert factory.called
@@ -155,10 +158,11 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
     def test_call_versionable_without_autoupdate_sheet(self):
         context = testing.DummyResource(__provides__=IItemVersion)
         isheet = IDummySheetNoAutoUpdate
-        event = _create_new_version_event_with_isheet(context, isheet)
+        registry = self.config.registry
+        event = _create_new_version_event_with_isheet(context, isheet, registry)
         _create_and_register_dummy_sheet(context, isheet)
 
-        self._makeOne(event)
+        self._make_one(event)
 
         factory = self.config.registry.content.create
         assert not factory.called
@@ -166,24 +170,26 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
     def test_call_nonversionable_with_autoupdate_sheet(self):
         context = testing.DummyResource()
         isheet = IDummySheetAutoUpdate
-        event = _create_new_version_event_with_isheet(context, isheet)
+        registry = self.config.registry
+        event = _create_new_version_event_with_isheet(context, isheet, registry)
         sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
         sheet_autoupdate._data = {'elements': [event.old_version]}
 
-        self._makeOne(event)
+        self._make_one(event)
 
         assert sheet_autoupdate._data == {'elements': [event.new_version]}
 
     def test_call_nonversionable_with_autoupdate_readonly(self):
         context = testing.DummyResource()
         isheet = IDummySheetAutoUpdate
-        event = _create_new_version_event_with_isheet(context, isheet)
+        registry = self.config.registry
+        event = _create_new_version_event_with_isheet(context, isheet, registry)
         sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
         sheet_autoupdate.meta = sheet_autoupdate.meta._replace(editable=False,
                                                                creatable=False)
         sheet_autoupdate._data = {'elements': [event.old_version]}
 
-        self._makeOne(event)
+        self._make_one(event)
 
         assert sheet_autoupdate._data == {'elements': [event.old_version]}
 

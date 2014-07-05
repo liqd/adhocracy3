@@ -166,7 +166,8 @@ class Client:
 
 def get_ws_client(registry) -> Client:
     """Return websocket client object or None."""
-    return getattr(registry, 'ws_client', None)
+    if registry:
+        return getattr(registry, 'ws_client', None)
 
 
 def send_messages_after_commit_hook(success, registry):

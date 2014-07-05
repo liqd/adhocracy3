@@ -298,6 +298,7 @@ class IResourceSheetModified(IObjectEvent):
 
     object = Attribute('The modified resource')
     isheet = Attribute('The modified sheet interface of the resource')
+    registry = Attribute('The pyramid registry')
 
 
 class IResourceCreatedAndAdded(IObjectEvent):
@@ -306,6 +307,7 @@ class IResourceCreatedAndAdded(IObjectEvent):
 
     object = Attribute('The new resource')
     parent = Attribute('The parent of the new resource')
+    registry = Attribute('The pyramid registry')
 
 
 class IItemVersionNewVersionAdded(IObjectEvent):
@@ -314,6 +316,7 @@ class IItemVersionNewVersionAdded(IObjectEvent):
 
     object = Attribute('The old ItemVersion followed by the new one')
     new_version = Attribute('The new ItemVersion')
+    registry = Attribute('The pyramid registry')
 
 
 class ISheetReferencedItemHasNewVersion(IObjectEvent):
@@ -329,3 +332,4 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
     root_versions = Attribute('Non-empty list of roots of the ItemVersion '
                               '(only resources that can be reached from one '
                               'of the roots should be updated)')
+    registry = Attribute('The pyramid registry')

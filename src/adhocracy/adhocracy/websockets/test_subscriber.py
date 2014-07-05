@@ -1,7 +1,6 @@
 import unittest
 
 from pyramid.testing import DummyResource
-from pyramid.threadlocal import get_current_registry
 
 
 class DummyClient():
@@ -17,46 +16,64 @@ class DummyClient():
         self.resource_modified = True
 
 
-class FunctionUnitTests(unittest.TestCase):
+def _create_dummy_event_with_client(ws_client):
+    registry = DummyResource(ws_client=ws_client)
+    event = DummyResource(registry=registry,
+                          object=None)
+    return event
 
-    """Test the functions defined by the subscriber module."""
 
-    def setUp(self):
-        self._event = DummyResource()
-        self._event.object = DummyResource()
-        self._registry = get_current_registry()
-        self._old_ws_client = getattr(self._registry, 'ws_client', None)
+class ResourceCreatedAndAddedSubscriberUnitTests(unittest.TestCase):
 
-    def tearDown(self):
-        setattr(self._registry, 'ws_client', self._old_ws_client)
-
-    def test_resource_created_and_added_subscriber(self):
+    def _call_fut(self, event):
         from adhocracy.websockets.subscriber import \
             resource_created_and_added_subscriber
+        return resource_created_and_added_subscriber(event)
+
+    def test_with_client(self):
         client = DummyClient()
-        self._registry.ws_client = client
-        resource_created_and_added_subscriber(self._event)
+        event = _create_dummy_event_with_client(client)
+        self._call_fut(event)
         assert client.resource_created is True
 
-    def test_resource_modified_subscriber(self):
+    def test_with_none_client(self):
+        event = _create_dummy_event_with_client(None)
+        assert self._call_fut(event) is None
+
+    def test_without_client(self):
+        event = _create_dummy_event_with_client(None)
+        delattr(event.registry, 'ws_client')
+        assert self._call_fut(event) is None
+
+    def test_with_none_registry(self):
+        event = _create_dummy_event_with_client(None)
+        event.registry = None
+        assert self._call_fut(event) is None
+
+
+class ResourceModifiedSubscriberUnitTests(unittest.TestCase):
+
+    def _call_fut(self, event):
         from adhocracy.websockets.subscriber import \
             resource_modified_subscriber
+        return resource_modified_subscriber(event)
+
+    def test_with_client(self):
         client = DummyClient()
-        self._registry.ws_client = client
-        resource_modified_subscriber(self._event)
+        event = _create_dummy_event_with_client(client)
+        self._call_fut(event)
         assert client.resource_modified is True
 
-    def test_resource_created_and_added_subscriber_no_client(
-            self):
-        """Call should pass without exceptions if there is no client."""
-        from adhocracy.websockets.subscriber import \
-            resource_created_and_added_subscriber
-        del self._registry.ws_client
-        resource_created_and_added_subscriber(self._event)
+    def test_with_none_client(self):
+        event = _create_dummy_event_with_client(None)
+        assert self._call_fut(event) is None
 
-    def test_resource_modified_subscriber_no_client(self):
-        """Call should pass without exceptions if there is no client."""
-        from adhocracy.websockets.subscriber import \
-            resource_modified_subscriber
-        del self._registry.ws_client
-        resource_modified_subscriber(self._event)
+    def test_without_client(self):
+        event = _create_dummy_event_with_client(None)
+        delattr(event.registry, 'ws_client')
+        assert self._call_fut(event) is None
+
+    def test_with_none_registry(self):
+        event = _create_dummy_event_with_client(None)
+        event.registry = None
+        assert self._call_fut(event) is None
