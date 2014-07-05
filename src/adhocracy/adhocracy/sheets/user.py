@@ -8,6 +8,8 @@ from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets import GenericResourceSheet
 from adhocracy.schema import Email
 from adhocracy.schema import TimeZoneName
+from adhocracy.schema import Password
+from adhocracy.schema import String
 
 
 class IUserBasic(ISheet):
@@ -24,9 +26,7 @@ class UserBasicSchema(colander.MappingSchema):
     """
 
     email = Email()
-    display_name = colander.SchemaNode(colander.String(),
-                                       missing=colander.drop,
-                                       default='')
+    display_name = String()
     tzname = TimeZoneName()
 
 
@@ -45,14 +45,10 @@ class PasswordAuthenticationSchema(colander.MappingSchema):
 
     """Data structure for password based user authentication.
 
-    `password`: plaintext password
+    `password`: plaintext password :class:`adhocracy.schema.Password`.
     """
 
-    password = colander.SchemaNode(colander.String(),
-                                   default='',
-                                   missing=colander.drop,
-                                   validator=colander.Length(min=6, max=100),
-                                   )
+    password = Password()
 
 
 class PasswordAuthenticationSheet(GenericResourceSheet):

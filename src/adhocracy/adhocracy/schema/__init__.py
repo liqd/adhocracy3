@@ -13,7 +13,6 @@ def raise_attribute_error_if_not_location_aware(context) -> None:
     """Ensure that the argument is location-aware.
 
     :raise AttributeError: if it isn't
-
     """
     context.__parent__
     context.__name__
@@ -25,7 +24,6 @@ def serialize_path(node, value):
     :param node: the Colander node
     :param value: the resource to serialize
     :return: the path of that resource
-
     """
     if value is colander.null:
         return value
@@ -44,7 +42,6 @@ def deserialize_path(node, value):
     :param node: the Colander node
     :param value: the path to deserialize
     :return: the resource registered under that path
-
     """
     if value is colander.null:
         return value
@@ -102,7 +99,6 @@ class Email(colander.SchemaNode):
     """String with email address.
 
     Example value: test@test.de
-
     """
 
     schema_type = colander.String
@@ -132,7 +128,6 @@ class AbsolutePath(colander.SchemaNode):
     """Absolute path made with  Identifier Strings.
 
     Example value: /bluaABC/_123/3
-
     """
 
     schema_type = colander.String
@@ -144,7 +139,6 @@ class ResourceObject(colander.SchemaType):
     """Resource object that automatically deserialized itself to a path.
 
     Example value: like AbsolutePath, e.g. '/bluaABC/_123/3'
-
     """
 
     def serialize(self, node, value):
@@ -168,7 +162,6 @@ class AbstractIterableOfPaths(IdSet):
     Child classes must overwrite the `create_empty_appstruct` and
     `add_to_appstruct` methods for the specific iterable to use for
     deserialization (e.g. list or set).
-
     """
 
     def create_empty_appstruct(self):
@@ -200,7 +193,6 @@ class AbstractIterableOfPaths(IdSet):
 
         Raises:
             KeyError: if path cannot be traversed to an ILocation aware object.
-
         """
         if value is colander.null:
             return value
@@ -219,7 +211,6 @@ class ListOfUniquePaths(AbstractIterableOfPaths):
     The order is preserved, duplicates are removed.
 
     Example value: [/bluaABC, /_123/3]
-
     """
 
     def create_empty_appstruct(self):
@@ -242,7 +233,6 @@ class SetOfPaths(AbstractIterableOfPaths):
     The order is not preserved, duplicates are removed.
 
     Example value: [/bluaABC, /_123/3]
-
     """
 
     def create_empty_appstruct(self):
@@ -274,7 +264,6 @@ class AbstractReferenceIterable(schema.MultireferenceIdSchemaNode):
 
     This is is an abstract class, only subclasses that set `schema_type` to a
     concrete subclass of `AbstractIterableOfPaths` can be instantiated.
-
     """
 
     schema_type = AbstractIterableOfPaths
@@ -304,3 +293,50 @@ class ListOfUniqueReferences(AbstractReferenceIterable):
     """Colander SchemaNode to store a list of references without duplicates."""
 
     schema_type = ListOfUniquePaths
+
+
+def string_has_no_newlines_validator(value: str) -> bool:
+    """Check for new line characters."""
+    return False if '\n' in value or '\r' in value else True  # noqa
+
+
+class String(colander.SchemaNode):  # noqa
+
+    """ UTF-8 encoded text without line breaks.
+
+    Disallowed characters linebreaks like: \n, \r
+    Example value: This is a something.
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+    validator = colander.Function(string_has_no_newlines_validator,
+                                  msg='New line characters are not allowed.')
+
+
+class Text(colander.SchemaNode):
+
+    """ UTF-8 encoded text.
+
+    Example value: This is a something
+                   with new lines.
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+
+
+class Password(colander.SchemaNode):
+
+    """ UTF-8 encoded text.
+
+    Minimal length=6, maximal length=100 characters.
+    Example value: secret password?
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+    validator = colander.Length(min=6, max=100)
