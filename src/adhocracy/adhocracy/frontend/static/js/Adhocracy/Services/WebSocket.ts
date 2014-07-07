@@ -30,7 +30,7 @@ export interface IService {
      * This function is a rough equivalent to $.on(), but handles
      * unregistrations differently.
      */
-    register: (path: string, callback: (event: ServerEvent) => void) => string;
+    register: (path: string, callback: (event: IServerEvent) => void) => string;
 
     /**
      * Unregister a callback from a resource.  If no other callbacks
@@ -46,7 +46,7 @@ export interface IService {
  * passed to the WebSocket factory as a separate service in order to make
  * unit testing possible (see below).
  */
-export interface RawWebSocket {
+export interface IRawWebSocket {
     send: (msg: string) => void;
     onmessage: (event: { data: string}) => void;
     onerror: (event: any) => void;
@@ -65,7 +65,7 @@ export interface RawWebSocket {
  * technicalities of the adhocracy websocket protocol and the lack of
  * disjunctive types in typescript.)
  */
-export interface ServerEvent {
+export interface IServerEvent {
     event?: string;
     resource?: string;
     child?: string;
@@ -92,7 +92,7 @@ interface ResponseError {
     details?: string;
 }
 
-interface ServerMessage extends ResponseOk, ResponseError, ServerEvent {};
+interface ServerMessage extends ResponseOk, ResponseError, IServerEvent {};
 
 
 //////////////////////////////////////////////////////////////////////
@@ -111,14 +111,14 @@ class Subscriptions {
 
     private _dict: {
         [name: string]: {
-            [id: string]: (event: ServerEvent) => void
+            [id: string]: (event: IServerEvent) => void
         }
     } = {};
 
     /**
      * Take a resource and call all subscribed callbacks.
      */
-    public notify = (event: ServerEvent): void => {
+    public notify = (event: IServerEvent): void => {
         var _self = this;
 
         if (_self._dict.hasOwnProperty(event.resource)) {
@@ -137,7 +137,7 @@ class Subscriptions {
      * Call a given function on all callbacks.  (Needed e.g. for
      * copying pending subscriptions to active subscriptions.)
      */
-    public forAll = (cmd: (resource: string, id: string, callback: (event: ServerEvent) => void) => void): void => {
+    public forAll = (cmd: (resource: string, id: string, callback: (event: IServerEvent) => void) => void): void => {
         var _self = this;
         var _dict = _self._dict;
 
@@ -178,7 +178,7 @@ class Subscriptions {
      */
     public add = (
         resource: string,
-        callback: (event: ServerEvent) => void,
+        callback: (event: IServerEvent) => void,
         id?: string,
         notifyServer?: () => void
     ): string => {
@@ -240,23 +240,27 @@ class Subscriptions {
 // factory functions
 
 /**
- * The WebSocket factory takes a config service and a RawWebSocket generator
- * service.  The last one is a bit peculiar: web sockets have no
- * "reopen" method, so after every "close", the object has to be
- * reconstructed.  Therefore, the service has to be a RawWebSocket
- * constructor factory that yields web socket constructors rather than
- * web socket objects.
+ * The WebSocket factory takes a config service and a IRawWebSocket
+ * generator service.  Consumers of this service should call the
+ * factory function that only takes a config service, and creates the
+ * raw web socket implicitly (see below).
+ *
+ * The last one is a bit peculiar: web sockets have no "reopen"
+ * method, so after every "close", the object has to be reconstructed.
+ * Therefore, the service has to be a IRawWebSocket constructor
+ * factory that yields web socket constructors rather than web socket
+ * objects.
  */
-export var factoryType = (
+export var factoryIService = (
     adhConfig: AdhConfig.Type,
-    constructRawWebSocket: (uri) => RawWebSocket
+    constructRawWebSocket: (uri) => IRawWebSocket
 ) : IService => {
     "use strict";
 
     /**
      * the socket handle
      */
-    var _ws: RawWebSocket;
+    var _ws: IRawWebSocket;
 
     /**
      * a distionary of all callbacks, stored under their
@@ -289,7 +293,7 @@ export var factoryType = (
      * function declarations
      */
 
-    var register: (path: string, callback: (event: ServerEvent) => void) => string;
+    var register: (path: string, callback: (event: IServerEvent) => void) => string;
     var unregister: (path: string, id: string) => void;
     var sendRequest: (req: Request) => void;
     var handleResponseMessage: (msg: ServerMessage) => void;
@@ -314,7 +318,7 @@ export var factoryType = (
      */
     register = (
         path: string,
-        callback: (event: ServerEvent) => void
+        callback: (event: IServerEvent) => void
     ) : string => {
         console.log("register", path);
         if (_ws.readyState === _ws.OPEN) {
@@ -497,17 +501,17 @@ export var factoryType = (
 };
 
 /**
- * trivial RawWebSocket constructor factory that returns the built-in
+ * trivial IRawWebSocket constructor factory that returns the built-in
  * thing.  (replace this for unit testing.)
  */
-export var factoryRawWebSocket = () => ((uri: string): RawWebSocket => new WebSocket(uri));
+export var factoryIRawWebSocket = () => ((uri: string): IRawWebSocket => new WebSocket(uri));
 
 /**
  * factory for export to consumer modules.  it combines
- * factoryRawWebSocket and factoryType in the way it is almost always
- * used (besides in unit tests).
+ * factoryIRawWebSocket and factoryIService in the way it is almost
+ * always used (besides in unit tests).
  */
-export var factory = (adhConfig: AdhConfig.Type): IService => factoryType(adhConfig, factoryRawWebSocket());
+export var factory = (adhConfig: AdhConfig.Type): IService => factoryIService(adhConfig, factoryIRawWebSocket());
 
 
 //////////////////////////////////////////////////////////////////////

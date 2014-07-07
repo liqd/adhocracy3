@@ -77,7 +77,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                     $scope.elements = _self.containerAdapter.elemRefs($scope.container);
                 };
 
-                var wsHandler = (event: AdhWebSocket.ServerEvent): void => {
+                var wsHandler = (event: AdhWebSocket.IServerEvent): void => {
                     adhHttp.get($scope.path).then(getHandler);
                 };
 

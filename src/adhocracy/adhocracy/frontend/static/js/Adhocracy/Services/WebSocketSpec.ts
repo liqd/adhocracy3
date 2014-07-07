@@ -20,14 +20,14 @@ export var register = () => {
         // constructor for a mock raw web socket that leaks the
         // constructee for inspection.
         var wsRaw: any;
-        var constructRawWebSocket = (uri: string): WebSocket.RawWebSocket => {
+        var constructRawWebSocket = (uri: string): WebSocket.IRawWebSocket => {
             wsRaw = <any>jasmine.createSpyObj("RawWebSocketMock", ["send", "onmessage", "onerror", "onopen", "onclose"]);
             return wsRaw;
         };
         var ws;
 
         beforeEach(() => {
-            ws = WebSocket.factoryType(config, constructRawWebSocket);
+            ws = WebSocket.factoryIService(config, constructRawWebSocket);
         });
 
         it("does not initially call the send method of web socket", () => {
