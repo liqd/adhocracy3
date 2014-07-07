@@ -331,7 +331,7 @@ export var run = () => {
 
     var app = angular.module("adhocracy3SampleFrontend", []);
 
-    app.factory("adhUser", () => new AdhUser.User());
+    app.service("adhUser", AdhUser.User);
     app.directive("adhLogin", ["adhUser", AdhUser.loginDirective]);
     app.factory("adhConfig", () => AdhConfig.config);
     app.factory("adhDone", () => (() => null));
