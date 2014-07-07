@@ -103,7 +103,7 @@ export var adhDocumentWorkbench = (adhConfig: AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.templatePath + "/Pages/DocumentWorkbench.html",
         controller: ["adhHttp", "$scope", "adhUser", (
-            adhHttp : AdhHttp.Type<Types.Content<Resources.HasIDocumentSheet>>,
+            adhHttp : AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>,
             $scope : IDocumentWorkbenchScope<Resources.HasIDocumentSheet>,
             user : AdhUser.User
         ) : void => {
@@ -155,7 +155,7 @@ export var adhProposalVersionDetail = (adhConfig: AdhConfig.Type) => {
             viewmode: "="
         },
         controller: ["adhHttp", "$scope", (
-            adhHttp : AdhHttp.Type<Types.Content<any>>,
+            adhHttp : AdhHttp.IService<Types.Content<any>>,
             $scope : IProposalVersionDetailScope<any>
         ) : void => {
             $scope.list = () => {
@@ -240,7 +240,7 @@ export var adhSectionVersionDetail = (adhConfig: AdhConfig.Type, RecursionHelper
             viewmode: "="
         },
         controller: ["adhHttp", "$scope", (
-            adhHttp : AdhHttp.Type<Types.Content<Resources.HasISectionSheet>>,
+            adhHttp : AdhHttp.IService<Types.Content<Resources.HasISectionSheet>>,
             $scope : DetailRefScope<Resources.HasISectionSheet>
         ) : void => {
             var commit = (event, ...args) => {
@@ -267,7 +267,7 @@ export var adhParagraphVersionDetail = (adhConfig: AdhConfig.Type) => {
             viewmode: "="
         },
         controller: ["adhHttp", "$scope", (
-            adhHttp : AdhHttp.Type<Types.Content<Resources.HasIParagraphSheet>>,
+            adhHttp : AdhHttp.IService<Types.Content<Resources.HasIParagraphSheet>>,
             $scope : DetailRefScope<Resources.HasIParagraphSheet>
         ) : void => {
             var commit = (event, ...args) => {

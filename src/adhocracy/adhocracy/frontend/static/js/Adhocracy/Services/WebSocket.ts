@@ -21,7 +21,7 @@ import AdhConfig = require("./Config");
 //////////////////////////////////////////////////////////////////////
 // exported Types
 
-export interface Type {
+export interface IService {
     /**
      * Register a callback to a resource.  If no other callbacks are
      * registered under this resource, send subscribe message to
@@ -250,7 +250,7 @@ class Subscriptions {
 export var factoryType = (
     adhConfig: AdhConfig.Type,
     constructRawWebSocket: (uri) => RawWebSocket
-) : Type => {
+) : IService => {
     "use strict";
 
     /**
@@ -507,7 +507,7 @@ export var factoryRawWebSocket = () => ((uri: string): RawWebSocket => new WebSo
  * factoryRawWebSocket and factoryType in the way it is almost always
  * used (besides in unit tests).
  */
-export var factory = (adhConfig: AdhConfig.Type): Type => factoryType(adhConfig, factoryRawWebSocket());
+export var factory = (adhConfig: AdhConfig.Type): IService => factoryType(adhConfig, factoryRawWebSocket());
 
 
 //////////////////////////////////////////////////////////////////////
@@ -529,7 +529,7 @@ interface WebSocketTestScope extends ng.IScope {
  */
 export class WebSocketTest {
 
-    public createDirective = ($timeout: ng.ITimeoutService, adhConfig: AdhConfig.Type, adhWebSocket: Type) : ng.IDirective => {
+    public createDirective = ($timeout: ng.ITimeoutService, adhConfig: AdhConfig.Type, adhWebSocket: IService) : ng.IDirective => {
         var _self = this;
 
         return {
