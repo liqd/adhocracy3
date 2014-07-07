@@ -3,6 +3,5 @@
  * dependency injection is used and where you want to be able to inject
  * a real callback in your tests.
  */
-var done = () => {
-    return;
-};
+export var done = () => null;
+export var factory = () => done;

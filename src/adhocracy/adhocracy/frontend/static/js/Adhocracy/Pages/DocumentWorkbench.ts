@@ -334,7 +334,7 @@ export var run = () => {
     app.service("adhUser", AdhUser.User);
     app.directive("adhLogin", ["adhUser", AdhUser.loginDirective]);
     app.factory("adhConfig", () => AdhConfig.config);
-    app.factory("adhDone", () => (() => null));
+    app.factory("adhDone", AdhDone.factory);
 
     app.factory("recursionHelper", ["$compile", recursionHelper]);
 
