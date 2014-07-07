@@ -1,4 +1,5 @@
-
+Frontend Testing
+----------------
 
 This document contains project-specific documentation of the testing
 tool chain and setup.
@@ -34,9 +35,6 @@ karma / jasmine
 code coverage tools for css
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[matthias suggests helium-css.]
-
-
 helium-css
   - github, javascript, seems to be most suitable for hacking
 
@@ -50,8 +48,12 @@ pagespeed
 code coverage tools for js
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[matthias suggests JSCover.]
+https://blanketjs.org/
+  - in use for a3 as of Wed Jul  2 10:18:37 CEST 2014
 
+http://gotwarlost.github.io/istanbul/
+  - written in javascript
+  - tobi thinks it looks nice
 
 https://github.com/tntim96/JSCover
   - runs in every browser.  allows dom interaction.  supports many test tools.
@@ -95,3 +97,12 @@ https://code.google.com/p/js-test-driver/wiki/CodeCoverage
 https://code.google.com/p/script-cover/
   - chrome plugin or javascript code (not clear).
   - very poorly documented.
+
+
+List without title
+~~~~~~~~~~~~~~~~~~
+
+https://github.com/jasmine/jasmine_selenium_runner
+https://github.com/juliemr/protractor
+https://github.com/paylogic/pytest-splinter
+https://github.com/velesin/jasmine-jquery

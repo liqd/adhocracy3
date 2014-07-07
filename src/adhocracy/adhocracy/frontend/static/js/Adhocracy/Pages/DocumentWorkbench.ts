@@ -98,7 +98,7 @@ export var filterDocumentTitle = () => {
     };
 };
 
-export var adhDocumentWorkbench = (adhConfig: AdhConfig.Type) => {
+export var adhDocumentWorkbench = (adhConfig: AdhConfig.Type, adhResources: Resources.Service) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.templatePath + "/Pages/DocumentWorkbench.html",
@@ -119,7 +119,7 @@ export var adhDocumentWorkbench = (adhConfig: AdhConfig.Type) => {
                 // FIXME: factor out getting the head version of a DAG.
 
                 var fetchDocumentHead = (n : number, dag : Types.Content<Resources.HasIDocumentSheet>) : ng.IPromise<void> => {
-                    return Resources.getNewestVersionPath(adhHttp, dag.path)
+                    return adhResources.getNewestVersionPath(dag.path)
                         .then((headPath) => adhHttp.get(headPath))
                         .then((headContent) => {
                             if (n in $scope.poolEntries) {
@@ -199,8 +199,8 @@ export var adhProposalVersionEdit = (adhConfig: AdhConfig.Type) => {
 
 export var adhProposalVersionNew = (
     adhHttp: ng.IHttpService,
-    $q : ng.IQService,
-    adhConfig: AdhConfig.Type
+    adhConfig: AdhConfig.Type,
+    adhResources: Resources.Service
 ) => {
     return {
         restrict: "E",
@@ -220,7 +220,7 @@ export var adhProposalVersionNew = (
             };
 
             $scope.commit = () => {
-                Resources.postProposal(adhHttp, $q, $scope.proposalVersion, $scope.paragraphVersions).then((resp) => {
+                adhResources.postProposalWithParagraphs($scope.proposalVersion, $scope.paragraphVersions).then((resp) => {
                     adhHttp.get(resp.path).then((respGet) => {
                         $scope.onNewProposal(respGet);
                     });
@@ -331,6 +331,8 @@ export var run = () => {
 
     var app = angular.module("adhocracy3SampleFrontend", []);
 
+    app.service("adhResources", Resources.Service);
+
     app.service("adhUser", AdhUser.User);
     app.directive("adhLogin", ["adhUser", AdhUser.loginDirective]);
     app.factory("adhConfig", () => AdhConfig.config);
@@ -362,10 +364,10 @@ export var run = () => {
 
     // application-specific (local) directives
 
-    app.directive("adhDocumentWorkbench", ["adhConfig", adhDocumentWorkbench]);
+    app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", adhDocumentWorkbench]);
     app.directive("adhProposalVersionDetail", ["adhConfig", adhProposalVersionDetail]);
     app.directive("adhProposalVersionEdit", ["adhConfig", adhProposalVersionEdit]);
-    app.directive("adhProposalVersionNew", ["adhHttp", "$q", "adhConfig", adhProposalVersionNew]);
+    app.directive("adhProposalVersionNew", ["adhHttp", "adhConfig", "adhResources", adhProposalVersionNew]);
     app.directive("adhSectionVersionDetail", ["adhConfig", "recursionHelper", adhSectionVersionDetail]);
     app.directive("adhParagraphVersionDetail", ["adhConfig", adhParagraphVersionDetail]);
     app.directive("adhDocumentSheetEdit", ["adhHttp", "$q", "adhConfig", adhDocumentSheetEdit]);

@@ -1,4 +1,5 @@
-
+Random Thoughts
+---------------
 
 object hierarchy
 ~~~~~~~~~~~~~~~~
