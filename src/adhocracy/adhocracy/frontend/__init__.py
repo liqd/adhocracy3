@@ -10,9 +10,10 @@ def config_view(request):
     settings = request.registry.settings or {}
     config = {}
     internal_ws_url = settings.get('adhocracy.ws_url', '')
-    public_ws_url = _build_ws_url(request, internal_ws_url)
     if 'adhocracy.frontend.ws_url' in settings:
         public_ws_url = settings.get('adhocracy.frontend.ws_url')
+    else:
+        public_ws_url = _build_ws_url(request, internal_ws_url)
     config['ws_url'] = public_ws_url
     config['template_path'] = settings.get('adhocracy.frontend.template_path',
                                            '/frontend_static/templates')
@@ -21,11 +22,11 @@ def config_view(request):
 
 
 def _build_ws_url(request: Request, url: str) -> str:
-        url_parsed = urlparse(url)
-        ws_domain = request.domain
-        ws_port = url_parsed.port or '80'
-        ws_scheme = 'wss' if url_parsed.scheme == 'https' else 'ws'
-        return '{}://{}:{}'.format(ws_scheme, ws_domain, ws_port)
+    url_parsed = urlparse(url)
+    ws_domain = request.domain
+    ws_port = url_parsed.port or '80'
+    ws_scheme = 'wss' if url_parsed.scheme == 'https' else 'ws'
+    return '{}://{}:{}'.format(ws_scheme, ws_domain, ws_port)
 
 
 def includeme(config):
