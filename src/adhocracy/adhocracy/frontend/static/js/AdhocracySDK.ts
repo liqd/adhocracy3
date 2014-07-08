@@ -16,6 +16,7 @@
 
     var $;
     var origin : string;
+    var iframeId : string = "adhocracy_iframe";
     var appUrl : string = "frontend_static/root.html";
 
     /**
@@ -64,7 +65,8 @@
             // In the future, marker may have additional attributes or
             // child elements that have influence on iframe.
             var marker = $(e);
-            var iframe = $("<iframe>");
+            var iframe = $("<iframe id='" + iframeId + "'>");
+
             iframe.css("border", "none");
             iframe.css("width", "100%");
             iframe.attr("src", origin + appUrl);
