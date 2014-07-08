@@ -1,10 +1,14 @@
+import subprocess
 
 class Test:
 
-    # if /etc/hosts has not been prepared (see development.rst), mark
-    # all tests in this class as "pending" before continuing.
-    def test_etc_hosts(self, browser_embedder_root):
-        assert True
+    # check that /etc/hosts has been prepared (see development.rst).
+    #
+    # FIXME: if this test fails, do not crash, but warn and mark all
+    # tests in this class as "pending" before continuing.
+    def test_etc_hosts(self):
+        assert subprocess.call(["grep", "-q", "adhocracy.embeddee.goo", "/etc/hosts"]) == 0
+        assert subprocess.call(["grep", "-q", "adhocracy.embedder.gaa", "/etc/hosts"]) == 0
 
     # run acceptance test after zooming in on iframe.  (this is mostly
     # interesting as an example on how to do acceptance tests in
