@@ -16,6 +16,7 @@
 
     var $;
     var origin : string;
+    var appUrl : string = "frontend_static/root.html";
 
     /**
      * Load external JavaScript asynchronously.
@@ -66,7 +67,7 @@
             var iframe = $("<iframe>");
             iframe.css("border", "none");
             iframe.css("width", "100%");
-            iframe.attr("src", origin + "frontend_static/root.html");
+            iframe.attr("src", origin + appUrl);
             marker.append(iframe);
         });
     };
