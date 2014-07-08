@@ -58,7 +58,8 @@
      */
     adhocracy.embed = (selector: string) => {
         $(selector).each((i, e) => {
-            // In the future, marker may have additional attributes that have influence on iframe.
+            // In the future, marker may have additional attributes or
+            // child elements that have influence on iframe.
             var marker = $(e);
             var iframe = $("<iframe>");
             iframe.css("border", "none");
