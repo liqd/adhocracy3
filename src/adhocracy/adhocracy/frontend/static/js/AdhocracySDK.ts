@@ -17,6 +17,9 @@
     var $;
     var origin : string;
     var appUrl : string = "/frontend_static/root.html";
+    var frames : {} = {};
+    var embedderID : number;
+    var embedderOrigin : string;
 
     /**
      * Load external JavaScript asynchronously.
@@ -40,14 +43,61 @@
     };
 
     /**
+     * Generate unique IDs.
+     */
+    var getUID = (() => {
+        var lastUID = 0;
+        return () : number => {
+            return lastUID++;
+        };
+    })();
+
+    /**
+     * Get a frame's contentWindow or the embedding window based un UID.
+     */
+    var getWindowByUID = (uid: number) : Window => {
+        if (uid === embedderID) {
+            return window;
+        } else {
+            var _uid = uid.toString();
+            var frame = frames[_uid];
+            return frame.contentWindow;
+        }
+    };
+
+    /**
+     * Handle a message that was sent by another window.
+     */
+    var handleMessage = (name: string, data, sender: number) : void => {
+        if (frames.hasOwnProperty(sender.toString())) {
+            var frame = frames[sender.toString()];
+
+            switch (name) {
+                case "resize":
+                    $(frame).height(data.height);
+                    break;
+            }
+        }
+    };
+
+    /**
      * Initialize adhocracy SDK.  Must be called before using any other methods.
      *
      * @param o Origin (e.g. https://adhocracy.de)
      */
     adhocracy.init = (o: string, callback) => {
         origin = o;
+        embedderID = getUID();
+        embedderOrigin = window.location.protocol + "//" + window.location.host;
+
         loadScript(origin + "/frontend_static/lib/jquery/jquery.js", () => {
             $ = (<any>window).jQuery.noConflict(true);
+
+            $(window).on("message", (event) => {
+                var data = JSON.parse(event.originalEvent.data);
+                handleMessage(data.name, data.data, data.sender);
+            });
+
             callback(adhocracy);
         });
     };
@@ -65,12 +115,46 @@
             // child elements that have influence on iframe.
             var marker = $(e);
             var iframe = $("<iframe>");
+            var uid = getUID();
 
             iframe.css("border", "none");
             iframe.css("width", "100%");
             iframe.attr("src", origin + appUrl);
             iframe.addClass("adhocracy-embed");
+            iframe.attr("data-adhocracy-frame-id", uid);
+
             marker.append(iframe);
+            frames[uid] = iframe[0];
+
+            iframe.load(() => {
+                adhocracy.postMessage(uid, "setUID", {uid: uid});
+            });
         });
+    };
+
+    /**
+     * Send a message to another window.
+     *
+     * @param uid ID of the target window
+     * @param name Message name
+     * @param data Message data
+     * @param sender ID of the sender window. Defaults to embedder.
+     * @param _origin Expected origin of target. Defaults to adhocracy origin or embedder origin (based on uid).
+     */
+    adhocracy.postMessage = (uid: number, name: string, data: {}, sender: number = embedderID, _origin?: string) => {
+        if (typeof _origin === "undefined") {
+            _origin = (uid === embedderID) ? embedderOrigin : origin;
+        }
+
+        var message = {
+            name: name,
+            data: data,
+            sender: sender
+        };
+        var messageString = JSON.stringify(message);
+        var win = getWindowByUID(uid);
+
+        // FIXME: use fallbacks here
+        win.postMessage(messageString, _origin);
     };
 })();
