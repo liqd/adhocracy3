@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+    <head>
+        <title>adhocracy embedder</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <p>this is an embedding web page.  make sure you run
+        everything on localhost (browser and all server processes),
+        and that you have the following entry in your /etc/hosts:</p>
+
+        <pre>
+            127.0.0.1 adhocracy.embeddee.goo adhocracy.embedder.gaa
+        </pre>
+
+        <!-- begin embed snipped -->
+        <script type="text/javascript" src="/frontend_static/js/AdhocracySDK.js"></script>
+        <script type="text/javascript">
+            adhocracy.init('http://adhocracy.embeddee.goo:6541/', function(adhocracy) {
+                adhocracy.embed('#adhocracy_marker');
+            });
+        </script>
+        <div id="adhocracy_marker"></div>
+        <!-- end embed snipped -->
+    </body>
+</html>
