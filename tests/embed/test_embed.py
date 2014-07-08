@@ -22,4 +22,5 @@ class Test:
 
     # resize messages from iframe to embedder window.
     def test_resize_message(self, browser_embedder_root):
+        print("\n\n\npending!\n\n\n")
         assert True
