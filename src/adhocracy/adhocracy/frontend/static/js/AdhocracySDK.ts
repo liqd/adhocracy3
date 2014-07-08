@@ -16,7 +16,7 @@
 
     var $;
     var origin : string;
-    var appUrl : string = "frontend_static/root.html";
+    var appUrl : string = "/frontend_static/root.html";
 
     /**
      * Load external JavaScript asynchronously.
@@ -42,11 +42,11 @@
     /**
      * Initialize adhocracy SDK.  Must be called before using any other methods.
      *
-     * @param o Origin (e.g. https://adhocracy.de/)
+     * @param o Origin (e.g. https://adhocracy.de)
      */
     adhocracy.init = (o: string, callback) => {
         origin = o;
-        loadScript(origin + "frontend_static/lib/jquery/jquery.js", () => {
+        loadScript(origin + "/frontend_static/lib/jquery/jquery.js", () => {
             $ = (<any>window).jQuery.noConflict(true);
             callback(adhocracy);
         });
