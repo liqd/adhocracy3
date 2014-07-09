@@ -4,8 +4,7 @@ export interface IMessage {
 }
 
 
-export interface IMessageData {
-}
+export interface IMessageData {}
 
 
 export class Service {
@@ -24,7 +23,7 @@ export class Service {
     public registerMessageHandler(name : string, callback : (IMessageData) => void) : void {
         var _self = this;
 
-        _self.$window.addEventListener("message", function(event) {
+        _self.$window.addEventListener("message", (event) => {
             var message = JSON.parse(event.data);
 
             if ((event.origin === _self.embedderOrigin) && (message.name === name)) {
@@ -37,8 +36,8 @@ export class Service {
         var _self : Service = this;
 
         var message : IMessage = {
-            data: data,
             name: name,
+            data: data
         };
 
         _self._postMessage(JSON.stringify(message), _self.embedderOrigin);
