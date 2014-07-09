@@ -9,12 +9,12 @@ export class Service {
     private uid : number;
 
     constructor(public _postMessage) {
-        var _self = this;
+        var _self : Service = this;
 
     }
 
     private postMessage(name: string, data: {}) : void {
-        var _self = this;
+        var _self : Service = this;
 
         var message : IMessage = {
             data: data,
@@ -26,7 +26,7 @@ export class Service {
     }
 
     postResize(height: number) : void {
-        var _self = this;
+        var _self : Service = this;
 
         _self.postMessage(
             "resize",
