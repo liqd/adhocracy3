@@ -1,5 +1,8 @@
 "use strict";
 
+// FIXME: internal object for testing
+// FIXME: we only send `sender` to get the iframe. But that allows third parties to send fake sender ids. This is nice for debugging.
+
 (function() {
     var adhocracy : any = {};
 
