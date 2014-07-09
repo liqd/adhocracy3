@@ -18,6 +18,8 @@
         <script type="text/javascript">
             adhocracy.init('http://adhocracy.embeddee.goo:6541/', function(adhocracy) {
                 adhocracy.embed('#adhocracy_marker');
+                // Not part of embed snipped. Only here for testing.
+                document.getElementsByClassName("adhocracy-embed")[0].id = "adhocracy-iframe";
             });
         </script>
         <div id="adhocracy_marker"></div>
