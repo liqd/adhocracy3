@@ -1,7 +1,6 @@
 export interface IMessage {
     data : IMessageData;
     name : string;
-    sender : string;
 }
 
 
@@ -11,18 +10,10 @@ export interface IMessageData {
 
 export class Service {
 
-    private uid : string;
-    private embedderOrigin : string;
-    private embedderID : string;
+    private embedderOrigin : string = "*";
 
     constructor(public _postMessage, public $window) {
         var _self = this;
-
-        _self.registerCallback("setup", function(data, sender) {
-            _self.uid = data.uid;
-            _self.embedderOrigin = data.embedderOrigin;
-            _self.embedderID = data.embedderID;
-        });
 
         _self.$window.addEventListener("resize", (event) => {
             var height = document.body.clientHeight;
@@ -30,16 +21,15 @@ export class Service {
         });
     }
 
-    private registerCallback(name : string, callback : (IMessageData, string) => void) : void {
+    public registerMessageHandler(name : string, callback : (IMessageData) => void) : void {
         var _self = this;
 
         _self.$window.addEventListener("message", function(event) {
             var message = JSON.parse(event.data);
 
-            if (((name === "setup") || (event.origin === _self.embedderOrigin))
-                && (message.name === name)) {
-                    callback(message.data, message.sender);
-                }
+            if ((event.origin === _self.embedderOrigin) && (message.name === name)) {
+                callback(message.data);
+            }
         });
     }
 
@@ -49,7 +39,6 @@ export class Service {
         var message : IMessage = {
             data: data,
             name: name,
-            sender: _self.uid
         };
 
         _self._postMessage(JSON.stringify(message), _self.embedderOrigin);
