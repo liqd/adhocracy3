@@ -1,8 +1,18 @@
 html {
     background-color: $primary-color;
+    padding: 0;
+}
+
+// This is important for iframe resizing
+html, body {
+    margin: 0;
 }
 
 body {
+    padding: 1em;
+}
+
+.page_wrapper {
     width: 50em;
     max-width: 90vw;
     margin: 2em auto;
