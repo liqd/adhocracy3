@@ -341,7 +341,7 @@ export var run = (config) => {
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
     app.factory("adhWebSocket", ["adhConfig", AdhWebSocket.factory]);
 
-    app.service("adhPostMessage", window.postMessage);
+    app.service("adhPostMessage", (...args) => window.postMessage.apply(window, args));
     app.service("adhCrossWindowMessaging", ["adhPostMessage", AdhCrossWindowMessaging.Service]);
 
     app.filter("documentTitle", [filterDocumentTitle]);
