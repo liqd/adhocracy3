@@ -47,7 +47,7 @@
         $("iframe.adhocracy-embed").each((i, iframe) => {
             if (iframe.contentWindow === win) {
                 result = iframe;
-                return;
+                return false;
             }
         });
         return result;

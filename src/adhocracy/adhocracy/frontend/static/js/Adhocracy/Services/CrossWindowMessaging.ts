@@ -16,6 +16,10 @@
  * data: {
  *   height: number
  * }
+ *
+ * Messages are serialized with JSON.stringify before being sent via
+ * window.postMessage().  (Reason: browser compatibility; IE prior to
+ * 10 in particular, but others may be affected.)
  */
 
 
