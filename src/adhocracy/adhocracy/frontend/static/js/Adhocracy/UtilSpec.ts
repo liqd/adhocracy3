@@ -95,7 +95,7 @@ export var register = () => {
                 expect(input.point.x).not.toBe(1);
             });
             it("does not support copying functions", () => {
-                expect(Util.deepcp(() => null)).toThrow();
+                expect(() => Util.deepcp(() => null)).toThrow();
             });
         });
 
