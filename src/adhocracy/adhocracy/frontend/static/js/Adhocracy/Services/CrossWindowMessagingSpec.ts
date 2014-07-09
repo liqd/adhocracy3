@@ -7,16 +7,16 @@ export var register = () => {
     describe("Services/CrossWindowMessaging", () => {
 
         var postMessageMock = <any>jasmine.createSpy("postMessageMock");
-        var service = new CrossWindowMessaging.Service(postMessageMock);
+        var windowMock = <any>jasmine.createSpyObj("windowMock", ["addEventListener"]);
+        var service = new CrossWindowMessaging.Service(postMessageMock, windowMock);
 
         it("calls window.postMessage with given resize parameters", () => {
 
             service.postResize(280);
             var args = postMessageMock.calls.mostRecent().args;
-            expect(JSON.parse(args)).toEqual({
+            expect(JSON.parse(args[0])).toEqual({
                 name: "resize",
-                data: {height: 280},
-                sender: 0
+                data: {height: 280}
             });
         });
     });
