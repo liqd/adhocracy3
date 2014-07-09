@@ -36,4 +36,7 @@ export class Service {
 }
 
 
-export var factory = ($window) => new Service((...args) => $window.postMessage.apply($window, args));
+export var factory = ($window) => {
+    var postMessageToParent = (data, origin) => $window.parent.postMessage(data, origin);
+    return new Service(postMessageToParent, $window);
+};
