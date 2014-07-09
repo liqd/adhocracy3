@@ -72,17 +72,14 @@ frontend functional tests::
 
 frontend acceptance tests::
 
-    bin/py.test tests/acceptance
+    bin/py.test tests/
 
-test embedding (interesting in its own right because it requires
-modification of /etc/hosts)::
+.. note::
 
-    # add localhost entries for embedding and embedded sites
-    export __ETC_HOSTS_ENTRY="127.0.0.1 adhocracy.embeddee.goo adhocracy.embedder.gaa"
-    grep -q "$__ETC_HOSTS_ENTRY" /etc/hosts || echo "$__ETC_HOSTS_ENTRY" >> /etc/hosts
+   Some of the tests assume aliases for localhost to exist. If it is
+   not already there, please add the following line to /etc/hosts::
 
-    # call embedding test individually
-    bin/py.test tests/embed
+       127.0.0.1  adhocracy.embeddee.goo adhocracy.embedder.gaa
 
 run all tests::
 
