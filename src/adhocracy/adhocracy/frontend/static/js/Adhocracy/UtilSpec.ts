@@ -131,10 +131,13 @@ export var register = () => {
                 expect((<any>_target).bar).toBe(3);
                 expect(_target.baz).toBeUndefined();
             });
-            xit("crashes if target is not an object", () => {
+            it("crashes if either argument is not an object", () => {
                 expect(() => Util.deepoverwrite({}, 1)).toThrow();
                 expect(() => Util.deepoverwrite({}, "test")).toThrow();
                 expect(() => Util.deepoverwrite({}, [])).toThrow();
+                expect(() => Util.deepoverwrite(1, {})).toThrow();
+                expect(() => Util.deepoverwrite("test", {})).toThrow();
+                expect(() => Util.deepoverwrite([], {})).toThrow();
             });
         });
 

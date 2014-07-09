@@ -64,8 +64,9 @@ export function deepcp(i) {
  * Do a deep copy of a javascript source object into a target object.
  * References to the target object are not severed; rather, all fields
  * in the target object are deleted, and all fields in the source
- * object are copied using deepcp().  Crashes if target is not an
- * object.
+ * object are copied using deepcp().  Since this function only makes
+ * sense on objects, and not on other types, it crashes if either
+ * argument is not an object.
  */
 export function deepoverwrite(source, target) {
     "use strict";
