@@ -23,6 +23,11 @@ export class Service {
             _self.embedderOrigin = data.embedderOrigin;
             _self.embedderID = data.embedderID;
         });
+
+        _self.$window.addEventListener("resize", (event) => {
+            var height = document.body.clientHeight;
+            _self.postResize(height);
+        });
     }
 
     private registerCallback(name : string, callback : (IMessageData, string) => void) : void {
