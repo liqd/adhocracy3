@@ -34,3 +34,6 @@ export class Service {
         );
     }
 }
+
+
+export var factory = ($window) => new Service((...args) => $window.postMessage.apply($window, args));
