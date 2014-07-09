@@ -31,6 +31,10 @@ export interface IMessageData {}
 export class Service {
 
     private embedderOrigin : string = "*";
+        // FIXME: this is a bit lax: all incoming message are taken
+        // seriously (bad!), and all outgoing messages may end up in
+        // the hands of hostile windows.  think of something more
+        // sohpisticated!
 
     constructor(public _postMessage, public $window, public $interval) {
         var _self : Service = this;
@@ -44,7 +48,8 @@ export class Service {
         _self.$window.addEventListener("message", (event) => {
             var message = JSON.parse(event.data);
 
-            if ((event.origin === _self.embedderOrigin) && (message.name === name)) {
+            if ((_self.embedderOrigin === "*" || event.origin === _self.embedderOrigin)
+                && (message.name === name)) {
                 callback(message.data);
             }
         });
