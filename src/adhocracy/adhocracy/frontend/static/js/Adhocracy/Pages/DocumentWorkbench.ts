@@ -11,6 +11,7 @@ import AdhWebSocket = require("../Services/WebSocket");
 import AdhUser = require("../Services/User");
 import AdhConfig = require("../Services/Config");
 import AdhDone = require("../Services/Done");
+import AdhCrossWindowMessaging = require("../Services/CrossWindowMessaging");
 
 import Resources = require("../Resources");
 import Widgets = require("../Widgets");
@@ -339,6 +340,8 @@ export var run = (config) => {
     app.factory("recursionHelper", ["$compile", recursionHelper]);
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
     app.factory("adhWebSocket", ["adhConfig", AdhWebSocket.factory]);
+
+    app.factory("adhCrossWindowMessaging", ["$window", AdhCrossWindowMessaging.factory]);
 
     app.filter("documentTitle", [filterDocumentTitle]);
 
