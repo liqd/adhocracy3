@@ -36,13 +36,13 @@ export function deepcp(i) {
     "use strict";
 
     // base types
-    if (i === null || ['number', 'boolean', 'string'].indexOf(typeof(i)) > -1) {
+    if (i === null || ["number", "boolean", "string"].indexOf(typeof(i)) > -1) {
         return i;
     }
 
     // structured types
     var o;
-    switch(Object.prototype.toString.call(i)) {
+    switch (Object.prototype.toString.call(i)) {
         case "[object Object]":
             o = new Object();
             break;
@@ -50,7 +50,7 @@ export function deepcp(i) {
             o = new Array();
             break;
         default:
-            throw "deepcp: unsupported object type!"
+            throw "deepcp: unsupported object type!";
     }
 
     for (var x in i) {
