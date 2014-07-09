@@ -6,7 +6,7 @@ export interface IMessage {
 
 export class Service {
 
-    private uid : number;
+    private uid : string;
 
     constructor(public _postMessage) {
         var _self : Service = this;
@@ -38,5 +38,5 @@ export class Service {
 
 export var factory = ($window) => {
     var postMessageToParent = (data, origin) => $window.parent.postMessage(data, origin);
-    return new Service(postMessageToParent, $window);
+    return new Service(postMessageToParent);
 };
