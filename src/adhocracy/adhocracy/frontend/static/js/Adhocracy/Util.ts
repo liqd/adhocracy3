@@ -30,7 +30,7 @@ export function isArrayMember(member : any, array : any[]) : boolean {
  * classes other than Object, Array are not treated properly either.)
  *
  * A competing (and possibly more sophisticated) implementation is
- * available as `cloneDeep` in <a href="http://lowdash.com/">low-dash</a>
+ * available as `cloneDeep` in <a href="http://lodash.com/">lo-dash</a>
  */
 export function deepcp(i) {
     "use strict";
