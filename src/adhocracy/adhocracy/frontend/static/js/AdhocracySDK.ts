@@ -87,6 +87,8 @@
                     case "resize":
                         $(frame).height(data.height);
                         break;
+                    default:
+                        throw "unknown message name: " + name;
                 }
             }
         }
