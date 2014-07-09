@@ -1,3 +1,4 @@
+SHELL=/bin/bash
 TSC=tsc
 # (for more info on tsc, see http://www.typescriptlang.org/)
 FIX_TSC_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\((\d+),(\d+)\):(.*)/) { print "$$1:$$2:$$3:\n$$4\n\n"; } else { print "$$_\n"; }'
@@ -27,7 +28,14 @@ description:
 
 # run tests
 
-test: tslint compile_tests_node test_node
+warn_orphan_js:
+	@for i in `find . -name '*.js'`; do \
+	    if [ ! -e `echo $$i | sed s/.js$$/.ts/` ]; then \
+		echo -ne "\n\nWARNING: orphan js file $$i.  you might want to make clean.\n\n"; \
+	    fi; \
+	done
+
+test: warn_orphan_js tslint compile_tests_node test_node
 
 tslint:
 	../../../../../../bin/tslint_check_adhocracy | $(FIX_TSLINT_ERROR_FORMAT)
