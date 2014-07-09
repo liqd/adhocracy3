@@ -1,7 +1,7 @@
 export interface IMessage {
     data: {};
     name: string;
-    sender: number;
+    sender: string;
 }
 
 export class Service {
@@ -10,7 +10,7 @@ export class Service {
 
     constructor(public _postMessage) {
         var _self = this;
-        _self.uid = 0;
+
     }
 
     private postMessage(name: string, data: {}) : void {
