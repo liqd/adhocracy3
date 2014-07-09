@@ -18,7 +18,7 @@
     var origin : string;
     var appUrl : string = "/frontend_static/root.html";
     var frames : {} = {};
-    var embedderID : number;
+    var embedderID : string;
     var embedderOrigin : string;
 
     /**
@@ -46,21 +46,21 @@
      * Generate unique IDs.
      */
     var getUID = (() => {
-        var lastUID = 0;
-        return () : number => {
-            return lastUID++;
+        var lastUID : number = 0;
+        return () : string => {
+            var i = lastUID++;
+            return i.toString();
         };
     })();
 
     /**
      * Get a frame's contentWindow or the embedding window based un UID.
      */
-    var getWindowByUID = (uid: number) : Window => {
+    var getWindowByUID = (uid: string) : Window => {
         if (uid === embedderID) {
             return window;
         } else {
-            var _uid = uid.toString();
-            var frame = frames[_uid];
+            var frame = frames[uid];
             return frame.contentWindow;
         }
     };
@@ -68,9 +68,9 @@
     /**
      * Handle a message that was sent by another window.
      */
-    var handleMessage = (name: string, data, sender: number) : void => {
-        if (frames.hasOwnProperty(sender.toString())) {
-            var frame = frames[sender.toString()];
+    var handleMessage = (name: string, data, sender: string) : void => {
+        if (frames.hasOwnProperty(sender)) {
+            var frame = frames[sender];
 
             switch (name) {
                 case "resize":
@@ -141,7 +141,7 @@
      * @param sender ID of the sender window. Defaults to embedder.
      * @param _origin Expected origin of target. Defaults to adhocracy origin or embedder origin (based on uid).
      */
-    adhocracy.postMessage = (uid: number, name: string, data: {}, sender: number = embedderID, _origin?: string) => {
+    adhocracy.postMessage = (uid: string, name: string, data: {}, sender: string = embedderID, _origin?: string) => {
         if (typeof _origin === "undefined") {
             _origin = (uid === embedderID) ? embedderOrigin : origin;
         }
