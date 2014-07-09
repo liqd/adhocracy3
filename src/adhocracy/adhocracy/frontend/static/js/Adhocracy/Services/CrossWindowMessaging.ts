@@ -1,3 +1,24 @@
+/**
+ * Cross Window Messaging
+ *
+ * Adhocracy -- or parts of it -- can be embedded as iframes.  The iframe provides
+ * sufficient isolation to separate our own DOM, JavaScript and CSS from that of the
+ * embedder page.
+ *
+ * Still it is required to be able to communicate between the embedder and the embedde.
+ * On the embedee site, this is handled by this module.  On the embedder site it is most
+ * likely handled by AdhocracySDK.
+ *
+ * Messages sent between the two are always of type IMessage.  Currentently the following
+ * messages exists:
+ *
+ * name: "resize"
+ * data: {
+ *   height: number
+ * }
+ */
+
+
 export interface IMessage {
     data : IMessageData;
     name : string;
