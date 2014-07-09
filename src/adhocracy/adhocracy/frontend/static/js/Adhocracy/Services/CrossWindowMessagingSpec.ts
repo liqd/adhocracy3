@@ -4,12 +4,12 @@ import CrossWindowMessaging = require("./CrossWindowMessaging");
 
 export var register = () => {
 
-    xdescribe("Services/CrossWindowMessaging", () => {
+    describe("Services/CrossWindowMessaging", () => {
 
         var postMessageMock = <any>jasmine.createSpy("postMessageMock");
         var windowMock = <any>jasmine.createSpyObj("windowMock", ["addEventListener"]);
-        // var service = new CrossWindowMessaging.Service(postMessageMock, windowMock);  // REVIEW: type error!
-        var service: any;
+        var intervalMock = jasmine.createSpy("intervalMock");
+        var service = new CrossWindowMessaging.Service(postMessageMock, windowMock, intervalMock);
 
         it("calls window.postMessage with given resize parameters", () => {
 
