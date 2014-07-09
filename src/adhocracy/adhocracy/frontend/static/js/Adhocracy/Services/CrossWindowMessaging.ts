@@ -22,7 +22,7 @@ export class Service {
             sender: _self.uid
         };
 
-        _self._postMessage(JSON.stringify(message));
+        _self._postMessage(JSON.stringify(message), "*");
     }
 
     postResize(height: number) : void {
