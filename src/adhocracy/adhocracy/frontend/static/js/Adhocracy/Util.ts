@@ -31,6 +31,9 @@ export function isArrayMember(member : any, array : any[]) : boolean {
  * Do a deep copy on any javascript object.  The resuling object does
  * not share sub-structures as the original.  (I think instances of
  * classes other than Object, Array are not treated properly either.)
+ *
+ * A competing (and possibly more sophisticated) implementation is
+ * available as `cloneDeep` in <a href="http://lowdash.com/">low-dash</a>
  */
 export function deepcp(i) {
     "use strict";
