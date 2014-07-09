@@ -69,14 +69,6 @@
 
     /**
      * Handle a message that was sent by another window.
-     *
-     * FIXME: when the next event will be introduced, i propose to set
-     * up a dictionary with one handler function for each message
-     * name.  handleMessage would then look up the appropriate handler
-     * in the dictionary, throw an error if there isn't any (or
-     * silently ignore the event, not sure what we want), and the
-     * individual name-based message handlers would be much easier to
-     * read.
      */
     var handleMessage = (name: string, data, sender: string, event) : void => {
         if (frames.hasOwnProperty(sender)) {
