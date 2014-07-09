@@ -220,6 +220,20 @@ export var register = () => {
             });
         });
 
+        describe("trickle", () => {
+            xit("calls function on every arg in array exactly once within the given timeout.", () => {
+                expect(false).toBe(true);
+
+                // there is a timeout mock object in jasmine, but any
+                // test of this function would mostly test that it is
+                // implemented *in a specific* way, which sais nothing
+                // about whether it is implemented *correctly*.
+                //
+                // `trickle` is a beautiful example of the claim that
+                // test coverage is not everything.
+            });
+        });
+
         describe("parentPath", () => {
             it("returns '/foo' for '/foo/bar'", () => {
                 expect(Util.parentPath("/foo/bar")).toBe("/foo");
