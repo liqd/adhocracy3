@@ -152,6 +152,11 @@
      * @param uid ID of the target window
      * @param name Message name
      * @param data Message data
+     *
+     * This is redundantly implemented in
+     * "Adhocracy/Services/CrossWindowMessaging".  if they start
+     * growing in parallel, we should factor them out into a shared
+     * module.
      */
     adhocracy.postMessage = (uid: string, name: string, data: {}) => {
         var message = {
