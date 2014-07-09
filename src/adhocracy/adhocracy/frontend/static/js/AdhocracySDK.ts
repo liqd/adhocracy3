@@ -16,6 +16,7 @@
 
     var $;
     var origin : string;
+    var appUrl : string = "frontend_static/root.html";
 
     /**
      * Load external JavaScript asynchronously.
@@ -64,9 +65,11 @@
             // child elements that have influence on iframe.
             var marker = $(e);
             var iframe = $("<iframe>");
+
             iframe.css("border", "none");
             iframe.css("width", "100%");
-            iframe.attr("src", origin + "frontend_static/root.html");
+            iframe.attr("src", origin + appUrl);
+            iframe.addClass("adhocracy-embed");
             marker.append(iframe);
         });
     };
