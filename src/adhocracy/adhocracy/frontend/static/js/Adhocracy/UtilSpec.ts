@@ -114,6 +114,9 @@ export var register = () => {
                 output.point.x = 1;
                 expect(input.point.x).not.toBe(1);
             });
+            it("does not support copying functions", () => {
+                expect(Util.deepcp(() => null)).toThrow();
+            });
         });
 
         describe("deepoverwrite", () => {
