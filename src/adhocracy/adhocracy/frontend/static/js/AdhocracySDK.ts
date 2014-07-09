@@ -48,9 +48,9 @@
      * Generate unique IDs.
      */
     var getUID = (() => {
-        var lastUID : number = 0;
+        var nextUID : number = 0;
         return () : string => {
-            var i = lastUID++;
+            var i = nextUID++;
             return i.toString();
         };
     })();
