@@ -99,7 +99,11 @@ export var filterDocumentTitle = () => {
     };
 };
 
-export var adhDocumentWorkbench = (adhConfig: AdhConfig.Type, adhResources: Resources.Service) => {
+export var adhDocumentWorkbench = (
+        adhConfig: AdhConfig.Type,
+        adhResources: Resources.Service,
+        adhCrossWindowMessaging: AdhCrossWindowMessaging.Service
+    ) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.template_path + "/Pages/DocumentWorkbench.html",
@@ -364,7 +368,7 @@ export var run = (config) => {
 
     // application-specific (local) directives
 
-    app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", adhDocumentWorkbench]);
+    app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", "adhCrossWindowMessaging", adhDocumentWorkbench]);
     app.directive("adhProposalVersionDetail", ["adhConfig", adhProposalVersionDetail]);
     app.directive("adhProposalVersionEdit", ["adhConfig", adhProposalVersionEdit]);
     app.directive("adhProposalVersionNew", ["adhHttp", "adhConfig", "adhResources", adhProposalVersionNew]);
