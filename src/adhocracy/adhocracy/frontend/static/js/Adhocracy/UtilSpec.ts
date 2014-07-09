@@ -27,27 +27,12 @@ export var register = () => {
             });
         });
 
-        describe("isInfixOf", () => {
-            it("returns false for an empty list", () => {
-                expect(Util.isInfixOf(0, [])).toBe(false);
-            });
-            it("returns false if needle is not in hay", () => {
-                expect(Util.isInfixOf("needle", ["hay", "stack"])).toBe(false);
-                expect(Util.isInfixOf(0, [1, 2, 3])).toBe(false);
-            });
-            it("returns true if needle is in hay", () => {
-                expect(Util.isInfixOf("hay", ["hay", "stack"])).toBe(true);
-                expect(Util.isInfixOf(2, [1, 2, 3])).toBe(true);
-            });
-            it("returns false for list properties that are not list items (such as length)", () => {
-                expect(Util.isInfixOf("length", ["hay", "stack"])).toBe(false);
-                expect(Util.isInfixOf(0, ["hay", "stack"])).toBe(false);
-            });
-        });
-
         describe("isArrayMember", () => {
             var isArrayMember = Util.isArrayMember;
 
+            it("finds nothing in empty array.", () => {
+                expect(isArrayMember(0, [])).toBe(false);
+            });
             it("finds array members if they are present at pos [0].", () => {
                 expect(isArrayMember("wef", ["wef", null, 3])).toBe(true);
             });
@@ -73,14 +58,9 @@ export var register = () => {
             it("null is not member of ['null'].", () => {
                 expect(isArrayMember(null, ["null"])).toBe(false);
             });
-        });
-
-        describe("parentPath", () => {
-            it("returns '/foo' for '/foo/bar'", () => {
-                expect(Util.parentPath("/foo/bar")).toBe("/foo");
-            });
-            it("returns '' for '/'", () => {
-                expect(Util.parentPath("/")).toBe("");
+            it("returns false for array properties that are not array items (such as length)", () => {
+                expect(Util.isArrayMember("length", ["hay", "stack"])).toBe(false);
+                expect(Util.isArrayMember(0, ["hay", "stack"])).toBe(false);
             });
         });
 
@@ -237,6 +217,15 @@ export var register = () => {
                     foo: "bar"
                 };
                 expect(Util.deepeq(a, b)).toBe(false);
+            });
+        });
+
+        describe("parentPath", () => {
+            it("returns '/foo' for '/foo/bar'", () => {
+                expect(Util.parentPath("/foo/bar")).toBe("/foo");
+            });
+            it("returns '' for '/'", () => {
+                expect(Util.parentPath("/")).toBe("");
             });
         });
 

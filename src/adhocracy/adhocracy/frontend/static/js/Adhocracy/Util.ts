@@ -11,10 +11,6 @@ export function cutArray(a : any[], from : number, to ?: number) : any[] {
     return a;
 };
 
-export function isInfixOf(needle : any, hay : any[]) : boolean {
-    "use strict";
-    return hay.indexOf(needle) !== -1;
-};
 
 /**
  * isArrayMember could be inlined, but is not for two reasons: (1)
@@ -26,6 +22,7 @@ export function isArrayMember(member : any, array : any[]) : boolean {
     "use strict";
     return array.indexOf(member) > -1;
 }
+
 
 /**
  * Do a deep copy on any javascript object.  The resuling object does
