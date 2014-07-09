@@ -131,7 +131,12 @@
             frames[uid] = iframe[0];
 
             iframe.load(() => {
-                adhocracy.postMessage(uid, "setUID", {uid: uid});
+                // FIXME: the code inside of the iframe is not ready when this is send.
+                adhocracy.postMessage(uid, "setup", {
+                    uid: uid,
+                    embedderOrigin: embedderOrigin,
+                    embedderID: embedderID
+                });
             });
         });
     };
