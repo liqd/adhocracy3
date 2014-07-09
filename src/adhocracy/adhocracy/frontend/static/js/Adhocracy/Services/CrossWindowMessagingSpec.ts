@@ -2,7 +2,6 @@
 
 import CrossWindowMessaging = require("./CrossWindowMessaging");
 
-
 export var register = () => {
 
     describe("Services/CrossWindowMessaging", () => {
@@ -20,6 +19,5 @@ export var register = () => {
                 sender: 0
             });
         });
-
     });
 };

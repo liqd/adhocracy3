@@ -1,25 +1,19 @@
 export interface IMessage {
-
     data: {};
     name: string;
     sender: number;
-
 }
-
 
 export class Service {
 
     private uid : number;
 
     constructor(public _postMessage) {
-
         var _self = this;
         _self.uid = 0;
-
     }
 
     private postMessage(name: string, data: {}) : void {
-
         var _self = this;
 
         var message : IMessage = {
@@ -32,7 +26,6 @@ export class Service {
     }
 
     postResize(height: number) : void {
-
         var _self = this;
 
         _self.postMessage(
@@ -40,5 +33,4 @@ export class Service {
             {height: height}
         );
     }
-
 }
