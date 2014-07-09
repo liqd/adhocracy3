@@ -27,13 +27,6 @@ export function isArrayMember(member : any, array : any[]) : boolean {
     return array.indexOf(member) > -1;
 }
 
-export function parentPath(url : string) : string {
-    "use strict";
-
-    return url.substring(0, url.lastIndexOf("/"));
-};
-
-
 /**
  * Do a deep copy on any javascript object.  The resuling object does
  * not share sub-structures as the original.  (I think instances of
@@ -134,7 +127,9 @@ export function deepeq(a : any, b : any) : boolean {
 }
 
 
-// sugar for angular
+/**
+ * sugar for angular
+ */
 export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
     "use strict";
 
@@ -143,11 +138,6 @@ export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
     return deferred.promise.then(() => obj);
 }
 
-export function normalizeName(name: string) : string {
-    "use strict";
-
-    return name.toLowerCase().replace(/\ /g, "_");
-}
 
 /**
  * Take a maximum delay time, an array of arguments and a function.
@@ -162,3 +152,24 @@ export function normalizeName(name: string) : string {
 export var trickle = <T>($timeout: ng.ITimeoutService, maxdelay: number, xs: T[], f: (T) => void): void => {
     xs.map((x) => $timeout(() => f(x), Math.random() * maxdelay, true));
 };
+
+
+/**
+ * Remove last hierarchy level from path (uris or directory paths).
+ */
+export function parentPath(url : string) : string {
+    "use strict";
+
+    return url.substring(0, url.lastIndexOf("/"));
+};
+
+
+/**
+ * replace space with _, make everything lower case.
+ */
+export function normalizeName(name: string) : string {
+    "use strict";
+
+    return name.toLowerCase().replace(/\ /g, "_");
+}
+
