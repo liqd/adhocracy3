@@ -1,5 +1,7 @@
 "use strict";
 
+// FIXME: internal object for testing
+
 (function() {
     var adhocracy : any = {};
 
@@ -16,7 +18,10 @@
 
     var $;
     var origin : string;
-    var appUrl : string = "frontend_static/root.html";
+    var appUrl : string = "/frontend_static/root.html";
+    var frames : {} = {};
+    var embedderID : string;
+    var embedderOrigin : string;
 
     /**
      * Load external JavaScript asynchronously.
@@ -40,14 +45,63 @@
     };
 
     /**
+     * Generate unique IDs.
+     */
+    var getUID = (() => {
+        var nextUID : number = 0;
+        return () : string => {
+            var i = nextUID++;
+            return i.toString();
+        };
+    })();
+
+    /**
+     * Get a frame's contentWindow or the embedding window based un UID.
+     */
+    var getWindowByUID = (uid: string) : Window => {
+        if (uid === embedderID) {
+            return window;
+        } else {
+            var frame = frames[uid];
+            return frame.contentWindow;
+        }
+    };
+
+    /**
+     * Handle a message that was sent by another window.
+     */
+    var handleMessage = (name: string, data, sender: string, event) : void => {
+        if (frames.hasOwnProperty(sender)) {
+            var frame = frames[sender];
+
+            if (frame.contentWindow === event.source) {
+                switch (name) {
+                    case "resize":
+                        $(frame).height(data.height);
+                        break;
+                }
+            }
+        }
+    };
+
+    /**
      * Initialize adhocracy SDK.  Must be called before using any other methods.
      *
-     * @param o Origin (e.g. https://adhocracy.de/)
+     * @param o Origin (e.g. https://adhocracy.de)
      */
     adhocracy.init = (o: string, callback) => {
         origin = o;
-        loadScript(origin + "frontend_static/lib/jquery/jquery.js", () => {
+        embedderID = getUID();
+        embedderOrigin = window.location.protocol + "//" + window.location.host;
+
+        loadScript(origin + "/frontend_static/lib/jquery/jquery.js", () => {
             $ = (<any>window).jQuery.noConflict(true);
+
+            $(window).on("message", (event) => {
+                var data = JSON.parse(event.originalEvent.data);
+                handleMessage(data.name, data.data, data.sender, event.originalEvent);
+            });
+
             callback(adhocracy);
         });
     };
@@ -65,12 +119,45 @@
             // child elements that have influence on iframe.
             var marker = $(e);
             var iframe = $("<iframe>");
+            var uid = getUID();
 
             iframe.css("border", "none");
             iframe.css("width", "100%");
             iframe.attr("src", origin + appUrl);
             iframe.addClass("adhocracy-embed");
+            iframe.attr("data-adhocracy-frame-id", uid);
+
             marker.append(iframe);
+            frames[uid] = iframe[0];
+
+            iframe.load(() => {
+                adhocracy.postMessage(uid, "setUID", {uid: uid});
+            });
         });
+    };
+
+    /**
+     * Send a message to another window.
+     *
+     * @param uid ID of the target window
+     * @param name Message name
+     * @param data Message data
+     *
+     * This is redundantly implemented in
+     * "Adhocracy/Services/CrossWindowMessaging".  if they start
+     * growing in parallel, we should factor them out into a shared
+     * module.
+     */
+    adhocracy.postMessage = (uid: string, name: string, data: {}) => {
+        var message = {
+            name: name,
+            data: data,
+            sender: embedderID
+        };
+        var messageString = JSON.stringify(message);
+        var win = getWindowByUID(uid);
+
+        // FIXME: use fallbacks here
+        win.postMessage(messageString, origin);
     };
 })();
