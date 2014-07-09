@@ -1,7 +1,6 @@
 "use strict";
 
 // FIXME: internal object for testing
-// FIXME: we only send `sender` to get the iframe. But that allows third parties to send fake sender ids. This is nice for debugging.
 
 (function() {
     var adhocracy : any = {};
@@ -71,14 +70,16 @@
     /**
      * Handle a message that was sent by another window.
      */
-    var handleMessage = (name: string, data, sender: string) : void => {
+    var handleMessage = (name: string, data, sender: string, event) : void => {
         if (frames.hasOwnProperty(sender)) {
             var frame = frames[sender];
 
-            switch (name) {
-                case "resize":
-                    $(frame).height(data.height);
-                    break;
+            if (frame.contentWindow === event.source) {
+                switch (name) {
+                    case "resize":
+                        $(frame).height(data.height);
+                        break;
+                }
             }
         }
     };
@@ -98,7 +99,7 @@
 
             $(window).on("message", (event) => {
                 var data = JSON.parse(event.originalEvent.data);
-                handleMessage(data.name, data.data, data.sender);
+                handleMessage(data.name, data.data, data.sender, event.originalEvent);
             });
 
             callback(adhocracy);
@@ -141,23 +142,17 @@
      * @param uid ID of the target window
      * @param name Message name
      * @param data Message data
-     * @param sender ID of the sender window. Defaults to embedder.
-     * @param _origin Expected origin of target. Defaults to adhocracy origin or embedder origin (based on uid).
      */
-    adhocracy.postMessage = (uid: string, name: string, data: {}, sender: string = embedderID, _origin?: string) => {
-        if (typeof _origin === "undefined") {
-            _origin = (uid === embedderID) ? embedderOrigin : origin;
-        }
-
+    adhocracy.postMessage = (uid: string, name: string, data: {}) => {
         var message = {
             name: name,
             data: data,
-            sender: sender
+            sender: embedderID
         };
         var messageString = JSON.stringify(message);
         var win = getWindowByUID(uid);
 
         // FIXME: use fallbacks here
-        win.postMessage(messageString, _origin);
+        win.postMessage(messageString, origin);
     };
 })();
