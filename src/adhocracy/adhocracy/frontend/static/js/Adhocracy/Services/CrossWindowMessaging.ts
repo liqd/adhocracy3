@@ -33,13 +33,13 @@ export class Service {
     private embedderOrigin : string = "*";
 
     constructor(public _postMessage, public $window, public $interval) {
-        var _self = this;
+        var _self : Service = this;
 
         _self.manageResize();
     }
 
     public registerMessageHandler(name : string, callback : (IMessageData) => void) : void {
-        var _self = this;
+        var _self : Service = this;
 
         _self.$window.addEventListener("message", (event) => {
             var message = JSON.parse(event.data);
@@ -75,7 +75,7 @@ export class Service {
      * has changed ourselves.
      */
     private manageResize() : void {
-        var _self = this;
+        var _self : Service = this;
 
         var postResizeIfChange = (() => {
             var oldHeight = 0;
