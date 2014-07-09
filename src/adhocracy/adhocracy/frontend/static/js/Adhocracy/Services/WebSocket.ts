@@ -274,6 +274,13 @@ export var factoryIService = (
      * is initialized and the adhWebSocket handle returned to the consumer,
      * the consumer may start subscribing to stuff, but the web socket
      * is not in connected state yet.
+     *
+     * FIXME: this could be better implemented with $q: if not
+     * connected, check if _pendingSubscriptions contains a deferred
+     * promise, and if it does not, create one.  call .then(..) on the
+     * promise with what you want to do once the connection is
+     * established; in the .onconnect(..) callback, fulfill the
+     * promise and delete _pendingSubscriptions.
      */
     var _pendingSubscriptions: Subscriptions;
 
