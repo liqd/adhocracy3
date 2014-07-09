@@ -38,25 +38,31 @@ export function isArrayMember(member : any, array : any[]) : boolean {
 export function deepcp(i) {
     "use strict";
 
-    if (typeof(i) === "object") {
-        var o : Object;
-        if (i === null) {
-            o = null;
-        } else if (i instanceof Array)  {
-            o = new Array();
-        } else {
-            o = new Object();
-        }
-
-        for (var x in i) {
-            if (i.hasOwnProperty(x)) {
-                o[x] = deepcp(i[x]);
-            }
-        }
-        return o;
-    } else {
+    // base types
+    if (i === null || ['number', 'boolean', 'string'].indexOf(typeof(i)) > -1) {
         return i;
     }
+
+    // structured types
+    var o;
+    switch(Object.prototype.toString.call(i)) {
+        case "[object Object]":
+            o = new Object();
+            break;
+        case "[object Array]":
+            o = new Array();
+            break;
+        default:
+            throw "deepcp: unsupported object type!"
+    }
+
+    for (var x in i) {
+        if (i.hasOwnProperty(x)) {
+            o[x] = deepcp(i[x]);
+        }
+    }
+
+    return o;
 }
 
 
@@ -71,20 +77,23 @@ export function deepcp(i) {
 export function deepoverwrite(source, target) {
     "use strict";
 
+    if (Object.prototype.toString.call(source) !== "[object Object]") {
+        throw "Util.deepoverwrite: source object " + source + " not of type 'object'!";
+    }
+    if (Object.prototype.toString.call(target) !== "[object Object]") {
+        throw "Util.deepoverwrite: target object " + target + " not of type 'object'!";
+    }
+
     var k;
-    try {
-        for (k in target) {
-            if (target.hasOwnProperty(k)) {
-                delete target[k];
-            }
+    for (k in target) {
+        if (target.hasOwnProperty(k)) {
+            delete target[k];
         }
-        for (k in source) {
-            if (source.hasOwnProperty(k)) {
-                target[k] = deepcp(source[k]);
-            }
+    }
+    for (k in source) {
+        if (source.hasOwnProperty(k)) {
+            target[k] = deepcp(source[k]);
         }
-    } catch (e) {
-        throw ("Util.deepoverwrite: " + [source, target, e]);
     }
 }
 
@@ -97,7 +106,7 @@ export function deepoverwrite(source, target) {
 export function deepeq(a : any, b : any) : boolean {
     "use strict";
 
-    if (typeof a !== typeof b) {
+    if (Object.prototype.toString.call(a) !== Object.prototype.toString.call(b)) {
         return false;
     }
 
