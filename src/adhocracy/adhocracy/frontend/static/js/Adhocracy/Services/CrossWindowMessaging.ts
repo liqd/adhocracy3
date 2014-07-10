@@ -82,6 +82,13 @@ export class Service {
     /**
      * Body does not trigger resize events. So we have to guess when its height
      * has changed ourselves.
+     *
+     * The following options come to mind:
+     *
+     * - polling (check for changes on regular intervals using $interval)
+     * - angular's $watch
+     * - triggering a resize manually whenever we change something
+     * - CSS hack: https://marcj.github.io/css-element-queries/
      */
     private manageResize() : void {
         var _self : Service = this;
