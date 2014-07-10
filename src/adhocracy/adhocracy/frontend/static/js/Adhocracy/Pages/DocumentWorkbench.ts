@@ -1,9 +1,11 @@
 /// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
 import angular = require("angular");
+import modernizr = require("modernizr");
 
 import AdhHttp = require("../Services/Http");
 import AdhWebSocket = require("../Services/WebSocket");
@@ -23,6 +25,8 @@ export var run = (config) => {
 
     var app = angular.module("adhocracy3SampleFrontend", []);
 
+    app.value("Modernizr", modernizr);
+
     app.service("adhResources", Resources.Service);
     app.service("adhUser", AdhUser.User);
     app.directive("adhLogin", ["adhUser", AdhUser.loginDirective]);
@@ -31,7 +35,7 @@ export var run = (config) => {
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
-    app.factory("adhWebSocket", ["adhConfig", AdhWebSocket.factory]);
+    app.factory("adhWebSocket", ["Modernizr", "adhConfig", AdhWebSocket.factory]);
 
     app.factory("adhCrossWindowMessaging", ["$window", "$rootScope", AdhCrossWindowMessaging.factory]);
 
