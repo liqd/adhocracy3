@@ -6,11 +6,11 @@ export var register = () => {
 
     describe("Services/CrossWindowMessaging", () => {
         var windowMock;
-        var intervalMock;
+        var rootScopeMock;
 
         beforeEach(() => {
             windowMock = <any>jasmine.createSpyObj("windowMock", ["addEventListener"]);
-            intervalMock = jasmine.createSpy("intervalMock");
+            rootScopeMock = <any>jasmine.createSpyObj("rootScopeMock", ["$watch"]);
         });
 
         describe("Service", () => {
@@ -19,7 +19,7 @@ export var register = () => {
 
             beforeEach(() => {
                 postMessageMock = <any>jasmine.createSpy("postMessageMock");
-                service = new CrossWindowMessaging.Service(postMessageMock, windowMock, intervalMock);
+                service = new CrossWindowMessaging.Service(postMessageMock, windowMock, rootScopeMock);
             });
 
             describe("registerMessageHandler", () => {
@@ -81,34 +81,21 @@ export var register = () => {
             });
 
             describe("manageResize", () => {
-                it("registers a callback to be executed every 100 msec", () => {
-                    service.manageResize();
-                    var args = intervalMock.calls.mostRecent().args;
-                    expect(args[1]).toBe(100);
+                beforeEach(() => {
+                    windowMock.document = {body: {clientHeight: 0}};
                 });
 
-                describe("postResizeIfChange", () => {
-                    beforeEach(() => {
-                        service.postResize = jasmine.createSpy("postResize");
-                        windowMock.document = {body: {clientHeight: 0}};
-                    });
+                it("registers a resize event listener on $window that calls postMessage", () => {
+                    var args = windowMock.addEventListener.calls.mostRecent().args;
+                    expect(args[0]).toBe("resize");
+                    args[1]();
+                    expect(postMessageMock).toHaveBeenCalled();
+                });
 
-                    var run = () => {
-                        service.manageResize();
-                        var args = intervalMock.calls.mostRecent().args;
-                        args[0]();
-                    };
-
-                    it("does not call postResize if body height has not changed", () => {
-                        run();
-                        expect(service.postResize).not.toHaveBeenCalled();
-                    });
-
-                    it("calls postResize if body height has changed", () => {
-                        windowMock.document.body.clientHeight++;
-                        run();
-                        expect(service.postResize).toHaveBeenCalled();
-                    });
+                it("registers a listener on $rootScope that calls postMessage", () => {
+                    var args = windowMock.addEventListener.calls.mostRecent().args;
+                    args[1]();
+                    expect(postMessageMock).toHaveBeenCalled();
                 });
             });
         });
@@ -118,7 +105,7 @@ export var register = () => {
 
             beforeEach(() => {
                 windowMock.parent = <any>jasmine.createSpyObj("parentMock", ["postMessage"]);
-                service = CrossWindowMessaging.factory(windowMock, intervalMock);
+                service = CrossWindowMessaging.factory(windowMock, rootScopeMock);
             });
 
             it("returns a service instance", () => {
