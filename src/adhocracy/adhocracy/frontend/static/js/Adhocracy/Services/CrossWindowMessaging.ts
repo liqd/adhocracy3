@@ -22,6 +22,8 @@
  * 10 in particular, but others may be affected.)
  */
 
+import AdhConfig = require("./Config");
+
 
 export interface IMessage {
     data : IMessageData;
@@ -37,6 +39,7 @@ export interface IPostMessageService {
 export interface IService {
     registerMessageHandler : (name : string, callback : (IMessageData) => void) => void;
     postResize : (height : number) => void;
+    dummy? : boolean;
 }
 
 
@@ -111,7 +114,28 @@ export class Service implements IService {
 }
 
 
-export var factory = ($window, $interval) => {
-    var postMessageToParent = (data, origin) => $window.parent.postMessage(data, origin);
-    return new Service(postMessageToParent, $window, $interval);
+export class Dummy implements IService {
+    public dummy : boolean;
+
+    constructor() {
+        this.dummy = true;
+    }
+
+    registerMessageHandler(name, callback) {
+        return;
+    }
+
+    postResize(height) {
+        return;
+    }
+}
+
+
+export var factory = (adhConfig : AdhConfig.Type, $window, $interval) : IService => {
+    if (adhConfig.embedded) {
+        var postMessageToParent = $window.parent.postMessage.bind($window.parent);
+        return new Service(postMessageToParent, $window, $interval);
+    } else {
+        return new Dummy();
+    }
 };

@@ -1,6 +1,9 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
+import Config = require("./Config");
+
 import CrossWindowMessaging = require("./CrossWindowMessaging");
+
 
 export var register = () => {
 
@@ -98,20 +101,56 @@ export var register = () => {
             });
         });
 
-        describe("factory", () => {
-            var service;
+        describe("Dummy", () => {
+            var dummy : CrossWindowMessaging.IService;
 
             beforeEach(() => {
+                dummy = new CrossWindowMessaging.Dummy();
+            });
+
+            it("has a property 'dummy'", () => {
+                expect(dummy.dummy).toBeDefined();
+            });
+
+            describe("registerMessageHandler", () => {
+                it("can be called", () => {
+                    expect(() => dummy.registerMessageHandler()).not.toThrow();
+                });
+            });
+            describe("postResize", () => {
+                it("can be called", () => {
+                    expect(() => dummy.postResize()).not.toThrow();
+                });
+            });
+        });
+
+        describe("factory", () => {
+            var service;
+            var config : Config.Type;
+
+            beforeEach(() => {
+                config = {
+                    template_path: "mock",
+                    root_path: "mock",
+                    ws_url: "mock",
+                    embedded: true
+                };
                 windowMock.parent = <any>jasmine.createSpyObj("parentMock", ["postMessage"]);
-                service = CrossWindowMessaging.factory(windowMock, intervalMock);
             });
 
             it("returns a service instance", () => {
+                service = CrossWindowMessaging.factory(config, windowMock, intervalMock);
                 expect(service).toBeDefined();
+            });
+            it("returns a dummy service when not embedded", () => {
+                config.embedded = false;
+                service = CrossWindowMessaging.factory(config, windowMock, intervalMock);
+                expect(service.dummy).toBeDefined();
             });
             it("returns a service instance that uses $window.parent.postMessage", () => {
                 var name = "test";
                 var data = {x: "y"};
+                service = CrossWindowMessaging.factory(config, windowMock, intervalMock);
                 service.postMessage(name, data);
                 expect(windowMock.parent.postMessage).toHaveBeenCalled();
             });
