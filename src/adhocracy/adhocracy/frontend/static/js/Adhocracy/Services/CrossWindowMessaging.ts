@@ -90,7 +90,9 @@ export class Service {
     private setup(data: IMessageData) : void {
         var _self : Service = this;
 
-        _self.embedderOrigin = data.embedderOrigin;
+        if (_self.embedderOrigin === "*") {
+            _self.embedderOrigin = data.embedderOrigin;
+        }
     }
 
     /**
