@@ -49,8 +49,10 @@ export class Service {
     constructor(public _postMessage, public $window, public $interval) {
         var _self : Service = this;
 
-        _self.registerMessageHandler("requestSetup", _self.setup);
+        _self.registerMessageHandler("setup", _self.setup.bind(_self));
         _self.manageResize();
+
+        _self.postMessage("requestSetup", {});
     }
 
     public registerMessageHandler(name : string, callback : (IMessageData) => void) : void {
@@ -59,8 +61,7 @@ export class Service {
         _self.$window.addEventListener("message", (event) => {
             var message = JSON.parse(event.data);
 
-            if ((_self.embedderOrigin === "*" || event.origin === _self.embedderOrigin)
-                && (message.name === name)) {
+            if (((message.name === "setup") || (event.origin === _self.embedderOrigin)) && (message.name === name)) {
                 callback(message.data);
             }
         });
