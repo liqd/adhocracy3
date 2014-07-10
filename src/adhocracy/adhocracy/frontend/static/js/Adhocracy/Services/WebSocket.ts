@@ -1,6 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 
 import AdhConfig = require("./Config");
 
@@ -513,12 +514,36 @@ export var factoryIService = (
  */
 export var factoryIRawWebSocket = () => ((uri: string): IRawWebSocket => new WebSocket(uri));
 
+export var factoryDummyWebSocket = () => ((uri: string): IRawWebSocket => {
+    return {
+        send: (msg) => undefined,
+        onmessage: (event) => undefined,
+        onerror: (event) => undefined,
+        onopen: (event) => undefined,
+        onclose: (event) => undefined,
+        readyState: undefined,
+        CONNECTING: undefined,
+        OPEN: undefined,
+        CLOSING: undefined,
+        CLOSED: undefined
+    };
+});
+
 /**
  * factory for export to consumer modules.  it combines
  * factoryIRawWebSocket and factoryIService in the way it is almost
  * always used (besides in unit tests).
  */
-export var factory = (adhConfig: AdhConfig.Type): IService => factoryIService(adhConfig, factoryIRawWebSocket());
+export var factory = (Modernizr: ModernizrStatic, adhConfig: AdhConfig.Type): IService => {
+    var websocketService;
+    if (Modernizr.websockets) {
+        websocketService = factoryIRawWebSocket();
+    } else {
+        console.log("Using dummy websocket service due to browser incapability.");
+        websocketService = factoryDummyWebSocket();
+    }
+    return factoryIService(adhConfig, websocketService);
+};
 
 
 //////////////////////////////////////////////////////////////////////
