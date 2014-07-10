@@ -40,7 +40,7 @@ export class Service {
         // the hands of hostile windows.  think of something more
         // sohpisticated!
 
-    constructor(public _postMessage, public $window, public $interval) {
+    constructor(public _postMessage, public $window, public $rootScope) {
         var _self : Service = this;
 
         _self.manageResize();
@@ -93,24 +93,19 @@ export class Service {
     private manageResize() : void {
         var _self : Service = this;
 
-        var postResizeIfChange = (() => {
-            var oldHeight = 0;
-            return () => {
-                var height = _self.$window.document.body.clientHeight;
-                if (height !== oldHeight) {
-                    oldHeight = height;
-                    _self.postResize(height);
-                }
-            };
-        })();
+        var getHeight = () : number => _self.$window.document.body.clientHeight;
 
-        // Check for changes regulary
-        _self.$interval(postResizeIfChange, 100);
+        _self.$rootScope.$watch(getHeight, (height) => {
+            _self.postResize(height);
+        });
+        _self.$window.addEventListener("resize", () => {
+            _self.postResize(getHeight());
+        });
     }
 }
 
 
-export var factory = ($window, $interval) => {
+export var factory = ($window, $rootScope) => {
     var postMessageToParent = (data, origin) => $window.parent.postMessage(data, origin);
-    return new Service(postMessageToParent, $window, $interval);
+    return new Service(postMessageToParent, $window, $rootScope);
 };
