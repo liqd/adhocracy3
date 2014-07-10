@@ -17,7 +17,8 @@ declare var beforeEach : (any) => void;
 var config : Config.Type = {
     template_path: "mock",
     root_path: "mock",
-    ws_url: "mock"
+    ws_url: "mock",
+    embedded: false
 };
 
 var createAdhHttpMock = () => {

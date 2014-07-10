@@ -14,7 +14,8 @@ export var register = () => {
         var config: Config.Type = {
             template_path: "mock",
             root_path: "mock",
-            ws_url: "mock"
+            ws_url: "mock",
+            embedded: false
         };
 
         // constructor for a mock raw web socket that leaks the
