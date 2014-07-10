@@ -65,6 +65,14 @@ export var register = () => {
                 });
             });
 
+            describe("setup", () => {
+                it("sets up the service", () => {
+                    var embedderOrigin = "http://embedder.lan";
+                    service.setup({embedderOrigin: embedderOrigin});
+                    expect(service.embedderOrigin).toBe(embedderOrigin);
+                });
+            });
+
             describe("manageResize", () => {
                 it("registers a callback to be executed every 100 msec", () => {
                     service.manageResize();

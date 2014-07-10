@@ -17,6 +17,14 @@
  *   height: number
  * }
  *
+ * name: "requestSetup"
+ * data: {}
+ *
+ * name: "setup"
+ * data: {
+ *   embedderOrigin: string
+ * }
+ *
  * Messages are serialized with JSON.stringify before being sent via
  * window.postMessage().  (Reason: browser compatibility; IE prior to
  * 10 in particular, but others may be affected.)
@@ -29,20 +37,19 @@ export interface IMessage {
 }
 
 
-export interface IMessageData {}
+export interface IMessageData {
+    embedderOrigin? : string;
+}
 
 
 export class Service {
 
     private embedderOrigin : string = "*";
-        // FIXME: this is a bit lax: all incoming message are taken
-        // seriously (bad!), and all outgoing messages may end up in
-        // the hands of hostile windows.  think of something more
-        // sohpisticated!
 
     constructor(public _postMessage, public $window, public $interval) {
         var _self : Service = this;
 
+        _self.registerMessageHandler("requestSetup", _self.setup);
         _self.manageResize();
     }
 
@@ -77,6 +84,12 @@ export class Service {
             "resize",
             {height: height}
         );
+    }
+
+    private setup(data: IMessageData) : void {
+        var _self : Service = this;
+
+        _self.embedderOrigin = data.embedderOrigin;
     }
 
     /**
