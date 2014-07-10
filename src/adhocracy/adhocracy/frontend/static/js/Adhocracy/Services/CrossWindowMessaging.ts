@@ -154,6 +154,7 @@ export var factory = (adhConfig : AdhConfig.Type, $window, $rootScope) : IServic
         var postMessageToParent = $window.parent.postMessage.bind($window.parent);
         return new Service(postMessageToParent, $window, $rootScope);
     } else {
+        console.log("Using dummy CrossWindowMassaging because we are not embedded.");
         return new Dummy();
     }
 };
