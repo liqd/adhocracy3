@@ -62,6 +62,8 @@
                 var iframe = getIFrameByWindow(source);
                 $(iframe).height(data.height);
                 break;
+            case "requestSetup":
+                adhocracy.postMessage(source, "setup", {embedderOrigin: embedderOrigin});
         }
     };
 

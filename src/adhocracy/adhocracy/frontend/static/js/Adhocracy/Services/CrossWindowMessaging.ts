@@ -17,6 +17,14 @@
  *   height: number
  * }
  *
+ * name: "requestSetup"
+ * data: {}
+ *
+ * name: "setup"
+ * data: {
+ *   embedderOrigin: string
+ * }
+ *
  * Messages are serialized with JSON.stringify before being sent via
  * window.postMessage().  (Reason: browser compatibility; IE prior to
  * 10 in particular, but others may be affected.)
@@ -29,21 +37,22 @@ export interface IMessage {
 }
 
 
-export interface IMessageData {}
+export interface IMessageData {
+    embedderOrigin? : string;
+}
 
 
 export class Service {
 
     private embedderOrigin : string = "*";
-        // FIXME: this is a bit lax: all incoming message are taken
-        // seriously (bad!), and all outgoing messages may end up in
-        // the hands of hostile windows.  think of something more
-        // sohpisticated!
 
     constructor(public _postMessage, public $window, public $interval) {
         var _self : Service = this;
 
+        _self.registerMessageHandler("setup", _self.setup.bind(_self));
         _self.manageResize();
+
+        _self.postMessage("requestSetup", {});
     }
 
     public registerMessageHandler(name : string, callback : (IMessageData) => void) : void {
@@ -52,8 +61,7 @@ export class Service {
         _self.$window.addEventListener("message", (event) => {
             var message = JSON.parse(event.data);
 
-            if ((_self.embedderOrigin === "*" || event.origin === _self.embedderOrigin)
-                && (message.name === name)) {
+            if (((message.name === "setup") || (event.origin === _self.embedderOrigin)) && (message.name === name)) {
                 callback(message.data);
             }
         });
@@ -77,6 +85,14 @@ export class Service {
             "resize",
             {height: height}
         );
+    }
+
+    private setup(data: IMessageData) : void {
+        var _self : Service = this;
+
+        if (_self.embedderOrigin === "*") {
+            _self.embedderOrigin = data.embedderOrigin;
+        }
     }
 
     /**
