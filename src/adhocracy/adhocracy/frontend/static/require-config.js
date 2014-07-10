@@ -5,7 +5,8 @@ require.config({
         jquery: '../lib/jquery/jquery',
         angular: '../lib/angular/angular',
         underscore: '../lib/underscore/underscore',
-        q: '../lib/q/q'
+        q: '../lib/q/q',
+        modernizr: '../lib2/modernizr/modernizr-2.8.3.min'
     },
     shim: {
         jquery: {
@@ -17,5 +18,8 @@ require.config({
         underscore: {
             exports: '_',
         },
+        modernizr: {
+            exports: 'Modernizr'
+        }
     }
 });
