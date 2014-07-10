@@ -33,7 +33,7 @@ export var run = (config) => {
     app.factory("adhHttp", ["$http", AdhHttp.factory]);
     app.factory("adhWebSocket", ["adhConfig", AdhWebSocket.factory]);
 
-    app.factory("adhCrossWindowMessaging", ["$window", "$interval", AdhCrossWindowMessaging.factory]);
+    app.factory("adhCrossWindowMessaging", ["$window", "$rootScope", AdhCrossWindowMessaging.factory]);
 
     app.filter("documentTitle", [Filters.filterDocumentTitle]);
 

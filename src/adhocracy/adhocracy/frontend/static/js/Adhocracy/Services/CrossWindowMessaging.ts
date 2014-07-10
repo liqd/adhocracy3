@@ -46,7 +46,7 @@ export class Service {
 
     private embedderOrigin : string = "*";
 
-    constructor(public _postMessage, public $window, public $interval) {
+    constructor(public _postMessage, public $window, public $rootScope) {
         var _self : Service = this;
 
         _self.registerMessageHandler("setup", _self.setup.bind(_self));
@@ -98,28 +98,30 @@ export class Service {
     /**
      * Body does not trigger resize events. So we have to guess when its height
      * has changed ourselves.
+     *
+     * The following options come to mind:
+     *
+     * - polling (check for changes on regular intervals using $interval)
+     * - angular's $watch
+     * - triggering a resize manually whenever we change something
+     * - CSS hack: https://marcj.github.io/css-element-queries/
      */
     private manageResize() : void {
         var _self : Service = this;
 
-        var postResizeIfChange = (() => {
-            var oldHeight = 0;
-            return () => {
-                var height = _self.$window.document.body.clientHeight;
-                if (height !== oldHeight) {
-                    oldHeight = height;
-                    _self.postResize(height);
-                }
-            };
-        })();
+        var getHeight = () : number => _self.$window.document.body.clientHeight;
 
-        // Check for changes regulary
-        _self.$interval(postResizeIfChange, 100);
+        _self.$rootScope.$watch(getHeight, (height) => {
+            _self.postResize(height);
+        });
+        _self.$window.addEventListener("resize", () => {
+            _self.postResize(getHeight());
+        });
     }
 }
 
 
-export var factory = ($window, $interval) => {
+export var factory = ($window, $rootScope) => {
     var postMessageToParent = (data, origin) => $window.parent.postMessage(data, origin);
-    return new Service(postMessageToParent, $window, $interval);
+    return new Service(postMessageToParent, $window, $rootScope);
 };
