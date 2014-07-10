@@ -28,11 +28,19 @@ export interface IMessage {
     name : string;
 }
 
-
 export interface IMessageData {}
 
+export interface IPostMessageService {
+    (data : string, origin : string) : void;
+}
 
-export class Service {
+export interface IService {
+    registerMessageHandler : (name : string, callback : (IMessageData) => void) => void;
+    postResize : (height : number) => void;
+}
+
+
+export class Service implements IService {
 
     private embedderOrigin : string = "*";
         // FIXME: this is a bit lax: all incoming message are taken
@@ -40,13 +48,13 @@ export class Service {
         // the hands of hostile windows.  think of something more
         // sohpisticated!
 
-    constructor(public _postMessage, public $window, public $interval) {
+    constructor(public _postMessage : IPostMessageService, public $window, public $interval) {
         var _self : Service = this;
 
         _self.manageResize();
     }
 
-    public registerMessageHandler(name : string, callback : (IMessageData) => void) : void {
+    public registerMessageHandler(name, callback) {
         var _self : Service = this;
 
         _self.$window.addEventListener("message", (event) => {
@@ -70,7 +78,7 @@ export class Service {
         _self._postMessage(JSON.stringify(message), _self.embedderOrigin);
     }
 
-    public postResize(height: number) : void {
+    public postResize(height) {
         var _self : Service = this;
 
         _self.postMessage(
