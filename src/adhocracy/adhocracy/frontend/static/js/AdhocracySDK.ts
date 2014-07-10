@@ -1,8 +1,8 @@
-"use strict";
-
 // FIXME: internal object for testing
 
 (function() {
+    "use strict";
+
     var adhocracy : any = {};
 
     // setup window.adhocracy and noConflict()
