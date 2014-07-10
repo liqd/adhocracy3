@@ -68,6 +68,21 @@ export var register = () => {
                 });
             });
 
+            describe("setup", () => {
+                it("sets up the service", () => {
+                    var embedderOrigin = "http://embedder.lan";
+                    service.setup({embedderOrigin: embedderOrigin});
+                    expect(service.embedderOrigin).toBe(embedderOrigin);
+                });
+                it("ignores subsequent calls", () => {
+                    var embedderOrigin1 = "http://embedder.lan";
+                    var embedderOrigin2 = "http://evil.lan";
+                    service.setup({embedderOrigin: embedderOrigin1});
+                    service.setup({embedderOrigin: embedderOrigin2});
+                    expect(service.embedderOrigin).toBe(embedderOrigin1);
+                });
+            });
+
             describe("manageResize", () => {
                 it("registers a callback to be executed every 100 msec", () => {
                     service.manageResize();
@@ -102,7 +117,7 @@ export var register = () => {
         });
 
         describe("Dummy", () => {
-            var dummy : CrossWindowMessaging.IService;
+            var dummy;
 
             beforeEach(() => {
                 dummy = new CrossWindowMessaging.Dummy();

@@ -17,6 +17,14 @@
  *   height: number
  * }
  *
+ * name: "requestSetup"
+ * data: {}
+ *
+ * name: "setup"
+ * data: {
+ *   embedderOrigin: string
+ * }
+ *
  * Messages are serialized with JSON.stringify before being sent via
  * window.postMessage().  (Reason: browser compatibility; IE prior to
  * 10 in particular, but others may be affected.)
@@ -30,7 +38,9 @@ export interface IMessage {
     name : string;
 }
 
-export interface IMessageData {}
+export interface IMessageData {
+    embedderOrigin? : string;
+}
 
 export interface IPostMessageService {
     (data : string, origin : string) : void;
@@ -46,15 +56,14 @@ export interface IService {
 export class Service implements IService {
 
     private embedderOrigin : string = "*";
-        // FIXME: this is a bit lax: all incoming message are taken
-        // seriously (bad!), and all outgoing messages may end up in
-        // the hands of hostile windows.  think of something more
-        // sohpisticated!
 
-    constructor(public _postMessage : IPostMessageService, public $window, public $interval) {
+    constructor(public _postMessage : IPostMessageService, public $window, public $rootScope) {
         var _self : Service = this;
 
+        _self.registerMessageHandler("setup", _self.setup.bind(_self));
         _self.manageResize();
+
+        _self.postMessage("requestSetup", {});
     }
 
     public registerMessageHandler(name, callback) {
@@ -63,8 +72,7 @@ export class Service implements IService {
         _self.$window.addEventListener("message", (event) => {
             var message = JSON.parse(event.data);
 
-            if ((_self.embedderOrigin === "*" || event.origin === _self.embedderOrigin)
-                && (message.name === name)) {
+            if (((message.name === "setup") || (event.origin === _self.embedderOrigin)) && (message.name === name)) {
                 callback(message.data);
             }
         });
@@ -90,26 +98,36 @@ export class Service implements IService {
         );
     }
 
+    private setup(data: IMessageData) : void {
+        var _self : Service = this;
+
+        if (_self.embedderOrigin === "*") {
+            _self.embedderOrigin = data.embedderOrigin;
+        }
+    }
+
     /**
      * Body does not trigger resize events. So we have to guess when its height
      * has changed ourselves.
+     *
+     * The following options come to mind:
+     *
+     * - polling (check for changes on regular intervals using $interval)
+     * - angular's $watch
+     * - triggering a resize manually whenever we change something
+     * - CSS hack: https://marcj.github.io/css-element-queries/
      */
     private manageResize() : void {
         var _self : Service = this;
 
-        var postResizeIfChange = (() => {
-            var oldHeight = 0;
-            return () => {
-                var height = _self.$window.document.body.clientHeight;
-                if (height !== oldHeight) {
-                    oldHeight = height;
-                    _self.postResize(height);
-                }
-            };
-        })();
+        var getHeight = () : number => _self.$window.document.body.clientHeight;
 
-        // Check for changes regulary
-        _self.$interval(postResizeIfChange, 100);
+        _self.$rootScope.$watch(getHeight, (height) => {
+            _self.postResize(height);
+        });
+        _self.$window.addEventListener("resize", () => {
+            _self.postResize(getHeight());
+        });
     }
 }
 
@@ -131,10 +149,10 @@ export class Dummy implements IService {
 }
 
 
-export var factory = (adhConfig : AdhConfig.Type, $window, $interval) : IService => {
+export var factory = (adhConfig : AdhConfig.Type, $window, $rootScope) : IService => {
     if (adhConfig.embedded) {
         var postMessageToParent = $window.parent.postMessage.bind($window.parent);
-        return new Service(postMessageToParent, $window, $interval);
+        return new Service(postMessageToParent, $window, $rootScope);
     } else {
         return new Dummy();
     }

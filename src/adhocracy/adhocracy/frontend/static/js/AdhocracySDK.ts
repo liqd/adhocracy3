@@ -1,8 +1,8 @@
-"use strict";
-
 // FIXME: internal object for testing
 
 (function() {
+    "use strict";
+
     var adhocracy : any = {};
 
     // setup window.adhocracy and noConflict()
@@ -62,6 +62,8 @@
                 var iframe = getIFrameByWindow(source);
                 $(iframe).height(data.height);
                 break;
+            case "requestSetup":
+                adhocracy.postMessage(source, "setup", {embedderOrigin: embedderOrigin});
         }
     };
 
