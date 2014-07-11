@@ -5,6 +5,7 @@
 /// <reference path="../../_all.d.ts"/>
 
 import angular = require("angular");
+import angularRoute = require("angularRoute");
 import modernizr = require("modernizr");
 
 import AdhHttp = require("../Services/Http");
@@ -23,7 +24,29 @@ import Filters = require("../Filters");
 export var run = (config) => {
     "use strict";
 
-    var app = angular.module("adhocracy3SampleFrontend", []);
+    // FIXME: angularRoute is not used directly.  Instead, it registers the "ngRoute" angular
+    // module.  But TypeScript will strip any imports that are not used.  So we have to use it
+    // somehow.
+    if (angularRoute) {
+        console.log("angularRoute is " + angularRoute);
+    }
+
+    var app = angular.module("adhocracy3SampleFrontend", ["ngRoute"]);
+
+    app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
+        $routeProvider
+            .when("/frontend_static/root.html", {
+                templateUrl: config.template_path + "/Pages/DocumentWorkbench.html"
+            })
+            .when("/embed/:directive", {
+                templateUrl: config.template_path + "/Pages/DocumentWorkbench.html"
+            })
+            .otherwise({
+                // FIXME: proper error template
+                template: "<h1>404 - not Found</h1>"
+            });
+        $locationProvider.html5Mode(true);
+    }]);
 
     app.value("Modernizr", modernizr);
 

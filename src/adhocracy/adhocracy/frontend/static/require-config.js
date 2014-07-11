@@ -4,6 +4,7 @@ require.config({
         text: '../lib/requirejs-text/text',
         jquery: '../lib/jquery/jquery',
         angular: '../lib/angular/angular',
+        angularRoute: '../lib/angular-route/angular-route',
         underscore: '../lib/underscore/underscore',
         q: '../lib/q/q',
         modernizr: '../lib2/modernizr/modernizr-2.8.3.min'
@@ -20,6 +21,9 @@ require.config({
         },
         modernizr: {
             exports: 'Modernizr'
+        },
+        angularRoute: {
+            deps: ['angular']
         }
     }
 });
