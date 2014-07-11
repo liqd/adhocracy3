@@ -5,6 +5,7 @@ import pytest
 
 from adhocracy.testing import splinter_browser_load_condition  # noqa
 
+
 @pytest.fixture()
 def browser_embedder_root(browser, server_sample) -> Browser:
     """Start embedder application."""
