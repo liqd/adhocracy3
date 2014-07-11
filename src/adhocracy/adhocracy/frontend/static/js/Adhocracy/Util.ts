@@ -183,3 +183,19 @@ export function normalizeName(name: string) : string {
     return name.toLowerCase().replace(/\ /g, "_");
 }
 
+/**
+ * format strings
+ *
+ * Example:
+ *   > formatString("Hello {0} from {1}", "World", "Bernd")
+ *   "Hello World from Bernd"
+ *
+ * http://stackoverflow.com/questions/610406/4673436#4673436
+ */
+export function formatString(format : string, ...args : string[]) {
+    "use strict";
+
+    return format.replace(/{(\d+)}/g, function(match, number) {
+        return (typeof args[number] !== "undefined") ? args[number] : match;
+    });
+}

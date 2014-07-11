@@ -254,5 +254,14 @@ export var register = () => {
                 });
             });
         });
+
+        describe("formatString", () => {
+            it("formats a string", () => {
+                expect(Util.formatString("Hello {0} from {1}", "World", "Bernd")).toBe("Hello World from Bernd");
+            });
+            it("does not replace {n} if there is no n-th parameter", () => {
+                expect(Util.formatString("Hello {0} from {1}", "World")).toBe("Hello World from {1}");
+            });
+        });
     });
 };
