@@ -30,23 +30,34 @@
  * 10 in particular, but others may be affected.)
  */
 
+import AdhConfig = require("./Config");
+
 
 export interface IMessage {
     data : IMessageData;
     name : string;
 }
 
-
 export interface IMessageData {
     embedderOrigin? : string;
 }
 
+export interface IPostMessageService {
+    (data : string, origin : string) : void;
+}
 
-export class Service {
+export interface IService {
+    registerMessageHandler : (name : string, callback : (IMessageData) => void) => void;
+    postResize : (height : number) => void;
+    dummy? : boolean;
+}
+
+
+export class Service implements IService {
 
     private embedderOrigin : string = "*";
 
-    constructor(public _postMessage, public $window, public $rootScope) {
+    constructor(public _postMessage : IPostMessageService, public $window, public $rootScope) {
         var _self : Service = this;
 
         _self.registerMessageHandler("setup", _self.setup.bind(_self));
@@ -55,7 +66,7 @@ export class Service {
         _self.postMessage("requestSetup", {});
     }
 
-    public registerMessageHandler(name : string, callback : (IMessageData) => void) : void {
+    public registerMessageHandler(name, callback) {
         var _self : Service = this;
 
         _self.$window.addEventListener("message", (event) => {
@@ -78,7 +89,7 @@ export class Service {
         _self._postMessage(JSON.stringify(message), _self.embedderOrigin);
     }
 
-    public postResize(height: number) : void {
+    public postResize(height) {
         var _self : Service = this;
 
         _self.postMessage(
@@ -121,7 +132,29 @@ export class Service {
 }
 
 
-export var factory = ($window, $rootScope) => {
-    var postMessageToParent = (data, origin) => $window.parent.postMessage(data, origin);
-    return new Service(postMessageToParent, $window, $rootScope);
+export class Dummy implements IService {
+    public dummy : boolean;
+
+    constructor() {
+        this.dummy = true;
+    }
+
+    registerMessageHandler(name, callback) {
+        return;
+    }
+
+    postResize(height) {
+        return;
+    }
+}
+
+
+export var factory = (adhConfig : AdhConfig.Type, $window, $rootScope) : IService => {
+    if (adhConfig.embedded) {
+        var postMessageToParent = $window.parent.postMessage.bind($window.parent);
+        return new Service(postMessageToParent, $window, $rootScope);
+    } else {
+        console.log("Using dummy CrossWindowMassaging because we are not embedded.");
+        return new Dummy();
+    }
 };
