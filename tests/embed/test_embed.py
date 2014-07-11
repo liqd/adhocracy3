@@ -1,4 +1,5 @@
 import subprocess
+from time import sleep
 
 class Test:
 
@@ -23,7 +24,22 @@ class Test:
             element = iframe.find_by_css('.login [name="name"]').first
             assert element != None
 
-    def test_resize_message(self, browser_embedder_root):
-        """Resize messages from iframe to embedder window."""
-        print("\n\n\npending!\n\n\n")
-        assert True
+    def test_resize(self, browser_embedder_root):
+        """Iframe height matches its content after at most 5 seconds."""
+
+        sec = 0
+        js = 'document.getElementById("adhocracy-iframe").clientHeight'
+
+        while True:
+            outer_height = browser_embedder_root.evaluate_script(js)
+
+            with browser_embedder_root.get_iframe('adhocracy-iframe') as iframe:
+                inner_height = iframe.evaluate_script('document.body.clientHeight')
+
+                if outer_height == inner_height:
+                    break
+                elif sec <= 5:
+                    sec += 1
+                    sleep(1)
+                else:
+                    assert outer_height == inner_height
