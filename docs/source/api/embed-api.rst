@@ -29,21 +29,21 @@ Example::
 Widget markers
 --------------
 
-A widget is defined by::
+A widget is defined by
 
-- One widget (presentation)
-- One or multiple resources (content)
-- Initial widget state? (e.g. initial list sorting)
-- Other widget parameters? (e.g. specify subwidgets)
+- One angular directive (presentation)
+- Multiple directive parameters, e.g.
 
-Idea: Use the same semantics as in directives (directive name and parameters)
-
-
-Constraints::
-
-- Different HTML5 (data- parameters) and HTML4 syntax
+  - One or multiple resources (content)
+  - Initial widget state? (e.g. initial list sorting)
+  - Other widget parameters? (e.g. specify subwidgets)
 
 
-Example::
+Constraints:
 
-    <div id="adhocracy_marker"></div>
+- Different HTML5 (`data`- parameters) and HTML4 syntax (different)
+
+
+Example (current HTML5 syntax)::
+
+    <div id="adhocracy_marker" data-widget="proposal-workbench" data-content="/proposal"></div>
