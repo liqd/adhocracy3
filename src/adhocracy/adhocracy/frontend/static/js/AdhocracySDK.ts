@@ -18,7 +18,7 @@
 
     var $;
     var origin : string;
-    var appUrl : string = "/frontend_static/root.html";
+    var appUrl : string = "/embed/";
     var embedderOrigin : string;
 
     /**
@@ -97,14 +97,19 @@
      */
     adhocracy.embed = (selector: string) => {
         $(selector).each((i, e) => {
-            // In the future, marker may have additional attributes or
-            // child elements that have influence on iframe.
             var marker = $(e);
             var iframe = $("<iframe>");
 
             iframe.css("border", "none");
             iframe.css("width", "100%");
-            iframe.attr("src", origin + appUrl);
+
+            var data = marker.data();
+            var widget = data.widget;
+            delete data.widget;
+
+            var url = origin + appUrl + widget + "?" + $.param(data, true);
+
+            iframe.attr("src", url);
             iframe.addClass("adhocracy-embed");
 
             marker.append(iframe);
