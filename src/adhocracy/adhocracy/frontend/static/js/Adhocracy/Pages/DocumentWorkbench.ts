@@ -36,7 +36,7 @@ export var run = (config) => {
     app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
         $routeProvider
             .when("/frontend_static/root.html", {
-                templateUrl: config.template_path + "/Pages/DocumentWorkbench.html"
+                templateUrl: config.template_path + "/Wrapper.html"
             })
             .when("/embed/:directive", {
                 templateUrl: config.template_path + "/Pages/DocumentWorkbench.html"
