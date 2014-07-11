@@ -19,6 +19,7 @@ import Resources = require("../Resources");
 import Widgets = require("../Widgets");
 import Directives = require("../Directives");
 import Filters = require("../Filters");
+import Embed = require("../Embed");
 
 
 export var run = (config) => {
@@ -39,7 +40,7 @@ export var run = (config) => {
                 templateUrl: config.template_path + "/Wrapper.html"
             })
             .when("/embed/:directive", {
-                templateUrl: config.template_path + "/Pages/DocumentWorkbench.html"
+                template: "<adh-embed></adh-embed>"
             })
             .otherwise({
                 // FIXME: proper error template
@@ -63,6 +64,8 @@ export var run = (config) => {
     app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", AdhCrossWindowMessaging.factory]);
 
     app.filter("documentTitle", [Filters.filterDocumentTitle]);
+
+    app.directive("adhEmbed", ["$compile", "$route", Embed.factory]);
 
     app.directive("adhListing",
         ["adhConfig", (adhConfig) =>
