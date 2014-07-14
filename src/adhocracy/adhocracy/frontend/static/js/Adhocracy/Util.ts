@@ -199,3 +199,17 @@ export function formatString(format : string, ...args : string[]) {
         return (typeof args[number] !== "undefined") ? args[number] : match;
     });
 }
+
+
+/**
+ * Escape angular expression.
+ *
+ * This is mainly used to prevent XSS.
+ *
+ * If you want to use the output of this in HTML, please remember
+ * to escape it using _.escape.
+ */
+export function escapeNgExp(s : string) {
+    "use strict";
+    return "'" + s.replace(/'/g, "\\'") + "'";
+}

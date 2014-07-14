@@ -24,7 +24,8 @@ export var register = () => {
 
         describe("route2template", () => {
             it("compiles a template from the parameters given in $route", () => {
-                var expected = "<adh-document-workbench data-path=\"/this/is/a/path\" data-test=\"&quot;&amp;\"></adh-document-workbench>";
+                var expected = "<adh-document-workbench data-path=\"&#x27;/this/is/a/path&#x27;\" " +
+                    "data-test=\"&#x27;&quot;&amp;&#x27;\"></adh-document-workbench>";
                 expect(Embed.route2template($routeMock)).toBe(expected);
             });
         });

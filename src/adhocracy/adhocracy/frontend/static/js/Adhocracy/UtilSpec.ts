@@ -263,5 +263,11 @@ export var register = () => {
                 expect(Util.formatString("Hello {0} from {1}", "World")).toBe("Hello World from {1}");
             });
         });
+
+        describe("escapeNgExp", () => {
+            it("wraps the input in single quotes and escapes any single quotes already in there", () => {
+                expect(Util.escapeNgExp("You, me & 'the thing'")).toBe("'You, me & \\'the thing\\''");
+            });
+        });
     });
 };
