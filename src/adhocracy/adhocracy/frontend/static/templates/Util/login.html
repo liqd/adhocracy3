@@ -4,8 +4,16 @@
         <input type="submit" value="LogOut" ng-click="logOut()" />
     </div>
     <div ng-switch-default class="login">
-        <input type="text" name="name" placeholder="name" ng-model="credentials.name" />
-        <input type="password" name="password" placeholder="password" ng-model="credentials.password" />
-        <input type="submit" value="LogIn" ng-click="logIn()" />
+        <h1 class="title">Log in!</h1>
+        <form class="login-form">
+            <input type="text" name="name" placeholder="email or username" ng-model="credentials.name" />
+            <input type="password" name="password" placeholder="password" ng-model="credentials.password" />
+            <a>forgot password</a>
+            <input type="submit" value="login" ng-click="logIn()" />
+        </form>
+        <div class="login-description">
+            <p>Description</p>
+            <a class="button">register</a>
+        </div>
     </div>
 </div>
