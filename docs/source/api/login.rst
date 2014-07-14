@@ -7,6 +7,10 @@ User Registration and Login
 Prerequisites
 -------------
 
+Some imports to work with rest api calls::
+
+    >>> from pprint import pprint
+
 Start Adhocracy testapp::
 
     >>> from webtest import TestApp
@@ -54,10 +58,18 @@ future story.
 Creating a new user will not automatically log them in. The frontend need to
 send an explicit login request afterwards.
 
-TODO Convert rest of document into doctest.
-On failure, the backend responds with::
+On failure, the backend responds with an error message. E.g. when we try to
+register a user with an empty password::
 
-    { "status": "error", "errors": [<errors>] }
+    >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
+    ...         'data': {
+    ...              'adhocracy.sheets.user.UserBasicSchema': {
+    ...                  'name': 'Anna Müllerin',
+    ...                  'email': 'annina@example.org'},
+    ...              'adhocracy.sheets.user.IPasswordAuthentication': {
+    ...                  'password': ''}}}
+    >>> resp_data = testapp.post_json("/principals/users", prop).json
+    { 'status': 'error', 'errors': [...] }
 
 <errors> is a list of errors. FIXME more on what can go wrong and how it's
 reported. Tentatively, the following error conditions can happen:
@@ -75,75 +87,87 @@ reported. Tentatively, the following error conditions can happen:
   * anything else?
 
 *Note:* in the future, the registration request may contain additional
-personal data for the user. This data will probably be collected in one (or
-several) sheets, e.g. ::
+personal data for the user. This data will probably be collected in one or
+several additional sheets, e.g. ::
 
-    { "username": "<arbitrary non-empty string>",
-      "email": "<e-mail address>",
-      "password": "<arbitrary non-empty string>",
-      "personal": {
-          "forename": "...",
-          "surname": "...",
-          "day_of_birth": "...",
-          "street": "...",
-          "town": "...",
-          "postcode": ..."",
-          "gender": "...",
+    'data': {
+        'adhocracy.sheets.user.UserBasicSchema': {
+            'name': 'Anna Müllerin',
+            'email': 'annina@example.org'},
+        'adhocracy.sheets.user.IPasswordAuthentication': {
+            'password': '...'},
+        'adhocracy.sheets.user.UserDetails': {
+          'forename': '...',
+          'surname': '...',
+          'day_of_birth': '...',
+          'street': '...',
+          'town': '...',
+          'postcode': '...',
+          'gender': '...'
         }
-    }
+     }
+
 
 User Login
 ----------
 
-To login an existing user via password, the frontend sends a JSON request
-to the URL ``login_username`` with the following fields::
+To log-in an existing user via password, the frontend sends a JSON request
+to the URL ``login_username`` with a user name and password::
 
-    { "username": "<arbitrary non-empty string>",
-      "password": "<arbitrary non-empty string>"
-    }
-
-Or ``login_email``::
-
-    { "email": "<e-mail address>",
-      "password": "<arbitrary non-empty string>"
-    }
-
-The "username" or "email" field must contain the username/email of a
-registered user and the "password" field must contain their password.
-
-On success, the backend responds with::
-
-   { "status": "success", 
-     "user_path": "/principals/users/1" , 
-     "user_token": "<arbitrary non-empty string>"
+    >>> prop = {'name': 'Anna Müllerin',
+    ...         'password': 'Inawgoywyk2'}}}
+    >>> resp_data = testapp.post_json('/login_username', prop).json
+    >>> pprint(resp_data)
+    {'status': 'success',
+     'user_path': '/principals/users/...',
+     'user_token': '...'
      }
+    >>> user_token_via_username = resp_data['user_token']
+
+Or to ``login_email``, specifying the user's email address instead of name::
+
+    >>> prop = {'email': 'annina@example.org',
+    ...         'password': 'Inawgoywyk2'}}}
+    >>> resp_data = testapp.post_json('/login_username', prop).json
+    >>> pprint(resp_data)
+    {'status': 'success',
+     'user_path': '/principals/users/...',
+     'user_token': '...'
+    }
+    >>> user_token_via_email = resp_data['user_token']
+
+On success, the backend sends back the path to the object
+representing the logged-in user and a token that must be used to authorize
+additional requests by the user.
+
 
 User Authentication
 -------------------
 
 Once the user is logged in, the backend must add an "X-User-Token" header
-field (FIXME is the name OK?) to all HTTP requests made for the user whose
-value is the received "user_token". The backend validates the token. If
-it's valid and not expired, the requested action is performed in the name
-and with the rights of the logged-in user.
+field to all HTTP requests made for the user whose value is the received
+"user_token". The backend validates the token. If it's valid and not
+expired, the requested action is performed in the name and with the rights
+of the logged-in user.
 
-If the token is not valid or expired, the backend responds with ::
+If the token is not valid or expired, the backend responds with an error
+status that identifies the "X-User-Token" header as source of the problem::
 
-    { "status": "error",
-      "errors": [
-        { "location": "header",
-          "name": "X-User-Token",
-          "description": "invalid user token"
-        }
-      ]
-    }
+    >>> headers = {'X-User-Token': 'Blah' }
+    >>> resp_data = testapp.get('/meta_api/', headers=headers).json
+    >>> resp_data['status']
+    'error'
+    >>> resp_data['errors'][0]['location']
+    'header'
+    >>> resp_data['errors'][0]['name']
+    'X-User-Token'
+    >>> resp_data['errors'][0]['description']
+    'invalid user token'
 
-FIXME Or should we report the error in some other way?
+Tokens will likely expire after some time. Once they are expired,
+they will be considered as invalid so any further requests made by the user
+will lead to errors. To resolve this, the user must log in again.
 
-Tokens automatically expire if they haven't been seen in any request made
-during the last 3 hours. Hence, if the user and the frontend stay idle for
-a longer time, the user must log in again. FIXME Or do we handle this in
-some other way? Longer or shorter timespan?
 
 User Logout
 -----------
@@ -154,11 +178,21 @@ user out, the frontend can simply "forget" the received user token and
 never use it any more. The token will automatically expire in the backend
 after a few hours.
 
+
 User Re-Login
 -------------
 
 If a user logs in, any previous user tokens generated for the same user
 will still remain valid until they expire in the normal way. This allows
-the user to be logged in from different devices at the same time.
+the user to be logged in from different devices at the same time. ::
 
-FIXME Or do we want to handle this situation in another way?
+    >>> user_token_via_username != user_token_via_email
+    True
+    >>> headers = {'X-User-Token': user_token_via_username }
+    >>> resp_data = testapp.get('/meta_api/', headers=headers).json
+    >>> 'resources' in resp_data.keys()
+    True
+    >>> headers = {'X-User-Token': user_token_via_email }
+    >>> resp_data = testapp.get('/meta_api/', headers=headers).json
+    >>> 'resources' in resp_data.keys()
+    True
