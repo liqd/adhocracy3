@@ -245,8 +245,16 @@ def browser_instance(request,
 
 
 @pytest.fixture()
-def browser_root(browser, server) -> Browser:
-    """Start sample application and go to the root html page."""
+def browser_root(browser_instance, server) -> Browser:
+    """browser_instance with url=root.html."""
     url = server.application_url + 'frontend_static/root.html'
-    browser.visit(url)
-    return browser
+    browser_instance.visit(url)
+    return browser_instance
+
+
+@pytest.fixture()
+def browser_test(browser_instance, server) -> Browser:
+    """browser_instance with url=test.html."""
+    url = server.application_url + 'frontend_static/test.html'
+    browser_instance.visit(url)
+    return browser_instance

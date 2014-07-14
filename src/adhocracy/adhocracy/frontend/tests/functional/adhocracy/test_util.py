@@ -1,17 +1,11 @@
 import pytest
-from time import sleep
+from adhocracy.testing import browser_root
 
 
 pytestmark = pytest.mark.functional  # mark theses tests as functional tests
 
 
 class TestDeepCp:
-
-    @pytest.fixture()
-    def browser_root(self, browser, server_static):
-        url = server_static.application_url + 'frontend_static/root.html'
-        browser.visit(url)
-        return browser
 
     @pytest.mark.parametrize("value",
                              [None,
@@ -22,7 +16,6 @@ class TestDeepCp:
                               {'a': 3, 'b': None, 'c': [None]}
                               ])
     def test_deepcp(self, browser_root, value):
-        sleep(1)
         code = """
                var U = require('Adhocracy/Util');
                return U.deepcp(input);
