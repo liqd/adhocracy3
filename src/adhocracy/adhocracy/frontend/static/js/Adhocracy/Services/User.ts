@@ -3,16 +3,24 @@ export class User {
     name : string;
     token : string;
 
-    constructor(public $http : ng.IHttpService) {}
+    constructor(public $http : ng.IHttpService, public cookies) {
+        if (typeof this.cookies.get("user-token")) {
+            // FIXME: check if user-token is still valid and get user data from server
+        }
+    }
 
     private setToken(token : string) {
         this.token = token;
         this.$http.defaults.headers.common["X-User-Token"] = token;
-        // FIXME set cookie for persistance
+        if (this.cookies.enabled) {
+            this.cookies.set("user-token", token);
+        } else {
+            console.log("session could not be persisted");
+        }
     }
 
     private deleteToken() {
-        // FIXME delete cookie
+        this.cookies.expire("user-token");
         delete this.$http.defaults.headers.common["X-User-Token"];
         this.token = undefined;
     }
