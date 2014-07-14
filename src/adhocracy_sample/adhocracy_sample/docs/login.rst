@@ -20,18 +20,28 @@ Start Adhocracy testapp::
     >>> testapp = TestApp(app)
 
 
+Test that the relevant resources and sheets exist:
+
+    >>> resp_data = testapp.get("/meta_api/").json
+    >>> 'adhocracy.sheets.versions.IVersions' in resp_data['sheets']
+    True
+    >>> 'adhocracy.sheets.user.IUserBasic' in resp_data['sheets']
+    True
+    >>> 'adhocracy.sheets.user.IPasswordAuthentication' in resp_data['sheets']
+    True
+
 User Creation (Registration)
 ----------------------------
 
-FIXME all the doctests in the document don't work yet.
+FIXME the remaining doctests in this document don't work yet.
 
 A new user is registered by creating a user object under the
 ``/principals/users`` pool. On success, the response contains the path of
-the new user.
+the new user::
 
     >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
     ...         'data': {
-    ...              'adhocracy.sheets.user.UserBasicSchema': {
+    ...              'adhocracy.sheets.user.IUserBasic': {
     ...                  'name': 'Anna Müller',
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy.sheets.user.IPasswordAuthentication': {
@@ -42,7 +52,7 @@ the new user.
     >>> resp_data["path"].startswith('/principals/users/')
     True
 
-The "name" field in the "UserBasicSchema" schema is a non-empty string that
+The "name" field in the "IUserBasic" schema is a non-empty string that
 can contain any characters except '@' (to make user names distinguishable
 from email addresses). The username must not contain any whitespace except
 single spaces, preceded and followed by non-whitespace (no whitespace at
@@ -63,7 +73,7 @@ register a user with an empty password::
 
     >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
     ...         'data': {
-    ...              'adhocracy.sheets.user.UserBasicSchema': {
+    ...              'adhocracy.sheets.user.IUserBasic': {
     ...                  'name': 'Anna Müllerin',
     ...                  'email': 'annina@example.org'},
     ...              'adhocracy.sheets.user.IPasswordAuthentication': {
@@ -88,15 +98,15 @@ reported. Tentatively, the following error conditions can happen:
 
 *Note:* in the future, the registration request may contain additional
 personal data for the user. This data will probably be collected in one or
-several additional sheets, e.g. ::
+several additional sheets, e.g.::
 
     'data': {
-        'adhocracy.sheets.user.UserBasicSchema': {
+        'adhocracy.sheets.user.IUserBasic': {
             'name': 'Anna Müllerin',
             'email': 'annina@example.org'},
         'adhocracy.sheets.user.IPasswordAuthentication': {
             'password': '...'},
-        'adhocracy.sheets.user.UserDetails': {
+        'adhocracy.sheets.user.IUserDetails': {
           'forename': '...',
           'surname': '...',
           'day_of_birth': '...',
