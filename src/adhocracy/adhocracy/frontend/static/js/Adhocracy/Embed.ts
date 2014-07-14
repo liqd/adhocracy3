@@ -3,18 +3,20 @@ import _ = require("underscore");
 import Util = require("./Util");
 
 /**
- * List of (camel-case) directive names that can be embedded.
+ * List of directive names that can be embedded.  names must be in
+ * lower-case with dashes, but without 'adh-' prefix.  (example:
+ * 'document-workbench' for directive DocumentWorkbench.)
  */
-var EmbeddableDirectives = ['DocumentWorkbench', 'ParagraphDetailView'];
+var embeddableDirectives = ["document-workbench", "paragraph-detail-view"];
 
 export var route2template = ($route) => {
     var params = $route.current.params;
 
     var attrs = [];
-    if (!params["widget"]) {
+    if (!params.hasOwnProperty("widget")) {
         throw "widget not specified";
     }
-    if (!(params.widget in params)) {
+    if (!Util.isArrayMember(params.widget, embeddableDirectives)) {
         throw "unknown widget: " + params.widget;
     }
     for (var key in params) {
