@@ -29,7 +29,9 @@ develop-eggs
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js.map
 /src/adhocracy/adhocracy/frontend/static/js/**/*.d.ts
-!/src/adhocracy/adhocracy/frontend/static/js/_all.d.ts
+!/src/adhocracy/adhocracy/frontend/static/js/**/_*.d.ts
+/src/adhocracy/adhocracy/frontend/static/js/AdhocracySpec.ts
+/src/adhocracy/adhocracy/frontend/static/test-no-blanket.html
 /src/adhocracy/adhocracy/frontend/static/lib/
 /src/adhocracy/adhocracy/frontend/static/stylesheets/.sass-cache/
 /src/adhocracy/adhocracy/frontend/static/stylesheets/a3.css

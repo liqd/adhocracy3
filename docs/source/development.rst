@@ -31,12 +31,44 @@ frontend unit tests:
 
     B.  In browser::
 
-        xdg-open http://localhost:6541/frontend_static/test.html
+            make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser
+            xdg-open http://localhost:6541/frontend_static/test.html
+
+        Make sure backend is running (or some means of delivering html
+        and js to the browser).
+
+        This is the best way to develop, as it lets you run tests
+        indiviually and repeatedly and enter the debugger.
+
+        .. note::
+
+           In the debugger, it helps to disable the script tag about
+           blanket in test.html.  You can do this thusly::
+
+               make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser test_no_blanket
+               xdg-open http://localhost:6541/frontend_static/test-no-blanket.html
 
     C.  With node.js::
 
-        bin/tsc -m commonjs ./src/adhocracy/adhocracy/frontend/static/js/Adhocracy*.ts
-        bin/jasmine-node ./src/adhocracy/adhocracy/frontend/static/js/
+            make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_node
+            bin/jasmine-node ./src/adhocracy/adhocracy/frontend/static/js/
+
+        .. note::
+
+           Node only works with the commonjs module system;
+           whereas the frontend currently uses requirejs and the amd
+           module system (rationale: requirejs is more powerful with
+           importing module-system-oblivious libraries like angular,
+           underscore, ...).  You know that you have run into this
+           problem if this appears in your browser console::
+
+               Uncaught Error: Module name "Adhocracy/UtilSpec" has not been loaded yet for context: _. Use require([])
+               http://requirejs.org/docs/errors.html#notloaded
+
+           In order for the javascript code to work in the browser, you
+           need to revert to adm::
+
+               make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser
 
 frontend functional tests::
 
@@ -44,8 +76,20 @@ frontend functional tests::
 
 frontend acceptance tests::
 
-    bin/py.test tests_acceptance
+    bin/py.test tests/
+
+.. note::
+
+   Some of the tests assume aliases for localhost to exist. If it is
+   not already there, please add the following line to /etc/hosts::
+
+       127.0.0.1  adhocracy.embeddee.goo adhocracy.embedder.gaa
 
 run all tests::
 
     bin/py.test_run_all
+
+delete database (works best on development systems without valuable data!)::
+
+    rm -f ./var/Data.*
+    supervisorctl reload

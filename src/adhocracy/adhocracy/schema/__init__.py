@@ -148,9 +148,11 @@ class ResourceObject(colander.SchemaType):
     """
 
     def serialize(self, node, value):
+        """Serialize object to path."""
         return serialize_path(node, value)
 
     def deserialize(self, node, value):
+        """Deserialize path to object."""
         return deserialize_path(node, value)
 
 
