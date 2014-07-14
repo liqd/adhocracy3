@@ -1,12 +1,10 @@
 export class User {
     loggedIn : boolean = false;
     name : string;
-    displayName : string;
 
-    logIn(name : string, password : string) {
+    logIn(nameOrEmail : string, password : string) {
         // FIXME this is only a dummy implementation
-        this.name = name;
-        this.displayName = name;
+        this.name = nameOrEmail;
         this.loggedIn = true;
     }
 
@@ -14,7 +12,6 @@ export class User {
         // FIXME this is only a dummy implementation
         this.loggedIn = false;
         this.name = undefined;
-        this.displayName = undefined;
     }
 
     can(permission : string) {
@@ -31,16 +28,16 @@ export var loginDirective = ($$user : User) => {
         controller: ["$scope", function($scope) : void {
             $scope.user = $$user;
             $scope.credentials = {
-                name: "",
+                nameOrEmail: "",
                 password: ""
             };
 
             $scope.resetCredentials = function() {
-                $scope.credentials.name = "";
+                $scope.credentials.nameOrEmail = "";
                 $scope.credentials.password = "";
             };
             $scope.logIn = function() {
-                $scope.user.logIn($scope.credentials.name, $scope.credentials.password);
+                $scope.user.logIn($scope.credentials.nameOrEmail, $scope.credentials.password);
                 $scope.resetCredentials();
             };
             $scope.logOut = function() {
