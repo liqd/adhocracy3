@@ -7,7 +7,7 @@ import Util = require("./Util");
  * lower-case with dashes, but without 'adh-' prefix.  (example:
  * 'document-workbench' for directive DocumentWorkbench.)
  */
-var embeddableDirectives = ["document-workbench", "paragraph-detail-view"];
+var embeddableDirectives = ["document-workbench", "paragraph-version-detail"];
 
 export var route2template = ($route) => {
     var params = $route.current.params;
