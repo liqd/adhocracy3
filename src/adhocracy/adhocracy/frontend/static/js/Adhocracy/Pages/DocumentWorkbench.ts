@@ -39,7 +39,7 @@ export var run = (config) => {
             .when("/frontend_static/root.html", {
                 templateUrl: config.template_path + "/Wrapper.html"
             })
-            .when("/embed/:directive", {
+            .when("/embed/:widget", {
                 template: "<adh-embed></adh-embed>"
             })
             .otherwise({

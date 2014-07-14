@@ -11,7 +11,7 @@ export var register = () => {
             $routeMock = {
                 current: {
                     params: {
-                        directive: "document-workbench",
+                        widget: "document-workbench",
                         path: "/this/is/a/path",
                         test: "\"&"
                     }
