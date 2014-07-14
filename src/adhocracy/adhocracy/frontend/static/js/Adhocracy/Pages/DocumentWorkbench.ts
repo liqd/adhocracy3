@@ -5,6 +5,7 @@
 /// <reference path="../../_all.d.ts"/>
 
 import angular = require("angular");
+import angularRoute = require("angularRoute");
 import modernizr = require("modernizr");
 
 import AdhHttp = require("../Services/Http");
@@ -18,12 +19,35 @@ import Resources = require("../Resources");
 import Widgets = require("../Widgets");
 import Directives = require("../Directives");
 import Filters = require("../Filters");
+import Embed = require("../Embed");
 
 
 export var run = (config) => {
     "use strict";
 
-    var app = angular.module("adhocracy3SampleFrontend", []);
+    // FIXME: angularRoute is not used directly.  Instead, it registers the "ngRoute" angular
+    // module.  But TypeScript will strip any imports that are not used.  So we have to use it
+    // somehow.
+    if (angularRoute) {
+        console.log("angularRoute is " + angularRoute);
+    }
+
+    var app = angular.module("adhocracy3SampleFrontend", ["ngRoute"]);
+
+    app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
+        $routeProvider
+            .when("/frontend_static/root.html", {
+                templateUrl: config.template_path + "/Wrapper.html"
+            })
+            .when("/embed/:widget", {
+                template: "<adh-embed></adh-embed>"
+            })
+            .otherwise({
+                // FIXME: proper error template
+                template: "<h1>404 - not Found</h1>"
+            });
+        $locationProvider.html5Mode(true);
+    }]);
 
     app.value("Modernizr", modernizr);
 
@@ -40,6 +64,8 @@ export var run = (config) => {
     app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", AdhCrossWindowMessaging.factory]);
 
     app.filter("documentTitle", [Filters.filterDocumentTitle]);
+
+    app.directive("adhEmbed", ["$compile", "$route", Embed.factory]);
 
     app.directive("adhListing",
         ["adhConfig", (adhConfig) =>

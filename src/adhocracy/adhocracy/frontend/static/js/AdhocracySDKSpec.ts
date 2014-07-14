@@ -7,6 +7,9 @@
  *
  * For this reason these tests are disabled by default and
  * _AdhocracySDK.d.ts is included in the source tree.
+ *
+ * FIXME: move to from ../js/ to ../sdk/, so that the special
+ * circumstances will become more appearent.
  */
 
 export var register = () => {

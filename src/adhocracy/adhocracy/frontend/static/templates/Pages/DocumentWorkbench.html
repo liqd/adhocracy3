@@ -1,36 +1,31 @@
-<div class="page_wrapper">
-    <adh-login></adh-login>
-    <adh-web-socket-test paths='["/adhocracy"]'></adh-web-socket-test>
+<table border="1">
+    <tr>
+        <td id="document_workbench_navigate">
 
-    <table border="1">
-        <tr>
-            <td id="document_workbench_navigate">
+            <adh-listing path="/adhocracy" title="proposals listing (abstract)">
+                <adh-listing-element path="{{element}}"></adh-listing-element>
+            </adh-listing>
 
-                <adh-listing path="/adhocracy" title="proposals listing (abstract)">
-                    <adh-listing-element path="{{element}}"></adh-listing-element>
-                </adh-listing>
+            <adh-listing path="/adhocracy" title="proposals listing (by titles)">
+                <adh-listing-element-title path="{{element}}"></adh-listing-element-title>
+            </adh-listing>
 
-                <adh-listing path="/adhocracy" title="proposals listing (by titles)">
-                    <adh-listing-element-title path="{{element}}"></adh-listing-element-title>
-                </adh-listing>
-
-            </td>
-            <td id="document_workbench_list">
-                <h3>table of contents</h3>
-                <ol>
-                    <li ng-repeat="doc in poolEntries track by $index">
-                        <div ng-switch="doc">
-                            <adh-proposal-version-detail content="doc.content" viewmode="doc.viewmode"></adh-proposal-version-detail>
-                        </div>
-                    </li>
-                </ol>
-            </td>
-            <td id="document_workbench_participate">
-                <div ng-if="user.can('proposal.create')">
-                    <p>proposal workbench changes and discussion</p>
-                    <adh-proposal-version-new on-new-proposal="insertParagraph"></adh-proposal-version-new>
-                </div>
-            </td>
-        </tr>
-    </table>
-</div>
+        </td>
+        <td id="document_workbench_list">
+            <h3>table of contents</h3>
+            <ol>
+                <li ng-repeat="doc in poolEntries track by $index">
+                    <div ng-switch="doc">
+                        <adh-proposal-version-detail content="doc.content" viewmode="doc.viewmode"></adh-proposal-version-detail>
+                    </div>
+                </li>
+            </ol>
+        </td>
+        <td id="document_workbench_participate">
+            <div ng-if="user.can('proposal.create')">
+                <p>proposal workbench changes and discussion</p>
+                <adh-proposal-version-new on-new-proposal="insertParagraph"></adh-proposal-version-new>
+            </div>
+        </td>
+    </tr>
+</table>
