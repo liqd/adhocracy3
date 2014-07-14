@@ -1,6 +1,9 @@
 exclude: '../src/adhocracy/adhocracy/frontend/static/stylesheets/scss/third_party/**'
 
 linters:
+    ColorKeyword:
+        enabled: false
+
     Comment:
         enabled: false
 
