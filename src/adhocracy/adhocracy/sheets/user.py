@@ -20,7 +20,7 @@ class UserBasicSchema(colander.MappingSchema):
     """Userbasic sheet data structure.
 
     `email`: email address
-    `display_name`: visible name
+    `name`: visible name
     """
 
     email = Email()

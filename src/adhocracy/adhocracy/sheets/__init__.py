@@ -177,7 +177,7 @@ def _assert_schema_preserves_super_type_data_structure(
 
 
 def includeme(config):  # pragma: no cover
-    """Include all sheets in this package."""
+    """Include many of the sheets in this package."""
     config.include('.name')
     config.include('.pool')
     config.include('.document')
