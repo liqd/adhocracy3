@@ -414,7 +414,6 @@ class MetaApiView(RESTView):
     """Access to metadata about the API specification of this installation.
 
     Returns a JSON document describing the existing resources and sheets.
-
     """
 
     def __init__(self, context, request):
@@ -506,6 +505,7 @@ class MetaApiView(RESTView):
                 typ = to_dotted_name(valuetyp)
                 containertype = None
                 targetsheet = None
+                readonly = getattr(node, 'readonly', False)
 
                 # If the outer type is not a container and it's not
                 # just a generic SchemaNode, we use the outer type
@@ -529,16 +529,13 @@ class MetaApiView(RESTView):
 
                 typ_stripped = strip_optional_prefix(typ, 'colander.')
 
-                editable = self._sheet_field_creatable_or_editable(
-                    sheet_name, fieldname, metadata.editable)
-                creatable = self._sheet_field_creatable_or_editable(
-                    sheet_name, fieldname, metadata.creatable)
                 fielddesc = {
                     'name': fieldname,
                     'valuetype': typ_stripped,
-                    'create_mandatory': metadata.create_mandatory,
-                    'editable': editable,
-                    'creatable': creatable,
+                    'create_mandatory':
+                        False if readonly else metadata.create_mandatory,
+                    'editable': False if readonly else metadata.editable,
+                    'creatable': False if readonly else metadata.creatable,
                     'readable': metadata.readable,
                 }
                 if containertype is not None:

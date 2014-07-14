@@ -840,23 +840,25 @@ class MetaApiViewUnitTest(unittest.TestCase):
         field_metadata = response['fields'][0]
         assert field_metadata['create_mandatory'] is False
         assert field_metadata['readable'] is True
+        assert field_metadata['editable'] is True
+        assert field_metadata['creatable'] is True
         assert field_metadata['name'] == 'test'
         assert 'valuetype' in field_metadata
 
-    def test_get_followed_by_field_of_versionable_sheet(self):
-        from adhocracy.sheets.versions import IVersionable
-
+    def test_get_sheet_with_readonly_field(self):
         class SchemaF(self.sheet_meta.schema_class):
-            followed_by = colander.SchemaNode(colander.List())
+            test = colander.SchemaNode(colander.Int(), readonly=True)
+
         sheet_meta = self.sheet_meta._replace(schema_class=SchemaF)
-        sheet_name = IVersionable.__identifier__
-        self.sheets_metadata.return_value = {sheet_name: sheet_meta}
+        self.sheets_metadata.return_value = {ISheet.__identifier__: sheet_meta}
         inst = self.make_one()
 
-        response = inst.get()['sheets'][sheet_name]
+        response = inst.get()['sheets'][ISheet.__identifier__]
 
         field_metadata = response['fields'][0]
-        assert field_metadata['readable'] is True
+        assert field_metadata['editable'] is False
+        assert field_metadata['creatable'] is False
+        assert field_metadata['create_mandatory'] is False
 
     def test_get_sheets_with_field_colander_noniteratable(self):
         class SchemaF(self.sheet_meta.schema_class):

@@ -1,12 +1,29 @@
 """Colander schema extensions."""
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
-from substanced import schema
 from substanced.schema import IdSet
 import colander
 import pytz
 
 from adhocracy.interfaces import SheetReference
+
+
+class AdhocracySchemaNode(colander.SchemaNode):
+
+    """Subclass of :class: `colander.SchemaNode` with extended keyword support.
+
+    The constructor accepts these additional keyword arguments:
+
+        - ``readonly``: Disable deserialization. Default: False
+    """
+
+    readonly = False
+
+    def deserialize(self, cstruct=colander.null):
+        """ Deserialize the :term:`cstruct` into an :term:`appstruct`. """
+        if self.readonly and cstruct != colander.null:
+            raise colander.Invalid(self, 'This field is ``readonly``.')
+        return super().deserialize(cstruct)
 
 
 def raise_attribute_error_if_not_location_aware(context) -> None:
@@ -76,7 +93,7 @@ def name_is_unique_validator(node: colander.SchemaNode, value: str):
         raise colander.Invalid(node, msg)
 
 
-class Name(colander.SchemaNode):
+class Name(AdhocracySchemaNode):
 
     """ The unique `name` of a resource inside the parent pool.
 
@@ -94,7 +111,7 @@ class Name(colander.SchemaNode):
                              name_is_unique_validator)
 
 
-class Email(colander.SchemaNode):
+class Email(AdhocracySchemaNode):
 
     """String with email address.
 
@@ -110,7 +127,7 @@ class Email(colander.SchemaNode):
 _ZONES = pytz.all_timezones
 
 
-class TimeZoneName(colander.SchemaNode):
+class TimeZoneName(AdhocracySchemaNode):
 
     """String with time zone.
 
@@ -123,7 +140,7 @@ class TimeZoneName(colander.SchemaNode):
     validator = colander.OneOf(_ZONES)
 
 
-class AbsolutePath(colander.SchemaNode):
+class AbsolutePath(AdhocracySchemaNode):
 
     """Absolute path made with  Identifier Strings.
 
@@ -258,7 +275,7 @@ def get_all_resources(node, context):
     #                [d for d in docs if d])
 
 
-class AbstractReferenceIterable(schema.MultireferenceIdSchemaNode):
+class AbstractReferenceIterable(AdhocracySchemaNode):
 
     """Abstract Colander SchemaNode to store multiple references.
 
@@ -315,7 +332,7 @@ class String(colander.SchemaNode):  # noqa
                                   msg='New line characters are not allowed.')
 
 
-class Text(colander.SchemaNode):
+class Text(AdhocracySchemaNode):
 
     """ UTF-8 encoded text.
 
@@ -328,7 +345,7 @@ class Text(colander.SchemaNode):
     missing = colander.drop
 
 
-class Password(colander.SchemaNode):
+class Password(AdhocracySchemaNode):
 
     """ UTF-8 encoded text.
 

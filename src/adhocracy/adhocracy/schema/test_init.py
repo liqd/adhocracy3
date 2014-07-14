@@ -14,10 +14,33 @@ def add_node_binding(node, context=None):
     node.bindings['context'] = context
     return node
 
-
 ###########
 #  tests  #
 ###########
+
+class AdhocracySchemaNodeUnitTest(unittest.TestCase):
+
+    def _make_one(self, *args, **kwargs):
+        from adhocracy.schema import AdhocracySchemaNode
+        return AdhocracySchemaNode(*args, **kwargs)
+
+    def test_serialize_non_readonly(self):
+        inst = self._make_one(colander.String())
+        assert inst.serialize(1) == '1'
+
+    def test_serialize_readonly(self):
+        inst = self._make_one(colander.Integer(), readonly=True)
+        assert inst.serialize(1) == '1'
+
+    def test_deserialize_non_readonly(self):
+        inst = self._make_one(colander.Integer())
+        assert inst.deserialize('1') == 1
+
+    def test_deserialize_readonly(self):
+        inst = self._make_one(colander.Integer(), readonly=True)
+        with pytest.raises(colander.Invalid):
+            inst.deserialize('1')
+
 
 class NameUnitTest(unittest.TestCase):
 

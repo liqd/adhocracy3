@@ -44,6 +44,7 @@ class VersionableSchema(colander.MappingSchema):
 
     follows = ListOfUniqueReferences(reftype=VersionableFollowsReference)
     followed_by = ListOfUniqueReferences(
+        readonly=True,
         reftype=VersionableFollowedByReference)
 
 
