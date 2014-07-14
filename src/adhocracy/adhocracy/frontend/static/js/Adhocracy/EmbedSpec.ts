@@ -13,7 +13,7 @@ export var register = () => {
                     params: {
                         widget: "document-workbench",
                         path: "/this/is/a/path",
-                        test: "\"&"
+                        test: "\"'&"
                     }
                 }
             };
@@ -25,7 +25,7 @@ export var register = () => {
         describe("route2template", () => {
             it("compiles a template from the parameters given in $route", () => {
                 var expected = "<adh-document-workbench data-path=\"&#x27;/this/is/a/path&#x27;\" " +
-                    "data-test=\"&#x27;&quot;&amp;&#x27;\"></adh-document-workbench>";
+                    "data-test=\"&#x27;&quot;\\&#x27;&amp;&#x27;\"></adh-document-workbench>";
                 expect(Embed.route2template($routeMock)).toBe(expected);
             });
         });
