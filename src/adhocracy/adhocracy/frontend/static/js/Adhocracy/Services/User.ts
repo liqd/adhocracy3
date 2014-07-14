@@ -1,16 +1,33 @@
 export class User {
     loggedIn : boolean = false;
     name : string;
+    token : string;
+
+    constructor(public $http : ng.IHttpService) {}
+
+    private setToken(token : string) {
+        this.token = token;
+        this.$http.defaults.headers.common["X-User-Token"] = token;
+        // FIXME set cookie for persistance
+    }
+
+    private deleteToken() {
+        // FIXME delete cookie
+        delete this.$http.defaults.headers.common["X-User-Token"];
+        this.token = undefined;
+    }
 
     logIn(nameOrEmail : string, password : string) {
         // FIXME this is only a dummy implementation
         this.name = nameOrEmail;
+        this.setToken(nameOrEmail);
         this.loggedIn = true;
     }
 
     logOut() {
         // FIXME this is only a dummy implementation
         this.loggedIn = false;
+        this.deleteToken();
         this.name = undefined;
     }
 
