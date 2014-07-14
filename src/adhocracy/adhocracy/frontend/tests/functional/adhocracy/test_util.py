@@ -1,4 +1,5 @@
 import pytest
+from time import sleep
 
 
 class TestDeepCp:
@@ -18,6 +19,7 @@ class TestDeepCp:
                               {'a': 3, 'b': None, 'c': [None]}
                               ])
     def test_deepcp(self, browser_root, value):
+        sleep(1)
         code = """
                var U = require('Adhocracy/Util');
                return U.deepcp(input);
