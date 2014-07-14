@@ -120,18 +120,6 @@ class GenericResourceSheet(PropertySheet):
                                           registry)
             registry.notify(event)
 
-    def validate_cstruct(self, cstruct: dict) -> dict:
-        """Validate schema :term:`cstruct`."""
-        # FIXME: misleading name, it does not validate but deserialize.
-        for child in self.schema:
-            editable = getattr(child, 'editable', True)
-            creatable = getattr(child, 'creatable', True)
-            writable = editable or creatable
-            if not writable:
-                raise colander.Invalid(child, msg=u'This key is readonly')
-        appstruct = self.schema.deserialize(cstruct)
-        return appstruct
-
     def get_cstruct(self) -> dict:
         """Return schema :term:`cstruct`."""
         struct = self.get()

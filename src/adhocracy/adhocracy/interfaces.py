@@ -91,15 +91,6 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
     def get_cstruct() -> dict:
         """ Return a serialized dictionary representing the sheet state."""
 
-    def validate_cstruct(cstruct: dict) -> dict:
-        """ Validate ``cstruct`` data.
-
-        :param cstruct: serialized application data (colander)
-        :returns: appstruct: deserialized application data (colander)
-        :raises colander.Invalid:
-
-        """
-
 
 RESOURCE_METADATA = OrderedDict({
     'content_name': '',

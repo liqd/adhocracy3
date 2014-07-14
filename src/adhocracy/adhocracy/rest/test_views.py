@@ -1,4 +1,5 @@
 """Test rest.views module."""
+import json
 import unittest
 
 from cornice.util import extract_json_data
@@ -42,7 +43,7 @@ class DummyFolder(testing.DummyResource):
 
 class CorniceDummyRequest(testing.DummyRequest):
 
-    def __init__(self, registry=None):
+    def __init__(self, registry=None, **kw):
         class Dummy:
             pass
 
@@ -57,6 +58,12 @@ class CorniceDummyRequest(testing.DummyRequest):
         self.registry.cornice_deserializers = {'application/json': extract_json_data}
         self.content_type = 'application/json'
         self.errors = Errors(self)
+        self.__dict__.update(kw)
+
+    @property
+    def json_body(self):
+        return json.loads(self.body)
+
 
 
 @patch('adhocracy.registry.ResourceContentRegistry')
@@ -71,9 +78,9 @@ def make_mock_resource_registry(mock_registry=None):
 
 class ValidateRequestDataUnitTest(unittest.TestCase):
 
-    def _make_one(self, *args, **kw):
+    def _make_one(self, context, request, **kw):
         from adhocracy.rest.views import validate_request_data
-        validate_request_data(*args, **kw)
+        validate_request_data(context, request, **kw)
 
     def setUp(self):
         self.request = CorniceDummyRequest()
@@ -94,9 +101,8 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
         assert self.request.validated == wanted
 
     def test_valid_with_schema_no_data(self):
-        schema = CountSchema
         self.request.body = ''
-        self._make_one(self.context, self.request, schema=schema)
+        self._make_one(self.context, self.request, schema=CountSchema())
         wanted = {}
         assert self.request.validated == wanted
 
@@ -108,277 +114,32 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
         assert self.request.validated == wanted
 
     def test_valid_with_schema_with_data(self):
-        schema = CountSchema
         self.request.body = '{"count": "1"}'
-        self._make_one(self.context, self.request, schema=schema)
+        self._make_one(self.context, self.request, schema=CountSchema())
         wanted = {'count': 1}
         assert self.request.validated == wanted
 
     def test_non_valid_with_schema_wrong_data(self):
         from cornice.util import _JSONError
-        schema = CountSchema
         self.request.body = '{"count": "wrong_value"}'
         with pytest.raises(_JSONError):
-            self._make_one(schema, self.request, schema=schema)
+            self._make_one(self.context, self.request, schema=CountSchema())
         assert self.request.errors != []
 
     def test_non_valid_with_schema_wrong_data_cleanup(self):
         from cornice.util import _JSONError
-        schema = CountSchema
         self.request.validated == {'secret_data': 'buh'}
         self.request.body = '{"count": "wrong_value"}'
         with pytest.raises(_JSONError):
-            self._make_one(schema, self.request, schema=schema)
+            self._make_one(self.context, self.request, schema=CountSchema())
         assert self.request.validated == {}
 
     def test_valid_with_extra_validator(self):
-        schema = CountSchema
-
         def validator1(context, request):
             request.validated = "validator1"
 
-        self._make_one(schema, self.request, extra_validators=[validator1])
+        self._make_one(self.context, self.request, extra_validators=[validator1])
         assert self.request.validated == "validator1"
-
-
-class ValidateSheetCstructsUnitTest(unittest.TestCase):
-
-    def setUp(self):
-        self.context = testing.DummyResource()
-        self.request = CorniceDummyRequest()
-
-    def _make_one(self, *args):
-        from adhocracy.rest.views import validate_sheet_cstructs
-        validate_sheet_cstructs(*args)
-
-    def test_valid_no_sheets(self):
-        sheets = {}
-        self.request.validated = {'data': {}}
-        self._make_one(self.context, self.request, sheets)
-        assert self.request.validated == {'data': {}}
-
-    def test_valid_no_sheets_no_data(self):
-        sheets = {}
-        self.request.validated = {}
-        self._make_one(self.context, self.request, sheets)
-        assert self.request.validated == {}
-
-    @patch('adhocracy.sheets.GenericResourceSheet')
-    def test_valid_with_sheets(self, dummy_sheet=None):
-        sheet = dummy_sheet.return_value
-        sheet.validate_cstruct.return_value = 'validated'
-        self.request.validated = {'data': {'sheet': {'x': 'y'}}}
-        self._make_one(self.context, self.request, {'sheet': sheet})
-        assert self.request.validated['data']['sheet'] == 'validated'
-
-    @patch('adhocracy.sheets.GenericResourceSheet')
-    def test_non_valid_with_sheets(self, dummy_sheet=None):
-        sheet = dummy_sheet.return_value
-        sheet.validate_cstruct.side_effect = colander.Invalid(None)
-        self.request.validated = {'data': {'sheet': {'x': 'y'}}}
-        with pytest.raises(colander.Invalid):
-            self._make_one(self.context, self.request, {'sheet': sheet})
-
-    def test_valid_with_wrong_sheet(self):
-        self.request.validated = {'data': {'wrong': {'x': 'y'}}}
-        self._make_one(self.context, self.request, {})
-        assert 'wrong' not in self.request.validated['data']
-
-
-class ValidatePutSheetCstructsUnitTest(unittest.TestCase):
-
-    def setUp(self):
-        self.context = testing.DummyResource()
-        request = CorniceDummyRequest()
-        resource_registry = make_mock_resource_registry()
-        request.registry.content = resource_registry
-        self.request = request
-        self.resource_sheets = resource_registry.resource_sheets
-
-    def make_one(self, context, request):
-        from adhocracy.rest.views import validate_put_sheet_cstructs
-        validate_put_sheet_cstructs(context, request)
-
-    @patch('adhocracy.sheets.GenericResourceSheet')
-    def test_valid(self, dummy_sheet=None):
-        sheet = dummy_sheet.return_value
-        sheets = {'sheet': sheet}
-        self.resource_sheets.return_value = sheets
-        self.request.validated = {'data': {'sheet': {'y': 'x'}}}
-
-        self.make_one(self.context, self.request)
-
-        assert self.request.validated['data']['sheet']['dummy_validated']
-        self.request.registry.content.resource_sheets.assert_called_with(
-            self.context, self.request, onlyeditable=True)
-
-
-class ValidatePostSheetCstructsUnitTest(unittest.TestCase):
-
-    def setUp(self):
-        self.context = testing.DummyResource()
-        request = CorniceDummyRequest()
-        resource_registry = make_mock_resource_registry()
-        request.registry.content = resource_registry
-        self.request = request
-        self.resource_sheets = request.registry.content.resource_sheets
-        self.resource_types = request.registry.content.resources_metadata
-        self.create = request.registry.content.create
-
-    def make_one(self, context, request):
-        from adhocracy.rest.views import validate_post_sheet_cstructs
-        validate_post_sheet_cstructs(context, request)
-
-    @patch('adhocracy.sheets.GenericResourceSheet')
-    def test_valid(self, dummy_sheet=None):
-        self.resource_sheets.return_value = {'sheet': dummy_sheet.return_value}
-        self.create.return_value = testing.DummyResource()
-        self.resource_types.return_value = {'resourcex': {}}
-        self.request.validated = {'content_type': 'resourcex',
-                                  'data': {'sheet': {'y': 'x'}}}
-
-        self.make_one(self.context, self.request)
-
-        assert self.request.validated['data']['sheet']['dummy_validated']
-        assert self.resource_sheets.call_args_list[0][1] == {'onlycreatable': True}
-        self.create.assert_called_with('resourcex', run_after_creation=False)
-
-    def test_valid_missing_content_type(self):
-        self.request.validated = {'data': {'sheet': {'y': 'x'}}}
-        self.make_one(self.context, self.request)
-        assert self.request.validated['data'] == {}
-
-    def test_valid_missing_data(self):
-        self.request.validated = {}
-        self.make_one(self.context, self.request)
-        assert self.request.validated == {}
-
-
-class ValidatePUTSheetNamesUnitTest(unittest.TestCase):
-
-    def setUp(self):
-        self.context = testing.DummyResource()
-        request = CorniceDummyRequest()
-        resource_registry = make_mock_resource_registry()
-        request.registry.content = resource_registry
-        self.request = request
-        self.resource_sheets = request.registry.content.resource_sheets
-
-    def make_one(self, context, request):
-        from adhocracy.rest.views import validate_put_sheet_names
-        validate_put_sheet_names(context, request)
-
-    def test_valid_no_sheets(self):
-        self.resource_sheets.return_value = {}
-        self.request.validated = {'data': {}}
-        self.make_one(self.context, self.request)
-        assert self.request.errors == []
-
-    @patch('adhocracy.sheets.GenericResourceSheet')
-    def test_valid_with_sheets(self, dummy_sheet=None):
-        self.resource_sheets.return_value = {'sheet': dummy_sheet.return_value}
-        self.request.validated = {'data': {'sheet': {'x': 'y'}}}
-        self.make_one(self.context, self.request)
-
-        self.resource_sheets.assert_called_with(self.context, self.request,
-                                                onlyeditable=True)
-        assert self.request.errors == []
-
-    @patch('adhocracy.sheets.GenericResourceSheet')
-    def test_valid_with_sheets_missing(self, dummy_sheet=None):
-        self.resource_sheets.return_value = {'sheet': dummy_sheet.return_value,
-                                             'sheetB': dummy_sheet.return_value}
-        self.request.validated = {'data': {'sheet': {'x': 'y'}}}
-        self.make_one(self.context, self.request)
-        assert self.request.errors == []
-
-    @patch('adhocracy.sheets.GenericResourceSheet')
-    def test_valid_with_sheets_missing_createmandatory(self, dummy_sheet=None):
-        sheets = {'sheet': dummy_sheet.return_value,
-                  'sheetB': dummy_sheet.return_value}
-        sheets['sheetB'].createmandatory = True
-        self.resource_sheets.return_value = sheets
-        self.request.validated = {'data': {'sheet': {'x': 'y'}}}
-        self.make_one(self.context, self.request)
-        assert self.request.errors == []
-
-    @patch('adhocracy.sheets.GenericResourceSheet')
-    def test_non_valid_with_sheets_wrong_name(self, dummy_sheet=None):
-        self.resource_sheets.return_value = {'sheet': dummy_sheet.return_value}
-        self.request.validated = {'data': {'wrongname': {'x': 'y'}}}
-        self.make_one(self.context, self.request)
-        assert self.request.errors != []
-
-
-class ValidatePOSTSheetNamesAddablesUnitTest(unittest.TestCase):
-
-    def setUp(self):
-        self.context = testing.DummyResource()
-        request = CorniceDummyRequest()
-        resource_registry = make_mock_resource_registry()
-        request.registry.content = resource_registry
-        self.request = request
-        self.resource_addables = request.registry.content.resource_addables
-
-    def make_one(self, context, request):
-        from adhocracy.rest.views import \
-            validate_post_sheet_names_and_resource_type
-        validate_post_sheet_names_and_resource_type(context, request)
-
-    def test_valid_optional(self):
-        self.resource_addables.return_value = {'iresourcex': {
-            'sheets_mandatory': [],
-            'sheets_optional': ['ipropertyx']}}
-        self.request.validated = {'content_type': 'iresourcex',
-                                  'data': {'ipropertyx': {'a': 'b'}}}
-
-        self.make_one(self.context, self.request)
-
-        assert self.request.errors == []
-
-    def test_valid_mandatory(self):
-        self.resource_addables.return_value = {'iresourcex': {
-            'sheets_optional': [],
-            'sheets_mandatory': ['ipropertyx']}}
-        self.request.validated = {'content_type': 'iresourcex',
-                                  'data': {'ipropertyx': {'a': 'b'}}}
-
-        self.make_one(self.context, self.request)
-
-        assert self.request.errors == []
-
-    def test_non_valid_wrong_content_type(self):
-        self.resource_addables.return_value = {'iresourcex': {
-            'sheets_optional': [],
-            'sheets_mandatory': ['ipropertyx']}}
-        self.request.validated = {'content_type': 'wrong_iresource',
-                                  'data': {'ipropertyx': {'a': 'b'}}}
-
-        self.make_one(self.context, self.request)
-
-        assert self.request.errors != []
-
-    def test_non_valid_wrong_sheet(self):
-        self.resource_addables.return_value = {'iresourcex': {
-            'sheets_optional': [],
-            'sheets_mandatory': ['ipropertyx']}}
-        self.request.validated = {'content_type': 'iresourcex',
-                                  'data': {'wrong_iproperty': {'a': 'b'}}}
-
-        self.make_one(self.context, self.request)
-
-        assert self.request.errors != []
-
-    def test_non_valid_missing_sheet_mandatory(self):
-        self.resource_addables.return_value = {'iresourcex': {
-            'sheets_optional': ['propertyy'],
-            'sheets_mandatory': ['ipropertyx']}}
-        self.request.validated = {'content_type': 'iresourcex',
-                                  'data': {'ipropertyy': {'a': 'b'}}}
-
-        self.make_one(self.context, self.request)
-
-        assert self.request.errors != []
 
 
 class ValidatePOSTRootVersionsUnitTest(unittest.TestCase):
@@ -548,16 +309,11 @@ class SimpleRESTViewUnitTest(unittest.TestCase):
         return SimpleRESTView(context, request)
 
     def test_create_valid(self, ):
-        from .views import validate_put_sheet_names
-        from .views import validate_put_sheet_cstructs
-        from .views import ResourceRESTView
-        from .schemas import PUTResourceRequestSchema
+        from adhocracy.rest.views import ResourceRESTView
+        from adhocracy.rest.schemas import PUTResourceRequestSchema
         inst = self.make_one(self.context, self.request)
         assert issubclass(inst.__class__, ResourceRESTView)
-        assert inst.validation_PUT == (PUTResourceRequestSchema,
-                                       [validate_put_sheet_names,
-                                        validate_put_sheet_cstructs,
-                                        ])
+        assert inst.validation_PUT == (PUTResourceRequestSchema, [])
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -599,21 +355,15 @@ class PoolRESTViewUnitTest(unittest.TestCase):
         self.create = request.registry.content.create
 
     def make_one(self, context, request):
-        from .views import PoolRESTView
+        from adhocracy.rest.views import PoolRESTView
         return PoolRESTView(context, request)
 
     def test_create(self, ):
-        from .views import validate_post_sheet_names_and_resource_type
-        from .views import validate_post_sheet_cstructs
-        from .views import SimpleRESTView
-        from .schemas import POSTResourceRequestSchema
+        from adhocracy.rest.views import SimpleRESTView
+        from adhocracy.rest.schemas import POSTResourceRequestSchema
         inst = self.make_one(self.context, self.request)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.validation_POST == \
-               (POSTResourceRequestSchema,
-                [validate_post_sheet_names_and_resource_type,
-                 validate_post_sheet_cstructs
-                 ])
+        assert inst.validation_POST == (POSTResourceRequestSchema, [])
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -647,20 +397,13 @@ class ItemRESTViewUnitTest(unittest.TestCase):
         return ItemRESTView(context, request)
 
     def test_create(self, ):
-        from adhocracy.rest.views import\
-            validate_post_sheet_names_and_resource_type
-        from adhocracy.rest.views import validate_post_sheet_cstructs
         from adhocracy.rest.views import validate_post_root_versions
         from adhocracy.rest.views import SimpleRESTView
         from adhocracy.rest.schemas import POSTItemRequestSchema
         inst = self.make_one(self.context, self.request)
         assert issubclass(inst.__class__, SimpleRESTView)
-        assert inst.validation_POST == \
-               (POSTItemRequestSchema,
-                [validate_post_sheet_names_and_resource_type,
-                 validate_post_root_versions,
-                 validate_post_sheet_cstructs,
-                 ])
+        assert inst.validation_POST == (POSTItemRequestSchema,
+                                        [validate_post_root_versions])
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
@@ -910,26 +653,47 @@ class MetaApiViewUnitTest(unittest.TestCase):
 
 class ValidateRequestDataDecoratorUnitTest(unittest.TestCase):
 
-    def test_decorates_rest_method(self):
+    def setUp(self):
+        request = CorniceDummyRequest(method='get')
+        request.registry.content = make_mock_resource_registry()
+        self.request = request
+        self.context = testing.DummyResource()
+
+    def _make_dummy_view_class_with_decorator(self, validation_get=(None, [])):
         from adhocracy.rest.views import validate_request_data_decorator
-        request = testing.DummyRequest(method='GET',
-                                       errors=[])
-        request.registry.content = testing.DummyResource()
-        context = testing.DummyResource()
-        def dummy_validate(context, request):
-            request.validated = {'data': True}
+
         class DummyOriginalView:
-            validation_GET = (None, [dummy_validate])
+            validation_GET = validation_get
+
         @validate_request_data_decorator()
         class DummyView(testing.DummyResource):
             __original_view__ = DummyOriginalView
 
-        DummyView(context, request)
+        return DummyView
 
-        assert request.validated == {'data': True}
+    def test_view_without_validators(self):
+        view_class = self._make_dummy_view_class_with_decorator(
+            validation_get=(None, []))
 
+        view_class(self.context, self.request)
 
+        assert self.request.validated == {}
 
+    def test_view_with_validate_method(self):
+        def dummy_validate(context, request):
+            request.validated = {'data': True}
+        view_class = self._make_dummy_view_class_with_decorator(
+            validation_get=(None, [dummy_validate]))
 
+        view_class(self.context, self.request)
 
+        assert self.request.validated == {'data': True}
 
+    def test_view_with_schema(self):
+        view_class = self._make_dummy_view_class_with_decorator(
+            validation_get=(CountSchema, []))
+        self.request.body = '{"count":"1"}'
+
+        view_class(self.context, self.request)
+
+        assert self.request.validated == {'count': 1}
