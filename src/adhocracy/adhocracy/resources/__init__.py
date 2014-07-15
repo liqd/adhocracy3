@@ -56,9 +56,9 @@ class ResourceFactory:
             prefix = self.meta.autonaming_prefix
             name = parent.next_name(resource, prefix=prefix)
         if name in parent:
-            raise KeyError
+            raise KeyError('Duplicate name: {}'.format(name))
         if name == '':
-            raise KeyError
+            raise KeyError('Empty name')
         parent.add(name, resource, send_events=False)
 
     def _notify_new_resource_created_and_added(self, resource):
