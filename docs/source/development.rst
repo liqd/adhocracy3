@@ -96,4 +96,4 @@ run only unit tests::
 delete database (works best on development systems without valuable data!)::
 
     rm -f ./var/Data.*
-    supervisorctl reload
+    supervisorctl restart all
