@@ -89,7 +89,7 @@ export var run = (config) => {
 
     // application-specific (local) directives
 
-    app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", "adhCrossWindowMessaging", Directives.adhDocumentWorkbench]);
+    app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", Directives.adhDocumentWorkbench]);
     app.directive("adhProposalVersionDetail", ["adhConfig", Directives.adhProposalVersionDetail]);
     app.directive("adhProposalVersionEdit", ["adhConfig", Directives.adhProposalVersionEdit]);
     app.directive("adhProposalVersionNew", ["adhHttp", "adhConfig", "adhResources", Directives.adhProposalVersionNew]);

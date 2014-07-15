@@ -2,7 +2,6 @@ import Types = require("./Types");
 import AdhHttp = require("./Services/Http");
 import AdhUser = require("./Services/User");
 import AdhConfig = require("./Services/Config");
-import AdhCrossWindowMessaging = require("./Services/CrossWindowMessaging");
 
 import Resources = require("./Resources");
 
@@ -43,8 +42,7 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
 
 export var adhDocumentWorkbench = (
         adhConfig: AdhConfig.Type,
-        adhResources: Resources.Service,
-        adhCrossWindowMessaging: AdhCrossWindowMessaging.Service
+        adhResources: Resources.Service
     ) => {
     return {
         restrict: "E",

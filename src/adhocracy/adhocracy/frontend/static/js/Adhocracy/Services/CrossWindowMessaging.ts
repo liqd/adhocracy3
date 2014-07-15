@@ -12,18 +12,21 @@
  * Messages sent between the two are always of type IMessage.  Currentently the following
  * messages exists:
  *
- * name: "resize"
+ * name: "resize"  // from SDK to iframes
  * data: {
  *   height: number
  * }
  *
- * name: "requestSetup"
+ * name: "requestSetup"  // from SDK to iframes
  * data: {}
  *
- * name: "setup"
+ * name: "setup"  // sent from SDK to iframes
  * data: {
  *   embedderOrigin: string
  * }
+ *
+ * Message handler callbacks for to-iframes messages are registered by
+ * the service factory.
  *
  * Messages are serialized with JSON.stringify before being sent via
  * window.postMessage().  (Reason: browser compatibility; IE prior to
