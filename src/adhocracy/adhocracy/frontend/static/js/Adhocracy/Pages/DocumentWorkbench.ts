@@ -5,7 +5,12 @@
 /// <reference path="../../_all.d.ts"/>
 
 import angular = require("angular");
-import angularRoute = require("angularRoute");
+import angularRoute = require("angularRoute");  angularRoute;
+// (since angularRoute does not export any objects or types we would
+// want to use, the extra mention of the module name is needed to keep
+// tsc from purging this import entirely.  which would have undesired
+// runtime effects.)
+
 import modernizr = require("modernizr");
 
 import AdhHttp = require("../Services/Http");
@@ -24,13 +29,6 @@ import Embed = require("../Embed");
 
 export var run = (config) => {
     "use strict";
-
-    // FIXME: angularRoute is not used directly.  Instead, it registers the "ngRoute" angular
-    // module.  But TypeScript will strip any imports that are not used.  So we have to use it
-    // somehow.
-    if (angularRoute) {
-        console.log("angularRoute is " + angularRoute);
-    }
 
     var app = angular.module("adhocracy3SampleFrontend", ["ngRoute"]);
 
