@@ -1,5 +1,54 @@
 /*doc
 ---
+title: textbox
+name: textbox
+category: Widgets
+---
+
+A simple box containing text.
+
+```html_example
+<div class="textbox">
+    <p>textbox</p>
+</div>
+<div class="textbox m-unobtrusive">
+    <p>unobtrusive textbox</p>
+</div>
+```
+*/
+.textbox {
+    .m-unobtrusive {
+        color: $fg2;
+    }
+}
+
+/*doc
+---
+title: box with button
+name: box-with-button
+category: Widgets
+---
+
+A generic box with a single button.
+
+```html_example
+<div class="box-with-button">
+    <p>Description</p>
+    <a class="button">register</a>
+</div>
+```
+*/
+.box-with-button {
+    border: 1px solid $border;
+    padding: 1em;
+
+    .button {
+        width: 100%;
+    }
+}
+
+/*doc
+---
 title: Login
 name: login
 category: Widgets
@@ -16,8 +65,10 @@ Login Dialog.
         <a>forgot password</a>
         <input type="submit" value="login" />
     </form>
-    <div class="login-description">
-        <p>Description</p>
+    <div class="login-description box-with-button">
+        <div class="textbox m-unobtrusive">
+            <p>Description</p>
+        </div>
         <a class="button">register</a>
     </div>
 </div>
@@ -31,11 +82,18 @@ Login Dialog.
 
 .login {
     @include container;
+
+    .login-form {
+        @include span(3 of 5);
+    }
+
+    .login-description {
+        @include span(2 of 5);
+        margin: 0;  // remove gutter
+    }
 }
 
 .login-form {
-    @include span(3 of 5);
-
     input[type="text"],
     input[type="password"] {
         width: 100%;
@@ -49,17 +107,5 @@ Login Dialog.
         &:last-child {
             margin: 0;  // remove gutter
         }
-    }
-}
-
-.login-description {
-    @include span(2 of 5);
-    margin: 0;  // remove gutter
-
-    border: 1px solid $border;
-    padding: 1em;
-
-    .button {
-        width: 100%;
     }
 }

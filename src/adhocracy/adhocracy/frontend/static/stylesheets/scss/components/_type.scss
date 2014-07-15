@@ -14,6 +14,24 @@ p {
     hyphens: auto;
 }
 
+/*doc
+---
+title: link
+name: link
+category: Type
+---
+
+A hyperlink. It may have the following states:
+
+-   has-focus
+-   is-hover
+
+```html_example
+<a href="#">internal link</a>
+<a href="#" rel="external">external link</a>
+<a href="#" class="m-unobtrusive">unobtrusive link</a>
+```
+*/
 a {
     color: $primary-color;
 }
