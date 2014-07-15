@@ -78,6 +78,10 @@ run all tests::
 
     bin/py.test_run_all
 
+run only unit tests::
+
+    bin/py.test -m "not functional" src/adhocracy src/adhocracy_sample
+
 delete database (works best on development systems without valuable data!)::
 
     rm -f ./var/Data.*

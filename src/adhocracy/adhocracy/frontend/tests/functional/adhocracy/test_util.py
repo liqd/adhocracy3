@@ -1,6 +1,9 @@
 import pytest
 
 
+pytestmark = pytest.mark.functional  # mark theses tests as functional tests
+
+
 class TestDeepCp:
 
     @pytest.fixture()

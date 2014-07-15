@@ -8,7 +8,7 @@ import transaction
 
 
 def root_factory(request, t=transaction, g=get_connection,
-                 mark_unfinished_as_finished=False):  # pragma: no cover
+                 mark_unfinished_as_finished=False):
     """ A function which can be used as a Pyramid ``root_factory``.
 
     It accepts a request and returns an instance of the ``Root`` content type.
@@ -40,7 +40,7 @@ def add_after_commit_hooks(request):
                                            args=(registry,))
 
 
-def includeme(config):  # pragma: no cover
+def includeme(config):
     """Setup basic adhocracy."""
     # FIXME: Fix substanced.sdi bug: you need to register the authorisation
     # utility first, then the authentication.

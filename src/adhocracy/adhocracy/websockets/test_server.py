@@ -473,6 +473,7 @@ class ClientTrackerUnitTests(unittest.TestCase):
         assert client2 in result
 
 
+@pytest.mark.functional
 class TestFunctionalClientCommunicator:
 
     @pytest.fixture()

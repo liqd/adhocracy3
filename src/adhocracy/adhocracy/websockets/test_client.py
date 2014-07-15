@@ -177,6 +177,7 @@ class ClientUnitTests(unittest.TestCase):
         assert len(self._dummy_connection.queue) == 2
 
 
+@pytest.mark.functional
 class TestFunctionalClient:
 
     @pytest.fixture()
