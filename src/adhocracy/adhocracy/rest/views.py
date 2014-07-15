@@ -78,10 +78,9 @@ def validate_request_data(context, request: Request, schema=MappingSchema(),
     :raises _JSONError: HTTP 400 for bad request data.
 
     """
-    if schema:
-        schema_with_binding = schema.bind(context=context, request=request)
-        schema_cornice = _CorniceSchemaAdapter(schema_with_binding)
-        validate_colander_schema(schema_cornice, request)
+    schema_with_binding = schema.bind(context=context, request=request)
+    schema_cornice = _CorniceSchemaAdapter(schema_with_binding)
+    validate_colander_schema(schema_cornice, request)
     for val in extra_validators:
         val(context, request)
     if request.errors:
@@ -409,23 +408,6 @@ class MetaApiView(RESTView):
 
             resource_map[name] = prop_map
         return resource_map
-
-    def _sheet_field_creatable_or_editable(self, sheetname: str,
-                                           fieldname: str,
-                                           default: bool) -> bool:
-        """Hook that allows modifying the read-only status for fields.
-
-        This allows setting a field none editable and none creatable even
-        if the  whole sheet is editable/creatable in the backend.
-
-        FIXME: this is just a cosmetic ad-hoc solution since the read-only
-        status in the backend is not affected.
-        """
-        if (sheetname, fieldname) == ('adhocracy.sheets.versions.IVersionable',
-                                      'followed_by'):
-            return False
-        else:
-            return default
 
     def _describe_sheets(self, sheet_metadata):
         """Build a description of the sheets used in the system.

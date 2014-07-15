@@ -23,7 +23,7 @@ def root_factory(request, t=transaction, g=get_connection,
         app_root = registry.content.create('Root')
         zodb_root['app_root'] = app_root
         t.savepoint()  # give app_root a _p_jar
-        if mark_unfinished_as_finished:  # pragma: no cover
+        if mark_unfinished_as_finished:
             markunf(app_root, registry, t)
         t.commit()
     add_after_commit_hooks(request)
@@ -66,7 +66,7 @@ def includeme(config):
     config.include('.frontend')
 
 
-def main(global_config, **settings):  # pragma: no cover
+def main(global_config, **settings):
     """ Return a Pyramid WSGI application. """
     config = Configurator(settings=settings, root_factory=root_factory)
     includeme(config)

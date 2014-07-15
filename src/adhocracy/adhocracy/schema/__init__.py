@@ -261,20 +261,6 @@ class SetOfPaths(AbstractIterableOfPaths):
         appstruct.add(element)
 
 
-def get_all_resources(node, context):
-    """Return List with all resources."""
-    return []
-    # FIXME: we need this to make the sdi work
-    # interfaces = [node.interfaces]
-    # catalog = find_catalog(context, 'system')
-    # if catalog:
-    #     interfaces = catalog['interfaces']
-    #     docs = interfaces.eq(interface).execute().all()
-    #     return map(lambda x: (get_oid(x), getattr(x, 'name', None) or
-    #                           x.__name__),
-    #                [d for d in docs if d])
-
-
 class AbstractReferenceIterable(AdhocracySchemaNode):
 
     """Abstract Colander SchemaNode to store multiple references.
@@ -288,11 +274,6 @@ class AbstractReferenceIterable(AdhocracySchemaNode):
     default = []
     missing = colander.drop
     reftype = SheetReference
-    choices_getter = get_all_resources
-
-    def _get_choices(self):
-        context = self.bindings['context']
-        return self.choices_getter(context)
 
     def validator(self, node, value):
         """Validate."""

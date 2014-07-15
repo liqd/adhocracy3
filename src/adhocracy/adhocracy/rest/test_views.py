@@ -91,33 +91,36 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
         self.request.body = '{"wilddata": "1"}'
         self.request.method = 'wrong_method'
         self._make_one(self.context, self.request)
-        wanted = {}
-        assert self.request.validated == wanted
+        assert self.request.validated == {}
 
     def test_valid_no_schema_with_data(self):
         self.request.body = '{"wilddata": "1"}'
         self._make_one(self.context, self.request)
-        wanted = {}
-        assert self.request.validated == wanted
+        assert self.request.validated == {}
 
     def test_valid_with_schema_no_data(self):
         self.request.body = ''
         self._make_one(self.context, self.request, schema=CountSchema())
-        wanted = {}
-        assert self.request.validated == wanted
+        assert self.request.validated == {}
 
     def test_valid_with_schema_no_data_empty_dict(self):
         schema = CountSchema
         self.request.body = '{}'
         self._make_one(schema, self.request)
-        wanted = {}
-        assert self.request.validated == wanted
+        assert self.request.validated == {}
 
     def test_valid_with_schema_with_data(self):
         self.request.body = '{"count": "1"}'
         self._make_one(self.context, self.request, schema=CountSchema())
-        wanted = {'count': 1}
-        assert self.request.validated == wanted
+        assert self.request.validated == {'count': 1}
+
+    def test_valid_with_schema_with_data_in_querystring(self):
+        class QueryStringSchema(colander.MappingSchema):
+            count = colander.SchemaNode(colander.Int(),
+                                        location='querystring')
+        self.request.GET = {'count': 1}
+        self._make_one(self.context, self.request, schema=QueryStringSchema())
+        assert self.request.validated == {'count': 1}
 
     def test_non_valid_with_schema_wrong_data(self):
         from cornice.util import _JSONError

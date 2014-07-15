@@ -1,6 +1,6 @@
 import unittest
 
-from pyramid.testing import DummyResource
+from pyramid import testing
 
 
 class DummyClient():
@@ -17,8 +17,8 @@ class DummyClient():
 
 
 def _create_dummy_event_with_client(ws_client):
-    registry = DummyResource(ws_client=ws_client)
-    event = DummyResource(registry=registry,
+    registry = testing.DummyResource(ws_client=ws_client)
+    event = testing.DummyResource(registry=registry,
                           object=None)
     return event
 
@@ -77,3 +77,23 @@ class ResourceModifiedSubscriberUnitTests(unittest.TestCase):
         event = _create_dummy_event_with_client(None)
         event.registry = None
         assert self._call_fut(event) is None
+
+
+class IncludemeIntegrationTest(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+        self.config.include('adhocracy.websockets.subscriber')
+        self.handlers = [x.handler.__name__ for x
+                         in self.config.registry.registeredHandlers()]
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_register_created_subscriber(self):
+        from adhocracy.websockets.subscriber import resource_created_and_added_subscriber
+        assert resource_created_and_added_subscriber.__name__ in self.handlers
+
+    def test_register_modified_subscriber(self):
+        from adhocracy.websockets.subscriber import resource_modified_subscriber
+        assert resource_modified_subscriber.__name__ in self.handlers
