@@ -4,50 +4,62 @@ export class User {
     token : string;
 
     constructor(public $http : ng.IHttpService, public $window : Window, public Modernizr) {
-        if (this.Modernizr.localstorage) {
-            if (this.$window.localStorage.getItem("user-token") !== null) {
+        var _self : User = this;
+
+        if (_self.Modernizr.localstorage) {
+            if (_self.$window.localStorage.getItem("user-token") !== null) {
                 // FIXME: check if user-token is still valid and get user data from server
-                this.setToken(this.$window.localStorage.getItem("user-token"));
-                this.loggedIn = true;
+                _self.setToken(this.$window.localStorage.getItem("user-token"));
+                _self.loggedIn = true;
             }
         }
     }
 
     private setToken(token : string) {
-        this.token = token;
-        this.$http.defaults.headers.common["X-User-Token"] = token;
-        if (this.Modernizr.localstorage) {
-            this.$window.localStorage.setItem("user-token", token);
+        var _self : User = this;
+
+        _self.token = token;
+        _self.$http.defaults.headers.common["X-User-Token"] = token;
+        if (_self.Modernizr.localstorage) {
+            _self.$window.localStorage.setItem("user-token", token);
         } else {
             console.log("session could not be persisted");
         }
     }
 
     private deleteToken() {
-        if (this.Modernizr.localstorage) {
-            this.$window.localStorage.removeItem("user-token");
+        var _self : User = this;
+
+        if (_self.Modernizr.localstorage) {
+            _self.$window.localStorage.removeItem("user-token");
         }
-        delete this.$http.defaults.headers.common["X-User-Token"];
-        this.token = undefined;
+        delete _self.$http.defaults.headers.common["X-User-Token"];
+        _self.token = undefined;
     }
 
     logIn(nameOrEmail : string, password : string) {
+        var _self : User = this;
+
         // FIXME this is only a dummy implementation
-        this.name = nameOrEmail;
-        this.setToken(nameOrEmail);
-        this.loggedIn = true;
+        _self.name = nameOrEmail;
+        _self.setToken(nameOrEmail);
+        _self.loggedIn = true;
     }
 
     logOut() {
+        var _self : User = this;
+
         // FIXME this is only a dummy implementation
-        this.loggedIn = false;
-        this.deleteToken();
-        this.name = undefined;
+        _self.loggedIn = false;
+        _self.deleteToken();
+        _self.name = undefined;
     }
 
     can(permission : string) {
+        var _self : User = this;
+
         // FIXME this is only a dummy implementation
-        return this.loggedIn;
+        return _self.loggedIn;
     }
 }
 
