@@ -20,6 +20,7 @@ from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISimple
 from adhocracy.interfaces import IPool
+from adhocracy.interfaces import ILocation
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
 from adhocracy.rest.schemas import POSTItemRequestSchema
@@ -63,8 +64,8 @@ def validate_post_root_versions(context, request: Request):
     request.validated['root_versions'] = root_resources
 
 
-def validate_request_data(context, request: Request, schema=MappingSchema(),
-                          extra_validators=[]):
+def validate_request_data(context: ILocation, request: Request,
+                          schema=MappingSchema(), extra_validators=[]):
     """ Validate request data.
 
     :param context: passed to validator functions
@@ -78,7 +79,9 @@ def validate_request_data(context, request: Request, schema=MappingSchema(),
     :raises _JSONError: HTTP 400 for bad request data.
 
     """
-    schema_with_binding = schema.bind(context=context, request=request)
+    parent = context if request.method == 'POST' else context.__parent__
+    schema_with_binding = schema.bind(context=context, request=request,
+                                      parent_pool=parent)
     schema_cornice = _CorniceSchemaAdapter(schema_with_binding)
     validate_colander_schema(schema_cornice, request)
     for val in extra_validators:

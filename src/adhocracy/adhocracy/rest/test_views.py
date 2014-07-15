@@ -104,9 +104,8 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
         assert self.request.validated == {}
 
     def test_valid_with_schema_no_data_empty_dict(self):
-        schema = CountSchema
         self.request.body = '{}'
-        self._make_one(schema, self.request)
+        self._make_one(self.context, self.request, schema=CountSchema())
         assert self.request.validated == {}
 
     def test_valid_with_schema_with_data(self):

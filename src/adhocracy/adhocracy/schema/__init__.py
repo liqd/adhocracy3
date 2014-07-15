@@ -73,24 +73,35 @@ def deserialize_path(node, value):
     return resource
 
 
-def name_is_unique_validator(node: colander.SchemaNode, value: str):
+def validate_name_is_unique(node: colander.SchemaNode, value: str):
     """Validate if `value` is name that does not exists in the parent object.
 
-    Node must a have a `context` binding object with an __parent__ attribute
-    that points to a dictionary like object.
+    Node must a have a `parent_pool` binding object attribute
+    that points to the parent pool object :class:`adhocracy.interfaces.IPool`.
 
     :raises colander.Invalid: if `name` already exists in the parent or parent
                               is None.
     """
-    context = node.bindings.get('context')
-    parent = context.__parent__
-    if parent is None:
-        msg = 'This resource has no parent pool to validate that the name is'\
-              ' unique'
+    parent = node.bindings.get('parent_pool', None)
+    try:
+        parent.check_name(value)
+    except AttributeError:
+        msg = 'This resource has no parent pool to validate the name.'
         raise colander.Invalid(node, msg)
-    if value in parent:
-        msg = 'The name "{0}" already exists in the parent pool.'.format(value)
-        raise colander.Invalid(node, msg)
+    except KeyError:
+        msg = 'The name already exists in the parent pool.'
+        raise colander.Invalid(node, msg, value=value)
+    except ValueError:
+        msg = 'The name has forbidden characters or is not a string.'
+        raise colander.Invalid(node, msg, value=value)
+
+
+@colander.deferred
+def deferred_validate_name(node: colander.SchemaNode, kw: dict) -> callable:
+    """Check that the node value is a valid child name."""
+    return colander.All(colander.Regex(u'^[a-zA-Z0-9\_\-\.]+$'),
+                        colander.Length(min=1, max=100),
+                        validate_name_is_unique)
 
 
 class Name(AdhocracySchemaNode):
@@ -101,14 +112,14 @@ class Name(AdhocracySchemaNode):
     The maximal length is 100 characters, the minimal length 1.
 
     Example value: blu.ABC_12-3
+
+    This node needs a `parent_pool` binding to validate.
     """
 
     schema_type = colander.String
     default = '',
     missing = colander.drop
-    validator = colander.All(colander.Regex(u'^[a-zA-Z0-9\_\-\.]+$'),
-                             colander.Length(min=1, max=100),
-                             name_is_unique_validator)
+    validator = deferred_validate_name
 
 
 class Email(AdhocracySchemaNode):

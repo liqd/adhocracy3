@@ -1,4 +1,5 @@
 import unittest
+from mock import Mock
 
 from pyramid import testing
 import colander
@@ -45,29 +46,22 @@ class AdhocracySchemaNodeUnitTest(unittest.TestCase):
 class NameUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.parent = testing.DummyResource()
-        self.context = testing.DummyResource(__parent__=self.parent)
+        self.parent = Mock()
 
     def _make_one(self):
         from adhocracy.schema import Name
         inst = Name()
-        return inst.bind(context=self.context)
+        return inst.bind(parent_pool=self.parent)
 
     def test_valid(self):
         inst = self._make_one()
         assert inst.deserialize('blu.ABC_12-3')
 
-    def test_no_valid_missing_context_binding(self):
+    def test_non_valid_missing_parent_pool_binding(self):
         inst = self._make_one()
         inst_no_context = inst.bind()
-        with pytest.raises(AttributeError):
-            inst_no_context.deserialize('blu.ABC_123')
-
-    def test_no_valid_parent_is_none(self):
-        inst = self._make_one()
-        self.context.__parent__ = None
         with pytest.raises(colander.Invalid):
-            inst.deserialize('blu.ABC_123')
+            inst_no_context.deserialize('blu.ABC_123')
 
     def test_non_valid_empty(self):
         inst = self._make_one()
@@ -86,9 +80,15 @@ class NameUnitTest(unittest.TestCase):
 
     def test_non_valid_not_unique(self):
         inst = self._make_one()
-        self.context.__parent__['name'] = testing.DummyRequest()
+        self.parent.check_name.side_effect = KeyError
         with pytest.raises(colander.Invalid):
             inst.validator(inst, 'name')
+
+    def test_non_valid_forbbiden_child_name(self):
+        inst = self._make_one()
+        self.parent.check_name.side_effect = ValueError
+        with pytest.raises(colander.Invalid):
+            inst.validator(inst, '@@')
 
 
 class EmailUnitTest(unittest.TestCase):

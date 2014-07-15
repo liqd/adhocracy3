@@ -183,6 +183,7 @@ class AddPostRequestSubSchemasUnitTest(unittest.TestCase):
 
         assert len(self.node.children) == 1
         assert self.node.children[0].name == ISheetA.__identifier__
+        assert self.node.children[0].bindings == self.context_and_request_dict
 
 
 class POSTItemRequestSchemaUnitTest(unittest.TestCase):

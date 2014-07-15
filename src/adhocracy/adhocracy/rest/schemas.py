@@ -45,7 +45,7 @@ def add_put_data_subschemas(node: colander.MappingSchema, kw: dict):
     sheets_metadata = request.registry.content.sheets_metadata()
     for name in [x for x in sheets if x in data]:
         subschema = sheets_metadata[name].schema_class(name=name)
-        node.add(subschema.bind(context=context, request=request))
+        node.add(subschema.bind(**kw))
 
 
 class PUTResourceRequestSchema(colander.Schema):
@@ -78,7 +78,7 @@ def add_post_data_subschemas(node: colander.MappingSchema, kw: dict):
         schema = sheets_metadata[name].schema_class(name=name, missing={})
         subschemas.append(schema)
     for schema in subschemas:
-        node.add(schema.bind(context=context, request=request))
+        node.add(schema.bind(**kw))
 
 
 @colander.deferred

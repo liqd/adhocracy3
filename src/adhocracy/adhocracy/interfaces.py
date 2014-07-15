@@ -202,11 +202,12 @@ class IPool(IResource):  # pragma: no cover
         """
 
     def check_name(name: str) -> str:
-        """ Check and modify the name passed for validity.
+        """ Check and the name passed for validity.
 
-        :returns: The name (with any needed modifications).
+        :returns: The name.
         :raises substanced.folder.FolderKeyError:
             if 'name' already exists in this pool.
+        :raises ValueError: if 'name' contains '@@', slashes or is empty.
         """
 
     def next_name(subobject, prefix='') -> str:
