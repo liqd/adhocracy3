@@ -3,8 +3,8 @@ export class User {
     name : string;
     token : string;
 
-    constructor(public $http : ng.IHttpService, public cookies) {
-        if (typeof this.cookies.get("user-token")) {
+    constructor(public $http : ng.IHttpService, public $window : Window, public Modernizr) {
+        if (this.$window.localStorage.getItem("user-token") !== null) {
             // FIXME: check if user-token is still valid and get user data from server
         }
     }
@@ -12,15 +12,15 @@ export class User {
     private setToken(token : string) {
         this.token = token;
         this.$http.defaults.headers.common["X-User-Token"] = token;
-        if (this.cookies.enabled) {
-            this.cookies.set("user-token", token);
+        if (this.Modernizr.localstorage) {
+            this.$window.localStorage.setItem("user-token", token);
         } else {
             console.log("session could not be persisted");
         }
     }
 
     private deleteToken() {
-        this.cookies.expire("user-token");
+        this.$window.localStorage.removeItem("user-token");
         delete this.$http.defaults.headers.common["X-User-Token"];
         this.token = undefined;
     }
