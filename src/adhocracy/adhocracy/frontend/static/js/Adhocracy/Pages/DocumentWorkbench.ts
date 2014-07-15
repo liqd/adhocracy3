@@ -5,7 +5,7 @@
 /// <reference path="../../_all.d.ts"/>
 
 import angular = require("angular");
-import angularRoute = require("angularRoute");  angularRoute;
+import angularRoute = require("angularRoute");  angularRoute = angularRoute;
 // (since angularRoute does not export any objects or types we would
 // want to use, the extra mention of the module name is needed to keep
 // tsc from purging this import entirely.  which would have undesired
