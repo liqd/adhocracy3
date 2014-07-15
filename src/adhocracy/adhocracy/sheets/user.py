@@ -9,7 +9,7 @@ from adhocracy.sheets import GenericResourceSheet
 from adhocracy.schema import Email
 from adhocracy.schema import TimeZoneName
 from adhocracy.schema import Password
-from adhocracy.schema import String
+from adhocracy.schema import SingleLine
 
 
 class IUserBasic(ISheet):
@@ -26,7 +26,7 @@ class UserBasicSchema(colander.MappingSchema):
     """
 
     email = Email()
-    display_name = String()
+    display_name = SingleLine()
     tzname = TimeZoneName()
 
 

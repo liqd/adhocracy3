@@ -464,7 +464,7 @@ class MetaApiView(RESTView):
                 # just a generic SchemaNode, we use the outer type
                 # as "valuetype" since it provides most specific
                 # information (e.g. "adhocracy.schema.Identifier"
-                # instead of just "String")
+                # instead of just "SingleLIne")
                 if valuetype is not SchemaNode:
                     typ = to_dotted_name(valuetype)
 

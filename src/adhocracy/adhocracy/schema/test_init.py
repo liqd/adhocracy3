@@ -372,8 +372,8 @@ class ReferenceSetSchemaNodeUnitTest(unittest.TestCase):
 class StringUnitTest(unittest.TestCase):
 
     def _make_one(self):
-        from adhocracy.schema import String
-        return String()
+        from adhocracy.schema import SingleLine
+        return SingleLine()
 
     def test_serialize_valid_emtpy(self):
         inst = self._make_one()

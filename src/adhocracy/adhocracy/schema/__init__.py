@@ -317,11 +317,11 @@ def string_has_no_newlines_validator(value: str) -> bool:
     return False if '\n' in value or '\r' in value else True  # noqa
 
 
-class String(colander.SchemaNode):  # noqa
+class SingleLine(colander.SchemaNode):  # noqa
 
-    """ UTF-8 encoded text without line breaks.
+    """ UTF-8 encoded String without line breaks.
 
-    Disallowed characters linebreaks like: \n, \r
+    Disallowed characters are linebreaks like: \n, \r
     Example value: This is a something.
     """
 
@@ -334,7 +334,7 @@ class String(colander.SchemaNode):  # noqa
 
 class Text(AdhocracySchemaNode):
 
-    """ UTF-8 encoded text.
+    """ UTF-8 encoded String with line breaks.
 
     Example value: This is a something
                    with new lines.
