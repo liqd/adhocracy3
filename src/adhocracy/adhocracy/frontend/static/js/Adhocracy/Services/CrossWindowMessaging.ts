@@ -112,10 +112,12 @@ export class Service implements IService {
      *
      * The following options come to mind:
      *
-     * - polling (check for changes on regular intervals using $interval)
-     * - angular's $watch
-     * - triggering a resize manually whenever we change something
-     * - CSS hack: https://marcj.github.io/css-element-queries/
+     * 1. polling (check for changes on regular intervals using $interval)
+     * 2. angular's $watch
+     * 3. triggering a resize manually whenever we change something
+     * 4. CSS hack: https://marcj.github.io/css-element-queries/
+     *
+     * This function uses 2. and 3.
      */
     private manageResize() : void {
         var _self : Service = this;
