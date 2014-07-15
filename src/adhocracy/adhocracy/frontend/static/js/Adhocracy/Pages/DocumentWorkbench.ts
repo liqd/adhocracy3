@@ -89,7 +89,8 @@ export var run = (config) => {
 
     // application-specific (local) directives
 
-    app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", Directives.adhDocumentWorkbench]);
+    // adhCrossWindowMessaging does work by itself. We only need to inject in anywhere in order to instantiate it.
+    app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", "adhCrossWindowMessaging", Directives.adhDocumentWorkbench]);
     app.directive("adhProposalVersionDetail", ["adhConfig", Directives.adhProposalVersionDetail]);
     app.directive("adhProposalVersionEdit", ["adhConfig", Directives.adhProposalVersionEdit]);
     app.directive("adhProposalVersionNew", ["adhHttp", "adhConfig", "adhResources", Directives.adhProposalVersionNew]);
