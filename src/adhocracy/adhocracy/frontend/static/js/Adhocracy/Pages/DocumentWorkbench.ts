@@ -44,6 +44,11 @@ export var run = (config) => {
                 // FIXME: proper error template
                 template: "<h1>404 - not Found</h1>"
             });
+
+        // Make sure HTML5 history API works.  (If support for older
+        // browsers is required, we may have to study angular support
+        // for conversion between history API and #!-URLs.  See
+        // angular documentation for details.)
         $locationProvider.html5Mode(true);
     }]);
 
