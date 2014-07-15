@@ -61,6 +61,37 @@ class PrincipalIntegrationTest(unittest.TestCase):
         assert IUser.providedBy(inst)
         assert isinstance(inst, User)
 
+    def test_create_and_add_user(self):
+        from adhocracy.resources.principal import IPrincipalsPool
+        from adhocracy.resources.principal import IUser
+        from adhocracy.sheets.user import IPasswordAuthentication
+        from adhocracy.sheets.user import IUserBasic
+
+        self.config.include('adhocracy.sheets.user')
+
+        principals_pool = self.config.registry.content.create(
+            IPrincipalsPool.__identifier__)
+        users_pool = principals_pool['users']
+        appstructs = {
+            IUserBasic.__identifier__ : {
+                'name': 'Anna Müller',
+                'email': 'anna@example.org'
+            },
+            IPasswordAuthentication.__identifier__ : {
+                'password': 'fodThyd2'
+            },
+        }
+        inst = self.config.registry.content.create(IUser.__identifier__,
+                                                   parent=users_pool,
+                                                   appstructs=appstructs)
+
+        got_it = False
+        for child in users_pool:
+            if users_pool[child] == inst:
+                got_it = True
+                break
+        assert got_it
+
 
 class UserUnitTest(unittest.TestCase):
 
