@@ -249,11 +249,6 @@ class AddSheetToRegistryIntegrationTest(unittest.TestCase):
         with pytest.raises(AssertionError):
             self._make_one(self.metadata, self.config.registry)
 
-    def test_register_non_valid_schema_without_missing_values(self):
-        del self.metadata.schema_class.__class_schema_nodes__[0].missing
-        with pytest.raises(AssertionError):
-            self._make_one(self.metadata, self.config.registry)
-
     def test_register_non_valid_non_mapping_schema(self):
         metadata_a = self.metadata._replace(schema_class=colander.TupleSchema)
         with pytest.raises(AssertionError):
