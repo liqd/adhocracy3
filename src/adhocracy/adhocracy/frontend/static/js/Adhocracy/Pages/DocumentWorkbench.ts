@@ -55,7 +55,7 @@ export var run = (config) => {
     app.value("Modernizr", modernizr);
 
     app.service("adhResources", Resources.Service);
-    app.service("adhUser", AdhUser.User);
+    app.service("adhUser", ["$http", "$window", "Modernizr", AdhUser.User]);
     app.directive("adhLogin", ["adhUser", AdhUser.loginDirective]);
     app.value("adhConfig", config);
     app.factory("adhDone", AdhDone.factory);
