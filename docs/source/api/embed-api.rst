@@ -10,7 +10,7 @@ SDK snippet
 -----------
 
 - Bootstraps everything, initializes widgets
-- Defines used Adhocracy version
+- Select Adhocracy version to be used
 - Opens `adhocracy` namespace
 - Resizes widgets on the fly
 
