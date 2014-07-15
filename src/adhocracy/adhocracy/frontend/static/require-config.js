@@ -7,7 +7,6 @@ require.config({
         angularRoute: "../lib/angular-route/angular-route",
         underscore: "../lib/underscore/underscore",
         q: "../lib/q/q",
-        cookies: "../lib/Cookies/dist/cookies.min",
         modernizr: "../lib2/modernizr/modernizr-2.8.3.min"
     },
     shim: {
@@ -22,9 +21,6 @@ require.config({
         },
         underscore: {
             exports: "_"
-        },
-        cookies: {
-            exports: "cookies"
         },
         modernizr: {
             exports: "Modernizr"

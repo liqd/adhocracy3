@@ -2,13 +2,11 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
-/// <reference path="../../../lib/Cookies/src/cookies.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
 import angular = require("angular");
 import angularRoute = require("angularRoute");
 import modernizr = require("modernizr");
-import cookies = require("cookies");
 
 import AdhHttp = require("../Services/Http");
 import AdhWebSocket = require("../Services/WebSocket");
@@ -52,7 +50,6 @@ export var run = (config) => {
     }]);
 
     app.value("Modernizr", modernizr);
-    app.value("cookies", cookies);
 
     app.service("adhResources", Resources.Service);
     app.service("adhUser", ["$http", "$window", "Modernizr", AdhUser.User]);
