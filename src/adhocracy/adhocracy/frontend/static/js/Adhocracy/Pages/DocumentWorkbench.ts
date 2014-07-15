@@ -5,7 +5,12 @@
 /// <reference path="../../_all.d.ts"/>
 
 import angular = require("angular");
-import angularRoute = require("angularRoute");
+import angularRoute = require("angularRoute");  angularRoute = angularRoute;
+// (since angularRoute does not export any objects or types we would
+// want to use, the extra mention of the module name is needed to keep
+// tsc from purging this import entirely.  which would have undesired
+// runtime effects.)
+
 import modernizr = require("modernizr");
 
 import AdhHttp = require("../Services/Http");
@@ -25,13 +30,6 @@ import Embed = require("../Embed");
 export var run = (config) => {
     "use strict";
 
-    // FIXME: angularRoute is not used directly.  Instead, it registers the "ngRoute" angular
-    // module.  But TypeScript will strip any imports that are not used.  So we have to use it
-    // somehow.
-    if (angularRoute) {
-        console.log("angularRoute is " + angularRoute);
-    }
-
     var app = angular.module("adhocracy3SampleFrontend", ["ngRoute"]);
 
     app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
@@ -46,6 +44,11 @@ export var run = (config) => {
                 // FIXME: proper error template
                 template: "<h1>404 - not Found</h1>"
             });
+
+        // Make sure HTML5 history API works.  (If support for older
+        // browsers is required, we may have to study angular support
+        // for conversion between history API and #!-URLs.  See
+        // angular documentation for details.)
         $locationProvider.html5Mode(true);
     }]);
 
@@ -86,6 +89,7 @@ export var run = (config) => {
 
     // application-specific (local) directives
 
+    // adhCrossWindowMessaging does work by itself. We only need to inject in anywhere in order to instantiate it.
     app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", "adhCrossWindowMessaging", Directives.adhDocumentWorkbench]);
     app.directive("adhProposalVersionDetail", ["adhConfig", Directives.adhProposalVersionDetail]);
     app.directive("adhProposalVersionEdit", ["adhConfig", Directives.adhProposalVersionEdit]);
