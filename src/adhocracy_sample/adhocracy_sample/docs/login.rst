@@ -33,11 +33,9 @@ Test that the relevant resources and sheets exist:
 User Creation (Registration)
 ----------------------------
 
-FIXME the remaining doctests in this document don't work yet.
-
 A new user is registered by creating a user object under the
-``/principals/users`` pool. On success, the response contains the path of
-the new user::
+``/adhocracy/principals/users`` pool. On success, the response contains the
+path of the new user::
 
     >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
     ...         'data': {
@@ -46,10 +44,10 @@ the new user::
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy.sheets.user.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp_data = testapp.post_json("/principals/users", prop).json
-    >>> resp_data["adhocracy.resources.principal.IUser"]
-    'adhocracy.resources.pool.IBasicPool'
-    >>> resp_data["path"].startswith('/principals/users/')
+    >>> resp_data = testapp.post_json("/adhocracy/principals/users", prop).json
+    >>> resp_data["content_type"]
+    'adhocracy.resources.principal.IUser'
+    >>> resp_data["path"].startswith('/adhocracy/principals/users/00')
     True
 
 The "name" field in the "IUserBasic" schema is a non-empty string that
@@ -68,8 +66,8 @@ future story.
 Creating a new user will not automatically log them in. The frontend need to
 send an explicit login request afterwards.
 
-On failure, the backend responds with an error message. E.g. when we try to
-register a user with an empty password::
+On failure, the backend responds with status code 400 and an error message.
+E.g. when we try to register a user with an empty password::
 
     >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
     ...         'data': {
@@ -78,11 +76,15 @@ register a user with an empty password::
     ...                  'email': 'annina@example.org'},
     ...              'adhocracy.sheets.user.IPasswordAuthentication': {
     ...                  'password': ''}}}
-    >>> resp_data = testapp.post_json("/principals/users", prop).json
-    { 'status': 'error', 'errors': [...] }
+    >>> resp_data = testapp.post_json("/adhocracy/principals/users", prop,
+    ...                               status=400).json
+    >>> pprint(resp_data)
+    {'errors': [['body', 'password', 'Required']], 'status': 'error'}
 
-<errors> is a list of errors. FIXME more on what can go wrong and how it's
-reported. Tentatively, the following error conditions can happen:
+<errors> is a list of errors. The above error indicates that a required
+field (the password field) is missing or empty.  FIXME more on what can go
+wrong and how it's reported. Tentatively, the following error conditions can
+ happen:
 
   * username does already exist
   * email does already exist
@@ -121,15 +123,17 @@ several additional sheets, e.g.::
 User Login
 ----------
 
+FIXME the remaining doctests in this document don't work yet.
+
 To log-in an existing user via password, the frontend sends a JSON request
 to the URL ``login_username`` with a user name and password::
 
     >>> prop = {'name': 'Anna Müllerin',
-    ...         'password': 'Inawgoywyk2'}}}
+    ...         'password': 'Inawgoywyk2'}
     >>> resp_data = testapp.post_json('/login_username', prop).json
     >>> pprint(resp_data)
     {'status': 'success',
-     'user_path': '/principals/users/...',
+     'user_path': '/adhocracy/principals/users/...',
      'user_token': '...'
      }
     >>> user_token_via_username = resp_data['user_token']
@@ -141,7 +145,7 @@ Or to ``login_email``, specifying the user's email address instead of name::
     >>> resp_data = testapp.post_json('/login_username', prop).json
     >>> pprint(resp_data)
     {'status': 'success',
-     'user_path': '/principals/users/...',
+     'user_path': '/adhocracy/principals/users/...',
      'user_token': '...'
     }
     >>> user_token_via_email = resp_data['user_token']
