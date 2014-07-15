@@ -7,6 +7,10 @@ from adhocracy.frontend.tests.unit.console import Formatter
 
 class TestJasmine:
 
+    # phantomjs does not provide Function.prototype.bind:
+    # https://github.com/ariya/phantomjs/issues/10522
+    # a3 provides a poly-fill to deal with this (see commit c0d0cd3).
+
     def test_all(self, browser_test):
         def jasmineFinished(browser):
             js = 'jsApiReporter.finished'
