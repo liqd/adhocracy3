@@ -6,6 +6,8 @@ export class User {
     constructor(public $http : ng.IHttpService, public $window : Window, public Modernizr) {
         if (this.$window.localStorage.getItem("user-token") !== null) {
             // FIXME: check if user-token is still valid and get user data from server
+            this.setToken(this.$window.localStorage.getItem("user-token"));
+            this.loggedIn = true;
         }
     }
 
