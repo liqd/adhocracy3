@@ -41,8 +41,6 @@ principals_metadata = pool_metadata._replace(
     iresource=IPrincipalsPool,
     after_creation=[create_initial_content_for_principals] +
     pool_metadata.after_creation,
-    basic_sheets=[IUserBasic],
-    extended_sheets=[IPasswordAuthentication],
     element_types=[]  # we don't want the frontend to post resources here
 )
 
@@ -74,7 +72,10 @@ class User(Pool):
 user_metadata = pool_metadata._replace(
     iresource=IUser,
     content_class=User,
-    element_types=[]  # we don't want the frontend to post resources here
+    basic_sheets=[IUserBasic],
+    extended_sheets=[IPasswordAuthentication],
+    element_types=[],  # we don't want the frontend to post resources here
+    use_autonaming=True
 )
 
 
