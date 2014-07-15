@@ -12,18 +12,21 @@
  * Messages sent between the two are always of type IMessage.  Currentently the following
  * messages exists:
  *
- * name: "resize"
+ * name: "resize"  // from SDK to iframes
  * data: {
  *   height: number
  * }
  *
- * name: "requestSetup"
+ * name: "requestSetup"  // from SDK to iframes
  * data: {}
  *
- * name: "setup"
+ * name: "setup"  // sent from SDK to iframes
  * data: {
  *   embedderOrigin: string
  * }
+ *
+ * Message handler callbacks for to-iframes messages are registered by
+ * the service factory.
  *
  * Messages are serialized with JSON.stringify before being sent via
  * window.postMessage().  (Reason: browser compatibility; IE prior to
@@ -112,10 +115,13 @@ export class Service implements IService {
      *
      * The following options come to mind:
      *
-     * - polling (check for changes on regular intervals using $interval)
-     * - angular's $watch
-     * - triggering a resize manually whenever we change something
-     * - CSS hack: https://marcj.github.io/css-element-queries/
+     * 1. polling (check for changes on regular intervals using $interval)
+     * 2. angular's $watch
+     * 3. triggering a resize manually whenever we change something
+     * 4. CSS hack: https://marcj.github.io/css-element-queries/
+     *
+     * This function uses 2. in combination with the window resize event to
+     * also catch changes triggered by the embedder.
      */
     private manageResize() : void {
         var _self : Service = this;

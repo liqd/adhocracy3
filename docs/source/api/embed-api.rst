@@ -10,7 +10,7 @@ SDK snippet
 -----------
 
 - Bootstraps everything, initializes widgets
-- Defines used Adhocracy version
+- Select Adhocracy version to be used
 - Opens `adhocracy` namespace
 - Resizes widgets on the fly
 
@@ -19,12 +19,19 @@ Example::
     <script type="text/javascript" src="https://adhocracy.lan/frontend_static/js/AdhocracySDK.js"></script>
     <script type="text/javascript">
         adhocracy.init('http://adhocracy.lan', function(adhocracy) {
-            adhocracy.embed('#adhocracy_marker');
-            // Not part of embed snipped. Only here for testing.
-            document.getElementsByClassName("adhocracy-embed")[0].id = "adhocracy-iframe";
+            adhocracy.embed('.adhocracy_marker');
         });
     </script>
 
+One or more markers can appear anywhere in the document::
+
+    <div class="adhocracy_marker"
+         data-widget="document-workbench">
+    </div>
+    <div class="adhocracy_marker"
+         data-widget="paragraph-version-detail"
+         data-ref="..." data-viewmode="display">
+    </div>
 
 Widget markers
 --------------
