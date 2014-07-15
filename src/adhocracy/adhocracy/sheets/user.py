@@ -23,9 +23,9 @@ class UserBasicSchema(colander.MappingSchema):
     `name`: visible name
     """
 
-    email = Email()
+    email = Email(missing=colander.required)
     name = colander.SchemaNode(colander.String(),
-                               missing=colander.drop,
+                               missing=colander.required,
                                default='')
     tzname = TimeZoneName()
 
@@ -50,7 +50,7 @@ class PasswordAuthenticationSchema(colander.MappingSchema):
 
     password = colander.SchemaNode(colander.String(),
                                    default='',
-                                   missing=colander.drop,
+                                   missing=colander.required,
                                    validator=colander.Length(min=6, max=100),
                                    )
 
