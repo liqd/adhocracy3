@@ -8,7 +8,7 @@ from substanced.util import set_acl
 from substanced.util import get_acl
 
 
-logger = logging.getLogger('evolution')
+logger = logging.getLogger(__name__)
 
 
 def add_app_root_element(root):
@@ -32,20 +32,8 @@ def add_app_root_permissions(root):
     set_acl(app_root, acl)
 
 
-def add_principals_element(root):
-    """Create and add 'principals' element if it doesn't exist yet."""
-    app_root = root['adhocracy']
-    if 'principals' not in app_root:
-        from adhocracy.resources.principal import IPrincipalsPool
-        reg = get_current_registry()
-        principals = reg.content.create(IPrincipalsPool.__identifier__)
-        app_root['principals'] = principals
-
-
 def includeme(config):  # pragma: no cover
     """Run pyramid configuration."""
     config.add_evolution_step(add_app_root_element)
     config.add_evolution_step(
         add_app_root_permissions, after=add_app_root_element)
-    config.add_evolution_step(
-        add_principals_element, after=add_app_root_permissions)

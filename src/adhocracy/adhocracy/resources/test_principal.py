@@ -27,6 +27,7 @@ class PrincipalIntegrationTest(unittest.TestCase):
         import substanced.principal
         self.config = testing.setUp()
         self.config.include('substanced.content')
+        self.config.include('substanced.evolution')
         self.config.scan(substanced.principal)
         self.config.include('adhocracy.registry')
         self.config.include('adhocracy.resources.principal')
