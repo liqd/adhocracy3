@@ -17,7 +17,7 @@ export var route2template = ($route) => {
         throw "widget not specified";
     }
     if (!Util.isArrayMember(params.widget, embeddableDirectives)) {
-        throw "unknown widget: " + params.widget;
+        throw "widget does not support embedding: " + params.widget;
     }
     for (var key in params) {
         if (params.hasOwnProperty(key) && key !== "widget") {
