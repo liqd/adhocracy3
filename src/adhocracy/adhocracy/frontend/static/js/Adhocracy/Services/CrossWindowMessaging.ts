@@ -120,7 +120,8 @@ export class Service implements IService {
      * 3. triggering a resize manually whenever we change something
      * 4. CSS hack: https://marcj.github.io/css-element-queries/
      *
-     * This function uses 2. and 3.
+     * This function uses 2. in combination with the window resize event to
+     * also catch changes triggered by the embedder.
      */
     private manageResize() : void {
         var _self : Service = this;
