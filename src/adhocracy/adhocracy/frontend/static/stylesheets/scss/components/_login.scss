@@ -1,0 +1,65 @@
+/*doc
+---
+title: Login
+name: login
+category: Widgets
+---
+
+Login Dialog.
+
+```html_example
+<div class="login">
+    <h1 class="title">Log in!</h1>
+    <form class="login-form">
+        <input type="text" name="name" placeholder="email or username" />
+        <input type="password" name="password" placeholder="password" />
+        <a>forgot password</a>
+        <input type="submit" value="login" />
+    </form>
+    <div class="login-description">
+        <p>Description</p>
+        <a class="button">register</a>
+    </div>
+</div>
+```
+*/
+
+.title {
+    font-size: 100%;
+    text-transform: uppercase;
+}
+
+.login {
+    @include container;
+}
+
+.login-form {
+    @include span(3 of 5);
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+    }
+
+    a,
+    input[type="submit"] {
+        @include span(1 of 2);
+        text-align: center;
+
+        &:last-child {
+            margin: 0;  // remove gutter
+        }
+    }
+}
+
+.login-description {
+    @include span(2 of 5);
+    margin: 0;  // remove gutter
+
+    border: 1px solid $border;
+    padding: 1em;
+
+    .button {
+        width: 100%;
+    }
+}

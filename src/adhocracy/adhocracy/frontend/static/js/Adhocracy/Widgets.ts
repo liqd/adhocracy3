@@ -5,7 +5,7 @@
 
 import Types = require("./Types");
 import AdhHttp = require("./Services/Http");
-import AdhWS = require("./Services/WS");
+import AdhWebSocket = require("./Services/WebSocket");
 import AdhConfig = require("./Services/Config");
 
 import Resources = require("./Resources");
@@ -60,16 +60,16 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.templatePath + "/" + _class.templateUrl,
+            templateUrl: adhConfig.template_path + "/" + _class.templateUrl,
             scope: {
                 path: "@",
                 title: "@"
             },
             transclude: true,
-            controller: ["$scope", "adhHttp", "adhWS", "adhDone", (
+            controller: ["$scope", "adhHttp", "adhWebSocket", "adhDone", (
                 $scope: ListingScope<Container>,
                 adhHttp: AdhHttp.IService<Container>,
-                adhWS: AdhWS.Type,
+                adhWebSocket: AdhWebSocket.IService,
                 adhDone
             ) : void => {
                 var getHandler = (pool: Container): void => {
@@ -77,7 +77,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                     $scope.elements = _self.containerAdapter.elemRefs($scope.container);
                 };
 
-                var wsHandler = (event: AdhWS.ServerEvent): void => {
+                var wsHandler = (event: AdhWebSocket.IServerEvent): void => {
                     adhHttp.get($scope.path).then(getHandler);
                 };
 
@@ -85,7 +85,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
                 // the updates, *then* get an initial copy.)
 
                 try {
-                    adhWS.register($scope.path, wsHandler);
+                    adhWebSocket.register($scope.path, wsHandler);
 
                     // FIXME: subscribe returns an id, and we need to
                     // unsubscribe when the listing is shut down.  how
@@ -169,7 +169,7 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.templatePath + "/" + _class.templateUrl,
+            templateUrl: adhConfig.template_path + "/" + _class.templateUrl,
             scope: {
                 path: "@"
             },

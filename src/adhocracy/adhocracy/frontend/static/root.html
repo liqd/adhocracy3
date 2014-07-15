@@ -6,9 +6,7 @@
         <link rel="stylesheet" href="/frontend_static/stylesheets/a3.css" />
     </head>
     <body>
-        <div>
-            <adh-document-workbench></adh-document-workbench>
-        </div>
+        <div data-ng-view=""></div>
 
         <script type="text/javascript"
                 src="/frontend_static/lib/requirejs/require.js"></script>
@@ -18,9 +16,10 @@
                 src="/frontend_static/lib/jquery/jquery.js"></script>  <!-- only needed for $(document in this html file) -->
 
         <script type="text/javascript">
-            require(['Adhocracy'], function(Adh) {
+            require(['Adhocracy', 'text!/frontend_config.json'], function(Adh, config_string) {
+                var config = JSON.parse(config_string);
                 $(document).ready(function() {
-                    Adh.init();
+                    Adh.init(config);
                 });
 
                 $(document).load(function() {

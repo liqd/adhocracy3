@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+    <head>
+        <title>adhocracy embedder</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <p>this is an embedding web page.  make sure you run
+        everything on localhost (browser and all server processes),
+        and that you have the following entry in your /etc/hosts:</p>
+
+        <pre>
+            127.0.0.1 adhocracy.embeddee.goo adhocracy.embedder.gaa
+        </pre>
+
+        <!-- begin embed snipped -->
+        <script type="text/javascript" src="/frontend_static/js/AdhocracySDK.js"></script>
+        <script type="text/javascript">
+            adhocracy.init('http://adhocracy.embeddee.goo:6541', function(adhocracy) {
+                adhocracy.embed('.adhocracy_marker');
+                // Not part of embed snipped. Only here for testing.
+                document.getElementsByClassName("adhocracy-embed")[0].id = "adhocracy-iframe";
+            });
+        </script>
+        <div class="adhocracy_marker" data-widget="document-workbench"></div>
+        <!--
+            it is possible to embed several snippets in parallel.  the
+            following crude example works if you adjust the path of
+            the paragraph version so something that exists in your
+            database backend:
+
+            <div class="adhocracy_marker" data-widget="paragraph-version-detail" data-ref="/adhocracy/wef0/paragraph0/VERSION_0000001" data-viewmode="display"></div>
+          -->
+        <!-- end embed snipped -->
+    </body>
+</html>

@@ -11,67 +11,55 @@ export function cutArray(a : any[], from : number, to ?: number) : any[] {
     return a;
 };
 
-export function isInfixOf(needle : any, hay : any[]) : boolean {
-    "use strict";
-    return hay.indexOf(needle) !== -1;
-};
 
 /**
- * this function is a workaround for the weirdness of the javscript
- * 'in' keyword.  use it if you want to test a string array for
- * memberships.  does not work on other types!  if you would relax the
- * type signature:
- *
- *   stringInArrayMember(null, ['null']) ==> true
- *
- * (nobody should use javascript, really.)
+ * isArrayMember could be inlined, but is not for two reasons: (1)
+ * even though js developers are used to it, the inlined idiom is just
+ * weird; (2) the test suite documents what can and cannot be done
+ * with it.
  */
-export function stringIsArrayMember(member: string, array: string[]): boolean {
+export function isArrayMember(member : any, array : any[]) : boolean {
     "use strict";
-
-    var obj = {};
-    for (var ix in array) {
-        if (array.hasOwnProperty(ix)) {
-            obj[array[ix]] = "";
-        }
-    }
-    return obj.hasOwnProperty(member);
+    return array.indexOf(member) > -1;
 }
-
-export function parentPath(url : string) : string {
-    "use strict";
-
-    return url.substring(0, url.lastIndexOf("/"));
-};
 
 
 /**
  * Do a deep copy on any javascript object.  The resuling object does
  * not share sub-structures as the original.  (I think instances of
  * classes other than Object, Array are not treated properly either.)
+ *
+ * A competing (and possibly more sophisticated) implementation is
+ * available as `cloneDeep` in <a href="http://lodash.com/">lo-dash</a>
  */
 export function deepcp(i) {
     "use strict";
 
-    if (typeof(i) === "object") {
-        var o : Object;
-        if (i === null) {
-            o = null;
-        } else if (i instanceof Array)  {
-            o = new Array();
-        } else {
-            o = new Object();
-        }
-
-        for (var x in i) {
-            if (i.hasOwnProperty(x)) {
-                o[x] = deepcp(i[x]);
-            }
-        }
-        return o;
-    } else {
+    // base types
+    if (i === null || ["number", "boolean", "string"].indexOf(typeof(i)) > -1) {
         return i;
     }
+
+    // structured types
+    var o;
+    switch (Object.prototype.toString.call(i)) {
+        case "[object Object]":
+            o = new Object();
+            break;
+        case "[object Array]":
+            o = new Array();
+            break;
+        default:
+            throw "deepcp: unsupported object type!";
+    }
+
+    for (var x in i) {
+        if (i.hasOwnProperty(x)) {
+            o[x] = deepcp(i[x]);
+        }
+    }
+
+    return o;
 }
 
 
@@ -79,26 +67,30 @@ export function deepcp(i) {
  * Do a deep copy of a javascript source object into a target object.
  * References to the target object are not severed; rather, all fields
  * in the target object are deleted, and all fields in the source
- * object are copied using deepcp().  Crashes if target is not an
- * object.
+ * object are copied using deepcp().  Since this function only makes
+ * sense on objects, and not on other types, it crashes if either
+ * argument is not an object.
  */
 export function deepoverwrite(source, target) {
     "use strict";
 
+    if (Object.prototype.toString.call(source) !== "[object Object]") {
+        throw "Util.deepoverwrite: source object " + source + " not of type 'object'!";
+    }
+    if (Object.prototype.toString.call(target) !== "[object Object]") {
+        throw "Util.deepoverwrite: target object " + target + " not of type 'object'!";
+    }
+
     var k;
-    try {
-        for (k in target) {
-            if (target.hasOwnProperty(k)) {
-                delete target[k];
-            }
+    for (k in target) {
+        if (target.hasOwnProperty(k)) {
+            delete target[k];
         }
-        for (k in source) {
-            if (source.hasOwnProperty(k)) {
-                target[k] = deepcp(source[k]);
-            }
+    }
+    for (k in source) {
+        if (source.hasOwnProperty(k)) {
+            target[k] = deepcp(source[k]);
         }
-    } catch (e) {
-        throw ("Util.deepoverwrite: " + [source, target, e]);
     }
 }
 
@@ -111,7 +103,7 @@ export function deepoverwrite(source, target) {
 export function deepeq(a : any, b : any) : boolean {
     "use strict";
 
-    if (typeof a !== typeof b) {
+    if (Object.prototype.toString.call(a) !== Object.prototype.toString.call(b)) {
         return false;
     }
 
@@ -145,7 +137,9 @@ export function deepeq(a : any, b : any) : boolean {
 }
 
 
-// sugar for angular
+/**
+ * sugar for angular
+ */
 export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
     "use strict";
 
@@ -154,11 +148,6 @@ export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
     return deferred.promise.then(() => obj);
 }
 
-export function normalizeName(name: string) : string {
-    "use strict";
-
-    return name.toLowerCase().replace(/\ /g, "_");
-}
 
 /**
  * Take a maximum delay time, an array of arguments and a function.
@@ -173,3 +162,54 @@ export function normalizeName(name: string) : string {
 export var trickle = <T>($timeout: ng.ITimeoutService, maxdelay: number, xs: T[], f: (T) => void): void => {
     xs.map((x) => $timeout(() => f(x), Math.random() * maxdelay, true));
 };
+
+
+/**
+ * Remove last hierarchy level from path (uris or directory paths).
+ */
+export function parentPath(url : string) : string {
+    "use strict";
+
+    return url.substring(0, url.lastIndexOf("/"));
+};
+
+
+/**
+ * replace space with _, make everything lower case.
+ */
+export function normalizeName(name: string) : string {
+    "use strict";
+
+    return name.toLowerCase().replace(/\ /g, "_");
+}
+
+/**
+ * format strings
+ *
+ * Example:
+ *   > formatString("Hello {0} from {1}", "World", "Bernd")
+ *   "Hello World from Bernd"
+ *
+ * http://stackoverflow.com/questions/610406/4673436#4673436
+ */
+export function formatString(format : string, ...args : string[]) {
+    "use strict";
+
+    return format.replace(/{(\d+)}/g, function(match, number) {
+        return (typeof args[number] !== "undefined") ? args[number] : match;
+    });
+}
+
+
+/**
+ * Escape angular expression.
+ *
+ * This is mainly used to prevent XSS.
+ *
+ * If you want to use the output of this in HTML, please remember
+ * to escape it using _.escape.
+ */
+export function escapeNgExp(s : string) {
+    "use strict";
+    return "'" + s.replace(/'/g, "\\'") + "'";
+}

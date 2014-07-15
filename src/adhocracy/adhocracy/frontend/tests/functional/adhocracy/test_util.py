@@ -1,4 +1,5 @@
 import pytest
+from time import sleep
 
 
 pytestmark = pytest.mark.functional  # mark theses tests as functional tests
@@ -21,6 +22,7 @@ class TestDeepCp:
                               {'a': 3, 'b': None, 'c': [None]}
                               ])
     def test_deepcp(self, browser_root, value):
+        sleep(1)
         code = """
                var U = require('Adhocracy/Util');
                return U.deepcp(input);

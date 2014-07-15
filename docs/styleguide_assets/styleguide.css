@@ -32,11 +32,11 @@
     border: none;
 }
 
-.styleguide .components h1 {
+.styleguide .components > h1 {
     padding-bottom: 0.2em;
     border-bottom: 1px solid silver;
 }
-.styleguide .components h1:not(:first-of-type) {
+.styleguide .components > h1:not(:first-of-type) {
     margin-top: 3em;
 }
 

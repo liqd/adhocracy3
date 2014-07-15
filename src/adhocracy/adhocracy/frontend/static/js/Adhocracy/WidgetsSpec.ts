@@ -15,9 +15,10 @@ declare var beforeEach : (any) => void;
 
 
 var config : Config.Type = {
-    templatePath: "mock",
-    jsonPrefix: "mock",
-    wsuri: "mock"
+    template_path: "mock",
+    root_path: "mock",
+    ws_url: "mock",
+    embedded: false
 };
 
 var createAdhHttpMock = () => {
@@ -82,7 +83,7 @@ export var register = () => {
                     }
                 };
 
-                var adhWSMock = <any>jasmine.createSpyObj("WSMock", ["register", "unregister"]);
+                var adhWebSocketMock = <any>jasmine.createSpyObj("WebSocketMock", ["register", "unregister"]);
 
                 var adapter = <any>jasmine.createSpyObj("adapter", ["elemRefs"]);
                 adapter.elemRefs.and.returnValue(elements);
@@ -110,7 +111,7 @@ export var register = () => {
                         };
 
                         var controller = directive.controller[4];
-                        controller(scope, adhHttpMock, adhWSMock, done);
+                        controller(scope, adhHttpMock, adhWebSocketMock, done);
                     });
 
                     it("sets scope.container", () => {

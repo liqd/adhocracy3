@@ -1,3 +1,4 @@
+SHELL=/bin/bash
 TSC=tsc
 # (for more info on tsc, see http://www.typescriptlang.org/)
 FIX_TSC_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\((\d+),(\d+)\):(.*)/) { print "$$1:$$2:$$3:\n$$4\n\n"; } else { print "$$_\n"; }'
@@ -7,8 +8,7 @@ FIX_TSLINT_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\[(\d+),\s*(\d+)\]:(.*)/) { 
 
 # make things
 
-compile:
-	$(TSC) --module amd --sourcemap --out Adhocracy.js Adhocracy.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
+compile: compile_tests_browser
 
 AdhocracySpec.ts: .dummy
 	./AdhocracySpec.sh > AdhocracySpec.ts
@@ -28,7 +28,14 @@ description:
 
 # run tests
 
-test: tslint tslint compile_tests_node test_node
+warn_orphan_js:
+	@for i in `find . -name '*.js'`; do \
+	    if [ ! -e `echo $$i | sed s/.js$$/.ts/` ]; then \
+		echo -ne "\n\nWARNING: orphan js file $$i.  you might want to make clean.\n\n"; \
+	    fi; \
+	done
+
+test: warn_orphan_js tslint compile_tests_node test_node
 
 tslint:
 	../../../../../../bin/tslint_check_adhocracy | $(FIX_TSLINT_ERROR_FORMAT)
@@ -62,6 +69,9 @@ test_node:
 	../../../../../../bin/jasmine-node .
 	@echo "NOTE: leaving commonjs modules in place."
 	@echo "      'make compile_tests_browser' if you need to run js code in browser again!"
+
+test_py:
+	../../../../../../bin/py.test ../../tests/unit
 
 
 # cleanup, word count, aux

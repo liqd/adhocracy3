@@ -2,32 +2,33 @@
 /// <reference path="../../../lib/DefinitelyTyped/q/Q.d.ts"/>
 
 import Config = require("./Config");
-import WS = require("./WS");
+import WebSocket = require("./WebSocket");
 
 export var register = () => {
-    // FIXME: This should be ``describe("WS")`` and should be wrapped in a
+    // FIXME: This should be ``describe("WebSocket")`` and should be wrapped in a
     // ``describe("Services")`` to mirror the module structure. This is not
     // currently possible because the script that generates AdhocracySpec.ts
     // includes all *Spec.ts modules.
 
-    describe("Services/WS", () => {
+    describe("Services/WebSocket", () => {
         var config: Config.Type = {
-            templatePath: "mock",
-            jsonPrefix: "mock",
-            wsuri: "mock"
+            template_path: "mock",
+            root_path: "mock",
+            ws_url: "mock",
+            embedded: false
         };
 
         // constructor for a mock raw web socket that leaks the
         // constructee for inspection.
         var wsRaw: any;
-        var constructRawWebSocket = (uri: string): WS.RawWebSocket => {
+        var constructRawWebSocket = (uri: string): WebSocket.IRawWebSocket => {
             wsRaw = <any>jasmine.createSpyObj("RawWebSocketMock", ["send", "onmessage", "onerror", "onopen", "onclose"]);
             return wsRaw;
         };
         var ws;
 
         beforeEach(() => {
-            ws = WS.factory(config, constructRawWebSocket);
+            ws = WebSocket.factoryIService(config, constructRawWebSocket);
         });
 
         it("does not initially call the send method of web socket", () => {
