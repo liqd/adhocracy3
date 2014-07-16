@@ -142,7 +142,7 @@ Or to ``login_email``, specifying the user's email address instead of name::
 
     >>> prop = {'email': 'annina@example.org',
     ...         'password': 'Inawgoywyk2'}}}
-    >>> resp_data = testapp.post_json('/login_username', prop).json
+    >>> resp_data = testapp.post_json('/login_email', prop).json
     >>> pprint(resp_data)
     {'status': 'success',
      'user_path': '/adhocracy/principals/users/...',
@@ -153,6 +153,8 @@ Or to ``login_email``, specifying the user's email address instead of name::
 On success, the backend sends back the path to the object
 representing the logged-in user and a token that must be used to authorize
 additional requests by the user.
+
+FIXME Add samples for on-error case.
 
 
 User Authentication
