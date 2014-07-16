@@ -86,7 +86,7 @@ def validate_post_root_versions(context, request: Request):
             res = find_resource(context, path_tuple)
         except KeyError:
             error = 'This resource path does not exist: {p}'.format(p=path)
-            request.errors.add('body", "root_versions', error)
+            request.errors.add('body', 'root_versions', error)
             continue
         if not IItemVersion.providedBy(res):
             error = 'This resource is not a valid ' \
@@ -575,35 +575,66 @@ class MetaApiView(RESTView):
         return struct
 
 
+def _add_no_such_user_or_wrong_password_error(request: Request):
+    request.errors.add('body', 'password',
+                       'User doesn\'t exist or password is wrong')
+
+
+def validate_login_username(context, request: Request):
+    """Validate the user name of a login request.
+
+    If valid, the path to the user object is added as 'user_path' to
+    `request.validated`.
+    """
+    name = request.validated['name']
+    # TODO implement: search for user object in catalog and store it here
+    user_found = True
+    if user_found:
+        request.validated['user_path'] = 'path for ' + name
+    else:
+        _add_no_such_user_or_wrong_password_error(request)
+
+
+def validate_password(context, request: Request):
+    """Validate the password of a login request."""
+    user_path = request.validated.get('user_path')
+    if not user_path:
+        return
+    password = request.validated['password']
+    # TODO actually validate the password
+    password_is_valid = bool(password)
+    if not password_is_valid:
+        _add_no_such_user_or_wrong_password_error(request)
+
+
+def _build_successful_login_response(user_path: str, user_token: str) -> dict:
+    """Build response data structure for a successful request. """
+    return {'status': 'success',
+            'user_path': user_path,
+            'user_token': user_token}
+
+
 @view_defaults(
     renderer='simplejson',
     context=IRoot,
     decorator=validate_request_data_decorator()
 )
-class LoginView(RESTView):
+class LoginUsernameView(RESTView):
 
-    """Log in a user."""
+    """Log in a user via their name."""
 
-    validation_POST = (POSTLoginUsernameRequestSchema, [])
-
-    def _build_successful_response(self, user_path: str,
-                                   user_token: str) -> dict:
-        """Build response data structure for a successful request. """
-        return {'status': 'success',
-                'user_path': user_path,
-                'user_token': user_token}
+    validation_POST = (POSTLoginUsernameRequestSchema,
+                       [validate_login_username, validate_password])
 
     @view_config(name='login_username',
                  request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
-        name = self.request.validated['name']
-        password = self.request.validated['password']
-        # TODO check that user exists and password is valid
-        user_path = 'blah_' + name
-        user_token = 'blub_' + password
-        return self._build_successful_response(user_path, user_token)
+        # TODO generate and return user token
+        user_path = self.request.validated['user_path']
+        user_token = 'token for ' + user_path
+        return _build_successful_login_response(user_path, user_token)
 
 
 def includeme(config):  # pragma: no cover
