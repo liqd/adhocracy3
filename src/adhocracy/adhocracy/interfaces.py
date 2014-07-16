@@ -329,3 +329,19 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
     root_versions = Attribute('Non-empty list of roots of the ItemVersion '
                               '(only resources that can be reached from one '
                               'of the roots should be updated)')
+
+
+class ITokenManger(Interface):
+
+    def create_token(user_id: str) -> str:
+        """ Create authentication token for user_id."""
+
+    def get_user_id(token: str) -> str:
+        """ Get user_id for authentication token.
+
+        :returns: user id for this token
+        :raises KeyError: if there is no corresponding user_id
+        """
+
+    def delete_token(token: str):
+        """ Delete authentication token."""
