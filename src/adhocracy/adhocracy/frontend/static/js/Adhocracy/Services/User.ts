@@ -5,7 +5,6 @@ export interface IUserResource {
 
 export class User {
     loggedIn : boolean = false;
-    name : string;
     token : string;
     data : IUserResource;
 
@@ -104,7 +103,7 @@ export class User {
         // The server does not have a logout yet.
         _self.loggedIn = false;
         _self.deleteToken();
-        _self.name = undefined;
+        _self.data = undefined;
     }
 
     can(permission : string) {
