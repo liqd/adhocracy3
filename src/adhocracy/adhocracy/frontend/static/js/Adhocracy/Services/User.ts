@@ -1,12 +1,14 @@
-export interface IUserResource {
-
+export interface IUserBasic {
+    name? : string;
+    email? : string;
+    tzname? : string;
 }
 
 
 export class User {
     loggedIn : boolean = false;
     token : string;
-    data : IUserResource;
+    data : IUserBasic;
 
     constructor(
         public adhHttp,
@@ -37,8 +39,8 @@ export class User {
         _self.loggedIn = true;
 
         return _self.adhHttp.get(userPath)
-            .then((data) => {
-                _self.data = data;
+            .then((resource) => {
+                _self.data = resource.data["adhocracy.resources.principal.IUsersPool"];
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect

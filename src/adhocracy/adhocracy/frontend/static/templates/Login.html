@@ -1,6 +1,6 @@
 <div ng-switch="user.loggedIn">
     <div ng-switch-when="true" class="logout">
-        <span>{{ user.name }}</span>
+        <span>{{ user.data.name }}</span>
         <input type="submit" value="LogOut" ng-click="logOut()" />
     </div>
     <div ng-switch-default class="login">
