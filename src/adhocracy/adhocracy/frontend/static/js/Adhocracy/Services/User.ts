@@ -33,6 +33,7 @@ export class User {
 
         _self.token = token;
         _self.$http.defaults.headers.common["X-User-Token"] = token;
+        _self.$http.defaults.headers.common["X-User-Path"] = userPath;
         _self.loggedIn = true;
 
         return _self.adhHttp.get(userPath)
@@ -66,6 +67,7 @@ export class User {
             _self.$window.localStorage.removeItem("user-token");
         }
         delete _self.$http.defaults.headers.common["X-User-Token"];
+        delete _self.$http.defaults.headers.common["X-User-Path"];
         _self.token = undefined;
         _self.data = undefined;
         _self.loggedIn = false;
