@@ -7,6 +7,7 @@ from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets import GenericResourceSheet
 from adhocracy.schema import Email
+from adhocracy.schema import Password
 from adhocracy.schema import TimeZoneName
 
 
@@ -48,11 +49,7 @@ class PasswordAuthenticationSchema(colander.MappingSchema):
     `password`: plaintext password
     """
 
-    password = colander.SchemaNode(colander.String(),
-                                   default='',
-                                   missing=colander.required,
-                                   validator=colander.Length(min=6, max=100),
-                                   )
+    password = Password(missing=colander.required)
 
 
 class PasswordAuthenticationSheet(GenericResourceSheet):
