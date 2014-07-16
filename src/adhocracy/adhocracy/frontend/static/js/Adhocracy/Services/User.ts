@@ -96,7 +96,7 @@ export class User {
             }, (reason) => {
                 // FIXME server does not send details on what went wrong.
                 // This may also be an internal server error or similar.
-                _self.$q.reject("invalid credentials");
+                return _self.$q.reject("invalid credentials");
             });
     }
 
