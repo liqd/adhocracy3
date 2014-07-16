@@ -105,6 +105,6 @@ tags: .dummy
 		--regex-typescript='/^[ \t]*(export)?[ \t]*(public|private)[ \t]+([a-zA-Z0-9_]+)/\3/m,members/' \
 		--regex-typescript='/^[ \t]*(export)?[ \t]*interface[ \t]+([a-zA-Z0-9_]+)/\2/i,interfaces/' \
 		--regex-typescript='/^[ \t]*(export)?[ \t]*enum[ \t]+([a-zA-Z0-9_]+)/\2/e,enums/' \
-		$(ADHOCRACY_TAGS_ARGS) --language-force=typescript
+	        --language-force=typescript
 
 .dummy:
