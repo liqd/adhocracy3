@@ -3,7 +3,13 @@ export class User {
     name : string;
     token : string;
 
-    constructor(public $http : ng.IHttpService, public $window : Window, public Modernizr) {
+    constructor(
+        public adhHttp,
+        public $q,
+        public $http : ng.IHttpService,
+        public $window : Window,
+        public Modernizr
+    ) {
         var _self : User = this;
 
         if (_self.Modernizr.localstorage) {
@@ -39,17 +45,47 @@ export class User {
 
     logIn(nameOrEmail : string, password : string) {
         var _self : User = this;
+        var promise;
 
-        // FIXME this is only a dummy implementation
-        _self.name = nameOrEmail;
-        _self.setToken(nameOrEmail);
-        _self.loggedIn = true;
+        if (nameOrEmail.indexOf("@") === -1) {
+            promise = _self.adhHttp.post("/login_username", {
+                name: nameOrEmail,
+                password: password
+            });
+        } else {
+            promise = _self.adhHttp.post("/login_email", {
+                email: nameOrEmail,
+                password: password
+            });
+        }
+
+        return promise
+            .then((response) => {
+                // FIXME use websockets for updates
+                _self.loggedIn = true;
+                _self.setToken(response.user_token);
+
+                return _self.adhHttp.get(response.user_path)
+                    .then((data) => {
+                        _self.data = data;
+                    }, (reason) => {
+                        // The user resource that was returned by the server could not be accessed.
+                        // This is an internal error.
+                        _self.deleteToken();
+                        _self.loggedIn = false;
+                        _self.$q.reject("internal error");
+                    });
+            }, (reason) => {
+                // FIXME server does not send details on what went wrong.
+                // This may also be an internal server error or similar.
+                _self.$q.reject("invalid credentials");
+            });
     }
 
     logOut() {
         var _self : User = this;
 
-        // FIXME this is only a dummy implementation
+        // The server does not have a logout yet.
         _self.loggedIn = false;
         _self.deleteToken();
         _self.name = undefined;
