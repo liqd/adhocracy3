@@ -142,7 +142,7 @@ Or to ``login_email``, specifying the user's email address instead of name::
 
     >>> prop = {'email': 'annina@example.org',
     ...         'password': 'Inawgoywyk2'}}}
-    >>> resp_data = testapp.post_json('/login_username', prop).json
+    >>> resp_data = testapp.post_json('/login_email', prop).json
     >>> pprint(resp_data)
     {'status': 'success',
      'user_path': '/adhocracy/principals/users/...',
