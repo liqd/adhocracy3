@@ -37,9 +37,16 @@ export var run = (config) => {
             .when("/frontend_static/root.html", {
                 templateUrl: config.template_path + "/Wrapper.html"
             })
-            .when("/register", {
-                templateUrl: config.template_path + "/Register.html"
-            })
+            .when("/register", Directives.adhRegister(config))
+
+        // [REVIEW:mf] should config be injected as a service here?
+        // it would be more consistent, but the usual injection
+        // pattern does not work here.
+
+        // [REVIEW:mf] register does not work if it is discharged as a
+        // http request to the server.  not sure if we want the
+        // backend to handle this?
+
             .when("/embed/:widget", {
                 template: "<adh-embed></adh-embed>"
             })
