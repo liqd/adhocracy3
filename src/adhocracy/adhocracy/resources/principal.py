@@ -1,5 +1,6 @@
 """Resources to handle users and groups."""
 from pyramid.registry import Registry
+from pyramid.threadlocal import get_current_registry
 from zope.interface import implementer
 
 from adhocracy.interfaces import IPool
@@ -112,6 +113,16 @@ passwordresets_metadata = pool_metadata._replace(
 )
 
 
+def add_principals_element(root):
+    """Create and add 'principals' element if it doesn't exist yet."""
+    app_root = root['adhocracy']
+    if 'principals' not in app_root:
+        from adhocracy.resources.principal import IPrincipalsPool
+        reg = get_current_registry()
+        principals = reg.content.create(IPrincipalsPool.__identifier__)
+        app_root['principals'] = principals
+
+
 def includeme(config):
     """Add resource types to registry."""
     add_resource_type_to_registry(principals_metadata, config)
@@ -119,3 +130,4 @@ def includeme(config):
     add_resource_type_to_registry(users_metadata, config)
     add_resource_type_to_registry(groups_metadata, config)
     add_resource_type_to_registry(passwordresets_metadata, config)
+    config.add_evolution_step(add_principals_element)
