@@ -60,11 +60,11 @@ class TokenMangerAnnotationStorage:
         :returns: user id for this token
         :raises KeyError: if there is no corresponding user_id
         """
-        token, timestamp = self._token_to_user_id_date[token]
+        user_id, timestamp = self._token_to_user_id_date[token]
         if self._is_expired(timestamp):
             del self._token_to_user_id_date[token]
             raise KeyError
-        return token
+        return user_id
 
     def _is_expired(self, timestamp: datetime) -> bool:
         if self.timeout is None:
