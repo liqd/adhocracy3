@@ -22,11 +22,12 @@ from adhocracy.interfaces import ISimple
 from adhocracy.interfaces import IPool
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
+from adhocracy.rest.schemas import GETItemResponseSchema
+from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import POSTItemRequestSchema
+from adhocracy.rest.schemas import POSTLoginUsernameRequestSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
 from adhocracy.rest.schemas import PUTResourceRequestSchema
-from adhocracy.rest.schemas import GETResourceResponseSchema
-from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import AbstractReferenceIterable
@@ -572,6 +573,37 @@ class MetaApiView(RESTView):
             sheet_map
         }
         return struct
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IRoot,
+    decorator=validate_request_data_decorator()
+)
+class LoginView(RESTView):
+
+    """Log in a user."""
+
+    validation_POST = (POSTLoginUsernameRequestSchema, [])
+
+    def _build_successful_response(self, user_path: str,
+                                   user_token: str) -> dict:
+        """Build response data structure for a successful request. """
+        return {'status': 'success',
+                'user_path': user_path,
+                'user_token': user_token}
+
+    @view_config(name='login_username',
+                 request_method='POST',
+                 content_type='application/json')
+    def post(self) -> dict:
+        """Create new resource and get response data."""
+        name = self.request.validated['name']
+        password = self.request.validated['password']
+        # TODO check that user exists and password is valid
+        user_path = 'blah_' + name
+        user_token = 'blub_' + password
+        return self._build_successful_response(user_path, user_token)
 
 
 def includeme(config):  # pragma: no cover

@@ -2,6 +2,7 @@
 import colander
 
 from adhocracy.schema import AbsolutePath
+from adhocracy.schema import Password
 
 
 class ResourceResponseSchema(colander.Schema):
@@ -95,6 +96,15 @@ class POSTLocationMapping(colander.Schema):
     request_body = colander.SchemaNode(POSTResourceRequestSchemaList(),
                                        default=[])
     response_body = ResourceResponseSchema()
+
+
+class POSTLoginUsernameRequestSchema(colander.Schema):
+
+    """"""
+
+    name = colander.SchemaNode(colander.String(),
+                               missing=colander.required)
+    password = Password(missing=colander.required)
 
 
 class OPTIONResourceResponseSchema(colander.Schema):
