@@ -42,7 +42,6 @@ export class User {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect
                 _self.deleteToken();
-                _self.loggedIn = false;
                 _self.$q.reject("failed to fetch user resource");
             });
     }
@@ -68,6 +67,8 @@ export class User {
         }
         delete _self.$http.defaults.headers.common["X-User-Token"];
         _self.token = undefined;
+        _self.data = undefined;
+        _self.loggedIn = false;
     }
 
     logIn(nameOrEmail : string, password : string) {
@@ -101,9 +102,7 @@ export class User {
         var _self : User = this;
 
         // The server does not have a logout yet.
-        _self.loggedIn = false;
         _self.deleteToken();
-        _self.data = undefined;
     }
 
     can(permission : string) {
