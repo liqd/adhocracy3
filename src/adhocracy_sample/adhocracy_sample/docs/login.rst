@@ -134,8 +134,7 @@ to the URL ``login_username`` with a user name and password::
     >>> pprint(resp_data)
     {'status': 'success',
      'user_path': '/adhocracy/principals/users/...',
-     'user_token': '...'
-     }
+     'user_token': '...'}
     >>> user_path = resp_data['user_path']
     >>> user_token_via_username = resp_data['user_token']
 
@@ -147,8 +146,7 @@ Or to ``login_email``, specifying the user's email address instead of name::
     >>> pprint(resp_data)
     {'status': 'success',
      'user_path': '/adhocracy/principals/users/...',
-     'user_token': '...'
-    }
+     'user_token': '...'}
     >>> user_token_via_email = resp_data['user_token']
 
 On success, the backend sends back the path to the object
