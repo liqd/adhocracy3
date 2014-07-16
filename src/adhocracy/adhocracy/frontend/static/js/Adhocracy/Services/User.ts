@@ -29,14 +29,14 @@ export class User {
         }
     }
 
-    private enableToken(token : string, user_path : string) : void {
+    private enableToken(token : string, userPath : string) : void {
         var _self : User = this;
 
         _self.token = token;
         _self.$http.defaults.headers.common["X-User-Token"] = token;
         _self.loggedIn = true;
 
-        return _self.adhHttp.get(user_path)
+        return _self.adhHttp.get(userPath)
             .then((data) => {
                 _self.data = data;
             }, (reason) => {
@@ -48,17 +48,17 @@ export class User {
             });
     }
 
-    private storeAndEnableToken(token : string, user_path : string) : void {
+    private storeAndEnableToken(token : string, userPath : string) : void {
         var _self : User = this;
 
         if (_self.Modernizr.localstorage) {
             _self.$window.localStorage.setItem("user-token", token);
-            _self.$window.localStorage.setItem("user-path", user_path);
+            _self.$window.localStorage.setItem("user-path", userPath);
         } else {
             console.log("session could not be persisted");
         }
 
-        return _self.enableToken(token, user_path);
+        return _self.enableToken(token, userPath);
     }
 
     private deleteToken() {
