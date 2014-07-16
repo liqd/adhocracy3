@@ -84,10 +84,10 @@ export class User {
                         _self.data = data;
                     }, (reason) => {
                         // The user resource that was returned by the server could not be accessed.
-                        // This is an internal error.
+                        // This may happen e.g. with a network disconnect
                         _self.deleteToken();
                         _self.loggedIn = false;
-                        _self.$q.reject("internal error");
+                        _self.$q.reject("failed to fetch user resource");
                     });
             }, (reason) => {
                 // FIXME server does not send details on what went wrong.
