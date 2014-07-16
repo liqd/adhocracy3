@@ -1,7 +1,13 @@
+export interface IUserResource {
+
+}
+
+
 export class User {
     loggedIn : boolean = false;
     name : string;
     token : string;
+    data : IUserResource;
 
     constructor(
         public adhHttp,
@@ -15,17 +21,25 @@ export class User {
         if (_self.Modernizr.localstorage) {
             if (_self.$window.localStorage.getItem("user-token") !== null) {
                 // FIXME: check if user-token is still valid and get user data from server
-                _self.setToken(this.$window.localStorage.getItem("user-token"));
+                _self.enableToken(this.$window.localStorage.getItem("user-token"));
                 _self.loggedIn = true;
             }
         }
     }
 
-    private setToken(token : string) {
+    private enableToken(token : string) : void {
         var _self : User = this;
 
         _self.token = token;
         _self.$http.defaults.headers.common["X-User-Token"] = token;
+    }
+
+
+    private enableAndStoreToken(token : string) : void {
+        var _self : User = this;
+
+        _self.enableToken(token);
+
         if (_self.Modernizr.localstorage) {
             _self.$window.localStorage.setItem("user-token", token);
         } else {
@@ -63,7 +77,7 @@ export class User {
             .then((response) => {
                 // FIXME use websockets for updates
                 _self.loggedIn = true;
-                _self.setToken(response.user_token);
+                _self.enableAndStoreToken(response.user_token);
 
                 return _self.adhHttp.get(response.user_path)
                     .then((data) => {
