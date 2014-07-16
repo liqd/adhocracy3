@@ -136,6 +136,7 @@ to the URL ``login_username`` with a user name and password::
      'user_path': '/adhocracy/principals/users/...',
      'user_token': '...'
      }
+    >>> user_path = resp_data['user_path']
     >>> user_token_via_username = resp_data['user_token']
 
 Or to ``login_email``, specifying the user's email address instead of name::
@@ -160,16 +161,17 @@ FIXME Add samples for on-error case.
 User Authentication
 -------------------
 
-Once the user is logged in, the backend must add an "X-User-Token" header
-field to all HTTP requests made for the user whose value is the received
-"user_token". The backend validates the token. If it's valid and not
+Once the user is logged in, the backend must add two header fields to all
+HTTP requests made for the user: "X-User-Path" and "X-User-Token". Their
+values are the received "user_path" and "user_token",
+respectively. The backend validates the token. If it's valid and not
 expired, the requested action is performed in the name and with the rights
 of the logged-in user.
 
 If the token is not valid or expired, the backend responds with an error
 status that identifies the "X-User-Token" header as source of the problem::
 
-    >>> headers = {'X-User-Token': 'Blah' }
+    >>> headers = {'X-User-Path': user_path, 'X-User-Token': 'Blah'}
     >>> resp_data = testapp.get('/meta_api/', headers=headers).json
     >>> resp_data['status']
     'error'
