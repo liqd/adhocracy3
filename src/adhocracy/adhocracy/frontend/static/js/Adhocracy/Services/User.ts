@@ -66,7 +66,7 @@ export class User {
 export var loginDirective = ($$user : User) => {
     return {
         restrict: "E",
-        templateUrl: "/frontend_static/templates" + "/Util/login.html",
+        templateUrl: "/frontend_static/templates" + "/Login.html",
         scope: {},
         controller: ["$scope", function($scope) : void {
             $scope.user = $$user;
