@@ -1,6 +1,8 @@
 """User Sheet."""
 import colander
 from cryptacular.bcrypt import BCRYPTPasswordManager
+from substanced.catalog import catalog_factory
+from substanced.catalog import Field
 
 from adhocracy.interfaces import ISheet
 from adhocracy.sheets import add_sheet_to_registry
@@ -24,7 +26,7 @@ class UserBasicSchema(colander.MappingSchema):
     `name`: visible name
     """
 
-    email = Email(missing=colander.required)
+    email = Email()
     name = colander.SchemaNode(colander.String(),
                                missing=colander.required,
                                default='')
@@ -35,6 +37,12 @@ userbasic_metadata = sheet_metadata_defaults._replace(
     isheet=IUserBasic,
     schema_class=UserBasicSchema,
 )
+
+
+@catalog_factory('usercatalog')
+class UserFactory(object):
+    email = Field()
+    name = Field()
 
 
 class IPasswordAuthentication(ISheet):
@@ -99,7 +107,16 @@ password_metadata = sheet_metadata_defaults._replace(
 )
 
 
+def add_user_catalog(root):
+    """Add the user catalog if it doesn't exist yet."""
+    catalogs = root['catalogs']
+    if 'usercatalog' not in catalogs:
+        catalogs.add_catalog('usercatalog', update_indexes=True)
+
+
 def includeme(config):
-    """Register sheets."""
+    """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_metadata, config.registry)
     add_sheet_to_registry(password_metadata, config.registry)
+    config.scan('.')
+    config.add_evolution_step(add_user_catalog)
