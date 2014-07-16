@@ -127,6 +127,19 @@ class TimeZoneName(colander.SchemaNode):
     validator = colander.OneOf(_ZONES)
 
 
+class Password(colander.SchemaNode):
+
+    """A password.
+
+    Example value: TemmyantAd5
+    """
+
+    schema_type = colander.String
+    default = '',
+    missing = colander.drop
+    validator = colander.Length(min=6, max=100)
+
+
 class AbsolutePath(colander.SchemaNode):
 
     """Absolute path made with  Identifier Strings.
