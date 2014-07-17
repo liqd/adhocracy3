@@ -109,6 +109,23 @@ export class User {
         _self.deleteToken();
     }
 
+    register(username : string, email : string, password : string, passwordRepeat : string) {
+        var _self : User = this;
+
+        return _self.adhHttp.post("/principals/users/", {
+            "content_type": "adhocracy.resources.principal.IUser",
+            "data": {
+                "adhocracy.sheets.user.UserBasicSchema": {
+                    "name": username,
+                    "email": email
+                },
+                "adhocracy.sheets.user.IPasswordAuthentication": {
+                    "password": password
+                }
+            }
+        });
+    }
+
     can(permission : string) {
         var _self : User = this;
 
@@ -117,28 +134,48 @@ export class User {
     }
 }
 
-export var loginDirective = ($$user : User) => {
+export var loginDirective = (adhConfig) => {
     return {
         restrict: "E",
-        templateUrl: "/frontend_static/templates" + "/Login.html",
+        templateUrl: adhConfig.template_path + "/Login.html",
         scope: {},
-        controller: ["$scope", function($scope) : void {
-            $scope.user = $$user;
+        controller: ["adhUser", "$scope", (adhUser : User, $scope) : void => {
             $scope.credentials = {
                 nameOrEmail: "",
                 password: ""
             };
 
-            $scope.resetCredentials = function() {
+            $scope.resetCredentials = () => {
                 $scope.credentials.nameOrEmail = "";
                 $scope.credentials.password = "";
             };
-            $scope.logIn = function() {
-                $scope.user.logIn($scope.credentials.nameOrEmail, $scope.credentials.password);
+            $scope.logIn = () => {
+                adhUser.logIn($scope.credentials.nameOrEmail, $scope.credentials.password);
                 $scope.resetCredentials();
             };
-            $scope.logOut = function() {
-                $scope.user.logOut();
+            $scope.logOut = () => {
+                adhUser.logOut();
+            };
+        }]
+    };
+};
+
+export var registerDirective = (adhConfig) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.template_path + "/Register.html",
+        scope: {},
+        controller: ["adhUser", "$scope", (adhUser, $scope) => {
+            $scope.input = {
+                username: "",
+                email: "",
+                password: "",
+                passwordRepeat: ""
+            };
+
+            $scope.register = () : void => {
+                // FIXME redirect after successful registration
+                adhUser.register($scope.username, $scope.email, $scope.password, $scope.passwordRepeat);
             };
         }]
     };

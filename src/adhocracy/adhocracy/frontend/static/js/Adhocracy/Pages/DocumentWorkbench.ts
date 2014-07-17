@@ -37,6 +37,9 @@ export var run = (config) => {
             .when("/frontend_static/root.html", {
                 templateUrl: config.template_path + "/Wrapper.html"
             })
+            .when("/register", {
+                template: "<adh-register></adh-register>"
+            })
             .when("/embed/:widget", {
                 template: "<adh-embed></adh-embed>"
             })
@@ -56,7 +59,8 @@ export var run = (config) => {
 
     app.service("adhResources", Resources.Service);
     app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
-    app.directive("adhLogin", ["adhUser", AdhUser.loginDirective]);
+    app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
+    app.directive("adhRegister", ["adhConfig", AdhUser.registerDirective]);
     app.value("adhConfig", config);
     app.factory("adhDone", AdhDone.factory);
 
