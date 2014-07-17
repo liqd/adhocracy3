@@ -1,5 +1,6 @@
 from json import dumps
 from json import loads
+import sys
 import unittest
 
 from pyramid import testing
@@ -156,8 +157,16 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
     def test_onMessage_with_invalid_json(self):
         self._comm.onMessage('This is not a JSON dict'.encode(), False)
         assert len(self._comm.queue) == 1
-        assert self._comm.queue[0] == {'error': 'malformed_message',
-           'details': 'No JSON object could be decoded'}
+        if sys.version_info <= (3, 3):
+            assert self._comm.queue[0] == {
+                'error': 'malformed_message',
+                'details': 'No JSON object could be decoded'
+            }
+        else:
+            assert self._comm.queue[0] == {
+                'error': 'malformed_message',
+                'details': 'Expecting value: line 1 column 1 (char 0)'
+            }
 
     def test_onMessage_with_json_array(self):
         msg = build_message(['This', 'is an array', 'not a dict'])
