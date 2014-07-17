@@ -176,7 +176,7 @@ export var registerDirective = (adhConfig) => {
 
             $scope.register = () : void => {
                 // FIXME redirect after successful registration
-                adhUser.register($scope.username, $scope.email, $scope.password, $scope.passwordRepeat);
+                adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat);
             };
         }]
     };
