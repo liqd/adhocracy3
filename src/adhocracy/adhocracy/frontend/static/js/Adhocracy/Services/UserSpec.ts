@@ -19,6 +19,14 @@ export var register = () => {
         describe("User", () => {
             beforeEach(() => {
                 adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["put", "get", "post"]);
+                adhHttpMock.put.and.returnValue(Util.mkPromise(q, {}));
+                adhHttpMock.post.and.returnValue(Util.mkPromise(q, {}));
+                adhHttpMock.get.and.returnValue(Util.mkPromise(q, {
+                    data: {
+                        "adhocracy.resources.principal.IUsersPool": {}
+                    }
+                }));
+
                 httpMock = {
                     defaults: {
                         headers: {
@@ -45,11 +53,6 @@ export var register = () => {
                         status: "success",
                         user_path: "user1_path",
                         user_token: "user1_tok"
-                    }));
-                    adhUser.adhHttp.get.and.returnValue(Util.mkPromise(q, {
-                        data: {
-                            "adhocracy.resources.principal.IUsersPool": {}
-                        }
                     }));
 
                     expect(adhUser.loggedIn).toBe(false);
@@ -149,7 +152,6 @@ export var register = () => {
 
             describe("register", () => {
                 beforeEach((done) => {
-                    adhHttpMock.post.and.returnValue(Util.mkPromise(q, {}));
                     adhUser.register("username", "email", "password", "passwordRepeat").then(done);
                 });
 
