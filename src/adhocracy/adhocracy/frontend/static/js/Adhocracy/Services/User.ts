@@ -67,6 +67,7 @@ export class User {
 
         if (_self.Modernizr.localstorage) {
             _self.$window.localStorage.removeItem("user-token");
+            _self.$window.localStorage.removeItem("user-path");
         }
         delete _self.$http.defaults.headers.common["X-User-Token"];
         delete _self.$http.defaults.headers.common["X-User-Path"];
