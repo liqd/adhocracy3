@@ -12,7 +12,7 @@ class TestJasmine:
         browser.visit(url)
         return browser
 
-    def _test_all(self, browser_test):
+    def test_all(self, browser_test):
         def jasmineFinished(browser):
             js = 'jsApiReporter.finished'
             return browser.evaluate_script(js)
