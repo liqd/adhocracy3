@@ -275,6 +275,7 @@ export var adhParagraphSheetEdit = (adhConfig) => {
 // FIXME: this doesn't really belong here, but to Services/User.ts.
 export var adhRegister = (adhConfig) => {
     return {
+        restrict: "E",
         templateUrl: adhConfig.template_path + "/Register.html",
         scope: { },
         controller: ["$scope", "adhHttp", ($scope, adhHttp) => {
