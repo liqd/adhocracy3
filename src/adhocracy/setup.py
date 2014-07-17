@@ -19,7 +19,7 @@ requires = [
     'colander',
     'autobahn',
     'asyncio',
-    'websocket-client-py3',
+    'websocket-client',
 ]
 
 test_requires = [
