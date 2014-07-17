@@ -24,6 +24,8 @@ for i in `find . -name '*Spec.ts' | grep -v ./AdhocracySpec.ts | sort`; do
 done
 
 echo
+echo "(<any>jasmine).DEFAULT_TIMEOUT_INTERVAL = 1000;"
+echo
 
 count=1
 for i in `find . -name '*Spec.ts' | grep -v ./AdhocracySpec.ts`; do
