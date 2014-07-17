@@ -3,8 +3,9 @@ from pyramid.config import Configurator
 from pyramid_zodbconn import get_connection
 from pyramid.authorization import ACLAuthorizationPolicy
 from substanced.evolution import mark_unfinished_as_finished as markunf
-
 import transaction
+
+from adhocracy.authentication import TokenHeaderAuthenticationPolicy
 
 
 def root_factory(request, t=transaction, g=get_connection,
@@ -42,19 +43,25 @@ def add_after_commit_hooks(request):
 
 def includeme(config):  # pragma: no cover
     """Setup basic adhocracy."""
+    settings = config.registry.settings
+    # handle exceptions in productive installations
+    # read; http://docs.pylonsproject.org/projects/pyramid-exclog
+    config.include('pyramid_exclog')
     # FIXME: Fix substanced.sdi bug: you need to register the authorisation
     # utility first, then the authentication.
     authz_policy = ACLAuthorizationPolicy()
     config.set_authorization_policy(authz_policy)
-    # handle exceptions in productive installations
-    # read; http://docs.pylonsproject.org/projects/pyramid-exclog
-    config.include('pyramid_exclog')
     # now we can proceed
     config.include('substanced')
     config.commit()  # commit to allow proper config overrides
+    authn_secret = settings.get('substanced.secret')
+    authn_timeout = 60 * 60 * 24 * 30
+    authn_policy = TokenHeaderAuthenticationPolicy(authn_secret,
+                                                   timeout=authn_timeout)
+    config.set_authentication_policy(authn_policy)
     config.include('.sheets')
     # By default only the pool resource type is included.
-    # Your extension package needs to explicit include them.
+    # Your extension package needs to explicit include the others.
     config.include('.resources.pool')
     config.include('.events')
     config.include('.subscriber')
