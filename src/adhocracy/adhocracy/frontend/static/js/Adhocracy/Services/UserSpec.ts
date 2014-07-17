@@ -146,6 +146,24 @@ export var register = () => {
                     });
                 });
             });
+
+            describe("register", () => {
+                beforeEach((done) => {
+                    adhHttpMock.post.and.returnValue(Util.mkPromise(q, {}));
+                    adhUser.register("username", "email", "password", "passwordRepeat").then(done);
+                });
+
+                it("posts to '/principals/users/'", () => {
+                    var args = adhHttpMock.post.calls.mostRecent().args;
+                    expect(args[0]).toBe("/principals/users/");
+                });
+                it("posts a valid user resource", () => {
+                    var data = adhHttpMock.post.calls.mostRecent().args[1].data;
+                    expect(data["adhocracy.sheets.user.UserBasicSchema"].name).toBe("username");
+                    expect(data["adhocracy.sheets.user.UserBasicSchema"].email).toBe("email");
+                    expect(data["adhocracy.sheets.user.IPasswordAuthentication"].password).toBe("password");
+                });
+            });
         });
     });
 };
