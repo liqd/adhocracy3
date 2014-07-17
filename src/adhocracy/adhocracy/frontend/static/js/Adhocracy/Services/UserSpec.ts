@@ -150,6 +150,49 @@ export var register = () => {
                 });
             });
 
+            describe("logOut", () => {
+                var testLogout = (_beforeEach : (done : () => void) => void) => {
+                    beforeEach((done) => {
+                        adhUser.logIn("user1", "user1_pass").then(() => {
+                            adhUser.logOut();
+                            _beforeEach(done);
+                        });
+                    });
+
+                    it("sets loggedIn to false", () => {
+                        expect(adhUser.loggedIn).toBe(false);
+                    });
+                    it("unsets data on the user resource", () => {
+                        expect(adhUser.data).not.toBeDefined();
+                    });
+                    it("unsets token", () => {
+                        expect(adhUser.token).not.toBeDefined;
+                    });
+                    it("unsets default http headers for the http service", () => {
+                        expect(httpMock.defaults.headers.common["X-User-Token"]).not.toBeDefined;
+                        expect(httpMock.defaults.headers.common["X-User-Path"]).not.toBeDefined;
+                    });
+                };
+
+                describe("localStorage available", () => {
+                    testLogout((done) => {
+                        done();
+                    });
+
+                    it("removes user token and user path from localstorage", () => {
+                        expect(windowMock.localStorage.removeItem).toHaveBeenCalledWith("user-token");
+                        expect(windowMock.localStorage.removeItem).toHaveBeenCalledWith("user-path");
+                    });
+                });
+
+                describe("localStorage unavaliable", () => {
+                    testLogout((done) => {
+                        adhUser.Modernizr.localstorage = false;
+                        done();
+                    });
+                });
+            });
+
             describe("register", () => {
                 beforeEach((done) => {
                     adhUser.register("username", "email", "password", "passwordRepeat").then(done);
