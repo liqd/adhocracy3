@@ -23,8 +23,8 @@ export class User {
             if (_self.$window.localStorage.getItem("user-token") !== null) {
                 // FIXME: check if user-token is still valid and get user data from server
                 _self.enableToken(
-                    this.$window.localStorage.getItem("user-token"),
-                    this.$window.localStorage.getItem("user-path")
+                    _self.$window.localStorage.getItem("user-token"),
+                    _self.$window.localStorage.getItem("user-path")
                 );
             }
         }
@@ -45,7 +45,7 @@ export class User {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect
                 _self.deleteToken();
-                _self.$q.reject("failed to fetch user resource");
+                return _self.$q.reject("failed to fetch user resource");
             });
     }
 
