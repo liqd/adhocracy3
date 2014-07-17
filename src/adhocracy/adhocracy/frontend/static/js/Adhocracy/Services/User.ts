@@ -58,23 +58,18 @@ export class User {
     register(username : string, email : string, password : string, passwordRepeat : string) {
         var _self : User = this;
 
-        // FIXME: sanity check input some more (do not post if email smells funny, ...)
-        if (password !== passwordRepeat) {
-            return _self.$q.reject("wrong password repeat");
-        } else {
-            return _self.adhHttp.post("/principals/users/", {
-                "content_type": "adhocracy.resources.principal.IUser",
-                "data": {
-                    "adhocracy.sheets.user.UserBasicSchema": {
-                        "name": username,
-                        "email": email
-                    },
-                    "adhocracy.sheets.user.IPasswordAuthentication": {
-                        "password": password
-                    }
+        return _self.adhHttp.post("/principals/users/", {
+            "content_type": "adhocracy.resources.principal.IUser",
+            "data": {
+                "adhocracy.sheets.user.UserBasicSchema": {
+                    "name": username,
+                    "email": email
+                },
+                "adhocracy.sheets.user.IPasswordAuthentication": {
+                    "password": password
                 }
-            });
-        }
+            }
+        });
     }
 
     can(permission : string) {

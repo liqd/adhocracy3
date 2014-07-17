@@ -1,15 +1,43 @@
-<form class="register">
+<form novalidate="novalidate" class="register" name="registerForm">
     <h1 class="title">Register!</h1>
     <div class="register-inputs">
-        <input type="text" name="username" placeholder="username" ng-model="input.username" />
-        <input type="email" name="email" placeholder="email" ng-model="input.email" />
-        <input type="password" name="password" placeholder="password" ng-model="input.password" />
-        <input type="password" name="password_repeat" placeholder="password repeat" ng-model="input.passwordRepeat" />
+        <input
+            type="text"
+            name="username"
+            placeholder="username"
+            ng-model="input.username"
+            required="required" />
+        <input
+            type="email"
+            name="email"
+            placeholder="email"
+            ng-model="input.email"
+            required="required" />
+        <input
+            type="password"
+            name="password"
+            placeholder="password"
+            ng-model="input.password"
+            required="required" />
+        <input
+            type="password"
+            name="password_repeat"
+            placeholder="password repeat"
+            ng-model="input.passwordRepeat"
+            required="required" />
+        <span class="error" ng-show="input.password !== input.passwordRepeat">
+            Does not match.
+        </span>
     </div>
     <div class="register-description box-with-button">
         <div class="textbox m-unobtrusive">
             <p>Disclaimer</p>
         </div>
-        <input type="submit" name="register" value="register" ng-click="register()"/>
+        <input
+            type="submit"
+            name="register"
+            value="register"
+            ng-click="register()"
+            ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
     </div>
 </form>
