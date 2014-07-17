@@ -271,35 +271,3 @@ export var adhParagraphSheetEdit = (adhConfig) => {
         }
     };
 };
-
-// FIXME: this doesn't really belong here, but to Services/User.ts.
-export var adhRegister = (adhConfig) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.template_path + "/Register.html",
-        scope: { },
-        controller: ["$scope", "adhHttp", ($scope, adhHttp) => {
-            $scope.postRegistration = (): void => {
-
-                // FIXME: sanity check input some more
-                // (password_repeat, do not post if email smells
-                // funny, ...)
-
-                adhHttp.post("/principals/users/", {
-                    "content_type": "adhocracy.resources.principal.IUser",
-                    "data": {
-                        "adhocracy.sheets.user.UserBasicSchema": {
-                            "name": $scope.username,
-                            "email": $scope.email
-                        },
-                        "adhocracy.sheets.user.IPasswordAuthentication": {
-                            "password": $scope.password
-                        }
-                    }
-                }).then(() => {
-                    throw "handler for registration response not implemented.";
-                });
-            };
-        }]
-    };
-};
