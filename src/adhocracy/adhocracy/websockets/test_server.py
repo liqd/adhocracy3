@@ -157,7 +157,7 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
     def test_onMessage_with_invalid_json(self):
         self._comm.onMessage('This is not a JSON dict'.encode(), False)
         assert len(self._comm.queue) == 1
-        if sys.version_info <= (3, 3):
+        if sys.version_info < (3, 4):
             assert self._comm.queue[0] == {
                 'error': 'malformed_message',
                 'details': 'No JSON object could be decoded'
