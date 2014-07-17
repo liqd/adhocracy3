@@ -36,7 +36,7 @@ export var register = () => {
                 };
 
                 windowMock = {
-                    localStorage: <any>jasmine.createSpyObj("localStorage", ["getItem", "setItem", "deleteItem"])
+                    localStorage: <any>jasmine.createSpyObj("localStorage", ["getItem", "setItem", "removeItem"])
                 };
                 windowMock.localStorage.getItem.and.returnValue(null);
 
