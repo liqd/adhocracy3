@@ -45,7 +45,11 @@ export var register = () => {
                     user_path: "user1_path",
                     user_token: "user1_tok"
                 }));
-                adhUser.adhHttp.get.and.returnValue(Util.mkPromise(q, {}));
+                adhUser.adhHttp.get.and.returnValue(Util.mkPromise(q, {
+                    data: {
+                        "adhocracy.resources.principal.IUsersPool": {}
+                    }
+                }));
 
                 expect(adhUser.loggedIn).toBe(false);
                 expect(adhUser.data).not.toBeDefined();
