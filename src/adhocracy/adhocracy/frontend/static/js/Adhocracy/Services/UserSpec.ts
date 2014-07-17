@@ -10,13 +10,13 @@ import q = require("q");
 export var register = () => {
     describe("Service/User", () => {
 
-        var adhUser;
-        var adhHttpMock;
-        var httpMock;
-        var windowMock;
-        var modernizrMock;
-
         describe("User", () => {
+            var adhUser;
+            var adhHttpMock;
+            var httpMock;
+            var windowMock;
+            var modernizrMock;
+
             beforeEach(() => {
                 adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["put", "get", "post"]);
                 adhHttpMock.put.and.returnValue(Util.mkPromise(q, {}));
