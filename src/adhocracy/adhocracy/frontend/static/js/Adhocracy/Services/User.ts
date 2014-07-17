@@ -63,28 +63,27 @@ export class User {
     }
 }
 
-export var loginDirective = ($$user : User) => {
+export var loginDirective = (adhConfig) => {
     return {
         restrict: "E",
-        templateUrl: "/frontend_static/templates" + "/Login.html",
+        templateUrl: adhConfig.template_path + "/Login.html",
         scope: {},
-        controller: ["$scope", function($scope) : void {
-            $scope.user = $$user;
+        controller: ["adhUser", "$scope", (adhUser : User, $scope) : void => {
             $scope.credentials = {
                 nameOrEmail: "",
                 password: ""
             };
 
-            $scope.resetCredentials = function() {
+            $scope.resetCredentials = () => {
                 $scope.credentials.nameOrEmail = "";
                 $scope.credentials.password = "";
             };
-            $scope.logIn = function() {
-                $scope.user.logIn($scope.credentials.nameOrEmail, $scope.credentials.password);
+            $scope.logIn = () => {
+                adhUser.logIn($scope.credentials.nameOrEmail, $scope.credentials.password);
                 $scope.resetCredentials();
             };
-            $scope.logOut = function() {
-                $scope.user.logOut();
+            $scope.logOut = () => {
+                adhUser.logOut();
             };
         }]
     };
@@ -94,9 +93,9 @@ export var registerDirective = (adhConfig) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.template_path + "/Register.html",
-        scope: { },
+        scope: {},
         controller: ["$scope", "adhHttp", ($scope, adhHttp) => {
-            $scope.postRegistration = (): void => {
+            $scope.postRegistration = () : void => {
 
                 // FIXME: sanity check input some more
                 // (password_repeat, do not post if email smells
