@@ -55,6 +55,28 @@ export class User {
         _self.name = undefined;
     }
 
+    register(username : string, email : string, password : string, passwordRepeat : string) {
+        var _self : User = this;
+
+        // FIXME: sanity check input some more (do not post if email smells funny, ...)
+        if (password !== passwordRepeat) {
+            return _self.$q.reject("wrong password repeat");
+        } else {
+            return _self.adhHttp.post("/principals/users/", {
+                "content_type": "adhocracy.resources.principal.IUser",
+                "data": {
+                    "adhocracy.sheets.user.UserBasicSchema": {
+                        "name": username,
+                        "email": email
+                    },
+                    "adhocracy.sheets.user.IPasswordAuthentication": {
+                        "password": password
+                    }
+                }
+            });
+        }
+    }
+
     can(permission : string) {
         var _self : User = this;
 
@@ -94,27 +116,17 @@ export var registerDirective = (adhConfig) => {
         restrict: "E",
         templateUrl: adhConfig.template_path + "/Register.html",
         scope: {},
-        controller: ["$scope", "adhHttp", ($scope, adhHttp) => {
-            $scope.postRegistration = () : void => {
+        controller: ["adhUser", "$scope", (adhUser, $scope) => {
+            $scope.input = {
+                username: "",
+                email: "",
+                password: "",
+                passwordRepeat: ""
+            };
 
-                // FIXME: sanity check input some more
-                // (password_repeat, do not post if email smells
-                // funny, ...)
-
-                adhHttp.post("/principals/users/", {
-                    "content_type": "adhocracy.resources.principal.IUser",
-                    "data": {
-                        "adhocracy.sheets.user.UserBasicSchema": {
-                            "name": $scope.username,
-                            "email": $scope.email
-                        },
-                        "adhocracy.sheets.user.IPasswordAuthentication": {
-                            "password": $scope.password
-                        }
-                    }
-                }).then(() => {
-                    throw "handler for registration response not implemented.";
-                });
+            $scope.register = () : void => {
+                // FIXME redirect after successful registration
+                adhUser.register($scope.username, $scope.email, $scope.password, $scope.passwordRepeat);
             };
         }]
     };
