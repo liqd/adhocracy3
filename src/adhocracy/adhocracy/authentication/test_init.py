@@ -17,19 +17,26 @@ class TokenManagerUnitTest(unittest.TestCase):
 
     def _make_one(self, context, **kw):
         from adhocracy.authentication import TokenMangerAnnotationStorage
-        return TokenMangerAnnotationStorage(context, **kw)
+        return TokenMangerAnnotationStorage(context)
 
     def test_create(self):
         from adhocracy.interfaces import ITokenManger
         from zope.interface.verify import verifyObject
-        inst = self._make_one(self.context, secret=self.secret, timeout=1)
+        inst = self._make_one(self.context)
         assert verifyObject(ITokenManger, inst)
         assert ITokenManger.providedBy(inst)
 
-    def test_create_token_with_user_id_first_time(self):
+    def test_create_token_with_user_id(self):
         inst = self._make_one(self.context)
         token = inst.create_token(self.user_id)
-        assert len(token) >= 128
+        assert len(token) == 128
+
+    def test_create_token_with_user_id_and_secret_and_hashalg(self):
+        inst = self._make_one(self.context)
+        token = inst.create_token(self.user_id,
+                                  secret='secret',
+                                  hashalg='sha256')
+        assert len(token) == 64
 
     def test_create_token_with_user_id_second_time(self):
         inst = self._make_one(self.context)
@@ -39,14 +46,14 @@ class TokenManagerUnitTest(unittest.TestCase):
 
     def test_get_user_id_with_existing_token(self):
         inst = self._make_one(self.context)
-        inst._token_to_user_id_date[self.token] = (self.user_id, self.timestamp)
+        inst.token_to_user_id_timestamp[self.token] = (self.user_id, self.timestamp)
         assert inst.get_user_id(self.token) == self.user_id
 
     def test_get_user_id_with_multiple_existing_token(self):
         inst = self._make_one(self.context)
-        inst._token_to_user_id_date[self.token] = (self.user_id, self.timestamp)
+        inst.token_to_user_id_timestamp[self.token] = (self.user_id, self.timestamp)
         token_second = 'secret_second'
-        inst._token_to_user_id_date[token_second] = (self.user_id, self.timestamp)
+        inst.token_to_user_id_timestamp[token_second] = (self.user_id, self.timestamp)
         assert inst.get_user_id(token_second) == self.user_id
 
     def test_get_user_id_with_non_existing_token(self):
@@ -55,27 +62,27 @@ class TokenManagerUnitTest(unittest.TestCase):
             inst.get_user_id('wrong_token')
 
     def test_get_user_id_with_existing_token_but_passed_timeout(self):
-        inst = self._make_one(self.context, timeout=0)
-        inst._token_to_user_id_date[self.token] = (self.user_id, self.timestamp)
+        inst = self._make_one(self.context)
+        inst.token_to_user_id_timestamp[self.token] = (self.user_id, self.timestamp)
         with pytest.raises(KeyError):
-            inst.get_user_id(self.token)
+            inst.get_user_id(self.token, timeout=0)
 
     def test_delete_token_with_non_existing_user_id(self):
         inst = self._make_one(self.context)
-        assert inst.delete_token('wrong_token') == None
+        assert inst.delete_token('wrong_token') is None
 
     def test_delete_token_with_existing_user_id(self):
         inst = self._make_one(self.context)
-        inst._token_to_user_id_date[self.token] = (self.user_id, self.timestamp)
+        inst.token_to_user_id_timestamp[self.token] = (self.user_id, self.timestamp)
         inst.delete_token(self.token)
-        assert self.token not in inst._token_to_user_id_date
+        assert self.token not in inst.token_to_user_id_timestamp
 
 
 class TokenHeaderAuthenticationPolicy(unittest.TestCase):
 
-    def _make_one(self, tokenmanager,  secret, **kw):
+    def _make_one(self, secret, **kw):
         from adhocracy.authentication import TokenHeaderAuthenticationPolicy
-        return TokenHeaderAuthenticationPolicy(tokenmanager, secret, **kw)
+        return TokenHeaderAuthenticationPolicy(secret, **kw)
 
     def setUp(self):
         self.request = testing.DummyRequest()
@@ -84,129 +91,131 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         self.token_and_user_id_headers = {'X-User-Token': self.token,
                                           'X-User-Path': self.user_id}
 
-    def test_create_without_tokenmanager(self):
+    def test_create(self):
         from pyramid.interfaces import IAuthenticationPolicy
         from zope.interface.verify import verifyObject
-        inst = self._make_one(None, 'secret')
+        inst = self._make_one('secret')
         assert verifyObject(IAuthenticationPolicy, inst)
         assert inst.callback is None
-        assert inst._tokenmanager is None
+        assert inst.secret == 'secret'
 
-    def test_create_with_tokenmanager_and_secret_and_timeout(self):
-        from adhocracy.authentication import CallbackToTokenMangerAdapter
-        tokenmanager = testing.DummyResource()
-        inst = self._make_one(tokenmanager, 'secret', timeout=1)
-        assert isinstance(inst.callback, CallbackToTokenMangerAdapter)
-        assert inst._tokenmanager is tokenmanager
-        assert inst._tokenmanager.secret == 'secret'
-        assert inst._tokenmanager.timeout == 1
+    def test_create_with_kw_args(self):
+        get_tokenmanager = lambda x: object(),
+        groupfinder = object()
+        inst = self._make_one('', groupfinder=groupfinder,
+                              get_tokenmanager=get_tokenmanager,
+                              timeout=1)
+        assert inst.callback == groupfinder
+        assert inst.timeout == 1
+        assert inst.get_tokenmanager == get_tokenmanager
 
     def test_unauthenticated_userid_without_header(self):
-        inst = self._make_one(None, 'secret')
+        inst = self._make_one('')
         assert inst.unauthenticated_userid(self.request) is None
 
     def test_unauthenticated_userid_with_header(self):
-        inst = self._make_one(None, 'secret')
+        inst = self._make_one('')
         self.request.headers = self.token_and_user_id_headers
         assert inst.unauthenticated_userid(self.request) == self.user_id
 
-    def test_authenticated_userid_withou_headers_and_callback_returns_None(self):
-        def callback(userid, request):
-            return None
-        inst = self._make_one(None, 'secret')
-        inst.callback = callback
+    def test_authenticated_userid_without_tokenmanger(self):
+        get_tokenmanager=lambda x: None
+        inst = self._make_one('', get_tokenmanager=get_tokenmanager)
         assert inst.authenticated_userid(self.request) is None
 
-    def test_authenticated_userid_with_header_and_callback_returns_groups(self):
-        def callback(userid, request):
-            return ['group']
-        inst = self._make_one(None, 'secret')
-        inst.callback = callback
+    def test_authenticated_userid_with_tokenmanger(self):
+        tokenmanager = Mock()
+        tokenmanager.get_user_id.return_value = self.user_id
+        inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager,
+                              timeout=10)
         self.request.headers = self.token_and_user_id_headers
         assert inst.authenticated_userid(self.request) == self.user_id
+        assert tokenmanager.get_user_id.call_args[1] == {'timeout': 10}
+
+    def test_authenticated_userid_with_tokenmanger_raising_key_error(self):
+        tokenmanager = Mock()
+        tokenmanager.get_user_id.side_effect = KeyError
+        inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager)
+        self.request.headers = self.token_and_user_id_headers
+        assert inst.authenticated_userid(self.request) == None
 
     def test_effective_principals_without_headers(self):
         from pyramid.security import Everyone
-        inst = self._make_one(None, 'secret')
+        inst = self._make_one('')
         assert inst.effective_principals(self.request) == [Everyone]
 
-    def test_effective_principals_without_headers_and_callback_returns_None(self):
+    def test_effective_principals_without_headers_and_groupfinder_returns_None(self):
         from pyramid.security import Everyone
-        def callback(userid, request):
+        def groupfinder(userid, request):
             return None
-        inst = self._make_one(None, 'secret')
-        inst.callback = callback
+        inst = self._make_one('', groupfinder=groupfinder)
         assert inst.effective_principals(self.request) == [Everyone]
 
-    def test_effective_principals_with_headers_and_call_returns_groups(self):
+    def test_effective_principals_with_headers_and_grougfinder_returns_groups(self):
         from pyramid.security import Everyone
         from pyramid.security import Authenticated
-        def callback(userid, request):
+        def groupfinder(userid, request):
             return ['group']
-        inst = self._make_one(None, 'secret')
-        inst.callback = callback
+        inst = self._make_one('', groupfinder=groupfinder)
         self.request.headers = self.token_and_user_id_headers
         result = inst.effective_principals(self.request)
         assert result == [Everyone, Authenticated, self.user_id, 'group']
 
     def test_remember_without_tokenmanager(self):
-        inst = self._make_one(None, 'secret')
+        inst = self._make_one('', get_tokenmanager=lambda x: None)
         result = inst.remember(self.request, self.user_id)
         assert result == {'X-User-Path': None, 'X-User-Token': None}
 
     def test_remember_with_tokenmanger(self):
         tokenmanager = Mock()
-        inst = self._make_one(tokenmanager, 'secret')
+        inst = self._make_one('secret', get_tokenmanager=lambda x: tokenmanager)
         tokenmanager.create_token.return_value = self.token
         result = inst.remember(self.request, self.user_id)
         assert result == self.token_and_user_id_headers
+        assert tokenmanager.create_token.call_args[1] =={'secret': 'secret',
+                                                         'hashalg': 'sha512'}
 
     def test_forget_without_tokenmanager(self):
-        inst = self._make_one(None, 'secret')
+        inst = self._make_one('', get_tokenmanager=lambda x: None)
         self.request.headers = self.token_and_user_id_headers
         assert inst.forget(self.request) == {}
 
     def test_forget_with_tokenmanger(self):
         tokenmanager = Mock()
-        inst = self._make_one(tokenmanager, 'secret')
+        inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager)
         self.request.headers = self.token_and_user_id_headers
         assert inst.forget(self.request) == {}
         assert tokenmanager.delete_token.is_called
 
 
-class CallbackToTokenMangerAdapter(unittest.TestCase):
-
-    def _make_one(self, tokenmanager):
-        from adhocracy.authentication import CallbackToTokenMangerAdapter
-        return CallbackToTokenMangerAdapter(tokenmanager)
+class GetTokenManagerUnitTest(unittest.TestCase):
 
     def setUp(self):
-        self.request = testing.DummyRequest()
-        self.user_id = 'principals/users/1'
-        self.token = 'secret'
-        self.token_and_user_id_headers = {'X-User-Token': self.token,
-                                          'X-User-Path': self.user_id}
-        self.tokenmanager = Mock()
+        self.config = testing.setUp()
+        self.request = testing.DummyRequest(registry=self.config.registry,
+                                            root=testing.DummyResource())
 
-    def test_create(self):
-        inst = self._make_one(self.tokenmanager)
-        assert callable(inst)
+    def _call_fut(self, request):
+        from adhocracy.authentication import get_tokenmanager
+        return get_tokenmanager(request)
 
-    def test_without_headers(self):
-        inst = self._make_one(self.tokenmanager)
-        assert inst(self.user_id, self.request) is None
+    def _register_tokenmanager_adapter(self):
+        from adhocracy.interfaces import ITokenManger
+        from zope.interface import Interface
+        dummy = testing.DummyResource(__provides__=ITokenManger)
+        self.config.registry.registerAdapter(lambda x: dummy,
+                                    required=(Interface,),
+                                    provided=ITokenManger)
 
-    def test_with_headers(self):
-        inst = self._make_one(self.tokenmanager)
-        self.request.headers = self.token_and_user_id_headers
-        self.tokenmanager.get_user_id.return_value = self.user_id
-        assert inst(self.user_id, self.request) == self.user_id
+    def test_tokenmanager_adapter_registered(self):
+        from adhocracy.interfaces import ITokenManger
+        self._register_tokenmanager_adapter()
+        inst = self._call_fut(self.request)
+        assert ITokenManger.providedBy(inst)
 
-    def test_with_headers_but_wrong_user_id(self):
-        inst = self._make_one(self.tokenmanager)
-        self.request.headers = self.token_and_user_id_headers
-        user_id = 'wrong'
-        assert inst(user_id, self.request) is None
+    def test_tokenmanager_adapter_not_registered(self):
+        inst = self._call_fut(self.request)
+        assert inst is None
 
 
 class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
@@ -215,18 +224,16 @@ class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
         config = testing.setUp()
         config.include('adhocracy.authentication')
         self.config = config
-        self.request = testing.DummyRequest(registry=self.config.registry)
-        self.context = testing.DummyResource()
+        self.request = testing.DummyRequest(registry=self.config.registry,
+                                            root=testing.DummyResource())
         self.user_id = '/principals/user/1'
 
     def _register_authentication_policy(self):
         from adhocracy.authentication import TokenHeaderAuthenticationPolicy
-        from adhocracy.authentication import TokenMangerAnnotationStorage
         from pyramid.authorization import ACLAuthorizationPolicy
-        tokenmanager = TokenMangerAnnotationStorage(self.context)
         authz_policy = ACLAuthorizationPolicy()
         self.config.set_authorization_policy(authz_policy)
-        authn_policy = TokenHeaderAuthenticationPolicy(tokenmanager, 'secret')
+        authn_policy = TokenHeaderAuthenticationPolicy('secret')
         self.config.set_authentication_policy(authn_policy)
 
     def test_remember(self):
@@ -244,7 +251,7 @@ class IncludemeIntegrationTest(unittest.TestCase):
         self.config.include('adhocracy.authentication')
         self.context = testing.DummyResource()
 
-    def test_get_adapter(self):
+    def test_get_tokenmanager_adapter(self):
         from zope.component import getAdapter
         from adhocracy.interfaces import ITokenManger
         from zope.interface.verify import verifyObject
