@@ -277,4 +277,56 @@ export var register = () => {
             });
         });
     });
+
+    describe("registerDirective", () => {
+        var directive;
+        var adhConfigMock;
+
+        beforeEach(() => {
+            adhConfigMock = {
+                template_path: "mock",
+                root_path: "mock",
+                ws_url: "mock",
+                embedded: true
+            };
+            directive = AdhUser.registerDirective(adhConfigMock);
+        });
+
+        describe("controller", () => {
+            var controller;
+            var $scopeMock;
+            var adhUserMock;
+
+            beforeEach(() => {
+                $scopeMock = {};
+                adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register"]);
+                controller = <any>(directive.controller[2]);
+                controller(adhUserMock, $scopeMock);
+            });
+
+            it("creates an empty input object in scope", () => {
+                expect($scopeMock.input).toEqual({
+                    username: "",
+                    email: "",
+                    password: "",
+                    passwordRepeat: ""
+                });
+            });
+
+            describe("register", () => {
+                beforeEach(() => {
+                    $scopeMock.input.username = "username";
+                    $scopeMock.input.email = "email";
+                    $scopeMock.input.password = "password";
+                    $scopeMock.input.passwordRepeat = "passwordRepeat";
+
+                    $scopeMock.register();
+                });
+
+                it("calls adhUser.register with data from scope.input", () => {
+                    expect(adhUserMock.register).toHaveBeenCalledWith("username", "email", "password", "passwordRepeat");
+                });
+            });
+        });
+    });
 };
