@@ -234,6 +234,7 @@ export var register = () => {
             beforeEach(() => {
                 $scopeMock = {};
                 adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn", "logOut"]);
+                adhUserMock.logIn.and.returnValue(Util.mkPromise(q, undefined));
                 controller = <any>(directive.controller[2]);
                 controller(adhUserMock, $scopeMock);
             });
@@ -257,15 +258,33 @@ export var register = () => {
                 beforeEach(() => {
                     $scopeMock.credentials.nameOrEmail = "foo";
                     $scopeMock.credentials.password = "bar";
-
-                    $scopeMock.logIn();
                 });
 
-                it("calls adhUser.logIn with scope.nameOrEmail and scope.password", () => {
-                    expect(adhUserMock.logIn).toHaveBeenCalledWith("foo", "bar");
+                it("calls adhUser.logIn with scope.nameOrEmail and scope.password", (done) => {
+                    $scopeMock.logIn().then(() => {
+                        expect(adhUserMock.logIn).toHaveBeenCalledWith("foo", "bar");
+                        done();
+                    });
                 });
-                it("resets credentials", () => {
-                    expect($scopeMock.credentials).toEqual({nameOrEmail: "", password: ""});
+                it("resets credentials", (done) => {
+                    $scopeMock.logIn().then(() => {
+                        expect($scopeMock.credentials).toEqual({nameOrEmail: "", password: ""});
+                        done();
+                    });
+                });
+                it("unsets scope.error if everything goes well", (done) => {
+                    $scopeMock.error = "error";
+                    $scopeMock.logIn().then(() => {
+                        expect($scopeMock.error).not.toBeDefined();
+                        done();
+                    });
+                });
+                it("sets scope.error if something goes wrong", (done) => {
+                    adhUserMock.logIn.and.returnValue(q.reject("error"));
+                    $scopeMock.logIn().then(() => {
+                        expect($scopeMock.error).toBe("error");
+                        done();
+                    });
                 });
             });
 
@@ -300,6 +319,7 @@ export var register = () => {
             beforeEach(() => {
                 $scopeMock = {};
                 adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register"]);
+                adhUserMock.register.and.returnValue(Util.mkPromise(q, undefined));
                 controller = <any>(directive.controller[2]);
                 controller(adhUserMock, $scopeMock);
             });
@@ -314,17 +334,30 @@ export var register = () => {
             });
 
             describe("register", () => {
-                beforeEach(() => {
+                it("calls adhUser.register with data from scope.input", (done) => {
                     $scopeMock.input.username = "username";
                     $scopeMock.input.email = "email";
                     $scopeMock.input.password = "password";
                     $scopeMock.input.passwordRepeat = "passwordRepeat";
 
-                    $scopeMock.register();
+                    $scopeMock.register().then(() => {
+                        expect(adhUserMock.register).toHaveBeenCalledWith("username", "email", "password", "passwordRepeat");
+                        done();
+                    });
                 });
-
-                it("calls adhUser.register with data from scope.input", () => {
-                    expect(adhUserMock.register).toHaveBeenCalledWith("username", "email", "password", "passwordRepeat");
+                it("unsets scope.error if everything goes well", (done) => {
+                    $scopeMock.error = "error";
+                    $scopeMock.register().then(() => {
+                        expect($scopeMock.error).not.toBeDefined();
+                        done();
+                    });
+                });
+                it("sets scope.error if something goes wrong", (done) => {
+                    adhUserMock.register.and.returnValue(q.reject("error"));
+                    $scopeMock.register().then(() => {
+                        expect($scopeMock.error).toBe("error");
+                        done();
+                    });
                 });
             });
         });
