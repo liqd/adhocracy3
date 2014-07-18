@@ -1,5 +1,8 @@
 <form novalidate="novalidate" class="register" name="registerForm">
     <h1 class="title">Register!</h1>
+    <div class="form-error" ng-show="error">
+        <p>{{error}}</p>
+    </div>
     <div class="register-inputs">
         <input
             type="text"
@@ -25,7 +28,7 @@
             placeholder="password repeat"
             ng-model="input.passwordRepeat"
             required="required" />
-        <span class="error" ng-show="input.password !== input.passwordRepeat">
+        <span class="input-error" ng-show="input.password !== input.passwordRepeat">
             Does not match.
         </span>
     </div>

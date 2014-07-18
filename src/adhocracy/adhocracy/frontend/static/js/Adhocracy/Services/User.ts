@@ -151,8 +151,13 @@ export var loginDirective = (adhConfig) => {
                 $scope.credentials.password = "";
             };
             $scope.logIn = () => {
-                adhUser.logIn($scope.credentials.nameOrEmail, $scope.credentials.password);
+                var promise = adhUser.logIn($scope.credentials.nameOrEmail, $scope.credentials.password).then(() => {
+                    $scope.error = undefined;
+                }, (error) => {
+                    $scope.error = error;
+                });
                 $scope.resetCredentials();
+                return promise;
             };
             $scope.logOut = () => {
                 adhUser.logOut();
@@ -175,8 +180,13 @@ export var registerDirective = (adhConfig) => {
             };
 
             $scope.register = () : void => {
-                // FIXME redirect after successful registration
-                adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat);
+                return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
+                    .then(() => {
+                        $scope.error = undefined;
+                        // FIXME redirect after successful registration
+                    }, (error) => {
+                        $scope.error = error;
+                    });
             };
         }]
     };
