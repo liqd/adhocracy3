@@ -210,153 +210,153 @@ export var register = () => {
                 });
             });
         });
-    });
 
-    describe("loginDirective", () => {
-        var directive;
-        var adhConfigMock;
-
-        beforeEach(() => {
-            adhConfigMock = {
-                template_path: "mock",
-                root_path: "mock",
-                ws_url: "mock",
-                embedded: true
-            };
-            directive = AdhUser.loginDirective(adhConfigMock);
-        });
-
-        describe("controller", () => {
-            var controller;
-            var $scopeMock;
-            var adhUserMock;
+        describe("loginDirective", () => {
+            var directive;
+            var adhConfigMock;
 
             beforeEach(() => {
-                $scopeMock = {};
-                adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn", "logOut"]);
-                adhUserMock.logIn.and.returnValue(Util.mkPromise(q, undefined));
-                controller = <any>(directive.controller[2]);
-                controller(adhUserMock, $scopeMock);
+                adhConfigMock = {
+                    template_path: "mock",
+                    root_path: "mock",
+                    ws_url: "mock",
+                    embedded: true
+                };
+                directive = AdhUser.loginDirective(adhConfigMock);
             });
 
-            it("creates an empty credentials object in scope", () => {
-                expect($scopeMock.credentials).toEqual({nameOrEmail: "", password: ""});
-            });
+            describe("controller", () => {
+                var controller;
+                var $scopeMock;
+                var adhUserMock;
 
-            describe("resetCredentials", () => {
-                it("cresets scope.credentials to empty strings", () => {
-                    $scopeMock.credentials.nameOrEmail = "foo";
-                    $scopeMock.credentials.password = "bar";
+                beforeEach(() => {
+                    $scopeMock = {};
+                    adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn", "logOut"]);
+                    adhUserMock.logIn.and.returnValue(Util.mkPromise(q, undefined));
+                    controller = <any>(directive.controller[2]);
+                    controller(adhUserMock, $scopeMock);
+                });
 
-                    $scopeMock.resetCredentials();
-
+                it("creates an empty credentials object in scope", () => {
                     expect($scopeMock.credentials).toEqual({nameOrEmail: "", password: ""});
                 });
-            });
 
-            describe("logIn", () => {
-                beforeEach(() => {
-                    $scopeMock.credentials.nameOrEmail = "foo";
-                    $scopeMock.credentials.password = "bar";
-                });
+                describe("resetCredentials", () => {
+                    it("cresets scope.credentials to empty strings", () => {
+                        $scopeMock.credentials.nameOrEmail = "foo";
+                        $scopeMock.credentials.password = "bar";
 
-                it("calls adhUser.logIn with scope.nameOrEmail and scope.password", (done) => {
-                    $scopeMock.logIn().then(() => {
-                        expect(adhUserMock.logIn).toHaveBeenCalledWith("foo", "bar");
-                        done();
-                    });
-                });
-                it("resets credentials", (done) => {
-                    $scopeMock.logIn().then(() => {
+                        $scopeMock.resetCredentials();
+
                         expect($scopeMock.credentials).toEqual({nameOrEmail: "", password: ""});
-                        done();
                     });
                 });
-                it("unsets scope.error if everything goes well", (done) => {
-                    $scopeMock.error = "error";
-                    $scopeMock.logIn().then(() => {
-                        expect($scopeMock.error).not.toBeDefined();
-                        done();
+
+                describe("logIn", () => {
+                    beforeEach(() => {
+                        $scopeMock.credentials.nameOrEmail = "foo";
+                        $scopeMock.credentials.password = "bar";
+                    });
+
+                    it("calls adhUser.logIn with scope.nameOrEmail and scope.password", (done) => {
+                        $scopeMock.logIn().then(() => {
+                            expect(adhUserMock.logIn).toHaveBeenCalledWith("foo", "bar");
+                            done();
+                        });
+                    });
+                    it("resets credentials", (done) => {
+                        $scopeMock.logIn().then(() => {
+                            expect($scopeMock.credentials).toEqual({nameOrEmail: "", password: ""});
+                            done();
+                        });
+                    });
+                    it("unsets scope.error if everything goes well", (done) => {
+                        $scopeMock.error = "error";
+                        $scopeMock.logIn().then(() => {
+                            expect($scopeMock.error).not.toBeDefined();
+                            done();
+                        });
+                    });
+                    it("sets scope.error if something goes wrong", (done) => {
+                        adhUserMock.logIn.and.returnValue(q.reject("error"));
+                        $scopeMock.logIn().then(() => {
+                            expect($scopeMock.error).toBe("error");
+                            done();
+                        });
                     });
                 });
-                it("sets scope.error if something goes wrong", (done) => {
-                    adhUserMock.logIn.and.returnValue(q.reject("error"));
-                    $scopeMock.logIn().then(() => {
-                        expect($scopeMock.error).toBe("error");
-                        done();
+
+                describe("logOut", () => {
+                    it("calls adhUser.logOut", () => {
+                        $scopeMock.logOut();
+                        expect(adhUserMock.logOut).toHaveBeenCalled();
                     });
                 });
             });
-
-            describe("logOut", () => {
-                it("calls adhUser.logOut", () => {
-                    $scopeMock.logOut();
-                    expect(adhUserMock.logOut).toHaveBeenCalled();
-                });
-            });
-        });
-    });
-
-    describe("registerDirective", () => {
-        var directive;
-        var adhConfigMock;
-
-        beforeEach(() => {
-            adhConfigMock = {
-                template_path: "mock",
-                root_path: "mock",
-                ws_url: "mock",
-                embedded: true
-            };
-            directive = AdhUser.registerDirective(adhConfigMock);
         });
 
-        describe("controller", () => {
-            var controller;
-            var $scopeMock;
-            var adhUserMock;
+        describe("registerDirective", () => {
+            var directive;
+            var adhConfigMock;
 
             beforeEach(() => {
-                $scopeMock = {};
-                adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register"]);
-                adhUserMock.register.and.returnValue(Util.mkPromise(q, undefined));
-                controller = <any>(directive.controller[2]);
-                controller(adhUserMock, $scopeMock);
+                adhConfigMock = {
+                    template_path: "mock",
+                    root_path: "mock",
+                    ws_url: "mock",
+                    embedded: true
+                };
+                directive = AdhUser.registerDirective(adhConfigMock);
             });
 
-            it("creates an empty input object in scope", () => {
-                expect($scopeMock.input).toEqual({
-                    username: "",
-                    email: "",
-                    password: "",
-                    passwordRepeat: ""
+            describe("controller", () => {
+                var controller;
+                var $scopeMock;
+                var adhUserMock;
+
+                beforeEach(() => {
+                    $scopeMock = {};
+                    adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register"]);
+                    adhUserMock.register.and.returnValue(Util.mkPromise(q, undefined));
+                    controller = <any>(directive.controller[2]);
+                    controller(adhUserMock, $scopeMock);
                 });
-            });
 
-            describe("register", () => {
-                it("calls adhUser.register with data from scope.input", (done) => {
-                    $scopeMock.input.username = "username";
-                    $scopeMock.input.email = "email";
-                    $scopeMock.input.password = "password";
-                    $scopeMock.input.passwordRepeat = "passwordRepeat";
-
-                    $scopeMock.register().then(() => {
-                        expect(adhUserMock.register).toHaveBeenCalledWith("username", "email", "password", "passwordRepeat");
-                        done();
+                it("creates an empty input object in scope", () => {
+                    expect($scopeMock.input).toEqual({
+                        username: "",
+                        email: "",
+                        password: "",
+                        passwordRepeat: ""
                     });
                 });
-                it("unsets scope.error if everything goes well", (done) => {
-                    $scopeMock.error = "error";
-                    $scopeMock.register().then(() => {
-                        expect($scopeMock.error).not.toBeDefined();
-                        done();
+
+                describe("register", () => {
+                    it("calls adhUser.register with data from scope.input", (done) => {
+                        $scopeMock.input.username = "username";
+                        $scopeMock.input.email = "email";
+                        $scopeMock.input.password = "password";
+                        $scopeMock.input.passwordRepeat = "passwordRepeat";
+
+                        $scopeMock.register().then(() => {
+                            expect(adhUserMock.register).toHaveBeenCalledWith("username", "email", "password", "passwordRepeat");
+                            done();
+                        });
                     });
-                });
-                it("sets scope.error if something goes wrong", (done) => {
-                    adhUserMock.register.and.returnValue(q.reject("error"));
-                    $scopeMock.register().then(() => {
-                        expect($scopeMock.error).toBe("error");
-                        done();
+                    it("unsets scope.error if everything goes well", (done) => {
+                        $scopeMock.error = "error";
+                        $scopeMock.register().then(() => {
+                            expect($scopeMock.error).not.toBeDefined();
+                            done();
+                        });
+                    });
+                    it("sets scope.error if something goes wrong", (done) => {
+                        adhUserMock.register.and.returnValue(q.reject("error"));
+                        $scopeMock.register().then(() => {
+                            expect($scopeMock.error).toBe("error");
+                            done();
+                        });
                     });
                 });
             });
