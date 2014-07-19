@@ -1,13 +1,10 @@
 /// <reference path="../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
-/// <reference path="../../lib/DefinitelyTyped/q/Q.d.ts"/>
+/// <reference path="../_all.d.ts"/>
 
 import Util = require("./Util");
 import q = require("q");
 
 import Resources = require("./Resources");
-
-// FIXME: DefinitelyTyped is not yet compatible with jasmine 2.0.0
-declare var beforeEach : (any) => void;
 
 
 var createAdhHttpMock = () => {

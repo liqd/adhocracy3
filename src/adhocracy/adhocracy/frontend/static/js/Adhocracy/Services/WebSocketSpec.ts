@@ -1,5 +1,4 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/q/Q.d.ts"/>
 
 import Config = require("./Config");
 import WebSocket = require("./WebSocket");
