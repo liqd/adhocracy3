@@ -24,6 +24,10 @@ for i in `find . -name '*Spec.ts' | grep -v ./AdhocracySpec.ts | sort`; do
 done
 
 echo
+
+# FIXME: We need a cast because DefinitelyTyped is not yet aware of
+# DEFAULT_TIMEOUT_INTERVAL.
+# See https://github.com/borisyankov/DefinitelyTyped/pull/2532
 echo "(<any>jasmine).DEFAULT_TIMEOUT_INTERVAL = 1000;"
 echo
 
