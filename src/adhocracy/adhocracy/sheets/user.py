@@ -1,8 +1,6 @@
 """User Sheet."""
 import colander
 from cryptacular.bcrypt import BCRYPTPasswordManager
-from substanced.catalog import catalog_factory
-from substanced.catalog import Field
 
 from adhocracy.interfaces import ISheet
 from adhocracy.sheets import add_sheet_to_registry
@@ -39,10 +37,10 @@ userbasic_metadata = sheet_metadata_defaults._replace(
 )
 
 
-#@catalog_factory('usercatalog')
-# class UserFactory(object):
-#    email = Field()
-#    name = Field()
+# @catalog_factory('usercatalog')
+#  class UserFactory(object):
+#     email = Field()
+#     name = Field()
 
 
 class IPasswordAuthentication(ISheet):

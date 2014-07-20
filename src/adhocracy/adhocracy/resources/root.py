@@ -20,7 +20,7 @@ class IRootPool(IPool, IRoot):
 
 def create_initial_content_for_app_root(context: IPool, registry: Registry,
                                         options: dict):
-    """Add the platform object, catalog and pricipals services to the context."""
+    """Add the platform object, Catalog, principals services to the context."""
     _add_objectmap_to_app_root(context)
     _add_graph(context, registry)
     _add_catalog_service(context, registry)
@@ -38,10 +38,11 @@ def _add_graph(context, registry):
     graph = registry.content.create('Graph', context)
     context.__graph__ = graph
 
+
 def _add_catalog_service(context, registry):
     catalogs = registry.content.create('Catalogs')
     # FIXME add the 'add_service' method to IPool
-    context.add_service('catalogs', catalogs)
+    context.add_service('catalogs', catalogs, registry=registry)
     catalogs.add_catalog('system')
 
 
@@ -49,7 +50,7 @@ def _add_principals_service(context, registry):
     appstructs = {'adhocracy.sheets.name.IName': {'name': 'principals'}}
     principals = registry.content.create(IPrincipalsPool.__identifier__,
                                          appstructs=appstructs)
-    context.add_service('principals', principals)
+    context.add_service('principals', principals, registry=registry)
 
 
 def _add_acl_to_app_root(context, registry):
@@ -69,7 +70,7 @@ def _add_platform(context, registry):
 root_metadata = pool_metadata._replace(
     iresource=IRootPool,
     after_creation=[create_initial_content_for_app_root] +
-                    pool_metadata.after_creation,
+    pool_metadata.after_creation,
 )
 
 

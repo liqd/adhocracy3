@@ -26,9 +26,9 @@ class Reference(namedtuple('Reference', 'source isheet field target')):
 
     """Fields: source isheet field target."""
 
-@content(
-    'Graph',
-    )
+
+@content('Graph',
+         )
 class Graph(Persistent):
 
     """Utility to work with versions/references.
