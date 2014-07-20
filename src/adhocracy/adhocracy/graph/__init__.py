@@ -9,6 +9,7 @@ from persistent import Persistent
 from substanced.util import find_objectmap
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import Multireference
+from substanced.content import content
 
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import SheetReference
@@ -25,7 +26,9 @@ class Reference(namedtuple('Reference', 'source isheet field target')):
 
     """Fields: source isheet field target."""
 
-
+@content(
+    'Graph',
+    )
 class Graph(Persistent):
 
     """Utility to work with versions/references.
@@ -36,10 +39,12 @@ class Graph(Persistent):
     """
 
     # FIXME: add interface for graph implementations
+    def __init__(self, context):
+        self.context = context
 
-    def __init__(self, root):
-        self._root = root
-        self._objectmap = find_objectmap(root)
+    @property
+    def _objectmap(self):
+        return find_objectmap(self.context)
 
     def get_reftypes(self, base_isheet=ISheet,
                      base_reftype=SheetReference) -> Iterator:
@@ -197,5 +202,6 @@ class Graph(Persistent):
 
 
 def includeme(config):  # pragma: no cover
-    """Graph package configuration."""
+    """Register Graph content type."""
+    config.scan('.')
     config.include('.evolve')

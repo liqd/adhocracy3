@@ -41,28 +41,21 @@ def create_dummy_resource(parent=None, iface=IResource):
 
 class TestGraphUnitTest(unittest.TestCase):
 
-    def _make_one(self, *args):
+    def _make_one(self, context=None):
         from adhocracy.graph import Graph
-        return Graph(*args)
+        return Graph(context)
 
     def test_create(self):
         from persistent import Persistent
-        dummy_objectmap = object()
-        root = testing.DummyResource(__objectmap__=dummy_objectmap)
-        graph = self._make_one(root)
+        objectmap = object()
+        context = testing.DummyResource(__objectmap__=objectmap)
+        graph = self._make_one(context=context)
         assert issubclass(graph.__class__, Persistent)
-        assert graph._root is root
-        assert graph._objectmap is root.__objectmap__
+        assert graph._objectmap is objectmap
 
     def test_create_with_missing_objectmap(self):
-        root = testing.DummyResource()
-        graph = self._make_one(root)
+        graph = self._make_one(context=None)
         assert graph._objectmap is None
-
-    def test_create_with_root_is_none(self):
-        root = None
-        graph = self._make_one(root)
-        assert graph._root is None
 
 
 class TestGraphGetReferencesUnitTest(unittest.TestCase):
@@ -73,8 +66,8 @@ class TestGraphGetReferencesUnitTest(unittest.TestCase):
 
     def _make_one(self, **kwargs):
         from adhocracy.graph import Graph
-        graph = Graph(None)
-        graph._objectmap = self.objectmap
+        context = testing.DummyResource(__objectmap__=self.objectmap)
+        graph = Graph(context=context)
         return Graph.get_reftypes(graph, **kwargs)
 
     def test_get_reftypes_no_objectmap(self):
@@ -160,8 +153,8 @@ class GraphSetReferencesUnitTest(unittest.TestCase):
 
     def _make_one(self, *args):
         from adhocracy.graph import Graph
-        graph = Graph(None)
-        graph._objectmap = self.objectmap
+        context = testing.DummyResource(__objectmap__=self.objectmap)
+        graph = Graph(context)
         return Graph.set_references(graph, *args)
 
     def test_reftype_not_sheetreferencetype(self):
@@ -248,8 +241,8 @@ class GraphGetReferencesUnitTest(unittest.TestCase):
 
     def _make_one(self, resource, **kwargs):
         from adhocracy.graph import Graph
-        graph = Graph(None)
-        graph._objectmap = self.objectmap
+        context = testing.DummyResource(__objectmap__=self.objectmap)
+        graph = Graph(context)
         return Graph.get_references(graph, resource, **kwargs)
 
     def test_no_reference(self):
@@ -313,8 +306,8 @@ class GraphGetBackReferencesUnitTest(unittest.TestCase):
 
     def _make_one(self, resource, **kwargs):
         from adhocracy.graph import Graph
-        graph = Graph(None)
-        graph._objectmap = self.objectmap
+        context = testing.DummyResource(__objectmap__=self.objectmap)
+        graph = Graph(context)
         return Graph.get_back_references(graph, resource, **kwargs)
 
     def test_no_reference(self):
@@ -374,14 +367,14 @@ class GraphGetBackReferencesForIsheetUnitTest(unittest.TestCase):
         from substanced.objectmap import ObjectMap
         context = create_dummy_resource()
         context.__objectmap__ = ObjectMap(context)
+        self.context = context
         self.objectmap = context.__objectmap__
         self.source = create_dummy_resource(parent=context)
         self.target = create_dummy_resource(parent=context)
 
     def _make_one(self, context, isheet):
         from adhocracy.graph import Graph
-        graph = Graph(None)
-        graph._objectmap = self.objectmap
+        graph = Graph(self.context)
         return Graph.get_back_references_for_isheet(graph, context, isheet)
 
     def test_with_isheet_but_no_rerferences(self):
@@ -461,14 +454,14 @@ class GraphGetReferencesForIsheetUnitTest(unittest.TestCase):
         from substanced.objectmap import ObjectMap
         context = create_dummy_resource()
         context.__objectmap__ = ObjectMap(context)
+        self.context = context
         self.objectmap = context.__objectmap__
         self.source = create_dummy_resource(parent=context)
         self.target = create_dummy_resource(parent=context)
 
     def _make_one(self, context, isheet):
         from adhocracy.graph import Graph
-        graph = Graph(None)
-        graph._objectmap = self.objectmap
+        graph = Graph(self.context)
         return Graph.get_references_for_isheet(graph, context, isheet)
 
     def test_with_isheet(self):
@@ -494,8 +487,7 @@ class GetFollowsUnitTest(unittest.TestCase):
 
     def _make_one(self, context):
         from adhocracy.graph import Graph
-        graph = self.graph
-        return Graph.get_follows(graph, context)
+        return Graph.get_follows(self.graph, context)
 
     def test_predecessor(self):
         from adhocracy.graph import Reference
@@ -523,8 +515,7 @@ class GetFollowedByUnitTest(unittest.TestCase):
 
     def _make_one(self, context):
         from adhocracy.graph import Graph
-        graph = self.graph
-        return Graph.get_followed_by(graph, context)
+        return Graph.get_followed_by(self.graph, context)
 
     def test_sucessors(self):
         from adhocracy.graph import Reference
@@ -555,8 +546,8 @@ class GraphIsInSubtreeUnitTest(unittest.TestCase):
 
     def _make_one(self, descendant, ancestors):
         from adhocracy.graph import Graph
-        graph = Graph(None)
-        graph._objectmap = self.objectmap
+        context = testing.DummyResource(__objectmap__=self.objectmap)
+        graph = Graph(context)
         return Graph.is_in_subtree(graph, descendant, ancestors)
 
     def test_with_no_ancestors(self):
@@ -642,3 +633,20 @@ class GraphIsInSubtreeUnitTest(unittest.TestCase):
         assert result is True
         result = self._make_one(element, [not_root, root])
         assert result is True
+
+
+class TestGraphIntegrationTest(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+        self.config.include('adhocracy.registry')
+        self.config.include('adhocracy.graph')
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_create_Graph(self):
+        from adhocracy.graph import Graph
+        context = testing.DummyResource()
+        graph = self.config.registry.content.create('Graph', context)
+        assert isinstance(graph, Graph)
