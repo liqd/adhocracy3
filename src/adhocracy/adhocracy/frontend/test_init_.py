@@ -38,9 +38,9 @@ class ConfigViewTest(unittest.TestCase):
         request.registry.settings = {'adhocracy.frontend.template_path': '/t'}
         assert self._callFUT(request)['template_path'] == '/t'
 
-    def test_root_path_with_root_settings(self):
+    def test_root_path_with_platform_settings(self):
         request = testing.DummyRequest()
-        request.registry.settings = {'adhocracy.root': 'adhocracy2'}
+        request.registry.settings = {'adhocracy.platform_id': 'adhocracy2'}
         assert self._callFUT(request)['root_path'] == '/adhocracy2'
 
 

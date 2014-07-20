@@ -34,36 +34,5 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def test_add_root_element(self):
-        from adhocracy.evolution import add_app_root_element
-        self.config.include('substanced.content')
-        self.config.include('adhocracy.registry')
-        self.config.include('adhocracy.resources.pool')
-        self.config.include('adhocracy.sheets.name')
-        root = DummyFolder()
-        add_app_root_element(root)
-        assert 'adhocracy' in root
-
-    def test_add_root_element_root_already_exists(self):
-        from adhocracy.evolution import add_app_root_element
-        root = DummyFolder()
-        root['adhocracy'] = DummyFolder()
-        add_app_root_element(root)
-        assert 'adhocracy' in root
-
-    def test_add_app_root_permissions(self):
-        from adhocracy.evolution import add_app_root_permissions
-        root = testing.DummyResource()
-        root['adhocracy'] = testing.DummyResource()
-        add_app_root_permissions(root)
-        assert len(root['adhocracy'].__acl__) > 0
-
-    def test_includeme_register_steps(self):
-        from substanced.interfaces import IEvolutionSteps
-        self.config.include('substanced.evolution')
-        self.config.include('adhocracy.evolution')
-        steps = self.config.registry.getUtility(IEvolutionSteps)
-        assert 'adhocracy.evolution.add_app_root_element' in steps.names
-        assert 'adhocracy.evolution.add_app_root_permissions' in steps.names
     def test_includeme_add_directives(self):
         assert 'add_evolution_step' in self.config.registry._directives

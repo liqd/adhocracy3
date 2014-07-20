@@ -6,6 +6,7 @@ from substanced.evolution import mark_unfinished_as_finished as markunf
 import transaction
 
 from adhocracy.authentication import TokenHeaderAuthenticationPolicy
+from adhocracy.resources.root import IRootPool
 
 
 def root_factory(request, t=transaction, g=get_connection,
@@ -21,7 +22,7 @@ def root_factory(request, t=transaction, g=get_connection,
     zodb_root = conn.root()
     if 'app_root' not in zodb_root:
         registry = request.registry
-        app_root = registry.content.create('Root')
+        app_root = registry.content.create(IRootPool.__identifier__)
         zodb_root['app_root'] = app_root
         t.savepoint()  # give app_root a _p_jar
         if mark_unfinished_as_finished:  # pragma: no cover

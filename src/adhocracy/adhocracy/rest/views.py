@@ -13,7 +13,6 @@ from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
-from substanced.interfaces import IRoot
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItem
@@ -34,6 +33,7 @@ from adhocracy.schema import AbstractReferenceIterable
 from adhocracy.utils import get_iresource
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
+from adhocracy.resources.root import IRootPool
 
 
 logger = getLogger(__name__)
@@ -407,7 +407,7 @@ class ItemRESTView(PoolRESTView):
 
 @view_defaults(
     renderer='simplejson',
-    context=IRoot,
+    context=IRootPool,
     name='meta_api'
 )
 class MetaApiView(RESTView):
@@ -616,7 +616,7 @@ def _build_successful_login_response(user_path: str, user_token: str) -> dict:
 
 @view_defaults(
     renderer='simplejson',
-    context=IRoot,
+    context=IRootPool,
     decorator=validate_request_data_decorator()
 )
 class LoginUsernameView(RESTView):

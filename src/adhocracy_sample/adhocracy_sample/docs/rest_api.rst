@@ -20,7 +20,6 @@ Start Adhocracy testapp::
 
     >>> from webtest import TestApp
     >>> app = getfixture('app_sample')
-    Executin...
     >>> websocket = getfixture('websocket')
     >>> testapp = TestApp(app)
 

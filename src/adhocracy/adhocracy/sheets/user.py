@@ -39,10 +39,10 @@ userbasic_metadata = sheet_metadata_defaults._replace(
 )
 
 
-@catalog_factory('usercatalog')
-class UserFactory(object):
-    email = Field()
-    name = Field()
+#@catalog_factory('usercatalog')
+# class UserFactory(object):
+#    email = Field()
+#    name = Field()
 
 
 class IPasswordAuthentication(ISheet):
@@ -107,16 +107,16 @@ password_metadata = sheet_metadata_defaults._replace(
 )
 
 
-def add_user_catalog(root):
-    """Add the user catalog if it doesn't exist yet."""
-    catalogs = root['catalogs']
-    if 'usercatalog' not in catalogs:
-        catalogs.add_catalog('usercatalog', update_indexes=True)
+# def add_user_catalog(root):
+#     """Add the user catalog if it doesn't exist yet."""
+#     catalogs = root['catalogs']
+#     if 'usercatalog' not in catalogs:
+#        catalogs.add_catalog('usercatalog', update_indexes=True)
 
 
 def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_metadata, config.registry)
     add_sheet_to_registry(password_metadata, config.registry)
-    config.scan('.')
-    config.add_evolution_step(add_user_catalog)
+    # config.scan('.')
+    # config.add_evolution_step(add_user_catalog)
