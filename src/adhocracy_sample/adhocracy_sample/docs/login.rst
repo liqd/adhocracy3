@@ -33,7 +33,7 @@ User Creation (Registration)
 ----------------------------
 
 A new user is registered by creating a user object under the
-``/adhocracy/principals/users`` pool. On success, the response contains the
+``/principals/users`` pool. On success, the response contains the
 path of the new user::
 
     >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
@@ -43,10 +43,10 @@ path of the new user::
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy.sheets.user.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp_data = testapp.post_json("/adhocracy/principals/users", prop).json
+    >>> resp_data = testapp.post_json("/principals/users", prop).json
     >>> resp_data["content_type"]
     'adhocracy.resources.principal.IUser'
-    >>> resp_data["path"].startswith('/adhocracy/principals/users/00')
+    >>> resp_data["path"].startswith('/principals/users/00')
     True
 
 The "name" field in the "IUserBasic" schema is a non-empty string that
@@ -75,7 +75,7 @@ E.g. when we try to register a user with an empty password::
     ...                  'email': 'annina@example.org'},
     ...              'adhocracy.sheets.user.IPasswordAuthentication': {
     ...                  'password': ''}}}
-    >>> resp_data = testapp.post_json("/adhocracy/principals/users", prop,
+    >>> resp_data = testapp.post_json("/principals/users", prop,
     ...                               status=400).json
     >>> pprint(resp_data)
     {'errors': [['body', 'password', 'Required']], 'status': 'error'}
@@ -132,7 +132,7 @@ to the URL ``login_username`` with a user name and password::
     >>> resp_data = testapp.post_json('/login_username', prop).json
     >>> pprint(resp_data)
     {'status': 'success',
-     'user_path': '/adhocracy/principals/users/...',
+     'user_path': '/principals/users/...',
      'user_token': '...'}
     >>> user_path = resp_data['user_path']
     >>> user_token_via_username = resp_data['user_token']
@@ -144,7 +144,7 @@ Or to ``login_email``, specifying the user's email address instead of name::
     >>> resp_data = testapp.post_json('/login_email', prop).json
     >>> pprint(resp_data)
     {'status': 'success',
-     'user_path': '/adhocracy/principals/users/...',
+     'user_path': '/principals/users/...',
      'user_token': '...'}
     >>> user_token_via_email = resp_data['user_token']
 
