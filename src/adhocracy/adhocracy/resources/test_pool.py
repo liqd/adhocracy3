@@ -24,7 +24,6 @@ class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
-        self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
         self.config.include('adhocracy.resources.pool')
         self.context = DummyFolder()

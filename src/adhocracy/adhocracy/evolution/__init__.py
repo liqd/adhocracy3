@@ -6,6 +6,7 @@ from pyramid.security import Allow
 from pyramid.security import ALL_PERMISSIONS
 from substanced.util import set_acl
 from substanced.util import get_acl
+from substanced.evolution import add_evolution_step
 
 
 logger = logging.getLogger(__name__)
@@ -37,3 +38,5 @@ def includeme(config):  # pragma: no cover
     config.add_evolution_step(add_app_root_element)
     config.add_evolution_step(
         add_app_root_permissions, after=add_app_root_element)
+    config.add_directive('add_evolution_step', add_evolution_step)
+    config.scan('substanced.evolution.subscribers')

@@ -6,12 +6,6 @@ from pyramid.config import Configurator
 def includeme(config):
     """Setup sample app."""
     config.include('adhocracy')
-    # include additional default resource types
-    config.include('adhocracy.resources.tag')
-    config.include('adhocracy.resources.pool')
-    config.include('adhocracy.resources.principal')
-    # include additional default sheet types
-    config.include('adhocracy.sheets.user')
     # include custom resource types
     config.include('adhocracy_sample.resources')
 

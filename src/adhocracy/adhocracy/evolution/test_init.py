@@ -29,6 +29,7 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
+        self.config.include('adhocracy.evolution')
 
     def tearDown(self):
         testing.tearDown()
@@ -64,3 +65,5 @@ class ResourceFactoryIntegrationTest(unittest.TestCase):
         steps = self.config.registry.getUtility(IEvolutionSteps)
         assert 'adhocracy.evolution.add_app_root_element' in steps.names
         assert 'adhocracy.evolution.add_app_root_permissions' in steps.names
+    def test_includeme_add_directives(self):
+        assert 'add_evolution_step' in self.config.registry._directives

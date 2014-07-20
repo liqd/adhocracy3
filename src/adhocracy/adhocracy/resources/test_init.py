@@ -53,14 +53,13 @@ class DummyFolder(testing.DummyResource):
 ###########
 
 
-
 class AddResourceTypeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         from adhocracy.interfaces import resource_metadata
         from adhocracy.resources.resource import Base
         self.config = testing.setUp()
-        self.config.include('substanced.content')
+        self.config.include('adhocracy.registry')
         self.content_registry = self.config.registry.content
         self.resource_metadata = resource_metadata._replace(iresource=IResource,
                                                             content_class=Base)

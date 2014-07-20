@@ -47,7 +47,6 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         from adhocracy.graph import Graph
         from substanced.objectmap import ObjectMap
         self.config = testing.setUp()
-        self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
         self.config.include('adhocracy.sheets.name')
         self.config.include('adhocracy.sheets.versions')
@@ -131,7 +130,6 @@ class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
-        self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
         self.config.include('adhocracy.resources.itemversion')
 

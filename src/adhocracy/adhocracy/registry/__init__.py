@@ -4,6 +4,8 @@ from pyramid.path import DottedNameResolver
 from pyramid.testing import DummyResource
 from pyramid.request import Request
 from substanced.content import ContentRegistry
+from substanced.content import add_content_type
+from substanced.content import add_service_type
 
 from adhocracy.interfaces import IResource
 from adhocracy.utils import get_iresource
@@ -145,7 +147,9 @@ class ResourceContentRegistry(ContentRegistry):
 
 def includeme(config):  # pragma: no cover
     """Run pyramid config."""
-    content_old = config.registry.content
-    content_new = ResourceContentRegistry(config.registry)
-    content_new.__dict__.update(content_old.__dict__)
-    config.registry.content = content_new
+    """Add content registry, register substanced content_type decorators."""
+    config.registry.content = ResourceContentRegistry(config.registry)
+    config.add_directive('add_content_type', add_content_type)
+    config.add_directive('add_service_type', add_service_type)
+    # FIXME we cannot add the substanced view_predicate `content_type` here,
+    # this conflicts with _:class:`cornice.ContentTypePredicate`

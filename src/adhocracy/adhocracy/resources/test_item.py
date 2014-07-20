@@ -49,7 +49,6 @@ class ItemIntegrationTest(unittest.TestCase):
         from adhocracy.graph import Graph
         from adhocracy.resources.item import item_metadata
         self.config = testing.setUp()
-        self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
         self.config.include('adhocracy.resources.item')
         self.config.include('adhocracy.resources.itemversion')
@@ -125,7 +124,6 @@ class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
-        self.config.include('substanced.content')
         self.config.include('adhocracy.registry')
         self.config.include('adhocracy.resources.item')
         self.context = DummyFolder()
