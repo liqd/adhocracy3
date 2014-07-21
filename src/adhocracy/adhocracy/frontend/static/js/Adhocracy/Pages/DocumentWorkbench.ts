@@ -108,4 +108,14 @@ export var run = (config) => {
     // get going
 
     angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
+
+
+    // readyState only indicates whether DOM construction is complete,
+    // at which point angular bootstrapping only starts.  once we are
+    // done bootstrapping, write an ad-hoc flag into the DOM, so the
+    // test code can check for that.
+    if (!window.hasOwnProperty("adhocracy")) {
+        window["adhocracy"] = {};
+    };
+    (<any>window).adhocracy.loadState = "complete";
 };
