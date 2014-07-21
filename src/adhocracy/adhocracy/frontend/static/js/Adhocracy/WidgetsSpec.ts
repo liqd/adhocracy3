@@ -4,7 +4,6 @@
 // This is only used at compile time and will be stripped by the compiler
 import Config = require("./Services/Config");
 
-import Util = require("./Util");
 import q = require("q");
 
 // the module under test
@@ -100,7 +99,7 @@ export var register = () => {
 
                     beforeEach((done) => {
                         adhHttpMock = createAdhHttpMock();
-                        adhHttpMock.get.and.callFake(() => Util.mkPromise(q, container));
+                        adhHttpMock.get.and.callFake(() => q.when(container));
 
                         scope = {
                             container: undefined,
@@ -207,7 +206,7 @@ export var register = () => {
 
                 beforeEach((done) => {
                     adhHttpMock = createAdhHttpMock();
-                    adhHttpMock.get.and.returnValue(Util.mkPromise(q, version));
+                    adhHttpMock.get.and.returnValue(q.when(version));
 
                     adapter = new Widgets.ListingElementTitleAdapter(q, adhHttpMock);
 
@@ -256,7 +255,7 @@ export var register = () => {
 
                     beforeEach((done) => {
                         adhHttpMock = createAdhHttpMock();
-                        adhHttpMock.get.and.returnValue(Util.mkPromise(q, path));
+                        adhHttpMock.get.and.returnValue(q.when(path));
 
                         var controller = <any>directive.controller[3];
                         controller(scope, adhHttpMock, done);

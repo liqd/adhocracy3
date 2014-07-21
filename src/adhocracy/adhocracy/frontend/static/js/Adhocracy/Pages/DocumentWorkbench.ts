@@ -37,6 +37,9 @@ export var run = (config) => {
             .when("/frontend_static/root.html", {
                 templateUrl: config.template_path + "/Wrapper.html"
             })
+            .when("/register", {
+                template: "<adh-register></adh-register>"
+            })
             .when("/embed/:widget", {
                 template: "<adh-embed></adh-embed>"
             })
@@ -55,8 +58,9 @@ export var run = (config) => {
     app.value("Modernizr", modernizr);
 
     app.service("adhResources", Resources.Service);
-    app.service("adhUser", ["$http", "$window", "Modernizr", AdhUser.User]);
-    app.directive("adhLogin", ["adhUser", AdhUser.loginDirective]);
+    app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
+    app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
+    app.directive("adhRegister", ["adhConfig", AdhUser.registerDirective]);
     app.value("adhConfig", config);
     app.factory("adhDone", AdhDone.factory);
 
@@ -104,4 +108,14 @@ export var run = (config) => {
     // get going
 
     angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
+
+
+    // readyState only indicates whether DOM construction is complete,
+    // at which point angular bootstrapping only starts.  once we are
+    // done bootstrapping, write an ad-hoc flag into the DOM, so the
+    // test code can check for that.
+    if (!window.hasOwnProperty("adhocracy")) {
+        window["adhocracy"] = {};
+    };
+    (<any>window).adhocracy.loadState = "complete";
 };

@@ -166,7 +166,7 @@ class Client:
 
 def get_ws_client(registry) -> Client:
     """Return websocket client object or None."""
-    if registry:
+    if registry is not None:
         return getattr(registry, 'ws_client', None)
 
 

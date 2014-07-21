@@ -245,8 +245,28 @@ def browser_instance(request,
 
 
 @pytest.fixture()
-def browser_root(browser, server) -> Browser:
-    """Start sample application and go to the root html page."""
+def browser_root(browser_instance, server) -> Browser:
+    """browser_instance with url=root.html."""
     url = server.application_url + 'frontend_static/root.html'
-    browser.visit(url)
-    return browser
+    browser_instance.visit(url)
+
+    def angular_app_loaded(browser):
+        code = 'window.hasOwnProperty("adhocracy") && window.adhocracy.hasOwnProperty("loadState") && window.adhocracy.loadState === "complete";'  # noqa
+        return browser.evaluate_script(code)
+    browser_instance.wait_for_condition(angular_app_loaded, 5)
+
+    return browser_instance
+
+
+@pytest.fixture()
+def browser_test(browser_instance, server) -> Browser:
+    """browser_instance with url=test.html."""
+    url = server.application_url + 'frontend_static/test.html'
+    browser_instance.visit(url)
+
+    def jasmine_finished(browser):
+        code = 'jsApiReporter.finished'
+        return browser.evaluate_script(code)
+    browser_instance.wait_for_condition(jasmine_finished, 5)
+
+    return browser_instance
