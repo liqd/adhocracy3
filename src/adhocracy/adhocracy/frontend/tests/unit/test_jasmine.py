@@ -12,11 +12,6 @@ class TestJasmine:
     # a3 provides a poly-fill to deal with this (see commit c0d0cd3).
 
     def test_all(self, browser_test):
-        def jasmineFinished(browser):
-            js = 'jsApiReporter.finished'
-            return browser.evaluate_script(js)
-        browser_test.wait_for_condition(jasmineFinished, 5)
-
         data = browser_test.evaluate_script('jsApiReporter.specs()')
 
         formatter = Formatter([])

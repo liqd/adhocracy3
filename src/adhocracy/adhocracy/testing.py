@@ -185,7 +185,7 @@ def splinter_browser_load_condition():
 
     """
     def is_page_loaded(browser):
-        code = 'document.readyState === "complete";'
+        code = 'document.readyState === "complete"';
         return browser.evaluate_script(code)
 
     return is_page_loaded
@@ -249,6 +249,12 @@ def browser_root(browser_instance, server) -> Browser:
     """browser_instance with url=root.html."""
     url = server.application_url + 'frontend_static/root.html'
     browser_instance.visit(url)
+
+    def angularAppLoaded(browser):
+        code = 'window.hasOwnProperty("adhocracy") && window.adhocracy.hasOwnProperty("loadState") && window.adhocracy.loadState === "complete";'
+        return browser.evaluate_script(code)
+    browser_instance.wait_for_condition(angularAppLoaded, 5)
+
     return browser_instance
 
 
@@ -257,4 +263,10 @@ def browser_test(browser_instance, server) -> Browser:
     """browser_instance with url=test.html."""
     url = server.application_url + 'frontend_static/test.html'
     browser_instance.visit(url)
+
+    def jasmineFinished(browser):
+        code = 'jsApiReporter.finished'
+        return browser.evaluate_script(code)
+    browser_instance.wait_for_condition(jasmineFinished, 5)
+
     return browser_instance
