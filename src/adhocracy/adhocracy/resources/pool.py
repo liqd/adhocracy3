@@ -2,7 +2,9 @@
 import datetime
 
 from substanced.folder import Folder
+from substanced.interfaces import IFolder
 from zope.interface import implementer
+
 import adhocracy.sheets.name
 import adhocracy.sheets.pool
 from adhocracy.interfaces import IPool
@@ -16,7 +18,7 @@ class IBasicPool(IPool):
     """Basic Pool."""
 
 
-@implementer(IPool)
+@implementer(IPool, IFolder)
 class Pool(Base, Folder):
 
     """An Auto-Naming Folder.
@@ -25,8 +27,10 @@ class Pool(Base, Folder):
 
     The next_name method sequentially increments the last name:
     ``0000001``, then ``0000002``, and so on.
-
     """
+
+    #  The pool needs to provide IFolder to make substance.util.find_service
+    # work
 
     _autoname_length = 7
     _autoname_last = -1
