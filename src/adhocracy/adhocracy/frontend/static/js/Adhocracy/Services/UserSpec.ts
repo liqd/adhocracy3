@@ -18,8 +18,7 @@ export var register = () => {
             var modernizrMock;
 
             beforeEach(() => {
-                adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["put", "get", "post"]);
-                adhHttpMock.put.and.returnValue(Util.mkPromise(q, {}));
+                adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "post"]);
                 adhHttpMock.post.and.returnValue(Util.mkPromise(q, {}));
                 adhHttpMock.get.and.returnValue(Util.mkPromise(q, {
                     data: {
@@ -49,7 +48,7 @@ export var register = () => {
 
             describe("login", () => {
                 beforeEach(() => {
-                    adhUser.adhHttp.put.and.returnValue(Util.mkPromise(q, {
+                    adhUser.adhHttp.post.and.returnValue(Util.mkPromise(q, {
                         status: "success",
                         user_path: "user1_path",
                         user_token: "user1_tok"
@@ -84,7 +83,7 @@ export var register = () => {
                     testLogin();
 
                     it("requests the API endpoint /login_username", () => {
-                        expect(adhHttpMock.put).toHaveBeenCalledWith("/login_username", {
+                        expect(adhHttpMock.post).toHaveBeenCalledWith("/login_username", {
                             name: "user1",
                             password: "user1_pass"
                         });
@@ -104,7 +103,7 @@ export var register = () => {
                     testLogin();
 
                     it("requests the API endpoint /login_email", () => {
-                        expect(adhHttpMock.put).toHaveBeenCalledWith("/login_email", {
+                        expect(adhHttpMock.post).toHaveBeenCalledWith("/login_email", {
                             email: "user1@somedomain",
                             password: "user1_pass"
                         });
@@ -129,7 +128,7 @@ export var register = () => {
                     var _reason;
 
                     beforeEach((done) => {
-                        adhUser.adhHttp.put.and.returnValue(q.reject());
+                        adhUser.adhHttp.post.and.returnValue(q.reject());
                         adhUser.logIn("user1", "user1_wrong_pass").then(
                             done,
                             (reason) => {

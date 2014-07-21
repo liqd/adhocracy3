@@ -81,12 +81,12 @@ export class User {
         var promise;
 
         if (nameOrEmail.indexOf("@") === -1) {
-            promise = _self.adhHttp.put("/login_username", {
+            promise = _self.adhHttp.post("/login_username", {
                 name: nameOrEmail,
                 password: password
             });
         } else {
-            promise = _self.adhHttp.put("/login_email", {
+            promise = _self.adhHttp.post("/login_email", {
                 email: nameOrEmail,
                 password: password
             });
