@@ -2,6 +2,7 @@
 import colander
 
 from adhocracy.schema import AbsolutePath
+from adhocracy.schema import Email
 from adhocracy.schema import Password
 
 
@@ -158,6 +159,14 @@ class POSTLoginUsernameRequestSchema(colander.Schema):
 
     name = colander.SchemaNode(colander.String(),
                                missing=colander.required)
+    password = Password(missing=colander.required)
+
+
+class POSTLoginEmailRequestSchema(colander.Schema):
+
+    """"""
+
+    email = Email(missing=colander.required)
     password = Password(missing=colander.required)
 
 

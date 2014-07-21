@@ -25,6 +25,7 @@ from adhocracy.interfaces import ILocation
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
 from adhocracy.rest.schemas import POSTItemRequestSchema
+from adhocracy.rest.schemas import POSTLoginEmailRequestSchema
 from adhocracy.rest.schemas import POSTLoginUsernameRequestSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
 from adhocracy.rest.schemas import PUTResourceRequestSchema
@@ -532,6 +533,22 @@ def validate_login_name(context, request: Request):
         request.validated['user'] = user
 
 
+def validate_login_email(context, request: Request):
+    """Validate the email address of a login request.
+
+    If valid, the user object is added as 'user' to
+    `request.validated`.
+    """
+    name = request.validated['email']
+    locator = request.registry.getMultiAdapter((context, request),
+                                               IUserLocator)
+    user = locator.get_user_by_email(name)
+    if user is None:
+        _add_no_such_user_or_wrong_password_error(request)
+    else:
+        request.validated['user'] = user
+
+
 def validate_login_password(context, request: Request):
     """Validate the password of a login request.
 
@@ -563,18 +580,39 @@ class LoginUsernameView(RESTView):
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
-        user = self.request.validated['user']
-        user_path = resource_path(user)
-        headers = remember(self.request, user_path)
-        return _build_successful_login_response(headers['X-User-Path'],
-                                                headers['X-User-Token'])
+        return _login_user(self.request)
 
 
-def _build_successful_login_response(user_path: str, user_token: str) -> dict:
-    """Build response data structure for a successful request. """
+def _login_user(request: Request) -> dict:
+    """Log-in a user and return a response indicating success."""
+    user = request.validated['user']
+    user_path = resource_path(user)
+    headers = remember(request, user_path)
+    user_path = headers['X-User-Path']
+    user_token = headers['X-User-Token']
     return {'status': 'success',
             'user_path': user_path,
             'user_token': user_token}
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IRootPool,
+    decorator=validate_request_data_decorator()
+)
+class LoginEmailView(RESTView):
+
+    """Log in a user via their email address."""
+
+    validation_POST = (POSTLoginEmailRequestSchema,
+                       [validate_login_email, validate_login_password])
+
+    @view_config(name='login_email',
+                 request_method='POST',
+                 content_type='application/json')
+    def post(self) -> dict:
+        """Create new resource and get response data."""
+        return _login_user(self.request)
 
 
 def includeme(config):  # pragma: no cover
