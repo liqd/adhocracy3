@@ -22,6 +22,7 @@ class UserBasicSchema(colander.MappingSchema):
 
     `email`: email address
     `name`: visible name
+    `tzname`: time zone
     """
 
     email = Email()
@@ -31,9 +32,19 @@ class UserBasicSchema(colander.MappingSchema):
     tzname = TimeZoneName()
 
 
+class AttributeStorageSheet(GenericResourceSheet):
+
+    """Sheet class that stores data as context attributes."""
+
+    @property
+    def _data(self):
+        return self.context.__dict__
+
+
 userbasic_metadata = sheet_metadata_defaults._replace(
     isheet=IUserBasic,
     schema_class=UserBasicSchema,
+    sheet_class=AttributeStorageSheet
 )
 
 

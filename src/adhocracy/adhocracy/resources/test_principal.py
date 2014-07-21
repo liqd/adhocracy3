@@ -1,8 +1,13 @@
 """Tests for the principal package."""
 import unittest
+from mock import patch
 
 from pyramid import testing
 
+
+#############
+#  helpers  #
+#############
 
 class DummyFolder(testing.DummyResource):
 
@@ -20,6 +25,10 @@ class DummyFolder(testing.DummyResource):
     def next_name(self, obj, prefix=''):
         return prefix + '_0000000'
 
+
+#############
+#  Tests    #
+#############
 
 class PrincipalIntegrationTest(unittest.TestCase):
 
@@ -105,3 +114,70 @@ class UserUnitTest(unittest.TestCase):
         assert user.email == ''
         assert user.password == ''
         assert user.tzname == 'UTC'
+
+
+class UserLocatorAdapterUnitTest(unittest.TestCase):
+
+    def _make_one(self, context=None, request=None):
+        from adhocracy.resources.principal import UserLocatorAdapter
+        return UserLocatorAdapter(context, request)
+
+    def setUp(self):
+        from substanced.interfaces import IFolder
+        self.config = testing.setUp()
+        context = testing.DummyResource(__provides__=IFolder)
+        context['principals'] = testing.DummyResource(__is_service__=True,
+                                                       __provides__=IFolder)
+        context['principals']['users'] = testing.DummyResource()
+        self.context = context
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_create(self):
+        from substanced.interfaces import IUserLocator
+        from zope.interface.verify import verifyObject
+        inst = self._make_one()
+        assert IUserLocator.providedBy(inst)
+        assert verifyObject(IUserLocator, inst)
+
+    def test_get_user_by_email_user_exists(self):
+        user = testing.DummyResource(email='test@test.de')
+        self.context['principals']['users']['User1'] = user
+        inst = self._make_one(self.context, testing.DummyRequest())
+        assert inst.get_user_by_email('test@test.de') is user
+
+    def test_get_user_by_email_user_not_exists(self):
+        user = testing.DummyResource(email='')
+        self.context['principals']['users']['User1'] = user
+        inst = self._make_one(self.context, testing.DummyRequest())
+        assert inst.get_user_by_email('wrong@test.de') is None
+
+    def test_get_user_by_login_user_exists(self):
+        user = testing.DummyResource(name='login name')
+        self.context['principals']['users']['User1'] = user
+        inst = self._make_one(self.context, testing.DummyRequest())
+        assert inst.get_user_by_login('login name') is user
+
+    def test_get_user_by_login_user_not_exists(self):
+        user = testing.DummyResource(name='')
+        self.context['principals']['users']['User1'] = user
+        inst = self._make_one(self.context, testing.DummyRequest())
+        assert inst.get_user_by_login('wrong login name') is None
+
+
+class UserLocatorAdapterIntegrationTest(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+        self.config.include('adhocracy.registry')
+        self.config.include('adhocracy.resources.principal')
+        self.context = testing.DummyResource()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_create(self):
+        from substanced.interfaces import IUserLocator
+        from zope.component import getMultiAdapter
+        assert getMultiAdapter((self.context, testing.DummyRequest), IUserLocator)

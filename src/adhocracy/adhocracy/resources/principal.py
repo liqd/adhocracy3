@@ -1,5 +1,8 @@
 """Resources to handle users and groups."""
 from pyramid.registry import Registry
+from zope.interface import Interface
+from substanced.util import find_service
+from substanced.interfaces import IUserLocator
 from zope.interface import implementer
 
 from adhocracy.interfaces import IPool
@@ -67,6 +70,7 @@ class User(Pool):
     tzname = 'UTC'
     password = ''
     email = ''
+    name = ''
 
 
 user_metadata = pool_metadata._replace(
@@ -112,6 +116,38 @@ passwordresets_metadata = pool_metadata._replace(
 )
 
 
+@implementer(IUserLocator)
+class UserLocatorAdapter(object):
+
+    """Provides helper methods to find users."""
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def get_user_by_login(self, login: str) -> IUser:
+        """Find user per `login` name or return None."""
+        users = find_service(self.context, 'principals', 'users')
+        for user in users.values():
+            if user.name == login:
+                return user
+
+    def get_user_by_userid(self, user_id: int) -> IUser:
+        """Find user per `user_id` (zodb oid) or return None."""
+        raise NotImplementedError
+
+    def get_user_by_email(self, email: str) -> IUser:
+        """Find user per email or return None."""
+        users = find_service(self.context, 'principals', 'users')
+        for user in users.values():
+            if user.email == email:
+                return user
+
+    def get_groupids(self, user_id: int):
+        """Get user groups for `user_id` (zodb oid)."""
+        raise NotImplementedError
+
+
 def includeme(config):
     """Add resource types to registry."""
     add_resource_type_to_registry(principals_metadata, config)
@@ -119,3 +155,6 @@ def includeme(config):
     add_resource_type_to_registry(users_metadata, config)
     add_resource_type_to_registry(groups_metadata, config)
     add_resource_type_to_registry(passwordresets_metadata, config)
+    config.registry.registerAdapter(UserLocatorAdapter,
+                                    (Interface, Interface),
+                                    IUserLocator)
