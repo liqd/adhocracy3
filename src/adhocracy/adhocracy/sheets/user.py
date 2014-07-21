@@ -1,6 +1,7 @@
 """User Sheet."""
 import colander
 from cryptacular.bcrypt import BCRYPTPasswordManager
+from substanced.interfaces import IUserLocator
 
 from adhocracy.interfaces import ISheet
 from adhocracy.sheets import add_sheet_to_registry
@@ -17,6 +18,53 @@ class IUserBasic(ISheet):
     """Market interface for the userbasic sheet."""
 
 
+@colander.deferred
+def deferred_validate_user_name(node: colander.SchemaNode, kw: dict)\
+        -> callable:
+    """Return validator to check that the user login `name` is unique or None.
+
+    :param kw: dictionary with 'request' key and
+               :class:`pyramid.request.Request` object.
+               If this is not available the validator is None.
+    :raise: colander.Invalid: if name is not unique.
+    """
+    request = kw.get('request', None)
+    if not request:
+        return None
+    locator = request.registry.getMultiAdapter((request.root, request),
+                                               IUserLocator)
+
+    def validate_user_name_is_unique(node, value):
+        if locator.get_user_by_login(value):
+            raise colander.Invalid('The user login name is not unique',
+                                   value=value)
+    return validate_user_name_is_unique
+
+
+@colander.deferred
+def deferred_validate_user_email(node: colander.SchemaNode, kw: dict)\
+        -> callable:
+    """Return validator to check that the `email` is unique and valid or None.
+
+    :param kw: dictionary with 'request' key and
+               :class:`pyramid.request.Request` object
+               If this is not available the validator is None.
+    :raise: colander.Invalid: if name is not unique or not an email address.
+    """
+    request = kw.get('request', None)
+    if not request:
+        return None
+    locator = request.registry.getMultiAdapter((request.root, request),
+                                               IUserLocator)
+
+    def validate_user_email_is_unique(node, value):
+        if locator.get_user_by_email(value):
+            raise colander.Invalid('The user login email is not unique',
+                                   value=value)
+    validate_email = Email.validator
+    return colander.All(validate_email, validate_user_email_is_unique)
+
+
 class UserBasicSchema(colander.MappingSchema):
 
     """Userbasic sheet data structure.
@@ -26,8 +74,9 @@ class UserBasicSchema(colander.MappingSchema):
     `tzname`: time zone
     """
 
-    email = Email()
-    name = SingleLine()
+    email = Email(validator=deferred_validate_user_email)
+    name = SingleLine(missing=colander.required,
+                      validator=deferred_validate_user_name)
     tzname = TimeZoneName()
 
 
