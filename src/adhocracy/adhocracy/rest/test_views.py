@@ -138,10 +138,19 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
 
     def test_valid_with_extra_validator(self):
         def validator1(context, request):
-            request.validated = "validator1"
-
+            request.validated = {"validator": "1"}
         self._make_one(self.context, self.request, extra_validators=[validator1])
-        assert self.request.validated == "validator1"
+        assert self.request.validated == {"validator": "1"}
+
+    def test_valid_with_extra_validator_and_wrong_schema_data(self):
+        from cornice.util import _JSONError
+        def validator1(context, request):
+            request._validator_called = True
+        self.request.body = '{"count": "wrong"}'
+        with pytest.raises(_JSONError):
+            self._make_one(self.context, self.request, schema=CountSchema(),
+                           extra_validators=[validator1])
+        assert hasattr(self.request, '_validator_called') is False
 
 
 class ValidatePOSTRootVersionsUnitTest(unittest.TestCase):

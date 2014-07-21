@@ -57,7 +57,7 @@ class PUTResourceRequestSchema(colander.Schema):
     The subschemas for the Resource Sheets
     """
 
-    data = colander.SchemaNode(colander.Mapping(),
+    data = colander.SchemaNode(colander.Mapping(unknown='raise'),
                                after_bind=add_put_data_subschemas,
                                default={})
 
@@ -101,7 +101,7 @@ class POSTResourceRequestSchema(PUTResourceRequestSchema):
         colander.String(),
         validator=deferred_validate_post_content_type,
         default='')
-    data = colander.SchemaNode(colander.Mapping(),
+    data = colander.SchemaNode(colander.Mapping(unknown='raise'),
                                after_bind=add_post_data_subschemas,
                                default={})
 

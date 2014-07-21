@@ -77,6 +77,12 @@ class POSTResourceRequestSchemaUnitTest(unittest.TestCase):
         data = {'content_type': 'VALID', 'data': {}}
         assert inst.deserialize(data) == data
 
+    def test_deserialize_with_data_unknown(self):
+        inst = self.make_one()
+        data = {'content_type': 'VALID', 'data': {'unknown': 1}}
+        with pytest.raises(colander.Invalid):
+            inst.deserialize(data)
+
     def test_deserialize_missing_data(self):
         inst = self.make_one()
         with pytest.raises(colander.Invalid):
@@ -220,6 +226,12 @@ class PUTResourceRequestSchemaUnitTest(unittest.TestCase):
         inst = self.make_one()
         data = {'data': {}}
         assert inst.deserialize(data) == data
+
+    def test_deserialize_with_data_unknown(self):
+        inst = self.make_one()
+        data = {'data': {'unknown': 1}}
+        with pytest.raises(colander.Invalid):
+            inst.deserialize(data)
 
     def test_deserialize_missing_data(self):
         inst = self.make_one()

@@ -90,6 +90,8 @@ def validate_request_data(context: ILocation, request: Request,
                                       parent_pool=parent)
     schema_cornice = _CorniceSchemaAdapter(schema_with_binding)
     validate_colander_schema(schema_cornice, request)
+    if request.errors:
+        extra_validators = []
     for val in extra_validators:
         val(context, request)
     if request.errors:
