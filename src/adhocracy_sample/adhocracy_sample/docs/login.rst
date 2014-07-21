@@ -150,7 +150,19 @@ On success, the backend sends back the path to the object
 representing the logged-in user and a token that must be used to authorize
 additional requests by the user.
 
-FIXME Add samples for on-error case.
+An error is returned if the specified user name or email doesn't exist or if
+the wrong password is specified. For security reasons,
+the same error message (referring to the password) is given in all these
+cases.
+
+    >>> prop = {'name': 'No such user',
+    ...         'password': 'EckVocUbs3'}
+    >>> resp_data = testapp.post_json('/login_username', prop, status=400).json
+    >>> pprint(resp_data)
+    {'errors': [{'description': "User doesn't exist or password is wrong",
+                 'location': 'body',
+                 'name': 'password'}],
+     'status': 'error'}
 
 
 User Authentication
