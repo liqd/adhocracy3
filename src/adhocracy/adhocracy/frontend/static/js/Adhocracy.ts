@@ -5,6 +5,9 @@ export var init = (config) : void => {
 
     // detect wheter we are running in iframe
     config.embedded = (window !== top);
+    if (config.embedded) {
+        window.document.body.className += " is-embedded";
+    }
 
     DWB.run(config);
 };

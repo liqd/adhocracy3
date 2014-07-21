@@ -1,5 +1,4 @@
 html {
-    background-color: $primary-color;
     padding: 0;
 }
 
@@ -10,6 +9,11 @@ html, body {
 
 body {
     padding: 1em;
+    background-color: $primary-color;
+
+    &.is-embedded {
+        background-color: lightsteelblue;
+    }
 }
 
 .page_wrapper {
