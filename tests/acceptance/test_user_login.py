@@ -27,9 +27,6 @@ class TestUserLogin:
             browser.wait_for_condition(is_logged_in, 2)
 
     def _logout(self, browser, server_sample):
-        logout_url = (server_sample.application_url
-                      + 'frontend_static/root.html')
-        browser.visit(logout_url)
         click_button(browser, '.logout [type="submit"]')
 
     def test_login_username(self, browser, server_sample):
