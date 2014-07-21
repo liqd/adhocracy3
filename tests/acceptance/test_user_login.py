@@ -16,12 +16,15 @@ class TestUserLogin:
         fill_input(browser, '.register [name="password_repeat"]', password)
         click_button(browser, '.register [type="submit"]')
 
-    def _login(self, browser, server_sample, name_or_email, password):
+    def _login(self, browser, server_sample, name_or_email, password,
+               expect_success=True):
         login_url = server_sample.application_url + 'frontend_static/root.html'
         browser.visit(login_url)
         fill_input(browser, '.login [name="nameOrEmail"]', name_or_email)
         fill_input(browser, '.login [name="password"]', password)
         click_button(browser, '.login [type="submit"]')
+        if expect_success:
+            browser.wait_for_condition(is_logged_in, 2)
 
     def _logout(self, browser, server_sample):
         logout_url = (server_sample.application_url
@@ -48,7 +51,8 @@ class TestUserLogin:
         self._register(browser, server_sample, 'user3', 'email3@example.com',
                        'password3')
         self._logout(browser, server_sample)
-        self._login(browser, server_sample, 'user3', 'other')
+        self._login(browser, server_sample, 'user3', 'other',
+                    expect_success=False)
         assert browser.is_element_present_by_css(
             '.login .form-error:not(.ng-hide)')
         assert not is_logged_in(browser)
