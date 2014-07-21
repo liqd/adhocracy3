@@ -320,6 +320,7 @@ export var register = () => {
                     $scopeMock = {};
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register", "logIn"]);
                     adhUserMock.register.and.returnValue(q.when(undefined));
+                    adhUserMock.logIn.and.returnValue(q.when(undefined));
                     controller = <any>(directive.controller[2]);
                     controller(adhUserMock, $scopeMock);
                 });

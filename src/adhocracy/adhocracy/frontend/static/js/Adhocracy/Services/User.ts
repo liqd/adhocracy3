@@ -179,7 +179,7 @@ export var registerDirective = (adhConfig, $location) => {
                 return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
                     .then(() => {
                         $scope.error = undefined;
-                        adhUser.logIn($scope.input.username, $scope.input.password).then(
+                        return adhUser.logIn($scope.input.username, $scope.input.password).then(
                             () => $location.path("/frontend_static/root.html"),
                             (errors) => $scope.error = errors.length ? errors[0].description : "Internal Error"
                         );
