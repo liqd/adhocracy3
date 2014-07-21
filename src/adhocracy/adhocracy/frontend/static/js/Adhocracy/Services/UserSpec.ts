@@ -345,6 +345,12 @@ export var register = () => {
                             done();
                         });
                     });
+                    it("logs user in after register ", (done) => {
+                        $scopeMock.register().then(() => {
+                            expect(adhUserMock.login).toHaveBeenCalled();
+                            done();
+                        });
+                    });
                     it("redirects to the root page after register ", (done) => {
                         $scopeMock.register().then(() => {
                             expect(locationMock.path).toHaveBeenCalledWith("/frontend_static/root.html");
