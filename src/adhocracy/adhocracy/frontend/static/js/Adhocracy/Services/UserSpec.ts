@@ -297,6 +297,7 @@ export var register = () => {
         describe("registerDirective", () => {
             var directive;
             var adhConfigMock;
+            var locationMock;
 
             beforeEach(() => {
                 adhConfigMock = {
@@ -305,7 +306,9 @@ export var register = () => {
                     ws_url: "mock",
                     embedded: true
                 };
-                directive = AdhUser.registerDirective(adhConfigMock);
+                locationMock = <any>jasmine.createSpyObj("locationMock", ["path"]);
+
+                directive = AdhUser.registerDirective(adhConfigMock, locationMock);
             });
 
             describe("controller", () => {
@@ -315,8 +318,9 @@ export var register = () => {
 
                 beforeEach(() => {
                     $scopeMock = {};
-                    adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register"]);
+                    adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register", "logIn"]);
                     adhUserMock.register.and.returnValue(q.when(undefined));
+                    adhUserMock.logIn.and.returnValue(q.when(undefined));
                     controller = <any>(directive.controller[2]);
                     controller(adhUserMock, $scopeMock);
                 });
@@ -339,6 +343,18 @@ export var register = () => {
 
                         $scopeMock.register().then(() => {
                             expect(adhUserMock.register).toHaveBeenCalledWith("username", "email", "password", "passwordRepeat");
+                            done();
+                        });
+                    });
+                    it("logs user in after register ", (done) => {
+                        $scopeMock.register().then(() => {
+                            expect(adhUserMock.logIn).toHaveBeenCalled();
+                            done();
+                        });
+                    });
+                    it("redirects to the root page after register ", (done) => {
+                        $scopeMock.register().then(() => {
+                            expect(locationMock.path).toHaveBeenCalledWith("/frontend_static/root.html");
                             done();
                         });
                     });
