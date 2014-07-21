@@ -20,6 +20,7 @@ They can have the following states:
 ```
 */
 input {
+    &.ng-invalid,
     &:invalid {
         outline: lightcoral auto 5px;
         outline-offset: -2px;
