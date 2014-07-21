@@ -137,6 +137,8 @@ export var loginDirective = (adhConfig) => {
         templateUrl: adhConfig.template_path + "/Login.html",
         scope: {},
         controller: ["adhUser", "$scope", (adhUser : User, $scope) : void => {
+            $scope.user = adhUser;
+
             $scope.credentials = {
                 nameOrEmail: "",
                 password: ""
