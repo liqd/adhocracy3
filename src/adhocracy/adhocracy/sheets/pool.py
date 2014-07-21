@@ -1,6 +1,5 @@
 """Pool Sheet."""
 import colander
-from pyramid.httpexceptions import HTTPNotImplemented
 
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import SheetToSheet
@@ -23,10 +22,6 @@ class PoolSheet(GenericResourceSheet):
                 struct['elements'].append(child)
         return struct
 
-    def set(self, appstruct, omit=(), send_event=True):
-        """Store appstruct."""
-        raise HTTPNotImplemented
-
 
 class IPool(ISheet):
 
@@ -47,10 +42,10 @@ class PoolSchema(colander.MappingSchema):
     """Pool sheet data structure.
 
     `elements`: children of this resource (object hierarchy).
-
     """
 
-    elements = ListOfUniqueReferences(reftype=PoolElementsReference)
+    elements = ListOfUniqueReferences(reftype=PoolElementsReference,
+                                      readonly=True)
 
 
 pool_metadata = sheet_metadata_defaults._replace(isheet=IPool,

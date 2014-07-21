@@ -74,6 +74,12 @@ class ResourcePropertySheetUnitTests(unittest.TestCase):
         inst = self.make_one(self.metadata, self.context)
         assert inst.set({'count': 11}, omit=('wrongkey',)) is True
 
+    def test_set_valid_omit_readonly(self):
+        inst = self.make_one(self.metadata, self.context)
+        inst.schema['count'].readonly = True
+        inst.set({'count': 11})
+        assert inst.get() == {'count': 0}
+
     def test_set_valid_with_sheet_subtype_and_name_conflicts(self):
         sheet_a_meta = self.metadata
 
@@ -105,28 +111,6 @@ class ResourcePropertySheetUnitTests(unittest.TestCase):
         inst._data['count'] = 11
         assert inst.get_cstruct() == {'count': '11'}
 
-    def test_validate_cstruct_valid(self):
-        inst = self.make_one(self.metadata, self.context)
-        appstruct = inst.validate_cstruct({'count': '11'})
-        assert appstruct == {'count': 11}
-
-    def test_validate_cstruct_valid_empty(self):
-        inst = self.make_one(self.metadata, self.context)
-        appstruct = inst.validate_cstruct({})
-        assert appstruct == {}
-
-    def test_validate_cstruct_non_valid_readonly(self):
-        inst = self.make_one(self.metadata, self.context)
-        inst.schema.children[0].editable = False
-        inst.schema.children[0].creatable = False
-        with pytest.raises(colander.Invalid):
-            inst.validate_cstruct({'count': 1})
-
-    def test_validate_cstruct_non_valid_wrong_type(self):
-        inst = self.make_one(self.metadata, self.context)
-        with pytest.raises(colander.Invalid):
-            inst.validate_cstruct({'count': 'wrongnumber'})
-
     @patch('adhocracy.graph.Graph')
     @patch('adhocracy.schema.ListOfUniqueReferences', autospec=True)
     def test_set_valid_references(self,
@@ -134,6 +118,7 @@ class ResourcePropertySheetUnitTests(unittest.TestCase):
                                   dummy_graph=None):
         target = testing.DummyResource()
         node = dummy_node.return_value
+        node.readonly = False
         node.name = 'references'
         inst = self.make_one(self.metadata, self.context)
         inst.schema.children.append(node)

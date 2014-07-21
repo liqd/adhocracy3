@@ -7,6 +7,7 @@ from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
 from adhocracy.interfaces import ResourceMetadata
+from adhocracy.interfaces import IPool
 from adhocracy.events import ResourceCreatedAndAdded
 from adhocracy.sheets.name import IName
 from adhocracy.utils import get_sheet
@@ -38,17 +39,12 @@ class ResourceFactory:
     def __init__(self, metadata: ResourceMetadata):
         self.meta = metadata
 
-    def _add(self, parent, resource, appstructs):
-        """Add resource to context folder.
+    def _add(self, parent: IPool, resource: object, appstructs: dict) -> str:
+        """Add resource to parent pool.
 
-        Returns:
-            name (String)
-        Raises:
-            substanced.folder.FolderKeyError
-            ValueError
-
+        :raises substanced.folder.FolderKeyError:
+        :raises ValueError:
         """
-        # TODO use seperated factory for IVersionables
         name = ''
         if self.name_identifier in appstructs:
             name = appstructs[self.name_identifier]['name']
@@ -61,12 +57,12 @@ class ResourceFactory:
             raise KeyError('Empty name')
         parent.add(name, resource, send_events=False)
 
-    def _notify_new_resource_created_and_added(self, resource):
-        registry = get_current_registry(resource.__parent__)
+    def _notify_new_resource_created_and_added(self, resource, registry):
         has_parent = resource.__parent__ is not None
         if has_parent and registry is not None:
             event = ResourceCreatedAndAdded(object=resource,
-                                            parent=resource.__parent__)
+                                            parent=resource.__parent__,
+                                            registry=registry)
             registry.notify(event)
 
     def __call__(self,
@@ -82,7 +78,7 @@ class ResourceFactory:
                                     None value is allowed to create non
                                     persistent Resources (without OID/parent).
             appstructs (dict): Key/Values of sheet appstruct data.
-                               Key is anidentifier of a sheet interface.
+                               Key is identifier of a sheet interface.
                                Value is the data to set.
             after_creation (bool): Whether to invoke after_creation hooks,
                                    Default is True.
@@ -120,10 +116,10 @@ class ResourceFactory:
                 if sheet.meta.creatable:
                     sheet.set(struct, send_event=False)
 
+        registry = get_current_registry()
         if run_after_creation:
-            registry = get_current_registry()
             for call in self.meta.after_creation:
                 call(resource, registry, options=kwargs)
 
-        self._notify_new_resource_created_and_added(resource)
+        self._notify_new_resource_created_and_added(resource, registry)
         return resource

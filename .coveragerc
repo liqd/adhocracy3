@@ -4,4 +4,7 @@ omit =
     *test*py
     # indirectly tested via websocket fixture:
     src/adhocracy/adhocracy/websockets/start_ws_server.py
+    # no unit test coverage
+    src/adhocracy/adhocracy/__init__.py
+    src/adhocracy_sample/adhocracy_sample/__init__.py
 

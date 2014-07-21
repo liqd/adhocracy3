@@ -13,7 +13,7 @@ class WebSocketError(Exception):
         return '{}: {}'.format(self.error_type, self.details)
 
 
-def includeme(config):
+def includeme(config):  # pragma: no cover
     """Configure WebSockets client."""
     config.include('.client')
     config.include('.subscriber')

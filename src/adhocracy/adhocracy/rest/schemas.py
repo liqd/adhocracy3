@@ -36,19 +36,73 @@ class GETItemResponseSchema(GETResourceResponseSchema):
     first_version_path = AbsolutePath(default='')
 
 
+def add_put_data_subschemas(node: colander.MappingSchema, kw: dict):
+    """Add the resource sheet colander schemas that are 'editable'."""
+    context = kw['context']
+    request = kw['request']
+    sheets = request.registry.content.resource_sheets(context, request,
+                                                      onlyeditable=True)
+    data = request.json_body.get('data', {})
+    sheets_metadata = request.registry.content.sheets_metadata()
+    for name in [x for x in sheets if x in data]:
+        subschema = sheets_metadata[name].schema_class(name=name)
+        node.add(subschema.bind(**kw))
+
+
 class PUTResourceRequestSchema(colander.Schema):
 
-    """Data structure for Resource PUT requests."""
+    """Data structure for Resource PUT requests.
 
-    data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
+    The subschemas for the Resource Sheets
+    """
+
+    data = colander.SchemaNode(colander.Mapping(),
+                               after_bind=add_put_data_subschemas,
                                default={})
+
+
+def add_post_data_subschemas(node: colander.MappingSchema, kw: dict):
+    """Add the resource sheet colander schemas that are 'creatable'."""
+    context = kw['context']
+    request = kw['request']
+    resource_type = request.json_body.get('content_type', None)
+    data = request.json_body.get('data', {})
+    addables = request.registry.content.resource_addables(context, request)
+    resource_sheets = addables.get(resource_type, {'sheets_mandatory': [],
+                                                   'sheets_optional': []})
+    sheets_metadata = request.registry.content.sheets_metadata()
+    subschemas = []
+    for name in [x for x in resource_sheets['sheets_mandatory'] if x in data]:
+        schema = sheets_metadata[name].schema_class(name=name)
+        subschemas.append(schema)
+    for name in [x for x in resource_sheets['sheets_optional'] if x in data]:
+        schema = sheets_metadata[name].schema_class(name=name, missing={})
+        subschemas.append(schema)
+    for schema in subschemas:
+        node.add(schema.bind(**kw))
+
+
+@colander.deferred
+def deferred_validate_post_content_type(node, kw):
+    """Validate the addable content type for post requests."""
+    context = kw['context']
+    request = kw['request']
+    resource_addables = request.registry.content.resource_addables
+    addable_content_types = resource_addables(context, request)
+    return colander.OneOf(addable_content_types.keys())
 
 
 class POSTResourceRequestSchema(PUTResourceRequestSchema):
 
     """Data structure for Resource POST requests."""
 
-    content_type = colander.SchemaNode(colander.String(), default='')
+    content_type = colander.SchemaNode(
+        colander.String(),
+        validator=deferred_validate_post_content_type,
+        default='')
+    data = colander.SchemaNode(colander.Mapping(),
+                               after_bind=add_post_data_subschemas,
+                               default={})
 
 
 class AbsolutePaths(colander.SequenceSchema):

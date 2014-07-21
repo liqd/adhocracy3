@@ -18,15 +18,15 @@ class ResourceCreatedAndAdded:
 
     """An event type sent when a new IResource is created and added.
 
-    Args:
-        object(IResource)
+    :param object(adhocracy.interfaces.IResource):
+    :param parent(adhocracy.interfaces.IResource):
+    :param registry(pyramid.registry.Registry):
     """
 
-    def __init__(self,
-                 object,
-                 parent):
+    def __init__(self, object, parent, registry):
         self.object = object
         self.parent = parent
+        self.registry = registry
 
 
 @implementer(IResourceSheetModified)
@@ -34,16 +34,15 @@ class ResourceSheetModified:
 
     """An event type sent when a resource sheet is modified.
 
-    Args:
-        object(IResource)
-        isheet(ISheet)
+    :param object(adhocracy.interfaces.IResource):
+    :param isheet(adhocracy.interfaces.IISheet):
+    :param registry(pyramid.registry.Registry):
     """
 
-    def __init__(self,
-                 object,
-                 isheet):
+    def __init__(self, object, isheet, registry):
         self.object = object
         self.isheet = isheet
+        self.registry = registry
 
 
 @implementer(IItemVersionNewVersionAdded)
@@ -51,17 +50,15 @@ class ItemVersionNewVersionAdded:
 
     """ An event sent when a new IItemVersion is being added.
 
-    Args:
-        object (IVersion): old version
-        new_version (IItemVersion)
-
+    :param object(adhocracy.interfaces.IItem):
+    :param new_version(adhocracy.interfaces.IItemVersion):
+    :param registry(pyramid.registry.Registry):
     """
 
-    def __init__(self,
-                 context,
-                 new_version):
-        self.object = context
+    def __init__(self, object, new_version, registry):
+        self.object = object
         self.new_version = new_version
+        self.registry = registry
 
 
 @implementer(ISheetReferencedItemHasNewVersion)
@@ -69,30 +66,33 @@ class SheetReferencedItemHasNewVersion:
 
     """ An event type sent when a referenced ItemVersion has a new follower.
 
-    Args:
-        object (IResource)
-        isheet (IISheet)
-        isheet_field (str): field name with updated reference
-        old_version (IItemVersion): old referenced resource
-        new_version (IItemVerison): new referenced resource
-        root_versions (list, optional): IVersionables not in the subtree of
-                                        these root resources should ignore
-                                        this event.
-
+    :param object(adhocracy.interfaces.IResource):
+    :param isheet(adhocracy.interfaces.IISheet):
+    :param isheet_field(str): field name with updated reference
+    :param old_version(adhocracy.interfaces.IItemVersion): old referenced
+                                                           resource
+    :param new_version(adhocracy.interfaces.IItemVersion): new referenced
+                                                           resource
+    :param registry(pyramid.registry.Registry):
+    :param root_versions(list): IItemVersions not in the subtree of
+                                these root resources should ignore
+                                this event. Optional.
     """
 
     def __init__(self,
-                 context,
+                 object,
                  isheet,
                  isheet_field,
                  old_version,
                  new_version,
+                 registry,
                  root_versions=[]):
-        self.object = context
+        self.object = object
         self.isheet = isheet
         self.isheet_field = isheet_field
         self.old_version = old_version
         self.new_version = new_version
+        self.registry = registry
         self.root_versions = root_versions
 
 

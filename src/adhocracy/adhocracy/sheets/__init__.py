@@ -51,6 +51,10 @@ class GenericResourceSheet(PropertySheet):
                 refs[child.name] = child.reftype
         return refs
 
+    @property
+    def _readonly_keys(self):
+        return [x.name for x in self.schema if getattr(x, 'readonly', False)]
+
     def get(self) -> dict:
         """Return appstruct."""
         appstruct = {}
@@ -88,7 +92,9 @@ class GenericResourceSheet(PropertySheet):
 
     def set(self, appstruct: dict, omit=(), send_event=True) -> bool:
         """Store appstruct."""
-        struct = remove_keys_from_dict(appstruct, keys_to_remove=omit)
+        omit = omit if isinstance(omit, tuple) else (omit,)
+        omitted_keys = omit + tuple(self._readonly_keys)
+        struct = remove_keys_from_dict(appstruct, keys_to_remove=omitted_keys)
         self._store_references(struct)
         self._store_non_references(struct)
         # FIXME: only store struct if values have changed
@@ -109,20 +115,10 @@ class GenericResourceSheet(PropertySheet):
     def _notify_resource_sheet_modified(self, send_event):
         registry = get_current_registry(self.context)
         if send_event and registry is not None:
-            event = ResourceSheetModified(self.context, self.meta.isheet)
+            event = ResourceSheetModified(self.context,
+                                          self.meta.isheet,
+                                          registry)
             registry.notify(event)
-
-    def validate_cstruct(self, cstruct: dict) -> dict:
-        """Validate schema :term:`cstruct`."""
-        # FIXME: misleading name, it does not validate but deserialize.
-        for child in self.schema:
-            editable = getattr(child, 'editable', True)
-            creatable = getattr(child, 'creatable', True)
-            writable = editable or creatable
-            if not writable:
-                raise colander.Invalid(child, msg=u'This key is readonly')
-        appstruct = self.schema.deserialize(cstruct)
-        return appstruct
 
     def get_cstruct(self) -> dict:
         """Return schema :term:`cstruct`."""

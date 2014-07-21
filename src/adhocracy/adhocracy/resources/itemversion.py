@@ -44,7 +44,7 @@ def notify_new_itemversion_created(context, registry, options):
 
 
 def _notify_itemversion_has_new_version(old_version, new_version, registry):
-    event = ItemVersionNewVersionAdded(old_version, new_version)
+    event = ItemVersionNewVersionAdded(old_version, new_version, registry)
     registry.notify(event)
 
 
@@ -60,7 +60,8 @@ def _notify_referencing_resources_about_new_version(old_version,
                                                  isheet_field,
                                                  old_version,
                                                  new_version,
-                                                 root_versions)
+                                                 registry,
+                                                 root_versions=root_versions)
         registry.notify(event)
 
 

@@ -5,6 +5,12 @@
 /// <reference path="../../_all.d.ts"/>
 
 import angular = require("angular");
+import angularRoute = require("angularRoute");  if (angularRoute) { return; };
+// (since angularRoute does not export any objects or types we would
+// want to use, the extra mention of the module name is needed to keep
+// tsc from purging this import entirely.  which would have undesired
+// runtime effects.)
+
 import modernizr = require("modernizr");
 
 import AdhHttp = require("../Services/Http");
@@ -18,17 +24,38 @@ import Resources = require("../Resources");
 import Widgets = require("../Widgets");
 import Directives = require("../Directives");
 import Filters = require("../Filters");
+import Embed = require("../Embed");
 
 
 export var run = (config) => {
     "use strict";
 
-    var app = angular.module("adhocracy3SampleFrontend", []);
+    var app = angular.module("adhocracy3SampleFrontend", ["ngRoute"]);
+
+    app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
+        $routeProvider
+            .when("/frontend_static/root.html", {
+                templateUrl: config.template_path + "/Wrapper.html"
+            })
+            .when("/embed/:widget", {
+                template: "<adh-embed></adh-embed>"
+            })
+            .otherwise({
+                // FIXME: proper error template
+                template: "<h1>404 - not Found</h1>"
+            });
+
+        // Make sure HTML5 history API works.  (If support for older
+        // browsers is required, we may have to study angular support
+        // for conversion between history API and #!-URLs.  See
+        // angular documentation for details.)
+        $locationProvider.html5Mode(true);
+    }]);
 
     app.value("Modernizr", modernizr);
 
     app.service("adhResources", Resources.Service);
-    app.service("adhUser", AdhUser.User);
+    app.service("adhUser", ["$http", "$window", "Modernizr", AdhUser.User]);
     app.directive("adhLogin", ["adhUser", AdhUser.loginDirective]);
     app.value("adhConfig", config);
     app.factory("adhDone", AdhDone.factory);
@@ -40,6 +67,8 @@ export var run = (config) => {
     app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", AdhCrossWindowMessaging.factory]);
 
     app.filter("documentTitle", [Filters.filterDocumentTitle]);
+
+    app.directive("adhEmbed", ["$compile", "$route", Embed.factory]);
 
     app.directive("adhListing",
         ["adhConfig", (adhConfig) =>
@@ -60,6 +89,7 @@ export var run = (config) => {
 
     // application-specific (local) directives
 
+    // adhCrossWindowMessaging does work by itself. We only need to inject in anywhere in order to instantiate it.
     app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", "adhCrossWindowMessaging", Directives.adhDocumentWorkbench]);
     app.directive("adhProposalVersionDetail", ["adhConfig", Directives.adhProposalVersionDetail]);
     app.directive("adhProposalVersionEdit", ["adhConfig", Directives.adhProposalVersionEdit]);

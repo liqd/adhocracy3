@@ -19,7 +19,6 @@ class PoolSheetUnitTest(unittest.TestCase):
         return self.metadata.sheet_class(*args)
 
     def test_create_valid(self):
-        from pyramid.httpexceptions import HTTPNotImplemented
         from zope.interface.verify import verifyObject
         from adhocracy.sheets.pool import PoolSheet
 
@@ -27,8 +26,6 @@ class PoolSheetUnitTest(unittest.TestCase):
 
         assert isinstance(inst, PoolSheet)
         assert verifyObject(IResourceSheet, inst) is True
-        with pytest.raises(HTTPNotImplemented):
-            inst.set({})
 
     def test_get_empty(self):
         inst = self._make_one(self.metadata, self.context)

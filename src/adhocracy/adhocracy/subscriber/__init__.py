@@ -1,7 +1,5 @@
 """adhocracy.event event subcriber to handle auto updates of resources."""
 
-from pyramid.threadlocal import get_current_registry
-
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
@@ -24,12 +22,11 @@ def _get_writable_appstructs(resource):
     return appstructs
 
 
-def _update_versionable(resource, isheet, appstruct, root_versions):
+def _update_versionable(resource, isheet, appstruct, root_versions, registry):
     graph = find_graph(resource)
     if root_versions and not graph.is_in_subtree(resource, root_versions):
         return resource
     else:
-        registry = get_current_registry()
         appstructs = _get_writable_appstructs(resource)
         appstructs[IVersionable.__identifier__]['follows'] = [resource]
         appstructs[isheet.__identifier__] = appstruct
@@ -53,10 +50,10 @@ def reference_has_new_version_subscriber(event):
         event (ISheetReferencedItemHasNewVersion)
 
     """
-    assert ISheetReferencedItemHasNewVersion.providedBy(event)
     resource = event.object
     root_versions = event.root_versions
     isheet = event.isheet
+    registry = event.registry
     sheet = get_sheet(resource, isheet)
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
     editable = sheet.meta.editable
@@ -68,7 +65,8 @@ def reference_has_new_version_subscriber(event):
         field.pop(old_version_index)
         field.insert(old_version_index, event.new_version)
         if IItemVersion.providedBy(resource):
-            _update_versionable(resource, isheet, appstruct, root_versions)
+            _update_versionable(resource, isheet, appstruct, root_versions,
+                                registry)
         else:
             _update_resource(resource, sheet, appstruct)
 

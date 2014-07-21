@@ -7,6 +7,8 @@ from adhocracy.interfaces import SheetToSheet
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.schema import ListOfUniqueReferences
+from adhocracy.schema import Text
+from adhocracy.schema import SingleLine
 
 
 class IDocument(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -58,13 +60,10 @@ class DocumentSchema(colander.MappingSchema):
     `title`: one line title
     `descripton`: summary text
     `elements`: structural subelements like sections
-
     """
 
-    title = colander.SchemaNode(colander.String(), default='',
-                                missing=colander.drop)
-    description = colander.SchemaNode(colander.String(), default='',
-                                      missing=colander.drop)
+    title = SingleLine()
+    description = Text()
     elements = ListOfUniqueReferences(reftype=DocumentElementsReference)
 
 
@@ -79,11 +78,9 @@ class SectionSchema(colander.MappingSchema):
 
     `elements`: content subelements like paragraphs
     `subsections`: structural subelements like sections
-
     """
 
-    title = colander.SchemaNode(colander.String(), default='',
-                                missing=colander.drop)
+    title = SingleLine()
     elements = ListOfUniqueReferences(reftype=SectionElementsReference)
     subsections = ListOfUniqueReferences(reftype=SectionSubsectionsReference)
 
@@ -97,12 +94,9 @@ class ParagraphSchema(colander.MappingSchema):
     """Section sheet data structure.
 
     `content`:  Text
-
     """
 
-    content = colander.SchemaNode(colander.String(),
-                                  default='',
-                                  missing=colander.drop)
+    content = Text()
 
 
 paragraph_meta = sheet_metadata_defaults._replace(isheet=IParagraph,

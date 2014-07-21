@@ -1,0 +1,147 @@
+/*doc
+---
+title: textbox
+name: textbox
+category: Widgets
+---
+
+A simple box containing text.
+
+```html_example
+<div class="textbox">
+    <p>textbox</p>
+</div>
+<div class="textbox m-unobtrusive">
+    <p>unobtrusive textbox</p>
+</div>
+```
+*/
+.textbox {
+    .m-unobtrusive {
+        color: $fg2;
+    }
+}
+
+/*doc
+---
+title: box with button
+name: box-with-button
+category: Widgets
+---
+
+A generic box with a single button.
+
+```html_example
+<div class="box-with-button">
+    <p>Description</p>
+    <a class="button">register</a>
+</div>
+```
+*/
+.box-with-button {
+    border: 1px solid $border;
+    padding: 1em;
+
+    .button,
+    button,
+    input[type="submit"],
+    input[type="reset"] {
+        width: 100%;
+    }
+}
+
+/*doc
+---
+title: Login
+name: login
+category: Widgets
+---
+
+Login Dialog.
+
+```html_example
+<div class="login">
+    <h1 class="title">Log in!</h1>
+    <form class="login-form">
+        <input type="text" name="name" placeholder="email or username" />
+        <input type="password" name="password" placeholder="password" />
+        <a>forgot password</a>
+        <input type="submit" value="login" />
+    </form>
+    <div class="login-description box-with-button">
+        <div class="textbox m-unobtrusive">
+            <p>Description</p>
+        </div>
+        <a class="button">register</a>
+    </div>
+</div>
+```
+*/
+
+/*doc
+---
+title: Register
+name: register
+category: Widgets
+---
+
+Register Dialog.
+
+```html_example
+<form class="register">
+    <h1 class="title">Register!</h1>
+    <div class="register-inputs">
+        <input type="text" name="username" placeholder="username" />
+        <input type="email" name="email" placeholder="email" />
+        <input type="password" name="password" placeholder="password" />
+        <input type="password" name="password_repeat" placeholder="password repeat" />
+    </div>
+    <div class="register-description box-with-button">
+        <div class="textbox m-unobtrusive">
+            <p>Disclaimer</p>
+        </div>
+        <input type="submit" name="register" value="register" />
+    </div>
+</form>
+```
+*/
+
+.title {
+    font-size: 100%;
+    text-transform: uppercase;
+}
+
+.register,
+.login {
+    @include container;
+
+    .register-inputs,
+    .login-form {
+        @include span(3 of 5);
+    }
+
+    .register-description,
+    .login-description {
+        @include span(2 of 5);
+        margin: 0;  // remove gutter
+    }
+}
+
+.register-inputs,
+.login-form {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        width: 100%;
+    }
+
+    a,
+    input[type="submit"] {
+        @include span(1 of 2);
+        text-align: center;
+
+        &:last-child {
+            margin: 0;  // remove gutter
+        }
+    }
+}

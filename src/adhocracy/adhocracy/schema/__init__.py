@@ -1,7 +1,6 @@
 """Colander schema extensions."""
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
-from substanced import schema
 from substanced.schema import IdSet
 import colander
 import pytz
@@ -9,11 +8,28 @@ import pytz
 from adhocracy.interfaces import SheetReference
 
 
+class AdhocracySchemaNode(colander.SchemaNode):
+
+    """Subclass of :class: `colander.SchemaNode` with extended keyword support.
+
+    The constructor accepts these additional keyword arguments:
+
+        - ``readonly``: Disable deserialization. Default: False
+    """
+
+    readonly = False
+
+    def deserialize(self, cstruct=colander.null):
+        """ Deserialize the :term:`cstruct` into an :term:`appstruct`. """
+        if self.readonly and cstruct != colander.null:
+            raise colander.Invalid(self, 'This field is ``readonly``.')
+        return super().deserialize(cstruct)
+
+
 def raise_attribute_error_if_not_location_aware(context) -> None:
     """Ensure that the argument is location-aware.
 
     :raise AttributeError: if it isn't
-
     """
     context.__parent__
     context.__name__
@@ -25,7 +41,6 @@ def serialize_path(node, value):
     :param node: the Colander node
     :param value: the resource to serialize
     :return: the path of that resource
-
     """
     if value is colander.null:
         return value
@@ -44,7 +59,6 @@ def deserialize_path(node, value):
     :param node: the Colander node
     :param value: the path to deserialize
     :return: the resource registered under that path
-
     """
     if value is colander.null:
         return value
@@ -59,27 +73,38 @@ def deserialize_path(node, value):
     return resource
 
 
-def name_is_unique_validator(node: colander.SchemaNode, value: str):
+def validate_name_is_unique(node: colander.SchemaNode, value: str):
     """Validate if `value` is name that does not exists in the parent object.
 
-    Node must a have a `context` binding object with an __parent__ attribute
-    that points to a dictionary like object.
+    Node must a have a `parent_pool` binding object attribute
+    that points to the parent pool object :class:`adhocracy.interfaces.IPool`.
 
     :raises colander.Invalid: if `name` already exists in the parent or parent
                               is None.
     """
-    context = node.bindings.get('context')
-    parent = context.__parent__
-    if parent is None:
-        msg = 'This resource has no parent pool to validate that the name is'\
-              ' unique'
+    parent = node.bindings.get('parent_pool', None)
+    try:
+        parent.check_name(value)
+    except AttributeError:
+        msg = 'This resource has no parent pool to validate the name.'
         raise colander.Invalid(node, msg)
-    if value in parent:
-        msg = 'The name "{0}" already exists in the parent pool.'.format(value)
-        raise colander.Invalid(node, msg)
+    except KeyError:
+        msg = 'The name already exists in the parent pool.'
+        raise colander.Invalid(node, msg, value=value)
+    except ValueError:
+        msg = 'The name has forbidden characters or is not a string.'
+        raise colander.Invalid(node, msg, value=value)
 
 
-class Name(colander.SchemaNode):
+@colander.deferred
+def deferred_validate_name(node: colander.SchemaNode, kw: dict) -> callable:
+    """Check that the node value is a valid child name."""
+    return colander.All(colander.Regex(u'^[a-zA-Z0-9\_\-\.]+$'),
+                        colander.Length(min=1, max=100),
+                        validate_name_is_unique)
+
+
+class Name(AdhocracySchemaNode):
 
     """ The unique `name` of a resource inside the parent pool.
 
@@ -87,22 +112,21 @@ class Name(colander.SchemaNode):
     The maximal length is 100 characters, the minimal length 1.
 
     Example value: blu.ABC_12-3
+
+    This node needs a `parent_pool` binding to validate.
     """
 
     schema_type = colander.String
     default = '',
     missing = colander.drop
-    validator = colander.All(colander.Regex(u'^[a-zA-Z0-9\_\-\.]+$'),
-                             colander.Length(min=1, max=100),
-                             name_is_unique_validator)
+    validator = deferred_validate_name
 
 
-class Email(colander.SchemaNode):
+class Email(AdhocracySchemaNode):
 
     """String with email address.
 
     Example value: test@test.de
-
     """
 
     schema_type = colander.String
@@ -114,7 +138,7 @@ class Email(colander.SchemaNode):
 _ZONES = pytz.all_timezones
 
 
-class TimeZoneName(colander.SchemaNode):
+class TimeZoneName(AdhocracySchemaNode):
 
     """String with time zone.
 
@@ -127,25 +151,11 @@ class TimeZoneName(colander.SchemaNode):
     validator = colander.OneOf(_ZONES)
 
 
-class Password(colander.SchemaNode):
-
-    """A password.
-
-    Example value: TemmyantAd5
-    """
-
-    schema_type = colander.String
-    default = '',
-    missing = colander.drop
-    validator = colander.Length(min=6, max=100)
-
-
-class AbsolutePath(colander.SchemaNode):
+class AbsolutePath(AdhocracySchemaNode):
 
     """Absolute path made with  Identifier Strings.
 
     Example value: /bluaABC/_123/3
-
     """
 
     schema_type = colander.String
@@ -157,7 +167,6 @@ class ResourceObject(colander.SchemaType):
     """Resource object that automatically deserialized itself to a path.
 
     Example value: like AbsolutePath, e.g. '/bluaABC/_123/3'
-
     """
 
     def serialize(self, node, value):
@@ -181,7 +190,6 @@ class AbstractIterableOfPaths(IdSet):
     Child classes must overwrite the `create_empty_appstruct` and
     `add_to_appstruct` methods for the specific iterable to use for
     deserialization (e.g. list or set).
-
     """
 
     def create_empty_appstruct(self):
@@ -213,7 +221,6 @@ class AbstractIterableOfPaths(IdSet):
 
         Raises:
             KeyError: if path cannot be traversed to an ILocation aware object.
-
         """
         if value is colander.null:
             return value
@@ -232,7 +239,6 @@ class ListOfUniquePaths(AbstractIterableOfPaths):
     The order is preserved, duplicates are removed.
 
     Example value: [/bluaABC, /_123/3]
-
     """
 
     def create_empty_appstruct(self):
@@ -255,7 +261,6 @@ class SetOfPaths(AbstractIterableOfPaths):
     The order is not preserved, duplicates are removed.
 
     Example value: [/bluaABC, /_123/3]
-
     """
 
     def create_empty_appstruct(self):
@@ -267,27 +272,12 @@ class SetOfPaths(AbstractIterableOfPaths):
         appstruct.add(element)
 
 
-def get_all_resources(node, context):
-    """Return List with all resources."""
-    return []
-    # FIXME: we need this to make the sdi work
-    # interfaces = [node.interfaces]
-    # catalog = find_catalog(context, 'system')
-    # if catalog:
-    #     interfaces = catalog['interfaces']
-    #     docs = interfaces.eq(interface).execute().all()
-    #     return map(lambda x: (get_oid(x), getattr(x, 'name', None) or
-    #                           x.__name__),
-    #                [d for d in docs if d])
-
-
-class AbstractReferenceIterable(schema.MultireferenceIdSchemaNode):
+class AbstractReferenceIterable(AdhocracySchemaNode):
 
     """Abstract Colander SchemaNode to store multiple references.
 
     This is is an abstract class, only subclasses that set `schema_type` to a
     concrete subclass of `AbstractIterableOfPaths` can be instantiated.
-
     """
 
     schema_type = AbstractIterableOfPaths
@@ -295,11 +285,6 @@ class AbstractReferenceIterable(schema.MultireferenceIdSchemaNode):
     default = []
     missing = colander.drop
     reftype = SheetReference
-    choices_getter = get_all_resources
-
-    def _get_choices(self):
-        context = self.bindings['context']
-        return self.choices_getter(context)
 
     def validator(self, node, value):
         """Validate."""
@@ -317,3 +302,50 @@ class ListOfUniqueReferences(AbstractReferenceIterable):
     """Colander SchemaNode to store a list of references without duplicates."""
 
     schema_type = ListOfUniquePaths
+
+
+def string_has_no_newlines_validator(value: str) -> bool:
+    """Check for new line characters."""
+    return False if '\n' in value or '\r' in value else True  # noqa
+
+
+class SingleLine(colander.SchemaNode):  # noqa
+
+    """ UTF-8 encoded String without line breaks.
+
+    Disallowed characters are linebreaks like: \n, \r
+    Example value: This is a something.
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+    validator = colander.Function(string_has_no_newlines_validator,
+                                  msg='New line characters are not allowed.')
+
+
+class Text(AdhocracySchemaNode):
+
+    """ UTF-8 encoded String with line breaks.
+
+    Example value: This is a something
+                   with new lines.
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+
+
+class Password(AdhocracySchemaNode):
+
+    """ UTF-8 encoded text.
+
+    Minimal length=6, maximal length=100 characters.
+    Example value: secret password?
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+    validator = colander.Length(min=6, max=100)

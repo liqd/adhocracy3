@@ -91,15 +91,6 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
     def get_cstruct() -> dict:
         """ Return a serialized dictionary representing the sheet state."""
 
-    def validate_cstruct(cstruct: dict) -> dict:
-        """ Validate ``cstruct`` data.
-
-        :param cstruct: serialized application data (colander)
-        :returns: appstruct: deserialized application data (colander)
-        :raises colander.Invalid:
-
-        """
-
 
 RESOURCE_METADATA = OrderedDict({
     'content_name': '',
@@ -211,11 +202,12 @@ class IPool(IResource):  # pragma: no cover
         """
 
     def check_name(name: str) -> str:
-        """ Check and modify the name passed for validity.
+        """ Check and the name passed for validity.
 
-        :returns: The name (with any needed modifications).
+        :returns: The name.
         :raises substanced.folder.FolderKeyError:
             if 'name' already exists in this pool.
+        :raises ValueError: if 'name' contains '@@', slashes or is empty.
         """
 
     def next_name(subobject, prefix='') -> str:
@@ -298,6 +290,7 @@ class IResourceSheetModified(IObjectEvent):
 
     object = Attribute('The modified resource')
     isheet = Attribute('The modified sheet interface of the resource')
+    registry = Attribute('The pyramid registry')
 
 
 class IResourceCreatedAndAdded(IObjectEvent):
@@ -306,6 +299,7 @@ class IResourceCreatedAndAdded(IObjectEvent):
 
     object = Attribute('The new resource')
     parent = Attribute('The parent of the new resource')
+    registry = Attribute('The pyramid registry')
 
 
 class IItemVersionNewVersionAdded(IObjectEvent):
@@ -314,6 +308,7 @@ class IItemVersionNewVersionAdded(IObjectEvent):
 
     object = Attribute('The old ItemVersion followed by the new one')
     new_version = Attribute('The new ItemVersion')
+    registry = Attribute('The pyramid registry')
 
 
 class ISheetReferencedItemHasNewVersion(IObjectEvent):
@@ -345,3 +340,4 @@ class ITokenManger(Interface):
 
     def delete_token(token: str):
         """ Delete authentication token."""
+    registry = Attribute('The pyramid registry')

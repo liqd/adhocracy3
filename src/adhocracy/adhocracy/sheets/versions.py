@@ -13,7 +13,7 @@ from adhocracy.schema import ListOfUniqueReferences
 
 class IVersionable(ISheet):
 
-    """Maker interface for resources with the versionable sheeet."""
+    """Maker interface for resources with the versionable sheet."""
 
 
 class VersionableFollowsReference(NewVersionToOldVersion):
@@ -40,11 +40,11 @@ class VersionableSchema(colander.MappingSchema):
 
     Set/get predecessor (`follows`) and get successor (`followed_by`) versions
     of this resource.
-
     """
 
     follows = ListOfUniqueReferences(reftype=VersionableFollowsReference)
     followed_by = ListOfUniqueReferences(
+        readonly=True,
         reftype=VersionableFollowedByReference)
 
 
@@ -54,12 +54,6 @@ class VersionableSheet(GenericResourceSheet):
 
     isheet = IVersionable
     schema_class = VersionableSchema
-
-    def set(self, appstruct, omit=(), send_event=True):
-        """Store appstruct, except non-persistent followed_by attribute."""
-        if 'followed_by' in appstruct:
-            del appstruct['followed_by']
-        super().set(appstruct, omit)
 
     def get(self):
         """Return appstruct."""
@@ -96,7 +90,6 @@ class VersionsSchema(colander.MappingSchema):
     """Versions sheet data structure.
 
     `elements`: Dag for collecting all versions of one item.
-
     """
 
     elements = ListOfUniqueReferences(

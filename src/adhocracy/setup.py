@@ -16,10 +16,11 @@ requires = [
     'substanced',
     'pyramid_tm',
     'cornice',
+    'colander',
     'autobahn',
     'asyncio',
-    'websocket-client-py3',
-    ]
+    'websocket-client',
+]
 
 test_requires = [
     'pytest',
@@ -35,13 +36,13 @@ test_requires = [
 setup(name='adhocracy',
       version='0.0',
       description='adhocracy',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pylons",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+          "Programming Language :: Python",
+          "Framework :: Pylons",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+      ],
       author='',
       author_email='',
       url='',
@@ -60,4 +61,3 @@ setup(name='adhocracy',
       start_ws_server = adhocracy.websockets.start_ws_server:main
       """,
       )
-

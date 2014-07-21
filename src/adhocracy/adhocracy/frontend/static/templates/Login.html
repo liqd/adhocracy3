@@ -1,0 +1,21 @@
+<div ng-switch="user.loggedIn">
+    <div ng-switch-when="true" class="logout">
+        <span>{{ user.name }}</span>
+        <input type="submit" value="LogOut" ng-click="logOut()" />
+    </div>
+    <div ng-switch-default class="login">
+        <h1 class="title">Log in!</h1>
+        <form class="login-form">
+            <input type="text" name="nameOrEmail" placeholder="email or username" ng-model="credentials.nameOrEmail" />
+            <input type="password" name="password" placeholder="password" ng-model="credentials.password" />
+            <a>forgot password</a>
+            <input type="submit" value="login" ng-click="logIn()" />
+        </form>
+        <div class="login-description box-with-button">
+            <div class="text-box m-unobtrusive">
+                <p>Description</p>
+            </div>
+            <a class="button">register</a>
+        </div>
+    </div>
+</div>

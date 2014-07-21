@@ -21,8 +21,8 @@ class Test:
         # one of many embedding contexts.
 
         with browser_embedder_root.get_iframe('adhocracy-iframe') as iframe:
-            element = iframe.find_by_css('.login [name="name"]').first
-            assert element != None
+            elements = iframe.find_by_css('#document_workbench_list')
+            assert len(elements) != 0 and elements.first != None
 
     def test_resize(self, browser_embedder_root):
         """Iframe height matches its content after at most 5 seconds."""

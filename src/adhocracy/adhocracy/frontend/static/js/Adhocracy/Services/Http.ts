@@ -22,6 +22,7 @@ export var logBackendError;
 export interface IService<Content extends Types.Content<any>> {
     get : (path : string) => ng.IPromise<Content>;
     put : (path : string, obj : Content) => ng.IPromise<Content>;
+    post : (path : string, obj : Content) => ng.IPromise<Content>;
     postNewVersion : (oldVersionPath : string, obj : Content) => ng.IPromise<Content>;
     postToPool : (poolPath : string, obj : Content) => ng.IPromise<Content>;
     metaApiResource : (name : string) => any;
@@ -34,6 +35,7 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
     var adhHttp : IService<Content> = {
         get: get,
         put: put,
+        post: post,
         postNewVersion: postNewVersion,
         postToPool: postToPool,
         metaApiResource: metaApiResource,
@@ -46,6 +48,10 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
 
     function put(path : string, obj : Content) : ng.IPromise<Content> {
         return $http.put(path, obj).then(importContent, logBackendError);
+    }
+
+    function post(path : string, obj : Content) : ng.IPromise<Content> {
+        return $http.post(path, obj).then(importContent, logBackendError);
     }
 
     function postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {

@@ -155,7 +155,7 @@ export var adhProposalVersionNew = (
         scope: {
             onNewProposal: "="
         },
-        controller: ($scope) => {
+        controller: ["$scope", ($scope) => {
             $scope.proposalVersion = (new Resources.Resource("adhocracy_sample.resources.proposal.IProposalVersion"))
                 .addIDocument("", "", []);
 
@@ -173,7 +173,7 @@ export var adhProposalVersionNew = (
                     });
                 });
             };
-        }
+        }]
     };
 };
 
@@ -239,7 +239,7 @@ export var adhDocumentSheetEdit = (adhHttp, $q, adhConfig: AdhConfig.Type) => {
         scope: {
             sheet: "="
         },
-        controller: ($scope) => {
+        controller: ["$scope", ($scope) => {
             var versionPromises = $scope.sheet.elements.map((path) =>
                                                             adhHttp.get(decodeURIComponent(path))
                                                             .then((resp) => resp.data)
@@ -248,7 +248,7 @@ export var adhDocumentSheetEdit = (adhHttp, $q, adhConfig: AdhConfig.Type) => {
             $q.all(versionPromises).then((versions) =>
                                          $scope.sectionVersions = versions
                                         );
-        }
+        }]
     };
 };
 

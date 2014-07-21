@@ -9,7 +9,7 @@ class TestUserLogin:
 
     def test_login_valid(self, browser_sample_root):
         fill_input(browser_sample_root, '.login [name="password"]', 'password')
-        fill_input(browser_sample_root, '.login [name="name"]', 'name')
+        fill_input(browser_sample_root, '.login [name="nameOrEmail"]', 'name')
         click_button(browser_sample_root, '.login [type="submit"]')
         assert is_logged_in(browser_sample_root)
 

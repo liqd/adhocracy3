@@ -21,4 +21,4 @@ dependencies:
 # Mark which category should be the index page
 # Alternatively, you may have an index.md in the documenatation assets
 # folder instead of specifying this configu.
-# index: basics
+index: type

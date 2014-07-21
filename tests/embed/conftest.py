@@ -9,6 +9,6 @@ from adhocracy.testing import splinter_browser_load_condition  # noqa
 @pytest.fixture()
 def browser_embedder_root(browser, server_sample) -> Browser:
     """Start embedder application."""
-    url = 'http://adhocracy.embedder.gaa:6541/frontend_static/embed.html'
+    url = server_sample.application_url + 'frontend_static/embed.html'
     browser.visit(url)
     return browser

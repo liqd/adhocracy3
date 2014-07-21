@@ -29,7 +29,6 @@ class TagSchema(colander.MappingSchema):
     """Tag sheet data structure.
 
     `elements`: Resources with this Tag
-
     """
 
     elements = ListOfUniqueReferences(reftype=TagElementsReference)
@@ -59,11 +58,9 @@ class TagsSchema(colander.MappingSchema):
     """Tags sheet data structure.
 
     `elements`: Tags in this Pool
-
     """
 
-    elements = ListOfUniqueReferences(
-        reftype=TagsElementsReference)
+    elements = ListOfUniqueReferences(reftype=TagsElementsReference)
 
 
 tags_metadata = sheet_metadata_defaults._replace(isheet=ITags,

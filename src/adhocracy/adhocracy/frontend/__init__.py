@@ -1,8 +1,10 @@
 """Frontend view and simple pyramid app configurations."""
 from urllib.parse import urlparse
+import os
 
 from pyramid.config import Configurator
 from pyramid.request import Request
+from pyramid.response import FileResponse
 
 
 def config_view(request):
@@ -22,6 +24,13 @@ def config_view(request):
     return config
 
 
+def embed_view(request):
+    """Return the embeddee HTML."""
+    here = os.path.dirname(__file__)
+    path = os.path.join(here, 'static', 'root.html')
+    return FileResponse(path, request=request)
+
+
 def _build_ws_url(request: Request, url: str) -> str:
     url_parsed = urlparse(url)
     ws_domain = request.domain
@@ -33,6 +42,8 @@ def _build_ws_url(request: Request, url: str) -> str:
 def includeme(config):
     """Run pyramid config."""
     config.add_static_view('frontend_static', 'adhocracy.frontend:static')
+    config.add_route('embed', 'embed/{directive}')
+    config.add_view(embed_view, route_name='embed', renderer='html')
     config.add_route('config_json', 'frontend_config.json')
     config.add_view(config_view, route_name='config_json', renderer='json')
 

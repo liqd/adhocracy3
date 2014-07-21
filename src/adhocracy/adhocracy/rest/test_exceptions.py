@@ -7,7 +7,7 @@ import colander
 class HandleError400ColanderInvalidUnitTest(unittest.TestCase):
 
     def make_one(self, error, request):
-        from .exceptions import handle_error_400_colander_invalid
+        from adhocracy.rest.exceptions import handle_error_400_colander_invalid
         return handle_error_400_colander_invalid(error, request)
 
     def test_render_exception_error(self):
@@ -36,7 +36,7 @@ class HandleError400ColanderInvalidUnitTest(unittest.TestCase):
 class HandleError500ExceptionUnitTest(unittest.TestCase):
 
     def make_one(self, error, request):
-        from .exceptions import handle_error_500_exception
+        from adhocracy.rest.exceptions import handle_error_500_exception
         return handle_error_500_exception(error, request)
 
     def test_render_exception_error(self):

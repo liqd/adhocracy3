@@ -1,25 +1,29 @@
 require.config({
-    baseUrl: '/frontend_static/js/',
+    baseUrl: "/frontend_static/js/",
     paths: {
-        text: '../lib/requirejs-text/text',
-        jquery: '../lib/jquery/jquery',
-        angular: '../lib/angular/angular',
-        underscore: '../lib/underscore/underscore',
-        q: '../lib/q/q',
-        modernizr: '../lib2/modernizr/modernizr-2.8.3.min'
+        text: "../lib/requirejs-text/text",
+        jquery: "../lib/jquery/dist/jquery",
+        angular: "../lib/angular/angular",
+        angularRoute: "../lib/angular-route/angular-route",
+        underscore: "../lib/underscore/underscore",
+        q: "../lib/q/q",
+        modernizr: "../lib2/modernizr/modernizr-2.8.3.min"
     },
     shim: {
         jquery: {
-            exports: '$',
+            exports: "$"
         },
         angular: {
-            exports: 'angular',
+            exports: "angular"
+        },
+        angularRoute: {
+            deps: ["angular"]
         },
         underscore: {
-            exports: '_',
+            exports: "_"
         },
         modernizr: {
-            exports: 'Modernizr'
+            exports: "Modernizr"
         }
     }
 });

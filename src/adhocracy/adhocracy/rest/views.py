@@ -6,6 +6,7 @@ import functools
 from colander import SchemaNode
 from colander import MappingSchema
 from cornice.util import json_error
+from cornice.util import to_list
 from cornice.schemas import validate_colander_schema
 from cornice.schemas import CorniceSchema
 from substanced.interfaces import IUserLocator
@@ -15,12 +16,14 @@ from pyramid.view import view_defaults
 from pyramid.security import remember
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
+from substanced.interfaces import IRoot
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISimple
 from adhocracy.interfaces import IPool
+from adhocracy.interfaces import ILocation
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
@@ -29,6 +32,8 @@ from adhocracy.rest.schemas import POSTItemRequestSchema
 from adhocracy.rest.schemas import POSTLoginUsernameRequestSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
 from adhocracy.rest.schemas import PUTResourceRequestSchema
+from adhocracy.rest.schemas import GETResourceResponseSchema
+from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import AbstractReferenceIterable
@@ -43,44 +48,10 @@ from adhocracy.sheets.user import IPasswordAuthentication
 logger = getLogger(__name__)
 
 
-def validate_sheet_cstructs(context, request: Request, sheets=[]):
-    """Validate sheet data."""
-    validated = request.validated.get('data', {})
-    sheetnames_wrong = []
-    for sheetname, cstruct in validated.items():
-        if sheetname in sheets:
-            sheet = sheets[sheetname]
-            appstruct = sheet.validate_cstruct(cstruct)
-            validated[sheetname] = appstruct
-        else:
-            sheetnames_wrong.append(sheetname)
-    for sheetname in sheetnames_wrong:
-        del validated[sheetname]
-
-
-def validate_put_sheet_cstructs(context, request: Request, sheets=[]):
-    """Validate sheet data for put requests."""
-    sheets = request.registry.content.resource_sheets(
-        context, request, onlyeditable=True)
-    validate_sheet_cstructs(context, request, sheets)
-
-
-def validate_post_sheet_cstructs(context, request: Request):
-    """Validate sheet data for post requests."""
-    type_ = request.validated.get('content_type', '')
-    dummy = object()
-    sheets = {}
-    if type_ in request.registry.content.resources_metadata():
-        dummy = request.registry.content.create(
-            type_, run_after_creation=False)
-        dummy.__parent__ = context
-        sheets = request.registry.content.resource_sheets(
-            dummy, request, onlycreatable=True)
-    validate_sheet_cstructs(dummy, request, sheets)
-
-
 def validate_post_root_versions(context, request: Request):
     """Check and transform the 'root_version' paths to resources."""
+    # FIXME: make this a colander validator and move to schema.py
+    # use the catalog to find IItemversions
     root_paths = request.validated.get('root_versions', [])
     root_resources = []
     for path in root_paths:
@@ -102,44 +73,8 @@ def validate_post_root_versions(context, request: Request):
     request.validated['root_versions'] = root_resources
 
 
-def validate_put_sheet_names(context, request: Request):
-    """Validate sheet names for put requests."""
-    sheets = request.registry.content.resource_sheets(
-        context, request, onlyeditable=True)
-    puted = request.validated.get('data', {}).keys()
-    wrong_sheets = set(puted) - set(sheets)
-    if wrong_sheets:
-        error = 'The following sheets are mispelled or you do not ' \
-                'have the edit permission: {names}'.format(names=wrong_sheets)
-        request.errors.add('body', 'data', error)
-
-
-def validate_post_sheet_names_and_resource_type(context, request: Request):
-    """Validate addable sheet names for post requests."""
-    addables = request.registry.content.resource_addables(context, request)
-    content_type = request.validated.get('content_type', '')
-    if content_type not in addables:
-        error = 'The following resource type is not ' \
-                'addable: {iresource} '.format(iresource=content_type)
-        request.errors.add('body', 'content_type', error)
-    else:
-        optional = addables[content_type]['sheets_optional']
-        mandatory = addables[content_type]['sheets_mandatory']
-        posted = request.validated.get('data', {}).keys()
-        wrong_sheets = set(posted) - set(optional + mandatory)
-        if wrong_sheets:
-            error = 'The following sheets are not allowed for this resource '\
-                    'type or misspelled: {names}'.format(names=wrong_sheets)
-            request.errors.add('body', 'data', error)
-        missing_sheets = set(mandatory) - set(posted)
-        if missing_sheets:
-            error = 'The following sheets are mandatory to create '\
-                    'this resource: {names}'.format(names=missing_sheets)
-            request.errors.add('body', 'data', error)
-
-
-def validate_request_data(context, request: Request, schema=MappingSchema,
-                          extra_validators=[]):
+def validate_request_data(context: ILocation, request: Request,
+                          schema=MappingSchema(), extra_validators=[]):
     """ Validate request data.
 
     :param context: passed to validator functions
@@ -147,21 +82,41 @@ def validate_request_data(context, request: Request, schema=MappingSchema,
     :param schema: Schema to validate the request data with
         :func:`cornice.schemas.validate_colander_schema`.
         `None` value is allowed.
-    :extra_validators: additionale validator functions. The have to accept
+    :extra_validators: additional validator functions. The have to accept
         the arguments `context` and `request`.
 
     :raises _JSONError: HTTP 400 for bad request data.
 
     """
-    if schema:
-        schema_cornice = CorniceSchema.from_colander(schema)
-        validate_colander_schema(schema_cornice, request)
+    parent = context if request.method == 'POST' else context.__parent__
+    schema_with_binding = schema.bind(context=context, request=request,
+                                      parent_pool=parent)
+    schema_cornice = _CorniceSchemaAdapter(schema_with_binding)
+    validate_colander_schema(schema_cornice, request)
     for val in extra_validators:
         val(context, request)
     if request.errors:
         request.validated = {}
         _log_request_errors(request)
         raise json_error(request.errors)
+
+
+class _CorniceSchemaAdapter:
+
+    def __init__(self, colander_schema):
+        self._c_schema = colander_schema
+
+    def get_attributes(self, location=('body', 'header', 'querystring'),
+                       required=(True, False), request=None):
+        def _filter(attr):
+            if not hasattr(attr, 'location'):
+                valid_location = 'body' in location
+            else:
+                valid_location = attr.location in to_list(location)
+            return valid_location and attr.required in to_list(required)
+
+        attributes = self._c_schema.children
+        return list(filter(_filter, attributes))
 
 
 def _log_request_errors(request: Request):
@@ -178,20 +133,29 @@ def validate_request_data_decorator():
     from the class attribute `validation_<http method>`.
 
     :returns: decorated method
+
     """
     def _dec(f):
         @functools.wraps(f)
         def wrapper(context, request):
-            http_method = request.method.upper()
             view_class = f.__original_view__
-            vals = getattr(view_class, 'validation_' + http_method, (None, []))
-            validate_request_data(context, request, schema=vals[0],
-                                  extra_validators=vals[1])
+            schema_class, validators = _get_schema_and_validators(view_class,
+                                                                  request)
+            validate_request_data(context, request,
+                                  schema=schema_class(),
+                                  extra_validators=validators)
             return f(context, request)
 
         return wrapper
 
     return _dec
+
+
+def _get_schema_and_validators(view_class, request: Request) -> tuple:
+    http_method = request.method.upper()
+    validation_attr = 'validation_' + http_method
+    schema, validators = getattr(view_class, validation_attr, (None, []))
+    return schema or MappingSchema, validators
 
 
 class RESTView:
@@ -285,9 +249,7 @@ class SimpleRESTView(ResourceRESTView):
 
     """View for simples (non versionable), implements get, options and put."""
 
-    validation_PUT = (PUTResourceRequestSchema,
-                      [validate_put_sheet_names,
-                       validate_put_sheet_cstructs])
+    validation_PUT = (PUTResourceRequestSchema, [])
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -325,9 +287,7 @@ class PoolRESTView(SimpleRESTView):
 
     """View for Pools, implements get, options, put and post."""
 
-    validation_POST = (POSTResourceRequestSchema,
-                       [validate_post_sheet_names_and_resource_type,
-                        validate_post_sheet_cstructs])
+    validation_POST = (POSTResourceRequestSchema, [])
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -385,9 +345,8 @@ class ItemRESTView(PoolRESTView):
     """View for Items and ItemVersions, overwrites POST handling."""
 
     validation_POST = (POSTItemRequestSchema,
-                       [validate_post_sheet_names_and_resource_type,
-                        validate_post_root_versions,
-                        validate_post_sheet_cstructs])
+                       [validate_post_root_versions,
+                        ])
 
     @view_config(request_method='GET')
     def get(self) -> dict:
@@ -419,7 +378,6 @@ class MetaApiView(RESTView):
     """Access to metadata about the API specification of this installation.
 
     Returns a JSON document describing the existing resources and sheets.
-
     """
 
     def __init__(self, context, request):
@@ -463,23 +421,6 @@ class MetaApiView(RESTView):
             resource_map[name] = prop_map
         return resource_map
 
-    def _sheet_field_creatable_or_editable(self, sheetname: str,
-                                           fieldname: str,
-                                           default: bool) -> bool:
-        """Hook that allows modifying the read-only status for fields.
-
-        This allows setting a field none editable and none creatable even
-        if the  whole sheet is editable/creatable in the backend.
-
-        FIXME: this is just a cosmetic ad-hoc solution since the read-only
-        status in the backend is not affected.
-        """
-        if (sheetname, fieldname) == ('adhocracy.sheets.versions.IVersionable',
-                                      'followed_by'):
-            return False
-        else:
-            return default
-
     def _describe_sheets(self, sheet_metadata):
         """Build a description of the sheets used in the system.
 
@@ -511,12 +452,13 @@ class MetaApiView(RESTView):
                 typ = to_dotted_name(valuetyp)
                 containertype = None
                 targetsheet = None
+                readonly = getattr(node, 'readonly', False)
 
                 # If the outer type is not a container and it's not
                 # just a generic SchemaNode, we use the outer type
                 # as "valuetype" since it provides most specific
                 # information (e.g. "adhocracy.schema.Identifier"
-                # instead of just "String")
+                # instead of just "SingleLIne")
                 if valuetype is not SchemaNode:
                     typ = to_dotted_name(valuetype)
 
@@ -534,16 +476,13 @@ class MetaApiView(RESTView):
 
                 typ_stripped = strip_optional_prefix(typ, 'colander.')
 
-                editable = self._sheet_field_creatable_or_editable(
-                    sheet_name, fieldname, metadata.editable)
-                creatable = self._sheet_field_creatable_or_editable(
-                    sheet_name, fieldname, metadata.creatable)
                 fielddesc = {
                     'name': fieldname,
                     'valuetype': typ_stripped,
-                    'create_mandatory': metadata.create_mandatory,
-                    'editable': editable,
-                    'creatable': creatable,
+                    'create_mandatory':
+                        False if readonly else metadata.create_mandatory,
+                    'editable': False if readonly else metadata.editable,
+                    'creatable': False if readonly else metadata.creatable,
                     'readable': metadata.readable,
                 }
                 if containertype is not None:
@@ -570,12 +509,9 @@ class MetaApiView(RESTView):
         sheet_metadata = self.registry.sheets_metadata()
         sheet_map = self._describe_sheets(sheet_metadata)
 
-        struct = {
-            'resources':
-            resource_map,
-            'sheets':
-            sheet_map
-        }
+        struct = {'resources': resource_map,
+                  'sheets': sheet_map,
+                  }
         return struct
 
 

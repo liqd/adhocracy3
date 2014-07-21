@@ -1,3 +1,58 @@
+/*doc
+---
+title: input
+name: input
+category: Inputs
+---
+
+Inputs are all elements that allow users to input data.
+
+They can have the following states:
+
+-   is-empty
+-   has-focus
+-   is-invalid
+-   is-disabled
+
+```html_example
+<input placeholder="you must not leave this empty" required=required />
+<input disabled="disabled" />
+```
+*/
+input {
+    &:invalid {
+        outline: lightcoral auto 5px;
+        outline-offset: -2px;
+
+        &:focus {
+            outline-color: red;
+        }
+    }
+}
+
+/*doc
+---
+title: textinput
+name: textinput
+parent: input
+---
+
+Element to enter one line of text.
+
+In fact, there are multiple variants of this already defined in HTML.
+They should all look and behave similarily.
+
+```html_example
+<input type="text" placeholder="text" />
+<input type="url" placeholder="url" />
+<input type="password" placeholder="password" />
+<input type="email" placeholder="email" />
+<input type="date" placeholder="date" />
+<input type="time" placeholder="time" />
+<input type="number" placeholder="number" />
+<input type="text" placeholder="required" required="required" />
+```
+*/
 input[type="text"],
 input[type="url"],
 input[type="password"],
@@ -5,5 +60,71 @@ input[type="email"],
 input[type="date"],
 input[type="time"],
 input[type="number"] {
+    display: block;
     min-width: 13em;
+    margin-bottom: 0.5em;
+}
+
+/*doc
+---
+title: checkbox
+name: checkbox
+parent: input
+---
+
+A checkbox has two states: is-checked and is-unchecked. It may be required to
+be checked, w.g. for accepting terms of service.
+
+```html_example
+<label>
+    <input type="checkbox" />
+    click me!
+</label>
+```
+*/
+
+/*doc
+---
+title: label
+name: label
+category: Inputs
+---
+
+A label can be used to describe an input.
+
+```html_example
+<label>
+    <input type="text" />
+    description
+</label>
+```
+*/
+
+/*doc
+---
+title: tooltip modifier
+name: label.m-tooltip
+parent: label
+---
+
+If you do not want to show a label directly but to have an info icon with a
+tooltip instead you may use this modifier.
+
+```html_example
+<label class="m-tooltip" title="description">
+    <input type="text" />
+</label>
+```
+*/
+label.m-tooltip {
+    &::after {
+        content: "i";
+        display: block;
+        height: 2em;
+        line-height: 2;
+        width: 2em;
+        border: 1px solid $border;
+        @include border-radius(50%);
+        text-align: center;
+    }
 }

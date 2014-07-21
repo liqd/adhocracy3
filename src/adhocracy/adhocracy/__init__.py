@@ -10,7 +10,7 @@ from adhocracy.resources.root import IRootPool
 
 
 def root_factory(request, t=transaction, g=get_connection,
-                 mark_unfinished_as_finished=False):  # pragma: no cover
+                 mark_unfinished_as_finished=False):
     """ A function which can be used as a Pyramid ``root_factory``.
 
     It accepts a request and returns an instance of the ``Root`` content type.
@@ -25,7 +25,7 @@ def root_factory(request, t=transaction, g=get_connection,
         app_root = registry.content.create(IRootPool.__identifier__)
         zodb_root['app_root'] = app_root
         t.savepoint()  # give app_root a _p_jar
-        if mark_unfinished_as_finished:  # pragma: no cover
+        if mark_unfinished_as_finished:
             markunf(app_root, registry, t)
         t.commit()
     add_after_commit_hooks(request)
@@ -42,7 +42,7 @@ def add_after_commit_hooks(request):
                                            args=(registry,))
 
 
-def includeme(config):  # pragma: no cover
+def includeme(config):
     """Setup basic adhocracy."""
     settings = config.registry.settings
     config.include('pyramid_zodbconn')
@@ -72,7 +72,7 @@ def includeme(config):  # pragma: no cover
     config.include('.frontend')
 
 
-def main(global_config, **settings):  # pragma: no cover
+def main(global_config, **settings):
     """ Return a Pyramid WSGI application. """
     config = Configurator(settings=settings, root_factory=root_factory)
     includeme(config)
