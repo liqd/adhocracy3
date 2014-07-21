@@ -40,7 +40,7 @@ export class User {
 
         return _self.adhHttp.get(userPath)
             .then((resource) => {
-                _self.data = resource.data["adhocracy.resources.principal.IUsersPool"];
+                _self.data = resource.data["adhocracy.sheets.user.IUserBasic"];
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect
@@ -112,7 +112,7 @@ export class User {
         return _self.adhHttp.post("/principals/users/", {
             "content_type": "adhocracy.resources.principal.IUser",
             "data": {
-                "adhocracy.sheets.user.UserBasicSchema": {
+                "adhocracy.sheets.user.IUserBasic": {
                     "name": username,
                     "email": email
                 },

@@ -202,8 +202,8 @@ export var register = () => {
                 });
                 it("posts a valid user resource", () => {
                     var data = adhHttpMock.post.calls.mostRecent().args[1].data;
-                    expect(data["adhocracy.sheets.user.UserBasicSchema"].name).toBe("username");
-                    expect(data["adhocracy.sheets.user.UserBasicSchema"].email).toBe("email");
+                    expect(data["adhocracy.sheets.user.IUserBasic"].name).toBe("username");
+                    expect(data["adhocracy.sheets.user.IUserBasic"].email).toBe("email");
                     expect(data["adhocracy.sheets.user.IPasswordAuthentication"].password).toBe("password");
                 });
             });
