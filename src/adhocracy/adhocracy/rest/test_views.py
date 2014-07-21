@@ -925,9 +925,3 @@ class ValidateRequestDataDecoratorUnitTest(unittest.TestCase):
         DummyView(context, request)
 
         assert request.validated == {'data': True}
-
-
-
-
-
-

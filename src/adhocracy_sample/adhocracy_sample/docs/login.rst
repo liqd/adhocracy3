@@ -71,7 +71,7 @@ E.g. when we try to register a user with an empty password::
     >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
     ...         'data': {
     ...              'adhocracy.sheets.user.IUserBasic': {
-    ...                  'name': 'Anna Müllerin',
+    ...                  'name': 'Anna Müller',
     ...                  'email': 'annina@example.org'},
     ...              'adhocracy.sheets.user.IPasswordAuthentication': {
     ...                  'password': ''}}}
@@ -118,16 +118,25 @@ several additional sheets, e.g.::
         }
      }
 
+Create a valid user::
+
+    >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
+    ...         'data': {
+    ...              'adhocracy.sheets.user.IUserBasic': {
+    ...                  'name': 'Anna Müller',
+    ...                  'email': 'annina@example.org'},
+    ...              'adhocracy.sheets.user.IPasswordAuthentication': {
+    ...                  'password': 'Inawgoywyk2'}}}
+    >>> resp_data = testapp.post_json("/principals/users", prop,
+    ...                               status=200).json
 
 User Login
 ----------
 
-FIXME the remaining doctests in this document don't work yet.
-
 To log-in an existing user via password, the frontend sends a JSON request
 to the URL ``login_username`` with a user name and password::
 
-    >>> prop = {'name': 'Anna Müllerin',
+    >>> prop = {'name': 'Anna Müller',
     ...         'password': 'Inawgoywyk2'}
     >>> resp_data = testapp.post_json('/login_username', prop).json
     >>> pprint(resp_data)

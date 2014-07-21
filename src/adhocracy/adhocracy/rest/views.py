@@ -8,9 +8,11 @@ from colander import MappingSchema
 from cornice.util import json_error
 from cornice.schemas import validate_colander_schema
 from cornice.schemas import CorniceSchema
+from substanced.interfaces import IUserLocator
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
+from pyramid.security import remember
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
 
@@ -33,7 +35,9 @@ from adhocracy.schema import AbstractReferenceIterable
 from adhocracy.utils import get_iresource
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
+from adhocracy.utils import get_sheet
 from adhocracy.resources.root import IRootPool
+from adhocracy.sheets.user import IPasswordAuthentication
 
 
 logger = getLogger(__name__)
@@ -580,38 +584,34 @@ def _add_no_such_user_or_wrong_password_error(request: Request):
                        'User doesn\'t exist or password is wrong')
 
 
-def validate_login_username(context, request: Request):
+def validate_login_name(context, request: Request):
     """Validate the user name of a login request.
 
-    If valid, the path to the user object is added as 'user_path' to
+    If valid, the user object is added as 'user' to
     `request.validated`.
     """
     name = request.validated['name']
-    # TODO implement: search for user object in catalog and store it here
-    user_found = True
-    if user_found:
-        request.validated['user_path'] = 'path for ' + name
+    locator = request.registry.getMultiAdapter((context, request),
+                                               IUserLocator)
+    user = locator.get_user_by_login(name)
+    if user:
+        request.validated['user'] = user
     else:
         _add_no_such_user_or_wrong_password_error(request)
 
 
-def validate_password(context, request: Request):
-    """Validate the password of a login request."""
-    user_path = request.validated.get('user_path')
-    if not user_path:
+def validate_login_password(context, request: Request):
+    """Validate the password of a login request.
+
+    Requires the user object as `user` in `request.validated`.
+    """
+    user = request.validated['user']
+    if not user:
         return
+    password_sheet = get_sheet(user, IPasswordAuthentication)
     password = request.validated['password']
-    # TODO actually validate the password
-    password_is_valid = bool(password)
-    if not password_is_valid:
+    if not password_sheet.check_plaintext_password(password):
         _add_no_such_user_or_wrong_password_error(request)
-
-
-def _build_successful_login_response(user_path: str, user_token: str) -> dict:
-    """Build response data structure for a successful request. """
-    return {'status': 'success',
-            'user_path': user_path,
-            'user_token': user_token}
 
 
 @view_defaults(
@@ -624,17 +624,25 @@ class LoginUsernameView(RESTView):
     """Log in a user via their name."""
 
     validation_POST = (POSTLoginUsernameRequestSchema,
-                       [validate_login_username, validate_password])
+                       [validate_login_name, validate_login_password])
 
     @view_config(name='login_username',
                  request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
-        # TODO generate and return user token
-        user_path = self.request.validated['user_path']
-        user_token = 'token for ' + user_path
-        return _build_successful_login_response(user_path, user_token)
+        user = self.request.validated['user']
+        user_path = resource_path(user)
+        headers = remember(self.request, user_path)
+        return _build_successful_login_response(headers['X-User-Path'],
+                                                headers['X-User-Token'])
+
+
+def _build_successful_login_response(user_path: str, user_token: str) -> dict:
+    """Build response data structure for a successful request. """
+    return {'status': 'success',
+            'user_path': user_path,
+            'user_token': user_token}
 
 
 def includeme(config):  # pragma: no cover
