@@ -1,7 +1,6 @@
 /// <reference path="../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 /// <reference path="../_all.d.ts"/>
 
-import Util = require("./Util");
 import q = require("q");
 
 import Resources = require("./Resources");
@@ -9,8 +8,8 @@ import Resources = require("./Resources");
 
 var createAdhHttpMock = () => {
     var mock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "postToPool"]);
-    mock.get.and.returnValue(Util.mkPromise(q, {}));
-    mock.postToPool.and.returnValue(Util.mkPromise(q, {}));
+    mock.get.and.returnValue(q.when({}));
+    mock.postToPool.and.returnValue(q.when({}));
     return mock;
 };
 
