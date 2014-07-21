@@ -78,25 +78,40 @@ E.g. when we try to register a user with an empty password::
     >>> resp_data = testapp.post_json("/principals/users", prop,
     ...                               status=400).json
     >>> pprint(resp_data)
-    {'errors':...
+    {'errors': [{'description': 'Required',
+                 'location': 'body',
+                 'name': 'data.adhocracy.sheets.user.IPasswordAuthentication.password'}],
      'status': 'error'}
 
 <errors> is a list of errors. The above error indicates that a required
-field (the password field) is missing or empty.  FIXME more on what can go
-wrong and how it's reported. Tentatively, the following error conditions can
- happen:
+field (the password field) is missing or empty. The following other error
+conditions can occur:
 
   * username does already exist
   * email does already exist
-  * username is invalid (e.g. contains "@", is empty, starts with
-    whitespace)
-  * email is invalid
-  * password is too short
-  * password is too long
-  * password is invalid (doesn't match our arbitrary expectations, e.g.
-    "password must contain an umlaut or a typographic quotation mark!")
+  * email is invalid (doesn't look like an email address)
+  * password is too short (less than 6 chars)
+  * password is too long (more than 100 chars)
   * internal error: something went wrong in the backend
-  * anything else?
+
+FIXME this doesn't work yet:
+For example, if we try to register a user whose email address is ready
+registered:
+
+    >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
+    ...         'data': {
+    ...              'adhocracy.sheets.user.IUserBasic': {
+    ...                  'name': 'New user with old password',
+    ...                  'email': 'anna@example.org'},
+    ...              'adhocracy.sheets.user.IPasswordAuthentication': {
+    ...                  'password': 'EckVocUbs3'}}}
+    >>> resp_data = testapp.post_json("/principals/users", prop,
+    ...                               status=400).json
+    >>> pprint(resp_data)
+    {'errors': [{'description': 'Required',
+                 'location': 'body',
+                 'name': 'adhocracy.sheets.user.IUserBasic.email'}],
+     'status': 'error'}
 
 *Note:* in the future, the registration request may contain additional
 personal data for the user. This data will probably be collected in one or
@@ -150,7 +165,19 @@ On success, the backend sends back the path to the object
 representing the logged-in user and a token that must be used to authorize
 additional requests by the user.
 
-FIXME Add samples for on-error case.
+An error is returned if the specified user name or email doesn't exist or if
+the wrong password is specified. For security reasons,
+the same error message (referring to the password) is given in all these
+cases.
+
+    >>> prop = {'name': 'No such user',
+    ...         'password': 'EckVocUbs3'}
+    >>> resp_data = testapp.post_json('/login_username', prop, status=400).json
+    >>> pprint(resp_data)
+    {'errors': [{'description': "User doesn't exist or password is wrong",
+                 'location': 'body',
+                 'name': 'password'}],
+     'status': 'error'}
 
 
 User Authentication
