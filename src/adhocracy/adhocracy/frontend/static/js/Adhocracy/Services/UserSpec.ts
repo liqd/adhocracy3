@@ -21,7 +21,7 @@ export var register = () => {
                 adhHttpMock.post.and.returnValue(q.when({}));
                 adhHttpMock.get.and.returnValue(q.when({
                     data: {
-                        "adhocracy.resources.principal.IUsersPool": {}
+                        "adhocracy.sheets.user.IUserBasic": {}
                     }
                 }));
 
