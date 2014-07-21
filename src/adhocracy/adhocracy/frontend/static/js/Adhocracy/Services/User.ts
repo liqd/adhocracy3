@@ -20,7 +20,8 @@ export class User {
         var _self : User = this;
 
         if (_self.Modernizr.localstorage) {
-            if (_self.$window.localStorage.getItem("user-token") !== null) {
+            if (_self.$window.localStorage.getItem("user-token") !== null &&
+                    _self.$window.localStorage.getItem("user-path") !== null) {
                 // FIXME: check if user-token is still valid and get user data from server
                 _self.enableToken(
                     _self.$window.localStorage.getItem("user-token"),
