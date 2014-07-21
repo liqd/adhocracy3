@@ -23,9 +23,16 @@ class TestUserLogin:
         fill_input(browser, '.login [name="password"]', password)
         click_button(browser, '.login [type="submit"]')
 
+    def _logout(self, browser, server_sample):
+        logout_url = (server_sample.application_url
+                      + 'frontend_static/root.html')
+        browser.visit(logout_url)
+        click_button(browser, '.logout [type="submit"]')
+
     def test_login_username(self, browser, server_sample):
         self._register(browser, server_sample, 'user1', 'email1@example.com',
                        'password1')
+        self._logout(browser, server_sample)
         # FIXME: Test that no error messages are shown
         self._login(browser, server_sample, 'user1', 'password1')
         assert is_logged_in(browser)
@@ -33,12 +40,14 @@ class TestUserLogin:
     def test_login_email(self, browser, server_sample):
         self._register(browser, server_sample, 'user1', 'email1@example.com',
                        'password1')
+        self._logout(browser, server_sample)
         self._login(browser, server_sample, 'email1@example.com', 'password1')
         assert is_logged_in(browser)
 
     def test_login_error(self, browser, server_sample):
         self._register(browser, server_sample, 'user1', 'email1@example.com',
                        'password1')
+        self._logout(browser, server_sample)
         self._login(browser, server_sample, 'user1', 'password2')
         assert browser.is_element_present_by_css(
             '.login .form-error:not(.ng-hide)')
@@ -58,6 +67,7 @@ class TestUserLogin:
     def test_login_persistence(self, browser, server_sample):
         self._register(browser, server_sample, 'user1', 'email1@example.com',
                        'password1')
+        self._logout(browser, server_sample)
         self._login(browser, server_sample, 'user1', 'password1')
         browser.reload()
         assert is_logged_in(browser)

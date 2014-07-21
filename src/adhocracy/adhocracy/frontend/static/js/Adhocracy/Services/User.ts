@@ -22,7 +22,6 @@ export class User {
         if (_self.Modernizr.localstorage) {
             if (_self.$window.localStorage.getItem("user-token") !== null &&
                     _self.$window.localStorage.getItem("user-path") !== null) {
-                // FIXME: check if user-token is still valid and get user data from server
                 _self.enableToken(
                     _self.$window.localStorage.getItem("user-token"),
                     _self.$window.localStorage.getItem("user-path")
@@ -163,7 +162,7 @@ export var loginDirective = (adhConfig) => {
     };
 };
 
-export var registerDirective = (adhConfig) => {
+export var registerDirective = (adhConfig, $location) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.template_path + "/Register.html",
@@ -180,7 +179,10 @@ export var registerDirective = (adhConfig) => {
                 return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
                     .then(() => {
                         $scope.error = undefined;
-                        // FIXME redirect after successful registration
+                        return adhUser.logIn($scope.input.username, $scope.input.password).then(
+                            () => $location.path("/frontend_static/root.html"),
+                            (errors) => $scope.error = errors.length ? errors[0].description : "Internal Error"
+                        );
                     }, (errors) => {
                         $scope.error = errors.length ? errors[0].description : "Internal Error";
                     });
