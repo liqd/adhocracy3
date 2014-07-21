@@ -83,7 +83,7 @@ clean:
 	find . -name '[^_]*.d.ts' -exec rm {} \;
 
 wc:
-	git ls-files | grep \\.ts$ | wc
-	git ls-files | grep \\.ts$ | xargs wc
+	git ls-files | grep \\.ts$$ | wc
+	git ls-files | grep \\.ts$$ | xargs wc
 
 .dummy:
