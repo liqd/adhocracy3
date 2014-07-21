@@ -78,25 +78,40 @@ E.g. when we try to register a user with an empty password::
     >>> resp_data = testapp.post_json("/principals/users", prop,
     ...                               status=400).json
     >>> pprint(resp_data)
-    {'errors':...
+    {'errors': [{'description': 'Required',
+                 'location': 'body',
+                 'name': 'data.adhocracy.sheets.user.IPasswordAuthentication.password'}],
      'status': 'error'}
 
 <errors> is a list of errors. The above error indicates that a required
-field (the password field) is missing or empty.  FIXME more on what can go
-wrong and how it's reported. Tentatively, the following error conditions can
- happen:
+field (the password field) is missing or empty. The following other error
+conditions can occur:
 
   * username does already exist
   * email does already exist
-  * username is invalid (e.g. contains "@", is empty, starts with
-    whitespace)
-  * email is invalid
-  * password is too short
-  * password is too long
-  * password is invalid (doesn't match our arbitrary expectations, e.g.
-    "password must contain an umlaut or a typographic quotation mark!")
+  * email is invalid (doesn't look like an email address)
+  * password is too short (less than 6 chars)
+  * password is too long (more than 100 chars)
   * internal error: something went wrong in the backend
-  * anything else?
+
+FIXME this doesn't work yet:
+For example, if we try to register a user whose email address is ready
+registered:
+
+    >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
+    ...         'data': {
+    ...              'adhocracy.sheets.user.IUserBasic': {
+    ...                  'name': 'New user with old password',
+    ...                  'email': 'anna@example.org'},
+    ...              'adhocracy.sheets.user.IPasswordAuthentication': {
+    ...                  'password': 'EckVocUbs3'}}}
+    >>> resp_data = testapp.post_json("/principals/users", prop,
+    ...                               status=400).json
+    >>> pprint(resp_data)
+    {'errors': [{'description': 'Required',
+                 'location': 'body',
+                 'name': 'adhocracy.sheets.user.IUserBasic.email'}],
+     'status': 'error'}
 
 *Note:* in the future, the registration request may contain additional
 personal data for the user. This data will probably be collected in one or
