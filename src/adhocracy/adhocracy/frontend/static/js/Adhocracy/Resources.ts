@@ -156,17 +156,17 @@ export class Service {
 
     postProposal(path: string, name: string, scope: {proposal?: any}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new Proposal(name))
-            .then((ret) => { scope.proposal = ret; }, Http.logBackendError);
+            .then((ret) => { scope.proposal = ret; });
     }
 
     postSection(path: string, name: string, scope: {section?: any}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new Section(name))
-            .then((ret) => { scope.section = ret; }, Http.logBackendError);
+            .then((ret) => { scope.section = ret; });
     }
 
     postParagraph(path: string, name: string, scope: {paragraphs}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new Paragraph(name))
-            .then((ret) => { scope.paragraphs[name] = ret; }, Http.logBackendError);
+            .then((ret) => { scope.paragraphs[name] = ret; });
     }
 
     postParagraphs(path: string, names: string[], scope) : ng.IPromise<void> {
@@ -185,8 +185,7 @@ export class Service {
     postVersion(path: string, data) : ng.IPromise<any> {
         var _self = this;
         return _self.getNewestVersionPath(path)
-            .then((versionPath) => _self.adhHttp.postNewVersion(versionPath, data), Http.logBackendError)
-            .then((ret) => ret, Http.logBackendError);
+            .then((versionPath) => _self.adhHttp.postNewVersion(versionPath, data));
     }
 
     postProposalVersion(proposal, data, sections, scope) : ng.IPromise<void> {

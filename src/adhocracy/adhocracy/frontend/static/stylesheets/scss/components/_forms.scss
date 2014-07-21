@@ -20,6 +20,7 @@ They can have the following states:
 ```
 */
 input {
+    &.ng-invalid,
     &:invalid {
         outline: lightcoral auto 5px;
         outline-offset: -2px;
@@ -127,4 +128,69 @@ label.m-tooltip {
         @include border-radius(50%);
         text-align: center;
     }
+}
+
+/*doc
+---
+title: Errors
+name: errors
+category: Inputs
+---
+*/
+
+/*doc
+---
+title: Form Error
+name: form-error
+parent: errors
+---
+
+This error concerns the whole form.
+
+```html_example
+<div class="login">
+    <h1 class="title">Log in!</h1>
+    <div class="form-error">
+        <p>This is plain wrong!</p>
+    </div>
+    <form class="login-form">
+        <input type="text" name="name" placeholder="email or username" />
+        <input type="password" name="password" placeholder="password" />
+        <input type="submit" value="login" />
+    </form>
+</div>
+```
+*/
+.form-error {
+    margin: 1em 0;
+    padding: 0 1em;
+    border-top: 1px solid $border;
+    border-bottom: 1px solid $border;
+    background: $bg2;
+}
+
+/*doc
+---
+title: Input Error
+name: input-error
+parent: errors
+---
+
+This error concerns a single input.
+
+```html_example
+<div class="login">
+    <h1 class="title">Log in!</h1>
+    <form class="login-form">
+        <input type="text" name="name" placeholder="email or username" />
+        <span class="input-error">Too short</span>
+        <input type="password" name="password" placeholder="password" />
+        <input type="submit" value="login" />
+    </form>
+</div>
+```
+*/
+.input-error {
+    font-size: $fontsize-small;
+    padding-left: 1em;
 }

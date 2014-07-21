@@ -181,24 +181,24 @@ exportContent = <Content extends Types.Content<any>>(obj : Content) : Content =>
 // the body that have the following form:
 export interface IBackendError {
     status: string;
-    errors: string[][];
+    errors: {name : string; location : string; description : string}[];
 }
 
-logBackendError = (data: IBackendError, status: number, headers, config) : void => {
+logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendError>) : void => {
     "use strict";
 
-    console.log("http response with error status: " + status);
+    console.log("http response with error status: " + response.status);
 
-    for (var e in data.errors) {
-        if (data.errors.hasOwnProperty(e)) {
+    for (var e in response.data.errors) {
+        if (response.data.errors.hasOwnProperty(e)) {
             console.log("error #" + e);
-            console.log("where: " + data.errors[e][0] + ", " + data.errors[e][1]);
-            console.log("what:  " + data.errors[e][2]);
+            console.log("where: " + response.data.errors[e].name + ", " + response.data.errors[e].location);
+            console.log("what:  " + response.data.errors[e].description);
         }
     }
 
-    console.log(config);
-    console.log(data);
+    console.log(response.config);
+    console.log(response.data);
 
-    throw ("adhHttp: exit code " + status + "!");
+    throw response.data.errors;
 };
