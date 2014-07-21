@@ -179,10 +179,10 @@ export var registerDirective = (adhConfig, $location) => {
                 return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
                     .then(() => {
                         $scope.error = undefined;
-                        // REVIEW: This should not work because the location change happens before the login request is finished.
-                        // Also handling of login errors is missing
-                        adhUser.login($scope.input.username, $scope.input.password);
-                        $location.path("/frontend_static/root.html");
+                        adhUser.logIn($scope.input.username, $scope.input.password).then(
+                            () => $location.path("/frontend_static/root.html"),
+                            (errors) => $scope.error = errors.length ? errors[0].description : "Internal Error"
+                        );
                     }, (errors) => {
                         $scope.error = errors.length ? errors[0].description : "Internal Error";
                     });

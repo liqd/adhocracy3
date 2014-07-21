@@ -318,7 +318,7 @@ export var register = () => {
 
                 beforeEach(() => {
                     $scopeMock = {};
-                    adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register"]);
+                    adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register", "logIn"]);
                     adhUserMock.register.and.returnValue(q.when(undefined));
                     controller = <any>(directive.controller[2]);
                     controller(adhUserMock, $scopeMock);
@@ -347,7 +347,7 @@ export var register = () => {
                     });
                     it("logs user in after register ", (done) => {
                         $scopeMock.register().then(() => {
-                            expect(adhUserMock.login).toHaveBeenCalled();
+                            expect(adhUserMock.logIn).toHaveBeenCalled();
                             done();
                         });
                     });
