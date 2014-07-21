@@ -96,10 +96,6 @@ export class User {
             .then((response) => {
                 // FIXME use websockets for updates
                 return _self.storeAndEnableToken(response.user_token, response.user_path);
-            }, (reason) => {
-                // FIXME server does not send details on what went wrong.
-                // This may also be an internal server error or similar.
-                return _self.$q.reject("invalid credentials");
             });
     }
 
@@ -153,8 +149,8 @@ export var loginDirective = (adhConfig) => {
             $scope.logIn = () => {
                 var promise = adhUser.logIn($scope.credentials.nameOrEmail, $scope.credentials.password).then(() => {
                     $scope.error = undefined;
-                }, (error) => {
-                    $scope.error = error;
+                }, (errors) => {
+                    $scope.error = errors.length ? errors[0].description : "Internal Error";
                 });
                 $scope.resetCredentials();
                 return promise;
@@ -184,8 +180,8 @@ export var registerDirective = (adhConfig) => {
                     .then(() => {
                         $scope.error = undefined;
                         // FIXME redirect after successful registration
-                    }, (error) => {
-                        $scope.error = error;
+                    }, (errors) => {
+                        $scope.error = errors.length ? errors[0].description : "Internal Error";
                     });
             };
         }]

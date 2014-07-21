@@ -200,5 +200,5 @@ logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendError>) : void 
     console.log(response.config);
     console.log(response.data);
 
-    throw ("adhHttp: exit code " + response.status + "!");
+    throw response.data.errors;
 };

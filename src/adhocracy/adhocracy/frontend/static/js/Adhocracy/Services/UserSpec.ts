@@ -128,7 +128,7 @@ export var register = () => {
                     var _reason;
 
                     beforeEach((done) => {
-                        adhUser.adhHttp.post.and.returnValue(q.reject());
+                        adhUser.adhHttp.post.and.returnValue(q.reject("errors"));
                         adhUser.logIn("user1", "user1_wrong_pass").then(
                             done,
                             (reason) => {
@@ -139,7 +139,7 @@ export var register = () => {
                     });
 
                     it("rejects the login attempt", () => {
-                        expect(_reason).toBe("invalid credentials");
+                        expect(_reason).toBe("errors");
                         expect(adhUser.loggedIn).toBe(false);
                         expect(adhUser.data).not.toBeDefined();
                         expect(adhUser.token).not.toBeDefined();
@@ -278,7 +278,7 @@ export var register = () => {
                         });
                     });
                     it("sets scope.error if something goes wrong", (done) => {
-                        adhUserMock.logIn.and.returnValue(q.reject("error"));
+                        adhUserMock.logIn.and.returnValue(q.reject([{description: "error"}]));
                         $scopeMock.logIn().then(() => {
                             expect($scopeMock.error).toBe("error");
                             done();
@@ -351,7 +351,7 @@ export var register = () => {
                         });
                     });
                     it("sets scope.error if something goes wrong", (done) => {
-                        adhUserMock.register.and.returnValue(q.reject("error"));
+                        adhUserMock.register.and.returnValue(q.reject([{description: "error"}]));
                         $scopeMock.register().then(() => {
                             expect($scopeMock.error).toBe("error");
                             done();
