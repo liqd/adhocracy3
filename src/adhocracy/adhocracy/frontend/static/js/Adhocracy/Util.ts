@@ -138,18 +138,6 @@ export function deepeq(a : any, b : any) : boolean {
 
 
 /**
- * sugar for angular
- */
-export function mkPromise($q : ng.IQService, obj : any) : ng.IPromise<any> {
-    "use strict";
-
-    var deferred = $q.defer();
-    deferred.resolve();
-    return deferred.promise.then(() => obj);
-}
-
-
-/**
  * Take a maximum delay time, an array of arguments and a function.
  * Generate random delays (in ms) for each and calls the function
  * asynchronously (out of order) on each element of the array.  Ignore
