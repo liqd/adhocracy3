@@ -203,4 +203,4 @@ class Graph(Persistent):
 
 def includeme(config):  # pragma: no cover
     """Register Graph content type."""
-    config.scan('.')
+    config.scan('.', ignore='.test_init')
