@@ -86,4 +86,25 @@ wc:
 	git ls-files | grep \\.ts$$ | wc
 	git ls-files | grep \\.ts$$ | xargs wc
 
+tags: .dummy
+	@echo
+	@echo "for emacs tag files, include '-e' in CTAGS in your shell env."
+	@echo "(note that ctags 5.9 seems to have a bug that keeps it from"
+	@echo "reading either of ~/.[ce]tags if called as 'ctags -e'!  not"
+	@echo "sure whether this has been reported yet.  use --verbose=1 if"
+	@echo "you want to investigate.)"
+	@echo
+	find . -name '*.ts' | xargs ctags \
+		--langdef=typescript \
+		--langmap=typescript:.ts \
+		--regex-typescript='/^[ \t]*(export)?[ \t]*class[ \t]+([a-zA-Z0-9_]+)/\2/c,classes/' \
+		--regex-typescript='/^[ \t]*(export)?[ \t]*module[ \t]+([a-zA-Z0-9_]+)/\2/n,modules/' \
+		--regex-typescript='/^[ \t]*(export)?[ \t]*function[ \t]+([a-zA-Z0-9_]+)/\2/f,functions/' \
+		--regex-typescript='/^[ \t]*export[ \t]+var[ \t]+([a-zA-Z0-9_]+)/\1/v,variables/' \
+		--regex-typescript='/^[ \t]*var[ \t]+([a-zA-Z0-9_]+)[ \t]*=[ \t]*function[ \t]*\(\)/\1/v,varlambdas/' \
+		--regex-typescript='/^[ \t]*(export)?[ \t]*(public|private)[ \t]+([a-zA-Z0-9_]+)/\3/m,members/' \
+		--regex-typescript='/^[ \t]*(export)?[ \t]*interface[ \t]+([a-zA-Z0-9_]+)/\2/i,interfaces/' \
+		--regex-typescript='/^[ \t]*(export)?[ \t]*enum[ \t]+([a-zA-Z0-9_]+)/\2/e,enums/' \
+	        --language-force=typescript
+
 .dummy:
