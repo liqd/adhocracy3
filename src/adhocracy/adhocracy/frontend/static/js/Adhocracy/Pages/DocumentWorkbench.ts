@@ -60,7 +60,7 @@ export var run = (config) => {
     app.service("adhResources", Resources.Service);
     app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
-    app.directive("adhRegister", ["adhConfig", AdhUser.registerDirective]);
+    app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
     app.value("adhConfig", config);
     app.factory("adhDone", AdhDone.factory);
 

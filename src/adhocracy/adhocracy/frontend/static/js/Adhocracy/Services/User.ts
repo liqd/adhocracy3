@@ -162,7 +162,7 @@ export var loginDirective = (adhConfig) => {
     };
 };
 
-export var registerDirective = (adhConfig) => {
+export var registerDirective = (adhConfig, $location) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.template_path + "/Register.html",
@@ -179,7 +179,7 @@ export var registerDirective = (adhConfig) => {
                 return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
                     .then(() => {
                         $scope.error = undefined;
-                        // FIXME redirect after successful registration
+                        $location.path("/frontend_static/root.html");
                     }, (errors) => {
                         $scope.error = errors.length ? errors[0].description : "Internal Error";
                     });
