@@ -17,6 +17,8 @@ class TestUserLogin:
         click_button(browser, '.register [type="submit"]')
 
     def _login(self, browser, server_sample, name_or_email, password):
+        # REVIEW: Now, as register automatically redirects here, it is
+        # confusing to repeat the redirect in the test
         login_url = server_sample.application_url + 'frontend_static/root.html'
         browser.visit(login_url)
         fill_input(browser, '.login [name="nameOrEmail"]', name_or_email)
