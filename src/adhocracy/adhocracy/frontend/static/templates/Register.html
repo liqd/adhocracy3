@@ -21,7 +21,9 @@
             name="password"
             placeholder="password"
             ng-model="input.password"
-            required="required" />
+            required="required"
+            ng-minlength="6"
+            ng-maxlength="100" />
         <input
             type="password"
             name="password_repeat"
