@@ -27,7 +27,7 @@ class UserBasicSchema(colander.MappingSchema):
     """
 
     email = Email()
-    display_name = SingleLine()
+    name = SingleLine()
     tzname = TimeZoneName()
 
 

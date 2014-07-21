@@ -324,6 +324,7 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
     root_versions = Attribute('Non-empty list of roots of the ItemVersion '
                               '(only resources that can be reached from one '
                               'of the roots should be updated)')
+    registry = Attribute('The pyramid registry')
 
 
 class ITokenManger(Interface):
@@ -340,4 +341,3 @@ class ITokenManger(Interface):
 
     def delete_token(token: str):
         """ Delete authentication token."""
-    registry = Attribute('The pyramid registry')

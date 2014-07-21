@@ -56,6 +56,8 @@ def includeme(config):
     authn_policy = TokenHeaderAuthenticationPolicy(authn_secret,
                                                    timeout=authn_timeout)
     config.set_authentication_policy(authn_policy)
+    config.include('.authentication')
+    config.include('.subscriber')
     config.include('.evolution')
     config.include('.events')
     config.include('.subscriber')

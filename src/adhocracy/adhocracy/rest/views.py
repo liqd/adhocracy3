@@ -8,7 +8,6 @@ from colander import MappingSchema
 from cornice.util import json_error
 from cornice.util import to_list
 from cornice.schemas import validate_colander_schema
-from cornice.schemas import CorniceSchema
 from substanced.interfaces import IUserLocator
 from pyramid.request import Request
 from pyramid.view import view_config
@@ -16,7 +15,6 @@ from pyramid.view import view_defaults
 from pyramid.security import remember
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
-from substanced.interfaces import IRoot
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItem
@@ -26,8 +24,6 @@ from adhocracy.interfaces import IPool
 from adhocracy.interfaces import ILocation
 from adhocracy.rest.schemas import ResourceResponseSchema
 from adhocracy.rest.schemas import ItemResponseSchema
-from adhocracy.rest.schemas import GETItemResponseSchema
-from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import POSTItemRequestSchema
 from adhocracy.rest.schemas import POSTLoginUsernameRequestSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
@@ -530,10 +526,10 @@ def validate_login_name(context, request: Request):
     locator = request.registry.getMultiAdapter((context, request),
                                                IUserLocator)
     user = locator.get_user_by_login(name)
-    if user:
-        request.validated['user'] = user
-    else:
+    if user is None:
         _add_no_such_user_or_wrong_password_error(request)
+    else:
+        request.validated['user'] = user
 
 
 def validate_login_password(context, request: Request):
@@ -541,8 +537,8 @@ def validate_login_password(context, request: Request):
 
     Requires the user object as `user` in `request.validated`.
     """
-    user = request.validated['user']
-    if not user:
+    user = request.validated.get('user', None)
+    if user is None:
         return
     password_sheet = get_sheet(user, IPasswordAuthentication)
     password = request.validated['password']
