@@ -4,7 +4,6 @@
 declare var beforeEach : (any) => void;
 
 import AdhUser = require("./User");
-import Util = require("../Util");
 import q = require("q");
 
 export var register = () => {
@@ -19,8 +18,8 @@ export var register = () => {
 
             beforeEach(() => {
                 adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "post"]);
-                adhHttpMock.post.and.returnValue(Util.mkPromise(q, {}));
-                adhHttpMock.get.and.returnValue(Util.mkPromise(q, {
+                adhHttpMock.post.and.returnValue(q.when({}));
+                adhHttpMock.get.and.returnValue(q.when({
                     data: {
                         "adhocracy.resources.principal.IUsersPool": {}
                     }
@@ -48,7 +47,7 @@ export var register = () => {
 
             describe("login", () => {
                 beforeEach(() => {
-                    adhUser.adhHttp.post.and.returnValue(Util.mkPromise(q, {
+                    adhUser.adhHttp.post.and.returnValue(q.when({
                         status: "success",
                         user_path: "user1_path",
                         user_token: "user1_tok"
@@ -232,7 +231,7 @@ export var register = () => {
                 beforeEach(() => {
                     $scopeMock = {};
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn", "logOut"]);
-                    adhUserMock.logIn.and.returnValue(Util.mkPromise(q, undefined));
+                    adhUserMock.logIn.and.returnValue(q.when(undefined));
                     controller = <any>(directive.controller[2]);
                     controller(adhUserMock, $scopeMock);
                 });
@@ -317,7 +316,7 @@ export var register = () => {
                 beforeEach(() => {
                     $scopeMock = {};
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register"]);
-                    adhUserMock.register.and.returnValue(Util.mkPromise(q, undefined));
+                    adhUserMock.register.and.returnValue(q.when(undefined));
                     controller = <any>(directive.controller[2]);
                     controller(adhUserMock, $scopeMock);
                 });
