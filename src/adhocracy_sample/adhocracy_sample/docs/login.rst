@@ -104,8 +104,8 @@ several additional sheets, e.g.::
 
     'data': {
         'adhocracy.sheets.user.IUserBasic': {
-            'name': 'Anna Müllerin',
-            'email': 'annina@example.org'},
+            'name': 'Anna Müller',
+            'email': 'anna@example.org'},
         'adhocracy.sheets.user.IPasswordAuthentication': {
             'password': '...'},
         'adhocracy.sheets.user.IUserDetails': {
@@ -137,8 +137,8 @@ to the URL ``login_username`` with a user name and password::
 
 Or to ``login_email``, specifying the user's email address instead of name::
 
-    >>> prop = {'email': 'annina@example.org',
-    ...         'password': 'EckVocUbs3E'}
+    >>> prop = {'email': 'anna@example.org',
+    ...        'password': 'EckVocUbs3'}
     >>> resp_data = testapp.post_json('/login_email', prop).json
     >>> pprint(resp_data)
     {'status': 'success',
@@ -163,23 +163,29 @@ respectively. The backend validates the token. If it's valid and not
 expired, the requested action is performed in the name and with the rights
 of the logged-in user.
 
-If the token is not valid or expired, the backend responds with an error
-status that identifies the "X-User-Token" header as source of the problem::
+If the token is not valid or expired and the tried to perform an action that
+requires authentication, the backend responds with an error status that
+identifies the "X-User-Token" header as source of the problem::
 
-    >>> headers = {'X-User-Path': user_path, 'X-User-Token': 'Blah'}
-    >>> resp_data = testapp.get('/meta_api/', headers=headers).json
-    >>> resp_data['status']
+FIXME Currently we don't have any actions that require authentication,
+hence we cannot provide the working example.
+
+    >> headers = {'X-User-Path': user_path, 'X-User-Token': 'Blah'}
+    >> resp_data = testapp.get('/meta_api/', headers=headers).json
+    >> resp_data['status']
     'error'
-    >>> resp_data['errors'][0]['location']
+    >> resp_data['errors'][0]['location']
     'header'
-    >>> resp_data['errors'][0]['name']
+    >> resp_data['errors'][0]['name']
     'X-User-Token'
-    >>> resp_data['errors'][0]['description']
+    >> resp_data['errors'][0]['description']
     'invalid user token'
 
-Tokens will likely expire after some time. Once they are expired,
-they will be considered as invalid so any further requests made by the user
-will lead to errors. To resolve this, the user must log in again.
+Tokens will usually expire after some time. (In the current implementation,
+they expire by default after 30 days, but configurations may change this.)
+Once they are expired, they will be considered as invalid so any further
+requests made by the user will lead to errors. To resolve this,
+the user must log in again.
 
 
 User Logout
