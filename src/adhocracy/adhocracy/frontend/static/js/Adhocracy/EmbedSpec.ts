@@ -17,8 +17,7 @@ export var register = () => {
                     }
                 }
             };
-            // FIXME DefinitelyTyped does not yet know of `and`.
-            $compileMock = (<any>jasmine.createSpy("$compileMock"))
+            $compileMock = jasmine.createSpy("$compileMock")
                 .and.returnValue(() => undefined);
         });
 
