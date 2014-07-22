@@ -27,6 +27,14 @@ export var register = () => {
                     "data-test=\"&#x27;&quot;\\&#x27;&amp;&#x27;\"></adh-document-workbench>";
                 expect(Embed.route2template($routeMock)).toBe(expected);
             });
+            it("throws if $route does not specify a widget", () => {
+                delete $routeMock.current.params.widget;
+                expect(() => Embed.route2template($routeMock)).toThrow();
+            });
+            it("throws if the requested widget is not available for embedding", () => {
+                $routeMock.current.params.widget = "do-not-embed";
+                expect(() => Embed.route2template($routeMock)).toThrow();
+            });
         });
 
         describe("factory", () => {
