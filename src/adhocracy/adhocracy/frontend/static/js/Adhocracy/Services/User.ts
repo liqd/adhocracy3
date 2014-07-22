@@ -49,7 +49,7 @@ var bindServerErrors = (
         errors.map((e) =>
             $scope.errors.push(e.description + " (" + e.name + ", " + e.location + ")"));
     }
-}
+};
 
 
 export class User {
@@ -187,6 +187,8 @@ export var loginDirective = (adhConfig) => {
         controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeLogin) : void => {
             $scope.user = adhUser;
 
+            $scope.errors = [];
+
             $scope.credentials = {
                 nameOrEmail: "",
                 password: ""
@@ -202,9 +204,9 @@ export var loginDirective = (adhConfig) => {
                     $scope.credentials.nameOrEmail,
                     $scope.credentials.password
                 ).then(() => {
-                    $scope.errors = undefined;
+                    $scope.errors = [];
                 }, (errors) => {
-                    bindServerErrors($scope, errors)
+                    bindServerErrors($scope, errors);
                 });
                 $scope.resetCredentials();
                 return promise;
@@ -231,10 +233,12 @@ export var registerDirective = (adhConfig, $location) => {
                 passwordRepeat: ""
             };
 
+            $scope.errors = [];
+
             $scope.register = () : ng.IPromise<IRegisterResponse> => {
                 return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
                     .then(() => {
-                        $scope.errors = undefined;
+                        $scope.errors = [];
                         return adhUser.logIn($scope.input.username, $scope.input.password).then(
                             () => $location.path("/frontend_static/root.html"),
                             (errors) => bindServerErrors($scope, errors)

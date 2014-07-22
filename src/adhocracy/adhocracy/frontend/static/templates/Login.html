@@ -5,13 +5,9 @@
     </div>
     <div ng-switch-default class="login">
         <h1 class="title">Log in!</h1>
-        <ul>
-            <li ng-repeat="error in errors track by $index">
-                <div class="form-error" ng-show="error">
-                    <p>{{error}}</p>
-                </div>
-            </li>
-        </ul>
+        <div class="form-error" ng-repeat="error in errors track by $index">
+            <p>{{error}}</p>
+        </div>
         <form class="login-form">
             <input type="text" name="nameOrEmail" placeholder="email or username" ng-model="credentials.nameOrEmail" />
             <input type="password" name="password" placeholder="password" ng-model="credentials.password" />
