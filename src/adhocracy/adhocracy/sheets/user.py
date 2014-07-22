@@ -36,7 +36,7 @@ def deferred_validate_user_name(node: colander.SchemaNode, kw: dict)\
 
     def validate_user_name_is_unique(node, value):
         if locator.get_user_by_login(value):
-            raise colander.Invalid('The user login name is not unique',
+            raise colander.Invalid(node, 'The user login name is not unique',
                                    value=value)
     return validate_user_name_is_unique
 
@@ -59,7 +59,7 @@ def deferred_validate_user_email(node: colander.SchemaNode, kw: dict)\
 
     def validate_user_email_is_unique(node, value):
         if locator.get_user_by_email(value):
-            raise colander.Invalid('The user login email is not unique',
+            raise colander.Invalid(node, 'The user login email is not unique',
                                    value=value)
     validate_email = Email.validator
     return colander.All(validate_email, validate_user_email_is_unique)

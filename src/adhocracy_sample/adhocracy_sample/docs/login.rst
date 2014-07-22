@@ -94,7 +94,6 @@ conditions can occur:
   * password is too long (more than 100 chars)
   * internal error: something went wrong in the backend
 
-FIXME this doesn't work yet:
 For example, if we try to register a user whose email address is ready
 registered:
 
@@ -108,9 +107,9 @@ registered:
     >>> resp_data = testapp.post_json("/principals/users", prop,
     ...                               status=400).json
     >>> pprint(resp_data)
-    {'errors': [{'description': 'Required',
+    {'errors': [{'description': 'The user login email is not unique',
                  'location': 'body',
-                 'name': 'adhocracy.sheets.user.IUserBasic.email'}],
+                 'name': 'data.adhocracy.sheets.user.IUserBasic.email'}],
      'status': 'error'}
 
 *Note:* in the future, the registration request may contain additional
