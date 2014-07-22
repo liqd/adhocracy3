@@ -6,7 +6,9 @@ export interface IUserBasic {
 
 
 var bindServerErrors = ($scope, errors) =>
-    $scope.error = errors.length ? (errors[0].description + " (" + errors[0].name + ", " + errors[0].location + ")") : "Internal Error";
+    $scope.error = errors.length
+        ? (errors[0].description + " (" + errors[0].name + ", " + errors[0].location + ")")
+        : "Internal Error";
 
 
 export class User {
@@ -165,6 +167,7 @@ export var loginDirective = (adhConfig) => {
         }]
     };
 };
+
 
 export var registerDirective = (adhConfig, $location) => {
     return {
