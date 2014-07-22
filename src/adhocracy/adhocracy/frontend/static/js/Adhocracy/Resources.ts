@@ -178,7 +178,7 @@ export class Service {
             return _self.postParagraph(path, names[0], scope)
                 .then(() => _self.postParagraphs(path, names.slice(1), scope));
         } else {
-            return Util.mkPromise(_self.$q, undefined);
+            return _self.$q.when(<void>null);
         }
     }
 
@@ -228,7 +228,7 @@ export class Service {
             return _self.postParagraphVersion(paragraphs[0], datas[0], scope)
                 .then(() => _self.postParagraphVersions(paragraphs.slice(1), datas.slice(1), scope));
         } else {
-            return Util.mkPromise(_self.$q, undefined);
+            return _self.$q.when(<void>null);
         }
     }
 
