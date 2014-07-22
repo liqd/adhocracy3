@@ -11,6 +11,7 @@ import pytest
 
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
+from adhocracy.sheets import GenericResourceSheet
 
 
 ############
@@ -55,6 +56,8 @@ class CorniceDummyRequest(testing.DummyRequest):
         self.validated = {}
         if registry is None:
             self.registry = Dummy()
+        else:
+            self.registry = registry
         self.registry.cornice_deserializers = {'application/json': extract_json_data}
         self.content_type = 'application/json'
         self.errors = Errors(self)
@@ -64,6 +67,33 @@ class CorniceDummyRequest(testing.DummyRequest):
     def json_body(self):
         return json.loads(self.body)
 
+
+
+class DummyUserLocator():
+
+    def __init__(self, dummy_user):
+        self.user = dummy_user
+
+    def get_user_by_email(self, email: str):
+        if email == 'user@example.org':
+            return self.user
+        else:
+            return None
+
+
+class MultiAdaptiveDummyRegistry():
+
+    def __init__(self, dummy_user):
+        self.user_locator = DummyUserLocator(dummy_user)
+
+    def getMultiAdapter(self, *args):
+        return self.user_locator
+
+
+class DummyPasswordAuthenticationSheet(GenericResourceSheet):
+
+    def check_plaintext_password(self, password: str) -> bool:
+        return password == 'lalala'
 
 
 @patch('adhocracy.registry.ResourceContentRegistry')
@@ -696,9 +726,57 @@ class ValidateRequestDataDecoratorUnitTest(unittest.TestCase):
             validation_get=(None, [dummy_validate]))
         view_class(self.context, self.request)
         assert self.request.validated == {'data': True}
+
     def test_view_with_schema(self):
         view_class = self._make_dummy_view_class_with_decorator(
             validation_get=(CountSchema, []))
         self.request.body = '{"count":"1"}'
         view_class(self.context, self.request)
         assert self.request.validated == {'count': 1}
+
+
+class ValidateUserDataUnitTest(unittest.TestCase):
+
+    def setUp(self):
+        config = testing.setUp()
+        from adhocracy.sheets import add_sheet_to_registry
+        from adhocracy.sheets.user import IPasswordAuthentication
+        from adhocracy.sheets.user import password_metadata
+        dummy_password_metadata = password_metadata._replace(
+            sheet_class=DummyPasswordAuthenticationSheet,
+        )
+        add_sheet_to_registry(dummy_password_metadata, config.registry)
+        self.dummy_user = testing.DummyResource(
+            __provides__=IPasswordAuthentication)
+        registry = MultiAdaptiveDummyRegistry(self.dummy_user)
+        self.request = CorniceDummyRequest(method='post', registry=registry)
+        self.context = testing.DummyResource()
+
+    def test_validate_login_email_valid(self):
+        self.request.validated['email'] = 'user@example.org'
+        from adhocracy.rest.views import validate_login_email
+        validate_login_email(self.context, self.request)
+        assert self.request.validated['user'] == self.dummy_user
+
+    def test_validate_login_email_invalid(self):
+        self.request.validated['email'] = 'no-such-user@example.org'
+        from adhocracy.rest.views import validate_login_email
+        validate_login_email(self.context, self.request)
+        assert 'user' not in self.request.validated
+        assert len(self.request.errors) == 1
+        assert 'User doesn\'t exist' in self.request.errors[0]['description']
+
+    def test_validate_login_password_valid(self):
+        self.request.validated['user'] = self.dummy_user
+        self.request.validated['password'] = 'lalala'
+        from adhocracy.rest.views import validate_login_password
+        validate_login_password(self.context, self.request)
+        assert len(self.request.errors) == 0
+
+    def test_validate_login_password_invalid(self):
+        self.request.validated['user'] = self.dummy_user
+        self.request.validated['password'] = 'wrong password'
+        from adhocracy.rest.views import validate_login_password
+        validate_login_password(self.context, self.request)
+        assert len(self.request.errors) == 1
+        assert 'password is wrong' in self.request.errors[0]['description']

@@ -541,10 +541,10 @@ def validate_login_email(context, request: Request):
     If valid, the user object is added as 'user' to
     `request.validated`.
     """
-    name = request.validated['email']
+    email = request.validated['email']
     locator = request.registry.getMultiAdapter((context, request),
                                                IUserLocator)
-    user = locator.get_user_by_email(name)
+    user = locator.get_user_by_email(email)
     if user is None:
         _add_no_such_user_or_wrong_password_error(request)
     else:
