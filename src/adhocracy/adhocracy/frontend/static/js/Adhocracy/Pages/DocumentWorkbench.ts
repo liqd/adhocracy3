@@ -115,7 +115,7 @@ export var run = (config) => {
     // done bootstrapping, write an ad-hoc flag into the DOM, so the
     // test code can check for that.
     if (!window.hasOwnProperty("adhocracy")) {
-        window.adhocracy = {};
+        (<any>window).adhocracy = {};
     };
     (<any>window).adhocracy.loadState = "complete";
 };
