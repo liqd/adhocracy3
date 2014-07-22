@@ -5,6 +5,10 @@ export interface IUserBasic {
 }
 
 
+var bindServerErrors = ($scope, errors) =>
+    $scope.error = errors.length ? (errors[0].description + " (" + errors[0].name + ", " + errors[0].location + ")") : "Internal Error";
+
+
 export class User {
     loggedIn : boolean = false;
     token : string;
@@ -151,9 +155,7 @@ export var loginDirective = (adhConfig) => {
             $scope.logIn = () => {
                 var promise = adhUser.logIn($scope.credentials.nameOrEmail, $scope.credentials.password).then(() => {
                     $scope.error = undefined;
-                }, (errors) => {
-                    $scope.error = errors.length ? errors[0].description : "Internal Error";
-                });
+                }, (errors) => bindServerErrors($scope, errors));
                 $scope.resetCredentials();
                 return promise;
             };
@@ -183,11 +185,9 @@ export var registerDirective = (adhConfig, $location) => {
                         $scope.error = undefined;
                         return adhUser.logIn($scope.input.username, $scope.input.password).then(
                             () => $location.path("/frontend_static/root.html"),
-                            (errors) => $scope.error = errors.length ? errors[0].description : "Internal Error"
+                            (errors) => bindServerErrors($scope, errors)
                         );
-                    }, (errors) => {
-                        $scope.error = errors.length ? errors[0].description : "Internal Error";
-                    });
+                    }, (errors) => bindServerErrors($scope, errors));
             };
         }]
     };
