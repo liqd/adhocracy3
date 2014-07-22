@@ -42,10 +42,10 @@ var bindServerErrors = (
     $scope : { errors : string[] },
     errors : AdhHttp.IBackendErrorItem[]
 ) => {
+    $scope.errors = [];
     if (!errors.length) {
-        return "Internal Error";
+        $scope.errors.push("Internal Error");
     } else {
-        $scope.errors = [];
         errors.map((e) =>
             $scope.errors.push(e.description);
     }
