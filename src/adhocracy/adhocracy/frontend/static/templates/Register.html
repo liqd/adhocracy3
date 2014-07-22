@@ -1,8 +1,12 @@
 <form novalidate="novalidate" class="register" name="registerForm">
     <h1 class="title">Register!</h1>
-    <div class="form-error" ng-show="error">
-        <p>{{error}}</p>
-    </div>
+    <ul>
+        <li ng-repeat="error in errors track by $index">
+            <div class="form-error" ng-show="error">
+                <p>{{error}}</p>
+            </div>
+        </li>
+    </ul>
     <div class="register-inputs">
         <input
             type="text"

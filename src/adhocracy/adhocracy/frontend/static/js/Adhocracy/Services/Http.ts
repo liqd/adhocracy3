@@ -181,7 +181,13 @@ exportContent = <Content extends Types.Content<any>>(obj : Content) : Content =>
 // the body that have the following form:
 export interface IBackendError {
     status: string;
-    errors: {name : string; location : string; description : string}[];
+    errors: IBackendErrorItem[];
+}
+
+export interface IBackendErrorItem {
+    name : string;
+    location : string;
+    description : string;
 }
 
 logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendError>) : void => {

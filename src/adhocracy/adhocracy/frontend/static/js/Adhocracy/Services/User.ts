@@ -13,7 +13,7 @@ interface IScopeLogin {
         nameOrEmail : string;
         password : string;
     };
-    error : string;
+    errors : string[];
 
     resetCredentials : () => void;
     logIn : () => ng.IPromise<void>;
@@ -28,7 +28,7 @@ interface IScopeRegister {
         password : string;
         passwordRepeat : string;
     };
-    error : string;
+    errors : string[];
 
     register : () => ng.IPromise<IRegisterResponse>;
 }
@@ -38,10 +38,17 @@ export interface IRegisterResponse {
 }
 
 
-var bindServerErrors = ($scope : { error : string }, errors : IBackendError[]) => {
-    $scope.error = errors.length
-        ? (errors[0].description + " (" + errors[0].name + ", " + errors[0].location + ")")
-        : "Internal Error";
+var bindServerErrors = (
+    $scope : { errors : string[] },
+    errors : AdhHttp.IBackendErrorItem[]
+) => {
+    if (!errors.length) {
+        return "Internal Error";
+    } else {
+        $scope.errors = [];
+        errors.map((e) =>
+            $scope.errors.push(e.description + " (" + e.name + ", " + e.location + ")"));
+    }
 }
 
 
@@ -189,13 +196,20 @@ export var loginDirective = (adhConfig) => {
                 $scope.credentials.nameOrEmail = "";
                 $scope.credentials.password = "";
             };
+
             $scope.logIn = () => {
-                var promise = adhUser.logIn($scope.credentials.nameOrEmail, $scope.credentials.password).then(() => {
-                    $scope.error = undefined;
-                }, (errors) => bindServerErrors($scope, errors));
+                var promise = adhUser.logIn(
+                    $scope.credentials.nameOrEmail,
+                    $scope.credentials.password
+                ).then(() => {
+                    $scope.errors = undefined;
+                }, (errors) => {
+                    bindServerErrors($scope, errors)
+                });
                 $scope.resetCredentials();
                 return promise;
             };
+
             $scope.logOut = () => {
                 adhUser.logOut();
             };
@@ -220,7 +234,7 @@ export var registerDirective = (adhConfig, $location) => {
             $scope.register = () : ng.IPromise<IRegisterResponse> => {
                 return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
                     .then(() => {
-                        $scope.error = undefined;
+                        $scope.errors = undefined;
                         return adhUser.logIn($scope.input.username, $scope.input.password).then(
                             () => $location.path("/frontend_static/root.html"),
                             (errors) => bindServerErrors($scope, errors)
