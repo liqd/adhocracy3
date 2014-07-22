@@ -5,6 +5,9 @@ from adhocracy.frontend.tests.unit.console import Parser
 from adhocracy.frontend.tests.unit.console import Formatter
 
 
+pytestmark = pytest.mark.jasmine  # mark theses tests as jasmine tests
+
+
 class TestJasmine:
 
     # phantomjs does not provide Function.prototype.bind:
