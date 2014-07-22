@@ -11,9 +11,12 @@ export var register = () => {
                 var resource = {
                     data: {
                         "adhocracy.sheets.document.IDocument": {
-                            title: title
+                            title: title,
+                            description: "description",
+                            elements: []
                         }
-                    }
+                    },
+                    content_type: "content_type"
                 };
                 expect(filter(resource)).toBe(title);
             });
