@@ -47,7 +47,7 @@ var bindServerErrors = (
     } else {
         $scope.errors = [];
         errors.map((e) =>
-            $scope.errors.push(e.description + " (" + e.name + ", " + e.location + ")"));
+            $scope.errors.push(e.description);
     }
 };
 
