@@ -1,3 +1,5 @@
+import AdhHttp = require("./Http");
+
 export interface IUserBasic {
     name? : string;
     email? : string;
@@ -5,10 +7,42 @@ export interface IUserBasic {
 }
 
 
-var bindServerErrors = ($scope, errors) =>
+interface IScopeLogin {
+    user : User;
+    credentials : {
+        nameOrEmail : string;
+        password : string;
+    };
+    error : string;
+
+    resetCredentials : () => void;
+    logIn : () => ng.IPromise<void>;
+    logOut : () => void;
+}
+
+
+interface IScopeRegister {
+    input : {
+        username : string;
+        email : string;
+        password : string;
+        passwordRepeat : string;
+    };
+    error : string;
+
+    register : () => ng.IPromise<IRegisterResponse>;
+}
+
+
+export interface IRegisterResponse {
+}
+
+
+var bindServerErrors = ($scope : { error : string }, errors : IBackendError[]) => {
     $scope.error = errors.length
         ? (errors[0].description + " (" + errors[0].name + ", " + errors[0].location + ")")
         : "Internal Error";
+}
 
 
 export class User {
@@ -68,7 +102,7 @@ export class User {
         return _self.enableToken(token, userPath);
     }
 
-    private deleteToken() {
+    private deleteToken() : void {
         var _self : User = this;
 
         if (_self.Modernizr.localstorage) {
@@ -82,7 +116,7 @@ export class User {
         _self.loggedIn = false;
     }
 
-    logIn(nameOrEmail : string, password : string) {
+    logIn(nameOrEmail : string, password : string) : ng.IPromise<void> {
         var _self : User = this;
         var promise;
 
@@ -105,14 +139,14 @@ export class User {
             });
     }
 
-    logOut() {
+    logOut() : void {
         var _self : User = this;
 
         // The server does not have a logout yet.
         _self.deleteToken();
     }
 
-    register(username : string, email : string, password : string, passwordRepeat : string) {
+    register(username : string, email : string, password : string, passwordRepeat : string) : ng.IPromise<IRegisterResponse> {
         var _self : User = this;
 
         return _self.adhHttp.post("/principals/users/", {
@@ -137,12 +171,13 @@ export class User {
     }
 }
 
+
 export var loginDirective = (adhConfig) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.template_path + "/Login.html",
         scope: {},
-        controller: ["adhUser", "$scope", (adhUser : User, $scope) : void => {
+        controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeLogin) : void => {
             $scope.user = adhUser;
 
             $scope.credentials = {
@@ -174,7 +209,7 @@ export var registerDirective = (adhConfig, $location) => {
         restrict: "E",
         templateUrl: adhConfig.template_path + "/Register.html",
         scope: {},
-        controller: ["adhUser", "$scope", (adhUser, $scope) => {
+        controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeRegister) => {
             $scope.input = {
                 username: "",
                 email: "",
@@ -182,7 +217,7 @@ export var registerDirective = (adhConfig, $location) => {
                 passwordRepeat: ""
             };
 
-            $scope.register = () : void => {
+            $scope.register = () : ng.IPromise<IRegisterResponse> => {
                 return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
                     .then(() => {
                         $scope.error = undefined;
