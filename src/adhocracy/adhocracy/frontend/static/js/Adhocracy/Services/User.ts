@@ -34,20 +34,20 @@ interface IScopeRegister {
 }
 
 
-export interface IRegisterResponse {
-}
+export interface IRegisterResponse {}
 
 
 var bindServerErrors = (
-    $scope : { errors : string[] },
+    $scope : {errors : string[]},
     errors : AdhHttp.IBackendErrorItem[]
 ) => {
     $scope.errors = [];
     if (!errors.length) {
         $scope.errors.push("Internal Error");
     } else {
-        errors.map((e) =>
+        errors.forEach((e) => {
             $scope.errors.push(e.description);
+        });
     }
 };
 
