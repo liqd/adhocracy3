@@ -1,6 +1,6 @@
 import unittest
 
-from mock import patch
+from unittest.mock import patch
 from pyramid import testing
 
 from adhocracy.interfaces import IResourceSheet

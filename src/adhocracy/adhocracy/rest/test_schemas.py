@@ -1,6 +1,6 @@
 import unittest
 import json
-from mock import patch
+from unittest.mock import patch
 
 from pyramid.testing import DummyResource
 from pyramid.testing import DummyRequest

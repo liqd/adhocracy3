@@ -1,4 +1,5 @@
 import os
+import sys
 
 from setuptools import setup
 from setuptools import find_packages
@@ -18,9 +19,12 @@ requires = [
     'cornice',
     'colander',
     'autobahn',
-    'asyncio',
     'websocket-client',
 ]
+
+if sys.version_info < (3, 4):
+    requires.append('asyncio')
+
 
 test_requires = [
     'pytest',
