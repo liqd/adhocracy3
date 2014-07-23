@@ -2,6 +2,7 @@
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ITag
 from adhocracy.interfaces import IItem
+from adhocracy_sample.resources.comment import IComment
 from adhocracy_sample.resources.section import ISection
 from adhocracy_sample.resources.paragraph import IParagraph
 from adhocracy.resources import add_resource_type_to_registry
@@ -35,6 +36,7 @@ proposal_meta = item_metadata._replace(
     element_types=[ITag,
                    ISection,
                    IParagraph,
+                   IComment,
                    IProposalVersion,
                    ],
     item_type=IProposalVersion,
