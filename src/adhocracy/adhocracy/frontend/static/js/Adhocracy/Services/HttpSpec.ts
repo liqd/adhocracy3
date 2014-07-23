@@ -6,7 +6,7 @@ import AdhHttp = require("./Http");
 
 export var register = () => {
     describe("Service/Http", () => {
-        describe("factory", () => {
+        describe("Service", () => {
             var $httpMock;
             var adhHttp;
 
@@ -16,7 +16,7 @@ export var register = () => {
                 $httpMock.post.and.returnValue(q.when({data: {}}));
                 $httpMock.put.and.returnValue(q.when({data: {}}));
 
-                adhHttp = AdhHttp.factory($httpMock);
+                adhHttp = new AdhHttp.Service($httpMock, q);
             });
 
             describe("get", () => {
@@ -64,6 +64,34 @@ export var register = () => {
                 it("calls $http.post", () => {
                     adhHttp.postToPool("/some/path", {data: {}});
                     expect($httpMock.post).toHaveBeenCalled();
+                });
+            });
+            describe("resolve", () => {
+                it("gets the resource if called with a path", (done) => {
+                    var path = "/some/path";
+                    var content = {
+                        content_type: "mock2",
+                        data: {}
+                    };
+                    adhHttp.get = jasmine.createSpy("adhHttp.get")
+                        .and.returnValue(q.when(content));
+
+                    adhHttp.resolve(path).then((ret) => {
+                        expect(ret).toEqual(content);
+                        expect(adhHttp.get).toHaveBeenCalledWith(path);
+                        done();
+                    });
+                });
+                it("promises the resource if called with a resource", (done) => {
+                    var content = {
+                        content_type: "mock2",
+                        data: {}
+                    };
+
+                    adhHttp.resolve(content).then((ret) => {
+                        expect(ret).toEqual(content);
+                        done();
+                    });
                 });
             });
         });

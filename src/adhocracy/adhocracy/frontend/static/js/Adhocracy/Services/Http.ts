@@ -18,43 +18,22 @@ export var logBackendError;
 // FIXME: This service should be able to handle any type, not just subtypes of
 // ``Types.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
+export class Service<Content extends Types.Content<any>> {
+    constructor(private $http : ng.IHttpService, private $q) {}
 
-export interface IService<Content extends Types.Content<any>> {
-    get : (path : string) => ng.IPromise<Content>;
-    put : (path : string, obj : Content) => ng.IPromise<Content>;
-    post : (path : string, obj : Content) => ng.IPromise<Content>;
-    postNewVersion : (oldVersionPath : string, obj : Content) => ng.IPromise<Content>;
-    postToPool : (poolPath : string, obj : Content) => ng.IPromise<Content>;
-    metaApiResource : (name : string) => any;
-    metaApiSheet : (name : string) => any;
-}
-
-factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IService<Content> => {
-    "use strict";
-
-    var adhHttp : IService<Content> = {
-        get: get,
-        put: put,
-        post: post,
-        postNewVersion: postNewVersion,
-        postToPool: postToPool,
-        metaApiResource: metaApiResource,
-        metaApiSheet: metaApiSheet
-    };
-
-    function get(path : string) : ng.IPromise<Content> {
-        return $http.get(path).then(importContent, logBackendError);
+    get(path : string) : ng.IPromise<Content> {
+        return this.$http.get(path).then(importContent, logBackendError);
     }
 
-    function put(path : string, obj : Content) : ng.IPromise<Content> {
-        return $http.put(path, exportContent(obj)).then(importContent, logBackendError);
+    put(path : string, obj : Content) : ng.IPromise<Content> {
+        return this.$http.put(path, exportContent(obj)).then(importContent, logBackendError);
     }
 
-    function post(path : string, obj : Content) : ng.IPromise<Content> {
-        return $http.post(path, exportContent(obj)).then(importContent, logBackendError);
+    post(path : string, obj : Content) : ng.IPromise<Content> {
+        return this.$http.post(path, exportContent(obj)).then(importContent, logBackendError);
     }
 
-    function postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
+    postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
         var dagPath = Util.parentPath(oldVersionPath);
         var _obj = exportContent(obj);
         _obj.data["adhocracy.sheets.versions.IVersionable"] = {
@@ -63,11 +42,27 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
         if (typeof rootVersions !== "undefined") {
             _obj.root_versions = rootVersions;
         }
-        return post(dagPath, _obj);
+        return this.post(dagPath, _obj);
     }
 
-    function postToPool(poolPath : string, obj : Content) : ng.IPromise<Content> {
-        return post(poolPath, obj);
+    postToPool(poolPath : string, obj : Content) : ng.IPromise<Content> {
+        return this.post(poolPath, obj);
+    }
+
+    /**
+     * Resolve a path or content to content
+     *
+     * If you do not know if a reference is already resolved to the corresponding content
+     * you can use this function to be sure.
+     */
+    resolve(path : string) : ng.IPromise<Content>;
+    resolve(content : Content) : ng.IPromise<Content>;
+    resolve(pathOrContent) {
+        if (typeof pathOrContent === "string") {
+            return this.get(pathOrContent);
+        } else {
+            return this.$q.when(pathOrContent);
+        }
     }
 
     /**
@@ -75,7 +70,7 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
      * object explaining the content type of a resource.  if called
      * without an argument, return a list of all known content types.
      */
-    function metaApiResource(name : string) : any {
+    metaApiResource(name : string) : any {
         throw "not implemented.";
     }
 
@@ -84,12 +79,10 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
      * explaining the type of a property sheet.  if called without an
      * argument, return a list of all known property sheets.
      */
-    function metaApiSheet(name : string) : any {
+    metaApiSheet(name : string) : any {
         throw "not implemented.";
     }
-
-    return adhHttp;
-};
+}
 
 
 /**
