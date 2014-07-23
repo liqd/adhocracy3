@@ -47,11 +47,11 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
     }
 
     function put(path : string, obj : Content) : ng.IPromise<Content> {
-        return $http.put(path, obj).then(importContent, logBackendError);
+        return $http.put(path, exportContent(obj)).then(importContent, logBackendError);
     }
 
     function post(path : string, obj : Content) : ng.IPromise<Content> {
-        return $http.post(path, obj).then(importContent, logBackendError);
+        return $http.post(path, exportContent(obj)).then(importContent, logBackendError);
     }
 
     function postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
@@ -63,15 +63,11 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
         if (typeof rootVersions !== "undefined") {
             _obj.root_versions = rootVersions;
         }
-        return $http
-            .post(dagPath, _obj)
-            .then(importContent, logBackendError);
+        return post(dagPath, _obj);
     }
 
     function postToPool(poolPath : string, obj : Content) : ng.IPromise<Content> {
-        return $http
-            .post(poolPath, exportContent(obj))
-            .then(importContent, logBackendError);
+        return post(poolPath, obj);
     }
 
     /**

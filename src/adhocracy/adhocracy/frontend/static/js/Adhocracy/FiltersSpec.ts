@@ -4,8 +4,22 @@ import AdhFilters = require("./Filters");
 
 export var register = () => {
     describe("Filters", () => {
-        xit("dummy", () => {
-            expect(AdhFilters).toBeDefined();
+        describe("filterDocumentTitle", () => {
+            it("returns the title field from the adhocracy.sheets.document.IDocument sheet", () => {
+                var filter = AdhFilters.filterDocumentTitle();
+                var title = "a good title";
+                var resource = {
+                    data: {
+                        "adhocracy.sheets.document.IDocument": {
+                            title: title,
+                            description: "description",
+                            elements: []
+                        }
+                    },
+                    content_type: "content_type"
+                };
+                expect(filter(resource)).toBe(title);
+            });
         });
     });
 };
