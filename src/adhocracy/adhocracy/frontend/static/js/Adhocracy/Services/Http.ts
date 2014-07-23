@@ -106,6 +106,13 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
      * author of `trans` to be very careful about not leaking
      * resources that haven't really been posted yet into the lexical
      * context.
+     *
+     * It will also be interesting to see what happens if really
+     * creative javascript developers will start doing something
+     * excessively asynchronous inside trans.  In contrast to
+     * preliminary resources leaking into the context, this could
+     * raise the issue of stale transaction handles still being used.
+     * (We should probably just disallow that.)
      */
     function withTransaction(trans : (adhHttp : IService<Content>) => void) : void {
         trans(adhHttp);
