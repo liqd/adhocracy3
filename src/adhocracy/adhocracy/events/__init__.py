@@ -5,6 +5,8 @@ https://substanced.readthedocs.org/en/latest/api.html#module-substanced.event
 
 """
 from zope.interface import implementer
+from zope.interface import Interface
+from zope.interface.interfaces import IInterface
 
 from adhocracy.interfaces import IItemVersionNewVersionAdded
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
@@ -20,13 +22,13 @@ class ResourceCreatedAndAdded:
 
     :param object(adhocracy.interfaces.IResource):
     :param parent(adhocracy.interfaces.IResource):
-    :param registry(pyramid.registry.Registry):
+    :param request(pyramid.request.Request):
     """
 
-    def __init__(self, object, parent, registry):
+    def __init__(self, object, parent, request):
         self.object = object
         self.parent = parent
-        self.registry = registry
+        self.request = request
 
 
 @implementer(IResourceSheetModified)
@@ -36,13 +38,13 @@ class ResourceSheetModified:
 
     :param object(adhocracy.interfaces.IResource):
     :param isheet(adhocracy.interfaces.IISheet):
-    :param registry(pyramid.registry.Registry):
+    :param request(pyramid.request.Request):
     """
 
-    def __init__(self, object, isheet, registry):
+    def __init__(self, object, isheet, request):
         self.object = object
         self.isheet = isheet
-        self.registry = registry
+        self.request = request
 
 
 @implementer(IItemVersionNewVersionAdded)
@@ -52,13 +54,13 @@ class ItemVersionNewVersionAdded:
 
     :param object(adhocracy.interfaces.IItem):
     :param new_version(adhocracy.interfaces.IItemVersion):
-    :param registry(pyramid.registry.Registry):
+    :param request(pyramid.request.Request):
     """
 
-    def __init__(self, object, new_version, registry):
+    def __init__(self, object, new_version, request):
         self.object = object
         self.new_version = new_version
-        self.registry = registry
+        self.request = request
 
 
 @implementer(ISheetReferencedItemHasNewVersion)
@@ -73,7 +75,7 @@ class SheetReferencedItemHasNewVersion:
                                                            resource
     :param new_version(adhocracy.interfaces.IItemVersion): new referenced
                                                            resource
-    :param registry(pyramid.registry.Registry):
+    :param request(pyramid.request.Request):
     :param root_versions(list): IItemVersions not in the subtree of
                                 these root resources should ignore
                                 this event. Optional.
@@ -85,40 +87,55 @@ class SheetReferencedItemHasNewVersion:
                  isheet_field,
                  old_version,
                  new_version,
-                 registry,
+                 request,
                  root_versions=[]):
         self.object = object
         self.isheet = isheet
         self.isheet_field = isheet_field
         self.old_version = old_version
         self.new_version = new_version
-        self.registry = registry
+        self.request = request
         self.root_versions = root_versions
 
 
 class _ISheetPredicate:
 
-    """Allow to register event subscriber with the 'isheet' predicate."""
+    """Subscriber predicate  'isheet' to check event.isheet."""
 
-    def __init__(self, val, config):
-        assert val.isOrExtends(ISheet)
-        self.val = val
-        self.config = config
+    def __init__(self, isheet: IInterface, config):
+        assert isheet.isOrExtends(ISheet)
+        self.isheet = isheet
 
-    def phash(self):
+    def text(self) -> str:
         """Return text representation."""
-        return 'isheet = %s' % (self.val,)
+        return 'isheet = %s' % (self.isheet.__identifier__)
 
-    text = phash
+    phash = text
 
     def __call__(self, event):
-        result = False
-        if ISheetReferencedItemHasNewVersion.providedBy(event):
-            if event.isheet.isOrExtends(self.val):
-                result = True
-        return result
+        event_isheet = getattr(event, 'isheet', Interface)
+        return event_isheet.isOrExtends(self.isheet)
+
+
+class _InterfacePredicate:
+
+    """Subscriber predicate 'interface' to check interfaces of event.object."""
+
+    def __init__(self, interface: IInterface, config):
+        assert interface.isOrExtends(Interface)
+        self.interface = interface
+
+    def text(self) -> str:
+        """Return text representation."""
+        return 'interface = %s' % (self.interface.__identifier__)
+
+    phash = text
+
+    def __call__(self, event):
+        return self.interface.providedBy(event.object)
 
 
 def includeme(config):
-    """ register event subscriber predicate 'isheet'."""
+    """ register event subscriber predicates 'isheet' and 'interface'."""
     config.add_subscriber_predicate('isheet', _ISheetPredicate)
+    config.add_subscriber_predicate('interface', _InterfacePredicate)

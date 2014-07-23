@@ -14,9 +14,9 @@ class ResourceCreatedAndAddedUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IResourceCreatedAndAdded
         context = testing.DummyResource()
         parent = testing.DummyResource()
-        registry = testing.DummyResource()
+        request = testing.DummyResource()
 
-        inst = self._make_one(context, parent, registry)
+        inst = self._make_one(context, parent, request)
 
         assert IResourceCreatedAndAdded.providedBy(inst)
         assert verifyObject(IResourceCreatedAndAdded, inst)
@@ -32,9 +32,9 @@ class ResourceSheetModifiedUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IResourceSheetModified
         context = testing.DummyResource()
         parent = testing.DummyResource()
-        registry = testing.DummyResource()
+        request = testing.DummyResource()
 
-        inst = self._make_one(context, parent, registry)
+        inst = self._make_one(context, parent, request)
 
         assert IResourceSheetModified.providedBy(inst)
         assert verifyObject(IResourceSheetModified, inst)
@@ -50,10 +50,10 @@ class ItemNewVersionAddedUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IItemVersionNewVersionAdded
         context = testing.DummyResource()
         new_version = testing.DummyResource()
-        registry = testing.DummyResource()
+        request = testing.DummyResource()
 
 
-        inst = self._make_one(context, new_version, registry)
+        inst = self._make_one(context, new_version, request)
 
         assert IItemVersionNewVersionAdded.providedBy(inst)
         assert verifyObject(IItemVersionNewVersionAdded, inst)
@@ -74,10 +74,10 @@ class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
         old_version = testing.DummyResource()
         new_version = testing.DummyResource()
         root_versions = [context]
-        registry = testing.DummyResource()
+        request = testing.DummyResource()
 
         inst = self._make_one(context, isheet, isheet_field, old_version,
-                              new_version, root_versions, registry)
+                              new_version, root_versions, request)
 
         assert ISheetReferencedItemHasNewVersion.providedBy(inst)
         assert verifyObject(ISheetReferencedItemHasNewVersion, inst)
@@ -92,26 +92,46 @@ class _ISheetPredicateUnitTest(unittest.TestCase):
     def test_create(self):
         from adhocracy.interfaces import ISheet
         inst = self._make_one(ISheet, None)
-        assert inst.val == ISheet
-        assert inst.config is None
+        assert inst.isheet == ISheet
 
-    def test_call_wrong_event_type(self):
+    def test_call_event_without_isheet(self):
         from adhocracy.interfaces import ISheet
         dummy_event = testing.DummyResource()
         inst = self._make_one(ISheet, None)
-        result = inst.__call__(dummy_event)
-        assert not result
+        assert not inst.__call__(dummy_event)
 
-    def test_call_right_event_type(self):
+    def test_call_event_with_isheet(self):
         from adhocracy.interfaces import ISheet
-        from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
-        from zope.interface import alsoProvides
         dummy_event = testing.DummyResource()
-        alsoProvides(dummy_event, ISheetReferencedItemHasNewVersion)
         dummy_event.isheet = ISheet
         inst = self._make_one(ISheet, None)
-        result = inst.__call__(dummy_event)
-        assert result
+        assert inst.__call__(dummy_event)
+
+
+class _InterfacePredicateUnitTest(unittest.TestCase):
+
+    def _make_one(self, *arg):
+        from adhocracy.events import _InterfacePredicate
+        return _InterfacePredicate(*arg)
+
+    def test_create(self):
+        from adhocracy.interfaces import ILocation
+        inst = self._make_one(ILocation, None)
+        assert inst.interface == ILocation
+
+    def test_call_event_without_object_iface(self):
+        from adhocracy.interfaces import ILocation
+        dummy_event = testing.DummyResource()
+        dummy_event.object = testing.DummyResource()
+        inst = self._make_one(ILocation, None)
+        assert not inst.__call__(dummy_event)
+
+    def test_call_event_with_object_iface(self):
+        from adhocracy.interfaces import ILocation
+        dummy_event = testing.DummyResource()
+        dummy_event.object = testing.DummyResource(__provides__=ILocation)
+        inst = self._make_one(ILocation, None)
+        assert inst.__call__(dummy_event)
 
 
 class IncludemeIntegrationTest(unittest.TestCase):
@@ -123,6 +143,6 @@ class IncludemeIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def test_register_subsriber_predictas(self):
-        preds = self.config.get_predlist('subscriber')
-        assert preds.last_added == 'isheet'
+    def test_register_subsriber_predicats(self):
+        assert self.config.get_predlist('isheet')
+        assert self.config.get_predlist('interface')
