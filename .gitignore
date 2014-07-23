@@ -55,6 +55,5 @@ robotframework/selenium_demo/
 /src/adhocracy/tests/log.html
 /src/adhocracy/tests/output.xml
 /src/supervisor
-adhocracy3/
 *.js.map
 *.css.map
