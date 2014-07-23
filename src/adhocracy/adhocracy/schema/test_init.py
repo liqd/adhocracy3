@@ -444,3 +444,39 @@ class PasswordUnitTest(unittest.TestCase):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
             inst.deserialize(1)
+
+
+class DateTimeUnitTest(unittest.TestCase):
+
+    def _make_one(self, **kwargs):
+        from adhocracy.schema import DateTime
+        return DateTime(**kwargs)
+
+    def test_create(self):
+        from colander import DateTime
+        inst = self._make_one()
+        assert inst.schema_type is DateTime
+        assert isinstance(inst.default, colander.deferred)
+        assert isinstance(inst.missing, colander.deferred)
+
+    def test_deserialize_empty(self):
+        inst = self._make_one()
+        with pytest.raises(colander.Invalid):
+            inst.deserialize()
+
+    def test_bind_and_deserialize_empty(self):
+        from datetime import datetime
+        inst = self._make_one().bind()
+        result = inst.deserialize()
+        assert isinstance(result, datetime)
+
+    def test_serialize_empty(self):
+        inst = self._make_one()
+        assert inst.serialize() is colander.null
+
+    def test_bind_and_serialize_empty(self):
+        from datetime import datetime
+        inst = self._make_one().bind()
+        result = inst.serialize()
+        today = str(datetime.today().date())
+        assert today in result

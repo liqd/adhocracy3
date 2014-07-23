@@ -1,4 +1,5 @@
 """Colander schema extensions."""
+from datetime import datetime
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
 from substanced.schema import IdSet
@@ -349,3 +350,35 @@ class Password(AdhocracySchemaNode):
     default = ''
     missing = colander.drop
     validator = colander.Length(min=6, max=100)
+
+
+@colander.deferred
+def deferred_date_default(node, kw):
+    # Fixme: set custom timezone
+    return datetime.now()
+
+
+class DateTime(AdhocracySchemaNode):
+    """ DateTime object.
+
+    This type serializes python ``datetime.datetime`` objects to a
+    `ISO8601 <http://en.wikipedia.org/wiki/ISO_8601>`_ string format.
+    The format includes the date, the time, and the timezone of the
+    datetime.
+
+    Example values: 2014-07-21, 2014-07-21T09:10:37, 2014-07-21T09:10:37+00:00
+
+    The default/missing value is the current datetime.
+
+    Constructor arguments::
+
+    :param 'tzinfo': This timezone is used if the cstrut is missing the tzinfo.
+                     Defaults to UTC
+    """
+
+    schema_type = colander.DateTime
+    default = deferred_date_default
+    missing = deferred_date_default
+
+
+
