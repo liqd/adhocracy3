@@ -30,6 +30,8 @@ comment_meta = item_metadata._replace(
     iresource=IComment,
     element_types=[IComment, ICommentVersion],
     item_type=ICommentVersion,
+    use_autonaming=True,
+    autonaming_prefix='comment_',
 )
 
 
