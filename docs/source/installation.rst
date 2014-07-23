@@ -85,10 +85,6 @@ Check that everything is running smoothly::
     ./bin/supervisorctl status
 
 
-Updating the object structure::
-
-    ./bin/sd_evolve etc/development.ini
-
 Open the javascript front-end with your web browser::
 
     xdg-open http://localhost:6541/frontend_static/root.html
