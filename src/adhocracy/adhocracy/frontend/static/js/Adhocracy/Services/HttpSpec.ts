@@ -6,7 +6,7 @@ import AdhHttp = require("./Http");
 
 export var register = () => {
     describe("Service/Http", () => {
-        describe("factory", () => {
+        describe("Service", () => {
             var $httpMock;
             var adhHttp;
 
@@ -16,7 +16,7 @@ export var register = () => {
                 $httpMock.post.and.returnValue(q.when({data: {}}));
                 $httpMock.put.and.returnValue(q.when({data: {}}));
 
-                adhHttp = AdhHttp.factory($httpMock);
+                adhHttp = new AdhHttp.Service($httpMock);
             });
 
             describe("get", () => {
