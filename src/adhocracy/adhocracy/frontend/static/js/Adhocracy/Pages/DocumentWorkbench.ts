@@ -61,7 +61,7 @@ export var run = (config) => {
     app.factory("adhDone", AdhDone.factory);
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
-    app.service("adhHttp", ["$http", AdhHttp.Service]);
+    app.service("adhHttp", ["$http", "$q", AdhHttp.Service]);
     app.factory("adhWebSocket", ["Modernizr", "adhConfig", AdhWebSocket.factory]);
 
     app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", AdhCrossWindowMessaging.factory]);

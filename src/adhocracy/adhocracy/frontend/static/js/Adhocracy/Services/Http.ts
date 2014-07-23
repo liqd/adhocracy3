@@ -19,7 +19,7 @@ export var logBackendError;
 // ``Types.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
 export class Service<Content extends Types.Content<any>> {
-    constructor(private $http : ng.IHttpService) {}
+    constructor(private $http : ng.IHttpService, private $q) {}
 
     get(path : string) : ng.IPromise<Content> {
         return this.$http.get(path).then(importContent, logBackendError);
@@ -47,6 +47,22 @@ export class Service<Content extends Types.Content<any>> {
 
     postToPool(poolPath : string, obj : Content) : ng.IPromise<Content> {
         return this.post(poolPath, obj);
+    }
+
+    /**
+     * Resolve a path or content to content
+     *
+     * If you do not know if a reference is already resolved to the corresponding content
+     * you can use this function to be sure.
+     */
+    resolve(path : string) : ng.IPromise<Content>;
+    resolve(content : Content) : ng.IPromise<Content>;
+    resolve(pathOrContent) {
+        if (typeof pathOrContent === "string") {
+            return this.get(pathOrContent);
+        } else {
+            return this.$q.when(pathOrContent);
+        }
     }
 
     /**
