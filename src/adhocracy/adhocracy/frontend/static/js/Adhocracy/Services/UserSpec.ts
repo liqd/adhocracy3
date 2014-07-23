@@ -269,17 +269,17 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("unsets scope.error if everything goes well", (done) => {
-                        $scopeMock.error = "error";
+                    it("clears $scope.errors if everything goes well", (done) => {
+                        $scopeMock.errors = ["errors"];
                         $scopeMock.logIn().then(() => {
-                            expect($scopeMock.error).not.toBeDefined();
+                            expect($scopeMock.errors.length).toBe(0);
                             done();
                         });
                     });
-                    it("sets scope.error if something goes wrong", (done) => {
+                    it("charges $scope.errors if something goes wrong", (done) => {
                         adhUserMock.logIn.and.returnValue(q.reject([{description: "error"}]));
                         $scopeMock.logIn().then(() => {
-                            expect($scopeMock.error).toBe("error");
+                            expect($scopeMock.errors.length).toBe(1);
                             done();
                         });
                     });
@@ -358,17 +358,17 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("unsets scope.error if everything goes well", (done) => {
-                        $scopeMock.error = "error";
+                    it("clear $scope.errors if everything goes well", (done) => {
+                        $scopeMock.errors = ["error"];
                         $scopeMock.register().then(() => {
-                            expect($scopeMock.error).not.toBeDefined();
+                            expect($scopeMock.errors.length).toBe(0);
                             done();
                         });
                     });
-                    it("sets scope.error if something goes wrong", (done) => {
+                    it("charges $scope.errors if something goes wrong", (done) => {
                         adhUserMock.register.and.returnValue(q.reject([{description: "error"}]));
                         $scopeMock.register().then(() => {
-                            expect($scopeMock.error).toBe("error");
+                            expect($scopeMock.errors.length).toBe(1);
                             done();
                         });
                     });
