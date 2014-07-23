@@ -66,6 +66,12 @@ export var register = () => {
                     expect($httpMock.post).toHaveBeenCalled();
                 });
             });
+            describe("withTransaction", () => {
+                it("performs AdhHttp api calls that are triggered inside the transaction callback", () => {
+                    adhHttp.withTransaction((transaction) => transaction.get("/some/path"));
+                    expect($httpMock.get).toHaveBeenCalled();
+                });
+            });
         });
 
         describe("importContent", () => {
