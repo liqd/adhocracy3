@@ -190,15 +190,8 @@ class Reference(AbsolutePath):
 
     default = ''
     missing = colander.drop
+    schema_type = ResourceObject
     reftype = SheetReference
-
-    def serialize(self, node, value):
-        """Serialize object to path."""
-        return serialize_path(node, value)
-
-    def deserialize(self, node, value):
-        """Deserialize path to object."""
-        return deserialize_path(node, value)
 
     def validator(self, node, value):
         """Validate."""

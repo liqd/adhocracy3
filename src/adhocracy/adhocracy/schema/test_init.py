@@ -231,22 +231,25 @@ class ReferenceUnitTest(unittest.TestCase):
     def test_serialize_value_location_aware(self):
         inst = self._make_one()
         self.context['child'] = self.child
-        node = add_node_binding(colander.Mapping(), context=self.context)
-        result = inst.serialize(node, self.child)
+        inst = add_node_binding(node=inst, context=self.context)
+        result = inst.serialize(self.child)
         assert result == '/child'
 
     def test_deserialize_value_valid_path(self):
+        from zope.interface import alsoProvides
         inst = self._make_one()
         self.context['child'] = self.child
-        node = add_node_binding(colander.Mapping(), context=self.context)
-        result = inst.deserialize(node, '/child')
+        inst = add_node_binding(node=inst, context=self.context)
+        isheet = inst.reftype.getTaggedValue('target_isheet')
+        alsoProvides(self.child, isheet)
+        result = inst.deserialize('/child')
         assert result == self.child
 
     def test_deserialize_value_invalid_path(self):
         inst = self._make_one()
-        node = add_node_binding(colander.Mapping(), context=self.context)
+        inst = add_node_binding(node=inst, context=self.context)
         with pytest.raises(colander.Invalid):
-            inst.deserialize(node, '/wrong_child')
+            inst.deserialize('/wrong_child')
 
 
 class PathListSetUnitTest(unittest.TestCase):
