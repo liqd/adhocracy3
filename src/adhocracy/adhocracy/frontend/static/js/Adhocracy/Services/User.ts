@@ -43,7 +43,7 @@ var bindServerErrors = (
 ) => {
     $scope.errors = [];
     if (!errors.length) {
-        $scope.errors.push("Internal Error");
+        $scope.errors.push("Unknown error from server (no details provided)");
     } else {
         errors.forEach((e) => {
             $scope.errors.push(e.description);
