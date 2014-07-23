@@ -108,12 +108,17 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
      * resources that haven't really been posted yet into the lexical
      * context.
      *
-     * It will also be interesting to see what happens if really
-     * creative javascript developers will start doing something
-     * excessively asynchronous inside trans.  In contrast to
-     * preliminary resources leaking into the context, this could
-     * raise the issue of stale transaction handles still being used.
-     * (We should probably just disallow that.)
+     * In an ideal world, the promised values of the calls to
+     * `httpTrans` should be completely indifferent to the question
+     * whether they have been produced in a transaction or not -- they
+     * should just return the values from the server once those have
+     * actually been produced.
+     *
+     * This is in tension with the requirement that requests inside
+     * one transaction depend on each other, so we need to change the
+     * api somehow.  Perhaps we can pass local preliminary paths
+     * together with post path and posted object to a variant of the
+     * post method.
      */
     function withTransaction(trans : (httpTrans : IService<Content>, done : () => void) => void) : void {
         trans(adhHttp, () => null);
