@@ -51,7 +51,7 @@ def zeo(request) -> bool:
         return True
     process = subprocess.Popen('bin/runzeo -Cetc/test_zeo.conf', shell=True,
                                stderr=subprocess.STDOUT)
-    time.sleep(2)
+    time.sleep(1)
 
     def fin():
         print('teardown zeo server')
