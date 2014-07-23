@@ -179,6 +179,37 @@ class ResourceObject(colander.SchemaType):
         return deserialize_path(node, value)
 
 
+class Reference(AbsolutePath):
+
+    """Reference to a resource that implements a specific sheet.
+
+    The `target_isheet` attribute of the `reftype` specifies the sheet that
+    accepted resources must implement. Storing another kind of resource will
+    trigger a validation error.
+    """
+
+    default = ''
+    missing = colander.drop
+    reftype = SheetReference
+
+    def serialize(self, node, value):
+        """Serialize object to path."""
+        return serialize_path(node, value)
+
+    def deserialize(self, node, value):
+        """Deserialize path to object."""
+        return deserialize_path(node, value)
+
+    def validator(self, node, value):
+        """Validate."""
+        reftype = self.reftype
+        isheet = reftype.getTaggedValue('target_isheet')
+        if not isheet.providedBy(value):
+            error = 'This Resource does not provide interface %s' % \
+                    (isheet.__identifier__)
+            raise colander.Invalid(node, msg=error, value=value)
+
+
 class AbstractIterableOfPaths(IdSet):
 
     """Abstract Colander type to store multiple object paths.

@@ -196,7 +196,57 @@ class ResourceObjectUnitTests(unittest.TestCase):
         inst = self._make_one()
         node = add_node_binding(colander.Mapping(), context=self.context)
         with pytest.raises(colander.Invalid):
-            inst.deserialize(node, ['/wrong_child'])
+            inst.deserialize(node, '/wrong_child')
+
+
+class ReferenceUnitTest(unittest.TestCase):
+
+    def _make_one(self):
+        from adhocracy.schema import Reference
+        return Reference()
+
+    def setUp(self):
+        self.context = testing.DummyResource()
+        self.target = testing.DummyResource()
+        self.child = testing.DummyResource()
+
+    def test_missing(self):
+        inst = self._make_one()
+        assert inst.missing == colander.drop
+
+    def test_valid_interface(self):
+        from zope.interface import alsoProvides
+        inst = self._make_one()
+        isheet = inst.reftype.getTaggedValue('target_isheet')
+        alsoProvides(self.target, isheet)
+        inst = add_node_binding(node=inst, context=self.context)
+        assert inst.validator(inst, self.target) is None
+
+    def test_nonvalid_interface(self):
+        inst = self._make_one()
+        inst = add_node_binding(node=inst, context=self.context)
+        with pytest.raises(colander.Invalid):
+            inst.validator(inst, self.target)
+
+    def test_serialize_value_location_aware(self):
+        inst = self._make_one()
+        self.context['child'] = self.child
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.serialize(node, self.child)
+        assert result == '/child'
+
+    def test_deserialize_value_valid_path(self):
+        inst = self._make_one()
+        self.context['child'] = self.child
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        result = inst.deserialize(node, '/child')
+        assert result == self.child
+
+    def test_deserialize_value_invalid_path(self):
+        inst = self._make_one()
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        with pytest.raises(colander.Invalid):
+            inst.deserialize(node, '/wrong_child')
 
 
 class PathListSetUnitTest(unittest.TestCase):
