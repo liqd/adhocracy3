@@ -204,9 +204,8 @@ class IncludemeIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def test_register_versions_adapter(self):
+    def test_register_has_new_version_subscriber(self):
         from adhocracy.subscriber import reference_has_new_version_subscriber
         handlers = [x.handler.__name__ for x
                     in self.config.registry.registeredHandlers()]
-        assert len(handlers) >= 1
         assert reference_has_new_version_subscriber.__name__ in handlers
