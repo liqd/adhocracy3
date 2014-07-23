@@ -39,12 +39,6 @@ __pycache__
 /src/rubygemsrecipe/build/
 /source_env
 /.vagrant
-robotframework/bin/
-robotframework/eggs/
-robotframework/include/
-robotframework/lib/
-robotframework/local/
-robotframework/selenium_demo/
 /.ropeproject/
 /.cache/
 /.coverage
