@@ -27,6 +27,7 @@ export interface IService<Content extends Types.Content<any>> {
     postToPool : (poolPath : string, obj : Content) => ng.IPromise<Content>;
     metaApiResource : (name : string) => any;
     metaApiSheet : (name : string) => any;
+    withTransaction : (trans : (adhHttp : IService<Content>) => void) => void;
 }
 
 factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IService<Content> => {
@@ -39,7 +40,8 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
         postNewVersion: postNewVersion,
         postToPool: postToPool,
         metaApiResource: metaApiResource,
-        metaApiSheet: metaApiSheet
+        metaApiSheet: metaApiSheet,
+        withTransaction: withTransaction
     };
 
     function get(path : string) : ng.IPromise<Content> {
@@ -86,6 +88,27 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
      */
     function metaApiSheet(name : string) : any {
         throw "not implemented.";
+    }
+
+    /**
+     * Call withTransaction with a function `trans` that accepts an
+     * adhHttp service.  All calls to adhHttp within `trans` are
+     * collected into a batch request, and the batch-request is sent
+     * to the backend when `trans` has returned.
+     *
+     * The current implementation is a mock and returns the plain
+     * (transaction-less) http service.
+     *
+     * In the proper implementation, it will be interesting to see how
+     * this abstraction works together with locally structures that
+     * are added by the server, such as the path of a posted resource
+     * or a server-generated user-id.  It may be necessary for the
+     * author of `trans` to be very careful about not leaking
+     * resources that haven't really been posted yet into the lexical
+     * context.
+     */
+    function withTransaction(trans : (adhHttp : IService<Content>) => void) : void {
+        trans(adhHttp);
     }
 
     return adhHttp;
