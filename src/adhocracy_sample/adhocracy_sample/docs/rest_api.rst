@@ -712,6 +712,69 @@ should the client to be able to ask (e.g. with an OPTIONS request)
 where to post a 'like'?
 
 
+Comments
+--------
+
+To give another example of a versionable content type, we can write comments
+about proposals::
+
+    >>> comment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
+    ...            'data': {}}
+    >>> resp = testapp.post_json(pdag_path, comment)
+    >>> comment_path = resp.json["path"]
+    >>> comment_path
+    '/adhocracy/Proposals/kommunismus/comment_000...'
+    >>> first_commvers_path = resp.json['first_version_path']
+    >>> first_commvers_path
+    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000'
+
+The first comment version is empty (as with all versionables), so lets add
+another version to say something meaningful. A comment contains *content*
+(arbitrary text) and *refers_to* a specific version of a proposal. ::
+
+    >>> commvers = {'content_type': 'adhocracy_sample.resources.comment.ICommentVersion',
+    ...             'data': {
+    ...                 'adhocracy_sample.sheets.comment.IComment': {
+    ...                     'refers_to': pvrs4_path,
+    ...                     'content': 'Gefällt mir, toller Vorschlag!'},
+    ...                 'adhocracy.sheets.versions.IVersionable': {
+    ...                     'follows': [first_commvers_path]}},
+    ...             'root_versions': [first_commvers_path]}
+    >>> resp = testapp.post_json(comment_path, commvers)
+    >>> snd_commvers_path = resp.json['path']
+    >>> snd_commvers_path
+    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001'
+
+Comments can be about any versionable that allows posting comments. Hence
+it's also possible to write a comment about another comment::
+
+    >>> metacomment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
+    ...                 'data': {}}
+    >>> resp = testapp.post_json(pdag_path, metacomment)
+    >>> metacomment_path = resp.json["path"]
+    >>> metacomment_path
+    '/adhocracy/Proposals/kommunismus/comment_000...'
+    >>> comment_path != metacomment_path
+    True
+    >>> first_metacommvers_path = resp.json['first_version_path']
+    >>> first_metacommvers_path
+    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000'
+
+As usual, we have to add another version to actually say something::
+
+    >>> metacommvers = {'content_type': 'adhocracy_sample.resources.comment.ICommentVersion',
+    ...                 'data': {
+    ...                     'adhocracy_sample.sheets.comment.IComment': {
+    ...                         'refers_to': snd_commvers_path,
+    ...                         'content': 'Find ich nicht!'},
+    ...                     'adhocracy.sheets.versions.IVersionable': {
+    ...                         'follows': [first_metacommvers_path]}},
+    ...                 'root_versions': [first_metacommvers_path]}
+    >>> resp = testapp.post_json(metacomment_path, metacommvers)
+    >>> resp.json['path']
+    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001'
+
+
 Batch requests
 ––––––––––––––
 
