@@ -68,7 +68,10 @@ export var register = () => {
             });
             describe("withTransaction", () => {
                 it("performs AdhHttp api calls that are triggered inside the transaction callback", () => {
-                    adhHttp.withTransaction((transaction) => transaction.get("/some/path"));
+                    adhHttp.withTransaction((httpTrans, done) => {
+                        httpTrans.get("/some/path");
+                        done();
+                    });
                     expect($httpMock.get).toHaveBeenCalled();
                 });
             });

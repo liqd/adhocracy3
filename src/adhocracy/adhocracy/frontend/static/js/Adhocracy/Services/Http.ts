@@ -97,7 +97,8 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
      * to the backend when `trans` has returned.
      *
      * The current implementation is a mock and returns the plain
-     * (transaction-less) http service.
+     * (transaction-less) http service.  The done callback must be
+     * called by the `trans` to wrap up and ship the transaction.
      *
      * In the proper implementation, it will be interesting to see how
      * this abstraction works together with locally structures that
@@ -114,8 +115,8 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
      * raise the issue of stale transaction handles still being used.
      * (We should probably just disallow that.)
      */
-    function withTransaction(trans : (adhHttp : IService<Content>) => void) : void {
-        trans(adhHttp);
+    function withTransaction(trans : (httpTrans : IService<Content>, done : () => void) => void) : void {
+        trans(adhHttp, () => null);
     }
 
     return adhHttp;
