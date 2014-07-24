@@ -19,39 +19,47 @@ def notify_new_itemversion_created(context, registry, options):
     Args:
         context (IItemversion): the newly created resource
         registry (pyramid registry):
-        option (dict): Dict with 'root_versions', a list of
-            root resources. Will be passed along to resources that
-            reference old versions so they can decide whether they should
-            update themselfes.
+        option (dict):
+            `root_versions`: List with root resources. Will be passed along to
+                            resources that reference old versions so they can
+                            decide whether they should update themselfes.
+            `creator`: User resource that passed to the creation events.
+
     Returns:
         None
 
     """
     new_version = context
     root_versions = options.get('root_versions', [])
+    creator = options.get('creator', None)
     old_versions = []
     graph = find_graph(context)
     for old_version in graph.get_follows(context):
         old_versions.append(old_version)
-        _notify_itemversion_has_new_version(old_version, new_version, registry)
+        _notify_itemversion_has_new_version(old_version, new_version, registry,
+                                            creator)
         _notify_referencing_resources_about_new_version(old_version,
                                                         new_version,
                                                         root_versions,
-                                                        registry)
+                                                        registry,
+                                                        creator)
 
         # Update LAST tag in parent item
         _update_last_tag(context, registry, old_versions)
 
 
-def _notify_itemversion_has_new_version(old_version, new_version, registry):
-    event = ItemVersionNewVersionAdded(old_version, new_version, registry)
+def _notify_itemversion_has_new_version(old_version, new_version, registry,
+                                        creator):
+    event = ItemVersionNewVersionAdded(old_version, new_version, registry,
+                                       creator)
     registry.notify(event)
 
 
 def _notify_referencing_resources_about_new_version(old_version,
                                                     new_version,
                                                     root_versions,
-                                                    registry):
+                                                    registry,
+                                                    creator):
     graph = find_graph(old_version)
     references = graph.get_back_references(old_version)
     for source, isheet, isheet_field, target in references:
@@ -61,6 +69,7 @@ def _notify_referencing_resources_about_new_version(old_version,
                                                  old_version,
                                                  new_version,
                                                  registry,
+                                                 creator,
                                                  root_versions=root_versions)
         registry.notify(event)
 
@@ -103,6 +112,7 @@ itemversion_metadata = resource_metadata_defaults._replace(
     content_name='ItemVersion',
     iresource=IItemVersion,
     basic_sheets=[adhocracy.sheets.versions.IVersionable,
+                  adhocracy.sheets.metadata.IMetadata,
                   ],
     after_creation=[notify_new_itemversion_created] +
     resource_metadata_defaults.after_creation,

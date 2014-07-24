@@ -45,17 +45,16 @@ class DummyFolder(testing.DummyResource):
 class CorniceDummyRequest(testing.DummyRequest):
 
     def __init__(self, registry=None, **kw):
-        class Dummy:
+        class DummyRegistry():
             pass
-
         self.headers = {}
         self.body = ''
         self.GET = {}
         self.POST = {}
-        self.matchdict = {}
         self.validated = {}
+        self.matchdict = {}
         if registry is None:
-            self.registry = Dummy()
+            self.registry = DummyRegistry()
         else:
             self.registry = registry
         self.registry.cornice_deserializers = {'application/json': extract_json_data}
@@ -63,10 +62,12 @@ class CorniceDummyRequest(testing.DummyRequest):
         self.errors = Errors(self)
         self.__dict__.update(kw)
 
+    def authenticated_userid(self):
+        return None
+
     @property
     def json_body(self):
         return json.loads(self.body)
-
 
 
 class DummyUserLocator():
@@ -251,7 +252,6 @@ class RESTViewUnitTest(unittest.TestCase):
         assert inst.validation_OPTIONS == (None, [])
         assert inst.validation_PUT == (None, [])
         assert inst.validation_POST == (None, [])
-        assert inst.reserved_names == []
         assert inst.context is self.context
         assert inst.request is self.request
         assert inst.request.errors == []
@@ -275,9 +275,9 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
         return ResourceRESTView(context, request)
 
     def test_create_valid(self, ):
+        from adhocracy.rest.views import RESTView
         inst = self.make_one(self.context, self.request)
-        assert 'options' in dir(inst)
-        assert 'get' in dir(inst)
+        assert isinstance(inst, RESTView)
 
     def test_options_valid_no_sheets_and_addables(self):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
@@ -390,7 +390,7 @@ class PoolRESTViewUnitTest(unittest.TestCase):
     def setUp(self):
         self.context = DummyFolder()
         resource_registry = make_mock_resource_registry()
-        request = CorniceDummyRequest()
+        request = CorniceDummyRequest(root=self.context)
         request.registry.content = resource_registry
         self.request = request
         self.create = request.registry.content.create
@@ -428,7 +428,7 @@ class ItemRESTViewUnitTest(unittest.TestCase):
     def setUp(self):
         self.context = DummyFolder()
         resource_registry = make_mock_resource_registry()
-        request = CorniceDummyRequest()
+        request = CorniceDummyRequest(root=self.context)
         request.registry.content = resource_registry
         self.request = request
         self.create = request.registry.content.create
@@ -486,7 +486,9 @@ class ItemRESTViewUnitTest(unittest.TestCase):
 
         wanted = {'path': '/child', 'content_type': IResourceX.__identifier__}
         self.create.assert_called_with(IResourceX.__identifier__, self.context,
-                                       appstructs={}, root_versions=[])
+                                       creator=None,
+                                       appstructs={},
+                                       root_versions=[])
         assert wanted == response
 
     def test_post_valid_item(self):
@@ -780,3 +782,19 @@ class ValidateUserDataUnitTest(unittest.TestCase):
         validate_login_password(self.context, self.request)
         assert len(self.request.errors) == 1
         assert 'password is wrong' in self.request.errors[0]['description']
+
+
+class IncludemeIntegrationTest(unittest.TestCase):
+
+    def setUp(self):
+        config = testing.setUp()
+        config.include('cornice')
+        config.include('adhocracy.rest.views')
+        self.config = config
+        self.config.commit()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_register_views(self):
+        pass

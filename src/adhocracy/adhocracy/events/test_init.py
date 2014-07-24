@@ -14,9 +14,10 @@ class ResourceCreatedAndAddedUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IResourceCreatedAndAdded
         context = testing.DummyResource()
         parent = testing.DummyResource()
-        request = testing.DummyResource()
+        registry = testing.DummyResource()
+        creator = testing.DummyResource()
 
-        inst = self._make_one(context, parent, request)
+        inst = self._make_one(context, parent, registry, creator)
 
         assert IResourceCreatedAndAdded.providedBy(inst)
         assert verifyObject(IResourceCreatedAndAdded, inst)
@@ -32,9 +33,9 @@ class ResourceSheetModifiedUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IResourceSheetModified
         context = testing.DummyResource()
         parent = testing.DummyResource()
-        request = testing.DummyResource()
+        registry = testing.DummyResource()
 
-        inst = self._make_one(context, parent, request)
+        inst = self._make_one(context, parent, registry)
 
         assert IResourceSheetModified.providedBy(inst)
         assert verifyObject(IResourceSheetModified, inst)
@@ -50,10 +51,10 @@ class ItemNewVersionAddedUnitTest(unittest.TestCase):
         from adhocracy.interfaces import IItemVersionNewVersionAdded
         context = testing.DummyResource()
         new_version = testing.DummyResource()
-        request = testing.DummyResource()
+        registry = testing.DummyResource()
+        creator = testing.DummyResource()
 
-
-        inst = self._make_one(context, new_version, request)
+        inst = self._make_one(context, new_version, registry, creator)
 
         assert IItemVersionNewVersionAdded.providedBy(inst)
         assert verifyObject(IItemVersionNewVersionAdded, inst)
@@ -61,9 +62,9 @@ class ItemNewVersionAddedUnitTest(unittest.TestCase):
 
 class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
 
-    def _make_one(self, *arg):
+    def _make_one(self, *arg, **kwargs):
         from adhocracy.events import SheetReferencedItemHasNewVersion
-        return SheetReferencedItemHasNewVersion(*arg)
+        return SheetReferencedItemHasNewVersion(*arg, **kwargs)
 
     def test_create(self):
         from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
@@ -74,10 +75,12 @@ class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
         old_version = testing.DummyResource()
         new_version = testing.DummyResource()
         root_versions = [context]
-        request = testing.DummyResource()
+        registry = testing.DummyResource()
+        creator = testing.DummyResource()
 
         inst = self._make_one(context, isheet, isheet_field, old_version,
-                              new_version, root_versions, request)
+                              new_version, registry, creator,
+                              root_versions=root_versions)
 
         assert ISheetReferencedItemHasNewVersion.providedBy(inst)
         assert verifyObject(ISheetReferencedItemHasNewVersion, inst)

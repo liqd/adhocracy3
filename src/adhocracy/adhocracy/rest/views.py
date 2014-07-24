@@ -329,7 +329,9 @@ class PoolRESTView(SimpleRESTView):
         """Create new resource and get response data."""
         resource_type = self.request.validated['content_type']
         appstructs = self.request.validated.get('data', {})
+        creator = get_user(self.request)
         resource = self.registry.create(resource_type, self.context,
+                                        creator=creator,
                                         appstructs=appstructs)
         return self.build_post_response(resource)
 
@@ -360,9 +362,11 @@ class ItemRESTView(PoolRESTView):
         """Create new resource and get response data."""
         resource_type = self.request.validated['content_type']
         appstructs = self.request.validated.get('data', {})
+        creator = get_user(self.request)
         root_versions = self.request.validated.get('root_versions', [])
         resource = self.registry.create(resource_type, self.context,
                                         appstructs=appstructs,
+                                        creator=creator,
                                         root_versions=root_versions)
         return self.build_post_response(resource)
 

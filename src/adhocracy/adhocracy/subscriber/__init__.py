@@ -22,7 +22,8 @@ def _get_writable_appstructs(resource):
     return appstructs
 
 
-def _update_versionable(resource, isheet, appstruct, root_versions, registry):
+def _update_versionable(resource, isheet, appstruct, root_versions, registry,
+                        creator):
     graph = find_graph(resource)
     if root_versions and not graph.is_in_subtree(resource, root_versions):
         return resource
@@ -34,6 +35,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions, registry):
         new_resource = registry.content.create(iresource.__identifier__,
                                                parent=resource.__parent__,
                                                appstructs=appstructs,
+                                               creator=creator,
                                                options=root_versions)
         return new_resource
 
@@ -54,6 +56,7 @@ def reference_has_new_version_subscriber(event):
     root_versions = event.root_versions
     isheet = event.isheet
     registry = event.registry
+    creator = event.creator
     sheet = get_sheet(resource, isheet)
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
     editable = sheet.meta.editable
@@ -66,7 +69,7 @@ def reference_has_new_version_subscriber(event):
         field.insert(old_version_index, event.new_version)
         if IItemVersion.providedBy(resource):
             _update_versionable(resource, isheet, appstruct, root_versions,
-                                registry)
+                                registry, creator)
         else:
             _update_resource(resource, sheet, appstruct)
 

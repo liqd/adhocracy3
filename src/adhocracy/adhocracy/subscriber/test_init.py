@@ -52,7 +52,7 @@ def _create_and_register_dummy_sheet(context, isheet):
     return sheet
 
 
-def _create_new_version_event_with_isheet(context, isheet, registry):
+def _create_new_version_event_with_isheet(context, isheet, registry, creator=None):
     return testing.DummyResource(__provides__=
                                  ISheetReferencedItemHasNewVersion,
                                  object=context,
@@ -61,6 +61,7 @@ def _create_new_version_event_with_isheet(context, isheet, registry):
                                  old_version=testing.DummyResource(),
                                  new_version=testing.DummyResource(),
                                  registry=registry,
+                                 creator=creator,
                                  root_versions=[])
 
 
@@ -98,6 +99,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         context = testing.DummyResource(__provides__=IItemVersion,
                                         __parent__=object())
         event = self._create_new_version_event_for_autoupdate_sheet(context)
+        event.creator = object()
 
         self._make_one(event)
 
@@ -109,6 +111,9 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         assert appstructs[event.isheet.__identifier__] == \
                {'elements': [event.new_version]}
         assert appstructs[IVersionable.__identifier__] == {'follows': [context]}
+        creator = factory.call_args[1]['creator']
+        assert creator == event.creator
+
 
     @patch('adhocracy.graph.Graph')
     def test_call_versionable_with_autoupdate_sheet_and_root_versions_and_not_is_insubtree(self,

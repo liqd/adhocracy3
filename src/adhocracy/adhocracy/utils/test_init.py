@@ -1,5 +1,6 @@
-from pyramid import testing
+import unittest
 
+from pyramid import testing
 import pytest
 
 
@@ -212,3 +213,34 @@ def test_get_all_sheets_adapter_exists(dummy_config):
                                           (ISheet,), IResourceSheet,
                                           ISheet.__identifier__)
     assert adapter in get_all_sheets(context)
+
+
+class _GetUserUnitTest(unittest.TestCase):
+
+    def _make_one(self, request):
+        from adhocracy.utils import get_user
+        return get_user(request)
+
+    def setUp(self):
+        user = testing.DummyResource()
+        context = testing.DummyResource()
+        context['user'] = user
+        self.context = context
+
+        class DummyRequest(testing.DummyRequest):
+            @property
+            def authenticated_userid(self):
+                return self._dummy_userid
+        self.request = DummyRequest(root=context,
+                                    _dummy_userid=None)
+
+    def test_with_user_id_is_None(self):
+        assert self._make_one(self.request) is None
+
+    def test_with_user_id_is_not_resource_path(self):
+        assert self._make_one(self.request) is None
+
+    def test_with_user_id(self):
+        user = self.context['user']
+        self.request._dummy_userid = '/user'
+        assert self._make_one(self.request) == user

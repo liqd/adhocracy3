@@ -22,13 +22,15 @@ class ResourceCreatedAndAdded:
 
     :param object(adhocracy.interfaces.IResource):
     :param parent(adhocracy.interfaces.IResource):
-    :param request(pyramid.request.Request):
+    :param registry(pyramid.registry.Request):
+    :param creator(adhocracy.resource.principal.IUser):
     """
 
-    def __init__(self, object, parent, request):
+    def __init__(self, object, parent, registry, creator):
         self.object = object
         self.parent = parent
-        self.request = request
+        self.registry = registry
+        self.creator = creator
 
 
 @implementer(IResourceSheetModified)
@@ -38,13 +40,13 @@ class ResourceSheetModified:
 
     :param object(adhocracy.interfaces.IResource):
     :param isheet(adhocracy.interfaces.IISheet):
-    :param request(pyramid.request.Request):
+    :param registry(pyramid.registry.Request):
     """
 
-    def __init__(self, object, isheet, request):
+    def __init__(self, object, isheet, registry):
         self.object = object
         self.isheet = isheet
-        self.request = request
+        self.registry = registry
 
 
 @implementer(IItemVersionNewVersionAdded)
@@ -54,13 +56,15 @@ class ItemVersionNewVersionAdded:
 
     :param object(adhocracy.interfaces.IItem):
     :param new_version(adhocracy.interfaces.IItemVersion):
-    :param request(pyramid.request.Request):
+    :param registry(pyramid.registry.Request):
+    :param creator(adhocracy.resource.principal.IUser':
     """
 
-    def __init__(self, object, new_version, request):
+    def __init__(self, object, new_version, registry, creator):
         self.object = object
         self.new_version = new_version
-        self.request = request
+        self.registry = registry
+        self.creator = creator
 
 
 @implementer(ISheetReferencedItemHasNewVersion)
@@ -75,10 +79,11 @@ class SheetReferencedItemHasNewVersion:
                                                            resource
     :param new_version(adhocracy.interfaces.IItemVersion): new referenced
                                                            resource
-    :param request(pyramid.request.Request):
+    :param registry(pyramid.registry.Request):
     :param root_versions(list): IItemVersions not in the subtree of
                                 these root resources should ignore
                                 this event. Optional.
+    :param creator(adhocracy.resource.principal.IUser':
     """
 
     def __init__(self,
@@ -87,14 +92,16 @@ class SheetReferencedItemHasNewVersion:
                  isheet_field,
                  old_version,
                  new_version,
-                 request,
+                 registry,
+                 creator,
                  root_versions=[]):
         self.object = object
         self.isheet = isheet
         self.isheet_field = isheet_field
         self.old_version = old_version
         self.new_version = new_version
-        self.request = request
+        self.registry = registry
+        self.creator = creator
         self.root_versions = root_versions
 
 

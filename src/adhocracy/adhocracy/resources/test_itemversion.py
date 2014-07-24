@@ -61,7 +61,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _make_one(self, root_versions=[], follows=[], appstructs={}):
+    def _make_one(self, root_versions=[], follows=[], appstructs={}, creator=None):
         from adhocracy.sheets.versions import IVersionable
         parent = self.context
         follow = {IVersionable.__identifier__: {'follows': follows}}
@@ -71,6 +71,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
             IItemVersion.__identifier__,
             parent=parent,
             appstructs=appstructs,
+            creator=creator,
             root_versions=root_versions)
         return itemversion
 
@@ -86,26 +87,29 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         events = []
         listener = lambda event: events.append(event)
         self.config.add_subscriber(listener, IItemVersionNewVersionAdded)
+        creator = self._make_one()
 
         version_0 = self._make_one()
-        version_1 = self._make_one(follows=[version_0])
+        version_1 = self._make_one(follows=[version_0], creator=creator)
 
         assert len(events) == 1
-        assert IItemVersionNewVersionAdded.providedBy(events[0])
         assert events[0].object == version_0
         assert events[0].new_version == version_1
+        assert events[0].creator == creator
 
     def test_create_new_version_with_referencing_resources(self):
         events = []
         listener = lambda event: events.append(event)
         self.config.add_subscriber(listener, ISheetReferencedItemHasNewVersion)
+        creator = self._make_one()
 
         version_0 = self._make_one()
         other_version_0 = self._make_one()
         self.objectmap.connect(other_version_0, version_0, SheetToSheet)
-        self._make_one(follows=[version_0])
+        self._make_one(follows=[version_0], creator=creator)
 
         assert len(events) == 1
+        assert events[0].creator == creator
 
     def test_autoupdate_with_referencing_items(self):
         # for more tests see adhocracy.subscriber

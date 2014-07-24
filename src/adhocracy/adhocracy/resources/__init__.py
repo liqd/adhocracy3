@@ -1,4 +1,6 @@
 """Resource type configuration and default factory."""
+from datetime import datetime
+
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from pyramid.config import Configurator
@@ -10,6 +12,7 @@ from adhocracy.interfaces import ResourceMetadata
 from adhocracy.interfaces import IPool
 from adhocracy.events import ResourceCreatedAndAdded
 from adhocracy.sheets.name import IName
+from adhocracy.sheets.metadata import IMetadata
 from adhocracy.utils import get_sheet
 
 
@@ -57,34 +60,46 @@ class ResourceFactory:
             raise KeyError('Empty name')
         parent.add(name, resource, send_events=False)
 
-    def _notify_new_resource_created_and_added(self, resource, registry):
+    def _notify_new_resource_created_and_added(self, resource, registry,
+                                               creator):
         has_parent = resource.__parent__ is not None
         if has_parent and registry is not None:
             event = ResourceCreatedAndAdded(object=resource,
                                             parent=resource.__parent__,
-                                            registry=registry)
+                                            registry=registry,
+                                            creator=creator)
             registry.notify(event)
 
     def __call__(self,
                  parent=None,
                  appstructs={},
                  run_after_creation=True,
+                 creator=None,
+                 registry=None,
                  **kwargs
                  ):
         """Triggered when a ResourceFactory instance is called.
 
-        Args:
+        Kwargs::
+
             parent (IPool or None): Add the new resource to this pool.
                                     None value is allowed to create non
                                     persistent Resources (without OID/parent).
+                                    Defaults to None.
             appstructs (dict): Key/Values of sheet appstruct data.
                                Key is identifier of a sheet interface.
                                Value is the data to set.
             after_creation (bool): Whether to invoke after_creation hooks,
-                                   Default is True.
                                    If parent is None you should set this False
-            **kwargs: Arbitary keyword arguments. Will be passed along to
-                after_creation hooks as 3rd argument 'options'.
+                                   Default is True.
+            creator (IResource or None): The resource of the creating user
+                                         to set the right metadata.
+            registry (Registry or None): Registry passed to creation eventes.
+                If None :func:`pyramid.threadlocal.get_current_registry` is
+                called. Default is None.
+            **kwargs: Arbitary keyword arguments. Will be passed along with
+                       'creator' to the `after_creation` hook as 3rd argument
+                      `options`.
 
         Returns:
             object (IResource): the newly created resource
@@ -109,17 +124,18 @@ class ResourceFactory:
             resource.__parent__ = None
             resource.__name__ = ''
 
-        if appstructs:
-            for key, struct in appstructs.items():
-                isheet = DottedNameResolver().maybe_resolve(key)
-                sheet = get_sheet(resource, isheet)
-                if sheet.meta.creatable:
-                    sheet.set(struct, send_event=False)
+        for key, struct in appstructs.items():
+            isheet = DottedNameResolver().maybe_resolve(key)
+            sheet = get_sheet(resource, isheet)
+            if sheet.meta.creatable:
+                sheet.set(struct, send_event=False)
 
-        registry = get_current_registry()
+        registry = registry if registry else get_current_registry()
         if run_after_creation:
             for call in self.meta.after_creation:
+                kwargs['creator'] = creator
                 call(resource, registry, options=kwargs)
 
-        self._notify_new_resource_created_and_added(resource, registry)
+                                                    creator)
+
         return resource

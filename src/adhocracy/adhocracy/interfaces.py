@@ -300,6 +300,7 @@ class IResourceCreatedAndAdded(IObjectEvent):
     object = Attribute('The new resource')
     parent = Attribute('The parent of the new resource')
     registry = Attribute('The pyramid registry')
+    creator = Attribute('User resource object of the authenticated User')
 
 
 class IItemVersionNewVersionAdded(IObjectEvent):
@@ -309,6 +310,7 @@ class IItemVersionNewVersionAdded(IObjectEvent):
     object = Attribute('The old ItemVersion followed by the new one')
     new_version = Attribute('The new ItemVersion')
     registry = Attribute('The pyramid registry')
+    creator = Attribute('User resource object of the authenticated User')
 
 
 class ISheetReferencedItemHasNewVersion(IObjectEvent):
@@ -325,6 +327,7 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
                               '(only resources that can be reached from one '
                               'of the roots should be updated)')
     registry = Attribute('The pyramid registry')
+    creator = Attribute('User resource object of the authenticated User')
 
 
 class ITokenManger(Interface):

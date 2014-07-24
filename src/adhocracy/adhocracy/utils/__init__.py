@@ -6,6 +6,8 @@ import pprint
 from collections.abc import Iterator
 
 from pyramid.compat import is_nonstr_iter
+from pyramid.request import Request
+from pyramid.traversal import find_resource
 from substanced.util import get_dotted_name
 from substanced.util import acquire
 from zope.component import getAdapter
@@ -176,3 +178,16 @@ def exception_to_str(err: Exception):
         return '{}: {}'.format(name, desc)
     else:
         return name
+
+
+def get_user(request: Request) -> object:
+    """"Return resource object of the authenticated user.
+
+    This requires that :func:`pyramid.request.Request.authenticated_userid`
+    returns a resource path.
+    """
+    user_path = request.authenticated_userid
+    try:
+        return find_resource(request.root, str(user_path))
+    except KeyError:
+        return None

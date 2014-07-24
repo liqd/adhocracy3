@@ -150,9 +150,9 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         meta = self.metadata._replace(iresource=IResource,
                                       after_creation=[dummy_after_create])
 
-        inst = self.make_one(meta)(kwarg1=True)
+        inst = self.make_one(meta)(creator=None, kwarg1=True)
 
-        assert inst._options == {'kwarg1': True}
+        assert inst._options == {'kwarg1': True, 'creator': None}
         assert inst._registry is self.config.registry
 
     def test_call_without_run_after_create(self):
@@ -274,9 +274,11 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         meta = self.metadata._replace(iresource=IResource,
                                       use_autonaming=True)
+        user = object()
 
-        resource = self.make_one(meta)(parent=self.context)
+        resource = self.make_one(meta)(parent=self.context, creator=user)
 
         assert IResourceCreatedAndAdded.providedBy(events[0])
         assert events[0].object == resource
         assert events[0].parent == self.context
+        assert events[0].creator == user
