@@ -1,8 +1,8 @@
-/// <reference path="../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
-/// <reference path="../_all.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
+/// <reference path="../../_all.d.ts"/>
 
 // This is only used at compile time and will be stripped by the compiler
-import Config = require("./Services/Config");
+import Config = require("../Config/Config");
 
 import q = require("q");
 

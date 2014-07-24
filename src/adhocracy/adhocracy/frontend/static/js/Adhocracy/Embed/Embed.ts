@@ -1,6 +1,6 @@
 import _ = require("underscore");
 
-import Util = require("./Util");
+import Util = require("../Util/Util");
 
 /**
  * List of directive names that can be embedded.  names must be in

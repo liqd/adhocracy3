@@ -33,7 +33,7 @@
  * 10 in particular, but others may be affected.)
  */
 
-import AdhConfig = require("./Config");
+import AdhConfig = require("../Config/Config");
 
 
 export interface IMessage {

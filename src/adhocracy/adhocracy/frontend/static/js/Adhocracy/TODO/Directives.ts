@@ -1,10 +1,10 @@
-import Types = require("./Types");
-import AdhHttp = require("./Services/Http");
-import AdhUser = require("./Services/User");
-import AdhConfig = require("./Services/Config");
-import AdhCrossWindowMessaging = require("./Services/CrossWindowMessaging");
+import Types = require("../Types");
+import AdhHttp = require("../Http/Http");
+import AdhUser = require("../User/User");
+import AdhConfig = require("../Config/Config");
+import AdhCrossWindowMessaging = require("../CrossWindowMessaging/CrossWindowMessaging");
 
-import Resources = require("./Resources");
+import Resources = require("../../Resources");
 
 
 /**

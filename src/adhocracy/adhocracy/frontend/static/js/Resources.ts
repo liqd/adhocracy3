@@ -1,12 +1,12 @@
-/// <reference path="../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
-/// <reference path="../_all.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/requirejs/require.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
+/// <reference path="./_all.d.ts"/>
 
 import _ = require("underscore");
 
-import Util = require("./Util");
-import Http = require("./Services/Http");
+import Util = require("./Adhocracy/Util/Util");
+import Http = require("./Adhocracy/Http/Http");
 
 
 export interface HasIPoolSheet {

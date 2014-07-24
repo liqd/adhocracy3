@@ -3,7 +3,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import Types = require("../Types");
-import Util = require("../Util");
+import Util = require("../Util/Util");
 
 export var importContent : <Content extends Types.Content<any>>(resp: {data: Content}) => Content;
 export var exportContent : <Content extends Types.Content<any>>(obj : Content) => Content;

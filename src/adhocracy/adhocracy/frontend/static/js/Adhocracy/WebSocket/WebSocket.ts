@@ -3,7 +3,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
 
-import AdhConfig = require("./Config");
+import AdhConfig = require("../Config/Config");
 
 
 // FIXME: consider refactoring this service into several smaller

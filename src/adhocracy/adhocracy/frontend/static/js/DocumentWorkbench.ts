@@ -1,8 +1,8 @@
-/// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
-/// <reference path="../../_all.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/requirejs/require.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
+/// <reference path="./_all.d.ts"/>
 
 import angular = require("angular");
 import angularRoute = require("angularRoute");  if (angularRoute) { return; };
@@ -13,18 +13,18 @@ import angularRoute = require("angularRoute");  if (angularRoute) { return; };
 
 import modernizr = require("modernizr");
 
-import AdhHttp = require("../Services/Http");
-import AdhWebSocket = require("../Services/WebSocket");
-import AdhUser = require("../Services/User");
-import AdhDone = require("../Services/Done");
-import AdhCrossWindowMessaging = require("../Services/CrossWindowMessaging");
-import AdhRecursionHelper = require("../Services/RecursionHelper");
+import AdhHttp = require("./Adhocracy/Http/Http");
+import AdhWebSocket = require("./Adhocracy/WebSocket/WebSocket");
+import AdhUser = require("./Adhocracy/User/User");
+import AdhDone = require("./Adhocracy/Done/Done");
+import AdhCrossWindowMessaging = require("./Adhocracy/CrossWindowMessaging/CrossWindowMessaging");
+import AdhRecursionHelper = require("./Adhocracy/RecursionHelper/RecursionHelper");
 
-import Resources = require("../Resources");
-import Widgets = require("../Widgets");
-import Directives = require("../Directives");
-import Filters = require("../Filters");
-import Embed = require("../Embed");
+import Resources = require("./Resources");
+import Widgets = require("./Adhocracy/TODO/Widgets");
+import Directives = require("./Adhocracy/TODO/Directives");
+import Filters = require("./Adhocracy/TODO/Filters");
+import Embed = require("./Adhocracy/Embed/Embed");
 
 
 export var run = (config) => {

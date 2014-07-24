@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import Config = require("./Config");
+import Config = require("../Config/Config");
 
 import CrossWindowMessaging = require("./CrossWindowMessaging");
 

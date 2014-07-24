@@ -1,4 +1,4 @@
-/// <reference path="../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
 import AdhFilters = require("./Filters");
 

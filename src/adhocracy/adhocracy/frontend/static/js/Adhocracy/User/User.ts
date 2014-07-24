@@ -1,4 +1,4 @@
-import AdhHttp = require("./Http");
+import AdhHttp = require("../Http/Http");
 
 export interface IUserBasic {
     name? : string;

@@ -1,7 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import Config = require("./Config");
-import WebSocket = require("./WebSocket");
+import Config = require("../Config/Config");
+import WebSocket = require("../WebSocket/WebSocket");
 
 export var register = () => {
     // FIXME: This should be ``describe("WebSocket")`` and should be wrapped in a

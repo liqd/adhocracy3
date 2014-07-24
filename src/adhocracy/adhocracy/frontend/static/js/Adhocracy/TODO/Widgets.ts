@@ -1,14 +1,14 @@
-/// <reference path="../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
-/// <reference path="../_all.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
+/// <reference path="../../_all.d.ts"/>
 
-import Types = require("./Types");
-import AdhHttp = require("./Services/Http");
-import AdhWebSocket = require("./Services/WebSocket");
-import AdhConfig = require("./Services/Config");
+import Types = require("../Types");
+import AdhHttp = require("../Http/Http");
+import AdhWebSocket = require("../WebSocket/WebSocket");
+import AdhConfig = require("../Config/Config");
 
-import Resources = require("./Resources");
+import Resources = require("../../Resources");
 
 
 //////////////////////////////////////////////////////////////////////

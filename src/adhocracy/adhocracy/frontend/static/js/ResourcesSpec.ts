@@ -1,5 +1,5 @@
-/// <reference path="../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
-/// <reference path="../_all.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
+/// <reference path="./_all.d.ts"/>
 
 import q = require("q");
 

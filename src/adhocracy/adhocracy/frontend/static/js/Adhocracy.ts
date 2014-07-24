@@ -1,4 +1,4 @@
-import DWB = require("./Adhocracy/Pages/DocumentWorkbench");
+import DWB = require("./DocumentWorkbench");
 
 export var init = (config) : void => {
     "use strict";
