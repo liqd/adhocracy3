@@ -6,14 +6,17 @@ from pyramid import testing
 class RootPoolIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.registry')
-        self.config.include('adhocracy.catalog')
-        self.config.include('adhocracy.graph')
-        self.config.include('adhocracy.resources.root')
-        self.config.include('adhocracy.resources.pool')
-        self.config.include('adhocracy.resources.principal')
-        self.config.include('adhocracy.sheets.name')
+        config = testing.setUp()
+        config.include('adhocracy.registry')
+        config.include('adhocracy.events')
+        config.include('adhocracy.catalog')
+        config.include('adhocracy.graph')
+        config.include('adhocracy.resources.root')
+        config.include('adhocracy.resources.pool')
+        config.include('adhocracy.resources.principal')
+        config.include('adhocracy.sheets.name')
+        config.include('adhocracy.sheets.metadata')
+        self.config = config
         self.context = testing.DummyResource()
 
     def tearDown(self):

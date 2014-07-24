@@ -8,6 +8,9 @@ import time
 
 from pyramid.config import Configurator
 from pyramid import testing
+from pyramid.traversal import resource_path_tuple
+from substanced.objectmap import ObjectMap
+from substanced.objectmap import find_objectmap
 from splinter import Browser
 from webtest.http import StopableWSGIServer
 from pytest_splinter.plugin import Browser as PytestSplinterBrowser
@@ -17,6 +20,42 @@ import pytest
 
 from adhocracy import root_factory
 
+
+#####################################
+# Integration/Function test helper  #
+#####################################
+
+class DummyFolder(testing.DummyResource):
+
+    def add(self, name, obj, **kwargs):
+        self[name] = obj
+        obj.__name__ = name
+        obj.__parent__ = self
+        objectmap = find_objectmap(self)
+        obj.__oid__ = objectmap.new_objectid()
+        path_tuple = resource_path_tuple(obj)
+        objectmap.add(obj, path_tuple)
+
+    def check_name(self, name):
+        return name
+
+    def next_name(self, obj, prefix=''):
+        return prefix + '_0000000' + str(hash(obj))
+
+
+def create_folder_with_graph() -> object:
+    """Return folder like dummy object with objectmap and graph."""
+    from adhocracy.graph import Graph
+    context = DummyFolder(__oid__=0)
+    objectmap = ObjectMap(context)
+    context.__objectmap__ = objectmap
+    context.__graph__ = Graph(context)
+    return context
+
+
+##################
+# Fixtures       #
+##################
 
 @pytest.fixture()
 def dummy_config(request):

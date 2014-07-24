@@ -8,9 +8,11 @@ from adhocracy.utils import get_sheet
 class NameDummySheetIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.sheets')
-        self.config.include('adhocracy_sample.sheets.sample_sheets')
+        config = testing.setUp()
+        config.include('adhocracy.events')
+        config.include('adhocracy.sheets.metadata')
+        config.include('adhocracy_sample.sheets.sample_sheets')
+        self.config = config
 
     def tearDown(self):
         testing.tearDown()

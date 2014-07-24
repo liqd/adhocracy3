@@ -1,46 +1,20 @@
 """Tests for the principal package."""
 import unittest
-from mock import patch
 
 from pyramid import testing
 
 
-#############
-#  helpers  #
-#############
-
-class DummyFolder(testing.DummyResource):
-
-    def add(self, name, obj, **kwargs):
-        self[name] = obj
-        obj.__name__ = name
-        obj.__parent__ = self
-        obj.__oid__ = 1
-
-    def check_name(self, name):
-        if name == 'invalid':
-            raise ValueError
-        return name
-
-    def next_name(self, obj, prefix=''):
-        return prefix + '_0000000'
-
-
-#############
-#  Tests    #
-#############
-
 class PrincipalIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        import substanced.principal
-        self.config = testing.setUp()
-        self.config.include('substanced.content')
-        self.config.include('adhocracy.evolution')
-        self.config.scan(substanced.principal)
-        self.config.include('adhocracy.registry')
-        self.config.include('adhocracy.resources.principal')
-        self.context = DummyFolder()
+        from adhocracy.testing import create_folder_with_graph
+        config = testing.setUp()
+        config.include('adhocracy.registry')
+        config.include('adhocracy.events')
+        config.include('adhocracy.sheets.metadata')
+        config.include('adhocracy.resources.principal')
+        self.config = config
+        self.context = create_folder_with_graph()
 
     def tearDown(self):
         testing.tearDown()

@@ -1,6 +1,7 @@
 import unittest
 
 from pyramid import testing
+from pyramid.traversal import resource_path_tuple
 
 from adhocracy.resources.pool import Pool
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
@@ -11,21 +12,6 @@ from adhocracy.interfaces import IItemVersion
 ##########
 # Helper #
 ##########
-
-
-class DummyFolder(testing.DummyResource):
-
-    def add(self, name, obj, **kwargs):
-        self[name] = obj
-        obj.__name__ = name
-        obj.__parent__ = self
-        obj.__oid__ = 1
-
-    def check_name(self, name):
-        return name
-
-    def next_name(self, obj, prefix=''):
-        return prefix + '_0000000' + str(obj.__oid__)
 
 
 def _add_resource_type_to_registry(metadata, registry):
@@ -44,19 +30,18 @@ def _add_resource_type_to_registry(metadata, registry):
 class ItemVersionIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        from adhocracy.graph import Graph
-        from substanced.objectmap import ObjectMap
-        self.config = testing.setUp()
-        self.config.include('adhocracy.registry')
-        self.config.include('adhocracy.sheets.name')
-        self.config.include('adhocracy.sheets.versions')
-        self.config.include('adhocracy.resources.itemversion')
-        context = Pool()
-        context.__objectmap__ = ObjectMap(context)
-        context.__graph__ = Graph(context)
-        self.context = context
-        self.objectmap = context.__objectmap__
-        self.graph = context.__graph__
+        from adhocracy.testing import create_folder_with_graph
+        config = testing.setUp()
+        config.include('adhocracy.registry')
+        config.include('adhocracy.events')
+        config.include('adhocracy.sheets.metadata')
+        config.include('adhocracy.sheets.versions')
+        config.include('adhocracy.sheets.name')
+        config.include('adhocracy.resources.itemversion')
+        self.config = config
+        self.context = create_folder_with_graph()
+        self.objectmap = self.context.__objectmap__
+        self.graph = self.context.__graph__
 
     def tearDown(self):
         testing.tearDown()
