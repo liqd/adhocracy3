@@ -51,12 +51,12 @@ path of the new user::
     '/principals/users/00...
 
 Like every resource the user has a metadata sheet with creation information::
-    >>> resp_data = testapp.get("/principals/users", prop).json
+    >>> resp_data = testapp.get(user_path).json
     >>> resp_metadata = resp_data['data']['adhocracy.sheets.metadata.IMetadata']
 
 Even tough he is not logged in yet, the creator points to his usr resource::
     >>> resp_metadata['creator']
-    '/principals/users/00...
+    ['/principals/users/00...
 
 The "name" field in the "IUserBasic" schema is a non-empty string that
 can contain any characters except '@' (to make user names distinguishable

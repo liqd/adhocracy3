@@ -130,7 +130,17 @@ class ResourceFactory:
             if sheet.meta.creatable:
                 sheet.set(struct, send_event=False)
 
+        # Fixme: Sideffect. We change here the passed creator because the
+        # creator of user resources should always be the created user.
+        # A better solution would be to have custom adapter to add
+        # resources.
+        # To prevent import circles we do not import at module level.
+        from adhocracy.resources.principal import IUser
+        if IUser.providedBy(resource):
+            creator = resource
+
         registry = registry if registry else get_current_registry()
+
         if run_after_creation:
             for call in self.meta.after_creation:
                 kwargs['creator'] = creator
@@ -138,7 +148,7 @@ class ResourceFactory:
 
         if IMetadata.providedBy(resource):
             now = datetime.now()
-            creator = [creator] if creator else []
+            creator = [creator] if creator is not None else []
             sheet = get_sheet(resource, IMetadata)
             metadata = {'creator': creator,
                         'creation_date': now,

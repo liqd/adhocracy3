@@ -289,12 +289,25 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         meta = self.metadata._replace(iresource=IResource,
                                       basic_sheets=[IMetadata])
         dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, IMetadata)
-        user = object()
+        authenticated_user = object()
 
-        resource = self.make_one(meta)(creator=user)
+        resource = self.make_one(meta)(creator=authenticated_user)
 
         set_appstructs = dummy_sheet.return_value.set.call_args[0][0]
-        assert set_appstructs['creator'] == [user]
+        assert set_appstructs['creator'] == [authenticated_user]
+
+    def test_with_creator_and_resource_implements_imetadata_and_iuser(self):
+        from adhocracy.resources.principal import IUser
+        from adhocracy.sheets.metadata import IMetadata
+        meta = self.metadata._replace(iresource=IUser,
+                                      basic_sheets=[IMetadata])
+        dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, IMetadata)
+        authenticated_user = object()
+
+        created_user = self.make_one(meta)(creator=authenticated_user)
+
+        set_appstructs = dummy_sheet.return_value.set.call_args[0][0]
+        assert set_appstructs['creator'] == [created_user]
 
     def test_notify_new_resource_created_and_added(self):
         events = []
