@@ -9,8 +9,9 @@ from adhocracy.interfaces import IPool
 from adhocracy.resources import add_resource_type_to_registry
 from adhocracy.resources.pool import Pool
 from adhocracy.resources.pool import pool_metadata
-from adhocracy.sheets.user import IPasswordAuthentication
-from adhocracy.sheets.user import IUserBasic
+import adhocracy.sheets.user
+import adhocracy.sheets.pool
+import adhocracy.sheets.metadata
 
 
 class IPrincipalsPool(IPool):
@@ -76,8 +77,12 @@ class User(Pool):
 user_metadata = pool_metadata._replace(
     iresource=IUser,
     content_class=User,
-    basic_sheets=[IUserBasic],
-    extended_sheets=[IPasswordAuthentication],
+    basic_sheets=[adhocracy.sheets.user.IUserBasic,
+                  adhocracy.sheets.metadata.IMetadata,
+                  adhocracy.sheets.pool.IPool,
+                  ],
+    extended_sheets=[adhocracy.sheets.user.IPasswordAuthentication,
+                     ],
     element_types=[],  # we don't want the frontend to post resources here
     use_autonaming=True
 )

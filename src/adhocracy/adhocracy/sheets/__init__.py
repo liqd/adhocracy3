@@ -179,3 +179,4 @@ def includeme(config):  # pragma: no cover
     config.include('.versions')
     config.include('.tags')
     config.include('.user')
+    config.include('.metadata')

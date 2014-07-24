@@ -36,6 +36,7 @@ item_metadata = pool_metadata._replace(
                   adhocracy.sheets.tags.ITags,
                   adhocracy.sheets.versions.IVersions,
                   adhocracy.sheets.pool.IPool,
+                  adhocracy.sheets.metadata.IMetadata,
                   ],
     element_types=[IItemVersion,
                    ITag,

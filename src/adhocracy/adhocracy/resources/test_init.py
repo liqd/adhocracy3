@@ -267,6 +267,35 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         assert 'prefix_0000000' in self.context
 
+    def test_without_creator_and_resource_implements_imetadata(self):
+        from datetime import datetime
+        from adhocracy.sheets.metadata import IMetadata
+        meta = self.metadata._replace(iresource=IResource,
+                                      basic_sheets=[IMetadata])
+        dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, IMetadata)
+
+        resource = self.make_one(meta)()
+
+        set_appstructs = dummy_sheet.return_value.set.call_args[0][0]
+        assert set_appstructs['creator'] == []
+        today = datetime.today().date()
+        assert set_appstructs['creation_date'].date() == today
+        assert set_appstructs['modification_date'].date() == today
+        set_send_event = dummy_sheet.return_value.set.call_args[1]['send_event']
+        assert set_send_event is False
+
+    def test_with_creator_and_resource_implements_imetadata(self):
+        from adhocracy.sheets.metadata import IMetadata
+        meta = self.metadata._replace(iresource=IResource,
+                                      basic_sheets=[IMetadata])
+        dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, IMetadata)
+        user = object()
+
+        resource = self.make_one(meta)(creator=user)
+
+        set_appstructs = dummy_sheet.return_value.set.call_args[0][0]
+        assert set_appstructs['creator'] == [user]
+
     def test_notify_new_resource_created_and_added(self):
         events = []
         listener = lambda event: events.append(event)

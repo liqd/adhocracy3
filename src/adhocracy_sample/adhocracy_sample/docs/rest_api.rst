@@ -115,7 +115,7 @@ of the sheets implemented by the resource::
 
     >>> basicpool_desc = resp_data['resources']['adhocracy.resources.pool.IBasicPool']
     >>> sorted(basicpool_desc['sheets'])
-    ['adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool'...]
+    ['adhocracy.sheets.metadata.IMetadata', 'adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool'...]
 
 If the resource is an item, it will also have a "item_type" key whose value
 is the type of versions managed by this item (e.g. a Section will manage
@@ -317,7 +317,8 @@ Returns resource and child elements meta data and all sheet with data::
 
     >>> resp_data = testapp.get("/adhocracy").json
     >>> pprint(resp_data["data"])
-    {'adhocracy.sheets.name.IName': {'name': 'adhocracy'},
+    {'adhocracy.sheets.metadata.IMetadata': ...
+     'adhocracy.sheets.name.IName': {'name': 'adhocracy'},
      'adhocracy.sheets.pool.IPool': {'elements': [...]}}
 
 POST
@@ -686,7 +687,8 @@ Each Versionable has a FIRST tag that points to the initial version::
     >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/FIRST')
     >>> pprint(resp.json)
     {'content_type': 'adhocracy.interfaces.ITag',
-     'data': {'adhocracy.sheets.name.IName': {'name': 'FIRST'},
+     'data': {...
+              'adhocracy.sheets.name.IName': {'name': 'FIRST'},
               'adhocracy.sheets.tags.ITag': {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000000']}},
      'path': '/adhocracy/Proposals/kommunismus/FIRST'}
 
@@ -696,7 +698,8 @@ that aren't 'followed_by' any later version::
     >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/LAST')
     >>> pprint(resp.json)
     {'content_type': 'adhocracy.interfaces.ITag',
-     'data': {'adhocracy.sheets.name.IName': {'name': 'LAST'},
+     'data': {...
+              'adhocracy.sheets.name.IName': {'name': 'LAST'},
               'adhocracy.sheets.tags.ITag': {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000004']}},
      'path': '/adhocracy/Proposals/kommunismus/LAST'}
 

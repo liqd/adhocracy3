@@ -136,6 +136,17 @@ class ResourceFactory:
                 kwargs['creator'] = creator
                 call(resource, registry, options=kwargs)
 
+        if IMetadata.providedBy(resource):
+            now = datetime.now()
+            creator = [creator] if creator else []
+            sheet = get_sheet(resource, IMetadata)
+            metadata = {'creator': creator,
+                        'creation_date': now,
+                        'modification_date': now,
+                        }
+            sheet.set(metadata, send_event=False)
+
+        self._notify_new_resource_created_and_added(resource, registry,
                                                     creator)
 
         return resource

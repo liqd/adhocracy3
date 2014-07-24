@@ -353,12 +353,14 @@ class Password(AdhocracySchemaNode):
 
 
 @colander.deferred
-def deferred_date_default(node, kw):
+def deferred_date_default(node: colander.MappingSchema, kw: dict) -> datetime:
+    """Return current date."""
     # Fixme: set custom timezone
     return datetime.now()
 
 
 class DateTime(AdhocracySchemaNode):
+
     """ DateTime object.
 
     This type serializes python ``datetime.datetime`` objects to a
@@ -379,6 +381,3 @@ class DateTime(AdhocracySchemaNode):
     schema_type = colander.DateTime
     default = deferred_date_default
     missing = deferred_date_default
-
-
-
