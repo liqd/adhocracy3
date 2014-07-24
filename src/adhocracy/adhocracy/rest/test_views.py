@@ -4,7 +4,7 @@ import unittest
 
 from cornice.util import extract_json_data
 from cornice.errors import Errors
-from mock import patch
+from unittest.mock import patch
 from pyramid import testing
 import colander
 import pytest

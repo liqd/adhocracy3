@@ -68,7 +68,7 @@ export class Listing<Container extends Types.Content<any>, ContainerAdapter exte
             transclude: true,
             controller: ["$scope", "adhHttp", "adhWebSocket", "adhDone", (
                 $scope: ListingScope<Container>,
-                adhHttp: AdhHttp.IService<Container>,
+                adhHttp: AdhHttp.Service<Container>,
                 adhWebSocket: AdhWebSocket.IService,
                 adhDone
             ) : void => {
@@ -133,7 +133,7 @@ export class ListingElementAdapter extends AbstractListingElementAdapter {
 export class ListingElementTitleAdapter extends AbstractListingElementAdapter {
     constructor(
         public $q: ng.IQService,
-        public adhHttp: AdhHttp.IService<Types.Content<Resources.HasIDocumentSheet>>
+        public adhHttp: AdhHttp.Service<Types.Content<Resources.HasIDocumentSheet>>
     ) {
         super($q);
     }
@@ -175,7 +175,7 @@ export class ListingElement<Element extends Types.Content<any>, ElementAdapter e
             },
             controller: ["$scope", "adhHttp", "adhDone", (
                 $scope: ListingElementScope,
-                adhHttp: AdhHttp.IService<Element>,
+                adhHttp: AdhHttp.Service<Element>,
                 adhDone
             ) : void => {
                 adhHttp.get($scope.path)

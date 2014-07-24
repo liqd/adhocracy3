@@ -17,8 +17,7 @@ export var register = () => {
                     }
                 }
             };
-            // FIXME DefinitelyTyped does not yet know of `and`.
-            $compileMock = (<any>jasmine.createSpy("$compileMock"))
+            $compileMock = jasmine.createSpy("$compileMock")
                 .and.returnValue(() => undefined);
         });
 
@@ -27,6 +26,14 @@ export var register = () => {
                 var expected = "<adh-document-workbench data-path=\"&#x27;/this/is/a/path&#x27;\" " +
                     "data-test=\"&#x27;&quot;\\&#x27;&amp;&#x27;\"></adh-document-workbench>";
                 expect(Embed.route2template($routeMock)).toBe(expected);
+            });
+            it("throws if $route does not specify a widget", () => {
+                delete $routeMock.current.params.widget;
+                expect(() => Embed.route2template($routeMock)).toThrow();
+            });
+            it("throws if the requested widget is not available for embedding", () => {
+                $routeMock.current.params.widget = "do-not-embed";
+                expect(() => Embed.route2template($routeMock)).toThrow();
             });
         });
 

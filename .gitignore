@@ -10,9 +10,9 @@ __pycache__
 *~
 .*~
 *.egg-info
-.installed.cfg
-.mr.developer.cfg
-.sass-cache
+/.installed.cfg
+/.mr.developer.cfg
+/.sass-cache
 .idea
 /bin
 /docs/build
@@ -20,8 +20,8 @@ __pycache__
 /etc/compass.min.rb
 /etc/compass.rb
 /etc/hologram.yml
-python
-develop-eggs
+/python
+/develop-eggs
 /var
 /include/
 /lib/
@@ -39,15 +39,8 @@ develop-eggs
 /src/rubygemsrecipe/build/
 /source_env
 /.vagrant
-robotframework/bin/
-robotframework/eggs/
-robotframework/include/
-robotframework/lib/
-robotframework/local/
-robotframework/selenium_demo/
-a3-backend-mockup
 /.ropeproject/
-.cache/
+/.cache/
 /.coverage
 /htmlcov/
 /pylintrc
@@ -56,6 +49,5 @@ a3-backend-mockup
 /src/adhocracy/tests/log.html
 /src/adhocracy/tests/output.xml
 /src/supervisor
-adhocracy3/
 *.js.map
 *.css.map

@@ -96,7 +96,7 @@ export var register = () => {
                 });
 
                 it("registers a listener on $rootScope that calls postMessage", () => {
-                    var args = windowMock.addEventListener.calls.mostRecent().args;
+                    var args = rootScopeMock.$watch.calls.mostRecent().args;
                     args[1]();
                     expect(postMessageMock).toHaveBeenCalled();
                 });

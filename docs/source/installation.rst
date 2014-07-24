@@ -43,12 +43,12 @@ compile python 3 and PIL ::
     cd python
     python ./bootstrap.py
     ./bin/buildout
+    ./bin/install-links
     cd ..
-    ./python/python-3.3/bin/python --version
 
 install adhocracy ::
 
-    ./python/python-3.3/bin/python ./bootstrap.py
+    ./bin/python3.4 ./bootstrap.py
     ./bin/buildout
 
 update your shell environment::
@@ -84,10 +84,6 @@ Check that everything is running smoothly::
 
     ./bin/supervisorctl status
 
-
-Updating the object structure::
-
-    ./bin/sd_evolve etc/development.ini
 
 Open the javascript front-end with your web browser::
 

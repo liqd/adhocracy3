@@ -1,5 +1,5 @@
 import unittest
-from mock import Mock
+from unittest.mock import Mock
 
 from pyramid import testing
 import colander

@@ -144,7 +144,7 @@ export var addParagraph = (proposalVersion: PartialIProposalVersion, paragraphPa
 };
 
 export class Service {
-    constructor(public adhHttp : Http.IService<any>, public $q: ng.IQService) {}
+    constructor(public adhHttp : Http.Service<any>, public $q: ng.IQService) {}
 
     getNewestVersionPath(path: string) : ng.IPromise<any> {
         // FIXME conceptually, there is no single newest version.  Versions have a tree
