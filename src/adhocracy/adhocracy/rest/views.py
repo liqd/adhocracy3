@@ -9,6 +9,7 @@ from cornice.util import json_error
 from cornice.util import to_list
 from cornice.schemas import validate_colander_schema
 from substanced.interfaces import IUserLocator
+from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
@@ -38,6 +39,7 @@ from adhocracy.utils import get_iresource
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
 from adhocracy.utils import get_sheet
+from adhocracy.utils import get_user
 from adhocracy.resources.root import IRootPool
 from adhocracy.sheets.user import IPasswordAuthentication
 
@@ -167,7 +169,6 @@ class RESTView:
         @view_defaults(
             renderer='simplejson',
             context=IResource,
-            decorator=validate_request_data_decorator(),
         )
         class MySubClass(RESTView):
             validation_GET = (MyColanderSchema, [my_extra_validation_function])
@@ -175,7 +176,6 @@ class RESTView:
             @view_config(request_method='GET')
             def get(self):
             ...
-
     """
 
     validation_OPTIONS = (None, [])
@@ -184,19 +184,34 @@ class RESTView:
     validation_PUT = (None, [])
     validation_POST = (None, [])
 
-    reserved_names = []
-
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        registry = request.registry.content
-        self.registry = registry
+        self.registry = request.registry.content
+        schema_class, validators = _get_schema_and_validators(self, request)
+        validate_request_data(context, request,
+                              schema=schema_class(),
+                              extra_validators=validators)
+
+    def options(self) -> dict:
+        raise HTTPMethodNotAllowed()
+
+    def get(self) -> dict:
+        raise HTTPMethodNotAllowed()
+
+    def put(self) -> dict:
+        raise HTTPMethodNotAllowed()
+
+    def post(self) -> dict:
+        raise HTTPMethodNotAllowed()
+
+    def delete(self) -> dict:
+        raise HTTPMethodNotAllowed()
 
 
 @view_defaults(
     renderer='simplejson',
     context=IResource,
-    decorator=validate_request_data_decorator(),
 )
 class ResourceRESTView(RESTView):
 
@@ -242,23 +257,12 @@ class ResourceRESTView(RESTView):
 @view_defaults(
     renderer='simplejson',
     context=ISimple,
-    decorator=validate_request_data_decorator(),
 )
 class SimpleRESTView(ResourceRESTView):
 
     """View for simples (non versionable), implements get, options and put."""
 
     validation_PUT = (PUTResourceRequestSchema, [])
-
-    @view_config(request_method='OPTIONS')
-    def options(self) -> dict:
-        """Get possible request/response data structures and http methods."""
-        return super().options()  # pragma: no cover
-
-    @view_config(request_method='GET')
-    def get(self) -> dict:
-        """Get resource data."""
-        return super().get()  # pragma: no cover
 
     @view_config(request_method='PUT',
                  content_type='application/json')
@@ -287,22 +291,6 @@ class PoolRESTView(SimpleRESTView):
     """View for Pools, implements get, options, put and post."""
 
     validation_POST = (POSTResourceRequestSchema, [])
-
-    @view_config(request_method='OPTIONS')
-    def options(self) -> dict:
-        """Get possible request/response data structures and http methods."""
-        return super().options()  # pragma: no cover
-
-    @view_config(request_method='GET')
-    def get(self) -> dict:
-        """Get resource data."""
-        return super().get()  # pragma: no cover
-
-    @view_config(request_method='PUT',
-                 content_type='application/json')
-    def put(self) -> dict:
-        """Edit resource and get response data."""
-        return super().put()  # pragma: no cover
 
     def build_post_response(self, resource) -> dict:
         """Build response data structure for a POST request. """
@@ -339,15 +327,12 @@ class PoolRESTView(SimpleRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IItem,
-    decorator=validate_request_data_decorator(),
 )
 class ItemRESTView(PoolRESTView):
 
-    """View for Items and ItemVersions, overwrites POST handling."""
+    """View for Items and ItemVersions, overwrites GET and  POST handling."""
 
-    validation_POST = (POSTItemRequestSchema,
-                       [validate_post_root_versions,
-                        ])
+    validation_POST = (POSTItemRequestSchema, [validate_post_root_versions])
 
     @view_config(request_method='GET')
     def get(self) -> dict:
@@ -383,10 +368,6 @@ class MetaApiView(RESTView):
     Returns a JSON document describing the existing resources and sheets.
     """
 
-    def __init__(self, context, request):
-        """Create a new instance."""
-        super().__init__(context, request)
-
     def _describe_resources(self, resource_types):
         """Build a description of the resources registered in the system.
 
@@ -397,7 +378,6 @@ class MetaApiView(RESTView):
           resource_map (dict): a dict (suitable for JSON serialization) that
                                describes all the resources registered in the
                                system.
-
         """
         resource_map = {}
 
@@ -572,7 +552,6 @@ def validate_login_password(context, request: Request):
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
-    decorator=validate_request_data_decorator()
 )
 class LoginUsernameView(RESTView):
 
@@ -604,7 +583,6 @@ def _login_user(request: Request) -> dict:
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
-    decorator=validate_request_data_decorator()
 )
 class LoginEmailView(RESTView):
 
@@ -622,5 +600,5 @@ class LoginEmailView(RESTView):
 
 
 def includeme(config):  # pragma: no cover
-    """Run Pyramid configuration."""
-    pass
+    """Register Views."""
+    config.scan('.views')

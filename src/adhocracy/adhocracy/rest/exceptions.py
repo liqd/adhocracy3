@@ -33,3 +33,8 @@ def handle_error_500_exception(error, request):
     error = ('internal', args, msg)
     logger.exception('internal')
     return _JSONError([error], 500)
+
+
+def includeme(config):  # pragma: no cover
+    """Include pyramid configuration."""
+    config.scan('.exceptions')

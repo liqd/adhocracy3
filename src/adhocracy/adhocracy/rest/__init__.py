@@ -2,7 +2,8 @@
 
 
 def includeme(config):  # pragma: no cover
-    """Run pyramid configuration."""
+    """Include all rest views configuration."""
     config.include('cornice')
-    config.scan('.views')
-    config.scan('.exceptions')
+    config.include('.views')
+    config.commit()  # override cornice exception views
+    config.include('.exceptions')
