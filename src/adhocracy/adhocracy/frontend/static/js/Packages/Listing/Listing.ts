@@ -3,7 +3,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import Types = require("../Types");
 import AdhHttp = require("../Http/Http");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 import AdhConfig = require("../Config/Config");
@@ -21,7 +20,7 @@ export class AbstractListingContainerAdapter {
 }
 
 export class ListingPoolAdapter extends AbstractListingContainerAdapter {
-    public elemRefs(container : Types.Content<Resources.HasIPoolSheet>) {
+    public elemRefs(container : Resources.Content<Resources.HasIPoolSheet>) {
         return container.data["adhocracy.sheets.pool.IPool"].elements;
     }
 }
@@ -49,7 +48,7 @@ export interface ListingScope<Container> {
 //
 // and implicitly know that Listing propagates the identifier
 // ``element`` to the element's scope.
-export class Listing<Container extends Types.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter> {
+export class Listing<Container extends Resources.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter> {
     public static templateUrl: string = "/Widgets/Listing.html";
 
     constructor(public containerAdapter: ContainerAdapter) {}

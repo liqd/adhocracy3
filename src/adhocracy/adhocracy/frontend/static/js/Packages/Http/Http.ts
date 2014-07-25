@@ -2,11 +2,11 @@
 /// <reference path="../../../lib/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
-import Types = require("../Types");
+import Resources = require("../../Resources");
 import Util = require("../Util/Util");
 
-export var importContent : <Content extends Types.Content<any>>(resp: {data: Content}) => Content;
-export var exportContent : <Content extends Types.Content<any>>(obj : Content) => Content;
+export var importContent : <Content extends Resources.Content<any>>(resp: {data: Content}) => Content;
+export var exportContent : <Content extends Resources.Content<any>>(obj : Content) => Content;
 export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void;
 
 
@@ -19,9 +19,9 @@ export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendErro
  */
 
 // FIXME: This service should be able to handle any type, not just subtypes of
-// ``Types.Content``.  Methods like ``postNewVersion`` may need additional
+// ``Resources.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
-export interface IBaseService<Content extends Types.Content<any>> {
+export interface IBaseService<Content extends Resources.Content<any>> {
     get : (path : string) => ng.IPromise<Content>;
     put : (path : string, obj : Content) => ng.IPromise<Content>;
     post : (path : string, obj : Content) => ng.IPromise<Content>;
@@ -29,9 +29,9 @@ export interface IBaseService<Content extends Types.Content<any>> {
     postToPool : (poolPath : string, obj : Content) => ng.IPromise<Content>;
 }
 
-export interface ITransaction<Content extends Types.Content<any>> extends IBaseService<Content> {}
+export interface ITransaction<Content extends Resources.Content<any>> extends IBaseService<Content> {}
 
-export class Service<Content extends Types.Content<any>> implements IBaseService<Content> {
+export class Service<Content extends Resources.Content<any>> implements IBaseService<Content> {
     constructor(private $http : ng.IHttpService, private $q) {}
 
     public get(path : string) : ng.IPromise<Content> {
@@ -132,7 +132,7 @@ export class Service<Content extends Types.Content<any>> implements IBaseService
 /**
  * transform objects on the way in and out
  */
-importContent = <Content extends Types.Content<any>>(resp: {data: Content}) : Content => {
+importContent = <Content extends Resources.Content<any>>(resp: {data: Content}) : Content => {
     "use strict";
 
     var obj = resp.data;
@@ -186,7 +186,7 @@ importContent = <Content extends Types.Content<any>>(resp: {data: Content}) : Co
     //   }
 };
 
-exportContent = <Content extends Types.Content<any>>(obj : Content) : Content => {
+exportContent = <Content extends Resources.Content<any>>(obj : Content) : Content => {
     "use strict";
 
     // FIXME: newobj should be a copy, not a reference

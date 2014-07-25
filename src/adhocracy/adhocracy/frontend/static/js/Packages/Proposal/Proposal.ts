@@ -3,7 +3,6 @@
 import _ = require("underscore");
 
 import Util = require("../Util/Util");
-import Types = require("../Types");
 import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
 
@@ -15,7 +14,7 @@ import Resources = require("../../Resources");
  */
 interface DetailScope<Data> extends ng.IScope {
     viewmode : string;
-    content : Types.Content<Data>;
+    content : Resources.Content<Data>;
 }
 
 interface DetailRefScope<Data> extends DetailScope<Data> {
@@ -65,7 +64,7 @@ export class ProposalVersionDetail {
                 viewmode: "@"
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Types.Content<any>>,
+                adhHttp : AdhHttp.Service<Resources.Content<any>>,
                 $scope : IProposalVersionDetailScope<any>
             ) : void => {
                 $scope.list = () => {
@@ -158,7 +157,7 @@ export class SectionVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Types.Content<Resources.HasISectionSheet>>,
+                adhHttp : AdhHttp.Service<Resources.Content<Resources.HasISectionSheet>>,
                 $scope : DetailRefScope<Resources.HasISectionSheet>
             ) : void => {
                 var commit = (event, ...args) => {
@@ -189,7 +188,7 @@ export class ParagraphVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Types.Content<Resources.HasIParagraphSheet>>,
+                adhHttp : AdhHttp.Service<Resources.Content<Resources.HasIParagraphSheet>>,
                 $scope : DetailRefScope<Resources.HasIParagraphSheet>
             ) : void => {
                 var commit = (event, ...args) => {
