@@ -330,7 +330,7 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
     creator = Attribute('User resource object of the authenticated User')
 
 
-class ITokenManger(Interface):
+class ITokenManger(Interface):  # pragma: no cover
 
     def create_token(user_id: str) -> str:
         """ Create authentication token for user_id."""

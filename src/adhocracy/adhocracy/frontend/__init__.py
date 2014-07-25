@@ -40,15 +40,12 @@ def _build_ws_url(request: Request, url: str) -> str:
 
 
 def includeme(config):
-    """Run pyramid config."""
+    """Add routing and static view to deliver the frontend application."""
     config.add_static_view('frontend_static', 'adhocracy.frontend:static')
-
-    # the frontend does its own routing, so we can simply serve the root_view
     config.add_route('embed', 'embed/{directive}')
     config.add_view(root_view, route_name='embed', renderer='html')
     config.add_route('register', 'register')
     config.add_view(root_view, route_name='register', renderer='html')
-
     config.add_route('config_json', 'frontend_config.json')
     config.add_view(config_view, route_name='config_json', renderer='json')
 

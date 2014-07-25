@@ -123,7 +123,7 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         inst = self._make_one('', get_tokenmanager=get_tokenmanager)
         assert inst.authenticated_userid(self.request) is None
 
-    def test_authenticated_userid_with_tokenmanger(self):
+    def test_authenticated_userid_with_tokenmanger_valid_token(self):
         tokenmanager = Mock()
         tokenmanager.get_user_id.return_value = self.user_id
         inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager,
@@ -132,7 +132,14 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         assert inst.authenticated_userid(self.request) == self.user_id
         assert tokenmanager.get_user_id.call_args[1] == {'timeout': 10}
 
-    def test_authenticated_userid_with_tokenmanger_raising_key_error(self):
+    def test_authenticated_userid_with_tokenmanger_valid_token_but_wrong_user_id(self):
+        tokenmanager = Mock()
+        tokenmanager.get_user_id.return_value = self.user_id + 'WRONG_ID'
+        inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager)
+        self.request.headers = self.token_and_user_id_headers
+        assert inst.authenticated_userid(self.request) is None
+
+    def test_authenticated_userid_with_tokenmanger_wrong_token(self):
         tokenmanager = Mock()
         tokenmanager.get_user_id.side_effect = KeyError
         inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager)

@@ -70,25 +70,33 @@ class CorniceDummyRequest(testing.DummyRequest):
         return json.loads(self.body)
 
 
-class DummyUserLocator():
-
-    def __init__(self, dummy_user):
-        self.user = dummy_user
-
-    def get_user_by_email(self, email: str):
-        if email == 'user@example.org':
-            return self.user
-        else:
-            return None
+@patch('adhocracy.resources.principal.UserLocatorAdapter')
+def _create_dummy_user_locator(registry, dummy_locator=None):
+    from zope.interface import Interface
+    from substanced.interfaces import IUserLocator
+    locator = dummy_locator.return_value
+    registry.registerAdapter(locator, (Interface, Interface), IUserLocator)
+    return locator
 
 
-class MultiAdaptiveDummyRegistry():
+@patch('adhocracy.authentication.TokenHeaderAuthenticationPolicy')
+def _create_dummy_token_authentication_policy(registry, dummy_policy=None):
+    from pyramid.interfaces import IAuthenticationPolicy
+    policy = dummy_policy.return_value
+    registry.registerUtility(policy, IAuthenticationPolicy)
+    return policy
 
-    def __init__(self, dummy_user):
-        self.user_locator = DummyUserLocator(dummy_user)
 
-    def getMultiAdapter(self, *args):
-        return self.user_locator
+@patch('adhocracy.sheets.user.PasswordAuthenticationSheet')
+def _create_dummy_password_sheet_adapter(registry, sheet_dummy=None):
+    from adhocracy.interfaces import IResourceSheet
+    from adhocracy.sheets.user import IPasswordAuthentication
+    isheet = IPasswordAuthentication
+    sheet = sheet_dummy.return_value
+    registry.registerAdapter(lambda x: sheet, (isheet,),
+                             IResourceSheet,
+                             isheet.__identifier__)
+    return sheet
 
 
 class DummyPasswordAuthenticationSheet(GenericResourceSheet):
@@ -256,7 +264,6 @@ class RESTViewUnitTest(unittest.TestCase):
         assert inst.request is self.request
         assert inst.request.errors == []
         assert inst.request.validated == {}
-        assert inst.registry is self.request.registry.content
 
 
 class ResourceRESTViewUnitTest(unittest.TestCase):
@@ -278,6 +285,7 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
         from adhocracy.rest.views import RESTView
         inst = self.make_one(self.context, self.request)
         assert isinstance(inst, RESTView)
+        assert inst.registry is self.request.registry.content
 
     def test_options_valid_no_sheets_and_addables(self):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
@@ -737,51 +745,166 @@ class ValidateRequestDataDecoratorUnitTest(unittest.TestCase):
         assert self.request.validated == {'count': 1}
 
 
-class ValidateUserDataUnitTest(unittest.TestCase):
+class ValidateLoginEmailUnitTest(unittest.TestCase):
+
+    def _call_fut(self, context, request):
+        from adhocracy.rest.views import validate_login_email
+        return validate_login_email(context, request)
 
     def setUp(self):
         config = testing.setUp()
-        from adhocracy.sheets import add_sheet_to_registry
-        from adhocracy.sheets.user import IPasswordAuthentication
-        from adhocracy.sheets.user import password_metadata
-        dummy_password_metadata = password_metadata._replace(
-            sheet_class=DummyPasswordAuthenticationSheet,
-        )
-        add_sheet_to_registry(dummy_password_metadata, config.registry)
-        self.dummy_user = testing.DummyResource(
-            __provides__=IPasswordAuthentication)
-        registry = MultiAdaptiveDummyRegistry(self.dummy_user)
-        self.request = CorniceDummyRequest(method='post', registry=registry)
+        request = CorniceDummyRequest(registry=config.registry)
+        request.validated['email'] = 'user@example.org'
+        self.request = request
         self.context = testing.DummyResource()
+        self.user = testing.DummyResource()
 
-    def test_validate_login_email_valid(self):
-        self.request.validated['email'] = 'user@example.org'
-        from adhocracy.rest.views import validate_login_email
-        validate_login_email(self.context, self.request)
-        assert self.request.validated['user'] == self.dummy_user
+    def tearDown(self):
+        testing.tearDown()
 
-    def test_validate_login_email_invalid(self):
-        self.request.validated['email'] = 'no-such-user@example.org'
-        from adhocracy.rest.views import validate_login_email
-        validate_login_email(self.context, self.request)
+    def test_valid(self):
+        locator = _create_dummy_user_locator(self.request.registry)
+        locator.return_value.get_user_by_email.return_value = self.user
+        self._call_fut(self.context, self.request)
+        assert self.request.validated['user'] == self.user
+
+    def test_invalid(self):
+        locator = _create_dummy_user_locator(self.request.registry)
+        locator.return_value.get_user_by_email.return_value = None
+        self._call_fut(self.context, self.request)
         assert 'user' not in self.request.validated
-        assert len(self.request.errors) == 1
         assert 'User doesn\'t exist' in self.request.errors[0]['description']
 
-    def test_validate_login_password_valid(self):
-        self.request.validated['user'] = self.dummy_user
-        self.request.validated['password'] = 'lalala'
-        from adhocracy.rest.views import validate_login_password
-        validate_login_password(self.context, self.request)
-        assert len(self.request.errors) == 0
 
-    def test_validate_login_password_invalid(self):
-        self.request.validated['user'] = self.dummy_user
-        self.request.validated['password'] = 'wrong password'
+class ValidateLoginNameUnitTest(unittest.TestCase):
+
+    def _call_fut(self, context, request):
+        from adhocracy.rest.views import validate_login_name
+        return validate_login_name(context, request)
+
+    def setUp(self):
+        config = testing.setUp()
+        request = CorniceDummyRequest(registry=config.registry)
+        request.validated['name'] = 'user'
+        self.request = request
+        self.context = testing.DummyResource()
+        self.user = testing.DummyResource()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_invalid(self):
+        locator = _create_dummy_user_locator(self.request.registry)
+        locator.return_value.get_user_by_login.return_value = None
+        self._call_fut(self.context, self.request)
+        assert 'User doesn\'t exist' in self.request.errors[0]['description']
+
+    def test_valid(self):
+        locator = _create_dummy_user_locator(self.request.registry)
+        locator.return_value.get_user_by_login.return_value = self.user
+        self._call_fut(self.context, self.request)
+        assert self.request.validated['user'] == self.user
+
+
+class ValidateLoginPasswordUnitTest(unittest.TestCase):
+
+    def _call_fut(self, context, request):
         from adhocracy.rest.views import validate_login_password
-        validate_login_password(self.context, self.request)
-        assert len(self.request.errors) == 1
+        return validate_login_password(context, request)
+
+    def setUp(self):
+        from adhocracy.sheets.user import IPasswordAuthentication
+        user = testing.DummyResource(__provides__=IPasswordAuthentication)
+        config = testing.setUp()
+        request = CorniceDummyRequest(registry=config.registry)
+        request.validated['user'] = user
+        request.validated['password'] = 'lalala'
+        self.request = request
+        self.context = testing.DummyResource()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_valid(self):
+        sheet = _create_dummy_password_sheet_adapter(self.request.registry)
+        sheet.check_plaintext_password.return_value = True
+        self._call_fut(self.context, self.request)
+        assert self.request.errors == []
+
+    def test_invalid(self):
+        sheet = _create_dummy_password_sheet_adapter(self.request.registry)
+        sheet.check_plaintext_password.return_value = False
+        self._call_fut(self.context, self.request)
         assert 'password is wrong' in self.request.errors[0]['description']
+
+    def test_invalid_with_ValueError(self):
+        sheet = _create_dummy_password_sheet_adapter(self.request.registry)
+        sheet.check_plaintext_password.side_effect = ValueError
+        self._call_fut(self.context, self.request)
+        assert 'password is wrong' in self.request.errors[0]['description']
+
+    def test_user_is_None(self):
+        self.request.validated['user'] = None
+        self._call_fut(self.context, self.request)
+        assert self.request.errors == []
+
+
+class LoginUserNameViewUnitTest(unittest.TestCase):
+
+    def _make_one(self, request, context):
+        from adhocracy.rest.views import LoginUsernameView
+        return LoginUsernameView(request, context)
+
+    def setUp(self):
+        config = testing.setUp()
+        request = CorniceDummyRequest()
+        request.registry = config.registry
+        request.validated['user'] = testing.DummyResource
+        self.request = request
+        self.context = testing.DummyResource()
+
+    def test_post_without_token_authentication_policy(self):
+        inst = self._make_one(self.context, self.request)
+        with pytest.raises(KeyError):
+            inst.post()
+
+    def test_post_with_token_authentication_policy(self):
+        policy = _create_dummy_token_authentication_policy(self.request.registry)
+        policy.remember.return_value = {'X-User-Path': '/user',
+                                        'X-User-Token': 'token'}
+        inst = self._make_one(self.context, self.request)
+        assert inst.post() == {'status': 'success',
+                               'user_path': '/user',
+                               'user_token': 'token'}
+
+
+class LoginEmailViewUnitTest(unittest.TestCase):
+
+    def _make_one(self, request, context):
+        from adhocracy.rest.views import LoginEmailView
+        return LoginEmailView(request, context)
+
+    def setUp(self):
+        config = testing.setUp()
+        request = CorniceDummyRequest()
+        request.registry = config.registry
+        request.validated['user'] = testing.DummyResource
+        self.request = request
+        self.context = testing.DummyResource()
+
+    def test_post_without_token_authentication_policy(self):
+        inst = self._make_one(self.context, self.request)
+        with pytest.raises(KeyError):
+            inst.post()
+
+    def test_post_with_token_authentication_policy(self):
+        policy = _create_dummy_token_authentication_policy(self.request.registry)
+        policy.remember.return_value = {'X-User-Path': '/user',
+                                        'X-User-Token': 'token'}
+        inst = self._make_one(self.context, self.request)
+        assert inst.post() == {'status': 'success',
+                               'user_path': '/user',
+                               'user_token': 'token'}
 
 
 class IncludemeIntegrationTest(unittest.TestCase):

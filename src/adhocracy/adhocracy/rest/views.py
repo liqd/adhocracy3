@@ -187,7 +187,6 @@ class RESTView:
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self.registry = request.registry.content
         schema_class, validators = _get_schema_and_validators(self, request)
         validate_request_data(context, request,
                               schema=schema_class(),
@@ -216,6 +215,10 @@ class RESTView:
 class ResourceRESTView(RESTView):
 
     """Default view for Resources, implements get and options."""
+
+    def __init__(self, context, request):
+        super().__init__(context, request)
+        self.registry = request.registry.content
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -485,11 +488,11 @@ class MetaApiView(RESTView):
     def get(self) -> dict:
         """Get the API specification of this installation as JSON."""
         # Collect info about all resources
-        resource_types = self.registry.resources_metadata()
+        resource_types = self.request.registry.content.resources_metadata()
         resource_map = self._describe_resources(resource_types)
 
         # Collect info about all sheets referenced by any of the resources
-        sheet_metadata = self.registry.sheets_metadata()
+        sheet_metadata = self.request.registry.content.sheets_metadata()
         sheet_map = self._describe_sheets(sheet_metadata)
 
         struct = {'resources': resource_map,
@@ -545,7 +548,11 @@ def validate_login_password(context, request: Request):
         return
     password_sheet = get_sheet(user, IPasswordAuthentication)
     password = request.validated['password']
-    if not password_sheet.check_plaintext_password(password):
+    try:
+        valid = password_sheet.check_plaintext_password(password)
+    except ValueError:
+        valid = False
+    if not valid:
         _add_no_such_user_or_wrong_password_error(request)
 
 
@@ -572,7 +579,7 @@ def _login_user(request: Request) -> dict:
     """Log-in a user and return a response indicating success."""
     user = request.validated['user']
     user_path = resource_path(user)
-    headers = remember(request, user_path)
+    headers = remember(request, user_path) or {}
     user_path = headers['X-User-Path']
     user_token = headers['X-User-Token']
     return {'status': 'success',
