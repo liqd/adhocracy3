@@ -99,12 +99,12 @@ export var init = (config) => {
 
     // adhCrossWindowMessaging does work by itself. We only need to inject in anywhere in order to instantiate it.
     app.directive("adhDocumentWorkbench",
-        ["adhConfig", "adhResources", "adhCrossWindowMessaging", (adhConfig, adhResources) =>
-            new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig, adhResources)]);
+        ["adhConfig", "adhCrossWindowMessaging", (adhConfig) =>
+            new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig)]);
 
+    app.directive("adhProposalDetail", () => new Proposal.ProposalDetail().createDirective());
     app.directive("adhProposalVersionDetail",
         ["adhConfig", (adhConfig) => new Proposal.ProposalVersionDetail().createDirective(adhConfig)]);
-
     app.directive("adhProposalVersionEdit",
         ["adhConfig", (adhConfig) => new Proposal.ProposalVersionEdit().createDirective(adhConfig)]);
     app.directive("adhProposalVersionNew",

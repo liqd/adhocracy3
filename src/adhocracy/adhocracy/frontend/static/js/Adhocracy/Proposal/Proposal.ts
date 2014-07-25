@@ -25,6 +25,25 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
     commit : () => void;
 }
 
+export class ProposalDetail {
+    public createDirective() {
+        return {
+            restrict: "E",
+            template: "<adh-proposal-version-detail data-content=\"content\" data-viewmode=\"list\"></adh-proposal-version-detail>",
+            scope: {
+                path: "="
+            },
+            controller: ["adhHttp", "$scope", (adhHttp, $scope) => {
+                adhHttp.get($scope.path + "/LAST")
+                    .then((tag) => tag.data["adhocracy.sheets.tags.ITag"].elements[0])
+                    .then((versionPath) => adhHttp.get(versionPath))
+                    .then((content) => {
+                        $scope.content = content;
+                    });
+            }]
+        };
+    }
+}
 
 export class ProposalVersionDetail {
     public static templateUrl: string = "/Resources/IProposalVersion/Detail.html";
@@ -38,7 +57,7 @@ export class ProposalVersionDetail {
             templateUrl: adhConfig.template_path + "/" + _class.templateUrl,
             scope: {
                 content: "=",
-                viewmode: "="
+                viewmode: "@"
             },
             controller: ["adhHttp", "$scope", (
                 adhHttp : AdhHttp.Service<Types.Content<any>>,
