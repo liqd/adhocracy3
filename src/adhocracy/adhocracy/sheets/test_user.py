@@ -1,11 +1,20 @@
 import unittest
-from mock import patch
+from unittest.mock import patch
 
 import colander
 from pyramid import testing
 import pytest
 
 from adhocracy.utils import get_sheet
+
+
+@patch('adhocracy.resources.principal.UserLocatorAdapter', autospec=True)
+def _create_dummy_user_locator(registry, dummy_locator=None):
+    from zope.interface import Interface
+    from substanced.interfaces import IUserLocator
+    locator = dummy_locator.return_value
+    registry.registerAdapter(lambda y, x: locator, (Interface, Interface), IUserLocator)
+    return locator
 
 
 class PasswordSheetUnitTest(unittest.TestCase):
@@ -126,41 +135,37 @@ class UserBasicSchemaSchemaUnitTest(unittest.TestCase):
 
 class DeferredValidateUserName(unittest.TestCase):
 
-    @patch('adhocracy.resources.principal.UserLocatorAdapter')
-    def setUp(self, mock_user_locator=None):
-        from zope.interface import Interface
-        from substanced.interfaces import IUserLocator
+    def setUp(self):
         config = testing.setUp()
         self.request = testing.DummyRequest(root=testing.DummyResource(),
                                             registry=config.registry)
-        self.user_locator = mock_user_locator
-        config.registry.registerAdapter(self.user_locator,
-                                        required=(Interface, Interface),
-                                        provided=IUserLocator)
+        self.user_locator = _create_dummy_user_locator(config.registry)
         self.node = colander.MappingSchema()
-        self.user_locator = mock_user_locator
+
+    def tearDown(self):
+        testing.tearDown()
 
     def _call_fut(self, node, kw):
         from adhocracy.sheets.user import deferred_validate_user_name
         return deferred_validate_user_name(node, kw)
 
     def test_name_is_empty_and_no_request_kw(self):
-        self.user_locator.return_value.get_user_by_login.return_value = None
+        self.user_locator.get_user_by_login.return_value = None
         validator = self._call_fut(self.node, {})
         assert validator is None
 
     def test_name_is_empty(self):
-        self.user_locator.return_value.get_user_by_login.return_value = None
+        self.user_locator.get_user_by_login.return_value = None
         validator = self._call_fut(self.node, {'request': self.request})
         assert validator(self.node, '') is None
 
     def test_name_is_unique(self):
-        self.user_locator.return_value.get_user_by_login.return_value = None
+        self.user_locator.get_user_by_login.return_value = None
         validator = self._call_fut(self.node, {'request': self.request})
         assert validator(self.node, 'unique') is None
 
     def test_name_is_not_unique(self):
-        self.user_locator.return_value.get_user_by_login.return_value = object()
+        self.user_locator.get_user_by_login.return_value = object()
         validator = self._call_fut(self.node, {'request': self.request})
         with pytest.raises(colander.Invalid):
             validator(self.node, 'not unique')
@@ -168,19 +173,15 @@ class DeferredValidateUserName(unittest.TestCase):
 
 class DeferredValidateUserEmail(unittest.TestCase):
 
-    @patch('adhocracy.resources.principal.UserLocatorAdapter')
-    def setUp(self, mock_user_locator=None):
-        from zope.interface import Interface
-        from substanced.interfaces import IUserLocator
+    def setUp(self):
         config = testing.setUp()
         self.request = testing.DummyRequest(root=testing.DummyResource(),
                                             registry=config.registry)
-        self.user_locator = mock_user_locator
-        config.registry.registerAdapter(self.user_locator,
-                                        required=(Interface, Interface),
-                                        provided=IUserLocator)
+        self.user_locator = _create_dummy_user_locator(config.registry)
         self.node = colander.MappingSchema()
-        self.user_locator = mock_user_locator
+
+    def tearDown(self):
+        testing.tearDown()
 
     def _call_fut(self, node, kw):
         from adhocracy.sheets.user import deferred_validate_user_email
@@ -197,12 +198,12 @@ class DeferredValidateUserEmail(unittest.TestCase):
              validator(self.node, 'wrong_email') is None
 
     def test_email_is_unique(self):
-        self.user_locator.return_value.get_user_by_email.return_value = None
+        self.user_locator.get_user_by_email.return_value = None
         validator = self._call_fut(self.node, {'request': self.request})
         assert validator(self.node, 'test@test.de') is None
 
     def test_email_is_not_unique(self):
-        self.user_locator.return_value.get_user_by_email.return_value = object()
+        self.user_locator.get_user_by_email.return_value = object()
         validator = self._call_fut(self.node, {'request': self.request})
         with pytest.raises(colander.Invalid):
             validator(self.node, 'not unique')

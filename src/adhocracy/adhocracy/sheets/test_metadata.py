@@ -7,7 +7,7 @@ from pyramid import testing
 from adhocracy.utils import get_sheet
 
 
-@patch('adhocracy.sheets.GenericResourceSheet')
+@patch('adhocracy.sheets.GenericResourceSheet', autospec=True)
 def _create_dummy_sheet_adapter(registry, isheet, dummy_sheet=None):
     from adhocracy.interfaces import IResourceSheet
     sheet = dummy_sheet.return_value

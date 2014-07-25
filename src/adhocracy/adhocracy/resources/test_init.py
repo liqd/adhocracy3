@@ -25,11 +25,11 @@ class ISheetX(ISheet):
 @patch('adhocracy.sheets.GenericResourceSheet')
 def _create_dummy_sheet_adapter(registry, isheet, sheet_dummy=None):
     from adhocracy.interfaces import IResourceSheet
-    registry.registerAdapter(sheet_dummy, (isheet,),
+    sheet = sheet_dummy.return_value
+    registry.registerAdapter(lambda x: sheet, (isheet,),
                              IResourceSheet,
                              isheet.__identifier__)
-    return sheet_dummy
-
+    return sheet
 
 class DummyFolder(testing.DummyResource):
 
@@ -179,37 +179,37 @@ class ResourceFactoryUnitTest(unittest.TestCase):
         meta = self.metadata._replace(iresource=IResource,
                                       basic_sheets=[ISheetY])
         dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, ISheetY)
-        dummy_sheet.return_value.meta = sheet_metadata._replace(creatable=True)
+        dummy_sheet.meta = sheet_metadata._replace(creatable=True)
         appstructs = {ISheetY.__identifier__: {'count': 0}}
 
         self.make_one(meta)(appstructs=appstructs)
 
-        assert dummy_sheet.return_value.set.call_args[0] == ({'count': 0},)
-        assert dummy_sheet.return_value.set.call_args[1]['send_event'] is False
+        assert dummy_sheet.set.call_args[0] == ({'count': 0},)
+        assert dummy_sheet.set.call_args[1]['send_event'] is False
 
     def test_call_with_not_creatable_appstructs_data(self):
         meta = self.metadata._replace(iresource=IResource,
                                       basic_sheets=[ISheetY])
         dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, ISheetY)
-        dummy_sheet.return_value.meta = sheet_metadata._replace(creatable=False)
+        dummy_sheet.meta = sheet_metadata._replace(creatable=False)
         appstructs = {ISheetY.__identifier__: {'count': 0}}
 
         self.make_one(meta)(appstructs=appstructs)
 
-        assert not dummy_sheet.return_value.set.called
+        assert not dummy_sheet.set.called
 
     def test_call_with_parent_and_appstructs_name_data(self):
         from adhocracy.sheets.name import IName
         meta = self.metadata._replace(iresource=IResource,
                                       basic_sheets=[IName])
         dummy_sheet = _create_dummy_sheet_adapter(self.config.registry, IName)
-        dummy_sheet.return_value.set.return_value = False
+        dummy_sheet.set.return_value = False
         appstructs = {IName.__identifier__: {'name': 'child'}}
 
         self.make_one(meta)(parent=self.context, appstructs=appstructs)
 
         assert 'child' in self.context
-        assert dummy_sheet.return_value.set.called
+        assert dummy_sheet.set.called
 
     def test_call_with_parent_and_no_name_appstruct(self):
         meta = self.metadata
@@ -276,12 +276,12 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         resource = self.make_one(meta)()
 
-        set_appstructs = dummy_sheet.return_value.set.call_args[0][0]
+        set_appstructs = dummy_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] == []
         today = datetime.today().date()
         assert set_appstructs['creation_date'].date() == today
         assert set_appstructs['modification_date'].date() == today
-        set_send_event = dummy_sheet.return_value.set.call_args[1]['send_event']
+        set_send_event = dummy_sheet.set.call_args[1]['send_event']
         assert set_send_event is False
 
     def test_with_creator_and_resource_implements_imetadata(self):
@@ -293,7 +293,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         resource = self.make_one(meta)(creator=authenticated_user)
 
-        set_appstructs = dummy_sheet.return_value.set.call_args[0][0]
+        set_appstructs = dummy_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] == [authenticated_user]
 
     def test_with_creator_and_resource_implements_imetadata_and_iuser(self):
@@ -306,7 +306,7 @@ class ResourceFactoryUnitTest(unittest.TestCase):
 
         created_user = self.make_one(meta)(creator=authenticated_user)
 
-        set_appstructs = dummy_sheet.return_value.set.call_args[0][0]
+        set_appstructs = dummy_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] == [created_user]
 
     def test_notify_new_resource_created_and_added(self):
