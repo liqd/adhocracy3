@@ -124,3 +124,9 @@ For every TypeScript module ``example.ts`` there is a corresponding
 module ``exampleSpec.ts`` that contains jasmine specs.
 
 .. FIXME: Write about mocking dependencies
+
+Further Reading
+---------------
+
+- `Angular Best Practice for App Structure <https://docs.google.com/document/d/1XXMvReO8-Awi1EZXAXS4PzDzdNvV6pGcuaF4Q9821Es/pub>`_
+- `An AngularJS Style Guide for Closure Users at Google <https://google-styleguide.googlecode.com/svn/trunk/angularjs-google-style.html>`_
