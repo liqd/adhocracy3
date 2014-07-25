@@ -44,6 +44,14 @@ like this::
 This mechanism happens at runtime and therefore missing dependencies and
 circular imports can only be detected at runtime.
 
+.. FIXME: Angular modules have some major downsides:
+
+   - They hide which services, directives and filters actually are
+     registered
+   - They need an additional name
+   - They can not really be used with widgets because widget directives
+     can only be defined where we know widgets *and* adapters.
+
 How we use it
 -------------
 
