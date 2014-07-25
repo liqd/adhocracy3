@@ -74,12 +74,15 @@ frontend acceptance tests::
 
     bin/py.test tests/
 
-.. note::
+   .. note::
+      The embed tests assume aliases for localhost to exist. If it is
+      not already there, please add the following line to /etc/hosts::
 
-   Some of the tests assume aliases for localhost to exist. If it is
-   not already there, please add the following line to /etc/hosts::
+          127.0.0.1  adhocracy.embeddee.goo adhocracy.embedder.gaa
 
-       127.0.0.1  adhocracy.embeddee.goo adhocracy.embedder.gaa
+      then start the testrunner with enabled embed testing::
+
+          bin/py.test --run_embed_tests tests
 
 run backend functional tests::
 

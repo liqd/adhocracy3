@@ -1,17 +1,18 @@
 import subprocess
 from time import sleep
 
+import pytest
+
+
 class Test:
 
+    @pytest.mark.embed
     def test_etc_hosts(self):
         """Check that /etc/hosts has been prepared (see development.rst)."""
-
-        # FIXME: if this test fails, do not crash, but warn and mark all
-        # tests in this class as "pending" before continuing.
-
         assert subprocess.call(["grep", "-q", "adhocracy.embeddee.goo", "/etc/hosts"]) == 0
         assert subprocess.call(["grep", "-q", "adhocracy.embedder.gaa", "/etc/hosts"]) == 0
 
+    @pytest.mark.embed
     def test_acceptance_zooming(self, browser_embedder_root):
         """Run acceptance test after zooming in on iframe."""
 
@@ -24,6 +25,7 @@ class Test:
             elements = iframe.find_by_css('#document_workbench_list')
             assert len(elements) != 0 and elements.first != None
 
+    @pytest.mark.embed
     def test_resize(self, browser_embedder_root):
         """Iframe height matches its content after at most 5 seconds."""
 
