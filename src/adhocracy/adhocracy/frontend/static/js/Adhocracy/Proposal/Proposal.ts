@@ -195,13 +195,13 @@ export class DocumentSheetEdit {
             },
             controller: ["$scope", ($scope) => {
                 var versionPromises = $scope.sheet.elements.map((path) =>
-                                                                adhHttp.get(decodeURIComponent(path))
-                                                                .then((resp) => resp.data)
-                                                               );
+                    adhHttp.get(decodeURIComponent(path))
+                        .then((resp) => resp.data)
+                );
 
                 $q.all(versionPromises).then((versions) =>
-                                             $scope.sectionVersions = versions
-                                            );
+                    $scope.sectionVersions = versions
+                );
             }]
         };
     }
