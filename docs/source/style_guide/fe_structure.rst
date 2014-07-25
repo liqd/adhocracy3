@@ -67,6 +67,9 @@ required to contains a TypeScript module with the same name as the
 package. This TypeScript module wires all contents of the package into
 an angular module.
 
+.. FIXME: Alternatively, the application can import services, directives
+   and filters directly. See FIXME in angular modules section.
+
 .. FIXME: Packages should also include all CSS and other static content
    they depend on.
 
@@ -74,6 +77,8 @@ A Package may only import TypeScipt modules from other Packages or
 parent directories for type-checking. When you want to actually use the
 code from other packages, you must import the corresponding angular
 module.
+
+.. FIXME: We might want to have exceptions, e.g. Util
 
 Be aware that depending on the angular module will not automatically
 load the required file in a browser environment. We will however take
@@ -116,14 +121,6 @@ TypeScript modules. You additionally need to use this modules, e.g. as
 parameters to a dummy function like this::
 
     var forceLoad = (...args) => args;
-
-Testing
-+++++++
-
-For every TypeScript module ``example.ts`` there is a corresponding
-module ``exampleSpec.ts`` that contains jasmine specs.
-
-.. FIXME: Write about mocking dependencies
 
 Further Reading
 ---------------
