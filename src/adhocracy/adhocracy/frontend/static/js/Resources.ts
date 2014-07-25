@@ -5,8 +5,8 @@
 
 import _ = require("underscore");
 
-import Util = require("./Adhocracy/Util/Util");
-import Http = require("./Adhocracy/Http/Http");
+import Util = require("./Packages/Util/Util");
+import Http = require("./Packages/Http/Http");
 
 
 export interface HasIPoolSheet {

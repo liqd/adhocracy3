@@ -13,18 +13,18 @@ import angularRoute = require("angularRoute");  if (angularRoute) { return; };
 
 import modernizr = require("modernizr");
 
-import AdhHttp = require("./Adhocracy/Http/Http");
-import AdhWebSocket = require("./Adhocracy/WebSocket/WebSocket");
-import AdhUser = require("./Adhocracy/User/User");
-import AdhDone = require("./Adhocracy/Done/Done");
-import AdhCrossWindowMessaging = require("./Adhocracy/CrossWindowMessaging/CrossWindowMessaging");
-import AdhRecursionHelper = require("./Adhocracy/RecursionHelper/RecursionHelper");
+import AdhHttp = require("./Packages/Http/Http");
+import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
+import AdhUser = require("./Packages/User/User");
+import AdhDone = require("./Packages/Done/Done");
+import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
+import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
 
 import Resources = require("./Resources");
-import Listing = require("./Adhocracy/Listing/Listing");
-import DocumentWorkbench = require("./Adhocracy/DocumentWorkbench/DocumentWorkbench");
-import Proposal = require("./Adhocracy/Proposal/Proposal");
-import Embed = require("./Adhocracy/Embed/Embed");
+import Listing = require("./Packages/Listing/Listing");
+import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
+import Proposal = require("./Packages/Proposal/Proposal");
+import Embed = require("./Packages/Embed/Embed");
 
 
 export var init = (config) => {
