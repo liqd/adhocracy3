@@ -22,6 +22,7 @@ import AdhRecursionHelper = require("./Adhocracy/RecursionHelper/RecursionHelper
 
 import Resources = require("./Resources");
 import Listing = require("./Adhocracy/Listing/Listing");
+import DocumentWorkbench = require("./Adhocracy/DocumentWorkbench/DocumentWorkbench");
 import Directives = require("./Adhocracy/TODO/Directives");
 import Embed = require("./Adhocracy/Embed/Embed");
 
@@ -97,7 +98,10 @@ export var init = (config) => {
     // application-specific (local) directives
 
     // adhCrossWindowMessaging does work by itself. We only need to inject in anywhere in order to instantiate it.
-    app.directive("adhDocumentWorkbench", ["adhConfig", "adhResources", "adhCrossWindowMessaging", Directives.adhDocumentWorkbench]);
+    app.directive("adhDocumentWorkbench",
+        ["adhConfig", "adhResources", "adhCrossWindowMessaging", (adhConfig, adhResources) =>
+            new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig, adhResources)]);
+
     app.directive("adhProposalVersionDetail", ["adhConfig", Directives.adhProposalVersionDetail]);
     app.directive("adhProposalVersionEdit", ["adhConfig", Directives.adhProposalVersionEdit]);
     app.directive("adhProposalVersionNew", ["adhHttp", "adhConfig", "adhResources", Directives.adhProposalVersionNew]);
