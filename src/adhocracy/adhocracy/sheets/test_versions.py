@@ -64,7 +64,7 @@ class VersionableSheetUnitTest(unittest.TestCase):
         assert list(data['follows']) == []
         assert list(data['followed_by']) == []
 
-    @patch('adhocracy.graph.Graph')
+    @patch('adhocracy.graph.Graph', autospec=True)
     def test_get_with_followed_by(self, graph_dummy=None):
         successor = testing.DummyResource()
         inst = self._make_one(self.metadata, self.context)
@@ -73,7 +73,7 @@ class VersionableSheetUnitTest(unittest.TestCase):
         data = inst.get()
         assert list(data['followed_by']) == [successor]
 
-    @patch('adhocracy.graph.Graph')
+    @patch('adhocracy.graph.Graph', autospec=True)
     def test_get_with_follows(self, graph_dummy=None):
         precessor = testing.DummyResource()
         inst = self._make_one(self.metadata, self.context)

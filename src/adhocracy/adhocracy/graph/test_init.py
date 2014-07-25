@@ -480,7 +480,7 @@ class GraphGetReferencesForIsheetUnitTest(unittest.TestCase):
 
 class GetFollowsUnitTest(unittest.TestCase):
 
-    @patch('adhocracy.graph.Graph')
+    @patch('adhocracy.graph.Graph', autospec=True)
     def setUp(self, dummy_graph=None):
         self.context = testing.DummyResource()
         self.graph = dummy_graph.return_value
@@ -508,7 +508,7 @@ class GetFollowsUnitTest(unittest.TestCase):
 
 class GetFollowedByUnitTest(unittest.TestCase):
 
-    @patch('adhocracy.graph.Graph')
+    @patch('adhocracy.graph.Graph', autospec=True)
     def setUp(self, dummy_graph=None):
         self.context = create_dummy_resource()
         self.graph = dummy_graph.return_value

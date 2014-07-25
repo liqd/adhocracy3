@@ -140,11 +140,11 @@ class TestResourceContentRegistrySheets(unittest.TestCase):
 
 class TestResourceContentRegistryResourcesMetadata(unittest.TestCase):
 
-    @patch('adhocracy.registry.ResourceContentRegistry')
+    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
     def setUp(self, dummy_registry=None):
         from adhocracy.interfaces import resource_metadata
         self.config = testing.setUp()
-        self.resource_registry = dummy_registry.return_value
+        self.dummy_registry = dummy_registry.return_value
         self.resource_meta = resource_metadata._replace(iresource=IResource)
 
     def tearDown(self):
@@ -152,27 +152,27 @@ class TestResourceContentRegistryResourcesMetadata(unittest.TestCase):
 
     def _make_one(self):
         from adhocracy.registry import ResourceContentRegistry
-        return ResourceContentRegistry.resources_metadata(
-            self.resource_registry)
+        return ResourceContentRegistry.resources_metadata(self.dummy_registry)
 
     def test_resources_metadata_without_content_type(self):
+        self.dummy_registry.meta = {}
         resources = self._make_one()
         assert resources == {}
 
     def test_resources_metadata_with_unresolvable_content_type(self):
-        self.resource_registry.meta = {"unresolvable": {}}
+        self.dummy_registry.meta = {"unresolvable": {}}
         resources = self._make_one()
         assert resources == {}
 
     def test_resources_metadata_with_non_iresource_content_types(self):
         from zope.interface import Interface
-        self.resource_registry.meta = {Interface.__identifier__: {}}
+        self.dummy_registry.meta = {Interface.__identifier__: {}}
         resources = self._make_one()
         assert resources == {}
 
     def test_resources_metadata_with_iresource_content_types(self):
         type_id = IResource.__identifier__
-        self.resource_registry.meta = \
+        self.dummy_registry.meta = \
             {type_id: {'resource_metadata': self.resource_meta}}
         resources = self._make_one()
         assert len(resources) == 1

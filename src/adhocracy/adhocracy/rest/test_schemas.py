@@ -106,7 +106,7 @@ class POSTResourceRequestSchemaUnitTest(unittest.TestCase):
 
 class DeferredValidatePostContentTypeUnitTest(unittest.TestCase):
 
-    @patch('adhocracy.registry.ResourceContentRegistry')
+    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
     def setUp(self, mock_registry=None):
         request = DummyRequest()
         request.registry.content = mock_registry.return_value
@@ -132,7 +132,7 @@ class DeferredValidatePostContentTypeUnitTest(unittest.TestCase):
 
 class AddPostRequestSubSchemasUnitTest(unittest.TestCase):
 
-    @patch('adhocracy.registry.ResourceContentRegistry')
+    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
     def setUp(self, mock_registry=None):
         from adhocracy.interfaces import sheet_metadata
         request = JSONDummyRequest(body='{}')
@@ -246,7 +246,7 @@ class PUTResourceRequestSchemaUnitTest(unittest.TestCase):
 
 class AddPutRequestSubSchemasUnitTest(unittest.TestCase):
 
-    @patch('adhocracy.registry.ResourceContentRegistry')
+    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
     def setUp(self, mock_registry=None):
         from adhocracy.interfaces import sheet_metadata
         request = JSONDummyRequest(body='{}')

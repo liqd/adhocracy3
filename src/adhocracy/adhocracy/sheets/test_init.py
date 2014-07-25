@@ -111,7 +111,7 @@ class ResourcePropertySheetUnitTests(unittest.TestCase):
         inst._data['count'] = 11
         assert inst.get_cstruct() == {'count': '11'}
 
-    @patch('adhocracy.graph.Graph')
+    @patch('adhocracy.graph.Graph', autospec=True)
     @patch('adhocracy.schema.ListOfUniqueReferences', autospec=True)
     def test_set_valid_references(self,
                                   dummy_node=None,

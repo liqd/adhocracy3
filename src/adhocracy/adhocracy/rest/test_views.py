@@ -1,17 +1,16 @@
 """Test rest.views module."""
 import json
 import unittest
+from unittest.mock import patch
 
 from cornice.util import extract_json_data
 from cornice.errors import Errors
-from unittest.mock import patch
 from pyramid import testing
 import colander
 import pytest
 
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
-from adhocracy.sheets import GenericResourceSheet
 
 
 ############
@@ -70,16 +69,16 @@ class CorniceDummyRequest(testing.DummyRequest):
         return json.loads(self.body)
 
 
-@patch('adhocracy.resources.principal.UserLocatorAdapter')
+@patch('adhocracy.resources.principal.UserLocatorAdapter', autospec=True)
 def _create_dummy_user_locator(registry, dummy_locator=None):
     from zope.interface import Interface
     from substanced.interfaces import IUserLocator
     locator = dummy_locator.return_value
-    registry.registerAdapter(locator, (Interface, Interface), IUserLocator)
+    registry.registerAdapter(lambda y,x: locator, (Interface, Interface), IUserLocator)
     return locator
 
 
-@patch('adhocracy.authentication.TokenHeaderAuthenticationPolicy')
+@patch('adhocracy.authentication.TokenHeaderAuthenticationPolicy', autospec=True)
 def _create_dummy_token_authentication_policy(registry, dummy_policy=None):
     from pyramid.interfaces import IAuthenticationPolicy
     policy = dummy_policy.return_value
@@ -87,7 +86,7 @@ def _create_dummy_token_authentication_policy(registry, dummy_policy=None):
     return policy
 
 
-@patch('adhocracy.sheets.user.PasswordAuthenticationSheet')
+@patch('adhocracy.sheets.user.PasswordAuthenticationSheet', autospec=True)
 def _create_dummy_password_sheet_adapter(registry, sheet_dummy=None):
     from adhocracy.interfaces import IResourceSheet
     from adhocracy.sheets.user import IPasswordAuthentication
@@ -99,13 +98,7 @@ def _create_dummy_password_sheet_adapter(registry, sheet_dummy=None):
     return sheet
 
 
-class DummyPasswordAuthenticationSheet(GenericResourceSheet):
-
-    def check_plaintext_password(self, password: str) -> bool:
-        return password == 'lalala'
-
-
-@patch('adhocracy.registry.ResourceContentRegistry')
+@patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
 def make_mock_resource_registry(mock_registry=None):
     return mock_registry.return_value
 
@@ -339,7 +332,7 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
         wanted['content_type'] = IResourceX.__identifier__
         assert wanted == response
 
-    @patch('adhocracy.sheets.GenericResourceSheet')
+    @patch('adhocracy.sheets.GenericResourceSheet', autospec=True)
     def test_get_valid_with_sheets(self, dummy_sheet):
         sheet = dummy_sheet.return_value
         sheet.meta.isheet = ISheetB
@@ -387,7 +380,7 @@ class SimpleRESTViewUnitTest(unittest.TestCase):
         wanted = {'path': '/', 'content_type': IResourceX.__identifier__}
         assert wanted == response
 
-    @patch('adhocracy.sheets.GenericResourceSheet')
+    @patch('adhocracy.sheets.GenericResourceSheet', autospec=True)
     def test_put_valid_with_sheets(self, dummy_sheet=None):
         sheet = dummy_sheet.return_value
         self.resource_sheets.return_value = {ISheetB.__identifier__: sheet}
@@ -731,13 +724,13 @@ class ValidateLoginEmailUnitTest(unittest.TestCase):
 
     def test_valid(self):
         locator = _create_dummy_user_locator(self.request.registry)
-        locator.return_value.get_user_by_email.return_value = self.user
+        locator.get_user_by_email.return_value = self.user
         self._call_fut(self.context, self.request)
         assert self.request.validated['user'] == self.user
 
     def test_invalid(self):
         locator = _create_dummy_user_locator(self.request.registry)
-        locator.return_value.get_user_by_email.return_value = None
+        locator.get_user_by_email.return_value = None
         self._call_fut(self.context, self.request)
         assert 'user' not in self.request.validated
         assert 'User doesn\'t exist' in self.request.errors[0]['description']
@@ -762,13 +755,13 @@ class ValidateLoginNameUnitTest(unittest.TestCase):
 
     def test_invalid(self):
         locator = _create_dummy_user_locator(self.request.registry)
-        locator.return_value.get_user_by_login.return_value = None
+        locator.get_user_by_login.return_value = None
         self._call_fut(self.context, self.request)
         assert 'User doesn\'t exist' in self.request.errors[0]['description']
 
     def test_valid(self):
         locator = _create_dummy_user_locator(self.request.registry)
-        locator.return_value.get_user_by_login.return_value = self.user
+        locator.get_user_by_login.return_value = self.user
         self._call_fut(self.context, self.request)
         assert self.request.validated['user'] == self.user
 

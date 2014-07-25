@@ -71,7 +71,7 @@ def _create_new_version_event_with_isheet(context, isheet, registry, creator=Non
 
 class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
 
-    @patch('adhocracy.registry.ResourceContentRegistry')
+    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
     def setUp(self, dummy_resource_registry=None):
         self.config = testing.setUp()
         resource_registry = dummy_resource_registry.return_value
@@ -115,7 +115,7 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         assert creator == event.creator
 
 
-    @patch('adhocracy.graph.Graph')
+    @patch('adhocracy.graph.Graph', autospec=True)
     def test_call_versionable_with_autoupdate_sheet_and_root_versions_and_not_is_insubtree(self,
                                                                                            dummy_graph):
         graph = dummy_graph.return_value
