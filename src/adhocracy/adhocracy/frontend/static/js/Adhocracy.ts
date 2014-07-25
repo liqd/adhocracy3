@@ -23,7 +23,6 @@ import AdhRecursionHelper = require("./Adhocracy/RecursionHelper/RecursionHelper
 import Resources = require("./Resources");
 import Widgets = require("./Adhocracy/TODO/Widgets");
 import Directives = require("./Adhocracy/TODO/Directives");
-import Filters = require("./Adhocracy/TODO/Filters");
 import Embed = require("./Adhocracy/Embed/Embed");
 
 
@@ -75,8 +74,6 @@ export var init = (config) => {
     app.factory("adhWebSocket", ["Modernizr", "adhConfig", AdhWebSocket.factory]);
 
     app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", AdhCrossWindowMessaging.factory]);
-
-    app.filter("documentTitle", [Filters.filterDocumentTitle]);
 
     app.directive("adhEmbed", ["$compile", "$route", Embed.factory]);
 

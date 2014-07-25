@@ -2,7 +2,7 @@
     <div ng-switch="viewmode">
         <div ng-switch-when="list">
             <a href ng-click="display()" class="document_title">
-                {{content | documentTitle}}
+                {{content.data['adhocracy.sheets.document.IDocument'].title}}
             </a>
         </div>
         <div ng-switch-when="display">
