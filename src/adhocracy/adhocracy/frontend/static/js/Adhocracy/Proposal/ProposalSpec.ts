@@ -1,11 +1,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhDirectives = require("./Directives");
+import AdhProposal = require("./Proposal");
 
 export var register = () => {
-    describe("Service/Directives", () => {
+    describe("Proposal/Proposal", () => {
         xit("dummy", () => {
-            expect(AdhDirectives).toBeDefined();
+            expect(AdhProposal).toBeDefined();
         });
     });
 };
+

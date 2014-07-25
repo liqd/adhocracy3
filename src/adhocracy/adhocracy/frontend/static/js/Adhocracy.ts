@@ -23,7 +23,7 @@ import AdhRecursionHelper = require("./Adhocracy/RecursionHelper/RecursionHelper
 import Resources = require("./Resources");
 import Listing = require("./Adhocracy/Listing/Listing");
 import DocumentWorkbench = require("./Adhocracy/DocumentWorkbench/DocumentWorkbench");
-import Directives = require("./Adhocracy/TODO/Directives");
+import Proposal = require("./Adhocracy/Proposal/Proposal");
 import Embed = require("./Adhocracy/Embed/Embed");
 
 
@@ -102,14 +102,26 @@ export var init = (config) => {
         ["adhConfig", "adhResources", "adhCrossWindowMessaging", (adhConfig, adhResources) =>
             new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig, adhResources)]);
 
-    app.directive("adhProposalVersionDetail", ["adhConfig", Directives.adhProposalVersionDetail]);
-    app.directive("adhProposalVersionEdit", ["adhConfig", Directives.adhProposalVersionEdit]);
-    app.directive("adhProposalVersionNew", ["adhHttp", "adhConfig", "adhResources", Directives.adhProposalVersionNew]);
-    app.directive("adhSectionVersionDetail", ["adhConfig", "recursionHelper", Directives.adhSectionVersionDetail]);
-    app.directive("adhParagraphVersionDetail", ["adhConfig", Directives.adhParagraphVersionDetail]);
-    app.directive("adhDocumentSheetEdit", ["adhHttp", "$q", "adhConfig", Directives.adhDocumentSheetEdit]);
-    app.directive("adhDocumentSheetShow", ["adhConfig", Directives.adhDocumentSheetShow]);
-    app.directive("adhParagraphSheetEdit", ["adhConfig", Directives.adhParagraphSheetEdit]);
+    app.directive("adhProposalVersionDetail",
+        ["adhConfig", (adhConfig) => new Proposal.ProposalVersionDetail().createDirective(adhConfig)]);
+
+    app.directive("adhProposalVersionEdit",
+        ["adhConfig", (adhConfig) => new Proposal.ProposalVersionEdit().createDirective(adhConfig)]);
+    app.directive("adhProposalVersionNew",
+        ["adhHttp", "adhConfig", "adhResources", (adhHttp, adhConfig, adhResources) =>
+            new Proposal.ProposalVersionNew().createDirective(adhHttp, adhConfig, adhResources)]);
+    app.directive("adhSectionVersionDetail",
+        ["adhConfig", "recursionHelper", (adhConfig, recursionHelper) =>
+            new Proposal.SectionVersionDetail().createDirective(adhConfig, recursionHelper)]);
+    app.directive("adhParagraphVersionDetail",
+        ["adhConfig", (adhConfig) => new Proposal.ParagraphVersionDetail().createDirective(adhConfig)]);
+    app.directive("adhDocumentSheetEdit",
+        ["adhHttp", "$q", "adhConfig", (adhHttp, $q, adhConfig) =>
+            new Proposal.DocumentSheetEdit().createDirective(adhConfig, $q, adhConfig)]);
+    app.directive("adhDocumentSheetShow",
+        ["adhConfig", (adhConfig) => new Proposal.DocumentSheetShow().createDirective(adhConfig)]);
+    app.directive("adhParagraphSheetEdit",
+        ["adhConfig", (adhConfig) => new Proposal.ParagraphSheetEdit().createDirective(adhConfig)]);
 
 
     // get going
