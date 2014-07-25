@@ -82,14 +82,6 @@ export var init = (config) => {
         ["adhConfig", (adhConfig) =>
             new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig)]);
 
-    app.directive("adhListingElement",
-        ["$q", "adhConfig", ($q, adhConfig) =>
-            new Listing.ListingElement(new Listing.ListingElementAdapter($q)).createDirective(adhConfig)]);
-
-    app.directive("adhListingElementTitle",
-        ["$q", "adhHttp", "adhConfig", ($q, adhHttp, adhConfig) =>
-            new Listing.ListingElement(new Listing.ListingElementTitleAdapter($q, adhHttp)).createDirective(adhConfig)]);
-
     app.directive("adhWebSocketTest",
         ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>
             new AdhWebSocket.WebSocketTest().createDirective($timeout, adhConfig, adhWebSocket)]);
