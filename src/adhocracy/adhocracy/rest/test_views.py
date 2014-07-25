@@ -147,6 +147,14 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
         self._make_one(self.context, self.request, schema=CountSchema())
         assert self.request.validated == {}
 
+    def test_valid_with_schema_no_data_and_defaults(self):
+        class DefaultDataSchema(colander.MappingSchema):
+            count = colander.SchemaNode(colander.Int(),
+                                        missing=1)
+        self.request.body = ''
+        self._make_one(self.context, self.request, schema=DefaultDataSchema())
+        assert self.request.validated == {'count': 1}
+
     def test_valid_with_schema_with_data(self):
         self.request.body = '{"count": "1"}'
         self._make_one(self.context, self.request, schema=CountSchema())
@@ -165,7 +173,9 @@ class ValidateRequestDataUnitTest(unittest.TestCase):
         self.request.body = '{"count": "wrong_value"}'
         with pytest.raises(_JSONError):
             self._make_one(self.context, self.request, schema=CountSchema())
-        assert self.request.errors != []
+        assert self.request.errors == [{'location': 'body',
+                                        'name': 'count',
+                                        'description': '"wrong_value" is not a number'}]
 
     def test_non_valid_with_schema_wrong_data_cleanup(self):
         from cornice.util import _JSONError

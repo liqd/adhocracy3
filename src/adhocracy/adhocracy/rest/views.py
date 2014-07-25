@@ -4,9 +4,10 @@ from logging import getLogger
 
 from colander import SchemaNode
 from colander import MappingSchema
+from colander import drop
+from colander import Invalid
 from cornice.util import json_error
-from cornice.util import to_list
-from cornice.schemas import validate_colander_schema
+from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.request import Request
@@ -54,7 +55,6 @@ def validate_post_root_versions(context, request: Request):
     root_resources = []
     for path in root_paths:
         path_tuple = tuple(str(path).split('/'))
-        res = None
         try:
             res = find_resource(context, path_tuple)
         except KeyError:
@@ -77,60 +77,74 @@ def validate_request_data(context: ILocation, request: Request,
 
     :param context: passed to validator functions
     :param request: passed to validator functions
-    :param schema: Schema to validate the request data with
-        :func:`cornice.schemas.validate_colander_schema`.
-        `None` value is allowed.
-    :extra_validators: additional validator functions. The have to accept
-        the arguments `context` and `request`.
+    :param schema: Schema to validate. Data to validate is extracted from the
+                   request.body. For schema nodes with attribute `location` ==
+                   `querystring` the data is extracted from the query string.
+                   The validated data is stored in the `request.validated`dict.
+                   The `None` value is allowed to disable schema validation.
+    :param extra_validators: Functions called after schema validation.
+                             The passed arguments are `context` and  `request`.
+                             The should append errors to `request.errors` and
+                             validated data to  `request.validated`.
 
     :raises _JSONError: HTTP 400 for bad request data.
-
     """
     parent = context if request.method == 'POST' else context.__parent__
     schema_with_binding = schema.bind(context=context, request=request,
                                       parent_pool=parent)
-    schema_cornice = _CorniceSchemaAdapter(schema_with_binding)
-    validate_colander_schema(schema_cornice, request)
+    qs, headers, body, path = extract_request_data(request)
+    _validate_schema(body, schema_with_binding, request, location='body')
+    _validate_schema(qs, schema_with_binding, request, location='querystring')
+    _validate_extra_validators(extra_validators, context, request)
+    _raise_if_errors(request)
+
+
+def _validate_schema(cstructs: dict, schema: MappingSchema, request: Request,
+                     location='body'):
+    """Validate that the `cstruct` data is conform to the given schema.
+
+    :param request: request with list like `errors` attribute to append errors
+                    and the dictionary attribute `validated` to add validated
+                    data.
+    :param location: filter schema nodes depending on the `location` attribute.
+                     The default value is `body`.
+    """
+    validated = {}
+    nodes = [n for n in schema if getattr(n, 'location', 'body') == location]
+    nodes_with_cstruct = [n for n in nodes if n.name in cstructs]
+    nodes_without_cstruct = [n for n in nodes if n.name not in cstructs]
+    for node in nodes_without_cstruct:
+        appstruct = node.deserialize()
+        if appstruct is not drop:
+            validated[node.name] = appstruct
+    for node in nodes_with_cstruct:
+        cstruct = cstructs[node.name]
+        try:
+            validated[node.name] = node.deserialize(cstruct)
+        except Invalid as e:
+            for name, msg in e.asdict().items():
+                request.errors.add(location, name, msg)
+    request.validated.update(validated)
+
+
+def _validate_extra_validators(validators: list, context, request: Request):
+    """Run `validators` functions. Assuming schema validation run before."""
     if request.errors:
-        extra_validators = []
-    for val in extra_validators:
+        return
+    for val in validators:
         val(context, request)
-    if request.errors:
-        request.validated = {}
-        _log_request_errors(request)
-        raise json_error(request.errors)
 
 
-class _CorniceSchemaAdapter:
-
-    def __init__(self, colander_schema):
-        self._c_schema = colander_schema
-
-    def get_attributes(self, location=('body', 'header', 'querystring'),
-                       required=(True, False), request=None):
-        def _filter(attr):
-            if not hasattr(attr, 'location'):
-                valid_location = 'body' in location
-            else:
-                valid_location = attr.location in to_list(location)
-            return valid_location and attr.required in to_list(required)
-
-        attributes = self._c_schema.children
-        return list(filter(_filter, attributes))
-
-
-def _log_request_errors(request: Request):
+def _raise_if_errors(request: Request):
+    """Raise :class:`cornice.errors._JSONError` and log if request.errors."""
+    if not request.errors:
+        return
     logger.warning('Found %i validation errors in request: <%s>',
                    len(request.errors), request.body)
     for error in request.errors:
         logger.warning('  %s', error)
-
-
-def _get_schema_and_validators(view_class, request: Request) -> tuple:
-    http_method = request.method.upper()
-    validation_attr = 'validation_' + http_method
-    schema, validators = getattr(view_class, validation_attr, (None, []))
-    return schema or MappingSchema, validators
+    request.validated = {}
+    raise json_error(request.errors)
 
 
 class RESTView:
@@ -180,6 +194,13 @@ class RESTView:
 
     def delete(self) -> dict:
         raise HTTPMethodNotAllowed()
+
+
+def _get_schema_and_validators(view_class, request: Request) -> tuple:
+    http_method = request.method.upper()
+    validation_attr = 'validation_' + http_method
+    schema, validators = getattr(view_class, validation_attr, (None, []))
+    return schema or MappingSchema, validators
 
 
 @view_defaults(
@@ -261,7 +282,6 @@ class SimpleRESTView(ResourceRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IPool,
-    decorator=validate_request_data_decorator(),
 )
 class PoolRESTView(SimpleRESTView):
 
