@@ -1,7 +1,6 @@
 """Rest API views."""
 from copy import deepcopy
 from logging import getLogger
-import functools
 
 from colander import SchemaNode
 from colander import MappingSchema
@@ -125,31 +124,6 @@ def _log_request_errors(request: Request):
                    len(request.errors), request.body)
     for error in request.errors:
         logger.warning('  %s', error)
-
-
-def validate_request_data_decorator():
-    """Validate request data for every http method of your RESTView class.
-
-    Run :func:`validate_request_data* with schema and additional validators
-    from the class attribute `validation_<http method>`.
-
-    :returns: decorated method
-
-    """
-    def _dec(f):
-        @functools.wraps(f)
-        def wrapper(context, request):
-            view_class = f.__original_view__
-            schema_class, validators = _get_schema_and_validators(view_class,
-                                                                  request)
-            validate_request_data(context, request,
-                                  schema=schema_class(),
-                                  extra_validators=validators)
-            return f(context, request)
-
-        return wrapper
-
-    return _dec
 
 
 def _get_schema_and_validators(view_class, request: Request) -> tuple:

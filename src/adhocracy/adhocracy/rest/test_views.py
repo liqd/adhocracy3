@@ -702,49 +702,6 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
 
 
-class ValidateRequestDataDecoratorUnitTest(unittest.TestCase):
-
-    def setUp(self):
-        request = CorniceDummyRequest(method='get')
-        request.registry.content = make_mock_resource_registry()
-        self.request = request
-        self.context = testing.DummyResource()
-
-    def _make_dummy_view_class_with_decorator(self, validation_get=(None, [])):
-        from adhocracy.rest.views import validate_request_data_decorator
-
-        class DummyOriginalView:
-            validation_GET = validation_get
-
-        @validate_request_data_decorator()
-        class DummyView(testing.DummyResource):
-            __original_view__ = DummyOriginalView
-
-        return DummyView
-
-    def test_view_without_validators(self):
-        view_class = self._make_dummy_view_class_with_decorator(
-            validation_get=(None, []))
-
-        view_class(self.context, self.request)
-        assert self.request.validated == {}
-
-    def test_view_with_validate_method(self):
-        def dummy_validate(context, request):
-            request.validated = {'data': True}
-        view_class = self._make_dummy_view_class_with_decorator(
-            validation_get=(None, [dummy_validate]))
-        view_class(self.context, self.request)
-        assert self.request.validated == {'data': True}
-
-    def test_view_with_schema(self):
-        view_class = self._make_dummy_view_class_with_decorator(
-            validation_get=(CountSchema, []))
-        self.request.body = '{"count":"1"}'
-        view_class(self.context, self.request)
-        assert self.request.validated == {'count': 1}
-
-
 class ValidateLoginEmailUnitTest(unittest.TestCase):
 
     def _call_fut(self, context, request):
