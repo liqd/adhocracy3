@@ -20,7 +20,6 @@ import AdhDone = require("./Packages/Done/Done");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
 
-import Resources = require("./Resources");
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
 import Proposal = require("./Packages/Proposal/Proposal");
@@ -63,7 +62,7 @@ export var init = (config) => {
 
     app.value("Modernizr", modernizr);
 
-    app.service("adhResources", Resources.Service);
+    app.service("adhProposal", Proposal.Service);
     app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
@@ -100,8 +99,8 @@ export var init = (config) => {
     app.directive("adhProposalVersionEdit",
         ["adhConfig", (adhConfig) => new Proposal.ProposalVersionEdit().createDirective(adhConfig)]);
     app.directive("adhProposalVersionNew",
-        ["adhHttp", "adhConfig", "adhResources", (adhHttp, adhConfig, adhResources) =>
-            new Proposal.ProposalVersionNew().createDirective(adhHttp, adhConfig, adhResources)]);
+        ["adhHttp", "adhConfig", "adhProposal", (adhHttp, adhConfig, adhProposal) =>
+            new Proposal.ProposalVersionNew().createDirective(adhHttp, adhConfig, adhProposal)]);
     app.directive("adhSectionVersionDetail",
         ["adhConfig", "recursionHelper", (adhConfig, recursionHelper) =>
             new Proposal.SectionVersionDetail().createDirective(adhConfig, recursionHelper)]);

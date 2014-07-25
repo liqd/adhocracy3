@@ -1,11 +1,67 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
+/// <reference path="../../_all.d.ts"/>
+
+import q = require("q");
 
 import AdhProposal = require("./Proposal");
 
+
+var createAdhHttpMock = () => {
+    var mock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "postToPool"]);
+    mock.get.and.returnValue(q.when({}));
+    mock.postToPool.and.returnValue(q.when({}));
+    return mock;
+};
+
+
 export var register = () => {
     describe("Proposal", () => {
-        xit("dummy", () => {
-            expect(AdhProposal).toBeDefined();
+        describe("Service", () => {
+            var adhProposal : AdhProposal.Service;
+            var adhHttpMock;
+
+            beforeEach(() => {
+                adhHttpMock = createAdhHttpMock();
+                adhProposal = new AdhProposal.Service(adhHttpMock, q);
+            });
+
+            describe("postProposal", () => {
+                var scope = {};
+
+                beforeEach((done) => {
+                    adhProposal.postProposal("/path", "TestProposal", scope).then(done);
+                });
+
+                it("writes proposal into the scope", () => {
+                    expect((<any>scope).proposal).toBeDefined();
+                });
+            });
+
+            describe("postSection", () => {
+                var scope = {};
+
+                beforeEach((done) => {
+                    adhProposal.postSection("/path", "TestSection", scope).then(done);
+                });
+
+                it("writes section into the scope", () => {
+                    expect((<any>scope).section).toBeDefined();
+                });
+            });
+
+            describe("postParagraph", () => {
+                var scope = {
+                    paragraphs: {}
+                };
+
+                beforeEach((done) => {
+                    adhProposal.postParagraph("/path", "TestParagraph", scope).then(done);
+                });
+
+                it("writes paragraph into scope.paragraphs", () => {
+                    expect((<any>scope).paragraphs.TestParagraph).toBeDefined();
+                });
+            });
         });
     });
 };
