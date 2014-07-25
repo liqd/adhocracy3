@@ -216,7 +216,7 @@ class TestFunctionalClient:
         includeme(dummy_config)
         assert not hasattr(dummy_config.registry, 'ws_client')
 
-    def test_includeme_with_ws_url_setting(self, websocket, dummy_config):
+    def test_includeme_with_ws_url_setting(self, dummy_config):
         from adhocracy.websockets.client import includeme
         from adhocracy.websockets.client import Client
         settings = dummy_config.registry.settings

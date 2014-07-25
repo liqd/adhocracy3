@@ -90,16 +90,11 @@ def zeo(request) -> bool:
         return True
     process = subprocess.Popen('bin/runzeo -Cetc/test_zeo.conf', shell=True,
                                stderr=subprocess.STDOUT)
-    time.sleep(2)
 
     def fin():
         print('teardown zeo server')
         process.kill()
         _kill_pid_in_file('var/test_zeodata/ZEO.pid')
-        subprocess.call(['rm', '-f', 'var/test_zeodata/Data.fs'])
-        subprocess.call(['rm', '-f', 'var/test_zeodata/Data.fs.index'])
-        subprocess.call(['rm', '-f', 'var/test_zeodata/Data.fs.lock'])
-        subprocess.call(['rm', '-f', 'var/test_zeodata/Data.fs.tmp'])
 
     request.addfinalizer(fin)
     return True
@@ -115,7 +110,7 @@ def websocket(request, zeo) -> bool:
     process = subprocess.Popen('bin/start_ws_server ' + config_file,
                                shell=True,
                                stderr=subprocess.STDOUT)
-    time.sleep(2)
+    time.sleep(1)
 
     def fin():
         print('teardown websocket server')
