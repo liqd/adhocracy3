@@ -1,0 +1,30 @@
+[run]
+branch = True
+omit =
+    *test*py
+    # indirectly tested via websocket fixture:
+    src/adhocracy/adhocracy/websockets/start_ws_server.py
+    # no unit test coverage
+    src/adhocracy/adhocracy/__init__.py
+    src/adhocracy_sample/adhocracy_sample/__init__.py
+    src/adhocracy/setup.py
+    src/adhocracy_sample/setup.py
+source =
+    src/adhocracy
+    src/adhocracy_sample
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run:
+    if __name__ == .__main__.:
+
+[html]
+directory = htmlcov

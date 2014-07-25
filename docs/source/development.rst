@@ -19,10 +19,6 @@ Example Vim config according to coding guideline::
 Running the Testsuite
 ---------------------
 
-backend unit, integration and acceptance tests::
-
-    bin/py.test src/adhocracy src/adhocracy_sample
-
 frontend unit tests:
 
     A.  Integrated with py.test::
@@ -85,13 +81,17 @@ frontend acceptance tests::
 
        127.0.0.1  adhocracy.embeddee.goo adhocracy.embedder.gaa
 
+run backend functional tests::
+
+    bin/py.test -m"functional" src/adhocrac/adhocracy/websocket src/adhocracy_sample/adhocracy_sample/docs
+
+run backend unit tests and show python test code coverage::
+
+    bin/py.test_run_unittests_with_coverage
+
 run all tests::
 
     bin/py.test_run_all
-
-run only unit tests::
-
-    bin/py.test -m "not functional" src/adhocracy src/adhocracy_sample
 
 delete database (works best on development systems without valuable data!)::
 
