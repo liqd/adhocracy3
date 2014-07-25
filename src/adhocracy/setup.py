@@ -31,9 +31,10 @@ test_requires = [
     'selenium',
     'webtest',
     'pytest-splinter',
-    'pytest-quickcheck',
     'pytest-pyramid',
+    'coverage',
     'requests',
+    'ipdb',
 ]
 
 
