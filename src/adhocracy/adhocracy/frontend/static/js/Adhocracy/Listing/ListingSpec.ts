@@ -7,7 +7,7 @@ import Config = require("../Config/Config");
 import q = require("q");
 
 // the module under test
-import Widgets = require("./Widgets");
+import Listing = require("./Listing");
 
 
 var config : Config.Type = {
@@ -36,11 +36,11 @@ var registerDirectiveSpec = (directive: ng.IDirective): void => {
 
 
 export var register = () => {
-    describe("Widgets", () => {
+    describe("Listing", () => {
         describe("AbstractListingContainerAdapter", () => {
             describe("elemRefs", () => {
                 it("always returns an empty list", () => {
-                    var adapter = new Widgets.AbstractListingContainerAdapter();
+                    var adapter = new Listing.AbstractListingContainerAdapter();
                     expect(adapter.elemRefs(undefined)).toEqual([]);
                     expect(adapter.elemRefs({"a": true})).toEqual([]);
                 });
@@ -58,7 +58,7 @@ export var register = () => {
                             }
                         }
                     };
-                    var adapter = new Widgets.ListingPoolAdapter();
+                    var adapter = new Listing.ListingPoolAdapter();
                     expect(adapter.elemRefs(<any>container)).toEqual(elements);
                 });
             });
@@ -66,7 +66,7 @@ export var register = () => {
 
         describe("Listing", () => {
             it("has property 'templateUrl'", () => {
-                expect(Widgets.Listing.templateUrl).toBeDefined();
+                expect(Listing.Listing.templateUrl).toBeDefined();
             });
 
             describe("createDirective", () => {
@@ -84,7 +84,7 @@ export var register = () => {
                 var adapter = <any>jasmine.createSpyObj("adapter", ["elemRefs"]);
                 adapter.elemRefs.and.returnValue(elements);
 
-                var listing = new Widgets.Listing(adapter);
+                var listing = new Listing.Listing(adapter);
                 var directive: ng.IDirective = listing.createDirective(config);
 
                 registerDirectiveSpec(directive);
@@ -122,7 +122,7 @@ export var register = () => {
         });
 
         describe("AbstractListingElementAdapter", () => {
-            var adapter = new Widgets.AbstractListingElementAdapter(q);
+            var adapter = new Listing.AbstractListingElementAdapter(q);
 
             describe("name", () => {
                 var ret;
@@ -147,7 +147,7 @@ export var register = () => {
         });
 
         describe("ListingElementAdapter", () => {
-            var adapter = new Widgets.ListingElementAdapter(q);
+            var adapter = new Listing.ListingElementAdapter(q);
 
             var element = {
                 path: "/this/is/a/path",
@@ -208,7 +208,7 @@ export var register = () => {
                     adhHttpMock = createAdhHttpMock();
                     adhHttpMock.get.and.returnValue(q.when(version));
 
-                    adapter = new Widgets.ListingElementTitleAdapter(q, adhHttpMock);
+                    adapter = new Listing.ListingElementTitleAdapter(q, adhHttpMock);
 
                     adapter.name(resource).then((value) => {
                         ret = value;
@@ -225,7 +225,7 @@ export var register = () => {
             describe("path", () => {
                 it("returns the right path", () => {
                     var adhHttpMock = createAdhHttpMock();
-                    var adapter = new Widgets.ListingElementTitleAdapter(q, adhHttpMock);
+                    var adapter = new Listing.ListingElementTitleAdapter(q, adhHttpMock);
 
                     expect(adapter.path(<any>resource)).toBe(resource.path);
                 });
@@ -234,13 +234,13 @@ export var register = () => {
 
         describe("ListingElement", () => {
             it("has property 'templateUrl'", () => {
-                expect(Widgets.ListingElement.templateUrl).toBeDefined();
+                expect(Listing.ListingElement.templateUrl).toBeDefined();
             });
             describe("createDirective", () => {
                 var elementAdapterMock = <any>jasmine.createSpyObj("elementAdapterMock", ["name"]);
                 elementAdapterMock.name.and.callFake((path) => path);
 
-                var listingElement = new Widgets.ListingElement(<any>elementAdapterMock);
+                var listingElement = new Listing.ListingElement(<any>elementAdapterMock);
                 var directive: ng.IDirective = listingElement.createDirective(config);
 
                 registerDirectiveSpec(directive);

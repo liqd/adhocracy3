@@ -21,7 +21,7 @@ import AdhCrossWindowMessaging = require("./Adhocracy/CrossWindowMessaging/Cross
 import AdhRecursionHelper = require("./Adhocracy/RecursionHelper/RecursionHelper");
 
 import Resources = require("./Resources");
-import Widgets = require("./Adhocracy/TODO/Widgets");
+import Listing = require("./Adhocracy/Listing/Listing");
 import Directives = require("./Adhocracy/TODO/Directives");
 import Embed = require("./Adhocracy/Embed/Embed");
 
@@ -79,15 +79,15 @@ export var init = (config) => {
 
     app.directive("adhListing",
         ["adhConfig", (adhConfig) =>
-            new Widgets.Listing(new Widgets.ListingPoolAdapter()).createDirective(adhConfig)]);
+            new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig)]);
 
     app.directive("adhListingElement",
         ["$q", "adhConfig", ($q, adhConfig) =>
-            new Widgets.ListingElement(new Widgets.ListingElementAdapter($q)).createDirective(adhConfig)]);
+            new Listing.ListingElement(new Listing.ListingElementAdapter($q)).createDirective(adhConfig)]);
 
     app.directive("adhListingElementTitle",
         ["$q", "adhHttp", "adhConfig", ($q, adhHttp, adhConfig) =>
-            new Widgets.ListingElement(new Widgets.ListingElementTitleAdapter($q, adhHttp)).createDirective(adhConfig)]);
+            new Listing.ListingElement(new Listing.ListingElementTitleAdapter($q, adhHttp)).createDirective(adhConfig)]);
 
     app.directive("adhWebSocketTest",
         ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>
