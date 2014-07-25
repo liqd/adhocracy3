@@ -7,7 +7,7 @@ import AdhUser = require("./User");
 import q = require("q");
 
 export var register = () => {
-    describe("Service/User", () => {
+    describe("User", () => {
 
         describe("User", () => {
             var adhUser;

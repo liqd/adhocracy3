@@ -3,7 +3,7 @@
 import AdhRecursionHelper = require("./RecursionHelper");
 
 export var register = () => {
-    describe("Service/RecursionHelper", () => {
+    describe("RecursionHelper", () => {
         xit("dummy", () => {
             expect(AdhRecursionHelper).toBeDefined();
         });

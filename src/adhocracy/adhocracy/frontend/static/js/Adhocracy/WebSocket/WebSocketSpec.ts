@@ -9,7 +9,7 @@ export var register = () => {
     // currently possible because the script that generates AdhocracySpec.ts
     // includes all *Spec.ts modules.
 
-    describe("Services/WebSocket", () => {
+    describe("WebSocket", () => {
         var config: Config.Type = {
             template_path: "mock",
             root_path: "mock",

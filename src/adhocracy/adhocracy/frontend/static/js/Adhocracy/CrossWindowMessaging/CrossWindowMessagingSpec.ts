@@ -7,7 +7,7 @@ import CrossWindowMessaging = require("./CrossWindowMessaging");
 
 export var register = () => {
 
-    describe("Services/CrossWindowMessaging", () => {
+    describe("CrossWindowMessaging", () => {
         var windowMock;
         var rootScopeMock;
 

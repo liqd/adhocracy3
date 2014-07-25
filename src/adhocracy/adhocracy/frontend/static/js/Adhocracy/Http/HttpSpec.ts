@@ -5,7 +5,7 @@ import q = require("q");
 import AdhHttp = require("./Http");
 
 export var register = () => {
-    describe("Service/Http", () => {
+    describe("Http", () => {
         describe("Service", () => {
             var $httpMock;
             var adhHttp;

@@ -3,7 +3,7 @@
 import AdhProposal = require("./Proposal");
 
 export var register = () => {
-    describe("Proposal/Proposal", () => {
+    describe("Proposal", () => {
         xit("dummy", () => {
             expect(AdhProposal).toBeDefined();
         });
