@@ -119,10 +119,10 @@ export var register = () => {
 
         describe("exportContent", () => {
             it("deletes the path", () => {
-                expect(AdhHttp.exportContent({data: {}, path: "test"})).toEqual({data: {}});
+                expect(AdhHttp.exportContent({content_type: "", data: {}, path: "test"})).toEqual({data: {}});
             });
             it("deletes read-only properties", () => {
-                expect(AdhHttp.exportContent({data: {"adhocracy.propertysheets.interfaces.IVersions": "test"}})).toEqual({data: {}});
+                expect(AdhHttp.exportContent({content_type: "", data: {"adhocracy.propertysheets.interfaces.IVersions": "test"}})).toEqual({data: {}});
             });
         });
 
@@ -139,7 +139,11 @@ export var register = () => {
                     status: "error",
                     errors: []
                 };
-                expect(() => AdhHttp.logBackendError(backendError, 400)).toThrow();
+                var callbackArg : ng.IHttpPromiseCallbackArg<AdhHttp.IBackendError> = q.when({
+                    data : backendError,
+                    status : 400
+                });
+                expect(() => AdhHttp.logBackendError(callbackArg)).toThrow();
             });
 
             it("logs the raw backend error to console", () => {
@@ -147,7 +151,11 @@ export var register = () => {
                     status: "error",
                     errors: []
                 };
-                expect(() => AdhHttp.logBackendError(backendError, 400)).toThrow();
+                var callbackArg : ng.IHttpPromiseCallbackArg<AdhHttp.IBackendError> = q.when({
+                    data : backendError,
+                    status : 400
+                });
+                expect(() => AdhHttp.logBackendError(callbackArg)).toThrow();
                 expect(console.log).toHaveBeenCalledWith(backendError);
             });
 
@@ -159,7 +167,11 @@ export var register = () => {
                         ["where1.0", "where1.1", "what1"]
                     ]
                 };
-                expect(() => AdhHttp.logBackendError(backendError, 400)).toThrow();
+                var callbackArg : ng.IHttpPromiseCallbackArg<AdhHttp.IBackendError> = q.when({
+                    data : backendError,
+                    status : 400
+                });
+                expect(() => AdhHttp.logBackendError(callbackArg)).toThrow();
                 expect(console.log).toHaveBeenCalledWith("error #0");
                 expect(console.log).toHaveBeenCalledWith("where: where0.0, where0.1");
                 expect(console.log).toHaveBeenCalledWith("what:  what0");
