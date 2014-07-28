@@ -25,13 +25,13 @@ export var register = () => {
                     }
                 }));
 
-                httpMock = {
-                    defaults: {
-                        headers: {
-                            common: {}
-                        }
+                httpMock = <any>jasmine.createSpyObj("httpMock", ["post"]);
+                httpMock.defaults = {
+                    headers: {
+                        common: {}
                     }
                 };
+                httpMock.post.and.returnValue(q.when({data: {}}));
 
                 windowMock = {
                     localStorage: <any>jasmine.createSpyObj("localStorage", ["getItem", "setItem", "removeItem"])
@@ -47,10 +47,12 @@ export var register = () => {
 
             describe("login", () => {
                 beforeEach(() => {
-                    adhUser.adhHttp.post.and.returnValue(q.when({
-                        status: "success",
-                        user_path: "user1_path",
-                        user_token: "user1_tok"
+                    adhUser.$http.post.and.returnValue(q.when({
+                        data: {
+                            status: "success",
+                            user_path: "user1_path",
+                            user_token: "user1_tok"
+                        }
                     }));
 
                     expect(adhUser.loggedIn).toBe(false);
@@ -82,7 +84,7 @@ export var register = () => {
                     testLogin();
 
                     it("requests the API endpoint /login_username", () => {
-                        expect(adhHttpMock.post).toHaveBeenCalledWith("/login_username", {
+                        expect(httpMock.post).toHaveBeenCalledWith("/login_username", {
                             name: "user1",
                             password: "user1_pass"
                         });
@@ -102,7 +104,7 @@ export var register = () => {
                     testLogin();
 
                     it("requests the API endpoint /login_email", () => {
-                        expect(adhHttpMock.post).toHaveBeenCalledWith("/login_email", {
+                        expect(httpMock.post).toHaveBeenCalledWith("/login_email", {
                             email: "user1@somedomain",
                             password: "user1_pass"
                         });
@@ -127,7 +129,7 @@ export var register = () => {
                     var _reason;
 
                     beforeEach((done) => {
-                        adhUser.adhHttp.post.and.returnValue(q.reject("errors"));
+                        adhUser.$http.post.and.returnValue(q.reject("errors"));
                         adhUser.logIn("user1", "user1_wrong_pass").then(
                             done,
                             (reason) => {
