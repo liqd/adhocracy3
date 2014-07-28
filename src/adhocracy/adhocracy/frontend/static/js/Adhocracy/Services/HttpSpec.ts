@@ -99,7 +99,9 @@ export var register = () => {
         describe("importContent", () => {
             it("returns response.data if it is an object", () => {
                 var obj = {
-                    foo: "bar"
+                    content_type: "ct",
+                    path: "p",
+                    data: {},
                 };
                 var response = {
                     data: obj

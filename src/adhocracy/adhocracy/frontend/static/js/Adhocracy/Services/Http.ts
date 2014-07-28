@@ -38,7 +38,7 @@ export class Service<Content extends Types.Content<any>> {
 
     postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
         var dagPath = Util.parentPath(oldVersionPath);
-        var _obj = exportContent(obj);
+        var _obj = Util.deepcp(obj);
         _obj.data["adhocracy.sheets.versions.IVersionable"] = {
             follows: [oldVersionPath]
         };
