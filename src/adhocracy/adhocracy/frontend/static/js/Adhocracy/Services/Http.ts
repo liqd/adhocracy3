@@ -18,7 +18,17 @@ export var logBackendError;
 // FIXME: This service should be able to handle any type, not just subtypes of
 // ``Types.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
-export class Service<Content extends Types.Content<any>> {
+export interface IBaseService<Content extends Types.Content<any>> {
+    get : (path : string) => ng.IPromise<Content>;
+    put : (path : string, obj : Content) => ng.IPromise<Content>;
+    post : (path : string, obj : Content) => ng.IPromise<Content>;
+    postNewVersion : (oldVersionPath : string, obj : Content) => ng.IPromise<Content>;
+    postToPool : (poolPath : string, obj : Content) => ng.IPromise<Content>;
+}
+
+export interface ITransaction<Content extends Types.Content<any>> extends IBaseService<Content> {}
+
+export class Service<Content extends Types.Content<any>> implements IBaseService<Content> {
     constructor(private $http : ng.IHttpService, private $q) {}
 
     get(path : string) : ng.IPromise<Content> {
@@ -81,6 +91,37 @@ export class Service<Content extends Types.Content<any>> {
      */
     metaApiSheet(name : string) : any {
         throw "not implemented.";
+    }
+
+    /**
+     * Call withTransaction with a callback `trans` that accepts a
+     * transaction (an adhHttp-like service) and a done callback.
+     * All calls to `transaction` within `trans` are collected into
+     * a batch request, and the batch-request is sent to the backend
+     * when `done` is called.
+     *
+     * Transactions can not be used as drop-ins for the adhHttp
+     * service because the promises will only be resolved after `done`
+     * has been called. This might result in deadlocks in code that
+     * was orginially written for adhHttp.
+     *
+     * The current implementation is a mock and passes the plain
+     * (transaction-less) http service.
+     *
+     * In an ideal world, the promised values of the calls to
+     * `transaction` should be completely indifferent to the question
+     * whether they have been produced in a transaction or not -- they
+     * should just return the values from the server once those have
+     * actually been produced.
+     *
+     * This is in tension with the requirement that requests inside
+     * one transaction depend on each other, so we need to change the
+     * api somehow.  Perhaps we can pass local preliminary paths
+     * together with post path and posted object to a variant of the
+     * post method.
+     */
+    public withTransaction(trans : (httpTrans : IService<Content>, done : () => void) => void) : void {
+        trans(adhHttp, () => null);
     }
 }
 
