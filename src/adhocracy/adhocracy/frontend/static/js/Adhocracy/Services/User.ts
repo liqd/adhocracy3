@@ -146,7 +146,7 @@ export class User {
 
         var success = (response) => {
             // FIXME use websockets for updates
-            return _self.storeAndEnableToken(response.user_token, response.user_path);
+            return _self.storeAndEnableToken(response.data.user_token, response.data.user_path);
         };
 
         return promise
