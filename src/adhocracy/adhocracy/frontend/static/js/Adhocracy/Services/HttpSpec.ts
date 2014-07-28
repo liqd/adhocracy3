@@ -141,11 +141,7 @@ export var register = () => {
                     status: "error",
                     errors: []
                 };
-                var callbackArg : ng.IHttpPromiseCallbackArg<AdhHttp.IBackendError> = q.when({
-                    data : backendError,
-                    status : 400
-                });
-                expect(() => AdhHttp.logBackendError(callbackArg)).toThrow();
+                expect(() => AdhHttp.logBackendError({ data: backendError })).toThrow();
             });
 
             it("logs the raw backend error to console", () => {
@@ -153,27 +149,22 @@ export var register = () => {
                     status: "error",
                     errors: []
                 };
-                var callbackArg : ng.IHttpPromiseCallbackArg<AdhHttp.IBackendError> = q.when({
-                    data : backendError,
-                    status : 400
-                });
-                expect(() => AdhHttp.logBackendError(callbackArg)).toThrow();
-                expect(console.log).toHaveBeenCalledWith(backendError);
+                var response = {
+                    data: backendError
+                };
+                expect(() => AdhHttp.logBackendError(response)).toThrow();
+                expect(console.log).toHaveBeenCalledWith(response);
             });
 
             it("logs all individual errors to console", () => {
                 var backendError = {
                     status: "error",
                     errors: [
-                        ["where0.0", "where0.1", "what0"],
-                        ["where1.0", "where1.1", "what1"]
+                        { name: "where0.0", location: "where0.1", description: "what0" },
+                        { name: "where1.0", location: "where1.1", description: "what1" }
                     ]
                 };
-                var callbackArg : ng.IHttpPromiseCallbackArg<AdhHttp.IBackendError> = q.when({
-                    data : backendError,
-                    status : 400
-                });
-                expect(() => AdhHttp.logBackendError(callbackArg)).toThrow();
+                expect(() => AdhHttp.logBackendError({ data: backendError })).toThrow();
                 expect(console.log).toHaveBeenCalledWith("error #0");
                 expect(console.log).toHaveBeenCalledWith("where: where0.0, where0.1");
                 expect(console.log).toHaveBeenCalledWith("what:  what0");
