@@ -144,11 +144,13 @@ export class User {
             password: password
         });
 
+        var success = (response) => {
+            // FIXME use websockets for updates
+            return _self.storeAndEnableToken(response.user_token, response.user_path);
+        };
+
         return promise
-            .then((response) => {
-                // FIXME use websockets for updates
-                return _self.storeAndEnableToken(response.user_token, response.user_path);
-            });
+            .then(success, AdhHttp.logBackendError);
     }
 
     public logOut() : void {
