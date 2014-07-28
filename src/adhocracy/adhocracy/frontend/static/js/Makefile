@@ -1,5 +1,6 @@
-SHELL=/bin/bash
+SHELL=/bin/bash --login
 TSC=tsc
+TSLINT=tslint
 # (for more info on tsc, see http://www.typescriptlang.org/)
 FIX_TSC_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\((\d+),(\d+)\):(.*)/) { print "$$1:$$2:$$3:\n$$4\n\n"; } else { print "$$_\n"; }'
 # (this line makes tsc output work for IDEs that expect gcc error message syntax.)
@@ -48,7 +49,7 @@ tslint_fast:
 	@echo "experimental.  if in doubt, use tslint instead."
 	@echo "More info / updates: https://github.com/palantir/tslint/pull/176."
 	@echo "\n\n"
-	tslint -c ../../../../../../etc/tslint.json \
+	$(TSLINT) -c ../../../../../../etc/tslint.json \
 		-f ./Adhocracy/Resources.ts \
 		-f ./Adhocracy/Util.ts \
 		-f ./Adhocracy/Pages/DocumentWorkbench.ts \
