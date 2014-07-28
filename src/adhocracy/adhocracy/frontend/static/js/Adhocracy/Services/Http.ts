@@ -97,25 +97,22 @@ factory = <Content extends Types.Content<any>>($http : ng.IHttpService) : IServi
     }
 
     /**
-     * Call withTransaction with a function `trans` that accepts an
-     * adhHttp service.  All calls to adhHttp within `trans` are
-     * collected into a batch request, and the batch-request is sent
-     * to the backend when `trans` has returned.
+     * Call withTransaction with a callback `trans` that accepts a
+     * transaction (an adhHttp-like service) and a done callback.
+     * All calls to `transaction` within `trans` are collected into
+     * a batch request, and the batch-request is sent to the backend
+     * when `done` is called.
      *
-     * The current implementation is a mock and returns the plain
-     * (transaction-less) http service.  The done callback must be
-     * called by the `trans` to wrap up and ship the transaction.
+     * Transactions can not be used as drop-ins for the adhHttp
+     * service because the promises will only be resolved after `done`
+     * has been called. This might result in deadlocks in code that
+     * was orginially written for adhHttp.
      *
-     * In the proper implementation, it will be interesting to see how
-     * this abstraction works together with locally structures that
-     * are added by the server, such as the path of a posted resource
-     * or a server-generated user-id.  It may be necessary for the
-     * author of `trans` to be very careful about not leaking
-     * resources that haven't really been posted yet into the lexical
-     * context.
+     * The current implementation is a mock and passes the plain
+     * (transaction-less) http service.
      *
      * In an ideal world, the promised values of the calls to
-     * `httpTrans` should be completely indifferent to the question
+     * `transaction` should be completely indifferent to the question
      * whether they have been produced in a transaction or not -- they
      * should just return the values from the server once those have
      * actually been produced.
