@@ -129,7 +129,15 @@ export var register = () => {
                     var _reason;
 
                     beforeEach((done) => {
-                        adhUser.$http.post.and.returnValue(q.reject("errors"));
+                        var error = {
+                            data: {
+                                status: "",
+                                errors: [
+                                    { name: "flurg", location: "grompf", description: "chrrgl" }
+                                ]
+                            }
+                        };
+                        adhUser.$http.post.and.returnValue(q.reject(error));
                         adhUser.logIn("user1", "user1_wrong_pass").then(
                             done,
                             (reason) => {
