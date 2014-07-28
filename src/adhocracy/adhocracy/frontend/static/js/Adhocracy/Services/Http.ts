@@ -120,7 +120,7 @@ export class Service<Content extends Types.Content<any>> implements IBaseService
      * together with post path and posted object to a variant of the
      * post method.
      */
-    public withTransaction(trans : (httpTrans : IService<Content>, done : () => void) => void) : void {
+    public withTransaction(trans : (httpTrans : ITransaction<Content>, done : () => void) => void) : void {
         trans(this, () => null);
     }
 }
