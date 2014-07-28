@@ -12,6 +12,10 @@ export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendErro
 
 /**
  * send and receive objects with adhocracy data model awareness
+ *
+ * this service only handles resources of the form {content_type: ...,
+ * path: ..., data: ...}.  if you want to send other objects over the
+ * wire (such as during user login), use $http.
  */
 
 // FIXME: This service should be able to handle any type, not just subtypes of
@@ -147,7 +151,7 @@ exportContent = <Content extends Types.Content<any>>(obj : Content) : Content =>
     // FIXME: newobj should be a copy, not a reference
     var newobj : Content = obj;
 
-    // FIXME: Get this list from the server!
+    // FIXME: Get this list from the server (meta-api)!
     var readOnlyProperties = [
         "adhocracy.propertysheets.interfaces.IVersions"
     ];
