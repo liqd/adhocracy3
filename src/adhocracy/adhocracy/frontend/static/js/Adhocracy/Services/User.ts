@@ -123,7 +123,7 @@ export class User {
         _self.loggedIn = false;
     }
 
-    logIn(nameOrEmail : string, password : string) : ng.IPromise<void> {
+    public logIn(nameOrEmail : string, password : string) : ng.IPromise<void> {
         var _self : User = this;
         var promise;
 
@@ -146,14 +146,14 @@ export class User {
             });
     }
 
-    logOut() : void {
+    public logOut() : void {
         var _self : User = this;
 
         // The server does not have a logout yet.
         _self.deleteToken();
     }
 
-    register(username : string, email : string, password : string, passwordRepeat : string) : ng.IPromise<IRegisterResponse> {
+    public register(username : string, email : string, password : string, passwordRepeat : string) : ng.IPromise<IRegisterResponse> {
         var _self : User = this;
 
         return _self.adhHttp.post("/principals/users/", {
@@ -170,7 +170,7 @@ export class User {
         });
     }
 
-    can(permission : string) {
+    public can(permission : string) {
         var _self : User = this;
 
         // FIXME this is only a dummy implementation
