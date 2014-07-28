@@ -5,10 +5,9 @@
 import Types = require("../Types");
 import Util = require("../Util");
 
-export var factory;
-export var importContent;
-export var exportContent;
-export var logBackendError;
+export var importContent : <Content extends Types.Content<any>>(resp: {data: Content}) => Content;
+export var exportContent : <Content extends Types.Content<any>>(obj : Content) => Content;
+export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void;
 
 
 /**
