@@ -127,13 +127,18 @@ export class User {
         var _self : User = this;
         var promise;
 
+        // NOTE: the post requests here do not contain resources in
+        // the body, so adhHttp must not be used (because it
+        // implicitly does importContent / exportContent which expect
+        // Types.Content)!
+
         if (nameOrEmail.indexOf("@") === -1) {
-            promise = _self.adhHttp.post("/login_username", {
+            promise = _self.$http.post("/login_username", {
                 name: nameOrEmail,
                 password: password
             });
         } else {
-            promise = _self.adhHttp.post("/login_email", {
+            promise = _self.$http.post("/login_email", {
                 email: nameOrEmail,
                 password: password
             });
