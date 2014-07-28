@@ -8,7 +8,7 @@
 
 export interface Type {
     root_path: string;
-    template_path: string;
+    pkg_path: string;
     ws_url: string;
     embedded: boolean;
 }

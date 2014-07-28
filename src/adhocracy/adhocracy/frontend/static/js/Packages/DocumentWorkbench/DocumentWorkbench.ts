@@ -3,6 +3,8 @@
 import AdhConfig = require("../Config/Config");
 import AdhUser = require("../User/User");
 
+var pkgLocation = "/DocumentWorkbench";
+
 interface IDocumentWorkbenchScope extends ng.IScope {
     path : string;
     user : AdhUser.User;
@@ -10,7 +12,7 @@ interface IDocumentWorkbenchScope extends ng.IScope {
 }
 
 export class DocumentWorkbench {
-    public static templateUrl: string = "/Pages/DocumentWorkbench.html";
+    public static templateUrl: string = pkgLocation + "/DocumentWorkbench.html";
 
     public createDirective(adhConfig: AdhConfig.Type) {
         var _self = this;
@@ -18,7 +20,7 @@ export class DocumentWorkbench {
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/" + _class.templateUrl,
+            templateUrl: adhConfig.pkg_path + _class.templateUrl,
             controller: ["adhUser", "$scope", (
                 adhUser : AdhUser.User,
                 $scope : IDocumentWorkbenchScope

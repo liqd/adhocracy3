@@ -40,7 +40,7 @@ export var init = (config) => {
     app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
         $routeProvider
             .when("/frontend_static/root.html", {
-                templateUrl: config.template_path + "/Wrapper.html"
+                templateUrl: "/frontend_static/js/templates/Wrapper.html"
             })
             .when("/register", {
                 template: "<adh-register></adh-register>"

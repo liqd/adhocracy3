@@ -8,6 +8,7 @@ import AdhConfig = require("../Config/Config");
 
 import Resources = require("../../Resources");
 
+var pkgLocation = "/Proposal";
 
 /**
  * contents of the resource with view mode.
@@ -50,7 +51,7 @@ export class ProposalDetail {
 }
 
 export class ProposalVersionDetail {
-    public static templateUrl: string = "/Resources/IProposalVersion/Detail.html";
+    public static templateUrl: string = "Resources/IProposalVersion/Detail.html";
 
     public createDirective(adhConfig: AdhConfig.Type) {
         var _self = this;
@@ -58,7 +59,7 @@ export class ProposalVersionDetail {
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/" + _class.templateUrl,
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + _class.templateUrl,
             scope: {
                 content: "=",
                 viewmode: "@"
@@ -103,7 +104,7 @@ export class ProposalVersionEdit {
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/Resources/IProposalVersion/Edit.html",
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Resources/IProposalVersion/Edit.html",
             scope: {
                 content: "="
             }
@@ -117,7 +118,7 @@ export class ProposalVersionNew {
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/Resources/IProposalVersion/New.html",
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Resources/IProposalVersion/New.html",
             scope: {
                 onNewProposal: "="
             },
@@ -150,7 +151,7 @@ export class SectionVersionDetail {
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/Resources/ISectionVersion/Detail.html",
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Resources/ISectionVersion/Detail.html",
             compile: (element) => recursionHelper.compile(element),
             scope: {
                 ref: "=",
@@ -182,7 +183,7 @@ export class ParagraphVersionDetail {
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/Resources/IParagraphVersion/Detail.html",
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Resources/IParagraphVersion/Detail.html",
             scope: {
                 ref: "=",
                 viewmode: "="
@@ -212,7 +213,7 @@ export class DocumentSheetEdit {
     public createDirective(adhHttp, $q, adhConfig: AdhConfig.Type) {
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/Sheets/IDocument/Edit.html",
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Sheets/IDocument/Edit.html",
             scope: {
                 sheet: "="
             },
@@ -235,7 +236,7 @@ export class DocumentSheetShow {
     public createDirective (adhConfig: AdhConfig.Type) {
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/Sheets/IDocument/Show.html",
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Sheets/IDocument/Show.html",
             scope: {
                 sheet: "="
             }
@@ -247,7 +248,7 @@ export class ParagraphSheetEdit {
     public createDirective (adhConfig: AdhConfig.Type) {
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/Sheets/IParagraph/Edit.html",
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Sheets/IParagraph/Edit.html",
             scope: {
                 sheet: "="
             }

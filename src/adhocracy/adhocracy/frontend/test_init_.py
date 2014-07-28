@@ -14,7 +14,7 @@ class ConfigViewTest(unittest.TestCase):
         request.registry.settings = None
         assert self._call_fut(request) == \
             {'ws_url': 'ws://example.com:80',
-             'template_path': '/frontend_static/templates',
+             'pkg_path': '/frontend_static/js/Packages',
              'root_path': '/adhocracy',
              }
 
@@ -33,10 +33,10 @@ class ConfigViewTest(unittest.TestCase):
         request.registry.settings = {'adhocracy.ws_url': 'ws://localhost:8888'}
         assert self._call_fut(request)['ws_url'] == 'ws://example.com:8888'
 
-    def test_template_path_with_template_path_settings(self):
+    def test_pkg_path_with_pkg_path_settings(self):
         request = testing.DummyRequest()
-        request.registry.settings = {'adhocracy.frontend.template_path': '/t'}
-        assert self._call_fut(request)['template_path'] == '/t'
+        request.registry.settings = {'adhocracy.frontend.pkg_path': '/t'}
+        assert self._call_fut(request)['pkg_path'] == '/t'
 
     def test_root_path_with_platform_settings(self):
         request = testing.DummyRequest()

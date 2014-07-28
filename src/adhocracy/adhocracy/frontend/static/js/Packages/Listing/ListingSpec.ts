@@ -11,7 +11,7 @@ import Listing = require("./Listing");
 
 
 var config : Config.Type = {
-    template_path: "mock",
+    pkg_path: "mock",
     root_path: "mock",
     ws_url: "mock",
     embedded: false

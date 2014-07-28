@@ -1,5 +1,7 @@
 import AdhHttp = require("../Http/Http");
 
+var pkgLocation = "/User";
+
 export interface IUserBasic {
     name? : string;
     email? : string;
@@ -189,7 +191,7 @@ export class User {
 export var loginDirective = (adhConfig) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.template_path + "/Login.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
         scope: {},
         controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeLogin) : void => {
             $scope.user = adhUser;
@@ -230,7 +232,7 @@ export var loginDirective = (adhConfig) => {
 export var registerDirective = (adhConfig, $location) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.template_path + "/Register.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
         controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeRegister) => {
             $scope.input = {

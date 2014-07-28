@@ -228,7 +228,7 @@ export var register = () => {
 
             beforeEach(() => {
                 adhConfigMock = {
-                    template_path: "mock",
+                    pkg_path: "mock",
                     root_path: "mock",
                     ws_url: "mock",
                     embedded: true
@@ -314,7 +314,7 @@ export var register = () => {
 
             beforeEach(() => {
                 adhConfigMock = {
-                    template_path: "mock",
+                    pkg_path: "mock",
                     root_path: "mock",
                     ws_url: "mock",
                     embedded: true

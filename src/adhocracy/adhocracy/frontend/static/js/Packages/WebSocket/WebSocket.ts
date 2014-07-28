@@ -5,6 +5,7 @@
 
 import AdhConfig = require("../Config/Config");
 
+var pkgLocation = "/WebSocket";
 
 // FIXME: consider refactoring this service into several smaller
 // services ("do one thing").
@@ -570,7 +571,7 @@ export class WebSocketTest {
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/Widgets/WebSocketTest.html",
+            templateUrl: adhConfig.pkg_path + pkgLocation + "/WebSocketTest.html",
             scope: {
                 rawPaths: "@paths"
             },

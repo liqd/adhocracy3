@@ -9,6 +9,7 @@ import AdhConfig = require("../Config/Config");
 
 import Resources = require("../../Resources");
 
+var pkgLocation = "/Listing";
 
 //////////////////////////////////////////////////////////////////////
 // Listings
@@ -49,7 +50,7 @@ export interface ListingScope<Container> {
 // and implicitly know that Listing propagates the identifier
 // ``element`` to the element's scope.
 export class Listing<Container extends Resources.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter> {
-    public static templateUrl: string = "/Widgets/Listing.html";
+    public static templateUrl: string = pkgLocation + "/Listing.html";
 
     constructor(public containerAdapter: ContainerAdapter) {}
 
@@ -59,7 +60,7 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
 
         return {
             restrict: "E",
-            templateUrl: adhConfig.template_path + "/" + _class.templateUrl,
+            templateUrl: adhConfig.pkg_path + _class.templateUrl,
             scope: {
                 path: "@",
                 title: "@"
