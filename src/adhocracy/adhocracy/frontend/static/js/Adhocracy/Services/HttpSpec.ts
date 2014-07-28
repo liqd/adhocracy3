@@ -119,10 +119,12 @@ export var register = () => {
 
         describe("exportContent", () => {
             it("deletes the path", () => {
-                expect(AdhHttp.exportContent({content_type: "", data: {}, path: "test"})).toEqual({data: {}});
+                expect(AdhHttp.exportContent({content_type: "", data: {}, path: "test"}))
+                    .toEqual({content_type: "", data: {}});
             });
             it("deletes read-only properties", () => {
-                expect(AdhHttp.exportContent({content_type: "", data: {"adhocracy.propertysheets.interfaces.IVersions": "test"}})).toEqual({data: {}});
+                expect(AdhHttp.exportContent({content_type: "", data: {"adhocracy.propertysheets.interfaces.IVersions": "test"}}))
+                    .toEqual({content_type: "", data: {}});
             });
         });
 
