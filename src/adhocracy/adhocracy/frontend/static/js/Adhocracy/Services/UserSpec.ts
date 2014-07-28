@@ -128,16 +128,19 @@ export var register = () => {
                 describe("request fails", () => {
                     var _reason;
 
+                    var logInErrorDetails = [
+                        { name: "flurg", location: "grompf", description: "chrrgl" }
+                    ];
+
+                    var fullError = {
+                        data: {
+                            status: "",
+                            errors: logInErrorDetails
+                        }
+                    };
+
                     beforeEach((done) => {
-                        var error = {
-                            data: {
-                                status: "",
-                                errors: [
-                                    { name: "flurg", location: "grompf", description: "chrrgl" }
-                                ]
-                            }
-                        };
-                        adhUser.$http.post.and.returnValue(q.reject(error));
+                        adhUser.$http.post.and.returnValue(q.reject(fullError));
                         adhUser.logIn("user1", "user1_wrong_pass").then(
                             done,
                             (reason) => {
@@ -148,7 +151,7 @@ export var register = () => {
                     });
 
                     it("rejects the login attempt", () => {
-                        expect(_reason).toBe("errors");
+                        expect(_reason).toBe(logInErrorDetails);
                         expect(adhUser.loggedIn).toBe(false);
                         expect(adhUser.data).not.toBeDefined();
                         expect(adhUser.token).not.toBeDefined();
