@@ -126,23 +126,23 @@ export class User {
     public logIn(nameOrEmail : string, password : string) : ng.IPromise<void> {
         var _self : User = this;
         var promise;
-        var path;
-
-        if (nameOrEmail.indexOf("@") === -1) {
-            path = "/login_username";
-        } else {
-            path = "/login_email";
-        }
 
         // NOTE: the post requests here do not contain resources in
         // the body, so adhHttp must not be used (because it
         // implicitly does importContent / exportContent which expect
         // Types.Content)!
 
-        promise = _self.$http.post(path, {
-            name: nameOrEmail,
-            password: password
-        });
+        if (nameOrEmail.indexOf("@") === -1) {
+            promise = _self.$http.post("/login_username", {
+                name: nameOrEmail,
+                password: password
+            });
+        } else {
+            promise = _self.$http.post("/login_email", {
+                email: nameOrEmail,
+                password: password
+            });
+        }
 
         var success = (response) => {
             // FIXME use websockets for updates
