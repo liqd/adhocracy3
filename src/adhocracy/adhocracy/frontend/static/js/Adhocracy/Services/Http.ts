@@ -121,7 +121,7 @@ export class Service<Content extends Types.Content<any>> implements IBaseService
      * post method.
      */
     public withTransaction(trans : (httpTrans : IService<Content>, done : () => void) => void) : void {
-        trans(adhHttp, () => null);
+        trans(this, () => null);
     }
 }
 
