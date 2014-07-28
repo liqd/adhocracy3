@@ -153,7 +153,7 @@ export var register = () => {
                     data: backendError
                 };
                 expect(() => AdhHttp.logBackendError(response)).toThrow();
-                expect(console.log).toHaveBeenCalledWith(response);
+                expect(console.log).toHaveBeenCalledWith(backendError);
             });
 
             it("logs all individual errors to console", () => {
