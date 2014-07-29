@@ -26,6 +26,13 @@ import Proposal = require("./Packages/Proposal/Proposal");
 import Embed = require("./Packages/Embed/Embed");
 
 
+var loadComplete = () : void => {
+    var w = (<any>window);
+    w.adhocracy = w.adhocracy || {};
+    w.adhocracy.loadState = "complete";
+};
+
+
 export var init = (config) => {
     "use strict";
 
@@ -118,4 +125,5 @@ export var init = (config) => {
     // get going
 
     angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
+    loadComplete();
 };
