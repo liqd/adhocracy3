@@ -5,6 +5,7 @@ import _ = require("underscore");
 import Util = require("../Util/Util");
 import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
+import AdhWebSocket = require("../WebSocket/WebSocket");
 
 import Resources = require("../../Resources");
 
@@ -38,14 +39,35 @@ export class ProposalDetail {
             scope: {
                 path: "="
             },
-            controller: ["adhHttp", "$scope", (adhHttp, $scope) => {
-                $scope.$watch("path", (newVal, oldVal, scope) => {
-                    adhHttp.get(newVal + "/LAST")
+            controller: ["adhHttp", "adhWebSocket", "$scope", (adhHttp, adhWebSocket, $scope) => {
+                var wsHandle;
+
+                var fetchAndUpdateContent = (itemPath : string) : void => {
+                    adhHttp.get(itemPath + "/LAST")
                         .then((tag) => tag.data["adhocracy.sheets.tags.ITag"].elements[0])
                         .then((versionPath) => adhHttp.get(versionPath))
                         .then((content) => {
-                            scope.content = content;
+                            $scope.content = content;
                         });
+                };
+
+                $scope.$watch("path", (newPath, oldPath, scope) => {
+                    var wsHandler = (event: AdhWebSocket.IServerEvent): void => {
+                        fetchAndUpdateContent(newPath);
+                    };
+
+                    try {
+                        if (typeof wsHandle !== "undefined") {
+                            adhWebSocket.unregister(oldPath, wsHandle);
+                        }
+                        wsHandle = adhWebSocket.register(newPath, wsHandler);
+
+                    } catch (e) {
+                        console.log(e);
+                        console.log("Will continue on resource " + $scope.path + " without server bind.");
+                    }
+
+                    fetchAndUpdateContent(newPath);
                 });
             }]
         };
