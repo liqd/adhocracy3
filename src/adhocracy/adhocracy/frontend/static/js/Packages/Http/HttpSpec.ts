@@ -110,7 +110,7 @@ export var register = () => {
                 var obj = {
                     content_type: "ct",
                     path: "p",
-                    data: {},
+                    data: {}
                 };
                 var response = {
                     data: obj
