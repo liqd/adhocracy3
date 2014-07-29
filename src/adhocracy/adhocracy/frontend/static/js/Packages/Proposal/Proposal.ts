@@ -39,12 +39,14 @@ export class ProposalDetail {
                 path: "="
             },
             controller: ["adhHttp", "$scope", (adhHttp, $scope) => {
-                adhHttp.get($scope.path + "/LAST")
-                    .then((tag) => tag.data["adhocracy.sheets.tags.ITag"].elements[0])
-                    .then((versionPath) => adhHttp.get(versionPath))
-                    .then((content) => {
-                        $scope.content = content;
-                    });
+                $scope.$watch("path", (newVal, oldVal, scope) => {
+                    adhHttp.get(newVal + "/LAST")
+                        .then((tag) => tag.data["adhocracy.sheets.tags.ITag"].elements[0])
+                        .then((versionPath) => adhHttp.get(versionPath))
+                        .then((content) => {
+                            scope.content = content;
+                        });
+                });
             }]
         };
     }
