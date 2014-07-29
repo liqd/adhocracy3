@@ -17,8 +17,8 @@ def config_view(request):
     else:
         public_ws_url = _build_ws_url(request, internal_ws_url)
     config['ws_url'] = public_ws_url
-    config['template_path'] = settings.get('adhocracy.frontend.template_path',
-                                           '/frontend_static/templates')
+    config['pkg_path'] = settings.get('adhocracy.frontend.pkg_path',
+                                      '/frontend_static/js/Packages')
     config['root_path'] = '/' + settings.get('adhocracy.platform_id',
                                              'adhocracy')
     return config

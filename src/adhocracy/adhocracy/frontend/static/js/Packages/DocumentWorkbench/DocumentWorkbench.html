@@ -1,0 +1,19 @@
+<table border="1">
+    <tr>
+        <td id="document_workbench_navigate">
+        </td>
+        <td id="document_workbench_list">
+            <h3>table of contents</h3>
+
+            <adh-listing path="{{path}}" title="proposals listing (by titles)">
+                <adh-proposal-detail path="element"></adh-proposal-detail>
+            </adh-listing>
+        </td>
+        <td id="document_workbench_participate">
+            <div ng-if="user.can('proposal.create')">
+                <p>proposal workbench changes and discussion</p>
+                <adh-proposal-version-new on-new-proposal="insertParagraph"></adh-proposal-version-new>
+            </div>
+        </td>
+    </tr>
+</table>

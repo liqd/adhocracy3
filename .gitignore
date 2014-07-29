@@ -30,6 +30,8 @@ __pycache__
 /src/adhocracy/adhocracy/frontend/static/js/**/*.js.map
 /src/adhocracy/adhocracy/frontend/static/js/**/*.d.ts
 !/src/adhocracy/adhocracy/frontend/static/js/**/_*.d.ts
+/src/adhocracy/adhocracy/frontend/static/js/TAGS
+/src/adhocracy/adhocracy/frontend/static/js/tags
 /src/adhocracy/adhocracy/frontend/static/js/AdhocracySpec.ts
 /src/adhocracy/adhocracy/frontend/static/test-no-blanket.html
 /src/adhocracy/adhocracy/frontend/static/lib/
