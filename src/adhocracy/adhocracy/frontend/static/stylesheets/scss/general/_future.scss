@@ -1,0 +1,11 @@
+@mixin text-align($value) {
+    @if $value == start {
+        text-align: left;
+        text-align: start;
+    } @else if $value == end {
+        text-align: right;
+        text-align: end;
+    } @else {
+        text-align: $value;
+    }
+}

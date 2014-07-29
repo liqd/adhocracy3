@@ -138,7 +138,7 @@ Register Dialog.
     a,
     input[type="submit"] {
         @include span(1 of 2);
-        text-align: center;
+        @include text-align(center);
 
         &:last-child {
             margin: 0;  // remove gutter
