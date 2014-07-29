@@ -1,3 +1,7 @@
+/* tslint:disable:no-unused-variable */
+import Resources_ = require("Resources_");
+/* tslint:enable:no-unused-variable */
+
 export interface Content<Data> {
     content_type: string;
     path?: string;

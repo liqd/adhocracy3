@@ -1,6 +1,7 @@
 SHELL=/bin/bash --login
-TSC=tsc
-TSLINT=tslint
+TSC=../../../../../../bin/tsc
+TSLINT=../../../../../../bin/tslint
+NODE=../../../../../../bin/node
 # (for more info on tsc, see http://www.typescriptlang.org/)
 FIX_TSC_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\((\d+),(\d+)\):(.*)/) { print "$$1:$$2:$$3:\n$$4\n\n"; } else { print "$$_\n"; }'
 # (this line makes tsc output work for IDEs that expect gcc error message syntax.)
@@ -78,6 +79,7 @@ test_py:
 # cleanup, word count, aux
 
 clean:
+	rm -rf Adhocracy/Resources_/
 	find . -name '*~' -exec rm {} \;
 	find . -name '*.js' -exec rm {} \;
 	find . -name '*.js.map' -exec rm {} \;
@@ -109,3 +111,15 @@ tags: .dummy
 	        --language-force=typescript
 
 .dummy:
+
+
+
+mkResources: .dummy
+	$(TSC) --module commonjs --sourcemap mkResources.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
+	$(TSLINT) -c ../../../../../../etc/tslint.json -f mkResources.ts 2>&1 | $(FIX_TSLINT_ERROR_FORMAT)
+	$(NODE) mkResources.js
+
+
+testMkResources: .dummy
+	$(TSC) --module commonjs --sourcemap mkResources/Util.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
+	cd mkResources && ../$(NODE) Util.js
