@@ -5,21 +5,12 @@ html {
 // This is important for iframe resizing
 html, body {
     margin: 0;
+    padding: 0;
 }
 
-body {
-    padding: 1em;
-    background-color: $primary-color;
-
-    &.is-embedded {
-        background-color: lightsteelblue;
-    }
-}
-
-.page_wrapper {
-    width: 50em;
-    max-width: 90vw;
-    margin: 2em auto;
-    background-color: $bg;
-    padding: 1em;
+.main-header {
+    padding: 0.5em;
+    background: $bg2;
+    @include text-align(end);
+    overflow: hidden;
 }
