@@ -9,6 +9,15 @@ import AdhWebSocket = require("../WebSocket/WebSocket");
 
 import Resources = require("../../Resources");
 
+import RIParagraph = require("../../Resources_/adhocracy_sample/resources/paragraph/IParagraph");
+import RIParagraphVersion = require("../../Resources_/adhocracy_sample/resources/paragraph/IParagraphVersion");
+import RIProposal = require("../../Resources_/adhocracy_sample/resources/proposal/IProposal");
+import RIProposalVersion = require("../../Resources_/adhocracy_sample/resources/proposal/IProposalVersion");
+import RISectionVersion = require("../../Resources_/adhocracy_sample/resources/section/ISectionVersion");
+import RISection = require("../../Resources_/adhocracy_sample/resources/section/ISection");
+import SIParagraph = require("../../Resources_/adhocracy/sheets/document/IParagraph");
+import SISection = require("../../Resources_/adhocracy/sheets/document/ISection");
+
 var pkgLocation = "/Proposal";
 
 /**
@@ -134,6 +143,14 @@ export class ProposalVersionEdit {
     }
 }
 
+interface IScopeProposalVersion {
+    proposalVersion : RIProposalVersion;
+    paragraphVersions : RIParagraphVersion[];
+    addParagraphVersion : () => void;
+    commit : () => void;
+    onNewProposal : (any) => void;
+}
+
 export class ProposalVersionNew {
 
     public createDirective(adhHttp : ng.IHttpService, adhConfig : AdhConfig.Type, adhProposal : Service) {
@@ -144,15 +161,12 @@ export class ProposalVersionNew {
             scope: {
                 onNewProposal: "="
             },
-            controller: ["$scope", ($scope) => {
-                $scope.proposalVersion = (new Resources.Resource("adhocracy_sample.resources.proposal.IProposalVersion"))
-                    .addIDocument("", "", []);
-
+            controller: ["$scope", ($scope : IScopeProposalVersion) => {
+                $scope.proposalVersion = new RIProposalVersion().setIDocument("", "", []);
                 $scope.paragraphVersions = [];
 
                 $scope.addParagraphVersion = () => {
-                    $scope.paragraphVersions.push(new Resources.Resource("adhocracy_sample.resources.paragraph.IParagraphVersion")
-                                                  .addIParagraph(""));
+                    $scope.paragraphVersions.push(new RIParagraphVersion().setIParagraph(""));
                 };
 
                 $scope.commit = () => {
@@ -180,8 +194,8 @@ export class SectionVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Resources.Content<Resources.HasISectionSheet>>,
-                $scope : DetailRefScope<Resources.HasISectionSheet>
+                adhHttp : AdhHttp.Service<Resources.Content<SISection.HasISection>>,
+                $scope : DetailRefScope<SISection.HasISection>
             ) : void => {
                 var commit = (event, ...args) => {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
@@ -211,8 +225,8 @@ export class ParagraphVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Resources.Content<Resources.HasIParagraphSheet>>,
-                $scope : DetailRefScope<Resources.HasIParagraphSheet>
+                adhHttp : AdhHttp.Service<Resources.Content<SIParagraph.HasIParagraph>>,
+                $scope : DetailRefScope<SIParagraph.HasIParagraph>
             ) : void => {
                 var commit = (event, ...args) => {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
@@ -369,8 +383,7 @@ export class Service {
     public postProposalWithParagraphs(proposalVersion : Resources.PartialIProposalVersion, paragraphVersions) {
         var _self = this;
 
-        var sectionVersion = new Resources.Resource("adhocracy_sample.resources.section.ISectionVersion");
-        sectionVersion.addISection("single section", []);
+        var sectionVersion : RISectionVersion = new RISectionVersion().setISection("single section", [], []);
 
         var name = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
         name = Util.normalizeName(name);
