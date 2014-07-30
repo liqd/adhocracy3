@@ -1,13 +1,22 @@
-$fg: #222;
-$fg2: #777;
-$bg: #fff;
-$bg2: #eee;
-$primary-color: #446191;
-$border: silver;
+$color-prime-standard: #575756;
+$color-prime-extrovert: #1c1c1b;
+$color-secondary-extrovert: #9d9c9c;
+$color-secondary-introvert: #dadad9;
+$color-highlight-standard: #009ee3;
+$color-highlight-reverse: white;
+$color-background: white;
+$color-structure-surface: #dadad9;
+$color-structure-border: #9d9c9c;
 
-$green: #060;
-$red: #800;
+$font-family-standard: "Open Sans", sans-serif;
+$font-weight-standard: normal;
+$font-weight-extrovert: 900;
+$font-size-small: 12px;
+$font-size-standard: 14px;
+$font-size-plus: 16px;
+$font-size-large: 21px;
+$font-letter-spacing-standard: 0.050em;
+$font-letter-spacing-narrow: 0.025em;
 
-$fontsize-large: large;
-$fontsize-medium: medium;
-$fontsize-small: small;
+$red: red;
+$green: green;

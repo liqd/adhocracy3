@@ -124,7 +124,7 @@ label.m-tooltip {
         height: 2em;
         line-height: 2;
         width: 2em;
-        border: 1px solid $border;
+        border: 1px solid $color-structure-border;
         @include border-radius(50%);
         @include text-align(center);
     }
@@ -164,9 +164,9 @@ This error concerns the whole form.
 .form-error {
     margin: 1em 0;
     padding: 0 1em;
-    border-top: 1px solid $border;
-    border-bottom: 1px solid $border;
-    background: $bg2;
+    border-top: 1px solid $color-structure-border;
+    border-bottom: 1px solid $color-structure-border;
+    background: $color-structure-surface;
 }
 
 /*doc
@@ -191,6 +191,6 @@ This error concerns a single input.
 ```
 */
 .input-error {
-    font-size: $fontsize-small;
+    font-size: $font-size-small;
     padding-left: 1em;
 }

@@ -30,7 +30,7 @@
     @include button-base;
     @include button-background($color);
 
-    color: $bg;
+    color: $color-structure-surface;
     min-width: 9em;
     line-height: 1.8em;
     height: 1.8em;  // fix height in firefox
@@ -46,7 +46,7 @@
     .inactive &,  // deprecated
     &:disabled,
     &.disabled {
-        @include button-background($fg2);
+        @include button-background($color-secondary-introvert);
         cursor: default;
 
         &.active,
@@ -115,7 +115,7 @@ button,
 input[type="reset"],
 input[type="submit"],
 input[type="button"] {
-    @include button($primary-color);
+    @include button($color-highlight-standard);
 
     &.m-call-to-action {
         @include button-background(red);
@@ -135,6 +135,6 @@ category: Buttons
 */
 .button_small,  // deprecated
 .button-small {
-    @include button($primary-color);
-    @include button-small($primary-color);
+    @include button($color-highlight-standard);
+    @include button-small($color-highlight-standard);
 }

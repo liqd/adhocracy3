@@ -10,7 +10,7 @@ html, body {
 
 .main-header {
     padding: 0.5em;
-    background: $bg2;
+    background: $color-structure-surface;
     @include text-align(end);
     overflow: hidden;
 }

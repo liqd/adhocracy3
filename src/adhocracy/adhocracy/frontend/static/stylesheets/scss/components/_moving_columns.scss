@@ -34,7 +34,7 @@ States:
     @include transition(width 0.5s, right 0.5s);
 
     // look
-    border-right: 1px solid $border;
+    border-right: 1px solid $color-structure-border;
     padding: 0.5em;
 }
 
