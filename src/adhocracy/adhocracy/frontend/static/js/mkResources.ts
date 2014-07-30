@@ -523,3 +523,9 @@ canonicalizePath = (filepath : string) : string => {
 // removes all generated files if executed.  (or, a bit less
 // extravagant, just a file list that can be processed by a cleanup
 // make or buildout rule or whatnot.)
+
+// FIXME:
+// mv Resources.Content to ResourcesBase.
+// rm Resources.ts
+// mv Resources_.ts to Resources.ts
+// since Resources.ts is not required any more, add it to the Makefile explicitly
