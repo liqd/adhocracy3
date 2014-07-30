@@ -114,10 +114,11 @@ def node() -> colander.MappingSchema:
 @fixture()
 def mock_sheet() -> Mock:
     """Mock :class:`adhocracy.sheets.GenericResourceSheet`."""
-    from adhocracy.sheets import GenericResourceSheet
     from adhocracy.interfaces import sheet_metadata
     from adhocracy.interfaces import ISheet
-    sheet = Mock(spec=GenericResourceSheet)
+    # FIXME: Use spec=GenericResourceSheet for Mock; however this fails if the
+    # mock object is deepcopied.
+    sheet = Mock()
     sheet.meta = sheet_metadata._replace(isheet=ISheet)
     return sheet
 
