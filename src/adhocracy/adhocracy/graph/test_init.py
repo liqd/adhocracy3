@@ -454,6 +454,7 @@ class TestGetFollowedBy:
         assert follows_by == []
 
 
+@mark.usefixtures('setup')
 class TestGraphIsInSubtree:
 
     @fixture()
@@ -470,19 +471,16 @@ class TestGraphIsInSubtree:
         graph = Graph(context)
         return Graph.is_in_subtree(graph, descendant, ancestors)
 
-    @mark.usefixtures('setup')
     def test_with_no_ancestors(self):
         """False if ancestors is an empty list."""
         result = self._call_fut(self.child, [])
         assert result is False
 
-    @mark.usefixtures('setup')
     def test_of_itself(self):
         """True if both are the same resource."""
         result = self._call_fut(self.child, [self.child])
         assert result is True
 
-    @mark.usefixtures('setup')
     def test_direct_link(self):
         """True if direct SheetToSheet link from ancestor to
         descendent.
@@ -497,7 +495,6 @@ class TestGraphIsInSubtree:
         result = self._call_fut(root, [element])
         assert result is False
 
-    @mark.usefixtures('setup')
     def test_direct_follows_link(self):
         """False if direct NewVersionToOldVersion link from ancestor to
         descendent.
@@ -512,7 +509,6 @@ class TestGraphIsInSubtree:
         result = self._call_fut(other_version, [old_version])
         assert result is False
 
-    @mark.usefixtures('setup')
     def test_indirect_link(self):
         """True if two-level SheetToSheet link from ancestor to
         descendent.
@@ -529,7 +525,6 @@ class TestGraphIsInSubtree:
         result = self._call_fut(grandma, [daugher])
         assert result is False
 
-    @mark.usefixtures('setup')
     def test_indirect_follows_link(self):
         """True if two-level link from ancestor to descendent that includes a
         follows relation.
@@ -546,7 +541,6 @@ class TestGraphIsInSubtree:
         result = self._call_fut(dad, [step_son])
         assert result is False
 
-    @mark.usefixtures('setup')
     def test_ancestor_list_has_multiple_elements(self):
         """True if ancestors is a two-element list and one of them is the right
         one.
