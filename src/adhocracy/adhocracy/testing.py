@@ -178,18 +178,26 @@ def mock_user_locator(registry) -> Mock:
     return locator
 
 
-@fixture(scope='class')
-def configurator(request) -> Configurator:
-    """Return the adhocracy configuration.
-
-    The path to the config file is set by the py.test --pc argument.
-    """
+def get_settings(request, part):
+    """Return settings of a config part."""
     config_parser = ConfigParser()
     config_file = request.config.getvalue('pyramid_config')
     config_parser.read(config_file)
     settings = {}
-    for option, value in config_parser.items('app:main'):
+    for option, value in config_parser.items(part):
         settings[option] = value
+    return settings
+
+
+@fixture(scope='session')
+def settings(request) -> dict:
+    """Return pyramid settings."""
+    return get_settings(request, 'app:main')
+
+
+@fixture(scope='class')
+def configurator(request, settings) -> Configurator:
+    """Return pyramid configuration."""
     configuration = Configurator(settings=settings, root_factory=root_factory)
     return configuration
 
