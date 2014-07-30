@@ -117,7 +117,7 @@ def mock_sheet() -> Mock:
     from adhocracy.sheets import GenericResourceSheet
     from adhocracy.interfaces import sheet_metadata
     from adhocracy.interfaces import ISheet
-    sheet = Mock(sepc=GenericResourceSheet)
+    sheet = Mock(spec=GenericResourceSheet)
     sheet.meta = sheet_metadata._replace(isheet=ISheet)
     return sheet
 
