@@ -9,3 +9,19 @@ $action-width: 3em;
     padding: 0;
     list-style: none;
 }
+
+/* starting animations */
+.listing-elem {
+
+    &.ng-enter {
+        @include transition(all 3s);
+        background: greenyellow;
+        @include opacity(0.5);
+
+        /* destination animations */
+        &.ng-enter-active {
+            background: white;
+            @include opacity(1);
+        }
+    }
+}
