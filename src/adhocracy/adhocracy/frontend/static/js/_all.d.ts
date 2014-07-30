@@ -37,4 +37,5 @@ declare module "q" {
     export function reject(reason?: any): ng.IPromise<void>;
     export function when<T>(value: ng.IPromise<T>): ng.IPromise<T>;
     export function when<T>(value: T): ng.IPromise<T>;
+    export function when(): ng.IPromise<void>;
 }

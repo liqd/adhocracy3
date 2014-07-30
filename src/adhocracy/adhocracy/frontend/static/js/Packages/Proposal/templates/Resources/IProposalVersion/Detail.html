@@ -1,0 +1,27 @@
+<div class="proposal_detail_ctrl">
+    <div ng-switch="viewmode">
+        <div ng-switch-when="list">
+            <a href ng-click="display()" class="document_title">
+                {{content.data['adhocracy.sheets.document.IDocument'].title}}
+            </a>
+        </div>
+        <div ng-switch-when="display">
+            <div class="buttons_box">
+                <button type="button" class="edit_button" ng-click="edit()">edit</button>
+                <button type="button" class="close_button" ng-click="list()">close</button>
+            </div>
+            <adh-document-sheet-show sheet="content.data['adhocracy.sheets.document.IDocument']"></adh-document-sheet-show>
+        </div>
+        <div ng-switch-when="edit">
+            <div class="buttons_box">
+                <button type="button" class="reset_button" ng-click="reset()">reset</button>
+                <button type="button" class="save_button" ng-click="commit()">save</button>
+            </div>
+            <adh-proposal-version-edit content="content"></adh-proposal-version-edit>
+        </div>
+        <div ng-switch-default>
+            internal error: unknown view mode: {{ viewmode }}
+        </div>
+    </div>
+    <adh-section-version-detail ng-repeat="sectionRef in content.data['adhocracy.sheets.document.IDocument'].elements" ref="sectionRef" viewmode="viewmode"></adh-section-version-detail>
+</div>

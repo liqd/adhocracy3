@@ -53,8 +53,7 @@ Widget Classes
 
 A simple widget class has the following form::
 
-    export class WidgetName<...Types>
-    {
+    export class WidgetName<...Types> {
         public static ...
 
         constructor(...adapters, ...parameters) {
@@ -73,13 +72,10 @@ A simple widget class has the following form::
 A directive ``<adh-listing>`` based on a widget ``Listing`` can then be
 registered like so::
 
-    app.directive(
-        "adhListing",
-        [
-            "$q", "adhHttp",
-            ($q, adhHttp) => new Listing(new ListingAdapter($q)).createDirective(adhHttp)
-        ]
-    );
+    app.directive("adhListing", [
+        "$q", "adhHttp",
+        ($q, adhHttp) => new Listing(new ListingAdapter($q)).createDirective(adhHttp)
+    ]);
 
 There are some interesting parts to note in this example:
 
@@ -106,9 +102,8 @@ Static class attributes and extension
 
 Example::
 
-    export class SomeWidget
-    {
-        public static templateUrl: string = "/Widgets/Listing.html";
+    export class SomeWidget {
+        public static templateUrl : string = "/Widgets/Listing.html";
 
         ...
 
@@ -124,9 +119,8 @@ Directives constructed from ``SomeWidget`` will always use the same
 template, no matter where used.  If you want to change the template,
 write the following trivial extension class::
 
-    export class SomeWidgetForSomeFancyClient extends SomeWidget
-    {
-        public static templateUrl: string = "/Widgets/FancyListing.html";
+    export class SomeWidgetForSomeFancyClient extends SomeWidget {
+        public static templateUrl : string = "/Widgets/FancyListing.html";
     }
 
 
@@ -136,9 +130,8 @@ Constructor Params
 If you want to decide on behavior every time you register a directive,
 you can add constructor parameters::
 
-    export class SomeWidget
-    {
-        constructor(public title: string) {
+    export class SomeWidget {
+        constructor(public title : string) {
             return;
         }
 
@@ -147,10 +140,9 @@ you can add constructor parameters::
             var _class = (<any>_self).constructor;
 
             return {
-                controller: ($scope) =>
-                    {
-                        $scope.title = _self.title;
-                        ...
+                controller: ($scope) => {
+                    $scope.title = _self.title;
+                    ...
 
 
 Transclusion
@@ -195,12 +187,12 @@ The solution is to resort to dynamic checks::
     export class ArbitraryListingElementAdapter extends ... {
         public renderItAll(...) {
             ...
-            if('comments' in self) {
+            if ('comments' in self) {
                 ...
             } else {
                 ...  // (do some padding where the comment button is missing)
             }
-            if('votes' in self) {
+            if ('votes' in self) {
                 ...
             }
             ...

@@ -1,0 +1,15 @@
+<div class="paragraph">
+    <div ng-switch="viewmode">
+        <div ng-switch-when="list">
+        </div>
+        <div ng-switch-when="display">
+            <p>{{ content.data['adhocracy.sheets.document.IParagraph'].content }}</p>
+        </div>
+        <div ng-switch-when="edit">
+            <adh-paragraph-sheet-edit sheet="content.data['adhocracy.sheets.document.IParagraph']"></adh-paragraph-sheet-edit>
+        </div>
+        <div ng-switch-default>
+            internal error: unknown view mode: [{{ viewmode }}]
+        </div>
+    </div>
+</div>

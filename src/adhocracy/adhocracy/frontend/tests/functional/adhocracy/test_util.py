@@ -17,7 +17,7 @@ class TestDeepCp:
                               ])
     def test_deepcp(self, browser_root, value):
         code = """
-               var U = require('Adhocracy/Util');
+               var U = require('Packages/Util/Util');
                return U.deepcp(input);
                """
         result = browser_root.evaluate_script_with_kwargs(code, input=value)

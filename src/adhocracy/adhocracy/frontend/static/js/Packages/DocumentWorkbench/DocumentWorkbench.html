@@ -1,0 +1,14 @@
+<div class="moving-columns">
+    <div class="moving-column-structure">
+        <adh-web-socket-test paths='["/adhocracy"]'></adh-web-socket-test>
+        <adh-login></adh-login>
+    </div>
+    <div class="moving-column-content">
+        <adh-listing path="{{path}}" title="proposals listing (by titles)">
+            <adh-proposal-detail path="element"></adh-proposal-detail>
+        </adh-listing>
+    </div>
+    <div class="moving-column-content2 placeholder">
+        secondary content
+    </div>
+</div>
