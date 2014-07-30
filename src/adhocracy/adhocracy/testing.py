@@ -228,9 +228,9 @@ def zeo(request) -> bool:
 
 
 @fixture(scope='class')
-def websocket(request, zeo) -> bool:
+def websocket(request, zeo, ws_settings) -> bool:
     """Start websocket server."""
-    is_running = os.path.isfile('var/WS_SERVER.pid')
+    is_running = os.path.isfile(ws_settings['pid_file'])
     if is_running:
         return True
     config_file = request.config.getvalue('pyramid_config')
@@ -242,7 +242,7 @@ def websocket(request, zeo) -> bool:
     def fin():
         print('teardown websocket server')
         process.kill()
-        _kill_pid_in_file('var/WS_SERVER.pid')
+        _kill_pid_in_file(ws_settings['pid_file'])
 
     request.addfinalizer(fin)
     return True

@@ -479,9 +479,10 @@ class ClientTrackerUnitTests(unittest.TestCase):
 class TestFunctionalClientCommunicator:
 
     @pytest.fixture()
-    def connection(self, request, server):
+    def connection(self, request, server, ws_settings):
         from websocket import create_connection
-        connection = create_connection('ws://localhost:8080')
+        connection = create_connection('ws://localhost:%s' %
+                                       ws_settings['port'])
 
         def tearDown():
             print('teardown websocket connection')
