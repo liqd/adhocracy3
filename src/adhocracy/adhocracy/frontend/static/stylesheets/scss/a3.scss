@@ -16,4 +16,7 @@
 @import "components/button";
 @import "components/login";
 
+// Debug (these should not be importet in productive setups
+@import "debug/placeholder";
+
 @import "overwrite";
