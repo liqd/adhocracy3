@@ -195,6 +195,12 @@ def settings(request) -> dict:
     return get_settings(request, 'app:main')
 
 
+@fixture(scope='session')
+def ws_settings(request) -> Configurator:
+    """Return websocket server settings."""
+    return get_settings(request, 'websockets')
+
+
 @fixture(scope='class')
 def configurator(request, settings) -> Configurator:
     """Return pyramid configuration."""
