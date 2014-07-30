@@ -66,6 +66,8 @@ class TagsSchema(colander.MappingSchema):
 tags_metadata = sheet_metadata_defaults._replace(isheet=ITags,
                                                  schema_class=TagsSchema,
                                                  sheet_class=PoolSheet,
+                                                 editable=False,
+                                                 creatable=False,
                                                  )
 
 

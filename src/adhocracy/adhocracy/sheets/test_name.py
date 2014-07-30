@@ -1,22 +1,34 @@
-import unittest
-
 from pyramid import testing
+from pytest import fixture
 
-from adhocracy.utils import get_sheet
 
+class TestNameSheet:
 
-class NameSheetIntegrationTest(unittest.TestCase):
+    @fixture()
+    def meta(self):
+        from adhocracy.sheets.name import name_metadata
+        return name_metadata
 
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.sheets.name')
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_includeme_add_name_sheet_to_registry(self):
-
+    def test_create(self, meta, context):
         from adhocracy.sheets.name import IName
-        context = testing.DummyResource(__provides__=IName)
-        inst = get_sheet(context, IName)
-        assert inst.meta.isheet is IName
+        from adhocracy.sheets.name import NameSchema
+        from adhocracy.sheets import GenericResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert isinstance(inst, GenericResourceSheet)
+        assert inst.meta.isheet == IName
+        assert inst.meta.schema_class == NameSchema
+        assert inst.meta.editable is False
+        assert inst.meta.create_mandatory is True
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'name': ''}
+
+
+def test_includeme_register_name_sheet(config):
+    from adhocracy.sheets.name import IName
+    from adhocracy.utils import get_sheet
+    config.include('adhocracy.sheets.name')
+    context = testing.DummyResource(__provides__=IName)
+    inst = get_sheet(context, IName)
+    assert inst.meta.isheet is IName

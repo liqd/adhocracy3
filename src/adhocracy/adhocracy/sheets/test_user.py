@@ -1,103 +1,83 @@
-import unittest
-from unittest.mock import patch
-
 import colander
 from pyramid import testing
-import pytest
-
-from adhocracy.utils import get_sheet
-
-
-@patch('adhocracy.resources.principal.UserLocatorAdapter', autospec=True)
-def _create_dummy_user_locator(registry, dummy_locator=None):
-    from zope.interface import Interface
-    from substanced.interfaces import IUserLocator
-    locator = dummy_locator.return_value
-    registry.registerAdapter(lambda y, x: locator, (Interface, Interface), IUserLocator)
-    return locator
+from pytest import raises
+from pytest import fixture
 
 
-class PasswordSheetUnitTest(unittest.TestCase):
+class TestPasswordSheet:
 
-    def setUp(self):
-        from adhocracy.sheets.user import IPasswordAuthentication
+    @fixture()
+    def meta(self):
         from adhocracy.sheets.user import password_metadata
-        self.metadata = password_metadata
-        self.context = testing.DummyResource(__provides__=IPasswordAuthentication)
+        return password_metadata
 
-    def _makeOne(self, metadata, context):
+    def test_create(self, meta, context):
+        from zope.interface.verify import verifyObject
+        from adhocracy.interfaces import IResourceSheet
+        from adhocracy.sheets.user import IPasswordAuthentication
         from adhocracy.sheets.user import PasswordAuthenticationSheet
-        return PasswordAuthenticationSheet(metadata, context)
+        from adhocracy.sheets.user import PasswordAuthenticationSchema
+        inst = meta.sheet_class(meta, context)
+        assert isinstance(inst, PasswordAuthenticationSheet)
+        assert IResourceSheet.providedBy(inst)
+        assert verifyObject(IResourceSheet, inst)
+        assert inst.meta.isheet == IPasswordAuthentication
+        assert inst.meta.schema_class == PasswordAuthenticationSchema
 
-    def test_set_password(self):
-        inst = self._makeOne(self.metadata, self.context)
+    def test_set_password(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         inst.set({'password': 'test'})
         assert len(inst.context.password) == 60
 
-    def test_reset_password(self):
-        inst = self._makeOne(self.metadata, self.context)
+    def test_reset_password(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         inst.set({'password': 'test'})
         password_old = inst.context.password
         inst.set({'password': 'test'})
         password_new = inst.context.password
         assert password_new != password_old
 
-    def test_set_empty_password(self):
-        inst = self._makeOne(self.metadata, self.context)
+    def test_set_empty_password(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         inst.set({'password': ''})
         assert not hasattr(inst.context, 'password')
 
-    def test_get_password(self):
-        inst = self._makeOne(self.metadata, self.context)
+    def test_get_password(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         inst.context.password = 'test'
         assert inst.get()['password'] == 'test'
 
-    def test_get_empty_password(self):
-        inst = self._makeOne(self.metadata, self.context)
+    def test_get_empty_password(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         assert inst.get()['password'] == ''
 
-    def test_check_password_valid(self):
-        inst = self._makeOne(self.metadata, self.context)
+    def test_check_password_valid(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         inst.set({'password': 'test'})
         assert inst.check_plaintext_password('test')
 
-    def test_check_password_not_valid(self):
-        inst = self._makeOne(self.metadata, self.context)
+    def test_check_password_not_valid(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         inst.set({'password': 'test'})
         assert not inst.check_plaintext_password('wrong')
 
-    def test_check_password_is_to_long(self):
-        inst = self._makeOne(self.metadata, self.context)
+    def test_check_password_is_to_long(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         password = 'x' * 40026
-        with pytest.raises(ValueError):
+        with raises(ValueError):
             inst.check_plaintext_password(password)
 
 
-class UserSheetsIntegrationTest(unittest.TestCase):
 
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.sheets.user')
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_add_userbasic_sheet_to_registry(self):
-        from adhocracy.sheets.user import IUserBasic
-        context = testing.DummyResource(__provides__=IUserBasic)
-        inst = get_sheet(context, IUserBasic)
-        assert inst.meta.isheet is IUserBasic
-
-    def test_add_password_sheet_to_registry(self):
-        from adhocracy.sheets.user import PasswordAuthenticationSheet
-        from adhocracy.sheets.user import IPasswordAuthentication
-        context = testing.DummyResource(__provides__=IPasswordAuthentication)
-        inst = get_sheet(context, IPasswordAuthentication)
-        assert inst.meta.isheet is IPasswordAuthentication
-        assert isinstance(inst, PasswordAuthenticationSheet)
+def test_includeme_register_password_sheet(config):
+    from adhocracy.sheets.user import IPasswordAuthentication
+    from adhocracy.utils import get_sheet
+    config.include('adhocracy.sheets.user')
+    context = testing.DummyResource(__provides__=IPasswordAuthentication)
+    assert get_sheet(context, IPasswordAuthentication)
 
 
-class UserBasicSchemaSchemaUnitTest(unittest.TestCase):
+class TestUserBasicSchemaSchema:
 
     def make_one(self):
         from adhocracy.sheets.user import UserBasicSchema
@@ -112,12 +92,12 @@ class UserBasicSchemaSchemaUnitTest(unittest.TestCase):
 
     def test_deserialize_name_missing(self):
         inst = self.make_one()
-        with pytest.raises(colander.Invalid):
+        with raises(colander.Invalid):
             inst.deserialize({})
 
     def test_deserialize_name_empty(self):
         inst = self.make_one()
-        with pytest.raises(colander.Invalid):
+        with raises(colander.Invalid):
             inst.deserialize({'name': ''})
 
     def test_deserialize_name(self):
@@ -133,77 +113,96 @@ class UserBasicSchemaSchemaUnitTest(unittest.TestCase):
         assert isinstance(inst['email'].validator, colander.deferred)
 
 
-class DeferredValidateUserName(unittest.TestCase):
+class TestDeferredValidateUserName:
 
-    def setUp(self):
-        config = testing.setUp()
-        self.request = testing.DummyRequest(root=testing.DummyResource(),
-                                            registry=config.registry)
-        self.user_locator = _create_dummy_user_locator(config.registry)
-        self.node = colander.MappingSchema()
-
-    def tearDown(self):
-        testing.tearDown()
+    @fixture()
+    def requestp(self, registry):
+        return testing.DummyRequest(root=testing.DummyResource(),
+                                    registry=registry)
 
     def _call_fut(self, node, kw):
         from adhocracy.sheets.user import deferred_validate_user_name
         return deferred_validate_user_name(node, kw)
 
-    def test_name_is_empty_and_no_request_kw(self):
-        self.user_locator.get_user_by_login.return_value = None
-        validator = self._call_fut(self.node, {})
-        assert validator is None
+    def test_name_is_empty_and_no_request_kw(self, node, mock_user_locator):
+        mock_user_locator.get_user_by_login.return_value = None
+        assert self._call_fut(node, {}) is None
 
-    def test_name_is_empty(self):
-        self.user_locator.get_user_by_login.return_value = None
-        validator = self._call_fut(self.node, {'request': self.request})
-        assert validator(self.node, '') is None
+    def test_name_is_empty(self, node, requestp, mock_user_locator):
+        mock_user_locator.get_user_by_login.return_value = None
+        validator = self._call_fut(node, {'request': requestp})
+        assert validator(node, '') is None
 
-    def test_name_is_unique(self):
-        self.user_locator.get_user_by_login.return_value = None
-        validator = self._call_fut(self.node, {'request': self.request})
-        assert validator(self.node, 'unique') is None
+    def test_name_is_unique(self, node, requestp, mock_user_locator):
+        mock_user_locator.get_user_by_login.return_value = None
+        validator = self._call_fut(node, {'request': requestp})
+        assert validator(node, 'unique') is None
 
-    def test_name_is_not_unique(self):
-        self.user_locator.get_user_by_login.return_value = object()
-        validator = self._call_fut(self.node, {'request': self.request})
-        with pytest.raises(colander.Invalid):
-            validator(self.node, 'not unique')
+    def test_name_is_not_unique(self, node, requestp, mock_user_locator):
+        mock_user_locator.get_user_by_login.return_value = object()
+        validator = self._call_fut(node, {'request': requestp})
+        with raises(colander.Invalid):
+            validator(node, 'not unique')
 
 
-class DeferredValidateUserEmail(unittest.TestCase):
+class TestDeferredValidateUserEmail:
 
-    def setUp(self):
-        config = testing.setUp()
-        self.request = testing.DummyRequest(root=testing.DummyResource(),
-                                            registry=config.registry)
-        self.user_locator = _create_dummy_user_locator(config.registry)
-        self.node = colander.MappingSchema()
-
-    def tearDown(self):
-        testing.tearDown()
+    @fixture()
+    def request(self, registry):
+        return testing.DummyRequest(root=testing.DummyResource(),
+                                    registry=registry)
 
     def _call_fut(self, node, kw):
         from adhocracy.sheets.user import deferred_validate_user_email
         return deferred_validate_user_email(node, kw)
 
-    def test_email_is_empty(self):
-        validator = self._call_fut(self.node, {'request': self.request})
-        with pytest.raises(colander.Invalid):
-            validator(self.node, '') is None
+    def test_email_is_empty(self, node, request, mock_user_locator):
+        mock_user_locator.get_user_by_email.return_value = None
+        validator = self._call_fut(node, {'request': request})
+        with raises(colander.Invalid):
+            validator(node, '') is None
 
-    def test_email_is_wrong(self):
-        validator = self._call_fut(self.node, {'request': self.request})
-        with pytest.raises(colander.Invalid):
-             validator(self.node, 'wrong_email') is None
+    def test_email_is_wrong(self, node, request, mock_user_locator):
+        validator = self._call_fut(node, {'request': request})
+        with raises(colander.Invalid):
+             validator(node, 'wrong_email') is None
 
-    def test_email_is_unique(self):
-        self.user_locator.get_user_by_email.return_value = None
-        validator = self._call_fut(self.node, {'request': self.request})
-        assert validator(self.node, 'test@test.de') is None
+    def test_email_is_unique(self, node, request, mock_user_locator):
+        mock_user_locator.get_user_by_email.return_value = None
+        validator = self._call_fut(node, {'request': request})
+        assert validator(node, 'test@test.de') is None
 
-    def test_email_is_not_unique(self):
-        self.user_locator.get_user_by_email.return_value = object()
-        validator = self._call_fut(self.node, {'request': self.request})
-        with pytest.raises(colander.Invalid):
-            validator(self.node, 'not unique')
+    def test_email_is_not_unique(self, node, request, mock_user_locator):
+        mock_user_locator.get_user_by_email.return_value = object()
+        validator = self._call_fut(node, {'request': request})
+        with raises(colander.Invalid):
+            validator(node, 'not unique')
+
+
+class TestUserBasicSheet:
+
+    @fixture()
+    def meta(self):
+        from adhocracy.sheets.user import userbasic_metadata
+        return userbasic_metadata
+
+    def test_create(self, meta, context):
+        from adhocracy.sheets.user import IUserBasic
+        from adhocracy.sheets.user import UserBasicSchema
+        from adhocracy.sheets import GenericResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert isinstance(inst, GenericResourceSheet)
+        assert inst.meta.isheet == IUserBasic
+        assert inst.meta.schema_class == UserBasicSchema
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'name': '', 'email': '', 'tzname': 'UTC'}
+
+
+def test_includeme_register_userbasic_sheet(config):
+    from adhocracy.sheets.user import IUserBasic
+    from adhocracy.utils import get_sheet
+    config.include('adhocracy.sheets.user')
+    context = testing.DummyResource(__provides__=IUserBasic)
+    assert get_sheet(context, IUserBasic)

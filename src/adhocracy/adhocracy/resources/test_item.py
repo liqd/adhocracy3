@@ -25,10 +25,10 @@ def make_itemversion(parent=None, follows=[]):
 ###########
 
 
-class ItemIntegrationTest(unittest.TestCase):
+class TestItemIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        from adhocracy.testing import create_folder_with_graph
+        from adhocracy.testing import create_pool_with_graph
         from adhocracy.resources.item import item_metadata
         config = testing.setUp()
         config.include('adhocracy.registry')
@@ -42,7 +42,7 @@ class ItemIntegrationTest(unittest.TestCase):
         config.include('adhocracy.resources.tag')
         config.include('adhocracy.subscriber')
         self.config = config
-        self.context = create_folder_with_graph()
+        self.context = create_pool_with_graph()
         self.objectmap = self.context.__objectmap__
         self.graph = self.context.__graph__
         self.metadata = item_metadata
@@ -107,7 +107,7 @@ class ItemIntegrationTest(unittest.TestCase):
 class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        from adhocracy.testing import create_folder_with_graph
+        from adhocracy.testing import create_pool_with_graph
         from adhocracy.resources.item import item_metadata
         config = testing.setUp()
         config.include('adhocracy.registry')
@@ -115,7 +115,7 @@ class IncludemeIntegrationTest(unittest.TestCase):
         config.include('adhocracy.resources.item')
         config.include('adhocracy.sheets.metadata')
         self.config = config
-        self.context = create_folder_with_graph()
+        self.context = create_pool_with_graph()
         self.metyyadata = item_metadata
 
     def tearDown(self):

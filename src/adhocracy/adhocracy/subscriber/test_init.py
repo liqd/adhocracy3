@@ -1,18 +1,15 @@
-from unittest.mock import patch
-import unittest
+from copy import deepcopy
 
 from pyramid import testing
+from pytest import fixture
 
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.sheets.versions import IVersionable
+from zope.interface import directlyProvides
 
-
-#############
-#  helpers  #
-#############
 
 class IDummySheetAutoUpdate(ISheet, ISheetReferenceAutoUpdateMarker):
     pass
@@ -22,34 +19,14 @@ class IDummySheetNoAutoUpdate(ISheet):
     pass
 
 
-class DummySheet:
-
-    _data = {}
-
-    def __init__(self, metadata, context):
-        self.meta = metadata
-        self.context = context
-
-    def set(self, appstruct):
-        self._data.update(appstruct)
-
-    def get(self):
-        return self._data
-
-
-def _create_and_register_dummy_sheet(context, isheet):
-    from pyramid.threadlocal import get_current_registry
+def add_and_register_sheet(context, mock_sheet, registry):
     from zope.interface import alsoProvides
     from adhocracy.interfaces import IResourceSheet
-    from adhocracy.interfaces import sheet_metadata
-    registry = get_current_registry(context)
-    metadata = sheet_metadata._replace(isheet=isheet)
+    isheet = mock_sheet.meta.isheet
     alsoProvides(context, isheet)
-    sheet = DummySheet(metadata, context)
-    registry.registerAdapter(lambda x: sheet, (isheet,),
+    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
                              IResourceSheet,
                              isheet.__identifier__)
-    return sheet
 
 
 def _create_new_version_event_with_isheet(context, isheet, registry, creator=None):
@@ -65,45 +42,37 @@ def _create_new_version_event_with_isheet(context, isheet, registry, creator=Non
                                  root_versions=[])
 
 
-###########
-#  tests  #
-###########
+class TestReferenceHasNewVersionSubscriberUnitTest:
 
-class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
-
-    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
-    def setUp(self, dummy_resource_registry=None):
-        self.config = testing.setUp()
-        resource_registry = dummy_resource_registry.return_value
-        self.config.registry.content = resource_registry
-
-    def tearDown(self):
-        testing.tearDown()
+    @fixture()
+    def registry(self, registry, mock_resource_registry):
+        registry.content = mock_resource_registry
+        return registry
 
     def _make_one(self, *args):
         from adhocracy.subscriber import reference_has_new_version_subscriber
         return reference_has_new_version_subscriber(*args)
 
-    def _create_new_version_event_for_autoupdate_sheet(self, context):
-        isheet = IDummySheetAutoUpdate
-        registry = self.config.registry
-        event = _create_new_version_event_with_isheet(context, isheet, registry)
-        sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
-        sheet_autoupdate._data = {'elements': [event.old_version]}
-        sheet_versionable = _create_and_register_dummy_sheet(event.object,
-                                                             IVersionable)
-        sheet_versionable._data = {'follows': []}
+    def _create_new_version_event_for_autoupdate_sheet(self, context, registry, mock_sheet):
+        event = _create_new_version_event_with_isheet(context, IDummySheetAutoUpdate, registry)
+        sheet_autoupdate = deepcopy(mock_sheet)
+        sheet_autoupdate.meta = mock_sheet.meta._replace(isheet=IDummySheetAutoUpdate)
+        sheet_autoupdate.get.return_value = {'elements': [event.old_version]}
+        add_and_register_sheet(context, sheet_autoupdate, registry)
+        sheet_versionable = deepcopy(mock_sheet)
+        sheet_versionable.meta = mock_sheet.meta._replace(isheet=IVersionable)
+        sheet_versionable.get.return_value = {'follows': []}
+        add_and_register_sheet(context, sheet_versionable, registry)
         return event
 
-    def test_call_versionable_with_autoupdate_sheet(self):
-        context = testing.DummyResource(__provides__=IItemVersion,
-                                        __parent__=object())
-        event = self._create_new_version_event_for_autoupdate_sheet(context)
+    def test_call_versionable_with_autoupdate_sheet(self, context, registry, mock_sheet):
+        directlyProvides(context, IItemVersion)
+        event = self._create_new_version_event_for_autoupdate_sheet(context, registry, mock_sheet)
         event.creator = object()
 
         self._make_one(event)
 
-        factory = self.config.registry.content.create
+        factory = registry.content.create
         assert factory.called
         parent = factory.call_args[1]['parent']
         assert parent is context.__parent__
@@ -114,103 +83,88 @@ class ReferenceHasNewVersionSubscriberUnitTest(unittest.TestCase):
         creator = factory.call_args[1]['creator']
         assert creator == event.creator
 
-
-    @patch('adhocracy.graph.Graph', autospec=True)
     def test_call_versionable_with_autoupdate_sheet_and_root_versions_and_not_is_insubtree(self,
-                                                                                           dummy_graph):
-        graph = dummy_graph.return_value
-        graph.is_in_subtree.return_value = False
+            context, mock_graph, registry, mock_sheet):
+        mock_graph.is_in_subtree.return_value = False
         context = testing.DummyResource(__provides__=IItemVersion,
                                         __parent__=object(),
-                                        __graph__=graph)
-        event = self._create_new_version_event_for_autoupdate_sheet(context)
+                                        __graph__=mock_graph)
+        event = self._create_new_version_event_for_autoupdate_sheet(context, registry, mock_sheet)
         event.root_versions = [context]
 
         self._make_one(event)
 
-        factory = self.config.registry.content.create
-        assert not factory.called
+        assert not registry.content.create.called
 
-    def test_call_versionable_with_autoupdate_sheet_but_readonly(self):
-        context = testing.DummyResource(__provides__=IItemVersion)
+    def test_call_versionable_with_autoupdate_sheet_but_readonly(self, context, registry, mock_sheet):
+        directlyProvides(context, IItemVersion)
         isheet = IDummySheetAutoUpdate
-        registry = self.config.registry
         event = _create_new_version_event_with_isheet(context, isheet, registry)
-        sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
-        sheet_autoupdate.meta = sheet_autoupdate.meta._replace(
-            editable=False,
-            creatable=False)
+        mock_sheet.meta = mock_sheet.meta._replace(editable=False,
+                                                   creatable=False,
+                                                   isheet=isheet)
+        add_and_register_sheet(context, mock_sheet, registry)
 
         self._make_one(event)
 
-        factory = self.config.registry.content.create
-        assert not factory.called
+        assert not registry.content.create.called
 
-    def test_call_versionable_with_autoupdate_sheet_and_other_sheet_readonly(self):
-        context = testing.DummyResource(__provides__=IItemVersion)
-        event = self._create_new_version_event_for_autoupdate_sheet(context)
+    def test_call_versionable_with_autoupdate_sheet_and_other_sheet_readonly(self, context, registry, mock_sheet):
+        directlyProvides(context, IItemVersion)
+        event = self._create_new_version_event_for_autoupdate_sheet(context, registry, mock_sheet)
         isheet_readonly = IDummySheetNoAutoUpdate
-        sheet_readonly = _create_and_register_dummy_sheet(context, isheet_readonly)
-        sheet_readonly.meta = sheet_readonly.meta._replace(editable=False,
-                                                           creatable=False)
+        mock_sheet.meta = mock_sheet.meta._replace(editable=False,
+                                                   creatable=False,
+                                                   isheet=isheet_readonly)
+        add_and_register_sheet(context, mock_sheet, registry)
 
         self._make_one(event)
 
-        factory = self.config.registry.content.create
-        assert factory.called
-        assert isheet_readonly.__identifier__ not in factory.call_args[1]['appstructs']
+        assert registry.content.create.called
+        assert isheet_readonly.__identifier__ not in registry.content.create.call_args[1]['appstructs']
 
-    def test_call_versionable_without_autoupdate_sheet(self):
-        context = testing.DummyResource(__provides__=IItemVersion)
+    def test_call_versionable_without_autoupdate_sheet(self, context, registry, mock_sheet):
+        directlyProvides(context, IItemVersion)
         isheet = IDummySheetNoAutoUpdate
-        registry = self.config.registry
         event = _create_new_version_event_with_isheet(context, isheet, registry)
-        _create_and_register_dummy_sheet(context, isheet)
+        mock_sheet.meta = mock_sheet.meta._replace(editable=False,
+                                                   creatable=False,
+                                                   isheet=isheet)
+        add_and_register_sheet(context, mock_sheet, registry)
 
         self._make_one(event)
 
-        factory = self.config.registry.content.create
-        assert not factory.called
+        assert not registry.content.create.called
 
-    def test_call_nonversionable_with_autoupdate_sheet(self):
-        context = testing.DummyResource()
+    def test_call_nonversionable_with_autoupdate_sheet(self, context, registry, mock_sheet):
         isheet = IDummySheetAutoUpdate
-        registry = self.config.registry
         event = _create_new_version_event_with_isheet(context, isheet, registry)
-        sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
-        sheet_autoupdate._data = {'elements': [event.old_version]}
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=isheet)
+        mock_sheet.get.return_value = {'elements': [event.old_version]}
+        add_and_register_sheet(context, mock_sheet, registry)
 
         self._make_one(event)
 
-        assert sheet_autoupdate._data == {'elements': [event.new_version]}
+        assert mock_sheet.set.call_args[0][0] == {'elements': [event.new_version]}
 
-    def test_call_nonversionable_with_autoupdate_readonly(self):
-        context = testing.DummyResource()
+    def test_call_nonversionable_with_autoupdate_readonly(self, context, registry, mock_sheet):
         isheet = IDummySheetAutoUpdate
-        registry = self.config.registry
         event = _create_new_version_event_with_isheet(context, isheet, registry)
-        sheet_autoupdate = _create_and_register_dummy_sheet(context, isheet)
-        sheet_autoupdate.meta = sheet_autoupdate.meta._replace(editable=False,
-                                                               creatable=False)
-        sheet_autoupdate._data = {'elements': [event.old_version]}
+        mock_sheet.meta = mock_sheet.meta._replace(editable=False,
+                                                   creatable=False,
+                                                   isheet=isheet)
+        mock_sheet.get.return_value = {'elements': [event.old_version]}
+        add_and_register_sheet(context, mock_sheet, registry)
 
         self._make_one(event)
 
-        assert sheet_autoupdate._data == {'elements': [event.old_version]}
+        assert mock_sheet.set.called is False
 
 
-class IncludemeIntegrationTest(unittest.TestCase):
-
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.events')
-        self.config.include('adhocracy.subscriber')
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_register_has_new_version_subscriber(self):
-        from adhocracy.subscriber import reference_has_new_version_subscriber
-        handlers = [x.handler.__name__ for x
-                    in self.config.registry.registeredHandlers()]
-        assert reference_has_new_version_subscriber.__name__ in handlers
+def includeme_register_has_new_version_subscriber(config):
+    from adhocracy.subscriber import reference_has_new_version_subscriber
+    config.include('adhocracy.events')
+    config.include('adhocracy.subscriber')
+    handlers = config.registry.registeredHandlers()
+    handler_names = [x.handler.__name__ for x in handlers]
+    assert reference_has_new_version_subscriber.__name__ in handler_names

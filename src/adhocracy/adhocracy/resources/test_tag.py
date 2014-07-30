@@ -6,14 +6,14 @@ from pyramid import testing
 class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        from adhocracy.testing import create_folder_with_graph
+        from adhocracy.testing import create_pool_with_graph
         config = testing.setUp()
         config.include('adhocracy.registry')
         config.include('adhocracy.events')
         config.include('adhocracy.sheets.metadata')
         config.include('adhocracy.resources.tag')
         self.config = config
-        self.context = create_folder_with_graph()
+        self.context = create_pool_with_graph()
 
     def tearDown(self):
         testing.tearDown()

@@ -68,6 +68,7 @@ versionable_metadata = sheet_metadata_defaults._replace(
     isheet=IVersionable,
     sheet_class=VersionableSheet,
     schema_class=VersionableSchema,
+
 )
 
 
@@ -100,6 +101,8 @@ versions_metadata = sheet_metadata_defaults._replace(
     isheet=IVersions,
     sheet_class=PoolSheet,
     schema_class=VersionsSchema,
+    editable=False,
+    creatable=False,
 )
 
 

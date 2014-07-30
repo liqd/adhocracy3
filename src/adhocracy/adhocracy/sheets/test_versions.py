@@ -1,120 +1,101 @@
-import unittest
-
-from unittest.mock import patch
 from pyramid import testing
-
-from adhocracy.interfaces import IResourceSheet
-from adhocracy.utils import get_sheet
+from pytest import fixture
 
 
-class VersionsSheetUnitTest(unittest.TestCase):
+class TestVersionsSheet:
 
-    def setUp(self):
+    @fixture()
+    def meta(self):
         from adhocracy.sheets.versions import versions_metadata
-        self.metadata = versions_metadata
-        self.context = testing.DummyResource()
+        return versions_metadata
 
-    def _make_one(self, *args):
-        return self.metadata.sheet_class(*args)
-
-    def test_create(self):
-        from adhocracy.sheets.versions import PoolSheet
-        inst = self._make_one(self.metadata, self.context)
+    def test_create(self, meta, context):
+        from adhocracy.sheets.versions import IVersions
+        from adhocracy.sheets.versions import VersionsSchema
+        from adhocracy.sheets.pool import PoolSheet
+        inst = meta.sheet_class(meta, context)
         assert isinstance(inst, PoolSheet)
+        assert inst.meta.isheet == IVersions
+        assert inst.meta.schema_class == VersionsSchema
+        assert inst.meta.editable is False
+        assert inst.meta.creatable is False
 
-    def test_get_empty(self):
-        inst = self._make_one(self.metadata, self.context)
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': []}
 
-    def test_get_not_empty(self):
+    def test_get_not_empty(self, meta, context):
+        context['child'] = testing.DummyResource()
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'elements': []}
+
+    def test_get_not_empty_with_versionable(self, meta, context):
         from adhocracy.sheets.versions import IVersionable
         versionable = testing.DummyResource(__provides__=IVersionable)
-        self.context['child'] = versionable
-        inst = self._make_one(self.metadata, self.context)
+        context['child'] = versionable
+        inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': [versionable]}
 
-    def test_get_not_empty_not_iversionable(self):
-        non_versionable = testing.DummyResource()
-        self.context['child'] = non_versionable
-        inst = self._make_one(self.metadata, self.context)
-        assert inst.get() == {'elements': []}
+
+def test_includeme_register_version_sheet(config):
+    from adhocracy.utils import get_sheet
+    from adhocracy.sheets.versions import IVersions
+    config.include('adhocracy.sheets.versions')
+    context = testing.DummyResource(__provides__=IVersions)
+    assert get_sheet(context, IVersions)
 
 
-class VersionableSheetUnitTest(unittest.TestCase):
+class TestVersionableSheet:
 
-    def setUp(self):
+    @fixture()
+    def meta(self):
         from adhocracy.sheets.versions import versionable_metadata
-        self.metadata = versionable_metadata
-        self.context = testing.DummyResource()
+        return versionable_metadata
 
-    def _make_one(self, *args):
-        return self.metadata.sheet_class(*args)
-
-    def test_create_valid(self):
+    def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
+        from adhocracy.interfaces import IResourceSheet
+        from adhocracy.sheets.versions import IVersionable
         from adhocracy.sheets.versions import VersionableSheet
-        inst = self._make_one(self.metadata, self.context)
+        from adhocracy.sheets.versions import VersionableSchema
+        inst = meta.sheet_class(meta, context)
         assert isinstance(inst, VersionableSheet)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
+        assert inst.meta.isheet == IVersionable
+        assert inst.meta.schema_class == VersionableSchema
 
-    def test_get_empty(self):
-        inst = self._make_one(self.metadata, self.context)
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         data = inst.get()
         assert list(data['follows']) == []
         assert list(data['followed_by']) == []
 
-    @patch('adhocracy.graph.Graph', autospec=True)
-    def test_get_with_followed_by(self, graph_dummy=None):
+    def test_get_with_followed_by(self, meta, context, mock_graph):
         successor = testing.DummyResource()
-        inst = self._make_one(self.metadata, self.context)
-        inst._graph = graph_dummy.return_value
-        inst._graph.get_followed_by.return_value = iter([successor])
+        inst = meta.sheet_class(meta, context)
+        inst._graph = mock_graph
+        mock_graph.get_followed_by.return_value = iter([successor])
         data = inst.get()
         assert list(data['followed_by']) == [successor]
 
-    @patch('adhocracy.graph.Graph', autospec=True)
-    def test_get_with_follows(self, graph_dummy=None):
+    def test_get_with_follows(self, meta, context, mock_graph):
         precessor = testing.DummyResource()
-        inst = self._make_one(self.metadata, self.context)
-        inst._graph = graph_dummy.return_value
-        inst._graph.get_follows.return_value = iter([precessor])
+        inst = meta.sheet_class(meta, context)
+        inst._graph = mock_graph
+        mock_graph.get_follows.return_value = iter([precessor])
         data = inst.get()
         assert list(data['follows']) == [precessor]
 
-    def test_set_with_followed_by(self):
-        inst = self._make_one(self.metadata, self.context)
+    def test_set_with_followed_by(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         inst.set({'followed_by': iter([])})
         assert not 'followed_by' in inst._data
 
 
-class VersionsSheetIntegrationTest(unittest.TestCase):
-
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.sheets.versions')
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_register_versions_sheet(self):
-        from adhocracy.sheets.versions import IVersions
-        context = testing.DummyResource(__provides__=IVersions)
-        inst = get_sheet(context, IVersions)
-        assert inst.meta.isheet is IVersions
-
-
-class VersionableSheetIntegrationTest(unittest.TestCase):
-
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.sheets.versions')
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_register_versionable_sheet(self):
-        from adhocracy.sheets.versions import IVersionable
-        context = testing.DummyResource(__provides__=IVersionable)
-        inst = get_sheet(context, IVersionable)
-        assert inst.meta.isheet is IVersionable
+def test_includeme_register_versionable_sheet(config):
+    from adhocracy.utils import get_sheet
+    from adhocracy.sheets.versions import IVersionable
+    config.include('adhocracy.sheets.versions')
+    context = testing.DummyResource(__provides__=IVersionable)
+    assert get_sheet(context, IVersionable)

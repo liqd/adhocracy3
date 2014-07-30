@@ -1,52 +1,38 @@
-import unittest
-from unittest.mock import patch
-
-import colander
 from pyramid import testing
+from pytest import fixture
+from pytest import mark
 
-from adhocracy.utils import get_sheet
 
-
-@patch('adhocracy.sheets.GenericResourceSheet', autospec=True)
-def _create_dummy_sheet_adapter(registry, isheet, dummy_sheet=None):
+def register_and_add_sheet(context, registry, mock_sheet):
+    from zope.interface import alsoProvides
     from adhocracy.interfaces import IResourceSheet
-    sheet = dummy_sheet.return_value
-    registry.registerAdapter(lambda x: sheet,
-                             required=(isheet,),
-                             provided=IResourceSheet,
-                             name=isheet.__identifier__)
-    return sheet
+    isheet = mock_sheet.meta.isheet
+    alsoProvides(context, isheet)
+    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
+                             IResourceSheet,
+                             isheet.__identifier__)
 
 
-class ResourceModifiedMetadataSubscriberUnitTest(unittest.TestCase):
+class TestResourceModifiedMetadataSubscriber:
 
     def _call_fut(self, event):
         from adhocracy.sheets.metadata import resource_modified_metadata_subscriber
         return resource_modified_metadata_subscriber(event)
 
-    def setUp(self):
-        from adhocracy.sheets.metadata import IMetadata
-        config = testing.setUp()
-        self.registry = config.registry
-        self.registry = config.registry
-        self.sheet = _create_dummy_sheet_adapter(self.registry, IMetadata)
-        self.context = testing.DummyResource(__provides__=IMetadata)
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_with_metadata_isheet(self):
+    def test_with_metadata_isheet(self, context, registry, mock_sheet):
         from datetime import datetime
-        event = testing.DummyResource(object=self.context)
+        from adhocracy.sheets.metadata import IMetadata
+        event = testing.DummyResource(object=context)
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IMetadata)
+        register_and_add_sheet(context, registry, mock_sheet)
 
         self._call_fut(event)
 
-        today = datetime.now().date()
-        set_modification_date = self.sheet.set.call_args[0][0]['modification_date']
-        assert set_modification_date.date() == today
+        set_modification_date = mock_sheet.set.call_args[0][0]['modification_date']
+        assert set_modification_date.date() == datetime.now().date()
 
 
-class IMetadataSchemaUnitTest(unittest.TestCase):
+class TestIMetadataSchema:
 
     def _make_one(self, **kwargs):
         from adhocracy.sheets.metadata import MetadataSchema
@@ -58,10 +44,11 @@ class IMetadataSchemaUnitTest(unittest.TestCase):
         assert result == {}
 
     def test_serialize_empty(self):
+        from colander import null
         inst = self._make_one()
         result = inst.serialize({})
-        assert result['creation_date'] == colander.null
-        assert result['modification_date'] == colander.null
+        assert result['creation_date'] == null
+        assert result['modification_date'] == null
         assert isinstance(result['creator'], list)
 
     def test_serialize_empty_and_bind(self):
@@ -73,28 +60,40 @@ class IMetadataSchemaUnitTest(unittest.TestCase):
         assert this_year in result['modification_date']
 
 
-class MetadataSheetIntegrationTest(unittest.TestCase):
+class TestMetadataSheet:
 
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.events')
-        self.config.include('adhocracy.sheets.metadata')
+    @fixture()
+    def meta(self):
+        from adhocracy.sheets.metadata import metadata_metadata
+        return metadata_metadata
 
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_includeme_add_metadata_sheet_to_registry(self):
+    def test_create(self, meta, context):
         from adhocracy.sheets.metadata import IMetadata
         from adhocracy.sheets.metadata import MetadataSchema
-        context = testing.DummyResource(__provides__=IMetadata)
-        inst = get_sheet(context, IMetadata)
-        assert inst.meta.isheet is IMetadata
+        inst = meta.sheet_class(meta, context)
+        assert inst.meta.isheet == IMetadata
+        assert inst.meta.schema_class == MetadataSchema
         assert inst.meta.editable is False
         assert inst.meta.creatable is False
-        assert inst.meta.readable
-        assert inst.meta.schema_class is MetadataSchema
+        assert inst.meta.readable is True
 
-    def test_register_metadate_update_subscriber(self):
-        handlers = [x.handler.__name__ for x
-                    in self.config.registry.registeredHandlers()]
-        assert 'resource_modified_metadata_subscriber' in handlers
+
+@fixture()
+def integration(config):
+    config.include('adhocracy.events')
+    config.include('adhocracy.sheets.metadata')
+
+
+@mark.usefixtures('integration')
+def test_includeme_register_metadata_sheet(config):
+    from adhocracy.sheets.metadata import IMetadata
+    from adhocracy.utils import get_sheet
+    context = testing.DummyResource(__provides__=IMetadata)
+    assert get_sheet(context, IMetadata)
+
+
+@mark.usefixtures('integration')
+def test_includeme_register_metadata_update_subscriber(config):
+    handlers = config.registry.registeredHandlers()
+    handler_names = [x.handler.__name__ for x in handlers]
+    assert 'resource_modified_metadata_subscriber' in handler_names

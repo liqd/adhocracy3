@@ -118,7 +118,7 @@ class Name(AdhocracySchemaNode):
     """
 
     schema_type = colander.String
-    default = '',
+    default = ''
     missing = colander.drop
     validator = deferred_validate_name
 

@@ -1,11 +1,10 @@
-import unittest
 import json
-from unittest.mock import patch
+from unittest.mock import Mock
 
-from pyramid.testing import DummyResource
-from pyramid.testing import DummyRequest
+from pyramid import testing
+from pytest import fixture
+from pytest import raises
 import colander
-import pytest
 
 from adhocracy.interfaces import ISheet
 
@@ -14,14 +13,24 @@ class ISheetA(ISheet):
     pass
 
 
-class JSONDummyRequest(DummyRequest):
+class JSONDummyRequest(testing.DummyRequest):
 
     @property
     def json_body(self):
         return json.loads(self.body)
 
 
-class ResourceResponseSchemaUnitTest(unittest.TestCase):
+
+@fixture()
+def sheet_metas():
+    from adhocracy.interfaces import sheet_metadata
+    meta = sheet_metadata._replace(schema_class=colander.MappingSchema)
+    metas = {ISheet.__identifier__: meta._replace(isheet=ISheet),
+             ISheetA.__identifier__: meta._replace(isheet=ISheet)}
+    return metas
+
+
+class TestResourceResponseSchema:
 
     def make_one(self):
         from adhocracy.rest.schemas import ResourceResponseSchema
@@ -38,7 +47,7 @@ class ResourceResponseSchemaUnitTest(unittest.TestCase):
         assert inst.serialize({'content_type': 'x', 'path': '/'}) == wanted
 
 
-class ItemResponseSchemaUnitTest(unittest.TestCase):
+class TestItemResponseSchema:
 
     def make_one(self):
         from adhocracy.rest.schemas import ItemResponseSchema
@@ -56,7 +65,7 @@ class ItemResponseSchemaUnitTest(unittest.TestCase):
                                'first_version_path': '/v'}) == wanted
 
 
-class POSTResourceRequestSchemaUnitTest(unittest.TestCase):
+class TestPOSTResourceRequestSchema:
 
     def make_one(self):
         from adhocracy.rest.schemas import POSTResourceRequestSchema
@@ -64,12 +73,12 @@ class POSTResourceRequestSchemaUnitTest(unittest.TestCase):
 
     def test_deserialize_missing_all(self):
         inst = self.make_one()
-        with pytest.raises(colander.Invalid):
+        with raises(colander.Invalid):
             inst.deserialize({})
 
     def test_deserialize_missing_contenttype(self):
         inst = self.make_one()
-        with pytest.raises(colander.Invalid):
+        with raises(colander.Invalid):
             inst.deserialize({'data': {}})
 
     def test_deserialize_with_data_and_contenttype(self):
@@ -80,17 +89,17 @@ class POSTResourceRequestSchemaUnitTest(unittest.TestCase):
     def test_deserialize_with_data_unknown(self):
         inst = self.make_one()
         data = {'content_type': 'VALID', 'data': {'unknown': 1}}
-        with pytest.raises(colander.Invalid):
+        with raises(colander.Invalid):
             inst.deserialize(data)
 
     def test_deserialize_missing_data(self):
         inst = self.make_one()
-        with pytest.raises(colander.Invalid):
+        with raises(colander.Invalid):
             inst.deserialize({'content_type': 'VALID'})
 
     def test_deserialize_wrong_data_type(self):
         inst = self.make_one()
-        with pytest.raises(colander.Invalid):
+        with raises(colander.Invalid):
             inst.deserialize({'content_type': 'VALID', 'data': ""})
 
     def test_data_has_after_bind(self):
@@ -104,95 +113,76 @@ class POSTResourceRequestSchemaUnitTest(unittest.TestCase):
         assert inst['content_type'].validator is deferred_validate_post_content_type
 
 
-class DeferredValidatePostContentTypeUnitTest(unittest.TestCase):
+class TestDeferredValidatePostContentType:
 
-    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
-    def setUp(self, mock_registry=None):
-        request = DummyRequest()
-        request.registry.content = mock_registry.return_value
-        self.resource_addables = request.registry.content.resource_addables
-        context = DummyResource()
-        self.context_and_request_dict = {'context': context, 'request': request}
-        self.node = colander.MappingSchema()
+    @fixture()
+    def request(self, mock_resource_registry):
+        request = JSONDummyRequest()
+        request.registry.content = mock_resource_registry
+        return request
 
     def _call_fut(self, node, kw):
         from adhocracy.rest.schemas import deferred_validate_post_content_type
         return deferred_validate_post_content_type(node, kw)
 
-    def test_without_content_types(self):
-        self.resource_addables.return_value = {}
-        validator = self._call_fut(self.node, self.context_and_request_dict)
+    def test_without_content_types(self, node, request, context):
+        validator = self._call_fut(node, {'context': context, 'request': request})
         assert list(validator.choices) == []
 
-    def test_with_content_types(self):
-        self.resource_addables.return_value = {'type': {}}
-        validator = self._call_fut(self.node, self.context_and_request_dict)
+    def test_with_content_types(self, node, request, context):
+        request.registry.content.resource_addables.return_value = {'type': {}}
+        validator = self._call_fut(node, {'context': context, 'request': request})
         assert list(validator.choices) == ['type']
 
 
-class AddPostRequestSubSchemasUnitTest(unittest.TestCase):
+class TestAddPostRequestSubSchemas:
 
-    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
-    def setUp(self, mock_registry=None):
-        from adhocracy.interfaces import sheet_metadata
+    @fixture()
+    def request(self, mock_resource_registry):
         request = JSONDummyRequest(body='{}')
-        request.registry.content = mock_registry.return_value
-        self.request = request
-        self.resource_addables = request.registry.content.resource_addables
-        request.registry.content.sheets_metadata.return_value = \
-            {ISheet.__identifier__: sheet_metadata._replace(isheet=ISheet,
-                                                            schema_class=colander.MappingSchema),
-             ISheetA.__identifier__: sheet_metadata._replace(isheet=ISheetA,
-                                                             schema_class=colander.MappingSchema)}
-        self.sheets_metadata = request.registry.content.sheets_metadata
-        context = DummyResource()
-        self.context_and_request_dict = {'context': context, 'request': request}
-        self.node = colander.MappingSchema()
+        request.registry.content = mock_resource_registry
+        return request
+
 
     def _call_fut(self, node, kw):
         from adhocracy.rest.schemas import add_post_data_subschemas
         return add_post_data_subschemas(node, kw)
 
-    def test_no_data_and_no_sheets(self):
-        self._call_fut(self.node, self.context_and_request_dict)
-        assert self.node.children == []
+    def test_no_data_and_no_sheets(self, node, request, context):
+        self._call_fut(node, {'context': context, 'request': request})
+        assert node.children == []
 
-    def test_no_data_and_optional_sheets(self):
-        self.resource_addables.return_value = \
+    def test_no_data_and_optional_sheets(self, node, request, context, sheet_metas):
+        request.registry.content.sheets_metadata.return_value = sheet_metas
+        request.registry.content.resource_addables.return_value =\
             {'VALID': {'sheets_mandatory': [],
                        'sheets_optional': [ISheet.__identifier__]}}
+        self._call_fut(node, {'context': context, 'request': request})
+        assert node.children == []
 
-        self._call_fut(self.node, self.context_and_request_dict)
-
-        assert self.node.children == []
-
-    def test_data_and_optional_sheets(self):
-        self.resource_addables.return_value = \
+    def test_data_and_optional_sheets(self, node, request, context, sheet_metas):
+        request.registry.content.sheets_metadata.return_value = sheet_metas
+        request.registry.content.resource_addables.return_value =\
             {'VALID': {'sheets_mandatory': [],
                        'sheets_optional': [ISheet.__identifier__]}}
         data = {'content_type': 'VALID', 'data': {ISheet.__identifier__: {}}}
-        self.request.body = json.dumps(data)
+        request.body = json.dumps(data)
+        self._call_fut(node, {'context': context, 'request': request})
+        assert node.children[0].name == ISheet.__identifier__
 
-        self._call_fut(self.node, self.context_and_request_dict)
-
-        assert len(self.node.children) == 1
-        assert self.node.children[0].name == ISheet.__identifier__
-
-    def test_data_and_mandatory_but_no_optional_sheets(self):
-        self.resource_addables.return_value = \
+    def test_data_and_mandatory_but_no_optional_sheets(self, node, request, context, sheet_metas):
+        request.registry.content.sheets_metadata.return_value = sheet_metas
+        request.registry.content.resource_addables.return_value =\
             {'VALID': {'sheets_mandatory': [ISheetA.__identifier__],
                        'sheets_optional': [ISheet.__identifier__]}}
         data = {'content_type': 'VALID', 'data': {ISheetA.__identifier__: {}}}
-        self.request.body = json.dumps(data)
-
-        self._call_fut(self.node, self.context_and_request_dict)
-
-        assert len(self.node.children) == 1
-        assert self.node.children[0].name == ISheetA.__identifier__
-        assert self.node.children[0].bindings == self.context_and_request_dict
+        request.body = json.dumps(data)
+        self._call_fut(node, {'context': context, 'request': request})
+        assert node.children[0].name == ISheetA.__identifier__
+        assert node.children[0].bindings == {'context': context, 'request': request}
 
 
-class POSTItemRequestSchemaUnitTest(unittest.TestCase):
+class TestPOSTItemRequestSchemaUnitTest:
 
     def make_one(self):
         from adhocracy.rest.schemas import POSTItemRequestSchema
@@ -201,22 +191,24 @@ class POSTItemRequestSchemaUnitTest(unittest.TestCase):
     def test_deserialize_without_root_versions(self):
         inst = self.make_one()
         result = inst.deserialize({'content_type': 'VALID', 'data': {}})
-        assert 'root_versions' in result
-        assert result['root_versions'] == []
+        assert result == {'content_type': 'VALID', 'data': {},
+                          'root_versions': []}
 
     def test_deserialize_with_root_versions(self):
         inst = self.make_one()
-        assert inst.deserialize({'content_type': "VALID", 'data': {},
-                                 'root_versions': ["/path"]})
+        result = inst.deserialize({'content_type': "VALID", 'data': {},
+                                   'root_versions': ["/path"]})
+        assert result == {'content_type': 'VALID', 'data': {},
+                          'root_versions': ['/path']}
 
     def test_deserialize_with_root_versions_but_wrong_type(self):
         inst = self.make_one()
-        with pytest.raises(colander.Invalid):
+        with raises(colander.Invalid):
             inst.deserialize({'content_type': "VALID", 'data': {},
                               'root_versions': ["?path"]})
 
 
-class PUTResourceRequestSchemaUnitTest(unittest.TestCase):
+class TestPUTResourceRequestSchema:
 
     def make_one(self):
         from adhocracy.rest.schemas import PUTResourceRequestSchema
@@ -230,12 +222,12 @@ class PUTResourceRequestSchemaUnitTest(unittest.TestCase):
     def test_deserialize_with_data_unknown(self):
         inst = self.make_one()
         data = {'data': {'unknown': 1}}
-        with pytest.raises(colander.Invalid):
+        with raises(colander.Invalid):
             inst.deserialize(data)
 
     def test_deserialize_missing_data(self):
         inst = self.make_one()
-        with pytest.raises(colander.Invalid):
+        with raises(colander.Invalid):
             inst.deserialize({})
 
     def test_data_has_after_bind(self):
@@ -244,50 +236,37 @@ class PUTResourceRequestSchemaUnitTest(unittest.TestCase):
         assert inst['data'].after_bind is add_put_data_subschemas
 
 
-class AddPutRequestSubSchemasUnitTest(unittest.TestCase):
+class TestAddPutRequestSubSchemasUnitTest:
 
-    @patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
-    def setUp(self, mock_registry=None):
-        from adhocracy.interfaces import sheet_metadata
+    @fixture()
+    def request(self, mock_resource_registry):
         request = JSONDummyRequest(body='{}')
-        request.registry.content = mock_registry.return_value
-        self.request = request
-        request.registry.content.sheets_metadata.return_value = \
-            {ISheet.__identifier__: sheet_metadata._replace(isheet=ISheet,
-                                                            schema_class=colander.MappingSchema),
-             ISheetA.__identifier__: sheet_metadata._replace(isheet=ISheetA,
-                                                             schema_class=colander.MappingSchema)}
-        self.sheets_metadata = request.registry.content.sheets_metadata
-        self.resource_sheets = request.registry.content.resource_sheets
-        context = DummyResource()
-        self.context_and_request_dict = {'context': context, 'request': request}
-        self.node = colander.MappingSchema()
+        request.registry.content = mock_resource_registry
+        return request
 
     def _call_fut(self, node, kw):
         from adhocracy.rest.schemas import add_put_data_subschemas
         return add_put_data_subschemas(node, kw)
 
-    def test_no_data_and_no_sheets(self):
-        self._call_fut(self.node, self.context_and_request_dict)
-        assert self.node.children == []
+    def test_no_data_and_no_sheets(self, node, context, request):
+        self._call_fut(node, {'context': context, 'request': request})
+        assert node.children == []
 
-    def test_no_data_and_optional_sheets(self):
-        self.resource_sheets.return_value = {ISheet.__identifier__: None}
-        self._call_fut(self.node, self.context_and_request_dict)
-        assert self.node.children == []
+    def test_no_data_and_optional_sheets(self, node, context, request):
+        request.registry.content.resource_sheets.return_value = {ISheet.__identifier__: None}
+        self._call_fut(node, {'context': context, 'request': request})
+        assert node.children == []
 
-    def test_data_and_optional_sheets(self):
-        self.resource_sheets.return_value = {ISheet.__identifier__: None}
-        self.request.body = json.dumps({'data': {ISheet.__identifier__: {}}})
-
-        self._call_fut(self.node, self.context_and_request_dict)
-
-        assert len(self.node.children) == 1
-        assert self.node.children[0].name == ISheet.__identifier__
-        assert self.node.children[0].bindings == self.context_and_request_dict
+    def test_data_and_optional_sheets(self, node, context, request, sheet_metas):
+        request.registry.content.sheets_metadata.return_value = sheet_metas
+        request.registry.content.resource_sheets.return_value = {ISheet.__identifier__: None}
+        request.body = json.dumps({'data': {ISheet.__identifier__: {}}})
+        self._call_fut(node, {'context': context, 'request': request})
+        assert node.children[0].name == ISheet.__identifier__
+        assert node.children[0].bindings == {'context': context, 'request': request}
 
 
-class OPTIONResourceResponseSchemaUnitTest(unittest.TestCase):
+class TestOPTIONResourceResponseSchema:
 
     def make_one(self):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
