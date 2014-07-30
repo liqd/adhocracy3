@@ -9,6 +9,8 @@ declare module "angular" {
 }
 declare module "angularRoute" {}
 
+declare module "angularAnimate" {}
+
 declare module "modernizr" {
     export var Modernizr : ModernizrStatic;
 }

@@ -11,6 +11,8 @@ import angularRoute = require("angularRoute");  if (angularRoute) { return; };
 // tsc from purging this import entirely.  which would have undesired
 // runtime effects.)
 
+import angularAnimate = require("angularAnimate");  if (angularAnimate) { return; };
+
 import modernizr = require("modernizr");
 
 import AdhHttp = require("./Packages/Http/Http");
@@ -43,7 +45,7 @@ export var init = (config) => {
         window.document.body.className += " is-embedded";
     }
 
-    var app = angular.module("adhocracy3SampleFrontend", ["ngRoute"]);
+    var app = angular.module("adhocracy3SampleFrontend", ["ngRoute", "ngAnimate"]);
 
     app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
         $routeProvider
