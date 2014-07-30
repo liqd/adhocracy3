@@ -1,0 +1,75 @@
+/*doc
+---
+title: Moving Columns
+name: moving-columns
+category: Layout
+---
+
+This widget represents a major design concept in Adhocracy 3.
+It contains a list of columns which may slide to either side to reveal
+new columns with additional functionality.
+
+States:
+
+-   is-detail - show a secondary content column
+
+```html_example
+<div class="moving-columns" style="height: 10em; position: relative;">
+    <div class="moving-column-structure">structure column</div>
+    <div class="moving-column-content">content column</div>
+    <div class="moving-column-content2">secondary-content-column</div>
+</div>
+<a onclick="$('.moving-columns').toggleClass('is-detail')">click me</a>
+```
+*/
+
+.moving-column-structure,
+.moving-column-content,
+.moving-column-content2 {
+    // layout
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
+    @include transition(width 0.5s, right 0.5s);
+
+    // look
+    border-right: 1px solid $border;
+    padding: 0.5em;
+}
+
+@mixin moving-column($from, $to, $gutter: 0, $total: 12) {
+    $column-width: (100% + $gutter) / $total;
+    right: $column-width * ($total - $to);
+    width: $column-width * ($to - $from) - $gutter;
+}
+
+.moving-columns {
+    overflow: hidden;
+
+    .moving-column-structure {
+        @include moving-column(0, 4);
+    }
+
+    .moving-column-content {
+        @include moving-column(4, 12);
+    }
+
+    .moving-column-content2 {
+        @include moving-column(12, 24);
+    }
+
+    &.is-detail {
+        .moving-column-structure {
+            @include moving-column(-4, 0);
+        }
+
+        .moving-column-content {
+            @include moving-column(0, 6);
+        }
+
+        .moving-column-content2 {
+            @include moving-column(6, 12);
+        }
+    }
+}

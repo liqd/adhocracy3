@@ -126,7 +126,7 @@ label.m-tooltip {
         width: 2em;
         border: 1px solid $border;
         @include border-radius(50%);
-        text-align: center;
+        @include text-align(center);
     }
 }
 

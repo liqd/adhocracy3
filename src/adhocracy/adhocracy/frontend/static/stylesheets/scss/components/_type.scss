@@ -57,14 +57,14 @@ section {
 // table
 table {
     td, th {
-        text-align: left;
+        @include text-align(start);
         padding: 0.5em;
         border-top: 1px solid mix($bg, $fg);
     }
 
     thead, tfoot {
         th {
-            text-align: center;
+            @include text-align(center);
         }
     }
 
