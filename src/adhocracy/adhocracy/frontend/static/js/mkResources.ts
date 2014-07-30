@@ -514,3 +514,12 @@ canonicalizePath = (filepath : string) : string => {
 // resources based on meta-api information.
 
 // FIXME: _updSheet methods for all sheets, resources.
+
+// FIXME: adapter code will be written manually written files in the
+// directory tree under Resources_.  this means that we will commit
+// auto-generated code, and also that we will have to think of a
+// better solution for cleanup than `rm -r Resources`.  one option is
+// to auto-generate a shell script during module generation that
+// removes all generated files if executed.  (or, a bit less
+// extravagant, just a file list that can be processed by a cleanup
+// make or buildout rule or whatnot.)
