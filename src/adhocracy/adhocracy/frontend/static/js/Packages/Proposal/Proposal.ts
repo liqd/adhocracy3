@@ -51,24 +51,22 @@ export class ProposalDetail {
                         });
                 };
 
-                $scope.$watch("path", (newPath, oldPath, scope) => {
-                    var wsHandler = (event: AdhWebSocket.IServerEvent): void => {
-                        fetchAndUpdateContent(newPath);
-                    };
+                var wsHandler = (event: AdhWebSocket.IServerEvent): void => {
+                    fetchAndUpdateContent($scope.path);
+                };
 
-                    try {
-                        if (typeof wsHandle !== "undefined") {
-                            adhWebSocket.unregister(oldPath, wsHandle);
-                        }
-                        wsHandle = adhWebSocket.register(newPath, wsHandler);
-
-                    } catch (e) {
-                        console.log(e);
-                        console.log("Will continue on resource " + $scope.path + " without server bind.");
+                try {
+                    if (typeof wsHandle !== "undefined") {
+                        adhWebSocket.unregister($scope.path, wsHandle);
                     }
+                    wsHandle = adhWebSocket.register($scope.path, wsHandler);
 
-                    fetchAndUpdateContent(newPath);
-                });
+                } catch (e) {
+                    console.log(e);
+                    console.log("Will continue on resource " + $scope.path + " without server bind.");
+                }
+
+                fetchAndUpdateContent($scope.path);
             }]
         };
     }

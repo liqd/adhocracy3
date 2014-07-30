@@ -49,6 +49,11 @@ export interface ListingScope<Container> {
 //
 // and implicitly know that Listing propagates the identifier
 // ``element`` to the element's scope.
+//
+//
+// FIXME: as the listing elements are tracked by their $id (the element path) in the listing template, we don't allow duplicate elements
+// in one listing. We should add a proper warning if that occurs or handle that case properly.
+//
 export class Listing<Container extends Resources.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter> {
     public static templateUrl: string = pkgLocation + "/Listing.html";
 
