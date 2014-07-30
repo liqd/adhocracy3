@@ -1,7 +1,8 @@
 import unittest
 
 from websocket import ABNF
-import pytest
+from pytest import fixture
+from pytest import mark
 
 
 class DummyClient():
@@ -177,18 +178,14 @@ class ClientUnitTests(unittest.TestCase):
         assert len(self._dummy_connection.queue) == 2
 
 
-@pytest.mark.websocket
+@mark.websocket
 class TestFunctionalClient:
 
-    @pytest.fixture()
+    @fixture()
     def websocket_client(self, request, websocket):
         from adhocracy.websockets.client import Client
         client = Client(ws_url='ws://localhost:8080')
-
-        def fin():
-            client.stop()
-        request.addfinalizer(fin)
-
+        request.addfinalizer(client.stop)
         return client
 
     def test_create(self, websocket_client):
@@ -210,16 +207,16 @@ class TestFunctionalClient:
         websocket_client._send_messages()
         assert child not in websocket_client._created_resources
 
-    def test_includeme_without_ws_url_setting(self, dummy_config):
+    def test_includeme_without_ws_url_setting(self, config):
         from adhocracy.websockets.client import includeme
-        dummy_config.registry.settings['adhocracy.ws_url'] = ''
-        includeme(dummy_config)
-        assert not hasattr(dummy_config.registry, 'ws_client')
+        config.registry.settings['adhocracy.ws_url'] = ''
+        includeme(config)
+        assert not hasattr(config.registry, 'ws_client')
 
-    def test_includeme_with_ws_url_setting(self, dummy_config):
+    def test_includeme_with_ws_url_setting(self, config):
         from adhocracy.websockets.client import includeme
         from adhocracy.websockets.client import Client
-        settings = dummy_config.registry.settings
+        settings = config.registry.settings
         settings['adhocracy.ws_url'] = 'ws://localhost:8080'
-        includeme(dummy_config)
-        assert isinstance(dummy_config.registry.ws_client, Client)
+        includeme(config)
+        assert isinstance(config.registry.ws_client, Client)

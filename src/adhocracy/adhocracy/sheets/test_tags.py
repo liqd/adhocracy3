@@ -1,68 +1,75 @@
-import unittest
-
 from pyramid import testing
-
-from adhocracy.interfaces import IResourceSheet
-from adhocracy.utils import get_sheet
+from pytest import fixture
 
 
-class TagsSheetUnitTest(unittest.TestCase):
+class TestTagsSheet:
 
-    def setUp(self):
+    @fixture()
+    def meta(self):
         from adhocracy.sheets.tags import tags_metadata
-        self.metadata = tags_metadata
-        self.context = testing.DummyResource()
+        return tags_metadata
 
-    def make_one(self, *args):
-        return self.metadata.sheet_class(*args)
-
-    def test_create_valid(self):
-        from zope.interface.verify import verifyObject
+    def test_create(self, meta, context):
+        from adhocracy.sheets.tags import ITags
+        from adhocracy.sheets.tags import TagsSchema
         from adhocracy.sheets.pool import PoolSheet
-        inst = self.make_one(self.metadata, self.context)
-        assert verifyObject(IResourceSheet, inst) is True
-        assert isinstance(inst, PoolSheet)
+        inst = meta.sheet_class(meta, context)
+        assert inst.meta.isheet == ITags
+        assert inst.meta.sheet_class == PoolSheet
+        assert inst.meta.schema_class == TagsSchema
+        assert inst.meta.editable is False
+        assert inst.meta.creatable is False
 
-    def test_get_not_empty(self):
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'elements': []}
+
+    def test_get_not_empty_with_target_isheet(self, meta, context):
         from adhocracy.sheets.tags import ITag
-        child_tag = testing.DummyResource(__provides__=ITag)
-        self.context['child'] = child_tag
-        inst = self.make_one(self.metadata, self.context)
-        assert inst.get() == {'elements': [child_tag]}
+        child = testing.DummyResource(__provides__=ITag)
+        context['child1'] = child
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'elements': [child]}
 
-    def test_get_not_empty_but_no_itag(self):
-        self.context['child'] = testing.DummyResource()
-        inst = self.make_one(self.metadata, self.context)
+    def test_get_not_empty_without_target_isheet(self, meta, context):
+        child = testing.DummyResource()
+        context['child1'] = child
+        inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': []}
 
 
-class TagsIntegrationTest(unittest.TestCase):
-
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.sheets.tags')
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_includeme_register_adapter_itags(self):
-        from adhocracy.sheets.tags import ITags
-        context = testing.DummyResource(__provides__=ITags)
-        inst = get_sheet(context, ITags)
-        assert inst.meta.isheet is ITags
+def test_includeme_register_tags_sheet(config):
+    from adhocracy.sheets.tags import ITags
+    from adhocracy.utils import get_sheet
+    config.include('adhocracy.sheets.tags')
+    context = testing.DummyResource(__provides__=ITags)
+    assert get_sheet(context, ITags)
 
 
-class TagIntegrationTest(unittest.TestCase):
+class TestTagSheet:
 
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.sheets.tags')
+    @fixture()
+    def meta(self):
+        from adhocracy.sheets.tags import tag_metadata
+        return tag_metadata
 
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_includeme_register_adapter_itag(self):
+    def test_create(self, meta, context):
         from adhocracy.sheets.tags import ITag
-        context = testing.DummyResource(__provides__=ITag)
-        inst = get_sheet(context, ITag)
-        assert inst.meta.isheet is ITag
+        from adhocracy.sheets.tags import TagSchema
+        from adhocracy.sheets import GenericResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert inst.meta.isheet == ITag
+        assert inst.meta.sheet_class == GenericResourceSheet
+        assert inst.meta.schema_class == TagSchema
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'elements': []}
+
+
+def test_includeme_register_tag_sheet(config):
+    from adhocracy.sheets.tags import ITag
+    from adhocracy.utils import get_sheet
+    config.include('adhocracy.sheets.tags')
+    context = testing.DummyResource(__provides__=ITag)
+    assert get_sheet(context, ITag)

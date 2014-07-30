@@ -1,61 +1,53 @@
-import unittest
-
 from pyramid import testing
-import pytest
-
-from adhocracy.interfaces import IResourceSheet
-from adhocracy.interfaces import ISheet
-from adhocracy.utils import get_sheet
+from pytest import fixture
 
 
-class PoolSheetUnitTest(unittest.TestCase):
+class TestPoolSheet:
 
-    def setUp(self):
+    @fixture()
+    def meta(self):
         from adhocracy.sheets.pool import pool_metadata
-        self.metadata = pool_metadata
-        self.context = testing.DummyResource()
+        return pool_metadata
 
-    def _make_one(self, *args):
-        return self.metadata.sheet_class(*args)
-
-    def test_create_valid(self):
-        from zope.interface.verify import verifyObject
+    def test_create(self, meta, context):
+        from adhocracy.interfaces import IResourceSheet
+        from adhocracy.sheets.pool import IPool
+        from adhocracy.sheets.pool import PoolSchema
         from adhocracy.sheets.pool import PoolSheet
-
-        inst = self._make_one(self.metadata, self.context)
-
+        from zope.interface.verify import verifyObject
+        inst = meta.sheet_class(meta, context)
         assert isinstance(inst, PoolSheet)
-        assert verifyObject(IResourceSheet, inst) is True
+        assert verifyObject(IResourceSheet, inst)
+        assert IResourceSheet.providedBy(inst)
+        assert inst.meta.schema_class == PoolSchema
+        assert inst.meta.isheet == IPool
+        assert inst.meta.editable is False
+        assert inst.meta.creatable is False
 
-    def test_get_empty(self):
-        inst = self._make_one(self.metadata, self.context)
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': []}
 
-    def test_get_not_empty_with_target_isheet(self):
+    #FIXME: add check if the schema has a children named 'elements' with tagged
+    #Value 'target_isheet'. This isheet is used to filter return data.
+
+    def test_get_not_empty_with_target_isheet(self, meta, context):
+        from adhocracy.interfaces import ISheet
         child = testing.DummyResource(__provides__=ISheet)
-        self.context['child1'] = child
-        inst = self._make_one(self.metadata, self.context)
+        context['child1'] = child
+        inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': [child]}
 
-    def test_get_not_empty_without_iresource(self):
-        self.context['child1'] = testing.DummyResource()
-        inst = self._make_one(self.metadata, self.context)
+    def test_get_not_empty_without_target_isheet(self, meta, context):
+        child = testing.DummyResource()
+        context['child1'] = child
+        inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': []}
 
 
-class PoolSheetIntegrationTest(unittest.TestCase):
-
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.sheets.pool')
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_includeme_register_pool_adapter(self):
-        from adhocracy.sheets.pool import IPool
-        context = testing.DummyResource(__provides__=IPool)
-        inst = get_sheet(context, IPool)
-        assert inst.meta.isheet == IPool
-
-
+def test_includeme_register_pool_sheet(config):
+    from adhocracy.sheets.pool import IPool
+    from adhocracy.utils import get_sheet
+    config.include('adhocracy.sheets.pool')
+    context = testing.DummyResource(__provides__=IPool)
+    assert get_sheet(context, IPool)

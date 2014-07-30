@@ -1,10 +1,8 @@
-import unittest
-
 from pyramid import testing
 import colander
 
 
-class HandleError400ColanderInvalidUnitTest(unittest.TestCase):
+class TestHandleError400ColanderInvalid:
 
     def make_one(self, error, request):
         from adhocracy.rest.exceptions import handle_error_400_colander_invalid
@@ -33,7 +31,7 @@ class HandleError400ColanderInvalidUnitTest(unittest.TestCase):
         assert json.loads(inst.body.decode()) == wanted
 
 
-class HandleError500ExceptionUnitTest(unittest.TestCase):
+class TestHandleError500Exception:
 
     def make_one(self, error, request):
         from adhocracy.rest.exceptions import handle_error_500_exception

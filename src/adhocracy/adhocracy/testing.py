@@ -1,4 +1,5 @@
 """Public py.test fixtures: http://pytest.org/latest/fixture.html. """
+from unittest.mock import Mock
 from configparser import ConfigParser
 import copy
 import json
@@ -16,16 +17,20 @@ from webtest.http import StopableWSGIServer
 from pytest_splinter.plugin import Browser as PytestSplinterBrowser
 from pytest_splinter.plugin import patch_webdriver
 from pytest_splinter.plugin import patch_webdriverelement
-import pytest
+from pytest import fixture
+import colander
 
 from adhocracy import root_factory
+from adhocracy.interfaces import SheetMetadata
+from adhocracy.interfaces import ResourceMetadata
 
 
 #####################################
 # Integration/Function test helper  #
 #####################################
 
-class DummyFolder(testing.DummyResource):
+
+class DummyPoolWithObjectMap(testing.DummyResource):
 
     def add(self, name, obj, **kwargs):
         self[name] = obj
@@ -36,17 +41,16 @@ class DummyFolder(testing.DummyResource):
         path_tuple = resource_path_tuple(obj)
         objectmap.add(obj, path_tuple)
 
-    def check_name(self, name):
-        return name
-
     def next_name(self, obj, prefix=''):
         return prefix + '_0000000' + str(hash(obj))
 
 
-def create_folder_with_graph() -> object:
-    """Return folder like dummy object with objectmap and graph."""
+def create_pool_with_graph() -> testing.DummyResource:
+    """Return pool like dummy object with objectmap and graph."""
+    from adhocracy.interfaces import IPool
     from adhocracy.graph import Graph
-    context = DummyFolder(__oid__=0)
+    context = DummyPoolWithObjectMap(__oid__=0,
+                                     __provides__=IPool)
     objectmap = ObjectMap(context)
     context.__objectmap__ = objectmap
     context.__graph__ = Graph(context)
@@ -57,21 +61,128 @@ def create_folder_with_graph() -> object:
 # Fixtures       #
 ##################
 
-@pytest.fixture()
-def dummy_config(request):
-    """Return pyramid dummy config."""
+@fixture()
+def resource_meta() -> ResourceMetadata:
+    """ Return basic resource metadata."""
+    from adhocracy.interfaces import resource_metadata
+    from adhocracy.interfaces import IResource
+    return resource_metadata._replace(iresource=IResource)
+
+
+@fixture()
+def sheet_meta() -> SheetMetadata:
+    """ Return basic sheet metadata."""
+    from adhocracy.interfaces import sheet_metadata
+    from adhocracy.interfaces import ISheet
+    return sheet_metadata._replace(isheet=ISheet,
+                                   schema_class=colander.MappingSchema)
+
+
+@fixture()
+def context() -> testing.DummyResource:
+    """ Return dummy context with IResource interface."""
+    from adhocracy.interfaces import IResource
+    return testing.DummyResource(__provides__=IResource)
+
+
+class DummyPool(testing.DummyResource):
+
+    """Dummy Pool based on :class:`pyramid.testing.DummyResource`."""
+
+    def add(self, name, resource, **kwargs):
+        self[name] = resource
+        resource.__parent__ = self
+        resource.__name__ = name
+
+    def next_name(self, obj, prefix=''):
+        return prefix + '_0000000'
+
+
+@fixture()
+def pool() -> DummyPool:
+    """ Return dummy pool with IPool interface."""
+    from adhocracy.interfaces import IPool
+    return DummyPool(__provides__=IPool)
+
+
+@fixture()
+def node() -> colander.MappingSchema:
+    """Return dummy node."""
+    return colander.MappingSchema()
+
+
+@fixture()
+def mock_sheet() -> Mock:
+    """Mock :class:`adhocracy.sheets.GenericResourceSheet`."""
+    from adhocracy.sheets import GenericResourceSheet
+    from adhocracy.interfaces import sheet_metadata
+    from adhocracy.interfaces import ISheet
+    sheet = Mock(sepc=GenericResourceSheet)
+    sheet.meta = sheet_metadata._replace(isheet=ISheet)
+    return sheet
+
+
+@fixture()
+def mock_graph() -> Mock:
+    """Mock :class:`adhocracy.graph.Graph`."""
+    from adhocracy.graph import Graph
+    mock = Mock(spec=Graph)
+    return mock
+
+
+@fixture()
+def mock_objectmap() -> Mock:
+    """Mock :class:`substanced.objectmap.ObjectMap`."""
+    from substanced.objectmap import ObjectMap
+    mock = Mock(spec=ObjectMap)
+    mock.get_reftypes.return_value = []
+    return mock
+
+
+@fixture()
+def mock_resource_registry() -> Mock:
+    """Mock :class:`adhocracy.registry.ResourceContentRegistry`."""
+    from adhocracy.registry import ResourceContentRegistry
+    mock = Mock(spec=ResourceContentRegistry)
+    mock.sheets_metadata.return_value = {}
+    mock.resources_metadata.return_value = {}
+    mock.resource_sheets.return_value = {}
+    mock.resource_addables.return_value = {}
+    return mock
+
+
+@fixture()
+def config(request) -> Configurator:
+    """Return dummy testing configuration."""
     config = testing.setUp()
-
-    def fin():
-        testing.tearDown()
-
-    request.addfinalizer(fin)
+    request.addfinalizer(testing.tearDown)
     return config
 
 
-@pytest.fixture(scope='class')
-def config(request) -> Configurator:
-    """Return the adhocracy configuration."""
+@fixture()
+def registry(config) -> object:
+    """Return dummy registry."""
+    return config.registry
+
+
+@fixture()
+def mock_user_locator(registry) -> Mock:
+    """Mock :class:`adhocracy.resource.principal.UserLocatorAdapter`."""
+    from zope.interface import Interface
+    from substanced.interfaces import IUserLocator
+    from adhocracy.resources.principal import UserLocatorAdapter
+    locator = Mock(spec=UserLocatorAdapter)
+    registry.registerAdapter(lambda y, x: locator, (Interface, Interface),
+                             IUserLocator)
+    return locator
+
+
+@fixture(scope='class')
+def configurator(request) -> Configurator:
+    """Return the adhocracy configuration.
+
+    The path to the config file is set by the py.test --pc argument.
+    """
     config_parser = ConfigParser()
     config_file = request.config.getvalue('pyramid_config')
     config_parser.read(config_file)
@@ -82,7 +193,7 @@ def config(request) -> Configurator:
     return configuration
 
 
-@pytest.fixture(scope='class')
+@fixture(scope='class')
 def zeo(request) -> bool:
     """Start the test zeo server."""
     is_running = os.path.isfile('var/test_zeodata/ZEO.pid')
@@ -101,7 +212,7 @@ def zeo(request) -> bool:
     return True
 
 
-@pytest.fixture(scope='class')
+@fixture(scope='class')
 def websocket(request, zeo) -> bool:
     """Start websocket server."""
     is_running = os.path.isfile('var/WS_SERVER.pid')
@@ -132,15 +243,15 @@ def _kill_pid_in_file(path_to_pid_file):
             subprocess.call(['rm', path_to_pid_file])
 
 
-@pytest.fixture(scope='class')
-def app(zeo, config, websocket):
+@fixture(scope='class')
+def app(zeo, configurator, websocket):
     """Return the adhocracy wsgi application."""
-    from adhocracy import includeme
-    includeme(config)
-    return config.make_wsgi_app()
+    import adhocracy
+    configurator.include(adhocracy)
+    return configurator.make_wsgi_app()
 
 
-@pytest.fixture(scope='class')
+@fixture(scope='class')
 def server(request, app) -> StopableWSGIServer:
     """Return a http server with the adhocracy wsgi application."""
     server = StopableWSGIServer.create(app)
@@ -153,7 +264,7 @@ def server(request, app) -> StopableWSGIServer:
     return server
 
 
-@pytest.fixture(scope='session')
+@fixture(scope='session')
 def server_static(request) -> StopableWSGIServer:
     """Return a http server that only serves the static files."""
     from adhocracy.frontend import includeme
@@ -211,7 +322,7 @@ class SplinterBrowser(PytestSplinterBrowser):
         return '(function({}) {{{}}})({})'.format(keys, code, values)
 
 
-@pytest.fixture(scope='session')
+@fixture(scope='session')
 def splinter_browser_load_condition():
     """Custom browser condition fixture to check that html page is fully loaded.
 
@@ -226,7 +337,7 @@ def splinter_browser_load_condition():
     return is_page_loaded
 
 
-@pytest.fixture
+@fixture
 def browser_instance(request,
                      splinter_selenium_socket_timeout,
                      splinter_selenium_implicit_wait,
@@ -279,7 +390,7 @@ def browser_instance(request,
     return browser
 
 
-@pytest.fixture()
+@fixture()
 def browser_root(browser_instance, server) -> Browser:
     """browser_instance with url=root.html."""
     url = server.application_url + 'frontend_static/root.html'
@@ -293,7 +404,7 @@ def browser_root(browser_instance, server) -> Browser:
     return browser_instance
 
 
-@pytest.fixture()
+@fixture()
 def browser_test(browser_instance, server) -> Browser:
     """browser_instance with url=test.html."""
     url = server.application_url + 'frontend_static/test.html'

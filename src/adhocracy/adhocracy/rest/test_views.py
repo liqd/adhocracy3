@@ -1,21 +1,16 @@
 """Test rest.views module."""
 import json
-import unittest
-from unittest.mock import patch
+from unittest.mock import Mock
 
 from cornice.util import extract_json_data
 from cornice.errors import Errors
 from pyramid import testing
+from pytest import fixture
 import colander
 import pytest
 
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import IResource
-
-
-############
-#  helper  #
-############
 
 
 class IResourceX(IResource):
@@ -31,14 +26,6 @@ class CountSchema(colander.MappingSchema):
     count = colander.SchemaNode(colander.Int(),
                                 default=0,
                                 missing=colander.drop)
-
-
-class DummyFolder(testing.DummyResource):
-
-    def add(self, name, resource, **kwargs):
-        self[name] = resource
-        resource.__parent__ = self
-        resource.__name__ = name
 
 
 class CorniceDummyRequest(testing.DummyRequest):
@@ -69,246 +56,232 @@ class CorniceDummyRequest(testing.DummyRequest):
         return json.loads(self.body)
 
 
-@patch('adhocracy.resources.principal.UserLocatorAdapter', autospec=True)
-def _create_dummy_user_locator(registry, dummy_locator=None):
-    from zope.interface import Interface
-    from substanced.interfaces import IUserLocator
-    locator = dummy_locator.return_value
-    registry.registerAdapter(lambda y,x: locator, (Interface, Interface), IUserLocator)
-    return locator
-
-
-@patch('adhocracy.authentication.TokenHeaderAuthenticationPolicy', autospec=True)
-def _create_dummy_token_authentication_policy(registry, dummy_policy=None):
+@fixture
+def mock_authpolicy(registry):
     from pyramid.interfaces import IAuthenticationPolicy
-    policy = dummy_policy.return_value
+    from adhocracy.authentication import TokenHeaderAuthenticationPolicy
+    policy = Mock(spec=TokenHeaderAuthenticationPolicy)
     registry.registerUtility(policy, IAuthenticationPolicy)
     return policy
 
 
-@patch('adhocracy.sheets.user.PasswordAuthenticationSheet', autospec=True)
-def _create_dummy_password_sheet_adapter(registry, sheet_dummy=None):
+@fixture
+def mock_password_sheet(registry):
     from adhocracy.interfaces import IResourceSheet
     from adhocracy.sheets.user import IPasswordAuthentication
+    from adhocracy.sheets.user import PasswordAuthenticationSheet
     isheet = IPasswordAuthentication
-    sheet = sheet_dummy.return_value
+    sheet = Mock(spec=PasswordAuthenticationSheet)
     registry.registerAdapter(lambda x: sheet, (isheet,),
                              IResourceSheet,
                              isheet.__identifier__)
     return sheet
 
 
-@patch('adhocracy.registry.ResourceContentRegistry', autospec=True)
-def make_mock_resource_registry(mock_registry=None):
-    return mock_registry.return_value
+@fixture()
+def mock_resource_registry():
+    from adhocracy.registry import ResourceContentRegistry
+    mock = Mock(spec=ResourceContentRegistry)
+    mock.sheets_metadata.return_value = {}
+    mock.resources_metadata.return_value = {}
+    mock.resource_sheets.return_value = {}
+    mock.resource_addables.return_value = {}
+    return mock
 
 
-##########
-#  tests #
-##########
 
+class TestValidateRequest:
 
-class ValidateRequestDataUnitTest(unittest.TestCase):
+    @fixture
+    def request(self):
+        return CorniceDummyRequest()
 
     def _make_one(self, context, request, **kw):
         from adhocracy.rest.views import validate_request_data
         validate_request_data(context, request, **kw)
 
-    def setUp(self):
-        self.request = CorniceDummyRequest()
-        self.context = testing.DummyResource()
-        setattr(self.request, 'errors', Errors(self.request))
+    def test_valid_wrong_method_with_data(self, context, request):
+        request.body = '{"wilddata": "1"}'
+        request.method = 'wrong_method'
+        self._make_one(context, request)
+        assert request.validated == {}
 
-    def test_valid_wrong_method_with_data(self):
-        self.request.body = '{"wilddata": "1"}'
-        self.request.method = 'wrong_method'
-        self._make_one(self.context, self.request)
-        assert self.request.validated == {}
+    def test_valid_no_schema_with_data(self, context, request):
+        request.body = '{"wilddata": "1"}'
+        self._make_one(context, request)
+        assert request.validated == {}
 
-    def test_valid_no_schema_with_data(self):
-        self.request.body = '{"wilddata": "1"}'
-        self._make_one(self.context, self.request)
-        assert self.request.validated == {}
+    def test_valid_with_schema_no_data(self, context, request):
+        request.body = ''
+        self._make_one(context, request, schema=CountSchema())
+        assert request.validated == {}
 
-    def test_valid_with_schema_no_data(self):
-        self.request.body = ''
-        self._make_one(self.context, self.request, schema=CountSchema())
-        assert self.request.validated == {}
+    def test_valid_with_schema_no_data_empty_dict(self, context, request):
+        request.body = '{}'
+        self._make_one(context, request, schema=CountSchema())
+        assert request.validated == {}
 
-    def test_valid_with_schema_no_data_empty_dict(self):
-        self.request.body = '{}'
-        self._make_one(self.context, self.request, schema=CountSchema())
-        assert self.request.validated == {}
-
-    def test_valid_with_schema_no_data_and_defaults(self):
+    def test_valid_with_schema_no_data_and_defaults(self, context, request):
         class DefaultDataSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int(),
                                         missing=1)
-        self.request.body = ''
-        self._make_one(self.context, self.request, schema=DefaultDataSchema())
-        assert self.request.validated == {'count': 1}
+        request.body = ''
+        self._make_one(context, request, schema=DefaultDataSchema())
+        assert request.validated == {'count': 1}
 
-    def test_valid_with_schema_with_data(self):
-        self.request.body = '{"count": "1"}'
-        self._make_one(self.context, self.request, schema=CountSchema())
-        assert self.request.validated == {'count': 1}
+    def test_valid_with_schema_with_data(self, context, request):
+        request.body = '{"count": "1"}'
+        self._make_one(context, request, schema=CountSchema())
+        assert request.validated == {'count': 1}
 
-    def test_valid_with_schema_with_data_in_querystring(self):
+    def test_valid_with_schema_with_data_in_querystring(self, context, request):
         class QueryStringSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int(),
                                         location='querystring')
-        self.request.GET = {'count': 1}
-        self._make_one(self.context, self.request, schema=QueryStringSchema())
-        assert self.request.validated == {'count': 1}
+        request.GET = {'count': 1}
+        self._make_one(context, request, schema=QueryStringSchema())
+        assert request.validated == {'count': 1}
 
-    def test_non_valid_with_schema_wrong_data(self):
+    def test_non_valid_with_schema_wrong_data(self, context, request):
         from cornice.util import _JSONError
-        self.request.body = '{"count": "wrong_value"}'
+        request.body = '{"count": "wrong_value"}'
         with pytest.raises(_JSONError):
-            self._make_one(self.context, self.request, schema=CountSchema())
-        assert self.request.errors == [{'location': 'body',
-                                        'name': 'count',
-                                        'description': '"wrong_value" is not a number'}]
+            self._make_one(context, request, schema=CountSchema())
+        assert request.errors == [{'location': 'body',
+                                   'name': 'count',
+                                   'description': '"wrong_value" is not a number'}]
 
-    def test_non_valid_with_schema_wrong_data_cleanup(self):
+    def test_non_valid_with_schema_wrong_data_cleanup(self, context, request):
         from cornice.util import _JSONError
-        self.request.validated == {'secret_data': 'buh'}
-        self.request.body = '{"count": "wrong_value"}'
+        request.validated = {'secret_data': 'buh'}
+        request.body = '{"count": "wrong_value"}'
         with pytest.raises(_JSONError):
-            self._make_one(self.context, self.request, schema=CountSchema())
-        assert self.request.validated == {}
+            self._make_one(context, request, schema=CountSchema())
+        assert request.validated == {}
 
-    def test_valid_with_extra_validator(self):
+    def test_valid_with_extra_validator(self, context, request):
         def validator1(context, request):
             request.validated = {"validator": "1"}
-        self._make_one(self.context, self.request, extra_validators=[validator1])
-        assert self.request.validated == {"validator": "1"}
+        self._make_one(context, request, extra_validators=[validator1])
+        assert request.validated == {"validator": "1"}
 
-    def test_valid_with_extra_validator_and_wrong_schema_data(self):
+    def test_valid_with_extra_validator_and_wrong_schema_data(self, context, request):
         from cornice.util import _JSONError
         def validator1(context, request):
             request._validator_called = True
-        self.request.body = '{"count": "wrong"}'
+        request.body = '{"count": "wrong"}'
         with pytest.raises(_JSONError):
-            self._make_one(self.context, self.request, schema=CountSchema(),
+            self._make_one(context, request, schema=CountSchema(),
                            extra_validators=[validator1])
-        assert hasattr(self.request, '_validator_called') is False
+        assert hasattr(request, '_validator_called') is False
 
 
-class ValidatePOSTRootVersionsUnitTest(unittest.TestCase):
+class TestValidatePOSTRootVersions:
 
-    def setUp(self):
-        self.context = testing.DummyResource()
-        self.request = CorniceDummyRequest()
+    @fixture
+    def request(self):
+        return CorniceDummyRequest()
 
     def make_one(self, context, request):
         from adhocracy.rest.views import validate_post_root_versions
         validate_post_root_versions(context, request)
 
-    def test_valid_no_value(self):
-        self.make_one(self.context, self.request)
-        assert self.request.errors == []
+    def test_valid_no_value(self, request, context):
+        self.make_one(context, request)
+        assert request.errors == []
 
-    def test_valid_empty_value(self):
-        self.make_one(self.context, self.request)
-        self.request.validated = {'root_versions': []}
-        assert self.request.errors == []
+    def test_valid_empty_value(self, request, context):
+        self.make_one(context, request)
+        request.validated = {'root_versions': []}
+        assert request.errors == []
 
-    def test_valid_with_value(self):
+    def test_valid_with_value(self, request, context):
         from adhocracy.interfaces import IItemVersion
         from adhocracy.interfaces import ISheet
         root = testing.DummyResource(__provides__=(IItemVersion, ISheet))
-        self.context['root'] = root
-        self.request.validated = {'root_versions': ["/root"]}
+        context['root'] = root
+        request.validated = {'root_versions': ["/root"]}
 
-        self.make_one(self.context, self.request)
+        self.make_one(context, request)
 
-        assert self.request.errors == []
-        assert self.request.validated == {'root_versions': [root]}
+        assert request.errors == []
+        assert request.validated == {'root_versions': [root]}
 
-    def test_non_valid_value_has_wrong_iface(self):
+    def test_non_valid_value_has_wrong_iface(self, request, context):
         from adhocracy.interfaces import ISheet
         root = testing.DummyResource(__provides__=(IResourceX, ISheet))
-        self.context['root'] = root
-        self.request.validated = {'root_versions': ["/root"]}
+        context['root'] = root
+        request.validated = {'root_versions': ["/root"]}
 
-        self.make_one(self.context, self.request)
+        self.make_one(context, request)
 
-        assert self.request.errors != []
-        assert self.request.validated == {'root_versions': []}
+        assert request.errors != []
+        assert request.validated == {'root_versions': []}
 
-    def test_non_valid_value_does_not_exists(self):
-        self.request.validated = {'root_versions': ["/root"]}
-        self.make_one(self.context, self.request)
-        assert self.request.errors != []
-        assert self.request.validated == {'root_versions': []}
+    def test_non_valid_value_does_not_exists(self, request, context):
+        request.validated = {'root_versions': ["/root"]}
+        self.make_one(context, request)
+        assert request.errors != []
+        assert request.validated == {'root_versions': []}
 
 
-class RESTViewUnitTest(unittest.TestCase):
+class TestRESTView:
 
-    def setUp(self):
-        self.context = DummyFolder(__provides__=IResourceX)
-        self.request = CorniceDummyRequest()
-        resource_registry = object()
-        self.request.registry.content = resource_registry
+    @fixture
+    def request(self):
+        return CorniceDummyRequest()
 
     def make_one(self, context, request):
         from adhocracy.rest.views import RESTView
         return RESTView(context, request)
 
-    def test_create_valid(self):
-        inst = self.make_one(self.context, self.request)
+    def test_create_valid(self, request, context):
+        inst = self.make_one(context, request)
         assert inst.validation_GET == (None, [])
         assert inst.validation_HEAD == (None, [])
         assert inst.validation_OPTIONS == (None, [])
         assert inst.validation_PUT == (None, [])
         assert inst.validation_POST == (None, [])
-        assert inst.context is self.context
-        assert inst.request is self.request
+        assert inst.context is context
+        assert inst.request is request
         assert inst.request.errors == []
         assert inst.request.validated == {}
 
 
-class ResourceRESTViewUnitTest(unittest.TestCase):
+class TestResourceRESTView:
 
-    def setUp(self):
-        self.context = DummyFolder(__provides__=IResourceX)
-        registry = make_mock_resource_registry()
+    @fixture()
+    def request(self, mock_resource_registry):
         request = CorniceDummyRequest()
-        request.registry.content = registry
-        self.request = request
-        self.resource_sheets = request.registry.content.resource_sheets
-        self.resource_addables = request.registry.content.resource_addables
+        request.registry.content = mock_resource_registry
+        return request
 
     def make_one(self, context, request):
         from adhocracy.rest.views import ResourceRESTView
         return ResourceRESTView(context, request)
 
-    def test_create_valid(self, ):
+    def test_create_valid(self, request, context):
         from adhocracy.rest.views import RESTView
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         assert isinstance(inst, RESTView)
-        assert inst.registry is self.request.registry.content
+        assert inst.registry is request.registry.content
 
-    def test_options_valid_no_sheets_and_addables(self):
+    def test_options_valid_no_sheets_and_addables(self, request, context):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-        self.resource_sheets.return_value = {}
-        self.resource_addables.return_value = {}
-
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         response = inst.options()
-
         wanted = OPTIONResourceResponseSchema().serialize()
         assert wanted == response
 
-    def test_options_valid_with_sheets_and_addables(self):
+    def test_options_valid_with_sheets_and_addables(self, request, context):
         from adhocracy.rest.schemas import OPTIONResourceResponseSchema
-        self.resource_sheets.return_value = {'ipropertyx': object()}
-        self.resource_addables.return_value = \
+        registry = request.registry.content
+        registry.resource_sheets.return_value = {'ipropertyx': object()}
+        registry.resource_addables.return_value = \
             {'iresourcex': {'sheets_mandatory': [],
                             'sheets_optional': ['ipropertyx']}}
 
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         response = inst.options()
 
         wanted = OPTIONResourceResponseSchema().serialize()
@@ -319,140 +292,129 @@ class ResourceRESTViewUnitTest(unittest.TestCase):
 
         assert wanted == response
 
-    def test_get_valid_no_sheets(self):
+    def test_get_valid_no_sheets(self, request, context):
         from adhocracy.rest.schemas import GETResourceResponseSchema
-        self.resource_sheets.return_value = {}
 
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         response = inst.get()
 
         wanted = GETResourceResponseSchema().serialize()
         wanted['path'] = '/'
         wanted['data'] = {}
-        wanted['content_type'] = IResourceX.__identifier__
+        wanted['content_type'] = IResource.__identifier__
         assert wanted == response
 
-    @patch('adhocracy.sheets.GenericResourceSheet', autospec=True)
-    def test_get_valid_with_sheets(self, dummy_sheet):
-        sheet = dummy_sheet.return_value
-        sheet.meta.isheet = ISheetB
-        sheet.get_cstruct.return_value = 'dummy_cstruct'
-        self.resource_sheets.return_value = {ISheetB.__identifier__: sheet}
+    def test_get_valid_with_sheets(self, request, context, mock_sheet):
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=ISheetB)
+        mock_sheet.get_cstruct.return_value = 'dummy_cstruct'
+        request.registry.content.resource_sheets.return_value = {ISheetB.__identifier__: mock_sheet}
 
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         response = inst.get()
 
         wanted = {ISheetB.__identifier__: 'dummy_cstruct'}
         assert wanted == response['data']
 
 
-class SimpleRESTViewUnitTest(unittest.TestCase):
+class TestSimpleRESTView:
 
-    def setUp(self):
-        self.context = DummyFolder(__provides__=IResourceX)
-        resource_registry = make_mock_resource_registry()
+    @fixture()
+    def request(self, mock_resource_registry):
         request = CorniceDummyRequest()
-        request.registry.content = resource_registry
-        self.request = request
-        self.resource_sheets = request.registry.content.resource_sheets
+        request.registry.content = mock_resource_registry
+        return request
 
     def make_one(self, context, request):
         from adhocracy.rest.views import SimpleRESTView
         return SimpleRESTView(context, request)
 
-    def test_create_valid(self, ):
+    def test_create_valid(self, context, request):
         from adhocracy.rest.views import ResourceRESTView
         from adhocracy.rest.schemas import PUTResourceRequestSchema
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         assert issubclass(inst.__class__, ResourceRESTView)
         assert inst.validation_PUT == (PUTResourceRequestSchema, [])
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
-    def test_put_valid_no_sheets(self):
-        self.resource_sheets.return_value = {}
-        self.request.validated = {"content_type": "X", "data": {}}
+    def test_put_valid_no_sheets(self, request, context):
+        request.validated = {"content_type": "X", "data": {}}
 
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         response = inst.put()
 
-        wanted = {'path': '/', 'content_type': IResourceX.__identifier__}
+        wanted = {'path': '/', 'content_type': IResource.__identifier__}
         assert wanted == response
 
-    @patch('adhocracy.sheets.GenericResourceSheet', autospec=True)
-    def test_put_valid_with_sheets(self, dummy_sheet=None):
-        sheet = dummy_sheet.return_value
-        self.resource_sheets.return_value = {ISheetB.__identifier__: sheet}
+    def test_put_valid_with_sheets(self, request, context, mock_sheet):
+        request.registry.content.resource_sheets.return_value = {ISheetB.__identifier__: mock_sheet}
         data = {'content_type': 'X',
                 'data': {ISheetB.__identifier__: {'x': 'y'}}}
-        self.request.validated = data
+        request.validated = data
 
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         response = inst.put()
 
-        wanted = {'path': '/', 'content_type': IResourceX.__identifier__}
+        wanted = {'path': '/', 'content_type': IResource.__identifier__}
         assert wanted == response
-        assert sheet.set.call_args[0][0] == {'x': 'y'}
+        assert mock_sheet.set.call_args[0][0] == {'x': 'y'}
 
 
-class PoolRESTViewUnitTest(unittest.TestCase):
+class TestPoolRESTView:
 
-    def setUp(self):
-        self.context = DummyFolder()
-        resource_registry = make_mock_resource_registry()
-        request = CorniceDummyRequest(root=self.context)
-        request.registry.content = resource_registry
-        self.request = request
-        self.create = request.registry.content.create
+    @fixture()
+    def request(self, mock_resource_registry):
+        request = CorniceDummyRequest()
+        request.registry.content = mock_resource_registry
+        return request
 
     def make_one(self, context, request):
         from adhocracy.rest.views import PoolRESTView
         return PoolRESTView(context, request)
 
-    def test_create(self, ):
+    def test_create(self, request, context):
         from adhocracy.rest.views import SimpleRESTView
         from adhocracy.rest.schemas import POSTResourceRequestSchema
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         assert issubclass(inst.__class__, SimpleRESTView)
         assert inst.validation_POST == (POSTResourceRequestSchema, [])
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
-    def test_post_valid(self):
+    def test_post_valid(self, request, context):
+        request.root = context
         child = testing.DummyResource(__provides__=IResourceX)
-        child.__parent__ = self.context
+        child.__parent__ = context
         child.__name__ = 'child'
-        self.create.return_value = child
-        self.request.validated = {'content_type': IResourceX.__identifier__,
+        request.registry.content.create.return_value = child
+        request.validated = {'content_type': IResourceX.__identifier__,
                                   'data': {}}
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         response = inst.post()
 
         wanted = {'path': '/child', 'content_type': IResourceX.__identifier__}
         assert wanted == response
 
 
-class ItemRESTViewUnitTest(unittest.TestCase):
+class TestItemRESTView:
 
-    def setUp(self):
-        self.context = DummyFolder()
-        resource_registry = make_mock_resource_registry()
-        request = CorniceDummyRequest(root=self.context)
-        request.registry.content = resource_registry
-        self.request = request
-        self.create = request.registry.content.create
+    @fixture()
+    def request(self, mock_resource_registry):
+        request = CorniceDummyRequest()
+        request.registry.content = mock_resource_registry
+        return request
 
     def make_one(self, context, request):
         from adhocracy.rest.views import ItemRESTView
         return ItemRESTView(context, request)
 
-    def test_create(self, ):
+    def test_create(self, request, context):
         from adhocracy.rest.views import validate_post_root_versions
         from adhocracy.rest.views import SimpleRESTView
         from adhocracy.rest.schemas import POSTItemRequestSchema
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         assert issubclass(inst.__class__, SimpleRESTView)
         assert inst.validation_POST == (POSTItemRequestSchema,
                                         [validate_post_root_versions])
@@ -460,60 +422,63 @@ class ItemRESTViewUnitTest(unittest.TestCase):
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
-    def test_get_item_with_first_version(self):
+    def test_get_item_with_first_version(self, request, context):
+        from zope.interface import directlyProvides
         from adhocracy.interfaces import IItem
         from adhocracy.interfaces import IItemVersion
-        context = testing.DummyResource(__provides__=IItem)
+        directlyProvides(context, IItem)
         context['first'] = testing.DummyResource(__provides__=IItemVersion)
 
-        inst = self.make_one(context, self.request)
+        inst = self.make_one(context, request)
 
         wanted = {'path': '/', 'data': {},
                   'content_type': IItem.__identifier__,
                   'first_version_path': '/first'}
         assert inst.get() == wanted
 
-    def test_get_item_without_first_version(self):
+    def test_get_item_without_first_version(self, request, context):
         from adhocracy.interfaces import IItem
         context = testing.DummyResource(__provides__=IItem)
         context['non_first'] = testing.DummyResource()
 
-        inst = self.make_one(context, self.request)
+        inst = self.make_one(context, request)
 
         wanted = {'path': '/', 'data': {},
                   'content_type': IItem.__identifier__,
                   'first_version_path': ''}
         assert inst.get() == wanted
 
-    def test_post_valid(self):
+    def test_post_valid(self, request, context):
+        request.root = context
         child = testing.DummyResource(__provides__=IResourceX,
-                                      __parent__=self.context,
+                                      __parent__=context,
                                       __name__='child')
-        self.create.return_value = child
-        self.request.validated = {'content_type': IResourceX.__identifier__,
+        request.registry.content.create.return_value = child
+        request.validated = {'content_type': IResourceX.__identifier__,
                                   'data': {}}
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         response = inst.post()
 
         wanted = {'path': '/child', 'content_type': IResourceX.__identifier__}
-        self.create.assert_called_with(IResourceX.__identifier__, self.context,
+        request.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
                                        creator=None,
                                        appstructs={},
                                        root_versions=[])
         assert wanted == response
 
-    def test_post_valid_item(self):
+    def test_post_valid_item(self, request, context):
         from adhocracy.interfaces import IItem
         from adhocracy.interfaces import IItemVersion
+        request.root = context
         child = testing.DummyResource(__provides__=IItem,
-                                      __parent__=self.context,
+                                      __parent__=context,
                                       __name__='child')
         first = testing.DummyResource(__provides__=IItemVersion)
         child['first'] = first
-        self.create.return_value = child
-        self.request.validated = {'content_type': IItemVersion.__identifier__,
+        request.registry.content.create.return_value = child
+        request.validated = {'content_type': IItemVersion.__identifier__,
                                   'data': {}}
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         response = inst.post()
 
         wanted = {'path': '/child',
@@ -521,115 +486,114 @@ class ItemRESTViewUnitTest(unittest.TestCase):
                   'first_version_path': '/child/first'}
         assert wanted == response
 
-    def test_post_valid_itemversion(self):
+    def test_post_valid_itemversion(self, request, context):
         from adhocracy.interfaces import IItemVersion
+        request.root = context
         child = testing.DummyResource(__provides__=IItemVersion,
-                                      __parent__=self.context,
+                                      __parent__=context,
                                       __name__='child')
         root = testing.DummyResource(__provides__=IItemVersion)
-        self.create.return_value = child
-        self.request.validated = {'content_type':
+        request.registry.content.create.return_value = child
+        request.validated = {'content_type':
                                       IItemVersion.__identifier__,
                                   'data': {},
                                   'root_versions': [root]}
-        inst = self.make_one(self.context, self.request)
+        inst = self.make_one(context, request)
         response = inst.post()
 
         wanted = {'path': '/child',
                   'content_type': IItemVersion.__identifier__}
-        assert self.create.call_args[1]['root_versions'] == [root]
+        assert request.registry.content.create.call_args[1]['root_versions'] == [root]
         assert wanted == response
 
 
-class MetaApiViewUnitTest(unittest.TestCase):
+class TestMetaApiView:
 
-    def setUp(self):
-        from adhocracy.interfaces import resource_metadata
-        from adhocracy.interfaces import sheet_metadata
-        self.context = DummyFolder()
-        resource_registry = make_mock_resource_registry()
+    @fixture()
+    def request(self, mock_resource_registry):
         request = CorniceDummyRequest()
-        request.registry.content = resource_registry
-        self.request = request
-        self.resources_metadata = request.registry.content.resources_metadata
-        self.sheets_metadata = request.registry.content.sheets_metadata
-        self.resource_meta = resource_metadata._replace(iresource=IResource)
-        self.sheet_meta = sheet_metadata._replace(
-            isheet=ISheet,
-            schema_class=colander.MappingSchema)
+        request.registry.content = mock_resource_registry
+        return request
 
-    def make_one(self):
+    @fixture()
+    def resource_meta(self):
+        from adhocracy.interfaces import resource_metadata
+        return resource_metadata._replace(iresource=IResource)
+
+    @fixture()
+    def sheet_meta(self):
+        from adhocracy.interfaces import sheet_metadata
+        return sheet_metadata._replace(isheet=ISheet,
+                                       schema_class=colander.MappingSchema)
+
+    def make_one(self, request, context):
         from adhocracy.rest.views import MetaApiView
-        return MetaApiView(self.context, self.request)
+        return MetaApiView(context, request)
 
-    def test_get_empty(self):
-        self.resources_metadata.return_value = {}
-        inst = self.make_one()
-
+    def test_get_empty(self, request, context):
+        inst = self.make_one(request, context)
         response = inst.get()
-
         assert sorted(response.keys()) == ['resources', 'sheets']
         assert response['resources'] == {}
         assert response['sheets'] == {}
 
-    def test_get_resources(self):
-        metas = {IResource.__identifier__: self.resource_meta}
-        self.resources_metadata.return_value = metas
-        inst = self.make_one()
+    def test_get_resources(self, request, context, resource_meta):
+        metas = {IResource.__identifier__: resource_meta}
+        request.registry.content.resources_metadata.return_value = metas
+        inst = self.make_one(request, context)
         resp = inst.get()
         assert IResource.__identifier__ in resp['resources']
         assert resp['resources'][IResource.__identifier__] == {'sheets': []}
 
-    def test_get_resources_with_sheets_metadata(self):
-        metas = {IResource.__identifier__: self.resource_meta._replace(
+    def test_get_resources_with_sheets_metadata(self, request, context, resource_meta):
+        metas = {IResource.__identifier__: resource_meta._replace(
             basic_sheets=[ISheet],
             extended_sheets=[ISheetB])}
-        self.resources_metadata.return_value = metas
-        inst = self.make_one()
+        request.registry.content.resources_metadata.return_value = metas
+        inst = self.make_one(request, context)
 
         resp = inst.get()['resources']
 
         wanted_sheets = [ISheet.__identifier__, ISheetB.__identifier__]
         assert wanted_sheets == resp[IResource.__identifier__]['sheets']
 
-    def test_get_resources_with_element_types_metadata(self):
-        metas = {IResource.__identifier__: self.resource_meta._replace(
+    def test_get_resources_with_element_types_metadata(self, request, context, resource_meta):
+        metas = {IResource.__identifier__: resource_meta._replace(
             element_types=[IResource, IResourceX])}
-        self.resources_metadata.return_value = metas
-        inst = self.make_one()
+        request.registry.content.resources_metadata.return_value = metas
+        inst = self.make_one(request, context)
 
         resp = inst.get()['resources']
 
         wanted = [IResource.__identifier__, IResourceX.__identifier__]
         assert wanted == resp[IResource.__identifier__]['element_types']
 
-    def test_get_resources_with_item_type_metadata(self):
-        metas = {IResource.__identifier__: self.resource_meta._replace(
+    def test_get_resources_with_item_type_metadata(self, request, context, resource_meta):
+        metas = {IResource.__identifier__: resource_meta._replace(
             item_type=IResourceX)}
-        self.resources_metadata.return_value = metas
-        inst = self.make_one()
+        request.registry.content.resources_metadata.return_value = metas
+        inst = self.make_one(request, context)
 
         resp = inst.get()['resources']
 
         wanted = IResourceX.__identifier__
         assert wanted == resp[IResource.__identifier__]['item_type']
 
-    def test_get_sheets(self):
-        sheets_meta = {ISheet.__identifier__: self.sheet_meta}
-        self.sheets_metadata.return_value = sheets_meta
-        inst = self.make_one()
+    def test_get_sheets(self, request, context, sheet_meta):
+        metas = {ISheet.__identifier__: sheet_meta}
+        request.registry.content.sheets_metadata.return_value = metas
+        inst = self.make_one(request, context)
         response = inst.get()
         assert ISheet.__identifier__ in response['sheets']
         assert 'fields' in response['sheets'][ISheet.__identifier__]
         assert response['sheets'][ISheet.__identifier__]['fields'] == []
 
-    def test_get_sheets_with_field(self):
-        class SchemaF(self.sheet_meta.schema_class):
+    def test_get_sheets_with_field(self, request, context, sheet_meta):
+        class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(colander.Int())
-
-        sheet_meta = self.sheet_meta._replace(schema_class=SchemaF)
-        self.sheets_metadata.return_value = {ISheet.__identifier__: sheet_meta}
-        inst = self.make_one()
+        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
+        request.registry.content.sheets_metadata.return_value = metas
+        inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
 
@@ -642,13 +606,12 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert field_metadata['name'] == 'test'
         assert 'valuetype' in field_metadata
 
-    def test_get_sheet_with_readonly_field(self):
-        class SchemaF(self.sheet_meta.schema_class):
+    def test_get_sheet_with_readonly_field(self, request, context, sheet_meta):
+        class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(colander.Int(), readonly=True)
-
-        sheet_meta = self.sheet_meta._replace(schema_class=SchemaF)
-        self.sheets_metadata.return_value = {ISheet.__identifier__: sheet_meta}
-        inst = self.make_one()
+        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
+        request.registry.content.sheets_metadata.return_value = metas
+        inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
 
@@ -657,13 +620,12 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert field_metadata['creatable'] is False
         assert field_metadata['create_mandatory'] is False
 
-    def test_get_sheets_with_field_colander_noniteratable(self):
-        class SchemaF(self.sheet_meta.schema_class):
+    def test_get_sheets_with_field_colander_noniteratable(self, request, context, sheet_meta):
+        class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(colander.Int())
-
-        sheet_meta = self.sheet_meta._replace(schema_class=SchemaF)
-        self.sheets_metadata.return_value = {ISheet.__identifier__: sheet_meta}
-        inst = self.make_one()
+        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
+        request.registry.content.sheets_metadata.return_value = metas
+        inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
 
@@ -671,15 +633,13 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert 'containertype' not in field_metadata
         assert field_metadata['valuetype'] == 'Integer'
 
-    def test_get_sheets_with_field_adhocracy_noniteratable(self):
+    def test_get_sheets_with_field_adhocracy_noniteratable(self, request, context, sheet_meta):
         from adhocracy.schema import Name
-
-        class SchemaF(self.sheet_meta.schema_class):
+        class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(Name())
-
-        sheet_meta = self.sheet_meta._replace(schema_class=SchemaF)
-        self.sheets_metadata.return_value = {ISheet.__identifier__: sheet_meta}
-        inst = self.make_one()
+        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
+        request.registry.content.sheets_metadata.return_value = metas
+        inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
 
@@ -687,16 +647,14 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert 'containertype' not in field_metadata
         assert field_metadata['valuetype'] == 'adhocracy.schema.Name'
 
-    def test_get_sheets_with_field_adhocracy_referencelist(self):
+    def test_get_sheets_with_field_adhocracy_referencelist(self, request, context, sheet_meta):
         from adhocracy.interfaces import SheetToSheet
         from adhocracy.schema import ListOfUniqueReferences
-
-        class SchemaF(self.sheet_meta.schema_class):
+        class SchemaF(colander.MappingSchema):
             test = ListOfUniqueReferences(reftype=SheetToSheet)
-
-        sheet_meta = self.sheet_meta._replace(schema_class=SchemaF)
-        self.sheets_metadata.return_value = {ISheet.__identifier__: sheet_meta}
-        inst = self.make_one()
+        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
+        request.registry.content.sheets_metadata.return_value = metas
+        inst = self.make_one(request, context)
 
         sheet_metadata = inst.get()['sheets'][ISheet.__identifier__]
 
@@ -705,179 +663,150 @@ class MetaApiViewUnitTest(unittest.TestCase):
         assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
 
 
-class ValidateLoginEmailUnitTest(unittest.TestCase):
+class TestValidateLoginEmail:
+
+    @fixture()
+    def request(self, registry):
+        request = CorniceDummyRequest(registry=registry)
+        request.validated['email'] = 'user@example.org'
+        return request
 
     def _call_fut(self, context, request):
         from adhocracy.rest.views import validate_login_email
         return validate_login_email(context, request)
 
-    def setUp(self):
-        config = testing.setUp()
-        request = CorniceDummyRequest(registry=config.registry)
-        request.validated['email'] = 'user@example.org'
-        self.request = request
-        self.context = testing.DummyResource()
-        self.user = testing.DummyResource()
+    def test_valid(self, request, context, mock_user_locator):
+        user = testing.DummyResource()
+        mock_user_locator.get_user_by_email.return_value = user
+        self._call_fut(context, request)
+        assert request.validated['user'] == user
 
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_valid(self):
-        locator = _create_dummy_user_locator(self.request.registry)
-        locator.get_user_by_email.return_value = self.user
-        self._call_fut(self.context, self.request)
-        assert self.request.validated['user'] == self.user
-
-    def test_invalid(self):
-        locator = _create_dummy_user_locator(self.request.registry)
-        locator.get_user_by_email.return_value = None
-        self._call_fut(self.context, self.request)
-        assert 'user' not in self.request.validated
-        assert 'User doesn\'t exist' in self.request.errors[0]['description']
+    def test_invalid(self, request, context, mock_user_locator):
+        mock_user_locator.get_user_by_email.return_value = None
+        self._call_fut(context, request)
+        assert 'user' not in request.validated
+        assert 'User doesn\'t exist' in request.errors[0]['description']
 
 
-class ValidateLoginNameUnitTest(unittest.TestCase):
+class TestValidateLoginNameUnitTest:
+
+    @fixture()
+    def request(self, registry):
+        request = CorniceDummyRequest(registry=registry)
+        request.validated['name'] = 'user'
+        return request
 
     def _call_fut(self, context, request):
         from adhocracy.rest.views import validate_login_name
         return validate_login_name(context, request)
 
-    def setUp(self):
-        config = testing.setUp()
-        request = CorniceDummyRequest(registry=config.registry)
-        request.validated['name'] = 'user'
-        self.request = request
-        self.context = testing.DummyResource()
-        self.user = testing.DummyResource()
+    def test_invalid(self, request, context, mock_user_locator):
+        mock_user_locator.get_user_by_login.return_value = None
+        self._call_fut(context, request)
+        assert 'User doesn\'t exist' in request.errors[0]['description']
 
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_invalid(self):
-        locator = _create_dummy_user_locator(self.request.registry)
-        locator.get_user_by_login.return_value = None
-        self._call_fut(self.context, self.request)
-        assert 'User doesn\'t exist' in self.request.errors[0]['description']
-
-    def test_valid(self):
-        locator = _create_dummy_user_locator(self.request.registry)
-        locator.get_user_by_login.return_value = self.user
-        self._call_fut(self.context, self.request)
-        assert self.request.validated['user'] == self.user
+    def test_valid(self, request, context, mock_user_locator):
+        user = testing.DummyResource()
+        mock_user_locator.get_user_by_login.return_value = user
+        self._call_fut(context, request)
+        assert request.validated['user'] == user
 
 
-class ValidateLoginPasswordUnitTest(unittest.TestCase):
+class TestValidateLoginPasswordUnitTest:
+
+    @fixture()
+    def request(self, registry):
+        from adhocracy.sheets.user import IPasswordAuthentication
+        request = CorniceDummyRequest(registry=registry)
+        user = testing.DummyResource(__provides__=IPasswordAuthentication)
+        request.validated['user'] = user
+        request.validated['password'] = 'lalala'
+        return request
 
     def _call_fut(self, context, request):
         from adhocracy.rest.views import validate_login_password
         return validate_login_password(context, request)
 
-    def setUp(self):
-        from adhocracy.sheets.user import IPasswordAuthentication
-        user = testing.DummyResource(__provides__=IPasswordAuthentication)
-        config = testing.setUp()
-        request = CorniceDummyRequest(registry=config.registry)
-        request.validated['user'] = user
-        request.validated['password'] = 'lalala'
-        self.request = request
-        self.context = testing.DummyResource()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_valid(self):
-        sheet = _create_dummy_password_sheet_adapter(self.request.registry)
+    def test_valid(self, request, context, mock_password_sheet):
+        sheet = mock_password_sheet
         sheet.check_plaintext_password.return_value = True
-        self._call_fut(self.context, self.request)
-        assert self.request.errors == []
+        self._call_fut(context, request)
+        assert request.errors == []
 
-    def test_invalid(self):
-        sheet = _create_dummy_password_sheet_adapter(self.request.registry)
+    def test_invalid(self, request, context, mock_password_sheet):
+        sheet = mock_password_sheet
         sheet.check_plaintext_password.return_value = False
-        self._call_fut(self.context, self.request)
-        assert 'password is wrong' in self.request.errors[0]['description']
+        self._call_fut(context, request)
+        assert 'password is wrong' in request.errors[0]['description']
 
-    def test_invalid_with_ValueError(self):
-        sheet = _create_dummy_password_sheet_adapter(self.request.registry)
+    def test_invalid_with_ValueError(self, request, context, mock_password_sheet):
+        sheet = mock_password_sheet
         sheet.check_plaintext_password.side_effect = ValueError
-        self._call_fut(self.context, self.request)
-        assert 'password is wrong' in self.request.errors[0]['description']
+        self._call_fut(context, request)
+        assert 'password is wrong' in request.errors[0]['description']
 
-    def test_user_is_None(self):
-        self.request.validated['user'] = None
-        self._call_fut(self.context, self.request)
-        assert self.request.errors == []
+    def test_user_is_None(self, request, context):
+        request.validated['user'] = None
+        self._call_fut(context, request)
+        assert request.errors == []
 
 
-class LoginUserNameViewUnitTest(unittest.TestCase):
+class TestLoginUserName:
+
+    @fixture()
+    def request(self, registry):
+        request = CorniceDummyRequest(registry=registry)
+        request.validated['user'] = testing.DummyResource()
+        request.validated['password'] = 'lalala'
+        return request
 
     def _make_one(self, request, context):
         from adhocracy.rest.views import LoginUsernameView
         return LoginUsernameView(request, context)
 
-    def setUp(self):
-        config = testing.setUp()
-        request = CorniceDummyRequest()
-        request.registry = config.registry
-        request.validated['user'] = testing.DummyResource
-        self.request = request
-        self.context = testing.DummyResource()
-
-    def test_post_without_token_authentication_policy(self):
-        inst = self._make_one(self.context, self.request)
+    def test_post_without_token_authentication_policy(self, request, context):
+        inst = self._make_one(context, request)
         with pytest.raises(KeyError):
             inst.post()
 
-    def test_post_with_token_authentication_policy(self):
-        policy = _create_dummy_token_authentication_policy(self.request.registry)
-        policy.remember.return_value = {'X-User-Path': '/user',
-                                        'X-User-Token': 'token'}
-        inst = self._make_one(self.context, self.request)
+    def test_post_with_token_authentication_policy(self, request, context, mock_authpolicy):
+        mock_authpolicy.remember.return_value = {'X-User-Path': '/user',
+                                                 'X-User-Token': 'token'}
+        inst = self._make_one(context, request)
         assert inst.post() == {'status': 'success',
                                'user_path': '/user',
                                'user_token': 'token'}
 
 
-class LoginEmailViewUnitTest(unittest.TestCase):
+class TestLoginEmailView:
 
-    def _make_one(self, request, context):
+    @fixture
+    def request(self, registry):
+        request = CorniceDummyRequest(registry=registry)
+        request.validated['user'] = testing.DummyResource()
+        return request
+
+    def _make_one(self, context, request):
         from adhocracy.rest.views import LoginEmailView
-        return LoginEmailView(request, context)
+        return LoginEmailView(context, request)
 
-    def setUp(self):
-        config = testing.setUp()
-        request = CorniceDummyRequest()
-        request.registry = config.registry
-        request.validated['user'] = testing.DummyResource
-        self.request = request
-        self.context = testing.DummyResource()
-
-    def test_post_without_token_authentication_policy(self):
-        inst = self._make_one(self.context, self.request)
+    def test_post_without_token_authentication_policy(self, request, context):
+        inst = self._make_one(context, request)
         with pytest.raises(KeyError):
             inst.post()
 
-    def test_post_with_token_authentication_policy(self):
-        policy = _create_dummy_token_authentication_policy(self.request.registry)
-        policy.remember.return_value = {'X-User-Path': '/user',
-                                        'X-User-Token': 'token'}
-        inst = self._make_one(self.context, self.request)
+    def test_post_with_token_authentication_policy(self, request, context, mock_authpolicy):
+        mock_authpolicy.remember.return_value = {'X-User-Path': '/user',
+                                                 'X-User-Token': 'token'}
+        inst = self._make_one(context, request)
         assert inst.post() == {'status': 'success',
                                'user_path': '/user',
                                'user_token': 'token'}
 
 
-class IncludemeIntegrationTest(unittest.TestCase):
+class TestIntegrationIncludeme:
 
-    def setUp(self):
-        config = testing.setUp()
+    def test_includeme(self, config):
+        """Check that include me runs without errors."""
         config.include('cornice')
         config.include('adhocracy.rest.views')
-        self.config = config
-        self.config.commit()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_register_views(self):
-        pass

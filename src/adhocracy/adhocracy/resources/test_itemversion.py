@@ -30,7 +30,7 @@ def _add_resource_type_to_registry(metadata, registry):
 class ItemVersionIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        from adhocracy.testing import create_folder_with_graph
+        from adhocracy.testing import create_pool_with_graph
         config = testing.setUp()
         config.include('adhocracy.registry')
         config.include('adhocracy.events')
@@ -39,7 +39,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         config.include('adhocracy.sheets.name')
         config.include('adhocracy.resources.itemversion')
         self.config = config
-        self.context = create_folder_with_graph()
+        self.context = create_pool_with_graph()
         self.objectmap = self.context.__objectmap__
         self.graph = self.context.__graph__
 
