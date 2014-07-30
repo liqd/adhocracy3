@@ -32,6 +32,7 @@ test_requires = [
     'webtest',
     'pytest-splinter',
     'pytest-pyramid',
+    'pytest-timeout',
     'coverage',
     'requests',
     'ipdb',
