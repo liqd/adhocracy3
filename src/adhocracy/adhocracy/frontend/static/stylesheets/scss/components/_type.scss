@@ -1,11 +1,16 @@
 body {
-    color: $fg;
+    color: $color-prime-standard;
+    font-family: $font-family-standard;
+    font-weight: $font-weight-standard;
+    font-size: $font-size-standard;
+    letter-spacing: $font-letter-spacing-standard;
     line-height: 1.5;
 }
 
 h1, h2, h3, h4, h5, h6 {
     // better kerning (char spacing)
     text-rendering: optimizelegibility;
+    color: $color-prime-extrovert;
 }
 
 p {
@@ -33,7 +38,7 @@ A hyperlink. It may have the following states:
 ```
 */
 a {
-    color: $primary-color;
+    color: $color-highlight-standard;
 }
 
 // smaller headings
@@ -59,7 +64,7 @@ table {
     td, th {
         @include text-align(start);
         padding: 0.5em;
-        border-top: 1px solid mix($bg, $fg);
+        border-top: 1px solid $color-structure-border;
     }
 
     thead, tfoot {
@@ -100,7 +105,7 @@ ins {
 blockquote {
     position: relative;
     font-style: italic;
-    border-left: 0.4em solid $primary-color;
+    border-left: 0.4em solid $color-highlight-standard;
     padding-left: 0.5em;
     margin: 1.5em;
 
@@ -121,7 +126,7 @@ figcaption {
 // code
 code {
     font-size: 0.9em;
-    background-color: $bg2;
+    background-color: $color-structure-surface;
 }
 
 pre {
@@ -129,8 +134,8 @@ pre {
     display: block;
     padding: 0.7em;
     font-size: 0.9em;
-    background-color: $bg2;
-    border: 1px solid mix($bg2, $fg);
+    background-color: $color-structure-surface;
+    border: 1px solid $color-structure-border;
     max-height: 18em;
     overflow: auto;
 

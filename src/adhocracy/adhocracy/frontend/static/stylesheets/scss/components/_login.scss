@@ -18,7 +18,7 @@ A simple box containing text.
 */
 .textbox {
     .m-unobtrusive {
-        color: $fg2;
+        color: $color-secondary-extrovert;
     }
 }
 
@@ -39,7 +39,7 @@ A generic box with a single button.
 ```
 */
 .box-with-button {
-    border: 1px solid $border;
+    border: 1px solid $color-structure-border;
     padding: 1em;
 
     .button,
