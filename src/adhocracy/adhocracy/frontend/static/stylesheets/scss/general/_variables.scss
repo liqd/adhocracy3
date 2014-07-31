@@ -65,7 +65,7 @@ $color-structure-surface: #dadad9;
 $color-structure-border: #9d9c9c;
 
 .example-color {
-    @include display(inline-block);
+    @include inline-block;
     height: 3em;
     width: 3em;
     border: 1px solid $color-structure-border;
