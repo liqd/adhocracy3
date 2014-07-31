@@ -19,6 +19,7 @@ import AdhUser = require("./Packages/User/User");
 import AdhDone = require("./Packages/Done/Done");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
+import AdhInject = require("./Packages/Inject/Inject");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -77,6 +78,7 @@ export var init = (config) => {
     app.factory("adhDone", AdhDone.factory);
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
+    app.directive("inject", AdhInject.factory);
     app.service("adhHttp", ["$http", "$q", AdhHttp.Service]);
     app.factory("adhWebSocket", ["Modernizr", "adhConfig", AdhWebSocket.factory]);
 
