@@ -1,3 +1,59 @@
+/*doc
+---
+title: Colors
+name: colors
+category: Variables
+---
+
+<table class="styleguide-colors">
+    <tr>
+        <td><div class="example-color color-prime-standard"></div></td>
+        <td><code>color-prime-standard</code></td>
+        <td>Default color for running text</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-prime-extrovert"></div></td>
+        <td><code>color-prime-extrovert</code></td>
+        <td>Default color for headings</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-secondary-extrovert"></div></td>
+        <td><code>color-secondary-extrovert</code></td>
+        <td>For secondar text</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-secondary-introvert"></div></td>
+        <td><code>color-secondary-introvert</code></td>
+        <td>For secondar text</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-highlight-standard"></div></td>
+        <td><code>color-highlight-standard</code></td>
+        <td>For highlighted content such as links</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-highlight-reverse"></div></td>
+        <td><code>color-highlight-reverse</code></td>
+        <td>Used as either forground or background with
+            <code>color-highlight-standard</code></td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-background"></div></td>
+        <td><code>color-background</code></td>
+        <td>Default background color</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-structure-surface"></div></td>
+        <td><code>color-structure-surface</code></td>
+        <td>Secondary background color</td>
+    </tr>
+    <tr>
+        <td><div class="example-color color-structure-border"></div></td>
+        <td><code>color-structure-border</code></td>
+        <td>Default border color</td>
+    </tr>
+</table>
+*/
 $color-prime-standard: #575756;
 $color-prime-extrovert: #1c1c1b;
 $color-secondary-extrovert: #9d9c9c;
@@ -7,6 +63,24 @@ $color-highlight-reverse: white;
 $color-background: white;
 $color-structure-surface: #dadad9;
 $color-structure-border: #9d9c9c;
+
+.example-color {
+    @include display(inline-block);
+    height: 3em;
+    width: 3em;
+    border: 1px solid $color-structure-border;
+}
+
+.color-prime-standard {background-color: $color-prime-standard;}
+.color-prime-extrovert {background-color: $color-prime-extrovert;}
+.color-secondary-extrovert {background-color: $color-secondary-extrovert;}
+.color-secondary-introvert {background-color: $color-secondary-introvert;}
+.color-highlight-standard {background-color: $color-highlight-standard;}
+.color-highlight-reverse {background-color: $color-highlight-reverse;}
+.color-background {background-color: $color-background;}
+.color-structure-surface {background-color: $color-structure-surface;}
+.color-structure-border {background-color: $color-structure-border;}
+
 
 $font-family-standard: "Open Sans", sans-serif;
 $font-weight-standard: normal;
