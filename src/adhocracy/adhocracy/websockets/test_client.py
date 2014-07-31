@@ -182,9 +182,9 @@ class ClientUnitTests(unittest.TestCase):
 class TestFunctionalClient:
 
     @fixture()
-    def websocket_client(self, request, websocket):
+    def websocket_client(self, request, websocket, settings):
         from adhocracy.websockets.client import Client
-        client = Client(ws_url='ws://localhost:8080')
+        client = Client(ws_url=settings['adhocracy.ws_url'])
         request.addfinalizer(client.stop)
         return client
 

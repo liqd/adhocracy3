@@ -178,18 +178,32 @@ def mock_user_locator(registry) -> Mock:
     return locator
 
 
-@fixture(scope='class')
-def configurator(request) -> Configurator:
-    """Return the adhocracy configuration.
-
-    The path to the config file is set by the py.test --pc argument.
-    """
+def get_settings(request, part):
+    """Return settings of a config part."""
     config_parser = ConfigParser()
     config_file = request.config.getvalue('pyramid_config')
     config_parser.read(config_file)
     settings = {}
-    for option, value in config_parser.items('app:main'):
+    for option, value in config_parser.items(part):
         settings[option] = value
+    return settings
+
+
+@fixture(scope='session')
+def settings(request) -> dict:
+    """Return pyramid settings."""
+    return get_settings(request, 'app:main')
+
+
+@fixture(scope='session')
+def ws_settings(request) -> Configurator:
+    """Return websocket server settings."""
+    return get_settings(request, 'websockets')
+
+
+@fixture(scope='class')
+def configurator(request, settings) -> Configurator:
+    """Return pyramid configuration."""
     configuration = Configurator(settings=settings, root_factory=root_factory)
     return configuration
 
@@ -214,9 +228,9 @@ def zeo(request) -> bool:
 
 
 @fixture(scope='class')
-def websocket(request, zeo) -> bool:
+def websocket(request, zeo, ws_settings) -> bool:
     """Start websocket server."""
-    is_running = os.path.isfile('var/WS_SERVER.pid')
+    is_running = os.path.isfile(ws_settings['pid_file'])
     if is_running:
         return True
     config_file = request.config.getvalue('pyramid_config')
@@ -228,7 +242,7 @@ def websocket(request, zeo) -> bool:
     def fin():
         print('teardown websocket server')
         process.kill()
-        _kill_pid_in_file('var/WS_SERVER.pid')
+        _kill_pid_in_file(ws_settings['pid_file'])
 
     request.addfinalizer(fin)
     return True
