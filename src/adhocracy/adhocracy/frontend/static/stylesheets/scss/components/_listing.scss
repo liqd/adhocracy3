@@ -10,15 +10,15 @@ $action-width: 3em;
     list-style: none;
 }
 
-/* starting animations */
-.listing-elem {
+// starting animations
+.listing-element {
 
     &.ng-enter {
         @include transition(all 3s);
         background: greenyellow;
         @include opacity(0.5);
 
-        /* destination animations */
+        // destination animations
         &.ng-enter-active {
             background: white;
             @include opacity(1);
