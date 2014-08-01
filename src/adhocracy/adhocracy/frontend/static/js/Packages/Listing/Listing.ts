@@ -31,6 +31,7 @@ export interface ListingScope<Container> {
     title : string;
     container : Container;
     elements : string[];
+    update : (...any) => ng.IPromise<void>;
 }
 
 // FIXME: the way Listing works now is similar to ngRepeat, but it
@@ -77,20 +78,18 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                 adhWebSocket: AdhWebSocket.IService,
                 adhDone
             ) : void => {
-                var getHandler = (pool : Container): void => {
-                    $scope.container = pool;
-                    $scope.elements = _self.containerAdapter.elemRefs($scope.container);
-                };
-
-                var wsHandler = (event : AdhWebSocket.IServerEvent): void => {
-                    adhHttp.get($scope.path).then(getHandler);
+                $scope.update = (...args) : ng.IPromise<void> => {
+                    return adhHttp.get($scope.path).then((pool) => {
+                        $scope.container = pool;
+                        $scope.elements = _self.containerAdapter.elemRefs($scope.container);
+                    });
                 };
 
                 // (The call order is important: *first* subscribe to
                 // the updates, *then* get an initial copy.)
 
                 try {
-                    adhWebSocket.register($scope.path, wsHandler);
+                    adhWebSocket.register($scope.path, $scope.update);
 
                     // FIXME: subscribe returns an id, and we need to
                     // unsubscribe when the listing is shut down.  how
@@ -99,9 +98,8 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                     console.log(e);
                     console.log("Will continue on resource " + $scope.path + " without server bind.");
                 }
-                adhHttp.get($scope.path)
-                    .then(getHandler)
-                    .then(adhDone);
+
+                $scope.update().then(adhDone);
             }]
         };
     }

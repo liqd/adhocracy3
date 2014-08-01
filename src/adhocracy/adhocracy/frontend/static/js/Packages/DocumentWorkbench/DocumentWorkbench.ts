@@ -8,7 +8,6 @@ var pkgLocation = "/DocumentWorkbench";
 interface IDocumentWorkbenchScope extends ng.IScope {
     path : string;
     user : AdhUser.User;
-    insertParagraph : (any) => void;
 }
 
 export class DocumentWorkbench {
@@ -27,11 +26,6 @@ export class DocumentWorkbench {
             ) : void => {
                 $scope.path = adhConfig.root_path;
                 $scope.user = adhUser;
-
-                $scope.insertParagraph = (proposalVersion) => {
-                    // This function is called when we create a new proposal ourselves.
-                    // It could be used to update the proposal list.
-                };
             }]
         };
     }
