@@ -29,7 +29,7 @@ export var register = () => {
                 var scope = {};
 
                 beforeEach((done) => {
-                    adhProposal.postProposal("/path", "TestProposal", scope).then(done);
+                    (<any>adhProposal).postProposal("/path", "TestProposal", scope).then(done);
                 });
 
                 it("writes proposal into the scope", () => {
@@ -41,7 +41,7 @@ export var register = () => {
                 var scope = {};
 
                 beforeEach((done) => {
-                    adhProposal.postSection("/path", "TestSection", scope).then(done);
+                    (<any>adhProposal).postSection("/path", "TestSection", scope).then(done);
                 });
 
                 it("writes section into the scope", () => {
@@ -55,7 +55,7 @@ export var register = () => {
                 };
 
                 beforeEach((done) => {
-                    adhProposal.postParagraph("/path", "TestParagraph", scope).then(done);
+                    (<any>adhProposal).postParagraph("/path", "TestParagraph", scope).then(done);
                 });
 
                 it("writes paragraph into scope.paragraphs", () => {

@@ -281,7 +281,7 @@ export class ParagraphSheetEdit {
 export class Service {
     constructor(private adhHttp : AdhHttp.Service<any>, private $q : ng.IQService) {}
 
-    getNewestVersionPath(path : string) : ng.IPromise<any> {
+    private getNewestVersionPath(path : string) : ng.IPromise<any> {
         // FIXME conceptually, there is no single newest version.  Versions have a tree
         // structure and there can be many leafs to that tree.  This is not a technical
         // issue but a concept issue.  For now, we use the first leaf.
@@ -289,22 +289,22 @@ export class Service {
             .then((tag) => tag.data["adhocracy.sheets.tags.ITag"].elements[0]);
     }
 
-    postProposal(path : string, name : string, scope : {proposal? : any}) : ng.IPromise<void> {
+    private postProposal(path : string, name : string, scope : {proposal? : any}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new Resources.Proposal(name))
             .then((ret) => { scope.proposal = ret; });
     }
 
-    postSection(path : string, name : string, scope : {section? : any}) : ng.IPromise<void> {
+    private postSection(path : string, name : string, scope : {section? : any}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new Resources.Section(name))
             .then((ret) => { scope.section = ret; });
     }
 
-    postParagraph(path : string, name : string, scope : {paragraphs}) : ng.IPromise<void> {
+    private postParagraph(path : string, name : string, scope : {paragraphs}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new Resources.Paragraph(name))
             .then((ret) => { scope.paragraphs[name] = ret; });
     }
 
-    postParagraphs(path : string, names : string[], scope) : ng.IPromise<void> {
+    private postParagraphs(path : string, names : string[], scope) : ng.IPromise<void> {
         var _self = this;
 
         // we need to post the paragraph versions one after another in order to guarantee
@@ -317,13 +317,13 @@ export class Service {
         }
     }
 
-    postVersion(path : string, data) : ng.IPromise<any> {
+    private postVersion(path : string, data) : ng.IPromise<any> {
         var _self = this;
         return _self.getNewestVersionPath(path)
             .then((versionPath) => _self.adhHttp.postNewVersion(versionPath, data));
     }
 
-    postProposalVersion(proposal, data, sections, scope) : ng.IPromise<void> {
+    private postProposalVersion(proposal, data, sections, scope) : ng.IPromise<void> {
         var _self = this;
         return _self.$q.all(sections.map((section) => _self.getNewestVersionPath(section.path)))
             .then((sectionVersionPaths) => {
@@ -333,7 +333,7 @@ export class Service {
             });
     }
 
-    postSectionVersion(section, data, paragraphs, scope) : ng.IPromise<void> {
+    private postSectionVersion(section, data, paragraphs, scope) : ng.IPromise<void> {
         var _self = this;
         return _self.$q.all(paragraphs.map((paragraph) => _self.getNewestVersionPath(paragraph.path)))
             .then((paragraphVersionPaths) => {
@@ -343,7 +343,7 @@ export class Service {
             });
     }
 
-    postParagraphVersion(paragraph, data, scope : {proposal : any}) : ng.IPromise<void> {
+    private postParagraphVersion(paragraph, data, scope : {proposal : any}) : ng.IPromise<void> {
         var _self = this;
         return _self.getNewestVersionPath(scope.proposal.path)
             .then((proposalVersionPath) => {
@@ -353,7 +353,7 @@ export class Service {
             });
     }
 
-    postParagraphVersions(paragraphs : any[], datas : any[], scope) : ng.IPromise<void> {
+    private postParagraphVersions(paragraphs : any[], datas : any[], scope) : ng.IPromise<void> {
         var _self = this;
 
         // we need to post the paragraph versions one after another in order to guarantee
