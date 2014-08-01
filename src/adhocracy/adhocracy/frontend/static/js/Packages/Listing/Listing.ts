@@ -32,7 +32,6 @@ export interface ListingScope<Container> {
     container: Container;
     elements: string[];
     update : (...any) => ng.IPromise<void>;
-    insertParagraph : (any) => void;
 }
 
 // FIXME: the way Listing works now is similar to ngRepeat, but it
@@ -84,11 +83,6 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                         $scope.container = pool;
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
                     });
-                };
-
-                $scope.insertParagraph = (proposalVersion) => {
-                    // This function is called when we create a new proposal ourselves.
-                    // It could be used to update the proposal list.
                 };
 
                 // (The call order is important: *first* subscribe to
