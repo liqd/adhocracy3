@@ -1,4 +1,5 @@
 import AdhHttp = require("../Http/Http");
+import AdhConfig = require("../Config/Config");
 
 var pkgLocation = "/User";
 
@@ -32,7 +33,7 @@ interface IScopeRegister {
     };
     errors : string[];
 
-    register : () => ng.IPromise<IRegisterResponse>;
+    register : () => ng.IPromise<void>;
 }
 
 
@@ -60,8 +61,8 @@ export class User {
     data : IUserBasic;
 
     constructor(
-        private adhHttp,
-        private $q,
+        private adhHttp : AdhHttp.Service<any>,
+        private $q : ng.IQService,
         private $http : ng.IHttpService,
         private $window : Window,
         private Modernizr
@@ -79,7 +80,7 @@ export class User {
         }
     }
 
-    private enableToken(token : string, userPath : string) : void {
+    private enableToken(token : string, userPath : string) : ng.IPromise<void> {
         var _self : User = this;
 
         _self.token = token;
@@ -90,6 +91,7 @@ export class User {
         return _self.adhHttp.get(userPath)
             .then((resource) => {
                 _self.data = resource.data["adhocracy.sheets.user.IUserBasic"];
+                return resource;  // FIXME this is only here because of a bug in DefinitelyTyped
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect
@@ -98,7 +100,7 @@ export class User {
             });
     }
 
-    private storeAndEnableToken(token : string, userPath : string) : void {
+    private storeAndEnableToken(token : string, userPath : string) : ng.IPromise<void> {
         var _self : User = this;
 
         if (_self.Modernizr.localstorage) {
@@ -188,7 +190,7 @@ export class User {
 }
 
 
-export var loginDirective = (adhConfig) => {
+export var loginDirective = (adhConfig : AdhConfig.Type) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
@@ -229,7 +231,7 @@ export var loginDirective = (adhConfig) => {
 };
 
 
-export var registerDirective = (adhConfig, $location) => {
+export var registerDirective = (adhConfig : AdhConfig.Type, $location : ng.ILocationService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
@@ -244,12 +246,12 @@ export var registerDirective = (adhConfig, $location) => {
 
             $scope.errors = [];
 
-            $scope.register = () : ng.IPromise<IRegisterResponse> => {
+            $scope.register = () : ng.IPromise<void> => {
                 return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
-                    .then(() => {
+                    .then((response) => {
                         $scope.errors = [];
                         return adhUser.logIn($scope.input.username, $scope.input.password).then(
-                            () => $location.path("/frontend_static/root.html"),
+                            () => { $location.path("/frontend_static/root.html"); },
                             (errors) => bindServerErrors($scope, errors)
                         );
                     }, (errors) => bindServerErrors($scope, errors));
