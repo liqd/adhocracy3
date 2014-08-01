@@ -1,6 +1,6 @@
-<label>title: <input ng-model="sheet.title"></input></label>
-<textarea ng-model="sheet.description"></textarea>
-<div ng-repeat="sectionVersion in sectionVersions">
+<input type="text" class="m-title" ng-model="sheet.title" placeholder="title"></input>
+<textarea ng-model="sheet.description" placeholder="description"></textarea>
+<section ng-repeat="sectionVersion in sectionVersions">
     <adh-section-sheet-edit sheet="sectionVersion.data['adhocracy.sheets.document.ISection']">
     </adh-section-sheet-edit>
-</div>
+</section>

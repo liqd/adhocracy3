@@ -2,7 +2,7 @@
     <div class="navbar">
         <div class="navbar-left listing-sort placeholder">sort</div>
         <div class="navbar-left listing-view placeholder">view</div>
-        <a class="navbar-right button listing-add-button" ng-click="show.addForm = true" ng-init="show = {addForm: false}" ng-disabled="show.addForm">Add</a>
+        <a class="navbar-right button listing-add-button m-call-to-action" ng-click="show.addForm = true" ng-init="show = {addForm: false}" ng-disabled="show.addForm">Add</a>
     </div>
     <div class="listing-add-form" ng-if="show.addForm">
         <adh-proposal-version-new on-new-proposal="insertParagraph"></adh-proposal-version-new>
