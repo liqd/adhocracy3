@@ -60,7 +60,7 @@ export class Service implements IService {
 
     private embedderOrigin : string = "*";
 
-    constructor(private _postMessage : IPostMessageService, private $window, private $rootScope) {
+    constructor(private _postMessage : IPostMessageService, private $window : Window, private $rootScope) {
         var _self : Service = this;
 
         _self.registerMessageHandler("setup", _self.setup.bind(_self));
@@ -155,7 +155,7 @@ export class Dummy implements IService {
 }
 
 
-export var factory = (adhConfig : AdhConfig.Type, $window, $rootScope) : IService => {
+export var factory = (adhConfig : AdhConfig.Type, $window : Window, $rootScope) : IService => {
     if (adhConfig.embedded) {
         var postMessageToParent = $window.parent.postMessage.bind($window.parent);
         return new Service(postMessageToParent, $window, $rootScope);

@@ -232,7 +232,7 @@ export class ParagraphVersionDetail {
 
 export class DocumentSheetEdit {
 
-    public createDirective(adhHttp, $q, adhConfig: AdhConfig.Type) {
+    public createDirective(adhHttp : AdhHttp.Service<any>, $q : ng.IQService, adhConfig : AdhConfig.Type) {
         return {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Sheets/IDocument/Edit.html",

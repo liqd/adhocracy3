@@ -32,7 +32,7 @@ export interface IBaseService<Content extends Resources.Content<any>> {
 export interface ITransaction<Content extends Resources.Content<any>> extends IBaseService<Content> {}
 
 export class Service<Content extends Resources.Content<any>> implements IBaseService<Content> {
-    constructor(private $http : ng.IHttpService, private $q) {}
+    constructor(private $http : ng.IHttpService, private $q : ng.IQService) {}
 
     public get(path : string) : ng.IPromise<Content> {
         return this.$http.get(path).then(importContent, logBackendError);

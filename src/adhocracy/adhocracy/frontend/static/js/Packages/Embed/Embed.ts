@@ -1,3 +1,5 @@
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular-route.d.ts"/>
+
 import _ = require("underscore");
 
 import Util = require("../Util/Util");
@@ -9,7 +11,7 @@ import Util = require("../Util/Util");
  */
 var embeddableDirectives = ["document-workbench", "paragraph-version-detail"];
 
-export var route2template = ($route) => {
+export var route2template = ($route : ng.route.IRouteService) => {
     var params = $route.current.params;
 
     var attrs = [];
@@ -27,7 +29,7 @@ export var route2template = ($route) => {
     return Util.formatString("<adh-{0} {1}></adh-{0}>", _.escape(params.widget), attrs.join(" "));
 };
 
-export var factory = ($compile, $route) => {
+export var factory = ($compile : ng.ICompileService, $route : ng.route.IRouteService) => {
     return {
         restrict: "E",
         scope: {},
