@@ -8,12 +8,34 @@
  * Due to a scoping bug in Angular < 1.2.18 it was possible to use transclude
  * instead of inject to get similar results.
  *
- * The inject directive is directly taken from
+ * In addition to a modified scoping, the inject directive also allows to
+ * have multiple transcluded elements.
+ *
+ * Listing template:
+ *
+ *     <div class="Listing">
+ *        <inject data-transclusion-id="add-form"></inject>
+ *        <ol>
+ *            <li ng-repeat="element in elements">
+ *                <inject data-transclusion-id="element"></inject>
+ *            </li>
+ *        </ol>
+ *     </div>
+ *
+ * Some other template that uses listing:
+ *
+ *     <listing>
+ *         <adh-proposal-version-new data-transclusion-id="add-form"></adh-proposal-version-new>
+ *         <adh-proposal-detail path="element" data-transclusion-id="element"></adh-proposal-detail>
+ *     </listing>
+ *
+ * The inject directive is based on the one from
  * https://github.com/angular/angular.js/issues/7874#issuecomment-47647528
  */
 
 export var factory = () => {
     return {
+        restrict: "EAC",
         link: ($scope, $element, $attrs, controller, $transclude) => {
             if (!$transclude) {
                 throw "Illegal use of inject directive in the template! " +
@@ -22,7 +44,16 @@ export var factory = () => {
             var innerScope = $scope.$new();
             $transclude(innerScope, (clone) => {
                 $element.empty();
-                $element.append(clone);
+
+                var transclusionID = $element.data("transclusion-id");
+                if (typeof transclusionID !== "undefined") {
+                    $element.append(clone.filter(function() {
+                        return $(this).data("transclusion-id") === transclusionID;
+                    }));
+                } else {
+                    $element.append(clone);
+                }
+
                 $element.on("$destroy", () => {
                     innerScope.$destroy();
                 });

@@ -156,6 +156,11 @@ feature to pass a template snippet to the widget::
         <adh-element path="{{element}}"></adh-element>
     </adh-listing>
 
+.. note::
+
+   The ``inject`` directive allows passing multiple elements via
+   transclusion.
+
 [FIXME: document scope propagation; see FIXME near class
 Widget.Listing.  i think in order to get this done, we need to write
 our own transclude function and inject it to the directive's link
