@@ -10,49 +10,16 @@
     &:hover {
         text-decoration: none;
     }
-
-    // button and anchor element and have different default box sizing
-    @include box-sizing(border-box);
 }
 
-@mixin button-background($color) {
-    $light1: lighten($color, 5%);
-    $light2: lighten($color, 10%);
-    $dark1: darken($color, 5%);
-    $dark2: darken($color, 10%);
+@mixin button-color($fg, $bg) {
+    color: $fg;
+    border-color: $fg;
+    background-color: $bg;
 
-    background-color: $color;
-    @include background-image(linear-gradient(top, lighten($color, 5%), darken($color, 5%)));  // FIXME: to bottom
-    border: 1px solid $dark1;
-}
-
-@mixin button($color) {
-    @include button-base;
-    @include button-background($color);
-
-    color: $color-structure-surface;
-    min-width: 9em;
-    line-height: 1.8em;
-    height: 1.8em;  // fix height in firefox
-    font-size: normal;
-    padding: 0 0.5em;
-
-    &:hover,
-    &:focus,
-    &:active {
-        @include button-background(darken($color, 5%));
-    }
-
-    .inactive &,  // deprecated
-    &:disabled,
-    &.disabled {
-        @include button-background($color-secondary-introvert);
-        cursor: default;
-
-        &.active,
-        &:active {
-            @include box-shadow(none);
-        }
+    &.m-call-to-action {
+        color: $bg;
+        background-color: $fg;
     }
 }
 
@@ -100,9 +67,35 @@ button,
 input[type="reset"],
 input[type="submit"],
 input[type="button"] {
-    @include button($color-highlight-standard);
+    @include button-base;
 
-    &.m-call-to-action {
-        @include button-background(red);
+    $border-width: 0.25em;
+
+    border: $border-width solid;
+    font-weight: $font-weight-extrovert;
+    text-transform: uppercase;
+
+    min-width: 9em;
+    line-height: 2em;
+    height: 2em + 2 * $border-width;  // fix height in firefox
+    padding: 0 0.5em;
+
+    @include button-color($color-highlight-standard, $color-highlight-reverse);
+
+    &:active,
+    &:focus {
+        outline: 0;
+    }
+
+    &.has-focus, &:focus,
+    &.is-hover, &:hover {
+        @include button-color(lighten($color-highlight-standard, 10%), $color-highlight-reverse);
+    }
+
+    &:disabled,
+    &.is-disabled,
+    &.ng-disabled {
+        cursor: default;
+        @include button-color($color-secondary-extrovert, $color-structure-surface);
     }
 }
