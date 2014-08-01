@@ -60,11 +60,11 @@ export class User {
     data : IUserBasic;
 
     constructor(
-        public adhHttp,
-        public $q,
-        public $http : ng.IHttpService,
-        public $window : Window,
-        public Modernizr
+        private adhHttp,
+        private $q,
+        private $http : ng.IHttpService,
+        private $window : Window,
+        private Modernizr
     ) {
         var _self : User = this;
 

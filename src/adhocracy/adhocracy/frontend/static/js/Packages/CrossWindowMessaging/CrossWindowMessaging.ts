@@ -60,7 +60,7 @@ export class Service implements IService {
 
     private embedderOrigin : string = "*";
 
-    constructor(public _postMessage : IPostMessageService, public $window, public $rootScope) {
+    constructor(private _postMessage : IPostMessageService, private $window, private $rootScope) {
         var _self : Service = this;
 
         _self.registerMessageHandler("setup", _self.setup.bind(_self));
