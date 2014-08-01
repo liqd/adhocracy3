@@ -19,3 +19,38 @@ This mixin provides fallbacks for CSS3 values to `text-align`, i.e. `start` and
         text-align: $value;
     }
 }
+
+/*doc
+---
+title: Placeholder
+name: placeholder
+category: Compability
+---
+
+This mixin allows to set attributes to placeholders in several browser.
+
+```
+@include placeholder {
+    color: black;
+}
+```
+
+*This is not part of any W3C standard.*
+*/
+@mixin placeholder {
+    &::-webkit-input-placeholder {
+        @content;
+    }
+
+    &:-moz-placeholder {  // Firefox 18-
+        @content;
+    }
+
+    &::-moz-placeholder {  // Firefox 19+
+        @content;
+    }
+
+    &:-ms-input-placeholder {
+        @content;
+    }
+}

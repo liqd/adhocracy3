@@ -15,21 +15,10 @@ They can have the following states:
 -   is-disabled
 
 ```html_example
-<input placeholder="you must not leave this empty" required=required />
-<input disabled="disabled" />
+<input type="text" placeholder="you must not leave this empty" required=required />
+<input type="text" disabled="disabled" placeholder="disabled" />
 ```
 */
-input {
-    &.ng-invalid,
-    &:invalid {
-        outline: lightcoral auto 5px;
-        outline-offset: -2px;
-
-        &:focus {
-            outline-color: red;
-        }
-    }
-}
 
 /*doc
 ---
@@ -52,6 +41,21 @@ They should all look and behave similarily.
 <input type="time" placeholder="time" />
 <input type="number" placeholder="number" />
 <input type="text" placeholder="required" required="required" />
+<textarea placeholder="textarea"></textarea>
+```
+*/
+
+/*doc
+---
+title: Title modifier
+name: textinput.m-title
+parent: textinput
+---
+
+Textinput that represents a title.
+
+```html_example
+<input type="text" placeholder="title" class="m-title"/>
 ```
 */
 input[type="text"],
@@ -60,10 +64,49 @@ input[type="password"],
 input[type="email"],
 input[type="date"],
 input[type="time"],
-input[type="number"] {
+input[type="number"],
+textarea {
     display: block;
-    min-width: 13em;
+    width: 100%;
     margin-bottom: 0.5em;
+    padding: 0.5em $font-size-standard * 0.5;
+    border: 1px solid $color-structure-border;
+    color: $color-prime-standard;
+    background-color: $color-background;
+
+    @include placeholder {
+        color: $color-secondary-extrovert;
+        @include opacity(1);
+    }
+
+    &.m-title {
+        font-size: $font-size-large;
+    }
+
+    &.has-focus,
+    &:focus {
+        border-color: $color-highlight-standard;
+        outline: 1px solid $color-highlight-standard;
+    }
+
+    &.ng-invalid,
+    &:invalid {
+        border-color: lightcoral;
+        outline: 1px solid lightcoral;
+
+        &.has-focus,
+        &:focus {
+            border-color: $red;
+            outline: 1px solid $red;
+        }
+    }
+
+    &.is-disabled,
+    &.ng-disabled,
+    &:disabled {
+        background-color: $color-structure-surface;
+        color: $color-secondary-extrovert;
+    }
 }
 
 /*doc
