@@ -56,7 +56,7 @@ States:
     }
 
     .moving-column-content2 {
-        @include moving-column(12, 24);
+        @include moving-column(12, 18);
     }
 
     &.is-detail {
