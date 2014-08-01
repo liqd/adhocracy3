@@ -5,7 +5,14 @@
     </div>
     <div class="moving-column-content">
         <adh-listing path="{{path}}" title="proposals listing (by titles)">
-            <adh-proposal-detail path="element"></adh-proposal-detail>
+            <adh-proposal-version-new
+                data-on-new-proposal="update"
+                data-transclusion-id="add-form">
+            </adh-proposal-version-new>
+            <adh-proposal-detail
+                data-path="element"
+                data-transclusion-id="element">
+            </adh-proposal-detail>
         </adh-listing>
     </div>
     <div class="moving-column-content2 placeholder">

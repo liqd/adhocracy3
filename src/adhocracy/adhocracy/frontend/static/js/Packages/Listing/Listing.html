@@ -5,12 +5,12 @@
         <a class="navbar-right button listing-add-button" ng-click="show.addForm = true" ng-init="show = {addForm: false}" ng-disabled="show.addForm">Add</a>
     </div>
     <div class="listing-add-form" ng-if="show.addForm">
-        <adh-proposal-version-new on-new-proposal="update"></adh-proposal-version-new>
+        <inject data-transclusion-id="add-form"></inject>
         <a href="" ng-click="show.addForm = false">cancel</a>
     </div>
     <ol class="listing-rows">
         <li class="listing-element" ng-repeat="element in elements">
-            <span data-inject="inject"></span>
+            <inject data-transclusion-id="element"></inject>
         </li>
     </ol>
 </div>
