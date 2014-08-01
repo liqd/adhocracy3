@@ -130,6 +130,8 @@ TypeScript
 
 -  Use ``type[]`` rather than ``Array<type>``.
 
+-  A colon used for types must always be sorrounded by single spaces.
+
 Lambdas
 ~~~~~~~
 

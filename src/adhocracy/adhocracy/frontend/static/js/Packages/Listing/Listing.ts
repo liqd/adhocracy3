@@ -27,10 +27,10 @@ export class ListingPoolAdapter extends AbstractListingContainerAdapter {
 }
 
 export interface ListingScope<Container> {
-    path: string;
-    title: string;
-    container: Container;
-    elements: string[];
+    path : string;
+    title : string;
+    container : Container;
+    elements : string[];
 }
 
 // FIXME: the way Listing works now is similar to ngRepeat, but it
@@ -55,11 +55,11 @@ export interface ListingScope<Container> {
 // in one listing. We should add a proper warning if that occurs or handle that case properly.
 //
 export class Listing<Container extends Resources.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter> {
-    public static templateUrl: string = pkgLocation + "/Listing.html";
+    public static templateUrl : string = pkgLocation + "/Listing.html";
 
-    constructor(public containerAdapter: ContainerAdapter) {}
+    constructor(private containerAdapter : ContainerAdapter) {}
 
-    public createDirective(adhConfig: AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.Type) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
@@ -77,12 +77,12 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                 adhWebSocket: AdhWebSocket.IService,
                 adhDone
             ) : void => {
-                var getHandler = (pool: Container): void => {
+                var getHandler = (pool : Container): void => {
                     $scope.container = pool;
                     $scope.elements = _self.containerAdapter.elemRefs($scope.container);
                 };
 
-                var wsHandler = (event: AdhWebSocket.IServerEvent): void => {
+                var wsHandler = (event : AdhWebSocket.IServerEvent): void => {
                     adhHttp.get($scope.path).then(getHandler);
                 };
 

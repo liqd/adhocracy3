@@ -51,7 +51,7 @@ export class ProposalDetail {
                         });
                 };
 
-                var wsHandler = (event: AdhWebSocket.IServerEvent): void => {
+                var wsHandler = (event : AdhWebSocket.IServerEvent) : void => {
                     fetchAndUpdateContent($scope.path);
                 };
 
@@ -73,9 +73,9 @@ export class ProposalDetail {
 }
 
 export class ProposalVersionDetail {
-    public static templateUrl: string = "Resources/IProposalVersion/Detail.html";
+    public static templateUrl : string = "Resources/IProposalVersion/Detail.html";
 
-    public createDirective(adhConfig: AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.Type) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
@@ -122,7 +122,7 @@ export class ProposalVersionDetail {
 
 export class ProposalVersionEdit {
 
-    public createDirective(adhConfig: AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.Type) {
 
         return {
             restrict: "E",
@@ -136,7 +136,7 @@ export class ProposalVersionEdit {
 
 export class ProposalVersionNew {
 
-    public createDirective(adhHttp: ng.IHttpService, adhConfig: AdhConfig.Type, adhProposal: Service) {
+    public createDirective(adhHttp : ng.IHttpService, adhConfig : AdhConfig.Type, adhProposal : Service) {
 
         return {
             restrict: "E",
@@ -169,7 +169,7 @@ export class ProposalVersionNew {
 
 export class SectionVersionDetail {
 
-    public createDirective(adhConfig: AdhConfig.Type, recursionHelper) {
+    public createDirective(adhConfig : AdhConfig.Type, recursionHelper) {
 
         return {
             restrict: "E",
@@ -201,7 +201,7 @@ export class SectionVersionDetail {
 
 export class ParagraphVersionDetail {
 
-    public createDirective(adhConfig: AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.Type) {
 
         return {
             restrict: "E",
@@ -255,7 +255,7 @@ export class DocumentSheetEdit {
 
 export class DocumentSheetShow {
 
-    public createDirective (adhConfig: AdhConfig.Type) {
+    public createDirective (adhConfig : AdhConfig.Type) {
         return {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Sheets/IDocument/Show.html",
@@ -267,7 +267,7 @@ export class DocumentSheetShow {
 }
 
 export class ParagraphSheetEdit {
-    public createDirective (adhConfig: AdhConfig.Type) {
+    public createDirective (adhConfig : AdhConfig.Type) {
         return {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Sheets/IParagraph/Edit.html",
@@ -279,9 +279,9 @@ export class ParagraphSheetEdit {
 }
 
 export class Service {
-    constructor(public adhHttp : AdhHttp.Service<any>, public $q: ng.IQService) {}
+    constructor(private adhHttp : AdhHttp.Service<any>, private $q : ng.IQService) {}
 
-    getNewestVersionPath(path: string) : ng.IPromise<any> {
+    getNewestVersionPath(path : string) : ng.IPromise<any> {
         // FIXME conceptually, there is no single newest version.  Versions have a tree
         // structure and there can be many leafs to that tree.  This is not a technical
         // issue but a concept issue.  For now, we use the first leaf.
@@ -289,22 +289,22 @@ export class Service {
             .then((tag) => tag.data["adhocracy.sheets.tags.ITag"].elements[0]);
     }
 
-    postProposal(path: string, name: string, scope: {proposal?: any}) : ng.IPromise<void> {
+    postProposal(path : string, name : string, scope : {proposal? : any}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new Resources.Proposal(name))
             .then((ret) => { scope.proposal = ret; });
     }
 
-    postSection(path: string, name: string, scope: {section?: any}) : ng.IPromise<void> {
+    postSection(path : string, name : string, scope : {section? : any}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new Resources.Section(name))
             .then((ret) => { scope.section = ret; });
     }
 
-    postParagraph(path: string, name: string, scope: {paragraphs}) : ng.IPromise<void> {
+    postParagraph(path : string, name : string, scope : {paragraphs}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new Resources.Paragraph(name))
             .then((ret) => { scope.paragraphs[name] = ret; });
     }
 
-    postParagraphs(path: string, names: string[], scope) : ng.IPromise<void> {
+    postParagraphs(path : string, names : string[], scope) : ng.IPromise<void> {
         var _self = this;
 
         // we need to post the paragraph versions one after another in order to guarantee
@@ -317,7 +317,7 @@ export class Service {
         }
     }
 
-    postVersion(path: string, data) : ng.IPromise<any> {
+    postVersion(path : string, data) : ng.IPromise<any> {
         var _self = this;
         return _self.getNewestVersionPath(path)
             .then((versionPath) => _self.adhHttp.postNewVersion(versionPath, data));
@@ -343,7 +343,7 @@ export class Service {
             });
     }
 
-    postParagraphVersion(paragraph, data, scope: {proposal: any}) : ng.IPromise<void> {
+    postParagraphVersion(paragraph, data, scope : {proposal : any}) : ng.IPromise<void> {
         var _self = this;
         return _self.getNewestVersionPath(scope.proposal.path)
             .then((proposalVersionPath) => {
@@ -353,7 +353,7 @@ export class Service {
             });
     }
 
-    postParagraphVersions(paragraphs: any[], datas: any[], scope) : ng.IPromise<void> {
+    postParagraphVersions(paragraphs : any[], datas : any[], scope) : ng.IPromise<void> {
         var _self = this;
 
         // we need to post the paragraph versions one after another in order to guarantee
@@ -366,7 +366,7 @@ export class Service {
         }
     }
 
-    public postProposalWithParagraphs(proposalVersion: Resources.PartialIProposalVersion, paragraphVersions) {
+    public postProposalWithParagraphs(proposalVersion : Resources.PartialIProposalVersion, paragraphVersions) {
         var _self = this;
 
         var sectionVersion = new Resources.Resource("adhocracy_sample.resources.section.ISectionVersion");
@@ -375,7 +375,7 @@ export class Service {
         var name = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
         name = Util.normalizeName(name);
 
-        var scope : {proposal?: any; section?: any; paragraphs: {}} = {
+        var scope : {proposal? : any; section? : any; paragraphs : {}} = {
             paragraphs: {}
         };
 

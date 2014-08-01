@@ -12,9 +12,9 @@ interface IDocumentWorkbenchScope extends ng.IScope {
 }
 
 export class DocumentWorkbench {
-    public static templateUrl: string = pkgLocation + "/DocumentWorkbench.html";
+    public static templateUrl : string = pkgLocation + "/DocumentWorkbench.html";
 
-    public createDirective(adhConfig: AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.Type) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
