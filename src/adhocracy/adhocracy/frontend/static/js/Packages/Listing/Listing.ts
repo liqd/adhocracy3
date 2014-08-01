@@ -31,6 +31,7 @@ export interface ListingScope<Container> {
     title: string;
     container: Container;
     elements: string[];
+    insertParagraph : (any) => void;
 }
 
 // FIXME: the way Listing works now is similar to ngRepeat, but it
@@ -86,6 +87,11 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                     adhHttp.get($scope.path).then(getHandler);
                 };
 
+                $scope.insertParagraph = (proposalVersion) => {
+                    // This function is called when we create a new proposal ourselves.
+                    // It could be used to update the proposal list.
+                };
+
                 // (The call order is important: *first* subscribe to
                 // the updates, *then* get an initial copy.)
 
@@ -99,6 +105,7 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                     console.log(e);
                     console.log("Will continue on resource " + $scope.path + " without server bind.");
                 }
+
                 adhHttp.get($scope.path)
                     .then(getHandler)
                     .then(adhDone);
