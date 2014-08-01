@@ -1,3 +1,13 @@
+/*doc
+---
+title: Text align
+name: text-align
+category: Compability
+---
+
+This mixin provides fallbacks for CSS3 values to `text-align`, i.e. `start` and
+`end`.
+*/
 @mixin text-align($value) {
     @if $value == start {
         text-align: left;
