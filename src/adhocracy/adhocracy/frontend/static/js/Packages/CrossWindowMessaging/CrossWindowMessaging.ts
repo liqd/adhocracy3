@@ -145,11 +145,11 @@ export class Dummy implements IService {
         this.dummy = true;
     }
 
-    registerMessageHandler(name, callback) {
+    public registerMessageHandler(name, callback) {
         return;
     }
 
-    postResize(height) {
+    public postResize(height) {
         return;
     }
 }
