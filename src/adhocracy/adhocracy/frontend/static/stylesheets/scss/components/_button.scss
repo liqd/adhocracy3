@@ -56,21 +56,6 @@
     }
 }
 
-@mixin button-small($color) {
-    // will always overwrite button, so no need to repeat everything
-    min-width: 0;
-    line-height: 1.4em; // em needed for border-radius
-    height: auto;
-    font-size: small;
-    @include border-radius(0.7em);
-    padding: 0 0.9em;
-
-    &:active,
-    &.active {
-        @include box-shadow(1px 2px 1px #333 inset);
-    }
-}
-
 /*doc
 ---
 title: button
@@ -120,21 +105,4 @@ input[type="button"] {
     &.m-call-to-action {
         @include button-background(red);
     }
-}
-
-/*doc
----
-title: Small Button
-name: button-small
-category: Buttons
----
-
-```html_example
-<a class="button-small">Small Button</a>
-```
-*/
-.button_small,  // deprecated
-.button-small {
-    @include button($color-highlight-standard);
-    @include button-small($color-highlight-standard);
 }
