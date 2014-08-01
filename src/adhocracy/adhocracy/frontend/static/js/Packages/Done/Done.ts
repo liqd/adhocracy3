@@ -4,4 +4,3 @@
  * a real callback in your tests.
  */
 export var done = () => null;
-export var factory = () => done;

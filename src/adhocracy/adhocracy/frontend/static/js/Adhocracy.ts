@@ -77,7 +77,7 @@ export var init = (config) => {
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
     app.value("adhConfig", config);
-    app.factory("adhDone", AdhDone.factory);
+    app.value("adhDone", AdhDone.done);
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
