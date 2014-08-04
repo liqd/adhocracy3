@@ -64,7 +64,13 @@ export class Service implements IService {
         var _self : Service = this;
 
         _self.registerMessageHandler("setup", _self.setup.bind(_self));
-        _self.manageResize();
+
+        // FIXME: the current default design does not require resizing and
+        // also will break if resizing is activated. There should be a proper
+        // way of disabeling this.
+        if (false) {
+            _self.manageResize();
+        }
 
         _self.postMessage("requestSetup", {});
     }
