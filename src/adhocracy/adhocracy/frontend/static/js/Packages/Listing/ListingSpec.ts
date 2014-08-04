@@ -85,7 +85,7 @@ export var register = () => {
                 adapter.elemRefs.and.returnValue(elements);
 
                 var listing = new Listing.Listing(adapter);
-                var directive: ng.IDirective = listing.createDirective(config);
+                var directive: ng.IDirective = listing.createDirective(config, adhWebSocketMock);
 
                 registerDirectiveSpec(directive);
 

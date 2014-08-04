@@ -89,8 +89,8 @@ export var init = (config) => {
     app.directive("adhEmbed", ["$compile", "$route", Embed.factory]);
 
     app.directive("adhListing",
-        ["adhConfig", (adhConfig) =>
-            new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig)]);
+        ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
+            new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
 
     app.directive("adhWebSocketTest",
         ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>
