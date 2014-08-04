@@ -426,7 +426,7 @@ mkNick = (modulePath : string, metaApi : IMetaApi) : string => {
             throw "mkNick: " + modulePath;
         }
     } else {
-        return "";
+        return modulePath;
     }
 };
 
