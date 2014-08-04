@@ -86,9 +86,8 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                     });
                 };
 
-                // (The call order is important: *first* subscribe to
-                // the updates, *then* get an initial copy.)
-
+                // (The call order is important: first subscribe to
+                // the updates, then get an initial copy.)
                 try {
                     adhWebSocket.register($scope.path, $scope.update);
 
