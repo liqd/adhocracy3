@@ -25,6 +25,7 @@ import AdhInject = require("./Packages/Inject/Inject");
 import AdhMetaApi = require("./Packages/MetaApi/MetaApi");
 import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
+import AdhComment = require("./Packages/Comment/Comment");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -115,6 +116,8 @@ export var init = (config, meta_api) => {
         ["adhConfig", "adhCrossWindowMessaging", (adhConfig) =>
             new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig)]);
 
+    app.directive("adhComment",
+        ["adhConfig", (adhConfig) => new AdhComment.Comment().createDirective(adhConfig)]);
     app.directive("adhProposalDetail", () => new Proposal.ProposalDetail().createDirective());
     app.directive("adhProposalVersionDetail",
         ["adhConfig", (adhConfig) => new Proposal.ProposalVersionDetail().createDirective(adhConfig)]);
