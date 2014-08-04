@@ -547,13 +547,6 @@ canonicalizePath = (filepath : string) : string => {
 
 
 
-
-
-// FIXME: before posting, delete read-only attributes / sheets from
-// resources based on meta-api information.
-
-// FIXME: _updSheet methods for all sheets, resources.
-
 // FIXME: adapter code will be written manually written files in the
 // directory tree under Resources_.  this means that we will commit
 // auto-generated code, and also that we will have to think of a
