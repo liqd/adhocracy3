@@ -326,10 +326,6 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
     var mkGettersSetters = (tab : string) : string => {
         var os : string[] = [];
 
-        // FIXME: this will be more interesting as soon as we get
-        // around implementing read-only / optional / ... sheet
-        // attributes.
-
         for (var x in resource.sheets) {
             if (resource.sheets.hasOwnProperty(x)) {
                 var name = resource.sheets[x];
