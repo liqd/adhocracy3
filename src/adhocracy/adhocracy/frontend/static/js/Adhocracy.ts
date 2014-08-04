@@ -117,9 +117,14 @@ export var init = (config, meta_api) => {
         ["adhConfig", "adhCrossWindowMessaging", (adhConfig) =>
             new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig)]);
 
-    app.directive("adhComment", ["adhConfig", (adhConfig) => {
+    app.directive("adhCommentCreate", ["adhConfig", (adhConfig) => {
         var adapter = new AdhCommentAdapter.CommentAdapter();
-        var widget = new AdhComment.Comment(adapter);
+        var widget = new AdhComment.CommentCreate(adapter);
+        return widget.createDirective(adhConfig);
+    }]);
+    app.directive("adhCommentDetail", ["adhConfig", (adhConfig) => {
+        var adapter = new AdhCommentAdapter.CommentAdapter();
+        var widget = new AdhComment.CommentDetail(adapter);
         return widget.createDirective(adhConfig);
     }]);
     app.directive("adhProposalDetail", () => new Proposal.ProposalDetail().createDirective());
