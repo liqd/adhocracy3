@@ -11,13 +11,13 @@
  * In addition to a modified scoping, the inject directive also allows to
  * have multiple transcluded elements.
  *
- * Listing template:
+ * Example: Listing template:
  *
  *     <div class="Listing">
- *        <inject data-transclusion-id="add-form"></inject>
+ *        <inject data-transclusion-id="add-form-id"></inject>
  *        <ol>
  *            <li ng-repeat="element in elements">
- *                <inject data-transclusion-id="element"></inject>
+ *                <inject data-transclusion-id="element-id"></inject>
  *            </li>
  *        </ol>
  *     </div>
@@ -30,6 +30,23 @@
  *             <adh-proposal-detail data-path="element" data-ng-switch-when="element-id"></adh-proposal-detail>
  *         </div>
  *     </listing>
+ *
+ * The purpose of data-transclusion-id is a bit confusing until you
+ * think of it as function application with named arguments: the
+ * definition of the listing template has the form (in tsc syntax):
+ *
+ *     var listing = (add-form-id, element-id) => { render("<div class...</div>"); }
+ *
+ * And the application of this template has the form:
+ *
+ *     listing("<adh-proposal-version-new ...", "<adh-proposal-detail ...");
+ *
+ * The bug in Angular < 1.2.18 gave us dynamic scoping for the
+ * `element` variable in the example: The scope is opened in the
+ * definition of Listing, but accessed in the application.  A better
+ * solution would be to do this with something like a lambda
+ * abstraction as well, but we haven't gotten around figuring out how
+ * quite yet.
  *
  * The inject directive is based on the one from
  * https://github.com/angular/angular.js/issues/7874#issuecomment-47647528
