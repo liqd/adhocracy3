@@ -13,6 +13,8 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
 }
 
 export class Comment {
+    constructor(private adapter : ICommentAdapter<any>) {}
+
     public createDirective(adhConfig : AdhConfig.Type) {
         return {
             restrict: "E",
