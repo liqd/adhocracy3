@@ -86,7 +86,7 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                 adhHttp: AdhHttp.Service<Container>,
                 adhDone
             ) : void => {
-                $scope.update = (...args) : ng.IPromise<void> => {
+                $scope.update = () : ng.IPromise<void> => {
                     return adhHttp.get($scope.path).then((pool) => {
                         $scope.container = pool;
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
