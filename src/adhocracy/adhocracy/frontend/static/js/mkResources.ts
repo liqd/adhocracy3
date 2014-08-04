@@ -12,6 +12,23 @@ import u = require("./mkResources/Util");
 
 
 /***********************************************************************
+ * config section
+ */
+
+interface IConfig {
+    nickNames : boolean;
+    sheetGetters : boolean;
+    sheetSetters : boolean;
+}
+
+var config : IConfig = {
+    nickNames : true,
+    sheetGetters : true,
+    sheetSetters : true
+};
+
+
+/***********************************************************************
  * types
  */
 
@@ -233,6 +250,7 @@ enabledFields = (fields : ISheetField[], enableFlags ?: string) : ISheetField[] 
 };
 
 mkSheetSetter = (nick : string, fields : ISheetField[], _selfType : string) : string => {
+    if (config.sheetSetters) {
     var ef = enabledFields(fields, "ECM");
 
     if (!ef.length) {
@@ -261,9 +279,13 @@ mkSheetSetter = (nick : string, fields : ISheetField[], _selfType : string) : st
         os.push("};\n");
         return u.intercalate(os, "\n");
     }
+    } else {
+        return "";
+    }
 };
 
 mkSheetGetter = (nick : string, _selfType : string) : string => {
+    if (config.sheetGetters) {
     var os = [];
     os.push("export var _get" + mkSheetName(nick) + " = (");
     os.push("    _self : " + _selfType);
@@ -271,6 +293,9 @@ mkSheetGetter = (nick : string, _selfType : string) : string => {
     os.push("    return _self.data[\"" + nick + "\"];");
     os.push("};\n");
     return u.intercalate(os, "\n");
+    } else {
+        return "";
+    }
 };
 
 renderResource = (modulePath : string, resource : IResource, modules : IModuleDict, metaApi : IMetaApi) : void => {
@@ -329,10 +354,13 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
         for (var x in resource.sheets) {
             if (resource.sheets.hasOwnProperty(x)) {
                 var name = resource.sheets[x];
+                if (config.sheetGetters) {
                 os.push("public get" + mkSheetName(mkNick(name, metaApi)) + "() {");
                 os.push("    return " + mkModuleName(name, metaApi) + "." + "_get" + mkSheetName(mkNick(name, metaApi)) + "(this);");
                 os.push("}");
+                }
 
+                if (config.sheetSetters) {
                 var ef = enabledFields(metaApi.sheets[name].fields, "ECM");
                 if (ef.length) {
                     os.push("public set" + mkSheetName(mkNick(name, metaApi)) + "(");
@@ -344,6 +372,7 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
                     os.push("    );");
                     os.push("    return _self;");
                     os.push("}");
+                }
                 }
             }
         }
@@ -388,12 +417,16 @@ mkImportStatement = (modulePath : string, relativeRoot : string, metaApi : IMeta
 };
 
 mkNick = (modulePath : string, metaApi : IMetaApi) : string => {
+    if (config.nickNames) {
     if (metaApi.sheets.hasOwnProperty(modulePath)) {
         return metaApi.sheets[modulePath].nick;
     } else if (metaApi.resources.hasOwnProperty(modulePath)) {
         return metaApi.resources[modulePath].nick;
     } else {
         throw "mkNick: " + modulePath;
+    }
+    } else {
+        return "";
     }
 };
 
