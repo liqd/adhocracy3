@@ -22,9 +22,9 @@ interface IConfig {
 }
 
 var config : IConfig = {
-    nickNames : true,
-    sheetGetters : true,
-    sheetSetters : true
+    nickNames : false,
+    sheetGetters : false,
+    sheetSetters : false
 };
 
 
@@ -144,8 +144,22 @@ http.request(options, callback).end();
 compileAll = (metaApi : IMetaApi) : void => {
     var modules : IModuleDict = {};
 
-    u.injectNickDict(metaApi.sheets);
-    u.injectNickDict(metaApi.resources);
+    if (config.nickNames) {
+        u.injectNickDict(metaApi.sheets);
+        u.injectNickDict(metaApi.resources);
+    } else {
+        var name : string;
+        for (name in metaApi.sheets) {
+            if (metaApi.sheets.hasOwnProperty(name)) {
+                metaApi.sheets[name].nick = name;
+            }
+        }
+        for (name in metaApi.resources) {
+            if (metaApi.resources.hasOwnProperty(name)) {
+                metaApi.resources[name].nick = name;
+            }
+        }
+    }
 
     for (var sheetName in metaApi.sheets) {
         if (metaApi.sheets.hasOwnProperty(sheetName)) {
@@ -417,16 +431,12 @@ mkImportStatement = (modulePath : string, relativeRoot : string, metaApi : IMeta
 };
 
 mkNick = (modulePath : string, metaApi : IMetaApi) : string => {
-    if (config.nickNames) {
-        if (metaApi.sheets.hasOwnProperty(modulePath)) {
-            return metaApi.sheets[modulePath].nick;
-        } else if (metaApi.resources.hasOwnProperty(modulePath)) {
-            return metaApi.resources[modulePath].nick;
-        } else {
-            throw "mkNick: " + modulePath;
-        }
+    if (metaApi.sheets.hasOwnProperty(modulePath)) {
+        return metaApi.sheets[modulePath].nick;
+    } else if (metaApi.resources.hasOwnProperty(modulePath)) {
+        return metaApi.resources[modulePath].nick;
     } else {
-        return modulePath;
+        throw "mkNick: " + modulePath;
     }
 };
 
