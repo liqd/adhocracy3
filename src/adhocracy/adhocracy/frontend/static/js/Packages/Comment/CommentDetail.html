@@ -1,0 +1,7 @@
+<div class="comment">
+    <div class="comment-content" data-ng-switch="viewmode">
+        <textarea data-ng-switch-when="edit">{{content}}</textarea>
+        <div data-ng-switch-default>{{content}}</div>
+    </div>
+    <div class="comment-meta">{{creator}}</div>
+</div>

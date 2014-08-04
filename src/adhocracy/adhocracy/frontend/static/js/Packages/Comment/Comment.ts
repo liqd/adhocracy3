@@ -75,8 +75,22 @@ export class CommentDetail {
                 path: "=",
                 viemode: "="
             },
-            controller: [() => {
-                return;
+            controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
+                var res;
+
+                $scope.edit = () => {
+                    _self.adapter.content(res, $scope.content);
+                    // FIXME: send res via adhHttp
+                };
+
+                adhHttp.getNewestVersionPath($scope.path)
+                    .then((path) => adhHttp.resolve(path))
+                    .then((_res) => {
+                        res = <AdhResource.Content<any>>_res;
+                        $scope.content = _self.adapter.content(res);
+                        $scope.creator = _self.adapter.creator(res);
+                    })
+                    .then(adhDone);
             }]
         };
     }
