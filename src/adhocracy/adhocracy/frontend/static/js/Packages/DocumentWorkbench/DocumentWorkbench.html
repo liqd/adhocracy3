@@ -19,8 +19,20 @@
             </div>
         </adh-listing>
     </div>
-    <div class="moving-column-content2 placeholder">
-        secondary content
+    <div class="moving-column-content2">
         {{content2Url}}
+        <adh-listing data-path="/adhocracy/asd">
+            <div data-ng-switch="transclusionId">
+                <adh-comment-create
+                    data-refers-to="/adhocracy/asd/VERSION_0000000"
+                    data-ng-switch-when="create-form-id">
+                </adh-comment-create>
+                <adh-comment-detail
+                    data-path="element"
+                    data-viemode="'list'"
+                    data-ng-switch-when="element-id">
+                </adh-comment-detail>
+            </div>
+        </adh-listing>
     </div>
 </div>
