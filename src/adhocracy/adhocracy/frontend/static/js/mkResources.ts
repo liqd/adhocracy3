@@ -251,34 +251,34 @@ enabledFields = (fields : ISheetField[], enableFlags ?: string) : ISheetField[] 
 
 mkSheetSetter = (nick : string, fields : ISheetField[], _selfType : string) : string => {
     if (config.sheetSetters) {
-    var ef = enabledFields(fields, "ECM");
+        var ef = enabledFields(fields, "ECM");
 
-    if (!ef.length) {
-        return "";
-    } else {
-        var os = [];
-        os.push("export var _set" + mkSheetName(nick) + " = (");
-        os.push("    _self : " + _selfType + ",");
-        os.push(mkFieldSignatures(ef, "    ", ",\n"));
-        os.push(") : " + _selfType + " => {");
-        os.push("    _self.data[\"" + nick + "\"] = {");
-        // set writeable fields to corresponding setter argument
-        os.push(mkFieldAssignments(ef, "        ") + ",");
-        // set hidden fields to null (or we will get type errors)
-        (() => {
-            var disabledFields = [];
-            fields.map((field) => {
-                if (ef.indexOf(field) === -1) {
-                    disabledFields.push(field);
-                }
-            });
-            os.push(u.mkThingList(disabledFields, (field) => field.name + ": null", "        ", ",\n"));
-        })();
-        os.push("    };");
-        os.push("    return _self;");
-        os.push("};\n");
-        return u.intercalate(os, "\n");
-    }
+        if (!ef.length) {
+            return "";
+        } else {
+            var os = [];
+            os.push("export var _set" + mkSheetName(nick) + " = (");
+            os.push("    _self : " + _selfType + ",");
+            os.push(mkFieldSignatures(ef, "    ", ",\n"));
+            os.push(") : " + _selfType + " => {");
+            os.push("    _self.data[\"" + nick + "\"] = {");
+            // set writeable fields to corresponding setter argument
+            os.push(mkFieldAssignments(ef, "        ") + ",");
+            // set hidden fields to null (or we will get type errors)
+            (() => {
+                var disabledFields = [];
+                fields.map((field) => {
+                    if (ef.indexOf(field) === -1) {
+                        disabledFields.push(field);
+                    }
+                });
+                os.push(u.mkThingList(disabledFields, (field) => field.name + ": null", "        ", ",\n"));
+            })();
+            os.push("    };");
+            os.push("    return _self;");
+            os.push("};\n");
+            return u.intercalate(os, "\n");
+        }
     } else {
         return "";
     }
@@ -286,13 +286,13 @@ mkSheetSetter = (nick : string, fields : ISheetField[], _selfType : string) : st
 
 mkSheetGetter = (nick : string, _selfType : string) : string => {
     if (config.sheetGetters) {
-    var os = [];
-    os.push("export var _get" + mkSheetName(nick) + " = (");
-    os.push("    _self : " + _selfType);
-    os.push(") : " + mkSheetName(nick) + " => {");
-    os.push("    return _self.data[\"" + nick + "\"];");
-    os.push("};\n");
-    return u.intercalate(os, "\n");
+        var os = [];
+        os.push("export var _get" + mkSheetName(nick) + " = (");
+        os.push("    _self : " + _selfType);
+        os.push(") : " + mkSheetName(nick) + " => {");
+        os.push("    return _self.data[\"" + nick + "\"];");
+        os.push("};\n");
+        return u.intercalate(os, "\n");
     } else {
         return "";
     }
@@ -355,24 +355,24 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
             if (resource.sheets.hasOwnProperty(x)) {
                 var name = resource.sheets[x];
                 if (config.sheetGetters) {
-                os.push("public get" + mkSheetName(mkNick(name, metaApi)) + "() {");
-                os.push("    return " + mkModuleName(name, metaApi) + "." + "_get" + mkSheetName(mkNick(name, metaApi)) + "(this);");
-                os.push("}");
+                    os.push("public get" + mkSheetName(mkNick(name, metaApi)) + "() {");
+                    os.push("    return " + mkModuleName(name, metaApi) + "." + "_get" + mkSheetName(mkNick(name, metaApi)) + "(this);");
+                    os.push("}");
                 }
 
                 if (config.sheetSetters) {
-                var ef = enabledFields(metaApi.sheets[name].fields, "ECM");
-                if (ef.length) {
-                    os.push("public set" + mkSheetName(mkNick(name, metaApi)) + "(");
-                    os.push(mkFieldSignatures(ef, "    ", ",\n"));
-                    os.push(") {");
-                    os.push("    var _self = this;\n");
-                    os.push("    " + mkModuleName(name, metaApi) + "." + "_set" + mkSheetName(mkNick(name, metaApi)) + "(this,");
-                    os.push(u.mkThingList(ef, (field) => field.name, "        ", ",\n    "));
-                    os.push("    );");
-                    os.push("    return _self;");
-                    os.push("}");
-                }
+                    var ef = enabledFields(metaApi.sheets[name].fields, "ECM");
+                    if (ef.length) {
+                        os.push("public set" + mkSheetName(mkNick(name, metaApi)) + "(");
+                        os.push(mkFieldSignatures(ef, "    ", ",\n"));
+                        os.push(") {");
+                        os.push("    var _self = this;\n");
+                        os.push("    " + mkModuleName(name, metaApi) + "." + "_set" + mkSheetName(mkNick(name, metaApi)) + "(this,");
+                        os.push(u.mkThingList(ef, (field) => field.name, "        ", ",\n    "));
+                        os.push("    );");
+                        os.push("    return _self;");
+                        os.push("}");
+                    }
                 }
             }
         }
@@ -418,13 +418,13 @@ mkImportStatement = (modulePath : string, relativeRoot : string, metaApi : IMeta
 
 mkNick = (modulePath : string, metaApi : IMetaApi) : string => {
     if (config.nickNames) {
-    if (metaApi.sheets.hasOwnProperty(modulePath)) {
-        return metaApi.sheets[modulePath].nick;
-    } else if (metaApi.resources.hasOwnProperty(modulePath)) {
-        return metaApi.resources[modulePath].nick;
-    } else {
-        throw "mkNick: " + modulePath;
-    }
+        if (metaApi.sheets.hasOwnProperty(modulePath)) {
+            return metaApi.sheets[modulePath].nick;
+        } else if (metaApi.resources.hasOwnProperty(modulePath)) {
+            return metaApi.resources[modulePath].nick;
+        } else {
+            throw "mkNick: " + modulePath;
+        }
     } else {
         return "";
     }
