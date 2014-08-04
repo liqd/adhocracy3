@@ -335,7 +335,7 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
             os.push("    super(\"" + modulePath + "\");");
             os.push("    var _self = this;");
             os.push("    if (name) {");
-            os.push("        _self.setIName(name);");
+            os.push("        _self.data[\"adhocracy.sheets.name.IName\"].name = name;");
             os.push("    }");
             os.push("}");
         } else {

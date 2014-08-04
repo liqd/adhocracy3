@@ -162,11 +162,18 @@ export class ProposalVersionNew {
                 onNewProposal: "="
             },
             controller: ["$scope", ($scope : IScopeProposalVersion) => {
-                $scope.proposalVersion = new RIProposalVersion().setIDocument("", "", []);
+                $scope.proposalVersion = new RIProposalVersion()
+                $scope.proposalVersion.data["adhocracy.sheets.document.IDocument"] = {
+                    title: "",
+                    description: "",
+                    elements: []
+                };
                 $scope.paragraphVersions = [];
 
                 $scope.addParagraphVersion = () => {
-                    $scope.paragraphVersions.push(new RIParagraphVersion().setIParagraph(""));
+                    var pv = new RIParagraphVersion();
+                    pv.data["adhocracy.sheets.document.IParagraph"].content = "";
+                    $scope.paragraphVersions.push(pv);
                 };
 
                 $scope.commit = () => {
@@ -194,8 +201,8 @@ export class SectionVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Resources.Content<SISection.HasISection>>,
-                $scope : DetailRefScope<SISection.HasISection>
+                adhHttp : AdhHttp.Service<Resources.Content<SISection.HasAdhocracySheetsDocumentISection>>,
+                $scope : DetailRefScope<SISection.HasAdhocracySheetsDocumentISection>
             ) : void => {
                 var commit = (event, ...args) => {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
@@ -225,8 +232,8 @@ export class ParagraphVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Resources.Content<SIParagraph.HasIParagraph>>,
-                $scope : DetailRefScope<SIParagraph.HasIParagraph>
+                adhHttp : AdhHttp.Service<Resources.Content<SIParagraph.HasAdhocracySheetsDocumentIParagraph>>,
+                $scope : DetailRefScope<SIParagraph.HasAdhocracySheetsDocumentIParagraph>
             ) : void => {
                 var commit = (event, ...args) => {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
@@ -386,7 +393,12 @@ export class Service {
     ) {
         var _self = this;
 
-        var sectionVersion : RISectionVersion = new RISectionVersion().setISection("single section", [], []);
+        var sectionVersion : RISectionVersion = new RISectionVersion();
+        sectionVersion.data["adhocracy.sheets.document.ISection"] = {
+            title : "single section",
+            elements : [],
+            subsections : []
+        };
 
         var name = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
         name = Util.normalizeName(name);

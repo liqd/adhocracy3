@@ -22,7 +22,7 @@ export class AbstractListingContainerAdapter {
 }
 
 export class ListingPoolAdapter extends AbstractListingContainerAdapter {
-    public elemRefs(container : Resources.Content<SIPool.HasIPool>) {
+    public elemRefs(container : Resources.Content<SIPool.HasAdhocracySheetsPoolIPool>) {
         return container.data["adhocracy.sheets.pool.IPool"].elements;
     }
 }
