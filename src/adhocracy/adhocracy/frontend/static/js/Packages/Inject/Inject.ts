@@ -41,7 +41,7 @@ export var factory = () => {
         link: ($scope, $element, $attrs, controller, $transclude) => {
             if (!$transclude) {
                 throw "Illegal use of inject directive in the template! " +
-                    "No parent directive that requires a transclusion found.";
+                    "No parent directive found that requires a transclusion.";
             }
             var innerScope = $scope.$new();
             innerScope.transclusionId = $element.data("transclusion-id");
