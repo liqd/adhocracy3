@@ -304,17 +304,17 @@ export class Service {
     }
 
     private postProposal(path : string, name : string, scope : {proposal? : any}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new Resources.Proposal(name))
+        return this.adhHttp.postToPool(path, new RIProposal(name))
             .then((ret) => { scope.proposal = ret; });
     }
 
     private postSection(path : string, name : string, scope : {section? : any}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new Resources.Section(name))
+        return this.adhHttp.postToPool(path, new RISection(name))
             .then((ret) => { scope.section = ret; });
     }
 
     private postParagraph(path : string, name : string, scope : {paragraphs}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new Resources.Paragraph(name))
+        return this.adhHttp.postToPool(path, new RIParagraph(name))
             .then((ret) => { scope.paragraphs[name] = ret; });
     }
 
@@ -380,7 +380,10 @@ export class Service {
         }
     }
 
-    public postProposalWithParagraphs(proposalVersion : Resources.PartialIProposalVersion, paragraphVersions) {
+    public postProposalWithParagraphs(
+        proposalVersion : RIProposalVersion,
+        paragraphVersions : RIParagraphVersion[]
+    ) {
         var _self = this;
 
         var sectionVersion : RISectionVersion = new RISectionVersion().setISection("single section", [], []);
