@@ -162,7 +162,7 @@ export class ProposalVersionNew {
                 onNewProposal: "="
             },
             controller: ["$scope", ($scope : IScopeProposalVersion) => {
-                $scope.proposalVersion = new RIProposalVersion()
+                $scope.proposalVersion = new RIProposalVersion();
                 $scope.proposalVersion.data["adhocracy.sheets.document.IDocument"] = {
                     title: "",
                     description: "",
