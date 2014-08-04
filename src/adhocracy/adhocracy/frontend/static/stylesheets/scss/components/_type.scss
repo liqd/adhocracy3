@@ -93,12 +93,12 @@ dt {
 
 del {
     text-decoration: line-through;
-    color: $red;
+    color: $color-highlight-invalid;
 }
 
 ins {
     text-decoration: underline;
-    color: $green;
+    color: $color-highlight-valid;
 }
 
 // blockqoute
