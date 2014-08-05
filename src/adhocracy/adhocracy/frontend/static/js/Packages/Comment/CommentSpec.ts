@@ -4,8 +4,11 @@ import q = require("q");
 
 import AdhComment = require("./Comment");
 
-// FIXME: all http interaction is currently untested as it is
-// likely to change in the near future
+var RESOURCE = {
+    path: "path",
+    content_type: "",
+    data: {}
+};
 
 export var register = () => {
     describe("Comment", () => {
@@ -21,10 +24,10 @@ export var register = () => {
             adapterMock = <any>jasmine.createSpyObj("adapterMock", ["create", "content", "refersTo", "creator"]);
 
             adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["postToPool", "resolve", "postNewVersion", "getNewestVersionPath"]);
-            adhHttpMock.postToPool.and.returnValue(q.when(""));
-            adhHttpMock.resolve.and.returnValue(q.when(""));
-            adhHttpMock.postNewVersion.and.returnValue(q.when(""));
-            adhHttpMock.getNewestVersionPath.and.returnValue(q.when(""));
+            adhHttpMock.postToPool.and.returnValue(q.when(RESOURCE));
+            adhHttpMock.resolve.and.returnValue(q.when(RESOURCE));
+            adhHttpMock.postNewVersion.and.returnValue(q.when(RESOURCE));
+            adhHttpMock.getNewestVersionPath.and.returnValue(q.when(RESOURCE));
         });
 
         describe("CommentCreate", () => {
@@ -54,6 +57,9 @@ export var register = () => {
                     });
 
                     describe("create", () => {
+                        // FIXME: all http interaction is currently untested as it is
+                        // likely to change in the near future
+
                         var res = {foo: "bar"};
                         var content = "content";
 
@@ -108,11 +114,58 @@ export var register = () => {
                     });
 
                     it("reads content and creator from adapter to scope", () => {
-                        expect(scopeMock.content).toBe(content);
-                        expect(scopeMock.creator).toBe(creator);
+                        expect(scopeMock.data.content).toBe(content);
+                        expect(scopeMock.data.creator).toBe(creator);
                     });
 
-                    // describe("edit", () => {});
+                    describe("edit", () => {
+                        beforeEach(() => {
+                            scopeMock.edit();
+                        });
+
+                        it("changes viewmode to 'edit'", () => {
+                            expect(scopeMock.viewmode).toBe("edit");
+                        });
+                    });
+
+                    describe("cancel", () => {
+                        beforeEach(() => {
+                            scopeMock.cancel();
+                        });
+
+                        it("changes viewmode to 'list'", () => {
+                            expect(scopeMock.viewmode).toBe("list");
+                        });
+
+                        it("clears all errors", () => {
+                            expect(scopeMock.errors).toEqual([]);
+                        });
+                    });
+
+                    describe("save", () => {
+                        it("updates the resource using the adapter", (done) => {
+                            scopeMock.data = {
+                                content: content
+                            };
+                            scopeMock.save().then(() => {
+                                expect(adapterMock.content).toHaveBeenCalledWith(RESOURCE, content);
+                                expect(adhHttpMock.postNewVersion).toHaveBeenCalled();
+                                done();
+                            });
+                        });
+
+                        it("sets scope.errors when something goes wrong", (done) => {
+                            var errors = "errors";
+                            adhHttpMock.postNewVersion.and.returnValue(q.reject(errors));
+                            scopeMock.data = {
+                                content: content
+                            };
+                            scopeMock.save().then(() => null, () => {
+                                expect(scopeMock.errors).toBe(errors);
+                                done();
+                            });
+                        });
+                    });
                 });
             });
         });

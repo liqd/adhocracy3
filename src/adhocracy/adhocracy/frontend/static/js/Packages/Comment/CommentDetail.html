@@ -1,7 +1,14 @@
-<div class="comment">
-    <div class="comment-content" data-ng-switch="viewmode">
-        <textarea data-ng-switch-when="edit">{{content}}</textarea>
-        <div data-ng-switch-default>{{content}}</div>
+<div class="comment" data-ng-switch="viewmode">
+    <div data-ng-switch-when="edit">
+        <div class="form-error" data-ng-repeat="error in errors">
+            <p>{{error}}</p>
+        </div>
     </div>
-    <div class="comment-meta">{{creator}}</div>
+    <div class="comment-content">
+        <textarea data-ng-switch-when="edit" data-ng-model="data.content"></textarea>
+        <div data-ng-switch-default="">{{data.content}}</div>
+    </div>
+    <a href="" data-ng-switch-when="edit" data-ng-click="save()">Save</a>
+    <a href="" data-ng-switch-when="edit" data-ng-click="cancel()">Cancel</a>
+    <a href="" data-ng-switch-default="" data-ng-click="edit()">Edit</a>
 </div>

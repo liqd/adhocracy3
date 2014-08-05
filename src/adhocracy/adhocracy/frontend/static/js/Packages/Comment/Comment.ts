@@ -77,20 +77,47 @@ export class CommentDetail {
             },
             controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
                 var res;
+                var versionPromise = adhHttp.getNewestVersionPath($scope.path)
+                    .then((path) => adhHttp.resolve(path));
 
-                $scope.edit = () => {
-                    _self.adapter.content(res, $scope.content);
-                    // FIXME: send res via adhHttp
+                var displayErrors = (errors) => {
+                    $scope.errors = errors;
+                    throw errors;
                 };
 
-                adhHttp.getNewestVersionPath($scope.path)
-                    .then((path) => adhHttp.resolve(path))
-                    .then((_res) => {
+                var updateScope = () => {
+                    return versionPromise.then((_res) => {
                         res = <AdhResource.Content<any>>_res;
-                        $scope.content = _self.adapter.content(res);
-                        $scope.creator = _self.adapter.creator(res);
-                    })
-                    .then(adhDone);
+                        $scope.data = {
+                            content: _self.adapter.content(res),
+                            creator: _self.adapter.creator(res)
+                        };
+                    });
+                };
+
+                $scope.errors = [];
+
+                $scope.edit = () => {
+                    $scope.viewmode = "edit";
+                };
+
+                $scope.cancel = () => {
+                    $scope.viewmode = "list";
+                    $scope.errors = [];
+                };
+
+                $scope.save = () => {
+                    _self.adapter.content(res, $scope.data.content);
+                    return versionPromise.then((version) => {
+                        versionPromise = adhHttp.postNewVersion(version.path, res)
+                            .then((_res) => adhHttp.resolve(_res.path), displayErrors);
+                        return updateScope().then(() => {
+                            $scope.viewmode = "list";
+                        });
+                    });
+                };
+
+                updateScope().then(adhDone);
             }]
         };
     }
