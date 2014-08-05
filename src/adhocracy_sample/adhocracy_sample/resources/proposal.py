@@ -10,6 +10,7 @@ from adhocracy.resources.itemversion import itemversion_metadata
 from adhocracy.resources.item import item_metadata
 
 import adhocracy.sheets.document
+import adhocracy_sample.sheets.comment
 
 
 class IProposalVersion(IItemVersion):
@@ -21,6 +22,7 @@ proposalversion_meta = itemversion_metadata._replace(
     content_name='ProposalVersion',
     iresource=IProposalVersion,
     extended_sheets=[adhocracy.sheets.document.IDocument,
+                     adhocracy_sample.sheets.comment.ICommentable
                      ],
 )
 

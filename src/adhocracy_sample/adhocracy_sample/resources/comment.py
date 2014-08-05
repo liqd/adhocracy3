@@ -6,6 +6,7 @@ from adhocracy.resources.itemversion import itemversion_metadata
 from adhocracy.resources.item import item_metadata
 
 from adhocracy_sample.sheets.comment import IComment
+from adhocracy_sample.sheets.comment import ICommentable
 
 
 class ICommentVersion(IItemVersion):
@@ -16,7 +17,7 @@ class ICommentVersion(IItemVersion):
 commentversion_meta = itemversion_metadata._replace(
     content_name='CommentVersion',
     iresource=ICommentVersion,
-    extended_sheets=[IComment],
+    extended_sheets=[IComment, ICommentable],
 )
 
 
