@@ -77,7 +77,7 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
                 element.on("$destroy", () => {
-                    if (typeof scope.wshandle === 'string') {
+                    if (typeof scope.wshandle === "string") {
                         adhWebSocket.unregister(scope.path, scope.wshandle);
                     }
                 });
