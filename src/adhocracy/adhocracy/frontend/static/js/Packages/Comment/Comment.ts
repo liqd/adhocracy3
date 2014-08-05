@@ -24,7 +24,7 @@ export class CommentCreate {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentCreate.html",
             scope: {
-                refersTo: "@"
+                refersTo: "@"  // path of a commentable version
             },
             controller: ["$scope", "adhHttp", ($scope, adhHttp) => {
                 $scope.errors = [];
@@ -72,8 +72,8 @@ export class CommentDetail {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentDetail.html",
             scope: {
-                path: "=",
-                viemode: "="
+                path: "=",  // path to a comment that should be displayed
+                viemode: "=" // "list" or "edit"
             },
             controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
                 var res;
