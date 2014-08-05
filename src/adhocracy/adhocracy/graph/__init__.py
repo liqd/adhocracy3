@@ -1,9 +1,9 @@
 """Utilities for working with the version/reference graph (DAG)."""
 
-from collections import Sequence
-from collections import Iterable
 from collections import namedtuple
+from collections.abc import Iterable
 from collections.abc import Iterator
+from collections.abc import Sequence
 
 from persistent import Persistent
 from substanced.util import find_objectmap
@@ -105,6 +105,18 @@ class Graph(Persistent):
                                                         base_reftype):
             for source in ObjectMap.sources(self._objectmap, target, reftype):
                 yield Reference(source, isheet, field, target)
+
+    def get_back_reference_sources(self, resource, reftype) -> Iterable:
+        """Get generator of the sources of backreferences.
+
+        :param resource: the resource whose backreferences we want
+        :param reftype: the type of backreferences we want
+        :return: a generator of reference sources (sheets referring to the
+                 resource)
+        """
+        comment_refs = self.get_back_references(resource, base_reftype=reftype)
+        for reference in comment_refs:
+            yield reference.source
 
     def get_references_for_isheet(self, source, isheet: ISheet) -> dict:
         """ Get references of this source for one isheet only.

@@ -408,6 +408,44 @@ class TestGraphGetReferencesForIsheet:
         assert result == {'name': [target]}
 
 
+class TestGraphGetBackReferenceSources:
+
+    def _call_fut(self, objectmap, resource, reftype):
+        from adhocracy.graph import Graph
+        graph = Graph(objectmap.root)
+        return graph.get_back_reference_sources(resource, reftype)
+
+    def test_no_reference(self, context, objectmap):
+        from adhocracy.interfaces import SheetToSheet
+        resource = create_dummy_resources(parent=context)
+        result = self._call_fut(objectmap, resource, SheetToSheet)
+        assert list(result) == []
+
+    def test_no_sheetreferences(self, context, objectmap):
+        resource = create_dummy_resources(parent=context)
+        objectmap.connect(resource, resource, 'NoSheetReference')
+        result = self._call_fut(objectmap, resource, SheetToSheet)
+        assert list(result) == []
+
+    def test_sheetreferences(self, context, objectmap):
+        resource, resource2 = create_dummy_resources(parent=context, count=2)
+        objectmap.connect(resource, resource2, SheetToSheet)
+
+        result = self._call_fut(objectmap, resource2, SheetToSheet)
+        fst = result.__next__()
+        assert fst == resource
+
+    def test_sheetreferences_and_reftype(self, context, objectmap):
+        resource = create_dummy_resources(parent=context)
+        class ASheetReferenceType(SheetReference):
+            pass
+        objectmap.connect(resource, resource, SheetReference)
+        objectmap.connect(resource, resource, ASheetReferenceType)
+
+        result = self._call_fut(objectmap, resource, ASheetReferenceType)
+        assert len(list(result)) == 1
+
+
 class TestGetFollows:
 
     def _make_one(self, mock_graph, context):
