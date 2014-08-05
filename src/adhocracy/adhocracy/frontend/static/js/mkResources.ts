@@ -8,6 +8,8 @@ var _fs : any = require("node-fs");
 var _s : any = require("underscore.string");
 /* tslint:enable:no-var-requires */
 
+declare var process : any;
+
 import u = require("./mkResources/Util");
 
 
@@ -134,8 +136,18 @@ var callback = (response) => {
     response.on("error", cbError);
 };
 
-http.request(options, callback).end();
-
+if (process.argv.length > 2) {
+    // Use JSON data from given file (e.g. meta_api.json)
+    // if called like `node mkResources.js meta_api.json`
+    fs.readFile(process.argv[2], "utf8", (err, data) => {
+        var bodyJs = JSON.parse(data);
+        compileAll(bodyJs, process.argv[3]);
+    });
+} else {
+    // Use JSON data from a running server if called without
+    // further argument, e.g. `node mkResources.js`
+    http.request(options, callback).end();
+}
 
 /***********************************************************************
  * renderers
