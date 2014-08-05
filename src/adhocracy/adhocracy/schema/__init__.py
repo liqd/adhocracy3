@@ -43,7 +43,7 @@ def serialize_path(node, value):
     :param value: the resource to serialize
     :return: the path of that resource
     """
-    if value is colander.null:
+    if value in (colander.null, ''):
         return value
     try:
         raise_attribute_error_if_not_location_aware(value)
