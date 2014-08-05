@@ -341,11 +341,10 @@ PUT
 
 Modify data of an existing resource ::
 
-FIXME: The put example is temporally disabled because the IName sheet is longer
-       editable.
+FIXME: disable because IName.name is not editable.  use another example!
 
 ...    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
-...    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'proposals'}}}
+...    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
 ...    >>> resp_data = testapp.put_json("/adhocracy/Proposals", data).json
 ...    >>> pprint(resp_data)
 ...    {'content_type': 'adhocracy.resources.pool.IBasicPool',
@@ -355,10 +354,10 @@ Check the changed resource ::
 
 ...   >>> resp_data = testapp.get("/adhocracy/Proposals").json
 ...   >>> resp_data["data"]["adhocracy.sheets.name.IName"]["name"]
-...   'proposals'
+...   'youdidntexpectthis'
 
-FIXME: write test cases for attributes with "create_mandatory", "editable",
-and possibly others.  (those work the same in PUT and POST, and on any
+FIXME: write test cases for attributes with "create_mandatory",
+"editable", etc.  (those work the same in PUT and POST, and on any
 attribute in the json tree.)
 
 
@@ -482,7 +481,7 @@ Create a Proposal (a subclass of Item which pools ProposalVersion's) ::
 
 The return data has the new attribute 'first_version_path' to get the path first Version::
 
-    >>> pvrs0_path = resp.json['first_version_path']  # FIXME: generalize over 'first_version_path'?
+    >>> pvrs0_path = resp.json['first_version_path']
     >>> pvrs0_path
     '/adhocracy/Proposals/kommunismus/VERSION_0000000'
 
@@ -673,10 +672,10 @@ pvrs2 (which also contains s2vrs0_path) ::
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     0
 
-.. FIXME: If two frontends post competing sections simultaneously,
-   neither knows which proposal version belongs to whom.  Proposed
-   solution: the post response must tell the frontend the changed
-   ``root_version``.
+FIXME: If two frontends post competing sections simultaneously,
+neither knows which proposal version belongs to whom.  Proposed
+solution: the post response must tell the frontend the changed
+``root_version``.
 
 
 Tags
@@ -706,9 +705,9 @@ that aren't 'followed_by' any later version::
 FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
 
-FIXME: should the server tell in general where to post speccific
+FIXME: should the server tell in general where to post specific
 content types? (like 'like', 'discussion',..)?  in other words,
-should the client to be able to ask (e.g. with an OPTIONS request)
+should the client be able to ask (e.g. with an OPTIONS request)
 where to post a 'like'?
 
 
