@@ -2,14 +2,17 @@
     <div class="navbar">
         <div class="navbar-left listing-sort placeholder">sort</div>
         <div class="navbar-left listing-view placeholder">view</div>
-        <a class="navbar-right button listing-add-button m-call-to-action" ng-click="show.addForm = true" ng-init="show = {addForm: false}" ng-disabled="show.addForm">Add</a>
+        <a class="navbar-right button listing-add-button m-call-to-action"
+            data-ng-click="show.addForm = true"
+            data-ng-init="show = {addForm: false}"
+            data-ng-disabled="show.addForm">Add</a>
     </div>
-    <div class="listing-add-form" ng-if="show.addForm">
+    <div class="listing-add-form" data-ng-if="show.addForm">
         <inject data-transclusion-id="add-form"></inject>
-        <a href="" ng-click="show.addForm = false">cancel</a>
+        <a href="" data-ng-click="show.addForm = false">cancel</a>
     </div>
     <ol class="listing-rows">
-        <li class="listing-element" ng-repeat="element in elements">
+        <li class="listing-element" data-ng-repeat="element in elements">
             <inject data-transclusion-id="element"></inject>
         </li>
     </ol>
