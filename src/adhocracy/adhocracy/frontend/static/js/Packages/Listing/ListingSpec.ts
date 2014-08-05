@@ -102,8 +102,8 @@ export var register = () => {
                         adhHttpMock.get.and.callFake(() => q.when(container));
 
                         scope = {
-                            container: undefined,
-                            elements: undefined
+                            container: 3,
+                            elements: 2
                         };
 
                         var controller = directive.controller[4];
