@@ -1,18 +1,18 @@
-<div ng-switch="user.loggedIn">
-    <div ng-switch-when="true" class="logout">
+<div data-ng-switch="user.loggedIn">
+    <div data-ng-switch-when="true" class="logout">
         <span>{{ user.data.name }}</span>
-        <input type="submit" value="LogOut" ng-click="logOut()" />
+        <input type="submit" value="LogOut" data-ng-click="logOut()" />
     </div>
-    <div ng-switch-default class="login">
+    <div data-ng-switch-default="" class="login">
         <h1 class="title">Log in!</h1>
-        <div class="form-error" ng-repeat="error in errors track by $index">
+        <div class="form-error" data-ng-repeat="error in errors track by $index">
             <p>{{error}}</p>
         </div>
         <form class="login-form">
-            <input type="text" name="nameOrEmail" placeholder="email or username" ng-model="credentials.nameOrEmail" />
-            <input type="password" name="password" placeholder="password" ng-model="credentials.password" />
+            <input type="text" name="nameOrEmail" placeholder="email or username" data-ng-model="credentials.nameOrEmail" />
+            <input type="password" name="password" placeholder="password" data-ng-model="credentials.password" />
             <a>forgot password</a>
-            <input type="submit" value="login" class="m-call-to-action" ng-click="logIn()" />
+            <input type="submit" value="login" class="m-call-to-action" data-ng-click="logIn()" />
         </form>
         <div class="login-description box-with-button">
             <div class="text-box m-unobtrusive">

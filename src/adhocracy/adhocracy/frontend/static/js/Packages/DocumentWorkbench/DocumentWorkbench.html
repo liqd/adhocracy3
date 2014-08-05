@@ -1,10 +1,10 @@
 <div class="moving-columns">
     <div class="moving-column-structure">
-        <adh-web-socket-test paths='["/adhocracy"]'></adh-web-socket-test>
+        <adh-web-socket-test data-paths="['/adhocracy']"></adh-web-socket-test>
         <adh-login></adh-login>
     </div>
     <div class="moving-column-content">
-        <adh-listing path="{{path}}" title="proposals listing (by titles)">
+        <adh-listing data-path="{{path}}" title="proposals listing (by titles)">
             <div data-ng-switch="transclusionId">
                 <adh-proposal-version-new
                     data-on-new-proposal="update"
