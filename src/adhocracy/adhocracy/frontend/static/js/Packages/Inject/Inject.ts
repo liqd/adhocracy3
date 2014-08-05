@@ -25,8 +25,10 @@
  * Some other template that uses listing:
  *
  *     <listing>
- *         <adh-proposal-version-new data-transclusion-id="add-form"></adh-proposal-version-new>
- *         <adh-proposal-detail path="element" data-transclusion-id="element"></adh-proposal-detail>
+ *         <div data-ng-switch="transclusionId">
+ *             <adh-proposal-version-new data-ng-switch-when="add-form-id"></adh-proposal-version-new>
+ *             <adh-proposal-detail data-path="element" data-ng-switch-when="element-id"></adh-proposal-detail>
+ *         </div>
  *     </listing>
  *
  * The inject directive is based on the one from
@@ -42,17 +44,11 @@ export var factory = () => {
                     "No parent directive that requires a transclusion found.";
             }
             var innerScope = $scope.$new();
+            innerScope.transclusionId = $element.data("transclusion-id");
             $transclude(innerScope, (clone) => {
                 $element.empty();
 
-                var transclusionID = $element.data("transclusion-id");
-                if (typeof transclusionID !== "undefined") {
-                    $element.append(clone.filter(function() {
-                        return $(this).data("transclusion-id") === transclusionID;
-                    }));
-                } else {
-                    $element.append(clone);
-                }
+                $element.append(clone);
 
                 $element.on("$destroy", () => {
                     innerScope.$destroy();
