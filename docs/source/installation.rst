@@ -58,9 +58,14 @@ update your shell environment::
 Installation (frontend)
 ------------------------
 
-install javascript front-end ::
+Run the server::
+
+    ./bin/supervisord
+
+Install javascript front-end::
 
     cd src/adhocracy/adhocracy/frontend/static/js/
+    make mkResources
     make
     cd ../../../../../..  # (or 'cd -')
 
