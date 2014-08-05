@@ -46,6 +46,14 @@ export class Service<Content extends Resources.Content<any>> implements IBaseSer
         return this.$http.post(path, exportContent(obj)).then(importContent, logBackendError);
     }
 
+    public getNewestVersionPath(path : string) : ng.IPromise<string> {
+        // FIXME: This works under the assumption that there is always only
+        // *one* latest version. This is not neccesserily true for multi-user
+        // scenarios.
+        return this.get(path + "/LAST")
+            .then((tag) => tag.data["adhocracy.sheets.tags.ITag"].elements[0]);
+    }
+
     public postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
         var dagPath = Util.parentPath(oldVersionPath);
         var _obj = Util.deepcp(obj);

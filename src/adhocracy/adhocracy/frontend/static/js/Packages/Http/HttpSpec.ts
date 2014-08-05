@@ -37,6 +37,26 @@ export var register = () => {
                     expect($httpMock.put).toHaveBeenCalled();
                 });
             });
+            describe("getNewestVersionPath", () => {
+                it("promises the first path from the LAST tag", () => {
+                    var path = "path";
+                    var returnPath1 = "path1";
+                    var returnPath2 = "path2";
+
+                    $httpMock.get.and.returnValue(q.when({
+                        data: {
+                            "adhocracy.sheets.tags.ITag": {
+                                elements: [returnPath1, returnPath2]
+                            }
+                        }
+                    }));
+
+                    adhHttp.getNewestVersionPath(path).then((ret) => {
+                        expect(ret).toBe(returnPath1);
+                        expect($httpMock.get).toHaveBeenCalledWith(path + "/LAST");
+                    });
+                });
+            });
             describe("postNewVersion", () => {
                 it("posts to the parent pool and adds a adhocracy.sheets.versions.IVersionable sheet with the right follows field", () => {
                     adhHttp.postNewVersion("/some/path", {data: {}});
