@@ -665,7 +665,6 @@ pvrs2 (which also contains s2vrs0_path) ::
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     1
 
-    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000003')
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     1
 
@@ -771,8 +770,33 @@ As usual, we have to add another version to actually say something::
     ...                         'follows': [first_metacommvers_path]}},
     ...                 'root_versions': [first_metacommvers_path]}
     >>> resp = testapp.post_json(metacomment_path, metacommvers)
-    >>> resp.json['path']
+    >>> snd_metacommvers_path = resp.json['path']
+    >>> snd_metacommvers_path
     '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001'
+
+
+Now, lets view all the comments referring to the proposal. First,
+lets find the path of the newest version of the proposal::
+
+    >>> resp = testapp.get(pdag_path + '/LAST')
+    >>> newest_prop_vers = resp.json['data']['adhocracy.sheets.tags.ITag']['elements'][-1]
+
+Now we can retrieve that version and consult the 'comments' fields of its
+'adhocracy_sample.sheets.comment.ICommentable' sheet::
+
+    >>> resp = testapp.get(newest_prop_vers)
+    >>> comlist = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']['comments']
+    >>> comlist == [snd_commvers_path]
+    True
+
+Any commentable resource has this sheet. Since comments can refer to other
+comments, they have it as well. Lets find out which other comments refer to
+this comment version::
+
+    >>> resp = testapp.get(snd_commvers_path)
+    >>> comlist = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']['comments']
+    >>> comlist == [snd_metacommvers_path]
+    True
 
 
 Batch requests
