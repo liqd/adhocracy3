@@ -34,6 +34,7 @@ export interface ListingScope<Container> {
     elements : string[];
     update : (...any) => ng.IPromise<void>;
     wshandle : string;
+    show : { addForm : boolean };
 }
 
 // FIXME: the way Listing works now is similar to ngRepeat, but it
@@ -86,6 +87,8 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                 adhHttp: AdhHttp.Service<Container>,
                 adhDone
             ) : void => {
+                $scope.show = {addForm: false};
+
                 $scope.update = () : ng.IPromise<void> => {
                     return adhHttp.get($scope.path).then((pool) => {
                         $scope.container = pool;
