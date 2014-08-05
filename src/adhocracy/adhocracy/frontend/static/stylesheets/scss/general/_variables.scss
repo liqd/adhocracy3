@@ -81,10 +81,14 @@ $color-structure-border: #9d9c9c;
 .color-structure-surface {background-color: $color-structure-surface;}
 .color-structure-border {background-color: $color-structure-border;}
 
+// some static contrast checks for a11y
 @include check-contrast($color-prime-standard, $color-background);
-@include check-contrast($color-prime-standard, $color-background);
+@include check-contrast($color-prime-standard, $color-structure-surface);
+@include check-contrast($color-prime-extrovert, $color-background);
+@include check-contrast($color-prime-extrovert, $color-structure-surface);
 @include check-contrast($color-highlight-standard, $color-highlight-reverse);
 @include check-contrast($color-highlight-standard, $color-background);
+@include check-contrast($color-highlight-standard, $color-structure-surface);
 
 $font-family-standard: "Open Sans", sans-serif;
 $font-weight-standard: normal;
