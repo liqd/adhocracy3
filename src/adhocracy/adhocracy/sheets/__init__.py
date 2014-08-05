@@ -1,10 +1,10 @@
 """Adhocarcy sheets."""
 from persistent.mapping import PersistentMapping
-import colander
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from substanced.property import PropertySheet
 from zope.interface import implementer
+import colander
 
 from adhocracy.utils import find_graph
 from adhocracy.events import ResourceSheetModified
@@ -13,6 +13,7 @@ from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import sheet_metadata
 from adhocracy.interfaces import SheetMetadata
 from adhocracy.schema import AbstractReferenceIterable
+from adhocracy.schema import Reference
 from adhocracy.utils import remove_keys_from_dict
 
 
@@ -44,11 +45,29 @@ class GenericResourceSheet(PropertySheet):
         return self.context._propertysheets[self._data_key]
 
     @property
-    def _key_reftype_map(self):
+    def _key_iterable_reftype_map(self):
+        """Mapping from names to reftypes that accept multiple references."""
         refs = {}
         for child in self.schema:
             if isinstance(child, AbstractReferenceIterable):
                 refs[child.name] = child.reftype
+        return refs
+
+    @property
+    def _key_single_reftype_map(self):
+        """Mapping from names to reftypes that accept a single reference."""
+        refs = {}
+        for child in self.schema:
+            if isinstance(child, Reference):
+                refs[child.name] = child.reftype
+        return refs
+
+    @property
+    def _key_reftype_map(self):
+        # FIXME The _key_[..._]reftype_map functions are called quite often,
+        # shouldn't they be cached somehow?
+        refs = self._key_iterable_reftype_map
+        refs.update(self._key_single_reftype_map)
         return refs
 
     @property
@@ -86,8 +105,11 @@ class GenericResourceSheet(PropertySheet):
                 self.meta.isheet)
         default = self._get_default_appstruct()
         for key, default_value in default.items():
-            if key in self._key_reftype_map:
+            if key in self._key_iterable_reftype_map:
                 appstruct[key] = references.get(key, default_value)
+            elif key in self._key_single_reftype_map:
+                reflist = references.get(key, None)
+                appstruct[key] = reflist[0] if reflist else default_value
         return appstruct
 
     def set(self, appstruct: dict, omit=(), send_event=True) -> bool:
@@ -104,10 +126,15 @@ class GenericResourceSheet(PropertySheet):
     def _store_references(self, appstruct):
         if not self._graph:
             return
-        for key, targets in appstruct.items():
+        for key, target in appstruct.items():
             if key in self._key_reftype_map:
                 reftyp = self._key_reftype_map[key]
-                self._graph.set_references(self.context, targets, reftyp)
+                if key in self._key_single_reftype_map:
+                    target_iterable = (target,)
+                else:
+                    target_iterable = target
+                self._graph.set_references(self.context, target_iterable,
+                                           reftyp)
 
     def _store_non_references(self, appstruct):
         self._data.update(appstruct)
