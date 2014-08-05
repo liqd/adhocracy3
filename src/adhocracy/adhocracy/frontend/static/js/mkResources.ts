@@ -514,10 +514,6 @@ mkFlags = (field : ISheetField, comment ?: boolean) : string => {
  */
 
 mkdirForFile = (filepath : string) : void => {
-    if (!_s.startsWith(filepath, "./") &&
-        !_s.startsWith(filepath, "../")) {
-        throw "mkdirForFile: path must start with './' or '../': " + filepath;
-    }
     var dirpath : string[] = _s.words(filepath, "/");
     dirpath.pop();
     _fs.mkdirSync(u.intercalate(dirpath, "/"), 0755, true);
