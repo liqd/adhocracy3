@@ -106,8 +106,8 @@ export var register = () => {
                             elements: 2
                         };
 
-                        var controller = directive.controller[4];
-                        controller(scope, adhHttpMock, adhWebSocketMock, done);
+                        var controller = directive.controller[3];
+                        controller(scope, adhHttpMock, done);
                     });
 
                     it("sets scope.container", () => {
