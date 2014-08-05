@@ -329,9 +329,7 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
         var os : string[] = [];
 
         if (resource.sheets.indexOf("adhocracy.sheets.name.IName") !== -1) {
-            os.push("constructor();");
-            os.push("constructor(name : string);");
-            os.push("constructor() {");
+            os.push("constructor(name ?: string) {");
             os.push("    super(\"" + modulePath + "\");");
             os.push("    var _self = this;");
             os.push("    if (typeof name !== 'undefined') {");
