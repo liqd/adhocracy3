@@ -32,7 +32,7 @@ export interface ListingScope<Container> {
     title : string;
     container : Container;
     elements : string[];
-    update : (...any) => ng.IPromise<void>;
+    update : () => ng.IPromise<void>;
     wshandle : string;
     show : { addForm : boolean };
 }
