@@ -102,6 +102,7 @@ export var register = () => {
                         adhHttpMock.get.and.callFake(() => q.when(container));
 
                         scope = {
+                            // arbitrary values
                             container: 3,
                             elements: 2
                         };
