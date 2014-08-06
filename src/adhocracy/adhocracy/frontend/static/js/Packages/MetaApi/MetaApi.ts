@@ -7,6 +7,7 @@ export interface ISheet {
     fields : ISheetField[];
 
     // generated after import
+    fieldDict ?: { [index: string]: ISheetField };
     nick ?: string;
 }
 
@@ -34,8 +35,26 @@ export interface IModuleDict {
     [index: string]: string;
 }
 
+
+export var feedFieldDicts = (data : IMetaApi) : void => {
+    for (var sheetName in data.sheets) {
+        if (data.sheets.hasOwnProperty(sheetName)) {
+            var sheet : ISheet = data.sheets[sheetName];
+            sheet.fieldDict = {};
+            for (var fieldIndex in sheet.fields) {
+                if (sheet.fields.hasOwnProperty(fieldIndex)) {
+                    var field = sheet.fields[fieldIndex];
+                    sheet.fieldDict[field.name] = field;
+                }
+            }
+        }
+    }
+};
+
+
 export class MetaApiQuery {
     constructor(public data : IMetaApi) {
+        feedFieldDicts(data);
     }
 
     public resource(name : string) : IResource {
@@ -61,9 +80,9 @@ export class MetaApiQuery {
     public field(sheetName : string, fieldName : string) : ISheetField {
         var _self : MetaApiQuery = this;
 
-        var s = _self.sheet(sheetName);
-        if (s.hasOwnProperty(fieldName)) {
-            return s[fieldName];
+        var fieldDict = _self.sheet(sheetName).fieldDict;
+        if (fieldDict.hasOwnProperty(fieldName)) {
+            return fieldDict[fieldName];
         } else {
             throw "MetaApiQuery: unknown field named " + fieldName + " in sheet " + sheetName;
         }
