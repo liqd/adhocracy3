@@ -119,7 +119,7 @@ export var init = (config) => {
         ["adhConfig", (adhConfig) => new Proposal.ParagraphVersionDetail().createDirective(adhConfig)]);
     app.directive("adhDocumentSheetEdit",
         ["adhHttp", "$q", "adhConfig", (adhHttp, $q, adhConfig) =>
-            new Proposal.DocumentSheetEdit().createDirective(adhConfig, $q, adhConfig)]);
+            new Proposal.DocumentSheetEdit().createDirective(adhHttp, $q, adhConfig)]);
     app.directive("adhDocumentSheetShow",
         ["adhConfig", (adhConfig) => new Proposal.DocumentSheetShow().createDirective(adhConfig)]);
     app.directive("adhParagraphSheetEdit",
