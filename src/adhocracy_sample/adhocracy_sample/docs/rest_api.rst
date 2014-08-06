@@ -827,34 +827,31 @@ Let's add some more paragraphs to the second section above ::
     ...             'path': '@@par1_item'
     ...           },
     ...         ]
-    >>> print('test disabled')
-    test disabled
-
-    .. >>> batch_resp = testapp.post_json(batch_url, batch).json
-    .. >>> pprint(batch_resp)
-    .. [
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy.resources.IParagraph',
-    ..             'path': '...'
-    ..         }
-    ..     },
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy.resources.IParagraphVersion',
-    ..             'path': '...'
-    ..         }
-    ..     },
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy.resources.IParagraphVersion',
-    ..             'path': '...'
-    ..         }
-    ..     }
-    .. ]
+    >>> batch_resp = testapp.post_json(batch_url, batch).json
+    >>> pprint(batch_resp)
+    [
+        {
+            'code': 200,
+            'body': {
+                'content_type': 'adhocracy.resources.IParagraph',
+                'path': '...'
+            }
+        },
+        {
+            'code': 200,
+            'body': {
+                'content_type': 'adhocracy.resources.IParagraphVersion',
+                'path': '...'
+            }
+        },
+        {
+            'code': 200,
+            'body': {
+                'content_type': 'adhocracy.resources.IParagraphVersion',
+                'path': '...'
+            }
+        }
+    ]
 
 Now the first, empty paragraph version should contain the newly
 created paragraph version as its only successor ::
