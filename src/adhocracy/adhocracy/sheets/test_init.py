@@ -33,6 +33,14 @@ class TestResourcePropertySheet:
         mock.name = 'references'
         return mock
 
+    @fixture()
+    def mock_node_single_reference(self):
+        from adhocracy.schema import Reference
+        mock = Mock(spec=Reference)
+        mock.readonly = False
+        mock.name = 'reference'
+        return mock
+
     def make_one(self, sheet_meta, context):
         from adhocracy.sheets import GenericResourceSheet
         return GenericResourceSheet(sheet_meta, context)
@@ -85,7 +93,8 @@ class TestResourcePropertySheet:
         inst.set({'count': 11})
         assert inst.get() == {'count': 0}
 
-    def test_set_valid_with_sheet_subtype_and_name_conflicts(self, sheet_meta, context):
+    def test_set_valid_with_sheet_subtype_and_name_conflicts(self, sheet_meta,
+                                                             context):
         sheet_a_meta = sheet_meta
 
         class ISheetB(sheet_a_meta.isheet):
@@ -128,6 +137,29 @@ class TestResourcePropertySheet:
 
         graph_set_args = mock_graph.set_references.call_args[0]
         assert graph_set_args == (context, [target], node.reftype)
+
+    def test_set_valid_reference(self, sheet_meta, context, mock_graph,
+                                 mock_node_single_reference):
+        inst = self.make_one(sheet_meta, context)
+        node = mock_node_single_reference
+        inst.schema.children.append(node)
+        inst._graph = mock_graph
+        target = testing.DummyResource()
+        inst.set({'reference': target})
+        graph_set_args = mock_graph.set_references.call_args[0]
+        assert graph_set_args == (context, (target,), node.reftype)
+
+    def test_get_valid_reference(self, sheet_meta, context, mock_graph,
+                                 mock_node_single_reference):
+        inst = self.make_one(sheet_meta, context)
+        node = mock_node_single_reference
+        inst.schema.children.append(node)
+        target = testing.DummyResource()
+        mock_graph.get_references_for_isheet.return_value = {'reference':
+                                                             [target]}
+        inst._graph = mock_graph
+        appstruct = inst.get()
+        assert appstruct['reference'] == target
 
     def test_notify_resource_sheet_modified(self, sheet_meta, context, config):
         from adhocracy.interfaces import IResourceSheetModified
