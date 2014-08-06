@@ -4,10 +4,10 @@
 
 import Resources = require("../../Resources");
 import Util = require("../Util/Util");
-import MA = require("../MetaApi/MetaApi");
+import MetaApi = require("../MetaApi/MetaApi");
 
 export var importContent : <Content extends Resources.Content<any>>(resp: {data: Content}) => Content;
-export var exportContent : <Content extends Resources.Content<any>>(adhMetaApi : MA.MetaApiQuery, obj : Content) => Content;
+export var exportContent : <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) => Content;
 export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void;
 
 
@@ -36,7 +36,7 @@ export class Service<Content extends Resources.Content<any>> implements IBaseSer
     constructor(
         private $http : ng.IHttpService,
         private $q : ng.IQService,
-        private adhMetaApi : MA.MetaApiQuery
+        private adhMetaApi : MetaApi.MetaApiQuery
     ) {}
 
     public get(path : string) : ng.IPromise<Content> {
@@ -209,7 +209,7 @@ importContent = <Content extends Resources.Content<any>>(resp: {data: Content}) 
  * also, fields with create_mandatory should not be missing from the
  * posted object.
  */
-exportContent = <Content extends Resources.Content<any>>(adhMetaApi : MA.MetaApiQuery, obj : Content) : Content => {
+exportContent = <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) : Content => {
     "use strict";
 
     var newobj : Content = Util.deepcp(obj);
@@ -218,12 +218,12 @@ exportContent = <Content extends Resources.Content<any>>(adhMetaApi : MA.MetaApi
     // newobj.data.
     for (var sheetName in newobj.data) {
         if (newobj.data.hasOwnProperty(sheetName)) {
-            var sheet : MA.ISheet = newobj.data[sheetName];
+            var sheet : MetaApi.ISheet = newobj.data[sheetName];
             var keepSheet : boolean = false;
 
             for (var fieldName in sheet) {
                 if (sheet.hasOwnProperty(fieldName)) {
-                    var fieldMeta : MA.ISheetField = adhMetaApi.field(sheetName, fieldName);
+                    var fieldMeta : MetaApi.ISheetField = adhMetaApi.field(sheetName, fieldName);
 
                     if (fieldMeta.editable || fieldMeta.creatable || fieldMeta.create_mandatory) {
                         keepSheet = true;
