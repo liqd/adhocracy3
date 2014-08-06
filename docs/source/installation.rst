@@ -55,19 +55,6 @@ update your shell environment::
 
     source ./source_env
 
-Installation (frontend)
-------------------------
-
-Run the server::
-
-    ./bin/supervisord
-
-Install javascript front-end::
-
-    cd src/adhocracy/adhocracy/frontend/static/js/
-    make mkResources
-    make
-    cd ../../../../../..  # (or 'cd -')
 
 Documentation
 -------------

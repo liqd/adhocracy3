@@ -6,6 +6,7 @@ var http : any = require("http");
 var fs : any = require("fs");
 var _fs : any = require("node-fs");
 var _s : any = require("underscore.string");
+var process : any = require("process");
 /* tslint:enable:no-var-requires */
 
 import u = require("./mkResources/Util");
@@ -68,7 +69,7 @@ interface IModuleDict {
     [index: string]: string;
 }
 
-var compileAll : (IMetaApiResponse) => void;
+var compileAll : (IMetaApiResponse, string) => void;
 
 var renderSheet : (string, ISheet, IModuleDict, IMetaApi) => void;
 var mkFieldSignatures : (fields : ISheetField[], tab : string, separator : string) => string;
@@ -120,7 +121,7 @@ var callback = (response) => {
         bodyJs = JSON.parse(body);
         console.log(JSON.stringify(bodyJs, null, 2));
 
-        compileAll(bodyJs);
+        compileAll(bodyJs, ".");
     };
 
     var cbError = (x, y, z) : void => {
@@ -134,14 +135,24 @@ var callback = (response) => {
     response.on("error", cbError);
 };
 
-http.request(options, callback).end();
-
+if (process.argv.length > 2) {
+    // Use JSON data from given file (e.g. meta_api.json)
+    // if called like `node mkResources.js meta_api.json`
+    fs.readFile(process.argv[2], "utf8", (err, data) => {
+        var bodyJs = JSON.parse(data);
+        compileAll(bodyJs, process.argv[3]);
+    });
+} else {
+    // Use JSON data from a running server if called without
+    // further argument, e.g. `node mkResources.js`
+    http.request(options, callback).end();
+}
 
 /***********************************************************************
  * renderers
  */
 
-compileAll = (metaApi : IMetaApi) : void => {
+compileAll = (metaApi : IMetaApi, outPath : string) : void => {
     var modules : IModuleDict = {};
 
     if (config.nickNames) {
@@ -188,7 +199,7 @@ compileAll = (metaApi : IMetaApi) : void => {
     (() => {
         for (var modulePath in modules) {
             if (modules.hasOwnProperty(modulePath)) {
-                var absfp = "./Resources_/" + pyModuleToTsModule(modulePath) + ".ts";
+                var absfp = outPath + "/Resources_/" + pyModuleToTsModule(modulePath) + ".ts";
                 var relativeRoot = mkRelativeRoot(pyModuleToTsModule(modulePath));
                 var contents = headerFooter(relativeRoot, modules[modulePath]);
                 mkdirForFile(absfp);
@@ -200,14 +211,14 @@ compileAll = (metaApi : IMetaApi) : void => {
     // generate main module
     (() => {
         var rootModule = "";
-        var relativeRoot = "./Resources_/";
+        var relativeRoot = outPath + "/Resources_/";
         for (var modulePath in modules) {
             if (modules.hasOwnProperty(modulePath)) {
                 rootModule += mkImportStatement(modulePath, relativeRoot, metaApi);
             }
         }
         rootModule += "\n";
-        var absfp = "./Resources_.ts";
+        var absfp = outPath + "/Resources_.ts";
         fs.writeFileSync(absfp, headerFooter(relativeRoot, rootModule));
     })();
 };
@@ -514,10 +525,6 @@ mkFlags = (field : ISheetField, comment ?: boolean) : string => {
  */
 
 mkdirForFile = (filepath : string) : void => {
-    if (!_s.startsWith(filepath, "./") &&
-        !_s.startsWith(filepath, "../")) {
-        throw "mkdirForFile: path must start with './' or '../': " + filepath;
-    }
     var dirpath : string[] = _s.words(filepath, "/");
     dirpath.pop();
     _fs.mkdirSync(u.intercalate(dirpath, "/"), 0755, true);
