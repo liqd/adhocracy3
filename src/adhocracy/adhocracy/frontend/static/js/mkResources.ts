@@ -6,9 +6,8 @@ var http : any = require("http");
 var fs : any = require("fs");
 var _fs : any = require("node-fs");
 var _s : any = require("underscore.string");
+var process : any = require("process");
 /* tslint:enable:no-var-requires */
-
-declare var process : any;
 
 import u = require("./mkResources/Util");
 
