@@ -21,7 +21,7 @@ TODO: make the automatic setup work (vagrant shell provisioner or salt)
 
 
 Installation (backend)
----------------------
+----------------------
 
 Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
@@ -55,14 +55,6 @@ update your shell environment::
 
     source ./source_env
 
-Installation (frontend)
-------------------------
-
-install javascript front-end ::
-
-    cd src/adhocracy/adhocracy/frontend/static/js/
-    make
-    cd ../../../../../..  # (or 'cd -')
 
 Documentation
 -------------
@@ -71,6 +63,7 @@ build sphinx documentation ::
 
     bin/sphinx_build_adhocracy
     xdg-open docs/build/html/index.html  # (alternatively, cut & paste the url into your browser)
+
 
 Run the application
 -------------------

@@ -8,29 +8,29 @@
             type="text"
             name="username"
             placeholder="username"
-            ng-model="input.username"
+            data-ng-model="input.username"
             required="required" />
         <input
             type="email"
             name="email"
             placeholder="email"
-            ng-model="input.email"
+            data-ng-model="input.email"
             required="required" />
         <input
             type="password"
             name="password"
             placeholder="password"
-            ng-model="input.password"
+            data-ng-model="input.password"
             required="required"
-            ng-minlength="6"
-            ng-maxlength="100" />
+            data-ng-minlength="6"
+            data-ng-maxlength="100" />
         <input
             type="password"
             name="password_repeat"
             placeholder="password repeat"
-            ng-model="input.passwordRepeat"
+            data-ng-model="input.passwordRepeat"
             required="required" />
-        <span class="input-error" ng-show="input.password !== input.passwordRepeat">
+        <span class="input-error" data-ng-show="input.password !== input.passwordRepeat">
             Does not match.
         </span>
     </div>
@@ -43,7 +43,7 @@
             name="register"
             value="register"
             class="m-call-to-action"
-            ng-click="register()"
-            ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
+            data-ng-click="register()"
+            data-ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
     </div>
 </form>
