@@ -17,6 +17,9 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
 }
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
+    // FIXME: WebSocket updates do not work with this because there are no WebSocket
+    // messages for new comments (only for new children). We do also not get any
+    // messages for new children because the commentable is a version.
     public elemRefs(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
         return container.data["adhocracy_sample.sheets.comment.ICommentable"].comments;
     }
