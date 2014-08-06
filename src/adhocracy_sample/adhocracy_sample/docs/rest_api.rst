@@ -716,7 +716,7 @@ Batch requests
 
 The following URL accepts batch requests ::
 
-    >>> batch_url = '/adhocracy-batch/'
+    >>> batch_url = '/batch'
 
 A batch request a POST request with a json array in the body that
 contains certain HTTP requests encoded in a certain way.
@@ -730,13 +730,13 @@ Batch requests are processed as a transaction.  By this, we mean that
 either all encoded HTTP requests succeed and the response to the batch
 request is a success response, or any one of them fails, the database
 state is rolled back to the beginning of the request, and the response
-is an error, explaining which requests failed for which reason.
+is an error, explaining which request failed for which reason.
 
 
 Things that are different in individual requests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*Preliminary pesource paths: motivation and general idea.*
+*Preliminary resource paths: motivation and general idea.*
 
 All requests with methods POST, GET, PUT as allowed in the rest of
 this document are allowed in batch requests.  POST differs in that it
@@ -750,29 +750,20 @@ POST, GET, and PUT are all allowed to use preliminary paths in
 addition to the "normal" ones.  Apart from this, nothing changes in
 the individual requests.
 
-*Preliminary pesource paths: implementation.*
+*Preliminary resource paths: implementation.*
 
 The encoding of a request consist of an object with attributes for
-method (aka HTTP verb), path, and body ::
+method (aka HTTP verb), path, and body. A further attribute, 'result_path',
+defines a name for the preliminary path of the object created by the request.
+If the preliminary name will not be used, this attribute can be omitted or
+left empty. ::
 
-    >>> encoded_request = {
+    >>> encoded_request_with_name = {
     ...     'method': 'POST',
     ...     'path': '/adhocracy/Proposal/kommunismus',
     ...     'body': { 'content_type': 'adhocracy.resources.IParagraph' },
+    ...     'result_path': 'par1_item'
     ... }
-
-This encoding is wrapped in a surrounding dictionary with only one
-entry.  This entry gives the requests response a preliminary path ::
-
-    >>> encoded_request_with_name = {
-    ...     'par1_item': {
-    ...         'method': 'POST',
-    ...         'path': '/adhocracy/Proposal/kommunismus',
-    ...         'body': { 'content_type': 'adhocracy.resources.IParagraph' },
-    ...     }
-    ... }
-
-If the preliminary name will not be used, it can be left empty.
 
 Preliminary paths can be used anywhere in subsequent requests, either
 in the 'path' item of the request itself, or anywhere in the json data
@@ -783,7 +774,7 @@ object and replace all preliminary names with the actual ones that
 will be available by then.
 
 At this point, the fact that an item is not constructed empty, but
-always immediately contains an intial, empty version that is passed
+always immediately contains an initial, empty version that is passed
 back to the client via an extra attribute 'first_version_path'
 complicates things significantly.
 
@@ -807,34 +798,33 @@ Let's add some more paragraphs to the second section above ::
 
     >>> prop_item = '/adhocracy/Proposals/kommunismus/'
     >>> section_item = s2dag_path
-    >>> batch = [ { 'par1_item': {
-    ...                 'method': 'POST',
-    ...                 'path': prop_item,
-    ...                 'body': {
-    ...                     'content_type': 'adhocracy.resources.IParagraph'
-    ...                 },
-    ...             }
+    >>> batch = [ {
+    ...             'method': 'POST',
+    ...             'path': prop_item,
+    ...             'body': {
+    ...                 'content_type': 'adhocracy.resources.IParagraph'
+    ...             },
+    ...             'result_path': 'par1_item'
     ...           },
-    ...           { 'par1_version': {
-    ...                 'method': 'POST',
-    ...                 'path': '@par1_item',
-    ...                 'body': {
-    ...                     'content_type': 'adhocracy.resources.IParagraphVersion',
-    ...                     'data': {
-    ...                         'adhocracy.sheets.versions.IVersionable': {
-    ...                             'follows': ['@@par1_item']
-    ...                         },
-    ...                         'adhocracy.sheets.document.IParagraph': {
-    ...                             'content': 'sein blick ist vom vorüberziehn der stäbchen'
-    ...                         }
+    ...           {
+    ...             'method': 'POST',
+    ...             'path': '@par1_item',
+    ...             'body': {
+    ...                 'content_type': 'adhocracy.resources.IParagraphVersion',
+    ...                 'data': {
+    ...                     'adhocracy.sheets.versions.IVersionable': {
+    ...                         'follows': ['@@par1_item']
+    ...                     },
+    ...                     'adhocracy.sheets.document.IParagraph': {
+    ...                         'content': 'sein blick ist vom vorüberziehn der stäbchen'
     ...                     }
-    ...                 }
-    ...             }
+    ...                 },
+    ...             },
+    ...             'result_path': 'par1_version'
     ...           },
-    ...           { '': {
-    ...                 'method': 'GET',
-    ...                 'path': '@@par1_item'
-    ...             }
+    ...           {
+    ...             'method': 'GET',
+    ...             'path': '@@par1_item'
     ...           },
     ...         ]
     >>> print('test disabled')
@@ -879,36 +869,36 @@ created paragraph version as its only successor ::
 Post another paragraph item and a version.  If the version post fails,
 the paragraph will not be present in the database ::
 
-    >>> butch = [ { 'par2_item': {
-    ...                 'method': 'POST',
-    ...                 'path': prop_item,
-    ...                 'body': {
-    ...                     'content_type': 'adhocracy.resources.IParagraph'
-    ...                 },
-    ...             }
+    >>> invalid_batch = [ {
+    ...             'method': 'POST',
+    ...             'path': prop_item,
+    ...             'body': {
+    ...                 'content_type': 'adhocracy.resources.IParagraph'
+    ...             },
+    ...             'result_path': 'par2_item'
     ...           },
-    ...           { 'par2_version': {
-    ...                 'method': 'POST',
-    ...                 'path': '@par2_item',
-    ...                 'body': {
-    ...                     'content_type': 'NOT_A_CONTENT_TYPE_AT_ALL',
-    ...                     'data': {
-    ...                         'adhocracy.sheets.versions.IVersionable': {
-    ...                             'follows': ['@@par2_item']
-    ...                         },
-    ...                         'adhocracy.sheets.document.IParagraph': {
-    ...                             'content': 'das wird eh nich gepostet'
-    ...                         }
+    ...           {
+    ...             'method': 'POST',
+    ...             'path': '@par2_item',
+    ...             'body': {
+    ...                 'content_type': 'NOT_A_CONTENT_TYPE_AT_ALL',
+    ...                 'data': {
+    ...                     'adhocracy.sheets.versions.IVersionable': {
+    ...                         'follows': ['@@par2_item']
+    ...                     },
+    ...                     'adhocracy.sheets.document.IParagraph': {
+    ...                         'content': 'das wird eh nich gepostet'
     ...                     }
     ...                 }
-    ...             }
+    ...             },
+    ...             'result_path': 'par2_version'
     ...           }
     ...         ]
     >>> print('test disabled')
     test disabled
 
-    .. >>> butch_resp = testapp.post_json(batch_url, butch).json
-    .. >>> pprint(butch_resp)
+    .. >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch).json
+    .. >>> pprint(invalid_batch_resp)
     .. [
     ..     {
     ..         'code': 200,
@@ -922,11 +912,17 @@ the paragraph will not be present in the database ::
     ..         ...
     ..     }
     .. ]
-    .. >>> butch_resp[1]['code'] >= 400
+    .. >>> invalid_batch_resp[1]['code'] >= 400
     .. True
-    .. >>> get_nonexistent_obj = testapp.get_json(butch_resp[0]['body']['path'])
+    .. >>> get_nonexistent_obj = testapp.get_json(invalid_batch_resp[0]['body']['path'])
     .. >>> get_nonexistent_obj['code'] >= 400
     .. True
+
+Note that the response will contain embedded responses for all successful
+encoded requests (if any) and also for the first failed encoded request (if
+any), but not for any further failed requests. The backend stops processing
+encoded requests once the first of them has failed, since further processing
+would probably only lead to further errors.
 
 FIXME: I don't think the tests are supposed to work as is, but they
 should be clear enough to serve as documentation.  Fix this once the
