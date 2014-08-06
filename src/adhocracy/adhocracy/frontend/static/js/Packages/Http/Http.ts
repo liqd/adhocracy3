@@ -205,8 +205,7 @@ exportContent = <Content extends Resources.Content<any>>(adhMetaApi : MA.MetaApi
     console.log("exportContent: we have the MetaApi!:");
     console.log(JSON.stringify(adhMetaApi.resource(obj.content_type), null, 4));
 
-    // FIXME: newobj should be a copy, not a reference
-    var newobj : Content = obj;
+    var newobj : Content = Util.deepcp(obj);
 
     // FIXME: Get this list from the server (meta-api)!
     var readOnlyProperties = [
