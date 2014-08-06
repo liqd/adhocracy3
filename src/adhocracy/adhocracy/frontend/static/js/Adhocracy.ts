@@ -89,8 +89,8 @@ export var init = (config) => {
     app.directive("adhEmbed", ["$compile", "$route", Embed.factory]);
 
     app.directive("adhListing",
-        ["adhConfig", (adhConfig) =>
-            new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig)]);
+        ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
+            new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
 
     app.directive("adhWebSocketTest",
         ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>
@@ -119,7 +119,7 @@ export var init = (config) => {
         ["adhConfig", (adhConfig) => new Proposal.ParagraphVersionDetail().createDirective(adhConfig)]);
     app.directive("adhDocumentSheetEdit",
         ["adhHttp", "$q", "adhConfig", (adhHttp, $q, adhConfig) =>
-            new Proposal.DocumentSheetEdit().createDirective(adhConfig, $q, adhConfig)]);
+            new Proposal.DocumentSheetEdit().createDirective(adhHttp, $q, adhConfig)]);
     app.directive("adhDocumentSheetShow",
         ["adhConfig", (adhConfig) => new Proposal.DocumentSheetShow().createDirective(adhConfig)]);
     app.directive("adhParagraphSheetEdit",

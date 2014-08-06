@@ -85,7 +85,7 @@ export var register = () => {
                 adapter.elemRefs.and.returnValue(elements);
 
                 var listing = new Listing.Listing(adapter);
-                var directive: ng.IDirective = listing.createDirective(config);
+                var directive: ng.IDirective = listing.createDirective(config, adhWebSocketMock);
 
                 registerDirectiveSpec(directive);
 
@@ -102,12 +102,13 @@ export var register = () => {
                         adhHttpMock.get.and.callFake(() => q.when(container));
 
                         scope = {
-                            container: undefined,
-                            elements: undefined
+                            // arbitrary values
+                            container: 3,
+                            elements: 2
                         };
 
-                        var controller = directive.controller[4];
-                        controller(scope, adhHttpMock, adhWebSocketMock, done);
+                        var controller = directive.controller[3];
+                        controller(scope, adhHttpMock, done);
                     });
 
                     it("sets scope.container", () => {
