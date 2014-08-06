@@ -104,8 +104,8 @@ textarea {
     &.is-disabled,
     &.ng-disabled,
     &:disabled {
-        background-color: $color-structure-surface;
-        color: $color-secondary-extrovert;
+        border-color: $color-structure-border-introvert;
+        outline: 1px solid $color-structure-border-introvert;
     }
 }
 
