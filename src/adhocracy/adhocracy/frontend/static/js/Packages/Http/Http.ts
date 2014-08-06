@@ -4,9 +4,10 @@
 
 import Resources = require("../../Resources");
 import Util = require("../Util/Util");
+import MA = require("../MetaApi/MetaApi");
 
 export var importContent : <Content extends Resources.Content<any>>(resp: {data: Content}) => Content;
-export var exportContent : <Content extends Resources.Content<any>>(obj : Content) => Content;
+export var exportContent : <Content extends Resources.Content<any>>(adhMetaApi : MA.MetaApiQuery, obj : Content) => Content;
 export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void;
 
 
@@ -32,18 +33,22 @@ export interface IBaseService<Content extends Resources.Content<any>> {
 export interface ITransaction<Content extends Resources.Content<any>> extends IBaseService<Content> {}
 
 export class Service<Content extends Resources.Content<any>> implements IBaseService<Content> {
-    constructor(private $http : ng.IHttpService, private $q : ng.IQService) {}
+    constructor(
+        private $http : ng.IHttpService,
+        private $q : ng.IQService,
+        private adhMetaApi : MA.MetaApiQuery
+    ) {}
 
     public get(path : string) : ng.IPromise<Content> {
         return this.$http.get(path).then(importContent, logBackendError);
     }
 
     public put(path : string, obj : Content) : ng.IPromise<Content> {
-        return this.$http.put(path, exportContent(obj)).then(importContent, logBackendError);
+        return this.$http.put(path, exportContent(this.adhMetaApi, obj)).then(importContent, logBackendError);
     }
 
     public post(path : string, obj : Content) : ng.IPromise<Content> {
-        return this.$http.post(path, exportContent(obj)).then(importContent, logBackendError);
+        return this.$http.post(path, exportContent(this.adhMetaApi, obj)).then(importContent, logBackendError);
     }
 
     public getNewestVersionPath(path : string) : ng.IPromise<string> {
@@ -194,8 +199,11 @@ importContent = <Content extends Resources.Content<any>>(resp: {data: Content}) 
     //   }
 };
 
-exportContent = <Content extends Resources.Content<any>>(obj : Content) : Content => {
+exportContent = <Content extends Resources.Content<any>>(adhMetaApi : MA.MetaApiQuery, obj : Content) : Content => {
     "use strict";
+
+    console.log("exportContent: we have the MetaApi!:");
+    console.log(JSON.stringify(adhMetaApi.resource(obj.content_type), null, 4));
 
     // FIXME: newobj should be a copy, not a reference
     var newobj : Content = obj;

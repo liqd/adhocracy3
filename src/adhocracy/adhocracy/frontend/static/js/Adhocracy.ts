@@ -83,7 +83,7 @@ export var init = (config, meta_api) => {
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
-    app.service("adhHttp", ["$http", "$q", AdhHttp.Service]);
+    app.service("adhHttp", ["$http", "$q", "adhMetaApi", AdhHttp.Service]);
     app.factory("adhWebSocket", ["Modernizr", "adhConfig", AdhWebSocket.factory]);
 
     app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", AdhCrossWindowMessaging.factory]);
