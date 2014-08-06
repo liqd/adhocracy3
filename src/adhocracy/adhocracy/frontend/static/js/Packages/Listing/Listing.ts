@@ -32,7 +32,9 @@ export interface ListingScope<Container> {
     title : string;
     container : Container;
     elements : string[];
-    update : (...any) => ng.IPromise<void>;
+    update : () => ng.IPromise<void>;
+    wshandle : string;
+    show : { addForm : boolean };
 }
 
 // FIXME: the way Listing works now is similar to ngRepeat, but it
@@ -55,13 +57,13 @@ export interface ListingScope<Container> {
 //
 // FIXME: as the listing elements are tracked by their $id (the element path) in the listing template, we don't allow duplicate elements
 // in one listing. We should add a proper warning if that occurs or handle that case properly.
-//
+
 export class Listing<Container extends Resources.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter> {
     public static templateUrl : string = pkgLocation + "/Listing.html";
 
     constructor(private containerAdapter : ContainerAdapter) {}
 
-    public createDirective(adhConfig : AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.Type, adhWebSocket: AdhWebSocket.IService) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
@@ -73,28 +75,31 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                 title: "@"
             },
             transclude: true,
-            controller: ["$scope", "adhHttp", "adhWebSocket", "adhDone", (
+            link: (scope, element, attrs, controller, transclude) => {
+                element.on("$destroy", () => {
+                    if (typeof scope.wshandle === "string") {
+                        adhWebSocket.unregister(scope.path, scope.wshandle);
+                    }
+                });
+            },
+            controller: ["$scope", "adhHttp", "adhDone", (
                 $scope: ListingScope<Container>,
                 adhHttp: AdhHttp.Service<Container>,
-                adhWebSocket: AdhWebSocket.IService,
                 adhDone
             ) : void => {
-                $scope.update = (...args) : ng.IPromise<void> => {
+                $scope.show = {addForm: false};
+
+                $scope.update = () : ng.IPromise<void> => {
                     return adhHttp.get($scope.path).then((pool) => {
                         $scope.container = pool;
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
                     });
                 };
 
-                // (The call order is important: *first* subscribe to
-                // the updates, *then* get an initial copy.)
-
+                // (The call order is important: first subscribe to
+                // the updates, then get an initial copy.)
                 try {
-                    adhWebSocket.register($scope.path, $scope.update);
-
-                    // FIXME: subscribe returns an id, and we need to
-                    // unsubscribe when the listing is shut down.  how
-                    // do we know if we are shut down here?
+                    $scope.wshandle = adhWebSocket.register($scope.path, $scope.update);
                 } catch (e) {
                     console.log(e);
                     console.log("Will continue on resource " + $scope.path + " without server bind.");
