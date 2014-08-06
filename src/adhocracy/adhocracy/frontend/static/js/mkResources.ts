@@ -22,12 +22,22 @@ interface IConfig {
     nickNames : boolean;
     sheetGetters : boolean;
     sheetSetters : boolean;
+    httpOptions : {
+        host: string;
+        port: number;
+        path: string;
+    }
 }
 
 var config : IConfig = {
     nickNames : false,
     sheetGetters : false,
-    sheetSetters : false
+    sheetSetters : false,
+    httpOptions : {
+        host: "127.0.0.1",
+        port: 6541,
+        path: "/meta_api/"
+    }
 };
 
 
@@ -64,12 +74,6 @@ var canonicalizePath : (string) => string;
 /***********************************************************************
  * fetch api
  */
-
-var options = {
-    host: "127.0.0.1",
-    port: 6541,
-    path: "/meta_api/"
-};
 
 var callback = (response) => {
     var body : string = "";
@@ -111,7 +115,7 @@ if (process.argv.length > 2) {
 } else {
     // Use JSON data from a running server if called without
     // further argument, e.g. `node mkResources.js`
-    http.request(options, callback).end();
+    http.request(config.httpOptions, callback).end();
 }
 
 /***********************************************************************
