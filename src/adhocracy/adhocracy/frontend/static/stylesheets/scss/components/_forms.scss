@@ -96,16 +96,16 @@ textarea {
 
         &.has-focus,
         &:focus {
-            border-color: $red;
-            outline: 1px solid $red;
+            border-color: $color-highlight-invalid;
+            outline: 1px solid $color-highlight-invalid;
         }
     }
 
     &.is-disabled,
     &.ng-disabled,
     &:disabled {
-        background-color: $color-structure-surface;
-        color: $color-secondary-extrovert;
+        border-color: $color-structure-border-introvert;
+        outline: 1px solid $color-structure-border-introvert;
     }
 }
 

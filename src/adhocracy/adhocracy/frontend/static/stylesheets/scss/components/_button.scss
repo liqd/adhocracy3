@@ -87,9 +87,12 @@ input[type="button"] {
         outline: 0;
     }
 
-    &.has-focus, &:focus,
+    &.has-focus, &:focus {
+        @include button-color($color-highlight-extrovert, $color-highlight-reverse);
+    }
+
     &.is-hover, &:hover {
-        @include button-color(lighten($color-highlight-standard, 10%), $color-highlight-reverse);
+        @include button-color($color-highlight-introvert, $color-highlight-reverse);
     }
 
     &:disabled,
