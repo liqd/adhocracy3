@@ -25,27 +25,22 @@ widgets and resources.
 
 Example::
 
-    export class AbstractListingContainerAdapter {
-        public elemRefs(container : any) : string[] {
-            return [];
-        }
+    export interface IListingContainerAdapter {
+        elemRefs(any) : string[] {
     }
 
-    export class ListingPoolAdapter extends AbstractListingContainerAdapter {
+    export class ListingPoolAdapter implements IListingContainerAdapter {
         public elemRefs(container : Types.Content<Resources.HasIPoolSheet>) {
             return container.data["adhocracy.sheets.pool.IPool"].elements;
         }
     }
 
-Both adapters provide a method ``elemRefs`` that consume a container
+The adapter provides a method ``elemRefs`` that consume a container
 resource of a given content type, and return a list of paths to more
 resources, namely the elements in the container.
 
-The first class does not expect anything from the container it gets
-passed and always returns the empty list.
-
-The second requires the container to have the ``Pool`` sheet and gets
-the element paths from there.
+The example implementation requires the container to have the ``Pool``
+sheet and gets the element paths from there.
 
 
 Widget Classes
@@ -179,7 +174,7 @@ heterogeneous objects, writing the adapter is slightly more
 challenging: On the one hand, we may want to do something specific
 where possible, such as allowing for inline-comments::
 
-    export class ListingElementWithCommentsAdapter extends ... {
+    export class ListingElementWithCommentsAdapter implements ... {
         public renderCommentButton: ... = ...
         ...
     }
@@ -189,7 +184,7 @@ all elements.
 
 The solution is to resort to dynamic checks::
 
-    export class ArbitraryListingElementAdapter extends ... {
+    export class ArbitraryListingElementAdapter implements ... {
         public renderItAll(...) {
             ...
             if ('comments' in self) {
