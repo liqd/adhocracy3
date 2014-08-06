@@ -84,9 +84,24 @@ export var register = () => {
             adhMetaApi = new AdhMetaApi.MetaApiQuery(sampleMetaApi);
         });
 
-        it("works!", () => {
+        it("returns the right resource meta data.", () => {
+            var sheetsList = adhMetaApi.resource("adhocracy.resources.root.IRootPool").sheets;
+            expect(sheetsList.indexOf("adhocracy.sheets.name.IName") >= 0).toBe(true);
+        });
+
+        it("returns the right sheet meta data.", () => {
+            expect(adhMetaApi.sheet("adhocracy.sheets.metadata.IMetadata")).toBeTruthy();
+        });
+
+        it("returns the right field meta data.", () => {
             expect(adhMetaApi.field("adhocracy.sheets.pool.IPool", "elements").name).toBe("elements");
             expect(adhMetaApi.field("adhocracy.sheets.pool.IPool", "elements").editable).toBe(false);
+        });
+
+        it("crashes if unhappy", () => {
+            expect(() => adhMetaApi.resource("blörg")).toThrow();
+            expect(() => adhMetaApi.sheet("blürg")).toThrow();
+            expect(() => adhMetaApi.field("adhocracy.sheets.name.IName", "fee")).toThrow();
         });
     });
 };
