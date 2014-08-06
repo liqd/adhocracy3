@@ -8,6 +8,7 @@ import AdhWebSocket = require("../WebSocket/WebSocket");
 import AdhConfig = require("../Config/Config");
 
 import Resources = require("../../Resources");
+import SIPool = require("../../Resources_/adhocracy/sheets/pool/IPool");
 
 var pkgLocation = "/Listing";
 
@@ -21,7 +22,7 @@ export class AbstractListingContainerAdapter {
 }
 
 export class ListingPoolAdapter extends AbstractListingContainerAdapter {
-    public elemRefs(container : Resources.Content<Resources.HasIPoolSheet>) {
+    public elemRefs(container : Resources.Content<SIPool.HasAdhocracySheetsPoolIPool>) {
         return container.data["adhocracy.sheets.pool.IPool"].elements;
     }
 }

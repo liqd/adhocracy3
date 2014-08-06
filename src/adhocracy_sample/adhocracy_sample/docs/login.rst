@@ -54,7 +54,8 @@ Like every resource the user has a metadata sheet with creation information::
     >>> resp_data = testapp.get(user_path).json
     >>> resp_metadata = resp_data['data']['adhocracy.sheets.metadata.IMetadata']
 
-Even tough he is not logged in yet, the creator points to his usr resource::
+Even though he is not logged in yet, the creator points to his user resource::
+
     >>> resp_metadata['creator']
     ['/principals/users/00...
 
