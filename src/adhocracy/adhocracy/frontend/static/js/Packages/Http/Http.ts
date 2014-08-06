@@ -199,22 +199,43 @@ importContent = <Content extends Resources.Content<any>>(resp: {data: Content}) 
     //   }
 };
 
+/**
+ * prepare object for post or put.  remove all fields that are none of
+ * editable, creatable, create_mandatory.  remove all sheets that have
+ * no fields after this.
+ *
+ * FIXME: there is a difference between put and post.  namely, fields
+ * that may be created but not edited should be treated differently.
+ * also, fields with create_mandatory should not be missing from the
+ * posted object.
+ */
 exportContent = <Content extends Resources.Content<any>>(adhMetaApi : MA.MetaApiQuery, obj : Content) : Content => {
     "use strict";
 
-    console.log("exportContent: we have the MetaApi!:");
-    console.log(JSON.stringify(adhMetaApi.resource(obj.content_type), null, 4));
-
     var newobj : Content = Util.deepcp(obj);
 
-    // FIXME: Get this list from the server (meta-api)!
-    var readOnlyProperties = [
-        "adhocracy.propertysheets.interfaces.IVersions"
-    ];
+    // remove some fields from newobj.data[*] and empty sheets from
+    // newobj.data.
+    for (var sheetName in newobj.data) {
+        if (newobj.data.hasOwnProperty(sheetName)) {
+            var sheet : MA.ISheet = newobj.data[sheetName];
+            var keepSheet : boolean = false;
 
-    for (var ro in readOnlyProperties) {
-        if (readOnlyProperties.hasOwnProperty(ro)) {
-            delete newobj.data[readOnlyProperties[ro]];
+            for (var fieldName in sheet) {
+                if (sheet.hasOwnProperty(fieldName)) {
+                    var fieldMeta : MA.ISheetField = adhMetaApi.field(sheetName, fieldName);
+
+                    if (fieldMeta.editable || fieldMeta.creatable || fieldMeta.create_mandatory) {
+                        keepSheet = true;
+                    } else {
+                        delete sheet[fieldName];
+                    }
+                }
+            }
+
+            if (!keepSheet) {
+                delete newobj.data[sheetName];
+            }
         }
     }
 
