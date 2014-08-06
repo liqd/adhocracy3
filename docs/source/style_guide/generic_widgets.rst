@@ -35,8 +35,8 @@ Example::
         }
     }
 
-The adapter provides a method ``elemRefs`` that consume a container
-resource of a given content type, and return a list of paths to more
+The adapter provides a method ``elemRefs`` that consumes a container
+resource of a given content type, and returns a list of paths to more
 resources, namely the elements in the container.
 
 The example implementation requires the container to have the ``Pool``
