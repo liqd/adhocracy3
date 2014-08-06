@@ -20,13 +20,17 @@ from adhocracy.utils import remove_keys_from_dict
 @implementer(IResourceSheet)
 class GenericResourceSheet(PropertySheet):
 
-    """Generic sheet for resources to get/set the sheet data structure."""
+    """Generic sheet for resources to get/set the sheet data structure.
 
-    context = None  # resource to adapt
-    request = None  # pyramid request object, just to fullfill the interface
-    schema = None  # colander.MappingSchema object to define the data structure
-    meta = None  # SheetMetadata
-    _data_key = ''  # identifier to store data
+    Instance attributes:
+
+    :context: resource to adapt
+    :schema: colander.MappingSchema object to define the data structure
+    :meta: SheetMetadata
+    :_data_key: identifier to store data
+    """
+
+    request = None  # pyramid request object, just to fulfill the interface
 
     def __init__(self, metadata, context):
         schema = metadata.schema_class()
