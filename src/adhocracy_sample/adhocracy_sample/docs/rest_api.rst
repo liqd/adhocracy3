@@ -341,11 +341,10 @@ PUT
 
 Modify data of an existing resource ::
 
-FIXME: The put example is temporally disabled because the IName sheet is longer
-       editable.
+FIXME: disable because IName.name is not editable.  use another example!
 
 ...    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
-...    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'proposals'}}}
+...    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
 ...    >>> resp_data = testapp.put_json("/adhocracy/Proposals", data).json
 ...    >>> pprint(resp_data)
 ...    {'content_type': 'adhocracy.resources.pool.IBasicPool',
@@ -355,10 +354,10 @@ Check the changed resource ::
 
 ...   >>> resp_data = testapp.get("/adhocracy/Proposals").json
 ...   >>> resp_data["data"]["adhocracy.sheets.name.IName"]["name"]
-...   'proposals'
+...   'youdidntexpectthis'
 
-FIXME: write test cases for attributes with "create_mandatory", "editable",
-and possibly others.  (those work the same in PUT and POST, and on any
+FIXME: write test cases for attributes with "create_mandatory",
+"editable", etc.  (those work the same in PUT and POST, and on any
 attribute in the json tree.)
 
 
@@ -375,7 +374,7 @@ The normal return code is 200 ::
 .. >>> testapp.put_json("/adhocracy/Proposals", data)
 .. 200 OK application/json ...
 
-If you submit invalid data the return error code is 400::
+If you submit invalid data the return error code is 400 ::
 
     >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
     ...         'data': {'adhocracy.sheets.example.WRONGINTERFACE': {'name': 'Proposals'}}}
@@ -482,7 +481,7 @@ Create a Proposal (a subclass of Item which pools ProposalVersion's) ::
 
 The return data has the new attribute 'first_version_path' to get the path first Version::
 
-    >>> pvrs0_path = resp.json['first_version_path']  # FIXME: generalize over 'first_version_path'?
+    >>> pvrs0_path = resp.json['first_version_path']
     >>> pvrs0_path
     '/adhocracy/Proposals/kommunismus/VERSION_0000000'
 
@@ -673,10 +672,10 @@ pvrs2 (which also contains s2vrs0_path) ::
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     0
 
-.. FIXME: If two frontends post competing sections simultaneously,
-   neither knows which proposal version belongs to whom.  Proposed
-   solution: the post response must tell the frontend the changed
-   ``root_version``.
+FIXME: If two frontends post competing sections simultaneously,
+neither knows which proposal version belongs to whom.  Proposed
+solution: the post response must tell the frontend the changed
+``root_version``.
 
 
 Tags
@@ -706,57 +705,131 @@ that aren't 'followed_by' any later version::
 FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
 
-FIXME: should the server tell in general where to post speccific
+FIXME: should the server tell in general where to post specific
 content types? (like 'like', 'discussion',..)?  in other words,
-should the client to be able to ask (e.g. with an OPTIONS request)
+should the client be able to ask (e.g. with an OPTIONS request)
 where to post a 'like'?
 
 
 Batch requests
 ––––––––––––––
 
-FIXME: eliminate talk on postroots (it's obsolete).
+The following URL accepts batch requests ::
 
-FIXME: one batch is one transaction: if the last request failes with a
-4xx error, the entire batch request must be rolled back.  the idea
-expressed in this section that half of a batch should be committed is
-weird and should be dropped.
+    >>> batch_url = '/batch'
 
-The following URL accepts POSTs of ordered sequences (json arrays) of
-encoded HTTP requests in one HTTP request body ::
+A batch request a POST request with a json array in the body that
+contains certain HTTP requests encoded in a certain way.
 
-    >>> batch_url = '/adhocracy-batch/'
+A success response contains in its body an array of encoded HTTP
+responses.  This way, the client can see what happened to the
+individual POSTS, and collect all the paths of the individual
+resources that were posted.
 
-The response contains an ordered sequence of the same (or, in case of
-error, shorter) length that contains the resp. HTTP responses.  First
-error terminates batch processing.  Batch requests are transactional
-in the sense that either all are successfully carried out or nothing
-is changed on the server.
+Batch requests are processed as a transaction.  By this, we mean that
+either all encoded HTTP requests succeed and the response to the batch
+request is a success response, or any one of them fails, the database
+state is rolled back to the beginning of the request, and the response
+is an error, explaining which request failed for which reason.
 
-Let's add some more paragraphs to the document above ::
 
-FIXME: postroot will go away.
+Things that are different in individual requests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    .. >>> batch = [ { 'method': 'POST',
-    .. ...             'path': propv2['postroot'],
-    .. ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
-    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
-    .. ...                           'text': 'sein blick ist vom vorüberziehn der stäbchen' }}}},
-    .. ...           { 'method': 'POST',
-    .. ...             'path': propv2['postroot'],
-    .. ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
-    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
-    .. ...                           'text': 'ganz weiß geworden, so wie nicht mehr frisch' }}}},
-    .. ...           { 'method': 'POST',
-    .. ...             'path': propv2['postroot'],
-    .. ...             'body': { 'content_type': 'this is not a very well-known content-type, and will trigger an error!',
-    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
-    .. ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
-    .. ...           { 'method': 'POST',
-    .. ...             'path': propv2['postroot'],
-    .. ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
-    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
-    .. ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
+*Preliminary resource paths: motivation and general idea.*
+
+All requests with methods POST, GET, PUT as allowed in the rest of
+this document are allowed in batch requests.  POST differs in that it
+yields *preliminary resource paths*.  To understand what that is,
+consider this example: In step 4 of a batch request, the front-end
+wants to post to the path that resulted from posting the parent
+resource in step 3 of the same request, so batch requests need to
+allow for an abstraction over the resource paths resulting from POST
+requests.  POST yields preliminary paths instead of actual ones, and
+POST, GET, and PUT are all allowed to use preliminary paths in
+addition to the "normal" ones.  Apart from this, nothing changes in
+the individual requests.
+
+*Preliminary resource paths: implementation.*
+
+The encoding of a request consist of an object with attributes for
+method (aka HTTP verb), path, and body. A further attribute, 'result_path',
+defines a name for the preliminary path of the object created by the request.
+If the preliminary name will not be used, this attribute can be omitted or
+left empty. ::
+
+    >>> encoded_request_with_name = {
+    ...     'method': 'POST',
+    ...     'path': '/adhocracy/Proposal/kommunismus',
+    ...     'body': { 'content_type': 'adhocracy.resources.IParagraph' },
+    ...     'result_path': 'par1_item'
+    ... }
+
+Preliminary paths can be used anywhere in subsequent requests, either
+in the 'path' item of the request itself, or anywhere in the json data
+in the body where the schemas expect to find resource paths.  It must
+be prefixed with "@" in order to mark it as preliminary.  Right
+before executing the request, the backend will traverse the request
+object and replace all preliminary names with the actual ones that
+will be available by then.
+
+At this point, the fact that an item is not constructed empty, but
+always immediately contains an initial, empty version that is passed
+back to the client via an extra attribute 'first_version_path'
+complicates things significantly.
+
+In order to post the first *real* item version, we must use
+'first_version_path' as the predecessor version, but we can't know its
+value that before the post of the item version.  This would not be a
+problem if the item would be created empty.
+
+*FIXME: change the api accordingly so that this problem goes away!*
+
+In order to work around this, preliminary path names for item posts
+can be used in two different syntaxes: First, like '@prelim_name' in
+order to refer to the item, and second, like '@@prelim_name' in order
+to refer to the first, implicitly generated, empty item version.
+
+
+Examples
+~~~~~~~~
+
+Let's add some more paragraphs to the second section above ::
+
+    >>> prop_item = '/adhocracy/Proposals/kommunismus/'
+    >>> section_item = s2dag_path
+    >>> batch = [ {
+    ...             'method': 'POST',
+    ...             'path': prop_item,
+    ...             'body': {
+    ...                 'content_type': 'adhocracy.resources.IParagraph'
+    ...             },
+    ...             'result_path': 'par1_item'
+    ...           },
+    ...           {
+    ...             'method': 'POST',
+    ...             'path': '@par1_item',
+    ...             'body': {
+    ...                 'content_type': 'adhocracy.resources.IParagraphVersion',
+    ...                 'data': {
+    ...                     'adhocracy.sheets.versions.IVersionable': {
+    ...                         'follows': ['@@par1_item']
+    ...                     },
+    ...                     'adhocracy.sheets.document.IParagraph': {
+    ...                         'content': 'sein blick ist vom vorüberziehn der stäbchen'
+    ...                     }
+    ...                 },
+    ...             },
+    ...             'result_path': 'par1_version'
+    ...           },
+    ...           {
+    ...             'method': 'GET',
+    ...             'path': '@@par1_item'
+    ...           },
+    ...         ]
+    >>> print('test disabled')
+    test disabled
+
     .. >>> batch_resp = testapp.post_json(batch_url, batch).json
     .. >>> pprint(batch_resp)
     .. [
@@ -767,6 +840,66 @@ FIXME: postroot will go away.
     ..             'path': '...'
     ..         }
     ..     },
+    ..     {
+    ..         'code': 200,
+    ..         'body': {
+    ..             'content_type': 'adhocracy.resources.IParagraphVersion',
+    ..             'path': '...'
+    ..         }
+    ..     },
+    ..     {
+    ..         'code': 200,
+    ..         'body': {
+    ..             'content_type': 'adhocracy.resources.IParagraphVersion',
+    ..             'path': '...'
+    ..         }
+    ..     }
+    .. ]
+
+Now the first, empty paragraph version should contain the newly
+created paragraph version as its only successor ::
+
+    .. >>> v1 = batch_resp[2]['body']['data']['adhocracy.sheets.versions.IVersionable']['followed_by']
+    .. >>> v2 = [batch_resp[1]['path']]
+    .. >>> v1 == v2
+    .. True
+    .. >>> print(v1, v2)
+    .. ...
+
+Post another paragraph item and a version.  If the version post fails,
+the paragraph will not be present in the database ::
+
+    >>> invalid_batch = [ {
+    ...             'method': 'POST',
+    ...             'path': prop_item,
+    ...             'body': {
+    ...                 'content_type': 'adhocracy.resources.IParagraph'
+    ...             },
+    ...             'result_path': 'par2_item'
+    ...           },
+    ...           {
+    ...             'method': 'POST',
+    ...             'path': '@par2_item',
+    ...             'body': {
+    ...                 'content_type': 'NOT_A_CONTENT_TYPE_AT_ALL',
+    ...                 'data': {
+    ...                     'adhocracy.sheets.versions.IVersionable': {
+    ...                         'follows': ['@@par2_item']
+    ...                     },
+    ...                     'adhocracy.sheets.document.IParagraph': {
+    ...                         'content': 'das wird eh nich gepostet'
+    ...                     }
+    ...                 }
+    ...             },
+    ...             'result_path': 'par2_version'
+    ...           }
+    ...         ]
+    >>> print('test disabled')
+    test disabled
+
+    .. >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch).json
+    .. >>> pprint(invalid_batch_resp)
+    .. [
     ..     {
     ..         'code': 200,
     ..         'body': {
@@ -776,75 +909,28 @@ FIXME: postroot will go away.
     ..     },
     ..     {
     ..         'code': ...,
-    ..         'body': ...
+    ..         ...
     ..     }
     .. ]
+    .. >>> invalid_batch_resp[1]['code'] >= 400
+    .. True
+    .. >>> get_nonexistent_obj = testapp.get_json(invalid_batch_resp[0]['body']['path'])
+    .. >>> get_nonexistent_obj['code'] >= 400
+    .. True
 
-(The third element of the above array must have return code >= 400.
-Not sure how to test this with doctest.)
+Note that the response will contain embedded responses for all successful
+encoded requests (if any) and also for the first failed encoded request (if
+any), but not for any further failed requests. The backend stops processing
+encoded requests once the first of them has failed, since further processing
+would probably only lead to further errors.
 
-Do this again with the last two paragraphs, but without the mistake
-above.  Also throw in a request at the end that depends on the former.
-References to objects earlier in the same batch request are easy:
-Instead of a string that contains the URI, the 'path' field of the
-reference object contains a number that points into the batch array
-(numbering starts with '0').  (Numeric paths are only allowed in batch
-requests!)
+FIXME: I don't think the tests are supposed to work as is, but they
+should be clear enough to serve as documentation.  Fix this once the
+application code that it is testing is supposed to work?  --mf
 
-    .. >>> propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
-    .. ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': batch_resp[0]['body']['path']})
-    .. ... propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
-    .. ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': batch_resp[1]['body']['path']})
-    .. ... propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
-    .. ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': 0})
-    .. ... propv2['data']['adhocracy.sheets.document.IDocument']['paragraphs']
-    .. ...      .append({ 'content_type': 'adhocracy.resources.IParagraph', 'path': 1})
-    .. ... propv2_vrsbl = propv2['data']['adhocracy.sheets.versions.IVersionable']
-    .. ... propv2_vrsbl['follows'] = [{'content_type': prop['content_type'], 'path': prop['path']}]
-    .. ... batch = [ { 'method': 'POST',
-    .. ...             'path': prop['postroot'],
-    .. ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
-    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
-    .. ...                           'text': 'ihm ist als ob es tausend stäbchen gäbchen' }}}},
-    .. ...           { 'method': 'POST',
-    .. ...             'path': prop['postroot'],
-    .. ...             'body': { 'content_type': 'adhocracy.resources.IParagraph',
-    .. ...                       'data': { 'adhocracy.sheets.document.Text': {
-    .. ...                           'text': 'und in den tausend stäbchen keinen fisch' }}}},
-    .. ...           { 'method': 'POST',
-    .. ...             'path': propv2_vrsbl['postroot'],
-    .. ...             'body': propv2 }
-    .. ...         ]
-    .. >>> batch_resp = testapp.post_json(batch_url, batch).json
-    .. >>> pprint(batch_resp)
-    .. [
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy.resources.IParagraph',
-    ..             'path': '...'
-    ..         }
-    ..     },
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy.resources.IParagraph',
-    ..             'path': '...'
-    ..         }
-    ..     },
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy_sample.resources.proposal.IProposal',
-    ..             'path': '...'
-    ..         }
-    ..     }
-    .. ]
-    .. >>> propv3 = testapp.get_json(batch_resp[2]['body']['path']).json
-    .. {
-    ..     'content_type': 'adhocracy_sample.resources.proposal.IProposal',
-    ..     ...
-    .. }
+FIXME: The response does not have to have this particular type.  I
+would prefer it if I could get the individual request responses (even
+if they are obsolete), but in which syntax I don't care.  --mf
 
 
 Other stuff
