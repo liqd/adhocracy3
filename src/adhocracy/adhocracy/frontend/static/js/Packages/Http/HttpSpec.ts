@@ -2,6 +2,7 @@
 
 import q = require("q");
 
+import Util = require("../Util/Util");
 import AdhHttp = require("./Http");
 
 var mkHttpMock = () => {
@@ -13,12 +14,49 @@ var mkHttpMock = () => {
 };
 
 var mkAdhMetaApiMock = () => {
-    var mock = jasmine.createSpyObj("adhMetaApiMock", ["resource", "sheet", "field"]);
-    mock.resource.and.returnValue(null);
-    mock.sheet.and.returnValue(null);
-    mock.field.and.returnValue(null);
+    var mock = {
+        objBefore: {
+            content_type: "",
+            data: {
+                readWriteSheet: {
+                    readOnlyField: 3,
+                    readWriteField: 8
+                },
+                readOnlySheet: {
+                    readOnlyField2: 9,
+                }
+            }
+        },
+
+        objAfter: {
+            content_type: "",
+            data: {
+                readWriteSheet: {
+                    readWriteField: 8
+                }
+            }
+        },
+
+        // used by exportContent.
+        field: (sheet, field) => {
+            switch (sheet + "/" + field) {
+            case "readWriteSheet/readOnlyField":
+                return { editable: false };
+            case "readWriteSheet/readWriteField":
+                return { editable: true };
+            case "readOnlySheet/readOnlyField2":
+                return { editable: false };
+            default:
+                return { editable: true };  // by default, don't delete anything.
+            }
+        }
+    };
+
+    spyOn(mock, 'field').and.callThrough();
+
     return mock;
 };
+
 
 export var register = () => {
     describe("Http", () => {
@@ -172,10 +210,10 @@ export var register = () => {
                     .toEqual({content_type: "", data: {}});
             });
             it("deletes read-only properties", () => {
-                expect(AdhHttp.exportContent(adhMetaApiMock, {
-                    content_type: "",
-                    data: {"adhocracy.propertysheets.interfaces.IVersions": "test"}
-                })).toEqual({content_type: "", data: {}});
+                var x = AdhHttp.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
+                var y = adhMetaApiMock.objAfter;
+                expect(Util.deepeq(x, y)).toBe(true);
+                expect(adhMetaApiMock.field).toHaveBeenCalled();
             });
         });
 
