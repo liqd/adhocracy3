@@ -19,12 +19,12 @@ export interface ISheetField {
     editable : boolean;
     creatable : boolean;
     create_mandatory : boolean;
-    targetsheet : string;
+    targetsheet ?: string;
 }
 
 export interface IResource {
     sheets : string[];
-    item_type : string;
+    item_type ?: string;
     element_types : string[];
 
     // generated after import
