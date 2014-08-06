@@ -30,6 +30,29 @@ export var register = () => {
             adhHttpMock.getNewestVersionPath.and.returnValue(q.when(RESOURCE));
         });
 
+        describe("ListingCommentableAdapter", () => {
+            var adapter;
+
+            beforeEach(() => {
+                adapter = new AdhComment.ListingCommentableAdapter();
+            });
+
+            describe("elemRefs", () => {
+                it("returns the items from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
+                    var elements = [1, 2, 3];
+                    var res = {
+                        data: {
+                            "adhocracy_sample.sheets.comment.ICommentable": {
+                                comments: elements
+                            }
+                        }
+                    };
+
+                    expect(adapter.elemRefs(res)).toEqual(elements);
+                });
+            });
+        });
+
         describe("CommentCreate", () => {
             var commentCreate;
 

@@ -105,6 +105,10 @@ export var init = (config, meta_api) => {
         ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
             new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
 
+    app.directive("adhCommentListing",
+        ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
+            new Listing.Listing(new AdhComment.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)]);
+
     app.directive("adhWebSocketTest",
         ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>
             new AdhWebSocket.WebSocketTest().createDirective($timeout, adhConfig, adhWebSocket)]);

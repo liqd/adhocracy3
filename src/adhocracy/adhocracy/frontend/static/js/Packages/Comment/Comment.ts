@@ -1,6 +1,9 @@
 import AdhConfig = require("../Config/Config");
 import AdhResource = require("../../Resources");
+import SICommentable = require("../../Resources_/adhocracy_sample/sheets/comment/ICommentable");
 
+import AdhConfig = require("../Config/Config");
+import AdhListing = require("../Listing/Listing");
 import Util = require("../Util/Util");
 
 var pkgLocation = "/Comment";
@@ -12,6 +15,12 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
     refersTo(res : T) : string;
     refersTo(res : T, value : string) : T;
     creator(red : T) : string;
+}
+
+export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
+    public elemRefs(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
+        return container.data["adhocracy_sample.sheets.comment.ICommentable"].comments;
+    }
 }
 
 export class CommentCreate {
