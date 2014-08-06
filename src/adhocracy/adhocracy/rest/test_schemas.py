@@ -286,3 +286,73 @@ class TestOPTIONResourceResponseSchema:
              'PUT': {'request_body': {'data': {}},
                      'response_body': {'content_type': '', 'path': ''}}}
         assert inst.serialize() == wanted
+
+
+class TestPOSTBatchRequestItem:
+
+    def make_one(self):
+        from adhocracy.rest.schemas import POSTBatchRequestItem
+        return POSTBatchRequestItem()
+
+    def test_deserialize_valid(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': 'par1_item'
+        }
+        assert inst.deserialize(data) == data
+
+    def test_deserialize_invalid_method(self):
+        inst = self.make_one()
+        data = {
+            'method': 'BRIEF',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': 'par1_item'
+        }
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_missing_path(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': 'par1_item'
+        }
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_invalid_body(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': 'This is not a JSON dict',
+            'result_path': 'par1_item'
+        }
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_empty_result_path(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': ''
+        }
+        assert inst.deserialize(data) == data
+
+    def test_deserialize_no_result_path(self):
+        """result_path defaults to an empty string."""
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'}
+        }
+        deserialized = inst.deserialize(data)
+        assert deserialized['result_path'] == ''

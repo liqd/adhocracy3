@@ -155,7 +155,7 @@ class POSTLocationMapping(colander.Schema):
 
 class POSTLoginUsernameRequestSchema(colander.Schema):
 
-    """"""
+    """Schema for login requests via username and password."""
 
     name = colander.SchemaNode(colander.String(),
                                missing=colander.required)
@@ -164,10 +164,37 @@ class POSTLoginUsernameRequestSchema(colander.Schema):
 
 class POSTLoginEmailRequestSchema(colander.Schema):
 
-    """"""
+    """Schema for login requests via email and password."""
 
     email = Email(missing=colander.required)
     password = Password(missing=colander.required)
+
+
+class BatchMethod(colander.SchemaNode):
+
+    """An HTTP method in a batch request."""
+
+    schema_type = colander.String
+    validator = colander.OneOf(['GET', 'POST', 'PUT'])
+    missing = colander.required
+
+
+class POSTBatchRequestItem(colander.Schema):
+
+    """A single item in a batch request, encoding a single request."""
+
+    method = BatchMethod()
+    path = AbsolutePath(default='', missing=colander.required)
+    body = colander.SchemaNode(colander.Mapping(unknown='preserve'))
+    result_path = colander.SchemaNode(colander.String(), default='',
+                                      missing='')
+
+
+class POSTBatchRequestSchema(colander.SequenceSchema):
+
+    """Schema for batch requests (list of POSTBatchRequestItem's)."""
+
+    items = colander.SchemaNode(POSTBatchRequestItem())
 
 
 class OPTIONResourceResponseSchema(colander.Schema):
