@@ -115,7 +115,7 @@ tags: .dummy
 
 
 mkResources: .dummy
-	git ls-files --other Resources_ | xargs rm
+	git ls-files --other Resources_ | xargs rm -f
 	$(TSC) --module commonjs --sourcemap mkResources.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 	$(TSLINT) -c ../../../../../../etc/tslint.json -f mkResources.ts 2>&1 | $(FIX_TSLINT_ERROR_FORMAT)
 	$(NODE) mkResources.js
