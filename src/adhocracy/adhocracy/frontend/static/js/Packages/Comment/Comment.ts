@@ -1,4 +1,3 @@
-import AdhConfig = require("../Config/Config");
 import AdhResource = require("../../Resources");
 import SICommentable = require("../../Resources_/adhocracy_sample/sheets/comment/ICommentable");
 
@@ -86,8 +85,7 @@ export class CommentDetail {
             },
             controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
                 var res;
-                var versionPromise = adhHttp.getNewestVersionPath($scope.path)
-                    .then((path) => adhHttp.resolve(path));
+                var versionPromise = adhHttp.resolve($scope.path);
 
                 var displayErrors = (errors) => {
                     $scope.errors = errors;
