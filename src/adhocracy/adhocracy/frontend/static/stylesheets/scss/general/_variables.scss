@@ -146,5 +146,16 @@ $font-size-small: 12px;
 $font-size-standard: 14px;
 $font-size-plus: 16px;
 $font-size-large: 21px;
-$font-letter-spacing-standard: 0.050em;
-$font-letter-spacing-narrow: 0.025em;
+
+@mixin font-tracking($value) {
+    @if $value == narrow {
+        word-spacing: 0.025em;
+        letter-spacing: 0.025em;
+    } @else if $value == standard {
+        word-spacing: 0.050em;
+        letter-spacing: 0.050em;
+    } @else {
+        word-spacing: $value;
+        letter-spacing: $value;
+    }
+}
