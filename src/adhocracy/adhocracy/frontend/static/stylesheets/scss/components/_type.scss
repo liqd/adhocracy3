@@ -7,12 +7,7 @@ category: Type
 */
 
 body {
-    color: $color-prime-standard;
-    font-family: $font-family-standard;
-    font-weight: $font-weight-standard;
-    font-size: $font-size-standard;
-    letter-spacing: $font-letter-spacing-standard;
-    line-height: 1.5;
+    @include text(running);
 }
 
 /*doc
@@ -74,7 +69,7 @@ A hyperlink. It may have the following states:
 ```
 */
 a {
-    color: $color-highlight-standard;
+    color: $color-highlight-normal;
 }
 
 // smaller headings
@@ -266,7 +261,7 @@ category: Type
 blockquote {
     position: relative;
     font-style: italic;
-    border-left: 0.4em solid $color-highlight-standard;
+    border-left: 0.4em solid $color-highlight-normal;
     padding-left: 0.5em;
     margin: 1.5em;
 

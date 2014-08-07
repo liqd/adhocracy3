@@ -7,8 +7,8 @@ category: Variables
 
 <table class="styleguide-colors">
     <tr>
-        <td><div class="example-color color-prime-standard"></div></td>
-        <td><code>color-prime-standard</code></td>
+        <td><div class="example-color color-prime-normal"></div></td>
+        <td><code>color-prime-normal</code></td>
         <td>Default color for running text</td>
     </tr>
     <tr>
@@ -27,8 +27,8 @@ category: Variables
         <td>For secondary text</td>
     </tr>
     <tr>
-        <td><div class="example-color color-highlight-standard"></div></td>
-        <td><code>color-highlight-standard</code></td>
+        <td><div class="example-color color-highlight-normal"></div></td>
+        <td><code>color-highlight-normal</code></td>
         <td>For highlighted content such as links</td>
     </tr>
     <tr>
@@ -45,7 +45,7 @@ category: Variables
         <td><div class="example-color color-highlight-reverse"></div></td>
         <td><code>color-highlight-reverse</code></td>
         <td>Used as either foreground or background with
-            <code>color-highlight-standard</code></td>
+            <code>color-highlight-normal</code></td>
     </tr>
     <tr>
         <td><div class="example-color color-highlight-valid"></div></td>
@@ -89,11 +89,11 @@ category: Variables
     </tr>
 </table>
 */
-$color-prime-standard: #575756;
+$color-prime-normal: #575756;
 $color-prime-extrovert: #1c1c1b;
 $color-secondary-extrovert: #9d9c9c;
 $color-secondary-introvert: #dadad9;
-$color-highlight-standard: #009ee3;
+$color-highlight-normal: #009ee3;
 $color-highlight-introvert: #3eb7ea;
 $color-highlight-extrovert: #0088b9;
 $color-highlight-reverse: white;
@@ -113,11 +113,11 @@ $color-structure-border-extrovert: #575756;
     border: 1px solid $color-structure-border;
 }
 
-.color-prime-standard {background-color: $color-prime-standard;}
+.color-prime-normal {background-color: $color-prime-normal;}
 .color-prime-extrovert {background-color: $color-prime-extrovert;}
 .color-secondary-extrovert {background-color: $color-secondary-extrovert;}
 .color-secondary-introvert {background-color: $color-secondary-introvert;}
-.color-highlight-standard {background-color: $color-highlight-standard;}
+.color-highlight-normal {background-color: $color-highlight-normal;}
 .color-highlight-introvert {background-color: $color-highlight-introvert;}
 .color-highlight-extrovert {background-color: $color-highlight-extrovert;}
 .color-highlight-reverse {background-color: $color-highlight-reverse;}
@@ -131,22 +131,105 @@ $color-structure-border-extrovert: #575756;
 .color-structure-border-extrovert {background-color: $color-structure-border-extrovert;}
 
 // some static contrast checks for a11y
-@include check-contrast($color-prime-standard, $color-background);
-@include check-contrast($color-prime-standard, $color-structure-surface);
+@include check-contrast($color-prime-normal, $color-background);
+@include check-contrast($color-prime-normal, $color-structure-surface);
 @include check-contrast($color-prime-extrovert, $color-background);
 @include check-contrast($color-prime-extrovert, $color-structure-surface);
-@include check-contrast($color-highlight-standard, $color-highlight-reverse);
-@include check-contrast($color-highlight-standard, $color-background);
-@include check-contrast($color-highlight-standard, $color-structure-surface);
+@include check-contrast($color-highlight-normal, $color-highlight-reverse);
+@include check-contrast($color-highlight-normal, $color-background);
+@include check-contrast($color-highlight-normal, $color-structure-surface);
 
-$font-family-standard: "Open Sans", sans-serif;
-$font-weight-standard: normal;
+$font-family-normal: "Open Sans", sans-serif;
+$font-weight-normal: normal;
 $font-weight-extrovert: 900;
 $font-size-small: 12px;
-$font-size-standard: 14px;
+$font-size-normal: 14px;
 $font-size-plus: 16px;
 $font-size-large: 21px;
-$font-letter-spacing-standard: 0.050em;
-$font-letter-spacing-narrow: 0.025em;
+
+@mixin font-tracking($value) {
+    @if $value == narrow {
+        word-spacing: 0.025em;
+        letter-spacing: 0.025em;
+    } @else if $value == normal {
+        word-spacing: 0.050em;
+        letter-spacing: 0.050em;
+    } @else {
+        word-spacing: $value;
+        letter-spacing: $value;
+    }
+}
+
+/*doc
+---
+title: Text mixin
+name: mixin-text
+category: type
+---
+
+The text mixin can be used to set the general text style. The following styles
+are available:
+
+<table class="styleguide-colors">
+    <tr>
+        <td><code>header</code></td>
+        <td class="text-header">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><code>running</code></td>
+        <td class="text-running">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
+        <td>For running text</td>
+    </tr>
+    <tr>
+        <td><code>functional</code></td>
+        <td class="text-functional">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><code>functional-introvert</code></td>
+        <td class="text-functional-introvert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
+        <td></td>
+    </tr>
+</table>
+*/
+@mixin text($value) {
+    @if $value == running {
+        font-family: $font-family-normal;
+        font-weight: $font-weight-normal;
+        font-size: $font-size-normal;
+        @include font-tracking(normal);
+        line-height: 1.5;
+        color: $color-prime-normal;
+    } @else if $value == functional {
+        font-family: $font-family-normal;
+        font-weight: $font-weight-normal;
+        font-size: $font-size-plus;
+        @include font-tracking(normal);
+        line-height: 1.5;
+        color: $color-prime-normal;
+    } @else if $value == functional-introvert {
+        font-family: $font-family-normal;
+        font-weight: $font-weight-normal;
+        font-size: $font-size-small;
+        @include font-tracking(narrow);
+        line-height: 1.5;
+        color: $color-secondary-extrovert;
+    } @else if $value == header {
+        font-family: $font-family-normal;
+        font-weight: $font-weight-normal;
+        font-size: $font-size-large;
+        @include font-tracking(narrow);
+        line-height: 1.5;
+        color: $color-prime-extrovert;
+    } @else {
+        @warn "no such text-style: #{$value}";
+    }
+}
+
+.text-header {@include text(header);}
+.text-running {@include text(running);}
+.text-functional {@include text(functional);}
+.text-functional-introvert {@include text(functional-introvert);}
 
 $width-action: 3em;
