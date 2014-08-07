@@ -80,7 +80,7 @@ input[type="button"] {
     height: 2em + 2 * $border-width;  // fix height in firefox
     padding: 0 0.5em;
 
-    @include button-color($color-highlight-standard, $color-highlight-reverse);
+    @include button-color($color-highlight-normal, $color-highlight-reverse);
 
     &:active,
     &:focus {

@@ -69,9 +69,9 @@ textarea {
     display: block;
     width: 100%;
     margin-bottom: 0.5em;
-    padding: 0.5em $font-size-standard * 0.5;
+    padding: 0.5em $font-size-normal * 0.5;
     border: 1px solid $color-structure-border;
-    color: $color-prime-standard;
+    color: $color-prime-normal;
     background-color: $color-background;
 
     @include placeholder {
@@ -85,8 +85,8 @@ textarea {
 
     &.has-focus,
     &:focus {
-        border-color: $color-highlight-standard;
-        outline: 1px solid $color-highlight-standard;
+        border-color: $color-highlight-normal;
+        outline: 1px solid $color-highlight-normal;
     }
 
     &.ng-invalid,

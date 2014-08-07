@@ -69,7 +69,7 @@ A hyperlink. It may have the following states:
 ```
 */
 a {
-    color: $color-highlight-standard;
+    color: $color-highlight-normal;
 }
 
 // smaller headings
@@ -261,7 +261,7 @@ category: Type
 blockquote {
     position: relative;
     font-style: italic;
-    border-left: 0.4em solid $color-highlight-standard;
+    border-left: 0.4em solid $color-highlight-normal;
     padding-left: 0.5em;
     margin: 1.5em;
 
