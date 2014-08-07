@@ -159,3 +159,75 @@ $font-size-large: 21px;
         letter-spacing: $value;
     }
 }
+
+/*doc
+---
+title: Text mixin
+name: mixin-text
+category: type
+---
+
+The text mixin can be used to set the general text style. The following styles
+are available:
+
+<table class="styleguide-colors">
+    <tr>
+        <td><code>header</code></td>
+        <td class="text-header">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><code>running</code></td>
+        <td class="text-running">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
+        <td>For running text</td>
+    </tr>
+    <tr>
+        <td><code>functional</code></td>
+        <td class="text-functional">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><code>functional-introvert</code></td>
+        <td class="text-functional-introvert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
+        <td></td>
+    </tr>
+</table>
+*/
+@mixin text($value) {
+    @if $value == running {
+        font-family: $font-family-standard;
+        font-weight: $font-weight-standard;
+        font-size: $font-size-standard;
+        @include font-tracking(standard);
+        line-height: 1.5;
+        color: $color-prime-standard;
+    } @else if $value == functional {
+        font-family: $font-family-standard;
+        font-weight: $font-weight-standard;
+        font-size: $font-size-plus;
+        @include font-tracking(standard);
+        line-height: 1.5;
+        color: $color-prime-standard;
+    } @else if $value == functional-introvert {
+        font-family: $font-family-standard;
+        font-weight: $font-weight-standard;
+        font-size: $font-size-small;
+        @include font-tracking(narrow);
+        line-height: 1.5;
+        color: $color-secondary-extrovert;
+    } @else if $value == header {
+        font-family: $font-family-standard;
+        font-weight: $font-weight-standard;
+        font-size: $font-size-large;
+        @include font-tracking(narrow);
+        line-height: 1.5;
+        color: $color-prime-extrovert;
+    } @else {
+        @warn "no such text-style" $value;
+    }
+}
+
+.text-header {@include text(header);}
+.text-running {@include text(running);}
+.text-functional {@include text(functional);}
+.text-functional-introvert {@include text(functional-introvert);}
