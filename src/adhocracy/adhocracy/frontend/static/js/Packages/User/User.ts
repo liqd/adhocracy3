@@ -56,9 +56,9 @@ var bindServerErrors = (
 
 
 export class User {
-    loggedIn : boolean = false;
-    token : string;
-    data : IUserBasic;
+    public loggedIn : boolean = false;
+    public data : IUserBasic;
+    private token : string;
 
     constructor(
         private adhHttp : AdhHttp.Service<any>,
