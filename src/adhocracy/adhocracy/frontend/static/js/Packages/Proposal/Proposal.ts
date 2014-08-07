@@ -171,7 +171,9 @@ export class ProposalVersionNew {
 
                 $scope.addParagraphVersion = () => {
                     var pv = new RIParagraphVersion();
-                    pv.data["adhocracy.sheets.document.IParagraph"].content = "";
+                    pv.data["adhocracy.sheets.document.IParagraph"] = {
+                        content: ""
+                    };
                     $scope.paragraphVersions.push(pv);
                 };
 
