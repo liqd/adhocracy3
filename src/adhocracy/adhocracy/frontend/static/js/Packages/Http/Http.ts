@@ -4,9 +4,10 @@
 
 import Resources = require("../../Resources");
 import Util = require("../Util/Util");
+import MetaApi = require("../MetaApi/MetaApi");
 
 export var importContent : <Content extends Resources.Content<any>>(resp: {data: Content}) => Content;
-export var exportContent : <Content extends Resources.Content<any>>(obj : Content) => Content;
+export var exportContent : <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) => Content;
 export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void;
 
 
@@ -32,18 +33,22 @@ export interface IBaseService<Content extends Resources.Content<any>> {
 export interface ITransaction<Content extends Resources.Content<any>> extends IBaseService<Content> {}
 
 export class Service<Content extends Resources.Content<any>> implements IBaseService<Content> {
-    constructor(private $http : ng.IHttpService, private $q : ng.IQService) {}
+    constructor(
+        private $http : ng.IHttpService,
+        private $q : ng.IQService,
+        private adhMetaApi : MetaApi.MetaApiQuery
+    ) {}
 
     public get(path : string) : ng.IPromise<Content> {
         return this.$http.get(path).then(importContent, logBackendError);
     }
 
     public put(path : string, obj : Content) : ng.IPromise<Content> {
-        return this.$http.put(path, exportContent(obj)).then(importContent, logBackendError);
+        return this.$http.put(path, exportContent(this.adhMetaApi, obj)).then(importContent, logBackendError);
     }
 
     public post(path : string, obj : Content) : ng.IPromise<Content> {
-        return this.$http.post(path, exportContent(obj)).then(importContent, logBackendError);
+        return this.$http.post(path, exportContent(this.adhMetaApi, obj)).then(importContent, logBackendError);
     }
 
     public getNewestVersionPath(path : string) : ng.IPromise<string> {
@@ -194,20 +199,43 @@ importContent = <Content extends Resources.Content<any>>(resp: {data: Content}) 
     //   }
 };
 
-exportContent = <Content extends Resources.Content<any>>(obj : Content) : Content => {
+/**
+ * prepare object for post or put.  remove all fields that are none of
+ * editable, creatable, create_mandatory.  remove all sheets that have
+ * no fields after this.
+ *
+ * FIXME: there is a difference between put and post.  namely, fields
+ * that may be created but not edited should be treated differently.
+ * also, fields with create_mandatory should not be missing from the
+ * posted object.
+ */
+exportContent = <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) : Content => {
     "use strict";
 
-    // FIXME: newobj should be a copy, not a reference
-    var newobj : Content = obj;
+    var newobj : Content = Util.deepcp(obj);
 
-    // FIXME: Get this list from the server (meta-api)!
-    var readOnlyProperties = [
-        "adhocracy.propertysheets.interfaces.IVersions"
-    ];
+    // remove some fields from newobj.data[*] and empty sheets from
+    // newobj.data.
+    for (var sheetName in newobj.data) {
+        if (newobj.data.hasOwnProperty(sheetName)) {
+            var sheet : MetaApi.ISheet = newobj.data[sheetName];
+            var keepSheet : boolean = false;
 
-    for (var ro in readOnlyProperties) {
-        if (readOnlyProperties.hasOwnProperty(ro)) {
-            delete newobj.data[readOnlyProperties[ro]];
+            for (var fieldName in sheet) {
+                if (sheet.hasOwnProperty(fieldName)) {
+                    var fieldMeta : MetaApi.ISheetField = adhMetaApi.field(sheetName, fieldName);
+
+                    if (fieldMeta.editable || fieldMeta.creatable || fieldMeta.create_mandatory) {
+                        keepSheet = true;
+                    } else {
+                        delete sheet[fieldName];
+                    }
+                }
+            }
+
+            if (!keepSheet) {
+                delete newobj.data[sheetName];
+            }
         }
     }
 

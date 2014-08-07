@@ -2,21 +2,73 @@
 
 import q = require("q");
 
+import Util = require("../Util/Util");
 import AdhHttp = require("./Http");
+
+var mkHttpMock = () => {
+    var mock = jasmine.createSpyObj("$httpMock", ["get", "post", "put"]);
+    mock.get.and.returnValue(q.when({data: {}}));
+    mock.post.and.returnValue(q.when({data: {}}));
+    mock.put.and.returnValue(q.when({data: {}}));
+    return mock;
+};
+
+var mkAdhMetaApiMock = () => {
+    var mock = {
+        objBefore: {
+            content_type: "",
+            data: {
+                readWriteSheet: {
+                    readOnlyField: 3,
+                    readWriteField: 8
+                },
+                readOnlySheet: {
+                    readOnlyField2: 9,
+                }
+            }
+        },
+
+        objAfter: {
+            content_type: "",
+            data: {
+                readWriteSheet: {
+                    readWriteField: 8
+                }
+            }
+        },
+
+        // used by exportContent.
+        field: (sheet, field) => {
+            switch (sheet + "/" + field) {
+            case "readWriteSheet/readOnlyField":
+                return { editable: false };
+            case "readWriteSheet/readWriteField":
+                return { editable: true };
+            case "readOnlySheet/readOnlyField2":
+                return { editable: false };
+            default:
+                return { editable: true };  // by default, don't delete anything.
+            }
+        }
+    };
+
+    spyOn(mock, 'field').and.callThrough();
+
+    return mock;
+};
+
 
 export var register = () => {
     describe("Http", () => {
         describe("Service", () => {
             var $httpMock;
+            var adhMetaApiMock;
             var adhHttp;
 
             beforeEach(() => {
-                $httpMock = jasmine.createSpyObj("$httpMock", ["get", "post", "put"]);
-                $httpMock.get.and.returnValue(q.when({data: {}}));
-                $httpMock.post.and.returnValue(q.when({data: {}}));
-                $httpMock.put.and.returnValue(q.when({data: {}}));
-
-                adhHttp = new AdhHttp.Service($httpMock, q);
+                $httpMock = mkHttpMock();
+                adhMetaApiMock = mkAdhMetaApiMock();
+                adhHttp = new AdhHttp.Service($httpMock, q, adhMetaApiMock);
             });
 
             describe("get", () => {
@@ -147,13 +199,21 @@ export var register = () => {
         });
 
         describe("exportContent", () => {
+            var adhMetaApiMock;
+
+            beforeEach(() => {
+                adhMetaApiMock = mkAdhMetaApiMock();
+            });
+
             it("deletes the path", () => {
-                expect(AdhHttp.exportContent({content_type: "", data: {}, path: "test"}))
+                expect(AdhHttp.exportContent(adhMetaApiMock, {content_type: "", data: {}, path: "test"}))
                     .toEqual({content_type: "", data: {}});
             });
             it("deletes read-only properties", () => {
-                expect(AdhHttp.exportContent({content_type: "", data: {"adhocracy.propertysheets.interfaces.IVersions": "test"}}))
-                    .toEqual({content_type: "", data: {}});
+                var x = AdhHttp.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
+                var y = adhMetaApiMock.objAfter;
+                expect(Util.deepeq(x, y)).toBe(true);
+                expect(adhMetaApiMock.field).toHaveBeenCalled();
             });
         });
 

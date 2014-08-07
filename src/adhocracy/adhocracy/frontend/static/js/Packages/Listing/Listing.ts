@@ -15,13 +15,11 @@ var pkgLocation = "/Listing";
 //////////////////////////////////////////////////////////////////////
 // Listings
 
-export class AbstractListingContainerAdapter {
-    public elemRefs(container : any) : string[] {
-        return [];
-    }
+export interface IListingContainerAdapter {
+    elemRefs(any) : string[];
 }
 
-export class ListingPoolAdapter extends AbstractListingContainerAdapter {
+export class ListingPoolAdapter implements IListingContainerAdapter {
     public elemRefs(container : Resources.Content<SIPool.HasAdhocracySheetsPoolIPool>) {
         return container.data["adhocracy.sheets.pool.IPool"].elements;
     }
@@ -29,12 +27,12 @@ export class ListingPoolAdapter extends AbstractListingContainerAdapter {
 
 export interface ListingScope<Container> {
     path : string;
-    title : string;
+    actionColumn : boolean;
     container : Container;
     elements : string[];
     update : () => ng.IPromise<void>;
     wshandle : string;
-    show : { addForm : boolean };
+    show : { createForm : boolean };
 }
 
 // FIXME: the way Listing works now is similar to ngRepeat, but it
@@ -58,10 +56,10 @@ export interface ListingScope<Container> {
 // FIXME: as the listing elements are tracked by their $id (the element path) in the listing template, we don't allow duplicate elements
 // in one listing. We should add a proper warning if that occurs or handle that case properly.
 
-export class Listing<Container extends Resources.Content<any>, ContainerAdapter extends AbstractListingContainerAdapter> {
+export class Listing<Container extends Resources.Content<any>> {
     public static templateUrl : string = pkgLocation + "/Listing.html";
 
-    constructor(private containerAdapter : ContainerAdapter) {}
+    constructor(private containerAdapter : IListingContainerAdapter) {}
 
     public createDirective(adhConfig : AdhConfig.Type, adhWebSocket: AdhWebSocket.IService) {
         var _self = this;
@@ -72,7 +70,7 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
             scope: {
                 path: "@",
-                title: "@"
+                actionColumn: "@"
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
@@ -87,7 +85,7 @@ export class Listing<Container extends Resources.Content<any>, ContainerAdapter 
                 adhHttp: AdhHttp.Service<Container>,
                 adhDone
             ) : void => {
-                $scope.show = {addForm: false};
+                $scope.show = {createForm: false};
 
                 $scope.update = () : ng.IPromise<void> => {
                     return adhHttp.get($scope.path).then((pool) => {

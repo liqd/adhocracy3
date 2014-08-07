@@ -22,6 +22,7 @@ import AdhDone = require("./Packages/Done/Done");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
 import AdhInject = require("./Packages/Inject/Inject");
+import AdhMetaApi = require("./Packages/MetaApi/MetaApi");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -36,7 +37,7 @@ var loadComplete = () : void => {
 };
 
 
-export var init = (config) => {
+export var init = (config, meta_api) => {
     "use strict";
 
     // detect wheter we are running in iframe
@@ -76,12 +77,14 @@ export var init = (config) => {
     app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
+    app.directive("adhUserIndicator", ["adhConfig", AdhUser.indicatorDirective]);
     app.value("adhConfig", config);
+    app.factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(meta_api));
     app.value("adhDone", AdhDone.done);
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
-    app.service("adhHttp", ["$http", "$q", AdhHttp.Service]);
+    app.service("adhHttp", ["$http", "$q", "adhMetaApi", AdhHttp.Service]);
     app.factory("adhWebSocket", ["Modernizr", "adhConfig", AdhWebSocket.factory]);
 
     app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", AdhCrossWindowMessaging.factory]);

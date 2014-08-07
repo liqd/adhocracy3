@@ -37,16 +37,6 @@ var registerDirectiveSpec = (directive: ng.IDirective): void => {
 
 export var register = () => {
     describe("Listing", () => {
-        describe("AbstractListingContainerAdapter", () => {
-            describe("elemRefs", () => {
-                it("always returns an empty list", () => {
-                    var adapter = new Listing.AbstractListingContainerAdapter();
-                    expect(adapter.elemRefs(undefined)).toEqual([]);
-                    expect(adapter.elemRefs({"a": true})).toEqual([]);
-                });
-            });
-        });
-
         describe("ListingPoolAdapter", () => {
             describe("elemRefs", () => {
                 it("returns the elements from the adhocracy.sheets.pool.IPool sheet", () => {

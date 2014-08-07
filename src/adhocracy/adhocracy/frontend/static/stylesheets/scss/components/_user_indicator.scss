@@ -1,0 +1,55 @@
+/*doc
+---
+title: User Indicator
+name: user-indicator
+category: Widgets
+---
+
+This Widget can be used to display the state of the currently logged in user.
+It is usually used in the header bar.
+
+The sizes in this widget depend on the variable `$l-header-height` because
+the whole widget must not be higher than that.
+Currently, they are adjusted to a 3.5em header with 0.5em padding on all sides.
+
+```html_example
+<div class="user-indicator">
+    <img class="user-indicator-graphic" src="icon-inactive.png" alt="" />
+    <div class="user-indicator-primary"><a>LogIn</a></div>
+    <div class="user-indicator-secondary">or <a>Register</a></div>
+</div>
+```
+*/
+
+.user-indicator {
+    @include text-align(right);
+}
+
+.user-indicator-primary,
+.user-indicator-secondary {
+    display: block;
+}
+
+.user-indicator-primary {
+    font-size: 130%;
+}
+
+.user-indicator-primary,
+.user-indicator-primary a {
+    line-height: 1.1;
+    color: $color-prime-normal;
+    text-decoration: none;
+}
+
+.user-indicator-secondary,
+.user-indicator-secondary a {
+    line-height: 1;
+    color: $color-secondary-extrovert;
+    text-decoration: none;
+}
+
+.user-indicator-graphic {
+    float: right;
+    height: $l-header-height - 1em;
+    margin-left: 0.5em;
+}
