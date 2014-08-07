@@ -243,7 +243,7 @@ export var register = () => {
 
                 beforeEach(() => {
                     $scopeMock = {};
-                    adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn", "logOut"]);
+                    adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn"]);
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
                     controller = <any>(directive.controller[2]);
                     controller(adhUserMock, $scopeMock);
@@ -295,13 +295,6 @@ export var register = () => {
                             expect($scopeMock.errors.length).toBe(1);
                             done();
                         });
-                    });
-                });
-
-                describe("logOut", () => {
-                    it("calls adhUser.logOut", () => {
-                        $scopeMock.logOut();
-                        expect(adhUserMock.logOut).toHaveBeenCalled();
                     });
                 });
             });

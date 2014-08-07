@@ -20,7 +20,6 @@ interface IScopeLogin {
 
     resetCredentials : () => void;
     logIn : () => ng.IPromise<void>;
-    logOut : () => void;
 }
 
 
@@ -196,8 +195,6 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
         scope: {},
         controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeLogin) : void => {
-            $scope.user = adhUser;
-
             $scope.errors = [];
 
             $scope.credentials = {
@@ -221,10 +218,6 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
                 });
                 $scope.resetCredentials();
                 return promise;
-            };
-
-            $scope.logOut = () => {
-                adhUser.logOut();
             };
         }]
     };
