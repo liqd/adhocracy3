@@ -1,10 +1,55 @@
-$action-width: 3em;
+/*doc
+---
+title: Listing
+name: listing
+category: Widgets
+---
 
+A Listing represents a list of elements that may be filtered and/or sorted.
+It is generic because it can be used very different kinds of elements.
+
+Apart from a navigation bar and the list of elements the listing also contains
+a form for creating new elements. This form is only visible in the
+`show-create-form` state. The navigation bar contains a button which triggers
+that state and is then disabled.
+
+```html_example
+<div class="listing">
+    <div class="navbar">
+        <span class="navbar-left placeholder"></span>
+        <a class="button navbar-right" onclick="toggleListing()">Add element</a>
+    </div>
+    <form class="listing-create-form placeholder">
+        Create Form
+        <a onclick="toggleListing()">Cancel</a>
+    </form>
+    <ol class="listing-elements">
+        <li class="listing-element placeholder">Element1</li>
+        <li class="listing-element placeholder">Element2</li>
+    </ol>
+</div>
+
+<script>
+var toggleListing = function() {
+    $('.listing').toggleClass('show-create-form');
+    $('.listing .navbar .button').toggleClass('is-disabled');
+};
+</script>
+```
+*/
 .listing {
-    padding-right: $action-width;
+    .listing-create-form {
+        display: none;
+    }
+
+    &.show-create-form {
+        .listing-create-form {
+            display: block;
+        }
+    }
 }
 
-.listing-rows {
+.listing-elements {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -12,7 +57,6 @@ $action-width: 3em;
 
 // starting animations
 .listing-element {
-
     &.ng-enter {
         @include transition(all 3s);
         background: greenyellow;
@@ -31,4 +75,19 @@ $action-width: 3em;
     padding: 0.5em;
     margin-left: -0.5em;
     margin-right: -0.5em;
+}
+
+/*doc
+---
+title: action-column modifier
+name: listing.m-action-column
+parent: listing
+---
+
+Sometimes you need some space to the right to list available actions on listing
+elements. This modifier makes the listing leave space according to the
+`width-action` variable.
+*/
+.listing.m-action-column {
+    padding-right: $width-action;
 }
