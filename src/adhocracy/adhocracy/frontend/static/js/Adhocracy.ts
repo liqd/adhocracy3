@@ -76,6 +76,7 @@ export var init = (config) => {
     app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
+    app.directive("adhUserIndicator", ["adhConfig", AdhUser.indicatorDirective]);
     app.value("adhConfig", config);
     app.value("adhDone", AdhDone.done);
 

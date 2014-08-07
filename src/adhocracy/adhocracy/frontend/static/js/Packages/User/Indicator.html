@@ -1,0 +1,12 @@
+<div class="user-indicator" data-ng-switch="user.loggedIn">
+    <div ng-switch-when="true">
+        <span class="user-indicator-primary">{{user.data.name}}</span>
+        <a href="" class="user-indicator-secondary" data-ng-click="logOut()">Logout</a>
+        <img src="{{pkgUrl}}/icon-active.png" alt="" />
+    </div>
+    <div ng-switch-default="">
+        <span class="user-indicator-primary">LogIn</span>
+        <span class="user-indicator-secondary">or Register</span>
+        <img src="{{pkgUrl}}/icon-inactive.png" alt="" />
+    </div>
+</div>

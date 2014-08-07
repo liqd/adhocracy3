@@ -381,5 +381,40 @@ export var register = () => {
                 });
             });
         });
+
+        describe("indicatorDirective", () => {
+            var directive;
+            var adhConfigMock;
+
+            beforeEach(() => {
+                adhConfigMock = {
+                    pkg_path: "mock",
+                    root_path: "mock",
+                    ws_url: "mock",
+                    embedded: true
+                };
+                directive = AdhUser.indicatorDirective(adhConfigMock);
+            });
+
+            describe("controller", () => {
+                var controller;
+                var $scopeMock;
+                var adhUserMock;
+
+                beforeEach(() => {
+                    $scopeMock = {};
+                    adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logOut"]);
+                    controller = <any>(directive.controller[2]);
+                    controller(adhUserMock, $scopeMock);
+                });
+
+                describe("logOut", () => {
+                    it("calls adhUser.logOut", () => {
+                        $scopeMock.logOut();
+                        expect(adhUserMock.logOut).toHaveBeenCalled();
+                    });
+                });
+            });
+        });
     });
 };

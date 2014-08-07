@@ -252,3 +252,19 @@ export var registerDirective = (adhConfig : AdhConfig.Type, $location : ng.ILoca
         }]
     };
 };
+
+export var indicatorDirective = (adhConfig : AdhConfig.Type) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Indicator.html",
+        scope: {},
+        controller: ["adhUser", "$scope", (adhUser : User, $scope) => {
+            $scope.user = adhUser;
+            $scope.pkgUrl = adhConfig.pkg_path + pkgLocation;
+
+            $scope.logOut = () => {
+                adhUser.logOut();
+            };
+        }]
+    };
+};
