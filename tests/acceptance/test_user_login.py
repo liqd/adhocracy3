@@ -27,7 +27,7 @@ class TestUserLogin:
             browser.wait_for_condition(is_logged_in, 2)
 
     def _logout(self, browser, server_sample):
-        click_button(browser, '.logout [type="submit"]')
+        click_button(browser, '.user-indicator-logout')
 
     def test_login_username(self, browser, server_sample):
         self._register(browser, server_sample, 'user1', 'email1@example.com',
@@ -83,6 +83,5 @@ def click_button(browser, selector):
     element = browser.browser.find_by_css(selector).first
     element.click()
 
-
 def is_logged_in(browser_root):
-    return browser_root.browser.is_element_present_by_css('.logout')
+    return browser_root.browser.is_element_present_by_css('.user-indicator-logout')
