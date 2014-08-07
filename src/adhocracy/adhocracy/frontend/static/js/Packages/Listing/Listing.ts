@@ -27,7 +27,6 @@ export class ListingPoolAdapter implements IListingContainerAdapter {
 
 export interface ListingScope<Container> {
     path : string;
-    title : string;
     container : Container;
     elements : string[];
     update : () => ng.IPromise<void>;
@@ -69,8 +68,7 @@ export class Listing<Container extends Resources.Content<any>> {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
             scope: {
-                path: "@",
-                title: "@"
+                path: "@"
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
