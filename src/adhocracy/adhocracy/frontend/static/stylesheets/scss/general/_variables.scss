@@ -223,7 +223,7 @@ are available:
         line-height: 1.5;
         color: $color-prime-extrovert;
     } @else {
-        @warn "no such text-style" $value;
+        @warn "no such text-style: #{$value}";
     }
 }
 
