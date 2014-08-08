@@ -89,8 +89,8 @@ textarea {
         outline: 1px solid $color-highlight-normal;
     }
 
-    &.ng-invalid,
-    &:invalid {
+    &.ng-dirty.ng-invalid,
+    &.ng-dirty:invalid {
         border-color: lightcoral;
         outline: 1px solid lightcoral;
 
