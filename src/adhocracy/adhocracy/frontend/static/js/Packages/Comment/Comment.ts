@@ -83,7 +83,7 @@ export class CommentCreate {
 export class CommentDetail {
     constructor(private adapter : ICommentAdapter<any>) {}
 
-    public createDirective(adhConfig : AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.Type, recursionHelper) {
         var _self : CommentDetail = this;
 
         return {
@@ -93,6 +93,7 @@ export class CommentDetail {
                 path: "=",  // path to a comment that should be displayed
                 viemode: "=" // "list" or "edit"
             },
+            compile: (element) => recursionHelper.compile(element),
             controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
                 var res;
                 var versionPromise = adhHttp.resolve($scope.path);

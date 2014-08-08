@@ -126,10 +126,10 @@ export var init = (config, meta_api) => {
         var widget = new AdhComment.CommentCreate(adapter);
         return widget.createDirective(adhConfig);
     }]);
-    app.directive("adhCommentDetail", ["adhConfig", (adhConfig) => {
+    app.directive("adhCommentDetail", ["adhConfig", "recursionHelper", (adhConfig, recursionHelper) => {
         var adapter = new AdhCommentAdapter.CommentAdapter();
         var widget = new AdhComment.CommentDetail(adapter);
-        return widget.createDirective(adhConfig);
+        return widget.createDirective(adhConfig, recursionHelper);
     }]);
     app.directive("adhProposalDetail", () => new Proposal.ProposalDetail().createDirective());
     app.directive("adhProposalVersionDetail",
