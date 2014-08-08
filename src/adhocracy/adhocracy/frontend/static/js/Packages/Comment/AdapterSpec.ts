@@ -15,7 +15,7 @@ export var register = () => {
                         content: "content"
                     },
                     "adhocracy.sheets.metadata.IMetadata": {
-                        creator: "creator"
+                        creator: ["creator"]
                     }
                 }
             };
@@ -23,16 +23,16 @@ export var register = () => {
         });
 
         describe("create", () => {
-            it("returns an empty adhocracy_sample.sheets.comment.IComment resource", () => {
-                expect(adapter.create()).toEqual({
-                    content_type: "adhocracy_sample.resources.comment.ICommentVersion",
-                    data: {
-                        "adhocracy_sample.sheets.comment.IComment": {
-                            content: undefined,
-                            refers_to: undefined
-                        }
-                    }
-                });
+            beforeEach(() => {
+                res = adapter.create();
+            });
+
+            it("returns an adhocracy_sample.resources.comment.ICommentVersion resource", () => {
+                expect(res.content_type).toBe("adhocracy_sample.resources.comment.ICommentVersion");
+            });
+
+            it("creates an empty adhocracy_sample.sheets.comment.IComment sheet", () => {
+                expect(res.data["adhocracy_sample.sheets.comment.IComment"]).toBeDefined();
             });
         });
 

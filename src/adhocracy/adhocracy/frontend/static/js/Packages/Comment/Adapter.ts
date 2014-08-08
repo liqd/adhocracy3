@@ -1,33 +1,19 @@
-import AdhResource = require("../../Resources");
+import RICommentVersion = require("../../Resources_/adhocracy_sample/resources/comment/ICommentVersion");
 
 import AdhComment = require("./Comment");
 
-// FIXME: use generated type instead
-export interface ICommentData {
-    "adhocracy_sample.sheets.comment.IComment" : {
-        content : string;
-        refers_to : string;
-    };
-    "adhocracy.sheets.metadata.IMetadata"? : {
-        creator : string;
-    };
-}
-
-export class CommentAdapter implements AdhComment.ICommentAdapter<AdhResource.Content<ICommentData>> {
-    create() : AdhResource.Content<ICommentData> {
-        return {
-            content_type: "adhocracy_sample.resources.comment.ICommentVersion",
-            data: {
-                "adhocracy_sample.sheets.comment.IComment": {
-                    content: undefined,
-                    refers_to: undefined
-                }
-            }
+export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
+    create() : RICommentVersion {
+        var res = new RICommentVersion();
+        res.data["adhocracy_sample.sheets.comment.IComment"] = {
+            refers_to: null,
+            content: null
         };
+        return res;
     }
 
-    content(res : AdhResource.Content<ICommentData>) : string;
-    content(res : AdhResource.Content<ICommentData>, value : string) : AdhResource.Content<ICommentData>;
+    content(res : RICommentVersion) : string;
+    content(res : RICommentVersion, value : string) : RICommentVersion;
     content(res, value?) {
         if (typeof value !== "undefined") {
             res.data["adhocracy_sample.sheets.comment.IComment"].content = value;
@@ -37,8 +23,8 @@ export class CommentAdapter implements AdhComment.ICommentAdapter<AdhResource.Co
         }
     }
 
-    refersTo(res : AdhResource.Content<ICommentData>) : string;
-    refersTo(res : AdhResource.Content<ICommentData>, value : string) : AdhResource.Content<ICommentData>;
+    refersTo(res : RICommentVersion) : string;
+    refersTo(res : RICommentVersion, value : string) : RICommentVersion;
     refersTo(res, value?) {
         if (typeof value !== "undefined") {
             res.data["adhocracy_sample.sheets.comment.IComment"].refers_to = value;
@@ -48,7 +34,10 @@ export class CommentAdapter implements AdhComment.ICommentAdapter<AdhResource.Co
         }
     }
 
-    creator(res : AdhResource.Content<ICommentData>) : string {
-        return res.data["adhocracy.sheets.metadata.IMetadata"].creator;
+    creator(res : RICommentVersion) : string {
+        // FIXME: For some reason, creator is a list in the backend.
+        // We will talk to them and do something better than blindly
+        // picking the first item as soon as possible.
+        return res.data["adhocracy.sheets.metadata.IMetadata"].creator[0];
     }
 }
