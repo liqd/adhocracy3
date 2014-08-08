@@ -35,7 +35,8 @@ export class CommentCreate {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentCreate.html",
             scope: {
-                refersTo: "@"  // path of a commentable version
+                refersTo: "@",  // path of a commentable version
+                onNew: "="  // callback to call after successful creation
             },
             controller: ["$scope", "adhHttp", ($scope, adhHttp) => {
                 $scope.errors = [];
@@ -43,6 +44,12 @@ export class CommentCreate {
                 var displayErrors = (errors) => {
                     $scope.errors = errors;
                     throw errors;
+                };
+
+                var onNew = () => {
+                    if (typeof $scope.onNew !== "undefined") {
+                        $scope.onNew();
+                    }
                 };
 
                 $scope.create = () => {
@@ -66,7 +73,7 @@ export class CommentCreate {
                     return adhHttp.postToPool(poolPath, comment)
                         .then(adhHttp.resolve.bind(adhHttp), displayErrors)
                         .then((comment) => adhHttp.postNewVersion(comment.first_version_path, res))
-                        .then((x) => x, displayErrors);
+                        .then(onNew, displayErrors);
                 };
             }]
         };

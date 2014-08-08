@@ -88,6 +88,7 @@ export var register = () => {
 
                         beforeEach((done) => {
                             scopeMock.content = content;
+                            scopeMock.onNew = jasmine.createSpy("onNew");
                             adapterMock.create.and.returnValue(res);
                             scopeMock.create().then(done);
                         });
@@ -98,6 +99,10 @@ export var register = () => {
                             expect(adapterMock.refersTo.calls.count()).toBe(1);
                             expect(adapterMock.content.calls.first().args[1]).toBe(content);
                             expect(adapterMock.refersTo.calls.first().args[1]).toBe("refersTo");
+                        });
+
+                        it("calls the onNew callback", () => {
+                            expect(scopeMock.onNew).toHaveBeenCalled();
                         });
                     });
                 });
