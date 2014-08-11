@@ -68,8 +68,8 @@ class TestGraphGetReftypes:
         graph = Graph(context=context)
         return Graph.get_reftypes(graph, **kwargs)
 
-    def test_no_objectmap(self, mock_objectmap):
-        assert list(self._call_fut(mock_objectmap)) == []
+    def test_no_objectmap(self):
+        assert list(self._call_fut(None)) == []
 
     def test_no_reftpyes(self, mock_objectmap):
         mock_objectmap.get_reftypes.return_value = []

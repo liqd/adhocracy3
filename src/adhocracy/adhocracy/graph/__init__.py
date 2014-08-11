@@ -55,7 +55,6 @@ class Graph(Persistent):
                             subclass of this.
         :returns: Generator of :class:`adhocracy.graph.SheetReftype`
         """
-        # REVIEW: this statement is not covered by unit tests
         if not self._objectmap:
             return []
         all_reftypes = self._objectmap.get_reftypes()
