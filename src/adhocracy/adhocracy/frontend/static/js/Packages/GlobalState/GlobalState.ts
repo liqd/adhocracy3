@@ -40,3 +40,21 @@ export var movingColumns = (globalState) => {
         }
     };
 };
+
+
+/**
+ * A simple focus switcher that can be used until we have a proper widget for this.
+ */
+export var adhFocusSwitch = (globalState) => {
+    return {
+        restrict: "E",
+        template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
+        link: (scope) => {
+            var column : number = 1;
+            scope.switchFocus = () => {
+                column = column === 1 ? 2 : 1;
+                globalState.setFocus(column);
+            };
+        }
+    };
+};

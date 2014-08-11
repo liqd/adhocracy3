@@ -87,6 +87,7 @@ export var init = (config, meta_api) => {
 
     app.service("adhGlobalState", AdhGlobalState.GlobalState);
     app.directive("adhMovingColumns", ["adhGlobalState", AdhGlobalState.movingColumns]);
+    app.directive("adhFocusSwitch", ["adhGlobalState", AdhGlobalState.adhFocusSwitch]);
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
