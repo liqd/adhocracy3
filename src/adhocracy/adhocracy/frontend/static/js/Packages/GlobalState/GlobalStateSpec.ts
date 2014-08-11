@@ -31,9 +31,20 @@ export var register = () => {
             });
 
             it("dispatches calls to onSetFocus to eventHandler", () => {
-                var callback = () => undefined;
+                var callback = (column) => undefined;
                 adhGlobalState.onSetFocus(callback);
                 expect(on).toHaveBeenCalledWith("setFocus", callback);
+            });
+
+            it("dispatches calls to setContent2Url to eventHandler", () => {
+                adhGlobalState.setContent2Url("some/path");
+                expect(trigger).toHaveBeenCalledWith("setContent2Url", "some/path");
+            });
+
+            it("dispatches calls to onSetContent2Url to eventHandler", () => {
+                var callback = (url) => undefined;
+                adhGlobalState.onSetContent2Url(callback);
+                expect(on).toHaveBeenCalledWith("setContent2Url", callback);
             });
         });
 
@@ -73,6 +84,19 @@ export var register = () => {
                     it("removes class 'is-detail' if columns is less than 2", () => {
                         callback(1);
                         expect(elementMock.removeClass).toHaveBeenCalledWith("is-detail");
+                    });
+                });
+
+                describe("onSetContent2Url", () => {
+                    var callback;
+
+                    beforeEach(() => {
+                        callback = globalStateMock.onSetContent2Url.calls.mostRecent().args[0];
+                    });
+
+                    it("sets content2Url in scope", () => {
+                        callback("some/path");
+                        expect(scopeMock.content2Url).toBe("some/path");
                     });
                 });
             });

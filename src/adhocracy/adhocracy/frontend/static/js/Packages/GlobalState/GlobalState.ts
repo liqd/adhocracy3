@@ -22,6 +22,14 @@ export class GlobalState {
     public onSetFocus(fn : (column : number) => void) : void {
         this.eventHandler.on("setFocus", fn);
     }
+
+    public setContent2Url(url : string) : void {
+        this.eventHandler.trigger("setContent2Url", url);
+    }
+
+    public onSetContent2Url(fn : (url : string) => void) : void {
+        this.eventHandler.on("setContent2Url", fn);
+    }
 }
 
 
@@ -36,6 +44,9 @@ export var movingColumns = (globalState) => {
                 } else if (column === 2) {
                     element.addClass("is-detail");
                 }
+            });
+            globalState.onSetContent2Url((url : string) => {
+                scope.content2Url = url;
             });
         }
     };
