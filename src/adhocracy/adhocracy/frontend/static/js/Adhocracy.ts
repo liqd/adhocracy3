@@ -23,6 +23,7 @@ import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossW
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhMetaApi = require("./Packages/MetaApi/MetaApi");
+import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -81,6 +82,7 @@ export var init = (config, meta_api) => {
     app.value("adhConfig", config);
     app.factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(meta_api));
     app.value("adhDone", AdhDone.done);
+    app.value("adhEventHandlerClass", AdhEventHandler.EventHandler);
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
