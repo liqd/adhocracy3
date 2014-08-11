@@ -17,7 +17,8 @@ class ICommentVersion(IItemVersion):
 commentversion_meta = itemversion_metadata._replace(
     content_name='CommentVersion',
     iresource=ICommentVersion,
-    extended_sheets=[IComment, ICommentable],
+    extended_sheets=[IComment,
+                     ICommentable],
 )
 
 
@@ -29,7 +30,8 @@ class IComment(IItem):
 comment_meta = item_metadata._replace(
     content_name='Comment',
     iresource=IComment,
-    element_types=[IComment, ICommentVersion],
+    element_types=[IComment,
+                   ICommentVersion],
     item_type=ICommentVersion,
     use_autonaming=True,
     autonaming_prefix='comment_',
