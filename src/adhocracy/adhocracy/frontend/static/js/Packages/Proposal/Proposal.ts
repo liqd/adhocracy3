@@ -6,6 +6,7 @@ import Util = require("../Util/Util");
 import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
 import AdhWebSocket = require("../WebSocket/WebSocket");
+import AdhGlobalState = require("../GlobalState/GlobalState");
 
 import Resources = require("../../Resources");
 
@@ -38,6 +39,8 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
     edit : () => void;
     reset : () => void;
     commit : () => void;
+    showComments : () => void;
+    hideComments : () => void;
 }
 
 export class ProposalDetail {
@@ -94,7 +97,8 @@ export class ProposalVersionDetail {
                 content: "=",
                 viewmode: "@"
             },
-            controller: ["adhHttp", "$scope", (
+            controller: ["adhGlobalState", "adhHttp", "$scope", (
+                adhGlobalState : AdhGlobalState.GlobalState,
                 adhHttp : AdhHttp.Service<Resources.Content<any>>,
                 $scope : IProposalVersionDetailScope<any>
             ) : void => {
@@ -122,6 +126,15 @@ export class ProposalVersionDetail {
 
                     $scope.$broadcast("commit");
                     $scope.viewmode = "display";
+                };
+
+                $scope.showComments = () => {
+                    adhGlobalState.setContent2Url($scope.content.path);
+                    adhGlobalState.setFocus(2);
+                };
+
+                $scope.hideComments = () => {
+                    adhGlobalState.setFocus(1);
                 };
             }]
         };
