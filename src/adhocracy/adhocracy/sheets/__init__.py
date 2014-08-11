@@ -70,6 +70,7 @@ class GenericResourceSheet(PropertySheet):
     def _key_reftype_map(self):
         # FIXME The _key_[..._]reftype_map functions are called quite often,
         # shouldn't they be cached somehow?
+        # REVIEW: we can just use the pyramid.decorator.reify decorator
         refs = self._key_iterable_reftype_map
         refs.update(self._key_single_reftype_map)
         return refs

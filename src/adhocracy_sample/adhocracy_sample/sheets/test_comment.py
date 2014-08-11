@@ -5,6 +5,8 @@ from pytest import fixture
 
 from adhocracy.utils import get_sheet
 
+# REVIEW: use more pytest fixtures
+
 
 class CommentSheetIntegrationTest(unittest.TestCase):
 
@@ -20,6 +22,7 @@ class CommentSheetIntegrationTest(unittest.TestCase):
         context = testing.DummyResource(__provides__=IComment)
         inst = get_sheet(context, IComment)
         assert inst.meta.isheet is IComment
+
 
 class TestCommentableSheet:
 

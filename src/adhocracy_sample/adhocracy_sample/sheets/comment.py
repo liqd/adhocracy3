@@ -72,6 +72,8 @@ class CommentableSheet(GenericResourceSheet):
     isheet = ICommentable
     schema_class = CommentableSchema
 
+    # REVIEW: instead of subclassing we could just use a special "Backref"
+    # schema node type.
     def get(self):
         """Return appstruct."""
         struct = super().get()
