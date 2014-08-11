@@ -774,8 +774,8 @@ As usual, we have to add another version to actually say something::
     '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001'
 
 
-Now, lets view all the comments referring to the proposal. First,
-lets find the path of the newest version of the proposal::
+Lets view all the comments referring to the proposal.
+First find the path of the newest version of the proposal::
 
     >>> resp = testapp.get(pdag_path + '/LAST')
     >>> newest_prop_vers = resp.json['data']['adhocracy.sheets.tags.ITag']['elements'][-1]
