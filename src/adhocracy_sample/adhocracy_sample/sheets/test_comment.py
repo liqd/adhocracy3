@@ -3,25 +3,13 @@ import unittest
 from pyramid import testing
 from pytest import fixture
 
-from adhocracy.utils import get_sheet
 
-# REVIEW: use more pytest fixtures
-
-
-class CommentSheetIntegrationTest(unittest.TestCase):
-
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy_sample.sheets.comment')
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_create_comment_sheet(self):
-        from adhocracy_sample.sheets.comment import IComment
-        context = testing.DummyResource(__provides__=IComment)
-        inst = get_sheet(context, IComment)
-        assert inst.meta.isheet is IComment
+def test_includeme_register_comment_sheet(config):
+    from adhocracy_sample.sheets.comment import IComment
+    from adhocracy.utils import get_sheet
+    config.include('adhocracy_sample.sheets.comment')
+    context = testing.DummyResource(__provides__=IComment)
+    assert get_sheet(context, IComment)
 
 
 class TestCommentableSheet:
