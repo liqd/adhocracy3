@@ -6,6 +6,7 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 
 from persistent import Persistent
+from pyramid.registry import Registry
 from substanced.util import find_objectmap
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import Multireference
@@ -117,6 +118,24 @@ class Graph(Persistent):
         comment_refs = self.get_back_references(resource, base_reftype=reftype)
         for reference in comment_refs:
             yield reference.source
+
+    def set_references_for_isheet(self, source, isheet: ISheet,
+                                  references: dict, registry: Registry):
+        """ Set references of this source for one isheet.
+
+        :param references: dictionary with the following content:
+                           key - isheet field name
+                           value - reference targets
+        :param registry: Pyramid Registry with
+                         :class:`adhocracy.registry.ResourceContentRegistry`
+                         attribute named `content`.
+        """
+        sheet_meta = registry.content.sheets_metadata()[isheet.__identifier__]
+        schema = sheet_meta.schema_class()
+        for field_name, targets in references.items():
+            assert field_name in schema
+            reftype = schema[field_name].reftype
+            self.set_references(source, targets, reftype)
 
     def get_references_for_isheet(self, source, isheet: ISheet) -> dict:
         """ Get references of this source for one isheet only.

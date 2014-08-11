@@ -2,6 +2,7 @@ from pyramid import testing
 from pytest import fixture
 from pytest import raises
 from pytest import mark
+from unittest.mock import Mock
 
 from zope.interface import taggedValue
 from zope.interface import Interface
@@ -309,6 +310,44 @@ class TestGraphGetBackReferences:
         result = self._call_fut(objectmap, resource, base_isheet=IASheet)
 
         assert len(list(result)) == 1
+
+
+class TestGraphSetReferencesForIsheet:
+
+    @fixture()
+    def registry(self, mock_resource_registry, sheet_meta):
+        registry = testing.DummyResource(content=mock_resource_registry)
+        registry.content.sheets_metadata.return_value = {
+            ISheet.__identifier__: sheet_meta
+        }
+        return registry
+
+    @fixture()
+    def sheet_meta(self, sheet_meta):
+        import colander
+        class SchemaF(colander.MappingSchema):
+            references = colander.SchemaNode(colander.Int, reftype=SheetReference)
+        return sheet_meta._replace(schema_class=SchemaF)
+
+    def _call_fut(self, graph, source, isheet, references, registry):
+        from adhocracy.graph import Graph
+        return Graph.set_references_for_isheet(graph, source, isheet,
+                                               references, registry)
+
+    def test_with_empty_references(self, context, mock_graph, registry):
+        references = {}
+        self._call_fut(mock_graph, context, ISheet, references, registry)
+        assert not mock_graph.set_references.called
+
+    def test_with_valid_references(self, context, mock_graph, registry):
+        references = {'references': [object()]}
+        self._call_fut(mock_graph, context, ISheet, references, registry)
+        mock_graph.set_references.assert_called_with(context, references['references'], SheetReference)
+
+    def test_with_invalid_references(self, context, mock_graph, registry):
+        references = {'invalid': [object()]}
+        with raises(AssertionError):
+            self._call_fut(mock_graph, context, ISheet, references, registry)
 
 
 class TestGraphGetBackReferencesForIsheet:
