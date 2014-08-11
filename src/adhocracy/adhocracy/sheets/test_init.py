@@ -28,17 +28,23 @@ class TestResourcePropertySheet:
     @fixture()
     def mock_node_unique_references(self):
         from adhocracy.schema import ListOfUniqueReferences
+        from adhocracy.schema import SheetReference
         mock = Mock(spec=ListOfUniqueReferences)
         mock.readonly = False
         mock.name = 'references'
+        mock.backref = False
+        mock.reftype = SheetReference
         return mock
 
     @fixture()
     def mock_node_single_reference(self):
         from adhocracy.schema import Reference
+        from adhocracy.schema import SheetReference
         mock = Mock(spec=Reference)
         mock.readonly = False
         mock.name = 'reference'
+        mock.backref = False
+        mock.reftype = SheetReference
         return mock
 
     def make_one(self, sheet_meta, context):
@@ -138,6 +144,22 @@ class TestResourcePropertySheet:
         graph_set_args = mock_graph.set_references.call_args[0]
         assert graph_set_args == (context, [target], node.reftype)
 
+    def test_get_valid_back_references(self, sheet_meta, context, mock_graph,
+                                       mock_node_unique_references):
+        from adhocracy.interfaces import ISheet
+        inst = self.make_one(sheet_meta, context)
+        node = mock_node_unique_references
+        node.backref = True
+        inst.schema.children.append(node)
+        source = testing.DummyResource()
+        mock_graph.get_back_references_for_isheet.return_value = {'': [source]}
+        inst._graph = mock_graph
+
+        appstruct = inst.get()
+
+        assert appstruct['references'] == [source]
+        mock_graph.get_back_references_for_isheet.assert_called_with(context, ISheet)
+
     def test_set_valid_reference(self, sheet_meta, context, mock_graph,
                                  mock_node_single_reference):
         inst = self.make_one(sheet_meta, context)
@@ -160,6 +182,20 @@ class TestResourcePropertySheet:
         inst._graph = mock_graph
         appstruct = inst.get()
         assert appstruct['reference'] == target
+
+    def test_get_valid_back_reference(self, sheet_meta, context, mock_graph,
+                                     mock_node_single_reference):
+        from adhocracy.interfaces import ISheet
+        inst = self.make_one(sheet_meta, context)
+        node = mock_node_single_reference
+        node.backref = True
+        inst.schema.children.append(node)
+        source = testing.DummyResource()
+        mock_graph.get_back_references_for_isheet.return_value = {'': [source]}
+        inst._graph = mock_graph
+        appstruct = inst.get()
+        assert appstruct['reference'] == source
+        mock_graph.get_back_references_for_isheet.assert_called_with(context, ISheet)
 
     def test_notify_resource_sheet_modified(self, sheet_meta, context, config):
         from adhocracy.interfaces import IResourceSheetModified

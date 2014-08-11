@@ -54,7 +54,8 @@ class GenericResourceSheet(PropertySheet):
         """Mapping from names to reftypes that accept multiple references."""
         refs = {}
         for child in self.schema:
-            if isinstance(child, AbstractReferenceIterable):
+            if isinstance(child, AbstractReferenceIterable) \
+                    and not child.backref:
                 refs[child.name] = child.reftype
         return refs
 
@@ -63,7 +64,23 @@ class GenericResourceSheet(PropertySheet):
         """Mapping from names to reftypes that accept a single reference."""
         refs = {}
         for child in self.schema:
-            if isinstance(child, Reference):
+            if isinstance(child, Reference) and not child.backref:
+                refs[child.name] = child.reftype
+        return refs
+
+    @property
+    def _key_single_back_reftype_map(self):
+        refs = {}
+        for child in self.schema:
+            if isinstance(child, Reference) and child.backref:
+                refs[child.name] = child.reftype
+        return refs
+
+    @property
+    def _key_iterable_back_reftype_map(self):
+        refs = {}
+        for child in self.schema:
+            if isinstance(child, AbstractReferenceIterable) and child.backref:
                 refs[child.name] = child.reftype
         return refs
 
@@ -79,7 +96,7 @@ class GenericResourceSheet(PropertySheet):
 
     def get(self) -> dict:
         """Return appstruct."""
-        appstruct = {}
+        appstruct = self._get_default_appstruct()
         appstruct.update(self._get_non_reference_appstruct())
         appstruct.update(self._get_reference_appstruct())
         return appstruct
@@ -100,19 +117,38 @@ class GenericResourceSheet(PropertySheet):
         return appstruct
 
     def _get_reference_appstruct(self):
+        if not self._graph:
+            return {}
         appstruct = {}
-        references = {}
-        if self._graph:
-            references = self._graph.get_references_for_isheet(
-                self.context,
-                self.meta.isheet)
+        refs = self._graph.get_references_for_isheet(self.context,
+                                                     self.meta.isheet)
         default = self._get_default_appstruct()
         for key, default_value in default.items():
             if key in self._key_iterable_reftype_map:
-                appstruct[key] = references.get(key, default_value)
+                appstruct[key] = refs.get(key, default_value)
             elif key in self._key_single_reftype_map:
-                reflist = references.get(key, None)
+                reflist = refs.get(key, None)
                 appstruct[key] = reflist[0] if reflist else default_value
+            elif key in self._key_iterable_back_reftype_map:
+                reftype = self._key_iterable_back_reftype_map[key]
+                source_isheet = reftype.getTaggedValue('source_isheet')
+                source_isheet_field = \
+                    reftype.getTaggedValue('source_isheet_field')
+                backrefs = self._graph.get_back_references_for_isheet(
+                    self.context, source_isheet)
+                appstruct[key] = backrefs.get(source_isheet_field,
+                                              default_value)
+            elif key in self._key_single_back_reftype_map:
+                reftype = self._key_single_back_reftype_map[key]
+                source_isheet = reftype.getTaggedValue('source_isheet')
+                source_isheet_field = \
+                    reftype.getTaggedValue('source_isheet_field')
+                backrefs = self._graph.get_back_references_for_isheet(
+                    self.context, source_isheet)
+                backreflist = backrefs.get(source_isheet_field, None)
+                value = backreflist[0] if backreflist else default_value
+                appstruct[key] = value
+
         return appstruct
 
     def set(self, appstruct: dict, omit=(), send_event=True) -> bool:

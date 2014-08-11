@@ -201,9 +201,9 @@ class ResourceObjectUnitTests(unittest.TestCase):
 
 class ReferenceUnitTest(unittest.TestCase):
 
-    def _make_one(self):
+    def _make_one(self, **kwargs):
         from adhocracy.schema import Reference
-        return Reference()
+        return Reference(**kwargs)
 
     def setUp(self):
         self.context = testing.DummyResource()
@@ -213,6 +213,14 @@ class ReferenceUnitTest(unittest.TestCase):
     def test_missing(self):
         inst = self._make_one()
         assert inst.missing == colander.drop
+
+    def test_with_backref(self):
+        inst = self._make_one(backref=True)
+        assert inst.backref
+
+    def test_without_backref(self):
+        inst = self._make_one()
+        assert inst.backref is False
 
     def test_valid_interface(self):
         from zope.interface import alsoProvides

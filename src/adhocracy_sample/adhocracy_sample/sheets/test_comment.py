@@ -24,9 +24,7 @@ class TestCommentableSheet:
         from adhocracy.interfaces import IResourceSheet
         from adhocracy_sample.sheets.comment import ICommentable
         from adhocracy_sample.sheets.comment import CommentableSchema
-        from adhocracy_sample.sheets.comment import CommentableSheet
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, CommentableSheet)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == ICommentable
@@ -41,7 +39,7 @@ class TestCommentableSheet:
         comment = testing.DummyResource()
         inst = meta.sheet_class(meta, context)
         inst._graph = mock_graph
-        mock_graph.get_back_reference_sources.return_value = iter([comment])
+        mock_graph.get_back_references_for_isheet.return_value = {'refers_to': [comment]}
         data = inst.get()
         assert list(data['comments']) == [comment]
 

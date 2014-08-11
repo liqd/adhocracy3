@@ -661,6 +661,24 @@ class TestMetaApiView:
         field_metadata = sheet_metadata['fields'][0]
         assert field_metadata['containertype'] == 'list'
         assert field_metadata['valuetype'] == 'adhocracy.schema.AbsolutePath'
+        assert field_metadata['targetsheet'] == ISheet.__identifier__
+
+    def test_get_sheets_with_field_adhocracy_back_referencelist(self, request, context, sheet_meta):
+        from adhocracy.interfaces import SheetToSheet
+        from adhocracy.schema import ListOfUniqueReferences
+        SheetToSheet.setTaggedValue('source_isheet', ISheetB)
+        class SchemaF(colander.MappingSchema):
+            test = ListOfUniqueReferences(reftype=SheetToSheet, backref=True)
+        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
+        request.registry.content.sheets_metadata.return_value = metas
+        inst = self.make_one(request, context)
+
+        sheet_metadata = inst.get()['sheets'][ISheet.__identifier__]
+
+        field_metadata = sheet_metadata['fields'][0]
+        assert field_metadata['targetsheet'] == ISheetB.__identifier__
+
+    # FIXME test for single reference
 
 
 class TestValidateLoginEmail:

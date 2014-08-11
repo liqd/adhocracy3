@@ -183,15 +183,24 @@ class Reference(AbsolutePath):
 
     """Reference to a resource that implements a specific sheet.
 
-    The `target_isheet` attribute of the `reftype` specifies the sheet that
-    accepted resources must implement. Storing another kind of resource will
-    trigger a validation error.
+    The constructor accepts these additional keyword arguments:
+
+        - ``reftype``: :class:` adhocracy.interfaces.SheetReference`.
+                       The `target_isheet` attribute of the `reftype` specifies
+                       the sheet that accepted resources must implement.
+                       Storing another kind of resource will trigger a
+                       validation error.
+        - ``backref``: marks this Reference as a back reference.
+                       :class:`adhocracy.sheet.ResourceSheet` can use this
+                       information to autogenerate the appstruct/cstruct.
+                       Default: False.
     """
 
     default = ''
     missing = colander.drop
     schema_type = ResourceObject
     reftype = SheetReference
+    backref = False
 
     def validator(self, node, value):
         """Validate."""
@@ -310,6 +319,7 @@ class AbstractReferenceIterable(AdhocracySchemaNode):
     default = []
     missing = colander.drop
     reftype = SheetReference
+    backref = False
 
     def validator(self, node, value):
         """Validate."""
