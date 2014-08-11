@@ -30,8 +30,11 @@
             placeholder="password repeat"
             data-ng-model="input.passwordRepeat"
             required="required" />
-        <span class="input-error" data-ng-show="input.password !== input.passwordRepeat">
-            Does not match.
+        <span class="input-error" data-ng-show="(!registerForm.password.$error.minlength) && (input.password !== input.passwordRepeat)">
+            Password fields do not match.
+        </span>
+        <span class="input-error" data-ng-show="registerForm.password.$error.minlength">
+            Password too short.
         </span>
     </div>
     <div class="register-description box-with-button">
