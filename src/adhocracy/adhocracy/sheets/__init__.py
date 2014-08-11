@@ -1,5 +1,6 @@
 """Adhocarcy sheets."""
 from persistent.mapping import PersistentMapping
+from pyramid.decorator import reify
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from substanced.property import PropertySheet
@@ -40,7 +41,7 @@ class GenericResourceSheet(PropertySheet):
         self._data_key = self.meta.isheet.__identifier__
         self._graph = find_graph(context)
 
-    @property
+    @reify
     def _data(self):
         if not hasattr(self.context, '_propertysheets'):
             self.context._propertysheets = PersistentMapping()
@@ -66,16 +67,13 @@ class GenericResourceSheet(PropertySheet):
                 refs[child.name] = child.reftype
         return refs
 
-    @property
+    @reify
     def _key_reftype_map(self):
-        # FIXME The _key_[..._]reftype_map functions are called quite often,
-        # shouldn't they be cached somehow?
-        # REVIEW: we can just use the pyramid.decorator.reify decorator
         refs = self._key_iterable_reftype_map
         refs.update(self._key_single_reftype_map)
         return refs
 
-    @property
+    @reify
     def _readonly_keys(self):
         return [x.name for x in self.schema if getattr(x, 'readonly', False)]
 
