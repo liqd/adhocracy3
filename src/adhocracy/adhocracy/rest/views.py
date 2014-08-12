@@ -2,10 +2,11 @@
 from copy import deepcopy
 from logging import getLogger
 
-from colander import SchemaNode
-from colander import MappingSchema
 from colander import drop
 from colander import Invalid
+from colander import MappingSchema
+from colander import SchemaNode
+from colander import SequenceSchema
 from cornice.util import json_error
 from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
@@ -99,7 +100,7 @@ def validate_request_data(context: ILocation, request: Request,
     _raise_if_errors(request)
 
 
-def _validate_schema(cstructs: dict, schema: MappingSchema, request: Request,
+def _validate_schema(cstructs: object, schema: MappingSchema, request: Request,
                      location='body'):
     """Validate that the `cstruct` data is conform to the given schema.
 
@@ -109,8 +110,38 @@ def _validate_schema(cstructs: dict, schema: MappingSchema, request: Request,
     :param location: filter schema nodes depending on the `location` attribute.
                      The default value is `body`.
     """
-    validated = {}
     nodes = [n for n in schema if getattr(n, 'location', 'body') == location]
+    if isinstance(schema, SequenceSchema):
+        _validate_list_schema(nodes, cstructs, request, location)
+    else:
+        _validate_dict_schema(nodes, cstructs, request, location)
+
+
+def _validate_list_schema(nodes: list, cstructs: list, request: Request,
+                          location='body'):
+    if not nodes:
+        return
+    if len(nodes) > 1:
+        request.errors.add(location, '', 'SequenceSchema has {} children '
+                                         'instead of 1'.format(len(nodes)))
+        return
+    validated_list = []
+    child_node = nodes[0]
+    for index, cstruct in enumerate(cstructs):
+        try:
+            validated_list.append(child_node.deserialize(cstruct))
+        except Invalid as e:
+            for name, msg in e.asdict().items():
+                indexed_name = _replace_fieldname_by_index(
+                    name, child_node.name, index)
+                request.errors.add(location, indexed_name, msg)
+    validated = {child_node.name: validated_list}
+    request.validated.update(validated)
+
+
+def _validate_dict_schema(nodes: list, cstructs: dict, request: Request,
+                          location='body'):
+    validated = {}
     nodes_with_cstruct = [n for n in nodes if n.name in cstructs]
     nodes_without_cstruct = [n for n in nodes if n.name not in cstructs]
     for node in nodes_without_cstruct:
@@ -125,6 +156,11 @@ def _validate_schema(cstructs: dict, schema: MappingSchema, request: Request,
             for name, msg in e.asdict().items():
                 request.errors.add(location, name, msg)
     request.validated.update(validated)
+
+
+def _replace_fieldname_by_index(fullname: str, fieldname: str,
+                                index: int) -> str:
+    return str(index) + strip_optional_prefix(fullname, fieldname)
 
 
 def _validate_extra_validators(validators: list, context, request: Request):

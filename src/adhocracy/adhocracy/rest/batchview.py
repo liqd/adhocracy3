@@ -27,8 +27,8 @@ class BatchView(RESTView):
     def post(self) -> dict:
         """Create new resource and get response data."""
         # TODO implement
-        itemcount = self.request.validated['items']
-        return {'itemcount': itemcount}
+        items = self.request.validated['items']
+        return {'itemcount': len(items)}
 
 
 def includeme(config):  # pragma: no cover
