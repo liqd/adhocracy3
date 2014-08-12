@@ -755,8 +755,10 @@ the individual requests.
 The encoding of a request consist of an object with attributes for
 method (aka HTTP verb), path, and body. A further attribute, 'result_path',
 defines a name for the preliminary path of the object created by the request.
-If the preliminary name will not be used, this attribute can be omitted or
-left empty. ::
+Like other resource names, the preliminary name is an *Identifier*,
+i.e. it can only contain ASCII letters and digits, underscores, dashes,
+and dots. If the preliminary name will not be used, this attribute can be
+omitted or left empty. ::
 
     >>> encoded_request_with_name = {
     ...     'method': 'POST',
