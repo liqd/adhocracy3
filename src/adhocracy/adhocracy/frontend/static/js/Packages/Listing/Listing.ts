@@ -25,13 +25,14 @@ export class ListingPoolAdapter implements IListingContainerAdapter {
     }
 }
 
-export interface ListingScope<Container> {
+export interface ListingScope<Container> extends ng.IScope {
     path : string;
     actionColumn : boolean;
     container : Container;
     elements : string[];
     update : () => ng.IPromise<void>;
     wshandle : string;
+    clear : () => void;
     show : { createForm : boolean };
     showCreateForm : () => void;
     hideCreateForm : () => void;
@@ -64,10 +65,9 @@ export class Listing<Container extends Resources.Content<any>> {
                     }
                 });
             },
-            controller: ["$scope", "adhHttp", "adhDone", (
+            controller: ["$scope", "adhHttp", (
                 $scope: ListingScope<Container>,
-                adhHttp: AdhHttp.Service<Container>,
-                adhDone
+                adhHttp: AdhHttp.Service<Container>
             ) : void => {
                 $scope.show = {createForm: false};
 
@@ -86,16 +86,33 @@ export class Listing<Container extends Resources.Content<any>> {
                     });
                 };
 
-                // (The call order is important: first subscribe to
-                // the updates, then get an initial copy.)
-                try {
-                    $scope.wshandle = adhWebSocket.register($scope.path, $scope.update);
-                } catch (e) {
-                    console.log(e);
-                    console.log("Will continue on resource " + $scope.path + " without server bind.");
-                }
+                $scope.clear = () : void => {
+                    $scope.container = undefined;
+                    $scope.elements = [];
+                };
 
-                $scope.update().then(adhDone);
+                $scope.$watch("path", (newPath : string, oldPath : string) => {
+                    if (oldPath && typeof $scope.wshandle !== "undefined") {
+                        // FIXME: When used with the commentable adapter the register fails
+                        // and the unregister is redundant
+                        adhWebSocket.unregister(oldPath, $scope.wshandle);
+                    }
+
+                    if (newPath) {
+                        // (The call order is important: first subscribe to
+                        // the updates, then get an initial copy.)
+                        try {
+                            $scope.wshandle = adhWebSocket.register(newPath, $scope.update);
+                        } catch (e) {
+                            console.log(e);
+                            console.log("Will continue on resource " + newPath + " without server bind.");
+                        }
+
+                        $scope.update();
+                    } else {
+                        $scope.clear();
+                    }
+                });
             }]
         };
     }

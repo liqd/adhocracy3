@@ -87,26 +87,94 @@ export var register = () => {
                     var adhHttpMock;
                     var scope;
 
-                    beforeEach((done) => {
+                    beforeEach(() => {
                         adhHttpMock = createAdhHttpMock();
                         adhHttpMock.get.and.callFake(() => q.when(container));
 
                         scope = {
                             // arbitrary values
                             container: 3,
-                            elements: 2
+                            elements: 2,
+                            $watch: jasmine.createSpy("$watch")
                         };
 
-                        var controller = directive.controller[3];
-                        controller(scope, adhHttpMock, done);
+                        var controller = directive.controller[2];
+                        controller(scope, adhHttpMock);
                     });
 
-                    it("initializes scope.container", () => {
-                        expect(scope.container).toEqual(container);
+                    it("defines scope.show", () => {
+                        expect(scope.show).toBeDefined();
                     });
 
-                    it("initializes scope.elements", () => {
-                        expect(scope.elements).toEqual(elements);
+                    it("defines scope.show.createForm", () => {
+                        expect(scope.show.createForm).toBeDefined();
+                    });
+
+                    it("watches scope.path", () => {
+                        expect(scope.$watch).toHaveBeenCalled();
+                        expect(scope.$watch.calls.mostRecent().args[0]).toBe("path");
+                    });
+
+                    describe("scope.clear", () => {
+                        it("clears scope.container", () => {
+                            scope.clear();
+                            expect(scope.container).not.toBeDefined();
+                        });
+
+                        it("clears scope.elements", () => {
+                            scope.clear();
+                            expect(scope.elements).toEqual([]);
+                        });
+                    });
+
+                    describe("scope.update", () => {
+                        var path = "some/path";
+
+                        beforeEach((done) => {
+                            scope.path = path;
+                            scope.update().then(done);
+                        });
+
+                        it("updates scope.container from server", () => {
+                            expect(adhHttpMock.get).toHaveBeenCalledWith(path);
+                            expect(scope.container).toBe(container);
+                        });
+
+                        it("updates scope.elements using adapter from container", () => {
+                            expect(adapter.elemRefs).toHaveBeenCalledWith(container);
+                            expect(scope.elements).toBe(elements);
+                        });
+                    });
+
+                    describe("$watch(path)", () => {
+                        var callback;
+
+                        beforeEach(() => {
+                            spyOn(scope, "update");
+                            spyOn(scope, "clear");
+                            callback = scope.$watch.calls.mostRecent().args[1];
+                        });
+
+                        it("unregisters old websocket when path changes", () => {
+                            scope.wshandle = "wshandle";
+                            callback("new/path", "old/path");
+                            expect(adhWebSocketMock.unregister).toHaveBeenCalledWith("old/path", "wshandle");
+                        });
+
+                        it("registers new websocket when path changes", () => {
+                            callback("new/path", "old/path");
+                            expect(adhWebSocketMock.register).toHaveBeenCalledWith("new/path", scope.update);
+                        });
+
+                        it("calls scope.update on new path", () => {
+                            callback("new/path", "old/path");
+                            expect(scope.update).toHaveBeenCalled();
+                        });
+
+                        it("calls scope.clear on path clear", () => {
+                            callback("", "old/path");
+                            expect(scope.clear).toHaveBeenCalled();
+                        });
                     });
 
                     it("intializes scope.show.createForm to false", () => {

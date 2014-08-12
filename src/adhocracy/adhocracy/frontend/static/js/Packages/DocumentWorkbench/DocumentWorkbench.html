@@ -20,8 +20,7 @@
         </adh-listing>
     </div>
     <div class="moving-column-content2">
-        {{content2Url}}
-        <adh-listing data-path="/adhocracy/asd/VERSION_0000000">
+        <adh-comment-listing data-path="{{content2Url}}">
             <div data-ng-switch="transclusionId">
                 <adh-comment-create
                     data-refers-to="{{path}}"
