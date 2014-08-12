@@ -13,7 +13,6 @@ from adhocracy.interfaces import IResourceSheet
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import sheet_metadata
 from adhocracy.interfaces import SheetMetadata
-from adhocracy.schema import AbstractReferenceIterable
 from adhocracy.schema import Reference
 from adhocracy.utils import remove_keys_from_dict
 
@@ -27,6 +26,7 @@ class GenericResourceSheet(PropertySheet):
 
     :context: resource to adapt
     :schema: colander.MappingSchema object to define the data structure
+    :registry: :class:`pyramid.registry.Registry` to add events and references
     :meta: SheetMetadata
     :_data_key: identifier to store data
     """
@@ -40,151 +40,124 @@ class GenericResourceSheet(PropertySheet):
         self.meta = metadata
         self._data_key = self.meta.isheet.__identifier__
         self._graph = find_graph(context)
-
-    @reify
-    def _data(self):
-        if not hasattr(self.context, '_propertysheets'):
-            self.context._propertysheets = PersistentMapping()
-        if self._data_key not in self.context._propertysheets:
-            self.context._propertysheets[self._data_key] = PersistentMapping()
-        return self.context._propertysheets[self._data_key]
-
-    @property
-    def _key_iterable_reftype_map(self):
-        """Mapping from names to reftypes that accept multiple references."""
-        refs = {}
-        for child in self.schema:
-            if isinstance(child, AbstractReferenceIterable) \
-                    and not child.backref:
-                refs[child.name] = child.reftype
-        return refs
-
-    @property
-    def _key_single_reftype_map(self):
-        """Mapping from names to reftypes that accept a single reference."""
-        refs = {}
-        for child in self.schema:
-            if isinstance(child, Reference) and not child.backref:
-                refs[child.name] = child.reftype
-        return refs
-
-    @property
-    def _key_single_back_reftype_map(self):
-        refs = {}
-        for child in self.schema:
-            if isinstance(child, Reference) and child.backref:
-                refs[child.name] = child.reftype
-        return refs
-
-    @property
-    def _key_iterable_back_reftype_map(self):
-        refs = {}
-        for child in self.schema:
-            if isinstance(child, AbstractReferenceIterable) and child.backref:
-                refs[child.name] = child.reftype
-        return refs
-
-    @reify
-    def _key_reftype_map(self):
-        refs = self._key_iterable_reftype_map
-        refs.update(self._key_single_reftype_map)
-        return refs
-
-    @reify
-    def _readonly_keys(self):
-        return [x.name for x in self.schema if getattr(x, 'readonly', False)]
+        self.registry = get_current_registry(context)
 
     def get(self) -> dict:
         """Return appstruct."""
-        appstruct = self._get_default_appstruct()
-        appstruct.update(self._get_non_reference_appstruct())
+        appstruct = self._default_appstruct
+        appstruct.update(self._get_data_appstruct())
         appstruct.update(self._get_reference_appstruct())
+        appstruct.update(self._get_back_reference_appstruct())
         return appstruct
 
-    def _get_default_appstruct(self) -> dict:
-        appstruct = {}
-        for child in self.schema.children:
-            assert hasattr(child, 'default')
-            appstruct[child.name] = child.default
-        return appstruct
+    @reify
+    def _default_appstruct(self) -> dict:
+        items = [(n.name, n.default) for n in self.schema]
+        return dict(items)
 
-    def _get_non_reference_appstruct(self):
-        appstruct = {}
-        default = self._get_default_appstruct()
-        for key, default_value in default.items():
-            if key not in self._key_reftype_map:
-                appstruct[key] = self._data.get(key, default_value)
-        return appstruct
+    def _get_data_appstruct(self) -> iter:
+        for key in self._data_keys:
+            if key in self._data:
+                yield (key, self._data[key])
 
-    def _get_reference_appstruct(self):
+    @reify
+    def _data_keys(self) -> list:
+        return [n.name for n in self.schema if not hasattr(n, 'reftype')]
+
+    @reify
+    def _data(self):
+        if not hasattr(self.context, '_sheets'):
+            self.context._sheets = PersistentMapping()
+        if self._data_key not in self.context._sheets:
+            self.context._sheets[self._data_key] = PersistentMapping()
+        return self.context._sheets[self._data_key]
+
+    def _get_reference_appstruct(self) -> iter:
+        references = self._get_references()
+        for key, node in self._reference_nodes.items():
+            node_references = references.get(key, None)
+            if not node_references:
+                continue
+            if isinstance(node, Reference):
+                yield(key, node_references[0])
+            else:
+                yield(key, node_references)
+
+    def _get_references(self) -> dict:
         if not self._graph:
             return {}
-        appstruct = {}
-        refs = self._graph.get_references_for_isheet(self.context,
+        return self._graph.get_references_for_isheet(self.context,
                                                      self.meta.isheet)
-        default = self._get_default_appstruct()
-        for key, default_value in default.items():
-            if key in self._key_iterable_reftype_map:
-                appstruct[key] = refs.get(key, default_value)
-            elif key in self._key_single_reftype_map:
-                reflist = refs.get(key, None)
-                appstruct[key] = reflist[0] if reflist else default_value
-            elif key in self._key_iterable_back_reftype_map:
-                reftype = self._key_iterable_back_reftype_map[key]
-                source_isheet = reftype.getTaggedValue('source_isheet')
-                source_isheet_field = \
-                    reftype.getTaggedValue('source_isheet_field')
-                backrefs = self._graph.get_back_references_for_isheet(
-                    self.context, source_isheet)
-                appstruct[key] = backrefs.get(source_isheet_field,
-                                              default_value)
-            elif key in self._key_single_back_reftype_map:
-                reftype = self._key_single_back_reftype_map[key]
-                source_isheet = reftype.getTaggedValue('source_isheet')
-                source_isheet_field = \
-                    reftype.getTaggedValue('source_isheet_field')
-                backrefs = self._graph.get_back_references_for_isheet(
-                    self.context, source_isheet)
-                backreflist = backrefs.get(source_isheet_field, None)
-                value = backreflist[0] if backreflist else default_value
-                appstruct[key] = value
 
-        return appstruct
+    @reify
+    def _reference_nodes(self) -> dict:
+        nodes = {}
+        for node in self.schema:
+            if hasattr(node, 'reftype') and not node.backref:
+                nodes[node.name] = node
+        return nodes
+
+    def _get_back_reference_appstruct(self) -> dict:
+        for key, node in self._back_reference_nodes.items():
+            node_backrefs = self._get_backrefs(node)
+            if not node_backrefs:
+                continue
+            if isinstance(node, Reference):
+                yield(key, node_backrefs[0])
+            else:
+                yield(key, node_backrefs)
+
+    def _get_backrefs(self, node: Reference) -> dict:
+            if not self._graph:
+                return {}
+            isheet = node.reftype.getTaggedValue('source_isheet')
+            backrefs = self._graph.get_back_references_for_isheet(self.context,
+                                                                  isheet)
+            field = node.reftype.getTaggedValue('source_isheet_field')
+            return backrefs.get(field, None)
+
+    @reify
+    def _back_reference_nodes(self) -> dict:
+        nodes = {}
+        for node in self.schema:
+            if hasattr(node, 'reftype') and node.backref:
+                nodes[node.name] = node
+        return nodes
 
     def set(self, appstruct: dict, omit=(), send_event=True) -> bool:
         """Store appstruct."""
-        omit = omit if isinstance(omit, tuple) else (omit,)
-        omitted_keys = omit + tuple(self._readonly_keys)
-        struct = remove_keys_from_dict(appstruct, keys_to_remove=omitted_keys)
-        self._store_references(struct)
-        self._store_non_references(struct)
+        appstruct = self._omit_forbidden_keys(appstruct, omit)
+        self._store_data(appstruct)
+        self._store_references(appstruct)
         # FIXME: only store struct if values have changed
         self._notify_resource_sheet_modified(send_event)
-        return bool(struct)
+        return bool(appstruct)
 
-    def _store_references(self, appstruct):
-        if not self._graph:
-            return
-        for key, target in appstruct.items():
-            if key in self._key_reftype_map:
-                reftyp = self._key_reftype_map[key]
-                if key in self._key_single_reftype_map:
-                    target_iterable = (target,)
-                else:
-                    target_iterable = target
-                self._graph.set_references(self.context, target_iterable,
-                                           reftyp)
+    def _omit_forbidden_keys(self, appstruct: dict, omit=()):
+        omit = omit if isinstance(omit, tuple) else (omit,)
+        omit_keys = omit + tuple(self._readonly_keys)
+        return remove_keys_from_dict(appstruct, keys_to_remove=omit_keys)
 
-    def _store_non_references(self, appstruct):
+    @reify
+    def _readonly_keys(self):
+        return [n.name for n in self.schema if getattr(n, 'readonly', False)]
+
+    def _store_data(self, appstruct):
         self._data.update(appstruct)
 
+    def _store_references(self, appstruct):
+        if self._graph:
+            self._graph.set_references_for_isheet(self.context,
+                                                  self.meta.isheet,
+                                                  appstruct,
+                                                  self.registry)
+
     def _notify_resource_sheet_modified(self, send_event):
-        registry = get_current_registry(self.context)
-        if send_event and registry is not None:
+        if send_event:
             event = ResourceSheetModified(self.context,
                                           self.meta.isheet,
-                                          registry)
-            registry.notify(event)
+                                          self.registry)
+            self.registry.notify(event)
 
     def get_cstruct(self) -> dict:
         """Return schema :term:`cstruct`."""

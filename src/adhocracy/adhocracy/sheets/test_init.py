@@ -132,7 +132,8 @@ class TestResourcePropertySheet:
         assert inst.get_cstruct() == {'count': '11'}
 
     def test_set_valid_references(self, sheet_meta, context, mock_graph,
-                                  mock_node_unique_references):
+                                  mock_node_unique_references, registry):
+        from adhocracy.interfaces import ISheet
         inst = self.make_one(sheet_meta, context)
         node = mock_node_unique_references
         inst.schema.children.append(node)
@@ -141,12 +142,11 @@ class TestResourcePropertySheet:
 
         inst.set({'references': [target]})
 
-        graph_set_args = mock_graph.set_references.call_args[0]
-        assert graph_set_args == (context, [target], node.reftype)
+        mock_graph.set_references_for_isheet.assert_called_with(
+            context, ISheet, {'references': [target]}, registry)
 
     def test_get_valid_back_references(self, sheet_meta, context, mock_graph,
                                        mock_node_unique_references):
-        from adhocracy.interfaces import ISheet
         inst = self.make_one(sheet_meta, context)
         node = mock_node_unique_references
         node.backref = True
@@ -158,18 +158,19 @@ class TestResourcePropertySheet:
         appstruct = inst.get()
 
         assert appstruct['references'] == [source]
-        mock_graph.get_back_references_for_isheet.assert_called_with(context, ISheet)
 
     def test_set_valid_reference(self, sheet_meta, context, mock_graph,
-                                 mock_node_single_reference):
+                                 mock_node_single_reference, registry):
+        from adhocracy.interfaces import ISheet
         inst = self.make_one(sheet_meta, context)
         node = mock_node_single_reference
         inst.schema.children.append(node)
         inst._graph = mock_graph
         target = testing.DummyResource()
         inst.set({'reference': target})
-        graph_set_args = mock_graph.set_references.call_args[0]
-        assert graph_set_args == (context, (target,), node.reftype)
+        graph_set_args = mock_graph.set_references_for_isheet.call_args[0]
+        assert graph_set_args == (context, ISheet, {'reference': target}, registry)
+
 
     def test_get_valid_reference(self, sheet_meta, context, mock_graph,
                                  mock_node_single_reference):

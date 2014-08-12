@@ -2,7 +2,6 @@ from pyramid import testing
 from pytest import fixture
 from pytest import raises
 from pytest import mark
-from unittest.mock import Mock
 
 from zope.interface import taggedValue
 from zope.interface import Interface
@@ -357,7 +356,7 @@ class TestGraphGetBackReferencesForIsheet:
         graph = Graph(objectmap.root)
         return Graph.get_back_references_for_isheet(graph, target, isheet)
 
-    def test_with_isheet_but_no_rerferences(self, context, objectmap):
+    def test_with_isheet_but_no_references(self, context, objectmap):
         target = create_dummy_resources(parent=context)
         class IASheet(ISheet):
             taggedValue('field:name', None)
@@ -483,52 +482,6 @@ class TestGraphGetBackReferenceSources:
 
         result = self._call_fut(objectmap, resource, ASheetReferenceType)
         assert len(list(result)) == 1
-
-
-class TestGetFollows:
-
-    def _make_one(self, mock_graph, context):
-        from adhocracy.graph import Graph
-        return Graph.get_follows(mock_graph, context)
-
-    def test_predecessor(self, mock_graph, context):
-        from adhocracy.graph import Reference
-        old = testing.DummyResource()
-        mock_graph.get_references.return_value = iter(
-            [Reference(None, None, None, old)])
-        follows = list(self._make_one(mock_graph, context))
-        assert mock_graph.get_references.call_args[0][0] == context
-        assert mock_graph.get_references.call_args[1]['base_reftype']\
-            == NewVersionToOldVersion
-        assert follows == [old]
-
-    def test_no_predecessor(self, mock_graph, context):
-        mock_graph.get_references.return_value = iter([])
-        follows = list(self._make_one(mock_graph, context))
-        assert follows == []
-
-
-class TestGetFollowedBy:
-
-    def _make_one(self, mock_graph, context):
-        from adhocracy.graph import Graph
-        return Graph.get_followed_by(mock_graph, context)
-
-    def test_sucessors(self, mock_graph, context):
-        from adhocracy.graph import Reference
-        new = testing.DummyResource()
-        mock_graph.get_back_references.return_value = iter(
-            [Reference(new, None, None, None)])
-        follows_by = list(self._make_one(mock_graph, context))
-        assert mock_graph.get_back_references.call_args[0][0] == context
-        assert mock_graph.get_back_references.call_args[1]['base_reftype'] ==\
-            NewVersionToOldVersion
-        assert follows_by == [new]
-
-    def test_no_sucessors(self, mock_graph, context):
-        mock_graph.get_back_references.return_value = iter([])
-        follows_by = list(self._make_one(mock_graph, context))
-        assert follows_by == []
 
 
 @mark.usefixtures('setup')

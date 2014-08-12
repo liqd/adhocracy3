@@ -10,7 +10,8 @@ class IncludemeIntegrationTest(unittest.TestCase):
         config = testing.setUp()
         config.include('adhocracy.registry')
         config.include('adhocracy.events')
-        config.include('adhocracy.sheets.metadata')
+        config.include('adhocracy.sheets')
+        config.include('adhocracy_sample.sheets.comment')
         config.include('adhocracy_sample.resources.comment')
         self.config = config
         self.context = create_pool_with_graph()

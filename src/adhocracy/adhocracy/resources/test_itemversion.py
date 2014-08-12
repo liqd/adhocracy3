@@ -1,30 +1,11 @@
 import unittest
 
 from pyramid import testing
-from pyramid.traversal import resource_path_tuple
 
-from adhocracy.resources.pool import Pool
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import IItemVersionNewVersionAdded
 from adhocracy.interfaces import IItemVersion
-
-##########
-# Helper #
-##########
-
-
-def _add_resource_type_to_registry(metadata, registry):
-    from adhocracy.resources import ResourceFactory
-    iresource = metadata.iresource
-    registry.content.add(iresource.__identifier__,
-                         iresource.__identifier__,
-                         ResourceFactory(metadata))
-
-
-################################
-# Tests                        #
-################################
 
 
 class ItemVersionIntegrationTest(unittest.TestCase):
@@ -34,9 +15,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         config = testing.setUp()
         config.include('adhocracy.registry')
         config.include('adhocracy.events')
-        config.include('adhocracy.sheets.metadata')
-        config.include('adhocracy.sheets.versions')
-        config.include('adhocracy.sheets.name')
+        config.include('adhocracy.sheets')
         config.include('adhocracy.resources.itemversion')
         self.config = config
         self.context = create_pool_with_graph()
@@ -57,7 +36,8 @@ class ItemVersionIntegrationTest(unittest.TestCase):
             parent=parent,
             appstructs=appstructs,
             creator=creator,
-            root_versions=root_versions)
+            root_versions=root_versions,
+            registry=self.config.registry)
         return itemversion
 
     def test_registry_factory(self):
@@ -100,18 +80,20 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         # for more tests see adhocracy.subscriber
         from adhocracy.sheets.document import ISection
         from adhocracy.resources.itemversion import itemversion_metadata
+        from adhocracy.resources import add_resource_type_to_registry
+        from adhocracy.interfaces import NewVersionToOldVersion
         self.config.include('adhocracy.sheets.document')
         self.config.include('adhocracy.subscriber')
 
-        metadata = itemversion_metadata._replace(
-            extended_sheets=[ISection])
-        _add_resource_type_to_registry(metadata, self.config.registry)
+        metadata = itemversion_metadata._replace(extended_sheets=[ISection])
+        add_resource_type_to_registry(metadata, self.config)
 
         child_v0 = self._make_one()
         appstructs = {ISection.__identifier__: {'subsections': [child_v0]}}
         root_v0 = self._make_one(appstructs=appstructs)
         child_v1 = self._make_one(follows=[child_v0], root_versions=[root_v0])
-        root_v0_followed_by = list(self.graph.get_followed_by(root_v0))
+        root_v0_followed_by = list(self.graph.get_back_references(root_v0,
+                                                                  base_reftype=NewVersionToOldVersion))
         assert len(root_v0_followed_by) == 2
 
 

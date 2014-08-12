@@ -2,6 +2,7 @@
 import colander
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from substanced.interfaces import IUserLocator
+from pyramid.decorator import reify
 
 from adhocracy.interfaces import ISheet
 from adhocracy.sheets import add_sheet_to_registry
@@ -84,7 +85,7 @@ class AttributeStorageSheet(GenericResourceSheet):
 
     """Sheet class that stores data as context attributes."""
 
-    @property
+    @reify
     def _data(self):
         return self.context.__dict__
 
@@ -94,12 +95,6 @@ userbasic_metadata = sheet_metadata_defaults._replace(
     schema_class=UserBasicSchema,
     sheet_class=AttributeStorageSheet
 )
-
-
-# @catalog_factory('usercatalog')
-#  class UserFactory(object):
-#     email = Field()
-#     name = Field()
 
 
 class IPasswordAuthentication(ISheet):
@@ -127,7 +122,7 @@ class PasswordAuthenticationSheet(GenericResourceSheet):
     The `check_plaintext_password` method can be used to validate passwords.
     """
 
-    def _store_non_references(self, appstruct):
+    def _store_data(self, appstruct):
         password = appstruct.get('password', '')
         if not password:
             return
@@ -137,7 +132,7 @@ class PasswordAuthenticationSheet(GenericResourceSheet):
             self.context.pwd_manager = BCRYPTPasswordManager()
         self.context.password = self.context.pwd_manager.encode(password)
 
-    def _get_non_reference_appstruct(self):
+    def _get_data_appstruct(self):
         password = getattr(self.context, 'password', '')
         return {'password': password}
 
