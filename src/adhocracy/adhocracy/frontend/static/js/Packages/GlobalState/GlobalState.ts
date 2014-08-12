@@ -7,6 +7,14 @@ import AdhEventHandler = require("../EventHandler/EventHandler");
  * application.  In the UI, this state is represented in the moving
  * columns widget.  This state is also what should be encoded in the
  * URL.
+ *
+ * The state consists of the state of each column and the currently
+ * focused column. Note that the "column" metaphor is derived from the
+ * moving columns widget. This does not need to be represented by
+ * actual columns in every implementation.
+ *
+ * Only focus and the state of content2 column are currently
+ * implemented.
  */
 export class GlobalState {
     private eventHandler : AdhEventHandler.EventHandler;
