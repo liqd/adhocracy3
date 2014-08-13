@@ -38,17 +38,27 @@ export var register = () => {
             });
 
             describe("elemRefs", () => {
-                it("returns the items from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
-                    var elements = [1, 2, 3];
+                it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
                     var res = {
                         data: {
                             "adhocracy_sample.sheets.comment.ICommentable": {
-                                comments: elements
+                                comments: [
+                                    "/asd/version2",
+                                    "/asd/version3",
+                                    "/foo/version1",
+                                    "/bar/version1",
+                                    "/asd/version1",
+                                    "/foo/version2"
+                                ]
                             }
                         }
                     };
 
-                    expect(adapter.elemRefs(res)).toEqual(elements);
+                    var result = adapter.elemRefs(res);
+                    expect(result).toContain("/asd/version3");
+                    expect(result).toContain("/foo/version2");
+                    expect(result).toContain("/bar/version1");
+                    expect(result.length).toBe(3);
                 });
             });
 
