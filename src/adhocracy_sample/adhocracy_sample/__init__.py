@@ -8,6 +8,8 @@ def includeme(config):
     config.include('adhocracy')
     # include custom resource types
     config.include('adhocracy_sample.resources')
+    # include custom sheets
+    config.include('adhocracy_sample.sheets.comment')
 
 
 def main(global_config, **settings):

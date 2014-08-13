@@ -11,7 +11,8 @@ class IncludemeIntegrationTest(unittest.TestCase):
         config.include('adhocracy.registry')
         config.include('adhocracy.events')
         config.include('adhocracy.sheets')
-        config.include('adhocracy_sample.resources.section')
+        config.include('adhocracy_sample.sheets.comment')
+        config.include('adhocracy_sample.resources.comment')
         self.config = config
         self.context = create_pool_with_graph()
 
@@ -19,14 +20,14 @@ class IncludemeIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_includeme_registry_register_factories(self):
-        from adhocracy_sample.resources.section import ISectionVersion
-        from adhocracy_sample.resources.section import ISection
+        from adhocracy_sample.resources.comment import ICommentVersion
+        from adhocracy_sample.resources.comment import IComment
         content_types = self.config.registry.content.factory_types
-        assert ISection.__identifier__ in content_types
-        assert ISectionVersion.__identifier__ in content_types
+        assert IComment.__identifier__ in content_types
+        assert ICommentVersion.__identifier__ in content_types
 
     def test_includeme_registry_create_content(self):
-        from adhocracy_sample.resources.section import ISectionVersion
-        res = self.config.registry.content.create(ISectionVersion.__identifier__,
+        from adhocracy_sample.resources.comment import ICommentVersion
+        res = self.config.registry.content.create(ICommentVersion.__identifier__,
                                                   self.context)
-        assert ISectionVersion.providedBy(res)
+        assert ICommentVersion.providedBy(res)

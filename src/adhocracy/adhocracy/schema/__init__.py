@@ -43,7 +43,7 @@ def serialize_path(node, value):
     :param value: the resource to serialize
     :return: the path of that resource
     """
-    if value is colander.null:
+    if value in (colander.null, ''):
         return value
     try:
         raise_attribute_error_if_not_location_aware(value)
@@ -179,6 +179,39 @@ class ResourceObject(colander.SchemaType):
         return deserialize_path(node, value)
 
 
+class Reference(AbsolutePath):
+
+    """Reference to a resource that implements a specific sheet.
+
+    The constructor accepts these additional keyword arguments:
+
+        - ``reftype``: :class:` adhocracy.interfaces.SheetReference`.
+                       The `target_isheet` attribute of the `reftype` specifies
+                       the sheet that accepted resources must implement.
+                       Storing another kind of resource will trigger a
+                       validation error.
+        - ``backref``: marks this Reference as a back reference.
+                       :class:`adhocracy.sheet.ResourceSheet` can use this
+                       information to autogenerate the appstruct/cstruct.
+                       Default: False.
+    """
+
+    default = ''
+    missing = colander.drop
+    schema_type = ResourceObject
+    reftype = SheetReference
+    backref = False
+
+    def validator(self, node, value):
+        """Validate."""
+        reftype = self.reftype
+        isheet = reftype.getTaggedValue('target_isheet')
+        if not isheet.providedBy(value):
+            error = 'This Resource does not provide interface %s' % \
+                    (isheet.__identifier__)
+            raise colander.Invalid(node, msg=error, value=value)
+
+
 class AbstractIterableOfPaths(IdSet):
 
     """Abstract Colander type to store multiple object paths.
@@ -286,6 +319,7 @@ class AbstractReferenceIterable(AdhocracySchemaNode):
     default = []
     missing = colander.drop
     reftype = SheetReference
+    backref = False
 
     def validator(self, node, value):
         """Validate."""

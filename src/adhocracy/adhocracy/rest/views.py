@@ -449,10 +449,14 @@ class MetaApiView(RESTView):
                     empty_appstruct = valuetyp().create_empty_appstruct()
                     containertype = empty_appstruct.__class__.__name__
                     typ = to_dotted_name(AbsolutePath)
+
+                if hasattr(node, 'reftype'):
                     # set targetsheet
                     reftype = node.reftype
                     target_isheet = reftype.getTaggedValue('target_isheet')
-                    targetsheet = to_dotted_name(target_isheet)
+                    source_isheet = reftype.getTaggedValue('source_isheet')
+                    isheet = source_isheet if node.backref else target_isheet
+                    targetsheet = to_dotted_name(isheet)
 
                 typ_stripped = strip_optional_prefix(typ, 'colander.')
 

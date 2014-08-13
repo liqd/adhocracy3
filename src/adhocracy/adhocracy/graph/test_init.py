@@ -68,8 +68,8 @@ class TestGraphGetReftypes:
         graph = Graph(context=context)
         return Graph.get_reftypes(graph, **kwargs)
 
-    def test_no_objectmap(self, mock_objectmap):
-        assert list(self._call_fut(mock_objectmap)) == []
+    def test_no_objectmap(self):
+        assert list(self._call_fut(None)) == []
 
     def test_no_reftpyes(self, mock_objectmap):
         mock_objectmap.get_reftypes.return_value = []
@@ -311,6 +311,44 @@ class TestGraphGetBackReferences:
         assert len(list(result)) == 1
 
 
+class TestGraphSetReferencesForIsheet:
+
+    @fixture()
+    def registry(self, mock_resource_registry, sheet_meta):
+        registry = testing.DummyResource(content=mock_resource_registry)
+        registry.content.sheets_metadata.return_value = {
+            ISheet.__identifier__: sheet_meta
+        }
+        return registry
+
+    @fixture()
+    def sheet_meta(self, sheet_meta):
+        import colander
+        class SchemaF(colander.MappingSchema):
+            references = colander.SchemaNode(colander.Int, reftype=SheetReference)
+        return sheet_meta._replace(schema_class=SchemaF)
+
+    def _call_fut(self, graph, source, isheet, references, registry):
+        from adhocracy.graph import Graph
+        return Graph.set_references_for_isheet(graph, source, isheet,
+                                               references, registry)
+
+    def test_with_empty_references(self, context, mock_graph, registry):
+        references = {}
+        self._call_fut(mock_graph, context, ISheet, references, registry)
+        assert not mock_graph.set_references.called
+
+    def test_with_valid_references(self, context, mock_graph, registry):
+        references = {'references': [object()]}
+        self._call_fut(mock_graph, context, ISheet, references, registry)
+        mock_graph.set_references.assert_called_with(context, references['references'], SheetReference)
+
+    def test_with_invalid_references(self, context, mock_graph, registry):
+        references = {'invalid': [object()]}
+        with raises(AssertionError):
+            self._call_fut(mock_graph, context, ISheet, references, registry)
+
+
 class TestGraphGetBackReferencesForIsheet:
 
     def _call_fut(self, objectmap, target, isheet):
@@ -318,7 +356,7 @@ class TestGraphGetBackReferencesForIsheet:
         graph = Graph(objectmap.root)
         return Graph.get_back_references_for_isheet(graph, target, isheet)
 
-    def test_with_isheet_but_no_rerferences(self, context, objectmap):
+    def test_with_isheet_but_no_references(self, context, objectmap):
         target = create_dummy_resources(parent=context)
         class IASheet(ISheet):
             taggedValue('field:name', None)
@@ -408,50 +446,42 @@ class TestGraphGetReferencesForIsheet:
         assert result == {'name': [target]}
 
 
-class TestGetFollows:
+class TestGraphGetBackReferenceSources:
 
-    def _make_one(self, mock_graph, context):
+    def _call_fut(self, objectmap, resource, reftype):
         from adhocracy.graph import Graph
-        return Graph.get_follows(mock_graph, context)
+        graph = Graph(objectmap.root)
+        return graph.get_back_reference_sources(resource, reftype)
 
-    def test_predecessor(self, mock_graph, context):
-        from adhocracy.graph import Reference
-        old = testing.DummyResource()
-        mock_graph.get_references.return_value = iter(
-            [Reference(None, None, None, old)])
-        follows = list(self._make_one(mock_graph, context))
-        assert mock_graph.get_references.call_args[0][0] == context
-        assert mock_graph.get_references.call_args[1]['base_reftype']\
-            == NewVersionToOldVersion
-        assert follows == [old]
+    def test_no_reference(self, context, objectmap):
+        from adhocracy.interfaces import SheetToSheet
+        resource = create_dummy_resources(parent=context)
+        result = self._call_fut(objectmap, resource, SheetToSheet)
+        assert list(result) == []
 
-    def test_no_predecessor(self, mock_graph, context):
-        mock_graph.get_references.return_value = iter([])
-        follows = list(self._make_one(mock_graph, context))
-        assert follows == []
+    def test_no_sheetreferences(self, context, objectmap):
+        resource = create_dummy_resources(parent=context)
+        objectmap.connect(resource, resource, 'NoSheetReference')
+        result = self._call_fut(objectmap, resource, SheetToSheet)
+        assert list(result) == []
 
+    def test_sheetreferences(self, context, objectmap):
+        resource, resource2 = create_dummy_resources(parent=context, count=2)
+        objectmap.connect(resource, resource2, SheetToSheet)
 
-class TestGetFollowedBy:
+        result = self._call_fut(objectmap, resource2, SheetToSheet)
+        fst = result.__next__()
+        assert fst == resource
 
-    def _make_one(self, mock_graph, context):
-        from adhocracy.graph import Graph
-        return Graph.get_followed_by(mock_graph, context)
+    def test_sheetreferences_and_reftype(self, context, objectmap):
+        resource = create_dummy_resources(parent=context)
+        class ASheetReferenceType(SheetReference):
+            pass
+        objectmap.connect(resource, resource, SheetReference)
+        objectmap.connect(resource, resource, ASheetReferenceType)
 
-    def test_sucessors(self, mock_graph, context):
-        from adhocracy.graph import Reference
-        new = testing.DummyResource()
-        mock_graph.get_back_references.return_value = iter(
-            [Reference(new, None, None, None)])
-        follows_by = list(self._make_one(mock_graph, context))
-        assert mock_graph.get_back_references.call_args[0][0] == context
-        assert mock_graph.get_back_references.call_args[1]['base_reftype'] ==\
-            NewVersionToOldVersion
-        assert follows_by == [new]
-
-    def test_no_sucessors(self, mock_graph, context):
-        mock_graph.get_back_references.return_value = iter([])
-        follows_by = list(self._make_one(mock_graph, context))
-        assert follows_by == []
+        result = self._call_fut(objectmap, resource, ASheetReferenceType)
+        assert len(list(result)) == 1
 
 
 @mark.usefixtures('setup')

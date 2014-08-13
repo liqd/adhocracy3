@@ -447,6 +447,9 @@ mkFieldType = (field : MetaApi.ISheetField) : string => {
     case "adhocracy.schema.TimeZoneName":
         result = "string";
         break;
+    case "adhocracy.schema.Reference":
+        result = "string";
+        break;
     default:
         throw "mkFieldType: unknown value " + field.valuetype;
     }
