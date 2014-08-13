@@ -66,16 +66,45 @@ class BatchView(RESTView):
     def _process_nested_request(self, nested_request: dict,
                                 path_map: dict) -> BatchItemResponse:
         result_path = nested_request['result_path']
-        # TODO resolve preliminary names in body
+        nested_request['path'] = self._resolve_preliminary_paths(
+            nested_request['path'], path_map)
+        nested_request['body'] = self._resolve_preliminary_paths(
+            nested_request['body'], path_map)
         subrequest = self._make_subrequest(nested_request)
         item_response = self._invoke_subrequest_and_handle_errors(subrequest)
         self._extend_path_map(path_map, result_path, item_response)
         return item_response
 
+    def _resolve_preliminary_paths(self, json_value: object,
+                                   path_map) -> object:
+        """Create a copy of `json_value` with preliminary paths resolved.
+
+        This method accepts arbitrary JSON values and calls itself
+        recursively, as needed. In trivial cases (no change necessary),
+        the original `json_value` may be returned instead of a copy.
+        """
+        if not path_map and json_value:
+            return json_value
+        if isinstance(json_value, str):
+            result = path_map.get(json_value, json_value)
+        elif isinstance(json_value, dict):
+            result = {}
+            for key, value in json_value.items():
+                result[key] = self._resolve_preliminary_paths(value, path_map)
+        elif isinstance(json_value, list):
+            result = []
+            for value in json_value:
+                result.append(self._resolve_preliminary_paths(value, path_map))
+        else:
+            result = json_value
+        return result
+
     def _make_subrequest(self, nested_request: dict) -> Request:
         path = nested_request['path']
         method = nested_request['method']
         json_body = nested_request['body']
+        logger.warning('path: %s', path)  # TODO debug
+        logger.warning('json_body: %s', json_body)
         if json_body:
             body = dumps(json_body).encode()
         else:
