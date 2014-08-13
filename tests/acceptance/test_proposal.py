@@ -31,18 +31,12 @@ class Test_Proposal:
         browser.visit(register_url)
         listing = browser.browser.find_by_css('.moving-column-content .listing').first
         self.create(listing, "sometitle")
-        # FIXME Proposal creation is too slow!! (often takes more than 1sec)
-        # This will hopefully be fixed by the batch+high-level API.
-        # After fixing, the higher wait_time attribute should be removed.
         assert browser.browser.is_element_present_by_css(
-                '.moving-column-content .listing .listing-element',
-                wait_time=5)
+                '.moving-column-content .listing .listing-element')
 
         element = listing.find_by_css('.listing-element')
         element_a =element.find_by_css('a').first
-        # FIXME Remove max_steps param once proposal creation is faster, see
-        # above!!
-        assert self.wait(lambda: element_a.value, max_steps=20)
+        assert self.wait(lambda: element_a.value)
         assert element_a.value == "sometitle"
 
         element_a.click()
