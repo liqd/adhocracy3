@@ -38,18 +38,32 @@ var registerDirectiveSpec = (directive: ng.IDirective): void => {
 export var register = () => {
     describe("Listing", () => {
         describe("ListingPoolAdapter", () => {
+            var path = "some/path";
+            var elements = ["foo", "bar", "baz"];
+            var container;
+            var adapter;
+
+            beforeEach(() => {
+                container = <any>{
+                    path: path,
+                    data: {
+                        "adhocracy.sheets.pool.IPool": {
+                            elements: elements
+                        }
+                    }
+                };
+                adapter = new Listing.ListingPoolAdapter();
+            });
+
             describe("elemRefs", () => {
                 it("returns the elements from the adhocracy.sheets.pool.IPool sheet", () => {
-                    var elements = ["foo", "bar", "baz"];
-                    var container = {
-                        data: {
-                            "adhocracy.sheets.pool.IPool": {
-                                elements: elements
-                            }
-                        }
-                    };
-                    var adapter = new Listing.ListingPoolAdapter();
-                    expect(adapter.elemRefs(<any>container)).toEqual(elements);
+                    expect(adapter.elemRefs(container)).toEqual(elements);
+                });
+            });
+
+            describe("poolPath", () => {
+                it("returns the container path", () => {
+                    expect(adapter.poolPath(container)).toBe("some/path");
                 });
             });
         });
@@ -61,6 +75,7 @@ export var register = () => {
 
             describe("createDirective", () => {
                 var elements = ["foo", "bar", "baz"];
+                var poolPath = "pool/path";
                 var container = {
                     data: {
                         "adhocracy.sheets.pool.IPool": {
@@ -71,8 +86,9 @@ export var register = () => {
 
                 var adhWebSocketMock = <any>jasmine.createSpyObj("WebSocketMock", ["register", "unregister"]);
 
-                var adapter = <any>jasmine.createSpyObj("adapter", ["elemRefs"]);
+                var adapter = <any>jasmine.createSpyObj("adapter", ["elemRefs", "poolPath"]);
                 adapter.elemRefs.and.returnValue(elements);
+                adapter.poolPath.and.returnValue(poolPath);
 
                 var listing = new Listing.Listing(adapter);
                 var directive: ng.IDirective = listing.createDirective(config, adhWebSocketMock);
@@ -94,6 +110,7 @@ export var register = () => {
                         scope = {
                             // arbitrary values
                             container: 3,
+                            poolPath: 4,
                             elements: 2,
                             $watch: jasmine.createSpy("$watch")
                         };
@@ -121,6 +138,11 @@ export var register = () => {
                             expect(scope.container).not.toBeDefined();
                         });
 
+                        it("clears scope.poolPath", () => {
+                            scope.clear();
+                            expect(scope.poolPath).not.toBeDefined();
+                        });
+
                         it("clears scope.elements", () => {
                             scope.clear();
                             expect(scope.elements).toEqual([]);
@@ -140,6 +162,11 @@ export var register = () => {
                             expect(scope.container).toBe(container);
                         });
 
+                        it("updates scope.poolPath using adapter from container", () => {
+                            expect(adapter.poolPath).toHaveBeenCalledWith(container);
+                            expect(scope.poolPath).toBe(poolPath);
+                        });
+
                         it("updates scope.elements using adapter from container", () => {
                             expect(adapter.elemRefs).toHaveBeenCalledWith(container);
                             expect(scope.elements).toBe(elements);
@@ -148,31 +175,36 @@ export var register = () => {
 
                     describe("$watch(path)", () => {
                         var callback;
+                        var updatePromise;
 
                         beforeEach(() => {
-                            spyOn(scope, "update");
+                            updatePromise = <any>jasmine.createSpyObj("updatePromise", ["then"]);
+                            spyOn(scope, "update").and.returnValue(updatePromise);
                             spyOn(scope, "clear");
                             callback = scope.$watch.calls.mostRecent().args[1];
                         });
 
                         it("unregisters old websocket when path changes", () => {
+                            scope.poolPath = "pool/path";
                             scope.wshandle = "wshandle";
-                            callback("new/path", "old/path");
-                            expect(adhWebSocketMock.unregister).toHaveBeenCalledWith("old/path", "wshandle");
+                            callback("");
+                            expect(adhWebSocketMock.unregister).toHaveBeenCalledWith("pool/path", "wshandle");
                         });
 
                         it("registers new websocket when path changes", () => {
-                            callback("new/path", "old/path");
-                            expect(adhWebSocketMock.register).toHaveBeenCalledWith("new/path", scope.update);
+                            scope.poolPath = "pool/path";
+                            callback("new/path");
+                            updatePromise.then.calls.mostRecent().args[0]();
+                            expect(adhWebSocketMock.register).toHaveBeenCalledWith("pool/path", scope.update);
                         });
 
                         it("calls scope.update on new path", () => {
-                            callback("new/path", "old/path");
+                            callback("new/path");
                             expect(scope.update).toHaveBeenCalled();
                         });
 
                         it("calls scope.clear on path clear", () => {
-                            callback("", "old/path");
+                            callback("");
                             expect(scope.clear).toHaveBeenCalled();
                         });
                     });

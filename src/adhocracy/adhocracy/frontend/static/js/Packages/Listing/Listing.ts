@@ -16,12 +16,20 @@ var pkgLocation = "/Listing";
 // Listings
 
 export interface IListingContainerAdapter {
+    // A list of elements that should be displayed
     elemRefs(any) : string[];
+
+    // The pool a new element should be posted to.
+    poolPath(any) : string;
 }
 
 export class ListingPoolAdapter implements IListingContainerAdapter {
     public elemRefs(container : Resources.Content<SIPool.HasAdhocracySheetsPoolIPool>) {
         return container.data["adhocracy.sheets.pool.IPool"].elements;
+    }
+
+    public poolPath(container : Resources.Content<SIPool.HasAdhocracySheetsPoolIPool>) {
+        return container.path;
     }
 }
 
@@ -29,6 +37,7 @@ export interface ListingScope<Container> extends ng.IScope {
     path : string;
     actionColumn : boolean;
     container : Container;
+    poolPath : string;
     elements : string[];
     update : () => ng.IPromise<void>;
     wshandle : string;
@@ -80,35 +89,38 @@ export class Listing<Container extends Resources.Content<any>> {
                 };
 
                 $scope.update = () : ng.IPromise<void> => {
-                    return adhHttp.get($scope.path).then((pool) => {
-                        $scope.container = pool;
+                    return adhHttp.get($scope.path).then((container) => {
+                        $scope.container = container;
+                        $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
                     });
                 };
 
                 $scope.clear = () : void => {
                     $scope.container = undefined;
+                    $scope.poolPath = undefined;
                     $scope.elements = [];
                 };
 
-                $scope.$watch("path", (newPath : string, oldPath : string) => {
-                    if (oldPath && typeof $scope.wshandle !== "undefined") {
-                        // FIXME: When used with the commentable adapter the register fails
-                        // and the unregister is redundant
-                        adhWebSocket.unregister(oldPath, $scope.wshandle);
+                $scope.$watch("path", (newPath : string) => {
+                    if (typeof $scope.poolPath !== "undefined" && typeof $scope.wshandle !== "undefined") {
+                        adhWebSocket.unregister($scope.poolPath, $scope.wshandle);
                     }
 
                     if (newPath) {
-                        // (The call order is important: first subscribe to
-                        // the updates, then get an initial copy.)
-                        try {
-                            $scope.wshandle = adhWebSocket.register(newPath, $scope.update);
-                        } catch (e) {
-                            console.log(e);
-                            console.log("Will continue on resource " + newPath + " without server bind.");
-                        }
-
-                        $scope.update();
+                        // NOTE: Ideally we would like to first subscribe to
+                        // websocket messages and only then get the resource in
+                        // order to not miss any messages in between. But in
+                        // order to subscribe we already need the resource. So
+                        // that is not possible.
+                        $scope.update().then(() => {
+                            try {
+                                $scope.wshandle = adhWebSocket.register($scope.poolPath, $scope.update);
+                            } catch (e) {
+                                console.log(e);
+                                console.log("Will continue on resource " + $scope.poolPath + " without server bind.");
+                            }
+                        });
                     } else {
                         $scope.clear();
                     }

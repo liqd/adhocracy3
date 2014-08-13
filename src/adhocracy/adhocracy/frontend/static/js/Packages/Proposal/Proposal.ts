@@ -163,6 +163,7 @@ interface IScopeProposalVersion {
     onNewProposal : (any) => void;
     onCancel : () => void;
     onSave : () => void;
+    poolPath : string;
 }
 
 export class ProposalVersionNew {
@@ -176,6 +177,7 @@ export class ProposalVersionNew {
                 onNewProposal: "=",
                 onCancel: "=",
                 onSave: "="
+                poolPath: "@"
             },
             controller: ["$scope", ($scope : IScopeProposalVersion) => {
                 $scope.proposalVersion = new RIProposalVersion();
@@ -195,9 +197,11 @@ export class ProposalVersionNew {
                 };
 
                 $scope.commit = () => {
-                    adhProposal.postProposalWithParagraphs($scope.proposalVersion, $scope.paragraphVersions).then((resp) => {
-                        adhHttp.get(resp.path).then((respGet) => {
-                            $scope.onNewProposal(respGet);
+                    adhProposal.postProposalWithParagraphs($scope.poolPath, $scope.proposalVersion, $scope.paragraphVersions)
+                        .then((resp) => {
+                            adhHttp.get(resp.path).then((respGet) => {
+                                $scope.onNewProposal(respGet);
+                            });
                         });
                     });
 
@@ -400,6 +404,7 @@ export class Service {
     }
 
     public postProposalWithParagraphs(
+        poolPath : string,
         proposalVersion : RIProposalVersion,
         paragraphVersions : RIParagraphVersion[]
     ) {
@@ -419,7 +424,7 @@ export class Service {
             paragraphs: {}
         };
 
-        return _self.postProposal("/adhocracy", name, scope)
+        return _self.postProposal(poolPath, name, scope)
             .then(() => _self.postSection(
                 scope.proposal.path,
                 "section",

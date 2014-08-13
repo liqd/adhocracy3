@@ -17,11 +17,15 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
 }
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
-    // FIXME: WebSocket updates do not work with this because there are no WebSocket
-    // messages for new comments (only for new children). We do also not get any
-    // messages for new children because the commentable is a version.
     public elemRefs(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
         return container.data["adhocracy_sample.sheets.comment.ICommentable"].comments;
+    }
+
+    public poolPath(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
+        // NOTE: If poolPath is defined like this, answers to comments are placed
+        // inside other comment. This should be changed if we prefer to flatten
+        // the hierarchy.
+        return Util.parentPath(container.path);
     }
 }
 
@@ -36,6 +40,7 @@ export class CommentCreate {
             templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentCreate.html",
             scope: {
                 refersTo: "@",  // path of a commentable version
+                poolPath: "@",  // pool where new comments should be posted to
                 onNew: "="  // callback to call after successful creation
             },
             controller: ["$scope", "adhHttp", ($scope, adhHttp) => {
@@ -66,11 +71,7 @@ export class CommentCreate {
                         }
                     };
 
-                    // NOTE: If poolPath is defined like this, answers to comments are placed
-                    // inside other comment. This should be changed if we prefer to flatten
-                    // the hierarchy.
-                    var poolPath = Util.parentPath($scope.refersTo);
-                    return adhHttp.postToPool(poolPath, comment)
+                    return adhHttp.postToPool($scope.poolPath, comment)
                         .then(adhHttp.resolve.bind(adhHttp), displayErrors)
                         .then((comment) => adhHttp.postNewVersion(comment.first_version_path, res))
                         .then(onNew, displayErrors);

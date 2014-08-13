@@ -51,6 +51,16 @@ export var register = () => {
                     expect(adapter.elemRefs(res)).toEqual(elements);
                 });
             });
+
+            describe("poolPath", () => {
+                it("returns the parent path of the container path", () => {
+                    var res = {
+                        path: "some/path/parent"
+                    };
+
+                    expect(adapter.poolPath(res)).toEqual("some/path");
+                });
+            });
         });
 
         describe("CommentCreate", () => {

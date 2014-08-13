@@ -10,6 +10,7 @@
                     data-on-new-proposal="update"
                     data-on-save="hideCreateForm"
                     data-on-cancel="hideCreateForm"
+                    data-pool-path="{{poolPath}}"
                     data-ng-switch-when="create-form-id">
                 </adh-proposal-version-new>
                 <adh-proposal-detail
@@ -24,6 +25,7 @@
             <div data-ng-switch="transclusionId">
                 <adh-comment-create
                     data-refers-to="{{path}}"
+                    data-pool-path="{{poolPath}}"
                     data-on-new="update"
                     data-ng-switch-when="create-form-id">
                 </adh-comment-create>
