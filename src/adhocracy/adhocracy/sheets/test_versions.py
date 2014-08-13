@@ -56,10 +56,8 @@ class TestVersionableSheet:
         from zope.interface.verify import verifyObject
         from adhocracy.interfaces import IResourceSheet
         from adhocracy.sheets.versions import IVersionable
-        from adhocracy.sheets.versions import VersionableSheet
         from adhocracy.sheets.versions import VersionableSchema
         inst = meta.sheet_class(meta, context)
-        assert isinstance(inst, VersionableSheet)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IVersionable
@@ -75,7 +73,7 @@ class TestVersionableSheet:
         successor = testing.DummyResource()
         inst = meta.sheet_class(meta, context)
         inst._graph = mock_graph
-        mock_graph.get_followed_by.return_value = iter([successor])
+        mock_graph.get_back_references_for_isheet.return_value = {'follows': iter([successor])}
         data = inst.get()
         assert list(data['followed_by']) == [successor]
 
@@ -83,7 +81,7 @@ class TestVersionableSheet:
         precessor = testing.DummyResource()
         inst = meta.sheet_class(meta, context)
         inst._graph = mock_graph
-        mock_graph.get_follows.return_value = iter([precessor])
+        mock_graph.get_references_for_isheet.return_value = {'follows': iter([precessor])}
         data = inst.get()
         assert list(data['follows']) == [precessor]
 

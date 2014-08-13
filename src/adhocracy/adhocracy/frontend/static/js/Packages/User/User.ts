@@ -20,7 +20,6 @@ interface IScopeLogin {
 
     resetCredentials : () => void;
     logIn : () => ng.IPromise<void>;
-    logOut : () => void;
 }
 
 
@@ -56,9 +55,9 @@ var bindServerErrors = (
 
 
 export class User {
-    loggedIn : boolean = false;
-    token : string;
-    data : IUserBasic;
+    public loggedIn : boolean = false;
+    public data : IUserBasic;
+    private token : string;
 
     constructor(
         private adhHttp : AdhHttp.Service<any>,
@@ -196,8 +195,6 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
         scope: {},
         controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeLogin) : void => {
-            $scope.user = adhUser;
-
             $scope.errors = [];
 
             $scope.credentials = {
@@ -221,10 +218,6 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
                 });
                 $scope.resetCredentials();
                 return promise;
-            };
-
-            $scope.logOut = () => {
-                adhUser.logOut();
             };
         }]
     };
@@ -255,6 +248,22 @@ export var registerDirective = (adhConfig : AdhConfig.Type, $location : ng.ILoca
                             (errors) => bindServerErrors($scope, errors)
                         );
                     }, (errors) => bindServerErrors($scope, errors));
+            };
+        }]
+    };
+};
+
+export var indicatorDirective = (adhConfig : AdhConfig.Type) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Indicator.html",
+        scope: {},
+        controller: ["adhUser", "$scope", (adhUser : User, $scope) => {
+            $scope.user = adhUser;
+            $scope.pkgUrl = adhConfig.pkg_path + pkgLocation;
+
+            $scope.logOut = () => {
+                adhUser.logOut();
             };
         }]
     };

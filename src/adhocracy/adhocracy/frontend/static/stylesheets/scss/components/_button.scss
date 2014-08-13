@@ -80,16 +80,19 @@ input[type="button"] {
     height: 2em + 2 * $border-width;  // fix height in firefox
     padding: 0 0.5em;
 
-    @include button-color($color-highlight-standard, $color-highlight-reverse);
+    @include button-color($color-highlight-normal, $color-highlight-reverse);
 
     &:active,
     &:focus {
         outline: 0;
     }
 
-    &.has-focus, &:focus,
+    &.has-focus, &:focus {
+        @include button-color($color-highlight-extrovert, $color-highlight-reverse);
+    }
+
     &.is-hover, &:hover {
-        @include button-color(lighten($color-highlight-standard, 10%), $color-highlight-reverse);
+        @include button-color($color-highlight-introvert, $color-highlight-reverse);
     }
 
     &:disabled,

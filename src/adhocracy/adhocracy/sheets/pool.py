@@ -14,13 +14,13 @@ class PoolSheet(GenericResourceSheet):
     """Pool resource sheet."""
 
     def _get_reference_appstruct(self):
-        struct = {'elements': []}
-        reftype = self._key_reftype_map['elements']
+        appstruct = {'elements': []}
+        reftype = self._reference_nodes['elements'].reftype
         target_isheet = reftype.getTaggedValue('target_isheet')
         for child in self.context.values():
             if target_isheet.providedBy(child):
-                struct['elements'].append(child)
-        return struct
+                appstruct['elements'].append(child)
+        return appstruct
 
 
 class IPool(ISheet):

@@ -10,7 +10,8 @@ var _s : any = require("underscore.string");
 
 declare var process : any;
 
-import u = require("./mkResources/Util");
+import Util = require("./mkResources/Util");
+import MetaApi = require("./Packages/MetaApi/MetaApi");
 
 
 /***********************************************************************
@@ -21,12 +22,22 @@ interface IConfig {
     nickNames : boolean;
     sheetGetters : boolean;
     sheetSetters : boolean;
+    httpOptions : {
+        host: string;
+        port: number;
+        path: string;
+    }
 }
 
 var config : IConfig = {
     nickNames : false,
     sheetGetters : false,
-    sheetSetters : false
+    sheetSetters : false,
+    httpOptions : {
+        host: "127.0.0.1",
+        port: 6541,
+        path: "/meta_api/"
+    }
 };
 
 
@@ -34,49 +45,13 @@ var config : IConfig = {
  * types
  */
 
-interface IMetaApi {
-    sheets : { [index: string]: ISheet };
-    resources : { [index: string]: IResource };
-}
-
-interface ISheet {
-    fields : ISheetField[];
-
-    // generated after import
-    nick ?: string;
-}
-
-interface ISheetField {
-    name : string;
-    valuetype : string;
-    containertype ?: string;
-    readable : boolean;
-    editable : boolean;
-    creatable : boolean;
-    create_mandatory : boolean;
-    targetsheet : string;
-}
-
-interface IResource {
-    sheets : string[];
-    item_type : string;
-    element_types : string[];
-
-    // generated after import
-    nick ?: string;
-}
-
-interface IModuleDict {
-    [index: string]: string;
-}
-
 var compileAll : (IMetaApiResponse, string) => void;
 
 var renderSheet : (string, ISheet, IModuleDict, IMetaApi) => void;
-var mkFieldSignatures : (fields : ISheetField[], tab : string, separator : string) => string;
-var mkFieldAssignments : (fields : ISheetField[], tab : string) => string;
-var enabledFields : (fields : ISheetField[], enableFlags ?: string) => ISheetField[];
-var mkSheetSetter : (modulePath : string, fields : ISheetField[], _selfType : string) => string;
+var mkFieldSignatures : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
+var mkFieldAssignments : (fields : MetaApi.ISheetField[], tab : string) => string;
+var enabledFields : (fields : MetaApi.ISheetField[], enableFlags ?: string) => MetaApi.ISheetField[];
+var mkSheetSetter : (modulePath : string, fields : MetaApi.ISheetField[], _selfType : string) => string;
 var mkSheetGetter : (modulePath : string, _selfType : string) => string;
 
 var renderResource : (string, IResource, IModuleDict, IMetaApi) => void;
@@ -84,11 +59,11 @@ var renderResource : (string, IResource, IModuleDict, IMetaApi) => void;
 var mkSheetName : (string) => string;
 var mkHasSheetName : (string) => string;
 var mkResourceClassName : (string) => string;
-var mkModuleName : (string, metaApi : IMetaApi) => string;
-var mkImportStatement : (modulePath : string, relativeRoot : string, metaApi : IMetaApi) => string;
-var mkNick : (modulePath : string, metaApi : IMetaApi) => string;
+var mkModuleName : (string, metaApi : MetaApi.IMetaApi) => string;
+var mkImportStatement : (modulePath : string, relativeRoot : string, metaApi : MetaApi.IMetaApi) => string;
+var mkNick : (modulePath : string, metaApi : MetaApi.IMetaApi) => string;
 var mkFieldType : (ISheetField) => string;
-var mkFlags : (field : ISheetField, comment ?: boolean) => string;
+var mkFlags : (field : MetaApi.ISheetField, comment ?: boolean) => string;
 
 var mkdirForFile : (string) => void;
 var pyModuleToTsModule : (string) => string;
@@ -100,15 +75,9 @@ var canonicalizePath : (string) => string;
  * fetch api
  */
 
-var options = {
-    host: "127.0.0.1",
-    port: 6541,
-    path: "/meta_api/"
-};
-
 var callback = (response) => {
     var body : string = "";
-    var bodyJs : IMetaApi;
+    var bodyJs : MetaApi.IMetaApi;
 
     var cbData = (chunk : string) : void => {
         body += chunk;
@@ -146,19 +115,19 @@ if (process.argv.length > 2) {
 } else {
     // Use JSON data from a running server if called without
     // further argument, e.g. `node mkResources.js`
-    http.request(options, callback).end();
+    http.request(config.httpOptions, callback).end();
 }
 
 /***********************************************************************
  * renderers
  */
 
-compileAll = (metaApi : IMetaApi, outPath : string) : void => {
-    var modules : IModuleDict = {};
+compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
+    var modules : MetaApi.IModuleDict = {};
 
     if (config.nickNames) {
-        u.injectNickDict(metaApi.sheets);
-        u.injectNickDict(metaApi.resources);
+        Util.injectNickDict(metaApi.sheets);
+        Util.injectNickDict(metaApi.resources);
     } else {
         var name : string;
         for (name in metaApi.sheets) {
@@ -224,7 +193,7 @@ compileAll = (metaApi : IMetaApi, outPath : string) : void => {
     })();
 };
 
-renderSheet = (modulePath : string, sheet : ISheet, modules : IModuleDict, metaApi : IMetaApi) : void => {
+renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) : void => {
     var sheetI : string = "";
     var hasSheetI : string = "";
 
@@ -242,21 +211,21 @@ renderSheet = (modulePath : string, sheet : ISheet, modules : IModuleDict, metaA
     modules[modulePath] = sheetI + hasSheetI;
 };
 
-mkFieldSignatures = (fields : ISheetField[], tab : string, separator : string) : string =>
-    u.mkThingList(
+mkFieldSignatures = (fields : MetaApi.ISheetField[], tab : string, separator : string) : string =>
+    Util.mkThingList(
         fields,
         (field) => field.name + " : " + mkFieldType(field),
         tab, separator
     );
 
-mkFieldAssignments = (fields : ISheetField[], tab : string) : string =>
-    u.mkThingList(
+mkFieldAssignments = (fields : MetaApi.ISheetField[], tab : string) : string =>
+    Util.mkThingList(
         fields,
         (field) => field.name + ": " + field.name,
         tab, ",\n"
     );
 
-enabledFields = (fields : ISheetField[], enableFlags ?: string) : ISheetField[] => {
+enabledFields = (fields : MetaApi.ISheetField[], enableFlags ?: string) : MetaApi.ISheetField[] => {
     if (typeof enableFlags !== "string") {
         // if `flags` is not set, enable all fields
         return fields;
@@ -275,7 +244,7 @@ enabledFields = (fields : ISheetField[], enableFlags ?: string) : ISheetField[] 
     }
 };
 
-mkSheetSetter = (nick : string, fields : ISheetField[], _selfType : string) : string => {
+mkSheetSetter = (nick : string, fields : MetaApi.ISheetField[], _selfType : string) : string => {
     if (config.sheetSetters) {
         var ef = enabledFields(fields, "ECM");
 
@@ -298,12 +267,12 @@ mkSheetSetter = (nick : string, fields : ISheetField[], _selfType : string) : st
                         disabledFields.push(field);
                     }
                 });
-                os.push(u.mkThingList(disabledFields, (field) => field.name + ": null", "        ", ",\n"));
+                os.push(Util.mkThingList(disabledFields, (field) => field.name + ": null", "        ", ",\n"));
             })();
             os.push("    };");
             os.push("    return _self;");
             os.push("};\n");
-            return u.intercalate(os, "\n");
+            return Util.intercalate(os, "\n");
         }
     } else {
         return "";
@@ -318,13 +287,13 @@ mkSheetGetter = (nick : string, _selfType : string) : string => {
         os.push(") : " + mkSheetName(nick) + " => {");
         os.push("    return _self.data[\"" + nick + "\"];");
         os.push("};\n");
-        return u.intercalate(os, "\n");
+        return Util.intercalate(os, "\n");
     } else {
         return "";
     }
 };
 
-renderResource = (modulePath : string, resource : IResource, modules : IModuleDict, metaApi : IMetaApi) : void => {
+renderResource = (modulePath : string, resource : MetaApi.IResource, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) : void => {
     var resourceC : string = "";
 
     // imports
@@ -354,7 +323,7 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
             os.push("}");
         }
 
-        return u.intercalate(os.map((s) => tab + s), "\n");
+        return Util.intercalate(os.map((s) => tab + s), "\n");
     };
 
     var mkDataDeclaration = (tab : string) : string => {
@@ -369,7 +338,7 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
         }
         os.push("};");
 
-        return u.intercalate(os.map((s) => tab + s), "\n");
+        return Util.intercalate(os.map((s) => tab + s), "\n");
     };
 
     var mkGettersSetters = (tab : string) : string => {
@@ -392,7 +361,7 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
                         os.push(") {");
                         os.push("    var _self = this;\n");
                         os.push("    " + mkModuleName(name, metaApi) + "." + "_set" + mkSheetName(mkNick(name, metaApi)) + "(this,");
-                        os.push(u.mkThingList(ef, (field) => field.name, "        ", ",\n    "));
+                        os.push(Util.mkThingList(ef, (field) => field.name, "        ", ",\n    "));
                         os.push("    );");
                         os.push("    return _self;");
                         os.push("}");
@@ -400,7 +369,7 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
                 }
             }
         }
-        return u.intercalate(os.map((s) => tab + s), "\n") + "";
+        return Util.intercalate(os.map((s) => tab + s), "\n") + "";
     };
 
     resourceC += "class " + mkResourceClassName(mkNick(modulePath, metaApi)) + " extends Base.Resource {\n";
@@ -414,33 +383,33 @@ renderResource = (modulePath : string, resource : IResource, modules : IModuleDi
 };
 
 mkSheetName = (name : string) : string =>
-    u.capitalizeHead(u.dotAndUnderscoreToCaml(name));
+    Util.capitalizeHead(Util.dotAndUnderscoreToCaml(name));
 
 mkHasSheetName = (name : string) : string =>
-    "HasSheet" + u.capitalizeHead(u.dotAndUnderscoreToCaml(name));
+    "HasSheet" + Util.capitalizeHead(Util.dotAndUnderscoreToCaml(name));
 
 mkResourceClassName = (name : string) : string =>
-    u.capitalizeHead(u.dotAndUnderscoreToCaml(name));
+    Util.capitalizeHead(Util.dotAndUnderscoreToCaml(name));
 
-mkModuleName = (modulePath : string, metaApi : IMetaApi) : string => {
+mkModuleName = (modulePath : string, metaApi : MetaApi.IMetaApi) : string => {
     if (metaApi.sheets.hasOwnProperty(modulePath)) {
-        return "S" + u.capitalizeHead(u.dotAndUnderscoreToCaml(metaApi.sheets[modulePath].nick));
+        return "S" + Util.capitalizeHead(Util.dotAndUnderscoreToCaml(metaApi.sheets[modulePath].nick));
     } else if (metaApi.resources.hasOwnProperty(modulePath)) {
-        return "R" + u.capitalizeHead(u.dotAndUnderscoreToCaml(metaApi.resources[modulePath].nick));
+        return "R" + Util.capitalizeHead(Util.dotAndUnderscoreToCaml(metaApi.resources[modulePath].nick));
     } else {
         throw "mkNick: " + modulePath;
     }
 
 };
 
-mkImportStatement = (modulePath : string, relativeRoot : string, metaApi : IMetaApi) : string => {
+mkImportStatement = (modulePath : string, relativeRoot : string, metaApi : MetaApi.IMetaApi) : string => {
     var tsModName = mkModuleName(modulePath, metaApi);
     var tsModPath = pyModuleToTsModule(modulePath);
     var tsModPathCanonicalized = canonicalizePath(relativeRoot + tsModPath);
     return "import " + tsModName + " = require(\"" + tsModPathCanonicalized + "\");\n";
 };
 
-mkNick = (modulePath : string, metaApi : IMetaApi) : string => {
+mkNick = (modulePath : string, metaApi : MetaApi.IMetaApi) : string => {
     if (metaApi.sheets.hasOwnProperty(modulePath)) {
         return metaApi.sheets[modulePath].nick;
     } else if (metaApi.resources.hasOwnProperty(modulePath)) {
@@ -450,7 +419,7 @@ mkNick = (modulePath : string, metaApi : IMetaApi) : string => {
     }
 };
 
-mkFieldType = (field : ISheetField) : string => {
+mkFieldType = (field : MetaApi.ISheetField) : string => {
     var result : string;
 
     switch (field.valuetype) {
@@ -478,6 +447,9 @@ mkFieldType = (field : ISheetField) : string => {
     case "adhocracy.schema.TimeZoneName":
         result = "string";
         break;
+    case "adhocracy.schema.Reference":
+        result = "string";
+        break;
     default:
         throw "mkFieldType: unknown value " + field.valuetype;
     }
@@ -497,7 +469,7 @@ mkFieldType = (field : ISheetField) : string => {
     return result;
 };
 
-mkFlags = (field : ISheetField, comment ?: boolean) : string => {
+mkFlags = (field : MetaApi.ISheetField, comment ?: boolean) : string => {
     var flags : string = "";
 
     if (field.hasOwnProperty("readable") && field.readable) {
@@ -528,11 +500,11 @@ mkFlags = (field : ISheetField, comment ?: boolean) : string => {
 mkdirForFile = (filepath : string) : void => {
     var dirpath : string[] = _s.words(filepath, "/");
     dirpath.pop();
-    _fs.mkdirSync(u.intercalate(dirpath, "/"), 0755, true);
+    _fs.mkdirSync(Util.intercalate(dirpath, "/"), 0755, true);
 };
 
 pyModuleToTsModule = (filepath : string) : string =>
-    "./" + u.intercalate(_s.words(filepath, "\."), "/");
+    "./" + Util.intercalate(_s.words(filepath, "\."), "/");
 
 /**
  * The `relativeRoot` always points from file containing contents to
@@ -542,7 +514,7 @@ mkRelativeRoot = (source : string) : string => {
     var arr = _s.words(source, "/");
     arr.pop();  // don't count leading `.`.
     arr.pop();  // just count directories, not the file name.
-    return u.intercalate(arr.map(() => ".."), "/") + "/";
+    return Util.intercalate(arr.map(() => ".."), "/") + "/";
 };
 
 canonicalizePath = (filepath : string) : string => {

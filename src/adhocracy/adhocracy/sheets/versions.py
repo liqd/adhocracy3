@@ -4,7 +4,6 @@ import colander
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import NewVersionToOldVersion
-from adhocracy.sheets import GenericResourceSheet
 from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets.pool import PoolSheet
@@ -25,15 +24,6 @@ class VersionableFollowsReference(NewVersionToOldVersion):
     target_isheet = IVersionable
 
 
-class VersionableFollowedByReference(SheetToSheet):
-
-    """BackReference for the VersionableFollowsReference, not stored."""
-
-    source_isheet = IVersionable
-    source_isheet_field = 'followed_by'
-    target_isheet = IVersionable
-
-
 class VersionableSchema(colander.MappingSchema):
 
     """ Versionable sheet data structure.
@@ -43,30 +33,13 @@ class VersionableSchema(colander.MappingSchema):
     """
 
     follows = ListOfUniqueReferences(reftype=VersionableFollowsReference)
-    followed_by = ListOfUniqueReferences(
-        readonly=True,
-        reftype=VersionableFollowedByReference)
-
-
-class VersionableSheet(GenericResourceSheet):
-
-    """Sheet to set/get the versionable data structure."""
-
-    isheet = IVersionable
-    schema_class = VersionableSchema
-
-    def get(self):
-        """Return appstruct."""
-        struct = super().get()
-        if self._graph:
-            struct['followed_by'] = self._graph.get_followed_by(self.context)
-            struct['follows'] = self._graph.get_follows(self.context)
-        return struct
+    followed_by = ListOfUniqueReferences(readonly=True,
+                                         backref=True,
+                                         reftype=VersionableFollowsReference)
 
 
 versionable_metadata = sheet_metadata_defaults._replace(
     isheet=IVersionable,
-    sheet_class=VersionableSheet,
     schema_class=VersionableSchema,
 
 )

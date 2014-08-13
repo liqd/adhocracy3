@@ -1,11 +1,12 @@
 """Utilities for working with the version/reference graph (DAG)."""
 
-from collections import Sequence
-from collections import Iterable
 from collections import namedtuple
+from collections.abc import Iterable
 from collections.abc import Iterator
+from collections.abc import Sequence
 
 from persistent import Persistent
+from pyramid.registry import Registry
 from substanced.util import find_objectmap
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import Multireference
@@ -14,7 +15,6 @@ from substanced.content import content
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import SheetReference
 from adhocracy.interfaces import SheetToSheet
-from adhocracy.interfaces import NewVersionToOldVersion
 
 
 class SheetReftype(namedtuple('ISheetReftype', 'isheet field reftype')):
@@ -91,7 +91,7 @@ class Graph(Persistent):
         multireference.connect(targets)
 
     def get_references(self, source, base_isheet=ISheet,
-                       base_reftype=SheetToSheet) -> Iterator:
+                       base_reftype=SheetReference) -> Iterator:
         """Get generator of :class:`Reference` with this `source`."""
         for isheet, field, reftype in self.get_reftypes(base_isheet,
                                                         base_reftype):
@@ -99,12 +99,46 @@ class Graph(Persistent):
                 yield Reference(source, isheet, field, target)
 
     def get_back_references(self, target, base_isheet=ISheet,
-                            base_reftype=SheetToSheet) -> Iterator:
+                            base_reftype=SheetReference) -> Iterator:
         """Get generator of :class:`Reference` with this `target`."""
         for isheet, field, reftype in self.get_reftypes(base_isheet,
                                                         base_reftype):
             for source in ObjectMap.sources(self._objectmap, target, reftype):
                 yield Reference(source, isheet, field, target)
+
+    def get_back_reference_sources(self, resource, reftype) -> Iterable:
+        """Get generator of the sources of backreferences.
+
+        :param resource: the resource whose backreferences we want
+        :param reftype: the type of backreferences we want
+        :return: a generator of reference sources (sheets referring to the
+                 resource)
+        """
+        comment_refs = self.get_back_references(resource, base_reftype=reftype)
+        for reference in comment_refs:
+            yield reference.source
+
+    def set_references_for_isheet(self, source, isheet: ISheet,
+                                  references: dict, registry: Registry):
+        """ Set references of this source for one isheet.
+
+        :param references: dictionary with the following content:
+                           key - isheet field name
+                           value - reference targets
+        :param registry: Pyramid Registry with
+                         :class:`adhocracy.registry.ResourceContentRegistry`
+                         attribute named `content`.
+        """
+        sheet_meta = registry.content.sheets_metadata()[isheet.__identifier__]
+        schema = sheet_meta.schema_class()
+        for field_name, targets in references.items():
+            assert field_name in schema
+            node = schema[field_name]
+            if not hasattr(node, 'reftype'):
+                continue
+            reftype = schema[field_name].reftype
+            targets = targets if isinstance(targets, Iterable) else [targets]
+            self.set_references(source, targets, reftype)
 
     def get_references_for_isheet(self, source, isheet: ISheet) -> dict:
         """ Get references of this source for one isheet only.
@@ -174,8 +208,8 @@ class Graph(Persistent):
         if candidate is descendant:
             return True
         checked_candidates.add(candidate.__oid__)
-
-        children = [ref.target for ref in self.get_references(candidate)]
+        references = self.get_references(candidate, base_reftype=SheetToSheet)
+        children = [ref.target for ref in references]
         unchecked_children = [x for x in children
                               if x.__oid__ not in checked_candidates]
         for child in unchecked_children:
@@ -184,21 +218,6 @@ class Graph(Persistent):
                 return True
 
         return False
-
-    def get_follows(self, resource) -> Iterable:
-        """Get Generator of the precessors of a versionable resource."""
-        precessors = self.get_references(resource,
-                                         base_reftype=NewVersionToOldVersion)
-        for reference in precessors:
-            yield reference.target
-
-    def get_followed_by(self, resource) -> Iterable:
-        """Get Generator of the successors of a versionable resource."""
-        successors = self.get_back_references(
-            resource,
-            base_reftype=NewVersionToOldVersion)
-        for reference in successors:
-            yield reference.source
 
 
 def includeme(config):  # pragma: no cover

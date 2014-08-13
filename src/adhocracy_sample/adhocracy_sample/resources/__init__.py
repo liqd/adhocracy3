@@ -6,3 +6,4 @@ def includeme(config):  # pragma: no cover
     config.include('.paragraph')
     config.include('.section')
     config.include('.proposal')
+    config.include('.comment')

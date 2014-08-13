@@ -31,11 +31,10 @@
 @mixin check-contrast(
     $color1,
     $color2,
-    $threshold: 4.5,
-    $msg: "contrast too low!"
+    $threshold: 4.5
 ) {
     $contrast: contrast($color1, $color2);
     @if $contrast < $threshold {
-        @warn $msg, $color1, $color2, $contrast;
+        @warn "contrast #{$contrast} between #{$color1} and #{$color2} too low!"
     }
 }

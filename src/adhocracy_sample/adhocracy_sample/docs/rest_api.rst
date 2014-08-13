@@ -664,7 +664,6 @@ pvrs2 (which also contains s2vrs0_path) ::
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     1
 
-    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000003')
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     1
 
@@ -709,6 +708,94 @@ FIXME: should the server tell in general where to post specific
 content types? (like 'like', 'discussion',..)?  in other words,
 should the client be able to ask (e.g. with an OPTIONS request)
 where to post a 'like'?
+
+
+Comments
+--------
+
+To give another example of a versionable content type, we can write comments
+about proposals::
+
+    >>> comment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
+    ...            'data': {}}
+    >>> resp = testapp.post_json(pdag_path, comment)
+    >>> comment_path = resp.json["path"]
+    >>> comment_path
+    '/adhocracy/Proposals/kommunismus/comment_000...'
+    >>> first_commvers_path = resp.json['first_version_path']
+    >>> first_commvers_path
+    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000'
+
+The first comment version is empty (as with all versionables), so lets add
+another version to say something meaningful. A comment contains *content*
+(arbitrary text) and *refers_to* a specific version of a proposal. ::
+
+    >>> commvers = {'content_type': 'adhocracy_sample.resources.comment.ICommentVersion',
+    ...             'data': {
+    ...                 'adhocracy_sample.sheets.comment.IComment': {
+    ...                     'refers_to': pvrs4_path,
+    ...                     'content': 'Gefällt mir, toller Vorschlag!'},
+    ...                 'adhocracy.sheets.versions.IVersionable': {
+    ...                     'follows': [first_commvers_path]}},
+    ...             'root_versions': [first_commvers_path]}
+    >>> resp = testapp.post_json(comment_path, commvers)
+    >>> snd_commvers_path = resp.json['path']
+    >>> snd_commvers_path
+    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001'
+
+Comments can be about any versionable that allows posting comments. Hence
+it's also possible to write a comment about another comment::
+
+    >>> metacomment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
+    ...                 'data': {}}
+    >>> resp = testapp.post_json(pdag_path, metacomment)
+    >>> metacomment_path = resp.json["path"]
+    >>> metacomment_path
+    '/adhocracy/Proposals/kommunismus/comment_000...'
+    >>> comment_path != metacomment_path
+    True
+    >>> first_metacommvers_path = resp.json['first_version_path']
+    >>> first_metacommvers_path
+    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000'
+
+As usual, we have to add another version to actually say something::
+
+    >>> metacommvers = {'content_type': 'adhocracy_sample.resources.comment.ICommentVersion',
+    ...                 'data': {
+    ...                     'adhocracy_sample.sheets.comment.IComment': {
+    ...                         'refers_to': snd_commvers_path,
+    ...                         'content': 'Find ich nicht!'},
+    ...                     'adhocracy.sheets.versions.IVersionable': {
+    ...                         'follows': [first_metacommvers_path]}},
+    ...                 'root_versions': [first_metacommvers_path]}
+    >>> resp = testapp.post_json(metacomment_path, metacommvers)
+    >>> snd_metacommvers_path = resp.json['path']
+    >>> snd_metacommvers_path
+    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001'
+
+
+Lets view all the comments referring to the proposal.
+First find the path of the newest version of the proposal::
+
+    >>> resp = testapp.get(pdag_path + '/LAST')
+    >>> newest_prop_vers = resp.json['data']['adhocracy.sheets.tags.ITag']['elements'][-1]
+
+Now we can retrieve that version and consult the 'comments' fields of its
+'adhocracy_sample.sheets.comment.ICommentable' sheet::
+
+    >>> resp = testapp.get(newest_prop_vers)
+    >>> comlist = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']['comments']
+    >>> comlist == [snd_commvers_path]
+    True
+
+Any commentable resource has this sheet. Since comments can refer to other
+comments, they have it as well. Lets find out which other comments refer to
+this comment version::
+
+    >>> resp = testapp.get(snd_commvers_path)
+    >>> comlist = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']['comments']
+    >>> comlist == [snd_metacommvers_path]
+    True
 
 
 Batch requests

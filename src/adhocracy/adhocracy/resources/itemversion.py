@@ -5,9 +5,11 @@ from adhocracy.events import ItemVersionNewVersionAdded
 from adhocracy.events import SheetReferencedItemHasNewVersion
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import IItem
+from adhocracy.interfaces import SheetToSheet
 from adhocracy.resources import add_resource_type_to_registry
 from adhocracy.resources.resource import resource_metadata_defaults
 from adhocracy.sheets import tags
+from adhocracy.sheets.versions import IVersionable
 import adhocracy.sheets.versions
 from adhocracy.utils import get_sheet
 from adhocracy.utils import find_graph
@@ -33,8 +35,9 @@ def notify_new_itemversion_created(context, registry, options):
     root_versions = options.get('root_versions', [])
     creator = options.get('creator', None)
     old_versions = []
-    graph = find_graph(context)
-    for old_version in graph.get_follows(context):
+    versionable = get_sheet(context, IVersionable)
+    follows = versionable.get()['follows']
+    for old_version in follows:
         old_versions.append(old_version)
         _notify_itemversion_has_new_version(old_version, new_version, registry,
                                             creator)
@@ -61,7 +64,8 @@ def _notify_referencing_resources_about_new_version(old_version,
                                                     registry,
                                                     creator):
     graph = find_graph(old_version)
-    references = graph.get_back_references(old_version)
+    references = graph.get_back_references(old_version,
+                                           base_reftype=SheetToSheet)
     for source, isheet, isheet_field, target in references:
         event = SheetReferencedItemHasNewVersion(source,
                                                  isheet,

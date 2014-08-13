@@ -16,10 +16,11 @@
                 src="/frontend_static/lib/jquery/dist/jquery.js"></script>  <!-- only needed for $(document in this html file) -->
 
         <script type="text/javascript">
-            require(['Adhocracy', 'text!/frontend_config.json'], function(Adh, config_string) {
+            require(['Adhocracy', 'text!/frontend_config.json', 'text!/meta_api'], function(Adh, config_string, meta_api_string) {
                 var config = JSON.parse(config_string);
+                var meta_api = JSON.parse(meta_api_string);
                 $(document).ready(function() {
-                    Adh.init(config);
+                    Adh.init(config, meta_api);
                 });
             });
         </script>
