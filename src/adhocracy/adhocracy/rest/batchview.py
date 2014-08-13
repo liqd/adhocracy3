@@ -1,7 +1,9 @@
 """Rest API view for batch API."""
 from json import dumps
+from json import loads
 from logging import getLogger
 
+from pyramid.httpexceptions import HTTPException
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
@@ -9,6 +11,7 @@ from pyramid.view import view_defaults
 from adhocracy.resources.root import IRootPool
 from adhocracy.rest.schemas import POSTBatchRequestSchema
 from adhocracy.rest.views import RESTView
+from adhocracy.utils import exception_to_str
 
 logger = getLogger(__name__)
 
@@ -56,6 +59,7 @@ class BatchView(RESTView):
             item_response = self._process_nested_request(item, path_map)
             response_list.append(item_response)
             if not item_response.was_successful():
+                self.request.response.status_code = item_response.code
                 break
         return [response.to_dict() for response in response_list]
 
@@ -64,24 +68,60 @@ class BatchView(RESTView):
         result_path = nested_request['result_path']
         # TODO resolve preliminary names in body
         subrequest = self._make_subrequest(nested_request)
-        subresponse = self.request.invoke_subrequest(subrequest)
-        logger.debug(result_path)  # TODO To make check_code happy
-        # TODO add result_path mapping, if defined and successful
-        # (also @@first version path):_extend_path_map(result_path, ...)
-        return BatchItemResponse(subresponse.status_code, subresponse.json)
+        item_response = self._invoke_subrequest_and_handle_errors(subrequest)
+        self._extend_path_map(path_map, result_path, item_response)
+        return item_response
 
-    def _make_subrequest(self, nested_request: dict):
+    def _make_subrequest(self, nested_request: dict) -> Request:
         path = nested_request['path']
         method = nested_request['method']
         json_body = nested_request['body']
         if json_body:
-            body = dumps(json_body).encode(self.request.charset)
+            body = dumps(json_body).encode()
         else:
             body = None
         return Request(environ=self.request.environ,
-                       charset=self.request.charset,
                        content_type='application/json',
                        method=method, path_info=path, body=body)
+
+    def _invoke_subrequest_and_handle_errors(
+            self, subrequest: Request) -> BatchItemResponse:
+        try:
+            subresponse = self.request.invoke_subrequest(subrequest)
+            code = subresponse.status_code
+            body = subresponse.json
+        except HTTPException as err:
+            code = err.status_code
+            body = self._try_to_decode_json(err.body)
+        except Exception as err:
+            code = 500
+            body = {'internal error': exception_to_str(err)}
+            logger.exception('Unexpected exception processing nested request')
+        return BatchItemResponse(code, body)
+
+    def _extend_path_map(self, path_map, result_path, item_response):
+        if not result_path and item_response.was_successful():
+            return
+        path = item_response.body.get('path', '')
+        first_version_path = item_response.body.get('first_version_path', '')
+        if path:
+            path_map['@' + result_path] = path
+        if first_version_path:
+            path_map['@@' + result_path] = first_version_path
+
+    def _try_to_decode_json(self, body: bytes) -> dict:
+        """Try to decode `body` as a JSON object.
+
+        If that fails, we just wrap the textual content of the body in an
+        `{"error": ...}` dict. If body is empty, we just return an empty dict.
+        """
+        if not body:
+            return {}
+        text = body.decode(errors='replace')
+        try:
+            return loads(text)
+        except ValueError:
+            return {'error': text}
 
 
 def includeme(config):  # pragma: no cover
