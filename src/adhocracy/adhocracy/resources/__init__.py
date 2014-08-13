@@ -25,8 +25,8 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
     :class:`adhocracy.registry.ResourceRegistry` to store the resource metadata
     """
     assert hasattr(config.registry, 'content')
-    resources_metadata = config.registry.content.resources_meta
-    resources_metadata[metadata.iresource.__identifier__] = metadata
+    resources_meta = config.registry.content.resources_meta
+    resources_meta[metadata.iresource.__identifier__] = metadata
     iresource = metadata.iresource
     name = metadata.content_name or iresource.__identifier__
     meta = {'content_name': name}

@@ -533,7 +533,7 @@ class TestMetaApiView:
         assert IResource.__identifier__ in resp['resources']
         assert resp['resources'][IResource.__identifier__] == {'sheets': []}
 
-    def test_get_resources_with_sheets_metadata(self, request, context, resource_meta):
+    def test_get_resources_with_sheets_meta(self, request, context, resource_meta):
         metas = {IResource.__identifier__: resource_meta._replace(
             basic_sheets=[ISheet],
             extended_sheets=[ISheetB])}

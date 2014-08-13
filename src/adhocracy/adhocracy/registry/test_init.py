@@ -124,7 +124,7 @@ class TestResourceContentRegistry:
         from adhocracy.registry import ResourceContentRegistry
         return ResourceContentRegistry(registry)
 
-    def test_resources_metadata_without_content_type(self):
+    def test_create(self):
         registry = object()
         inst = self._make_one(registry)
         assert inst.registry == registry

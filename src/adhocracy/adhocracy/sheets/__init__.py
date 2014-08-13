@@ -184,8 +184,8 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
     """
     assert metadata.isheet.isOrExtends(ISheet)
     if hasattr(registry, 'content'):
-        sheets_metadata = registry.content.sheets_meta
-        sheets_metadata[metadata.isheet.__identifier__] = metadata
+        sheets_meta = registry.content.sheets_meta
+        sheets_meta[metadata.isheet.__identifier__] = metadata
     if metadata.create_mandatory:
         assert metadata.creatable and metadata.create_mandatory
     schema = metadata.schema_class()
