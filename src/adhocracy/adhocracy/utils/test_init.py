@@ -203,7 +203,7 @@ def test_get_all_sheets_adapter_exists(config):
     assert adapter in get_all_sheets(context)
 
 
-class _GetUserUnitTest(unittest.TestCase):
+class GetUserUnitTest(unittest.TestCase):
 
     def _make_one(self, request):
         from adhocracy.utils import get_user

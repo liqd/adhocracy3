@@ -13,9 +13,15 @@ They can have the following states:
 -   has-focus
 -   is-invalid
 -   is-disabled
+-   is-dirty
+
+Is-invalid should generally only change the presentation of the input widget if
+it is also dirty.
 
 ```html_example
-<input type="text" placeholder="you must not leave this empty" required=required />
+<input type="text" placeholder="required and dirty" required="required" class="is-dirty" />
+<input type="text" placeholder="invalid and dirty" class="is-invalid is-dirty" />
+<input type="text" placeholder="invalid and prestine" class="is-invalid" />
 <input type="text" disabled="disabled" placeholder="disabled" />
 ```
 */
@@ -89,15 +95,16 @@ textarea {
         outline: 1px solid $color-highlight-normal;
     }
 
-    &.ng-invalid,
-    &:invalid {
-        border-color: lightcoral;
-        outline: 1px solid lightcoral;
+    &.ng-dirty, &.is-dirty {
+        &.ng-invalid, &:invalid, &.is-invalid {
+            border-color: lightcoral;
+            outline: 1px solid lightcoral;
 
-        &.has-focus,
-        &:focus {
-            border-color: $color-highlight-invalid;
-            outline: 1px solid $color-highlight-invalid;
+            &.has-focus,
+            &:focus {
+                border-color: $color-highlight-invalid;
+                outline: 1px solid $color-highlight-invalid;
+            }
         }
     }
 

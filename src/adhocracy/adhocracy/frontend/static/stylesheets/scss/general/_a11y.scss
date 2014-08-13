@@ -35,6 +35,6 @@
 ) {
     $contrast: contrast($color1, $color2);
     @if $contrast < $threshold {
-        @warn "contrast #{$contrast} between #{$color1} and #{$color1} too low!"
+        @warn "contrast #{$contrast} between #{$color1} and #{$color2} too low!"
     }
 }
