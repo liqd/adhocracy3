@@ -763,7 +763,7 @@ omitted or left empty. ::
     >>> encoded_request_with_name = {
     ...     'method': 'POST',
     ...     'path': '/adhocracy/Proposal/kommunismus',
-    ...     'body': { 'content_type': 'adhocracy.resources.IParagraph' },
+    ...     'body': { 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph' },
     ...     'result_path': 'par1_item'
     ... }
 
@@ -798,13 +798,13 @@ Examples
 
 Let's add some more paragraphs to the second section above ::
 
-    >>> prop_item = '/adhocracy/Proposals/kommunismus/'
     >>> section_item = s2dag_path
     >>> batch = [ {
     ...             'method': 'POST',
-    ...             'path': prop_item,
+    ...             'path': pdag_path,
     ...             'body': {
-    ...                 'content_type': 'adhocracy.resources.IParagraph'
+    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+    ...                 'data': {}
     ...             },
     ...             'result_path': 'par1_item'
     ...           },
@@ -812,7 +812,7 @@ Let's add some more paragraphs to the second section above ::
     ...             'method': 'POST',
     ...             'path': '@par1_item',
     ...             'body': {
-    ...                 'content_type': 'adhocracy.resources.IParagraphVersion',
+    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
     ...                 'data': {
     ...                     'adhocracy.sheets.versions.IVersionable': {
     ...                         'follows': ['@@par1_item']
@@ -835,21 +835,21 @@ Let's add some more paragraphs to the second section above ::
         {
             'code': 200,
             'body': {
-                'content_type': 'adhocracy.resources.IParagraph',
+                'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
                 'path': '...'
             }
         },
         {
             'code': 200,
             'body': {
-                'content_type': 'adhocracy.resources.IParagraphVersion',
+                'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
                 'path': '...'
             }
         },
         {
             'code': 200,
             'body': {
-                'content_type': 'adhocracy.resources.IParagraphVersion',
+                'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
                 'path': '...'
             }
         }
@@ -870,9 +870,9 @@ the paragraph will not be present in the database ::
 
     >>> invalid_batch = [ {
     ...             'method': 'POST',
-    ...             'path': prop_item,
+    ...             'path': pdag_path,
     ...             'body': {
-    ...                 'content_type': 'adhocracy.resources.IParagraph'
+    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph'
     ...             },
     ...             'result_path': 'par2_item'
     ...           },
@@ -902,7 +902,7 @@ the paragraph will not be present in the database ::
     ..     {
     ..         'code': 200,
     ..         'body': {
-    ..             'content_type': 'adhocracy.resources.IParagraph',
+    ..             'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
     ..             'path': '...'
     ..         }
     ..     },
