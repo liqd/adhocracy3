@@ -40,7 +40,9 @@ class Test_Proposal:
 
         element = listing.find_by_css('.listing-element')
         element_a =element.find_by_css('a').first
-        assert self.wait(lambda: element_a.value)
+        # FIXME Remove max_steps param once proposal creation is faster, see
+        # above!!
+        assert self.wait(lambda: element_a.value, max_steps=20)
         assert element_a.value == "sometitle"
 
         element_a.click()
