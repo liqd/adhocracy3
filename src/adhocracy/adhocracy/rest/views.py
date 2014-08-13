@@ -369,7 +369,7 @@ class MetaApiView(RESTView):
         """Build a description of the resources registered in the system.
 
         Args:
-          resources_metadata (list): resource metadata
+          resources_meta (list): resource metadata
 
         Returns:
           resource_map (dict): a dict (suitable for JSON serialization) that
@@ -486,11 +486,11 @@ class MetaApiView(RESTView):
     def get(self) -> dict:
         """Get the API specification of this installation as JSON."""
         # Collect info about all resources
-        resource_types = self.request.registry.content.resources_metadata()
+        resource_types = self.request.registry.content.resources_meta
         resource_map = self._describe_resources(resource_types)
 
         # Collect info about all sheets referenced by any of the resources
-        sheet_metadata = self.request.registry.content.sheets_metadata()
+        sheet_metadata = self.request.registry.content.sheets_meta
         sheet_map = self._describe_sheets(sheet_metadata)
 
         struct = {'resources': resource_map,

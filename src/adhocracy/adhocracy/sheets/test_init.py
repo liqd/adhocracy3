@@ -222,11 +222,17 @@ class TestAddSheetToRegistry:
         from adhocracy.sheets import add_sheet_to_registry
         return add_sheet_to_registry(sheet_meta, registry)
 
-    def test_register_valid_sheet_sheet_meta(self, sheet_meta, registry, context):
+    def test_register_valid_sheet_sheet_adapter(self, sheet_meta, registry, context):
         from adhocracy.utils import get_sheet
         self._call_fut(sheet_meta, registry)
         sheet = get_sheet(context, sheet_meta.isheet)
         assert sheet_meta.isheet == sheet.meta.isheet
+
+    def test_register_valid_sheet_sheet_meta(self, sheet_meta, registry, mock_resource_registry, context):
+        registry.content = mock_resource_registry
+        self._call_fut(sheet_meta, registry)
+        assert registry.content.sheets_meta ==\
+            {sheet_meta.isheet.__identifier__: sheet_meta}
 
     def test_register_valid_sheet_sheet_meta_replace_exiting(self, sheet_meta, registry, context):
         from adhocracy.utils import get_sheet

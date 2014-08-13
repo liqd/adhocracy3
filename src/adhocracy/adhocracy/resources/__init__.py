@@ -21,13 +21,15 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
     """Add the `resource` type specified in metadata to the content registry.
 
     As generic factory the :class:`ResourceFactory` is used.
-
+    `config.registry` should have an `content` attribute with
+    :class:`adhocracy.registry.ResourceRegistry` to store the resource metadata
     """
     assert hasattr(config.registry, 'content')
+    resources_metadata = config.registry.content.resources_meta
+    resources_metadata[metadata.iresource.__identifier__] = metadata
     iresource = metadata.iresource
     name = metadata.content_name or iresource.__identifier__
-    meta = {'content_name': name,
-            'resource_metadata': metadata}
+    meta = {'content_name': name}
     add_content_type(config, iresource.__identifier__,
                      ResourceFactory(metadata),
                      factory_type=iresource.__identifier__, **meta)

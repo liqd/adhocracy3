@@ -25,7 +25,7 @@ def add_resource_meta(request, *metas):
     for meta in metas:
         iresource = meta.iresource
         resource_metas[iresource.__identifier__] = meta
-    request.registry.content.resources_metadata.return_value = resource_metas
+    request.registry.content.resources_meta = resource_metas
 
 
 def register_and_add_sheet(context, registry, mock_sheet):
@@ -118,59 +118,18 @@ class TestResourceContentRegistryResourceSheets:
         assert sheets == {}
 
 
-class TestResourceContentRegistryResourcesMetadata:
+class TestResourceContentRegistry:
 
-    def _call_fut(self, mock_registry):
+    def _make_one(self, registry):
         from adhocracy.registry import ResourceContentRegistry
-        return ResourceContentRegistry.resources_metadata(mock_registry)
+        return ResourceContentRegistry(registry)
 
-    def test_resources_metadata_without_content_type(self, mock_resource_registry):
-        mock_resource_registry.meta = {}
-        assert self._call_fut(mock_resource_registry) == {}
-
-    def test_resources_metadata_with_unresolvable_content_type(self, mock_resource_registry):
-        mock_resource_registry.meta = {"unresolvable": {}}
-        assert self._call_fut(mock_resource_registry) == {}
-
-    def test_resources_metadata_with_non_iresource_content_types(self, mock_resource_registry):
-        from zope.interface import Interface
-        mock_resource_registry.meta = {Interface.__identifier__: {}}
-        assert self._call_fut(mock_resource_registry) == {}
-
-    def test_resources_metadata_with_iresource_content_types(self, mock_resource_registry, resource_meta):
-        mock_resource_registry.meta = {IResource.__identifier__:
-                                           {'resource_metadata': resource_meta}}
-        result = self._call_fut(mock_resource_registry)
-        assert result[IResource.__identifier__] == resource_meta
-
-
-class TestResourceContentRegistrySheetsMetadata:
-
-    def _call_fut(self, mock_registry):
-        from adhocracy.registry import ResourceContentRegistry
-        return ResourceContentRegistry.sheets_metadata(mock_registry)
-
-    def test_sheets_metadata_without_resources(self, mock_resource_registry):
-        sheets = self._call_fut(mock_resource_registry)
-        assert sheets == {}
-
-    def test_sheets_metadata_with_resources_and_basic_isheets(self, context,
-            registry, mock_resource_registry, mock_sheet, resource_meta):
-        meta = resource_meta._replace(basic_sheets=[mock_sheet.meta.isheet])
-        mock_resource_registry.resources_metadata.return_value =\
-            {IResource.__identifier__: meta}
-        register_and_add_sheet(context, registry, mock_sheet)
-        sheets = self._call_fut(mock_resource_registry)
-        assert sheets[ISheet.__identifier__] == mock_sheet.meta
-
-    def test_sheets_metadata_with_resources_and_extended_isheets(self, context,
-            registry, mock_resource_registry, mock_sheet, resource_meta):
-        meta = resource_meta._replace(extended_sheets=[mock_sheet.meta.isheet])
-        mock_resource_registry.resources_metadata.return_value =\
-            {IResource.__identifier__: meta}
-        register_and_add_sheet(context, registry, mock_sheet)
-        sheets = self._call_fut(mock_resource_registry)
-        assert sheets[ISheet.__identifier__] == mock_sheet.meta
+    def test_resources_metadata_without_content_type(self):
+        registry = object()
+        inst = self._make_one(registry)
+        assert inst.registry == registry
+        assert inst.sheets_meta == {}
+        assert inst.resources_meta == {}
 
 
 class TestResourceContentRegistryResourceAddables:

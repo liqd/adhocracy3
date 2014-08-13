@@ -527,7 +527,7 @@ class TestMetaApiView:
 
     def test_get_resources(self, request, context, resource_meta):
         metas = {IResource.__identifier__: resource_meta}
-        request.registry.content.resources_metadata.return_value = metas
+        request.registry.content.resources_meta = metas
         inst = self.make_one(request, context)
         resp = inst.get()
         assert IResource.__identifier__ in resp['resources']
@@ -537,7 +537,7 @@ class TestMetaApiView:
         metas = {IResource.__identifier__: resource_meta._replace(
             basic_sheets=[ISheet],
             extended_sheets=[ISheetB])}
-        request.registry.content.resources_metadata.return_value = metas
+        request.registry.content.resources_meta = metas
         inst = self.make_one(request, context)
 
         resp = inst.get()['resources']
@@ -548,7 +548,7 @@ class TestMetaApiView:
     def test_get_resources_with_element_types_metadata(self, request, context, resource_meta):
         metas = {IResource.__identifier__: resource_meta._replace(
             element_types=[IResource, IResourceX])}
-        request.registry.content.resources_metadata.return_value = metas
+        request.registry.content.resources_meta = metas
         inst = self.make_one(request, context)
 
         resp = inst.get()['resources']
@@ -559,7 +559,7 @@ class TestMetaApiView:
     def test_get_resources_with_item_type_metadata(self, request, context, resource_meta):
         metas = {IResource.__identifier__: resource_meta._replace(
             item_type=IResourceX)}
-        request.registry.content.resources_metadata.return_value = metas
+        request.registry.content.resources_meta = metas
         inst = self.make_one(request, context)
 
         resp = inst.get()['resources']
@@ -569,7 +569,7 @@ class TestMetaApiView:
 
     def test_get_sheets(self, request, context, sheet_meta):
         metas = {ISheet.__identifier__: sheet_meta}
-        request.registry.content.sheets_metadata.return_value = metas
+        request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)
         response = inst.get()
         assert ISheet.__identifier__ in response['sheets']
@@ -580,7 +580,7 @@ class TestMetaApiView:
         class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(colander.Int())
         metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_metadata.return_value = metas
+        request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
@@ -598,7 +598,7 @@ class TestMetaApiView:
         class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(colander.Int(), readonly=True)
         metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_metadata.return_value = metas
+        request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
@@ -612,7 +612,7 @@ class TestMetaApiView:
         class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(colander.Int())
         metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_metadata.return_value = metas
+        request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
@@ -626,7 +626,7 @@ class TestMetaApiView:
         class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(Name())
         metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_metadata.return_value = metas
+        request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
@@ -641,7 +641,7 @@ class TestMetaApiView:
         class SchemaF(colander.MappingSchema):
             test = ListOfUniqueReferences(reftype=SheetToSheet)
         metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_metadata.return_value = metas
+        request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)
 
         sheet_metadata = inst.get()['sheets'][ISheet.__identifier__]
@@ -658,7 +658,7 @@ class TestMetaApiView:
         class SchemaF(colander.MappingSchema):
             test = ListOfUniqueReferences(reftype=SheetToSheet, backref=True)
         metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_metadata.return_value = metas
+        request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)
 
         sheet_metadata = inst.get()['sheets'][ISheet.__identifier__]

@@ -54,8 +54,7 @@ class TestAddResourceTypeToRegistry:
         type_id = IResource.__identifier__
         self.make_one(resource_meta, config)
         assert config.registry.content.meta[type_id]['content_name'] == type_id
-        assert config.registry.content.meta[type_id]['resource_metadata']\
-            == resource_meta
+        assert config.registry.content.resources_meta[type_id] == resource_meta
 
     def test_add_resource_type_metadata_with_content_name(self, config, resource_meta):
         config.include('adhocracy.registry')
