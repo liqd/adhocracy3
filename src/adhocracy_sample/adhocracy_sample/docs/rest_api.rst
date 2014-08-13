@@ -891,7 +891,9 @@ Let's add some more paragraphs to the second section above ::
     ...             'path': pdag_path,
     ...             'body': {
     ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
-    ...                 'data': {}
+    ...                 'data': {'adhocracy.sheets.name.IName':
+    ...                              {'name': 'par1'}
+    ...                         }
     ...             },
     ...             'result_path': 'par1_item'
     ...           },
