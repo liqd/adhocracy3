@@ -171,6 +171,7 @@ export var register = () => {
                 var put;
                 var post1;
                 var post2;
+                var get2;
                 var response;
                 var _httpTrans;
 
@@ -179,7 +180,8 @@ export var register = () => {
                         "get response",
                         "put response",
                         "post1 response",
-                        "post2 response"
+                        "post2 response",
+                        "get2 response"
                     ]));
 
                     adhHttp.withTransaction((httpTrans) => {
@@ -195,6 +197,7 @@ export var register = () => {
                         post2 = httpTrans.post("/post/path/2", {
                             content_type: "content_type"
                         });
+                        get2 = httpTrans.get(post1.path);
                         return httpTrans.commit();
                     }).then((_response) => {
                         response = _response;
@@ -215,6 +218,7 @@ export var register = () => {
                     expect(response[put.path]).toBe("put response");
                     expect(response[post1.path]).toBe("post1 response");
                     expect(response[post2.path]).toBe("post2 response");
+                    expect(response[get2.path]).toBe("get2 response");
                 });
 
                 it("throws if you try to use the transaction after commit", () => {
