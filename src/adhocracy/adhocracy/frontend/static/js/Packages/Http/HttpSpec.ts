@@ -52,7 +52,7 @@ var mkAdhMetaApiMock = () => {
         }
     };
 
-    spyOn(mock, 'field').and.callThrough();
+    spyOn(mock, "field").and.callThrough();
 
     return mock;
 };
@@ -167,12 +167,58 @@ export var register = () => {
                 });
             });
             describe("withTransaction", () => {
-                it("performs AdhHttp api calls that are triggered inside the transaction callback", () => {
-                    adhHttp.withTransaction((httpTrans, done) => {
-                        httpTrans.get("/some/path");
+                var get;
+                var put;
+                var post1;
+                var post2;
+                var response;
+                var _httpTrans;
+
+                beforeEach((done) => {
+                    $httpMock.post.and.returnValue(q.when([
+                        "get response",
+                        "put response",
+                        "post1 response",
+                        "post2 response"
+                    ]));
+
+                    adhHttp.withTransaction((httpTrans) => {
+                        _httpTrans = httpTrans;
+
+                        get = httpTrans.get("/get/path");
+                        put = httpTrans.put("/put/path", {
+                            content_type: "content_type"
+                        });
+                        post1 = httpTrans.post("/post/path/1", {
+                            content_type: "content_type"
+                        });
+                        post2 = httpTrans.post("/post/path/2", {
+                            content_type: "content_type"
+                        });
+                        return httpTrans.commit();
+                    }).then((_response) => {
+                        response = _response;
                         done();
                     });
-                    expect($httpMock.get).toHaveBeenCalled();
+                });
+
+                it("assigns different preliminary paths to different post requests", () => {
+                    expect(post1.path).not.toEqual(post2.path);
+                });
+
+                it("assigns preliminary first_version_paths on post requests", () => {
+                    expect(post1.first_version_path).toBeDefined();
+                });
+
+                it("maps preliminary paths to responses", () => {
+                    expect(response[get.path]).toBe("get response");
+                    expect(response[put.path]).toBe("put response");
+                    expect(response[post1.path]).toBe("post1 response");
+                    expect(response[post2.path]).toBe("post2 response");
+                });
+
+                it("throws if you try to use the transaction after commit", () => {
+                    expect(() => _httpTrans.get("/some/path")).toThrow();
                 });
             });
         });
