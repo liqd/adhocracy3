@@ -253,6 +253,7 @@ export var registerDirective = (adhConfig : AdhConfig.Type, $location : ng.ILoca
     };
 };
 
+
 export var indicatorDirective = (adhConfig : AdhConfig.Type) => {
     return {
         restrict: "E",
