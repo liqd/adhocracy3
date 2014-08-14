@@ -213,12 +213,12 @@ export var register = () => {
                     expect(post1.first_version_path).toBeDefined();
                 });
 
-                it("maps preliminary paths to responses", () => {
-                    expect(response[get.path]).toBe("get response");
-                    expect(response[put.path]).toBe("put response");
-                    expect(response[post1.path]).toBe("post1 response");
-                    expect(response[post2.path]).toBe("post2 response");
-                    expect(response[get2.path]).toBe("get2 response");
+                it("maps preliminary data to responses via `index`", () => {
+                    expect(response[get.index]).toBe("get response");
+                    expect(response[put.index]).toBe("put response");
+                    expect(response[post1.index]).toBe("post1 response");
+                    expect(response[post2.index]).toBe("post2 response");
+                    expect(response[get2.index]).toBe("get2 response");
                 });
 
                 it("throws if you try to use the transaction after commit", () => {

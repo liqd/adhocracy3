@@ -118,8 +118,9 @@ export class Service<Content extends Resources.Content<any>> {
      * After all requests have been made you need to call
      * `transaction.commit()`.  After that, no further interaction
      * with `transaction` is possible and will throw exceptions.
-     * `commit` promises an object containing a mapping of
-     * (preliminary) paths to server responses.
+     * `commit` promises a list of responses. You can easily
+     * identify the index of each request via the `index` property
+     * in the preliminary data.
      *
      * `withTransaction` simply returns the result of the callback.
      *
@@ -143,7 +144,7 @@ export class Service<Content extends Resources.Content<any>> {
      *
      *             return transaction.commit()
      *                 .then((responses) => {
-     *                     return responses[versionGet.path];
+     *                     return responses[versionGet.index];
      *                 });
      *         });
      *     };

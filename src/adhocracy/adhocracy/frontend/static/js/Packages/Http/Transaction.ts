@@ -2,6 +2,7 @@ import AdhResources = require("../../Resources");
 
 
 export interface ITransactionResult {
+    index : number;
     path : string;
     first_version_path? : string;
 }
@@ -17,13 +18,11 @@ export class Transaction {
     // incorporated.
 
     private requests : any[];
-    private paths : string[];
     private committed : boolean;
     private nextID : number;
 
     constructor(private $http : ng.IHttpService) {
         this.requests = [];
-        this.paths = [];
         this.committed = false;
         this.nextID = 0;
     }
@@ -44,8 +43,8 @@ export class Transaction {
             method: "GET",
             path: path
         });
-        this.paths.push(path);
         return {
+            index: this.requests.length - 1,
             path: path
         };
     }
@@ -57,8 +56,8 @@ export class Transaction {
             path: path,
             body: obj
         });
-        this.paths.push(path);
         return {
+            index: this.requests.length - 1,
             path: path
         };
     }
@@ -71,28 +70,17 @@ export class Transaction {
             path: path,
             body: obj
         });
-        this.paths.push(preliminaryPath);
         return {
+            index: this.requests.length - 1,
             path: preliminaryPath,
             first_version_path: "@" + preliminaryPath
         };
     }
 
-    public commit() : ng.IPromise<{[path : string]: AdhResources.Content<any>}> {
+    public commit() : ng.IPromise<AdhResources.Content<any>[]> {
         this.checkCommitted();
         this.committed = true;
-
-        return this.$http.post("/batch", this.requests)
-            .then((responses : AdhResources.Content<any>[]) => {
-                var responseMap = {};
-
-                responses.forEach((response, ix) => {
-                    var path = this.paths[ix];
-                    responseMap[path] = response;
-                });
-
-                return responseMap;
-            });
+        return this.$http.post("/batch", this.requests);
     }
 }
 
