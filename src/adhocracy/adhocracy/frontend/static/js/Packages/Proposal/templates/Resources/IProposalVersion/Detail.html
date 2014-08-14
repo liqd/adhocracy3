@@ -11,6 +11,7 @@
                 <button type="button" class="close_button" data-ng-click="list()">close</button>
             </div>
             <adh-document-sheet-show data-sheet="content.data['adhocracy.sheets.document.IDocument']"></adh-document-sheet-show>
+            <adh-user-meta data-path="{{content.data['adhocracy.sheets.metadata.IMetadata'].creator[0]}}"</adh-user-meta>
         </div>
         <div data-ng-switch-when="edit">
             <div class="buttons_box">
