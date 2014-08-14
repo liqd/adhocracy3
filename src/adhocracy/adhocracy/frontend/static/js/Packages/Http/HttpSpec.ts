@@ -172,6 +172,7 @@ export var register = () => {
                 var post1;
                 var post2;
                 var get2;
+                var request;
                 var response;
                 var _httpTrans;
 
@@ -205,12 +206,38 @@ export var register = () => {
                     });
                 });
 
+                it("posts to /batch", () => {
+                    expect($httpMock.post).toHaveBeenCalled();
+                    var args = $httpMock.post.calls.mostRecent().args;
+                    expect(args[0]).toBe("/batch");
+                    request = args[1];
+                });
+
                 it("assigns different preliminary paths to different post requests", () => {
                     expect(post1.path).not.toEqual(post2.path);
                 });
 
                 it("assigns preliminary first_version_paths on post requests", () => {
                     expect(post1.first_version_path).toBeDefined();
+                });
+
+                it("prefixes preliminary paths with a single '@'", () => {
+                    expect(post1.path[0]).toBe("@");
+                    expect(post1.path[1]).not.toBe("@");
+                });
+
+                it("prefixes preliminary first_version_paths with '@@'", () => {
+                    expect(post1.first_version_path[0]).toBe("@");
+                    expect(post1.first_version_path[1]).toBe("@");
+                    expect(post1.first_version_path[2]).not.toBe("@");
+                });
+
+                it("adds a result_path to post requests", () => {
+                    expect(request[post1.index].result_path).toBeDefined();
+                    expect("@" + request[post1.index].result_path).toBe(post1.path);
+
+                    expect(request[post2.index].result_path).toBeDefined();
+                    expect("@" + request[post2.index].result_path).toBe(post2.path);
                 });
 
                 it("maps preliminary data to responses via `index`", () => {

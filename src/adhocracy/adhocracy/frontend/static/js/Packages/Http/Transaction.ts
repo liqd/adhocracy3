@@ -34,7 +34,7 @@ export class Transaction {
     }
 
     private generatePath() : string {
-        return "@path" + this.nextID++;
+        return "path" + this.nextID++;
     }
 
     public get(path : string) : ITransactionResult {
@@ -68,12 +68,13 @@ export class Transaction {
         this.requests.push({
             method: "POST",
             path: path,
-            body: obj
+            body: obj,
+            result_path: preliminaryPath
         });
         return {
             index: this.requests.length - 1,
-            path: preliminaryPath,
-            first_version_path: "@" + preliminaryPath
+            path: "@" + preliminaryPath,
+            first_version_path: "@@" + preliminaryPath
         };
     }
 
