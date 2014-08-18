@@ -84,4 +84,3 @@ export class Transaction {
         return this.$http.post("/batch", this.requests);
     }
 }
-
