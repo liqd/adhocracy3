@@ -120,8 +120,7 @@ export class CommentDetail {
                 };
 
                 var updateScope = () => {
-                    return versionPromise.then((_res) => {
-                        res = <AdhResource.Content<any>>_res;
+                    return versionPromise.then((res : AdhResource.Content<any>) => {
                         $scope.data = {
                             content: _self.adapter.content(res),
                             creator: _self.adapter.creator(res)
