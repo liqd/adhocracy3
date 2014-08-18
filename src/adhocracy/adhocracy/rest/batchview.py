@@ -103,13 +103,12 @@ class BatchView(RESTView):
         path = nested_request['path']
         method = nested_request['method']
         json_body = nested_request['body']
-        logger.warning('path: %s', path)  # TODO debug
-        logger.warning('json_body: %s', json_body)
         if json_body:
             body = dumps(json_body).encode()
         else:
             body = None
         return Request(environ=self.request.environ,
+                       # TODO only for POST requests!
                        content_type='application/json',
                        method=method, path_info=path, body=body)
 
