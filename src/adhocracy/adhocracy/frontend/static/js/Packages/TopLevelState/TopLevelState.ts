@@ -1,7 +1,7 @@
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
 /**
- * GlobalState service for managing global state.
+ * TopLevelState service for managing top level state.
  *
  * This service is used to interact with the general state of the
  * application.  In the UI, this state is represented in the moving
@@ -16,7 +16,7 @@ import AdhEventHandler = require("../EventHandler/EventHandler");
  * Only focus and the state of content2 column are currently
  * implemented.
  */
-export class GlobalState {
+export class TopLevelState {
     private eventHandler : AdhEventHandler.EventHandler;
 
     constructor(adhEventHandlerClass : typeof AdhEventHandler.EventHandler) {
@@ -41,10 +41,10 @@ export class GlobalState {
 }
 
 
-export var movingColumns = (globalState) => {
+export var movingColumns = (topLevelState) => {
     return {
         link: (scope, element) => {
-            globalState.onSetFocus((column : number) : void => {
+            topLevelState.onSetFocus((column : number) : void => {
                 // This is likely to change in the future.
                 // So do not spend too much time interpreting this.
                 if (column <= 1) {
@@ -53,7 +53,7 @@ export var movingColumns = (globalState) => {
                     element.addClass("is-detail");
                 }
             });
-            globalState.onSetContent2Url((url : string) => {
+            topLevelState.onSetContent2Url((url : string) => {
                 scope.content2Url = url;
             });
         }

@@ -6,7 +6,7 @@ import Util = require("../Util/Util");
 import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
 import AdhWebSocket = require("../WebSocket/WebSocket");
-import AdhGlobalState = require("../GlobalState/GlobalState");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import Resources = require("../../Resources");
 
@@ -97,8 +97,8 @@ export class ProposalVersionDetail {
                 content: "=",
                 viewmode: "@"
             },
-            controller: ["adhGlobalState", "adhHttp", "$scope", (
-                adhGlobalState : AdhGlobalState.GlobalState,
+            controller: ["adhTopLevelState", "adhHttp", "$scope", (
+                adhTopLevelState : AdhTopLevelState.TopLevelState,
                 adhHttp : AdhHttp.Service<Resources.Content<any>>,
                 $scope : IProposalVersionDetailScope<any>
             ) : void => {
@@ -129,12 +129,12 @@ export class ProposalVersionDetail {
                 };
 
                 $scope.showComments = () => {
-                    adhGlobalState.setContent2Url($scope.content.path);
-                    adhGlobalState.setFocus(2);
+                    adhTopLevelState.setContent2Url($scope.content.path);
+                    adhTopLevelState.setFocus(2);
                 };
 
                 $scope.hideComments = () => {
-                    adhGlobalState.setFocus(1);
+                    adhTopLevelState.setFocus(1);
                 };
             }]
         };

@@ -24,7 +24,7 @@ import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper"
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhMetaApi = require("./Packages/MetaApi/MetaApi");
 import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
-import AdhGlobalState = require("./Packages/GlobalState/GlobalState");
+import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -85,9 +85,9 @@ export var init = (config, meta_api) => {
     app.value("adhDone", AdhDone.done);
     app.value("adhEventHandlerClass", AdhEventHandler.EventHandler);
 
-    app.service("adhGlobalState", AdhGlobalState.GlobalState);
-    app.directive("adhMovingColumns", ["adhGlobalState", AdhGlobalState.movingColumns]);
-    app.directive("adhFocusSwitch", ["adhGlobalState", AdhGlobalState.adhFocusSwitch]);
+    app.service("adhTopLevelState", AdhTopLevelState.TopLevelState);
+    app.directive("adhMovingColumns", ["adhTopLevelState", AdhTopLevelState.movingColumns]);
+    app.directive("adhFocusSwitch", ["adhTopLevelState", AdhTopLevelState.adhFocusSwitch]);
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
