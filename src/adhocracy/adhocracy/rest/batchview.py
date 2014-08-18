@@ -109,9 +109,12 @@ class BatchView(RESTView):
             body = dumps(json_body).encode()
         else:
             body = None
-        return Request(environ=self.request.environ,
-                       content_type='application/json',
-                       method=method, path_info=path, body=body)
+        request = Request.blank(path,
+                                content_type='application/json',
+                                method=method,
+                                body=body)
+        request.root = self.request.root
+        return request
 
     def _invoke_subrequest_and_handle_errors(
             self, subrequest: Request) -> BatchItemResponse:

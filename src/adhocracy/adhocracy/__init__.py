@@ -18,6 +18,10 @@ def root_factory(request, t=transaction, g=get_connection,
     """
     # FIXME: Fix substanced bug: mark_unfinished_as_finished keyword
     # is not working
+    # Ee don't get the root object if the request alread have one.
+    # Workaround to make the subrequests in adhocracy.rest.batchview work.
+    if getattr(request, 'root', False):
+        return request.root
     conn = g(request)
     zodb_root = conn.root()
     if 'app_root' not in zodb_root:
