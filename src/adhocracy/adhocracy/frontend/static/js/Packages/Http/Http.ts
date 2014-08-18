@@ -7,6 +7,9 @@ import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
 import AdhTransaction = require("./Transaction");
 
+// re-exports
+export interface ITransactionResult extends AdhTransaction.ITransactionResult {};
+
 export var importContent : <Content extends Resources.Content<any>>(resp: {data: Content}) => Content;
 export var exportContent : <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) => Content;
 export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void;
