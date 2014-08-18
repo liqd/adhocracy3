@@ -27,7 +27,7 @@ export class Transaction {
         this.nextID = 0;
     }
 
-    private checkCommitted() : void {
+    private checkNotCommitted() : void {
         if (this.committed) {
             throw("Tried to use an already committed transaction");
         }
@@ -38,7 +38,7 @@ export class Transaction {
     }
 
     public get(path : string) : ITransactionResult {
-        this.checkCommitted();
+        this.checkNotCommitted();
         this.requests.push({
             method: "GET",
             path: path
@@ -50,7 +50,7 @@ export class Transaction {
     }
 
     public put(path : string, obj : AdhResources.Content<any>) : ITransactionResult {
-        this.checkCommitted();
+        this.checkNotCommitted();
         this.requests.push({
             method: "PUT",
             path: path,
@@ -63,7 +63,7 @@ export class Transaction {
     }
 
     public post(path : string, obj : AdhResources.Content<any>) : ITransactionResult {
-        this.checkCommitted();
+        this.checkNotCommitted();
         var preliminaryPath = this.generatePath();
         this.requests.push({
             method: "POST",
@@ -79,7 +79,7 @@ export class Transaction {
     }
 
     public commit() : ng.IPromise<AdhResources.Content<any>[]> {
-        this.checkCommitted();
+        this.checkNotCommitted();
         this.committed = true;
         return this.$http.post("/batch", this.requests);
     }
