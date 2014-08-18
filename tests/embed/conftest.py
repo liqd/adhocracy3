@@ -3,8 +3,6 @@
 from splinter import Browser
 import pytest
 
-from adhocracy.testing import splinter_browser_load_condition  # noqa
-
 
 def pytest_addoption(parser):
     """Add pytest option --run_embed_tests."""
