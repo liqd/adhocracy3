@@ -915,34 +915,29 @@ Let's add some more paragraphs to the second section above ::
     ...           },
     ...           {
     ...             'method': 'GET',
-    ...             'path': '@@par1_item'
+    ...             'path': '@par1_version'
     ...           },
     ...         ]
     >>> batch_resp = testapp.post_json(batch_url, batch).json
-    >>> pprint(batch_resp)
-    [
-        {
-            'code': 200,
-            'body': {
-                'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
-                'path': '...'
-            }
-        },
-        {
-            'code': 200,
-            'body': {
-                'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
-                'path': '...'
-            }
-        },
-        {
-            'code': 200,
-            'body': {
-                'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
-                'path': '...'
-            }
-        }
-    ]
+    >>> len(batch_resp)
+    3
+    >>> pprint(batch_resp[0])
+    {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+              'first_version_path': '/adhocracy/Proposals/kommunismus/par1/VERSION_0000000',
+              'path': '/adhocracy/Proposals/kommunismus/par1'},
+     'code': 200}
+    >>> pprint(batch_resp[1])
+    {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
+              'path': '/adhocracy/Proposals/kommunismus/par1/VERSION_0000001'},
+     'code': 200}
+    >>> pprint(batch_resp[2])
+    {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
+              'data': {...},
+              'path': '/adhocracy/Proposals/kommunismus/par1/VERSION_0000001'},
+     'code': 200}
+     >>> batch_resp[2]['body']['data']['adhocracy.sheets.document.IParagraph']['content']
+     'sein blick ist vom vorüberziehn der stäbchen'
+
 
 Now the first, empty paragraph version should contain the newly
 created paragraph version as its only successor ::
