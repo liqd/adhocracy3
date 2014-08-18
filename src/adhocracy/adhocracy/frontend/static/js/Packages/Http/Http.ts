@@ -83,24 +83,6 @@ export class Service<Content extends Resources.Content<any>> {
     }
 
     /**
-     * query meta-api for resource content types.  return the json
-     * object explaining the content type of a resource.  if called
-     * without an argument, return a list of all known content types.
-     */
-    public metaApiResource(name : string) : any {
-        throw "not implemented.";
-    }
-
-    /**
-     * query meta-api for property types.  return the json object
-     * explaining the type of a property sheet.  if called without an
-     * argument, return a list of all known property sheets.
-     */
-    public metaApiSheet(name : string) : any {
-        throw "not implemented.";
-    }
-
-    /**
      * Call `withTransaction` with a callback that accepts a
      * transaction.  All calls to `transaction` within `trans` are
      * collected into a batch request.
