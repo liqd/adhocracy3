@@ -34,8 +34,8 @@ def proposal(browser, server_sample):
     return element
 
 
-def test_create(browser, server_sample):
-    register_url = server_sample.application_url + 'frontend_static/root.html'
+def test_create(browser, server):
+    register_url = server.application_url + 'frontend_static/root.html'
     browser.visit(register_url)
 
     column = '.moving-column-content'
