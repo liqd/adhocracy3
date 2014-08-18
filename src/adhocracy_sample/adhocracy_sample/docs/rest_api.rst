@@ -949,6 +949,8 @@ created paragraph version as its only successor ::
     .. >>> print(v1, v2)
     .. ...
 
+FIXME Transaction handling doesn't yet work correctly!
+
 Post another paragraph item and a version.  If the version post fails,
 the paragraph will not be present in the database ::
 
@@ -956,7 +958,10 @@ the paragraph will not be present in the database ::
     ...             'method': 'POST',
     ...             'path': pdag_path,
     ...             'body': {
-    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph'
+    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+    ...                 'data': {'adhocracy.sheets.name.IName':
+    ...                              {'name': 'par2'}
+    ...                         }
     ...             },
     ...             'result_path': 'par2_item'
     ...           },
@@ -977,29 +982,21 @@ the paragraph will not be present in the database ::
     ...             'result_path': 'par2_version'
     ...           }
     ...         ]
-    >>> print('test disabled')
-    test disabled
-
-    .. >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch).json
-    .. >>> pprint(invalid_batch_resp)
-    .. [
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
-    ..             'path': '...'
-    ..         }
-    ..     },
-    ..     {
-    ..         'code': ...,
-    ..         ...
-    ..     }
-    .. ]
-    .. >>> invalid_batch_resp[1]['code'] >= 400
-    .. True
-    .. >>> get_nonexistent_obj = testapp.get_json(invalid_batch_resp[0]['body']['path'])
-    .. >>> get_nonexistent_obj['code'] >= 400
-    .. True
+    >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch,
+    ...                                        status=400).json
+    >>> pprint(invalid_batch_resp)
+    [{'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+               'first_version_path': '...',
+               'path': '...'},
+      'code': 200},
+     {'body': {'errors': [...],
+               'status': 'error'},
+      'code': 400}]
+    >>> get_nonexistent_obj = testapp.get(invalid_batch_resp[0]['body']['path']).json
+    >>> pprint(get_nonexistent_obj)
+    'blah'
+    >>> get_nonexistent_obj['code'] >= 400
+    True
 
 Note that the response will contain embedded responses for all successful
 encoded requests (if any) and also for the first failed encoded request (if
