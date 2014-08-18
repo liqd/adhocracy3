@@ -149,6 +149,7 @@ interface IScopeProposalVersion {
     commit : () => void;
     onNewProposal : (any) => void;
     onCancel : () => void;
+    onSave : () => void;
 }
 
 export class ProposalVersionNew {
@@ -160,7 +161,8 @@ export class ProposalVersionNew {
             templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Resources/IProposalVersion/New.html",
             scope: {
                 onNewProposal: "=",
-                onCancel: "="
+                onCancel: "=",
+                onSave: "="
             },
             controller: ["$scope", ($scope : IScopeProposalVersion) => {
                 $scope.proposalVersion = new RIProposalVersion();
@@ -185,6 +187,8 @@ export class ProposalVersionNew {
                             $scope.onNewProposal(respGet);
                         });
                     });
+
+                    $scope.onSave();
                 };
             }]
         };
