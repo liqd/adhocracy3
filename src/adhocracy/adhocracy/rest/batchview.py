@@ -103,15 +103,14 @@ class BatchView(RESTView):
         path = nested_request['path']
         method = nested_request['method']
         json_body = nested_request['body']
+        keywords_args = {'method': method}
+
         if json_body:
-            body = dumps(json_body).encode()
-        else:
-            body = None
-        request = Request.blank(path,
-                                # TODO only for POST requests!
-                                content_type='application/json',
-                                method=method,
-                                body=body)
+            keywords_args['body'] = dumps(json_body).encode()
+        if method != 'GET':
+            keywords_args['content_type'] = 'application/json'
+
+        request = Request.blank(path, **keywords_args)
         request.root = self.request.root
         return request
 
