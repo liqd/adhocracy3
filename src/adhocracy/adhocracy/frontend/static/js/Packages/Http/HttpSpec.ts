@@ -52,7 +52,7 @@ var mkAdhMetaApiMock = () => {
         }
     };
 
-    spyOn(mock, 'field').and.callThrough();
+    spyOn(mock, "field").and.callThrough();
 
     return mock;
 };
