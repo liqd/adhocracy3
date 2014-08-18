@@ -18,10 +18,7 @@ def create(listing, title, description='', paragraphs=[]):
 
 
 @fixture
-def proposal(browser, server_sample):
-    root_url = server_sample.application_url + 'frontend_static/root.html'
-    browser.visit(root_url)
-
+def proposal(browser):
     column = '.moving-column-content'
     listing = browser.browser.find_by_css(column + ' .listing').first
 
@@ -34,10 +31,7 @@ def proposal(browser, server_sample):
     return element
 
 
-def test_create(browser, server_sample):
-    register_url = server_sample.application_url + 'frontend_static/root.html'
-    browser.visit(register_url)
-
+def test_create(browser):
     column = '.moving-column-content'
     listing = browser.browser.find_by_css(column + ' .listing').first
 
