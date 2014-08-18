@@ -106,12 +106,21 @@ export class Service<Content extends Resources.Content<any>> {
      *
      * `withTransaction` simply returns the result of the callback.
      *
+     * Arguably, `withTransaction` should implicitly call `commit`
+     * after the callback returns, but this would only work in the
+     * synchronous case.  On the other hand, the done()-idiom is not
+     * any prettier than forcing the caller of `withTransaction` to
+     * call `commit` manually.  On the plus side, this makes it easy
+     * to do post-processing (such as discarding parts of the batch
+     * request that have become uninteresting with the successful
+     * batch post).
+     *
      * Example:
      *
-     *     var postVersion = (...) => {
+     *     var postVersion = (path : string, ...) => {
      *         return adhHttp.withTransaction((transaction) => {
      *             var resource = ...
-     *             var resourcePost = transaction.post(..., resource);
+     *             var resourcePost = transaction.post(path, resource);
      *
      *             var version = {
      *                 data: {
