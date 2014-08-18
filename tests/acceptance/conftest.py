@@ -2,16 +2,10 @@
 from pytest import fixture
 
 
-@fixture(scope='class')
-def server(server_sample):
-    """Return the adhocracy sample app wsgi application."""
-    return server_sample
-
-
 @fixture()
-def browser(browsera, server):
+def browser(browsera, server_sample):
     """Return test browser instance with url=root.html."""
-    url = server.application_url + 'frontend_static/root.html'
+    url = server_sample.application_url + 'frontend_static/root.html'
     browsera.visit(url)
 
     def angular_app_loaded(browser):
