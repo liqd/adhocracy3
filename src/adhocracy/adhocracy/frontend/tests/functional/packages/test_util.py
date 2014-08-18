@@ -1,6 +1,4 @@
 import pytest
-from adhocracy.testing import browser_root
-
 
 pytestmark = pytest.mark.functional  # mark theses tests as functional tests
 

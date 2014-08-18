@@ -1,5 +1,4 @@
 import pytest
-import time
 
 from adhocracy.frontend.tests.unit.console import Parser
 from adhocracy.frontend.tests.unit.console import Formatter
