@@ -52,6 +52,23 @@
  * https://github.com/angular/angular.js/issues/7874#issuecomment-47647528
  */
 
+// FIXME: Injection does not allow for the template author to control
+// the name of scope variables passed to injected template snippets.
+// Instead of something like:
+//
+// <listing element="row">
+//   <element path="{{row}}"></element>
+// </listing>
+//
+// She has to write:
+//
+// <listing>
+//   <element path="{{element}}"></element>
+// </listing>
+//
+// and implicitly know that Listing propagates the identifier
+// ``element`` to the element's scope.
+
 export var factory = () => {
     return {
         restrict: "EAC",

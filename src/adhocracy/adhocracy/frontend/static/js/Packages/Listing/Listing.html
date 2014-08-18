@@ -3,12 +3,11 @@
         <div class="navbar-left listing-sort placeholder">sort</div>
         <div class="navbar-left listing-view placeholder">view</div>
         <a class="navbar-right button m-call-to-action"
-            data-ng-click="show.createForm = true"
+            data-ng-click="showCreateForm()"
             data-ng-disabled="show.createForm">Add</a>
     </div>
     <div class="listing-create-form" data-ng-if="show.createForm">
         <inject data-transclusion-id="create-form-id"></inject>
-        <a href="" data-ng-click="show.createForm = false">cancel</a>
     </div>
     <ol class="listing-elements">
         <li class="listing-element" data-ng-repeat="element in elements">

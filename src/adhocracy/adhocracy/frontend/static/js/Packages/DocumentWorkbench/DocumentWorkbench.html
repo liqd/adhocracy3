@@ -8,6 +8,8 @@
             <div data-ng-switch="transclusionId">
                 <adh-proposal-version-new
                     data-on-new-proposal="update"
+                    data-on-save="hideCreateForm"
+                    data-on-cancel="hideCreateForm"
                     data-ng-switch-when="create-form-id">
                 </adh-proposal-version-new>
                 <adh-proposal-detail
