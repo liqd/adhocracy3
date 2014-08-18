@@ -5,6 +5,10 @@
 import Resources = require("../../Resources");
 import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
+import AdhTransaction = require("./Transaction");
+
+// re-exports
+export interface ITransactionResult extends AdhTransaction.ITransactionResult {};
 
 export var importContent : <Content extends Resources.Content<any>>(resp: {data: Content}) => Content;
 export var exportContent : <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) => Content;
@@ -22,17 +26,7 @@ export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendErro
 // FIXME: This service should be able to handle any type, not just subtypes of
 // ``Resources.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
-export interface IBaseService<Content extends Resources.Content<any>> {
-    get : (path : string) => ng.IPromise<Content>;
-    put : (path : string, obj : Content) => ng.IPromise<Content>;
-    post : (path : string, obj : Content) => ng.IPromise<Content>;
-    postNewVersion : (oldVersionPath : string, obj : Content) => ng.IPromise<Content>;
-    postToPool : (poolPath : string, obj : Content) => ng.IPromise<Content>;
-}
-
-export interface ITransaction<Content extends Resources.Content<any>> extends IBaseService<Content> {}
-
-export class Service<Content extends Resources.Content<any>> implements IBaseService<Content> {
+export class Service<Content extends Resources.Content<any>> {
     constructor(
         private $http : ng.IHttpService,
         private $q : ng.IQService,
@@ -92,52 +86,65 @@ export class Service<Content extends Resources.Content<any>> implements IBaseSer
     }
 
     /**
-     * query meta-api for resource content types.  return the json
-     * object explaining the content type of a resource.  if called
-     * without an argument, return a list of all known content types.
+     * Call `withTransaction` with a callback that accepts a
+     * transaction.  All calls to `transaction` within `trans` are
+     * collected into a batch request.
+     *
+     * Note that the interface of the transaction differs
+     * significantly from that of adhHttp. It can therefore not be
+     * used as a drop-in.
+     *
+     * A transaction returns an object (not a promise!) containing
+     * some information you might need in other requests within the
+     * same transaction. Note that some of this information may be
+     * preliminary and should therefore not be used outside of the
+     * transaction.
+     *
+     * After all requests have been made you need to call
+     * `transaction.commit()`.  After that, no further interaction
+     * with `transaction` is possible and will throw exceptions.
+     * `commit` promises a list of responses. You can easily
+     * identify the index of each request via the `index` property
+     * in the preliminary data.
+     *
+     * `withTransaction` simply returns the result of the callback.
+     *
+     * Arguably, `withTransaction` should implicitly call `commit`
+     * after the callback returns, but this would only work in the
+     * synchronous case.  On the other hand, the done()-idiom is not
+     * any prettier than forcing the caller of `withTransaction` to
+     * call `commit` manually.  On the plus side, this makes it easy
+     * to do post-processing (such as discarding parts of the batch
+     * request that have become uninteresting with the successful
+     * batch post).
+     *
+     * Example:
+     *
+     *     var postVersion = (path : string, ...) => {
+     *         return adhHttp.withTransaction((transaction) => {
+     *             var resource = ...
+     *             var resourcePost = transaction.post(path, resource);
+     *
+     *             var version = {
+     *                 data: {
+     *                     "adhocracy.sheets.versions.IVersionable": {
+     *                         follows: resourcePost.first_version_path
+     *                     },
+     *                     ...
+     *                 }
+     *             };
+     *             var versionPost = transaction.post(resourcePost.path, version);
+     *             var versionGet = transaction.get(versionPost.path);
+     *
+     *             return transaction.commit()
+     *                 .then((responses) => {
+     *                     return responses[versionGet.index];
+     *                 });
+     *         });
+     *     };
      */
-    public metaApiResource(name : string) : any {
-        throw "not implemented.";
-    }
-
-    /**
-     * query meta-api for property types.  return the json object
-     * explaining the type of a property sheet.  if called without an
-     * argument, return a list of all known property sheets.
-     */
-    public metaApiSheet(name : string) : any {
-        throw "not implemented.";
-    }
-
-    /**
-     * Call withTransaction with a callback `trans` that accepts a
-     * transaction (an adhHttp-like service) and a done callback.
-     * All calls to `transaction` within `trans` are collected into
-     * a batch request, and the batch-request is sent to the backend
-     * when `done` is called.
-     *
-     * Transactions can not be used as drop-ins for the adhHttp
-     * service because the promises will only be resolved after `done`
-     * has been called. This might result in deadlocks in code that
-     * was orginially written for adhHttp.
-     *
-     * The current implementation is a mock and passes the plain
-     * (transaction-less) http service.
-     *
-     * In an ideal world, the promised values of the calls to
-     * `transaction` should be completely indifferent to the question
-     * whether they have been produced in a transaction or not -- they
-     * should just return the values from the server once those have
-     * actually been produced.
-     *
-     * This is in tension with the requirement that requests inside
-     * one transaction depend on each other, so we need to change the
-     * api somehow.  Perhaps we can pass local preliminary paths
-     * together with post path and posted object to a variant of the
-     * post method.
-     */
-    public withTransaction(trans : (httpTrans : ITransaction<Content>, done : () => void) => void) : void {
-        trans(this, () => null);
+    public withTransaction(callback : (httpTrans : AdhTransaction.Transaction) => any) : void {
+        return callback(new AdhTransaction.Transaction(this.$http));
     }
 }
 
