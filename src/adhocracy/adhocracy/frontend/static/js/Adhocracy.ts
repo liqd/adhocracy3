@@ -78,6 +78,7 @@ export var init = (config, meta_api) => {
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
     app.directive("adhUserIndicator", ["adhConfig", AdhUser.indicatorDirective]);
+    app.directive("adhUserMeta", ["adhConfig", AdhUser.metaDirective]);
     app.value("adhConfig", config);
     app.factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(meta_api));
     app.value("adhDone", AdhDone.done);
