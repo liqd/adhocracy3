@@ -37,24 +37,6 @@ export interface ListingScope<Container> {
     hideCreateForm : () => void;
 }
 
-// FIXME: the way Listing works now is similar to ngRepeat, but it
-// does not allow for the template author to control the name of the
-// iterator.  Instead of something like:
-//
-// <listing element="row">
-//   <element path="{{row}}"></element>
-// </listing>
-//
-// She has to write:
-//
-// <listing>
-//   <element path="{{element}}"></element>
-// </listing>
-//
-// and implicitly know that Listing propagates the identifier
-// ``element`` to the element's scope.
-//
-//
 // FIXME: as the listing elements are tracked by their $id (the element path) in the listing template, we don't allow duplicate elements
 // in one listing. We should add a proper warning if that occurs or handle that case properly.
 
