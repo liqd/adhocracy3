@@ -992,11 +992,9 @@ the paragraph will not be present in the database ::
      {'body': {'errors': [...],
                'status': 'error'},
       'code': 400}]
-    >>> get_nonexistent_obj = testapp.get(invalid_batch_resp[0]['body']['path']).json
-    >>> pprint(get_nonexistent_obj)
-    'blah'
-    >>> get_nonexistent_obj['code'] >= 400
-    True
+    >>> get_nonexistent_obj = testapp.get(invalid_batch_resp[0]['body']['path'], status=404)
+    >>> get_nonexistent_obj.status
+    '404 Not Found'
 
 Note that the response will contain embedded responses for all successful
 encoded requests (if any) and also for the first failed encoded request (if
