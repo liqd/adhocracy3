@@ -1,3 +1,5 @@
+/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
 /**
@@ -41,7 +43,7 @@ export class TopLevelState {
 }
 
 
-export var movingColumns = (topLevelState) => {
+export var movingColumns = (topLevelState : TopLevelState) => {
     return {
         link: (scope, element) => {
             topLevelState.onSetFocus((column : number) : void => {
@@ -64,7 +66,7 @@ export var movingColumns = (topLevelState) => {
 /**
  * A simple focus switcher that can be used until we have a proper widget for this.
  */
-export var adhFocusSwitch = (topLevelState) => {
+export var adhFocusSwitch = (topLevelState : TopLevelState) => {
     return {
         restrict: "E",
         template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
