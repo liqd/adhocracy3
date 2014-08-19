@@ -1,5 +1,3 @@
-/// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
 /**
