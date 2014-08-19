@@ -39,7 +39,7 @@ export var register = () => {
 
             describe("elemRefs", () => {
                 it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
-                    var res = {
+                    var resource = {
                         data: {
                             "adhocracy_sample.sheets.comment.ICommentable": {
                                 comments: [
@@ -54,7 +54,7 @@ export var register = () => {
                         }
                     };
 
-                    var result = adapter.elemRefs(res);
+                    var result = adapter.elemRefs(resource);
                     expect(result).toContain("/asd/version3");
                     expect(result).toContain("/foo/version2");
                     expect(result).toContain("/bar/version1");
@@ -64,11 +64,11 @@ export var register = () => {
 
             describe("poolPath", () => {
                 it("returns the parent path of the container path", () => {
-                    var res = {
+                    var resource = {
                         path: "some/path/parent"
                     };
 
-                    expect(adapter.poolPath(res)).toEqual("some/path");
+                    expect(adapter.poolPath(resource)).toEqual("some/path");
                 });
             });
         });
@@ -103,13 +103,13 @@ export var register = () => {
                         // FIXME: all http interaction is currently untested as it is
                         // likely to change in the near future
 
-                        var res = {foo: "bar"};
+                        var resource = {foo: "bar"};
                         var content = "content";
 
                         beforeEach((done) => {
                             scopeMock.content = content;
                             scopeMock.onNew = jasmine.createSpy("onNew");
-                            adapterMock.create.and.returnValue(res);
+                            adapterMock.create.and.returnValue(resource);
                             scopeMock.create().then(done);
                         });
 

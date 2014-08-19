@@ -4,40 +4,40 @@ import AdhComment = require("./Comment");
 
 export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
     create() : RICommentVersion {
-        var res = new RICommentVersion();
-        res.data["adhocracy_sample.sheets.comment.IComment"] = {
+        var resource = new RICommentVersion();
+        resource.data["adhocracy_sample.sheets.comment.IComment"] = {
             refers_to: null,
             content: null
         };
-        return res;
+        return resource;
     }
 
-    content(res : RICommentVersion) : string;
-    content(res : RICommentVersion, value : string) : RICommentVersion;
-    content(res, value?) {
+    content(resource : RICommentVersion) : string;
+    content(resource : RICommentVersion, value : string) : RICommentVersion;
+    content(resource, value?) {
         if (typeof value !== "undefined") {
-            res.data["adhocracy_sample.sheets.comment.IComment"].content = value;
-            return res;
+            resource.data["adhocracy_sample.sheets.comment.IComment"].content = value;
+            return resource;
         } else {
-            return res.data["adhocracy_sample.sheets.comment.IComment"].content;
+            return resource.data["adhocracy_sample.sheets.comment.IComment"].content;
         }
     }
 
-    refersTo(res : RICommentVersion) : string;
-    refersTo(res : RICommentVersion, value : string) : RICommentVersion;
-    refersTo(res, value?) {
+    refersTo(resource : RICommentVersion) : string;
+    refersTo(resource : RICommentVersion, value : string) : RICommentVersion;
+    refersTo(resource, value?) {
         if (typeof value !== "undefined") {
-            res.data["adhocracy_sample.sheets.comment.IComment"].refers_to = value;
-            return res;
+            resource.data["adhocracy_sample.sheets.comment.IComment"].refers_to = value;
+            return resource;
         } else {
-            return res.data["adhocracy_sample.sheets.comment.IComment"].refers_to;
+            return resource.data["adhocracy_sample.sheets.comment.IComment"].refers_to;
         }
     }
 
-    creator(res : RICommentVersion) : string {
+    creator(resource : RICommentVersion) : string {
         // FIXME: For some reason, creator is a list in the backend.
         // We will talk to them and do something better than blindly
         // picking the first item as soon as possible.
-        return res.data["adhocracy.sheets.metadata.IMetadata"].creator[0];
+        return resource.data["adhocracy.sheets.metadata.IMetadata"].creator[0];
     }
 }

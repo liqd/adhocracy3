@@ -9,11 +9,11 @@ var pkgLocation = "/Comment";
 
 export interface ICommentAdapter<T extends AdhResource.Content<any>> {
     create() : T;
-    content(res : T) : string;
-    content(res : T, value : string) : T;
-    refersTo(res : T) : string;
-    refersTo(res : T, value : string) : T;
-    creator(red : T) : string;
+    content(resource : T) : string;
+    content(resource : T, value : string) : T;
+    refersTo(resource : T) : string;
+    refersTo(resource : T, value : string) : T;
+    creator(resource : T) : string;
 }
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
@@ -73,9 +73,9 @@ export class CommentCreate {
                 };
 
                 $scope.create = () => {
-                    var res = _self.adapter.create();
-                    _self.adapter.content(res, $scope.content);
-                    _self.adapter.refersTo(res, $scope.refersTo);
+                    var resource = _self.adapter.create();
+                    _self.adapter.content(resource, $scope.content);
+                    _self.adapter.refersTo(resource, $scope.refersTo);
 
                     var comment = {
                         content_type: "adhocracy_sample.resources.comment.IComment",
@@ -88,7 +88,7 @@ export class CommentCreate {
 
                     return adhHttp.postToPool($scope.poolPath, comment)
                         .then(adhHttp.resolve.bind(adhHttp), displayErrors)
-                        .then((comment) => adhHttp.postNewVersion(comment.first_version_path, res))
+                        .then((comment) => adhHttp.postNewVersion(comment.first_version_path, resource))
                         .then(onNew, displayErrors);
                 };
             }]
@@ -111,7 +111,7 @@ export class CommentDetail {
             },
             compile: (element) => recursionHelper.compile(element),
             controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
-                var res : AdhResource.Content<any>;
+                var resource : AdhResource.Content<any>;
                 var versionPromise = adhHttp.resolve($scope.path);
 
                 var displayErrors = (errors) => {
@@ -120,11 +120,11 @@ export class CommentDetail {
                 };
 
                 var updateScope = () => {
-                    return versionPromise.then((_res : AdhResource.Content<any>) => {
-                        res = _res;
+                    return versionPromise.then((_resource : AdhResource.Content<any>) => {
+                        resource = _resource;
                         $scope.data = {
-                            content: _self.adapter.content(res),
-                            creator: _self.adapter.creator(res)
+                            content: _self.adapter.content(resource),
+                            creator: _self.adapter.creator(resource)
                         };
                     });
                 };
@@ -141,10 +141,10 @@ export class CommentDetail {
                 };
 
                 $scope.save = () => {
-                    _self.adapter.content(res, $scope.data.content);
+                    _self.adapter.content(resource, $scope.data.content);
                     return versionPromise.then((version) => {
-                        versionPromise = adhHttp.postNewVersion(version.path, res)
-                            .then((_res) => adhHttp.resolve(_res.path), displayErrors);
+                        versionPromise = adhHttp.postNewVersion(version.path, resource)
+                            .then((_resource) => adhHttp.resolve(_resource.path), displayErrors);
                         return updateScope().then(() => {
                             $scope.viewmode = "list";
                         });
