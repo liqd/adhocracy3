@@ -5,6 +5,8 @@ import AdhConfig = require("../Config/Config");
 import AdhListing = require("../Listing/Listing");
 import Util = require("../Util/Util");
 
+import RIComment = require("../../Resources_/adhocracy_sample/resources/comment/IComment");
+
 var pkgLocation = "/Comment";
 
 export interface ICommentAdapter<T extends AdhResource.Content<any>> {
@@ -77,14 +79,7 @@ export class CommentCreate {
                     _self.adapter.content(resource, $scope.content);
                     _self.adapter.refersTo(resource, $scope.refersTo);
 
-                    var comment = {
-                        content_type: "adhocracy_sample.resources.comment.IComment",
-                        data: {
-                            "adhocracy.sheets.name.IName": {
-                                name: "comment"
-                            }
-                        }
-                    };
+                    var comment = new RIComment("comment");
 
                     return adhHttp.postToPool($scope.poolPath, comment)
                         .then(adhHttp.resolve.bind(adhHttp), displayErrors)
