@@ -37,18 +37,12 @@ def test_create(browser):
 
     create(listing, 'sometitle')
 
-    # FIXME Proposal creation is too slow!! (often takes more than 1sec)
-    # This will hopefully be fixed by the batch+high-level API.
-    # After fixing, the higher wait_time attribute should be removed.
     assert browser.browser.is_element_present_by_css(
-        column + ' .listing-element',
-        wait_time=5)
+        column + ' .listing-element')
 
     element = listing.find_by_css('.listing-element')
     element_a = element.find_by_css('a').first
-    # FIXME Remove max_steps param once proposal creation is faster, see
-    # above!!
-    assert wait(lambda: element_a.text, max_steps=20)
+    assert wait(lambda: element_a.text)
     assert element_a.text == 'sometitle'
 
     element_a.click()

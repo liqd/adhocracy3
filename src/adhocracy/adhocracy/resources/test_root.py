@@ -28,10 +28,8 @@ class RootPoolIntegrationTest(unittest.TestCase):
 
     def test_includeme_registry_register_meta(self):
         from adhocracy.resources.root import IRootPool
-        from adhocracy.resources.root import root_metadata
         meta = self.config.registry.content.meta
         assert IRootPool.__identifier__ in meta
-        assert meta[IRootPool.__identifier__]['resource_metadata'] == root_metadata
 
     def test_includeme_registry_create_content_with_default_platform_id(self):
         from adhocracy.resources.root import IRootPool

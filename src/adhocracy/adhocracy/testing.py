@@ -142,8 +142,8 @@ def mock_resource_registry() -> Mock:
     """Mock :class:`adhocracy.registry.ResourceContentRegistry`."""
     from adhocracy.registry import ResourceContentRegistry
     mock = Mock(spec=ResourceContentRegistry)
-    mock.sheets_metadata.return_value = {}
-    mock.resources_metadata.return_value = {}
+    mock.sheets_meta = {}
+    mock.resources_meta = {}
     mock.resource_sheets.return_value = {}
     mock.resource_addables.return_value = {}
     return mock
