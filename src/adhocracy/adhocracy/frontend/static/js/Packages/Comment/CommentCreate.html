@@ -1,0 +1,7 @@
+<form class="comment-create-form">
+    <div class="form-error" data-ng-repeat="error in errors">
+        <p>{{error}}</p>
+    </div>
+    <textarea data-ng-model="content"></textarea>
+    <input type="submit" value="create" data-ng-click="create()" />
+</form>
