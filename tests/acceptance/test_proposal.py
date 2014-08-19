@@ -1,49 +1,39 @@
+"""User wants to create, edit and view proposal."""
+from splinter.driver.webdriver import WebDriverElement
 from pytest import fixture
 
 from .shared import wait
 from .shared import get_listing_create_form
+from .shared import get_content_listing
+from .shared import get_list_element
+from .shared import title_is_in_listing
 
 
-@fixture
+@fixture()
 def proposal(browser):
-    column = '.moving-column-content'
-    listing = browser.browser.find_by_css(column + ' .listing').first
-
-    create(listing, 'test proposal')
-
-    browser.browser.is_element_present_by_css(column + ' .listing-element')
-    element = listing.find_by_css('.listing-element')
-    wait(lambda: element.text)
-
-    return element
+    """Go to content listing and create proposal with title `test proposal`."""
+    listing = get_content_listing(browser)
+    return create_proposal(listing, 'test proposal')
 
 
-def test_create(browser):
-    column = '.moving-column-content'
-    listing = browser.browser.find_by_css(column + ' .listing').first
+def test_proposal_create(browser):
+    content_listing = get_content_listing(browser)
+    proposal = create_proposal(content_listing, 'some title')
+    assert title_is_in_listing(content_listing, proposal.text)
 
-    create(listing, 'sometitle')
 
+def test_proposal_view(browser, proposal):
+    content_listing = get_content_listing(browser)
+    browser.click_link_by_partial_text('test proposal')
+    assert proposal_details_are_in_listing(content_listing, 'test proposal')
+
+
+def create_proposal(listing: WebDriverElement, title: str, description='',
+                    paragraphs=[]):
+    """Create a new Proposal."""
     # FIXME Proposal creation is too slow!! (often takes more than 1sec)
     # This will hopefully be fixed by the batch+high-level API.
     # After fixing, the higher wait_time attribute should be removed.
-    assert browser.browser.is_element_present_by_css(
-        column + ' .listing-element',
-        wait_time=5)
-
-    element = listing.find_by_css('.listing-element')
-    element_a = element.find_by_css('a').first
-    # FIXME Remove max_steps param once proposal creation is faster, see
-    # above!!
-    assert wait(lambda: element_a.text, max_steps=20)
-    assert element_a.text == 'sometitle'
-
-    element_a.click()
-    assert element.find_by_css('h1').first.text == 'sometitle'
-
-
-def create_proposal(listing, title, description='', paragraphs=[]):
-    """Create a new Proposal."""
     form = get_listing_create_form(listing)
 
     form.find_by_css('[name="title"]').first.fill(title)
@@ -54,3 +44,10 @@ def create_proposal(listing, title, description='', paragraphs=[]):
 
     form.find_by_css('input[type="submit"]').first.click()
 
+    # FIXME Remove max_steps param once proposal creation is faster, see above!
+    wait(lambda: get_list_element(listing, title), max_steps=40)
+    return get_list_element(listing, title)
+
+
+def proposal_details_are_in_listing(listing: WebDriverElement, title: str) -> bool:
+    return listing.find_by_css('h1').first.text == title
