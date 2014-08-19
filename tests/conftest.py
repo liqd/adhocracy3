@@ -32,10 +32,17 @@ def server_sample(request, app_sample) -> StopableWSGIServer:
 
 @fixture()
 def browser(browser, server_sample) -> Browser:
-    """Return test browser, start sample application and go to `root.html`."""
+    """Return test browser, start sample application and go to `root.html`.
+
+    Add attribute `root_url` pointing to the adhocracy root.html page.
+    Add attribute `app_url` pointing to the adhocracy application page.
+    Before visiting a new url the browser waits until the angular app is loaded
+    """
     from adhocracy.testing import angular_app_loaded
-    url = server_sample.application_url + 'frontend_static/root.html'
-    browser.visit(url)
+    app_url = server_sample.application_url
+    browser.root_url = app_url + 'frontend_static/root.html'
+    browser.app_url = app_url
+    browser.visit(browser.root_url)
     browser.wait_for_condition(angular_app_loaded, 5)
     return browser
 
