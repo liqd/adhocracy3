@@ -176,7 +176,7 @@ export class ProposalVersionNew {
             scope: {
                 onNewProposal: "=",
                 onCancel: "=",
-                onSave: "="
+                onSave: "=",
                 poolPath: "@"
             },
             controller: ["$scope", ($scope : IScopeProposalVersion) => {
@@ -203,7 +203,6 @@ export class ProposalVersionNew {
                                 $scope.onNewProposal(respGet);
                             });
                         });
-                    });
 
                     $scope.onSave();
                 };
