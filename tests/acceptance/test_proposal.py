@@ -4,19 +4,6 @@ from .shared import wait
 from .shared import get_listing_create_form
 
 
-def create(listing, title, description='', paragraphs=[]):
-    """Create a new Proposal."""
-    form = get_listing_create_form(listing)
-
-    form.find_by_css('[name="title"]').first.fill(title)
-    form.find_by_css('[name="description"]').first.fill(description)
-    for paragraph in paragraphs:
-        form.find_by_css('[name="add-paragraph"]').first.click()
-        form.find_by_css('textarea')[-1].fill(paragraph)
-
-    form.find_by_css('input[type="submit"]').first.click()
-
-
 @fixture
 def proposal(browser):
     column = '.moving-column-content'
@@ -53,3 +40,17 @@ def test_create(browser):
 
     element_a.click()
     assert element.find_by_css('h1').first.text == 'sometitle'
+
+
+def create_proposal(listing, title, description='', paragraphs=[]):
+    """Create a new Proposal."""
+    form = get_listing_create_form(listing)
+
+    form.find_by_css('[name="title"]').first.fill(title)
+    form.find_by_css('[name="description"]').first.fill(description)
+    for paragraph in paragraphs:
+        form.find_by_css('[name="add-paragraph"]').first.click()
+        form.find_by_css('textarea')[-1].fill(paragraph)
+
+    form.find_by_css('input[type="submit"]').first.click()
+

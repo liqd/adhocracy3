@@ -1,6 +1,8 @@
 """Acceptances tests using py.test fixtures in :mod: `adhocracy.testing` and
    `adhocracy_sample.testing.
 """
+from .shared import fill_input
+from .shared import click_button
 
 
 class TestUserLogin:
@@ -74,14 +76,8 @@ class TestUserLogin:
         assert is_logged_in(browser)
 
 
-def fill_input(browser, selector, value):
-    element = browser.browser.find_by_css(selector).first
-    element.fill(value)
 
 
-def click_button(browser, selector):
-    element = browser.browser.find_by_css(selector).first
-    element.click()
 
 def is_logged_in(browser_root):
     return browser_root.browser.is_element_present_by_css('.user-indicator-logout')
