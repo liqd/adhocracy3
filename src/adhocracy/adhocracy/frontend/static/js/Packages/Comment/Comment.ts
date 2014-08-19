@@ -25,7 +25,7 @@ export class ListingCommentableAdapter implements AdhListing.IListingContainerAd
         var latestVersions : string[] = [];
         var lastCommentPath : string = undefined;
 
-        refs.sort().reverse().forEach((versionPath : string) => {
+        Util.deepcp(refs).sort().reverse().forEach((versionPath : string) => {
             var commentPath = Util.parentPath(versionPath);
             if (commentPath !== lastCommentPath) {
                 latestVersions.push(versionPath);

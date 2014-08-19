@@ -38,8 +38,8 @@ export var register = () => {
             });
 
             describe("elemRefs", () => {
-                it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
-                    var resource = {
+                var generateResource = () => {
+                    return {
                         data: {
                             "adhocracy_sample.sheets.comment.ICommentable": {
                                 comments: [
@@ -54,11 +54,21 @@ export var register = () => {
                         }
                     };
 
+                };
+
+                it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
+                    var resource = generateResource();
                     var result = adapter.elemRefs(resource);
                     expect(result).toContain("/asd/version3");
                     expect(result).toContain("/foo/version2");
                     expect(result).toContain("/bar/version1");
                     expect(result.length).toBe(3);
+                });
+
+                it("does not modify the resource", () => {
+                    var resource = generateResource();
+                    adapter.elemRefs(resource);
+                    expect(resource).toEqual(generateResource());
                 });
             });
 
