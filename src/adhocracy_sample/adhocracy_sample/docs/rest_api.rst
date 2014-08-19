@@ -799,7 +799,7 @@ this comment version::
 
 
 Batch requests
-––––––––––––––
+--------------
 
 The following URL accepts batch requests ::
 

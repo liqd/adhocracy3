@@ -1,7 +1,7 @@
 """Public py.test fixtures: http://pytest.org/latest/fixture.html. """
 from unittest.mock import Mock
 from configparser import ConfigParser
-import copy
+import types
 import json
 import os
 import subprocess
@@ -14,9 +14,6 @@ from substanced.objectmap import ObjectMap
 from substanced.objectmap import find_objectmap
 from splinter import Browser
 from webtest.http import StopableWSGIServer
-from pytest_splinter.plugin import Browser as PytestSplinterBrowser
-from pytest_splinter.plugin import patch_webdriver
-from pytest_splinter.plugin import patch_webdriverelement
 from pytest import fixture
 import colander
 
@@ -145,8 +142,8 @@ def mock_resource_registry() -> Mock:
     """Mock :class:`adhocracy.registry.ResourceContentRegistry`."""
     from adhocracy.registry import ResourceContentRegistry
     mock = Mock(spec=ResourceContentRegistry)
-    mock.sheets_metadata.return_value = {}
-    mock.resources_metadata.return_value = {}
+    mock.sheets_meta = {}
+    mock.resources_meta = {}
     mock.resource_sheets.return_value = {}
     mock.resource_addables.return_value = {}
     return mock
@@ -297,137 +294,86 @@ def server_static(request) -> StopableWSGIServer:
     return server
 
 
-class SplinterBrowser(PytestSplinterBrowser):
-
-    """ Extended Splinter browser."""
-
-    def evaluate_script_with_kwargs(self, code: str, **kwargs) -> object:
-        """Replace kwargs in javascript code and evaluate."""
-        code_with_kwargs = self.compile_js_code(code, **kwargs)
-        return self.evaluate_script(code_with_kwargs)
-
-    def compile_js_code(self, code: str, **kwargs) -> str:
-        """Generate a single JavaScript expression from complex code.
-
-        This is accomplished by wrapping the code in a JavaScript function
-        and passing any key word arguments to that function.  All arguments
-        will be JSON encoded.
-
-        :param code: any JavaScript code
-        :param kwargs: arguments that will be passed to the wrapper function
-
-        :returns: a string containing a single JavaScript expression suitable
-            for consumption by splinter's ``evaluate_script``
-
-        >>> code = "var a = 1; test.y = a; return test;"
-        >>> compile_js_code(code, test={"x": 2})
-        '(function(test) {var a = 1; test.y = a; return test;})({"x": 2})'
-
-        """
-        # make sure keys and values are in the same order
-        keys = []
-        values = []
-        for key in kwargs:
-            keys.append(key)
-            values.append(kwargs[key])
-
-        keys = ', '.join(keys)
-        values = ', '.join((json.dumps(v) for v in values))
-
-        return '(function({}) {{{}}})({})'.format(keys, code, values)
+def evaluate_script_with_kwargs(self, code: str, **kwargs) -> object:
+    """Replace kwargs in javascript code and evaluate."""
+    code_with_kwargs = self.compile_js_code(code, **kwargs)
+    return self.evaluate_script(code_with_kwargs)
 
 
-@fixture(scope='session')
-def splinter_browser_load_condition():
-    """Custom browser condition fixture to check that html page is fully loaded.
+def compile_js_code(self, code: str, **kwargs) -> str:
+    """Generate a single JavaScript expression from complex code.
 
-    The splinter browser has no general "wait for page load" function:
-    https://github.com/cobrateam/splinter/issues/237
+    This is accomplished by wrapping the code in a JavaScript function
+    and passing any key word arguments to that function.  All arguments
+    will be JSON encoded.
+
+    :param code: any JavaScript code
+    :param kwargs: arguments that will be passed to the wrapper function
+
+    :returns: a string containing a single JavaScript expression suitable
+        for consumption by splinter's ``evaluate_script``
+
+    >>> code = "var a = 1; test.y = a; return test;"
+    >>> compile_js_code(code, test={"x": 2})
+    '(function(test) {var a = 1; test.y = a; return test;})({"x": 2})'
 
     """
-    def is_page_loaded(browser):
-        code = 'document.readyState === "complete";'
-        return browser.evaluate_script(code)
+    # make sure keys and values are in the same order
+    keys = []
+    values = []
+    for key in kwargs:
+        keys.append(key)
+        values.append(kwargs[key])
 
-    return is_page_loaded
+    keys = ', '.join(keys)
+    values = ', '.join((json.dumps(v) for v in values))
+
+    return '(function({}) {{{}}})({})'.format(keys, code, values)
 
 
-@fixture
-def browser_instance(request,
-                     splinter_selenium_socket_timeout,
-                     splinter_selenium_implicit_wait,
-                     splinter_selenium_speed,
-                     splinter_webdriver,
-                     splinter_browser_load_condition,
-                     splinter_browser_load_timeout,
-                     splinter_file_download_dir,
-                     splinter_download_file_types,
-                     splinter_firefox_profile_preferences,
-                     splinter_driver_kwargs,
-                     splinter_window_size,
-                     ):
-    """Splinter browser wrapper instance.
+@fixture()  # pragma: no cover
+def browsera(request,
+             browser_pool,
+             splinter_webdriver,
+             splinter_session_scoped_browser,
+             splinter_close_browser):
+    """Return test browser instance to be used for browser interaction.
 
-    Based on: :mod:`pytest_splinter.plugin.browser_instance`
-
-    This fixture can be used to setup the other splinter fixtures:
-
-       https://pypi.python.org/pypi/pytest-splinter
-
+    Function scoped (cookies are clean for each test and on blank).
+    Add additional helper functions to browser instance.
     """
-    patch_webdriver(splinter_selenium_socket_timeout)
-    patch_webdriverelement()
-
-    kwargs = {}
-    if splinter_webdriver == 'firefox':
-        kwargs['profile_preferences'] = dict({
-            'browser.download.folderList': 2,
-            'browser.download.manager.showWhenStarting': False,
-            'browser.download.dir':
-                splinter_file_download_dir,
-            'browser.helperApps.neverAsk.saveToDisk':
-                splinter_download_file_types,
-            'browser.helperApps.alwaysAsk.force': False,
-        }, **splinter_firefox_profile_preferences)
-    if splinter_driver_kwargs:
-        kwargs.update(splinter_driver_kwargs)
-
-    browser = SplinterBrowser(
-        splinter_webdriver,
-        visit_condition=splinter_browser_load_condition,
-        visit_condition_timeout=splinter_browser_load_timeout,
-        **copy.deepcopy(kwargs))
-    browser.driver.implicitly_wait(splinter_selenium_implicit_wait)
-    browser.driver.set_speed(splinter_selenium_speed)
-    if splinter_window_size:
-        browser.driver.set_window_size(*splinter_window_size)
-
-    return browser
+    from pytest_splinter.plugin import browser
+    inst = browser(request, browser_pool, splinter_webdriver,
+                   splinter_session_scoped_browser, splinter_close_browser)
+    inst.compile_js_code = types.MethodType(compile_js_code, inst)
+    inst.evaluate_script_with_kwargs = types.MethodType(
+        evaluate_script_with_kwargs, inst)
+    return inst
 
 
 @fixture()
-def browser_root(browser_instance, server) -> Browser:
-    """browser_instance with url=root.html."""
+def browser_root(browsera, server) -> Browser:
+    """Return test browser instance with url=root.html."""
     url = server.application_url + 'frontend_static/root.html'
-    browser_instance.visit(url)
+    browsera.visit(url)
 
     def angular_app_loaded(browser):
         code = 'window.hasOwnProperty("adhocracy") && window.adhocracy.hasOwnProperty("loadState") && window.adhocracy.loadState === "complete";'  # noqa
         return browser.evaluate_script(code)
-    browser_instance.wait_for_condition(angular_app_loaded, 5)
+    browsera.wait_for_condition(angular_app_loaded, 5)
 
-    return browser_instance
+    return browsera
 
 
 @fixture()
-def browser_test(browser_instance, server) -> Browser:
-    """browser_instance with url=test.html."""
-    url = server.application_url + 'frontend_static/test.html'
-    browser_instance.visit(url)
+def browser_test(browsera, server_static) -> Browser:
+    """Return test browser instance with url=test.html."""
+    url = server_static.application_url + 'frontend_static/test.html'
+    browsera.visit(url)
 
     def jasmine_finished(browser):
         code = 'jsApiReporter.finished'
-        return browser.evaluate_script(code)
-    browser_instance.wait_for_condition(jasmine_finished, 5)
+        return browser.browser.evaluate_script(code)
+    browsera.wait_for_condition(jasmine_finished, 5)
 
-    return browser_instance
+    return browsera

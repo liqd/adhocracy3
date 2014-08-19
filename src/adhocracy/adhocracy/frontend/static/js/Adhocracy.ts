@@ -23,6 +23,8 @@ import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossW
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhMetaApi = require("./Packages/MetaApi/MetaApi");
+import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
+import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -78,9 +80,15 @@ export var init = (config, meta_api) => {
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
     app.directive("adhUserIndicator", ["adhConfig", AdhUser.indicatorDirective]);
+    app.directive("adhUserMeta", ["adhConfig", AdhUser.metaDirective]);
     app.value("adhConfig", config);
     app.factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(meta_api));
     app.value("adhDone", AdhDone.done);
+    app.value("adhEventHandlerClass", AdhEventHandler.EventHandler);
+
+    app.service("adhTopLevelState", AdhTopLevelState.TopLevelState);
+    app.directive("adhMovingColumns", ["adhTopLevelState", AdhTopLevelState.movingColumns]);
+    app.directive("adhFocusSwitch", ["adhTopLevelState", AdhTopLevelState.adhFocusSwitch]);
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
