@@ -111,7 +111,7 @@ export class CommentDetail {
             },
             compile: (element) => recursionHelper.compile(element),
             controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
-                var res;
+                var res : AdhResource.Content<any>;
                 var versionPromise = adhHttp.resolve($scope.path);
 
                 var displayErrors = (errors) => {
@@ -120,7 +120,8 @@ export class CommentDetail {
                 };
 
                 var updateScope = () => {
-                    return versionPromise.then((res : AdhResource.Content<any>) => {
+                    return versionPromise.then((_res : AdhResource.Content<any>) => {
+                        res = _res;
                         $scope.data = {
                             content: _self.adapter.content(res),
                             creator: _self.adapter.creator(res)
