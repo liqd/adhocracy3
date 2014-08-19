@@ -253,6 +253,7 @@ export var registerDirective = (adhConfig : AdhConfig.Type, $location : ng.ILoca
     };
 };
 
+
 export var indicatorDirective = (adhConfig : AdhConfig.Type) => {
     return {
         restrict: "E",
@@ -265,6 +266,31 @@ export var indicatorDirective = (adhConfig : AdhConfig.Type) => {
             $scope.logOut = () => {
                 adhUser.logOut();
             };
+        }]
+    };
+};
+
+
+export var metaDirective = (adhConfig : AdhConfig.Type) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",
+        scope: {
+            path: "@"
+        },
+        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
+            if ($scope.path) {
+                adhHttp.resolve($scope.path)
+                    .then((res) => {
+                        $scope.userBasic = res.data["adhocracy.sheets.user.IUserBasic"];
+                        $scope.isAnonymous = false;
+                    });
+            } else {
+                $scope.userBasic = {
+                    name: "anonymous",
+                };
+                $scope.isAnonymous = true;
+            }
         }]
     };
 };

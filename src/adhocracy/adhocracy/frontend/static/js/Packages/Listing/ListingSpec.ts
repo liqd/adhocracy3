@@ -101,12 +101,34 @@ export var register = () => {
                         controller(scope, adhHttpMock, done);
                     });
 
-                    it("sets scope.container", () => {
+                    it("initializes scope.container", () => {
                         expect(scope.container).toEqual(container);
                     });
 
-                    it("sets scope.elements", () => {
+                    it("initializes scope.elements", () => {
                         expect(scope.elements).toEqual(elements);
+                    });
+
+                    it("intializes scope.show.createForm to false", () => {
+                        expect(scope.show).toBeDefined();
+                        expect(scope.show.createForm).toBeDefined();
+                        expect(scope.show.createForm).toBe(false);
+                    });
+
+                    describe("showCreateForm", () => {
+                        it("sets $scope.show.createForm to true", () => {
+                            expect(scope.showCreateForm).toBeDefined();
+                            scope.showCreateForm();
+                            expect(scope.show.createForm).toBe(true);
+                        });
+                    });
+
+                    describe("hideCreateForm", () => {
+                        it("sets $scope.show.createForm to false", () => {
+                            expect(scope.hideCreateForm).toBeDefined();
+                            scope.hideCreateForm();
+                            expect(scope.show.createForm).toBe(false);
+                        });
                     });
                 });
             });
