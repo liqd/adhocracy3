@@ -6,10 +6,11 @@ from time import sleep
 
 def wait(condition, step=0.1, max_steps=10) -> bool:
     """Wait for a condition to become true."""
-    for i in range(max_steps):
+    for i in range(max_steps - 1):
         if condition():
             return True
-        sleep(step)
+        else:
+            sleep(step)
     return condition()
 
 

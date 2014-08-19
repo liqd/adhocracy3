@@ -19,10 +19,8 @@ def test_includeme_registry_register_factories(config):
 @mark.usefixtures('integration')
 def test_includeme_registry_register_meta(config):
     from adhocracy.resources.pool import IBasicPool
-    from adhocracy.resources.pool import pool_metadata
     meta = config.registry.content.meta
     assert IBasicPool.__identifier__ in meta
-    assert meta[IBasicPool.__identifier__]['resource_metadata'] == pool_metadata
 
 
 @mark.usefixtures('integration')

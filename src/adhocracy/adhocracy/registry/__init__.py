@@ -1,21 +1,30 @@
 """Content registry."""
 from pyramid.security import has_permission
-from pyramid.path import DottedNameResolver
-from pyramid.testing import DummyResource
 from pyramid.request import Request
 from substanced.content import ContentRegistry
 from substanced.content import add_content_type
 from substanced.content import add_service_type
 
-from adhocracy.interfaces import IResource
 from adhocracy.utils import get_iresource
 from adhocracy.utils import get_all_sheets
-from adhocracy.utils import get_sheet
 
 
 class ResourceContentRegistry(ContentRegistry):
 
-    """Extend substanced content registry to work with resources."""
+    """Extend substanced content registry to work with resources.
+
+    Instance attributes:
+
+    :resources_meta: dictionary with key `resource type` and value
+                    :class:`adhocracy.interfaces.ResourceMetadata`.
+    :sheets_meta: dictionary with key `resource type` and value
+                 :class:`adhocracy.interfaces.SheetMetadata`.
+    """
+
+    def __init__(self, registry):
+        super().__init__(registry)
+        self.resources_meta = {}
+        self.sheets_meta = {}
 
     def resource_sheets(self, context, request,
                         onlyeditable=False,
@@ -55,41 +64,6 @@ class ResourceContentRegistry(ContentRegistry):
             wanted_sheets[sheet.meta.isheet.__identifier__] = sheet
         return wanted_sheets
 
-    def resources_metadata(self) -> dict:
-        """Get resource types with resource_metadata."""
-        resource_types = {}
-        resolve = DottedNameResolver()
-        for type_id, type_metadata in self.meta.items():
-            try:
-                iresource = resolve.maybe_resolve(type_id)
-                if iresource.isOrExtends(IResource):
-                    metadata = type_metadata['resource_metadata']
-                    resource_types[type_id] = metadata
-            except (ValueError, ImportError):
-                pass
-        return resource_types
-
-    def sheets_metadata(self):
-        """Get dictionary with all sheet metadata.
-
-        Returns:
-            dict: key = isheet identifier (dotted_name),
-                  value = isheet metadata
-
-        """
-        isheets = set()
-        for resource_meta in self.resources_metadata().values():
-            isheets.update(resource_meta.basic_sheets)
-            isheets.update(resource_meta.extended_sheets)
-
-        isheets_meta = {}
-        for isheet in isheets:
-            dummy_context = DummyResource(__provides__=isheet)
-            sheet = get_sheet(dummy_context, isheet)
-            isheets_meta[isheet.__identifier__] = sheet.meta
-
-        return isheets_meta
-
     def resource_addables(self, context, request: Request) -> dict:
         """Get dictionary with addable resource types.
 
@@ -112,13 +86,12 @@ class ResourceContentRegistry(ContentRegistry):
         iresource = get_iresource(context)
         if iresource is None:
             return {}
-        resources_metadata = self.resources_metadata()
-        assert iresource.__identifier__ in resources_metadata
-        metadata = resources_metadata[iresource.__identifier__]
+        assert iresource.__identifier__ in self.resources_meta
+        metadata = self.resources_meta[iresource.__identifier__]
         addables = metadata.element_types
         # get all addable types
         addable_types = []
-        for metdata in resources_metadata.values():
+        for metdata in self.resources_meta.values():
             is_implicit = metdata.is_implicit_addable
             for addable in addables:
                 is_subtype = is_implicit and metdata.iresource.extends(addable)
