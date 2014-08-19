@@ -3,15 +3,16 @@ from json import dumps
 from json import loads
 from logging import getLogger
 
+from cornice.util import _JSONError
 from pyramid.httpexceptions import HTTPException
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 
 from adhocracy.resources.root import IRootPool
+from adhocracy.rest.exceptions import internal_exception_to_tuple
 from adhocracy.rest.schemas import POSTBatchRequestSchema
 from adhocracy.rest.views import RESTView
-from adhocracy.utils import exception_to_str
 
 logger = getLogger(__name__)
 
@@ -59,9 +60,10 @@ class BatchView(RESTView):
             item_response = self._process_nested_request(item, path_map)
             response_list.append(item_response)
             if not item_response.was_successful():
-                self.request.response.status_code = item_response.code
-                break
-        return [response.to_dict() for response in response_list]
+                err = _JSONError([], status=item_response.code)
+                err.text = dumps(self._response_list_to_json(response_list))
+                raise err
+        return self._response_list_to_json(response_list)
 
     def _process_nested_request(self, nested_request: dict,
                                 path_map: dict) -> BatchItemResponse:
@@ -74,6 +76,9 @@ class BatchView(RESTView):
         item_response = self._invoke_subrequest_and_handle_errors(subrequest)
         self._extend_path_map(path_map, result_path, item_response)
         return item_response
+
+    def _response_list_to_json(self, response_list: list) -> list:
+        return [response.to_dict() for response in response_list]
 
     def _resolve_preliminary_paths(self, json_value: object,
                                    path_map) -> object:
@@ -125,7 +130,8 @@ class BatchView(RESTView):
             body = self._try_to_decode_json(err.body)
         except Exception as err:
             code = 500
-            body = {'internal error': exception_to_str(err)}
+            error_tuple = internal_exception_to_tuple(err)
+            body = {'status': 'error', 'errors': [error_tuple]}
             logger.exception('Unexpected exception processing nested request')
         return BatchItemResponse(code, body)
 
