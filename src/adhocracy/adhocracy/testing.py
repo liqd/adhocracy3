@@ -175,7 +175,7 @@ def mock_user_locator(registry) -> Mock:
     return locator
 
 
-def get_settings(request, part):
+def _get_settings(request, part):
     """Return settings of a config part."""
     config_parser = ConfigParser()
     config_file = request.config.getvalue('pyramid_config')
@@ -189,13 +189,13 @@ def get_settings(request, part):
 @fixture(scope='session')
 def settings(request) -> dict:
     """Return pyramid settings."""
-    return get_settings(request, 'app:main')
+    return _get_settings(request, 'app:main')
 
 
 @fixture(scope='session')
 def ws_settings(request) -> Configurator:
     """Return websocket server settings."""
-    return get_settings(request, 'websockets')
+    return _get_settings(request, 'websockets')
 
 
 @fixture(scope='class')
@@ -267,12 +267,7 @@ def app(zeo, configurator, websocket):
 def server(request, app) -> StopableWSGIServer:
     """Return a http server with the adhocracy wsgi application."""
     server = StopableWSGIServer.create(app)
-
-    def fin():
-        print('teardown adhocracy http server')
-        server.shutdown()
-
-    request.addfinalizer(fin)
+    request.addfinalizer(server.shutdown)
     return server
 
 
@@ -353,12 +348,14 @@ def browsera(request,
 
 @fixture()
 def browser_root(browsera, server) -> Browser:
-    """Return test browser instance with url=root.html."""
+    """Return test browser, start application and go to `root.html`."""
     url = server.application_url + 'frontend_static/root.html'
     browsera.visit(url)
 
     def angular_app_loaded(browser):
-        code = 'window.hasOwnProperty("adhocracy") && window.adhocracy.hasOwnProperty("loadState") && window.adhocracy.loadState === "complete";'  # noqa
+        code = 'window.hasOwnProperty("adhocracy") '\
+               '&& window.adhocracy.hasOwnProperty("loadState") '\
+               '&& window.adhocracy.loadState === "complete";'
         return browser.evaluate_script(code)
     browsera.wait_for_condition(angular_app_loaded, 5)
 
@@ -367,7 +364,7 @@ def browser_root(browsera, server) -> Browser:
 
 @fixture()
 def browser_test(browsera, server_static) -> Browser:
-    """Return test browser instance with url=test.html."""
+    """Return test browser and got to `test.html`."""
     url = server_static.application_url + 'frontend_static/test.html'
     browsera.visit(url)
 

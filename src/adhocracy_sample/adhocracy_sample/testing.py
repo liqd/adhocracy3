@@ -6,7 +6,7 @@ from pytest import fixture
 
 @fixture(scope='class')
 def app_sample(zeo, configurator, websocket):
-    """Return the adhocracy wsgi application."""
+    """Return the adhocracy sample wsgi application."""
     from adhocracy_sample import includeme
     includeme(configurator)
     return configurator.make_wsgi_app()
@@ -27,7 +27,7 @@ def server_sample(request, app_sample) -> StopableWSGIServer:
 
 @fixture()
 def browser_sample_root(browser, server_sample) -> Browser:
-    """Start sample application and go to the root html page."""
+    """Return test browser, start sample application and go to `root.html`."""
     url = server_sample.application_url + 'frontend_static/root.html'
     browser.visit(url)
     return browser
