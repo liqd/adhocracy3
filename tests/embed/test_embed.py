@@ -13,7 +13,7 @@ class Test:
         assert subprocess.call(["grep", "-q", "adhocracy.embedder.gaa", "/etc/hosts"]) == 0
 
     @pytest.mark.embed
-    def test_acceptance_zooming(self, browser_embedder_root):
+    def test_acceptance_zooming(self, browser_embed):
         """Run acceptance test after zooming in on iframe."""
 
         # This is mostly interesting as an example on how to do acceptance
@@ -21,21 +21,21 @@ class Test:
         # all the code there can be run both in the non-embed case and in any
         # one of many embedding contexts.
 
-        with browser_embedder_root.get_iframe('adhocracy-iframe') as iframe:
+        with browser_embed.get_iframe('adhocracy-iframe') as iframe:
             elements = iframe.find_by_css('#document_workbench_list')
             assert len(elements) != 0 and elements.first != None
 
     @pytest.mark.embed
-    def test_resize(self, browser_embedder_root):
+    def test_resize(self, browser_embed):
         """Iframe height matches its content after at most 5 seconds."""
 
         sec = 0
         js = 'document.getElementById("adhocracy-iframe").clientHeight'
 
         while True:
-            outer_height = browser_embedder_root.evaluate_script(js)
+            outer_height = browser_embed.evaluate_script(js)
 
-            with browser_embedder_root.get_iframe('adhocracy-iframe') as iframe:
+            with browser_embed.get_iframe('adhocracy-iframe') as iframe:
                 inner_height = iframe.evaluate_script('document.body.clientHeight')
 
                 if outer_height == inner_height:
