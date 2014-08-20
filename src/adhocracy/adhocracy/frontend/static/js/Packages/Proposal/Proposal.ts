@@ -453,7 +453,7 @@ export class Service {
             .then((proposalVersionPath) => _self.adhHttp.get(proposalVersionPath));
     }
 
-    public postProposalWithParagraphs(
+    public postProposalWithParagraphsBatched(
         poolPath : string,
         proposalVersion : RIProposalVersion,
         paragraphVersions : RIParagraphVersion[]
@@ -514,5 +514,10 @@ export class Service {
                         return responses[postProposalVersion.index];
                     });
             });
+    }
+
+    public postProposalWithParagraphs(p, v, pvs) {
+        return this.postProposalWithParagraphsOld(p, v, pvs);
+        // return this.postProposalWithParagraphsBatched(p, v, pvs);
     }
 };
