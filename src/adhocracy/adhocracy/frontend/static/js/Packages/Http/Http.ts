@@ -6,13 +6,19 @@ import Resources = require("../../Resources");
 import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
 import AdhTransaction = require("./Transaction");
+import AdhError = require("./Error");
+import AdhMarshall = require("./Marshall");
 
 // re-exports
 export interface ITransactionResult extends AdhTransaction.ITransactionResult {};
+export interface IBackendError extends AdhError.IBackendError {};
+export interface IBackendErrorItem extends AdhError.IBackendErrorItem {};
+export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void = AdhError.logBackendError;
 
-export var importContent : <Content extends Resources.Content<any>>(resp: {data: Content}) => Content;
-export var exportContent : <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) => Content;
-export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void;
+export var importContent : <Content extends Resources.Content<any>>(resp: {data: Content}) => Content
+    = AdhMarshall.importContent;
+export var exportContent : <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) => Content
+    = AdhMarshall.exportContent;
 
 
 /**
@@ -34,15 +40,15 @@ export class Service<Content extends Resources.Content<any>> {
     ) {}
 
     public get(path : string) : ng.IPromise<Content> {
-        return this.$http.get(path).then(importContent, logBackendError);
+        return this.$http.get(path).then(importContent, AdhError.logBackendError);
     }
 
     public put(path : string, obj : Content) : ng.IPromise<Content> {
-        return this.$http.put(path, exportContent(this.adhMetaApi, obj)).then(importContent, logBackendError);
+        return this.$http.put(path, exportContent(this.adhMetaApi, obj)).then(importContent, AdhError.logBackendError);
     }
 
     public post(path : string, obj : Content) : ng.IPromise<Content> {
-        return this.$http.post(path, exportContent(this.adhMetaApi, obj)).then(importContent, logBackendError);
+        return this.$http.post(path, exportContent(this.adhMetaApi, obj)).then(importContent, AdhError.logBackendError);
     }
 
     public getNewestVersionPath(path : string) : ng.IPromise<string> {
@@ -147,140 +153,3 @@ export class Service<Content extends Resources.Content<any>> {
         return callback(new AdhTransaction.Transaction(this.$http));
     }
 }
-
-
-/**
- * transform objects on the way in and out
- */
-importContent = <Content extends Resources.Content<any>>(resp: {data: Content}) : Content => {
-    "use strict";
-
-    var obj = resp.data;
-
-    if (typeof obj === "object") {
-        return obj;
-    } else {
-        throw ("unexpected type: " + (typeof obj).toString() + " " + obj.toString());
-    }
-
-    // FIXME: it would be nice if this function could throw an
-    // exception at run-time if the type of obj does not match
-    // Content.  however, not only is Content a compile-time entity,
-    // but it may very well be based on an interface that has no
-    // run-time entity anywhere.  two options:
-    //
-    // (1) http://stackoverflow.com/questions/24056019/is-there-a-way-to-check-instanceof-on-types-dynamically
-    //
-    // (2) typescript language feature request! :)
-    //
-    //
-    // the following function would be useful if the problem of
-    // turning abstract types into runtime objects could be solved.
-    // (for the time being, it has been removed from the Util module
-    // where it belongs.)
-    //
-    //
-    //   // in a way another function in the deep* family: check that _super
-    //   // has only attributes also available in _sub.  also check recursively
-    //   // (if _super has an object attribute, its counterpart in _sub must
-    //   // have the same attributes, and so on).
-    //
-    //   // FIXME: untested!
-    //   export function subtypeof(_sub, _super) {
-    //       if (typeof _sub !== typeof _super) {
-    //           return false;
-    //       }
-    //
-    //       if (typeof(_sub) === "object") {
-    //           if (_sub === null || _super === null) {
-    //               return true;
-    //           }
-    //
-    //           for (var x in _super) {
-    //               if (!(x in _sub)) { return false; }
-    //               if (!subtypeof(_sub[x], _super[x])) { return false; }
-    //           }
-    //       }
-    //
-    //       return true;
-    //   }
-};
-
-/**
- * prepare object for post or put.  remove all fields that are none of
- * editable, creatable, create_mandatory.  remove all sheets that have
- * no fields after this.
- *
- * FIXME: there is a difference between put and post.  namely, fields
- * that may be created but not edited should be treated differently.
- * also, fields with create_mandatory should not be missing from the
- * posted object.
- */
-exportContent = <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) : Content => {
-    "use strict";
-
-    var newobj : Content = Util.deepcp(obj);
-
-    // remove some fields from newobj.data[*] and empty sheets from
-    // newobj.data.
-    for (var sheetName in newobj.data) {
-        if (newobj.data.hasOwnProperty(sheetName)) {
-            var sheet : MetaApi.ISheet = newobj.data[sheetName];
-            var keepSheet : boolean = false;
-
-            for (var fieldName in sheet) {
-                if (sheet.hasOwnProperty(fieldName)) {
-                    var fieldMeta : MetaApi.ISheetField = adhMetaApi.field(sheetName, fieldName);
-
-                    if (fieldMeta.editable || fieldMeta.creatable || fieldMeta.create_mandatory) {
-                        keepSheet = true;
-                    } else {
-                        delete sheet[fieldName];
-                    }
-                }
-            }
-
-            if (!keepSheet) {
-                delete newobj.data[sheetName];
-            }
-        }
-    }
-
-    delete newobj.path;
-    return newobj;
-};
-
-
-// error handling
-
-// Error responses in the Adhocracy REST API contain json objects in
-// the body that have the following form:
-export interface IBackendError {
-    status: string;
-    errors: IBackendErrorItem[];
-}
-
-export interface IBackendErrorItem {
-    name : string;
-    location : string;
-    description : string;
-}
-
-logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendError>) : void => {
-    "use strict";
-
-    console.log("http response with error status: " + response.status);
-
-    for (var e in response.data.errors) {
-        if (response.data.errors.hasOwnProperty(e)) {
-            console.log("error #" + e);
-            console.log("where: " + response.data.errors[e].name + ", " + response.data.errors[e].location);
-            console.log("what:  " + response.data.errors[e].description);
-        }
-    }
-
-    console.log(response.config);
-    console.log(response.data);
-
-    throw response.data.errors;
-};
