@@ -121,10 +121,6 @@ def _validate_list_schema(nodes: list, cstructs: list, request: Request,
                           location='body'):
     if not nodes:
         return
-    if len(nodes) > 1:
-        request.errors.add(location, '', 'SequenceSchema has {} children '
-                                         'instead of 1'.format(len(nodes)))
-        return
     validated_list = []
     child_node = nodes[0]
     for index, cstruct in enumerate(cstructs):
