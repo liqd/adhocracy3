@@ -4,6 +4,7 @@ import q = require("q");
 
 import Util = require("../Util/Util");
 import AdhHttp = require("./Http");
+import AdhConvert = require("./Convert");
 
 var mkHttpMock = () => {
     var mock = jasmine.createSpyObj("$httpMock", ["get", "post", "put"]);
@@ -264,14 +265,14 @@ export var register = () => {
                 var response = {
                     data: obj
                 };
-                expect(AdhHttp.importContent(response)).toBe(obj);
+                expect(AdhConvert.importContent(response)).toBe(obj);
             });
             it("throws if response.data is not an object", () => {
                 var obj = <any>"foobar";
                 var response = {
                     data: obj
                 };
-                expect(() => AdhHttp.importContent(response)).toThrow();
+                expect(() => AdhConvert.importContent(response)).toThrow();
             });
         });
 
@@ -283,11 +284,11 @@ export var register = () => {
             });
 
             it("deletes the path", () => {
-                expect(AdhHttp.exportContent(adhMetaApiMock, {content_type: "", data: {}, path: "test"}))
+                expect(AdhConvert.exportContent(adhMetaApiMock, {content_type: "", data: {}, path: "test"}))
                     .toEqual({content_type: "", data: {}});
             });
             it("deletes read-only properties", () => {
-                var x = AdhHttp.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
+                var x = AdhConvert.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
                 var y = adhMetaApiMock.objAfter;
                 expect(Util.deepeq(x, y)).toBe(true);
                 expect(adhMetaApiMock.field).toHaveBeenCalled();

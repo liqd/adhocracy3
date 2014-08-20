@@ -15,11 +15,6 @@ export interface IBackendError extends AdhError.IBackendError {};
 export interface IBackendErrorItem extends AdhError.IBackendErrorItem {};
 export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void = AdhError.logBackendError;
 
-export var importContent : <Content extends Resources.Content<any>>(resp: {data: Content}) => Content
-    = AdhConvert.importContent;
-export var exportContent : <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) => Content
-    = AdhConvert.exportContent;
-
 
 /**
  * send and receive objects with adhocracy data model awareness
@@ -40,15 +35,21 @@ export class Service<Content extends Resources.Content<any>> {
     ) {}
 
     public get(path : string) : ng.IPromise<Content> {
-        return this.$http.get(path).then(importContent, AdhError.logBackendError);
+        return this.$http
+            .get(path)
+            .then(AdhConvert.importContent, AdhError.logBackendError);
     }
 
     public put(path : string, obj : Content) : ng.IPromise<Content> {
-        return this.$http.put(path, exportContent(this.adhMetaApi, obj)).then(importContent, AdhError.logBackendError);
+        return this.$http
+            .put(path, AdhConvert.exportContent(this.adhMetaApi, obj))
+            .then(AdhConvert.importContent, AdhError.logBackendError);
     }
 
     public post(path : string, obj : Content) : ng.IPromise<Content> {
-        return this.$http.post(path, exportContent(this.adhMetaApi, obj)).then(importContent, AdhError.logBackendError);
+        return this.$http
+            .post(path, AdhConvert.exportContent(this.adhMetaApi, obj))
+            .then(AdhConvert.importContent, AdhError.logBackendError);
     }
 
     public getNewestVersionPath(path : string) : ng.IPromise<string> {
