@@ -2,7 +2,7 @@ import AdhResources = require("../../Resources");
 import MetaApi = require("../MetaApi/MetaApi");
 
 import AdhError = require("./Error");
-import AdhMarshall = require("./Marshall");
+import AdhConvert = require("./Convert");
 
 
 export interface ITransactionResult {
@@ -58,7 +58,7 @@ export class Transaction {
         this.requests.push({
             method: "PUT",
             path: path,
-            body: AdhMarshall.exportContent(this.adhMetaApi, obj)
+            body: AdhConvert.exportContent(this.adhMetaApi, obj)
         });
         return {
             index: this.requests.length - 1,
@@ -72,7 +72,7 @@ export class Transaction {
         this.requests.push({
             method: "POST",
             path: path,
-            body: AdhMarshall.exportContent(this.adhMetaApi, obj),
+            body: AdhConvert.exportContent(this.adhMetaApi, obj),
             result_path: preliminaryPath
         });
         return {
@@ -87,7 +87,7 @@ export class Transaction {
         this.committed = true;
         return this.$http.post("/batch", this.requests).then(
             (response) => {
-                response.data = (<any>(response.data)).map(AdhMarshall.importContent);
+                response.data = (<any>(response.data)).map(AdhConvert.importContent);
                 // FIXME: description files don't appear to support
                 // array-typed response bodies.  this might be a good
                 // thing (web security and all).  change rest batch

@@ -7,7 +7,7 @@ import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
 import AdhTransaction = require("./Transaction");
 import AdhError = require("./Error");
-import AdhMarshall = require("./Marshall");
+import AdhConvert = require("./Convert");
 
 // re-exports
 export interface ITransactionResult extends AdhTransaction.ITransactionResult {};
@@ -16,9 +16,9 @@ export interface IBackendErrorItem extends AdhError.IBackendErrorItem {};
 export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void = AdhError.logBackendError;
 
 export var importContent : <Content extends Resources.Content<any>>(resp: {data: Content}) => Content
-    = AdhMarshall.importContent;
+    = AdhConvert.importContent;
 export var exportContent : <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) => Content
-    = AdhMarshall.exportContent;
+    = AdhConvert.exportContent;
 
 
 /**
