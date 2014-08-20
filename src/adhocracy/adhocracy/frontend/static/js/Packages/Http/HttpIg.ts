@@ -4,6 +4,18 @@
 
 var ng = require("angular");
 
+
+
+// FIXME: our current approach does not work, because we need to
+// import angular asynchronously.  and then also bootstrap it
+// manually.  which we don't want to do, i think.
+//
+// see also:
+// http://stackoverflow.com/questions/15499997/how-to-use-angular-scenario-with-requirejs (may be deprecated)
+// angular protractor (on docs.angularjs.org)
+
+
+
 import Resources = require("../../Resources");
 import RIProposal = require("../../Resources_/adhocracy_sample/resources/proposal/IProposal");
 import RIProposalVersion = require("../../Resources_/adhocracy_sample/resources/proposal/IProposalVersion");
