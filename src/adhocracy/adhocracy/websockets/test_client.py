@@ -10,6 +10,12 @@ class DummyClient():
     def __init__(self):
         self.messages_sent = False
 
+    def add_message_resource_modified(self, resource):
+        self.message_modfied_added = True
+
+    def add_message_resource_created(self, resource):
+        self.message_created_added = True
+
     def send_messages(self):
         self.messages_sent = True
 
@@ -48,19 +54,40 @@ class SendMessageAfterCommitUnitTests(unittest.TestCase):
 
     def setUp(self):
         from pyramid.testing import DummyResource
+        from adhocracy.resources.subscriber import changelog_metadata
         self._client = DummyClient()
         self._registry = DummyResource()
         self._registry.ws_client = self._client
+        self._registry._transaction_changelog = dict()
+        self._changelog_metadata = changelog_metadata
 
-    def test_send_messages_after_commit_hook_success(self):
+    def test_send_messages_after_commit_hook_success_and_empty_changelog(self):
         from adhocracy.websockets.client import send_messages_after_commit_hook
         send_messages_after_commit_hook(success=True, registry=self._registry)
         assert self._client.messages_sent is True
 
-    def test_send_messages_after_commit_hook_no_success(self):
+    def test_send_messages_after_commit_hook_no_success_and_empty_changelog(self):
         from adhocracy.websockets.client import send_messages_after_commit_hook
         send_messages_after_commit_hook(success=False, registry=self._registry)
         assert self._client.messages_sent is False
+
+    def test_send_messages_after_commit_hook_success_and_modified_in_changelog(self):
+        from pyramid.testing import DummyResource
+        from adhocracy.websockets.client import send_messages_after_commit_hook
+        self._registry._transaction_changelog['/'] = \
+            self._changelog_metadata._replace(modified=True,
+                                              resource=DummyResource())
+        send_messages_after_commit_hook(success=True, registry=self._registry)
+        assert self._client.message_modfied_added
+
+    def test_send_messages_after_commit_hook_success_and_created_in_changelog(self):
+        from pyramid.testing import DummyResource
+        from adhocracy.websockets.client import send_messages_after_commit_hook
+        self._registry._transaction_changelog['/'] = \
+            self._changelog_metadata._replace(created=True,
+                                              resource=DummyResource())
+        send_messages_after_commit_hook(success=True, registry=self._registry)
+        assert self._client.message_created_added
 
 
 class ClientUnitTests(unittest.TestCase):
