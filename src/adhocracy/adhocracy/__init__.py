@@ -36,10 +36,14 @@ def add_after_commit_hooks(request):
     """Add after commit hook to notify the websocket server."""
     # FIXME this is a quick hack
     from adhocracy.websockets.client import send_messages_after_commit_hook
+    from adhocracy.resources.subscriber import\
+        clear_transaction_changelog_after_commit_hook
     current_transaction = transaction.get()
     registry = request.registry
     current_transaction.addAfterCommitHook(send_messages_after_commit_hook,
                                            args=(registry,))
+    current_transaction.addAfterCommitHook(
+        clear_transaction_changelog_after_commit_hook, args=(registry,))
 
 
 def includeme(config):
@@ -69,6 +73,7 @@ def includeme(config):
     config.include('.resources.root')
     config.include('.resources.tag')
     config.include('.resources.principal')
+    config.include('.resources.subscriber')
     config.include('.websockets')
     config.include('.rest')
     config.include('.frontend')

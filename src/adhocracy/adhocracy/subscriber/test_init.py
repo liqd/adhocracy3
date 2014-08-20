@@ -45,8 +45,9 @@ def _create_new_version_event_with_isheet(context, isheet, registry, creator=Non
 class TestReferenceHasNewVersionSubscriberUnitTest:
 
     @fixture()
-    def registry(self, registry, mock_resource_registry):
+    def registry(self, config, registry, mock_resource_registry, transaction_changelog):
         registry.content = mock_resource_registry
+        registry._transaction_changelog = transaction_changelog
         return registry
 
     def _make_one(self, *args):
@@ -65,7 +66,7 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         add_and_register_sheet(context, sheet_versionable, registry)
         return event
 
-    def test_call_versionable_with_autoupdate_sheet(self, context, registry, mock_sheet):
+    def test_call_versionable_with_autoupdate_sheet_once(self, context, registry, mock_sheet):
         directlyProvides(context, IItemVersion)
         event = self._create_new_version_event_for_autoupdate_sheet(context, registry, mock_sheet)
         event.creator = object()
@@ -73,7 +74,7 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         self._make_one(event)
 
         factory = registry.content.create
-        assert factory.called
+        assert factory.call_count == 1
         parent = factory.call_args[1]['parent']
         assert parent is context.__parent__
         appstructs = factory.call_args[1]['appstructs']
@@ -83,11 +84,25 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         creator = factory.call_args[1]['creator']
         assert creator == event.creator
 
+    def test_call_versionable_with_autoupdate_sheet_twice(self, context, registry, mock_sheet, transaction_changelog):
+        directlyProvides(context, IItemVersion)
+        event = self._create_new_version_event_for_autoupdate_sheet(context, registry, mock_sheet)
+        self._make_one(event)
+
+        event_second = self._create_new_version_event_for_autoupdate_sheet(context, registry, mock_sheet)
+        transaction_changelog['/'] = transaction_changelog['/']._replace(
+            followed_by=event_second.new_version)
+        registry._transaction_changelog = transaction_changelog
+        self._make_one(event_second)
+
+        factory = registry.content.create
+        assert factory.call_count == 1
+
     def test_call_versionable_with_autoupdate_sheet_and_root_versions_and_not_is_insubtree(self,
             context, mock_graph, registry, mock_sheet):
         mock_graph.is_in_subtree.return_value = False
         context = testing.DummyResource(__provides__=IItemVersion,
-                                        __parent__=object(),
+                                        __parent__=testing.DummyResource(),
                                         __graph__=mock_graph)
         event = self._create_new_version_event_for_autoupdate_sheet(context, registry, mock_sheet)
         event.root_versions = [context]
