@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>adhocracy 3 frontend tests (unit plus coverage)</title>
+    <title>adhocracy 3 frontend tests (integration)</title>
 
     <script type="text/javascript" src="/frontend_static/lib/requirejs/require.js"></script>
     <script type="text/javascript" src="/frontend_static/require-config.js"></script>
@@ -14,14 +14,6 @@
 
     <script type="text/javascript" src="js/AdhocracySDK.js"></script>
 
-    <script
-        src="lib/blanket/dist/qunit/blanket.js"
-        data-cover-adapter="lib2/jasmine-2.x-blanket.js"
-        data-cover-only="//js/[^.]/"
-        data-cover-never="//spec$|js/Resources_//i"
-        data-cover-flags="branchTracking"
-        type="text/javascript">
-    </script>
 </head>
 
 <body>
@@ -34,7 +26,7 @@
             };
         };
 
-        require(['AdhocracySpec'], function(spec) {
+        require(['AdhocracyIg'], function(spec) {
             jasmine.getEnv().execute()
         });
     </script>

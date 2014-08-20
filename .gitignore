@@ -35,6 +35,7 @@ __pycache__
 /src/adhocracy/adhocracy/frontend/static/js/TAGS
 /src/adhocracy/adhocracy/frontend/static/js/tags
 /src/adhocracy/adhocracy/frontend/static/js/AdhocracySpec.ts
+/src/adhocracy/adhocracy/frontend/static/js/AdhocracyIg.ts
 /src/adhocracy/adhocracy/frontend/static/test-no-blanket.html
 /src/adhocracy/adhocracy/frontend/static/lib/
 /src/adhocracy/adhocracy/frontend/static/stylesheets/.sass-cache/
