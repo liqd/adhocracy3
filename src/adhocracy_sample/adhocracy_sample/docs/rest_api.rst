@@ -949,7 +949,11 @@ created paragraph version as its only successor ::
     .. >>> print(v1, v2)
     .. ...
 
-FIXME Transaction handling doesn't yet work correctly!
+The LAST tag should point to the version we created within the batch request::
+
+    >>> resp_data = testapp.get("/adhocracy/Proposals/kommunismus/par1/LAST").json
+    >>> resp_data['data']['adhocracy.sheets.tags.ITag']['elements']
+    ['/adhocracy/Proposals/kommunismus/par1/VERSION_0000001']
 
 Post another paragraph item and a version.  If the version post fails,
 the paragraph will not be present in the database ::
