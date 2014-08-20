@@ -150,6 +150,6 @@ export class Service<Content extends Resources.Content<any>> {
      *     };
      */
     public withTransaction<Result>(callback : (httpTrans : AdhTransaction.Transaction) => ng.IPromise<Result>) : ng.IPromise<Result> {
-        return callback(new AdhTransaction.Transaction(this.$http));
+        return callback(new AdhTransaction.Transaction(this.$http, this.adhMetaApi));
     }
 }

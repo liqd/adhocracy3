@@ -1,4 +1,8 @@
 import AdhResources = require("../../Resources");
+import MetaApi = require("../MetaApi/MetaApi");
+
+import AdhError = require("./Error");
+import AdhMarshall = require("./Marshall");
 
 
 export interface ITransactionResult {
@@ -21,7 +25,7 @@ export class Transaction {
     private committed : boolean;
     private nextID : number;
 
-    constructor(private $http : ng.IHttpService) {
+    constructor(private $http : ng.IHttpService, private adhMetaApi : MetaApi.MetaApiQuery) {
         this.requests = [];
         this.committed = false;
         this.nextID = 0;
@@ -54,7 +58,7 @@ export class Transaction {
         this.requests.push({
             method: "PUT",
             path: path,
-            body: obj
+            body: AdhMarshall.exportContent(this.adhMetaApi, obj)
         });
         return {
             index: this.requests.length - 1,
@@ -68,7 +72,7 @@ export class Transaction {
         this.requests.push({
             method: "POST",
             path: path,
-            body: obj,
+            body: AdhMarshall.exportContent(this.adhMetaApi, obj),
             result_path: preliminaryPath
         });
         return {
@@ -81,6 +85,16 @@ export class Transaction {
     public commit() : ng.IPromise<AdhResources.Content<any>[]> {
         this.checkNotCommitted();
         this.committed = true;
-        return this.$http.post("/batch", this.requests);
+        return this.$http.post("/batch", this.requests).then(
+            (response) => {
+                response.data = (<any>(response.data)).map(AdhMarshall.importContent);
+                // FIXME: description files don't appear to support
+                // array-typed response bodies.  this might be a good
+                // thing (web security and all).  change rest batch
+                // spec to wrap array in trivial object?
+
+                return response;
+            },
+            AdhError.logBackendError);
     }
 }
