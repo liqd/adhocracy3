@@ -2,13 +2,14 @@ import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
 import Resources = require("../../Resources");
 
+
 /**
- * transform objects on the way in and out
+ * transform objects on the way in (all request methods)
  */
-export var importContent = <Content extends Resources.Content<any>>(resp: {data: Content}) : Content => {
+export var importContent = <Content extends Resources.Content<any>>(response : {data : Content}) : Content => {
     "use strict";
 
-    var obj = resp.data;
+    var obj = response.data;
 
     if (typeof obj === "object") {
         return obj;
