@@ -3,6 +3,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import Resources = require("../../Resources");
+import ResourcesBase = require("../../ResourcesBase");
 import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
 import AdhTransaction = require("./Transaction");
@@ -51,6 +52,56 @@ export class Service<Content extends Resources.Content<any>> {
         // scenarios.
         return this.get(path + "/LAST")
             .then((tag) => tag.data["adhocracy.sheets.tags.ITag"].elements[0]);
+    }
+
+    /**
+     * Post a reference graph of resources.
+     *
+     * Take an array of resources.  The array has set semantics and
+     * often only contains one element (e.g., a proposal to be posted
+     * with all of its sub-resources).  All resources in the set are
+     * traversed, and all `references` (see below) to other resources
+     * are collected and added to the set.  Finally, all elements of
+     * the extended set are posted in an order that avoids dangling
+     * references (referenced object before referencing object).
+     *
+     * *return value:* `deepPost` promises an array of the posted
+     * objects.  The objects explicitly listed in the argument(s)
+     * appear first (in the original order), then all implicitly
+     * posted objects (in unspecified order).
+     *
+     * *references:* you can generate temporary resource paths with
+     * `mkPreliminaryPath`.  These paths can be put into the `path`
+     * attribute of any resource object, and then used as references
+     * in places where `adhocracy.schema.AbsolutePath` is expected.
+     * `deepPost` will resolve these references and replace them with
+     * the paths permanent resource paths returned from the server.
+     *
+     * *post diff:* an optional second argument contains a pristine
+     * copy of the resource array in the first.  deepPost extends both
+     * arrays and only posts those objects from the first array that
+     * differ from their counterparts in the second.
+     *
+     * (POSSIBLY FUTURE WORK: We could also support nested resources
+     * here, but this would be strictly less expressive: it would not
+     * be possible to reference the same section version object from
+     * both the containing section item and the proposal resource that
+     * it is contained in.  We could support a combination of
+     * preliminary names and nested resources, but for now it is not
+     * clear if that would be better or worse.)
+     */
+    public deepPost(
+        resources : ResourcesBase.Resource[],
+        pristine ?: ResourcesBase.Resource[]
+    ) : ng.IPromise<ResourcesBase.Resource[]> {
+        throw "not implemented";
+    }
+
+    /**
+     * See `deepPost`.
+     */
+    public mkPreliminaryPath() : string {
+        throw "not implemented";
     }
 
     public postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
