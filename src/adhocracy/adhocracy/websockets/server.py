@@ -9,7 +9,6 @@ import logging
 from autobahn.asyncio.websocket import WebSocketServerProtocol
 from autobahn.websocket.protocol import ConnectionRequest
 from pyramid.traversal import resource_path
-from substanced.util import get_oid
 import colander
 
 from adhocracy.interfaces import IResource
@@ -30,14 +29,14 @@ class ClientTracker():
     """"Keeps track of the clients that want notifications."""
 
     def __init__(self):
-        self._clients2resource_oids = defaultdict(set)
-        self._resource_oids2clients = defaultdict(set)
+        self._clients2resource_paths = defaultdict(set)
+        self._resource_paths2clients = defaultdict(set)
 
     def is_subscribed(self, client: Hashable, resource: IResource) -> bool:
         """Check whether a client is subscribed to a resource."""
-        oid = get_oid(resource)
-        return (client in self._clients2resource_oids and
-                oid in self._clients2resource_oids[client])
+        path = resource_path(resource)
+        return (client in self._clients2resource_paths and
+                path in self._clients2resource_paths[client])
 
     def subscribe(self, client: Hashable, resource: IResource) -> bool:
         """Subscribe a client to a resource, if necessary.
@@ -47,9 +46,9 @@ class ClientTracker():
         """
         if self.is_subscribed(client, resource):
             return False
-        oid = get_oid(resource)
-        self._clients2resource_oids[client].add(oid)
-        self._resource_oids2clients[oid].add(client)
+        path = resource_path(resource)
+        self._clients2resource_paths[client].add(path)
+        self._resource_paths2clients[path].add(client)
         return True
 
     def unsubscribe(self, client: Hashable, resource: IResource) -> bool:
@@ -60,10 +59,12 @@ class ClientTracker():
         """
         if not self.is_subscribed(client, resource):
             return False
-        oid = get_oid(resource)
-        self._discard_from_set_valued_dict(self._clients2resource_oids, client,
-                                           oid)
-        self._discard_from_set_valued_dict(self._resource_oids2clients, oid,
+        path = resource_path(resource)
+        self._discard_from_set_valued_dict(self._clients2resource_paths,
+                                           client,
+                                           path)
+        self._discard_from_set_valued_dict(self._resource_paths2clients,
+                                           path,
                                            client)
         return True
 
@@ -78,17 +79,17 @@ class ClientTracker():
 
     def delete_all_subscriptions(self, client: Hashable):
         """Delete all subscriptions for a client."""
-        oid_set = self._clients2resource_oids.pop(client, set())
-        for oid in oid_set:
-            self._discard_from_set_valued_dict(self._resource_oids2clients,
-                                               oid, client)
+        path_set = self._clients2resource_paths.pop(client, set())
+        for path in path_set:
+            self._discard_from_set_valued_dict(self._resource_paths2clients,
+                                               path, client)
 
     def iterate_subscribers(self, resource: IResource) -> Iterable:
         """Return an iterator over all clients subscribed to a resource."""
-        oid = get_oid(resource)
+        path = resource_path(resource)
         # 'if' check is necessary to avoid creating spurious empty sets
-        if oid in self._resource_oids2clients:
-            for client in self._resource_oids2clients[oid]:
+        if path in self._resource_paths2clients:
+            for client in self._resource_paths2clients[path]:
                 yield client
 
 

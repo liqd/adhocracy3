@@ -3,7 +3,6 @@ from json import loads
 import unittest
 
 from pyramid import testing
-from substanced.util import get_oid
 from zope.interface import alsoProvides
 import pytest
 
@@ -12,14 +11,6 @@ from adhocracy.websockets.server import ClientCommunicator
 
 def build_message(json_message: dict) -> bytes:
     return dumps(json_message).encode()
-
-
-class DummyResource():
-
-    """Dummy resource for testing."""
-
-    def __init__(self, oid):
-        self.__oid__ = oid
 
 
 class DummyConnectionRequest():
@@ -57,14 +48,12 @@ class QueueingClientCommunicator(ClientCommunicator):
 class ClientCommunicatorUnitTests(unittest.TestCase):
 
     def setUp(self):
-        self._next_oid = 1
-        self._child = self._make_resource()
-        app_root = self._make_resource()
-        app_root['child'] = self._child
-        zodb_root = self._make_resource()
+        app_root = testing.DummyResource()
+        app_root['child'] = testing.DummyResource()
+        zodb_root = testing.DummyResource()
         zodb_root['app_root'] = app_root
-        app_root.__parent__ = None
-        app_root.__name__ = None
+        app_root.__name__ = app_root.__parent__ = None
+        self._child = app_root['child']
         QueueingClientCommunicator.zodb_connection = DummyZODBConnection(
             zodb_root=zodb_root)
         self._comm = QueueingClientCommunicator()
@@ -73,12 +62,6 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
 
     def tearDown(self):
         self._comm.onClose(True, 0, 'teardown')
-
-    def _make_resource(self, *args):
-        resource = testing.DummyResource(*args)
-        resource.__oid__ = self._next_oid
-        self._next_oid += 1
-        return resource
 
     def test_autobahn_installed(self):
         from autobahn import __version__
@@ -216,16 +199,18 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
                                        'resource': '/child'}
 
     def test_send_child_notification(self):
-        grandchild = self._make_resource('grandchild', self._child)
-        self._comm.send_child_notification('new', self._child, grandchild)
+        child = self._child
+        child['grandchild'] = testing.DummyResource()
+        self._comm.send_child_notification('new', child, child['grandchild'])
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'event': 'new_child',
                                        'resource': '/child',
                                        'child': '/child/grandchild'}
 
     def test_send_new_version_notification(self):
-        new_version = self._make_resource('version_007', self._child)
-        self._comm.send_new_version_notification(self._child, new_version)
+        child = self._child
+        child['version_007'] = testing.DummyResource()
+        self._comm.send_new_version_notification(child, child['version_007'])
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'event': 'new_version',
                                        'resource': '/child',
@@ -249,16 +234,14 @@ class EventDispatchUnitTests(unittest.TestCase):
     """Test event dispatch from one ClientCommunicator to others."""
 
     def setUp(self):
-        self._next_oid = 1
-        self._child = self._make_resource()
-        app_root = self._make_resource()
-        app_root['child'] = self._child
-        self._grandchild = self._make_resource()
-        self._child['grandchild'] = self._grandchild
-        zodb_root = self._make_resource()
+        app_root = testing.DummyResource()
+        app_root['child'] = testing.DummyResource()
+        app_root['child']['grandchild'] = testing.DummyResource()
+        zodb_root = testing.DummyResource()
         zodb_root['app_root'] = app_root
-        app_root.__parent__ = None
-        app_root.__name__ = None
+        app_root.__name__ = app_root.__parent__ = None
+        self._child = app_root['child']
+        self._grandchild = app_root['child']['grandchild']
         QueueingClientCommunicator.zodb_connection = DummyZODBConnection(
             zodb_root=zodb_root)
         self._subscriber = QueueingClientCommunicator()
@@ -273,12 +256,6 @@ class EventDispatchUnitTests(unittest.TestCase):
     def tearDown(self):
         self._subscriber.onClose(True, 0, 'teardown')
         self._dispatcher.onClose(True, 0, 'teardown')
-
-    def _make_resource(self, *args):
-        resource = testing.DummyResource(*args)
-        resource.__oid__ = self._next_oid
-        self._next_oid += 1
-        return resource
 
     def test_dispatch_created_notification(self):
         msg = build_message({'event': 'created',
@@ -339,31 +316,27 @@ class ClientTrackerUnitTests(unittest.TestCase):
     def _make_client(self):
         return object()
 
-    def _make_resource(self):
-        resource = DummyResource(self._next_oid)
-        self._next_oid += 1
-        return resource
-
     def setUp(self):
         from adhocracy.websockets.server import ClientTracker
+        app_root = testing.DummyResource()
+        app_root['child'] = testing.DummyResource()
+        self._child = app_root['child']
         self._tracker = ClientTracker()
-        self._next_oid = 1
 
     def test_subscribe(self):
         client = self._make_client()
-        resource = self._make_resource()
-        oid = get_oid(resource)
+        resource = self._child
         result = self._tracker.subscribe(client, resource)
         assert result is True
-        assert len(self._tracker._clients2resource_oids) == 1
-        assert len(self._tracker._resource_oids2clients) == 1
-        assert self._tracker._clients2resource_oids[client] == {oid}
-        assert self._tracker._resource_oids2clients[oid] == {client}
+        assert len(self._tracker._clients2resource_paths) == 1
+        assert len(self._tracker._resource_paths2clients) == 1
+        assert self._tracker._clients2resource_paths[client] == {'/child'}
+        assert self._tracker._resource_paths2clients['/child'] == {client}
 
     def test_subscribe_redundant(self):
         """Test client subscribing same resource twice."""
         client = self._make_client()
-        resource = self._make_resource()
+        resource = self._child
         self._tracker.subscribe(client, resource)
         result = self._tracker.subscribe(client, resource)
         assert result is False
@@ -371,49 +344,46 @@ class ClientTrackerUnitTests(unittest.TestCase):
     def test_subscribe_two_resources(self):
         """Test client subscribing to two resources."""
         client = self._make_client()
-        resource1 = self._make_resource()
-        resource2 = self._make_resource()
-        oid1 = get_oid(resource1)
-        oid2 = get_oid(resource2)
+        resource1 = self._child
+        resource2 = self._child.__parent__['child2'] = testing.DummyResource()
         result1 = self._tracker.subscribe(client, resource1)
         result2 = self._tracker.subscribe(client, resource2)
         assert result1 is True
         assert result2 is True
-        assert len(self._tracker._clients2resource_oids) == 1
-        assert len(self._tracker._resource_oids2clients) == 2
-        assert self._tracker._clients2resource_oids[client] == {oid1, oid2}
-        assert self._tracker._resource_oids2clients[oid1] == {client}
-        assert self._tracker._resource_oids2clients[oid2] == {client}
+        assert len(self._tracker._clients2resource_paths) == 1
+        assert len(self._tracker._resource_paths2clients) == 2
+        assert self._tracker._clients2resource_paths[client] == {'/child', '/child2'}
+        assert self._tracker._resource_paths2clients['/child'] == {client}
+        assert self._tracker._resource_paths2clients['/child2'] == {client}
 
     def test_subscribe_two_clients(self):
         """Test two clients subscribing to same resource."""
         client1 = self._make_client()
         client2 = self._make_client()
-        resource = self._make_resource()
-        oid = get_oid(resource)
+        resource = self._child
         result1 = self._tracker.subscribe(client1, resource)
         result2 = self._tracker.subscribe(client2, resource)
         assert result1 is True
         assert result2 is True
-        assert len(self._tracker._clients2resource_oids) == 2
-        assert len(self._tracker._resource_oids2clients) == 1
-        assert self._tracker._clients2resource_oids[client1] == {oid}
-        assert self._tracker._clients2resource_oids[client2] == {oid}
-        assert self._tracker._resource_oids2clients[oid] == {client1, client2}
+        assert len(self._tracker._clients2resource_paths) == 2
+        assert len(self._tracker._resource_paths2clients) == 1
+        assert self._tracker._clients2resource_paths[client1] == {'/child'}
+        assert self._tracker._clients2resource_paths[client2] == {'/child'}
+        assert self._tracker._resource_paths2clients['/child'] == {client1, client2}
 
     def test_unsubscribe(self):
         client = self._make_client()
-        resource = self._make_resource()
+        resource = self._child
         self._tracker.subscribe(client, resource)
         result = self._tracker.unsubscribe(client, resource)
         assert result is True
-        assert len(self._tracker._clients2resource_oids) == 0
-        assert len(self._tracker._resource_oids2clients) == 0
+        assert len(self._tracker._clients2resource_paths) == 0
+        assert len(self._tracker._resource_paths2clients) == 0
 
     def test_unsubscribe_redundant(self):
         """Test client unsubscribing from the same resource twice."""
         client = self._make_client()
-        resource = self._make_resource()
+        resource = self._child
         self._tracker.subscribe(client, resource)
         self._tracker.unsubscribe(client, resource)
         result = self._tracker.unsubscribe(client, resource)
@@ -423,19 +393,19 @@ class ClientTrackerUnitTests(unittest.TestCase):
         """Test deleting all subscriptions for a client that has none."""
         client = self._make_client()
         self._tracker.delete_all_subscriptions(client)
-        assert len(self._tracker._clients2resource_oids) == 0
-        assert len(self._tracker._resource_oids2clients) == 0
+        assert len(self._tracker._clients2resource_paths) == 0
+        assert len(self._tracker._resource_paths2clients) == 0
 
     def test_delete_all_subscriptions_two_resource(self):
         """Test deleting all subscriptions for a client that has two."""
         client = self._make_client()
-        resource1 = self._make_resource()
-        resource2 = self._make_resource()
+        resource1 = self._child
+        resource2 = self._child
         self._tracker.subscribe(client, resource1)
         self._tracker.subscribe(client, resource2)
         self._tracker.delete_all_subscriptions(client)
-        assert len(self._tracker._clients2resource_oids) == 0
-        assert len(self._tracker._resource_oids2clients) == 0
+        assert len(self._tracker._clients2resource_paths) == 0
+        assert len(self._tracker._resource_paths2clients) == 0
 
     def test_delete_all_subscriptions_two_clients(self):
         """Test deleting all subscriptions for one client subscribed to the
@@ -443,30 +413,29 @@ class ClientTrackerUnitTests(unittest.TestCase):
         """
         client1 = self._make_client()
         client2 = self._make_client()
-        resource = self._make_resource()
-        oid = get_oid(resource)
+        resource = self._child
         self._tracker.subscribe(client1, resource)
         self._tracker.subscribe(client2, resource)
         self._tracker.delete_all_subscriptions(client1)
-        assert len(self._tracker._clients2resource_oids) == 1
-        assert len(self._tracker._resource_oids2clients) == 1
-        assert self._tracker._clients2resource_oids[client2] == {oid}
-        assert self._tracker._resource_oids2clients[oid] == {client2}
-        assert client1 not in self._tracker._clients2resource_oids
+        assert len(self._tracker._clients2resource_paths) == 1
+        assert len(self._tracker._resource_paths2clients) == 1
+        assert self._tracker._clients2resource_paths[client2] == {'/child'}
+        assert self._tracker._resource_paths2clients['/child'] == {client2}
+        assert client1 not in self._tracker._clients2resource_paths
 
     def test_iterate_subscribers_empty(self):
         """Test iterating subscribers for a resource that has none."""
-        resource = self._make_resource()
+        resource = self._child
         result = list(self._tracker.iterate_subscribers(resource))
         assert len(result) == 0
-        assert len(self._tracker._clients2resource_oids) == 0
-        assert len(self._tracker._resource_oids2clients) == 0
+        assert len(self._tracker._clients2resource_paths) == 0
+        assert len(self._tracker._resource_paths2clients) == 0
 
     def test_iterate_subscribers_two(self):
         """Test iterating subscribers for a resource that has two."""
         client1 = self._make_client()
         client2 = self._make_client()
-        resource = self._make_resource()
+        resource = self._child
         self._tracker.subscribe(client1, resource)
         self._tracker.subscribe(client2, resource)
         result = list(self._tracker.iterate_subscribers(resource))
