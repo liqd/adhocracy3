@@ -62,6 +62,22 @@ export var importContent = <Content extends Resources.Content<any>>(response : {
 
 
 /**
+ * transform batch request response into Content array
+ */
+export var importBatchContent = <Content extends Resources.Content<any>>(responses : { data : {body : Content}[] }) : Content[] => {
+    // FIXME: description files don't appear to support array-typed
+    // response bodies.  this might be a good thing (web security and
+    // all).  change rest batch spec to wrap array in trivial object?
+
+    return (<any>(responses.data)).map((response) => {
+        response.data = response.body;
+        delete response.body;
+        return importContent(response);
+    });
+};
+
+
+/**
  * prepare object for post or put.  remove all fields that are none of
  * editable, creatable, create_mandatory.  remove all sheets that have
  * no fields after this.

@@ -86,15 +86,7 @@ export class Transaction {
         this.checkNotCommitted();
         this.committed = true;
         return this.$http.post("/batch", this.requests).then(
-            (response) => {
-                response.data = (<any>(response.data)).map(AdhConvert.importContent);
-                // FIXME: description files don't appear to support
-                // array-typed response bodies.  this might be a good
-                // thing (web security and all).  change rest batch
-                // spec to wrap array in trivial object?
-
-                return response;
-            },
+            AdhConvert.importBatchContent,
             AdhError.logBackendError);
     }
 }
