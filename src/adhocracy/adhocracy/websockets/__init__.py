@@ -16,4 +16,3 @@ class WebSocketError(Exception):
 def includeme(config):  # pragma: no cover
     """Configure WebSockets client."""
     config.include('.client')
-    config.include('.subscriber')
