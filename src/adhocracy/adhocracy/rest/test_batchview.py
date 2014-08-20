@@ -1,0 +1,250 @@
+from pyramid import testing
+from pyramid.request import Request
+
+from adhocracy.rest.batchview import BatchItemResponse
+
+
+class DummySubresponse:
+
+    def __init__(self, status_code: int=200, json: dict={}):
+        self.status_code = status_code
+        self.json = json
+
+
+class CorniceDummyRequest(testing.DummyRequest):
+
+    def __init__(self, items: list=[], subresponse=DummySubresponse(),
+                 exception: Exception=None):
+        super().__init__()
+        from cornice.errors import Errors
+        self.validated = {'items': items}
+        self.errors = Errors(self)
+        self.subresponse = subresponse
+        self.exception = exception
+
+    def invoke_subrequest(self, request: Request):
+        if self.exception is not None:
+            raise self.exception
+        return self.subresponse
+
+
+class TestBatchItemResponse:
+
+    def _make_one(self, code=200, body: dict={}) -> BatchItemResponse:
+        return BatchItemResponse(code, body)
+
+    def test_was_successful_true(self):
+        inst = self._make_one()
+        assert inst.was_successful() is True
+
+    def test_was_successful_false(self):
+        inst = self._make_one(404)
+        assert inst.was_successful() is False
+
+    def test_to_dict(self):
+        inst = self._make_one()
+        assert inst.to_dict() == {'code': 200, 'body': {}}
+
+
+class TestBatchView:
+
+    def _make_one(self, context, request=CorniceDummyRequest()):
+        from adhocracy.rest.batchview import BatchView
+        inst = BatchView(context, request)
+        return inst
+
+    def _make_subrequest_dict(self, path: str='/adhocracy/blah',
+                              result_path: str='newpath',
+                              method: str='PUT',
+                              body: dict={}) -> dict:
+        return {'path': path,
+                'result_path': result_path,
+                'method': method,
+                'body': body}
+
+    def test_post_empty(self, context):
+        inst = self._make_one(context)
+        assert inst.post() == []
+
+    def test_post_successful_subrequest(self, context):
+        subrequest_dict = self._make_subrequest_dict()
+        request = CorniceDummyRequest(items=[subrequest_dict])
+        inst = self._make_one(context, request)
+        response = inst.post()
+        assert response == [{'body': {}, 'code': 200}]
+
+    def test_post_failed_subrequest(self, context):
+        from cornice.util import _JSONError
+        subrequest_dict = self._make_subrequest_dict()
+        request = CorniceDummyRequest(items=[subrequest_dict],
+                                      subresponse=DummySubresponse(444))
+        inst = self._make_one(context, request)
+        try:
+            inst.post()
+            assert False
+        except _JSONError as err:
+            assert err.status_code == 444
+            assert err.text.startswith('[{')
+            assert err.text.endswith('}]')
+
+    def test_post_subrequest_with_http_exception(self, context):
+        from cornice.util import _JSONError
+        from pyramid.httpexceptions import HTTPUnauthorized
+        subrequest_dict = self._make_subrequest_dict()
+        request = CorniceDummyRequest(items=[subrequest_dict],
+                                      exception=HTTPUnauthorized())
+        inst = self._make_one(context, request)
+        try:
+            inst.post()
+            assert False
+        except _JSONError as err:
+            assert err.status_code == 401
+            assert '"code": 401' in err.text
+
+    def test_post_subrequest_with_other_exception(self, context):
+        from cornice.util import _JSONError
+        subrequest_dict = self._make_subrequest_dict()
+        request = CorniceDummyRequest(items=[subrequest_dict],
+                                      exception=RuntimeError('Bad luck'))
+        inst = self._make_one(context, request)
+        try:
+            inst.post()
+            assert False
+        except _JSONError as err:
+            assert err.status_code == 500
+            assert '"internal"' in err.text
+            assert 'Bad luck' in err.text
+
+    def _make_batch_response(self, code=200, path=None,
+                             first_version_path=None) -> BatchItemResponse:
+        body = {}
+        if path is not None:
+            body['path'] = path
+        if first_version_path is not None:
+            body['first_version_path'] = first_version_path
+        return BatchItemResponse(code, body)
+
+    def test_extend_path_map_just_path(self, context):
+        inst = self._make_one(context)
+        path_map = {}
+        result_path = 'newpath'
+        item_response = self._make_batch_response(path='/adhocracy/new_item')
+        inst._extend_path_map(path_map, result_path, item_response)
+        assert path_map == {'@newpath': '/adhocracy/new_item'}
+
+    def test_extend_path_map_path_and_first_version_path(self, context):
+        inst = self._make_one(context)
+        path_map = {}
+        result_path = 'newpath'
+        item_response = self._make_batch_response(
+            path='/adhocracy/new_item',
+            first_version_path='/adhocracy/new_item/v0')
+        inst._extend_path_map(path_map, result_path, item_response)
+        assert path_map == {'@newpath': '/adhocracy/new_item',
+                            '@@newpath': '/adhocracy/new_item/v0'}
+
+    def test_extend_path_map_no_result_path(self, context):
+        inst = self._make_one(context)
+        path_map = {}
+        result_path = ''
+        item_response = self._make_batch_response(path='/adhocracy/new_item')
+        inst._extend_path_map(path_map, result_path, item_response)
+        assert path_map == {}
+
+    def test_extend_path_map_failed_response(self, context):
+        inst = self._make_one(context)
+        path_map = {}
+        result_path = 'newpath'
+        item_response = self._make_batch_response(code=444,
+                                                  path='/adhocracy/new_item')
+        inst._extend_path_map(path_map, result_path, item_response)
+        assert path_map == {}
+
+    def test_make_subrequest_post_with_non_empty_body(self, context):
+        inst = self._make_one(context)
+        body = {'content_type':
+                    'adhocracy_sample.resources.paragraph.IParagraph',
+                'data': {'adhocracy.sheets.name.IName': {'name': 'par1'}}
+               }
+        subrequest_dict = self._make_subrequest_dict(method='POST', body=body)
+        subrequest = inst._make_subrequest(subrequest_dict)
+        assert isinstance(subrequest, Request)
+        assert subrequest.method == 'POST'
+        assert subrequest.content_type == 'application/json'
+        assert subrequest.json == body
+
+    def test_make_subrequest_get_with_empty_body(self, context):
+        inst = self._make_one(context)
+        subrequest_dict = self._make_subrequest_dict(method='GET')
+        subrequest = inst._make_subrequest(subrequest_dict)
+        assert subrequest.method == 'GET'
+        assert subrequest.content_type != 'application/json'
+        assert len(subrequest.body) == 0
+
+    def test_resolve_preliminary_paths_str_with_replacement(self, context):
+        inst = self._make_one(context)
+        path_map = {'@newpath': '/adhocracy/new_item'}
+        json_value = '@newpath'
+        result = inst._resolve_preliminary_paths(json_value, path_map)
+        assert result == '/adhocracy/new_item'
+
+    def test_resolve_preliminary_paths_str_without_replacement(self, context):
+        inst = self._make_one(context)
+        path_map = {'@newpath': '/adhocracy/new_item'}
+        json_value = 'nopath'
+        result = inst._resolve_preliminary_paths(json_value, path_map)
+        assert result == json_value
+
+    def test_resolve_preliminary_paths_dict_with_replacement(self, context):
+        inst = self._make_one(context)
+        path_map = {'@newpath': '/adhocracy/new_item'}
+        json_value = {'item1': 'foo', 'item2': '@newpath', 'item3': 'bar'}
+        result = inst._resolve_preliminary_paths(json_value, path_map)
+        assert result == {'item1': 'foo',
+                          'item2': '/adhocracy/new_item',
+                          'item3': 'bar'}
+
+    def test_resolve_preliminary_paths_dict_without_replacement(self, context):
+        inst = self._make_one(context)
+        path_map = {'@newpath': '/adhocracy/new_item'}
+        json_value = {'item1': 'foo', 'item2': 'nopath', 'item3': 'bar'}
+        result = inst._resolve_preliminary_paths(json_value, path_map)
+        assert result == json_value
+
+    def test_resolve_preliminary_paths_list_with_replacement(self, context):
+        inst = self._make_one(context)
+        path_map = {'@newpath': '/adhocracy/new_item'}
+        json_value = ['@newpath', 'foo', 'bar']
+        result = inst._resolve_preliminary_paths(json_value, path_map)
+        assert result == ['/adhocracy/new_item', 'foo', 'bar']
+
+    def test_resolve_preliminary_paths_list_without_replacement(self, context):
+        inst = self._make_one(context)
+        path_map = {'@newpath': '/adhocracy/new_item'}
+        json_value = ['nopath', 'foo', 'bar']
+        result = inst._resolve_preliminary_paths(json_value, path_map)
+        assert result == json_value
+
+    def test_resolve_preliminary_paths_other_type(self, context):
+        inst = self._make_one(context)
+        path_map = {'@newpath': '/adhocracy/new_item'}
+        json_value = 123.456
+        result = inst._resolve_preliminary_paths(json_value, path_map)
+        assert result == json_value
+
+    def test_try_to_decode_json_empty(self, context):
+        inst = self._make_one(context)
+        result = inst._try_to_decode_json(b'')
+        assert result == {}
+
+    def test_try_to_decode_json_valid(self, context):
+        inst = self._make_one(context)
+        payload = b'{"item2": 2, "item3": null, "item1": "value1"}'
+        result = inst._try_to_decode_json(payload)
+        assert result == {'item1': 'value1', 'item2': 2, 'item3': None}
+
+    def test_try_to_decode_json_invalid(self, context):
+        inst = self._make_one(context)
+        payload = b'{this is not a JSON object}'
+        result = inst._try_to_decode_json(payload)
+        assert result == {'error': '{this is not a JSON object}'}
