@@ -43,6 +43,7 @@ export interface ListingScope<Container> extends ng.IScope {
     wshandle : string;
     clear : () => void;
     show : { createForm : boolean };
+    onCreate : () => void;
     showCreateForm : () => void;
     hideCreateForm : () => void;
 }
@@ -105,6 +106,11 @@ export class Listing<Container extends Resources.Content<any>> {
                     $scope.container = undefined;
                     $scope.poolPath = undefined;
                     $scope.elements = [];
+                };
+
+                $scope.onCreate = () : void => {
+                    $scope.update();
+                    $scope.hideCreateForm();
                 };
 
                 $scope.$watch("path", (newPath : string) => {
