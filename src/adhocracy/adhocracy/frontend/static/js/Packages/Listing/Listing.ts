@@ -43,6 +43,7 @@ export interface ListingScope<Container> extends ng.IScope {
     wshandle : string;
     clear : () => void;
     show : { createForm : boolean };
+    onCreate : () => void;
     showCreateForm : () => void;
     hideCreateForm : () => void;
 }
@@ -59,6 +60,13 @@ export class Listing<Container extends Resources.Content<any>> {
         var _self = this;
         var _class = (<any>_self).constructor;
 
+        var unregisterWebsocket = (scope) => {
+            if (typeof scope.poolPath !== "undefined" && typeof scope.wshandle !== "undefined") {
+                adhWebSocket.unregister(scope.poolPath, scope.wshandle);
+                scope.wshandle = undefined;
+            }
+        };
+
         return {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
@@ -69,9 +77,7 @@ export class Listing<Container extends Resources.Content<any>> {
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
                 element.on("$destroy", () => {
-                    if (typeof scope.wshandle === "string") {
-                        adhWebSocket.unregister(scope.path, scope.wshandle);
-                    }
+                    unregisterWebsocket(scope);
                 });
             },
             controller: ["$scope", "adhHttp", (
@@ -102,10 +108,13 @@ export class Listing<Container extends Resources.Content<any>> {
                     $scope.elements = [];
                 };
 
+                $scope.onCreate = () : void => {
+                    $scope.update();
+                    $scope.hideCreateForm();
+                };
+
                 $scope.$watch("path", (newPath : string) => {
-                    if (typeof $scope.poolPath !== "undefined" && typeof $scope.wshandle !== "undefined") {
-                        adhWebSocket.unregister($scope.poolPath, $scope.wshandle);
-                    }
+                    unregisterWebsocket($scope);
 
                     if (newPath) {
                         // NOTE: Ideally we would like to first subscribe to

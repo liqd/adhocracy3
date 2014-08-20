@@ -17,7 +17,6 @@ from webtest.http import StopableWSGIServer
 from pytest import fixture
 import colander
 
-from adhocracy import root_factory
 from adhocracy.interfaces import SheetMetadata
 from adhocracy.interfaces import ResourceMetadata
 
@@ -184,7 +183,7 @@ def mock_user_locator(registry) -> Mock:
     return locator
 
 
-def get_settings(request, part):
+def _get_settings(request, part):
     """Return settings of a config part."""
     config_parser = ConfigParser()
     config_file = request.config.getvalue('pyramid_config')
@@ -198,20 +197,13 @@ def get_settings(request, part):
 @fixture(scope='session')
 def settings(request) -> dict:
     """Return pyramid settings."""
-    return get_settings(request, 'app:main')
+    return _get_settings(request, 'app:main')
 
 
 @fixture(scope='session')
 def ws_settings(request) -> Configurator:
     """Return websocket server settings."""
-    return get_settings(request, 'websockets')
-
-
-@fixture(scope='class')
-def configurator(request, settings) -> Configurator:
-    """Return pyramid configuration."""
-    configuration = Configurator(settings=settings, root_factory=root_factory)
-    return configuration
+    return _get_settings(request, 'websockets')
 
 
 @fixture(scope='class')
@@ -265,9 +257,11 @@ def _kill_pid_in_file(path_to_pid_file):
 
 
 @fixture(scope='class')
-def app(zeo, configurator, websocket):
+def app(zeo, settings, websocket):
     """Return the adhocracy wsgi application."""
     import adhocracy
+    configurator = Configurator(settings=settings,
+                                root_factory=adhocracy.root_factory)
     configurator.include(adhocracy)
     return configurator.make_wsgi_app()
 
@@ -276,12 +270,7 @@ def app(zeo, configurator, websocket):
 def server(request, app) -> StopableWSGIServer:
     """Return a http server with the adhocracy wsgi application."""
     server = StopableWSGIServer.create(app)
-
-    def fin():
-        print('teardown adhocracy http server')
-        server.shutdown()
-
-    request.addfinalizer(fin)
+    request.addfinalizer(server.shutdown)
     return server
 
 
@@ -340,49 +329,44 @@ def compile_js_code(self, code: str, **kwargs) -> str:
     return '(function({}) {{{}}})({})'.format(keys, code, values)
 
 
-@fixture()  # pragma: no cover
-def browsera(request,
-             browser_pool,
-             splinter_webdriver,
-             splinter_session_scoped_browser,
-             splinter_close_browser):
-    """Return test browser instance to be used for browser interaction.
-
-    Function scoped (cookies are clean for each test and on blank).
-    Add additional helper functions to browser instance.
-    """
-    from pytest_splinter.plugin import browser
-    inst = browser(request, browser_pool, splinter_webdriver,
-                   splinter_session_scoped_browser, splinter_close_browser)
+def add_helper_methods_to_splinter_browser_wrapper(inst: Browser) -> Browser:
+    """Add additional helper functions to the splinter browser wrapper."""
     inst.compile_js_code = types.MethodType(compile_js_code, inst)
     inst.evaluate_script_with_kwargs = types.MethodType(
         evaluate_script_with_kwargs, inst)
     return inst
 
 
+def angular_app_loaded(browser: Browser) -> bool:
+    """Check that the angular app is loaded."""
+    code = 'window.hasOwnProperty("adhocracy") '\
+           '&& window.adhocracy.hasOwnProperty("loadState") '\
+           '&& window.adhocracy.loadState === "complete";'
+    return browser.evaluate_script(code)
+
+
 @fixture()
-def browser_root(browsera, server) -> Browser:
-    """Return test browser instance with url=root.html."""
+def browser_root(browser, server) -> Browser:
+    """Return test browser, start application and go to `root.html`."""
+    add_helper_methods_to_splinter_browser_wrapper(browser)
     url = server.application_url + 'frontend_static/root.html'
-    browsera.visit(url)
-
-    def angular_app_loaded(browser):
-        code = 'window.hasOwnProperty("adhocracy") && window.adhocracy.hasOwnProperty("loadState") && window.adhocracy.loadState === "complete";'  # noqa
-        return browser.evaluate_script(code)
-    browsera.wait_for_condition(angular_app_loaded, 5)
-
-    return browsera
+    browser.visit(url)
+    browser.wait_for_condition(angular_app_loaded, 5)
+    return browser
 
 
 @fixture()
-def browser_test(browsera, server_static) -> Browser:
-    """Return test browser instance with url=test.html."""
+def browser_test(browser, server_static) -> Browser:
+    """Return test browser and go to `test.html`."""
+    add_helper_methods_to_splinter_browser_wrapper(browser)
+
     url = server_static.application_url + 'frontend_static/test.html'
-    browsera.visit(url)
+    browser.visit(url)
 
     def jasmine_finished(browser):
         code = 'jsApiReporter.finished'
         return browser.browser.evaluate_script(code)
-    browsera.wait_for_condition(jasmine_finished, 5)
 
-    return browsera
+    browser.wait_for_condition(jasmine_finished, 5)
+
+    return browser

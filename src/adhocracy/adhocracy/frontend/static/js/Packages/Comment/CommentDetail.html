@@ -17,7 +17,8 @@
             <adh-comment-create
                 data-refers-to="{{path}}"
                 data-pool-path="{{poolPath}}"
-                data-on-new="update"
+                data-on-new="onCreate"
+                data-on-cancel="hideCreateForm"
                 data-ng-switch-when="create-form-id">
             </adh-comment-create>
             <adh-comment-detail

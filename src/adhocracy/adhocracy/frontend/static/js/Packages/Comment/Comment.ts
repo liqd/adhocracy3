@@ -58,7 +58,8 @@ export class CommentCreate {
             scope: {
                 refersTo: "@",  // path of a commentable version
                 poolPath: "@",  // pool where new comments should be posted to
-                onNew: "="  // callback to call after successful creation
+                onNew: "=",  // callback to call after successful creation
+                onCancel: "="  // callback to call when cancel was clicked
             },
             controller: ["$scope", "adhHttp", ($scope, adhHttp) => {
                 $scope.errors = [];
