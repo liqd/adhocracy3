@@ -28,17 +28,14 @@ var pkgLocation = "/Proposal";
 interface DetailScope<Data> extends ng.IScope {
     viewmode : string;
     content : Resources.Content<Data>;
-}
-
-interface DetailRefScope<Data> extends DetailScope<Data> {
-    ref : string;
+    path : string;
 }
 
 interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
     list : () => void;
     display : () => void;
     edit : () => void;
-    reset : () => void;
+    onCancel : () => void;
     commit : () => void;
     showComments : () => void;
     hideComments : () => void;
@@ -48,18 +45,21 @@ export class ProposalDetail {
     public createDirective() {
         return {
             restrict: "E",
-            template: "<adh-proposal-version-detail data-content=\"content\" data-viewmode=\"list\"></adh-proposal-version-detail>",
+            template: "<adh-proposal-version-detail data-ng-if=\"versionPath\" data-path=\"{{versionPath}}\" data-viewmode=\"viewmode\">" +
+                "</adh-proposal-version-detail>",
             scope: {
                 path: "="
+            },
+            link: (scope) => {
+                scope.viewmode = "list";
             },
             controller: ["adhHttp", "adhWebSocket", "$scope", (adhHttp, adhWebSocket, $scope) => {
                 var wsHandle;
 
                 var fetchAndUpdateContent = (itemPath : string) : void => {
                     adhHttp.getNewestVersionPath(itemPath)
-                        .then((versionPath) => adhHttp.get(versionPath))
-                        .then((content) => {
-                            $scope.content = content;
+                        .then((versionPath) => {
+                            $scope.versionPath = versionPath;
                         });
                 };
 
@@ -95,8 +95,8 @@ export class ProposalVersionDetail {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + _class.templateUrl,
             scope: {
-                content: "=",
-                viewmode: "@"
+                path: "@",
+                viewmode: "="
             },
             controller: ["adhTopLevelState", "adhHttp", "$scope", (
                 adhTopLevelState : AdhTopLevelState.TopLevelState,
@@ -115,7 +115,7 @@ export class ProposalVersionDetail {
                     $scope.viewmode = "edit";
                 };
 
-                $scope.reset = () => {
+                $scope.onCancel = () => {
                     adhHttp.get($scope.content.path).then((content) => {
                         $scope.content = content;
                     });
@@ -137,6 +137,10 @@ export class ProposalVersionDetail {
                 $scope.hideComments = () => {
                     adhTopLevelState.setFocus(1);
                 };
+
+                adhHttp.get($scope.path).then((content) => {
+                    $scope.content = content;
+                });
             }]
         };
     }
@@ -206,19 +210,19 @@ export class SectionVersionDetail {
             templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Section.html",
             compile: (element) => recursionHelper.compile(element),
             scope: {
-                ref: "=",
+                path: "@",
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
                 adhHttp : AdhHttp.Service<Resources.Content<SISection.HasAdhocracySheetsDocumentISection>>,
-                $scope : DetailRefScope<SISection.HasAdhocracySheetsDocumentISection>
+                $scope : DetailScope<SISection.HasAdhocracySheetsDocumentISection>
             ) : void => {
                 var commit = (event, ...args) => {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
                 };
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
-                adhHttp.get($scope.ref).then((content) => {
+                adhHttp.get($scope.path).then((content) => {
                     $scope.content = content;
                 });
 
@@ -237,19 +241,19 @@ export class ParagraphVersionDetail {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Paragraph.html",
             scope: {
-                ref: "=",
+                path: "@",
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
                 adhHttp : AdhHttp.Service<Resources.Content<SIParagraph.HasAdhocracySheetsDocumentIParagraph>>,
-                $scope : DetailRefScope<SIParagraph.HasAdhocracySheetsDocumentIParagraph>
+                $scope : DetailScope<SIParagraph.HasAdhocracySheetsDocumentIParagraph>
             ) : void => {
                 var commit = (event, ...args) => {
                     adhHttp.postNewVersion($scope.content.path, $scope.content);
                 };
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
-                adhHttp.get($scope.ref).then((content) => {
+                adhHttp.get($scope.path).then((content) => {
                     $scope.content = content;
                 });
 
