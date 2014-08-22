@@ -100,9 +100,9 @@ def validate_request_data(context: ILocation, request: Request,
     _raise_if_errors(request)
 
 
-def _validate_schema(cstructs: object, schema: MappingSchema, request: Request,
+def _validate_schema(cstruct: object, schema: MappingSchema, request: Request,
                      location='body'):
-    """Validate that the `cstruct` data is conform to the given schema.
+    """Validate that the :term:`cstruct` data is conform to the given schema.
 
     :param request: request with list like `errors` attribute to append errors
                     and the dictionary attribute `validated` to add validated
@@ -112,12 +112,12 @@ def _validate_schema(cstructs: object, schema: MappingSchema, request: Request,
     """
     nodes = [n for n in schema if getattr(n, 'location', 'body') == location]
     if isinstance(schema, SequenceSchema):
-        _validate_list_schema(nodes, cstructs, request, location)
-    else:
-        _validate_dict_schema(nodes, cstructs, request, location)
+        _validate_list_schema(nodes, cstruct, request, location)
+    elif isinstance(schema, MappingSchema):
+        _validate_dict_schema(nodes, cstruct, request, location)
 
 
-def _validate_list_schema(nodes: list, cstructs: list, request: Request,
+def _validate_list_schema(nodes: list, cstruct: list, request: Request,
                           location='body'):
     if not nodes:
         return
@@ -127,7 +127,7 @@ def _validate_list_schema(nodes: list, cstructs: list, request: Request,
         return
     validated_list = []
     child_node = nodes[0]
-    for index, cstruct in enumerate(cstructs):
+    for index, cstruct in enumerate(cstruct):
         try:
             validated_list.append(child_node.deserialize(cstruct))
         except Invalid as e:
@@ -139,17 +139,17 @@ def _validate_list_schema(nodes: list, cstructs: list, request: Request,
     request.validated.update(validated)
 
 
-def _validate_dict_schema(nodes: list, cstructs: dict, request: Request,
+def _validate_dict_schema(nodes: list, cstruct: dict, request: Request,
                           location='body'):
     validated = {}
-    nodes_with_cstruct = [n for n in nodes if n.name in cstructs]
-    nodes_without_cstruct = [n for n in nodes if n.name not in cstructs]
+    nodes_with_cstruct = [n for n in nodes if n.name in cstruct]
+    nodes_without_cstruct = [n for n in nodes if n.name not in cstruct]
     for node in nodes_without_cstruct:
         appstruct = node.deserialize()
         if appstruct is not drop:
             validated[node.name] = appstruct
     for node in nodes_with_cstruct:
-        cstruct = cstructs[node.name]
+        cstruct = cstruct[node.name]
         try:
             validated[node.name] = node.deserialize(cstruct)
         except Invalid as e:
