@@ -157,6 +157,7 @@ class RESTView:
         @view_defaults(
             renderer='simplejson',
             context=IResource,
+            http_cache=0,
         )
         class MySubClass(RESTView):
             validation_GET = (MyColanderSchema, [my_extra_validation_function])
@@ -206,6 +207,7 @@ def _get_schema_and_validators(view_class, request: Request) -> tuple:
 @view_defaults(
     renderer='simplejson',
     context=IResource,
+    http_cache=0,
 )
 class ResourceRESTView(RESTView):
 
@@ -255,6 +257,7 @@ class ResourceRESTView(RESTView):
 @view_defaults(
     renderer='simplejson',
     context=ISimple,
+    http_cache=0,
 )
 class SimpleRESTView(ResourceRESTView):
 
@@ -282,6 +285,7 @@ class SimpleRESTView(ResourceRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IPool,
+    http_cache=0,
 )
 class PoolRESTView(SimpleRESTView):
 
@@ -324,6 +328,7 @@ class PoolRESTView(SimpleRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IItem,
+    http_cache=0,
 )
 class ItemRESTView(PoolRESTView):
 
@@ -356,6 +361,7 @@ class ItemRESTView(PoolRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
+    http_cache=0,
     name='meta_api'
 )
 class MetaApiView(RESTView):
@@ -557,6 +563,7 @@ def validate_login_password(context, request: Request):
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
+    http_cache=0,
 )
 class LoginUsernameView(RESTView):
 
@@ -588,6 +595,7 @@ def _login_user(request: Request) -> dict:
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
+    http_cache=0,
 )
 class LoginEmailView(RESTView):
 
