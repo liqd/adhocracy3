@@ -1,9 +1,6 @@
 adhocracy.subscriber package
 ============================
 
-Submodules
-----------
-
 Module contents
 ---------------
 

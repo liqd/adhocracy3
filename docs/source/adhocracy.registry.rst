@@ -1,9 +1,6 @@
 adhocracy.registry package
 ==========================
 
-Submodules
-----------
-
 Module contents
 ---------------
 

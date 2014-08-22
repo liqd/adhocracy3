@@ -252,7 +252,11 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {'python': ('http://docs.python.org/3.4', None),
+                       'colander': ('http://colander.readthedocs.org/en/latest', None),
+                       'substanced': ('https://substanced.readthedocs.org/en/latest', None),
+                       'pyramid': ('http://docs.pylonsproject.org/en/latest', None),
+                       }
 
 #autodoc config
 autodoc_member_order = 'bysource'

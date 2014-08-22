@@ -7,8 +7,7 @@
         <adh-listing data-path="{{path}}" data-action-column="action-column">
             <div data-ng-switch="transclusionId">
                 <adh-proposal-version-new
-                    data-on-new-proposal="update"
-                    data-on-save="hideCreateForm"
+                    data-on-new-proposal="onCreate"
                     data-on-cancel="hideCreateForm"
                     data-pool-path="{{poolPath}}"
                     data-ng-switch-when="create-form-id">
@@ -26,7 +25,8 @@
                 <adh-comment-create
                     data-refers-to="{{path}}"
                     data-pool-path="{{poolPath}}"
-                    data-on-new="update"
+                    data-on-new="onCreate"
+                    data-on-cancel="hideCreateForm"
                     data-ng-switch-when="create-form-id">
                 </adh-comment-create>
                 <adh-comment-detail
