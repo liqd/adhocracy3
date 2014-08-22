@@ -376,9 +376,8 @@ def browser_root(browser, server) -> Browser:
     return browser
 
 
-@fixture
-def browser_test(browser, server_static) -> Browser:
-    """Return test browser and go to `test.html`."""
+def browser_test_helper(browser, server_static, url) -> Browser:
+    """Return test browser and go to url."""
     add_helper_methods_to_splinter_browser_wrapper(browser)
 
     url = server_static.application_url + 'frontend_static/test.html'
@@ -391,3 +390,17 @@ def browser_test(browser, server_static) -> Browser:
     browser.wait_for_condition(jasmine_finished, 5)
 
     return browser
+
+
+@fixture()
+def browser_test(browser, server_static) -> Browser:
+    """Return test browser instance with url=test.html."""
+    url = server_static.application_url + 'frontend_static/test.html'
+    return browser_test_helper(browser, server_static, url)
+
+
+@fixture()
+def browser_igtest(browser, server_static) -> Browser:
+    """Return test browser instance with url=igtest.html."""
+    url = server_static.application_url + 'frontend_static/igtest.html'
+    return browser_test_helper(browser, server_static, url)
