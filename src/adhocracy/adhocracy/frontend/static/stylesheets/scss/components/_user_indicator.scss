@@ -10,7 +10,7 @@ It is usually used in the header bar.
 
 The sizes in this widget depend on the variable `$l-header-height` because
 the whole widget must not be higher than that.
-Currently, they are adjusted to a 3.5em header with 0.5em padding on all sides.
+Currently, they are adjusted to 0.5em padding on all sides.
 
 ```html_example
 <div class="user-indicator">
@@ -31,7 +31,7 @@ Currently, they are adjusted to a 3.5em header with 0.5em padding on all sides.
 }
 
 .user-indicator-primary {
-    font-size: 130%;
+    font-size: 130% * ($l-header-height - 1em) / 2.5em;
 }
 
 .user-indicator-primary,
@@ -39,6 +39,10 @@ Currently, they are adjusted to a 3.5em header with 0.5em padding on all sides.
     line-height: 1.1;
     color: $color-prime-normal;
     text-decoration: none;
+}
+
+.user-indicator-secondary {
+    font-size: 100% * ($l-header-height - 1em) / 2.5em;
 }
 
 .user-indicator-secondary,
