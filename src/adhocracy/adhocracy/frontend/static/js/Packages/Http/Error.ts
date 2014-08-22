@@ -13,18 +13,14 @@ export interface IBackendErrorItem {
     description : string;
 }
 
-var renderBackendError = (es : IBackendErrorItem[]) : string => {
-    var v = "";
-
+var renderBackendError = (es : IBackendErrorItem[]) : void => {
     for (var e in es) {
         if (es.hasOwnProperty(e)) {
-            v += "error #" + e + "\n";
-            v += "where: " + es[e].name + ", " + es[e].location + "\n";
-            v += "what:  " + es[e].description;
+            console.log("error #" + e);
+            console.log("where: " + es[e].name + ", " + es[e].location);
+            console.log("what:  " + es[e].description);
         }
     }
-
-    return v;
 };
 
 export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendError>) : void => {
@@ -36,7 +32,7 @@ export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendErro
     console.log(response.config);
     console.log(response.data);
 
-    console.log(renderBackendError(es));
+    renderBackendError(es);
     throw es;
 };
 
@@ -62,6 +58,6 @@ export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBacken
     // Workaround for backend bug.  See redmine ticket #1466.
     es = es.map((a) => { return { name: a[0], location: a[1], description: a[2] }; });
 
-    console.log(renderBackendError(es));
+    renderBackendError(es);
     throw es;
 };
