@@ -67,16 +67,6 @@ export var register = (angular, config, meta_api) => {
                     .then(() => {
                         done()
                     }, (error) => {
-
-                        // FIXME: error is undefined at this point.
-                        // errors should propagate through all
-                        // handlers, also the one in .commit()!
-                        //
-                        // (for now, just make sure that at this point the
-                        // test fails.)
-
-                        console.log("*** ", error);
-
                         expect(false).toBe(true);
                         done()
                     });

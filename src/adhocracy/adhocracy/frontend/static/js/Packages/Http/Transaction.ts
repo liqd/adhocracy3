@@ -87,6 +87,6 @@ export class Transaction {
         this.committed = true;
         return this.$http.post("/batch", this.requests).then(
             AdhConvert.importBatchContent,
-            AdhError.logBackendError);
+            AdhError.logBackendBatchError);
     }
 }
