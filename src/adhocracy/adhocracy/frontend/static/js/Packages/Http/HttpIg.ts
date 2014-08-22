@@ -47,11 +47,12 @@ export var register = (angular, config, meta_api) => {
                     description: "whoof",
                     elements: [sectionVersion.path]
                 };
-                proposalVersionResource.data["adhocracy.sheets.document.IVersionable"] = {
-                    follows: [proposal.first_version_path]
+                proposalVersionResource.data["adhocracy.sheets.versions.IVersionable"] = {
+                    follows: [proposal.first_version_path],
+                    followed_by: []
                 };
                 var proposalVersion : AdhHttp.ITransactionResult =
-                    transaction.post(proposal.path, proposalVersion);
+                    transaction.post(proposal.path, proposalVersionResource);
 
                 var errorCb = (error) => {
 
