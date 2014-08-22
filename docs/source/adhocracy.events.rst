@@ -1,9 +1,6 @@
 adhocracy.events package
 ========================
 
-Submodules
-----------
-
 Module contents
 ---------------
 

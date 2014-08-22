@@ -1,9 +1,6 @@
 adhocracy.utils package
 =======================
 
-Submodules
-----------
-
 Module contents
 ---------------
 
