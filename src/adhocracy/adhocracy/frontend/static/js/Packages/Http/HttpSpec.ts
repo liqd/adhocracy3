@@ -203,6 +203,10 @@ export var register = () => {
                         return httpTrans.commit();
                     }).then((_response) => {
                         response = _response;
+                    }).then(() => {
+                        done();
+                    }, (error) => {
+                        expect(false).toBe(true);
                         done();
                     });
                 });
