@@ -33,10 +33,10 @@ echo
 echo "jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;"
 echo
 
-echo "export var register = (angular) => {"
+echo "export var register = (angular, config, meta_api) => {"
 count=1
 for i in `find . -name '*Ig.ts' | grep -v ./AdhocracyIg.ts`; do
-    echo "    `moduleName $count`.register(angular);"
+    echo "    `moduleName $count`.register(angular, config, meta_api);"
     count=$[$count+1]
 done
 echo "};"

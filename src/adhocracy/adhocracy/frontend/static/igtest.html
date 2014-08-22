@@ -26,9 +26,12 @@
             };
         };
 
-        require(['angular', 'AdhocracyIg'], function(angular, spec) {
-            spec.register(angular);
-            jasmine.getEnv().execute();
+        require(['angular', 'text!/frontend_config.json', 'text!/meta_api', 'AdhocracyIg'],
+            function(angular, config_string, meta_api_string, spec) {
+                var config = JSON.parse(config_string);
+                var meta_api = JSON.parse(meta_api_string);
+                spec.register(angular, config, meta_api);
+                jasmine.getEnv().execute();
         });
     </script>
 </body>

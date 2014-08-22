@@ -11,7 +11,7 @@ import RITag = require("../../Resources_/adhocracy/interfaces/ITag");
 import AdhHttp = require("./Http");
 
 
-export var register = (angular) => {
+export var register = (angular, config, meta_api) => {
     AdhHttp.Service.$inject = ["$http"];
 
     describe("withTransaction", () => {
