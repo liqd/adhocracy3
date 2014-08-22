@@ -18,7 +18,7 @@ class TokenMangerAnnotationStorage:
 
     """Manage authentication tokens and use object annotation to store them.
 
-    Constructor arguments::
+    Constructor arguments:
 
     :param context: the object to annotate the authentication token storage.
     """
