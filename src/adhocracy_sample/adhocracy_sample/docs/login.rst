@@ -203,8 +203,8 @@ If the token is not valid or expired and the tried to perform an action that
 requires authentication, the backend responds with an error status that
 identifies the "X-User-Token" header as source of the problem::
 
-FIXME Currently we don't have any actions that require authentication,
-hence we cannot provide the working example.
+    FIXME Currently we don't have any actions that require authentication,
+    hence we cannot provide the working example.
 
     >> headers = {'X-User-Path': user_path, 'X-User-Token': 'Blah'}
     >> resp_data = testapp.get('/meta_api/', headers=headers).json

@@ -340,7 +340,7 @@ PUT
 
 Modify data of an existing resource ::
 
-FIXME: disable because IName.name is not editable.  use another example!
+    FIXME: disable because IName.name is not editable.  use another example!
 
 ...    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
 ...    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'youdidntexpectthis'}}}

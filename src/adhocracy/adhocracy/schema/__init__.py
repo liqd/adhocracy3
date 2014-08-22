@@ -348,7 +348,7 @@ class SingleLine(colander.SchemaNode):  # noqa
 
     """ UTF-8 encoded String without line breaks.
 
-    Disallowed characters are linebreaks like: \n, \r
+    Disallowed characters are linebreaks like: \n, \r.
     Example value: This is a something.
     """
 
@@ -406,7 +406,7 @@ class DateTime(AdhocracySchemaNode):
 
     The default/missing value is the current datetime.
 
-    Constructor arguments::
+    Constructor arguments:
 
     :param 'tzinfo': This timezone is used if the cstrut is missing the tzinfo.
                      Defaults to UTC
