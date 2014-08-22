@@ -13,11 +13,11 @@ class DummySubresponse:
 
 class CorniceDummyRequest(testing.DummyRequest):
 
-    def __init__(self, items: list=[], subresponse=DummySubresponse(),
+    def __init__(self, subresponse=DummySubresponse(),
                  exception: Exception=None):
         super().__init__()
         from cornice.errors import Errors
-        self.validated = {'items': items}
+        self.validated = {}
         self.errors = Errors(self)
         self.subresponse = subresponse
         self.exception = exception
@@ -68,17 +68,18 @@ class TestBatchView:
 
     def test_post_successful_subrequest(self, context):
         subrequest_dict = self._make_subrequest_dict()
-        request = CorniceDummyRequest(items=[subrequest_dict])
+        request = CorniceDummyRequest()
         inst = self._make_one(context, request)
+        request.validated = [subrequest_dict]
         response = inst.post()
         assert response == [{'body': {}, 'code': 200}]
 
     def test_post_failed_subrequest(self, context):
         from cornice.util import _JSONError
         subrequest_dict = self._make_subrequest_dict()
-        request = CorniceDummyRequest(items=[subrequest_dict],
-                                      subresponse=DummySubresponse(444))
+        request = CorniceDummyRequest(subresponse=DummySubresponse(444))
         inst = self._make_one(context, request)
+        request.validated = [subrequest_dict]
         try:
             inst.post()
             assert False
@@ -91,9 +92,9 @@ class TestBatchView:
         from cornice.util import _JSONError
         from pyramid.httpexceptions import HTTPUnauthorized
         subrequest_dict = self._make_subrequest_dict()
-        request = CorniceDummyRequest(items=[subrequest_dict],
-                                      exception=HTTPUnauthorized())
+        request = CorniceDummyRequest(exception=HTTPUnauthorized())
         inst = self._make_one(context, request)
+        request.validated = [subrequest_dict]
         try:
             inst.post()
             assert False
@@ -104,9 +105,9 @@ class TestBatchView:
     def test_post_subrequest_with_other_exception(self, context):
         from cornice.util import _JSONError
         subrequest_dict = self._make_subrequest_dict()
-        request = CorniceDummyRequest(items=[subrequest_dict],
-                                      exception=RuntimeError('Bad luck'))
+        request = CorniceDummyRequest(exception=RuntimeError('Bad luck'))
         inst = self._make_one(context, request)
+        request.validated=[subrequest_dict]
         try:
             inst.post()
             assert False

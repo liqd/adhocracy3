@@ -169,7 +169,7 @@ class TestValidateRequest:
 
         request.body = '["alpha", "beta", "gamma"]'
         self._make_one(context, request, schema=TestListSchema())
-        assert request.validated == {'elements': ['alpha', 'beta', 'gamma']}
+        assert request.validated == ['alpha', 'beta', 'gamma']
 
     def test_with_invalid_sequence_schema(self, context, request):
         class TestListSchema(colander.SequenceSchema):
@@ -190,6 +190,11 @@ class TestValidateRequest:
         with pytest.raises(_JSONError):
             self._make_one(context, request, schema=TestListSchema())
         assert request.validated == {}
+
+    def test_invalid_with_not_sequence_and_not_mapping_schema(self, context, request):
+        schema = colander.SchemaNode(colander.Int())
+        with pytest.raises(Exception):
+            self._make_one(context, request, schema=schema)
 
 
 class TestValidatePOSTRootVersions:

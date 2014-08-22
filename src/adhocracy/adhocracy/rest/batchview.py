@@ -53,10 +53,9 @@ class BatchView(RESTView):
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
-        items = self.request.validated['items']
         response_list = []
         path_map = {}
-        for item in items:
+        for item in self.request.validated:
             item_response = self._process_nested_request(item, path_map)
             response_list.append(item_response)
             if not item_response.was_successful():

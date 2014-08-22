@@ -81,12 +81,13 @@ def validate_request_data(context: ILocation, request: Request,
     :param schema: Schema to validate. Data to validate is extracted from the
                    request.body. For schema nodes with attribute `location` ==
                    `querystring` the data is extracted from the query string.
-                   The validated data is stored in the `request.validated`dict.
+                   The validated data (dict or list) is stored in the
+                   `request.validated` attribute.
                    The `None` value is allowed to disable schema validation.
     :param extra_validators: Functions called after schema validation.
                              The passed arguments are `context` and  `request`.
                              The should append errors to `request.errors` and
-                             validated data to  `request.validated`.
+                             validated data to `request.validated`.
 
     :raises _JSONError: HTTP 400 for bad request data.
     """
@@ -110,33 +111,29 @@ def _validate_schema(cstruct: object, schema: MappingSchema, request: Request,
     :param location: filter schema nodes depending on the `location` attribute.
                      The default value is `body`.
     """
-    nodes = [n for n in schema if getattr(n, 'location', 'body') == location]
     if isinstance(schema, SequenceSchema):
-        _validate_list_schema(nodes, cstruct, request, location)
+        _validate_list_schema(schema, cstruct, request, location)
     elif isinstance(schema, MappingSchema):
-        _validate_dict_schema(nodes, cstruct, request, location)
+        _validate_dict_schema(schema, cstruct, request, location)
+    else:
+        error = 'Validation for schema {} is unsupported.'.format(str(schema))
+        raise(Exception(error))
 
 
-def _validate_list_schema(nodes: list, cstruct: list, request: Request,
-                          location='body'):
-    if not nodes:
+def _validate_list_schema(schema: SequenceSchema, cstruct: list,
+                          request: Request, location='body'):
+    if location != 'body':  # for now we only support location == body
         return
-    validated_list = []
-    child_node = nodes[0]
-    for index, cstruct in enumerate(cstruct):
-        try:
-            validated_list.append(child_node.deserialize(cstruct))
-        except Invalid as e:
-            for name, msg in e.asdict().items():
-                indexed_name = _replace_fieldname_by_index(
-                    name, child_node.name, index)
-                request.errors.add(location, indexed_name, msg)
-    validated = {child_node.name: validated_list}
-    request.validated.update(validated)
+    child_cstructs = schema.cstruct_children(cstruct)
+    try:
+        request.validated = schema.deserialize(child_cstructs)
+    except Invalid as err:
+        _add_colander_invalid_error_to_request(err, request, location)
 
 
-def _validate_dict_schema(nodes: list, cstruct: dict, request: Request,
-                          location='body'):
+def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
+                          request: Request, location='body'):
+    nodes = [n for n in schema if getattr(n, 'location', 'body') == location]
     validated = {}
     nodes_with_cstruct = [n for n in nodes if n.name in cstruct]
     nodes_without_cstruct = [n for n in nodes if n.name not in cstruct]
@@ -145,18 +142,18 @@ def _validate_dict_schema(nodes: list, cstruct: dict, request: Request,
         if appstruct is not drop:
             validated[node.name] = appstruct
     for node in nodes_with_cstruct:
-        cstruct = cstruct[node.name]
+        node_cstruct = cstruct[node.name]
         try:
-            validated[node.name] = node.deserialize(cstruct)
-        except Invalid as e:
-            for name, msg in e.asdict().items():
-                request.errors.add(location, name, msg)
+            validated[node.name] = node.deserialize(node_cstruct)
+        except Invalid as err:
+            _add_colander_invalid_error_to_request(err, request, location)
     request.validated.update(validated)
 
 
-def _replace_fieldname_by_index(fullname: str, fieldname: str,
-                                index: int) -> str:
-    return str(index) + strip_optional_prefix(fullname, fieldname)
+def _add_colander_invalid_error_to_request(error: Invalid, request: Request,
+                                           location: str):
+    for name, msg in error.asdict().items():
+        request.errors.add(location, name, msg)
 
 
 def _validate_extra_validators(validators: list, context, request: Request):
