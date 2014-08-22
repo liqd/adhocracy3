@@ -53,17 +53,32 @@ export var register = (angular, config, meta_api) => {
                 var proposalVersion : AdhHttp.ITransactionResult =
                     transaction.post(proposal.path, proposalVersion);
 
+                var errorCb = (error) => {
+
+                    // FIXME: error can undefined at this point.  i
+                    // think this is because we raise exceptions in
+                    // the Http exception handler, or anyway because
+                    // we do something we shouldn't.  errors should
+                    // propagate through all handlers!
+                    //
+                    // (for now, just make sure that at this point the
+                    // test fails.)
+
+                    expect(false).toBe(true);
+                    done();
+                };
+
                 return transaction.commit()
                     .then((responses) : ng.IPromise<Resources.Content<any>> => {
                         var lastTagPath : string = responses[proposalVersion.index].path + "/LAST";
                         return adhHttp.get(lastTagPath);
-                    })
+                    }, errorCb)
                     .then((lastTag : RITag) => {
                         var lastVersionPaths : string[] = lastTag.data["adhocracy.sheets.tags.ITag"].elements;
                         expect(lastVersionPaths.length).toBe(1);
                         expect(lastVersionPaths[0].substring(lastVersionPaths[0].length - 4)).toBe("0001");
                         done();
-                    });
+                    }, errorCb);
             };
 
             adhHttp.withTransaction(cb);
