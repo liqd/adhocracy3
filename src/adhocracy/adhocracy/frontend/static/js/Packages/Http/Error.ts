@@ -60,7 +60,7 @@ export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBacken
     // backend, and then in these two functions.
 
     // Workaround for backend bug.  See redmine ticket #1466.
-    var es = es.map((a) => { return { name: a[0], location: a[1], description: a[2] }});
+    es = es.map((a) => { return { name: a[0], location: a[1], description: a[2] }; });
 
     console.log(renderBackendError(es));
     throw es;

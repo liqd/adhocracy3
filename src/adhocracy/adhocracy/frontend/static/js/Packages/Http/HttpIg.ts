@@ -65,10 +65,10 @@ export var register = (angular, config, meta_api) => {
                         expect(lastVersionPaths[0].substring(lastVersionPaths[0].length - 4)).toBe("0001");
                     })
                     .then(() => {
-                        done()
+                        done();
                     }, (error) => {
                         expect(false).toBe(true);
-                        done()
+                        done();
                     });
             };
 
