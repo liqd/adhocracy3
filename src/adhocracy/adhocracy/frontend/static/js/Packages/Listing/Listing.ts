@@ -16,43 +16,37 @@ var pkgLocation = "/Listing";
 // Listings
 
 export interface IListingContainerAdapter {
+    // A list of elements that should be displayed
     elemRefs(any) : string[];
+
+    // The pool a new element should be posted to.
+    poolPath(any) : string;
 }
 
 export class ListingPoolAdapter implements IListingContainerAdapter {
     public elemRefs(container : Resources.Content<SIPool.HasAdhocracySheetsPoolIPool>) {
         return container.data["adhocracy.sheets.pool.IPool"].elements;
     }
+
+    public poolPath(container : Resources.Content<SIPool.HasAdhocracySheetsPoolIPool>) {
+        return container.path;
+    }
 }
 
-export interface ListingScope<Container> {
+export interface ListingScope<Container> extends ng.IScope {
     path : string;
     actionColumn : boolean;
     container : Container;
+    poolPath : string;
     elements : string[];
     update : () => ng.IPromise<void>;
     wshandle : string;
+    clear : () => void;
     show : { createForm : boolean };
+    showCreateForm : () => void;
+    hideCreateForm : () => void;
 }
 
-// FIXME: the way Listing works now is similar to ngRepeat, but it
-// does not allow for the template author to control the name of the
-// iterator.  Instead of something like:
-//
-// <listing element="row">
-//   <element path="{{row}}"></element>
-// </listing>
-//
-// She has to write:
-//
-// <listing>
-//   <element path="{{element}}"></element>
-// </listing>
-//
-// and implicitly know that Listing propagates the identifier
-// ``element`` to the element's scope.
-//
-//
 // FIXME: as the listing elements are tracked by their $id (the element path) in the listing template, we don't allow duplicate elements
 // in one listing. We should add a proper warning if that occurs or handle that case properly.
 
@@ -80,30 +74,57 @@ export class Listing<Container extends Resources.Content<any>> {
                     }
                 });
             },
-            controller: ["$scope", "adhHttp", "adhDone", (
+            controller: ["$scope", "adhHttp", (
                 $scope: ListingScope<Container>,
-                adhHttp: AdhHttp.Service<Container>,
-                adhDone
+                adhHttp: AdhHttp.Service<Container>
             ) : void => {
                 $scope.show = {createForm: false};
 
+                $scope.showCreateForm = () => {
+                    $scope.show.createForm = true;
+                };
+
+                $scope.hideCreateForm = () => {
+                    $scope.show.createForm = false;
+                };
+
                 $scope.update = () : ng.IPromise<void> => {
-                    return adhHttp.get($scope.path).then((pool) => {
-                        $scope.container = pool;
+                    return adhHttp.get($scope.path).then((container) => {
+                        $scope.container = container;
+                        $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
                     });
                 };
 
-                // (The call order is important: first subscribe to
-                // the updates, then get an initial copy.)
-                try {
-                    $scope.wshandle = adhWebSocket.register($scope.path, $scope.update);
-                } catch (e) {
-                    console.log(e);
-                    console.log("Will continue on resource " + $scope.path + " without server bind.");
-                }
+                $scope.clear = () : void => {
+                    $scope.container = undefined;
+                    $scope.poolPath = undefined;
+                    $scope.elements = [];
+                };
 
-                $scope.update().then(adhDone);
+                $scope.$watch("path", (newPath : string) => {
+                    if (typeof $scope.poolPath !== "undefined" && typeof $scope.wshandle !== "undefined") {
+                        adhWebSocket.unregister($scope.poolPath, $scope.wshandle);
+                    }
+
+                    if (newPath) {
+                        // NOTE: Ideally we would like to first subscribe to
+                        // websocket messages and only then get the resource in
+                        // order to not miss any messages in between. But in
+                        // order to subscribe we already need the resource. So
+                        // that is not possible.
+                        $scope.update().then(() => {
+                            try {
+                                $scope.wshandle = adhWebSocket.register($scope.poolPath, $scope.update);
+                            } catch (e) {
+                                console.log(e);
+                                console.log("Will continue on resource " + $scope.poolPath + " without server bind.");
+                            }
+                        });
+                    } else {
+                        $scope.clear();
+                    }
+                });
             }]
         };
     }

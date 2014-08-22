@@ -1,4 +1,4 @@
-<div class="moving-columns">
+<div data-adh-moving-columns="" class="moving-columns">
     <div class="moving-column-structure">
         <adh-web-socket-test data-paths="[&quot;/adhocracy&quot;]"></adh-web-socket-test>
         <adh-login></adh-login>
@@ -8,6 +8,9 @@
             <div data-ng-switch="transclusionId">
                 <adh-proposal-version-new
                     data-on-new-proposal="update"
+                    data-on-save="hideCreateForm"
+                    data-on-cancel="hideCreateForm"
+                    data-pool-path="{{poolPath}}"
                     data-ng-switch-when="create-form-id">
                 </adh-proposal-version-new>
                 <adh-proposal-detail
@@ -17,7 +20,21 @@
             </div>
         </adh-listing>
     </div>
-    <div class="moving-column-content2 placeholder">
-        secondary content
+    <div class="moving-column-content2">
+        <adh-comment-listing data-path="{{content2Url}}">
+            <div data-ng-switch="transclusionId">
+                <adh-comment-create
+                    data-refers-to="{{path}}"
+                    data-pool-path="{{poolPath}}"
+                    data-on-new="update"
+                    data-ng-switch-when="create-form-id">
+                </adh-comment-create>
+                <adh-comment-detail
+                    data-path="element"
+                    data-viemode="'list'"
+                    data-ng-switch-when="element-id">
+                </adh-comment-detail>
+            </div>
+        </adh-comment-listing>
     </div>
 </div>

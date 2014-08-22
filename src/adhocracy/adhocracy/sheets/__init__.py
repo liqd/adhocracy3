@@ -177,8 +177,15 @@ sheet_metadata_defaults = sheet_metadata._replace(
 
 
 def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
-    """Add sheet type to registry."""
+    """Register sheet adapter and metadata to registry.
+
+    There registry should have an `content` attribute with
+    :class:`adhocracy.registry.ResourceRegistry` to store the sheet metadata.
+    """
     assert metadata.isheet.isOrExtends(ISheet)
+    if hasattr(registry, 'content'):
+        sheets_meta = registry.content.sheets_meta
+        sheets_meta[metadata.isheet.__identifier__] = metadata
     if metadata.create_mandatory:
         assert metadata.creatable and metadata.create_mandatory
     schema = metadata.schema_class()

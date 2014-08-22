@@ -17,7 +17,7 @@ from adhocracy.rest.views import RESTView
 logger = getLogger(__name__)
 
 
-class BatchItemResponse():
+class BatchItemResponse:
 
     """Wrap the response to a nested request in a batch request.
 
@@ -81,14 +81,14 @@ class BatchView(RESTView):
         return [response.to_dict() for response in response_list]
 
     def _resolve_preliminary_paths(self, json_value: object,
-                                   path_map) -> object:
+                                   path_map: dict) -> object:
         """Create a copy of `json_value` with preliminary paths resolved.
 
         This method accepts arbitrary JSON values and calls itself
         recursively, as needed. In trivial cases (no change necessary),
         the original `json_value` may be returned instead of a copy.
         """
-        if not path_map and json_value:
+        if not (path_map and json_value):
             return json_value
         if isinstance(json_value, str):
             result = path_map.get(json_value, json_value)
@@ -135,8 +135,9 @@ class BatchView(RESTView):
             logger.exception('Unexpected exception processing nested request')
         return BatchItemResponse(code, body)
 
-    def _extend_path_map(self, path_map, result_path, item_response):
-        if not result_path and item_response.was_successful():
+    def _extend_path_map(self, path_map: dict, result_path: str,
+                         item_response: BatchItemResponse):
+        if not (result_path and item_response.was_successful()):
             return
         path = item_response.body.get('path', '')
         first_version_path = item_response.body.get('first_version_path', '')

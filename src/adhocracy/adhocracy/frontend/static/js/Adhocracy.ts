@@ -23,6 +23,10 @@ import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossW
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhMetaApi = require("./Packages/MetaApi/MetaApi");
+import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
+import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
+import AdhComment = require("./Packages/Comment/Comment");
+import AdhCommentAdapter = require("./Packages/Comment/Adapter");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -78,9 +82,15 @@ export var init = (config, meta_api) => {
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
     app.directive("adhUserIndicator", ["adhConfig", AdhUser.indicatorDirective]);
+    app.directive("adhUserMeta", ["adhConfig", AdhUser.metaDirective]);
     app.value("adhConfig", config);
     app.factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(meta_api));
     app.value("adhDone", AdhDone.done);
+    app.value("adhEventHandlerClass", AdhEventHandler.EventHandler);
+
+    app.service("adhTopLevelState", AdhTopLevelState.TopLevelState);
+    app.directive("adhMovingColumns", ["adhTopLevelState", AdhTopLevelState.movingColumns]);
+    app.directive("adhFocusSwitch", ["adhTopLevelState", AdhTopLevelState.adhFocusSwitch]);
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
@@ -95,6 +105,10 @@ export var init = (config, meta_api) => {
         ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
             new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
 
+    app.directive("adhCommentListing",
+        ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
+            new Listing.Listing(new AdhComment.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)]);
+
     app.directive("adhWebSocketTest",
         ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>
             new AdhWebSocket.WebSocketTest().createDirective($timeout, adhConfig, adhWebSocket)]);
@@ -107,6 +121,16 @@ export var init = (config, meta_api) => {
         ["adhConfig", "adhCrossWindowMessaging", (adhConfig) =>
             new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig)]);
 
+    app.directive("adhCommentCreate", ["adhConfig", (adhConfig) => {
+        var adapter = new AdhCommentAdapter.CommentAdapter();
+        var widget = new AdhComment.CommentCreate(adapter);
+        return widget.createDirective(adhConfig);
+    }]);
+    app.directive("adhCommentDetail", ["adhConfig", "recursionHelper", (adhConfig, recursionHelper) => {
+        var adapter = new AdhCommentAdapter.CommentAdapter();
+        var widget = new AdhComment.CommentDetail(adapter);
+        return widget.createDirective(adhConfig, recursionHelper);
+    }]);
     app.directive("adhProposalDetail", () => new Proposal.ProposalDetail().createDirective());
     app.directive("adhProposalVersionDetail",
         ["adhConfig", (adhConfig) => new Proposal.ProposalVersionDetail().createDirective(adhConfig)]);

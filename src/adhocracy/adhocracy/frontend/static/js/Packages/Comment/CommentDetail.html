@@ -1,0 +1,30 @@
+<div class="comment" data-ng-switch="viewmode">
+    <div data-ng-switch-when="edit">
+        <div class="form-error" data-ng-repeat="error in errors">
+            <p>{{error}}</p>
+        </div>
+    </div>
+    <div class="comment-content">
+        <textarea data-ng-switch-when="edit" data-ng-model="data.content"></textarea>
+        <div data-ng-switch-default="">{{data.content}}</div>
+    </div>
+    <a href="" data-ng-switch-when="edit" data-ng-click="save()">Save</a>
+    <a href="" data-ng-switch-when="edit" data-ng-click="cancel()">Cancel</a>
+    <a href="" data-ng-switch-default="" data-ng-click="edit()">Edit</a>
+
+    <adh-comment-listing data-path="{{path}}">
+        <div data-ng-switch="transclusionId">
+            <adh-comment-create
+                data-refers-to="{{path}}"
+                data-pool-path="{{poolPath}}"
+                data-on-new="update"
+                data-ng-switch-when="create-form-id">
+            </adh-comment-create>
+            <adh-comment-detail
+                data-path="element"
+                data-viemode="'list'"
+                data-ng-switch-when="element-id">
+            </adh-comment-detail>
+        </div>
+    </adh-comment-listing>
+</div>

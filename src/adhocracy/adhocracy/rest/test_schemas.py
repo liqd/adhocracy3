@@ -153,7 +153,7 @@ class TestAddPostRequestSubSchemas:
         assert node.children == []
 
     def test_no_data_and_optional_sheets(self, node, request, context, sheet_metas):
-        request.registry.content.sheets_metadata.return_value = sheet_metas
+        request.registry.content.sheets_meta = sheet_metas
         request.registry.content.resource_addables.return_value =\
             {'VALID': {'sheets_mandatory': [],
                        'sheets_optional': [ISheet.__identifier__]}}
@@ -161,7 +161,7 @@ class TestAddPostRequestSubSchemas:
         assert node.children == []
 
     def test_data_and_optional_sheets(self, node, request, context, sheet_metas):
-        request.registry.content.sheets_metadata.return_value = sheet_metas
+        request.registry.content.sheets_meta = sheet_metas
         request.registry.content.resource_addables.return_value =\
             {'VALID': {'sheets_mandatory': [],
                        'sheets_optional': [ISheet.__identifier__]}}
@@ -171,7 +171,7 @@ class TestAddPostRequestSubSchemas:
         assert node.children[0].name == ISheet.__identifier__
 
     def test_data_and_mandatory_but_no_optional_sheets(self, node, request, context, sheet_metas):
-        request.registry.content.sheets_metadata.return_value = sheet_metas
+        request.registry.content.sheets_meta = sheet_metas
         request.registry.content.resource_addables.return_value =\
             {'VALID': {'sheets_mandatory': [ISheetA.__identifier__],
                        'sheets_optional': [ISheet.__identifier__]}}
@@ -258,7 +258,7 @@ class TestAddPutRequestSubSchemasUnitTest:
         assert node.children == []
 
     def test_data_and_optional_sheets(self, node, context, request, sheet_metas):
-        request.registry.content.sheets_metadata.return_value = sheet_metas
+        request.registry.content.sheets_meta = sheet_metas
         request.registry.content.resource_sheets.return_value = {ISheet.__identifier__: None}
         request.body = json.dumps({'data': {ISheet.__identifier__: {}}})
         self._call_fut(node, {'context': context, 'request': request})

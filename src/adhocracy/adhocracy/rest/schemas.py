@@ -46,9 +46,9 @@ def add_put_data_subschemas(node: colander.MappingSchema, kw: dict):
     sheets = request.registry.content.resource_sheets(context, request,
                                                       onlyeditable=True)
     data = request.json_body.get('data', {})
-    sheets_metadata = request.registry.content.sheets_metadata()
+    sheets_meta = request.registry.content.sheets_meta
     for name in [x for x in sheets if x in data]:
-        subschema = sheets_metadata[name].schema_class(name=name)
+        subschema = sheets_meta[name].schema_class(name=name)
         node.add(subschema.bind(**kw))
 
 
@@ -73,13 +73,13 @@ def add_post_data_subschemas(node: colander.MappingSchema, kw: dict):
     addables = request.registry.content.resource_addables(context, request)
     resource_sheets = addables.get(resource_type, {'sheets_mandatory': [],
                                                    'sheets_optional': []})
-    sheets_metadata = request.registry.content.sheets_metadata()
+    sheets_meta = request.registry.content.sheets_meta
     subschemas = []
     for name in [x for x in resource_sheets['sheets_mandatory'] if x in data]:
-        schema = sheets_metadata[name].schema_class(name=name)
+        schema = sheets_meta[name].schema_class(name=name)
         subschemas.append(schema)
     for name in [x for x in resource_sheets['sheets_optional'] if x in data]:
-        schema = sheets_metadata[name].schema_class(name=name, missing={})
+        schema = sheets_meta[name].schema_class(name=name, missing={})
         subschemas.append(schema)
     for schema in subschemas:
         node.add(schema.bind(**kw))

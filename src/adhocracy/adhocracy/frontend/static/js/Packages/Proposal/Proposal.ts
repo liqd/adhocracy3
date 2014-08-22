@@ -6,6 +6,7 @@ import Util = require("../Util/Util");
 import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
 import AdhWebSocket = require("../WebSocket/WebSocket");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import Resources = require("../../Resources");
 
@@ -38,6 +39,8 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
     edit : () => void;
     reset : () => void;
     commit : () => void;
+    showComments : () => void;
+    hideComments : () => void;
 }
 
 export class ProposalDetail {
@@ -94,7 +97,8 @@ export class ProposalVersionDetail {
                 content: "=",
                 viewmode: "@"
             },
-            controller: ["adhHttp", "$scope", (
+            controller: ["adhTopLevelState", "adhHttp", "$scope", (
+                adhTopLevelState : AdhTopLevelState.TopLevelState,
                 adhHttp : AdhHttp.Service<Resources.Content<any>>,
                 $scope : IProposalVersionDetailScope<any>
             ) : void => {
@@ -123,6 +127,15 @@ export class ProposalVersionDetail {
                     $scope.$broadcast("commit");
                     $scope.viewmode = "display";
                 };
+
+                $scope.showComments = () => {
+                    adhTopLevelState.setContent2Url($scope.content.path);
+                    adhTopLevelState.setFocus(2);
+                };
+
+                $scope.hideComments = () => {
+                    adhTopLevelState.setFocus(1);
+                };
             }]
         };
     }
@@ -148,6 +161,9 @@ interface IScopeProposalVersion {
     addParagraphVersion : () => void;
     commit : () => void;
     onNewProposal : (any) => void;
+    onCancel : () => void;
+    onSave : () => void;
+    poolPath : string;
 }
 
 export class ProposalVersionNew {
@@ -158,7 +174,10 @@ export class ProposalVersionNew {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/Resources/IProposalVersion/New.html",
             scope: {
-                onNewProposal: "="
+                onNewProposal: "=",
+                onCancel: "=",
+                onSave: "=",
+                poolPath: "@"
             },
             controller: ["$scope", ($scope : IScopeProposalVersion) => {
                 $scope.proposalVersion = new RIProposalVersion();
@@ -178,11 +197,14 @@ export class ProposalVersionNew {
                 };
 
                 $scope.commit = () => {
-                    adhProposal.postProposalWithParagraphs($scope.proposalVersion, $scope.paragraphVersions).then((resp) => {
-                        adhHttp.get(resp.path).then((respGet) => {
-                            $scope.onNewProposal(respGet);
+                    adhProposal.postProposalWithParagraphs($scope.poolPath, $scope.proposalVersion, $scope.paragraphVersions)
+                        .then((resp) => {
+                            adhHttp.get(resp.path).then((respGet) => {
+                                $scope.onNewProposal(respGet);
+                            });
                         });
-                    });
+
+                    $scope.onSave();
                 };
             }]
         };
@@ -381,6 +403,7 @@ export class Service {
     }
 
     public postProposalWithParagraphs(
+        poolPath : string,
         proposalVersion : RIProposalVersion,
         paragraphVersions : RIParagraphVersion[]
     ) {
@@ -400,7 +423,7 @@ export class Service {
             paragraphs: {}
         };
 
-        return _self.postProposal("/adhocracy", name, scope)
+        return _self.postProposal(poolPath, name, scope)
             .then(() => _self.postSection(
                 scope.proposal.path,
                 "section",
