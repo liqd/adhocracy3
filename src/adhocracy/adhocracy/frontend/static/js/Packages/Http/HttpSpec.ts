@@ -178,13 +178,13 @@ export var register = () => {
                 var _httpTrans;
 
                 beforeEach((done) => {
-                    $httpMock.post.and.returnValue(q.when([
-                        "get response",
-                        "put response",
-                        "post1 response",
-                        "post2 response",
-                        "get2 response"
-                    ]));
+                    $httpMock.post.and.returnValue(q.when({data: [
+                        {body: {content_type: "get response"}},
+                        {body: {content_type: "put response"}},
+                        {body: {content_type: "post1 response"}},
+                        {body: {content_type: "post2 response"}},
+                        {body: {content_type: "get2 response"}}
+                    ]}));
 
                     adhHttp.withTransaction((httpTrans) => {
                         _httpTrans = httpTrans;
@@ -246,11 +246,11 @@ export var register = () => {
                 });
 
                 it("maps preliminary data to responses via `index`", () => {
-                    expect(response[get.index]).toBe("get response");
-                    expect(response[put.index]).toBe("put response");
-                    expect(response[post1.index]).toBe("post1 response");
-                    expect(response[post2.index]).toBe("post2 response");
-                    expect(response[get2.index]).toBe("get2 response");
+                    expect(response[get.index].content_type).toBe("get response");
+                    expect(response[put.index].content_type).toBe("put response");
+                    expect(response[post1.index].content_type).toBe("post1 response");
+                    expect(response[post2.index].content_type).toBe("post2 response");
+                    expect(response[get2.index].content_type).toBe("get2 response");
                 });
 
                 it("throws if you try to use the transaction after commit", () => {
