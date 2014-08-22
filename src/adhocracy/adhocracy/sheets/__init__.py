@@ -20,27 +20,23 @@ from adhocracy.utils import remove_keys_from_dict
 @implementer(IResourceSheet)
 class GenericResourceSheet(PropertySheet):
 
-    """Generic sheet for resources to get/set the sheet data structure.
+    """Generic sheet for resources to get/set the sheet data structure."""
 
-    Instance attributes:
-
-    :context: resource to adapt
-    :schema: colander.MappingSchema object to define the data structure
-    :registry: :class:`pyramid.registry.Registry` to add events and references
-    :meta: SheetMetadata
-    :_data_key: identifier to store data
-    """
-
-    request = None  # pyramid request object, just to fulfill the interface
+    request = None
+    """Pyramid request object, just to fulfill the interface."""
 
     def __init__(self, metadata, context):
         schema = metadata.schema_class()
         self.schema = schema.bind(context=context)
+        """:class:`colander.MappingSchema` to define the data structure."""
         self.context = context
+        """Resource to adapt."""
         self.meta = metadata
+        """SheetMetadata"""
+        self.registry = get_current_registry(context)
+        """class:`Registry` to add events and references."""
         self._data_key = self.meta.isheet.__identifier__
         self._graph = find_graph(context)
-        self.registry = get_current_registry(context)
 
     def get(self) -> dict:
         """Return appstruct."""

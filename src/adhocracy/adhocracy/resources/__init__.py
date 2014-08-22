@@ -43,6 +43,7 @@ class ResourceFactory:
 
     def __init__(self, metadata: ResourceMetadata):
         self.meta = metadata
+        """:class:`ResourceMetadata`."""
 
     def _add(self, parent: IPool, resource: object, appstructs: dict) -> str:
         """Add resource to parent pool.
