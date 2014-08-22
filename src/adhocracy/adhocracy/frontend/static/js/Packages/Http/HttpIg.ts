@@ -8,18 +8,23 @@ import RIProposalVersion = require("../../Resources_/adhocracy_sample/resources/
 import RISection = require("../../Resources_/adhocracy_sample/resources/section/ISection");
 import RISectionVersion = require("../../Resources_/adhocracy_sample/resources/section/ISectionVersion");
 import RITag = require("../../Resources_/adhocracy/interfaces/ITag");
+import AdhMetaApi = require("../MetaApi/MetaApi");
 import AdhHttp = require("./Http");
 
 
 export var register = (angular, config, meta_api) => {
-    AdhHttp.Service.$inject = ["$http"];
 
     describe("withTransaction", () => {
-
-        var adhHttp : AdhHttp.Service<any>;
+        var adhHttp : AdhHttp.Service<any> = (() => {
+            var factory = ($http, $q) => {
+                return (new AdhHttp.Service($http, $q, new AdhMetaApi.MetaApiQuery(meta_api)));
+            };
+            factory.$inject = ["$http", "$q"];
+            return angular.injector(["ng"]).invoke(factory);
+        })();
 
         beforeEach(() => {
-            adhHttp = angular.injector(["ng"]).invoke(AdhHttp.Service);
+            return;
         });
 
         it("Deep-rewrites preliminary resource paths.", (done) => {
