@@ -9,7 +9,7 @@ This Widget can be used to display the state of the currently logged in user.
 It is usually used in the header bar.
 
 The sizes in this widget depend on the variable `$l-header-height` because
-they whole widget must not be higher than that.
+the whole widget must not be higher than that.
 Currently, they are adjusted to a 3.5em header with 0.5em padding on all sides.
 
 ```html_example
