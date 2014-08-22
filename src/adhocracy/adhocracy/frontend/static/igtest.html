@@ -26,8 +26,9 @@
             };
         };
 
-        require(['AdhocracyIg'], function(spec) {
-            jasmine.getEnv().execute()
+        require(['angular', 'AdhocracyIg'], function(angular, spec) {
+            spec.register(angular);
+            jasmine.getEnv().execute();
         });
     </script>
 </body>
