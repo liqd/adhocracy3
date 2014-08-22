@@ -145,17 +145,17 @@ class ResourceFactory:
         if IUser.providedBy(resource):
             creator = resource
 
+        if IMetadata.providedBy(resource):
+            metadata = self._get_metadata(resource, creator)
+            sheet = get_sheet(resource, IMetadata)
+            sheet.set(metadata, send_event=False)
+
         registry = registry if registry else get_current_registry()
 
         if run_after_creation:
             for call in self.meta.after_creation:
                 kwargs['creator'] = creator
                 call(resource, registry, options=kwargs)
-
-        if IMetadata.providedBy(resource):
-            metadata = self._get_metadata(resource, creator)
-            sheet = get_sheet(resource, IMetadata)
-            sheet.set(metadata, send_event=False)
 
         self._notify_new_resource_created_and_added(resource, registry,
                                                     creator)

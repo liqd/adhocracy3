@@ -57,7 +57,7 @@ Like every resource the user has a metadata sheet with creation information::
 Even though he is not logged in yet, the creator points to his user resource::
 
     >>> resp_metadata['creator']
-    ['/principals/users/00...
+    '/principals/users/00...
 
 The "name" field in the "IUserBasic" schema is a non-empty string that
 can contain any characters except '@' (to make user names distinguishable

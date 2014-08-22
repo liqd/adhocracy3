@@ -351,8 +351,9 @@ class TestGraphSetReferencesForIsheet:
         self._call_fut(mock_graph, context, ISheet, references, registry)
         mock_graph.set_references.assert_called is False
 
-    def test_with_references_is_one_valid_reference(self, context, mock_graph, registry):
-        references = {'references': object()}
+    def test_with_references_is_one_resource(self, context, mock_graph, registry):
+        from adhocracy.interfaces import IResource
+        references = {'references': testing.DummyResource(__provides__=IResource)}
         self._call_fut(mock_graph, context, ISheet, references, registry)
         mock_graph.set_references.assert_called_with(context, [references['references']], SheetReference)
 
