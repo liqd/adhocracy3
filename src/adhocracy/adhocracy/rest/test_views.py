@@ -496,17 +496,17 @@ class TestItemRESTView:
 
 class TestMetaApiView:
 
-    @fixture()
+    @fixture
     def request(self, cornice_request,  mock_resource_registry):
         cornice_request.registry.content = mock_resource_registry
         return cornice_request
 
-    @fixture()
+    @fixture
     def resource_meta(self):
         from adhocracy.interfaces import resource_metadata
         return resource_metadata._replace(iresource=IResource)
 
-    @fixture()
+    @fixture
     def sheet_meta(self):
         from adhocracy.interfaces import sheet_metadata
         return sheet_metadata._replace(isheet=ISheet,
@@ -757,7 +757,7 @@ class TestValidateLoginPasswordUnitTest:
 
 class TestLoginUserName:
 
-    @fixture()
+    @fixture
     def request(self, cornice_request, registry):
         cornice_request.registry=registry
         cornice_request.validated['user'] = testing.DummyResource()
@@ -784,7 +784,7 @@ class TestLoginUserName:
 
 class TestLoginEmailView:
 
-    @fixture()
+    @fixture
     def request(self, cornice_request, registry):
         cornice_request.registry=registry
         cornice_request.validated['user'] = testing.DummyResource()

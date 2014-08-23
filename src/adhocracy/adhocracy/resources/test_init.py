@@ -24,7 +24,7 @@ def register_sheet(isheet, mock_sheet, registry):
                              isheet.__identifier__)
     return mock_sheet
 
-@fixture()
+@fixture
 def resource_meta(resource_meta):
     from adhocracy.resources.resource import Base
     return resource_meta._replace(iresource=IResource,

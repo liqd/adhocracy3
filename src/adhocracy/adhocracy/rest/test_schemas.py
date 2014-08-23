@@ -1,5 +1,4 @@
 import json
-from unittest.mock import Mock
 
 from pyramid import testing
 from pytest import fixture
@@ -21,7 +20,7 @@ class JSONDummyRequest(testing.DummyRequest):
 
 
 
-@fixture()
+@fixture
 def sheet_metas():
     from adhocracy.interfaces import sheet_metadata
     meta = sheet_metadata._replace(schema_class=colander.MappingSchema)
@@ -115,7 +114,7 @@ class TestPOSTResourceRequestSchema:
 
 class TestDeferredValidatePostContentType:
 
-    @fixture()
+    @fixture
     def request(self, mock_resource_registry):
         request = JSONDummyRequest()
         request.registry.content = mock_resource_registry
@@ -137,7 +136,7 @@ class TestDeferredValidatePostContentType:
 
 class TestAddPostRequestSubSchemas:
 
-    @fixture()
+    @fixture
     def request(self, mock_resource_registry):
         request = JSONDummyRequest(body='{}')
         request.registry.content = mock_resource_registry
@@ -238,7 +237,7 @@ class TestPUTResourceRequestSchema:
 
 class TestAddPutRequestSubSchemasUnitTest:
 
-    @fixture()
+    @fixture
     def request(self, mock_resource_registry):
         request = JSONDummyRequest(body='{}')
         request.registry.content = mock_resource_registry

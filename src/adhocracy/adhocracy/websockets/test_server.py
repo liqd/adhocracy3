@@ -478,7 +478,7 @@ class ClientTrackerUnitTests(unittest.TestCase):
 @pytest.mark.functional
 class TestFunctionalClientCommunicator:
 
-    @pytest.fixture()
+    @pytest.fixture
     def connection(self, request, server, ws_settings):
         from websocket import create_connection
         connection = create_connection('ws://localhost:%s' %

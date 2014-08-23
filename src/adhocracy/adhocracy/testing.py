@@ -59,7 +59,7 @@ def create_pool_with_graph() -> testing.DummyResource:
 # Fixtures       #
 ##################
 
-@fixture()
+@fixture
 def resource_meta() -> ResourceMetadata:
     """ Return basic resource metadata."""
     from adhocracy.interfaces import resource_metadata
@@ -67,7 +67,7 @@ def resource_meta() -> ResourceMetadata:
     return resource_metadata._replace(iresource=IResource)
 
 
-@fixture()
+@fixture
 def sheet_meta() -> SheetMetadata:
     """ Return basic sheet metadata."""
     from adhocracy.interfaces import sheet_metadata
@@ -104,7 +104,7 @@ def cornice_request():
     return CorniceDummyRequest()
 
 
-@fixture()
+@fixture
 def context() -> testing.DummyResource:
     """ Return dummy context with IResource interface."""
     from adhocracy.interfaces import IResource
@@ -124,20 +124,20 @@ class DummyPool(testing.DummyResource):
         return prefix + '_0000000'
 
 
-@fixture()
+@fixture
 def pool() -> DummyPool:
     """ Return dummy pool with IPool interface."""
     from adhocracy.interfaces import IPool
     return DummyPool(__provides__=IPool)
 
 
-@fixture()
+@fixture
 def node() -> colander.MappingSchema:
     """Return dummy node."""
     return colander.MappingSchema()
 
 
-@fixture()
+@fixture
 def mock_sheet() -> Mock:
     """Mock :class:`adhocracy.sheets.GenericResourceSheet`."""
     from adhocracy.interfaces import sheet_metadata
@@ -149,7 +149,7 @@ def mock_sheet() -> Mock:
     return sheet
 
 
-@fixture()
+@fixture
 def mock_graph() -> Mock:
     """Mock :class:`adhocracy.graph.Graph`."""
     from adhocracy.graph import Graph
@@ -157,7 +157,7 @@ def mock_graph() -> Mock:
     return mock
 
 
-@fixture()
+@fixture
 def mock_objectmap() -> Mock:
     """Mock :class:`substanced.objectmap.ObjectMap`."""
     from substanced.objectmap import ObjectMap
@@ -166,7 +166,7 @@ def mock_objectmap() -> Mock:
     return mock
 
 
-@fixture()
+@fixture
 def mock_resource_registry() -> Mock:
     """Mock :class:`adhocracy.registry.ResourceContentRegistry`."""
     from adhocracy.registry import ResourceContentRegistry
@@ -178,7 +178,7 @@ def mock_resource_registry() -> Mock:
     return mock
 
 
-@fixture()
+@fixture
 def config(request) -> Configurator:
     """Return dummy testing configuration."""
     config = testing.setUp()
@@ -186,13 +186,13 @@ def config(request) -> Configurator:
     return config
 
 
-@fixture()
+@fixture
 def registry(config) -> object:
     """Return dummy registry."""
     return config.registry
 
 
-@fixture()
+@fixture
 def mock_user_locator(registry) -> Mock:
     """Mock :class:`adhocracy.resource.principal.UserLocatorAdapter`."""
     from zope.interface import Interface
@@ -366,7 +366,7 @@ def angular_app_loaded(browser: Browser) -> bool:
     return browser.evaluate_script(code)
 
 
-@fixture()
+@fixture
 def browser_root(browser, server) -> Browser:
     """Return test browser, start application and go to `root.html`."""
     add_helper_methods_to_splinter_browser_wrapper(browser)
@@ -376,7 +376,7 @@ def browser_root(browser, server) -> Browser:
     return browser
 
 
-@fixture()
+@fixture
 def browser_test(browser, server_static) -> Browser:
     """Return test browser and go to `test.html`."""
     add_helper_methods_to_splinter_browser_wrapper(browser)

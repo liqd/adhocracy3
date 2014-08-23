@@ -3,7 +3,7 @@ from pytest import fixture
 from pyramid import testing
 
 
-@fixture()
+@fixture
 def integration(config):
     config.include('adhocracy.registry')
     config.include('adhocracy.events')

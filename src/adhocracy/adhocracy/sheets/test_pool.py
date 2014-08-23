@@ -4,7 +4,7 @@ from pytest import fixture
 
 class TestPoolSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.pool import pool_metadata
         return pool_metadata
