@@ -30,11 +30,16 @@ def handle_error_400_colander_invalid(error, request):
 )
 def handle_error_500_exception(error, request):
     """Return 500 JSON error."""
-    args = str(error.args)
-    msg = getattr(error, 'msg', '')
-    error = ('internal', args, msg)
+    error = internal_exception_to_tuple(error)
     logger.exception('internal')
     return _JSONError([error], 500)
+
+
+def internal_exception_to_tuple(error: Exception) -> tuple:
+    """Convert an internal (unexpected) exception into a tuple."""
+    args = str(error.args)
+    msg = getattr(error, 'msg', '')
+    return 'internal', args, msg
 
 
 def includeme(config):  # pragma: no cover

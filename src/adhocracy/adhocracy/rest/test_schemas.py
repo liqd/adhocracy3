@@ -286,3 +286,179 @@ class TestOPTIONResourceResponseSchema:
              'PUT': {'request_body': {'data': {}},
                      'response_body': {'content_type': '', 'path': ''}}}
         assert inst.serialize() == wanted
+
+
+class TestPOSTBatchRequestItem:
+
+    def make_one(self):
+        from adhocracy.rest.schemas import POSTBatchRequestItem
+        return POSTBatchRequestItem()
+
+    def test_deserialize_valid(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': 'par1_item'
+        }
+        assert inst.deserialize(data) == data
+
+    def test_deserialize_at_path(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '@par1_item',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': 'par1_item'
+        }
+        assert inst.deserialize(data) == data
+
+    def test_deserialize_atat_path(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '@@par1_item',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': 'par1_item'
+        }
+        assert inst.deserialize(data) == data
+
+    def test_deserialize_invalid_relative_path(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': 'par1_item',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': 'par1_item'
+        }
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_missing_path(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': 'par1_item'
+        }
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_invalid_method(self):
+        inst = self.make_one()
+        data = {
+            'method': 'BRIEF',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': 'par1_item'
+        }
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_invalid_body(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': 'This is not a JSON dict',
+            'result_path': 'par1_item'
+        }
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_empty_result_path(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': ''
+        }
+        assert inst.deserialize(data) == data
+
+    def test_deserialize_no_result_path(self):
+        """result_path defaults to an empty string."""
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'}
+        }
+        deserialized = inst.deserialize(data)
+        assert deserialized['result_path'] == ''
+
+    def test_deserialize_invalid_result_path(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': 'not an identifier'
+        }
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+
+class TestPOSTBatchRequestSchema:
+
+    def make_one(self):
+        from adhocracy.rest.schemas import POSTBatchRequestSchema
+        return POSTBatchRequestSchema()
+
+    def test_deserialize_valid(self):
+        inst = self.make_one()
+        data = [{
+                'method': 'POST',
+                'path': '/adhocracy/Proposal/kommunismus',
+                'body': {'content_type': 'adhocracy.resources.IParagraph'},
+                'result_path': 'par1_item'
+            },
+            {
+                'method': 'GET',
+                'path': '@@par1_item'
+            }
+        ]
+        data_with_defaults = data.copy()
+        data_with_defaults[1]['body'] = {}
+        data_with_defaults[1]['result_path'] = ''
+        assert inst.deserialize(data) == data_with_defaults
+
+    def test_deserialize_invalid_inner_field(self):
+        inst = self.make_one()
+        data = [{
+                'method': 'POST',
+                'path': '/adhocracy/Proposal/kommunismus',
+                'body': {'content_type': 'adhocracy.resources.IParagraph'},
+                'result_path': 'par1_item'
+            },
+            {
+                'method': 'HOT',
+                'path': '@@par1_item'
+            }
+        ]
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_invalid_inner_type(self):
+        inst = self.make_one()
+        data = [{
+                'method': 'POST',
+                'path': '/adhocracy/Proposal/kommunismus',
+                'body': {'content_type': 'adhocracy.resources.IParagraph'},
+                'result_path': 'par1_item'
+            },
+            ['this', 'is not', 'a dictionary']
+        ]
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_invalid_outer_type(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'}
+        }
+        with raises(colander.Invalid):
+            inst.deserialize(data)

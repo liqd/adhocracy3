@@ -2,7 +2,9 @@
 import colander
 
 from adhocracy.schema import AbsolutePath
+from adhocracy.schema import AdhocracySchemaNode
 from adhocracy.schema import Email
+from adhocracy.schema import Identifier
 from adhocracy.schema import Password
 
 
@@ -155,7 +157,7 @@ class POSTLocationMapping(colander.Schema):
 
 class POSTLoginUsernameRequestSchema(colander.Schema):
 
-    """"""
+    """Schema for login requests via username and password."""
 
     name = colander.SchemaNode(colander.String(),
                                missing=colander.required)
@@ -164,10 +166,52 @@ class POSTLoginUsernameRequestSchema(colander.Schema):
 
 class POSTLoginEmailRequestSchema(colander.Schema):
 
-    """"""
+    """Schema for login requests via email and password."""
 
     email = Email(missing=colander.required)
     password = Password(missing=colander.required)
+
+
+class BatchMethod(colander.SchemaNode):
+
+    """An HTTP method in a batch request."""
+
+    schema_type = colander.String
+    validator = colander.OneOf(['GET', 'POST', 'PUT'])
+    missing = colander.required
+
+
+class BatchRequestPath(AdhocracySchemaNode):
+
+    """A path in a batch request.
+
+    Either an absolute path or a preliminary resource path (an identifier
+    preceded by '@' or '@@').
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.required
+    validator = colander.Regex('^(' + AbsolutePath.relative_regex + '|@@?'
+                               + Identifier.relative_regex + ')$')
+
+
+class POSTBatchRequestItem(colander.Schema):
+
+    """A single item in a batch request, encoding a single request."""
+
+    method = BatchMethod()
+    path = BatchRequestPath()
+    body = colander.SchemaNode(colander.Mapping(unknown='preserve'),
+                               missing={})
+    result_path = Identifier(missing='')
+
+
+class POSTBatchRequestSchema(colander.SequenceSchema):
+
+    """Schema for batch requests (list of POSTBatchRequestItem's)."""
+
+    items = POSTBatchRequestItem()
 
 
 class OPTIONResourceResponseSchema(colander.Schema):

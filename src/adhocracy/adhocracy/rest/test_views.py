@@ -163,6 +163,39 @@ class TestValidateRequest:
                            extra_validators=[validator1])
         assert hasattr(request, '_validator_called') is False
 
+    def test_valid_with_sequence_schema(self, context, request):
+        class TestListSchema(colander.SequenceSchema):
+            elements = colander.SchemaNode(colander.String())
+
+        request.body = '["alpha", "beta", "gamma"]'
+        self._make_one(context, request, schema=TestListSchema())
+        assert request.validated == ['alpha', 'beta', 'gamma']
+
+    def test_with_invalid_sequence_schema(self, context, request):
+        class TestListSchema(colander.SequenceSchema):
+            elements = colander.SchemaNode(colander.String())
+            nonsense_node = colander.SchemaNode(colander.String())
+
+        request.body = '["alpha", "beta", "gamma"]'
+        with pytest.raises(colander.Invalid):
+            self._make_one(context, request, schema=TestListSchema())
+        assert request.validated == {}
+
+    def test_invalid_with_sequence_schema(self, context, request):
+        class TestListSchema(colander.SequenceSchema):
+            elements = colander.SchemaNode(colander.Integer())
+
+        from cornice.util import _JSONError
+        request.body = '[1, 2, "three"]'
+        with pytest.raises(_JSONError):
+            self._make_one(context, request, schema=TestListSchema())
+        assert request.validated == {}
+
+    def test_invalid_with_not_sequence_and_not_mapping_schema(self, context, request):
+        schema = colander.SchemaNode(colander.Int())
+        with pytest.raises(Exception):
+            self._make_one(context, request, schema=schema)
+
 
 class TestValidatePOSTRootVersions:
 
