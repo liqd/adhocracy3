@@ -1,9 +1,6 @@
 """Test rest.views module."""
-import json
 from unittest.mock import Mock
 
-from cornice.util import extract_json_data
-from cornice.errors import Errors
 from pyramid import testing
 from pytest import fixture
 import colander
@@ -26,34 +23,6 @@ class CountSchema(colander.MappingSchema):
     count = colander.SchemaNode(colander.Int(),
                                 default=0,
                                 missing=colander.drop)
-
-
-class CorniceDummyRequest(testing.DummyRequest):
-
-    def __init__(self, registry=None, **kw):
-        class DummyRegistry():
-            pass
-        self.headers = {}
-        self.body = ''
-        self.GET = {}
-        self.POST = {}
-        self.validated = {}
-        self.matchdict = {}
-        if registry is None:
-            self.registry = DummyRegistry()
-        else:
-            self.registry = registry
-        self.registry.cornice_deserializers = {'application/json': extract_json_data}
-        self.content_type = 'application/json'
-        self.errors = Errors(self)
-        self.__dict__.update(kw)
-
-    def authenticated_userid(self):
-        return None
-
-    @property
-    def json_body(self):
-        return json.loads(self.body)
 
 
 @fixture
@@ -81,8 +50,8 @@ def mock_password_sheet(registry):
 class TestValidateRequest:
 
     @fixture
-    def request(self):
-        return CorniceDummyRequest()
+    def request(self, cornice_request):
+        return cornice_request
 
     def _make_one(self, context, request, **kw):
         from adhocracy.rest.views import validate_request_data
@@ -200,8 +169,8 @@ class TestValidateRequest:
 class TestValidatePOSTRootVersions:
 
     @fixture
-    def request(self):
-        return CorniceDummyRequest()
+    def request(self, cornice_request):
+        return cornice_request
 
     def make_one(self, context, request):
         from adhocracy.rest.views import validate_post_root_versions
@@ -249,8 +218,8 @@ class TestValidatePOSTRootVersions:
 class TestRESTView:
 
     @fixture
-    def request(self):
-        return CorniceDummyRequest()
+    def request(self, cornice_request):
+        return cornice_request
 
     def make_one(self, context, request):
         from adhocracy.rest.views import RESTView
@@ -271,11 +240,11 @@ class TestRESTView:
 
 class TestResourceRESTView:
 
-    @fixture()
-    def request(self, mock_resource_registry):
-        request = CorniceDummyRequest()
-        request.registry.content = mock_resource_registry
-        return request
+
+    @fixture
+    def request(self, cornice_request, mock_resource_registry):
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
 
     def make_one(self, context, request):
         from adhocracy.rest.views import ResourceRESTView
@@ -339,11 +308,10 @@ class TestResourceRESTView:
 
 class TestSimpleRESTView:
 
-    @fixture()
-    def request(self, mock_resource_registry):
-        request = CorniceDummyRequest()
-        request.registry.content = mock_resource_registry
-        return request
+    @fixture
+    def request(self, cornice_request, mock_resource_registry):
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
 
     def make_one(self, context, request):
         from adhocracy.rest.views import SimpleRESTView
@@ -384,11 +352,10 @@ class TestSimpleRESTView:
 
 class TestPoolRESTView:
 
-    @fixture()
-    def request(self, mock_resource_registry):
-        request = CorniceDummyRequest()
-        request.registry.content = mock_resource_registry
-        return request
+    @fixture
+    def request(self, cornice_request, mock_resource_registry):
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
 
     def make_one(self, context, request):
         from adhocracy.rest.views import PoolRESTView
@@ -421,11 +388,10 @@ class TestPoolRESTView:
 
 class TestItemRESTView:
 
-    @fixture()
-    def request(self, mock_resource_registry):
-        request = CorniceDummyRequest()
-        request.registry.content = mock_resource_registry
-        return request
+    @fixture
+    def request(self, cornice_request, mock_resource_registry):
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
 
     def make_one(self, context, request):
         from adhocracy.rest.views import ItemRESTView
@@ -531,10 +497,9 @@ class TestItemRESTView:
 class TestMetaApiView:
 
     @fixture()
-    def request(self, mock_resource_registry):
-        request = CorniceDummyRequest()
-        request.registry.content = mock_resource_registry
-        return request
+    def request(self, cornice_request,  mock_resource_registry):
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
 
     @fixture()
     def resource_meta(self):
@@ -704,11 +669,11 @@ class TestMetaApiView:
 
 class TestValidateLoginEmail:
 
-    @fixture()
-    def request(self, registry):
-        request = CorniceDummyRequest(registry=registry)
-        request.validated['email'] = 'user@example.org'
-        return request
+    @fixture
+    def request(self, cornice_request, registry):
+        cornice_request.registry = registry
+        cornice_request.validated['email'] = 'user@example.org'
+        return cornice_request
 
     def _call_fut(self, context, request):
         from adhocracy.rest.views import validate_login_email
@@ -729,11 +694,11 @@ class TestValidateLoginEmail:
 
 class TestValidateLoginNameUnitTest:
 
-    @fixture()
-    def request(self, registry):
-        request = CorniceDummyRequest(registry=registry)
-        request.validated['name'] = 'user'
-        return request
+    @fixture
+    def request(self, cornice_request, registry):
+        cornice_request.registry = registry
+        cornice_request.validated['name'] = 'user'
+        return cornice_request
 
     def _call_fut(self, context, request):
         from adhocracy.rest.views import validate_login_name
@@ -753,14 +718,14 @@ class TestValidateLoginNameUnitTest:
 
 class TestValidateLoginPasswordUnitTest:
 
-    @fixture()
-    def request(self, registry):
+    @fixture
+    def request(self, cornice_request, registry):
         from adhocracy.sheets.user import IPasswordAuthentication
-        request = CorniceDummyRequest(registry=registry)
+        cornice_request.registry = registry
         user = testing.DummyResource(__provides__=IPasswordAuthentication)
-        request.validated['user'] = user
-        request.validated['password'] = 'lalala'
-        return request
+        cornice_request.validated['user'] = user
+        cornice_request.validated['password'] = 'lalala'
+        return cornice_request
 
     def _call_fut(self, context, request):
         from adhocracy.rest.views import validate_login_password
@@ -793,11 +758,11 @@ class TestValidateLoginPasswordUnitTest:
 class TestLoginUserName:
 
     @fixture()
-    def request(self, registry):
-        request = CorniceDummyRequest(registry=registry)
-        request.validated['user'] = testing.DummyResource()
-        request.validated['password'] = 'lalala'
-        return request
+    def request(self, cornice_request, registry):
+        cornice_request.registry=registry
+        cornice_request.validated['user'] = testing.DummyResource()
+        cornice_request.validated['password'] = 'lalala'
+        return cornice_request
 
     def _make_one(self, request, context):
         from adhocracy.rest.views import LoginUsernameView
@@ -819,11 +784,11 @@ class TestLoginUserName:
 
 class TestLoginEmailView:
 
-    @fixture
-    def request(self, registry):
-        request = CorniceDummyRequest(registry=registry)
-        request.validated['user'] = testing.DummyResource()
-        return request
+    @fixture()
+    def request(self, cornice_request, registry):
+        cornice_request.registry=registry
+        cornice_request.validated['user'] = testing.DummyResource()
+        return cornice_request
 
     def _make_one(self, context, request):
         from adhocracy.rest.views import LoginEmailView

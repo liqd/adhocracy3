@@ -7,6 +7,8 @@ import os
 import subprocess
 import time
 
+from cornice.util import extract_json_data
+from cornice.errors import Errors
 from pyramid.config import Configurator
 from pyramid import testing
 from pyramid.traversal import resource_path_tuple
@@ -72,6 +74,34 @@ def sheet_meta() -> SheetMetadata:
     from adhocracy.interfaces import ISheet
     return sheet_metadata._replace(isheet=ISheet,
                                    schema_class=colander.MappingSchema)
+
+
+class CorniceDummyRequest(testing.DummyRequest):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.validated = {}
+        self.errors = Errors(self)
+        self.content_type = 'application/json'
+        deserializer = {'application/json': extract_json_data}
+        self.registry.cornice_deserializers = deserializer
+
+    def authenticated_userid(self):
+        return None
+
+    @property
+    def json_body(self):
+        return json.loads(self.body)
+
+
+@fixture
+def cornice_request():
+    """ Return dummy request with additional validation attributes.
+
+    Additional Attributes:
+        `errors`, `validated`, `content_type`
+    """
+    return CorniceDummyRequest()
 
 
 @fixture()
