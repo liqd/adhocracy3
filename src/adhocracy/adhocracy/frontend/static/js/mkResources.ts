@@ -309,19 +309,21 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
     var mkConstructor = (tab : string) => {
         var os : string[] = [];
 
+        var args : string[] = [];
+        var lines : string[] = [];
+
         if (resource.sheets.indexOf("adhocracy.sheets.name.IName") !== -1) {
-            os.push("constructor(name ?: string) {");
-            os.push("    super(\"" + modulePath + "\");");
-            os.push("    var _self = this;");
-            os.push("    if (typeof name !== 'undefined') {");
-            os.push("        _self.data[\"adhocracy.sheets.name.IName\"] = { name: name };");
-            os.push("    }");
-            os.push("}");
-        } else {
-            os.push("constructor() {");
-            os.push("    super(\"" + modulePath + "\");");
-            os.push("}");
+            args.push("name ?: string");
+            lines.push("    if (typeof name !== 'undefined') {");
+            lines.push("        _self.data[\"adhocracy.sheets.name.IName\"] = { name: name };");
+            lines.push("    }");
         }
+
+        os.push("constructor(" + Util.intercalate(args, ", ") + ") {");
+        os.push("    super(\"" + modulePath + "\");");
+        os.push("    var _self = this;");
+        lines.forEach((line) => os.push(line));
+        os.push("}");
 
         return Util.intercalate(os.map((s) => tab + s), "\n");
     };
