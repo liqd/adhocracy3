@@ -1,4 +1,3 @@
-from adhocracy.interfaces import ChangelogMetadata
 from pytest import mark
 from pytest import fixture
 
@@ -53,6 +52,7 @@ class TestResourceModifiedSubscriber:
 
 
 def test_create_transaction_changelog():
+    from adhocracy.interfaces import ChangelogMetadata
     from adhocracy.resources.subscriber import create_transaction_changelog
     changelog = create_transaction_changelog()
     changelog_metadata = changelog['/resource/path']

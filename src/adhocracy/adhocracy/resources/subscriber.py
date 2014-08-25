@@ -4,7 +4,8 @@ from collections import defaultdict
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
 
-from adhocracy.interfaces import IResource, ChangelogMetadata
+from adhocracy.interfaces import ChangelogMetadata
+from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourceCreatedAndAdded
 from adhocracy.interfaces import IResourceSheetModified
 from adhocracy.interfaces import IItemVersionNewVersionAdded
