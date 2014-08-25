@@ -380,7 +380,6 @@ def browser_test_helper(browser, server_static, url) -> Browser:
     """Return test browser and go to url."""
     add_helper_methods_to_splinter_browser_wrapper(browser)
 
-    url = server_static.application_url + 'frontend_static/test.html'
     browser.visit(url)
 
     def jasmine_finished(browser):
