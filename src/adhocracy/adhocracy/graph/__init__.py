@@ -12,6 +12,7 @@ from substanced.objectmap import ObjectMap
 from substanced.objectmap import Multireference
 from substanced.content import content
 
+from adhocracy.interfaces import IResource
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import SheetReference
 from adhocracy.interfaces import SheetToSheet
@@ -133,11 +134,14 @@ class Graph(Persistent):
         schema = sheet_meta.schema_class()
         for field_name, targets in references.items():
             assert field_name in schema
+            if targets is None:
+                continue
             node = schema[field_name]
             if not hasattr(node, 'reftype'):
                 continue
             reftype = schema[field_name].reftype
-            targets = targets if isinstance(targets, Iterable) else [targets]
+            if IResource.providedBy(targets):
+                targets = [targets]
             self.set_references(source, targets, reftype)
 
     def get_references_for_isheet(self, source, isheet: ISheet) -> dict:
