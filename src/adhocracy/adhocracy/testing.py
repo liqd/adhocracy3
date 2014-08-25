@@ -376,7 +376,7 @@ def browser_root(browser, server) -> Browser:
     return browser
 
 
-def browser_test_helper(browser, server_static, url) -> Browser:
+def browser_test_helper(browser, url) -> Browser:
     """Return test browser and go to url."""
     add_helper_methods_to_splinter_browser_wrapper(browser)
 
@@ -395,11 +395,4 @@ def browser_test_helper(browser, server_static, url) -> Browser:
 def browser_test(browser, server_static) -> Browser:
     """Return test browser instance with url=test.html."""
     url = server_static.application_url + 'frontend_static/test.html'
-    return browser_test_helper(browser, server_static, url)
-
-
-@fixture()
-def browser_igtest(browser, server_static) -> Browser:
-    """Return test browser instance with url=igtest.html."""
-    url = server_static.application_url + 'frontend_static/igtest.html'
-    return browser_test_helper(browser, server_static, url)
+    return browser_test_helper(browser, url)
