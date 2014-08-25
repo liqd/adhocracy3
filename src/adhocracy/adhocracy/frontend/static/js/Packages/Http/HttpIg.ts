@@ -27,7 +27,7 @@ export var register = (angular, config, meta_api) => {
             return;
         });
 
-        it("Deep-rewrites preliminary resource paths.", (done) => {
+        xit("Deep-rewrites preliminary resource paths.", (done) => {
             var poolPath = "/adhocracy";
             var proposalName = "Against Curtains " + Math.random();
                 // (we don't have a way yet to repeat this test
