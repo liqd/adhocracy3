@@ -138,6 +138,15 @@ def node() -> colander.MappingSchema:
 
 
 @fixture
+def transaction_changelog():
+    """Return transaction_changelog dictionary."""
+    from collections import defaultdict
+    from adhocracy.resources.subscriber import changelog_metadata
+    metadata = lambda: changelog_metadata
+    return defaultdict(metadata)
+
+
+@fixture
 def mock_sheet() -> Mock:
     """Mock :class:`adhocracy.sheets.GenericResourceSheet`."""
     from adhocracy.interfaces import sheet_metadata

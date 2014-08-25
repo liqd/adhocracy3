@@ -1,4 +1,5 @@
 """adhocracy.event event subcriber to handle auto updates of resources."""
+from pyramid.traversal import resource_path
 
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
@@ -67,11 +68,21 @@ def reference_has_new_version_subscriber(event):
         old_version_index = field.index(event.old_version)
         field.pop(old_version_index)
         field.insert(old_version_index, event.new_version)
-        if IItemVersion.providedBy(resource):
+        new_version = _get_new_version_created_in_this_transaction(registry,
+                                                                   resource)
+        if IItemVersion.providedBy(resource) and new_version is None:
             _update_versionable(resource, isheet, appstruct, root_versions,
                                 registry, creator)
         else:
             _update_resource(resource, sheet, appstruct)
+
+
+def _get_new_version_created_in_this_transaction(registry, resource):
+        if not hasattr(registry, '_transaction_changelog'):
+            return
+        path = resource_path(resource)
+        changelog_metadata = registry._transaction_changelog[path]
+        return changelog_metadata.followed_by
 
 
 def includeme(config):
