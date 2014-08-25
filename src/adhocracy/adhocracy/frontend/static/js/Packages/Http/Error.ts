@@ -13,12 +13,12 @@ export interface IBackendErrorItem {
     description : string;
 }
 
-var renderBackendError = (es : IBackendErrorItem[]) : void => {
-    for (var e in es) {
-        if (es.hasOwnProperty(e)) {
+var renderBackendError = (errors : IBackendErrorItem[]) : void => {
+    for (var e in errors) {
+        if (errors.hasOwnProperty(e)) {
             console.log("error #" + e);
-            console.log("where: " + es[e].name + ", " + es[e].location);
-            console.log("what:  " + es[e].description);
+            console.log("where: " + errors[e].name + ", " + errors[e].location);
+            console.log("what:  " + errors[e].description);
         }
     }
 };
@@ -26,14 +26,14 @@ var renderBackendError = (es : IBackendErrorItem[]) : void => {
 export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendError>) : void => {
     "use strict";
 
-    var es = response.data.errors;
+    var errors = response.data.errors;
 
     console.log("http response with error status: " + response.status);
     console.log(response.config);
     console.log(response.data);
 
-    renderBackendError(es);
-    throw es;
+    renderBackendError(errors);
+    throw errors;
 };
 
 export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBackendError[]>) : void => {
@@ -48,7 +48,7 @@ export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBacken
     }
 
     var lastBatchItemResponse = response.data[response.data.length - 1];
-    var es = (<any>lastBatchItemResponse).body.errors;
+    var errors = (<any>lastBatchItemResponse).body.errors;
     // In rest_api.rst, we call the response body field 'body', but
     // $http calls it 'data'.  `logBackendBatchError` and
     // `importBatchContent` are the only two places where this gets a
@@ -56,8 +56,8 @@ export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBacken
     // backend, and then in these two functions.
 
     // Workaround for backend bug.  See redmine ticket #1466.
-    es = es.map((a) => { return { name: a[0], location: a[1], description: a[2] }; });
+    errors = errors.map((a) => { return { name: a[0], location: a[1], description: a[2] }; });
 
-    renderBackendError(es);
-    throw es;
+    renderBackendError(errors);
+    throw errors;
 };

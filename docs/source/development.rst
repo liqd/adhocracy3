@@ -74,12 +74,18 @@ frontend integration tests:
     can talk to a running backend, angular runtime, etc..
 
     This makes it possible to write integration tests that reproduce
-    any possible bug once it is reported.  For instance, one can write
+    any possible bug once it is reported (even though it may sometimes
+    be better to write a unit or an acceptance test).
+
+    For instance, one can write
     a test that registers and injects the AdhHttp service, renders
     some directive into the DOM, sends some keys to some input fields
     and clicks "save", and, once the object has been saved to the
     database, gets it from the backend and compares it to the one
     rendered in the directive.
+
+    Integration do not support nodejs.  They can only be run in
+    browser manually or via py.test.
 
     A.  Integrated with py.test::
 
