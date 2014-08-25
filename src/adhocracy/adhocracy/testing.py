@@ -21,6 +21,8 @@ import colander
 
 from adhocracy.interfaces import SheetMetadata
 from adhocracy.interfaces import ResourceMetadata
+from adhocracy.resources.subscriber import ChangelogMetadata
+# FIXME: move this to adhocracy.interface to import package isolation
 
 
 #####################################
@@ -105,6 +107,13 @@ def cornice_request():
 
 
 @fixture
+def changelog_meta() -> ChangelogMetadata:
+    """ Return changelog metadata."""
+    from adhocracy.resources.subscriber import changelog_metadata
+    return changelog_metadata
+
+
+@fixture
 def context() -> testing.DummyResource:
     """ Return dummy context with IResource interface."""
     from adhocracy.interfaces import IResource
@@ -138,11 +147,10 @@ def node() -> colander.MappingSchema:
 
 
 @fixture
-def transaction_changelog():
+def transaction_changelog(changelog_meta):
     """Return transaction_changelog dictionary."""
     from collections import defaultdict
-    from adhocracy.resources.subscriber import changelog_metadata
-    metadata = lambda: changelog_metadata
+    metadata = lambda: changelog_meta
     return defaultdict(metadata)
 
 
