@@ -343,3 +343,25 @@ class ITokenManger(Interface):  # pragma: no cover
 
     def delete_token(token: str):
         """ Delete authentication token."""
+
+
+class ChangelogMetadata(namedtuple('ChangelogMetadata',
+                                   ['modified', 'created', 'followed_by',
+                                    'resource'])):
+
+    """Metadata to track modified resources during one transaction.
+
+    Fields:
+    -------
+
+    modified (bool):
+        Resource sheets (:class:`adhocracy.interfaces.IResourceSheet`) are
+        modified.
+    created (bool):
+        This resource is created and added to a pool.
+    followed_by (None or IResource):
+        A new Version (:class:`adhocracy.interfaces.IItemVersion`) follows
+        this resource
+    resource (None or IResource):
+        The resource that is modified/created.
+    """

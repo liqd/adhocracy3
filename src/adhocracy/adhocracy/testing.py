@@ -19,10 +19,8 @@ from webtest.http import StopableWSGIServer
 from pytest import fixture
 import colander
 
-from adhocracy.interfaces import SheetMetadata
+from adhocracy.interfaces import SheetMetadata, ChangelogMetadata
 from adhocracy.interfaces import ResourceMetadata
-from adhocracy.resources.subscriber import ChangelogMetadata
-# FIXME: move this to adhocracy.interface to import package isolation
 
 
 #####################################

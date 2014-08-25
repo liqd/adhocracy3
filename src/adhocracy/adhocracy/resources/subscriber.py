@@ -1,11 +1,10 @@
 """Subscriber to track changed resources during one transaction."""
-from collections import namedtuple
 from collections import defaultdict
 
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
 
-from adhocracy.interfaces import IResource
+from adhocracy.interfaces import IResource, ChangelogMetadata
 from adhocracy.interfaces import IResourceCreatedAndAdded
 from adhocracy.interfaces import IResourceSheetModified
 from adhocracy.interfaces import IItemVersionNewVersionAdded
@@ -35,28 +34,6 @@ def _add_changelog_metadata(registry: Registry, resource: IResource, **kwargs):
     path = resource_path(resource)
     metadata = changelog[path]
     changelog[path] = metadata._replace(resource=resource, **kwargs)
-
-
-class ChangelogMetadata(namedtuple('ChangelogMetadata',
-                                   ['modified', 'created', 'followed_by',
-                                    'resource'])):
-
-    """Metadata to track modified resources during one transaction.
-
-    Fields:
-    -------
-
-    modified (bool):
-        Resource sheets (:class:`adhocracy.interfaces.IResourceSheet`) are
-        modified.
-    created (bool):
-        This resource is created and added to a pool.
-    followed_by (None or IResource):
-        A new Version (:class:`adhocracy.interfaces.IItemVersion`) follows
-        this resource
-    resource (None or IResource):
-        The resource that is modified/created.
-    """
 
 
 changelog_metadata = ChangelogMetadata(False, False, None, None)

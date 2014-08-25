@@ -1,3 +1,4 @@
+from adhocracy.interfaces import ChangelogMetadata
 from pytest import mark
 from pytest import fixture
 
@@ -53,7 +54,6 @@ class TestResourceModifiedSubscriber:
 
 def test_create_transaction_changelog():
     from adhocracy.resources.subscriber import create_transaction_changelog
-    from adhocracy.resources.subscriber import ChangelogMetadata
     changelog = create_transaction_changelog()
     changelog_metadata = changelog['/resource/path']
     assert isinstance(changelog_metadata, ChangelogMetadata)
