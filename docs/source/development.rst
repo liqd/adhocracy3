@@ -84,7 +84,7 @@ frontend integration tests:
     database, gets it from the backend and compares it to the one
     rendered in the directive.
 
-    Integration do not support nodejs.  They can only be run in
+    Integration tests do not support nodejs.  They can only be run in
     browser manually or via py.test.
 
     A.  Integrated with py.test::
