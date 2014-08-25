@@ -11,20 +11,18 @@ from adhocracy.utils import get_all_sheets
 
 class ResourceContentRegistry(ContentRegistry):
 
-    """Extend substanced content registry to work with resources.
-
-    Instance attributes:
-
-    :resources_meta: dictionary with key `resource type` and value
-                    :class:`adhocracy.interfaces.ResourceMetadata`.
-    :sheets_meta: dictionary with key `resource type` and value
-                 :class:`adhocracy.interfaces.SheetMetadata`.
-    """
+    """Extend substanced content registry to work with resources."""
 
     def __init__(self, registry):
         super().__init__(registry)
         self.resources_meta = {}
+        """Dictionary with key `resource type` and value
+        :class:`adhocracy.interfaces.ResourceMetadata`.
+        """
         self.sheets_meta = {}
+        """Dictionary with key `resource type` and value
+        :class:`adhocracy.interfaces.SheetMetadata`.
+        """
 
     def resource_sheets(self, context, request,
                         onlyeditable=False,
