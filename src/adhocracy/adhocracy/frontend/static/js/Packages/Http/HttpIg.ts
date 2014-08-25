@@ -23,10 +23,6 @@ export var register = (angular, config, meta_api) => {
             return angular.injector(["ng"]).invoke(factory);
         })();
 
-        beforeEach(() => {
-            return;
-        });
-
         xit("Deep-rewrites preliminary resource paths.", (done) => {
             var poolPath = "/adhocracy";
             var proposalName = "Against Curtains " + Math.random();
@@ -75,9 +71,8 @@ export var register = (angular, config, meta_api) => {
             adhHttp.withTransaction(cb);
         });
 
-        xit("Keeps track of the LAST tag properly.", (done) => {
+        xit("Keeps track of the LAST tag properly.", () => {
             expect(false).toBe(true);
-            done();
         });
     });
 };

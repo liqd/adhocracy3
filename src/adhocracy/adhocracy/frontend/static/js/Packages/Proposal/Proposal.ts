@@ -470,10 +470,6 @@ export class Service {
         var name = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
         name = Util.normalizeName(name);
 
-        var scope : {proposal? : any; section? : any; paragraphs : {}} = {
-            paragraphs: {}
-        };
-
         // this is the batch-request logic.  it works a bit different
         // from the original logic in that it follows the references
         // down the items and up the versions, rather than going down
@@ -504,18 +500,17 @@ export class Service {
 
                 return transaction.commit()
                     .then((responses) : Resources.Content<any> => {
-                        // store items in scope
-                        scope.proposal = responses[postProposal.index];
-                        scope.section = responses[postSection.index];
-                        postParagraphs.forEach((postParagraph, i) =>
-                            scope.paragraphs[i] = responses[postParagraph.index][i]);
-
                         // return the latest proposal Version
                         return responses[postProposalVersion.index];
                     });
             });
     }
 
+    // FIXME: there are two implementations of
+    // postProposalWithParagraph.  both will be obsoleted by upcoming
+    // changes in surrounding the high-level-api user story, so we
+    // keep both of them in the code for reference for now.  They need
+    // to be cleaned up together once the high-level api is stable.
     public postProposalWithParagraphs(p, v, pvs) {
         return this.postProposalWithParagraphsOld(p, v, pvs);
         // return this.postProposalWithParagraphsBatched(p, v, pvs);
