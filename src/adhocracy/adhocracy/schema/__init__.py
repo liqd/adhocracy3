@@ -97,11 +97,25 @@ def validate_name_is_unique(node: colander.SchemaNode, value: str):
         raise colander.Invalid(node, msg, value=value)
 
 
+class Identifier(AdhocracySchemaNode):
+
+    """Like :class:`Name`, but doesn't check uniqueness..
+
+    Example value: blu.ABC_12-3
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+    relative_regex = '[a-zA-Z0-9\_\-\.]+'
+    validator = colander.All(colander.Regex('^' + relative_regex + '$'),
+                             colander.Length(min=1, max=100))
+
+
 @colander.deferred
 def deferred_validate_name(node: colander.SchemaNode, kw: dict) -> callable:
     """Check that the node value is a valid child name."""
-    return colander.All(colander.Regex(u'^[a-zA-Z0-9\_\-\.]+$'),
-                        colander.Length(min=1, max=100),
+    return colander.All(Identifier.validator,
                         validate_name_is_unique)
 
 
@@ -160,7 +174,8 @@ class AbsolutePath(AdhocracySchemaNode):
     """
 
     schema_type = colander.String
-    validator = colander.Regex(u'^/[a-zA-Z0-9\_\-\.\/]+$')
+    relative_regex = '/[a-zA-Z0-9\_\-\.\/]+'
+    validator = colander.Regex('^' + relative_regex + '$')
 
 
 class ResourceObject(colander.SchemaType):
@@ -348,7 +363,7 @@ class SingleLine(colander.SchemaNode):  # noqa
 
     """ UTF-8 encoded String without line breaks.
 
-    Disallowed characters are linebreaks like: \n, \r
+    Disallowed characters are linebreaks like: \n, \r.
     Example value: This is a something.
     """
 
@@ -406,7 +421,7 @@ class DateTime(AdhocracySchemaNode):
 
     The default/missing value is the current datetime.
 
-    Constructor arguments::
+    Constructor arguments:
 
     :param 'tzinfo': This timezone is used if the cstrut is missing the tzinfo.
                      Defaults to UTC

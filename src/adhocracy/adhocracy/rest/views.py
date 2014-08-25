@@ -2,10 +2,11 @@
 from copy import deepcopy
 from logging import getLogger
 
-from colander import SchemaNode
-from colander import MappingSchema
 from colander import drop
 from colander import Invalid
+from colander import MappingSchema
+from colander import SchemaNode
+from colander import SequenceSchema
 from cornice.util import json_error
 from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
@@ -80,12 +81,13 @@ def validate_request_data(context: ILocation, request: Request,
     :param schema: Schema to validate. Data to validate is extracted from the
                    request.body. For schema nodes with attribute `location` ==
                    `querystring` the data is extracted from the query string.
-                   The validated data is stored in the `request.validated`dict.
+                   The validated data (dict or list) is stored in the
+                   `request.validated` attribute.
                    The `None` value is allowed to disable schema validation.
     :param extra_validators: Functions called after schema validation.
                              The passed arguments are `context` and  `request`.
                              The should append errors to `request.errors` and
-                             validated data to  `request.validated`.
+                             validated data to `request.validated`.
 
     :raises _JSONError: HTTP 400 for bad request data.
     """
@@ -99,9 +101,9 @@ def validate_request_data(context: ILocation, request: Request,
     _raise_if_errors(request)
 
 
-def _validate_schema(cstructs: dict, schema: MappingSchema, request: Request,
+def _validate_schema(cstruct: object, schema: MappingSchema, request: Request,
                      location='body'):
-    """Validate that the `cstruct` data is conform to the given schema.
+    """Validate that the :term:`cstruct` data is conform to the given schema.
 
     :param request: request with list like `errors` attribute to append errors
                     and the dictionary attribute `validated` to add validated
@@ -109,22 +111,49 @@ def _validate_schema(cstructs: dict, schema: MappingSchema, request: Request,
     :param location: filter schema nodes depending on the `location` attribute.
                      The default value is `body`.
     """
-    validated = {}
+    if isinstance(schema, SequenceSchema):
+        _validate_list_schema(schema, cstruct, request, location)
+    elif isinstance(schema, MappingSchema):
+        _validate_dict_schema(schema, cstruct, request, location)
+    else:
+        error = 'Validation for schema {} is unsupported.'.format(str(schema))
+        raise(Exception(error))
+
+
+def _validate_list_schema(schema: SequenceSchema, cstruct: list,
+                          request: Request, location='body'):
+    if location != 'body':  # for now we only support location == body
+        return
+    child_cstructs = schema.cstruct_children(cstruct)
+    try:
+        request.validated = schema.deserialize(child_cstructs)
+    except Invalid as err:
+        _add_colander_invalid_error_to_request(err, request, location)
+
+
+def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
+                          request: Request, location='body'):
     nodes = [n for n in schema if getattr(n, 'location', 'body') == location]
-    nodes_with_cstruct = [n for n in nodes if n.name in cstructs]
-    nodes_without_cstruct = [n for n in nodes if n.name not in cstructs]
+    validated = {}
+    nodes_with_cstruct = [n for n in nodes if n.name in cstruct]
+    nodes_without_cstruct = [n for n in nodes if n.name not in cstruct]
     for node in nodes_without_cstruct:
         appstruct = node.deserialize()
         if appstruct is not drop:
             validated[node.name] = appstruct
     for node in nodes_with_cstruct:
-        cstruct = cstructs[node.name]
+        node_cstruct = cstruct[node.name]
         try:
-            validated[node.name] = node.deserialize(cstruct)
-        except Invalid as e:
-            for name, msg in e.asdict().items():
-                request.errors.add(location, name, msg)
+            validated[node.name] = node.deserialize(node_cstruct)
+        except Invalid as err:
+            _add_colander_invalid_error_to_request(err, request, location)
     request.validated.update(validated)
+
+
+def _add_colander_invalid_error_to_request(error: Invalid, request: Request,
+                                           location: str):
+    for name, msg in error.asdict().items():
+        request.errors.add(location, name, msg)
 
 
 def _validate_extra_validators(validators: list, context, request: Request):
@@ -157,6 +186,7 @@ class RESTView:
         @view_defaults(
             renderer='simplejson',
             context=IResource,
+            http_cache=0,
         )
         class MySubClass(RESTView):
             validation_GET = (MyColanderSchema, [my_extra_validation_function])
@@ -206,6 +236,7 @@ def _get_schema_and_validators(view_class, request: Request) -> tuple:
 @view_defaults(
     renderer='simplejson',
     context=IResource,
+    http_cache=0,
 )
 class ResourceRESTView(RESTView):
 
@@ -255,6 +286,7 @@ class ResourceRESTView(RESTView):
 @view_defaults(
     renderer='simplejson',
     context=ISimple,
+    http_cache=0,
 )
 class SimpleRESTView(ResourceRESTView):
 
@@ -282,6 +314,7 @@ class SimpleRESTView(ResourceRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IPool,
+    http_cache=0,
 )
 class PoolRESTView(SimpleRESTView):
 
@@ -324,6 +357,7 @@ class PoolRESTView(SimpleRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IItem,
+    http_cache=0,
 )
 class ItemRESTView(PoolRESTView):
 
@@ -356,6 +390,7 @@ class ItemRESTView(PoolRESTView):
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
+    http_cache=0,
     name='meta_api'
 )
 class MetaApiView(RESTView):
@@ -557,6 +592,7 @@ def validate_login_password(context, request: Request):
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
+    http_cache=0,
 )
 class LoginUsernameView(RESTView):
 
@@ -588,6 +624,7 @@ def _login_user(request: Request) -> dict:
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
+    http_cache=0,
 )
 class LoginEmailView(RESTView):
 

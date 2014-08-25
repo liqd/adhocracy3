@@ -4,7 +4,7 @@ from pytest import mark
 from pyramid import testing
 
 
-@fixture()
+@fixture
 def integration(config):
     config.include('adhocracy.events')
     config.include('adhocracy.sheets.metadata')

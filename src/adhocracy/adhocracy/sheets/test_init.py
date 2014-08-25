@@ -6,7 +6,7 @@ from pytest import fixture
 import colander
 
 
-@fixture()
+@fixture
 def sheet_meta(sheet_meta):
     from adhocracy.sheets import GenericResourceSheet
     from adhocracy.interfaces import ISheet
@@ -25,7 +25,7 @@ def sheet_meta(sheet_meta):
 
 class TestResourcePropertySheet:
 
-    @fixture()
+    @fixture
     def mock_node_unique_references(self):
         from adhocracy.schema import ListOfUniqueReferences
         from adhocracy.schema import SheetReference
@@ -36,7 +36,7 @@ class TestResourcePropertySheet:
         mock.reftype = SheetReference
         return mock
 
-    @fixture()
+    @fixture
     def mock_node_single_reference(self):
         from adhocracy.schema import Reference
         from adhocracy.schema import SheetReference
@@ -213,7 +213,7 @@ class TestResourcePropertySheet:
 
 class TestAddSheetToRegistry:
 
-    @fixture()
+    @fixture
     def context(self):
         from adhocracy.interfaces import ISheet
         return testing.DummyResource(__provides__=ISheet)

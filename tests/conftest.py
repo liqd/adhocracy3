@@ -30,7 +30,7 @@ def server_sample(request, app_sample) -> StopableWSGIServer:
     return server
 
 
-@fixture()
+@fixture
 def browser(browser, server_sample) -> Browser:
     """Return test browser, start sample application and go to `root.html`.
 
@@ -47,7 +47,7 @@ def browser(browser, server_sample) -> Browser:
     return browser
 
 
-@fixture()
+@fixture
 def browser_embed(browser, server_sample) -> Browser:
     """Start embedder application."""
     url = server_sample.application_url + 'frontend_static/embed.html'

@@ -4,7 +4,7 @@ from pytest import fixture
 
 class TestTagsSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.tags import tags_metadata
         return tags_metadata
@@ -48,7 +48,7 @@ def test_includeme_register_tags_sheet(config):
 
 class TestTagSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.tags import tag_metadata
         return tag_metadata

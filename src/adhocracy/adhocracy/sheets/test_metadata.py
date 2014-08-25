@@ -62,7 +62,7 @@ class TestIMetadataSchema:
 
 class TestMetadataSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.metadata import metadata_metadata
         return metadata_metadata
@@ -78,7 +78,7 @@ class TestMetadataSheet:
         assert inst.meta.readable is True
 
 
-@fixture()
+@fixture
 def integration(config):
     config.include('adhocracy.events')
     config.include('adhocracy.sheets.metadata')

@@ -4,14 +4,70 @@ adhocracy.resources package
 Submodules
 ----------
 
-.. toctree::
+adhocracy.resources.item module
+-------------------------------
 
-   adhocracy.resources.item
-   adhocracy.resources.itemversion
-   adhocracy.resources.pool
-   adhocracy.resources.resource
-   adhocracy.resources.simple
-   adhocracy.resources.tag
+.. automodule:: adhocracy.resources.item
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+adhocracy.resources.itemversion module
+--------------------------------------
+
+.. automodule:: adhocracy.resources.itemversion
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+adhocracy.resources.pool module
+-------------------------------
+
+.. automodule:: adhocracy.resources.pool
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+adhocracy.resources.principal module
+------------------------------------
+
+.. automodule:: adhocracy.resources.principal
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+adhocracy.resources.resource module
+-----------------------------------
+
+.. automodule:: adhocracy.resources.resource
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+adhocracy.resources.root module
+-------------------------------
+
+.. automodule:: adhocracy.resources.root
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+adhocracy.resources.simple module
+---------------------------------
+
+.. automodule:: adhocracy.resources.simple
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+adhocracy.resources.tag module
+------------------------------
+
+.. automodule:: adhocracy.resources.tag
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

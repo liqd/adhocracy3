@@ -6,7 +6,7 @@ from pytest import fixture
 
 class TestPasswordSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.user import password_metadata
         return password_metadata
@@ -115,7 +115,7 @@ class TestUserBasicSchemaSchema:
 
 class TestDeferredValidateUserName:
 
-    @fixture()
+    @fixture
     def requestp(self, registry):
         return testing.DummyRequest(root=testing.DummyResource(),
                                     registry=registry)
@@ -147,7 +147,7 @@ class TestDeferredValidateUserName:
 
 class TestDeferredValidateUserEmail:
 
-    @fixture()
+    @fixture
     def request(self, registry):
         return testing.DummyRequest(root=testing.DummyResource(),
                                     registry=registry)
@@ -181,7 +181,7 @@ class TestDeferredValidateUserEmail:
 
 class TestUserBasicSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.user import userbasic_metadata
         return userbasic_metadata

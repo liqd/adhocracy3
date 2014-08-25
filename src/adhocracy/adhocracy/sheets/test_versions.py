@@ -4,7 +4,7 @@ from pytest import fixture
 
 class TestVersionsSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.versions import versions_metadata
         return versions_metadata
@@ -47,7 +47,7 @@ def test_includeme_register_version_sheet(config):
 
 class TestVersionableSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.versions import versionable_metadata
         return versionable_metadata

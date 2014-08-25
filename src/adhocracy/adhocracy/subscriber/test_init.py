@@ -44,7 +44,7 @@ def _create_new_version_event_with_isheet(context, isheet, registry, creator=Non
 
 class TestReferenceHasNewVersionSubscriberUnitTest:
 
-    @fixture()
+    @fixture
     def registry(self, config, registry, mock_resource_registry, transaction_changelog):
         registry.content = mock_resource_registry
         registry._transaction_changelog = transaction_changelog

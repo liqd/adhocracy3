@@ -7,6 +7,8 @@ import os
 import subprocess
 import time
 
+from cornice.util import extract_json_data
+from cornice.errors import Errors
 from pyramid.config import Configurator
 from pyramid import testing
 from pyramid.traversal import resource_path_tuple
@@ -57,7 +59,7 @@ def create_pool_with_graph() -> testing.DummyResource:
 # Fixtures       #
 ##################
 
-@fixture()
+@fixture
 def resource_meta() -> ResourceMetadata:
     """ Return basic resource metadata."""
     from adhocracy.interfaces import resource_metadata
@@ -65,7 +67,7 @@ def resource_meta() -> ResourceMetadata:
     return resource_metadata._replace(iresource=IResource)
 
 
-@fixture()
+@fixture
 def sheet_meta() -> SheetMetadata:
     """ Return basic sheet metadata."""
     from adhocracy.interfaces import sheet_metadata
@@ -74,7 +76,35 @@ def sheet_meta() -> SheetMetadata:
                                    schema_class=colander.MappingSchema)
 
 
-@fixture()
+class CorniceDummyRequest(testing.DummyRequest):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.validated = {}
+        self.errors = Errors(self)
+        self.content_type = 'application/json'
+        deserializer = {'application/json': extract_json_data}
+        self.registry.cornice_deserializers = deserializer
+
+    def authenticated_userid(self):
+        return None
+
+    @property
+    def json_body(self):
+        return json.loads(self.body)
+
+
+@fixture
+def cornice_request():
+    """ Return dummy request with additional validation attributes.
+
+    Additional Attributes:
+        `errors`, `validated`, `content_type`
+    """
+    return CorniceDummyRequest()
+
+
+@fixture
 def context() -> testing.DummyResource:
     """ Return dummy context with IResource interface."""
     from adhocracy.interfaces import IResource
@@ -94,20 +124,20 @@ class DummyPool(testing.DummyResource):
         return prefix + '_0000000'
 
 
-@fixture()
+@fixture
 def pool() -> DummyPool:
     """ Return dummy pool with IPool interface."""
     from adhocracy.interfaces import IPool
     return DummyPool(__provides__=IPool)
 
 
-@fixture()
+@fixture
 def node() -> colander.MappingSchema:
     """Return dummy node."""
     return colander.MappingSchema()
 
 
-@fixture()
+@fixture
 def transaction_changelog():
     """Return transaction_changelog dictionary."""
     from collections import defaultdict
@@ -116,7 +146,7 @@ def transaction_changelog():
     return defaultdict(metadata)
 
 
-@fixture()
+@fixture
 def mock_sheet() -> Mock:
     """Mock :class:`adhocracy.sheets.GenericResourceSheet`."""
     from adhocracy.interfaces import sheet_metadata
@@ -128,7 +158,7 @@ def mock_sheet() -> Mock:
     return sheet
 
 
-@fixture()
+@fixture
 def mock_graph() -> Mock:
     """Mock :class:`adhocracy.graph.Graph`."""
     from adhocracy.graph import Graph
@@ -136,7 +166,7 @@ def mock_graph() -> Mock:
     return mock
 
 
-@fixture()
+@fixture
 def mock_objectmap() -> Mock:
     """Mock :class:`substanced.objectmap.ObjectMap`."""
     from substanced.objectmap import ObjectMap
@@ -145,7 +175,7 @@ def mock_objectmap() -> Mock:
     return mock
 
 
-@fixture()
+@fixture
 def mock_resource_registry() -> Mock:
     """Mock :class:`adhocracy.registry.ResourceContentRegistry`."""
     from adhocracy.registry import ResourceContentRegistry
@@ -157,7 +187,7 @@ def mock_resource_registry() -> Mock:
     return mock
 
 
-@fixture()
+@fixture
 def config(request) -> Configurator:
     """Return dummy testing configuration."""
     config = testing.setUp()
@@ -165,13 +195,13 @@ def config(request) -> Configurator:
     return config
 
 
-@fixture()
+@fixture
 def registry(config) -> object:
     """Return dummy registry."""
     return config.registry
 
 
-@fixture()
+@fixture
 def mock_user_locator(registry) -> Mock:
     """Mock :class:`adhocracy.resource.principal.UserLocatorAdapter`."""
     from zope.interface import Interface
@@ -345,7 +375,7 @@ def angular_app_loaded(browser: Browser) -> bool:
     return browser.evaluate_script(code)
 
 
-@fixture()
+@fixture
 def browser_root(browser, server) -> Browser:
     """Return test browser, start application and go to `root.html`."""
     add_helper_methods_to_splinter_browser_wrapper(browser)
@@ -355,7 +385,7 @@ def browser_root(browser, server) -> Browser:
     return browser
 
 
-@fixture()
+@fixture
 def browser_test(browser, server_static) -> Browser:
     """Return test browser and go to `test.html`."""
     add_helper_methods_to_splinter_browser_wrapper(browser)

@@ -1,13 +1,6 @@
 adhocracy.graph package
 =======================
 
-Submodules
-----------
-
-.. toctree::
-
-   adhocracy.graph.evolve
-
 Module contents
 ---------------
 

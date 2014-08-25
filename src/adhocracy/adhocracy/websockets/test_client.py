@@ -208,7 +208,7 @@ class ClientUnitTests(unittest.TestCase):
 @mark.websocket
 class TestFunctionalClient:
 
-    @fixture()
+    @fixture
     def websocket_client(self, request, websocket, settings):
         from adhocracy.websockets.client import Client
         client = Client(ws_url=settings['adhocracy.ws_url'])

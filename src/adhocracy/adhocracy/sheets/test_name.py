@@ -4,7 +4,7 @@ from pytest import fixture
 
 class TestNameSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.name import name_metadata
         return name_metadata

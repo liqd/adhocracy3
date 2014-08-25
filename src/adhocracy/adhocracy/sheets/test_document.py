@@ -4,7 +4,7 @@ from pytest import fixture
 
 class TestDocumentSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.document import document_meta
         return document_meta
@@ -33,7 +33,7 @@ def test_includeme_register_document_sheet(config):
 
 class TestParagraphSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.document import paragraph_meta
         return paragraph_meta
@@ -62,7 +62,7 @@ def test_includeme_register_paragraph_sheet(config):
 
 class TestSectionSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy.sheets.document import section_meta
         return section_meta

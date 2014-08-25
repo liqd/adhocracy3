@@ -9,7 +9,7 @@ from .shared import get_list_element
 from .shared import title_is_in_listing
 
 
-@fixture()
+@fixture
 def proposal(browser):
     """Go to content listing and create proposal with title `test proposal`."""
     listing = get_content_listing(browser)

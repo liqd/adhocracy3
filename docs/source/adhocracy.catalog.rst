@@ -1,10 +1,10 @@
-adhocracy.schema package
-========================
+adhocracy.catalog package
+=========================
 
 Module contents
 ---------------
 
-.. automodule:: adhocracy.schema
+.. automodule:: adhocracy.catalog
     :members:
     :undoc-members:
     :show-inheritance:

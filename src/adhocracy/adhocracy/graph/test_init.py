@@ -27,7 +27,7 @@ def create_dummy_resources(parent=None, count=1):
     return resources[0] if count == 1 else resources
 
 
-@fixture()
+@fixture
 def objectmap():
     from substanced.objectmap import ObjectMap
     context = testing.DummyResource()
@@ -35,7 +35,7 @@ def objectmap():
     return context.__objectmap__
 
 
-@fixture()
+@fixture
 def context(objectmap):
     context = objectmap.root
     context.__objectmap__ = objectmap
@@ -313,13 +313,13 @@ class TestGraphGetBackReferences:
 
 class TestGraphSetReferencesForIsheet:
 
-    @fixture()
+    @fixture
     def registry(self, mock_resource_registry, sheet_meta):
         registry = testing.DummyResource(content=mock_resource_registry)
         registry.content.sheets_meta = {ISheet.__identifier__: sheet_meta}
         return registry
 
-    @fixture()
+    @fixture
     def sheet_meta(self, sheet_meta):
         import colander
         class SchemaF(colander.MappingSchema):
@@ -421,7 +421,7 @@ class TestGraphGetBackReferencesForIsheet:
 
 class TestGraphGetReferencesForIsheet:
 
-    @fixture()
+    @fixture
     def context(self, context):
         from substanced.objectmap import ObjectMap
         context.__objectmap__ = ObjectMap(context)
@@ -485,7 +485,7 @@ class TestGraphGetBackReferenceSources:
 @mark.usefixtures('setup')
 class TestGraphIsInSubtree:
 
-    @fixture()
+    @fixture
     def setup(self, context):
         from substanced.objectmap import ObjectMap
         context.__objectmap__ = ObjectMap(context)

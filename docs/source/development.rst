@@ -100,3 +100,15 @@ delete database (works best on development systems without valuable data!)::
 
     rm -f ./var/Data.*
     supervisorctl restart all
+
+Generate html documentation
+---------------------------
+
+Recreate api documentation source files::
+
+    bin/sphinx-apidoc -fo docs/source src/adhocracy  **/test* 
+
+Generate html documentation::
+
+    bin/sphinx_build_adhocracy
+

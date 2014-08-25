@@ -14,7 +14,7 @@ def test_includeme_register_comment_sheet(config):
 
 class TestCommentableSheet:
 
-    @fixture()
+    @fixture
     def meta(self):
         from adhocracy_sample.sheets.comment import commentable_meta
         return commentable_meta

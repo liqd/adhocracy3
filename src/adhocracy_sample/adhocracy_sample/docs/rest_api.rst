@@ -340,7 +340,7 @@ PUT
 
 Modify data of an existing resource ::
 
-FIXME: disable because IName.name is not editable.  use another example!
+    FIXME: disable because IName.name is not editable.  use another example!
 
 ...    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
 ...    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
@@ -841,13 +841,15 @@ the individual requests.
 The encoding of a request consist of an object with attributes for
 method (aka HTTP verb), path, and body. A further attribute, 'result_path',
 defines a name for the preliminary path of the object created by the request.
-If the preliminary name will not be used, this attribute can be omitted or
-left empty. ::
+Like other resource names, the preliminary name is an *Identifier*,
+i.e. it can only contain ASCII letters and digits, underscores, dashes,
+and dots. If the preliminary name will not be used, this attribute can be
+omitted or left empty. ::
 
     >>> encoded_request_with_name = {
     ...     'method': 'POST',
     ...     'path': '/adhocracy/Proposal/kommunismus',
-    ...     'body': { 'content_type': 'adhocracy.resources.IParagraph' },
+    ...     'body': { 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph' },
     ...     'result_path': 'par1_item'
     ... }
 
@@ -882,13 +884,15 @@ Examples
 
 Let's add some more paragraphs to the second section above ::
 
-    >>> prop_item = '/adhocracy/Proposals/kommunismus/'
     >>> section_item = s2dag_path
     >>> batch = [ {
     ...             'method': 'POST',
-    ...             'path': prop_item,
+    ...             'path': pdag_path,
     ...             'body': {
-    ...                 'content_type': 'adhocracy.resources.IParagraph'
+    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+    ...                 'data': {'adhocracy.sheets.name.IName':
+    ...                              {'name': 'par1'}
+    ...                         }
     ...             },
     ...             'result_path': 'par1_item'
     ...           },
@@ -896,7 +900,7 @@ Let's add some more paragraphs to the second section above ::
     ...             'method': 'POST',
     ...             'path': '@par1_item',
     ...             'body': {
-    ...                 'content_type': 'adhocracy.resources.IParagraphVersion',
+    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
     ...                 'data': {
     ...                     'adhocracy.sheets.versions.IVersionable': {
     ...                         'follows': ['@@par1_item']
@@ -910,37 +914,29 @@ Let's add some more paragraphs to the second section above ::
     ...           },
     ...           {
     ...             'method': 'GET',
-    ...             'path': '@@par1_item'
+    ...             'path': '@par1_version'
     ...           },
     ...         ]
-    >>> print('test disabled')
-    test disabled
+    >>> batch_resp = testapp.post_json(batch_url, batch).json
+    >>> len(batch_resp)
+    3
+    >>> pprint(batch_resp[0])
+    {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+              'first_version_path': '/adhocracy/Proposals/kommunismus/par1/VERSION_0000000',
+              'path': '/adhocracy/Proposals/kommunismus/par1'},
+     'code': 200}
+    >>> pprint(batch_resp[1])
+    {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
+              'path': '/adhocracy/Proposals/kommunismus/par1/VERSION_0000001'},
+     'code': 200}
+    >>> pprint(batch_resp[2])
+    {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
+              'data': {...},
+              'path': '/adhocracy/Proposals/kommunismus/par1/VERSION_0000001'},
+     'code': 200}
+     >>> batch_resp[2]['body']['data']['adhocracy.sheets.document.IParagraph']['content']
+     'sein blick ist vom vorüberziehn der stäbchen'
 
-    .. >>> batch_resp = testapp.post_json(batch_url, batch).json
-    .. >>> pprint(batch_resp)
-    .. [
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy.resources.IParagraph',
-    ..             'path': '...'
-    ..         }
-    ..     },
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy.resources.IParagraphVersion',
-    ..             'path': '...'
-    ..         }
-    ..     },
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy.resources.IParagraphVersion',
-    ..             'path': '...'
-    ..         }
-    ..     }
-    .. ]
 
 Now the first, empty paragraph version should contain the newly
 created paragraph version as its only successor ::
@@ -952,14 +948,23 @@ created paragraph version as its only successor ::
     .. >>> print(v1, v2)
     .. ...
 
+The LAST tag should point to the version we created within the batch request::
+
+    >>> resp_data = testapp.get("/adhocracy/Proposals/kommunismus/par1/LAST").json
+    >>> resp_data['data']['adhocracy.sheets.tags.ITag']['elements']
+    ['/adhocracy/Proposals/kommunismus/par1/VERSION_0000001']
+
 Post another paragraph item and a version.  If the version post fails,
 the paragraph will not be present in the database ::
 
     >>> invalid_batch = [ {
     ...             'method': 'POST',
-    ...             'path': prop_item,
+    ...             'path': pdag_path,
     ...             'body': {
-    ...                 'content_type': 'adhocracy.resources.IParagraph'
+    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+    ...                 'data': {'adhocracy.sheets.name.IName':
+    ...                              {'name': 'par2'}
+    ...                         }
     ...             },
     ...             'result_path': 'par2_item'
     ...           },
@@ -980,29 +985,19 @@ the paragraph will not be present in the database ::
     ...             'result_path': 'par2_version'
     ...           }
     ...         ]
-    >>> print('test disabled')
-    test disabled
-
-    .. >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch).json
-    .. >>> pprint(invalid_batch_resp)
-    .. [
-    ..     {
-    ..         'code': 200,
-    ..         'body': {
-    ..             'content_type': 'adhocracy.resources.IParagraph',
-    ..             'path': '...'
-    ..         }
-    ..     },
-    ..     {
-    ..         'code': ...,
-    ..         ...
-    ..     }
-    .. ]
-    .. >>> invalid_batch_resp[1]['code'] >= 400
-    .. True
-    .. >>> get_nonexistent_obj = testapp.get_json(invalid_batch_resp[0]['body']['path'])
-    .. >>> get_nonexistent_obj['code'] >= 400
-    .. True
+    >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch,
+    ...                                        status=400).json
+    >>> pprint(invalid_batch_resp)
+    [{'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+               'first_version_path': '...',
+               'path': '...'},
+      'code': 200},
+     {'body': {'errors': [...],
+               'status': 'error'},
+      'code': 400}]
+    >>> get_nonexistent_obj = testapp.get(invalid_batch_resp[0]['body']['path'], status=404)
+    >>> get_nonexistent_obj.status
+    '404 Not Found'
 
 Note that the response will contain embedded responses for all successful
 encoded requests (if any) and also for the first failed encoded request (if

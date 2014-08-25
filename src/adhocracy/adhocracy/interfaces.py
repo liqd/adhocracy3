@@ -242,7 +242,6 @@ class SheetReferenceClass(ReferenceClass):
     """Reference a source and target with a specific ISheet interface.
 
     Uses class attributes "target_*" and "source_*" to set tagged values.
-
     """
 
     def __init__(self, *arg, **kw):

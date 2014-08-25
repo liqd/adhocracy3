@@ -40,7 +40,7 @@ def register_and_add_sheet(context, registry, mock_sheet):
 
 class TestResourceContentRegistryResourceSheets:
 
-    @fixture()
+    @fixture
     def request(self, registry, mock_resource_registry):
         request = testing.DummyRequest(registry=registry)
         request.registry.content = mock_resource_registry
@@ -134,13 +134,13 @@ class TestResourceContentRegistry:
 
 class TestResourceContentRegistryResourceAddables:
 
-    @fixture()
+    @fixture
     def request(self, registry, mock_resource_registry):
         request = testing.DummyRequest(registry=registry)
         request.registry.content = mock_resource_registry
         return request
 
-    @fixture()
+    @fixture
     def pool(self, context, request):
         return testing.DummyResource(__provides__=IPool)
 
