@@ -41,6 +41,7 @@ __pycache__
 /src/adhocracy/adhocracy/frontend/static/stylesheets/a3.css
 /src/adhocracy/adhocracy/frontend/static/stylesheets/min/
 /src/rubygemsrecipe/build/
+/src/sphinx-autodoc-annotation/
 /source_env
 /.vagrant
 /.ropeproject/
