@@ -346,6 +346,16 @@ class TestGraphSetReferencesForIsheet:
         with raises(AssertionError):
             self._call_fut(mock_graph, context, ISheet, references, registry)
 
+    def test_with_references_is_none(self, context, mock_graph, registry):
+        references = {'references': None}
+        self._call_fut(mock_graph, context, ISheet, references, registry)
+        mock_graph.set_references.assert_called is False
+
+    def test_with_references_is_one_valid_reference(self, context, mock_graph, registry):
+        references = {'references': object()}
+        self._call_fut(mock_graph, context, ISheet, references, registry)
+        mock_graph.set_references.assert_called_with(context, [references['references']], SheetReference)
+
 
 class TestGraphGetBackReferencesForIsheet:
 

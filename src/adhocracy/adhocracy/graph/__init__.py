@@ -133,6 +133,8 @@ class Graph(Persistent):
         schema = sheet_meta.schema_class()
         for field_name, targets in references.items():
             assert field_name in schema
+            if targets is None:
+                continue
             node = schema[field_name]
             if not hasattr(node, 'reftype'):
                 continue
