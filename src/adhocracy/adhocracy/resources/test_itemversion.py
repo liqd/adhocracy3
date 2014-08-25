@@ -17,6 +17,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         config.include('adhocracy.events')
         config.include('adhocracy.sheets')
         config.include('adhocracy.resources.itemversion')
+        config.include('adhocracy.resources.subscriber')
         self.config = config
         self.context = create_pool_with_graph()
         self.objectmap = self.context.__objectmap__
