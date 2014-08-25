@@ -157,7 +157,9 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
     var headerFooter = (relativeRoot : string, contents : string) : string => {
         var header = "";
         header += "/* tslint:disable:variable-name */\n\n";
-        header += "import Base = require(\"" + canonicalizePath(relativeRoot + "../ResourcesBase") + "\");\n\n";
+        header += "import Base = require(\"" + canonicalizePath(relativeRoot + "../ResourcesBase") + "\");\n";
+        header += "import PreliminaryNames = require(\"" +
+            canonicalizePath(relativeRoot + "../Packages/PreliminaryNames/PreliminaryNames") + "\");\n\n";
 
         var footer = "";
         footer += "/* tslint:enable:variable-name */\n";
@@ -311,6 +313,11 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
 
         var args : string[] = [];
         var lines : string[] = [];
+
+        args.push("preliminaryNames : PreliminaryNames");
+        lines.push("    _self.path = preliminaryNames.next();");
+        lines.push("    _self.first_version_path = preliminaryNames.next();");
+        lines.push("    _self.root_versions = preliminaryNames.next();");
 
         if (resource.sheets.indexOf("adhocracy.sheets.name.IName") !== -1) {
             args.push("name ?: string");
