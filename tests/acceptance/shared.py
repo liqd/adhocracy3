@@ -42,16 +42,20 @@ def get_listing_create_form(listing) -> WebDriverElement:
     return listing.find_by_css('.listing-create-form').first
 
 
-def get_content_listing(browser) -> WebDriverElement:
+def get_column_listing(browser, column_name: str) -> WebDriverElement:
     """Return the listing in the content column ."""
-    content_column = browser.browser.find_by_css('.moving-column-content')
-    listing = content_column.find_by_css('.listing')
+    column = browser.browser.find_by_css('.moving-column-' + column_name)
+    listing = column.find_by_css('.listing')
     return listing
 
 
-def get_list_element(listing, title):
-    """Return list element with text == `title`."""
+def get_list_element(listing, text, descendant=None, max_steps=20):
+    """Return list element with text == `text`."""
     for element in listing.find_by_css('.listing-element'):
-        wait(lambda: element.text, max_steps=20)
-        if element.text == title:
+        wait(lambda: element.text, max_steps=max_steps)
+        if descendant is None:
+            element_text = element.text
+        else:
+            element_text = element.find_by_css(descendant).first.text
+        if element_text == text:
             return element
