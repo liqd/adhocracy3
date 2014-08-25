@@ -48,6 +48,7 @@ class TestIMetadataSchema:
         inst = self._make_one()
         result = inst.serialize({})
         assert result['creation_date'] == null
+        assert result['item_creation_date'] == null
         assert result['modification_date'] == null
         assert isinstance(result['creator'], list)
 
@@ -57,6 +58,7 @@ class TestIMetadataSchema:
         result = inst.serialize({})
         this_year = str(datetime.now().year)
         assert this_year in result['creation_date']
+        assert this_year in result['item_creation_date']
         assert this_year in result['modification_date']
 
 

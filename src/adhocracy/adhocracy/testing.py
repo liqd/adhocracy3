@@ -132,6 +132,14 @@ def pool() -> DummyPool:
 
 
 @fixture
+def item() -> DummyPool:
+    """ Return dummy pool with IItem and IMetadata interface."""
+    from adhocracy.interfaces import IItem
+    from adhocracy.sheets.metadata import IMetadata
+    return DummyPool(__provides__=(IItem, IMetadata))
+
+
+@fixture
 def node() -> colander.MappingSchema:
     """Return dummy node."""
     return colander.MappingSchema()

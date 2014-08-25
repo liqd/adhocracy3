@@ -232,9 +232,39 @@ class TestResourceFactory:
         assert set_appstructs['creator'] == []
         today = datetime.today().date()
         assert set_appstructs['creation_date'].date() == today
+        assert set_appstructs['item_creation_date'] == set_appstructs['creation_date']
         assert set_appstructs['modification_date'].date() == today
         set_send_event = dummy_sheet.set.call_args[1]['send_event']
         assert set_send_event is False
+
+    def test_without_parent_and_resource_implements_imetadata_and_itemversion(self, resource_meta, registry, mock_sheet):
+        from adhocracy.sheets.metadata import IMetadata
+        from adhocracy.interfaces import IItemVersion
+        meta = resource_meta._replace(iresource=IItemVersion,
+                                      basic_sheets=[IMetadata])
+        dummy_sheet = register_sheet(IMetadata, mock_sheet, registry)
+
+        self.make_one(meta)()
+
+        set_appstructs = dummy_sheet.set.call_args[0][0]
+        assert set_appstructs['item_creation_date'] == set_appstructs['creation_date']
+
+    def test_with_parent_and_resource_implements_imetadata_and_itemversion(self, item, resource_meta, registry, mock_sheet):
+        from datetime import datetime
+        from adhocracy.sheets.metadata import IMetadata
+        from adhocracy.interfaces import IItemVersion
+        from adhocracy.sheets.name import IName
+        meta = resource_meta._replace(iresource=IItemVersion,
+                                      basic_sheets=[IMetadata, IName])
+        dummy_sheet = register_sheet(IMetadata, mock_sheet, registry)
+        register_sheet(IName, mock_sheet, registry)
+        item_creation_date = datetime.today()
+        dummy_sheet.get.return_value = {'creation_date': item_creation_date}
+
+        self.make_one(meta)(parent=item, appstructs={IName.__identifier__: {'name': 'N'}})
+
+        set_appstructs = dummy_sheet.set.call_args[0][0]
+        assert set_appstructs['item_creation_date'] == item_creation_date
 
     def test_with_creator_and_resource_implements_imetadata(self, resource_meta, registry, mock_sheet):
         from adhocracy.sheets.metadata import IMetadata
