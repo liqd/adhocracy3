@@ -41,6 +41,7 @@ class BatchItemResponse:
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
+    http_cache=0,
 )
 class BatchView(RESTView):
 
