@@ -164,7 +164,7 @@ class ResourceFactory:
 
     def _get_metadata(self, resource: IResource, creator: IResource) -> dict:
         now = datetime.now()
-        creator = [creator] if creator is not None else []
+        creator = creator if creator is not None else None
         metadata = {'creator': creator,
                     'creation_date': now,
                     'item_creation_date': now,

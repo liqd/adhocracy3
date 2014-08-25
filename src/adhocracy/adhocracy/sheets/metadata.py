@@ -10,7 +10,7 @@ from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets.user import IUserBasic
 from adhocracy.schema import DateTime
-from adhocracy.schema import ListOfUniqueReferences
+from adhocracy.schema import Reference
 from adhocracy.utils import get_sheet
 
 
@@ -51,8 +51,7 @@ class MetadataSchema(colander.MappingSchema):
     `creator`: creator (list of user resources) of this resource.
     """
 
-    # Fixme: this should be a single reference
-    creator = ListOfUniqueReferences(reftype=MetadataCreatorsReference)
+    creator = Reference(reftype=MetadataCreatorsReference)
     creation_date = DateTime(missing=colander.drop)
     item_creation_date = DateTime(missing=colander.drop)
     modification_date = DateTime(missing=colander.drop)

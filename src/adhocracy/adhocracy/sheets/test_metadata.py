@@ -50,7 +50,7 @@ class TestIMetadataSchema:
         assert result['creation_date'] == null
         assert result['item_creation_date'] == null
         assert result['modification_date'] == null
-        assert isinstance(result['creator'], list)
+        assert result['creator'] == ''
 
     def test_serialize_empty_and_bind(self):
         from datetime import datetime
