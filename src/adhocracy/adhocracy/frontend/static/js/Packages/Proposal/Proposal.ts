@@ -38,7 +38,7 @@ interface IProposalVersionDetailScope<Data> extends DetailScope<Data> {
     list : () => void;
     display : () => void;
     edit : () => void;
-    reset : () => void;
+    onCancel : () => void;
     commit : () => void;
     showComments : () => void;
     hideComments : () => void;
@@ -115,7 +115,7 @@ export class ProposalVersionDetail {
                     $scope.viewmode = "edit";
                 };
 
-                $scope.reset = () => {
+                $scope.onCancel = () => {
                     adhHttp.get($scope.content.path).then((content) => {
                         $scope.content = content;
                     });
