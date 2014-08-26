@@ -4,7 +4,7 @@ from pytest import fixture
 
 from .shared import wait
 from .shared import get_listing_create_form
-from .shared import get_content_listing
+from .shared import get_column_listing
 from .shared import get_list_element
 from .shared import title_is_in_listing
 
@@ -12,18 +12,18 @@ from .shared import title_is_in_listing
 @fixture
 def proposal(browser):
     """Go to content listing and create proposal with title `test proposal`."""
-    listing = get_content_listing(browser)
+    listing = get_column_listing(browser, 'content')
     return create_proposal(listing, 'test proposal')
 
 
 def test_proposal_create(browser):
-    content_listing = get_content_listing(browser)
+    content_listing = get_column_listing(browser, 'content')
     proposal = create_proposal(content_listing, 'some title')
-    assert title_is_in_listing(content_listing, proposal.text)
+    assert proposal is not None
 
 
 def test_proposal_view(browser, proposal):
-    content_listing = get_content_listing(browser)
+    content_listing = get_column_listing(browser, 'content')
     browser.click_link_by_partial_text('test proposal')
     assert proposal_details_are_in_listing(content_listing, 'test proposal')
 

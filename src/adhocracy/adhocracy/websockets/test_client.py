@@ -257,9 +257,9 @@ def test_get_ws_client_with_none():
     assert get_ws_client(None) is None
 
 
-def test_get_ws_client_with_registry():
+def test_get_ws_client_with_registry(context):
     from adhocracy.websockets.client import get_ws_client
-    assert get_ws_client(None) is None
+    assert get_ws_client(context) is None
 
 
 def test_get_ws_client_with_registry_and_ws_client(context):

@@ -4,12 +4,16 @@ from datetime import datetime
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from pyramid.config import Configurator
+from pyramid.traversal import find_interface
 from substanced.content import add_content_type
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 
 from adhocracy.interfaces import ResourceMetadata
 from adhocracy.interfaces import IPool
+from adhocracy.interfaces import IItemVersion
+from adhocracy.interfaces import IItem
+from adhocracy.interfaces import IResource
 from adhocracy.events import ResourceCreatedAndAdded
 from adhocracy.sheets.name import IName
 from adhocracy.sheets.metadata import IMetadata
@@ -43,6 +47,7 @@ class ResourceFactory:
 
     def __init__(self, metadata: ResourceMetadata):
         self.meta = metadata
+        """:class:`ResourceMetadata`."""
 
     def _add(self, parent: IPool, resource: object, appstructs: dict) -> str:
         """Add resource to parent pool.
@@ -141,6 +146,11 @@ class ResourceFactory:
         if IUser.providedBy(resource):
             creator = resource
 
+        if IMetadata.providedBy(resource):
+            metadata = self._get_metadata(resource, creator)
+            sheet = get_sheet(resource, IMetadata)
+            sheet.set(metadata, send_event=False)
+
         registry = registry if registry else get_current_registry()
 
         if run_after_creation:
@@ -148,17 +158,22 @@ class ResourceFactory:
                 kwargs['creator'] = creator
                 call(resource, registry, options=kwargs)
 
-        if IMetadata.providedBy(resource):
-            now = datetime.now()
-            creator = [creator] if creator is not None else []
-            sheet = get_sheet(resource, IMetadata)
-            metadata = {'creator': creator,
-                        'creation_date': now,
-                        'modification_date': now,
-                        }
-            sheet.set(metadata, send_event=False)
-
         self._notify_new_resource_created_and_added(resource, registry,
                                                     creator)
 
         return resource
+
+    def _get_metadata(self, resource: IResource, creator: IResource) -> dict:
+        now = datetime.now()
+        creator = creator if creator is not None else None
+        metadata = {'creator': creator,
+                    'creation_date': now,
+                    'item_creation_date': now,
+                    'modification_date': now,
+                    }
+        item = find_interface(resource, IItem)
+        if IItemVersion.providedBy(resource) and item is not None:
+            item_sheet = get_sheet(item, IMetadata)
+            item_creation_date = item_sheet.get()['creation_date']
+            metadata['item_creation_date'] = item_creation_date
+        return metadata

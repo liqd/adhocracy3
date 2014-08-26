@@ -4,8 +4,8 @@ from collections import defaultdict
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
 
-from adhocracy.interfaces import ChangelogMetadata, \
-    ISheetReferenceAutoUpdateMarker, IItemVersion
+from adhocracy.interfaces import ChangelogMetadata
+from adhocracy.interfaces import IResource
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourceCreatedAndAdded

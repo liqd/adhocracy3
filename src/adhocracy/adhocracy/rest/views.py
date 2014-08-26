@@ -204,7 +204,9 @@ class RESTView:
 
     def __init__(self, context, request):
         self.context = context
+        """Context Resource."""
         self.request = request
+        """:class:`pyramid.request.Request`."""
         schema_class, validators = _get_schema_and_validators(self, request)
         validate_request_data(context, request,
                               schema=schema_class(),
@@ -245,6 +247,7 @@ class ResourceRESTView(RESTView):
     def __init__(self, context, request):
         super().__init__(context, request)
         self.registry = request.registry.content
+        """:class:`pyramid.registry.Registry`."""
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
