@@ -1,9 +1,10 @@
 """Helper functions."""
+from collections.abc import Iterator
+from datetime import datetime
 from functools import reduce
 import copy
 import json
 import pprint
-from collections.abc import Iterator
 
 from pyramid.compat import is_nonstr_iter
 from pyramid.request import Request
@@ -103,10 +104,20 @@ def _sort_dict(d, sort_paths):  # pragma: no cover
     return d2
 
 
+def log_compatible_datetime(dt: datetime=datetime.now()):
+    """Format a datetime in the same way as the logging framework.
+
+    Mimics the output of the '%(asctime)' placeholder.
+    """
+    return '{}-{:02}-{:02} {:02}:{:02}:{:02},{:03}'.format(
+        dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second,
+        dt.microsecond // 1000)
+
+
 def pprint_json(json_dict):  # pragma: no cover
     """Return sorted string representation of the dict.
 
-    WARN: Not used and not testet
+    WARN: Not used and not tested.
 
     """
     json_dict_sorted = _sort_dict(json_dict)

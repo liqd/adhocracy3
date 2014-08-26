@@ -35,6 +35,21 @@ def test_diff_dict_omit():
     assert diff == ({'baz', 'faz'}, {'kaz'}, set())
 
 
+def test_log_compatible_datetime():
+    from datetime import datetime
+    from . import log_compatible_datetime
+    now = datetime.now()
+    now_str = str(now)
+    result = log_compatible_datetime(now)
+    result_len = len(result)
+    # Should have 3 places less than the standard format
+    assert result_len + 3 == len(now_str)
+    # 4th position from right should be a comma
+    assert result[-4] == ','
+    # Other positions should look like the standard format
+    assert result[0:result_len-4] == now_str[0:result_len-4]
+    assert result[result_len-3:] == now_str[result_len-3:result_len]
+
 
 @mark.parametrize('string,prefix,expected_output', [
     ('footile', 'foo', 'tile'),
