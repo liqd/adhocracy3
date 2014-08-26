@@ -302,11 +302,8 @@ export var register = () => {
 
         var _logBackendError = (name, fn, wrap) => {
             describe(name, () => {
-                var origConsoleLog;
-
                 beforeEach(() => {
-                    origConsoleLog = console.log;
-                    console.log = jasmine.createSpy("consoleLogMock");
+                    spyOn(console, 'log').and.callThrough();
                 });
 
                 it("always throws an exception", () => {
@@ -341,10 +338,6 @@ export var register = () => {
                     expect(console.log).toHaveBeenCalledWith("error #1");
                     expect(console.log).toHaveBeenCalledWith("where: where1.0, where1.1");
                     expect(console.log).toHaveBeenCalledWith("what:  what1");
-                });
-
-                afterEach(() => {
-                    console.log = origConsoleLog;
                 });
             });
         };
