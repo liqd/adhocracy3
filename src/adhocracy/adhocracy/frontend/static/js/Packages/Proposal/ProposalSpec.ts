@@ -4,6 +4,7 @@
 import q = require("q");
 
 import AdhProposal = require("./Proposal");
+import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
 
 
 var createAdhHttpMock = () => {
@@ -22,7 +23,7 @@ export var register = () => {
 
             beforeEach(() => {
                 adhHttpMock = createAdhHttpMock();
-                adhProposal = new AdhProposal.Service(adhHttpMock, q);
+                adhProposal = new AdhProposal.Service(adhHttpMock, new AdhPreliminaryNames(), q);
             });
 
             describe("postProposal", () => {
@@ -65,4 +66,3 @@ export var register = () => {
         });
     });
 };
-

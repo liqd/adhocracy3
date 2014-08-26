@@ -40,6 +40,10 @@ export function deepcp(i) {
         return i;
     }
 
+    if (typeof i === "undefined") {
+        return undefined;
+    }
+
     // structured types
     var o;
     switch (Object.prototype.toString.call(i)) {

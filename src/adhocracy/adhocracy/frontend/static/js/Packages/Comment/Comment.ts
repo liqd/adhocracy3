@@ -1,16 +1,17 @@
 import AdhResource = require("../../Resources");
-import SICommentable = require("../../Resources_/adhocracy_sample/sheets/comment/ICommentable");
+import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
 
 import AdhConfig = require("../Config/Config");
 import AdhListing = require("../Listing/Listing");
 import Util = require("../Util/Util");
 
+import SICommentable = require("../../Resources_/adhocracy_sample/sheets/comment/ICommentable");
 import RIComment = require("../../Resources_/adhocracy_sample/resources/comment/IComment");
 
 var pkgLocation = "/Comment";
 
 export interface ICommentAdapter<T extends AdhResource.Content<any>> {
-    create() : T;
+    create(pn : AdhPreliminaryNames) : T;
     content(resource : T) : string;
     content(resource : T, value : string) : T;
     refersTo(resource : T) : string;
@@ -61,7 +62,7 @@ export class CommentCreate {
                 onNew: "=",  // callback to call after successful creation
                 onCancel: "="  // callback to call when cancel was clicked
             },
-            controller: ["$scope", "adhHttp", ($scope, adhHttp) => {
+            controller: ["$scope", "adhHttp", "adhPreliminaryNames", ($scope, adhHttp, adhPreliminaryNames) => {
                 $scope.errors = [];
 
                 var displayErrors = (errors) => {
@@ -76,11 +77,11 @@ export class CommentCreate {
                 };
 
                 $scope.create = () => {
-                    var resource = _self.adapter.create();
+                    var resource = _self.adapter.create(adhPreliminaryNames);
                     _self.adapter.content(resource, $scope.content);
                     _self.adapter.refersTo(resource, $scope.refersTo);
 
-                    var comment = new RIComment("comment");
+                    var comment = new RIComment(adhPreliminaryNames, "comment");
 
                     return adhHttp.postToPool($scope.poolPath, comment)
                         .then(adhHttp.resolve.bind(adhHttp), displayErrors)

@@ -1,10 +1,12 @@
 import RICommentVersion = require("../../Resources_/adhocracy_sample/resources/comment/ICommentVersion");
 
 import AdhComment = require("./Comment");
+import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+
 
 export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
-    create() : RICommentVersion {
-        var resource = new RICommentVersion();
+    create(adhPreliminaryNames : AdhPreliminaryNames) : RICommentVersion {
+        var resource = new RICommentVersion(adhPreliminaryNames);
         resource.data["adhocracy_sample.sheets.comment.IComment"] = {
             refers_to: null,
             content: null

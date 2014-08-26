@@ -10,6 +10,7 @@ import RISectionVersion = require("../../Resources_/adhocracy_sample/resources/s
 import RITag = require("../../Resources_/adhocracy/interfaces/ITag");
 import AdhMetaApi = require("../MetaApi/MetaApi");
 import AdhHttp = require("./Http");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 
 export var register = (angular, config, meta_api) => {
@@ -23,6 +24,8 @@ export var register = (angular, config, meta_api) => {
             return angular.injector(["ng"]).invoke(factory);
         })();
 
+        var adhPreliminaryNames = new AdhPreliminaryNames();
+
         xit("Deep-rewrites preliminary resource paths.", (done) => {
             var poolPath = "/adhocracy";
             var proposalName = "Against Curtains " + Math.random();
@@ -31,13 +34,15 @@ export var register = (angular, config, meta_api) => {
                 // time, so we just randomise.)
 
             var cb = (transaction : any) : ng.IPromise<void> => {
-                var proposal : AdhHttp.ITransactionResult = transaction.post(poolPath, new RIProposal(proposalName));
-                var section : AdhHttp.ITransactionResult = transaction.post(proposal.path, new RISection("Motivation"));
+                var proposal : AdhHttp.ITransactionResult =
+                    transaction.post(poolPath, new RIProposal(adhPreliminaryNames, proposalName));
+                var section : AdhHttp.ITransactionResult =
+                    transaction.post(proposal.path, new RISection(adhPreliminaryNames, "Motivation"));
 
-                var sectionVersionResource = new RISectionVersion();
+                var sectionVersionResource = new RISectionVersion(adhPreliminaryNames);
                 var sectionVersion : AdhHttp.ITransactionResult = transaction.post(section.path, sectionVersionResource);
 
-                var proposalVersionResource = new RIProposalVersion();
+                var proposalVersionResource = new RIProposalVersion(adhPreliminaryNames);
                 proposalVersionResource.data["adhocracy.sheets.document.IDocument"] = {
                     title: proposalName,
                     description: "whoof",

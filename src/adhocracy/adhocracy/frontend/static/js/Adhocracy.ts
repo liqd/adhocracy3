@@ -15,6 +15,7 @@ import angularAnimate = require("angularAnimate");  if (angularAnimate) { return
 
 import modernizr = require("modernizr");
 
+import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhHttp = require("./Packages/Http/Http");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
 import AdhUser = require("./Packages/User/User");
@@ -94,6 +95,7 @@ export var init = (config, meta_api) => {
 
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
+    app.service("adhPreliminaryNames", AdhPreliminaryNames);
     app.service("adhHttp", ["$http", "$q", "adhMetaApi", AdhHttp.Service]);
     app.factory("adhWebSocket", ["Modernizr", "adhConfig", AdhWebSocket.factory]);
 
