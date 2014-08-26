@@ -2,6 +2,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
+import Util = require("../Util/Util");
 import Resources = require("../../Resources");
 import RIProposal = require("../../Resources_/adhocracy_sample/resources/proposal/IProposal");
 import RIProposalVersion = require("../../Resources_/adhocracy_sample/resources/proposal/IProposalVersion");
@@ -52,7 +53,7 @@ export var register = (angular, config, meta_api) => {
 
                 return transaction.commit()
                     .then((responses) : ng.IPromise<Resources.Content<any>> => {
-                        var lastTagPath : string = responses[proposalVersion.index].path + "/LAST";
+                        var lastTagPath : string = Util.parentPath(responses[proposalVersion.index].path) + "/LAST";
                         return adhHttp.get(lastTagPath);
                     })
                     .then((lastTag : RITag) => {
