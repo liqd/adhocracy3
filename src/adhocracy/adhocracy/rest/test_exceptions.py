@@ -1,5 +1,11 @@
 from pyramid import testing
+from pytest import fixture
 import colander
+
+
+@fixture
+def request():
+    return testing.DummyRequest()
 
 
 class TestHandleError400ColanderInvalid:
@@ -8,10 +14,9 @@ class TestHandleError400ColanderInvalid:
         from adhocracy.rest.exceptions import handle_error_400_colander_invalid
         return handle_error_400_colander_invalid(error, request)
 
-    def test_render_exception_error(self):
+    def test_render_exception_error(self, request):
         from cornice.util import _JSONError
         import json
-        request = testing.DummyRequest()
         invalid0 = colander.SchemaNode(typ=colander.String(), name='parent0',
                                        msg='msg_parent')
         invalid1 = colander.SchemaNode(typ=colander.String(), name='child1')
@@ -37,10 +42,9 @@ class TestHandleError500Exception:
         from adhocracy.rest.exceptions import handle_error_500_exception
         return handle_error_500_exception(error, request)
 
-    def test_render_exception_error(self):
+    def test_render_exception_error(self, request):
         from cornice.util import _JSONError
         import json
-        request = testing.DummyRequest()
         error = Exception('arg1')
 
         inst = self.make_one(error, request)
