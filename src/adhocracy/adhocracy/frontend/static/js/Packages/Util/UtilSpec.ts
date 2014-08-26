@@ -98,7 +98,7 @@ export var register = () => {
                 expect(() => Util.deepcp(() => null)).toThrow();
             });
             it("does supports copying undefined", () => {
-                expect(undefined).toBe(undefined);
+                expect(Util.deepcp(undefined)).toBe(undefined);
             });
         });
 
