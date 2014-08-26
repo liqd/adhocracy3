@@ -1,5 +1,5 @@
 class PreliminaryNames {
-    state : number;
+    private state : number;
 
     constructor() {
         this.state = 0;
