@@ -65,42 +65,29 @@ export class Service<Content extends Resources.Content<any>> {
      * the extended set are posted in an order that avoids dangling
      * references (referenced object before referencing object).
      *
+     * Resources in that array may contain preliminary paths created
+     * by the PreliminaryNames service in places where
+     * `adhocracy.schema.AbsolutePath` is expected. These paths are
+     * converted to real paths by the batch API server endpoint.
+     *
+     * This function does not automatically handle unchanged resources
+     * properly, i.e. unchanged resources in the resources array will
+     * end up as duplicate versions on the server. Therefore the caller
+     * should only pass resources that have changed. We might want to
+     * handle this case in the future within the deepPost function
+     * as well.
+     *
      * *return value:* `deepPost` promises an array of the posted
      * objects.  The objects explicitly listed in the argument(s)
      * appear first (in the original order), then all implicitly
      * posted objects (in unspecified order).
      *
-     * *references:* you can generate temporary resource paths with
-     * `mkPreliminaryPath`.  These paths can be put into the `path`
-     * attribute of any resource object, and then used as references
-     * in places where `adhocracy.schema.AbsolutePath` is expected.
-     * `deepPost` will resolve these references and replace them with
-     * the paths permanent resource paths returned from the server.
-     *
-     * *post diff:* an optional second argument contains a pristine
-     * copy of the resource array in the first.  deepPost extends both
-     * arrays and only posts those objects from the first array that
-     * differ from their counterparts in the second.
-     *
-     * (POSSIBLY FUTURE WORK: We could also support nested resources
-     * here, but this would be strictly less expressive: it would not
-     * be possible to reference the same section version object from
-     * both the containing section item and the proposal resource that
-     * it is contained in.  We could support a combination of
-     * preliminary names and nested resources, but for now it is not
-     * clear if that would be better or worse.)
+     * TODO: It is not yet defined how errors (e.g. validation errors)
+     * are passed back to the caller.
      */
     public deepPost(
-        resources : ResourcesBase.Resource[],
-        pristine ?: ResourcesBase.Resource[]
+        resources : ResourcesBase.Resource[]
     ) : ng.IPromise<ResourcesBase.Resource[]> {
-        throw "not implemented";
-    }
-
-    /**
-     * See `deepPost`.
-     */
-    public mkPreliminaryPath() : string {
         throw "not implemented";
     }
 
