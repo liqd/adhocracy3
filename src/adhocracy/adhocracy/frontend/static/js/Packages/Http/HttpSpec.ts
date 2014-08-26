@@ -302,7 +302,10 @@ export var register = () => {
 
         var _logBackendError = (name, fn, wrap) => {
             describe(name, () => {
+                var origConsoleLog;
+
                 beforeEach(() => {
+                    origConsoleLog = console.log;
                     spyOn(console, 'log').and.callThrough();
                 });
 
@@ -339,6 +342,10 @@ export var register = () => {
                     expect(console.log).toHaveBeenCalledWith("where: where1.0, where1.1");
                     expect(console.log).toHaveBeenCalledWith("what:  what1");
                 });
+
+                afterEach(() => {
+                    console.log = origConsoleLog;
+                })
             });
         };
 
