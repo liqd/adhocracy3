@@ -49,6 +49,9 @@ export function deepcp(i) {
         case "[object Array]":
             o = new Array();
             break;
+        case "[object Undefined]":
+            o = undefined;
+            break;
         default:
             throw "deepcp: unsupported object type!";
     }
