@@ -47,6 +47,10 @@ class TestHandleError500Exception:
 
         assert isinstance(inst, _JSONError)
         assert inst.status == '500 Internal Server Error'
-        wanted = {'status': 'error',
-                  'errors': [['internal', "('arg1',)", '']]}
-        assert json.loads(inst.body.decode()) == wanted
+        message = json.loads(inst.body.decode())
+        assert message['status'] == 'error'
+        assert len(message['errors']) == 1
+        assert message['errors'][0]['description'].startswith(
+            'Exception: arg1; time: ')
+        assert message['errors'][0]['location'] == 'internal'
+        assert message['errors'][0]['name'] == ''

@@ -10,7 +10,7 @@ from pyramid.view import view_config
 from pyramid.view import view_defaults
 
 from adhocracy.resources.root import IRootPool
-from adhocracy.rest.exceptions import internal_exception_to_tuple
+from adhocracy.rest.exceptions import internal_exception_to_dict
 from adhocracy.rest.schemas import POSTBatchRequestSchema
 from adhocracy.rest.views import RESTView
 
@@ -130,8 +130,8 @@ class BatchView(RESTView):
             body = self._try_to_decode_json(err.body)
         except Exception as err:
             code = 500
-            error_tuple = internal_exception_to_tuple(err)
-            body = {'status': 'error', 'errors': [error_tuple]}
+            error_dict = internal_exception_to_dict(err)
+            body = {'status': 'error', 'errors': [error_dict]}
             logger.exception('Unexpected exception processing nested request')
         return BatchItemResponse(code, body)
 
