@@ -40,7 +40,7 @@ export function deepcp(i) {
         return i;
     }
 
-    if (typeof i === 'undefined') {
+    if (typeof i === "undefined") {
         return undefined;
     }
 
