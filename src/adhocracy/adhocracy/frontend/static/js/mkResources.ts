@@ -315,9 +315,9 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
         var lines : string[] = [];
 
         args.push("preliminaryNames : PreliminaryNames");
-        lines.push("    _self.path = preliminaryNames.next();");
-        lines.push("    _self.first_version_path = preliminaryNames.next();");
-        lines.push("    _self.root_versions = preliminaryNames.next();");
+        lines.push("    _self.path = preliminaryNames.nextPreliminary();");
+        lines.push("    _self.first_version_path = preliminaryNames.nextPreliminary();");
+        lines.push("    _self.root_versions = preliminaryNames.nextPreliminary();");
 
         if (resource.sheets.indexOf("adhocracy.sheets.name.IName") !== -1) {
             args.push("name ?: string");
