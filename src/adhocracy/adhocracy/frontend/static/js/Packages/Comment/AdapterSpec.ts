@@ -1,6 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
 import AdhCommentAdapter = require("./Adapter");
+import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
 
 export var register = () => {
     describe("CommentAdapter", () => {
@@ -24,7 +25,7 @@ export var register = () => {
 
         describe("create", () => {
             beforeEach(() => {
-                resource = adapter.create();
+                resource = adapter.create(new AdhPreliminaryNames());
             });
 
             it("returns an adhocracy_sample.resources.comment.ICommentVersion resource", () => {
