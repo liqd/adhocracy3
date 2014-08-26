@@ -15,7 +15,7 @@ export var register = () => {
                         content: "content"
                     },
                     "adhocracy.sheets.metadata.IMetadata": {
-                        creator: ["creator"]
+                        creator: "creator"
                     }
                 }
             };

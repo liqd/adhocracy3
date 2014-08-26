@@ -12,7 +12,7 @@
                 <button type="button" data-ng-click="showComments()">Show comments</a>
             </div>
             <adh-document-sheet-show data-sheet="content.data['adhocracy.sheets.document.IDocument']"></adh-document-sheet-show>
-            <adh-user-meta data-path="{{content.data['adhocracy.sheets.metadata.IMetadata'].creator[0]}}"</adh-user-meta>
+            <adh-user-meta data-path="{{content.data['adhocracy.sheets.metadata.IMetadata'].creator}}"</adh-user-meta>
         </div>
         <div data-ng-switch-when="edit">
             <div class="buttons_box">

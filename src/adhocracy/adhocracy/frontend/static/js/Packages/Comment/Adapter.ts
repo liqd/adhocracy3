@@ -35,9 +35,6 @@ export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersi
     }
 
     creator(resource : RICommentVersion) : string {
-        // FIXME: For some reason, creator is a list in the backend.
-        // We will talk to them and do something better than blindly
-        // picking the first item as soon as possible.
-        return resource.data["adhocracy.sheets.metadata.IMetadata"].creator[0];
+        return resource.data["adhocracy.sheets.metadata.IMetadata"].creator;
     }
 }
