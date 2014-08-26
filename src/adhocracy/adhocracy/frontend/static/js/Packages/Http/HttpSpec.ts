@@ -300,64 +300,69 @@ export var register = () => {
             });
         });
 
-        var logBackendError_ = (name, fn, wrap) => {
+        var _logBackendError = (name, fn, wrap) => {
 
-        describe(name, () => {
-            var origConsoleLog;
+            describe(name, () => {
+                var origConsoleLog;
 
-            beforeEach(() => {
-                origConsoleLog = console.log;
-                console.log = jasmine.createSpy("consoleLogMock");
+                beforeEach(() => {
+                    origConsoleLog = console.log;
+                    console.log = jasmine.createSpy("consoleLogMock");
+                });
+
+                it("always throws an exception", () => {
+                    var backendError = {
+                        status: "error",
+                        errors: []
+                    };
+                    expect(() => fn(wrap(backendError))).toThrow();
+                });
+
+                it("logs the raw backend error to console", () => {
+                    var backendError = {
+                        status: "error",
+                        errors: []
+                    };
+                    expect(() => fn(wrap(backendError))).toThrow();
+                    expect(console.log).toHaveBeenCalledWith(backendError);
+                });
+
+                it("logs all individual errors to console", () => {
+                    var backendError = {
+                        status: "error",
+                        errors: [
+                            { name: "where0.0", location: "where0.1", description: "what0" },
+                            { name: "where1.0", location: "where1.1", description: "what1" }
+                        ]
+                    };
+                    expect(() => fn(wrap(backendError))).toThrow();
+                    expect(console.log).toHaveBeenCalledWith("error #0");
+                    expect(console.log).toHaveBeenCalledWith("where: where0.0, where0.1");
+                    expect(console.log).toHaveBeenCalledWith("what:  what0");
+                    expect(console.log).toHaveBeenCalledWith("error #1");
+                    expect(console.log).toHaveBeenCalledWith("where: where1.0, where1.1");
+                    expect(console.log).toHaveBeenCalledWith("what:  what1");
+                });
+
+                afterEach(() => {
+                    console.log = origConsoleLog;
+                });
             });
-
-            it("always throws an exception", () => {
-                var backendError = {
-                    status: "error",
-                    errors: []
-                };
-                expect(() => fn(wrap(backendError))).toThrow();
-            });
-
-            it("logs the raw backend error to console", () => {
-                var backendError = {
-                    status: "error",
-                    errors: []
-                };
-                expect(() => fn(wrap(backendError))).toThrow();
-                expect(console.log).toHaveBeenCalledWith(backendError);
-            });
-
-            it("logs all individual errors to console", () => {
-                var backendError = {
-                    status: "error",
-                    errors: [
-                        { name: "where0.0", location: "where0.1", description: "what0" },
-                        { name: "where1.0", location: "where1.1", description: "what1" }
-                    ]
-                };
-                expect(() => fn(wrap(backendError))).toThrow();
-                expect(console.log).toHaveBeenCalledWith("error #0");
-                expect(console.log).toHaveBeenCalledWith("where: where0.0, where0.1");
-                expect(console.log).toHaveBeenCalledWith("what:  what0");
-                expect(console.log).toHaveBeenCalledWith("error #1");
-                expect(console.log).toHaveBeenCalledWith("where: where1.0, where1.1");
-                expect(console.log).toHaveBeenCalledWith("what:  what1");
-            });
-
-            afterEach(() => {
-                console.log = origConsoleLog;
-            });
-        });
-
         };
 
-        logBackendError_(
+        _logBackendError(
             "logBackendError",
             AdhHttp.logBackendError,
-            (error) => { data: error });
-        logBackendError_(
+            (error) => {
+                return { data: error };
+            }
+        );
+        _logBackendError(
             "logBackendBatchError",
             Error.logBackendBatchError,
-            (error) => { data: [ {body: error} ]});
+            (error) => {
+                return { data: [ {body: error} ]};
+            }
+        );
     });
 };
