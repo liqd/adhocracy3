@@ -36,6 +36,14 @@ export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendErro
     throw errors;
 };
 
+/**
+ * batch requests recive an array of responses.  each response matches
+ * one request that was actually processed in the backend.  Since the
+ * first error makes batch processing stop, all responses up to the
+ * last one are successes.  If this function is called, the error is
+ * contained in the last element of the array.  All other elements are
+ * ignored by this function.
+ */
 export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBackendError[]>) : void => {
     "use strict";
 
