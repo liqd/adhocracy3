@@ -58,17 +58,12 @@ export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBacken
     console.log(lastBatchItemResponse);
 
     var errors : IBackendErrorItem[] = lastBatchItemResponse.errors;
-    // In rest_api.rst, we call the response body field 'body', but
-    // $http calls it 'data'.  `logBackendBatchError` and
+
+    // FIXME: In rest_api.rst, we call the response body field 'body',
+    // but $http calls it 'data'.  `logBackendBatchError` and
     // `importBatchContent` are the only two places where this gets a
     // little confusing.  It could be fixed in rest_api.rst, the
     // backend, and then in these two functions.
-
-    // Workaround for backend bug.  See redmine ticket #1466.
-    if (errors.length > 0 && !errors[0].hasOwnProperty("name")) {
-        var es = errors.map((a) => { return { name: a[0], location: a[1], description: a[2] }; });
-        errors = es;
-    }
 
     renderBackendError(errors);
     throw errors;
