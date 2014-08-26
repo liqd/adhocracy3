@@ -40,6 +40,10 @@ export function deepcp(i) {
         return i;
     }
 
+    if (typeof i === 'undefined') {
+        return undefined;
+    }
+
     // structured types
     var o;
     switch (Object.prototype.toString.call(i)) {
@@ -48,9 +52,6 @@ export function deepcp(i) {
             break;
         case "[object Array]":
             o = new Array();
-            break;
-        case "[object Undefined]":
-            o = undefined;
             break;
         default:
             throw "deepcp: unsupported object type!";
