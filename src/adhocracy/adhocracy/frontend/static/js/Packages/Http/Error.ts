@@ -41,14 +41,15 @@ export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBacken
 
     console.log("http batch response with error status: " + response.status);
     console.log(response.config);
-    console.log(response.data);
 
     if (response.data.length < 1) {
         throw "no batch item responses!";
     }
 
-    var lastBatchItemResponse = response.data[response.data.length - 1];
-    var errors = (<any>lastBatchItemResponse).body.errors;
+    var lastBatchItemResponse : IBackendError = (<any>(response.data[response.data.length - 1])).body;
+    console.log(lastBatchItemResponse);
+
+    var errors = lastBatchItemResponse.errors;
     // In rest_api.rst, we call the response body field 'body', but
     // $http calls it 'data'.  `logBackendBatchError` and
     // `importBatchContent` are the only two places where this gets a
