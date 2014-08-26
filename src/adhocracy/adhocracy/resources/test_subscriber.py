@@ -178,6 +178,17 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         factory = registry.content.create
         assert factory.call_count == 1
 
+    def test_call_versionable_with_autoupdate_sheet_twice_without_transaction_changelog(self, itemversion, registry, mock_sheet):
+        event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
+        self._make_one(event)
+
+        event_second = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
+        delattr(registry, '_transaction_changelog')
+        self._make_one(event_second)
+
+        factory = registry.content.create
+        assert factory.call_count == 2
+
     def test_call_versionable_with_autoupdate_sheet_and_root_versions_and_not_is_insubtree(self,
             itemversion, mock_graph, registry, mock_sheet):
         mock_graph.is_in_subtree.return_value = False
