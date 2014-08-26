@@ -3,6 +3,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
 import Resources = require("../../Resources");
+import ResourcesBase = require("../../ResourcesBase");
 import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
 import AdhTransaction = require("./Transaction");
@@ -58,6 +59,40 @@ export class Service<Content extends Resources.Content<any>> {
         // scenarios.
         return this.get(path + "/LAST")
             .then((tag) => tag.data["adhocracy.sheets.tags.ITag"].elements[0]);
+    }
+
+    /**
+     * Post a reference graph of resources.
+     *
+     * Take an array of resources.  The array has set semantics and
+     * may contain, e.g., a proposal to be posted and all of its
+     * sub-resources.  All elements of the extended set are posted in
+     * an order that avoids dangling references (referenced object
+     * always occur before referencing object).
+     *
+     * Resources may contain preliminary paths created by the
+     * PreliminaryNames service in places where
+     * `adhocracy.schema.AbsolutePath` is expected.  These paths must
+     * reference other items of the input array, and are converted to
+     * real paths by the batch API server endpoint.
+     *
+     * This function does not handle unchanged resources any different
+     * from changed ones, i.e. unchanged resources in the input array
+     * will end up as duplicate versions on the server.  Therefore,
+     * the caller should only pass resources that have changed. We
+     * might want to handle this case in the future within the
+     * deepPost function as well.
+     *
+     * *return value:* `deepPost` promises an array of the posted
+     * objects (in original order).
+     *
+     * FIXME: It is not yet defined how errors (e.g. validation
+     * errors) are passed back to the caller.
+     */
+    public deepPost(
+        resources : ResourcesBase.Resource[]
+    ) : ng.IPromise<ResourcesBase.Resource[]> {
+        throw "not implemented";
     }
 
     public postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
