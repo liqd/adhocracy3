@@ -23,9 +23,9 @@ export var register = (angular, config, meta_api) => {
             return angular.injector(["ng"]).invoke(factory);
         })();
 
-        xit("Deep-rewrites preliminary resource paths.", (done) => {
+        it("Deep-rewrites preliminary resource paths.", (done) => {
             var poolPath = "/adhocracy";
-            var proposalName = "Against Curtains " + Math.random();
+            var proposalName = "Against_Curtains_" + Math.random();
                 // (we don't have a way yet to repeat this test
                 // without having to come up with new names every
                 // time, so we just randomise.)
