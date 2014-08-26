@@ -301,7 +301,6 @@ export var register = () => {
         });
 
         var _logBackendError = (name, fn, wrap) => {
-
             describe(name, () => {
                 var origConsoleLog;
 
