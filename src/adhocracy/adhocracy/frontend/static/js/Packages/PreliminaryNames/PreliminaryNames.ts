@@ -5,13 +5,9 @@ class PreliminaryNames {
         this.state = 0;
     }
 
-    public next() : string {
-        this.state += 1;
-        return "pn" + this.state.toString();
-    }
-
     public nextPreliminary() : string {
-        return "@" + this.next();
+        this.state += 1;
+        return "@pn" + this.state.toString();
     }
 
     public isPreliminary(path : string) : boolean {
