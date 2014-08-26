@@ -6,11 +6,11 @@ from pyramid.traversal import resource_path
 
 from adhocracy.interfaces import ChangelogMetadata
 from adhocracy.interfaces import IResource
-
-from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourceCreatedAndAdded
 from adhocracy.interfaces import IResourceSheetModified
+from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import IItemVersionNewVersionAdded
+from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy.sheets.versions import IVersionable
 from adhocracy.utils import find_graph
