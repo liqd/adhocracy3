@@ -58,32 +58,29 @@ export class Service<Content extends Resources.Content<any>> {
      * Post a reference graph of resources.
      *
      * Take an array of resources.  The array has set semantics and
-     * often only contains one element (e.g., a proposal to be posted
-     * with all of its sub-resources).  All resources in the set are
-     * traversed, and all `references` (see below) to other resources
-     * are collected and added to the set.  Finally, all elements of
-     * the extended set are posted in an order that avoids dangling
-     * references (referenced object before referencing object).
+     * may contain, e.g., a proposal to be posted and all of its
+     * sub-resources.  All elements of the extended set are posted in
+     * an order that avoids dangling references (referenced object
+     * always occur before referencing object).
      *
-     * Resources in that array may contain preliminary paths created
-     * by the PreliminaryNames service in places where
-     * `adhocracy.schema.AbsolutePath` is expected. These paths are
-     * converted to real paths by the batch API server endpoint.
+     * Resources may contain preliminary paths created by the
+     * PreliminaryNames service in places where
+     * `adhocracy.schema.AbsolutePath` is expected.  These paths must
+     * reference other items of the input array, and are converted to
+     * real paths by the batch API server endpoint.
      *
-     * This function does not automatically handle unchanged resources
-     * properly, i.e. unchanged resources in the resources array will
-     * end up as duplicate versions on the server. Therefore the caller
-     * should only pass resources that have changed. We might want to
-     * handle this case in the future within the deepPost function
-     * as well.
+     * This function does not handle unchanged resources any different
+     * from changed ones, i.e. unchanged resources in the input array
+     * will end up as duplicate versions on the server.  Therefore,
+     * the caller should only pass resources that have changed. We
+     * might want to handle this case in the future within the
+     * deepPost function as well.
      *
      * *return value:* `deepPost` promises an array of the posted
-     * objects.  The objects explicitly listed in the argument(s)
-     * appear first (in the original order), then all implicitly
-     * posted objects (in unspecified order).
+     * objects (in original order).
      *
-     * TODO: It is not yet defined how errors (e.g. validation errors)
-     * are passed back to the caller.
+     * FIXME: It is not yet defined how errors (e.g. validation
+     * errors) are passed back to the caller.
      */
     public deepPost(
         resources : ResourcesBase.Resource[]
