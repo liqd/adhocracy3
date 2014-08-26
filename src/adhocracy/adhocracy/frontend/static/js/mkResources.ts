@@ -316,7 +316,13 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
 
         args.push("preliminaryNames : PreliminaryNames");
         lines.push("    _self.path = preliminaryNames.nextPreliminary();");
-        lines.push("    _self.first_version_path = preliminaryNames.nextPreliminary();");
+
+        if (resource.sheets.indexOf("adhocracy.sheets.versions.IVersions") !== -1) {
+            lines.push("    _self.first_version_path = preliminaryNames.nextPreliminary();");
+        } else {
+            lines.push("    _self.first_version_path = undefined;");
+        }
+
         lines.push("    _self.root_versions = [];");
 
         if (resource.sheets.indexOf("adhocracy.sheets.name.IName") !== -1) {
