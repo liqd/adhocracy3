@@ -4,6 +4,7 @@ import q = require("q");
 
 import Util = require("../Util/Util");
 import AdhHttp = require("./Http");
+import Error = require("./Error");
 import AdhConvert = require("./Convert");
 
 var mkHttpMock = () => {
@@ -299,7 +300,9 @@ export var register = () => {
             });
         });
 
-        describe("logBackendError", () => {
+        var logBackendError_ = (name, fn, wrap) => {
+
+        describe(name, () => {
             var origConsoleLog;
 
             beforeEach(() => {
@@ -312,7 +315,7 @@ export var register = () => {
                     status: "error",
                     errors: []
                 };
-                expect(() => AdhHttp.logBackendError({ data: backendError })).toThrow();
+                expect(() => fn(wrap(backendError))).toThrow();
             });
 
             it("logs the raw backend error to console", () => {
@@ -320,10 +323,7 @@ export var register = () => {
                     status: "error",
                     errors: []
                 };
-                var response = {
-                    data: backendError
-                };
-                expect(() => AdhHttp.logBackendError(response)).toThrow();
+                expect(() => fn(wrap(backendError))).toThrow();
                 expect(console.log).toHaveBeenCalledWith(backendError);
             });
 
@@ -335,7 +335,7 @@ export var register = () => {
                         { name: "where1.0", location: "where1.1", description: "what1" }
                     ]
                 };
-                expect(() => AdhHttp.logBackendError({ data: backendError })).toThrow();
+                expect(() => fn(wrap(backendError))).toThrow();
                 expect(console.log).toHaveBeenCalledWith("error #0");
                 expect(console.log).toHaveBeenCalledWith("where: where0.0, where0.1");
                 expect(console.log).toHaveBeenCalledWith("what:  what0");
@@ -348,5 +348,16 @@ export var register = () => {
                 console.log = origConsoleLog;
             });
         });
+
+        };
+
+        logBackendError_(
+            "logBackendError",
+            AdhHttp.logBackendError,
+            (error) => { data: error });
+        logBackendError_(
+            "logBackendBatchError",
+            Error.logBackendBatchError,
+            (error) => { data: [ {body: error} ]});
     });
 };
