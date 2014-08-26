@@ -3,6 +3,8 @@
 import Resources_ = require("Resources_");
 /* tslint:enable:no-unused-variable */
 
+// DEPRECATED: Content should be replaced by ResourcesBase.Resource
+// everywhere.  Then this module can be removed.
 export interface Content<Data> {
     content_type: string;
     path?: string;

@@ -4,6 +4,8 @@ import q = require("q");
 
 import Util = require("../Util/Util");
 import AdhHttp = require("./Http");
+import Error = require("./Error");
+import AdhConvert = require("./Convert");
 
 var mkHttpMock = () => {
     var mock = jasmine.createSpyObj("$httpMock", ["get", "post", "put"]);
@@ -177,13 +179,13 @@ export var register = () => {
                 var _httpTrans;
 
                 beforeEach((done) => {
-                    $httpMock.post.and.returnValue(q.when([
-                        "get response",
-                        "put response",
-                        "post1 response",
-                        "post2 response",
-                        "get2 response"
-                    ]));
+                    $httpMock.post.and.returnValue(q.when({data: [
+                        {body: {content_type: "get response"}},
+                        {body: {content_type: "put response"}},
+                        {body: {content_type: "post1 response"}},
+                        {body: {content_type: "post2 response"}},
+                        {body: {content_type: "get2 response"}}
+                    ]}));
 
                     adhHttp.withTransaction((httpTrans) => {
                         _httpTrans = httpTrans;
@@ -202,6 +204,10 @@ export var register = () => {
                         return httpTrans.commit();
                     }).then((_response) => {
                         response = _response;
+                    }).then(() => {
+                        done();
+                    }, (error) => {
+                        expect(false).toBe(true);
                         done();
                     });
                 });
@@ -241,11 +247,11 @@ export var register = () => {
                 });
 
                 it("maps preliminary data to responses via `index`", () => {
-                    expect(response[get.index]).toBe("get response");
-                    expect(response[put.index]).toBe("put response");
-                    expect(response[post1.index]).toBe("post1 response");
-                    expect(response[post2.index]).toBe("post2 response");
-                    expect(response[get2.index]).toBe("get2 response");
+                    expect(response[get.index].content_type).toBe("get response");
+                    expect(response[put.index].content_type).toBe("put response");
+                    expect(response[post1.index].content_type).toBe("post1 response");
+                    expect(response[post2.index].content_type).toBe("post2 response");
+                    expect(response[get2.index].content_type).toBe("get2 response");
                 });
 
                 it("throws if you try to use the transaction after commit", () => {
@@ -264,14 +270,14 @@ export var register = () => {
                 var response = {
                     data: obj
                 };
-                expect(AdhHttp.importContent(response)).toBe(obj);
+                expect(AdhConvert.importContent(response)).toBe(obj);
             });
             it("throws if response.data is not an object", () => {
                 var obj = <any>"foobar";
                 var response = {
                     data: obj
                 };
-                expect(() => AdhHttp.importContent(response)).toThrow();
+                expect(() => AdhConvert.importContent(response)).toThrow();
             });
         });
 
@@ -283,65 +289,79 @@ export var register = () => {
             });
 
             it("deletes the path", () => {
-                expect(AdhHttp.exportContent(adhMetaApiMock, {content_type: "", data: {}, path: "test"}))
+                expect(AdhConvert.exportContent(adhMetaApiMock, {content_type: "", data: {}, path: "test"}))
                     .toEqual({content_type: "", data: {}});
             });
             it("deletes read-only properties", () => {
-                var x = AdhHttp.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
+                var x = AdhConvert.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
                 var y = adhMetaApiMock.objAfter;
                 expect(Util.deepeq(x, y)).toBe(true);
                 expect(adhMetaApiMock.field).toHaveBeenCalled();
             });
         });
 
-        describe("logBackendError", () => {
-            var origConsoleLog;
+        var _logBackendError = (name, fn, wrap) => {
+            describe(name, () => {
+                var origConsoleLog;
 
-            beforeEach(() => {
-                origConsoleLog = console.log;
-                console.log = jasmine.createSpy("consoleLogMock");
-            });
+                beforeEach(() => {
+                    origConsoleLog = console.log;
+                    spyOn(console, 'log').and.callThrough();
+                });
 
-            it("always throws an exception", () => {
-                var backendError = {
-                    status: "error",
-                    errors: []
-                };
-                expect(() => AdhHttp.logBackendError({ data: backendError })).toThrow();
-            });
+                it("always throws an exception", () => {
+                    var backendError = {
+                        status: "error",
+                        errors: []
+                    };
+                    expect(() => fn(wrap(backendError))).toThrow();
+                });
 
-            it("logs the raw backend error to console", () => {
-                var backendError = {
-                    status: "error",
-                    errors: []
-                };
-                var response = {
-                    data: backendError
-                };
-                expect(() => AdhHttp.logBackendError(response)).toThrow();
-                expect(console.log).toHaveBeenCalledWith(backendError);
-            });
+                it("logs the raw backend error to console", () => {
+                    var backendError = {
+                        status: "error",
+                        errors: []
+                    };
+                    expect(() => fn(wrap(backendError))).toThrow();
+                    expect(console.log).toHaveBeenCalledWith(backendError);
+                });
 
-            it("logs all individual errors to console", () => {
-                var backendError = {
-                    status: "error",
-                    errors: [
-                        { name: "where0.0", location: "where0.1", description: "what0" },
-                        { name: "where1.0", location: "where1.1", description: "what1" }
-                    ]
-                };
-                expect(() => AdhHttp.logBackendError({ data: backendError })).toThrow();
-                expect(console.log).toHaveBeenCalledWith("error #0");
-                expect(console.log).toHaveBeenCalledWith("where: where0.0, where0.1");
-                expect(console.log).toHaveBeenCalledWith("what:  what0");
-                expect(console.log).toHaveBeenCalledWith("error #1");
-                expect(console.log).toHaveBeenCalledWith("where: where1.0, where1.1");
-                expect(console.log).toHaveBeenCalledWith("what:  what1");
-            });
+                it("logs all individual errors to console", () => {
+                    var backendError = {
+                        status: "error",
+                        errors: [
+                            { name: "where0.0", location: "where0.1", description: "what0" },
+                            { name: "where1.0", location: "where1.1", description: "what1" }
+                        ]
+                    };
+                    expect(() => fn(wrap(backendError))).toThrow();
+                    expect(console.log).toHaveBeenCalledWith("error #0");
+                    expect(console.log).toHaveBeenCalledWith("where: where0.0, where0.1");
+                    expect(console.log).toHaveBeenCalledWith("what:  what0");
+                    expect(console.log).toHaveBeenCalledWith("error #1");
+                    expect(console.log).toHaveBeenCalledWith("where: where1.0, where1.1");
+                    expect(console.log).toHaveBeenCalledWith("what:  what1");
+                });
 
-            afterEach(() => {
-                console.log = origConsoleLog;
+                afterEach(() => {
+                    console.log = origConsoleLog;
+                })
             });
-        });
+        };
+
+        _logBackendError(
+            "logBackendError",
+            AdhHttp.logBackendError,
+            (error) => {
+                return { data: error };
+            }
+        );
+        _logBackendError(
+            "logBackendBatchError",
+            Error.logBackendBatchError,
+            (error) => {
+                return { data: [ {body: error} ]};
+            }
+        );
     });
 };

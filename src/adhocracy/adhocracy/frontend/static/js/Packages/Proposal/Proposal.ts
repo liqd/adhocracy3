@@ -398,7 +398,7 @@ export class Service {
         }
     }
 
-    public postProposalWithParagraphs(
+    public postProposalWithParagraphsOld(
         poolPath : string,
         proposalVersion : RIProposalVersion,
         paragraphVersions : RIParagraphVersion[]
@@ -451,5 +451,68 @@ export class Service {
             // return the latest proposal Version
             .then(() => _self.adhHttp.getNewestVersionPath(scope.proposal.path))
             .then((proposalVersionPath) => _self.adhHttp.get(proposalVersionPath));
+    }
+
+    public postProposalWithParagraphsBatched(
+        poolPath : string,
+        proposalVersion : RIProposalVersion,
+        paragraphVersions : RIParagraphVersion[]
+    ) {
+        var _self = this;
+
+        var sectionVersion : RISectionVersion = new RISectionVersion();
+        sectionVersion.data["adhocracy.sheets.document.ISection"] = {
+            title : "single section",
+            elements : [],
+            subsections : []
+        };
+
+        var name = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
+        name = Util.normalizeName(name);
+
+        // this is the batch-request logic.  it works a bit different
+        // from the original logic in that it follows the references
+        // down the items and up the versions, rather than going down
+        // both.
+        //
+        // (this comment reference a meeting held earlier today and is
+        // meaningless without having been there.  since this function
+        // will be refactored away soon, so that should not be a big
+        // deal.)
+
+        return _self.adhHttp
+            .withTransaction((transaction) : ng.IPromise<Resources.Content<any>> => {
+                // items
+                var postProposal : AdhHttp.ITransactionResult = transaction.post(poolPath, new RIProposal(name));
+                var postSection : AdhHttp.ITransactionResult = transaction.post(postProposal.path, new RISection("section"));
+                var postParagraphs : AdhHttp.ITransactionResult[] = paragraphVersions.map((paragraphVersion, i) =>
+                    transaction.post(postProposal.path, new RIParagraph("paragraph" + i)));
+
+                // versions
+                paragraphVersions.map((paragraphVersion, i) =>
+                    transaction.post(postParagraphs[i].path, paragraphVersion));
+                transaction.post(postSection.path, sectionVersion);
+                var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
+
+                // FIXME: use first_version_paths properly (i don't
+                // think that was done right in the old, non-batch
+                // version of this function either).
+
+                return transaction.commit()
+                    .then((responses) : Resources.Content<any> => {
+                        // return the latest proposal Version
+                        return responses[postProposalVersion.index];
+                    });
+            });
+    }
+
+    // FIXME: there are two implementations of
+    // postProposalWithParagraph.  both will be obsoleted by upcoming
+    // changes in surrounding the high-level-api user story, so we
+    // keep both of them in the code for reference for now.  They need
+    // to be cleaned up together once the high-level api is stable.
+    public postProposalWithParagraphs(p, v, pvs) {
+        return this.postProposalWithParagraphsOld(p, v, pvs);
+        // return this.postProposalWithParagraphsBatched(p, v, pvs);
     }
 };

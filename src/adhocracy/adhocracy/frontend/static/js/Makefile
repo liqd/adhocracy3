@@ -15,7 +15,10 @@ compile: compile_tests_browser
 AdhocracySpec.ts: .dummy
 	./AdhocracySpec.sh > AdhocracySpec.ts
 
-compile_tests_browser: AdhocracySpec.ts
+AdhocracyIg.ts: .dummy
+	./AdhocracyIg.sh > AdhocracyIg.ts
+
+compile_tests_browser: AdhocracySpec.ts AdhocracyIg.ts
 	$(TSC) --module amd --sourcemap Adhocracy*.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 
 test_no_blanket: .dummy

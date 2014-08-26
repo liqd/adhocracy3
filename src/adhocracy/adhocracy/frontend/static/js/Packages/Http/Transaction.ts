@@ -1,4 +1,8 @@
 import AdhResources = require("../../Resources");
+import MetaApi = require("../MetaApi/MetaApi");
+
+import AdhError = require("./Error");
+import AdhConvert = require("./Convert");
 
 
 export interface ITransactionResult {
@@ -21,7 +25,7 @@ export class Transaction {
     private committed : boolean;
     private nextID : number;
 
-    constructor(private $http : ng.IHttpService) {
+    constructor(private $http : ng.IHttpService, private adhMetaApi : MetaApi.MetaApiQuery) {
         this.requests = [];
         this.committed = false;
         this.nextID = 0;
@@ -54,7 +58,7 @@ export class Transaction {
         this.requests.push({
             method: "PUT",
             path: path,
-            body: obj
+            body: AdhConvert.exportContent(this.adhMetaApi, obj)
         });
         return {
             index: this.requests.length - 1,
@@ -68,7 +72,7 @@ export class Transaction {
         this.requests.push({
             method: "POST",
             path: path,
-            body: obj,
+            body: AdhConvert.exportContent(this.adhMetaApi, obj),
             result_path: preliminaryPath
         });
         return {
@@ -81,6 +85,8 @@ export class Transaction {
     public commit() : ng.IPromise<AdhResources.Content<any>[]> {
         this.checkNotCommitted();
         this.committed = true;
-        return this.$http.post("/batch", this.requests);
+        return this.$http.post("/batch", this.requests).then(
+            AdhConvert.importBatchContent,
+            AdhError.logBackendBatchError);
     }
 }
