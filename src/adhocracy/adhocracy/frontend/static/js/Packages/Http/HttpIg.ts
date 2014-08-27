@@ -2,7 +2,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import Util = require("../Util/Util");
 import Resources = require("../../Resources");
 import RIProposal = require("../../Resources_/adhocracy_sample/resources/proposal/IProposal");
 import RIProposalVersion = require("../../Resources_/adhocracy_sample/resources/proposal/IProposalVersion");
@@ -53,8 +52,7 @@ export var register = (angular, config, meta_api) => {
                     follows: [proposal.first_version_path],
                     followed_by: []
                 };
-                var proposalVersion : AdhHttp.ITransactionResult =
-                    transaction.post(proposal.path, proposalVersionResource);
+                transaction.post(proposal.path, proposalVersionResource);
 
                 return transaction.commit()
                     .then((responses) : ng.IPromise<Resources.Content<any>> => {
