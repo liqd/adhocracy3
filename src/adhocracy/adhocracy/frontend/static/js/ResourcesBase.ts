@@ -30,13 +30,16 @@ export class Resource {
     }
 
     public getReferences() : string[] {
-        throw "not implemented";
+        var _self = this;
+        var result : string[] = [];
 
-        /*
+        for (var x in _self.data) {
+            if (_self.data.hasOwnProperty(x)) {
+                var sheet = _self.data[x];
+                result.push.apply(result, sheet.getMeta().references);
+            }
+        }
 
-           FIXME: traverse all sheets in the resource, call getMeta
-           on each, and compute the union of all references.
-
-         */
+        return result;
     }
 }
