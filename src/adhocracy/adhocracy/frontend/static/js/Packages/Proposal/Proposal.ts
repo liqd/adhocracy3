@@ -449,21 +449,21 @@ export class Service {
                 var postParagraphVersions = paragraphVersions.map((paragraphVersion, i) => {
                     paragraphVersion.data["adhocracy.sheets.versions.IVersionable"] =
                         new SIVersionable.AdhocracySheetsVersionsIVersionable({
-                            follows: [postParagraphs[i].first_version_path],
+                            follows: [postParagraphs[i].first_version_path]
                         });
                     return transaction.post(postParagraphs[i].path, paragraphVersion);
                 });
 
                 sectionVersion.data["adhocracy.sheets.versions.IVersionable"] =
                     new SIVersionable.AdhocracySheetsVersionsIVersionable({
-                        follows: [postSection.first_version_path],
+                        follows: [postSection.first_version_path]
                     });
                 sectionVersion.data["adhocracy.sheets.document.ISection"].elements = postParagraphVersions.map((p) => p.path);
                 var postSectionVersion = transaction.post(postSection.path, sectionVersion);
 
                 proposalVersion.data["adhocracy.sheets.versions.IVersionable"] =
                     new SIVersionable.AdhocracySheetsVersionsIVersionable({
-                        follows: [postProposal.first_version_path],
+                        follows: [postProposal.first_version_path]
                     });
                 proposalVersion.data["adhocracy.sheets.document.IDocument"].elements = [postSectionVersion.path];
                 var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
