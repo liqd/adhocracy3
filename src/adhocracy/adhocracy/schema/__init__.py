@@ -115,8 +115,8 @@ class Identifier(AdhocracySchemaNode):
 @colander.deferred
 def deferred_validate_name(node: colander.SchemaNode, kw: dict) -> callable:
     """Check that the node value is a valid child name."""
-    return colander.All(Identifier.validator,
-                        validate_name_is_unique)
+    return colander.All(validate_name_is_unique,
+                        *Identifier.validator.validators)
 
 
 class Name(AdhocracySchemaNode):
