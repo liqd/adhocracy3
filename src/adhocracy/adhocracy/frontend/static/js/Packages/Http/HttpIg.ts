@@ -26,9 +26,9 @@ export var register = (angular, config, meta_api) => {
 
         var adhPreliminaryNames = new AdhPreliminaryNames();
 
-        xit("Deep-rewrites preliminary resource paths.", (done) => {
+        it("Deep-rewrites preliminary resource paths.", (done) => {
             var poolPath = "/adhocracy";
-            var proposalName = "Against Curtains " + Math.random();
+            var proposalName = "Against_Curtains_" + Math.random();
                 // (we don't have a way yet to repeat this test
                 // without having to come up with new names every
                 // time, so we just randomise.)
@@ -52,12 +52,11 @@ export var register = (angular, config, meta_api) => {
                     follows: [proposal.first_version_path],
                     followed_by: []
                 };
-                var proposalVersion : AdhHttp.ITransactionResult =
-                    transaction.post(proposal.path, proposalVersionResource);
+                transaction.post(proposal.path, proposalVersionResource);
 
                 return transaction.commit()
                     .then((responses) : ng.IPromise<Resources.Content<any>> => {
-                        var lastTagPath : string = responses[proposalVersion.index].path + "/LAST";
+                        var lastTagPath : string = responses[proposal.index].path + "/LAST";
                         return adhHttp.get(lastTagPath);
                     })
                     .then((lastTag : RITag) => {
