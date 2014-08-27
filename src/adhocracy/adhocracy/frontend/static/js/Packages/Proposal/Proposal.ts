@@ -168,7 +168,7 @@ export class ProposalVersionNew {
             controller: ["$scope", "adhPreliminaryNames", ($scope : IScopeProposalVersion, adhPreliminaryNames : AdhPreliminaryNames) => {
                 $scope.viewmode = "edit";
 
-                $scope.content = new RIProposalVersion(adhPreliminaryNames);
+                $scope.content = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
                 $scope.content.data["adhocracy.sheets.document.IDocument"] = {
                     title: "",
                     description: "",
@@ -177,7 +177,7 @@ export class ProposalVersionNew {
                 $scope.paragraphVersions = [];
 
                 $scope.addParagraphVersion = () => {
-                    var pv = new RIParagraphVersion(adhPreliminaryNames);
+                    var pv = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
                     pv.data["adhocracy.sheets.document.IParagraph"] = {
                         content: ""
                     };
@@ -268,17 +268,17 @@ export class Service {
     ) {}
 
     private postProposal(path : string, name : string, scope : {proposal? : any}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new RIProposal(this.adhPreliminaryNames, name))
+        return this.adhHttp.postToPool(path, new RIProposal({preliminaryNames: this.adhPreliminaryNames, name: name}))
             .then((ret) => { scope.proposal = ret; });
     }
 
     private postSection(path : string, name : string, scope : {section? : any}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new RISection(this.adhPreliminaryNames, name))
+        return this.adhHttp.postToPool(path, new RISection({preliminaryNames: this.adhPreliminaryNames, name: name}))
             .then((ret) => { scope.section = ret; });
     }
 
     private postParagraph(path : string, name : string, scope : {paragraphs}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new RIParagraph(this.adhPreliminaryNames, name))
+        return this.adhHttp.postToPool(path, new RIParagraph({preliminaryNames: this.adhPreliminaryNames, name: name}))
             .then((ret) => { scope.paragraphs[name] = ret; });
     }
 
@@ -351,7 +351,7 @@ export class Service {
     ) {
         var _self = this;
 
-        var sectionVersion : RISectionVersion = new RISectionVersion(_self.adhPreliminaryNames);
+        var sectionVersion : RISectionVersion = new RISectionVersion({preliminaryNames: _self.adhPreliminaryNames});
         sectionVersion.data["adhocracy.sheets.document.ISection"] = {
             title : "single section",
             elements : [],
@@ -406,7 +406,7 @@ export class Service {
     ) {
         var _self = this;
 
-        var sectionVersion : RISectionVersion = new RISectionVersion(_self.adhPreliminaryNames);
+        var sectionVersion : RISectionVersion = new RISectionVersion({preliminaryNames: _self.adhPreliminaryNames});
         sectionVersion.data["adhocracy.sheets.document.ISection"] = {
             title : "single_section",
             elements : [],
@@ -430,12 +430,14 @@ export class Service {
             .withTransaction((transaction) : ng.IPromise<Resources.Content<any>> => {
                 // items
                 var postProposal : AdhHttp.ITransactionResult =
-                    transaction.post(poolPath, new RIProposal(_self.adhPreliminaryNames, name));
+                    transaction.post(poolPath, new RIProposal({preliminaryNames: _self.adhPreliminaryNames, name: name}));
                 var postSection : AdhHttp.ITransactionResult =
-                    transaction.post(postProposal.path, new RISection(_self.adhPreliminaryNames, "section"));
+                    transaction.post(postProposal.path, new RISection({preliminaryNames: _self.adhPreliminaryNames, name: "section"}));
                 var postParagraphs : AdhHttp.ITransactionResult[] =
                     paragraphVersions.map((paragraphVersion, i) =>
-                        transaction.post(postProposal.path, new RIParagraph(_self.adhPreliminaryNames, "paragraph" + i)));
+                        transaction.post(
+                            postProposal.path,
+                            new RIParagraph({preliminaryNames: _self.adhPreliminaryNames, name: "paragraph" + i})));
 
                 // versions
                 var postParagraphVersions = paragraphVersions.map((paragraphVersion, i) => {

@@ -311,28 +311,65 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
     var mkConstructor = (tab : string) => {
         var os : string[] = [];
 
-        var args : string[] = [];
+        // we use reqArgs, optArgs, and lines to group semantically
+        // close constructor arguments and code lines.
+        //
+        // `{ [key : string] : string }` cannot be used with object
+        // attribute syntax, so we type the args dictionaries as
+        // `any`.
+        var reqArgs : any = {};
+        var optArgs : any = {};
         var lines : string[] = [];
 
-        args.push("preliminaryNames : PreliminaryNames");
-        lines.push("    _self.path = preliminaryNames.nextPreliminary();");
+        reqArgs.preliminaryNames = "PreliminaryNames";
 
+        // resource path is either optional arg or (if n/a)
+        // preliminary name.
+        optArgs.path = "string";
+        lines.push("    if (args.hasOwnProperty(\"path\")) {");
+        lines.push("        _self.path = args.path;");
+        lines.push("    } else {");
+        lines.push("        _self.path = args.preliminaryNames.nextPreliminary();");
+        lines.push("    }");
+
+        // first_version_path is set to a preliminary name iff
+        // iversions sheet is present.
         if (resource.sheets.indexOf("adhocracy.sheets.versions.IVersions") !== -1) {
-            lines.push("    _self.first_version_path = preliminaryNames.nextPreliminary();");
+            lines.push("    _self.first_version_path = args.preliminaryNames.nextPreliminary();");
         } else {
             lines.push("    _self.first_version_path = undefined;");
         }
 
+        // root_versions is empty.
         lines.push("    _self.root_versions = [];");
 
+        // if IName sheet is present, allow to set name in
+        // constructor (optional arg).
         if (resource.sheets.indexOf("adhocracy.sheets.name.IName") !== -1) {
-            args.push("name ?: string");
-            lines.push("    if (typeof name !== 'undefined') {");
-            lines.push("        _self.data[\"adhocracy.sheets.name.IName\"] = { name: name };");
+            optArgs.name = "string";
+            lines.push("    if (args.hasOwnProperty(\"name\")) {");
+            lines.push("        _self.data[\"adhocracy.sheets.name.IName\"] = { name: args.name };");
             lines.push("    }");
         }
 
-        os.push("constructor(" + Util.intercalate(args, ", ") + ") {");
+        // construct optargs
+        var args : string[] = [];
+        (() => {
+            var x;
+            for (x in reqArgs) {
+                if (reqArgs.hasOwnProperty(x)) {
+                    args.push(x + " : " + reqArgs[x]);
+                }
+            }
+            for (x in optArgs) {
+                if (optArgs.hasOwnProperty(x)) {
+                    args.push(x + " ?: " + optArgs[x]);
+                }
+            }
+        })();
+
+        // construct constructor function code.
+        os.push("constructor(args : { " + Util.intercalate(args, "; ") + " }) {");
         os.push("    super(\"" + modulePath + "\");");
         os.push("    var _self = this;");
         lines.forEach((line) => os.push(line));

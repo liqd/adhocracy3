@@ -35,14 +35,14 @@ export var register = (angular, config, meta_api) => {
 
             var cb = (transaction : any) : ng.IPromise<void> => {
                 var proposal : AdhHttp.ITransactionResult =
-                    transaction.post(poolPath, new RIProposal(adhPreliminaryNames, proposalName));
+                    transaction.post(poolPath, new RIProposal({preliminaryNames: adhPreliminaryNames, name: proposalName}));
                 var section : AdhHttp.ITransactionResult =
-                    transaction.post(proposal.path, new RISection(adhPreliminaryNames, "Motivation"));
+                    transaction.post(proposal.path, new RISection({preliminaryNames: adhPreliminaryNames, name : "Motivation"}));
 
-                var sectionVersionResource = new RISectionVersion(adhPreliminaryNames);
+                var sectionVersionResource = new RISectionVersion({preliminaryNames: adhPreliminaryNames});
                 var sectionVersion : AdhHttp.ITransactionResult = transaction.post(section.path, sectionVersionResource);
 
-                var proposalVersionResource = new RIProposalVersion(adhPreliminaryNames);
+                var proposalVersionResource = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
                 proposalVersionResource.data["adhocracy.sheets.document.IDocument"] = {
                     title: proposalName,
                     description: "whoof",

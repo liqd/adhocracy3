@@ -81,7 +81,7 @@ export class CommentCreate {
                     _self.adapter.content(resource, $scope.content);
                     _self.adapter.refersTo(resource, $scope.refersTo);
 
-                    var comment = new RIComment(adhPreliminaryNames, "comment");
+                    var comment = new RIComment({preliminaryNames: adhPreliminaryNames, name: "comment"});
 
                     return adhHttp.postToPool($scope.poolPath, comment)
                         .then(adhHttp.resolve.bind(adhHttp), displayErrors)
