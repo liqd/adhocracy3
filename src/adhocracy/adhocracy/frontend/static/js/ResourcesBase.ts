@@ -11,4 +11,15 @@ export class Resource {
     constructor(public content_type: string) {
         this.data = {};
     }
+
+    public getReferences() : string[] {
+        throw "not implemented";
+
+        /*
+
+           FIXME: traverse all sheets in the resource, call getMeta
+           on each, and compute the union of all references.
+
+         */
+    }
 }
