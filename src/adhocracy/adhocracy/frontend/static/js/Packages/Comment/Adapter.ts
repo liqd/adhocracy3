@@ -6,7 +6,7 @@ import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/Preliminar
 
 export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
     create(adhPreliminaryNames : AdhPreliminaryNames) : RICommentVersion {
-        var resource = new RICommentVersion(adhPreliminaryNames);
+        var resource = new RICommentVersion({preliminaryNames: adhPreliminaryNames});
         resource.data["adhocracy_sample.sheets.comment.IComment"] = {
             refers_to: null,
             content: null
