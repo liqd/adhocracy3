@@ -21,7 +21,7 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
     public elemRefs(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
-        // The backend sends all versions that refere to container. So we need
+        // The backend sends all versions that refer to container. So we need
         // to find out which ones are most recent ourselves.
 
         var refs : string[] = container.data["adhocracy_sample.sheets.comment.ICommentable"].comments;
