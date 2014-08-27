@@ -2,6 +2,7 @@
 /// <reference path="../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../lib/DefinitelyTyped/modernizr/modernizr.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/moment/moment.d.ts"/>
 /// <reference path="./_all.d.ts"/>
 
 import angular = require("angular");
@@ -14,6 +15,7 @@ import angularRoute = require("angularRoute");  if (angularRoute) { return; };
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { return; };
 
 import modernizr = require("modernizr");
+import moment = require("moment");
 
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhHttp = require("./Packages/Http/Http");
@@ -77,6 +79,7 @@ export var init = (config, meta_api) => {
     }]);
 
     app.value("Modernizr", modernizr);
+    app.value("moment", moment);
 
     app.service("adhProposal", AdhProposal.Service);
     app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
