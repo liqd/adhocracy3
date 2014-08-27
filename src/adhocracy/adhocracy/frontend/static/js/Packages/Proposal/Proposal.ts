@@ -497,7 +497,7 @@ export class Service {
                         transaction.post(postProposal.path, new RIParagraph(_self.adhPreliminaryNames, "paragraph" + i)));
 
                 // versions
-                paragraphVersions.map((paragraphVersion, i) => {
+                var postParagraphVersions = paragraphVersions.map((paragraphVersion, i) => {
                     paragraphVersion.data["adhocracy.sheets.versions.IVersionable"] = {
                         follows: [postParagraphs[i].first_version_path],
                         followed_by: []
@@ -509,12 +509,14 @@ export class Service {
                     follows: [postSection.first_version_path],
                     followed_by: []
                 };
-                transaction.post(postSection.path, sectionVersion);
+                sectionVersion.data["adhocracy.sheets.document.ISection"].elements = postParagraphVersions.map((p) => p.path);
+                var postSectionVersion = transaction.post(postSection.path, sectionVersion);
 
                 proposalVersion.data["adhocracy.sheets.versions.IVersionable"] = {
                     follows: [postProposal.first_version_path],
                     followed_by: []
                 };
+                proposalVersion.data["adhocracy.sheets.document.IDocument"].elements = [postSectionVersion.path];
                 var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
 
                 return transaction.commit()
