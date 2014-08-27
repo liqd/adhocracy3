@@ -203,7 +203,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
     var mkGetMeta = () => {
         var s = "";
         s += "    public getMeta() : Base.ISheetMetaApi {\n";
-        s += "        throw \"not implemented\";\n";
+        s += "        return _meta;\n";
         s += "    }\n";
         return s;
     };
@@ -274,6 +274,22 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
         s += "    }\n";
         return s;
     };
+
+    var showList = (elems : string[]) : string => {
+        if (elems.length === 0) {
+            return "[]";
+        } else {
+            return "[\"" + Util.intercalate(elems, "\", \"") + "\"]";
+        }
+    };
+
+    sheetI += "var _meta : Base.ISheetMetaApi = {\n";
+    sheetI += "    readable: " + showList(sheetMetaApi.readable) + ",\n";
+    sheetI += "    editable: " + showList(sheetMetaApi.editable) + ",\n";
+    sheetI += "    creatable: " + showList(sheetMetaApi.creatable) + ",\n";
+    sheetI += "    create_mandatory: " + showList(sheetMetaApi.create_mandatory) + ",\n";
+    sheetI += "    references: " + showList(sheetMetaApi.references) + "\n";
+    sheetI += "};\n\n";
 
     sheetI += "export class " + mkSheetName(sheet.nick) + " implements Base.ISheet {\n";
     sheetI += mkGetMeta() + "\n";
