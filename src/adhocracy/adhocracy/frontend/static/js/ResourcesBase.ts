@@ -1,3 +1,20 @@
+export interface ISheetMetaApi {
+    // meta api flags
+    readable : string[];
+    editable : string[];
+    creatable : string[];
+    create_mandatory : string[];
+
+    // computed information
+    references : string[];
+}
+
+
+export interface ISheet {
+    getMeta() : ISheetMetaApi;
+}
+
+
 export class Resource {
     public data : Object;
 
