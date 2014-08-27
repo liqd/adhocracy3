@@ -63,6 +63,15 @@ export var importContent = <Content extends Resources.Content<any>>(response : {
 
 /**
  * transform batch request response into Content array
+ *
+ * NOTE: The single batched http requests listed in the response array
+ * of the batch request confusingly call the response body 'body',
+ * while $http calls it 'data'.  `logBackendBatchError` and
+ * `importBatchContent` are (the only two) places where this requires
+ * writing a few lines of awkward code.  Fixing it would require
+ * changes to /docs/source/rest_api.rst, backend, and these two
+ * functions simultaneously and has not been deemed worthwhile so
+ * far.
  */
 export var importBatchContent = <Content extends Resources.Content<any>>(responses : { data : {body : Content}[] }) : Content[] => {
     // FIXME: description files don't appear to support array-typed

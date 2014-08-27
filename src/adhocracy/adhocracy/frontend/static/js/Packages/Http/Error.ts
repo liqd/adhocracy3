@@ -43,6 +43,8 @@ export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendErro
  * last one are successes.  If this function is called, the error is
  * contained in the last element of the array.  All other elements are
  * ignored by this function.
+ *
+ * NOTE: See documentation of `importBatchContent`.
  */
 export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBackendError[]>) : void => {
     "use strict";
@@ -58,12 +60,6 @@ export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBacken
     console.log(lastBatchItemResponse);
 
     var errors : IBackendErrorItem[] = lastBatchItemResponse.errors;
-
-    // FIXME: In rest_api.rst, we call the response body field 'body',
-    // but $http calls it 'data'.  `logBackendBatchError` and
-    // `importBatchContent` are the only two places where this gets a
-    // little confusing.  It could be fixed in rest_api.rst, the
-    // backend, and then in these two functions.
 
     renderBackendError(errors);
     throw errors;
