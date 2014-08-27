@@ -53,7 +53,7 @@ export var register = (angular, config, meta_api) => {
 
                 return transaction.commit()
                     .then((responses) : ng.IPromise<Resources.Content<any>> => {
-                        var lastTagPath : string = Util.parentPath(responses[proposalVersion.index].path) + "/LAST";
+                        var lastTagPath : string = responses[proposal.index].path + "/LAST";
                         return adhHttp.get(lastTagPath);
                     })
                     .then((lastTag : RITag) => {
