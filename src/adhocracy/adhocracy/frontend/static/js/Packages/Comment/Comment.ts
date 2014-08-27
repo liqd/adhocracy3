@@ -17,6 +17,8 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
     refersTo(resource : T) : string;
     refersTo(resource : T, value : string) : T;
     creator(resource : T) : string;
+    creationDate(resource : T) : string;
+    modificationDate(resource : T) : string;
 }
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
@@ -121,7 +123,9 @@ export class CommentDetail {
                         resource = _resource;
                         $scope.data = {
                             content: _self.adapter.content(resource),
-                            creator: _self.adapter.creator(resource)
+                            creator: _self.adapter.creator(resource),
+                            creationDate: _self.adapter.creationDate(resource),
+                            modificationDate: _self.adapter.modificationDate(resource)
                         };
                     });
                 };
