@@ -467,7 +467,7 @@ export class Service {
 
         var sectionVersion : RISectionVersion = new RISectionVersion(_self.adhPreliminaryNames);
         sectionVersion.data["adhocracy.sheets.document.ISection"] = {
-            title : "single section",
+            title : "single_section",
             elements : [],
             subsections : []
         };
@@ -497,14 +497,27 @@ export class Service {
                         transaction.post(postProposal.path, new RIParagraph(_self.adhPreliminaryNames, "paragraph" + i)));
 
                 // versions
-                paragraphVersions.map((paragraphVersion, i) =>
-                    transaction.post(postParagraphs[i].path, paragraphVersion));
-                transaction.post(postSection.path, sectionVersion);
-                var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
+                var postParagraphVersions = paragraphVersions.map((paragraphVersion, i) => {
+                    paragraphVersion.data["adhocracy.sheets.versions.IVersionable"] = {
+                        follows: [postParagraphs[i].first_version_path],
+                        followed_by: []
+                    };
+                    return transaction.post(postParagraphs[i].path, paragraphVersion);
+                });
 
-                // FIXME: use first_version_paths properly (i don't
-                // think that was done right in the old, non-batch
-                // version of this function either).
+                sectionVersion.data["adhocracy.sheets.versions.IVersionable"] = {
+                    follows: [postSection.first_version_path],
+                    followed_by: []
+                };
+                sectionVersion.data["adhocracy.sheets.document.ISection"].elements = postParagraphVersions.map((p) => p.path);
+                var postSectionVersion = transaction.post(postSection.path, sectionVersion);
+
+                proposalVersion.data["adhocracy.sheets.versions.IVersionable"] = {
+                    follows: [postProposal.first_version_path],
+                    followed_by: []
+                };
+                proposalVersion.data["adhocracy.sheets.document.IDocument"].elements = [postSectionVersion.path];
+                var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
 
                 return transaction.commit()
                     .then((responses) : Resources.Content<any> => {
@@ -520,7 +533,7 @@ export class Service {
     // keep both of them in the code for reference for now.  They need
     // to be cleaned up together once the high-level api is stable.
     public postProposalWithParagraphs(p, v, pvs) {
-        return this.postProposalWithParagraphsOld(p, v, pvs);
-        // return this.postProposalWithParagraphsBatched(p, v, pvs);
+        // return this.postProposalWithParagraphsOld(p, v, pvs);
+        return this.postProposalWithParagraphsBatched(p, v, pvs);
     }
 };
