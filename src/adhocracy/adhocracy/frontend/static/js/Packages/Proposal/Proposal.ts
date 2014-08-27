@@ -271,17 +271,17 @@ export class Service {
         private $q : ng.IQService
     ) {}
 
-    private postProposal(path : string, name : string, scope : {proposal? : any}) : ng.IPromise<void> {
+    private postProposal(path : string, name : string, scope : {proposal ?: any}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new RIProposal({preliminaryNames: this.adhPreliminaryNames, name: name}))
             .then((ret) => { scope.proposal = ret; });
     }
 
-    private postSection(path : string, name : string, scope : {section? : any}) : ng.IPromise<void> {
+    private postSection(path : string, name : string, scope : {section ?: any}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new RISection({preliminaryNames: this.adhPreliminaryNames, name: name}))
             .then((ret) => { scope.section = ret; });
     }
 
-    private postParagraph(path : string, name : string, scope : {paragraphs}) : ng.IPromise<void> {
+    private postParagraph(path : string, name : string, scope : {paragraphs ?: any}) : ng.IPromise<void> {
         return this.adhHttp.postToPool(path, new RIParagraph({preliminaryNames: this.adhPreliminaryNames, name: name}))
             .then((ret) => { scope.paragraphs[name] = ret; });
     }
