@@ -5,7 +5,7 @@ export class Resource {
     /* tslint:disable:variable-name */
     public path : string;
     public first_version_path : string;
-    public root_versions : string;
+    public root_versions : string[];
     /* tslint:enable:variable-name */
 
     constructor(public content_type: string) {

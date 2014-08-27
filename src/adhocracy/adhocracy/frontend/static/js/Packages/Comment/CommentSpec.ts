@@ -3,6 +3,7 @@
 import q = require("q");
 
 import AdhComment = require("./Comment");
+import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
 
 var RESOURCE = {
     path: "path",
@@ -105,8 +106,8 @@ export var register = () => {
                             refersTo: "refersTo"
                         };
 
-                        var controller = <any>directive.controller[2];
-                        controller(scopeMock, adhHttpMock);
+                        var controller = <any>directive.controller[3];
+                        controller(scopeMock, adhHttpMock, new AdhPreliminaryNames());
                     });
 
                     describe("create", () => {

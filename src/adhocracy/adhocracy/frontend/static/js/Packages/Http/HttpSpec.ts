@@ -306,7 +306,7 @@ export var register = () => {
 
                 beforeEach(() => {
                     origConsoleLog = console.log;
-                    spyOn(console, 'log').and.callThrough();
+                    spyOn(console, "log").and.callThrough();
                 });
 
                 it("always throws an exception", () => {
@@ -345,7 +345,7 @@ export var register = () => {
 
                 afterEach(() => {
                     console.log = origConsoleLog;
-                })
+                });
             });
         };
 
