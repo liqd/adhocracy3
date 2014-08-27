@@ -37,7 +37,7 @@ class TestItemIntegrationTest(unittest.TestCase):
         config.include('adhocracy.resources.itemversion')
         config.include('adhocracy.resources.item')
         config.include('adhocracy.resources.tag')
-        config.include('adhocracy.subscriber')
+        config.include('adhocracy.resources.subscriber')
         self.config = config
         self.context = create_pool_with_graph()
         self.objectmap = self.context.__objectmap__
@@ -89,7 +89,8 @@ class TestItemIntegrationTest(unittest.TestCase):
         """
         from adhocracy.sheets.tags import ITag as ITagS
         self.config.include('adhocracy.sheets.versions')
-        self.config.include('adhocracy.subscriber')
+        self.config.include('adhocracy.events')
+        self.config.include('adhocracy.resources.subscriber')
         item = self.make_one()
         version0 = item['VERSION_0000000']
 

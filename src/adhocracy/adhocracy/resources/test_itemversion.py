@@ -17,6 +17,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         config.include('adhocracy.events')
         config.include('adhocracy.sheets')
         config.include('adhocracy.resources.itemversion')
+        config.include('adhocracy.resources.subscriber')
         self.config = config
         self.context = create_pool_with_graph()
         self.objectmap = self.context.__objectmap__
@@ -25,7 +26,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _make_one(self, root_versions=[], follows=[], appstructs={}, creator=None):
+    def _make_one(self, follows=[], appstructs={}, creator=None):
         from adhocracy.sheets.versions import IVersionable
         parent = self.context
         follow = {IVersionable.__identifier__: {'follows': follows}}
@@ -36,7 +37,6 @@ class ItemVersionIntegrationTest(unittest.TestCase):
             parent=parent,
             appstructs=appstructs,
             creator=creator,
-            root_versions=root_versions,
             registry=self.config.registry)
         return itemversion
 
@@ -77,34 +77,22 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         assert events[0].creator == creator
 
     def test_autoupdate_with_referencing_items(self):
-        # for more tests see adhocracy.subscriber
+        # for more tests see adhocracy.resources.subscriber
         from adhocracy.sheets.document import ISection
         from adhocracy.resources.itemversion import itemversion_metadata
         from adhocracy.resources import add_resource_type_to_registry
-        from adhocracy.interfaces import NewVersionToOldVersion
+        from adhocracy.sheets.versions import IVersionable
+        from adhocracy.utils import get_sheet
         self.config.include('adhocracy.sheets.document')
-        self.config.include('adhocracy.subscriber')
-
+        self.config.include('adhocracy.sheets.versions')
         metadata = itemversion_metadata._replace(extended_sheets=[ISection])
         add_resource_type_to_registry(metadata, self.config)
+        referenced_v0 = self._make_one()
+        referenceing_v0 = self._make_one(appstructs={ISection.__identifier__:
+                                                     {'subsections': [referenced_v0]}})
 
-        child_v0 = self._make_one()
-        appstructs = {ISection.__identifier__: {'subsections': [child_v0]}}
-        root_v0 = self._make_one(appstructs=appstructs)
-        child_v1 = self._make_one(follows=[child_v0], root_versions=[root_v0])
-        root_v0_followed_by = list(self.graph.get_back_references(root_v0,
-                                                                  base_reftype=NewVersionToOldVersion))
-        assert len(root_v0_followed_by) == 2
+        referenced_v1 = self._make_one(follows=[referenced_v0])
 
-
-class IncludemeIntegrationTest(unittest.TestCase):
-
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy.registry')
-        self.config.include('adhocracy.resources.itemversion')
-
-    def tearDown(self):
-        testing.tearDown()
-
+        referencing_v0_versions = get_sheet(referenceing_v0, IVersionable).get()
+        assert len(referencing_v0_versions['followed_by']) == 1
 
