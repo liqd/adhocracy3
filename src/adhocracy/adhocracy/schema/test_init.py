@@ -90,6 +90,16 @@ class NameUnitTest(unittest.TestCase):
         with pytest.raises(colander.Invalid):
             inst.validator(inst, '@@')
 
+    def test_invalid_asdict_output(self):
+        """Test case added since we had a bug here."""
+        inst = self._make_one()
+        try:
+            inst.validator(inst, 'ä')
+            assert False
+        except colander.Invalid as err:
+            wanted = {'': 'String does not match expected pattern'}
+            assert err.asdict() == wanted
+
 
 class EmailUnitTest(unittest.TestCase):
 
