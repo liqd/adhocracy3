@@ -11,7 +11,7 @@
     <div class="comment-meta" data-ng-if="data">
         Created: <adh-time data-datetime="{{data.creationDate}}"></adh-time>
         Modified: <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
-        By: <adh-user-meta data-path="{{data.creator}}"</adh-user-meta>
+        By: <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
         Replies: {{data.commentCount}}
     </div>
     <a href="" data-ng-switch-when="edit" data-ng-click="save()">Save</a>
