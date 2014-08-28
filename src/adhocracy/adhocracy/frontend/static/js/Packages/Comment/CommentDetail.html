@@ -36,20 +36,16 @@
         <span class="comment-count">{{data.commentCount}} <!-- bubble --></span>
     </div>
 
-    <adh-comment-listing data-path="{{path}}">
-        <div data-ng-switch="transclusionId">
-            <adh-comment-create
-                data-refers-to="{{path}}"
-                data-pool-path="{{poolPath}}"
-                data-on-new="onCreate"
-                data-on-cancel="hideCreateForm"
-                data-ng-switch-when="create-form-id">
-            </adh-comment-create>
-            <adh-comment-detail
-                data-path="element"
-                data-viemode="'list'"
-                data-ng-switch-when="element-id">
-            </adh-comment-detail>
-        </div>
-    </adh-comment-listing>
+    <div class="comment-children">
+        <adh-comment-create
+            data-ng-if="showCreateForm"
+            data-refers-to="{{path}}"
+            data-pool-path="{{data.poolPath}}">
+        </adh-comment-create>
+        <adh-comment-detail
+            data-ng-repeat="comment in data.comments"
+            data-path="comment"
+            data-viemode="'list'">
+        </adh-comment-detail>
+    </div>
 </div>
