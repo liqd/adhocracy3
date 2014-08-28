@@ -8,7 +8,8 @@ require.config({
         angularAnimate: "../lib/angular-animate/angular-animate",
         lodash: "../lib/lodash/dist/lodash",
         q: "../lib/q/q",
-        modernizr: "../lib2/modernizr/modernizr-2.8.3.min"
+        modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
+        moment: "../lib/moment/moment"
     },
     shim: {
         jquery: {
