@@ -23,7 +23,7 @@ export var register = () => {
             };
 
             adapterMock = <any>jasmine.createSpyObj("adapterMock", ["create", "content", "refersTo", "creator", "creationDate",
-                "modificationDate"]);
+                "modificationDate", "commentCount"]);
 
             adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["postToPool", "resolve", "postNewVersion", "getNewestVersionPath"]);
             adhHttpMock.postToPool.and.returnValue(q.when(RESOURCE));
@@ -161,6 +161,7 @@ export var register = () => {
                     var creator = "creator";
                     var creationDate = "creationDate";
                     var modificationDate = "modificationDate";
+                    var commentCount = 2;
 
                     beforeEach((done) => {
                         scopeMock = {
@@ -172,6 +173,7 @@ export var register = () => {
                         adapterMock.creator.and.returnValue(creator);
                         adapterMock.creationDate.and.returnValue(creationDate);
                         adapterMock.modificationDate.and.returnValue(modificationDate);
+                        adapterMock.commentCount.and.returnValue(commentCount);
 
                         var controller = <any>directive.controller[3];
                         controller(scopeMock, adhHttpMock, done);
@@ -182,6 +184,7 @@ export var register = () => {
                         expect(scopeMock.data.creator).toBe(creator);
                         expect(scopeMock.data.creationDate).toBe(creationDate);
                         expect(scopeMock.data.modificationDate).toBe(modificationDate);
+                        expect(scopeMock.data.commentCount).toBe(commentCount);
                     });
 
                     describe("edit", () => {

@@ -19,26 +19,12 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
     creator(resource : T) : string;
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;
+    commentCount(resource : T) : number;
 }
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
     public elemRefs(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
-        // The backend sends all versions that refere to container. So we need
-        // to find out which ones are most recent ourselves.
-
-        var refs : string[] = container.data["adhocracy_sample.sheets.comment.ICommentable"].comments;
-        var latestVersions : string[] = [];
-        var lastCommentPath : string = undefined;
-
-        Util.deepcp(refs).sort().reverse().forEach((versionPath : string) => {
-            var commentPath = Util.parentPath(versionPath);
-            if (commentPath !== lastCommentPath) {
-                latestVersions.push(versionPath);
-                lastCommentPath = commentPath;
-            }
-        });
-
-        return latestVersions;
+        return Util.latestVersionsOnly(container.data["adhocracy_sample.sheets.comment.ICommentable"].comments);
     }
 
     public poolPath(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
@@ -125,7 +111,8 @@ export class CommentDetail {
                             content: _self.adapter.content(resource),
                             creator: _self.adapter.creator(resource),
                             creationDate: _self.adapter.creationDate(resource),
-                            modificationDate: _self.adapter.modificationDate(resource)
+                            modificationDate: _self.adapter.modificationDate(resource),
+                            commentCount: _self.adapter.commentCount(resource)
                         };
                     });
                 };

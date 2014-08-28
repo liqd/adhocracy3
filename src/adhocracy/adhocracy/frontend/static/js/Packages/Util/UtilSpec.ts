@@ -272,5 +272,36 @@ export var register = () => {
                 expect(Util.escapeNgExp("You, me & 'the thing'")).toBe("'You, me & \\'the thing\\''");
             });
         });
+
+        describe("latestVersionsOnly", () => {
+            var testCase = [
+                "/asd/version2",
+                "/asd/version3",
+                "/foo/version1",
+                "/bar/version1",
+                "/asd/version1",
+                "/foo/version2"
+            ];
+
+            it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
+                var result = Util.latestVersionsOnly(testCase);
+                expect(result).toContain("/asd/version3");
+                expect(result).toContain("/foo/version2");
+                expect(result).toContain("/bar/version1");
+                expect(result.length).toBe(3);
+            });
+
+            it("does not alter the input list", () => {
+                Util.latestVersionsOnly(testCase);
+                expect(testCase).toEqual([
+                    "/asd/version2",
+                    "/asd/version3",
+                    "/foo/version1",
+                    "/bar/version1",
+                    "/asd/version1",
+                    "/foo/version2"
+                ]);
+            });
+        });
     });
 };

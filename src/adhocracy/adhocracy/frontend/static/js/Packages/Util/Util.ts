@@ -205,3 +205,23 @@ export function escapeNgExp(s : string) {
     "use strict";
     return "'" + s.replace(/'/g, "\\'") + "'";
 }
+
+/**
+ * Filter a list of version paths to only contain the latests versions for each item.
+ */
+export function latestVersionsOnly(refs : string[]) : string[] {
+    "use strict";
+
+    var latestVersions : string[] = [];
+    var lastCommentPath : string = undefined;
+
+    deepcp(refs).sort().reverse().forEach((versionPath : string) => {
+        var commentPath = parentPath(versionPath);
+        if (commentPath !== lastCommentPath) {
+            latestVersions.push(versionPath);
+            lastCommentPath = commentPath;
+        }
+    });
+
+    return latestVersions;
+};

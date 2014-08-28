@@ -19,6 +19,9 @@ export var register = () => {
                         creator: "creator",
                         item_creation_date: "creationDate",
                         modification_date: "modificationDate"
+                    },
+                    "adhocracy_sample.sheets.comment.ICommentable": {
+                        comments: ["foo/VERSION_0000001", "bar/VERSION_0000001"]
                     }
                 }
             };
@@ -82,6 +85,19 @@ export var register = () => {
         describe("modificationDate", () => {
             it("gets modificationDate from adhocracy.sheets.metadata.IMetadata", () => {
                 expect(adapter.modificationDate(resource)).toBe("modificationDate");
+            });
+        });
+
+        describe("commentCount", () => {
+            it("gets commentCount from adhocracy_sample.sheets.comment.ICommentable", () => {
+                expect(adapter.commentCount(resource)).toBe(2);
+            });
+            it("does not count multiple versions of the same item", () => {
+                resource.data["adhocracy_sample.sheets.comment.ICommentable"].comments = [
+                    "foo/VERSION_0000001",
+                    "foo/VERSION_0000002"
+                ];
+                expect(adapter.commentCount(resource)).toBe(1);
             });
         });
     });
