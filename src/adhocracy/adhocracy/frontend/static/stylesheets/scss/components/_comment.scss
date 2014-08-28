@@ -1,0 +1,52 @@
+/*doc
+---
+title: Discussion Header
+name: discussion-header
+category: Widgets
+---
+
+This widget appears at the top of a discussion and contains the main meta data
+about it.
+
+```html_example
+<div class="discussion-header">
+    <span class="discussion-header-icon placeholder">icon</span>
+    <div class="discussion-header-column2">4</div>
+    <div class="discussion-header-column1">
+        <div class="discussion-header-creator">guest</div>
+        <div class="discussion-header-date">5 minutes ago</div>
+    </div>
+</div>
+```
+*/
+.discussion-header {
+    background: $color-structure-surface;
+    padding: 0.5em;
+    @include clearfix;
+    @include text(meta);
+
+    .discussion-header-icon {
+        @include inline-block;
+        height: 2em;
+        min-height: 2em !important;
+    }
+
+    .discussion-header-creator,
+    .discussion-header-date {
+        a, a:hover, a:focus, a:active {
+            color: inherit;
+            text-decoration: inherit;
+        }
+    }
+
+    .discussion-header-column2 {
+        font-size: 200%;
+    }
+
+    .discussion-header-column1,
+    .discussion-header-column2 {
+        float: right;
+        @include text-align(right);
+        margin-left: 0.5em;
+    }
+}

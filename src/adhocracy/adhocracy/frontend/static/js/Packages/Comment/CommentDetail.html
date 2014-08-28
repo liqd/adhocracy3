@@ -1,14 +1,18 @@
 <div class="comment" data-ng-switch="viewmode" data-ng-if="data">
     <div class="discussion-header">
-        <!-- Circle with bubble -->
-        <span class="discussion-header-creator">
-            <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
-        </span>
-        <span class="discussion-header-date">
-            <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
-        </span>
-        <!-- Bubble -->
-        {{data.commentCount}}
+        <span class="discussion-header-icon placeholder">icon</span>
+        <div class="discussion-header-column2">
+            <!-- Bubble -->
+            {{data.commentCount}}
+        </div>
+        <div class="discussion-header-column1">
+            <div class="discussion-header-creator">
+                <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
+            </div>
+            <div class="discussion-header-date">
+                <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
+            </div>
+        </div>
     </div>
 
     <div class="comment-title">
