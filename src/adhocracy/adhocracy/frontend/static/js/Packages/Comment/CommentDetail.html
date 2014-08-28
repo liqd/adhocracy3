@@ -8,6 +8,11 @@
         <textarea data-ng-switch-when="edit" data-ng-model="data.content"></textarea>
         <div data-ng-switch-default="">{{data.content}}</div>
     </div>
+    <div class="comment-meta" data-ng-if="data">
+        Created: <adh-time data-datetime="{{data.creationDate}}"></adh-time>
+        Modified: <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
+        By: <adh-user-meta data-path="{{data.creator}}"</adh-user-meta>
+    </div>
     <a href="" data-ng-switch-when="edit" data-ng-click="save()">Save</a>
     <a href="" data-ng-switch-when="edit" data-ng-click="cancel()">Cancel</a>
     <a href="" data-ng-switch-default="" data-ng-click="edit()">Edit</a>
