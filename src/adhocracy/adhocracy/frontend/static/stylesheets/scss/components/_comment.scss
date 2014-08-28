@@ -1,8 +1,145 @@
 /*doc
 ---
+title: Comment
+name: comment
+category: Widgets
+---
+
+A comment widget consists of a comment-main widget and a list of child
+comments (replies). There is a form for creating new replies.
+Top-level comments also contain a discussion-header widget at the top.
+
+```html_example
+<div class="comment">
+    <div class="discussion-header placeholder">Discussion Header</div>
+
+    <div class="comment-main placeholder">Comment Main</div>
+
+    <div class="comment-children-create-form placeholder">
+        Comment Create Form
+    </div>
+
+
+    <div class="comment-children">
+        <div class="comment">
+            <div class="discussion-header placeholder">Discussion Header</div>
+
+            <div class="comment-main placeholder">Comment Main</div>
+
+            <div class="comment-children">
+            </div>
+        </div>
+        <div class="comment">
+            <div class="discussion-header placeholder">Discussion Header</div>
+
+            <div class="comment-main placeholder">Comment Main</div>
+
+            <div class="comment-children-create-form placeholder">
+                Comment Create Form
+            </div>
+
+            <div class="comment-children"></div>
+        </div>
+    </div>
+</div>
+<div class="comment">
+    <div class="discussion-header placeholder">Discussion Header</div>
+
+    <div class="comment-main placeholder">Comment Main</div>
+
+    <div class="comment-children"></div>
+</div>
+```
+*/
+.comment-children {
+    margin-top: 2em;
+    margin-left: 3em;
+    border-left: 2px solid $color-structure-border;
+
+    .discussion-header {
+        display: none;
+    }
+
+    .comment {
+        margin-left: -2px;
+    }
+}
+
+.comment {
+    margin-bottom: 2em;
+    border-left: 2px solid $color-structure-border;
+
+    &:hover {
+        border-color: $color-highlight-normal;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.comment-main,
+.comment-children-create-form {
+    margin-top: 1em;
+    padding-left: 0.5em;
+}
+
+/*doc
+---
+title: Comment Main
+name: comment-main
+parent: comment
+---
+
+```html_example
+<div class="comment-main">
+    <div class="comment-title">Willy Wonka</div>
+    <div class="comment-content">
+        I like chocolate. I want more chocolate. Chocolate.
+    </div>
+    <div class="comment-meta">
+        5 minutes ago
+        <a href="">Edit</a>
+        <a href="">Add Comment</a>
+        <span class="comment-count">3 <!-- bubble --></span>
+    </div>
+</div>
+```
+*/
+.comment-content {
+    margin: 0.5em 0;
+}
+
+.comment-title,
+.comment-meta {
+    @include text(meta);
+}
+
+.comment-title {
+    a, a:hover, a:focus, a:active {
+        color: inherit;
+        text-decoration: inherit;
+    }
+}
+
+.comment-meta {
+    a {
+        color: $color-secondary-extrovert;
+        font-weight: bold;
+        text-transform: lowercase;
+        text-decoration: none;
+
+        &:hover, &:focus, &:active {
+            color: darken($color-secondary-extrovert, 10%);
+        }
+    }
+}
+
+/*doc
+---
 title: Discussion Header
 name: discussion-header
-category: Widgets
+parent: comment
 ---
 
 This widget appears at the top of a discussion and contains the main meta data
@@ -21,6 +158,7 @@ about it.
 */
 .discussion-header {
     background: $color-structure-surface;
+    margin-bottom: 1em;
     padding: 0.5em;
     @include clearfix;
     @include text(meta);
@@ -51,6 +189,19 @@ about it.
     }
 }
 
-.comment-children {
-    margin-left: 2.5em;
-}
+
+/*doc
+---
+title: Comment Create Form
+name: comment-create-form
+parent: comment
+---
+
+```html_example
+<form class="comment-create-form">
+    <textarea></textarea>
+    <input type="submit" value="create" />
+    <a href="">Cancel</a>
+</form>
+```
+*/

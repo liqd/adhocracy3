@@ -15,35 +15,39 @@
         </div>
     </div>
 
-    <div class="comment-title">
-        <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
-    </div>
-    <div data-ng-switch-when="edit">
-        <div class="form-error" data-ng-repeat="error in errors">
-            <p>{{error}}</p>
+    <div class="comment-main">
+        <div class="comment-title">
+            <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
+        </div>
+        <div data-ng-switch-when="edit">
+            <div class="form-error" data-ng-repeat="error in errors">
+                <p>{{error}}</p>
+            </div>
+        </div>
+        <div class="comment-content">
+            <textarea data-ng-switch-when="edit" data-ng-model="data.content"></textarea>
+            <div data-ng-switch-default="">{{data.content}}</div>
+        </div>
+        <div class="comment-meta">
+            <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
+            <a href="" data-ng-switch-default="" data-ng-click="edit()">Edit</a>
+            <a href="" data-ng-switch-default="" data-ng-click="createComment()">Add Comment</a>
+            <a href="" data-ng-switch-when="edit" data-ng-click="save()">Save</a>
+            <a href="" data-ng-switch-when="edit" data-ng-click="cancel()">Cancel</a>
+            <span class="comment-count">{{data.commentCount}} <!-- bubble --></span>
         </div>
     </div>
-    <div class="comment-content">
-        <textarea data-ng-switch-when="edit" data-ng-model="data.content"></textarea>
-        <div data-ng-switch-default="">{{data.content}}</div>
-    </div>
-    <div class="comment-meta">
-        <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
-        <a href="" data-ng-switch-default="" data-ng-click="edit()">Edit</a>
-        <a href="" data-ng-switch-default="" data-ng-click="createComment()">Add Comment</a>
-        <a href="" data-ng-switch-when="edit" data-ng-click="save()">Save</a>
-        <a href="" data-ng-switch-when="edit" data-ng-click="cancel()">Cancel</a>
-        <span class="comment-count">{{data.commentCount}} <!-- bubble --></span>
-    </div>
 
-    <div class="comment-children">
+    <div class="comment-children-create-form" data-ng-if="show.createForm">
         <adh-comment-create
-            data-ng-if="show.createForm"
             data-refers-to="{{path}}"
             data-pool-path="{{data.poolPath}}"
             data-on-cancel="cancelCreateComment"
             data-on-new="afterCreateComment">
         </adh-comment-create>
+    </div>
+
+    <div class="comment-children">
         <adh-comment-detail
             data-ng-repeat="comment in data.comments"
             data-path="comment">
