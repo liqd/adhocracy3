@@ -5,6 +5,14 @@ import JasmineHelpers = require("./JasmineHelpers");
 
 export var register = () => {
     describe("JasmineHelpers", () => {
+        /**
+         * This isn't strictly speaking a unit test, but rather an integration
+         * test. Instead of mocking the jasmine environment, it tests whether
+         * the custom matcher works within the jasmine environment.
+         *
+         * As this only requires jasmine and nothing else, it nevertheless
+         * uses the unit test format.
+         */
         describe("customMatchers", () => {
             describe("toSetEqual", () => {
 
