@@ -2,12 +2,13 @@ import AdhResource = require("../../Resources");
 import RIComment = require("../../Resources_/adhocracy_sample/resources/comment/IComment");
 
 import AdhConfig = require("../Config/Config");
-import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhListing = require("../Listing/Listing");
 
 var pkgLocation = "/Comment";
 
 
-export interface ICommentAdapter<T extends AdhResource.Content<any>> {
+export interface ICommentAdapter<T extends AdhResource.Content<any>> extends AdhListing.IListingContainerAdapter {
     create(pn : AdhPreliminaryNames) : T;
     content(resource : T) : string;
     content(resource : T, value : string) : T;
@@ -96,7 +97,9 @@ export class CommentDetail {
                             creator: _self.adapter.creator(resource),
                             creationDate: _self.adapter.creationDate(resource),
                             modificationDate: _self.adapter.modificationDate(resource),
-                            commentCount: _self.adapter.commentCount(resource)
+                            commentCount: _self.adapter.commentCount(resource),
+                            comments: _self.adapter.elemRefs(resource),
+                            poolPath: _self.adapter.poolPath(resource)
                         };
                     });
                 };

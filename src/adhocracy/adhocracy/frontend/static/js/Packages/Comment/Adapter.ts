@@ -22,7 +22,7 @@ export class ListingCommentableAdapter implements AdhListing.IListingContainerAd
     }
 }
 
-export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
+export class CommentAdapter extends ListingCommentableAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
     create(adhPreliminaryNames : AdhPreliminaryNames) : RICommentVersion {
         var resource = new RICommentVersion({preliminaryNames: adhPreliminaryNames});
         resource.data["adhocracy_sample.sheets.comment.IComment"] = {

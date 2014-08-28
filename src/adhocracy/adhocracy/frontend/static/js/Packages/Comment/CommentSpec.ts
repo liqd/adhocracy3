@@ -25,7 +25,7 @@ export var register = () => {
             };
 
             adapterMock = <any>jasmine.createSpyObj("adapterMock", ["create", "content", "refersTo", "creator", "creationDate",
-                "modificationDate", "commentCount"]);
+                "modificationDate", "commentCount", "elemRefs", "poolPath"]);
 
             adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["postToPool", "resolve", "postNewVersion", "getNewestVersionPath"]);
             adhHttpMock.postToPool.and.returnValue(q.when(RESOURCE));
@@ -111,6 +111,8 @@ export var register = () => {
                     var creationDate = "creationDate";
                     var modificationDate = "modificationDate";
                     var commentCount = 2;
+                    var elemRefs = ["foo", "bar"];
+                    var poolPath = "poolPath";
 
                     beforeEach((done) => {
                         scopeMock = {
@@ -123,17 +125,33 @@ export var register = () => {
                         adapterMock.creationDate.and.returnValue(creationDate);
                         adapterMock.modificationDate.and.returnValue(modificationDate);
                         adapterMock.commentCount.and.returnValue(commentCount);
+                        adapterMock.elemRefs.and.returnValue(elemRefs);
+                        adapterMock.poolPath.and.returnValue(poolPath);
 
                         var controller = <any>directive.controller[3];
                         controller(scopeMock, adhHttpMock, done);
                     });
 
-                    it("reads content and creator from adapter to scope", () => {
+                    it("reads content from adapter to scope", () => {
                         expect(scopeMock.data.content).toBe(content);
+                    });
+                    it("reads creator from adapter to scope", () => {
                         expect(scopeMock.data.creator).toBe(creator);
+                    });
+                    it("reads creationDate from adapter to scope", () => {
                         expect(scopeMock.data.creationDate).toBe(creationDate);
+                    });
+                    it("reads modificationDate from adapter to scope", () => {
                         expect(scopeMock.data.modificationDate).toBe(modificationDate);
+                    });
+                    it("reads commentCount from adapter to scope", () => {
                         expect(scopeMock.data.commentCount).toBe(commentCount);
+                    });
+                    it("reads comments from adapter to scope", () => {
+                        expect(scopeMock.data.comments).toBe(elemRefs);
+                    });
+                    it("reads poolPath from adapter to scope", () => {
+                        expect(scopeMock.data.poolPath).toBe(poolPath);
                     });
 
                     describe("edit", () => {
