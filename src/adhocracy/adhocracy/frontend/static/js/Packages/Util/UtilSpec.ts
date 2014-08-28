@@ -290,6 +290,18 @@ export var register = () => {
                 expect(result).toContain("/bar/version1");
                 expect(result.length).toBe(3);
             });
+
+            it("does not alter the input list", () => {
+                Util.latestVersionsOnly(testCase);
+                expect(testCase).toEqual([
+                    "/asd/version2",
+                    "/asd/version3",
+                    "/foo/version1",
+                    "/bar/version1",
+                    "/asd/version1",
+                    "/foo/version2"
+                ]);
+            });
         });
     });
 };
