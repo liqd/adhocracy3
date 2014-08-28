@@ -1,8 +1,10 @@
 <div class="comment" data-ng-switch="viewmode" data-ng-if="data">
     <div class="discussion-header">
-        <span class="discussion-header-icon placeholder">icon</span>
+        <span class="discussion-header-icon">
+            <i class="icon-speachbubble-outline"></i>
+        </span>
         <div class="discussion-header-column2">
-            <!-- Bubble -->
+            <i class="icon-speachbubble-outline"></i>
             {{data.commentCount}}
         </div>
         <div class="discussion-header-column1">
@@ -34,7 +36,10 @@
             <a href="" data-ng-switch-default="" data-ng-click="createComment()">Add Comment</a>
             <a href="" data-ng-switch-when="edit" data-ng-click="save()">Save</a>
             <a href="" data-ng-switch-when="edit" data-ng-click="cancel()">Cancel</a>
-            <span class="comment-count">{{data.commentCount}} <!-- bubble --></span>
+            <span class="comment-count">
+                <i class="icon-speachbubble-outline"></i>
+                {{data.commentCount}}
+            </span>
         </div>
     </div>
 

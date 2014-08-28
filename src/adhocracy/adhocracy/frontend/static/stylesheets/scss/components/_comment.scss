@@ -101,7 +101,9 @@ parent: comment
         5 minutes ago
         <a href="">Edit</a>
         <a href="">Add Comment</a>
-        <span class="comment-count">3 <!-- bubble --></span>
+        <span class="comment-count">
+            <i class="icon-speachbubble-outline"></i> 3
+        </span>
     </div>
 </div>
 ```
@@ -147,8 +149,12 @@ about it.
 
 ```html_example
 <div class="discussion-header">
-    <span class="discussion-header-icon placeholder">icon</span>
-    <div class="discussion-header-column2">4</div>
+    <span class="discussion-header-icon">
+        <i class="icon-speachbubble-outline"></i>
+    </span>
+    <div class="discussion-header-column2">
+        <i class="icon-speachbubble-outline"></i> 4
+    </div>
     <div class="discussion-header-column1">
         <div class="discussion-header-creator">guest</div>
         <div class="discussion-header-date">5 minutes ago</div>
@@ -164,9 +170,13 @@ about it.
     @include text(meta);
 
     .discussion-header-icon {
-        @include inline-block;
-        height: 2em;
-        min-height: 2em !important;
+        float: left;
+        font-size: 150%;
+        line-height: 1.333;
+        width: 1.333em;
+        text-align: center;
+        @include border-radius(50%);
+        background: white;
     }
 
     .discussion-header-creator,
