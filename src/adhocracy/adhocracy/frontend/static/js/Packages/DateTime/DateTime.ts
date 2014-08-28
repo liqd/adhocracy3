@@ -2,7 +2,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/moment/moment.d.ts"/>
 
 /**
- * A wrapper around to HTML5's <time> integrating moment.js.
+ * A wrapper around HTML5's <time> integrating moment.js.
  */
 export var createDirective = (moment : MomentStatic, $interval : ng.IIntervalService) => {
     return {
