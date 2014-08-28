@@ -2,15 +2,16 @@
 
 import q = require("q");
 
-import AdhComment = require("./Comment");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
-import JasmineHelpers = require("../../JasmineHelpers");
+
+import AdhComment = require("./Comment");
 
 var RESOURCE = {
     path: "path",
     content_type: "",
     data: {}
 };
+
 
 export var register = () => {
     describe("Comment", () => {
@@ -31,58 +32,6 @@ export var register = () => {
             adhHttpMock.resolve.and.returnValue(q.when(RESOURCE));
             adhHttpMock.postNewVersion.and.returnValue(q.when(RESOURCE));
             adhHttpMock.getNewestVersionPath.and.returnValue(q.when(RESOURCE));
-        });
-
-        describe("ListingCommentableAdapter", () => {
-            var adapter;
-
-            beforeEach(() => {
-                adapter = new AdhComment.ListingCommentableAdapter();
-            });
-
-            describe("elemRefs", () => {
-                var generateResource = () => {
-                    return {
-                        data: {
-                            "adhocracy_sample.sheets.comment.ICommentable": {
-                                comments: [
-                                    "/asd/version2",
-                                    "/asd/version3",
-                                    "/foo/version1",
-                                    "/bar/version1",
-                                    "/asd/version1",
-                                    "/foo/version2"
-                                ]
-                            }
-                        }
-                    };
-
-                };
-
-                it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
-                    jasmine.addMatchers(JasmineHelpers.customMatchers);
-
-                    var resource = generateResource();
-                    var result = adapter.elemRefs(resource);
-                    (<any>expect(result)).toSetEqual(["/asd/version3", "/foo/version2", "/bar/version1"]);
-                });
-
-                it("does not modify the resource", () => {
-                    var resource = generateResource();
-                    adapter.elemRefs(resource);
-                    expect(resource).toEqual(generateResource());
-                });
-            });
-
-            describe("poolPath", () => {
-                it("returns the parent path of the container path", () => {
-                    var resource = {
-                        path: "some/path/parent"
-                    };
-
-                    expect(adapter.poolPath(resource)).toEqual("some/path");
-                });
-            });
         });
 
         describe("CommentCreate", () => {

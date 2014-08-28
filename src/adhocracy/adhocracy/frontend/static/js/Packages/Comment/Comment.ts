@@ -1,14 +1,11 @@
 import AdhResource = require("../../Resources");
-import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
-
-import AdhConfig = require("../Config/Config");
-import AdhListing = require("../Listing/Listing");
-import Util = require("../Util/Util");
-
-import SICommentable = require("../../Resources_/adhocracy_sample/sheets/comment/ICommentable");
 import RIComment = require("../../Resources_/adhocracy_sample/resources/comment/IComment");
 
+import AdhConfig = require("../Config/Config");
+import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+
 var pkgLocation = "/Comment";
+
 
 export interface ICommentAdapter<T extends AdhResource.Content<any>> {
     create(pn : AdhPreliminaryNames) : T;
@@ -20,19 +17,6 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;
     commentCount(resource : T) : number;
-}
-
-export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
-    public elemRefs(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
-        return Util.latestVersionsOnly(container.data["adhocracy_sample.sheets.comment.ICommentable"].comments);
-    }
-
-    public poolPath(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
-        // NOTE: If poolPath is defined like this, answers to comments are placed
-        // inside other comment. This should be changed if we prefer to flatten
-        // the hierarchy.
-        return Util.parentPath(container.path);
-    }
 }
 
 export class CommentCreate {
