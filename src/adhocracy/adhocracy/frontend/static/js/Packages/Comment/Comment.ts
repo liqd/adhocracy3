@@ -19,28 +19,9 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
     creator(resource : T) : string;
 }
 
-/**
- * The backend sends all versions that refer to container. So we need
- * to find out which ones are most recent ourselves.
- */
-var latestVersionsOnly = (refs : string[]) : string[] => {
-    var latestVersions : string[] = [];
-    var lastCommentPath : string = undefined;
-
-    Util.deepcp(refs).sort().reverse().forEach((versionPath : string) => {
-        var commentPath = Util.parentPath(versionPath);
-        if (commentPath !== lastCommentPath) {
-            latestVersions.push(versionPath);
-            lastCommentPath = commentPath;
-        }
-    });
-
-    return latestVersions;
-};
-
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
     public elemRefs(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
-        return latestVersionsOnly(container.data["adhocracy_sample.sheets.comment.ICommentable"].comments);
+        return Util.latestVersionsOnly(container.data["adhocracy_sample.sheets.comment.ICommentable"].comments);
     }
 
     public poolPath(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
