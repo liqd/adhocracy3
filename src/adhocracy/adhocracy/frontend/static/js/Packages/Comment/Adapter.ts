@@ -39,4 +39,12 @@ export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersi
     creator(resource : RICommentVersion) : string {
         return resource.data["adhocracy.sheets.metadata.IMetadata"].creator;
     }
+
+    creationDate(resource : RICommentVersion) : string {
+        return resource.data["adhocracy.sheets.metadata.IMetadata"].item_creation_date;
+    }
+
+    modificationDate(resource : RICommentVersion) : string {
+        return resource.data["adhocracy.sheets.metadata.IMetadata"].modification_date;
+    }
 }

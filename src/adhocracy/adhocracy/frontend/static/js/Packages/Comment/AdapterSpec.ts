@@ -16,7 +16,9 @@ export var register = () => {
                         content: "content"
                     },
                     "adhocracy.sheets.metadata.IMetadata": {
-                        creator: "creator"
+                        creator: "creator",
+                        item_creation_date: "creationDate",
+                        modification_date: "modificationDate"
                     }
                 }
             };
@@ -68,6 +70,18 @@ export var register = () => {
         describe("creator", () => {
             it("gets creator from adhocracy.sheets.metadata.IMetadata", () => {
                 expect(adapter.creator(resource)).toBe("creator");
+            });
+        });
+
+        describe("creationDate", () => {
+            it("gets creationDate from adhocracy.sheets.metadata.IMetadata", () => {
+                expect(adapter.creationDate(resource)).toBe("creationDate");
+            });
+        });
+
+        describe("modificationDate", () => {
+            it("gets modificationDate from adhocracy.sheets.metadata.IMetadata", () => {
+                expect(adapter.modificationDate(resource)).toBe("modificationDate");
             });
         });
     });
