@@ -77,8 +77,7 @@ export class CommentDetail {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentDetail.html",
             scope: {
-                path: "=",  // path to a comment that should be displayed
-                viemode: "=" // "list" or "edit"
+                path: "="  // path to a comment that should be displayed
             },
             compile: (element) => recursionHelper.compile(element),
             controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
