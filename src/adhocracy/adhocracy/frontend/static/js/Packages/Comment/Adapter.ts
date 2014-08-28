@@ -3,6 +3,8 @@ import RICommentVersion = require("../../Resources_/adhocracy_sample/resources/c
 import AdhComment = require("./Comment");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
 
+import Util = require("../Util/Util");
+
 
 export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
     create(adhPreliminaryNames : AdhPreliminaryNames) : RICommentVersion {
@@ -46,5 +48,9 @@ export class CommentAdapter implements AdhComment.ICommentAdapter<RICommentVersi
 
     modificationDate(resource : RICommentVersion) : string {
         return resource.data["adhocracy.sheets.metadata.IMetadata"].modification_date;
+    }
+
+    commentCount(resource : RICommentVersion) : number {
+        return Util.latestVersionsOnly(resource.data["adhocracy_sample.sheets.comment.ICommentable"].comments).length;
     }
 }

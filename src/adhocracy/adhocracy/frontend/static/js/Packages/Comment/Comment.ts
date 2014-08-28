@@ -19,6 +19,7 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
     creator(resource : T) : string;
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;
+    commentCount(resource : T) : number;
 }
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
@@ -110,7 +111,8 @@ export class CommentDetail {
                             content: _self.adapter.content(resource),
                             creator: _self.adapter.creator(resource),
                             creationDate: _self.adapter.creationDate(resource),
-                            modificationDate: _self.adapter.modificationDate(resource)
+                            modificationDate: _self.adapter.modificationDate(resource),
+                            commentCount: _self.adapter.commentCount(resource)
                         };
                     });
                 };
