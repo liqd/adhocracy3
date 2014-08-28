@@ -200,14 +200,6 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
     var sheetI : string = "";
     var hasSheetI : string = "";
 
-    var mkGetMeta = () => {
-        var s = "";
-        s += "    public getMeta() : Base.ISheetMetaApi {\n";
-        s += "        return _meta;\n";
-        s += "    }\n";
-        return s;
-    };
-
     var writables : MetaApi.ISheetField[] = [];
     var nonWritables : MetaApi.ISheetField[] = [];
 
@@ -268,6 +260,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
 
         var s = "";
         s += "    constructor(" + Util.intercalate(args, "\n") + ") {\n";
+        s += "        super();\n";
         if (lines.length > 0) {
             s += Util.intercalate(lines, "\n") + "\n";
         }
@@ -283,16 +276,16 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
         }
     };
 
-    sheetI += "var _meta : Base.ISheetMetaApi = {\n";
-    sheetI += "    readable: " + showList(sheetMetaApi.readable) + ",\n";
-    sheetI += "    editable: " + showList(sheetMetaApi.editable) + ",\n";
-    sheetI += "    creatable: " + showList(sheetMetaApi.creatable) + ",\n";
-    sheetI += "    create_mandatory: " + showList(sheetMetaApi.create_mandatory) + ",\n";
-    sheetI += "    references: " + showList(sheetMetaApi.references) + "\n";
-    sheetI += "};\n\n";
+    sheetI += "export class " + mkSheetName(sheet.nick) + " extends Base.Sheet {\n";
 
-    sheetI += "export class " + mkSheetName(sheet.nick) + " implements Base.ISheet {\n";
-    sheetI += mkGetMeta() + "\n";
+    sheetI += "    public static _meta : Base.ISheetMetaApi = {\n";
+    sheetI += "        readable: " + showList(sheetMetaApi.readable) + ",\n";
+    sheetI += "        editable: " + showList(sheetMetaApi.editable) + ",\n";
+    sheetI += "        creatable: " + showList(sheetMetaApi.creatable) + ",\n";
+    sheetI += "        create_mandatory: " + showList(sheetMetaApi.create_mandatory) + ",\n";
+    sheetI += "        references: " + showList(sheetMetaApi.references) + "\n";
+    sheetI += "    };\n\n";
+
     sheetI += mkConstructor() + "\n";
     sheetI += mkFieldSignatures(sheet.fields, "    public ", ";\n") + "\n";
     sheetI += "}\n\n";

@@ -10,8 +10,10 @@ export interface ISheetMetaApi {
 }
 
 
-export interface ISheet {
-    getMeta() : ISheetMetaApi;
+export class Sheet {
+    public getMeta() : ISheetMetaApi {
+        return (<any>this).constructor._meta;
+    }
 }
 
 
