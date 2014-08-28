@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular-route.d.ts"/>
 
-import _ = require("underscore");
+import _ = require("lodash");
 
 import Util = require("../Util/Util");
 

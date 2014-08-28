@@ -1,6 +1,6 @@
-/// <reference path="../../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
-import _ = require("underscore");
+import _ = require("lodash");
 
 import Util = require("../Util/Util");
 import AdhHttp = require("../Http/Http");
