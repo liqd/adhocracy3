@@ -83,15 +83,15 @@ export class CommentDetail {
             compile: (element) => recursionHelper.compile(element),
             controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
                 var resource : AdhResource.Content<any>;
-                var versionPromise = adhHttp.resolve($scope.path);
 
                 var displayErrors = (errors) => {
                     $scope.errors = errors;
                     throw errors;
                 };
 
-                var updateScope = () => {
-                    return versionPromise.then((_resource : AdhResource.Content<any>) => {
+                var updateScope = (path) => {
+                    $scope.path = path;
+                    return adhHttp.resolve(path).then((_resource : AdhResource.Content<any>) => {
                         resource = _resource;
                         $scope.data = {
                             content: _self.adapter.content(resource),
@@ -121,13 +121,12 @@ export class CommentDetail {
 
                 $scope.save = () => {
                     _self.adapter.content(resource, $scope.data.content);
-                    return versionPromise.then((version) => {
-                        versionPromise = adhHttp.postNewVersion(version.path, resource)
-                            .then((_resource) => adhHttp.resolve(_resource.path), displayErrors);
-                        return updateScope().then(() => {
+                    return adhHttp.postNewVersion($scope.path, resource)
+                        .then((_resource) => _resource.path, displayErrors)
+                        .then(updateScope)
+                        .then(() => {
                             $scope.viewmode = "list";
                         });
-                    });
                 };
 
                 $scope.createComment = () => {
@@ -140,15 +139,13 @@ export class CommentDetail {
 
                 $scope.afterCreateComment = () => {
                     return adhHttp.getNewestVersionPath(Util.parentPath($scope.path))
-                        .then((versionPath) => {
-                            versionPromise = adhHttp.resolve(versionPath);
-                            return updateScope().then(() => {
-                                $scope.show.createForm = false;
-                            });
+                        .then(updateScope)
+                        .then(() => {
+                            $scope.show.createForm = false;
                         });
                 };
 
-                updateScope().then(adhDone);
+                updateScope($scope.path).then(adhDone);
             }]
         };
     }
