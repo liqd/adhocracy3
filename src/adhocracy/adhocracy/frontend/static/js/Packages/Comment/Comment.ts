@@ -4,6 +4,7 @@ import RIComment = require("../../Resources_/adhocracy_sample/resources/comment/
 import AdhConfig = require("../Config/Config");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
+import Util = require("../Util/Util");
 
 var pkgLocation = "/Comment";
 
@@ -105,6 +106,9 @@ export class CommentDetail {
                 };
 
                 $scope.errors = [];
+                $scope.show = {
+                    createForm: false
+                };
 
                 $scope.edit = () => {
                     $scope.viewmode = "edit";
@@ -124,6 +128,24 @@ export class CommentDetail {
                             $scope.viewmode = "list";
                         });
                     });
+                };
+
+                $scope.createComment = () => {
+                    $scope.show.createForm = true;
+                };
+
+                $scope.cancelCreateComment = () => {
+                    $scope.show.createForm = false;
+                };
+
+                $scope.afterCreateComment = () => {
+                    return adhHttp.getNewestVersionPath(Util.parentPath($scope.path))
+                        .then((versionPath) => {
+                            versionPromise = adhHttp.resolve(versionPath);
+                            return updateScope().then(() => {
+                                $scope.show.createForm = false;
+                            });
+                        });
                 };
 
                 updateScope().then(adhDone);

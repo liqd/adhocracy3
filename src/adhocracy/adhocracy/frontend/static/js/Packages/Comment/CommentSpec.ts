@@ -31,7 +31,7 @@ export var register = () => {
             adhHttpMock.postToPool.and.returnValue(q.when(RESOURCE));
             adhHttpMock.resolve.and.returnValue(q.when(RESOURCE));
             adhHttpMock.postNewVersion.and.returnValue(q.when(RESOURCE));
-            adhHttpMock.getNewestVersionPath.and.returnValue(q.when(RESOURCE));
+            adhHttpMock.getNewestVersionPath.and.returnValue(q.when("newestVersion"));
         });
 
         describe("CommentCreate", () => {
@@ -200,6 +200,39 @@ export var register = () => {
                                 expect(scopeMock.errors).toBe(errors);
                                 done();
                             });
+                        });
+                    });
+
+                    describe("createComment", () => {
+                        it("sets scope.show.createForm to true", () => {
+                            scopeMock.createComment();
+                            expect(scopeMock.show.createForm).toBe(true);
+                        });
+                    });
+
+                    describe("cancelCreateComment", () => {
+                        it("sets scope.show.createForm to false", () => {
+                            scopeMock.cancelCreateComment();
+                            expect(scopeMock.show.createForm).toBe(false);
+                        });
+                    });
+
+                    describe("afterCreateComment", () => {
+                        beforeEach((done) => {
+                            adapterMock.creator.and.returnValue("afterCreateCommentCreator");
+                            scopeMock.afterCreateComment().then(done);
+                        });
+
+                        it("gets the newest version", () => {
+                            expect(adhHttpMock.getNewestVersionPath).toHaveBeenCalled();
+                        });
+
+                        it("updates the scope", () => {
+                            expect(scopeMock.data.creator).toBe("afterCreateCommentCreator");
+                        });
+
+                        it("sets scope.show.createForm to false", () => {
+                            expect(scopeMock.show.createForm).toBe(false);
                         });
                     });
                 });
