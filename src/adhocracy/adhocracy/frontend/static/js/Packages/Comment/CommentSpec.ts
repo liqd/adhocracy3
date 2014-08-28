@@ -4,6 +4,7 @@ import q = require("q");
 
 import AdhComment = require("./Comment");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+import JasmineHelpers = require("../../JasmineHelpers");
 
 var RESOURCE = {
     path: "path",
@@ -59,12 +60,11 @@ export var register = () => {
                 };
 
                 it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
+                    jasmine.addMatchers(JasmineHelpers.customMatchers);
+
                     var resource = generateResource();
                     var result = adapter.elemRefs(resource);
-                    expect(result).toContain("/asd/version3");
-                    expect(result).toContain("/foo/version2");
-                    expect(result).toContain("/bar/version1");
-                    expect(result.length).toBe(3);
+                    (<any>expect(result)).toSetEqual(["/asd/version3", "/foo/version2", "/bar/version1"]);
                 });
 
                 it("does not modify the resource", () => {

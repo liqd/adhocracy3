@@ -1,5 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
+import JasmineHelpers = require("../../JasmineHelpers");
 import Util = require("./Util");
 
 export var register = () => {
@@ -284,11 +285,10 @@ export var register = () => {
             ];
 
             it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
+                jasmine.addMatchers(JasmineHelpers.customMatchers);
+
                 var result = Util.latestVersionsOnly(testCase);
-                expect(result).toContain("/asd/version3");
-                expect(result).toContain("/foo/version2");
-                expect(result).toContain("/bar/version1");
-                expect(result.length).toBe(3);
+                (<any>expect(result)).toSetEqual(["/asd/version3", "/foo/version2", "/bar/version1"]);
             });
 
             it("does not alter the input list", () => {
