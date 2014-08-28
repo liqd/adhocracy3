@@ -12,19 +12,19 @@ def comment(browser, proposal):
     """Go to content2 column and create comment with content 'comment1'."""
     show_proposal_comments(proposal)
     listing = get_column_listing(browser, 'content2')
-    return create_comment(listing, 'comment1')
+    return create_top_level_comment(listing, 'comment1')
 
 
 def test_create(browser, proposal):
     show_proposal_comments(proposal)
     listing = get_column_listing(browser, 'content2')
-    comment = create_comment(listing, 'somecomment')
+    comment = create_top_level_comment(listing, 'somecomment')
     assert comment is not None
 
 
 def test_reply(browser, comment):
-    listing = get_column_listing(browser, 'content2').find_by_css('.listing')
-    element = create_comment(listing, 'somereply')
+    parent = get_column_listing(browser, 'content2').find_by_css('.comment')
+    element = create_reply_comment(parent, 'somereply')
     assert element is not None
 
 
@@ -45,16 +45,38 @@ def show_proposal_comments(proposal):
     proposal.find_by_css('button').last.click()
 
 
-def create_comment(listing, content):
-    """Create a new Comment."""
+def create_top_level_comment(listing, content):
+    """Create a new top level Comment."""
     form = get_listing_create_form(listing)
     form.find_by_css('textarea').first.fill(content)
     form.find_by_css('input[type="submit"]').first.click()
     return get_list_element(listing, content, descendant='.comment-content')
 
 
+def create_reply_comment(parent, content):
+    """Create a new reply to an existing comment."""
+    form = get_comment_create_form(parent)
+    form.find_by_css('textarea').first.fill(content)
+    form.find_by_css('input[type="submit"]').first.click()
+    return get_reply(parent, content)
+
+
 def edit_comment(comment, content):
-    comment.find_by_css('a')[-2].click()
+    comment.find_by_css('.comment-meta a')[0].click()
     comment.find_by_css('textarea').first.fill(content)
-    comment.find_by_css('a')[-3].click()
-    wait(lambda: len(comment.find_by_css('a')) == 2)
+    comment.find_by_css('.comment-meta a')[0].click()
+    wait(lambda: comment.find_by_css('.comment-content').first.text == content)
+
+
+def get_comment_create_form(comment):
+    button = comment.find_by_css('.comment-meta a')[-1]
+    button.click()
+    return comment.find_by_css('.comment-create-form').first
+
+
+def get_reply(parent, content):
+    """Return reply to comment `parent` with content == `content`."""
+    for element in parent.find_by_css('.comment'):
+        wait(lambda: element.text)
+        if element.find_by_css('.comment-content').first.text == content:
+            return element
