@@ -48,10 +48,13 @@ export var register = () => {
                 directive.link(scopeMock);
                 expect($intervalMock).toHaveBeenCalled();
                 var fn = $intervalMock.calls.mostRecent().args[0];
+                var delay = $intervalMock.calls.mostRecent().args[1];
 
                 expect(dtMock.fromNow.calls.count()).toBe(1);
                 fn();
                 expect(dtMock.fromNow.calls.count()).toBe(2);
+
+                expect(delay).toBe(5000);
             });
         });
     });
