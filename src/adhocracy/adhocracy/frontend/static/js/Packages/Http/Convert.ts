@@ -14,7 +14,7 @@ export var importContent = <Content extends Resources.Content<any>>(response : {
     if (typeof obj === "object") {
         return obj;
     } else {
-        throw ("unexpected type: " + (typeof obj).toString() + " " + obj.toString());
+        throw ("unexpected type: " + (typeof obj).toString() + " " + JSON.stringify(obj, null, 2));
     }
 
     // FIXME: it would be nice if this function could throw an
