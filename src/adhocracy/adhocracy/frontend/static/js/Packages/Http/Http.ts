@@ -38,6 +38,9 @@ export class Service<Content extends Resources.Content<any>> {
     ) {}
 
     public get(path : string) : ng.IPromise<Content> {
+        if (this.adhPreliminaryNames.isPreliminary(path)) {
+            throw "attempt to http-get preliminary path: " + path;
+        }
         return this.$http
             .get(path)
             .then(
@@ -46,6 +49,9 @@ export class Service<Content extends Resources.Content<any>> {
     }
 
     public put(path : string, obj : Content) : ng.IPromise<Content> {
+        if (this.adhPreliminaryNames.isPreliminary(path)) {
+            throw "attempt to http-put preliminary path: " + path;
+        }
         return this.$http
             .put(path, AdhConvert.exportContent(this.adhMetaApi, obj))
             .then(
@@ -54,6 +60,9 @@ export class Service<Content extends Resources.Content<any>> {
     }
 
     public post(path : string, obj : Content) : ng.IPromise<Content> {
+        if (this.adhPreliminaryNames.isPreliminary(path)) {
+            throw "attempt to http-post preliminary path: " + path;
+        }
         return this.$http
             .post(path, AdhConvert.exportContent(this.adhMetaApi, obj))
             .then(
