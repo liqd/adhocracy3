@@ -31,11 +31,11 @@ export var importContent = <Content extends Resources.Content<any>>(
         throw ("resource has no path field: " + JSON.stringify(obj, null, 2));
     }
 
-    if (!Resources_.registry.hasOwnProperty(obj.content_type)) {
+    if (!Resources_.resourceRegistry.hasOwnProperty(obj.content_type)) {
         throw ("unknown content_type: " + obj.content_type + " " + JSON.stringify(obj, null, 2));
     }
 
-    var _class = Resources_.registry[obj.content_type];
+    var _class = Resources_.resourceRegistry[obj.content_type];
     var _obj = new _class({
         preliminaryNames: preliminaryNames,
         path: obj.path

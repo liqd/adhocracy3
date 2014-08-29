@@ -196,6 +196,7 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
             rootModule += Util.intercalate(imports, "") + "\n";
         })();
 
+        // resource registry.
         (() => {
             var dictEntries : string[] = [];
             for (var modulePath in metaApi.resources) {
@@ -204,7 +205,19 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
                 }
             }
             dictEntries.sort();
-            rootModule += "export var registry = {\n" + Util.intercalate(dictEntries, ",\n") + "\n};\n";
+            rootModule += "export var resourceRegistry = {\n" + Util.intercalate(dictEntries, ",\n") + "\n};\n\n";
+        })();
+
+        // sheet registry.
+        (() => {
+            var dictEntries : string[] = [];
+            for (var modulePath in metaApi.sheets) {
+                if (metaApi.sheets.hasOwnProperty(modulePath)) {
+                    dictEntries.push("    \"" + modulePath + "\": " + mkModuleName(modulePath, metaApi));
+                }
+            }
+            dictEntries.sort();
+            rootModule += "export var sheetRegistry = {\n" + Util.intercalate(dictEntries, ",\n") + "\n};\n";
         })();
 
         var absfp = outPath + "/Resources_.ts";
