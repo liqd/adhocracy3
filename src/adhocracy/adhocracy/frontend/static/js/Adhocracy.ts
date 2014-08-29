@@ -82,7 +82,7 @@ export var init = (config, meta_api) => {
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
 
-    app.service("adhProposal", AdhProposal.Service);
+    app.service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", AdhProposal.Service]);
     app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
@@ -100,7 +100,7 @@ export var init = (config, meta_api) => {
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
     app.service("adhPreliminaryNames", AdhPreliminaryNames);
-    app.service("adhHttp", ["$http", "$q", "adhMetaApi", AdhHttp.Service]);
+    app.service("adhHttp", ["$http", "$q", "adhMetaApi", "adhPreliminaryNames", AdhHttp.Service]);
     app.factory("adhWebSocket", ["Modernizr", "adhConfig", AdhWebSocket.factory]);
 
     app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", AdhCrossWindowMessaging.factory]);

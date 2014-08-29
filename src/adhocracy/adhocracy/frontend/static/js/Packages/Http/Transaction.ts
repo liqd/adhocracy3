@@ -1,5 +1,6 @@
 import AdhResources = require("../../Resources");
 import MetaApi = require("../MetaApi/MetaApi");
+import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import AdhError = require("./Error");
 import AdhConvert = require("./Convert");
@@ -25,7 +26,11 @@ export class Transaction {
     private committed : boolean;
     private nextID : number;
 
-    constructor(private $http : ng.IHttpService, private adhMetaApi : MetaApi.MetaApiQuery) {
+    constructor(
+        private $http : ng.IHttpService,
+        private adhMetaApi : MetaApi.MetaApiQuery,
+        private adhPreliminaryNames : PreliminaryNames
+    ) {
         this.requests = [];
         this.committed = false;
         this.nextID = 0;
@@ -86,7 +91,7 @@ export class Transaction {
         this.checkNotCommitted();
         this.committed = true;
         return this.$http.post("/batch", this.requests).then(
-            AdhConvert.importBatchContent,
+            (response) => AdhConvert.importBatchContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
             AdhError.logBackendBatchError);
     }
 }
