@@ -213,7 +213,9 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
             var dictEntries : string[] = [];
             for (var modulePath in metaApi.sheets) {
                 if (metaApi.sheets.hasOwnProperty(modulePath)) {
-                    dictEntries.push("    \"" + modulePath + "\": " + mkModuleName(modulePath, metaApi));
+                    dictEntries.push(
+                            "    \"" + modulePath + "\": "
+                            + mkModuleName(modulePath, metaApi) + "." + mkSheetName(mkNick(modulePath, metaApi)));
                 }
             }
             dictEntries.sort();
