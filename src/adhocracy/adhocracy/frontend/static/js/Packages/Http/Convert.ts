@@ -1,6 +1,7 @@
 import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
 import Resources = require("../../Resources");
+import Resources_ = require("../../Resources_");
 
 
 /**
@@ -16,6 +17,13 @@ export var importContent = <Content extends Resources.Content<any>>(response : {
     } else {
         throw ("unexpected type: " + (typeof obj).toString() + " " + JSON.stringify(obj, null, 2));
     }
+
+    if (!obj.hasOwnProperty("content_type")) {
+        throw ("resource has no content_type field: " + JSON.stringify(obj, null, 2));
+    }
+
+    var dummy = new (Resources_.registry[obj.content_type])();
+
 
     // FIXME: it would be nice if this function could throw an
     // exception at run-time if the type of obj does not match
