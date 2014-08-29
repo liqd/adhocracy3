@@ -1,6 +1,7 @@
 import AdhResource = require("../../Resources");
 import RICommentVersion = require("../../Resources_/adhocracy_sample/resources/comment/ICommentVersion");
 import SICommentable = require("../../Resources_/adhocracy_sample/sheets/comment/ICommentable");
+import SIComment = require("../../Resources_/adhocracy_sample/sheets/comment/IComment");
 
 import AdhListing = require("../Listing/Listing");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
@@ -25,10 +26,11 @@ export class ListingCommentableAdapter implements AdhListing.IListingContainerAd
 export class CommentAdapter extends ListingCommentableAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
     create(adhPreliminaryNames : AdhPreliminaryNames) : RICommentVersion {
         var resource = new RICommentVersion({preliminaryNames: adhPreliminaryNames});
-        resource.data["adhocracy_sample.sheets.comment.IComment"] = {
-            refers_to: null,
-            content: null
-        };
+        resource.data["adhocracy_sample.sheets.comment.IComment"] =
+            new SIComment.AdhocracySampleSheetsCommentIComment({
+                refers_to: null,
+                content: null
+            });
         return resource;
     }
 
