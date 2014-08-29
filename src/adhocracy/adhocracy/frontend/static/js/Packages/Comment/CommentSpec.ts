@@ -223,10 +223,6 @@ export var register = () => {
                             scopeMock.afterCreateComment().then(done);
                         });
 
-                        it("gets the newest version", () => {
-                            expect(adhHttpMock.getNewestVersionPath).toHaveBeenCalled();
-                        });
-
                         it("updates the scope", () => {
                             expect(scopeMock.data.creator).toBe("afterCreateCommentCreator");
                         });
