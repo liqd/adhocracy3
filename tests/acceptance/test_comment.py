@@ -1,5 +1,4 @@
 from pytest import fixture
-from pytest import mark
 
 from .shared import wait
 from .shared import get_column_listing
@@ -41,7 +40,6 @@ def test_edit(browser, comment):
     assert browser.find_by_css('.comment-content').text == 'edited'
 
 
-@mark.xfail
 def test_multi_edits(browser, comment):
     parent = get_column_listing(browser, 'content2').find_by_css('.comment')
     reply = create_reply_comment(parent, 'somereply')
