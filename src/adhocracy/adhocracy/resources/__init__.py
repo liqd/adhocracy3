@@ -167,7 +167,7 @@ class ResourceFactory:
     def _get_metadata(self, resource: IResource, creator: IResource) -> dict:
         # FIXME: bad SRP, there are two places responsible to set the default
         # date, here and in adhocracy.schema.Date
-        now = datetime.utcnow(UTC)
+        now = datetime.utcnow().replace(tzinfo=UTC)
         creator = creator if creator is not None else None
         metadata = {'creator': creator,
                     'creation_date': now,
