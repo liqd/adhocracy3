@@ -70,11 +70,12 @@ var toggleListing = function() {
     }
 }
 
-.listing-add-form {
+.listing-create-form {
     background-color: $color-structure-surface;
     padding: 0.5em;
     margin-left: -0.5em;
     margin-right: -0.5em;
+    margin-bottom: 2em;
 }
 
 /*doc

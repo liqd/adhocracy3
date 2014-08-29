@@ -287,7 +287,7 @@ export var metaDirective = (adhConfig : AdhConfig.Type) => {
                     });
             } else {
                 $scope.userBasic = {
-                    name: "anonymous",
+                    name: "guest",
                 };
                 $scope.isAnonymous = true;
             }

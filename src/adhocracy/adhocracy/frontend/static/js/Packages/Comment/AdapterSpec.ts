@@ -1,103 +1,161 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
+import JasmineHelpers = require("../../JasmineHelpers");
+
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+
 import AdhCommentAdapter = require("./Adapter");
-import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+
 
 export var register = () => {
     describe("CommentAdapter", () => {
-        var resource;
-        var adapter;
+        describe("ListingCommentableAdapter", () => {
+            var adapter;
 
-        beforeEach(() => {
-            resource = {
-                data: {
-                    "adhocracy_sample.sheets.comment.IComment": {
-                        refers_to: "refersTo",
-                        content: "content"
-                    },
-                    "adhocracy.sheets.metadata.IMetadata": {
-                        creator: "creator",
-                        item_creation_date: "creationDate",
-                        modification_date: "modificationDate"
-                    },
-                    "adhocracy_sample.sheets.comment.ICommentable": {
-                        comments: ["foo/VERSION_0000001", "bar/VERSION_0000001"]
-                    }
-                }
-            };
-            adapter = new AdhCommentAdapter.CommentAdapter();
-        });
-
-        describe("create", () => {
             beforeEach(() => {
-                resource = adapter.create(new AdhPreliminaryNames());
+                adapter = new AdhCommentAdapter.ListingCommentableAdapter();
             });
 
-            it("returns an adhocracy_sample.resources.comment.ICommentVersion resource", () => {
-                expect(resource.content_type).toBe("adhocracy_sample.resources.comment.ICommentVersion");
+            describe("elemRefs", () => {
+                var generateResource = () => {
+                    return {
+                        data: {
+                            "adhocracy_sample.sheets.comment.ICommentable": {
+                                comments: [
+                                    "/asd/version2",
+                                    "/asd/version3",
+                                    "/foo/version1",
+                                    "/bar/version1",
+                                    "/asd/version1",
+                                    "/foo/version2"
+                                ]
+                            }
+                        }
+                    };
+
+                };
+
+                it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
+                    jasmine.addMatchers(JasmineHelpers.customMatchers);
+
+                    var resource = generateResource();
+                    var result = adapter.elemRefs(resource);
+                    (<any>expect(result)).toSetEqual(["/asd/version3", "/foo/version2", "/bar/version1"]);
+                });
+
+                it("does not modify the resource", () => {
+                    var resource = generateResource();
+                    adapter.elemRefs(resource);
+                    expect(resource).toEqual(generateResource());
+                });
             });
 
-            it("creates an empty adhocracy_sample.sheets.comment.IComment sheet", () => {
-                expect(resource.data["adhocracy_sample.sheets.comment.IComment"]).toBeDefined();
+            describe("poolPath", () => {
+                it("returns the parent path of the container path", () => {
+                    var resource = {
+                        path: "some/path/parent"
+                    };
+
+                    expect(adapter.poolPath(resource)).toEqual("some/path");
+                });
             });
         });
 
-        describe("content", () => {
-            it("gets content from adhocracy_sample.sheets.comment.IComment", () => {
-                expect(adapter.content(resource)).toBe("content");
-            });
-            it("sets content from adhocracy_sample.sheets.comment.IComment", () => {
-                adapter.content(resource, "content2");
-                expect(resource.data["adhocracy_sample.sheets.comment.IComment"].content).toBe("content2");
-            });
-            it("returns resource when used as a setter", () => {
-                var result = adapter.content(resource, "content2");
-                expect(result.data["adhocracy_sample.sheets.comment.IComment"].content).toBe("content2");
-            });
-        });
+        describe("CommentAdapter", () => {
+            var resource;
+            var adapter;
 
-        describe("refersTo", () => {
-            it("gets refers_to from adhocracy_sample.sheets.comment.IComment", () => {
-                expect(adapter.refersTo(resource)).toBe("refersTo");
+            beforeEach(() => {
+                resource = {
+                    data: {
+                        "adhocracy_sample.sheets.comment.IComment": {
+                            refers_to: "refersTo",
+                            content: "content"
+                        },
+                        "adhocracy.sheets.metadata.IMetadata": {
+                            creator: "creator",
+                            item_creation_date: "creationDate",
+                            modification_date: "modificationDate"
+                        },
+                        "adhocracy_sample.sheets.comment.ICommentable": {
+                            comments: ["foo/VERSION_0000001", "bar/VERSION_0000001"]
+                        }
+                    }
+                };
+                adapter = new AdhCommentAdapter.CommentAdapter();
             });
-            it("sets refers_to from adhocracy_sample.sheets.comment.IComment", () => {
-                adapter.refersTo(resource, "refersTo2");
-                expect(resource.data["adhocracy_sample.sheets.comment.IComment"].refers_to).toBe("refersTo2");
-            });
-            it("returns resource when used as a setter", () => {
-                var result = adapter.refersTo(resource, "refersTo2");
-                expect(result.data["adhocracy_sample.sheets.comment.IComment"].refers_to).toBe("refersTo2");
-            });
-        });
 
-        describe("creator", () => {
-            it("gets creator from adhocracy.sheets.metadata.IMetadata", () => {
-                expect(adapter.creator(resource)).toBe("creator");
-            });
-        });
+            describe("create", () => {
+                beforeEach(() => {
+                    resource = adapter.create(new AdhPreliminaryNames());
+                });
 
-        describe("creationDate", () => {
-            it("gets creationDate from adhocracy.sheets.metadata.IMetadata", () => {
-                expect(adapter.creationDate(resource)).toBe("creationDate");
-            });
-        });
+                it("returns an adhocracy_sample.resources.comment.ICommentVersion resource", () => {
+                    expect(resource.content_type).toBe("adhocracy_sample.resources.comment.ICommentVersion");
+                });
 
-        describe("modificationDate", () => {
-            it("gets modificationDate from adhocracy.sheets.metadata.IMetadata", () => {
-                expect(adapter.modificationDate(resource)).toBe("modificationDate");
+                it("creates an empty adhocracy_sample.sheets.comment.IComment sheet", () => {
+                    expect(resource.data["adhocracy_sample.sheets.comment.IComment"]).toBeDefined();
+                });
             });
-        });
 
-        describe("commentCount", () => {
-            it("gets commentCount from adhocracy_sample.sheets.comment.ICommentable", () => {
-                expect(adapter.commentCount(resource)).toBe(2);
+            describe("content", () => {
+                it("gets content from adhocracy_sample.sheets.comment.IComment", () => {
+                    expect(adapter.content(resource)).toBe("content");
+                });
+                it("sets content from adhocracy_sample.sheets.comment.IComment", () => {
+                    adapter.content(resource, "content2");
+                    expect(resource.data["adhocracy_sample.sheets.comment.IComment"].content).toBe("content2");
+                });
+                it("returns resource when used as a setter", () => {
+                    var result = adapter.content(resource, "content2");
+                    expect(result.data["adhocracy_sample.sheets.comment.IComment"].content).toBe("content2");
+                });
             });
-            it("does not count multiple versions of the same item", () => {
-                resource.data["adhocracy_sample.sheets.comment.ICommentable"].comments = [
-                    "foo/VERSION_0000001",
-                    "foo/VERSION_0000002"
-                ];
-                expect(adapter.commentCount(resource)).toBe(1);
+
+            describe("refersTo", () => {
+                it("gets refers_to from adhocracy_sample.sheets.comment.IComment", () => {
+                    expect(adapter.refersTo(resource)).toBe("refersTo");
+                });
+                it("sets refers_to from adhocracy_sample.sheets.comment.IComment", () => {
+                    adapter.refersTo(resource, "refersTo2");
+                    expect(resource.data["adhocracy_sample.sheets.comment.IComment"].refers_to).toBe("refersTo2");
+                });
+                it("returns resource when used as a setter", () => {
+                    var result = adapter.refersTo(resource, "refersTo2");
+                    expect(result.data["adhocracy_sample.sheets.comment.IComment"].refers_to).toBe("refersTo2");
+                });
+            });
+
+            describe("creator", () => {
+                it("gets creator from adhocracy.sheets.metadata.IMetadata", () => {
+                    expect(adapter.creator(resource)).toBe("creator");
+                });
+            });
+
+            describe("creationDate", () => {
+                it("gets creationDate from adhocracy.sheets.metadata.IMetadata", () => {
+                    expect(adapter.creationDate(resource)).toBe("creationDate");
+                });
+            });
+
+            describe("modificationDate", () => {
+                it("gets modificationDate from adhocracy.sheets.metadata.IMetadata", () => {
+                    expect(adapter.modificationDate(resource)).toBe("modificationDate");
+                });
+            });
+
+            describe("commentCount", () => {
+                it("gets commentCount from adhocracy_sample.sheets.comment.ICommentable", () => {
+                    expect(adapter.commentCount(resource)).toBe(2);
+                });
+                it("does not count multiple versions of the same item", () => {
+                    resource.data["adhocracy_sample.sheets.comment.ICommentable"].comments = [
+                        "foo/VERSION_0000001",
+                        "foo/VERSION_0000002"
+                    ];
+                    expect(adapter.commentCount(resource)).toBe(1);
+                });
             });
         });
     });

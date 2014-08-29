@@ -2,15 +2,16 @@
 
 import q = require("q");
 
-import AdhComment = require("./Comment");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
-import JasmineHelpers = require("../../JasmineHelpers");
+
+import AdhComment = require("./Comment");
 
 var RESOURCE = {
     path: "path",
     content_type: "",
     data: {}
 };
+
 
 export var register = () => {
     describe("Comment", () => {
@@ -24,65 +25,13 @@ export var register = () => {
             };
 
             adapterMock = <any>jasmine.createSpyObj("adapterMock", ["create", "content", "refersTo", "creator", "creationDate",
-                "modificationDate", "commentCount"]);
+                "modificationDate", "commentCount", "elemRefs", "poolPath"]);
 
             adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["postToPool", "resolve", "postNewVersion", "getNewestVersionPath"]);
             adhHttpMock.postToPool.and.returnValue(q.when(RESOURCE));
             adhHttpMock.resolve.and.returnValue(q.when(RESOURCE));
             adhHttpMock.postNewVersion.and.returnValue(q.when(RESOURCE));
-            adhHttpMock.getNewestVersionPath.and.returnValue(q.when(RESOURCE));
-        });
-
-        describe("ListingCommentableAdapter", () => {
-            var adapter;
-
-            beforeEach(() => {
-                adapter = new AdhComment.ListingCommentableAdapter();
-            });
-
-            describe("elemRefs", () => {
-                var generateResource = () => {
-                    return {
-                        data: {
-                            "adhocracy_sample.sheets.comment.ICommentable": {
-                                comments: [
-                                    "/asd/version2",
-                                    "/asd/version3",
-                                    "/foo/version1",
-                                    "/bar/version1",
-                                    "/asd/version1",
-                                    "/foo/version2"
-                                ]
-                            }
-                        }
-                    };
-
-                };
-
-                it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
-                    jasmine.addMatchers(JasmineHelpers.customMatchers);
-
-                    var resource = generateResource();
-                    var result = adapter.elemRefs(resource);
-                    (<any>expect(result)).toSetEqual(["/asd/version3", "/foo/version2", "/bar/version1"]);
-                });
-
-                it("does not modify the resource", () => {
-                    var resource = generateResource();
-                    adapter.elemRefs(resource);
-                    expect(resource).toEqual(generateResource());
-                });
-            });
-
-            describe("poolPath", () => {
-                it("returns the parent path of the container path", () => {
-                    var resource = {
-                        path: "some/path/parent"
-                    };
-
-                    expect(adapter.poolPath(resource)).toEqual("some/path");
-                });
-            });
+            adhHttpMock.getNewestVersionPath.and.returnValue(q.when("newestVersion"));
         });
 
         describe("CommentCreate", () => {
@@ -162,6 +111,8 @@ export var register = () => {
                     var creationDate = "creationDate";
                     var modificationDate = "modificationDate";
                     var commentCount = 2;
+                    var elemRefs = ["foo", "bar"];
+                    var poolPath = "poolPath";
 
                     beforeEach((done) => {
                         scopeMock = {
@@ -174,17 +125,33 @@ export var register = () => {
                         adapterMock.creationDate.and.returnValue(creationDate);
                         adapterMock.modificationDate.and.returnValue(modificationDate);
                         adapterMock.commentCount.and.returnValue(commentCount);
+                        adapterMock.elemRefs.and.returnValue(elemRefs);
+                        adapterMock.poolPath.and.returnValue(poolPath);
 
                         var controller = <any>directive.controller[3];
                         controller(scopeMock, adhHttpMock, done);
                     });
 
-                    it("reads content and creator from adapter to scope", () => {
+                    it("reads content from adapter to scope", () => {
                         expect(scopeMock.data.content).toBe(content);
+                    });
+                    it("reads creator from adapter to scope", () => {
                         expect(scopeMock.data.creator).toBe(creator);
+                    });
+                    it("reads creationDate from adapter to scope", () => {
                         expect(scopeMock.data.creationDate).toBe(creationDate);
+                    });
+                    it("reads modificationDate from adapter to scope", () => {
                         expect(scopeMock.data.modificationDate).toBe(modificationDate);
+                    });
+                    it("reads commentCount from adapter to scope", () => {
                         expect(scopeMock.data.commentCount).toBe(commentCount);
+                    });
+                    it("reads comments from adapter to scope", () => {
+                        expect(scopeMock.data.comments).toBe(elemRefs);
+                    });
+                    it("reads poolPath from adapter to scope", () => {
+                        expect(scopeMock.data.poolPath).toBe(poolPath);
                     });
 
                     describe("edit", () => {
@@ -233,6 +200,35 @@ export var register = () => {
                                 expect(scopeMock.errors).toBe(errors);
                                 done();
                             });
+                        });
+                    });
+
+                    describe("createComment", () => {
+                        it("sets scope.show.createForm to true", () => {
+                            scopeMock.createComment();
+                            expect(scopeMock.show.createForm).toBe(true);
+                        });
+                    });
+
+                    describe("cancelCreateComment", () => {
+                        it("sets scope.show.createForm to false", () => {
+                            scopeMock.cancelCreateComment();
+                            expect(scopeMock.show.createForm).toBe(false);
+                        });
+                    });
+
+                    describe("afterCreateComment", () => {
+                        beforeEach((done) => {
+                            adapterMock.creator.and.returnValue("afterCreateCommentCreator");
+                            scopeMock.afterCreateComment().then(done);
+                        });
+
+                        it("updates the scope", () => {
+                            expect(scopeMock.data.creator).toBe("afterCreateCommentCreator");
+                        });
+
+                        it("sets scope.show.createForm to false", () => {
+                            expect(scopeMock.show.createForm).toBe(false);
                         });
                     });
                 });

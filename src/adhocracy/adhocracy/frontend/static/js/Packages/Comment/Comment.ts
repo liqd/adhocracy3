@@ -1,16 +1,14 @@
 import AdhResource = require("../../Resources");
-import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+import RIComment = require("../../Resources_/adhocracy_sample/resources/comment/IComment");
 
 import AdhConfig = require("../Config/Config");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
-import Util = require("../Util/Util");
-
-import SICommentable = require("../../Resources_/adhocracy_sample/sheets/comment/ICommentable");
-import RIComment = require("../../Resources_/adhocracy_sample/resources/comment/IComment");
 
 var pkgLocation = "/Comment";
 
-export interface ICommentAdapter<T extends AdhResource.Content<any>> {
+
+export interface ICommentAdapter<T extends AdhResource.Content<any>> extends AdhListing.IListingContainerAdapter {
     create(pn : AdhPreliminaryNames) : T;
     content(resource : T) : string;
     content(resource : T, value : string) : T;
@@ -20,19 +18,6 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> {
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;
     commentCount(resource : T) : number;
-}
-
-export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
-    public elemRefs(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
-        return Util.latestVersionsOnly(container.data["adhocracy_sample.sheets.comment.ICommentable"].comments);
-    }
-
-    public poolPath(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
-        // NOTE: If poolPath is defined like this, answers to comments are placed
-        // inside other comment. This should be changed if we prefer to flatten
-        // the hierarchy.
-        return Util.parentPath(container.path);
-    }
 }
 
 export class CommentCreate {
@@ -91,33 +76,37 @@ export class CommentDetail {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentDetail.html",
             scope: {
-                path: "=",  // path to a comment that should be displayed
-                viemode: "=" // "list" or "edit"
+                path: "="  // path to a comment that should be displayed
             },
             compile: (element) => recursionHelper.compile(element),
             controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
                 var resource : AdhResource.Content<any>;
-                var versionPromise = adhHttp.resolve($scope.path);
 
                 var displayErrors = (errors) => {
                     $scope.errors = errors;
                     throw errors;
                 };
 
-                var updateScope = () => {
-                    return versionPromise.then((_resource : AdhResource.Content<any>) => {
+                var updateScope = (path) => {
+                    $scope.path = path;
+                    return adhHttp.resolve(path).then((_resource : AdhResource.Content<any>) => {
                         resource = _resource;
                         $scope.data = {
                             content: _self.adapter.content(resource),
                             creator: _self.adapter.creator(resource),
                             creationDate: _self.adapter.creationDate(resource),
                             modificationDate: _self.adapter.modificationDate(resource),
-                            commentCount: _self.adapter.commentCount(resource)
+                            commentCount: _self.adapter.commentCount(resource),
+                            comments: _self.adapter.elemRefs(resource),
+                            poolPath: _self.adapter.poolPath(resource)
                         };
                     });
                 };
 
                 $scope.errors = [];
+                $scope.show = {
+                    createForm: false
+                };
 
                 $scope.edit = () => {
                     $scope.viewmode = "edit";
@@ -130,16 +119,29 @@ export class CommentDetail {
 
                 $scope.save = () => {
                     _self.adapter.content(resource, $scope.data.content);
-                    return versionPromise.then((version) => {
-                        versionPromise = adhHttp.postNewVersion(version.path, resource)
-                            .then((_resource) => adhHttp.resolve(_resource.path), displayErrors);
-                        return updateScope().then(() => {
+                    return adhHttp.postNewVersion($scope.path, resource)
+                        .then((_resource) => _resource.path, displayErrors)
+                        .then(updateScope)
+                        .then(() => {
                             $scope.viewmode = "list";
                         });
+                };
+
+                $scope.createComment = () => {
+                    $scope.show.createForm = true;
+                };
+
+                $scope.cancelCreateComment = () => {
+                    $scope.show.createForm = false;
+                };
+
+                $scope.afterCreateComment = () => {
+                    return updateScope($scope.path).then(() => {
+                        $scope.show.createForm = false;
                     });
                 };
 
-                updateScope().then(adhDone);
+                updateScope($scope.path).then(adhDone);
             }]
         };
     }
