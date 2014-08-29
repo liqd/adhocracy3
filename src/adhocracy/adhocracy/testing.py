@@ -27,13 +27,27 @@ from adhocracy.interfaces import ResourceMetadata
 # Integration/Function test helper  #
 #####################################
 
+class DummyPool(testing.DummyResource):
 
-class DummyPoolWithObjectMap(testing.DummyResource):
+    """Dummy Pool based on :class:`pyramid.testing.DummyResource`."""
+
+    def add(self, name, resource, **kwargs):
+        self[name] = resource
+        resource.__parent__ = self
+        resource.__name__ = name
+
+    def next_name(self, obj, prefix=''):
+        return prefix + '_0000000'
+
+    def add_service(self, name, resource, **kwargs):
+        resource.__is_service__ = True
+        self.add(name, resource)
+
+
+class DummyPoolWithObjectMap(DummyPool):
 
     def add(self, name, obj, **kwargs):
-        self[name] = obj
-        obj.__name__ = name
-        obj.__parent__ = self
+        super().add(name, obj)
         objectmap = find_objectmap(self)
         obj.__oid__ = objectmap.new_objectid()
         path_tuple = resource_path_tuple(obj)
@@ -116,19 +130,6 @@ def context() -> testing.DummyResource:
     """ Return dummy context with IResource interface."""
     from adhocracy.interfaces import IResource
     return testing.DummyResource(__provides__=IResource)
-
-
-class DummyPool(testing.DummyResource):
-
-    """Dummy Pool based on :class:`pyramid.testing.DummyResource`."""
-
-    def add(self, name, resource, **kwargs):
-        self[name] = resource
-        resource.__parent__ = self
-        resource.__name__ = name
-
-    def next_name(self, obj, prefix=''):
-        return prefix + '_0000000'
 
 
 @fixture

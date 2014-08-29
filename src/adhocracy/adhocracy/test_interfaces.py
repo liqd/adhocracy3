@@ -1,7 +1,5 @@
 import unittest
 
-from pyramid import testing
-
 from adhocracy.interfaces import ISheet
 
 
