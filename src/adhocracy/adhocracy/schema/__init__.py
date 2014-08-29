@@ -2,6 +2,7 @@
 from datetime import datetime
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
+from pytz import UTC
 from substanced.schema import IdSet
 import colander
 import pytz
@@ -404,8 +405,8 @@ class Password(AdhocracySchemaNode):
 @colander.deferred
 def deferred_date_default(node: colander.MappingSchema, kw: dict) -> datetime:
     """Return current date."""
-    return datetime.now()
     # Fixme: set custom default timezone
+    return datetime.now(UTC)
 
 
 class DateTime(AdhocracySchemaNode):
