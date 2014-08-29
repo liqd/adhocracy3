@@ -6,6 +6,7 @@ import Util = require("../Util/Util");
 import AdhHttp = require("./Http");
 import Error = require("./Error");
 import AdhConvert = require("./Convert");
+import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 var mkHttpMock = () => {
     var mock = jasmine.createSpyObj("$httpMock", ["get", "post", "put"]);
@@ -65,12 +66,14 @@ export var register = () => {
         describe("Service", () => {
             var $httpMock;
             var adhMetaApiMock;
+            var adhPreliminaryNames;
             var adhHttp;
 
             beforeEach(() => {
                 $httpMock = mkHttpMock();
                 adhMetaApiMock = mkAdhMetaApiMock();
-                adhHttp = new AdhHttp.Service($httpMock, q, adhMetaApiMock);
+                adhPreliminaryNames = new PreliminaryNames();
+                adhHttp = new AdhHttp.Service($httpMock, q, adhMetaApiMock, adhPreliminaryNames);
             });
 
             describe("get", () => {
@@ -270,14 +273,20 @@ export var register = () => {
                 var response = {
                     data: obj
                 };
-                expect(AdhConvert.importContent(response)).toBe(obj);
+                var adhMetaApiMock = mkAdhMetaApiMock();
+                var adhPreliminaryNames = new PreliminaryNames();
+                var imported = () => AdhConvert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
+                expect(imported()).toBe(obj);
             });
             it("throws if response.data is not an object", () => {
                 var obj = <any>"foobar";
                 var response = {
                     data: obj
                 };
-                expect(() => AdhConvert.importContent(response)).toThrow();
+                var adhMetaApiMock = mkAdhMetaApiMock();
+                var adhPreliminaryNames = new PreliminaryNames();
+                var imported = () => AdhConvert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
+                expect(imported).toThrow();
             });
         });
 

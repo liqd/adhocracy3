@@ -1,5 +1,6 @@
 import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
+import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import Resources = require("../../Resources");
 import Resources_ = require("../../Resources_");
 
@@ -7,7 +8,11 @@ import Resources_ = require("../../Resources_");
 /**
  * transform objects on the way in (all request methods)
  */
-export var importContent = <Content extends Resources.Content<any>>(response : {data : Content}) : Content => {
+export var importContent = <Content extends Resources.Content<any>>(
+    response : {data : Content},
+    metaApi : MetaApi.MetaApiQuery,
+    preliminaryNames : PreliminaryNames
+) : Content => {
     "use strict";
 
     var obj = response.data;
@@ -81,7 +86,11 @@ export var importContent = <Content extends Resources.Content<any>>(response : {
  * functions simultaneously and has not been deemed worthwhile so
  * far.
  */
-export var importBatchContent = <Content extends Resources.Content<any>>(responses : { data : {body : Content}[] }) : Content[] => {
+export var importBatchContent = <Content extends Resources.Content<any>>(
+    responses : { data : {body : Content}[] },
+    metaApi : MetaApi.MetaApiQuery,
+    preliminaryNames : PreliminaryNames
+) : Content[] => {
     // FIXME: description files don't appear to support array-typed
     // response bodies.  this might be a good thing (web security and
     // all).  change rest batch spec to wrap array in trivial object?
@@ -89,7 +98,7 @@ export var importBatchContent = <Content extends Resources.Content<any>>(respons
     return (<any>(responses.data)).map((response) => {
         response.data = response.body;
         delete response.body;
-        return importContent(response);
+        return importContent(response, metaApi, preliminaryNames);
     });
 };
 

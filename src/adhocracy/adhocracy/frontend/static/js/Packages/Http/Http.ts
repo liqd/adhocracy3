@@ -6,6 +6,7 @@ import Resources = require("../../Resources");
 import ResourcesBase = require("../../ResourcesBase");
 import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
+import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhTransaction = require("./Transaction");
 import AdhError = require("./Error");
 import AdhConvert = require("./Convert");
@@ -32,25 +33,32 @@ export class Service<Content extends Resources.Content<any>> {
     constructor(
         private $http : ng.IHttpService,
         private $q : ng.IQService,
-        private adhMetaApi : MetaApi.MetaApiQuery
+        private adhMetaApi : MetaApi.MetaApiQuery,
+        private adhPreliminaryNames : PreliminaryNames
     ) {}
 
     public get(path : string) : ng.IPromise<Content> {
         return this.$http
             .get(path)
-            .then(AdhConvert.importContent, AdhError.logBackendError);
+            .then(
+                (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
+                AdhError.logBackendError);
     }
 
     public put(path : string, obj : Content) : ng.IPromise<Content> {
         return this.$http
             .put(path, AdhConvert.exportContent(this.adhMetaApi, obj))
-            .then(AdhConvert.importContent, AdhError.logBackendError);
+            .then(
+                (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
+                AdhError.logBackendError);
     }
 
     public post(path : string, obj : Content) : ng.IPromise<Content> {
         return this.$http
             .post(path, AdhConvert.exportContent(this.adhMetaApi, obj))
-            .then(AdhConvert.importContent, AdhError.logBackendError);
+            .then(
+                (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
+                AdhError.logBackendError);
     }
 
     public getNewestVersionPath(path : string) : ng.IPromise<string> {
@@ -186,6 +194,6 @@ export class Service<Content extends Resources.Content<any>> {
      *     };
      */
     public withTransaction<Result>(callback : (httpTrans : AdhTransaction.Transaction) => ng.IPromise<Result>) : ng.IPromise<Result> {
-        return callback(new AdhTransaction.Transaction(this.$http, this.adhMetaApi));
+        return callback(new AdhTransaction.Transaction(this.$http, this.adhMetaApi, this.adhPreliminaryNames));
     }
 }
