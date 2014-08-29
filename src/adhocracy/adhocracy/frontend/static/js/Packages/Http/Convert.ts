@@ -1,3 +1,5 @@
+import _ = require("lodash");
+
 import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
 import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
@@ -49,9 +51,25 @@ export var importContent = <Content extends Resources.Content<any>>(
         _obj.root_versions = obj.root_versions;
     }
 
-    // construct sheets
+    // iterate over all delivered sheets and construct instances
 
-    _obj.data = obj.data;  // FIXME!
+    (() => {
+        _.forOwn(obj.data, (jsonSheet, sheetName) => {
+            if (!Resources_.sheetRegistry.hasOwnProperty(sheetName)) {
+                throw ("unknown property sheet: " + sheetName + " " + JSON.stringify(obj, null, 2));
+            }
+
+            var _class = Resources_.sheetRegistry[sheetName];
+            _obj.data[sheetName] = new _class({});
+            _.forOwn(jsonSheet, (val, key) => {
+                _obj.data[sheetName][key] = val;
+            });
+
+            // the above four lines compile because we leave
+            // typescript in the dark about the actual type of _class.
+            // har!
+        });
+    })();
 
     // return
 
