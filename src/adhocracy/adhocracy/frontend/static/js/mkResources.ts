@@ -185,12 +185,14 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
     (() => {
         var rootModule = "";
         var relativeRoot = outPath + "/Resources_/";
+        var imports : string[] = [];
         for (var modulePath in modules) {
             if (modules.hasOwnProperty(modulePath)) {
-                rootModule += mkImportStatement(modulePath, relativeRoot, metaApi);
+                imports.push(mkImportStatement(modulePath, relativeRoot, metaApi));
             }
         }
-        rootModule += "\n";
+        imports.sort();
+        rootModule += Util.intercalate(imports, "") + "\n";
         var absfp = outPath + "/Resources_.ts";
         fs.writeFileSync(absfp, headerFooter(relativeRoot, rootModule));
     })();
