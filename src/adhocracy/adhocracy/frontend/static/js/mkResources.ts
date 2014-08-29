@@ -187,28 +187,24 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
         var relativeRoot = outPath + "/Resources_/";
         var imports : string[] = [];
         (() => {
-
-        for (var modulePath in modules) {
-            if (modules.hasOwnProperty(modulePath)) {
-                imports.push(mkImportStatement(modulePath, relativeRoot, metaApi));
+            for (var modulePath in modules) {
+                if (modules.hasOwnProperty(modulePath)) {
+                    imports.push(mkImportStatement(modulePath, relativeRoot, metaApi));
+                }
             }
-        }
-        imports.sort();
-        rootModule += Util.intercalate(imports, "") + "\n";
-
+            imports.sort();
+            rootModule += Util.intercalate(imports, "") + "\n";
         })();
 
         (() => {
-
-        var dictEntries : string[] = [];
-        for (var modulePath in metaApi.resources) {
-            if (metaApi.resources.hasOwnProperty(modulePath)) {
-                dictEntries.push("    \"" + modulePath + "\": " + mkModuleName(modulePath, metaApi));
+            var dictEntries : string[] = [];
+            for (var modulePath in metaApi.resources) {
+                if (metaApi.resources.hasOwnProperty(modulePath)) {
+                    dictEntries.push("    \"" + modulePath + "\": " + mkModuleName(modulePath, metaApi));
+                }
             }
-        }
-        dictEntries.sort();
-        rootModule += "export var registry = {\n" + Util.intercalate(dictEntries, ",\n") + "\n};\n";
-
+            dictEntries.sort();
+            rootModule += "export var registry = {\n" + Util.intercalate(dictEntries, ",\n") + "\n};\n";
         })();
 
         var absfp = outPath + "/Resources_.ts";
