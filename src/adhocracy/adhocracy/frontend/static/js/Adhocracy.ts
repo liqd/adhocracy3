@@ -82,7 +82,7 @@ export var init = (config, meta_api) => {
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
 
-    app.service("adhProposal", AdhProposal.Service);
+    app.service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", AdhProposal.Service]);
     app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
