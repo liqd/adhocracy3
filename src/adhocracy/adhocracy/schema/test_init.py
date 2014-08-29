@@ -540,6 +540,7 @@ class DateTimeUnitTest(unittest.TestCase):
         inst = self._make_one().bind()
         result = inst.deserialize()
         assert isinstance(result, datetime)
+        assert result.tzname() == 'UTC'
 
     def test_serialize_empty(self):
         inst = self._make_one()
@@ -549,5 +550,6 @@ class DateTimeUnitTest(unittest.TestCase):
         from datetime import datetime
         inst = self._make_one().bind()
         result = inst.serialize()
-        today = str(datetime.today().date())
+        # we want an iso 8601 string with the current datetime
+        today = datetime.today().date().isoformat()
         assert today in result

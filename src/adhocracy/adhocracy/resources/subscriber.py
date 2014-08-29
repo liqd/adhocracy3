@@ -1,5 +1,6 @@
 """Subscriber to track changed resources during one transaction."""
 from collections import defaultdict
+from collections import Sequence
 
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
@@ -75,9 +76,12 @@ def reference_has_new_version_subscriber(event):
     if autoupdate and editable:
         appstruct = sheet.get()
         field = appstruct[event.isheet_field]
-        old_version_index = field.index(event.old_version)
-        field.pop(old_version_index)
-        field.insert(old_version_index, event.new_version)
+        if isinstance(field, Sequence):
+            old_version_index = field.index(event.old_version)
+            field.pop(old_version_index)
+            field.insert(old_version_index, event.new_version)
+        else:
+            appstruct[event.isheet_field] = event.new_version
         new_version = _get_new_version_created_in_this_transaction(registry,
                                                                    resource)
         if IItemVersion.providedBy(resource) and new_version is None:
