@@ -181,7 +181,7 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
         }
     })();
 
-    // generate main module
+    // generate root module Resources_.ts
     (() => {
         var rootModule = "";
         var relativeRoot = outPath + "/Resources_/";
