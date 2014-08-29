@@ -17,9 +17,9 @@ export var importContent = <Content extends Resources.Content<any>>(
 
     var obj = response.data;
 
-    if (typeof obj === "object") {
-        return obj;
-    } else {
+    // construct resource
+
+    if (typeof obj !== "object") {
         throw ("unexpected type: " + (typeof obj).toString() + " " + JSON.stringify(obj, null, 2));
     }
 
@@ -27,7 +27,31 @@ export var importContent = <Content extends Resources.Content<any>>(
         throw ("resource has no content_type field: " + JSON.stringify(obj, null, 2));
     }
 
-    var dummy = new (Resources_.registry[obj.content_type])();
+    if (!obj.hasOwnProperty("path")) {
+        throw ("resource has no path field: " + JSON.stringify(obj, null, 2));
+    }
+
+    var _class = Resources_.registry[obj.content_type];
+    var _obj = new _class({
+        preliminaryNames: preliminaryNames,
+        path: obj.path
+    });
+
+    if (obj.hasOwnProperty("first_version_path")) {
+        _obj.first_version_path = obj.first_version_path;
+    }
+
+    if (obj.hasOwnProperty("root_versions")) {
+        _obj.root_versions = obj.root_versions;
+    }
+
+    // construct sheets
+
+    _obj.data = obj.data;  // FIXME!
+
+    // return
+
+    return _obj;
 
 
     // FIXME: it would be nice if this function could throw an
