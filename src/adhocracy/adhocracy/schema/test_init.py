@@ -549,5 +549,6 @@ class DateTimeUnitTest(unittest.TestCase):
         from datetime import datetime
         inst = self._make_one().bind()
         result = inst.serialize()
-        today = str(datetime.today().date())
+        # we want an iso 8601 string with the current datetime
+        today = datetime.today().date().isoformat()
         assert today in result

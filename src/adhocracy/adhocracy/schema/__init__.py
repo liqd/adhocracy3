@@ -404,8 +404,8 @@ class Password(AdhocracySchemaNode):
 @colander.deferred
 def deferred_date_default(node: colander.MappingSchema, kw: dict) -> datetime:
     """Return current date."""
-    # Fixme: set custom timezone
     return datetime.now()
+    # Fixme: set custom default timezone
 
 
 class DateTime(AdhocracySchemaNode):
@@ -423,8 +423,8 @@ class DateTime(AdhocracySchemaNode):
 
     Constructor arguments:
 
-    :param 'tzinfo': This timezone is used if the cstrut is missing the tzinfo.
-                     Defaults to UTC
+    :param 'tzinfo': This timezone is used if the :term:`cstruct` is missing
+                     the tzinfo. Defaults to UTC
     """
 
     schema_type = colander.DateTime
