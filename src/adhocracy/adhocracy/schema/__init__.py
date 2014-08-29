@@ -405,8 +405,7 @@ class Password(AdhocracySchemaNode):
 @colander.deferred
 def deferred_date_default(node: colander.MappingSchema, kw: dict) -> datetime:
     """Return current date."""
-    # Fixme: set custom default timezone
-    return datetime.now(UTC)
+    return datetime.utcnow().replace(tzinfo=UTC)
 
 
 class DateTime(AdhocracySchemaNode):
