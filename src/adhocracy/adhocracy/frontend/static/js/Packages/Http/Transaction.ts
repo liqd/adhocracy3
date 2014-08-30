@@ -1,6 +1,6 @@
+import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResources = require("../../Resources");
 import MetaApi = require("../MetaApi/MetaApi");
-import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import AdhError = require("./Error");
 import AdhConvert = require("./Convert");
@@ -42,10 +42,6 @@ export class Transaction {
         }
     }
 
-    private generatePath() : string {
-        return "path" + this.nextID++;
-    }
-
     public get(path : string) : ITransactionResult {
         this.checkNotCommitted();
         this.requests.push({
@@ -73,17 +69,29 @@ export class Transaction {
 
     public post(path : string, obj : AdhResources.Content<any>) : ITransactionResult {
         this.checkNotCommitted();
-        var preliminaryPath = this.generatePath();
+        var preliminaryPath;
+        if (obj.hasOwnProperty("path") && typeof obj.path === "string") {
+            preliminaryPath = obj.path;
+        } else {
+            preliminaryPath = this.adhPreliminaryNames.nextPreliminary();
+        }
+        var preliminaryFirstVersionPath;
+        if (obj.hasOwnProperty("first_version_path") && typeof obj.first_version_path === "string") {
+            preliminaryFirstVersionPath = obj.first_version_path;
+        } else {
+            preliminaryFirstVersionPath = this.adhPreliminaryNames.nextPreliminary();
+        }
         this.requests.push({
             method: "POST",
             path: path,
             body: AdhConvert.exportContent(this.adhMetaApi, obj),
-            result_path: preliminaryPath
+            result_path: preliminaryPath,
+            result_first_version_path: preliminaryFirstVersionPath
         });
         return {
             index: this.requests.length - 1,
-            path: "@" + preliminaryPath,
-            first_version_path: "@@" + preliminaryPath
+            path: preliminaryPath,
+            first_version_path: preliminaryFirstVersionPath
         };
     }
 
