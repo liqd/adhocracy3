@@ -16,93 +16,52 @@ export var register = () => {
             var directive;
 
             beforeEach(() => {
-                directive = AdhResourceWidgets.resourceWrapper(q);
+                directive = AdhResourceWidgets.resourceWrapper();
             });
 
-            describe("link", () => {
+            describe("controller", () => {
                 var scopeMock;
+                var controller;
 
                 beforeEach(() => {
-                    scopeMock = jasmine.createSpyObj("scope", ["$on", "$broadcast"]);
-                    directive.link(scopeMock);
+                    scopeMock = jasmine.createSpyObj("scope", ["$broadcast"]);
+                    controller = new directive.controller[2](scopeMock, q);
                 });
 
                 it("does not pollute the scope", () => {
                     expect(scopeMock).toEqual({
-                        $on: jasmine.any(Function),
                         $broadcast: jasmine.any(Function)
                     });
                 });
 
-                describe("on registerResourceDirective", () => {
-                    var fn;
-                    var ev;
-
-                    beforeEach(() => {
-                        fn = getArgsByFirst(scopeMock.$on, "registerResourceDirective")[0][1];
-                        ev = jasmine.createSpyObj("event", ["stopPropagation"]);
-                    });
-
-                    it("stops event propagation", () => {
-                        fn(ev, "promise");
-                        expect(ev.stopPropagation).toHaveBeenCalled();
-                    });
-
+                describe("registerResourceDirective", () => {
                     xit("stores the passed promise", () => {
                         throw "untestable";
                     });
                 });
 
-                describe("on triggerSubmit", () => {
-                    var ev;
-
-                    beforeEach(() => {
-                        var fn = getArgsByFirst(scopeMock.$on, "triggerSubmit")[0][1];
-                        ev = jasmine.createSpyObj("event", ["stopPropagation"]);
-                        fn(ev);
-                    });
-
-                    it("stops event propagation", () => {
-                        expect(ev.stopPropagation).toHaveBeenCalled();
+                describe("triggerSubmit", () => {
+                    beforeEach((done) => {
+                        controller.triggerSubmit().then(done);
                     });
 
                     it("broadcasts a 'submit' event", () => {
                         expect(scopeMock.$broadcast).toHaveBeenCalledWith("submit");
                     });
+
+                    // FIXME
                 });
 
-                describe("on triggerCancel", () => {
-                    var ev;
-
-                    beforeEach(() => {
-                        var fn = getArgsByFirst(scopeMock.$on, "triggerCancel")[0][1];
-                        ev = jasmine.createSpyObj("event", ["stopPropagation"]);
-                        fn(ev);
-                    });
-
-                    it("stops event propagation", () => {
-                        expect(ev.stopPropagation).toHaveBeenCalled();
-                    });
-
+                describe("triggerCancel", () => {
                     it("broadcasts a 'cancel' event", () => {
+                        controller.triggerCancel();
                         expect(scopeMock.$broadcast).toHaveBeenCalledWith("cancel");
                     });
                 });
 
-                describe("on triggerSetMode", () => {
-                    var ev;
-
-                    beforeEach(() => {
-                        var fn = getArgsByFirst(scopeMock.$on, "triggerSetMode")[0][1];
-                        ev = jasmine.createSpyObj("event", ["stopPropagation"]);
-                        fn(ev, "mode");
-                    });
-
-                    it("stops event propagation", () => {
-                        expect(ev.stopPropagation).toHaveBeenCalled();
-                    });
-
+                describe("triggerSetMode", () => {
                     it("broadcasts a 'setMode' event with mode as first parameter", () => {
+                        controller.triggerSetMode("mode");
                         expect(scopeMock.$broadcast).toHaveBeenCalledWith("setMode", "mode");
                     });
                 });
@@ -113,6 +72,7 @@ export var register = () => {
             var adhHttpMock;
             var adhPreliminaryNamesMock;
             var resourceWidget;
+            var instanceMock;
 
             beforeEach(() => {
                 adhHttpMock = jasmine.createSpyObj("adhHttp", ["get"]);
@@ -121,13 +81,14 @@ export var register = () => {
                 adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary"]);
                 adhPreliminaryNamesMock.isPreliminary.and.returnValue(false);
 
-                resourceWidget = new AdhResourceWidgets.ResourceWidget(adhHttpMock, adhPreliminaryNamesMock, q);
-            });
+                instanceMock = {
+                    scope: jasmine.createSpyObj("scope", ["$emit"]),
+                    wrapper: jasmine.createSpyObj("wrapper", ["registerResourceDirective", "triggerSubmit", "triggerCancel",
+                        "triggerSetMode"]),
+                    deferred: q.defer()
+                };
 
-            describe("constructor", () => {
-                it("sets this.deferred", () => {
-                    expect(resourceWidget.deferred).toBeDefined();
-                });
+                resourceWidget = new AdhResourceWidgets.ResourceWidget(adhHttpMock, adhPreliminaryNamesMock, q);
             });
 
             describe("createDirective", () => {
@@ -144,16 +105,26 @@ export var register = () => {
 
                 describe("link", () => {
                     var scopeMock;
+                    var instance;
 
                     beforeEach(() => {
                         scopeMock = jasmine.createSpyObj("scope", ["$on", "$emit", "$broadcast"]);
+                        scopeMock.mode = "mode";
+
                         resourceWidget.update = jasmine.createSpy("update").and.returnValue(q.when());
-                        resourceWidget.setMode = jasmine.createSpy("setMode").and.returnValue(q.when());
+                        resourceWidget.setMode = jasmine.createSpy("setMode");
                         resourceWidget._handleDelete = jasmine.createSpy("_handleDelete").and.returnValue(q.when());
                         resourceWidget._provide = jasmine.createSpy("_provide").and.returnValue(q.when());
-                        directive.link(scopeMock);
+
+                        directive.link(scopeMock, undefined, undefined, instanceMock.wrapper);
+
+                        // instance is private, but we can get it via this hack
+                        instance = resourceWidget.update.calls.mostRecent().args[0];
                     });
 
+                    it("calls setMode", () => {
+                        expect(resourceWidget.setMode).toHaveBeenCalledWith(instance, "mode");
+                    });
                     it("calls update", () => {
                         expect(resourceWidget.update).toHaveBeenCalled();
                     });
@@ -161,9 +132,9 @@ export var register = () => {
                     describe("on $delete", () => {
                         it("resolves the promise that is registered with resourceWrapper with an empty list", () => {
                             var fn = getArgsByFirst(scopeMock.$on, "$delete")[0][1];
-                            resourceWidget.deferred.resolve = jasmine.createSpy("resolve");
+                            instance.deferred.resolve = jasmine.createSpy("resolve");
                             fn("event");
-                            expect(resourceWidget.deferred.resolve).toHaveBeenCalledWith([]);
+                            expect(instance.deferred.resolve).toHaveBeenCalledWith([]);
                         });
                     });
 
@@ -175,7 +146,7 @@ export var register = () => {
                             fn().then(() => {
                                 expect(resourceWidget._provide).toHaveBeenCalled();
 
-                                resourceWidget.deferred.promise.then((promised) => {
+                                instance.deferred.promise.then((promised) => {
                                     expect(promised).toBe("provided");
                                     done();
                                 });
@@ -202,8 +173,9 @@ export var register = () => {
                         it("does not call update and does not change mode if mode is not edit", (done) => {
                             scopeMock.mode = "foo";
                             fn().then(() => {
+                                // both have already been called once by link()
                                 expect(resourceWidget.update.calls.count()).toBe(1);
-                                expect(resourceWidget.setMode).not.toHaveBeenCalled();
+                                expect(resourceWidget.setMode.calls.count()).toBe(1);
                                 done();
                             });
                         });
@@ -213,7 +185,7 @@ export var register = () => {
                         it("calls setMode with first parameter", () => {
                             var fn = getArgsByFirst(scopeMock.$on, "setMode")[0][1];
                             fn("event", "mode");
-                            expect(resourceWidget.setMode).toHaveBeenCalledWith(scopeMock, "mode");
+                            expect(resourceWidget.setMode).toHaveBeenCalledWith(instance, "mode");
                         });
                     });
 
@@ -221,28 +193,28 @@ export var register = () => {
                         it("calls _handleDelete with first parameter", () => {
                             var fn = getArgsByFirst(scopeMock.$on, "triggerDelete")[0][1];
                             fn("event", "path");
-                            expect(resourceWidget._handleDelete).toHaveBeenCalledWith(scopeMock, "path");
+                            expect(resourceWidget._handleDelete).toHaveBeenCalledWith(instance, "path");
                         });
                     });
 
                     describe("edit", () => {
-                        it("uses setMode to switch to edit mode", () => {
+                        it("calls wrapper.triggerSetMode with Mode.edit", () => {
                             scopeMock.edit();
-                            expect(resourceWidget.setMode).toHaveBeenCalledWith(scopeMock, AdhResourceWidgets.Mode.edit);
+                            expect(instanceMock.wrapper.triggerSetMode).toHaveBeenCalledWith(AdhResourceWidgets.Mode.edit);
                         });
                     });
 
                     describe("submit", () => {
-                        it("emits a 'triggerSubmit' event", () => {
+                        it("calls wrapper.triggerSubmit", () => {
                             scopeMock.submit();
-                            expect(scopeMock.$emit).toHaveBeenCalledWith("triggerSubmit");
+                            expect(instanceMock.wrapper.triggerSubmit).toHaveBeenCalled();
                         });
                     });
 
                     describe("cancel", () => {
-                        it("emits a 'triggerCancel' event", () => {
+                        it("calls wrapper.triggerCancel", () => {
                             scopeMock.cancel();
-                            expect(scopeMock.$emit).toHaveBeenCalledWith("triggerCancel");
+                            expect(instanceMock.wrapper.triggerCancel).toHaveBeenCalled();
                         });
                     });
 
@@ -257,52 +229,43 @@ export var register = () => {
             });
 
             describe("setMode", () => {
-                var scopeMock;
-
-                beforeEach(() => {
-                    scopeMock = jasmine.createSpyObj("scope", ["$emit"]);
-                });
-
                 it("sets scope.mode", () => {
-                    resourceWidget.setMode(scopeMock, 15);
-                    expect((<any>scopeMock).mode).toBe(15);
+                    resourceWidget.setMode(instanceMock, 15);
+                    expect((<any>instanceMock.scope).mode).toBe(15);
                 });
 
                 it("allows to set mode by string", () => {
-                    resourceWidget.setMode(scopeMock, "edit");
-                    expect((<any>scopeMock).mode).toBe(1);
+                    resourceWidget.setMode(instanceMock, "edit");
+                    expect((<any>instanceMock.scope).mode).toBe(1);
                 });
 
                 it("defults to display mode", () => {
-                    resourceWidget.setMode(scopeMock);
-                    expect((<any>scopeMock).mode).toBe(0);
+                    resourceWidget.setMode(instanceMock);
+                    expect((<any>instanceMock.scope).mode).toBe(0);
                 });
 
                 it("resolves the promise that is registered with resourceWrapper with an empty list", () => {
-                    resourceWidget.deferred.resolve = jasmine.createSpy("resolve");
-                    resourceWidget.setMode(scopeMock, AdhResourceWidgets.Mode.display);
-                    expect(resourceWidget.deferred.resolve).toHaveBeenCalledWith([]);
+                    instanceMock.deferred.resolve = jasmine.createSpy("resolve");
+                    resourceWidget.setMode(instanceMock, AdhResourceWidgets.Mode.display);
+                    expect(instanceMock.deferred.resolve).toHaveBeenCalledWith([]);
                 });
 
                 it("creates a new promise and registers it with resourceWrapper using a 'registerResourceDirective' event", () => {
                     spyOn(q, "defer").and.callThrough();
-                    resourceWidget.setMode(scopeMock, AdhResourceWidgets.Mode.edit);
+                    resourceWidget.setMode(instanceMock, AdhResourceWidgets.Mode.edit);
                     expect(q.defer).toHaveBeenCalled();
-                    expect(scopeMock.$emit).toHaveBeenCalledWith("registerResourceDirective", jasmine.any(Object));
+                    expect(instanceMock.wrapper.registerResourceDirective).toHaveBeenCalled();
                 });
             });
 
             describe("update", () => {
-                var scopeMock;
-
                 beforeEach(() => {
-                    scopeMock = {};
                     resourceWidget._update = jasmine.createSpy("_update");
                 });
 
                 it("does not call adhHttp.get or _update when scope.path is preliminary", (done) => {
                     adhPreliminaryNamesMock.isPreliminary.and.returnValue(true);
-                    resourceWidget.update(scopeMock).then(() => {
+                    resourceWidget.update(instanceMock).then(() => {
                         expect(adhHttpMock.get).not.toHaveBeenCalled();
                         expect(resourceWidget._update).not.toHaveBeenCalled();
                         done();
@@ -311,8 +274,8 @@ export var register = () => {
 
                 it("does get scope.path from server and feed it to _update", (done) => {
                     adhPreliminaryNamesMock.isPreliminary.and.returnValue(false);
-                    scopeMock.path = "/some/path";
-                    resourceWidget.update(scopeMock).then(() => {
+                    instanceMock.scope.path = "/some/path";
+                    resourceWidget.update(instanceMock).then(() => {
                         expect(adhHttpMock.get).toHaveBeenCalledWith("/some/path");
                         expect(resourceWidget._update).toHaveBeenCalled();
 

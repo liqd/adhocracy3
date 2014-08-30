@@ -26,8 +26,6 @@
  *   may simply be resolved with an empty list.
  */
 
-// import _ = require("lodash");
-
 import ResourcesBase = require("../../ResourcesBase");
 
 import AdhHttp = require("../Http/Http");
@@ -37,10 +35,19 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 export enum Mode {display, edit};
 
 
-export var resourceWrapper = ($q : ng.IQService) => {
+export interface IResourceWrapperController {
+    registerResourceDirective(promise : ng.IPromise<ResourcesBase.Resource[]>) : void;
+    triggerSubmit() : ng.IPromise<void>;
+    triggerCancel() : void;
+    triggerSetMode(mode : Mode) : void;
+}
+
+export var resourceWrapper = () => {
     return {
         restrict: "E",
-        link: (scope : ng.IScope) => {
+        controller: ["$scope", "$q", function($scope : ng.IScope, $q : ng.IQService) {
+            var self : IResourceWrapperController = this;
+
             var resourcePromises : ng.IPromise<ResourcesBase.Resource[]>[] = [];
 
             var resetResourcePromises = (arg?) => {
@@ -48,32 +55,28 @@ export var resourceWrapper = ($q : ng.IQService) => {
                 return arg;
             };
 
-            scope.$on("registerResourceDirective", (ev, promise) => {
-                ev.stopPropagation();
+            self.registerResourceDirective = (promise : ng.IPromise<ResourcesBase.Resource[]>) => {
                 resourcePromises.push(promise);
-            });
+            };
 
-            scope.$on("triggerSubmit", (ev) => {
-                ev.stopPropagation();
-
-                scope.$broadcast("submit");
-                $q.all(resourcePromises)
+            self.triggerSubmit = () => {
+                $scope.$broadcast("submit");
+                return $q.all(resourcePromises)
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
-                    .then((resources) => console.log(resources));  // FIXME do deep post
-            });
+                    .then((resources) => console.log(resources))  // FIXME do deep post
+                    .then(() => self.triggerSetMode(Mode.display));
+            };
 
-            scope.$on("triggerCancel", (ev) => {
-                ev.stopPropagation();
-                scope.$broadcast("cancel");
-            });
+            self.triggerCancel = () => {
+                $scope.$broadcast("cancel");
+            };
 
-            scope.$on("triggerSetMode", (ev, mode : Mode) => {
-                ev.stopPropagation();
+            self.triggerSetMode = (mode : Mode) => {
                 resetResourcePromises();
-                scope.$broadcast("setMode", mode);
-            });
-        }
+                $scope.$broadcast("setMode", mode);
+            };
+        }]
     };
 };
 
@@ -82,66 +85,75 @@ export interface IResourceWidgetScope extends ng.IScope {
     mode : Mode;
     path : string;
     edit() : void;
-    submit() : ng.IAngularEvent;
-    cancel() : ng.IAngularEvent;
-    delete() : ng.IAngularEvent;
+    submit() : ng.IPromise<void>;
+    cancel() : void;
+    delete() : void;
 }
 
-export class ResourceWidget<R extends ResourcesBase.Resource> {
-    private deferred : ng.IDeferred<R[]>;
+export interface IResourceWidgetInstance<R extends ResourcesBase.Resource, S extends IResourceWidgetScope> {
+    scope : S;
+    wrapper : IResourceWrapperController;
+    deferred : ng.IDeferred<R[]>
+}
+
+export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourceWidgetScope> {
     public templateUrl : string;
 
     constructor(
         public adhHttp : AdhHttp.Service<any>,
         public adhPreliminaryNames : AdhPreliminaryNames,
         public $q : ng.IQService
-    ) {
-        this.deferred = this.$q.defer();
-    }
+    ) {}
 
     public createDirective() : ng.IDirective {
-        var self : ResourceWidget<R> = this;
+        var self : ResourceWidget<R, S> = this;
 
         return {
             restrict: "E",
+            require: "^adhResourceWrapper",
             templateUrl: self.templateUrl,
             scope: {
                 mode: "@",
                 path: "@"
             },
-            link: (scope : IResourceWidgetScope) => {
-                scope.mode = scope.mode || Mode.display;  // FIXME: untested
+            link: (scope : S, element, attrs, wrapper : IResourceWrapperController) => {
+                var instance : IResourceWidgetInstance<R, S> = {
+                    scope: scope,
+                    wrapper: wrapper,
+                    deferred: self.$q.defer()
+                };
 
-                scope.$on("setMode", (ev, mode : Mode) => self.setMode(scope, mode));
-                scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(scope, path));
-                scope.$on("$delete", () => self.deferred.resolve([]));
-                scope.$on("submit", () => self._provide(scope)
-                    .then((resources) => self.deferred.resolve(resources)));
+                scope.$on("setMode", (ev, mode : Mode) => self.setMode(instance, mode));
+                scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(instance, path));
+                scope.$on("$delete", () => instance.deferred.resolve([]));
+                scope.$on("submit", () => self._provide(instance)
+                    .then((resources) => instance.deferred.resolve(resources)));
 
                 scope.$on("cancel", () => {
                     if (scope.mode === Mode.edit) {
-                        return self.update(scope).then(() => {
-                            self.setMode(scope, Mode.display);
+                        return self.update(instance).then(() => {
+                            self.setMode(instance, Mode.display);
                         });
                     } else {
                         return self.$q.when();
                     }
                 });
 
-                scope.edit = () => self.setMode(scope, Mode.edit);
-                scope.submit = () => scope.$emit("triggerSubmit");
-                scope.cancel = () => scope.$emit("triggerCancel");
+                scope.edit = () => wrapper.triggerSetMode(Mode.edit);
+                scope.submit = () => wrapper.triggerSubmit();
+                scope.cancel = () => wrapper.triggerCancel();
                 scope.delete = () => scope.$emit("triggerDelete", scope.path);
 
-                self.update(scope);
+                self.setMode(instance, scope.mode);
+                self.update(instance);
             }
         };
     }
 
-    setMode(scope : IResourceWidgetScope, mode? : string) : void;
-    setMode(scope : IResourceWidgetScope, mode? : Mode) : void;
-    public setMode(scope, mode) {
-        var self : ResourceWidget<R> = this;
+    setMode(instance : IResourceWidgetInstance<R, S>, mode? : string) : void;
+    setMode(instance : IResourceWidgetInstance<R, S>, mode? : Mode) : void;
+    public setMode(instance, mode) : void {
+        var self : ResourceWidget<R, S> = this;
 
         if (typeof mode === "string") {
             mode = Mode[mode];
@@ -149,36 +161,36 @@ export class ResourceWidget<R extends ResourcesBase.Resource> {
             mode = Mode.display;
         }
 
-        self.deferred.resolve([]);
+        instance.deferred.resolve([]);
         if (mode === Mode.edit) {
-            self.deferred = self.$q.defer();
-            scope.$emit("registerResourceDirective", self.deferred.promise);
+            instance.deferred = self.$q.defer();
+            instance.wrapper.registerResourceDirective(instance.deferred.promise);
         }
-        scope.mode = mode;
+        instance.scope.mode = mode;
     }
 
-    public update(scope : IResourceWidgetScope) : ng.IPromise<void> {
-        var self : ResourceWidget<R> = this;
+    public update(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<void> {
+        var self : ResourceWidget<R, S> = this;
 
-        if (self.adhPreliminaryNames.isPreliminary(scope.path)) {
+        if (self.adhPreliminaryNames.isPreliminary(instance.scope.path)) {
             return self.$q.when();
         } else {
-            return self.adhHttp.get(scope.path)
-                .then((resource : R) => self._update(scope, resource));
+            return self.adhHttp.get(instance.scope.path)
+                .then((resource : R) => self._update(instance, resource));
         }
     }
 
     /**
      * Handle delete events from children.
      */
-    public _handleDelete(scope : IResourceWidgetScope, path : string) : ng.IPromise<void> {
+    public _handleDelete(instance : IResourceWidgetInstance<R, S>, path : string) : ng.IPromise<void> {
         throw "not implemented";
     }
 
     /**
      * Update scope from resource.
      */
-    public _update(scope : IResourceWidgetScope, resource : R) : ng.IPromise<void> {
+    public _update(instance : IResourceWidgetInstance<R, S>, resource : R) : ng.IPromise<void> {
         throw "not implemented";
     }
 
@@ -188,7 +200,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource> {
      * If the widget represents a versionable and scope.path
      * is preliminary, this function must also provide an item.
      */
-    public _provide(scope : IResourceWidgetScope) : ng.IPromise<R[]> {
+    public _provide(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<R[]> {
         throw "not implemented";
     }
 }
