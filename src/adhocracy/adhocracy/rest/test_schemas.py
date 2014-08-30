@@ -447,16 +447,18 @@ class TestPOSTBatchRequestSchema:
                 'method': 'POST',
                 'path': '/adhocracy/Proposal/kommunismus',
                 'body': {'content_type': 'adhocracy.resources.IParagraph'},
-                'result_path': 'par1_item'
+                'result_first_version_path': '@par1_item',
+                'result_path': '@par1_item'
             },
             {
                 'method': 'GET',
-                'path': '@@par1_item'
+                'path': '@par1_item'
             }
         ]
         data_with_defaults = data.copy()
         data_with_defaults[1]['body'] = {}
         data_with_defaults[1]['result_path'] = ''
+        data_with_defaults[1]['result_first_version_path'] = ''
         assert inst.deserialize(data) == data_with_defaults
 
     def test_deserialize_invalid_inner_field(self):
