@@ -69,7 +69,16 @@ export class CommentCreate {
 }
 
 
-export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, any> {
+export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidgetScope {
+    show : {
+        createForm : boolean;
+    };
+    createComment() : void;
+    cancelCreateComment() : void;
+    afterCreateComment() : ng.IPromise<void>;
+}
+
+export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICommentResourceScope> {
     constructor(
         private adapter : ICommentAdapter<any>,
         adhConfig : AdhConfig.Type,
@@ -82,8 +91,33 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, any>
     }
 
     createRecursionDirective(recursionHelper) {
+        var self = this;
+
         var directive = this.createDirective();
         directive.compile = (element) => recursionHelper.compile(element, directive.link);
+
+        directive.link = (scope : ICommentResourceScope, element, attrs, wrapper) => {
+            var instance = self.link(scope, element, attrs, wrapper);
+
+            scope.show = {
+                createForm: false
+            };
+
+            scope.createComment = () => {
+                scope.show.createForm = true;
+            };
+
+            scope.cancelCreateComment = () => {
+                scope.show.createForm = false;
+            };
+
+            scope.afterCreateComment = () => {
+                return this.update(instance).then(() => {
+                    scope.show.createForm = false;
+                });
+            };
+        };
+
         return directive;
     }
 

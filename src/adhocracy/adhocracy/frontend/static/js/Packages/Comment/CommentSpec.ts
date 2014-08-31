@@ -100,10 +100,7 @@ export var register = () => {
                 widget = new AdhComment.CommentResource(adapterMock, adhConfigMock, "adhHttp", adhPreliminaryNamesMock, q);
 
                 instanceMock = {
-                    scope: {
-                        path: "/some/path",
-                        viemode: "list"
-                    }
+                    scope: jasmine.createSpyObj("scope", ["$on"])
                 };
             });
 
@@ -116,9 +113,48 @@ export var register = () => {
                     directive = widget.createRecursionDirective(recursionHelperMock);
                 });
 
-                it("uses recursionHelper on compile", () => {
-                    directive.compile("element");
-                    expect(recursionHelperMock.compile).toHaveBeenCalled();
+                describe("compile", () => {
+                    it("uses recursionHelper", () => {
+                        directive.compile("element");
+                        expect(recursionHelperMock.compile).toHaveBeenCalled();
+                    });
+                });
+
+                describe("link", () => {
+                    beforeEach(() => {
+                        spyOn(widget, "update").and.returnValue(q.when());
+                        spyOn(widget, "setMode");
+                        directive.link(instanceMock.scope);
+                    });
+
+                    describe("createComment", () => {
+                        it("sets scope.show.createForm to true", () => {
+                            instanceMock.scope.createComment();
+                            expect(instanceMock.scope.show.createForm).toBe(true);
+                        });
+                    });
+
+                    describe("cancelCreateComment", () => {
+                        it("sets scope.show.createForm to false", () => {
+                            instanceMock.scope.cancelCreateComment();
+                            expect(instanceMock.scope.show.createForm).toBe(false);
+                        });
+                    });
+
+                    describe("afterCreateComment", () => {
+                        beforeEach((done) => {
+                            adapterMock.creator.and.returnValue("afterCreateCommentCreator");
+                            instanceMock.scope.afterCreateComment().then(done);
+                        });
+
+                        it("updates the scope", () => {
+                            expect(widget.update).toHaveBeenCalled();
+                        });
+
+                        it("sets scope.show.createForm to false", () => {
+                            expect(instanceMock.scope.show.createForm).toBe(false);
+                        });
+                    });
                 });
             });
 
