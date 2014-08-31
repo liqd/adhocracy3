@@ -169,76 +169,73 @@ export var register = () => {
                 });
             });
 
-            describe("_provide", () => {
+            describe("_create", () => {
                 var result;
-                var resource = {foo: "bar"};
                 var content = "content";
                 var refersTo = "refersTo";
 
-                beforeEach(() => {
+                beforeEach((done) => {
                     instanceMock.scope.data = {
                         content: content
                     };
                     instanceMock.scope.refersTo = refersTo;
-                    adapterMock.create.and.returnValue(resource);
-                });
-
-                describe("create case", () => {
-                    beforeEach((done) => {
-                        adhPreliminaryNamesMock.isPreliminary.and.returnValue(true);
-                        instanceMock.scope.poolPath = "poolPath";
-                        widget._provide(instanceMock).then((_result) => {
-                            result = _result;
-                            done();
-                        });
-                    });
-
-                    it("creates a new resource using the adapter", () => {
-                        expect(adapterMock.create.calls.count()).toBe(1);
-                        expect(adapterMock.createItem.calls.count()).toBe(1);
-                        expect(adapterMock.content.calls.count()).toBe(1);
-                        expect(adapterMock.refersTo.calls.count()).toBe(1);
-                        expect(adapterMock.content.calls.first().args[1]).toBe(content);
-                        expect(adapterMock.refersTo.calls.first().args[1]).toBe(refersTo);
-                    });
-
-                    it("sets parent properties on all resources", () => {
-                        result.forEach((resource) => {
-                            expect(resource.parent).toBeDefined();
-                        });
-                    });
-
-                    it("creates a new item", () => {
-                        expect(result.length).toBe(2);
+                    instanceMock.scope.poolPath = "poolPath";
+                    widget._create(instanceMock).then((_result) => {
+                        result = _result;
+                        done();
                     });
                 });
 
-                describe("edit case", () => {
-                    beforeEach((done) => {
-                        adhPreliminaryNamesMock.isPreliminary.and.returnValue(false);
-                        widget._provide(instanceMock).then((_result) => {
-                            result = _result;
-                            done();
-                        });
-                    });
+                it("creates a new resource using the adapter", () => {
+                    expect(adapterMock.create.calls.count()).toBe(1);
+                    expect(adapterMock.createItem.calls.count()).toBe(1);
+                    expect(adapterMock.content.calls.count()).toBe(1);
+                    expect(adapterMock.refersTo.calls.count()).toBe(1);
+                    expect(adapterMock.content.calls.first().args[1]).toBe(content);
+                    expect(adapterMock.refersTo.calls.first().args[1]).toBe(refersTo);
+                });
 
-                    it("creates a new resource using the adapter", () => {
-                        expect(adapterMock.derive.calls.count()).toBe(1);
-                        expect(adapterMock.content.calls.count()).toBe(1);
-                        expect(adapterMock.refersTo.calls.count()).toBe(1);
-                        expect(adapterMock.content.calls.first().args[1]).toBe(content);
-                        expect(adapterMock.refersTo.calls.first().args[1]).toBe(refersTo);
+                it("sets parent properties on all resources", () => {
+                    result.forEach((resource) => {
+                        expect(resource.parent).toBeDefined();
                     });
+                });
 
-                    it("sets parent properties on all resources", () => {
-                        result.forEach((resource) => {
-                            expect(resource.parent).toBeDefined();
-                        });
-                    });
+                it("creates a new item", () => {
+                    expect(result.length).toBe(2);
+                });
+            });
 
-                    it("does not create a new item", () => {
-                        expect(result.length).toBe(1);
+            describe("_edit", () => {
+                var result;
+                var oldVersion;
+                var content = "content";
+
+                beforeEach((done) => {
+                    oldVersion = RESOURCE;
+                    instanceMock.scope.data = {
+                        content: content
+                    };
+                    widget._edit(instanceMock, oldVersion).then((_result) => {
+                        result = _result;
+                        done();
                     });
+                });
+
+                it("creates a new resource using the adapter", () => {
+                    expect(adapterMock.derive.calls.count()).toBe(1);
+                    expect(adapterMock.content.calls.count()).toBe(1);
+                    expect(adapterMock.content.calls.first().args[1]).toBe(content);
+                });
+
+                it("sets parent properties on all resources", () => {
+                    result.forEach((resource) => {
+                        expect(resource.parent).toBeDefined();
+                    });
+                });
+
+                it("does not create a new item", () => {
+                    expect(result.length).toBe(1);
                 });
             });
         });

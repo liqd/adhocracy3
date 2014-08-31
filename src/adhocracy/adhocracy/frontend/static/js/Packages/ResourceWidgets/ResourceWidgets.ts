@@ -150,7 +150,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         };
 
         var setModeID = wrapper.eventHandler.on("setMode", (mode : Mode) => self.setMode(instance, mode));
-        var submitID = wrapper.eventHandler.on("submit", () => self._provide(instance)
+        var submitID = wrapper.eventHandler.on("submit", () => self.provide(instance)
             .then((resources) => instance.deferred.resolve(resources)));
 
         var cancelID = wrapper.eventHandler.on("cancel", () => {
@@ -229,10 +229,29 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
     /**
      * Create resource(s) from scope.
      *
-     * If the widget represents a versionable and scope.path
-     * is preliminary, this function must also provide an item.
+     * Calls _create/_edit based on whether scope.path is preliminary.
      */
-    public _provide(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<R[]> {
+    public provide(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<R[]> {
+        if (this.adhPreliminaryNames.isPreliminary(instance.scope.path)) {
+            return this._create(instance);
+        } else {
+            return this.adhHttp.get(instance.scope.path).then((old) => {
+                return this._edit(instance, old);
+            });
+        }
+    }
+
+    /**
+     * Initially create resource(s) from scope.
+     */
+    public _create(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<R[]> {
+        throw "not implemented";
+    }
+
+    /**
+     * Create modified resource(s) from scope.
+     */
+    public _edit(instance : IResourceWidgetInstance<R, S>, old : R) : ng.IPromise<R[]> {
         throw "not implemented";
     }
 }

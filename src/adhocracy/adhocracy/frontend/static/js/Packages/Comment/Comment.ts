@@ -101,37 +101,29 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
         return this.$q.when();
     }
 
-    public _provide(instance) {
-        var self = this;
+    public _create(instance) {
+        var item = this.adapter.createItem({
+            preliminaryNames: this.adhPreliminaryNames,
+            name: "comment"
+        });
+        item.parent = instance.scope.poolPath;
 
-        var updateFromScope = (resource) => {
-            self.adapter.content(resource, instance.scope.data.content);
-            self.adapter.refersTo(resource, instance.scope.refersTo);
-        };
+        var version = this.adapter.create({
+            preliminaryNames: this.adhPreliminaryNames,
+            follows: item.first_version_path
+        });
+        this.adapter.content(version, instance.scope.data.content);
+        this.adapter.refersTo(version, instance.scope.refersTo);
+        version.parent = item.path;
 
-        if (self.adhPreliminaryNames.isPreliminary(instance.scope.path)) {
-            var item = self.adapter.createItem({
-                preliminaryNames: self.adhPreliminaryNames,
-                name: "comment"
-            });
-            item.parent = instance.scope.poolPath;
+        return this.$q.when([item, version]);
+    }
 
-            var version = self.adapter.create({
-                preliminaryNames: self.adhPreliminaryNames,
-                follows: item.first_version_path
-            });
-            updateFromScope(version);
-            version.parent = item.path;
-
-            return self.$q.when([item, version]);
-        } else {
-            return self.adhHttp.get(instance.scope.path).then((oldVersion) => {
-                var resource = self.adapter.derive(oldVersion, {preliminaryNames: self.adhPreliminaryNames});
-                updateFromScope(resource);
-                resource.parent = Util.parentPath(oldVersion.path);
-                return [resource];
-            });
-        }
+    public _edit(instance, oldVersion) {
+        var resource = this.adapter.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
+        this.adapter.content(resource, instance.scope.data.content);
+        resource.parent = Util.parentPath(oldVersion.path);
+        return this.$q.when([resource]);
     }
 }
 

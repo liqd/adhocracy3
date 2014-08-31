@@ -138,7 +138,7 @@ export var register = () => {
                         resourceWidget.update = jasmine.createSpy("update").and.returnValue(q.when());
                         resourceWidget.setMode = jasmine.createSpy("setMode");
                         resourceWidget._handleDelete = jasmine.createSpy("_handleDelete").and.returnValue(q.when());
-                        resourceWidget._provide = jasmine.createSpy("_provide").and.returnValue(q.when());
+                        resourceWidget.provide = jasmine.createSpy("provide").and.returnValue(q.when());
 
                         directive.link(scopeMock, undefined, undefined, instanceMock.wrapper);
 
@@ -172,10 +172,10 @@ export var register = () => {
                     describe("on submit", () => {
                         it("calls provide and resolves the promise with the result", (done) => {
                             var fn = getArgsByFirst(instance.wrapper.eventHandler.on, "submit")[0][1];
-                            resourceWidget._provide.and.returnValue(q.when("provided"));
+                            resourceWidget.provide.and.returnValue(q.when("provided"));
 
                             fn().then(() => {
-                                expect(resourceWidget._provide).toHaveBeenCalled();
+                                expect(resourceWidget.provide).toHaveBeenCalled();
 
                                 instance.deferred.promise.then((promised) => {
                                     expect(promised).toBe("provided");
@@ -315,6 +315,40 @@ export var register = () => {
                 });
             });
 
+            describe("provide", () => {
+                var instanceMock;
+
+                beforeEach(() => {
+                    instanceMock = {
+                        scope: {
+                            path: "/some/path"
+                        }
+                    };
+                    spyOn(resourceWidget, "_create").and.returnValue(q.when());
+                    spyOn(resourceWidget, "_edit").and.returnValue(q.when());
+                });
+
+                it("calls _create if path is preliminary", (done) => {
+                    adhPreliminaryNamesMock.isPreliminary.and.returnValue(true);
+
+                    resourceWidget.provide(instanceMock).then(() => {
+                        expect(resourceWidget._create).toHaveBeenCalled();
+                        done();
+                    });
+                });
+
+                it("gets the current resource from the server and passes it to _edit", (done) => {
+                    adhPreliminaryNamesMock.isPreliminary.and.returnValue(false);
+                    adhHttpMock.get.and.returnValue(q.when("huhu"));
+
+                    resourceWidget.provide(instanceMock).then(() => {
+                        expect(adhHttpMock.get).toHaveBeenCalledWith("/some/path");
+                        expect(resourceWidget._edit).toHaveBeenCalledWith(jasmine.any(Object), "huhu");
+                        done();
+                    });
+                });
+            });
+
             describe("_handleDelete", () => {
                 it("raises an 'not implemented' exception", () => {
                     expect(() => resourceWidget._handleDelete({}, "path")).toThrow();
@@ -327,9 +361,15 @@ export var register = () => {
                 });
             });
 
-            describe("_provide", () => {
+            describe("_create", () => {
                 it("raises an 'not implemented' exception", () => {
-                    expect(() => resourceWidget._provide({}, "path")).toThrow();
+                    expect(() => resourceWidget._create({})).toThrow();
+                });
+            });
+
+            describe("_edit", () => {
+                it("raises an 'not implemented' exception", () => {
+                    expect(() => resourceWidget._edit({}, {})).toThrow();
                 });
             });
         });
