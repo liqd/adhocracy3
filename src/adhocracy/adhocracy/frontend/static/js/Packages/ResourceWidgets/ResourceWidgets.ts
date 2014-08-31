@@ -4,26 +4,14 @@
  * These directives provide a generic interface for creating, displaying,
  * editing and deleting resources with minimal additional effort.
  *
- * Each resourceWidget takes care of its own resources.  It can communicate
- * with other resourceWidgets py emitting events.  These events are catched
- * by a resourceWrapper that in turn broadcasts it to all its children.
+ * Each resourceWidget takes care of its own resources.  There is a single
+ * central resourceWrapper that manages communication and also takes care
+ * of collecting all generated resources and dispatching an HTTP request
+ * on submit.
  *
- * The following event types exist:
- *
- * setMode / triggerSetMode
- * : set the mode (display/edit) to the first parameter given with this event.
- *
- * cancel / triggerCancel
- * : change from edit mode to display mode; discard all unsaved changes
- *
- * submit / triggerSubmit
- * : the resourceWrapper waits for all registered resourcePromises. When
- *   they are ready, it uses deepPost to post all updates.
- *
- * registerResourceDirective
- * : is used by resourceWidgets to register a promise with the resourceWrapper
- *   that can be resolved on submit.  Instead of unregistering, the promise
- *   may simply be resolved with an empty list.
+ * The resourceWidgets can access the resourceWrapper by requiring it and
+ * using its controller (see https://docs.angularjs.org/guide/directive#creating-directives-that-communicate).
+ * See IResourceWrapperController for a description of the interface.
  */
 
 import ResourcesBase = require("../../ResourcesBase");
@@ -37,13 +25,61 @@ export enum Mode {display, edit};
 
 
 export interface IResourceWrapperController {
-    registerResourceDirective(promise : ng.IPromise<ResourcesBase.Resource[]>) : void;
-    triggerSubmit() : ng.IPromise<void>;
-    triggerCancel() : void;
-    triggerSetMode(mode : Mode) : void;
+    /**
+     * An event handler that is used whenever the resourceWrapper needs to
+     * contact the resourceWidgets. The following events are used:
+     *
+     * setMode
+     * : set mode to the passed argument
+     *
+     * cancel
+     * : when in edit mode, reset scope and switch to display mode
+     *
+     * submit
+     * : resolve promise with a list of resources
+     */
     eventHandler : AdhEventHandler.EventHandler;
+
+    /**
+     * registers a promise that will eventually be resolved with a list of
+     * resources on submit.
+     */
+    registerResourceDirective(promise : ng.IPromise<ResourcesBase.Resource[]>) : void;
+
+    /**
+     * triggers a "setMode" event on eventHandler
+     */
+    triggerSetMode(mode : Mode) : void;
+
+    /**
+     * triggers a "cancel" event on eventHandler
+     */
+    triggerCancel() : void;
+
+    /**
+     * triggers a "submit" event on eventHandler. This will cause the
+     * resourceWidgets to resolve the promises registered via
+     * registerResourceDirective. When all promises have been resolved,
+     * all promised resources will be posted to the server via deepPost.
+     */
+    triggerSubmit() : ng.IPromise<void>;
 }
 
+/**
+ * Directive that wraps resourceWidgets, manages communication and also takes
+ * care of dispatching a HTTP request on submit.
+ *
+ * You can pass two callbacks to this directive:
+ *
+ * onSubmit
+ * : called after successful submit
+ *
+ * onCancel
+ * : called after cancel
+ *
+ * Note that these callbacks need to be functions of type () : void in the
+ * parent scope.
+ */
 export var resourceWrapper = () => {
     return {
         restrict: "E",
@@ -54,7 +90,6 @@ export var resourceWrapper = () => {
             adhEventHandlerClass
         ) {
             var self : IResourceWrapperController = this;
-
             var resourcePromises : ng.IPromise<ResourcesBase.Resource[]>[] = [];
 
             var resetResourcePromises = (arg?) => {
@@ -75,6 +110,16 @@ export var resourceWrapper = () => {
                 resourcePromises.push(promise);
             };
 
+            self.triggerSetMode = (mode : Mode) => {
+                resetResourcePromises();
+                self.eventHandler.trigger("setMode", mode);
+            };
+
+            self.triggerCancel = () => {
+                self.eventHandler.trigger("cancel");
+                triggerCallback("onCancel");
+            };
+
             self.triggerSubmit = () => {
                 self.eventHandler.trigger("submit");
                 return $q.all(resourcePromises)
@@ -84,16 +129,6 @@ export var resourceWrapper = () => {
                     .then(() => self.triggerSetMode(Mode.display))
                     .then(() => triggerCallback("onSubmit"));
             };
-
-            self.triggerCancel = () => {
-                self.eventHandler.trigger("cancel");
-                triggerCallback("onCancel");
-            };
-
-            self.triggerSetMode = (mode : Mode) => {
-                resetResourcePromises();
-                self.eventHandler.trigger("setMode", mode);
-            };
         }]
     };
 };
@@ -102,9 +137,25 @@ export var resourceWrapper = () => {
 export interface IResourceWidgetScope extends ng.IScope {
     mode : Mode;
     path : string;
+
+    /**
+     * Set mode to "edit"
+     */
     edit() : void;
+
+    /**
+     * Trigger submit on resourceWrapper.
+     */
     submit() : ng.IPromise<void>;
+
+    /**
+     * Trigger cancel on resourceWrapper.
+     */
     cancel() : void;
+
+    /**
+     * Emit an angular "delete" event.
+     */
     delete() : void;
 }
 
@@ -114,6 +165,26 @@ export interface IResourceWidgetInstance<R extends ResourcesBase.Resource, S ext
     deferred : ng.IDeferred<R[]>
 }
 
+/**
+ * Abstract base class for all resourceWidgets.
+ *
+ * This class implements the basic functionality to interact with a
+ * resourceWrapper. It is implemented in such a way that most functionality is
+ * implemented in widget methods. This way it is easy to extend.
+ *
+ * Subclasses need to implement _handleDelete, _update, _create and _edit. They
+ * must also set templateUrl in the constructor. Additionally, they may extend
+ * createDirective to modify the generated directive directly.
+ *
+ * If a resourceWidget is instantiated without a mode, the mode defaults to
+ * "display".
+ *
+ * A resourceWidget must always be instantiated with a path. If you want to use
+ * the widget to create a new resource and therefore do not know its path, you
+ * must use a preliminary name (see PreliminaryNames package). The
+ * resourceWidget will detect that and behave accordingly (e.g. it will not try
+ * to load the resource from the server).
+ */
 export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourceWidgetScope> {
     public templateUrl : string;
 
@@ -182,9 +253,16 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         return instance;
     }
 
+    /**
+     * Set the mode of a this widget to either "display" or "edit".
+     *
+     * this method should  not be used directly. You should rather use
+     * instance.wrapper.triggerSetMode in order to change the mode on all
+     * resourceWidgets in this resourceWrapper.
+     */
     setMode(instance : IResourceWidgetInstance<R, S>, mode? : string) : void;
     setMode(instance : IResourceWidgetInstance<R, S>, mode? : Mode) : void;
-    public setMode(instance, mode) : void {
+    private setMode(instance, mode) {
         var self : ResourceWidget<R, S> = this;
 
         if (typeof mode === "string") {
