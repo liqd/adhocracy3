@@ -138,8 +138,16 @@ export class ResourceWidget<R extends ResourcesBase.Resource> {
         };
     }
 
-    public setMode(scope : IResourceWidgetScope, mode : Mode) : void {
+    setMode(scope : IResourceWidgetScope, mode? : string) : void;
+    setMode(scope : IResourceWidgetScope, mode? : Mode) : void;
+    public setMode(scope, mode) {
         var self : ResourceWidget<R> = this;
+
+        if (typeof mode === "string") {
+            mode = Mode[mode];
+        } else if (typeof mode === "undefined") {
+            mode = Mode.display;
+        }
 
         self.deferred.resolve([]);
         if (mode === Mode.edit) {

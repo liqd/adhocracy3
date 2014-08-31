@@ -264,8 +264,18 @@ export var register = () => {
                 });
 
                 it("sets scope.mode", () => {
-                    resourceWidget.setMode(scopeMock, "test");
-                    expect((<any>scopeMock).mode).toBe("test");
+                    resourceWidget.setMode(scopeMock, 15);
+                    expect((<any>scopeMock).mode).toBe(15);
+                });
+
+                it("allows to set mode by string", () => {
+                    resourceWidget.setMode(scopeMock, "edit");
+                    expect((<any>scopeMock).mode).toBe(1);
+                });
+
+                it("defults to display mode", () => {
+                    resourceWidget.setMode(scopeMock);
+                    expect((<any>scopeMock).mode).toBe(0);
                 });
 
                 it("resolves the promise that is registered with resourceWrapper with an empty list", () => {
