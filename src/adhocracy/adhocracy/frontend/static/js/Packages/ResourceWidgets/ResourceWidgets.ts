@@ -47,7 +47,12 @@ export interface IResourceWrapperController {
 export var resourceWrapper = () => {
     return {
         restrict: "E",
-        controller: ["$scope", "$q", "adhEventHandlerClass", function($scope : ng.IScope, $q : ng.IQService, adhEventHandlerClass) {
+        controller: ["$scope", "$attrs", "$q", "adhEventHandlerClass", function(
+            $scope : ng.IScope,
+            $attrs : ng.IAttributes,
+            $q : ng.IQService,
+            adhEventHandlerClass
+        ) {
             var self : IResourceWrapperController = this;
 
             var resourcePromises : ng.IPromise<ResourcesBase.Resource[]>[] = [];
@@ -55,6 +60,13 @@ export var resourceWrapper = () => {
             var resetResourcePromises = (arg?) => {
                 resourcePromises = [];
                 return arg;
+            };
+
+            var triggerCallback = (key : string) : void => {
+                if (typeof $attrs[key] !== "undefined") {
+                    var fn = $scope.$parent[$attrs[key]];
+                    fn.call($scope.$parent);
+                }
             };
 
             self.eventHandler = new adhEventHandlerClass();
@@ -69,11 +81,13 @@ export var resourceWrapper = () => {
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
                     .then((resources) => console.log(resources))  // FIXME do deep post
-                    .then(() => self.triggerSetMode(Mode.display));
+                    .then(() => self.triggerSetMode(Mode.display))
+                    .then(() => triggerCallback("onSubmit"));
             };
 
             self.triggerCancel = () => {
                 self.eventHandler.trigger("cancel");
+                triggerCallback("onCancel");
             };
 
             self.triggerSetMode = (mode : Mode) => {

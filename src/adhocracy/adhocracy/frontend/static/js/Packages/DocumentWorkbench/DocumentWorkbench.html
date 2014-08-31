@@ -23,13 +23,13 @@
         <adh-comment-listing data-path="{{content2Url}}">
             <div data-ng-switch="transclusionId">
                 <adh-resource-wrapper
+                    data-on-submit="onCreate"
+                    data-on-cancel="hideCreateForm"
                     data-ng-switch-when="create-form-id">
                     <adh-comment-create
                         data-path="{{createPath}}"
                         data-refers-to="{{path}}"
                         data-pool-path="{{poolPath}}"
-                        data-on-new="onCreate"
-                        data-on-cancel="hideCreateForm"
                         data-mode="edit">
                     </adh-comment-create>
                 </adh-resource-wrapper>

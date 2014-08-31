@@ -47,14 +47,14 @@
     </div>
 
     <div class="comment-children-create-form" data-ng-if="show.createForm">
-        <adh-resource-wrapper>
+        <adh-resource-wrapper
+            data-on-submit="afterCreateComment"
+            data-on-cancel="cancelCreateComment">
             <adh-comment-create
                 data-path="{{createPath}}"
                 data-mode="edit"
                 data-refers-to="{{path}}"
-                data-pool-path="{{data.replyPoolPath}}"
-                data-on-cancel="cancelCreateComment"
-                data-on-new="afterCreateComment">
+                data-pool-path="{{data.replyPoolPath}}">
             </adh-comment-create>
         </adh-resource-wrapper>
     </div>

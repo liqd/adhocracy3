@@ -21,6 +21,7 @@ export var register = () => {
 
             describe("controller", () => {
                 var scopeMock;
+                var attrsMock;
                 var controller;
                 var eventHandlerClassMock = function() {
                     this.on = jasmine.createSpy("on");
@@ -29,12 +30,20 @@ export var register = () => {
                 };
 
                 beforeEach(() => {
-                    scopeMock = {};
-                    controller = new directive.controller[3](scopeMock, q, eventHandlerClassMock);
+                    scopeMock = {
+                        $parent: jasmine.createSpyObj("$parent", ["onCancel", "onSubmitX"])
+                    };
+                    attrsMock = {
+                        onCancel: "onCancel",
+                        onSubmit: "onSubmitX"
+                    };
+                    controller = new directive.controller[4](scopeMock, attrsMock, q, eventHandlerClassMock);
                 });
 
                 it("does not pollute the scope", () => {
-                    expect(scopeMock).toEqual({});
+                    expect(scopeMock).toEqual({
+                        $parent: jasmine.any(Object)
+                    });
                 });
 
                 describe("registerResourceDirective", () => {
@@ -52,13 +61,24 @@ export var register = () => {
                         expect(controller.eventHandler.trigger).toHaveBeenCalledWith("submit");
                     });
 
+                    it("calls onSubmit callback", () => {
+                        expect(scopeMock.$parent.onSubmitX).toHaveBeenCalled();
+                    });
+
                     // FIXME
                 });
 
                 describe("triggerCancel", () => {
-                    it("triggers a 'cancel' event on eventHandler", () => {
+                    beforeEach(() => {
                         controller.triggerCancel();
+                    });
+
+                    it("triggers a 'cancel' event on eventHandler", () => {
                         expect(controller.eventHandler.trigger).toHaveBeenCalledWith("cancel");
+                    });
+
+                    it("calls onCancel callback", () => {
+                        expect(scopeMock.$parent.onCancel).toHaveBeenCalled();
                     });
                 });
 
