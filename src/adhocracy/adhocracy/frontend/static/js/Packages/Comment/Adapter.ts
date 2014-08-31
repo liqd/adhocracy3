@@ -39,6 +39,7 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
         return new RIComment(settings);
     }
 
+    // FIXME: move to a service
     derive<R extends ResourcesBase.Resource>(oldVersion : R, settings) : R {
         var resource = new (<any>oldVersion).constructor(settings);
 
