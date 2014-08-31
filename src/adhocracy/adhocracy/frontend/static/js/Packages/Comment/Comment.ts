@@ -135,18 +135,6 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
     }
 }
 
-export var commentDetail = () => {
-    return {
-        restrict: "E",
-        scope: {
-            path: "="
-        },
-        template: "<adh-resource-wrapper><adh-comment-resource data-path=\"{{path}}\" data-mode=\"display\">" +
-            "</adh-comment-resource></adh-resource-wrapper>"
-    };
-};
-
-
 export class CommentCreate extends CommentResource {
     constructor(
         adapter : ICommentAdapter<any>,

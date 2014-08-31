@@ -141,7 +141,6 @@ export var init = (config, meta_api) => {
             var widget = new AdhComment.CommentCreate(adapter, adhConfig, adhHttp, adhPreliminaryNames, $q);
             return widget.createRecursionDirective(recursionHelper);
         }]);
-    app.directive("adhCommentDetail", AdhComment.commentDetail);
     app.directive("adhProposalDetail", () => new AdhProposal.ProposalDetail().createDirective());
     app.directive("adhProposalVersionDetail",
         ["adhConfig", (adhConfig) => new AdhProposal.ProposalVersionDetail().createDirective(adhConfig)]);

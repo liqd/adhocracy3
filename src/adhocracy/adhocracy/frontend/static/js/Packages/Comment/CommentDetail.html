@@ -60,9 +60,12 @@
     </div>
 
     <div class="comment-children">
-        <adh-comment-detail
-            data-ng-repeat="comment in data.comments"
-            data-path="comment">
-        </adh-comment-detail>
+        <adh-resource-wrapper
+            data-ng-repeat="comment in data.comments">
+            <adh-comment-resource
+                data-path="{{comment}}"
+                data-mode="display">
+            </adh-comment-resource>
+        </adh-resource-wrapper>
     </div>
 </div>

@@ -33,8 +33,13 @@
                         data-mode="edit">
                     </adh-comment-create>
                 </adh-resource-wrapper>
+                <adh-resource-wrapper
                     data-ng-switch-when="element-id">
-                </adh-comment-detail>
+                    <adh-comment-resource
+                        data-path="{{element}}"
+                        data-mode="display">
+                    </adh-comment-resource>
+                </adh-resource-wrapper>
             </div>
         </adh-comment-listing>
     </div>
