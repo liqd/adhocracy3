@@ -117,37 +117,45 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
                 path: "@"
             },
             link: (scope : S, element, attrs, wrapper : IResourceWrapperController) => {
-                var instance : IResourceWidgetInstance<R, S> = {
-                    scope: scope,
-                    wrapper: wrapper,
-                    deferred: self.$q.defer()
-                };
-
-                scope.$on("setMode", (ev, mode : Mode) => self.setMode(instance, mode));
-                scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(instance, path));
-                scope.$on("$delete", () => instance.deferred.resolve([]));
-                scope.$on("submit", () => self._provide(instance)
-                    .then((resources) => instance.deferred.resolve(resources)));
-
-                scope.$on("cancel", () => {
-                    if (scope.mode === Mode.edit) {
-                        return self.update(instance).then(() => {
-                            self.setMode(instance, Mode.display);
-                        });
-                    } else {
-                        return self.$q.when();
-                    }
-                });
-
-                scope.edit = () => wrapper.triggerSetMode(Mode.edit);
-                scope.submit = () => wrapper.triggerSubmit();
-                scope.cancel = () => wrapper.triggerCancel();
-                scope.delete = () => scope.$emit("triggerDelete", scope.path);
-
-                self.setMode(instance, scope.mode);
-                self.update(instance);
+                self.link(scope, element, attrs, wrapper);
             }
         };
+    }
+
+    public link(scope : S, element, attrs, wrapper : IResourceWrapperController) : IResourceWidgetInstance<R, S> {
+        var self : ResourceWidget<R, S> = this;
+
+        var instance : IResourceWidgetInstance<R, S> = {
+            scope: scope,
+            wrapper: wrapper,
+            deferred: self.$q.defer()
+        };
+
+        scope.$on("setMode", (ev, mode : Mode) => self.setMode(instance, mode));
+        scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(instance, path));
+        scope.$on("$delete", () => instance.deferred.resolve([]));
+        scope.$on("submit", () => self._provide(instance)
+            .then((resources) => instance.deferred.resolve(resources)));
+
+        scope.$on("cancel", () => {
+            if (scope.mode === Mode.edit) {
+                return self.update(instance).then(() => {
+                    self.setMode(instance, Mode.display);
+                });
+            } else {
+                return self.$q.when();
+            }
+        });
+
+        scope.edit = () => wrapper.triggerSetMode(Mode.edit);
+        scope.submit = () => wrapper.triggerSubmit();
+        scope.cancel = () => wrapper.triggerCancel();
+        scope.delete = () => scope.$emit("triggerDelete", scope.path);
+
+        self.setMode(instance, scope.mode);
+        self.update(instance);
+
+        return instance;
     }
 
     setMode(instance : IResourceWidgetInstance<R, S>, mode? : string) : void;
