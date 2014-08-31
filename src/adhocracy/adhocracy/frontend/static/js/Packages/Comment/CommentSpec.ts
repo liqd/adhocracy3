@@ -97,6 +97,7 @@ export var register = () => {
 
         describe("commentResource", () => {
             var widget;
+            var wrapperMock;
             var instanceMock;
             var adhPreliminaryNamesMock;
 
@@ -104,8 +105,12 @@ export var register = () => {
                 adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
                 widget = new AdhComment.CommentResource(adapterMock, adhConfigMock, adhHttpMock, adhPreliminaryNamesMock, q);
 
+                wrapperMock = {
+                    eventHandler: jasmine.createSpyObj("eventHandler", ["on", "off", "trigger"])
+                };
                 instanceMock = {
-                    scope: jasmine.createSpyObj("scope", ["$on"])
+                    scope: jasmine.createSpyObj("scope", ["$on"]),
+                    wrapper: wrapperMock
                 };
             });
 
@@ -129,7 +134,7 @@ export var register = () => {
                     beforeEach(() => {
                         spyOn(widget, "update").and.returnValue(q.when());
                         spyOn(widget, "setMode");
-                        directive.link(instanceMock.scope);
+                        directive.link(instanceMock.scope, "element", "attrs", wrapperMock);
                     });
 
                     describe("createComment", () => {

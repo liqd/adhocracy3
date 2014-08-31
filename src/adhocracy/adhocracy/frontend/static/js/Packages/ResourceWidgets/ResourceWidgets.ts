@@ -29,6 +29,7 @@
 import ResourcesBase = require("../../ResourcesBase");
 
 import AdhHttp = require("../Http/Http");
+import AdhEventHandler = require("../EventHandler/EventHandler");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 
@@ -40,12 +41,13 @@ export interface IResourceWrapperController {
     triggerSubmit() : ng.IPromise<void>;
     triggerCancel() : void;
     triggerSetMode(mode : Mode) : void;
+    eventHandler : AdhEventHandler.EventHandler;
 }
 
 export var resourceWrapper = () => {
     return {
         restrict: "E",
-        controller: ["$scope", "$q", function($scope : ng.IScope, $q : ng.IQService) {
+        controller: ["$scope", "$q", "adhEventHandlerClass", function($scope : ng.IScope, $q : ng.IQService, adhEventHandlerClass) {
             var self : IResourceWrapperController = this;
 
             var resourcePromises : ng.IPromise<ResourcesBase.Resource[]>[] = [];
@@ -55,12 +57,14 @@ export var resourceWrapper = () => {
                 return arg;
             };
 
+            self.eventHandler = new adhEventHandlerClass();
+
             self.registerResourceDirective = (promise : ng.IPromise<ResourcesBase.Resource[]>) => {
                 resourcePromises.push(promise);
             };
 
             self.triggerSubmit = () => {
-                $scope.$broadcast("submit");
+                self.eventHandler.trigger("submit");
                 return $q.all(resourcePromises)
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
@@ -69,12 +73,12 @@ export var resourceWrapper = () => {
             };
 
             self.triggerCancel = () => {
-                $scope.$broadcast("cancel");
+                self.eventHandler.trigger("cancel");
             };
 
             self.triggerSetMode = (mode : Mode) => {
                 resetResourcePromises();
-                $scope.$broadcast("setMode", mode);
+                self.eventHandler.trigger("setMode", mode);
             };
         }]
     };
@@ -131,13 +135,11 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             deferred: self.$q.defer()
         };
 
-        scope.$on("setMode", (ev, mode : Mode) => self.setMode(instance, mode));
-        scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(instance, path));
-        scope.$on("$delete", () => instance.deferred.resolve([]));
-        scope.$on("submit", () => self._provide(instance)
+        var setModeID = wrapper.eventHandler.on("setMode", (mode : Mode) => self.setMode(instance, mode));
+        var submitID = wrapper.eventHandler.on("submit", () => self._provide(instance)
             .then((resources) => instance.deferred.resolve(resources)));
 
-        scope.$on("cancel", () => {
+        var cancelID = wrapper.eventHandler.on("cancel", () => {
             if (scope.mode === Mode.edit) {
                 return self.update(instance).then(() => {
                     self.setMode(instance, Mode.display);
@@ -145,6 +147,14 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             } else {
                 return self.$q.when();
             }
+        });
+
+        scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(instance, path));
+        scope.$on("$delete", () => {
+            wrapper.eventHandler.off("setMode", setModeID);
+            wrapper.eventHandler.off("submit", submitID);
+            wrapper.eventHandler.off("cancel", cancelID);
+            instance.deferred.resolve([]);
         });
 
         scope.edit = () => wrapper.triggerSetMode(Mode.edit);

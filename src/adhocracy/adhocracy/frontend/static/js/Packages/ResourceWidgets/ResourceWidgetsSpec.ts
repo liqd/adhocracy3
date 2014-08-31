@@ -22,16 +22,19 @@ export var register = () => {
             describe("controller", () => {
                 var scopeMock;
                 var controller;
+                var eventHandlerClassMock = function() {
+                    this.on = jasmine.createSpy("on");
+                    this.off = jasmine.createSpy("off");
+                    this.trigger = jasmine.createSpy("trigger");
+                };
 
                 beforeEach(() => {
-                    scopeMock = jasmine.createSpyObj("scope", ["$broadcast"]);
-                    controller = new directive.controller[2](scopeMock, q);
+                    scopeMock = {};
+                    controller = new directive.controller[3](scopeMock, q, eventHandlerClassMock);
                 });
 
                 it("does not pollute the scope", () => {
-                    expect(scopeMock).toEqual({
-                        $broadcast: jasmine.any(Function)
-                    });
+                    expect(scopeMock).toEqual({});
                 });
 
                 describe("registerResourceDirective", () => {
@@ -45,24 +48,24 @@ export var register = () => {
                         controller.triggerSubmit().then(done);
                     });
 
-                    it("broadcasts a 'submit' event", () => {
-                        expect(scopeMock.$broadcast).toHaveBeenCalledWith("submit");
+                    it("triggers a 'submit' event on eventHandler", () => {
+                        expect(controller.eventHandler.trigger).toHaveBeenCalledWith("submit");
                     });
 
                     // FIXME
                 });
 
                 describe("triggerCancel", () => {
-                    it("broadcasts a 'cancel' event", () => {
+                    it("triggers a 'cancel' event on eventHandler", () => {
                         controller.triggerCancel();
-                        expect(scopeMock.$broadcast).toHaveBeenCalledWith("cancel");
+                        expect(controller.eventHandler.trigger).toHaveBeenCalledWith("cancel");
                     });
                 });
 
                 describe("triggerSetMode", () => {
-                    it("broadcasts a 'setMode' event with mode as first parameter", () => {
+                    it("triggers a 'setMode' event with mode as first parameter on eventHandler", () => {
                         controller.triggerSetMode("mode");
-                        expect(scopeMock.$broadcast).toHaveBeenCalledWith("setMode", "mode");
+                        expect(controller.eventHandler.trigger).toHaveBeenCalledWith("setMode", "mode");
                     });
                 });
             });
@@ -87,6 +90,7 @@ export var register = () => {
                         "triggerSetMode"]),
                     deferred: q.defer()
                 };
+                instanceMock.wrapper.eventHandler = jasmine.createSpyObj("eventHandler", ["on", "off", "trigger"]);
 
                 resourceWidget = new AdhResourceWidgets.ResourceWidget(adhHttpMock, adhPreliminaryNamesMock, q);
             });
@@ -108,7 +112,7 @@ export var register = () => {
                     var instance;
 
                     beforeEach(() => {
-                        scopeMock = jasmine.createSpyObj("scope", ["$on", "$emit", "$broadcast"]);
+                        scopeMock = jasmine.createSpyObj("scope", ["$on", "$emit"]);
                         scopeMock.mode = "mode";
 
                         resourceWidget.update = jasmine.createSpy("update").and.returnValue(q.when());
@@ -130,17 +134,24 @@ export var register = () => {
                     });
 
                     describe("on $delete", () => {
-                        it("resolves the promise that is registered with resourceWrapper with an empty list", () => {
+                        beforeEach(() => {
                             var fn = getArgsByFirst(scopeMock.$on, "$delete")[0][1];
                             instance.deferred.resolve = jasmine.createSpy("resolve");
                             fn("event");
+                        });
+
+                        it("resolves the promise that is registered with resourceWrapper with an empty list", () => {
                             expect(instance.deferred.resolve).toHaveBeenCalledWith([]);
+                        });
+
+                        it("unregisters all listeners on wrapper.eventHandler", () => {
+                            expect(instance.wrapper.eventHandler.off.calls.count()).toBe(3);
                         });
                     });
 
                     describe("on submit", () => {
                         it("calls provide and resolves the promise with the result", (done) => {
-                            var fn = getArgsByFirst(scopeMock.$on, "submit")[0][1];
+                            var fn = getArgsByFirst(instance.wrapper.eventHandler.on, "submit")[0][1];
                             resourceWidget._provide.and.returnValue(q.when("provided"));
 
                             fn().then(() => {
@@ -158,7 +169,7 @@ export var register = () => {
                         var fn;
 
                         beforeEach(() => {
-                            fn = getArgsByFirst(scopeMock.$on, "cancel")[0][1];
+                            fn = getArgsByFirst(instance.wrapper.eventHandler.on, "cancel")[0][1];
                         });
 
                         it("resets scope and sets mode to display if scope.mode is edit", (done) => {
@@ -183,7 +194,7 @@ export var register = () => {
 
                     describe("on setMode", () => {
                         it("calls setMode with first parameter", () => {
-                            var fn = getArgsByFirst(scopeMock.$on, "setMode")[0][1];
+                            var fn = getArgsByFirst(instance.wrapper.eventHandler.on, "setMode")[0][1];
                             fn("event", "mode");
                             expect(resourceWidget.setMode).toHaveBeenCalledWith(instance, "mode");
                         });
