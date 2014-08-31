@@ -4,6 +4,7 @@ import RIComment = require("../../Resources_/adhocracy_sample/resources/comment/
 import AdhConfig = require("../Config/Config");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
+import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 
 var pkgLocation = "/Comment";
 
@@ -19,6 +20,7 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> extends Adh
     modificationDate(resource : T) : string;
     commentCount(resource : T) : number;
 }
+
 
 export class CommentCreate {
     constructor(private adapter : ICommentAdapter<any>) {}
@@ -66,83 +68,70 @@ export class CommentCreate {
     }
 }
 
-export class CommentDetail {
-    constructor(private adapter : ICommentAdapter<any>) {}
 
-    public createDirective(adhConfig : AdhConfig.Type, recursionHelper) {
-        var _self : CommentDetail = this;
+export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, any> {
+    constructor(
+        private adapter : ICommentAdapter<any>,
+        adhConfig : AdhConfig.Type,
+        adhHttp,
+        adhPreliminaryNames : AdhPreliminaryNames,
+        $q : ng.IQService
+    ) {
+        super(adhHttp, adhPreliminaryNames, $q);
+        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentDetail.html";
+    }
 
-        return {
-            restrict: "E",
-            templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentDetail.html",
-            scope: {
-                path: "="  // path to a comment that should be displayed
-            },
-            compile: (element) => recursionHelper.compile(element),
-            controller: ["$scope", "adhHttp", "adhDone", ($scope, adhHttp, adhDone) => {
-                var resource : AdhResource.Content<any>;
+    createRecursionDirective(recursionHelper) {
+        var directive = this.createDirective();
+        directive.compile = (element) => recursionHelper.compile(element, directive.link);
+        return directive;
+    }
 
-                var displayErrors = (errors) => {
-                    $scope.errors = errors;
-                    throw errors;
-                };
+    public _handleDelete(instance, path : string) {
+        return this.$q.when();
+    }
 
-                var updateScope = (path) => {
-                    $scope.path = path;
-                    return adhHttp.resolve(path).then((_resource : AdhResource.Content<any>) => {
-                        resource = _resource;
-                        $scope.data = {
-                            content: _self.adapter.content(resource),
-                            creator: _self.adapter.creator(resource),
-                            creationDate: _self.adapter.creationDate(resource),
-                            modificationDate: _self.adapter.modificationDate(resource),
-                            commentCount: _self.adapter.commentCount(resource),
-                            comments: _self.adapter.elemRefs(resource),
-                            poolPath: _self.adapter.poolPath(resource)
-                        };
-                    });
-                };
-
-                $scope.errors = [];
-                $scope.show = {
-                    createForm: false
-                };
-
-                $scope.edit = () => {
-                    $scope.viewmode = "edit";
-                };
-
-                $scope.cancel = () => {
-                    $scope.viewmode = "list";
-                    $scope.errors = [];
-                };
-
-                $scope.save = () => {
-                    _self.adapter.content(resource, $scope.data.content);
-                    return adhHttp.postNewVersion($scope.path, resource)
-                        .then((_resource) => _resource.path, displayErrors)
-                        .then(updateScope)
-                        .then(() => {
-                            $scope.viewmode = "list";
-                        });
-                };
-
-                $scope.createComment = () => {
-                    $scope.show.createForm = true;
-                };
-
-                $scope.cancelCreateComment = () => {
-                    $scope.show.createForm = false;
-                };
-
-                $scope.afterCreateComment = () => {
-                    return updateScope($scope.path).then(() => {
-                        $scope.show.createForm = false;
-                    });
-                };
-
-                updateScope($scope.path).then(adhDone);
-            }]
+    public _update(instance, resource) {
+        instance.scope.data = {
+            content: this.adapter.content(resource),
+            creator: this.adapter.creator(resource),
+            creationDate: this.adapter.creationDate(resource),
+            modificationDate: this.adapter.modificationDate(resource),
+            commentCount: this.adapter.commentCount(resource),
+            comments: this.adapter.elemRefs(resource),
+            poolPath: this.adapter.poolPath(resource)
         };
+        return this.$q.when();
+    }
+
+    public _provide(instance) {
+        var resources = [];
+
+        // FIXME use derive
+        var resource = this.adapter.create(this.adhPreliminaryNames);
+        this.adapter.content(resource, instance.scope.content);
+        this.adapter.refersTo(resource, instance.scope.refersTo);
+        resources.push(resource);
+
+        if (this.adhPreliminaryNames.isPreliminary(instance.scope.path)) {
+            var comment = new RIComment({
+                preliminaryNames: this.adhPreliminaryNames,
+                name: "comment"
+            });
+            resources.push(comment);
+        }
+
+        return this.$q.when(resources);
     }
 }
+
+export var commentDetail = () => {
+    return {
+        restrict: "E",
+        scope: {
+            path: "="
+        },
+        template: "<adh-resource-wrapper><adh-comment-resource data-path=\"{{path}}\" data-mode=\"display\">" +
+            "</adh-comment-resource></adh-resource-wrapper>"
+    };
+};

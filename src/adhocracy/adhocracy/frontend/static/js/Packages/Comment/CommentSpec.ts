@@ -90,146 +90,139 @@ export var register = () => {
             });
         });
 
-        describe("CommentDetail", () => {
-            var commentDetail;
+        describe("commentResource", () => {
+            var widget;
+            var instanceMock;
+            var adhPreliminaryNamesMock;
 
             beforeEach(() => {
-                commentDetail = new AdhComment.CommentDetail(adapterMock);
+                adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
+                widget = new AdhComment.CommentResource(adapterMock, adhConfigMock, "adhHttp", adhPreliminaryNamesMock, q);
+
+                instanceMock = {
+                    scope: {
+                        path: "/some/path",
+                        viemode: "list"
+                    }
+                };
             });
 
-            describe("createDirective", () => {
+            describe("createRecursionDirective", () => {
                 var directive;
+                var recursionHelperMock;
 
                 beforeEach(() => {
-                    directive = commentDetail.createDirective(adhConfigMock);
+                    recursionHelperMock = jasmine.createSpyObj("recursionHelper", ["compile"]);
+                    directive = widget.createRecursionDirective(recursionHelperMock);
                 });
 
-                describe("controller", () => {
-                    var scopeMock;
-                    var content = "content";
-                    var creator = "creator";
-                    var creationDate = "creationDate";
-                    var modificationDate = "modificationDate";
-                    var commentCount = 2;
-                    var elemRefs = ["foo", "bar"];
-                    var poolPath = "poolPath";
+                it("uses recursionHelper on compile", () => {
+                    directive.compile("element");
+                    expect(recursionHelperMock.compile).toHaveBeenCalled();
+                });
+            });
 
+            describe("_handleDelete", () => {
+                xit("does nothing", () => undefined);
+            });
+
+            describe("_update", () => {
+                var content = "content";
+                var creator = "creator";
+                var creationDate = "creationDate";
+                var modificationDate = "modificationDate";
+                var commentCount = 2;
+                var elemRefs = ["foo", "bar"];
+                var poolPath = "poolPath";
+
+                beforeEach((done) => {
+                    adapterMock.content.and.returnValue(content);
+                    adapterMock.creator.and.returnValue(creator);
+                    adapterMock.creationDate.and.returnValue(creationDate);
+                    adapterMock.modificationDate.and.returnValue(modificationDate);
+                    adapterMock.commentCount.and.returnValue(commentCount);
+                    adapterMock.elemRefs.and.returnValue(elemRefs);
+                    adapterMock.poolPath.and.returnValue(poolPath);
+
+                    widget._update(instanceMock, {}).then(done);
+                });
+
+                it("reads content from adapter to scope", () => {
+                    expect(instanceMock.scope.data.content).toBe(content);
+                });
+                it("reads creator from adapter to scope", () => {
+                    expect(instanceMock.scope.data.creator).toBe(creator);
+                });
+                it("reads creationDate from adapter to scope", () => {
+                    expect(instanceMock.scope.data.creationDate).toBe(creationDate);
+                });
+                it("reads modificationDate from adapter to scope", () => {
+                    expect(instanceMock.scope.data.modificationDate).toBe(modificationDate);
+                });
+                it("reads commentCount from adapter to scope", () => {
+                    expect(instanceMock.scope.data.commentCount).toBe(commentCount);
+                });
+                it("reads comments from adapter to scope", () => {
+                    expect(instanceMock.scope.data.comments).toBe(elemRefs);
+                });
+                it("reads poolPath from adapter to scope", () => {
+                    expect(instanceMock.scope.data.poolPath).toBe(poolPath);
+                });
+            });
+
+            describe("_provide", () => {
+                var result;
+                var resource = {foo: "bar"};
+                var content = "content";
+                var refersTo = "refersTo";
+
+                beforeEach(() => {
+                    instanceMock.scope.content = content;
+                    instanceMock.scope.refersTo = refersTo;
+                    adapterMock.create.and.returnValue(resource);
+                });
+
+                describe("create case", () => {
                     beforeEach((done) => {
-                        scopeMock = {
-                            path: "/some/path",
-                            viemode: "list"
-                        };
-
-                        adapterMock.content.and.returnValue(content);
-                        adapterMock.creator.and.returnValue(creator);
-                        adapterMock.creationDate.and.returnValue(creationDate);
-                        adapterMock.modificationDate.and.returnValue(modificationDate);
-                        adapterMock.commentCount.and.returnValue(commentCount);
-                        adapterMock.elemRefs.and.returnValue(elemRefs);
-                        adapterMock.poolPath.and.returnValue(poolPath);
-
-                        var controller = <any>directive.controller[3];
-                        controller(scopeMock, adhHttpMock, done);
-                    });
-
-                    it("reads content from adapter to scope", () => {
-                        expect(scopeMock.data.content).toBe(content);
-                    });
-                    it("reads creator from adapter to scope", () => {
-                        expect(scopeMock.data.creator).toBe(creator);
-                    });
-                    it("reads creationDate from adapter to scope", () => {
-                        expect(scopeMock.data.creationDate).toBe(creationDate);
-                    });
-                    it("reads modificationDate from adapter to scope", () => {
-                        expect(scopeMock.data.modificationDate).toBe(modificationDate);
-                    });
-                    it("reads commentCount from adapter to scope", () => {
-                        expect(scopeMock.data.commentCount).toBe(commentCount);
-                    });
-                    it("reads comments from adapter to scope", () => {
-                        expect(scopeMock.data.comments).toBe(elemRefs);
-                    });
-                    it("reads poolPath from adapter to scope", () => {
-                        expect(scopeMock.data.poolPath).toBe(poolPath);
-                    });
-
-                    describe("edit", () => {
-                        beforeEach(() => {
-                            scopeMock.edit();
-                        });
-
-                        it("changes viewmode to 'edit'", () => {
-                            expect(scopeMock.viewmode).toBe("edit");
+                        adhPreliminaryNamesMock.isPreliminary.and.returnValue(true);
+                        widget._provide(instanceMock).then((_result) => {
+                            result = _result;
+                            done();
                         });
                     });
 
-                    describe("cancel", () => {
-                        beforeEach(() => {
-                            scopeMock.cancel();
-                        });
+                    it("creates a new resource using the adapter", () => {
+                        expect(adapterMock.create.calls.count()).toBe(1);
+                        expect(adapterMock.content.calls.count()).toBe(1);
+                        expect(adapterMock.refersTo.calls.count()).toBe(1);
+                        expect(adapterMock.content.calls.first().args[1]).toBe(content);
+                        expect(adapterMock.refersTo.calls.first().args[1]).toBe(refersTo);
+                    });
 
-                        it("changes viewmode to 'list'", () => {
-                            expect(scopeMock.viewmode).toBe("list");
-                        });
+                    it("creates a new item", () => {
+                        expect(result.length).toBe(2);
+                    });
+                });
 
-                        it("clears all errors", () => {
-                            expect(scopeMock.errors).toEqual([]);
+                describe("edit case", () => {
+                    beforeEach((done) => {
+                        adhPreliminaryNamesMock.isPreliminary.and.returnValue(false);
+                        widget._provide(instanceMock).then((_result) => {
+                            result = _result;
+                            done();
                         });
                     });
 
-                    describe("save", () => {
-                        it("updates the resource using the adapter", (done) => {
-                            scopeMock.data = {
-                                content: content
-                            };
-                            scopeMock.save().then(() => {
-                                expect(adapterMock.content).toHaveBeenCalledWith(RESOURCE, content);
-                                expect(adhHttpMock.postNewVersion).toHaveBeenCalled();
-                                done();
-                            });
-                        });
-
-                        it("sets scope.errors when something goes wrong", (done) => {
-                            var errors = "errors";
-                            adhHttpMock.postNewVersion.and.returnValue(q.reject(errors));
-                            scopeMock.data = {
-                                content: content
-                            };
-                            scopeMock.save().then(() => null, () => {
-                                expect(scopeMock.errors).toBe(errors);
-                                done();
-                            });
-                        });
+                    it("creates a new resource using the adapter", () => {
+                        expect(adapterMock.create.calls.count()).toBe(1);
+                        expect(adapterMock.content.calls.count()).toBe(1);
+                        expect(adapterMock.refersTo.calls.count()).toBe(1);
+                        expect(adapterMock.content.calls.first().args[1]).toBe(content);
+                        expect(adapterMock.refersTo.calls.first().args[1]).toBe(refersTo);
                     });
 
-                    describe("createComment", () => {
-                        it("sets scope.show.createForm to true", () => {
-                            scopeMock.createComment();
-                            expect(scopeMock.show.createForm).toBe(true);
-                        });
-                    });
-
-                    describe("cancelCreateComment", () => {
-                        it("sets scope.show.createForm to false", () => {
-                            scopeMock.cancelCreateComment();
-                            expect(scopeMock.show.createForm).toBe(false);
-                        });
-                    });
-
-                    describe("afterCreateComment", () => {
-                        beforeEach((done) => {
-                            adapterMock.creator.and.returnValue("afterCreateCommentCreator");
-                            scopeMock.afterCreateComment().then(done);
-                        });
-
-                        it("updates the scope", () => {
-                            expect(scopeMock.data.creator).toBe("afterCreateCommentCreator");
-                        });
-
-                        it("sets scope.show.createForm to false", () => {
-                            expect(scopeMock.show.createForm).toBe(false);
-                        });
+                    it("does not create a new item", () => {
+                        expect(result.length).toBe(1);
                     });
                 });
             });

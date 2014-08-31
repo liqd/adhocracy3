@@ -31,6 +31,7 @@ import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhComment = require("./Packages/Comment/Comment");
 import AdhCommentAdapter = require("./Packages/Comment/Adapter");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
+import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -132,11 +133,14 @@ export var init = (config, meta_api) => {
         var widget = new AdhComment.CommentCreate(adapter);
         return widget.createDirective(adhConfig);
     }]);
-    app.directive("adhCommentDetail", ["adhConfig", "recursionHelper", (adhConfig, recursionHelper) => {
-        var adapter = new AdhCommentAdapter.CommentAdapter();
-        var widget = new AdhComment.CommentDetail(adapter);
-        return widget.createDirective(adhConfig, recursionHelper);
-    }]);
+    app.directive("adhResourceWrapper", AdhResourceWidgets.resourceWrapper);
+    app.directive("adhCommentResource", ["adhConfig", "adhHttp", "adhPreliminaryNames", "recursionHelper", "$q",
+        (adhConfig, adhHttp, adhPreliminaryNames, recursionHelper, $q) => {
+            var adapter = new AdhCommentAdapter.CommentAdapter();
+            var widget = new AdhComment.CommentResource(adapter, adhConfig, adhHttp, adhPreliminaryNames, $q);
+            return widget.createRecursionDirective(recursionHelper);
+        }]);
+    app.directive("adhCommentDetail", AdhComment.commentDetail);
     app.directive("adhProposalDetail", () => new AdhProposal.ProposalDetail().createDirective());
     app.directive("adhProposalVersionDetail",
         ["adhConfig", (adhConfig) => new AdhProposal.ProposalVersionDetail().createDirective(adhConfig)]);
