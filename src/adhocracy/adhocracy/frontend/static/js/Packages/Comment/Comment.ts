@@ -6,11 +6,15 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 
+import Util = require("../Util/Util");
+
 var pkgLocation = "/Comment";
 
 
 export interface ICommentAdapter<T extends AdhResource.Content<any>> extends AdhListing.IListingContainerAdapter {
-    create(pn : AdhPreliminaryNames) : T;
+    create(settings : any) : T;
+    createItem(settings : any) : any;
+    derive(oldVersion : T, settings : any) : T;
     content(resource : T) : string;
     content(resource : T, value : string) : T;
     refersTo(resource : T) : string;
@@ -52,7 +56,7 @@ export class CommentCreate {
                 };
 
                 $scope.create = () => {
-                    var resource = _self.adapter.create(adhPreliminaryNames);
+                    var resource = _self.adapter.create({preliminaryNames: adhPreliminaryNames});
                     _self.adapter.content(resource, $scope.content);
                     _self.adapter.refersTo(resource, $scope.refersTo);
 
@@ -70,6 +74,8 @@ export class CommentCreate {
 
 
 export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidgetScope {
+    refersTo : string;
+    poolPath : string;
     show : {
         createForm : boolean;
     };
@@ -95,6 +101,9 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
 
         var directive = this.createDirective();
         directive.compile = (element) => recursionHelper.compile(element, directive.link);
+
+        directive.scope.refersTo = "@";
+        directive.scope.poolPath = "@";
 
         directive.link = (scope : ICommentResourceScope, element, attrs, wrapper) => {
             var instance = self.link(scope, element, attrs, wrapper);
@@ -133,29 +142,42 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
             modificationDate: this.adapter.modificationDate(resource),
             commentCount: this.adapter.commentCount(resource),
             comments: this.adapter.elemRefs(resource),
-            poolPath: this.adapter.poolPath(resource)
+            replyPoolPath: this.adapter.poolPath(resource)
         };
         return this.$q.when();
     }
 
     public _provide(instance) {
-        var resources = [];
+        var self = this;
 
-        // FIXME use derive
-        var resource = this.adapter.create(this.adhPreliminaryNames);
-        this.adapter.content(resource, instance.scope.content);
-        this.adapter.refersTo(resource, instance.scope.refersTo);
-        resources.push(resource);
+        var updateFromScope = (resource) => {
+            self.adapter.content(resource, instance.scope.data.content);
+            self.adapter.refersTo(resource, instance.scope.refersTo);
+        };
 
-        if (this.adhPreliminaryNames.isPreliminary(instance.scope.path)) {
-            var comment = new RIComment({
-                preliminaryNames: this.adhPreliminaryNames,
+        if (self.adhPreliminaryNames.isPreliminary(instance.scope.path)) {
+            var item = self.adapter.createItem({
+                preliminaryNames: self.adhPreliminaryNames,
                 name: "comment"
             });
-            resources.push(comment);
-        }
+            item.parent = instance.scope.poolPath;
 
-        return this.$q.when(resources);
+            var version = self.adapter.create({
+                preliminaryNames: self.adhPreliminaryNames,
+                follows: item.first_version_path
+            });
+            updateFromScope(version);
+            version.parent = item.path;
+
+            return self.$q.when([item, version]);
+        } else {
+            return self.adhHttp.get(instance.scope.path).then((oldVersion) => {
+                var resource = self.adapter.derive(oldVersion, {preliminaryNames: self.adhPreliminaryNames});
+                updateFromScope(resource);
+                resource.parent = Util.parentPath(oldVersion.path);
+                return [resource];
+            });
+        }
     }
 }
 

@@ -24,14 +24,19 @@ export var register = () => {
                 pkg_path: "mock"
             };
 
-            adapterMock = <any>jasmine.createSpyObj("adapterMock", ["create", "content", "refersTo", "creator", "creationDate",
-                "modificationDate", "commentCount", "elemRefs", "poolPath"]);
+            adapterMock = <any>jasmine.createSpyObj("adapterMock", ["create", "createItem", "derive", "content", "refersTo", "creator",
+                "creationDate", "modificationDate", "commentCount", "elemRefs", "poolPath"]);
+            adapterMock.create.and.returnValue(RESOURCE);
+            adapterMock.createItem.and.returnValue(RESOURCE);
+            adapterMock.derive.and.returnValue(RESOURCE);
 
-            adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["postToPool", "resolve", "postNewVersion", "getNewestVersionPath"]);
+            adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["postToPool", "resolve", "postNewVersion", "getNewestVersionPath",
+                "get"]);
             adhHttpMock.postToPool.and.returnValue(q.when(RESOURCE));
             adhHttpMock.resolve.and.returnValue(q.when(RESOURCE));
             adhHttpMock.postNewVersion.and.returnValue(q.when(RESOURCE));
             adhHttpMock.getNewestVersionPath.and.returnValue(q.when("newestVersion"));
+            adhHttpMock.get.and.returnValue(q.when(RESOURCE));
         });
 
         describe("CommentCreate", () => {
@@ -97,7 +102,7 @@ export var register = () => {
 
             beforeEach(() => {
                 adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
-                widget = new AdhComment.CommentResource(adapterMock, adhConfigMock, "adhHttp", adhPreliminaryNamesMock, q);
+                widget = new AdhComment.CommentResource(adapterMock, adhConfigMock, adhHttpMock, adhPreliminaryNamesMock, q);
 
                 instanceMock = {
                     scope: jasmine.createSpyObj("scope", ["$on"])
@@ -202,7 +207,7 @@ export var register = () => {
                     expect(instanceMock.scope.data.comments).toBe(elemRefs);
                 });
                 it("reads poolPath from adapter to scope", () => {
-                    expect(instanceMock.scope.data.poolPath).toBe(poolPath);
+                    expect(instanceMock.scope.data.replyPoolPath).toBe(poolPath);
                 });
             });
 
@@ -213,7 +218,9 @@ export var register = () => {
                 var refersTo = "refersTo";
 
                 beforeEach(() => {
-                    instanceMock.scope.content = content;
+                    instanceMock.scope.data = {
+                        content: content
+                    };
                     instanceMock.scope.refersTo = refersTo;
                     adapterMock.create.and.returnValue(resource);
                 });
@@ -221,6 +228,7 @@ export var register = () => {
                 describe("create case", () => {
                     beforeEach((done) => {
                         adhPreliminaryNamesMock.isPreliminary.and.returnValue(true);
+                        instanceMock.scope.poolPath = "poolPath";
                         widget._provide(instanceMock).then((_result) => {
                             result = _result;
                             done();
@@ -229,10 +237,17 @@ export var register = () => {
 
                     it("creates a new resource using the adapter", () => {
                         expect(adapterMock.create.calls.count()).toBe(1);
+                        expect(adapterMock.createItem.calls.count()).toBe(1);
                         expect(adapterMock.content.calls.count()).toBe(1);
                         expect(adapterMock.refersTo.calls.count()).toBe(1);
                         expect(adapterMock.content.calls.first().args[1]).toBe(content);
                         expect(adapterMock.refersTo.calls.first().args[1]).toBe(refersTo);
+                    });
+
+                    it("sets parent properties on all resources", () => {
+                        result.forEach((resource) => {
+                            expect(resource.parent).toBeDefined();
+                        });
                     });
 
                     it("creates a new item", () => {
@@ -250,11 +265,17 @@ export var register = () => {
                     });
 
                     it("creates a new resource using the adapter", () => {
-                        expect(adapterMock.create.calls.count()).toBe(1);
+                        expect(adapterMock.derive.calls.count()).toBe(1);
                         expect(adapterMock.content.calls.count()).toBe(1);
                         expect(adapterMock.refersTo.calls.count()).toBe(1);
                         expect(adapterMock.content.calls.first().args[1]).toBe(content);
                         expect(adapterMock.refersTo.calls.first().args[1]).toBe(refersTo);
+                    });
+
+                    it("sets parent properties on all resources", () => {
+                        result.forEach((resource) => {
+                            expect(resource.parent).toBeDefined();
+                        });
                     });
 
                     it("does not create a new item", () => {
