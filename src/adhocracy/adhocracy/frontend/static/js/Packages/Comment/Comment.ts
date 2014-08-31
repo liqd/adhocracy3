@@ -1,5 +1,4 @@
 import AdhResource = require("../../Resources");
-import RIComment = require("../../Resources_/adhocracy_sample/resources/comment/IComment");
 
 import AdhConfig = require("../Config/Config");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
@@ -26,56 +25,10 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> extends Adh
 }
 
 
-export class CommentCreate {
-    constructor(private adapter : ICommentAdapter<any>) {}
-
-    public createDirective(adhConfig : AdhConfig.Type) {
-        var _self : CommentCreate = this;
-
-        return {
-            restrict: "E",
-            templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentCreate.html",
-            scope: {
-                refersTo: "@",  // path of a commentable version
-                poolPath: "@",  // pool where new comments should be posted to
-                onNew: "=",  // callback to call after successful creation
-                onCancel: "="  // callback to call when cancel was clicked
-            },
-            controller: ["$scope", "adhHttp", "adhPreliminaryNames", ($scope, adhHttp, adhPreliminaryNames) => {
-                $scope.errors = [];
-
-                var displayErrors = (errors) => {
-                    $scope.errors = errors;
-                    throw errors;
-                };
-
-                var onNew = () => {
-                    if (typeof $scope.onNew !== "undefined") {
-                        $scope.onNew();
-                    }
-                };
-
-                $scope.create = () => {
-                    var resource = _self.adapter.create({preliminaryNames: adhPreliminaryNames});
-                    _self.adapter.content(resource, $scope.content);
-                    _self.adapter.refersTo(resource, $scope.refersTo);
-
-                    var comment = new RIComment({preliminaryNames: adhPreliminaryNames, name: "comment"});
-
-                    return adhHttp.postToPool($scope.poolPath, comment)
-                        .then(adhHttp.resolve.bind(adhHttp), displayErrors)
-                        .then((comment) => adhHttp.postNewVersion(comment.first_version_path, resource))
-                        .then(onNew, displayErrors);
-                };
-            }]
-        };
-    }
-}
-
-
 export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidgetScope {
     refersTo : string;
     poolPath : string;
+    createPath : string;
     show : {
         createForm : boolean;
     };
@@ -114,6 +67,7 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
 
             scope.createComment = () => {
                 scope.show.createForm = true;
+                scope.createPath = self.adhPreliminaryNames.nextPreliminary();
             };
 
             scope.cancelCreateComment = () => {
@@ -191,3 +145,17 @@ export var commentDetail = () => {
             "</adh-comment-resource></adh-resource-wrapper>"
     };
 };
+
+
+export class CommentCreate extends CommentResource {
+    constructor(
+        adapter : ICommentAdapter<any>,
+        adhConfig : AdhConfig.Type,
+        adhHttp,
+        adhPreliminaryNames : AdhPreliminaryNames,
+        $q : ng.IQService
+    ) {
+        super(adapter, adhConfig, adhHttp, adhPreliminaryNames, $q);
+        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentCreate.html";
+    }
+}

@@ -2,7 +2,7 @@
     <div class="form-error" data-ng-repeat="error in errors">
         <p>{{error}}</p>
     </div>
-    <textarea data-ng-model="content"></textarea>
-    <input type="submit" value="create" data-ng-click="create()" />
-    <a href="" data-ng-click="onCancel()">Cancel</a>
+    <textarea data-ng-model="data.content"></textarea>
+    <input type="submit" value="create" data-ng-click="submit()" />
+    <a href="" data-ng-click="cancel()">Cancel</a>
 </form>

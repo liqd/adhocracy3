@@ -128,16 +128,17 @@ export var init = (config, meta_api) => {
         ["adhConfig", "adhCrossWindowMessaging", (adhConfig) =>
             new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig)]);
 
-    app.directive("adhCommentCreate", ["adhConfig", (adhConfig) => {
-        var adapter = new AdhCommentAdapter.CommentAdapter();
-        var widget = new AdhComment.CommentCreate(adapter);
-        return widget.createDirective(adhConfig);
-    }]);
     app.directive("adhResourceWrapper", AdhResourceWidgets.resourceWrapper);
     app.directive("adhCommentResource", ["adhConfig", "adhHttp", "adhPreliminaryNames", "recursionHelper", "$q",
         (adhConfig, adhHttp, adhPreliminaryNames, recursionHelper, $q) => {
             var adapter = new AdhCommentAdapter.CommentAdapter();
             var widget = new AdhComment.CommentResource(adapter, adhConfig, adhHttp, adhPreliminaryNames, $q);
+            return widget.createRecursionDirective(recursionHelper);
+        }]);
+    app.directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "recursionHelper", "$q",
+        (adhConfig, adhHttp, adhPreliminaryNames, recursionHelper, $q) => {
+            var adapter = new AdhCommentAdapter.CommentAdapter();
+            var widget = new AdhComment.CommentCreate(adapter, adhConfig, adhHttp, adhPreliminaryNames, $q);
             return widget.createRecursionDirective(recursionHelper);
         }]);
     app.directive("adhCommentDetail", AdhComment.commentDetail);

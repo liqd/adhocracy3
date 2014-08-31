@@ -2,8 +2,6 @@
 
 import q = require("q");
 
-import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
-
 import AdhComment = require("./Comment");
 
 var RESOURCE = {
@@ -39,62 +37,6 @@ export var register = () => {
             adhHttpMock.get.and.returnValue(q.when(RESOURCE));
         });
 
-        describe("CommentCreate", () => {
-            var commentCreate;
-
-            beforeEach(() => {
-                commentCreate = new AdhComment.CommentCreate(adapterMock);
-            });
-
-            describe("createDirective", () => {
-                var directive;
-
-                beforeEach(() => {
-                    directive = commentCreate.createDirective(adhConfigMock);
-                });
-
-                describe("controller", () => {
-                    var scopeMock;
-
-                    beforeEach(() => {
-                        scopeMock = {
-                            refersTo: "refersTo"
-                        };
-
-                        var controller = <any>directive.controller[3];
-                        controller(scopeMock, adhHttpMock, new AdhPreliminaryNames());
-                    });
-
-                    describe("create", () => {
-                        // FIXME: all http interaction is currently untested as it is
-                        // likely to change in the near future
-
-                        var resource = {foo: "bar"};
-                        var content = "content";
-
-                        beforeEach((done) => {
-                            scopeMock.content = content;
-                            scopeMock.onNew = jasmine.createSpy("onNew");
-                            adapterMock.create.and.returnValue(resource);
-                            scopeMock.create().then(done);
-                        });
-
-                        it("creates a new resource using the adapter", () => {
-                            expect(adapterMock.create.calls.count()).toBe(1);
-                            expect(adapterMock.content.calls.count()).toBe(1);
-                            expect(adapterMock.refersTo.calls.count()).toBe(1);
-                            expect(adapterMock.content.calls.first().args[1]).toBe(content);
-                            expect(adapterMock.refersTo.calls.first().args[1]).toBe("refersTo");
-                        });
-
-                        it("calls the onNew callback", () => {
-                            expect(scopeMock.onNew).toHaveBeenCalled();
-                        });
-                    });
-                });
-            });
-        });
-
         describe("commentResource", () => {
             var widget;
             var wrapperMock;
@@ -112,6 +54,11 @@ export var register = () => {
                     scope: jasmine.createSpyObj("scope", ["$on"]),
                     wrapper: wrapperMock
                 };
+            });
+
+            it("sets 'templateUrl' on construction", () => {
+                expect(widget.templateUrl).toBeDefined();
+                expect(widget.templateUrl.indexOf("CommentDetail")).not.toBe(-1);
             });
 
             describe("createRecursionDirective", () => {
@@ -141,6 +88,12 @@ export var register = () => {
                         it("sets scope.show.createForm to true", () => {
                             instanceMock.scope.createComment();
                             expect(instanceMock.scope.show.createForm).toBe(true);
+                        });
+
+                        it("sets scope.createPath to a preliminary name", () => {
+                            adhPreliminaryNamesMock.nextPreliminary.and.returnValue("preliminary name");
+                            instanceMock.scope.createComment();
+                            expect(instanceMock.scope.createPath).toBe("preliminary name");
                         });
                     });
 
@@ -287,6 +240,20 @@ export var register = () => {
                         expect(result.length).toBe(1);
                     });
                 });
+            });
+        });
+
+        describe("CommentCreate", () => {
+            var widget;
+
+            beforeEach(() => {
+                var adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
+                widget = new AdhComment.CommentCreate(adapterMock, adhConfigMock, adhHttpMock, adhPreliminaryNamesMock, q);
+            });
+
+            it("sets 'templateUrl' on construction", () => {
+                expect(widget.templateUrl).toBeDefined();
+                expect(widget.templateUrl.indexOf("CommentCreate")).not.toBe(-1);
             });
         });
     });
