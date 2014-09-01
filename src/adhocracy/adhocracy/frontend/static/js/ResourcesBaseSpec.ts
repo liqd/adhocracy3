@@ -50,6 +50,8 @@ export var register = () => {
             var r2;
             var r3;
             var r4;
+            var r5;
+            var adhPreliminaryNamesMock;
 
             beforeEach(() => {
                 r1 = {
@@ -68,10 +70,13 @@ export var register = () => {
                     path: "r4"
                 };
                 r4.getReferences = jasmine.createSpy("getReferences").and.returnValue(["r1", "r3"]);
+
+                adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary"]);
+                adhPreliminaryNamesMock.isPreliminary.and.returnValue(true);
             });
 
             it("should call getReferences on all given resources", () => {
-                ResourcesBase.sortResourcesTopologically([r2, r3, r4, r1]);
+                ResourcesBase.sortResourcesTopologically([r2, r3, r4, r1], adhPreliminaryNamesMock);
                 expect(r1.getReferences).toHaveBeenCalled();
                 expect(r2.getReferences).toHaveBeenCalled();
                 expect(r3.getReferences).toHaveBeenCalled();
@@ -79,14 +84,25 @@ export var register = () => {
             });
 
             it("should return the references sorted topologically", () => {
-                var result = ResourcesBase.sortResourcesTopologically([r2, r3, r4, r1]);
+                var result = ResourcesBase.sortResourcesTopologically([r2, r3, r4, r1], adhPreliminaryNamesMock);
                 expect(result).toEqual([r1, r2, r3, r4]);
             });
 
             it("doesn't matter if there are duplicate refernces", () => {
                 r4.getReferences = jasmine.createSpy("getReferences").and.returnValue(["r1", "r3", "r1"]);
-                var result = ResourcesBase.sortResourcesTopologically([r2, r3, r4, r1]);
+                var result = ResourcesBase.sortResourcesTopologically([r2, r3, r4, r1], adhPreliminaryNamesMock);
                 expect(result).toEqual([r1, r2, r3, r4]);
+            });
+
+            it("considers parent as just another reference", () => {
+                r5 = {
+                    path: "r5",
+                    parent: "r4"
+                };
+                r5.getReferences = jasmine.createSpy("getReferences").and.returnValue([]);
+
+                var result = ResourcesBase.sortResourcesTopologically([r2, r3, r4, r5, r1], adhPreliminaryNamesMock);
+                expect(result).toEqual([r1, r2, r3, r4, r5]);
             });
         });
     });

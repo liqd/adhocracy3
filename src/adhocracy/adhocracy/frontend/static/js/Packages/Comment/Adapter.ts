@@ -1,10 +1,14 @@
+import _ = require("lodash");
+
 import AdhResource = require("../../Resources");
+import ResourcesBase = require("../../ResourcesBase");
 import RICommentVersion = require("../../Resources_/adhocracy_sample/resources/comment/ICommentVersion");
+import RIComment = require("../../Resources_/adhocracy_sample/resources/comment/IComment");
+import SIVersionable = require("../../Resources_/adhocracy/sheets/versions/IVersionable");
 import SICommentable = require("../../Resources_/adhocracy_sample/sheets/comment/ICommentable");
 import SIComment = require("../../Resources_/adhocracy_sample/sheets/comment/IComment");
 
 import AdhListing = require("../Listing/Listing");
-import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
 import Util = require("../Util/Util");
 
 import AdhComment = require("./Comment");
@@ -24,13 +28,34 @@ export class ListingCommentableAdapter implements AdhListing.IListingContainerAd
 }
 
 export class CommentAdapter extends ListingCommentableAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
-    create(adhPreliminaryNames : AdhPreliminaryNames) : RICommentVersion {
-        var resource = new RICommentVersion({preliminaryNames: adhPreliminaryNames});
+    create(settings) : RICommentVersion {
+        var resource = new RICommentVersion(settings);
         resource.data["adhocracy_sample.sheets.comment.IComment"] =
-            new SIComment.AdhocracySampleSheetsCommentIComment({
-                refers_to: null,
-                content: null
+            new SIComment.AdhocracySampleSheetsCommentIComment(settings);
+        resource.data["adhocracy.sheets.versions.IVersionable"] =
+            new SIVersionable.AdhocracySheetsVersionsIVersionable(settings);
+        return resource;
+    }
+
+    createItem(settings) : RIComment {
+        return new RIComment(settings);
+    }
+
+    // FIXME: move to a service
+    derive<R extends ResourcesBase.Resource>(oldVersion : R, settings) : R {
+        var resource = new (<any>oldVersion).constructor(settings);
+
+        _.forOwn(oldVersion.data, (sheet, key) => {
+            resource.data[key] = new sheet.constructor(settings);
+
+            _.forOwn(sheet, (value, field) => {
+                resource.data[key][field] = _.cloneDeep(value);
             });
+        });
+
+        resource.data["adhocracy.sheets.versions.IVersionable"] =
+            new SIVersionable.AdhocracySheetsVersionsIVersionable({follows: [oldVersion.path]});
+
         return resource;
     }
 

@@ -56,7 +56,7 @@ export class Resource {
  *
  * FIXME: this should probably go into something like ResourcesUtil or Packages/Resources/Util
  */
-export function sortResourcesTopologically(resources : Resource[]) : Resource[] {
+export function sortResourcesTopologically(resources : Resource[], adhPreliminaryNames) : Resource[] {
     "use strict";
 
     // prepare DAG
@@ -75,6 +75,7 @@ export function sortResourcesTopologically(resources : Resource[]) : Resource[] 
         }
 
         references = _.uniq(references);
+        references = _.filter(references, adhPreliminaryNames.isPreliminary);
 
         dag[key].incoming = references;
 
