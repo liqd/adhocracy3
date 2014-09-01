@@ -59,10 +59,11 @@ class DummyPoolWithObjectMap(DummyPool):
 
 def create_pool_with_graph() -> testing.DummyResource:
     """Return pool like dummy object with objectmap and graph."""
+    from substanced.interfaces import IFolder
     from adhocracy.interfaces import IPool
     from adhocracy.graph import Graph
     context = DummyPoolWithObjectMap(__oid__=0,
-                                     __provides__=IPool)
+                                     __provides__=(IPool, IFolder))
     objectmap = ObjectMap(context)
     context.__objectmap__ = objectmap
     context.__graph__ = Graph(context)

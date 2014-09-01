@@ -2,6 +2,7 @@
 import datetime
 
 from substanced.folder import Folder
+from substanced.util import find_service
 from substanced.interfaces import IFolder
 from zope.interface import implementer
 
@@ -67,6 +68,10 @@ class Pool(Base, Folder):
 
     def _zfill(self, name):
         return str(int(name)).zfill(self._autoname_length)
+
+    def find_service(self, service_name, *sub_service_names):
+        """Return  the :term:`service` for the given context."""
+        return find_service(self, service_name, *sub_service_names)
 
 
 pool_metadata = resource_metadata_defaults._replace(
