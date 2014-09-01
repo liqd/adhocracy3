@@ -202,7 +202,7 @@ class IPool(IResource):  # pragma: no cover
         """
 
     def check_name(name: str) -> str:
-        """ Check and the name passed for validity.
+        """ Check that the passed name is valid.
 
         :returns: The name.
         :raises substanced.folder.FolderKeyError:
