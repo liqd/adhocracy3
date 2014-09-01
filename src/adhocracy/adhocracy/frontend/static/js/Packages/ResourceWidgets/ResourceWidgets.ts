@@ -260,8 +260,8 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
      * instance.wrapper.triggerSetMode in order to change the mode on all
      * resourceWidgets in this resourceWrapper.
      */
-    setMode(instance : IResourceWidgetInstance<R, S>, mode? : string) : void;
-    setMode(instance : IResourceWidgetInstance<R, S>, mode? : Mode) : void;
+    private setMode(instance : IResourceWidgetInstance<R, S>, mode? : string) : void;
+    private setMode(instance : IResourceWidgetInstance<R, S>, mode? : Mode) : void;
     private setMode(instance, mode) {
         var self : ResourceWidget<R, S> = this;
 
