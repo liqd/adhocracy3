@@ -70,13 +70,13 @@ export class Transaction {
     public post(path : string, obj : AdhResources.Content<any>) : ITransactionResult {
         this.checkNotCommitted();
         var preliminaryPath;
-        if (obj.hasOwnProperty("path") && typeof obj.path === "string") {
+        if (typeof obj.path === "string") {
             preliminaryPath = obj.path;
         } else {
             preliminaryPath = this.adhPreliminaryNames.nextPreliminary();
         }
         var preliminaryFirstVersionPath;
-        if (obj.hasOwnProperty("first_version_path") && typeof obj.first_version_path === "string") {
+        if (typeof obj.first_version_path === "string") {
             preliminaryFirstVersionPath = obj.first_version_path;
         } else {
             preliminaryFirstVersionPath = this.adhPreliminaryNames.nextPreliminary();
