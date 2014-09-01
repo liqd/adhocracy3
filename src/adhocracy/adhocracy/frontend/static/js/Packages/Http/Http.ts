@@ -111,7 +111,7 @@ export class Service<Content extends Resources.Content<any>> {
         resources : ResourcesBase.Resource[]
     ) : ng.IPromise<ResourcesBase.Resource[]> {
 
-        var sortedResources : ResourcesBase.Resource[] = ResourcesBase.sortResourcesTopologically(resources);
+        var sortedResources : ResourcesBase.Resource[] = ResourcesBase.sortResourcesTopologically(resources, this.adhPreliminaryNames);
 
         // post stuff
         return this.withTransaction((transaction) : ng.IPromise<ResourcesBase.Resource[]> => {
