@@ -88,7 +88,7 @@ export var register = () => {
 
             describe("create", () => {
                 beforeEach(() => {
-                    resource = adapter.create({preliminaryNames: adhPreliminaryNamesMock});
+                    resource = adapter.create({preliminaryNames: adhPreliminaryNamesMock, follows: "@foo"});
                 });
 
                 it("returns an adhocracy_sample.resources.comment.ICommentVersion resource", () => {
@@ -97,6 +97,11 @@ export var register = () => {
 
                 it("creates an empty adhocracy_sample.sheets.comment.IComment sheet", () => {
                     expect(resource.data["adhocracy_sample.sheets.comment.IComment"]).toBeDefined();
+                });
+
+                it("creates an adhocracy.sheets.versions.IVersionable sheet with the right follows field", () => {
+                    expect(resource.data["adhocracy.sheets.versions.IVersionable"]).toBeDefined();
+                    expect(resource.data["adhocracy.sheets.versions.IVersionable"].follows).toBe("@foo");
                 });
             });
 

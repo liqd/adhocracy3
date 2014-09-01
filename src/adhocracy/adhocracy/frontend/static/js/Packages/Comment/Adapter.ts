@@ -32,6 +32,8 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
         var resource = new RICommentVersion(settings);
         resource.data["adhocracy_sample.sheets.comment.IComment"] =
             new SIComment.AdhocracySampleSheetsCommentIComment(settings);
+        resource.data["adhocracy.sheets.versions.IVersionable"] =
+            new SIVersionable.AdhocracySheetsVersionsIVersionable(settings);
         return resource;
     }
 
