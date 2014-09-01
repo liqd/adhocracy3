@@ -841,9 +841,8 @@ the individual requests.
 The encoding of a request consist of an object with attributes for
 method (aka HTTP verb), path, and body. A further attribute, 'result_path',
 defines a name for the preliminary path of the object created by the request.
-Like other resource names, the preliminary name is an *Identifier*,
-i.e. it can only contain ASCII letters and digits, underscores, dashes,
-and dots. In addition it must start with '@'. If the preliminary name will not be used, this attribute can be
+The preliminary path is like an *AbsolutePath*, but it starts with '@'
+instead of '/'. If the preliminary name will not be used, this attribute can be
 omitted or left empty. ::
 
     >>> encoded_request_with_name = {
@@ -859,13 +858,8 @@ in the 'path' item of the request itself, or anywhere in the json data
 in the body where the schemas expect to find resource paths.  It must
 be prefixed with "@" in order to mark it as preliminary.  Right
 before executing the request, the backend will traverse the request
-object and replace all preliminary names with the actual ones that
+object and replace all preliminary paths with the actual ones that
 will be available by then.
-
-At this point, the fact that an item is not constructed empty, but
-always immediately contains an initial, empty version that is passed
-back to the client via an extra attribute 'first_version_path'
-complicates things significantly.
 
 In order to post the first *real* item version, we must use
 'first_version_path' as the predecessor version, but we can't know its
