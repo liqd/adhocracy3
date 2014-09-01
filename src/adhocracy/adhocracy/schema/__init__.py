@@ -258,11 +258,15 @@ class AbstractIterableOfPaths(IdSet):
         """
         if value is colander.null:
             return value
-        self._check_iterable(node, value)
+        self._check_nonstr_iterable(node, value)
         paths = []
         for resource in value:
             paths.append(serialize_path(node, resource))
         return paths
+
+    def _check_nonstr_iterable(self, node, value):
+        if isinstance(value, str) or not hasattr(value, '__iter__'):
+            raise colander.Invalid(node, '{} is not list-like'.format(value))
 
     def deserialize(self, node, value):
         """Deserialize path to object.
@@ -274,7 +278,7 @@ class AbstractIterableOfPaths(IdSet):
         """
         if value is colander.null:
             return value
-        self._check_iterable(node, value)
+        self._check_nonstr_iterable(node, value)
         resources = self.create_empty_appstruct()
         for path in value:
             resource = deserialize_path(node, path)
