@@ -290,6 +290,12 @@ class PathListSetUnitTest(unittest.TestCase):
         with pytest.raises(colander.Invalid):
             inst.serialize(None, None)
 
+    def test_serialize_string(self):
+        inst = self._make_one()
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        with pytest.raises(colander.Invalid):
+            inst.serialize(node, 'blah')
+
     def test_serialize_iterable(self):
         inst = self._make_one()
         node = add_node_binding(colander.Mapping(), context=self.context)
