@@ -235,18 +235,17 @@ export var register = () => {
                     expect(post1.path[1]).not.toBe("@");
                 });
 
-                it("prefixes preliminary first_version_paths with '@@'", () => {
+                it("prefixes preliminary first_version_paths with a single '@'", () => {
                     expect(post1.first_version_path[0]).toBe("@");
-                    expect(post1.first_version_path[1]).toBe("@");
-                    expect(post1.first_version_path[2]).not.toBe("@");
+                    expect(post1.first_version_path[1]).not.toBe("@");
                 });
 
                 it("adds a result_path to post requests", () => {
                     expect(request[post1.index].result_path).toBeDefined();
-                    expect("@" + request[post1.index].result_path).toBe(post1.path);
+                    expect(request[post1.index].result_path).toBe(post1.path);
 
                     expect(request[post2.index].result_path).toBeDefined();
-                    expect("@" + request[post2.index].result_path).toBe(post2.path);
+                    expect(request[post2.index].result_path).toBe(post2.path);
                 });
 
                 it("maps preliminary data to responses via `index`", () => {
