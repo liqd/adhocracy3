@@ -50,6 +50,7 @@ export var register = () => {
             var r2;
             var r3;
             var r4;
+            var r5;
             var adhPreliminaryNamesMock;
 
             beforeEach(() => {
@@ -91,6 +92,17 @@ export var register = () => {
                 r4.getReferences = jasmine.createSpy("getReferences").and.returnValue(["r1", "r3", "r1"]);
                 var result = ResourcesBase.sortResourcesTopologically([r2, r3, r4, r1], adhPreliminaryNamesMock);
                 expect(result).toEqual([r1, r2, r3, r4]);
+            });
+
+            it("considers parent as just another reference", () => {
+                r5 = {
+                    path: "r5",
+                    parent: "r4"
+                };
+                r5.getReferences = jasmine.createSpy("getReferences").and.returnValue([]);
+
+                var result = ResourcesBase.sortResourcesTopologically([r2, r3, r4, r5, r1], adhPreliminaryNamesMock);
+                expect(result).toEqual([r1, r2, r3, r4, r5]);
             });
         });
     });
