@@ -83,11 +83,12 @@ export interface IResourceWrapperController {
 export var resourceWrapper = () => {
     return {
         restrict: "E",
-        controller: ["$scope", "$attrs", "$q", "adhEventHandlerClass", function(
+        controller: ["$scope", "$attrs", "$q", "adhEventHandlerClass", "adhHttp", function(
             $scope : ng.IScope,
             $attrs : ng.IAttributes,
             $q : ng.IQService,
-            adhEventHandlerClass
+            adhEventHandlerClass,
+            adhHttp : AdhHttp.Service<any>
         ) {
             var self : IResourceWrapperController = this;
             var resourcePromises : ng.IPromise<ResourcesBase.Resource[]>[] = [];
@@ -125,7 +126,7 @@ export var resourceWrapper = () => {
                 return $q.all(resourcePromises)
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
-                    .then((resources) => console.log(resources))  // FIXME do deep post
+                    .then((resources) => adhHttp.deepPost(resources))
                     .then(() => self.triggerSetMode(Mode.display))
                     .then(() => triggerCallback("onSubmit"));
             };

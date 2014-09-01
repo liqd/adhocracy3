@@ -28,6 +28,7 @@ export var register = () => {
                     this.off = jasmine.createSpy("off");
                     this.trigger = jasmine.createSpy("trigger");
                 };
+                var adhHttpMock;
 
                 beforeEach(() => {
                     scopeMock = {
@@ -37,7 +38,8 @@ export var register = () => {
                         onCancel: "onCancel",
                         onSubmit: "onSubmitX"
                     };
-                    controller = new directive.controller[4](scopeMock, attrsMock, q, eventHandlerClassMock);
+                    adhHttpMock = jasmine.createSpyObj("adhHttpMock", ["deepPost"]);
+                    controller = new directive.controller[5](scopeMock, attrsMock, q, eventHandlerClassMock, adhHttpMock);
                 });
 
                 it("does not pollute the scope", () => {
