@@ -71,6 +71,7 @@ export var register = () => {
                 r4.getReferences = jasmine.createSpy("getReferences").and.returnValue(["r1", "r3"]);
 
                 adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary"]);
+                adhPreliminaryNamesMock.isPreliminary.and.returnValue(true);
             });
 
             it("should call getReferences on all given resources", () => {
