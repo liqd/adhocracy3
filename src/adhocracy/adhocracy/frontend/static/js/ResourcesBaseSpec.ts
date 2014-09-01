@@ -82,6 +82,12 @@ export var register = () => {
                 var result = ResourcesBase.sortResourcesTopologically([r2, r3, r4, r1]);
                 expect(result).toEqual([r1, r2, r3, r4]);
             });
+
+            it("doesn't matter if there are duplicate refernces", () => {
+                r4.getReferences = jasmine.createSpy("getReferences").and.returnValue(["r1", "r3", "r1"]);
+                var result = ResourcesBase.sortResourcesTopologically([r2, r3, r4, r1]);
+                expect(result).toEqual([r1, r2, r3, r4]);
+            });
         });
     });
 };

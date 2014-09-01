@@ -116,9 +116,7 @@ export class Service<Content extends Resources.Content<any>> {
         // post stuff
         return this.withTransaction((transaction) : ng.IPromise<ResourcesBase.Resource[]> => {
             _.forEach(sortedResources, (resource) => {
-                // FIXME: post to resource.parent
-                // transaction.post(resource.parent, resource);
-                transaction.post(resource.path, resource);
+                transaction.post(resource.parent, resource);
             });
 
             return transaction.commit();

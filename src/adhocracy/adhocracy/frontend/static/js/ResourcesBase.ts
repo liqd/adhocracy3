@@ -26,6 +26,7 @@ export class Resource {
     // these path attributes may be undefined or null.
     /* tslint:disable:variable-name */
     public path : string;
+    public parent : string;
     public first_version_path : string;
     public root_versions : string[];
     /* tslint:enable:variable-name */
@@ -69,8 +70,11 @@ export function sortResourcesTopologically(resources : Resource[]) : Resource[] 
     _.forEach(dag, (vertex : Util.IVertex<Resource>, key, l) => {
         var references = vertex.content.getReferences();
 
-        // FIXME: add parent (doesn't exist in resource yet)
-        // references.push(vertex.resource.parent.path);
+        if (typeof vertex.content.parent !== "undefined") {
+            references.push(vertex.content.parent);
+        }
+
+        references = _.uniq(references);
 
         dag[key].incoming = references;
 
