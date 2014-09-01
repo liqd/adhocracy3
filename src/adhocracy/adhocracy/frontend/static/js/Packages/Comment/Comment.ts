@@ -110,7 +110,7 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
 
         var version = this.adapter.create({
             preliminaryNames: this.adhPreliminaryNames,
-            follows: item.first_version_path
+            follows: [item.first_version_path]
         });
         this.adapter.content(version, instance.scope.data.content);
         this.adapter.refersTo(version, instance.scope.refersTo);
