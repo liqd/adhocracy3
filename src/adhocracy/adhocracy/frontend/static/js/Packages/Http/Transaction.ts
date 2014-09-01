@@ -24,7 +24,6 @@ export class Transaction {
 
     private requests : any[];
     private committed : boolean;
-    private nextID : number;
 
     constructor(
         private $http : ng.IHttpService,
@@ -33,7 +32,6 @@ export class Transaction {
     ) {
         this.requests = [];
         this.committed = false;
-        this.nextID = 0;
     }
 
     private checkNotCommitted() : void {
