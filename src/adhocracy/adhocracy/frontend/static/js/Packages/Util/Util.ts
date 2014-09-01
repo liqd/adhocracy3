@@ -225,3 +225,61 @@ export function latestVersionsOnly(refs : string[]) : string[] {
 
     return latestVersions;
 };
+
+
+export interface IVertex<vertexType> {
+    content : vertexType;
+    incoming : string[];
+    outgoing : string[];
+    done : Boolean;
+};
+
+
+/**
+ * Data structure which contains a DAG in a structure that is easy to work with.
+ */
+export interface IDag<vertexType> {
+    [key : string] : IVertex<vertexType>;
+}
+
+
+/**
+ * Sort a given IDag<any> topologically and return the sorted content items.
+ *
+ * This function has some assumptions which fit the current only use case:
+ *
+ * - It currently destroys the edges of the Dag.
+ */
+export function sortDagTopologically(dag : IDag<any>, sources : string[]) : any[] {
+    "use strict";
+
+    // getNext pops any possible candidate from
+    // the DAG by modifying the dag object
+    var getNext = (dag) => {
+        var next = sources.pop();
+
+        _.forEach((<IVertex<any>>dag[next]).outgoing, (key) => {
+            // dag[key].incoming.deleteItem(next)
+            dag[key].incoming.splice(_.indexOf(dag[key].incoming, next), 1);
+            if (_.isEmpty(dag[key].incoming)) {
+                sources.push(key);
+            }
+        });
+
+        return next;
+    };
+
+    var sorted = [];
+
+    while (!_.isEmpty(sources)) {
+        var next = getNext(dag);
+        sorted.push(dag[next].content);
+        dag[next].done = true;
+    }
+
+    if (!_.all(_.pluck(dag, "done"))) {
+        throw "cycle detected";
+    }
+
+    return sorted;
+}

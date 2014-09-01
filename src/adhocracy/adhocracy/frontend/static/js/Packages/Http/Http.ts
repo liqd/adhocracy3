@@ -1,6 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
 import Resources = require("../../Resources");
 import ResourcesBase = require("../../ResourcesBase");
@@ -109,7 +110,17 @@ export class Service<Content extends Resources.Content<any>> {
     public deepPost(
         resources : ResourcesBase.Resource[]
     ) : ng.IPromise<ResourcesBase.Resource[]> {
-        throw "not implemented";
+
+        var sortedResources : ResourcesBase.Resource[] = ResourcesBase.sortResourcesTopologically(resources);
+
+        // post stuff
+        return this.withTransaction((transaction) : ng.IPromise<ResourcesBase.Resource[]> => {
+            _.forEach(sortedResources, (resource) => {
+                transaction.post(resource.parent, resource);
+            });
+
+            return transaction.commit();
+        });
     }
 
     public postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
