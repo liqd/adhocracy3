@@ -1,5 +1,5 @@
 /// <reference path="../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
+/// <reference path="../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
 /* tslint:disable:no-var-requires */
 var _s : any = require("underscore.string");

@@ -1,5 +1,5 @@
 /// <reference path="../lib/DefinitelyTyped/requirejs/require.d.ts"/>
-/// <reference path="../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
+/// <reference path="../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
 /* tslint:disable:no-var-requires */
 var http : any = require("http");
@@ -10,6 +10,7 @@ var _s : any = require("underscore.string");
 
 declare var process : any;
 
+import Base = require("./ResourcesBase");
 import Util = require("./mkResources/Util");
 import MetaApi = require("./Packages/MetaApi/MetaApi");
 
@@ -180,16 +181,47 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
         }
     })();
 
-    // generate main module
+    // generate root module Resources_.ts
     (() => {
         var rootModule = "";
         var relativeRoot = outPath + "/Resources_/";
-        for (var modulePath in modules) {
-            if (modules.hasOwnProperty(modulePath)) {
-                rootModule += mkImportStatement(modulePath, relativeRoot, metaApi);
+        var imports : string[] = [];
+        (() => {
+            for (var modulePath in modules) {
+                if (modules.hasOwnProperty(modulePath)) {
+                    imports.push(mkImportStatement(modulePath, relativeRoot, metaApi));
+                }
             }
-        }
-        rootModule += "\n";
+            imports.sort();
+            rootModule += Util.intercalate(imports, "") + "\n";
+        })();
+
+        // resource registry.
+        (() => {
+            var dictEntries : string[] = [];
+            for (var modulePath in metaApi.resources) {
+                if (metaApi.resources.hasOwnProperty(modulePath)) {
+                    dictEntries.push("    \"" + modulePath + "\": " + mkModuleName(modulePath, metaApi));
+                }
+            }
+            dictEntries.sort();
+            rootModule += "export var resourceRegistry = {\n" + Util.intercalate(dictEntries, ",\n") + "\n};\n\n";
+        })();
+
+        // sheet registry.
+        (() => {
+            var dictEntries : string[] = [];
+            for (var modulePath in metaApi.sheets) {
+                if (metaApi.sheets.hasOwnProperty(modulePath)) {
+                    dictEntries.push(
+                            "    \"" + modulePath + "\": "
+                            + mkModuleName(modulePath, metaApi) + "." + mkSheetName(mkNick(modulePath, metaApi)));
+                }
+            }
+            dictEntries.sort();
+            rootModule += "export var sheetRegistry = {\n" + Util.intercalate(dictEntries, ",\n") + "\n};\n";
+        })();
+
         var absfp = outPath + "/Resources_.ts";
         fs.writeFileSync(absfp, headerFooter(relativeRoot, rootModule));
     })();
@@ -199,8 +231,94 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
     var sheetI : string = "";
     var hasSheetI : string = "";
 
-    sheetI += "export interface " + mkSheetName(sheet.nick) + " {\n";
-    sheetI += mkFieldSignatures(sheet.fields, "    ", ";\n") + "\n";
+    var writables : MetaApi.ISheetField[] = [];
+    var nonWritables : MetaApi.ISheetField[] = [];
+
+    var sheetMetaApi : Base.ISheetMetaApi = {
+        readable: [],
+        editable: [],
+        creatable: [],
+        create_mandatory: [],
+        references: []
+    };
+
+    (() => {
+        for (var x in sheet.fields) {
+            if (sheet.fields.hasOwnProperty(x)) {
+                var field = sheet.fields[x];
+
+                if (field.editable || field.creatable || field.create_mandatory) {
+                    writables.push(field);
+
+                    if (field.valuetype === "adhocracy.schema.AbsolutePath") {
+                        sheetMetaApi.references.push(field.name);
+                    }
+                } else {
+                    nonWritables.push(field);
+                }
+
+                if (field.readable) {
+                    sheetMetaApi.readable.push(field.name);
+                }
+                if (field.editable) {
+                    sheetMetaApi.editable.push(field.name);
+                }
+                if (field.creatable) {
+                    sheetMetaApi.creatable.push(field.name);
+                }
+                if (field.create_mandatory) {
+                    sheetMetaApi.create_mandatory.push(field.name);
+                }
+            }
+        }
+    })();
+
+    var mkConstructor = () => {
+        var args : string[] = [];
+        var lines : string[] = [];
+
+        if (writables.length > 0) {
+            args.push("args : {");
+            args.push(mkFieldSignatures(writables, "        ", ";\n") + ";");
+            args.push("    }");
+
+            for (var x in writables) {
+                if (writables.hasOwnProperty(x)) {
+                    lines.push("        this." + writables[x].name + " = args." + writables[x].name + ";");
+                }
+            }
+        }
+
+        var s = "";
+        s += "    constructor(" + Util.intercalate(args, "\n") + ") {\n";
+        s += "        super();\n";
+        if (lines.length > 0) {
+            s += Util.intercalate(lines, "\n") + "\n";
+        }
+        s += "    }\n";
+        return s;
+    };
+
+    var showList = (elems : string[]) : string => {
+        if (elems.length === 0) {
+            return "[]";
+        } else {
+            return "[\"" + Util.intercalate(elems, "\", \"") + "\"]";
+        }
+    };
+
+    sheetI += "export class " + mkSheetName(sheet.nick) + " extends Base.Sheet {\n";
+
+    sheetI += "    public static _meta : Base.ISheetMetaApi = {\n";
+    sheetI += "        readable: " + showList(sheetMetaApi.readable) + ",\n";
+    sheetI += "        editable: " + showList(sheetMetaApi.editable) + ",\n";
+    sheetI += "        creatable: " + showList(sheetMetaApi.creatable) + ",\n";
+    sheetI += "        create_mandatory: " + showList(sheetMetaApi.create_mandatory) + ",\n";
+    sheetI += "        references: " + showList(sheetMetaApi.references) + "\n";
+    sheetI += "    };\n\n";
+
+    sheetI += mkConstructor() + "\n";
+    sheetI += mkFieldSignatures(sheet.fields, "    public ", ";\n") + "\n";
     sheetI += "}\n\n";
 
     sheetI += "export interface Has" + mkSheetName(sheet.nick) + " {\n";
@@ -220,12 +338,17 @@ mkFieldSignatures = (fields : MetaApi.ISheetField[], tab : string, separator : s
         tab, separator
     );
 
-mkFieldAssignments = (fields : MetaApi.ISheetField[], tab : string) : string =>
-    Util.mkThingList(
-        fields,
-        (field) => field.name + ": " + field.name,
-        tab, ",\n"
-    );
+mkFieldAssignments = (fields : MetaApi.ISheetField[], tab : string) : string => {
+    if (fields.length === 0) {
+        return "";
+    } else {
+        return Util.mkThingList(
+            fields,
+            (field) => field.name + ": " + field.name,
+            tab, ",\n"
+        );
+    }
+};
 
 enabledFields = (fields : MetaApi.ISheetField[], enableFlags ?: string) : MetaApi.ISheetField[] => {
     if (typeof enableFlags !== "string") {
@@ -311,28 +434,67 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
     var mkConstructor = (tab : string) => {
         var os : string[] = [];
 
-        var args : string[] = [];
+        // we use reqArgs, optArgs, and lines to group semantically
+        // close constructor arguments and code lines.
+        //
+        // `{ [key : string] : string }` cannot be used with object
+        // attribute syntax, so we type the args dictionaries as
+        // `any`.
+        var reqArgs : any = {};
+        var optArgs : any = {};
         var lines : string[] = [];
 
-        args.push("preliminaryNames : PreliminaryNames");
-        lines.push("    _self.path = preliminaryNames.nextPreliminary();");
+        reqArgs.preliminaryNames = "PreliminaryNames";
 
+        // resource path is either optional arg or (if n/a)
+        // preliminary name.
+        optArgs.path = "string";
+        lines.push("    if (args.hasOwnProperty(\"path\")) {");
+        lines.push("        _self.path = args.path;");
+        lines.push("    } else {");
+        lines.push("        _self.path = args.preliminaryNames.nextPreliminary();");
+        lines.push("    }");
+
+        // first_version_path is set to a preliminary name iff
+        // IVersions sheet is present.
         if (resource.sheets.indexOf("adhocracy.sheets.versions.IVersions") !== -1) {
-            lines.push("    _self.first_version_path = preliminaryNames.nextPreliminary();");
+            lines.push("    _self.first_version_path = args.preliminaryNames.nextPreliminary();");
         } else {
             lines.push("    _self.first_version_path = undefined;");
         }
 
+        // root_versions is empty.
         lines.push("    _self.root_versions = [];");
 
+        // if IName sheet is present, allow to set name in
+        // constructor (optional arg).
         if (resource.sheets.indexOf("adhocracy.sheets.name.IName") !== -1) {
-            args.push("name ?: string");
-            lines.push("    if (typeof name !== 'undefined') {");
-            lines.push("        _self.data[\"adhocracy.sheets.name.IName\"] = { name: name };");
+            optArgs.name = "string";
+            lines.push("    if (args.hasOwnProperty(\"name\")) {");
+            lines.push("        _self.data[\"adhocracy.sheets.name.IName\"] =");
+            lines.push("            new " + mkModuleName("adhocracy.sheets.name.IName", metaApi) + "." +
+                       mkSheetName("adhocracy.sheets.name.IName") + "({ name : args.name })");
             lines.push("    }");
         }
 
-        os.push("constructor(" + Util.intercalate(args, ", ") + ") {");
+        // construct optargs
+        var args : string[] = [];
+        (() => {
+            var x;
+            for (x in reqArgs) {
+                if (reqArgs.hasOwnProperty(x)) {
+                    args.push(x + " : " + reqArgs[x]);
+                }
+            }
+            for (x in optArgs) {
+                if (optArgs.hasOwnProperty(x)) {
+                    args.push(x + " ?: " + optArgs[x]);
+                }
+            }
+        })();
+
+        // construct constructor function code.
+        os.push("constructor(args : { " + Util.intercalate(args, "; ") + " }) {");
         os.push("    super(\"" + modulePath + "\");");
         os.push("    var _self = this;");
         lines.forEach((line) => os.push(line));

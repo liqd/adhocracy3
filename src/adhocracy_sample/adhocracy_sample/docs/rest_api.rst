@@ -841,16 +841,16 @@ the individual requests.
 The encoding of a request consist of an object with attributes for
 method (aka HTTP verb), path, and body. A further attribute, 'result_path',
 defines a name for the preliminary path of the object created by the request.
-Like other resource names, the preliminary name is an *Identifier*,
-i.e. it can only contain ASCII letters and digits, underscores, dashes,
-and dots. If the preliminary name will not be used, this attribute can be
+The preliminary path is like an *AbsolutePath*, but it starts with '@'
+instead of '/'. If the preliminary name will not be used, this attribute can be
 omitted or left empty. ::
 
     >>> encoded_request_with_name = {
     ...     'method': 'POST',
     ...     'path': '/adhocracy/Proposal/kommunismus',
     ...     'body': { 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph' },
-    ...     'result_path': 'par1_item'
+    ...     'result_path': '@par1_item',
+    ...     'result_first_version_path': '@par1_item/v1'
     ... }
 
 Preliminary paths can be used anywhere in subsequent requests, either
@@ -858,25 +858,18 @@ in the 'path' item of the request itself, or anywhere in the json data
 in the body where the schemas expect to find resource paths.  It must
 be prefixed with "@" in order to mark it as preliminary.  Right
 before executing the request, the backend will traverse the request
-object and replace all preliminary names with the actual ones that
+object and replace all preliminary paths with the actual ones that
 will be available by then.
-
-At this point, the fact that an item is not constructed empty, but
-always immediately contains an initial, empty version that is passed
-back to the client via an extra attribute 'first_version_path'
-complicates things significantly.
 
 In order to post the first *real* item version, we must use
 'first_version_path' as the predecessor version, but we can't know its
-value that before the post of the item version.  This would not be a
+value before the post of the item version. This would not be a
 problem if the item would be created empty.
 
 *FIXME: change the api accordingly so that this problem goes away!*
 
-In order to work around this, preliminary path names for item posts
-can be used in two different syntaxes: First, like '@prelim_name' in
-order to refer to the item, and second, like '@@prelim_name' in order
-to refer to the first, implicitly generated, empty item version.
+In order to work around you can set the optional field
+'result_first_version_path' with a *preliminary resource path*.
 
 
 Examples
@@ -894,7 +887,8 @@ Let's add some more paragraphs to the second section above ::
     ...                              {'name': 'par1'}
     ...                         }
     ...             },
-    ...             'result_path': 'par1_item'
+    ...             'result_path': '@par1_item',
+    ...             'result_first_version_path': '@par1_item/v1'
     ...           },
     ...           {
     ...             'method': 'POST',
@@ -903,18 +897,18 @@ Let's add some more paragraphs to the second section above ::
     ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
     ...                 'data': {
     ...                     'adhocracy.sheets.versions.IVersionable': {
-    ...                         'follows': ['@@par1_item']
+    ...                         'follows': ['@par1_item/v1']
     ...                     },
     ...                     'adhocracy.sheets.document.IParagraph': {
     ...                         'content': 'sein blick ist vom vorüberziehn der stäbchen'
     ...                     }
     ...                 },
     ...             },
-    ...             'result_path': 'par1_version'
+    ...             'result_path': '@par1_item/v2'
     ...           },
     ...           {
     ...             'method': 'GET',
-    ...             'path': '@par1_version'
+    ...             'path': '@par1_item/v2'
     ...           },
     ...         ]
     >>> batch_resp = testapp.post_json(batch_url, batch).json
@@ -966,7 +960,7 @@ the paragraph will not be present in the database ::
     ...                              {'name': 'par2'}
     ...                         }
     ...             },
-    ...             'result_path': 'par2_item'
+    ...             'result_path': '@par2_item'
     ...           },
     ...           {
     ...             'method': 'POST',
@@ -975,14 +969,14 @@ the paragraph will not be present in the database ::
     ...                 'content_type': 'NOT_A_CONTENT_TYPE_AT_ALL',
     ...                 'data': {
     ...                     'adhocracy.sheets.versions.IVersionable': {
-    ...                         'follows': ['@@par2_item']
+    ...                         'follows': ['@par2_item/v1']
     ...                     },
     ...                     'adhocracy.sheets.document.IParagraph': {
     ...                         'content': 'das wird eh nich gepostet'
     ...                     }
     ...                 }
     ...             },
-    ...             'result_path': 'par2_version'
+    ...             'result_path': '@par2_item/v2'
     ...           }
     ...         ]
     >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch,

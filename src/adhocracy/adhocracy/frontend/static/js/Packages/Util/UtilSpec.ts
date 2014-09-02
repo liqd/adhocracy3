@@ -1,5 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
+import JasmineHelpers = require("../../JasmineHelpers");
 import Util = require("./Util");
 
 export var register = () => {
@@ -270,6 +271,96 @@ export var register = () => {
         describe("escapeNgExp", () => {
             it("wraps the input in single quotes and escapes any single quotes already in there", () => {
                 expect(Util.escapeNgExp("You, me & 'the thing'")).toBe("'You, me & \\'the thing\\''");
+            });
+        });
+
+        describe("latestVersionsOnly", () => {
+            var testCase = [
+                "/asd/version2",
+                "/asd/version3",
+                "/foo/version1",
+                "/bar/version1",
+                "/asd/version1",
+                "/foo/version2"
+            ];
+
+            it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
+                jasmine.addMatchers(JasmineHelpers.customMatchers);
+
+                var result = Util.latestVersionsOnly(testCase);
+                (<any>expect(result)).toSetEqual(["/asd/version3", "/foo/version2", "/bar/version1"]);
+            });
+
+            it("does not alter the input list", () => {
+                Util.latestVersionsOnly(testCase);
+                expect(testCase).toEqual([
+                    "/asd/version2",
+                    "/asd/version3",
+                    "/foo/version1",
+                    "/bar/version1",
+                    "/asd/version1",
+                    "/foo/version2"
+                ]);
+            });
+        });
+
+        describe("sortDagTopologically", () => {
+
+            it("sorts a given dag topologically", () => {
+                var dag : Util.IDag<string> = {
+                    "A": {
+                        "content": "AA",
+                        "incoming": [],
+                        "outgoing": ["B", "D"],
+                        "done": false
+                    },
+                    "B": {
+                        "content": "BB",
+                        "incoming": ["A"],
+                        "outgoing": ["C"],
+                        "done": false
+                    },
+                    "C": {
+                        "content": "CC",
+                        "incoming": ["B"],
+                        "outgoing": ["D"],
+                        "done": false
+                    },
+                    "D": {
+                        "content": "DD",
+                        "incoming": ["A", "C"],
+                        "outgoing": [],
+                        "done": false
+                    }
+                };
+
+                var result = Util.sortDagTopologically(dag, ["A"]);
+                expect(result).toEqual(["AA", "BB", "CC", "DD"]);
+            });
+
+            it("throws a cycle detected error if the given graph contains cycles", () => {
+                var dag : Util.IDag<string> = {
+                    "A": {
+                        "content": "AA",
+                        "incoming": [],
+                        "outgoing": ["B"],
+                        "done": false
+                    },
+                    "B": {
+                        "content": "BB",
+                        "incoming": ["A", "C"],
+                        "outgoing": ["C"],
+                        "done": false
+                    },
+                    "C": {
+                        "content": "CC",
+                        "incoming": ["B"],
+                        "outgoing": ["B"],
+                        "done": false
+                    }
+                };
+
+                expect(() => Util.sortDagTopologically(dag, ["A"])).toThrow();
             });
         });
     });

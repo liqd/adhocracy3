@@ -191,6 +191,11 @@ are available:
         <td class="text-functional-introvert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
         <td></td>
     </tr>
+    <tr>
+        <td><code>meta</code></td>
+        <td class="text-meta">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor.</td>
+        <td></td>
+    </tr>
 </table>
 */
 @mixin text($value) {
@@ -222,6 +227,14 @@ are available:
         @include font-tracking(narrow);
         line-height: 1.5;
         color: $color-prime-extrovert;
+    } @else if $value == meta {
+        font-family: $font-family-normal;
+        font-weight: $font-weight-normal;
+        font-size: $font-size-small;
+        @include font-tracking(normal);
+        line-height: 1.2;
+        color: $color-secondary-extrovert;
+        text-transform: uppercase;
     } @else {
         @warn "no such text-style: #{$value}";
     }
@@ -231,5 +244,6 @@ are available:
 .text-running {@include text(running);}
 .text-functional {@include text(functional);}
 .text-functional-introvert {@include text(functional-introvert);}
+.text-meta {@include text(meta);}
 
 $width-action: 3em;

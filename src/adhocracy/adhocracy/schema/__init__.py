@@ -2,6 +2,7 @@
 from datetime import datetime
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
+from pytz import UTC
 from substanced.schema import IdSet
 import colander
 import pytz
@@ -257,11 +258,15 @@ class AbstractIterableOfPaths(IdSet):
         """
         if value is colander.null:
             return value
-        self._check_iterable(node, value)
+        self._check_nonstr_iterable(node, value)
         paths = []
         for resource in value:
             paths.append(serialize_path(node, resource))
         return paths
+
+    def _check_nonstr_iterable(self, node, value):
+        if isinstance(value, str) or not hasattr(value, '__iter__'):
+            raise colander.Invalid(node, '{} is not list-like'.format(value))
 
     def deserialize(self, node, value):
         """Deserialize path to object.
@@ -273,7 +278,7 @@ class AbstractIterableOfPaths(IdSet):
         """
         if value is colander.null:
             return value
-        self._check_iterable(node, value)
+        self._check_nonstr_iterable(node, value)
         resources = self.create_empty_appstruct()
         for path in value:
             resource = deserialize_path(node, path)
@@ -404,8 +409,7 @@ class Password(AdhocracySchemaNode):
 @colander.deferred
 def deferred_date_default(node: colander.MappingSchema, kw: dict) -> datetime:
     """Return current date."""
-    # Fixme: set custom timezone
-    return datetime.now()
+    return datetime.utcnow().replace(tzinfo=UTC)
 
 
 class DateTime(AdhocracySchemaNode):
@@ -423,8 +427,8 @@ class DateTime(AdhocracySchemaNode):
 
     Constructor arguments:
 
-    :param 'tzinfo': This timezone is used if the cstrut is missing the tzinfo.
-                     Defaults to UTC
+    :param 'tzinfo': This timezone is used if the :term:`cstruct` is missing
+                     the tzinfo. Defaults to UTC
     """
 
     schema_type = colander.DateTime

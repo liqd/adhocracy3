@@ -13,7 +13,7 @@
             </div>
             <h1>{{content.data['adhocracy.sheets.document.IDocument'].title}}</h1>
             <p><em>{{content.data['adhocracy.sheets.document.IDocument'].description}}</em></p>
-            <adh-user-meta data-path="{{content.data['adhocracy.sheets.metadata.IMetadata'].creator}}"</adh-user-meta>
+            author: <adh-user-meta data-path="{{content.data['adhocracy.sheets.metadata.IMetadata'].creator}}"</adh-user-meta>
         </div>
         <div data-ng-switch-when="edit">
             <input type="text" name="title" class="m-title" data-ng-model="content.data['adhocracy.sheets.document.IDocument'].title" placeholder="title"></input>

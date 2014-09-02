@@ -8,6 +8,9 @@ import RIProposalVersion = require("../../Resources_/adhocracy_sample/resources/
 import RISection = require("../../Resources_/adhocracy_sample/resources/section/ISection");
 import RISectionVersion = require("../../Resources_/adhocracy_sample/resources/section/ISectionVersion");
 import RITag = require("../../Resources_/adhocracy/interfaces/ITag");
+import SIDocument = require("../../Resources_/adhocracy/sheets/document/IDocument");
+import SIVersionable = require("../../Resources_/adhocracy/sheets/versions/IVersionable");
+
 import AdhMetaApi = require("../MetaApi/MetaApi");
 import AdhHttp = require("./Http");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
@@ -18,7 +21,7 @@ export var register = (angular, config, meta_api) => {
     describe("withTransaction", () => {
         var adhHttp : AdhHttp.Service<any> = (() => {
             var factory = ($http, $q) => {
-                return (new AdhHttp.Service($http, $q, new AdhMetaApi.MetaApiQuery(meta_api)));
+                return (new AdhHttp.Service($http, $q, new AdhMetaApi.MetaApiQuery(meta_api), new AdhPreliminaryNames));
             };
             factory.$inject = ["$http", "$q"];
             return angular.injector(["ng"]).invoke(factory);
@@ -35,23 +38,24 @@ export var register = (angular, config, meta_api) => {
 
             var cb = (transaction : any) : ng.IPromise<void> => {
                 var proposal : AdhHttp.ITransactionResult =
-                    transaction.post(poolPath, new RIProposal(adhPreliminaryNames, proposalName));
+                    transaction.post(poolPath, new RIProposal({preliminaryNames: adhPreliminaryNames, name: proposalName}));
                 var section : AdhHttp.ITransactionResult =
-                    transaction.post(proposal.path, new RISection(adhPreliminaryNames, "Motivation"));
+                    transaction.post(proposal.path, new RISection({preliminaryNames: adhPreliminaryNames, name : "Motivation"}));
 
-                var sectionVersionResource = new RISectionVersion(adhPreliminaryNames);
+                var sectionVersionResource = new RISectionVersion({preliminaryNames: adhPreliminaryNames});
                 var sectionVersion : AdhHttp.ITransactionResult = transaction.post(section.path, sectionVersionResource);
 
-                var proposalVersionResource = new RIProposalVersion(adhPreliminaryNames);
-                proposalVersionResource.data["adhocracy.sheets.document.IDocument"] = {
-                    title: proposalName,
-                    description: "whoof",
-                    elements: [sectionVersion.path]
-                };
-                proposalVersionResource.data["adhocracy.sheets.versions.IVersionable"] = {
-                    follows: [proposal.first_version_path],
-                    followed_by: []
-                };
+                var proposalVersionResource = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+                proposalVersionResource.data["adhocracy.sheets.document.IDocument"] =
+                    new SIDocument.AdhocracySheetsDocumentIDocument({
+                        title: proposalName,
+                        description: "whoof",
+                        elements: [sectionVersion.path]
+                    });
+                proposalVersionResource.data["adhocracy.sheets.versions.IVersionable"] =
+                    new SIVersionable.AdhocracySheetsVersionsIVersionable({
+                        follows: [proposal.first_version_path]
+                    });
                 transaction.post(proposal.path, proposalVersionResource);
 
                 return transaction.commit()

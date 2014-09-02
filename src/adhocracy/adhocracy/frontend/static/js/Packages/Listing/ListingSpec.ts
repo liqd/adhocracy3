@@ -101,11 +101,13 @@ export var register = () => {
 
                 describe("controller", () => {
                     var adhHttpMock;
+                    var adhPreliminaryNamesMock;
                     var scope;
 
                     beforeEach(() => {
                         adhHttpMock = createAdhHttpMock();
                         adhHttpMock.get.and.callFake(() => q.when(container));
+                        adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
 
                         scope = {
                             // arbitrary values
@@ -115,8 +117,8 @@ export var register = () => {
                             $watch: jasmine.createSpy("$watch")
                         };
 
-                        var controller = directive.controller[2];
-                        controller(scope, adhHttpMock);
+                        var controller = directive.controller[3];
+                        controller(scope, adhHttpMock, adhPreliminaryNamesMock);
                     });
 
                     it("defines scope.show", () => {
@@ -220,6 +222,12 @@ export var register = () => {
                             expect(scope.showCreateForm).toBeDefined();
                             scope.showCreateForm();
                             expect(scope.show.createForm).toBe(true);
+                        });
+
+                        it("sets $scope.createPath to a preliminary name", () => {
+                            adhPreliminaryNamesMock.nextPreliminary.and.returnValue("preliminary name");
+                            scope.showCreateForm();
+                            expect(scope.createPath).toBe("preliminary name");
                         });
                     });
 

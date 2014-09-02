@@ -1,6 +1,6 @@
-/// <reference path="../../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
-import _ = require("underscore");
+import _ = require("lodash");
 
 import Util = require("../Util/Util");
 import AdhHttp = require("../Http/Http");
@@ -19,6 +19,8 @@ import RISectionVersion = require("../../Resources_/adhocracy_sample/resources/s
 import RISection = require("../../Resources_/adhocracy_sample/resources/section/ISection");
 import SIParagraph = require("../../Resources_/adhocracy/sheets/document/IParagraph");
 import SISection = require("../../Resources_/adhocracy/sheets/document/ISection");
+import SIDocument = require("../../Resources_/adhocracy/sheets/document/IDocument");
+import SIVersionable = require("../../Resources_/adhocracy/sheets/versions/IVersionable");
 
 var pkgLocation = "/Proposal";
 
@@ -168,19 +170,21 @@ export class ProposalVersionNew {
             controller: ["$scope", "adhPreliminaryNames", ($scope : IScopeProposalVersion, adhPreliminaryNames : AdhPreliminaryNames) => {
                 $scope.viewmode = "edit";
 
-                $scope.content = new RIProposalVersion(adhPreliminaryNames);
-                $scope.content.data["adhocracy.sheets.document.IDocument"] = {
-                    title: "",
-                    description: "",
-                    elements: []
-                };
+                $scope.content = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
+                $scope.content.data["adhocracy.sheets.document.IDocument"] =
+                    new SIDocument.AdhocracySheetsDocumentIDocument({
+                        title: "",
+                        description: "",
+                        elements: []
+                    });
                 $scope.paragraphVersions = [];
 
                 $scope.addParagraphVersion = () => {
-                    var pv = new RIParagraphVersion(adhPreliminaryNames);
-                    pv.data["adhocracy.sheets.document.IParagraph"] = {
-                        content: ""
-                    };
+                    var pv = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
+                    pv.data["adhocracy.sheets.document.IParagraph"] =
+                        new SIParagraph.AdhocracySheetsDocumentIParagraph({
+                            content: ""
+                        });
                     $scope.paragraphVersions.push(pv);
                 };
 
@@ -267,18 +271,18 @@ export class Service {
         private $q : ng.IQService
     ) {}
 
-    private postProposal(path : string, name : string, scope : {proposal? : any}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new RIProposal(this.adhPreliminaryNames, name))
+    private postProposal(path : string, name : string, scope : {proposal ?: any}) : ng.IPromise<void> {
+        return this.adhHttp.postToPool(path, new RIProposal({preliminaryNames: this.adhPreliminaryNames, name: name}))
             .then((ret) => { scope.proposal = ret; });
     }
 
-    private postSection(path : string, name : string, scope : {section? : any}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new RISection(this.adhPreliminaryNames, name))
+    private postSection(path : string, name : string, scope : {section ?: any}) : ng.IPromise<void> {
+        return this.adhHttp.postToPool(path, new RISection({preliminaryNames: this.adhPreliminaryNames, name: name}))
             .then((ret) => { scope.section = ret; });
     }
 
-    private postParagraph(path : string, name : string, scope : {paragraphs}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new RIParagraph(this.adhPreliminaryNames, name))
+    private postParagraph(path : string, name : string, scope : {paragraphs ?: any}) : ng.IPromise<void> {
+        return this.adhHttp.postToPool(path, new RIParagraph({preliminaryNames: this.adhPreliminaryNames, name: name}))
             .then((ret) => { scope.paragraphs[name] = ret; });
     }
 
@@ -351,12 +355,13 @@ export class Service {
     ) {
         var _self = this;
 
-        var sectionVersion : RISectionVersion = new RISectionVersion(_self.adhPreliminaryNames);
-        sectionVersion.data["adhocracy.sheets.document.ISection"] = {
-            title : "single section",
-            elements : [],
-            subsections : []
-        };
+        var sectionVersion : RISectionVersion = new RISectionVersion({preliminaryNames: _self.adhPreliminaryNames});
+        sectionVersion.data["adhocracy.sheets.document.ISection"] =
+            new SISection.AdhocracySheetsDocumentISection({
+                title : "single section",
+                elements : [],
+                subsections : []
+            });
 
         var name = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
         name = Util.normalizeName(name);
@@ -406,12 +411,13 @@ export class Service {
     ) {
         var _self = this;
 
-        var sectionVersion : RISectionVersion = new RISectionVersion(_self.adhPreliminaryNames);
-        sectionVersion.data["adhocracy.sheets.document.ISection"] = {
-            title : "single_section",
-            elements : [],
-            subsections : []
-        };
+        var sectionVersion : RISectionVersion = new RISectionVersion({preliminaryNames: _self.adhPreliminaryNames});
+        sectionVersion.data["adhocracy.sheets.document.ISection"] =
+            new SISection.AdhocracySheetsDocumentISection({
+                title : "single_section",
+                elements : [],
+                subsections : []
+            });
 
         var name = proposalVersion.data["adhocracy.sheets.document.IDocument"].title;
         name = Util.normalizeName(name);
@@ -430,33 +436,35 @@ export class Service {
             .withTransaction((transaction) : ng.IPromise<Resources.Content<any>> => {
                 // items
                 var postProposal : AdhHttp.ITransactionResult =
-                    transaction.post(poolPath, new RIProposal(_self.adhPreliminaryNames, name));
+                    transaction.post(poolPath, new RIProposal({preliminaryNames: _self.adhPreliminaryNames, name: name}));
                 var postSection : AdhHttp.ITransactionResult =
-                    transaction.post(postProposal.path, new RISection(_self.adhPreliminaryNames, "section"));
+                    transaction.post(postProposal.path, new RISection({preliminaryNames: _self.adhPreliminaryNames, name: "section"}));
                 var postParagraphs : AdhHttp.ITransactionResult[] =
                     paragraphVersions.map((paragraphVersion, i) =>
-                        transaction.post(postProposal.path, new RIParagraph(_self.adhPreliminaryNames, "paragraph" + i)));
+                        transaction.post(
+                            postProposal.path,
+                            new RIParagraph({preliminaryNames: _self.adhPreliminaryNames, name: "paragraph" + i})));
 
                 // versions
                 var postParagraphVersions = paragraphVersions.map((paragraphVersion, i) => {
-                    paragraphVersion.data["adhocracy.sheets.versions.IVersionable"] = {
-                        follows: [postParagraphs[i].first_version_path],
-                        followed_by: []
-                    };
+                    paragraphVersion.data["adhocracy.sheets.versions.IVersionable"] =
+                        new SIVersionable.AdhocracySheetsVersionsIVersionable({
+                            follows: [postParagraphs[i].first_version_path]
+                        });
                     return transaction.post(postParagraphs[i].path, paragraphVersion);
                 });
 
-                sectionVersion.data["adhocracy.sheets.versions.IVersionable"] = {
-                    follows: [postSection.first_version_path],
-                    followed_by: []
-                };
+                sectionVersion.data["adhocracy.sheets.versions.IVersionable"] =
+                    new SIVersionable.AdhocracySheetsVersionsIVersionable({
+                        follows: [postSection.first_version_path]
+                    });
                 sectionVersion.data["adhocracy.sheets.document.ISection"].elements = postParagraphVersions.map((p) => p.path);
                 var postSectionVersion = transaction.post(postSection.path, sectionVersion);
 
-                proposalVersion.data["adhocracy.sheets.versions.IVersionable"] = {
-                    follows: [postProposal.first_version_path],
-                    followed_by: []
-                };
+                proposalVersion.data["adhocracy.sheets.versions.IVersionable"] =
+                    new SIVersionable.AdhocracySheetsVersionsIVersionable({
+                        follows: [postProposal.first_version_path]
+                    });
                 proposalVersion.data["adhocracy.sheets.document.IDocument"].elements = [postSectionVersion.path];
                 var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
 

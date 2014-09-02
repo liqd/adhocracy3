@@ -5,6 +5,7 @@ from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from pyramid.config import Configurator
 from pyramid.traversal import find_interface
+from pytz import UTC
 from substanced.content import add_content_type
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
@@ -164,7 +165,9 @@ class ResourceFactory:
         return resource
 
     def _get_metadata(self, resource: IResource, creator: IResource) -> dict:
-        now = datetime.now()
+        # FIXME: bad SRP, there are two places responsible to set the default
+        # date, here and in adhocracy.schema.Date
+        now = datetime.utcnow().replace(tzinfo=UTC)
         creator = creator if creator is not None else None
         metadata = {'creator': creator,
                     'creation_date': now,

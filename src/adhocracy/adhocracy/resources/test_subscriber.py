@@ -139,7 +139,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         event = _create_new_version_event_with_isheet(context, IDummySheetAutoUpdate, registry)
         sheet_autoupdate = deepcopy(mock_sheet)
         sheet_autoupdate.meta = mock_sheet.meta._replace(isheet=IDummySheetAutoUpdate)
-        sheet_autoupdate.get.return_value = {'elements': [event.old_version]}
+        sheet_autoupdate.get.return_value = {'elements': [event.old_version],
+                                             'element': event.old_version}
         add_and_register_sheet(context, sheet_autoupdate, registry)
         sheet_versionable = deepcopy(mock_sheet)
         sheet_versionable.meta = mock_sheet.meta._replace(isheet=IVersionable)
@@ -159,11 +160,20 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         parent = factory.call_args[1]['parent']
         assert parent is itemversion.__parent__
         appstructs = factory.call_args[1]['appstructs']
-        assert appstructs[event.isheet.__identifier__] == \
-               {'elements': [event.new_version]}
+        assert appstructs[event.isheet.__identifier__]['elements'] == [event.new_version]
         assert appstructs[IVersionable.__identifier__] == {'follows': [itemversion]}
         creator = factory.call_args[1]['creator']
         assert creator == event.creator
+
+    def test_call_versionable_with_autoupdate_sheet_with_single_reference(self, itemversion, registry, mock_sheet):
+        event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)
+        event.creator = object()
+        event.isheet_field = 'element'
+
+        self._make_one(event)
+
+        factory = registry.content.create
+        assert factory.call_count == 1
 
     def test_call_versionable_with_autoupdate_sheet_twice(self, itemversion, registry, mock_sheet, transaction_changelog):
         event = self._create_new_version_event_for_autoupdate_sheet(itemversion, registry, mock_sheet)

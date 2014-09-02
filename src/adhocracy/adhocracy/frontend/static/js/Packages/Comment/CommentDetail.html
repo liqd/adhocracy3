@@ -1,31 +1,71 @@
-<div class="comment" data-ng-switch="viewmode">
-    <div data-ng-switch-when="edit">
-        <div class="form-error" data-ng-repeat="error in errors">
-            <p>{{error}}</p>
+<div class="comment" data-ng-switch="mode" data-ng-if="data">
+    <div class="discussion-header">
+        <span class="discussion-header-icon">
+            <i class="icon-speachbubble-outline"></i>
+        </span>
+        <div class="discussion-header-column2">
+            <i class="icon-speachbubble-outline"></i>
+            {{data.commentCount}}
+        </div>
+        <div class="discussion-header-column1">
+            <div class="discussion-header-creator">
+                <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
+            </div>
+            <div class="discussion-header-date">
+                <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
+            </div>
         </div>
     </div>
-    <div class="comment-content">
-        <textarea data-ng-switch-when="edit" data-ng-model="data.content"></textarea>
-        <div data-ng-switch-default="">{{data.content}}</div>
-    </div>
-    <a href="" data-ng-switch-when="edit" data-ng-click="save()">Save</a>
-    <a href="" data-ng-switch-when="edit" data-ng-click="cancel()">Cancel</a>
-    <a href="" data-ng-switch-default="" data-ng-click="edit()">Edit</a>
 
-    <adh-comment-listing data-path="{{path}}">
-        <div data-ng-switch="transclusionId">
-            <adh-comment-create
-                data-refers-to="{{path}}"
-                data-pool-path="{{poolPath}}"
-                data-on-new="onCreate"
-                data-on-cancel="hideCreateForm"
-                data-ng-switch-when="create-form-id">
-            </adh-comment-create>
-            <adh-comment-detail
-                data-path="element"
-                data-viemode="'list'"
-                data-ng-switch-when="element-id">
-            </adh-comment-detail>
+    <div class="comment-main">
+        <div class="comment-title">
+            <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
         </div>
-    </adh-comment-listing>
+        <div data-ng-switch-when="1">
+            <div class="form-error" data-ng-repeat="error in errors">
+                <p>{{error}}</p>
+            </div>
+        </div>
+        <div class="comment-content">
+            <textarea data-ng-switch-when="1" data-ng-model="data.content"></textarea>
+            <div data-ng-switch-default="">{{data.content}}</div>
+        </div>
+        <div class="comment-meta">
+            <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
+
+            <div class="comment-actions">
+                <a href="" class="comment-action" data-ng-switch-default="" data-ng-click="edit()">Edit</a>
+                <a href="" class="comment-action m-comment-reply" data-ng-switch-default="" data-ng-click="createComment()">Add Comment</a>
+                <a href="" class="comment-action" data-ng-switch-when="1" data-ng-click="submit()">Save</a>
+                <a href="" class="comment-action" data-ng-switch-when="1" data-ng-click="cancel()">Cancel</a>
+                <span class="comment-count">
+                    <i class="icon-speachbubble-outline"></i>
+                    {{data.commentCount}}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="comment-children-create-form" data-ng-if="show.createForm">
+        <adh-resource-wrapper
+            data-on-submit="afterCreateComment"
+            data-on-cancel="cancelCreateComment">
+            <adh-comment-create
+                data-path="{{createPath}}"
+                data-mode="edit"
+                data-refers-to="{{path}}"
+                data-pool-path="{{data.replyPoolPath}}">
+            </adh-comment-create>
+        </adh-resource-wrapper>
+    </div>
+
+    <div class="comment-children">
+        <adh-resource-wrapper
+            data-ng-repeat="comment in data.comments">
+            <adh-comment-resource
+                data-path="{{comment}}"
+                data-mode="display">
+            </adh-comment-resource>
+        </adh-resource-wrapper>
+    </div>
 </div>

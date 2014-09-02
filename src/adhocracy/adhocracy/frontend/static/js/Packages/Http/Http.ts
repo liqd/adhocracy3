@@ -1,11 +1,13 @@
 /// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/jquery/jquery.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
 import Resources = require("../../Resources");
 import ResourcesBase = require("../../ResourcesBase");
 import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
+import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhTransaction = require("./Transaction");
 import AdhError = require("./Error");
 import AdhConvert = require("./Convert");
@@ -32,25 +34,41 @@ export class Service<Content extends Resources.Content<any>> {
     constructor(
         private $http : ng.IHttpService,
         private $q : ng.IQService,
-        private adhMetaApi : MetaApi.MetaApiQuery
+        private adhMetaApi : MetaApi.MetaApiQuery,
+        private adhPreliminaryNames : PreliminaryNames
     ) {}
 
     public get(path : string) : ng.IPromise<Content> {
+        if (this.adhPreliminaryNames.isPreliminary(path)) {
+            throw "attempt to http-get preliminary path: " + path;
+        }
         return this.$http
             .get(path)
-            .then(AdhConvert.importContent, AdhError.logBackendError);
+            .then(
+                (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
+                AdhError.logBackendError);
     }
 
     public put(path : string, obj : Content) : ng.IPromise<Content> {
+        if (this.adhPreliminaryNames.isPreliminary(path)) {
+            throw "attempt to http-put preliminary path: " + path;
+        }
         return this.$http
             .put(path, AdhConvert.exportContent(this.adhMetaApi, obj))
-            .then(AdhConvert.importContent, AdhError.logBackendError);
+            .then(
+                (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
+                AdhError.logBackendError);
     }
 
     public post(path : string, obj : Content) : ng.IPromise<Content> {
+        if (this.adhPreliminaryNames.isPreliminary(path)) {
+            throw "attempt to http-post preliminary path: " + path;
+        }
         return this.$http
             .post(path, AdhConvert.exportContent(this.adhMetaApi, obj))
-            .then(AdhConvert.importContent, AdhError.logBackendError);
+            .then(
+                (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
+                AdhError.logBackendError);
     }
 
     public getNewestVersionPath(path : string) : ng.IPromise<string> {
@@ -92,7 +110,17 @@ export class Service<Content extends Resources.Content<any>> {
     public deepPost(
         resources : ResourcesBase.Resource[]
     ) : ng.IPromise<ResourcesBase.Resource[]> {
-        throw "not implemented";
+
+        var sortedResources : ResourcesBase.Resource[] = ResourcesBase.sortResourcesTopologically(resources, this.adhPreliminaryNames);
+
+        // post stuff
+        return this.withTransaction((transaction) : ng.IPromise<ResourcesBase.Resource[]> => {
+            _.forEach(sortedResources, (resource) => {
+                transaction.post(resource.parent, resource);
+            });
+
+            return transaction.commit();
+        });
     }
 
     public postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
@@ -186,6 +214,6 @@ export class Service<Content extends Resources.Content<any>> {
      *     };
      */
     public withTransaction<Result>(callback : (httpTrans : AdhTransaction.Transaction) => ng.IPromise<Result>) : ng.IPromise<Result> {
-        return callback(new AdhTransaction.Transaction(this.$http, this.adhMetaApi));
+        return callback(new AdhTransaction.Transaction(this.$http, this.adhMetaApi, this.adhPreliminaryNames));
     }
 }

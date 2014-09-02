@@ -1,11 +1,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/requirejs/require.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
-/// <reference path="../../../lib/DefinitelyTyped/underscore/underscore.d.ts"/>
+/// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
 import AdhHttp = require("../Http/Http");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 import AdhConfig = require("../Config/Config");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import Resources = require("../../Resources");
 import SIPool = require("../../Resources_/adhocracy/sheets/pool/IPool");
@@ -38,6 +39,7 @@ export interface ListingScope<Container> extends ng.IScope {
     actionColumn : boolean;
     container : Container;
     poolPath : string;
+    createPath? : string;
     elements : string[];
     update : () => ng.IPromise<void>;
     wshandle : string;
@@ -80,14 +82,16 @@ export class Listing<Container extends Resources.Content<any>> {
                     unregisterWebsocket(scope);
                 });
             },
-            controller: ["$scope", "adhHttp", (
+            controller: ["$scope", "adhHttp", "adhPreliminaryNames", (
                 $scope: ListingScope<Container>,
-                adhHttp: AdhHttp.Service<Container>
+                adhHttp: AdhHttp.Service<Container>,
+                adhPreliminaryNames : AdhPreliminaryNames
             ) : void => {
                 $scope.show = {createForm: false};
 
                 $scope.showCreateForm = () => {
                     $scope.show.createForm = true;
+                    $scope.createPath = adhPreliminaryNames.nextPreliminary();
                 };
 
                 $scope.hideCreateForm = () => {
