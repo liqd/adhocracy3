@@ -1,5 +1,4 @@
 from pytest import fixture
-from pytest import mark
 
 from .shared import wait
 from .shared import get_column_listing
@@ -50,7 +49,6 @@ def test_multi_edits(browser, comment):
     assert parent.find_by_css('.comment-content').first.text == 'edited'
 
 
-@mark.xfail
 def test_author(browser, user, comment):
     actual = comment.find_by_css("adh-user-meta").first.text
     # the captialisation might be changed by CSS
