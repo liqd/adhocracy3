@@ -72,6 +72,7 @@ def includeme(config):
     config.include('.catalog')
     config.include('.sheets')
     config.include('.resources.pool')
+    config.include('.resources.filterablepool')
     config.include('.resources.root')
     config.include('.resources.tag')
     config.include('.resources.principal')
