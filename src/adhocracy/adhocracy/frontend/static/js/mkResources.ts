@@ -181,16 +181,47 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
         }
     })();
 
-    // generate main module
+    // generate root module Resources_.ts
     (() => {
         var rootModule = "";
         var relativeRoot = outPath + "/Resources_/";
-        for (var modulePath in modules) {
-            if (modules.hasOwnProperty(modulePath)) {
-                rootModule += mkImportStatement(modulePath, relativeRoot, metaApi);
+        var imports : string[] = [];
+        (() => {
+            for (var modulePath in modules) {
+                if (modules.hasOwnProperty(modulePath)) {
+                    imports.push(mkImportStatement(modulePath, relativeRoot, metaApi));
+                }
             }
-        }
-        rootModule += "\n";
+            imports.sort();
+            rootModule += Util.intercalate(imports, "") + "\n";
+        })();
+
+        // resource registry.
+        (() => {
+            var dictEntries : string[] = [];
+            for (var modulePath in metaApi.resources) {
+                if (metaApi.resources.hasOwnProperty(modulePath)) {
+                    dictEntries.push("    \"" + modulePath + "\": " + mkModuleName(modulePath, metaApi));
+                }
+            }
+            dictEntries.sort();
+            rootModule += "export var resourceRegistry = {\n" + Util.intercalate(dictEntries, ",\n") + "\n};\n\n";
+        })();
+
+        // sheet registry.
+        (() => {
+            var dictEntries : string[] = [];
+            for (var modulePath in metaApi.sheets) {
+                if (metaApi.sheets.hasOwnProperty(modulePath)) {
+                    dictEntries.push(
+                            "    \"" + modulePath + "\": "
+                            + mkModuleName(modulePath, metaApi) + "." + mkSheetName(mkNick(modulePath, metaApi)));
+                }
+            }
+            dictEntries.sort();
+            rootModule += "export var sheetRegistry = {\n" + Util.intercalate(dictEntries, ",\n") + "\n};\n";
+        })();
+
         var absfp = outPath + "/Resources_.ts";
         fs.writeFileSync(absfp, headerFooter(relativeRoot, rootModule));
     })();

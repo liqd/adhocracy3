@@ -6,6 +6,7 @@ import Util = require("../Util/Util");
 import AdhHttp = require("./Http");
 import Error = require("./Error");
 import AdhConvert = require("./Convert");
+import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 var mkHttpMock = () => {
     var mock = jasmine.createSpyObj("$httpMock", ["get", "post", "put"]);
@@ -65,12 +66,14 @@ export var register = () => {
         describe("Service", () => {
             var $httpMock;
             var adhMetaApiMock;
+            var adhPreliminaryNames;
             var adhHttp;
 
             beforeEach(() => {
                 $httpMock = mkHttpMock();
                 adhMetaApiMock = mkAdhMetaApiMock();
-                adhHttp = new AdhHttp.Service($httpMock, q, adhMetaApiMock);
+                adhPreliminaryNames = new PreliminaryNames();
+                adhHttp = new AdhHttp.Service($httpMock, q, adhMetaApiMock, adhPreliminaryNames);
             });
 
             describe("get", () => {
@@ -180,11 +183,11 @@ export var register = () => {
 
                 beforeEach((done) => {
                     $httpMock.post.and.returnValue(q.when({data: [
-                        {body: {content_type: "get response"}},
-                        {body: {content_type: "put response"}},
-                        {body: {content_type: "post1 response"}},
-                        {body: {content_type: "post2 response"}},
-                        {body: {content_type: "get2 response"}}
+                        {body: {content_type: "adhocracy.resources.pool.IBasicPool", path: "get response"}},
+                        {body: {content_type: "adhocracy.resources.pool.IBasicPool", path: "put response"}},
+                        {body: {content_type: "adhocracy.resources.pool.IBasicPool", path: "post1 response"}},
+                        {body: {content_type: "adhocracy.resources.pool.IBasicPool", path: "post2 response"}},
+                        {body: {content_type: "adhocracy.resources.pool.IBasicPool", path: "get2 response"}}
                     ]}));
 
                     adhHttp.withTransaction((httpTrans) => {
@@ -232,26 +235,25 @@ export var register = () => {
                     expect(post1.path[1]).not.toBe("@");
                 });
 
-                it("prefixes preliminary first_version_paths with '@@'", () => {
+                it("prefixes preliminary first_version_paths with a single '@'", () => {
                     expect(post1.first_version_path[0]).toBe("@");
-                    expect(post1.first_version_path[1]).toBe("@");
-                    expect(post1.first_version_path[2]).not.toBe("@");
+                    expect(post1.first_version_path[1]).not.toBe("@");
                 });
 
                 it("adds a result_path to post requests", () => {
                     expect(request[post1.index].result_path).toBeDefined();
-                    expect("@" + request[post1.index].result_path).toBe(post1.path);
+                    expect(request[post1.index].result_path).toBe(post1.path);
 
                     expect(request[post2.index].result_path).toBeDefined();
-                    expect("@" + request[post2.index].result_path).toBe(post2.path);
+                    expect(request[post2.index].result_path).toBe(post2.path);
                 });
 
                 it("maps preliminary data to responses via `index`", () => {
-                    expect(response[get.index].content_type).toBe("get response");
-                    expect(response[put.index].content_type).toBe("put response");
-                    expect(response[post1.index].content_type).toBe("post1 response");
-                    expect(response[post2.index].content_type).toBe("post2 response");
-                    expect(response[get2.index].content_type).toBe("get2 response");
+                    expect(response[get.index].path).toBe("get response");
+                    expect(response[put.index].path).toBe("put response");
+                    expect(response[post1.index].path).toBe("post1 response");
+                    expect(response[post2.index].path).toBe("post2 response");
+                    expect(response[get2.index].path).toBe("get2 response");
                 });
 
                 it("throws if you try to use the transaction after commit", () => {
@@ -263,21 +265,27 @@ export var register = () => {
         describe("importContent", () => {
             it("returns response.data if it is an object", () => {
                 var obj = {
-                    content_type: "ct",
+                    content_type: "adhocracy.resources.pool.IBasicPool",
                     path: "p",
                     data: {}
                 };
                 var response = {
                     data: obj
                 };
-                expect(AdhConvert.importContent(response)).toBe(obj);
+                var adhMetaApiMock = mkAdhMetaApiMock();
+                var adhPreliminaryNames = new PreliminaryNames();
+                var imported = () => AdhConvert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
+                expect(imported().path).toBe(obj.path);
             });
             it("throws if response.data is not an object", () => {
                 var obj = <any>"foobar";
                 var response = {
                     data: obj
                 };
-                expect(() => AdhConvert.importContent(response)).toThrow();
+                var adhMetaApiMock = mkAdhMetaApiMock();
+                var adhPreliminaryNames = new PreliminaryNames();
+                var imported = () => AdhConvert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
+                expect(imported).toThrow();
             });
         });
 

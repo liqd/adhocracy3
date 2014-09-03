@@ -1,3 +1,4 @@
+import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResources = require("../../Resources");
 import MetaApi = require("../MetaApi/MetaApi");
 
@@ -23,22 +24,20 @@ export class Transaction {
 
     private requests : any[];
     private committed : boolean;
-    private nextID : number;
 
-    constructor(private $http : ng.IHttpService, private adhMetaApi : MetaApi.MetaApiQuery) {
+    constructor(
+        private $http : ng.IHttpService,
+        private adhMetaApi : MetaApi.MetaApiQuery,
+        private adhPreliminaryNames : PreliminaryNames
+    ) {
         this.requests = [];
         this.committed = false;
-        this.nextID = 0;
     }
 
     private checkNotCommitted() : void {
         if (this.committed) {
             throw("Tried to use an already committed transaction");
         }
-    }
-
-    private generatePath() : string {
-        return "path" + this.nextID++;
     }
 
     public get(path : string) : ITransactionResult {
@@ -68,17 +67,29 @@ export class Transaction {
 
     public post(path : string, obj : AdhResources.Content<any>) : ITransactionResult {
         this.checkNotCommitted();
-        var preliminaryPath = this.generatePath();
+        var preliminaryPath;
+        if (typeof obj.path === "string") {
+            preliminaryPath = obj.path;
+        } else {
+            preliminaryPath = this.adhPreliminaryNames.nextPreliminary();
+        }
+        var preliminaryFirstVersionPath;
+        if (typeof obj.first_version_path === "string") {
+            preliminaryFirstVersionPath = obj.first_version_path;
+        } else {
+            preliminaryFirstVersionPath = this.adhPreliminaryNames.nextPreliminary();
+        }
         this.requests.push({
             method: "POST",
             path: path,
             body: AdhConvert.exportContent(this.adhMetaApi, obj),
-            result_path: preliminaryPath
+            result_path: preliminaryPath,
+            result_first_version_path: preliminaryFirstVersionPath
         });
         return {
             index: this.requests.length - 1,
-            path: "@" + preliminaryPath,
-            first_version_path: "@@" + preliminaryPath
+            path: preliminaryPath,
+            first_version_path: preliminaryFirstVersionPath
         };
     }
 
@@ -86,7 +97,7 @@ export class Transaction {
         this.checkNotCommitted();
         this.committed = true;
         return this.$http.post("/batch", this.requests).then(
-            AdhConvert.importBatchContent,
+            (response) => AdhConvert.importBatchContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
             AdhError.logBackendBatchError);
     }
 }

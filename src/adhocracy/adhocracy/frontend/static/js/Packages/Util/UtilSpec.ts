@@ -303,5 +303,65 @@ export var register = () => {
                 ]);
             });
         });
+
+        describe("sortDagTopologically", () => {
+
+            it("sorts a given dag topologically", () => {
+                var dag : Util.IDag<string> = {
+                    "A": {
+                        "content": "AA",
+                        "incoming": [],
+                        "outgoing": ["B", "D"],
+                        "done": false
+                    },
+                    "B": {
+                        "content": "BB",
+                        "incoming": ["A"],
+                        "outgoing": ["C"],
+                        "done": false
+                    },
+                    "C": {
+                        "content": "CC",
+                        "incoming": ["B"],
+                        "outgoing": ["D"],
+                        "done": false
+                    },
+                    "D": {
+                        "content": "DD",
+                        "incoming": ["A", "C"],
+                        "outgoing": [],
+                        "done": false
+                    }
+                };
+
+                var result = Util.sortDagTopologically(dag, ["A"]);
+                expect(result).toEqual(["AA", "BB", "CC", "DD"]);
+            });
+
+            it("throws a cycle detected error if the given graph contains cycles", () => {
+                var dag : Util.IDag<string> = {
+                    "A": {
+                        "content": "AA",
+                        "incoming": [],
+                        "outgoing": ["B"],
+                        "done": false
+                    },
+                    "B": {
+                        "content": "BB",
+                        "incoming": ["A", "C"],
+                        "outgoing": ["C"],
+                        "done": false
+                    },
+                    "C": {
+                        "content": "CC",
+                        "incoming": ["B"],
+                        "outgoing": ["B"],
+                        "done": false
+                    }
+                };
+
+                expect(() => Util.sortDagTopologically(dag, ["A"])).toThrow();
+            });
+        });
     });
 };

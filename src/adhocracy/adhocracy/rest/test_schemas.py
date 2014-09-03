@@ -287,6 +287,41 @@ class TestOPTIONResourceResponseSchema:
         assert inst.serialize() == wanted
 
 
+class TestBatchRequestPath:
+
+    def make_one(self):
+        from adhocracy.rest.schemas import BatchRequestPath
+        return BatchRequestPath()
+
+    def test_deserialize_valid_perliminary_path(self):
+        inst = self.make_one()
+        assert inst.deserialize('@item/v1') == '@item/v1'
+
+    def test_deserialize_valid_absolute_path(self):
+        inst = self.make_one()
+        assert inst.deserialize('/item/v1') == '/item/v1'
+
+    def test_deserialize_nonvalid_long_absolute_path(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            assert inst.deserialize('/a' * 100) == '@item/v1'
+
+    def test_deserialize_nonvalid_relativ_path_depth2(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('item/v1')
+
+    def test_deserialize_nonvalid_relativ_path_depth1(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('item')
+
+    def test_deserialize_nonvalid_special_characters(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('ö/v1')
+
+
 class TestPOSTBatchRequestItem:
 
     def make_one(self):
@@ -299,7 +334,8 @@ class TestPOSTBatchRequestItem:
             'method': 'POST',
             'path': '/adhocracy/Proposal/kommunismus',
             'body': {'content_type': 'adhocracy.resources.IParagraph'},
-            'result_path': 'par1_item'
+            'result_path': '@part1_item',
+            'result_first_version_path': '@part1_item'
         }
         assert inst.deserialize(data) == data
 
@@ -309,19 +345,9 @@ class TestPOSTBatchRequestItem:
             'method': 'POST',
             'path': '@par1_item',
             'body': {'content_type': 'adhocracy.resources.IParagraph'},
-            'result_path': 'par1_item'
+            'result_path': '@par1_item/v1'
         }
-        assert inst.deserialize(data) == data
-
-    def test_deserialize_atat_path(self):
-        inst = self.make_one()
-        data = {
-            'method': 'POST',
-            'path': '@@par1_item',
-            'body': {'content_type': 'adhocracy.resources.IParagraph'},
-            'result_path': 'par1_item'
-        }
-        assert inst.deserialize(data) == data
+        assert inst.deserialize(data)['path'] == '@par1_item'
 
     def test_deserialize_invalid_relative_path(self):
         inst = self.make_one()
@@ -329,17 +355,7 @@ class TestPOSTBatchRequestItem:
             'method': 'POST',
             'path': 'par1_item',
             'body': {'content_type': 'adhocracy.resources.IParagraph'},
-            'result_path': 'par1_item'
-        }
-        with raises(colander.Invalid):
-            inst.deserialize(data)
-
-    def test_deserialize_missing_path(self):
-        inst = self.make_one()
-        data = {
-            'method': 'POST',
-            'body': {'content_type': 'adhocracy.resources.IParagraph'},
-            'result_path': 'par1_item'
+            'result_path': '@par1_item'
         }
         with raises(colander.Invalid):
             inst.deserialize(data)
@@ -350,7 +366,7 @@ class TestPOSTBatchRequestItem:
             'method': 'BRIEF',
             'path': '/adhocracy/Proposal/kommunismus',
             'body': {'content_type': 'adhocracy.resources.IParagraph'},
-            'result_path': 'par1_item'
+            'result_path': '@par1_item'
         }
         with raises(colander.Invalid):
             inst.deserialize(data)
@@ -361,7 +377,7 @@ class TestPOSTBatchRequestItem:
             'method': 'POST',
             'path': '/adhocracy/Proposal/kommunismus',
             'body': 'This is not a JSON dict',
-            'result_path': 'par1_item'
+            'result_path': '@par1_item'
         }
         with raises(colander.Invalid):
             inst.deserialize(data)
@@ -374,7 +390,7 @@ class TestPOSTBatchRequestItem:
             'body': {'content_type': 'adhocracy.resources.IParagraph'},
             'result_path': ''
         }
-        assert inst.deserialize(data) == data
+        assert inst.deserialize(data)['result_path'] == ''
 
     def test_deserialize_no_result_path(self):
         """result_path defaults to an empty string."""
@@ -398,6 +414,26 @@ class TestPOSTBatchRequestItem:
         with raises(colander.Invalid):
             inst.deserialize(data)
 
+    def test_deserialize_with_missing_result_frist_version_path(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_path': '@par1_item',
+        }
+        assert inst.deserialize(data)['result_first_version_path'] == ''
+
+    def test_deserialize_with_empty_result_frist_version_path(self):
+        inst = self.make_one()
+        data = {
+            'method': 'POST',
+            'path': '/adhocracy/Proposal/kommunismus',
+            'body': {'content_type': 'adhocracy.resources.IParagraph'},
+            'result_first_version_path': '',
+        }
+        assert inst.deserialize(data)['result_first_version_path'] == ''
+
 
 class TestPOSTBatchRequestSchema:
 
@@ -411,16 +447,18 @@ class TestPOSTBatchRequestSchema:
                 'method': 'POST',
                 'path': '/adhocracy/Proposal/kommunismus',
                 'body': {'content_type': 'adhocracy.resources.IParagraph'},
-                'result_path': 'par1_item'
+                'result_first_version_path': '@par1_item',
+                'result_path': '@par1_item'
             },
             {
                 'method': 'GET',
-                'path': '@@par1_item'
+                'path': '@par1_item'
             }
         ]
         data_with_defaults = data.copy()
         data_with_defaults[1]['body'] = {}
         data_with_defaults[1]['result_path'] = ''
+        data_with_defaults[1]['result_first_version_path'] = ''
         assert inst.deserialize(data) == data_with_defaults
 
     def test_deserialize_invalid_inner_field(self):
