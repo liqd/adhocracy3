@@ -32,6 +32,7 @@ import AdhComment = require("./Packages/Comment/Comment");
 import AdhCommentAdapter = require("./Packages/Comment/Adapter");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
+import AdhVote = require("./Packages/Vote/Vote");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -154,6 +155,8 @@ export var init = (config, meta_api) => {
         ["adhConfig", (adhConfig) => new AdhProposal.ParagraphVersionDetail().createDirective(adhConfig)]);
 
     app.directive("adhTime", ["moment", "$interval", AdhDateTime.createDirective]);
+
+    app.directive("adhVote", ["adhConfig", AdhVote.createDirective]);
 
     // get going
 
