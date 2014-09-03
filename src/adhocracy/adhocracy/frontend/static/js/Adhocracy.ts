@@ -84,6 +84,8 @@ export var init = (config, meta_api) => {
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
 
+    app.filter("signum", () => (n : number) : string => n > 0 ? "+" + n.toString() : n.toString());
+
     app.service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", AdhProposal.Service]);
     app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
