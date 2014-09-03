@@ -217,6 +217,14 @@ class IPool(IResource):  # pragma: no cover
         """Add new subobject and auto generate name."""
 
 
+class IFilterablePool(IPool):
+
+    """A pool that can be filtered and aggregated."""
+
+    def filtered_elements(*filters) -> Iterable:
+        """Return elements accepted by all specified filters."""
+
+
 class IItem(IPool):
 
     """Pool for any versionable objects (DAG), tags and related Pools. """
