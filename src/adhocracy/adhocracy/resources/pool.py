@@ -70,7 +70,6 @@ class Pool(Base, Folder):
 
 
 pool_metadata = resource_metadata_defaults._replace(
-    content_name=IBasicPool.__identifier__,
     iresource=IBasicPool,
     content_class=Pool,
     basic_sheets=[adhocracy.sheets.name.IName,
