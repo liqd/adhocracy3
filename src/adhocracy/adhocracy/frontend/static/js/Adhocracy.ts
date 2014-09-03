@@ -32,6 +32,7 @@ import AdhComment = require("./Packages/Comment/Comment");
 import AdhCommentAdapter = require("./Packages/Comment/Adapter");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
+import AdhVote = require("./Packages/Vote/Vote");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -82,6 +83,8 @@ export var init = (config, meta_api) => {
 
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
+
+    app.filter("signum", () => (n : number) : string => n > 0 ? "+" + n.toString() : n.toString());
 
     app.service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", AdhProposal.Service]);
     app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
@@ -154,6 +157,8 @@ export var init = (config, meta_api) => {
         ["adhConfig", (adhConfig) => new AdhProposal.ParagraphVersionDetail().createDirective(adhConfig)]);
 
     app.directive("adhTime", ["moment", "$interval", AdhDateTime.createDirective]);
+
+    app.directive("adhVote", ["adhConfig", AdhVote.createDirective]);
 
     // get going
 
