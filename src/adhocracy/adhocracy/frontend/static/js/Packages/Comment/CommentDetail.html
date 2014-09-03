@@ -1,4 +1,4 @@
-<div class="comment" data-ng-switch="viewmode" data-ng-if="data">
+<div class="comment" data-ng-switch="mode" data-ng-if="data">
     <div class="discussion-header">
         <span class="discussion-header-icon">
             <i class="icon-speachbubble-outline"></i>
@@ -21,13 +21,13 @@
         <div class="comment-title">
             <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
         </div>
-        <div data-ng-switch-when="edit">
+        <div data-ng-switch-when="1">
             <div class="form-error" data-ng-repeat="error in errors">
                 <p>{{error}}</p>
             </div>
         </div>
         <div class="comment-content">
-            <textarea data-ng-switch-when="edit" data-ng-model="data.content"></textarea>
+            <textarea data-ng-switch-when="1" data-ng-model="data.content"></textarea>
             <div data-ng-switch-default="">{{data.content}}</div>
         </div>
         <div class="comment-meta">
@@ -36,8 +36,8 @@
             <div class="comment-actions">
                 <a href="" class="comment-action" data-ng-switch-default="" data-ng-click="edit()">Edit</a>
                 <a href="" class="comment-action m-comment-reply" data-ng-switch-default="" data-ng-click="createComment()">Add Comment</a>
-                <a href="" class="comment-action" data-ng-switch-when="edit" data-ng-click="save()">Save</a>
-                <a href="" class="comment-action" data-ng-switch-when="edit" data-ng-click="cancel()">Cancel</a>
+                <a href="" class="comment-action" data-ng-switch-when="1" data-ng-click="submit()">Save</a>
+                <a href="" class="comment-action" data-ng-switch-when="1" data-ng-click="cancel()">Cancel</a>
                 <span class="comment-count">
                     <i class="icon-speachbubble-outline"></i>
                     {{data.commentCount}}
@@ -47,18 +47,25 @@
     </div>
 
     <div class="comment-children-create-form" data-ng-if="show.createForm">
-        <adh-comment-create
-            data-refers-to="{{path}}"
-            data-pool-path="{{data.poolPath}}"
-            data-on-cancel="cancelCreateComment"
-            data-on-new="afterCreateComment">
-        </adh-comment-create>
+        <adh-resource-wrapper
+            data-on-submit="afterCreateComment"
+            data-on-cancel="cancelCreateComment">
+            <adh-comment-create
+                data-path="{{createPath}}"
+                data-mode="edit"
+                data-refers-to="{{path}}"
+                data-pool-path="{{data.replyPoolPath}}">
+            </adh-comment-create>
+        </adh-resource-wrapper>
     </div>
 
     <div class="comment-children">
-        <adh-comment-detail
-            data-ng-repeat="comment in data.comments"
-            data-path="comment">
-        </adh-comment-detail>
+        <adh-resource-wrapper
+            data-ng-repeat="comment in data.comments">
+            <adh-comment-resource
+                data-path="{{comment}}"
+                data-mode="display">
+            </adh-comment-resource>
+        </adh-resource-wrapper>
     </div>
 </div>

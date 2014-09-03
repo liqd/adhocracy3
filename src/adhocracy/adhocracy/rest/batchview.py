@@ -68,13 +68,15 @@ class BatchView(RESTView):
     def _process_nested_request(self, nested_request: dict,
                                 path_map: dict) -> BatchItemResponse:
         result_path = nested_request['result_path']
+        result_first_version_path = nested_request['result_first_version_path']
         nested_request['path'] = self._resolve_preliminary_paths(
             nested_request['path'], path_map)
         nested_request['body'] = self._resolve_preliminary_paths(
             nested_request['body'], path_map)
         subrequest = self._make_subrequest(nested_request)
         item_response = self._invoke_subrequest_and_handle_errors(subrequest)
-        self._extend_path_map(path_map, result_path, item_response)
+        self._extend_path_map(path_map, result_path, result_first_version_path,
+                              item_response)
         return item_response
 
     def _response_list_to_json(self, response_list: list) -> list:
@@ -117,6 +119,8 @@ class BatchView(RESTView):
 
         request = Request.blank(path, **keywords_args)
         request.root = self.request.root
+        self.copy_header_if_exists('X-User-Path', request)
+        self.copy_header_if_exists('X-User-Token', request)
         return request
 
     def _invoke_subrequest_and_handle_errors(
@@ -136,15 +140,21 @@ class BatchView(RESTView):
         return BatchItemResponse(code, body)
 
     def _extend_path_map(self, path_map: dict, result_path: str,
+                         result_first_version_path: str,
                          item_response: BatchItemResponse):
         if not (result_path and item_response.was_successful()):
             return
         path = item_response.body.get('path', '')
         first_version_path = item_response.body.get('first_version_path', '')
         if path:
-            path_map['@' + result_path] = path
+            path_map[result_path] = path
         if first_version_path:
-            path_map['@@' + result_path] = first_version_path
+            path_map[result_first_version_path] = first_version_path
+
+    def copy_header_if_exists(self, header: str, request: Request):
+        value = self.request.headers.get(header, None)
+        if value is not None:
+            request.headers[header] = value
 
     def _try_to_decode_json(self, body: bytes) -> dict:
         """Try to decode `body` as a JSON object.

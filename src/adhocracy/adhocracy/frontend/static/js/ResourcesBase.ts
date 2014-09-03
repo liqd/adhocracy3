@@ -1,3 +1,6 @@
+import Util = require("./Packages/Util/Util");
+
+
 export interface ISheetMetaApi {
     // meta api flags
     readable : string[];
@@ -23,6 +26,7 @@ export class Resource {
     // these path attributes may be undefined or null.
     /* tslint:disable:variable-name */
     public path : string;
+    public parent : string;
     public first_version_path : string;
     public root_versions : string[];
     /* tslint:enable:variable-name */
@@ -44,4 +48,45 @@ export class Resource {
 
         return result;
     }
+}
+
+
+/**
+ * Create an IDag<Resource> out of given resources.
+ *
+ * FIXME: this should probably go into something like ResourcesUtil or Packages/Resources/Util
+ */
+export function sortResourcesTopologically(resources : Resource[], adhPreliminaryNames) : Resource[] {
+    "use strict";
+
+    // prepare DAG
+    // sources are resource paths without incoming references
+    var dag : Util.IDag<Resource> = (<any>_).object(_.map(resources, (resource) => [resource.path, {
+            content: resource, incoming: [], outgoing: [], done: false
+    }]));
+    var sources : string[] = [];
+
+    // fill edges, determine possible starter sources
+    _.forEach(dag, (vertex : Util.IVertex<Resource>, key, l) => {
+        var references = vertex.content.getReferences();
+
+        if (typeof vertex.content.parent !== "undefined") {
+            references.push(vertex.content.parent);
+        }
+
+        references = _.uniq(references);
+        references = _.filter(references, adhPreliminaryNames.isPreliminary);
+
+        dag[key].incoming = references;
+
+        if (_.isEmpty(references)) {
+            sources.push(key);
+        }
+
+        _.forEach(references, (reference) => {
+            dag[reference].outgoing.push(key);
+        });
+    });
+
+    return Util.sortDagTopologically(dag, sources);
 }

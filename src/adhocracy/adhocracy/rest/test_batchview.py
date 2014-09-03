@@ -51,11 +51,14 @@ class TestBatchView:
         return BatchView(context, request)
 
     def _make_subrequest_cstruct(self, path: str='/adhocracy/blah',
-                                 result_path: str='newpath',
+                                 result_path: str='@newpath',
                                  method: str='PUT',
-                                 body: dict={}) -> dict:
+                                 body: dict={},
+                                 result_first_version_path: str='@newpath/v1',
+                                 ) -> dict:
         return {'path': path,
                 'result_path': result_path,
+                'result_first_version_path': result_first_version_path,
                 'method': method,
                 'body': body}
 
@@ -67,11 +70,30 @@ class TestBatchView:
         inst = self._make_one(context, request)
         assert inst.post() == []
 
-    def test_post_successful_subrequest(self, context, request):
+    def test_post_successful_subrequest(self, context, request, mock_invoke_subrequest):
         request.body = self._make_json_with_subrequest_cstructs()
         inst = self._make_one(context, request)
+        paths = {'path': '/pool/item',
+                 'first_version_path': '/pool/item/v1'}
+        mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
+                                                               json=paths,)
         response = inst.post()
-        assert response == [{'body': {}, 'code': 200}]
+        assert response == [{'body': paths, 'code': 200}]
+
+    def test_post_successful_subrequest_resolve_result_paths(self, context, request, mock_invoke_subrequest):
+        cstruct1 = self._make_subrequest_cstruct(result_first_version_path='@item/v1')
+        cstruct2 = self._make_subrequest_cstruct(body={'ISheet': {'ref': '@item/v1'}})
+        request.body = json.dumps([cstruct1, cstruct2])
+        inst = self._make_one(context, request)
+        paths = {'path': '/pool/item',
+                 'first_version_path': '/pool/item/v1'}
+        mock_invoke_subrequest.return_value = DummySubresponse(status_code=200,
+                                                               json=paths)
+
+        inst.post()
+
+        subrequest2 = mock_invoke_subrequest.call_args[0][0]
+        assert subrequest2.json ==  {'ISheet': {'ref': '/pool/item/v1'}}
 
     def test_post_failed_subrequest(self, context, request, mock_invoke_subrequest):
         from cornice.util import _JSONError
@@ -118,37 +140,65 @@ class TestBatchView:
     def test_extend_path_map_just_path(self, context, request):
         inst = self._make_one(context, request)
         path_map = {}
-        result_path = 'newpath'
+        result_path = '@newpath'
+        result_first_version_path = ''
         item_response = self._make_batch_response(path='/adhocracy/new_item')
-        inst._extend_path_map(path_map, result_path, item_response)
+        inst._extend_path_map(path_map, result_path, result_first_version_path, item_response)
         assert path_map == {'@newpath': '/adhocracy/new_item'}
+
+    def test_extend_path_map_just_path_and_missing_response_path(self, context, request):
+        inst = self._make_one(context, request)
+        path_map = {}
+        result_path = '@newpath'
+        result_first_version_path = ''
+        item_response = self._make_batch_response()
+        inst._extend_path_map(path_map, result_path, result_first_version_path, item_response)
+        assert path_map == {}
 
     def test_extend_path_map_path_and_first_version_path(self, context, request):
         inst = self._make_one(context, request)
         path_map = {}
-        result_path = 'newpath'
+        result_path = '@newpath'
+        result_first_version_path = '@newpath/v1'
         item_response = self._make_batch_response(
             path='/adhocracy/new_item',
             first_version_path='/adhocracy/new_item/v0')
-        inst._extend_path_map(path_map, result_path, item_response)
+        inst._extend_path_map(path_map, result_path, result_first_version_path, item_response)
         assert path_map == {'@newpath': '/adhocracy/new_item',
-                            '@@newpath': '/adhocracy/new_item/v0'}
+                            '@newpath/v1': '/adhocracy/new_item/v0'}
+
+    def test_copy_header_if_exists_not_existing(self, context, request):
+        from copy import deepcopy
+        inst = self._make_one(context, request)
+        subrequest = deepcopy(request)
+        inst.copy_header_if_exists('non_existing', subrequest)
+        assert 'non_existing' not in subrequest.headers
+
+    def test_copy_header_if_exists_existing(self, context, request):
+        from copy import deepcopy
+        inst = self._make_one(context, request)
+        subrequest = deepcopy(request)
+        request.headers['existing'] = 'Test'
+        inst.copy_header_if_exists('existing', subrequest)
+        assert 'existing' in subrequest.headers
 
     def test_extend_path_map_no_result_path(self, context, request):
         inst = self._make_one(context, request)
         path_map = {}
         result_path = ''
+        result_first_version_path = ''
         item_response = self._make_batch_response(path='/adhocracy/new_item')
-        inst._extend_path_map(path_map, result_path, item_response)
+        inst._extend_path_map(path_map, result_path, result_first_version_path, item_response)
         assert path_map == {}
 
     def test_extend_path_map_failed_response(self, context, request):
         inst = self._make_one(context, request)
         path_map = {}
-        result_path = 'newpath'
+        result_path = '@newpath'
+        result_first_version_path = ''
         item_response = self._make_batch_response(code=444,
                                                   path='/adhocracy/new_item')
-        inst._extend_path_map(path_map, result_path, item_response)
+        inst._extend_path_map(path_map, result_path, result_first_version_path, item_response)
         assert path_map == {}
 
     def test_make_subrequest_post_with_non_empty_body(self, context, request):

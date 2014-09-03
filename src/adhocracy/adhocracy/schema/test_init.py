@@ -290,6 +290,12 @@ class PathListSetUnitTest(unittest.TestCase):
         with pytest.raises(colander.Invalid):
             inst.serialize(None, None)
 
+    def test_serialize_string(self):
+        inst = self._make_one()
+        node = add_node_binding(colander.Mapping(), context=self.context)
+        with pytest.raises(colander.Invalid):
+            inst.serialize(node, 'blah')
+
     def test_serialize_iterable(self):
         inst = self._make_one()
         node = add_node_binding(colander.Mapping(), context=self.context)
@@ -551,5 +557,5 @@ class DateTimeUnitTest(unittest.TestCase):
         inst = self._make_one().bind()
         result = inst.serialize()
         # we want an iso 8601 string with the current datetime
-        today = datetime.today().date().isoformat()
+        today = datetime.utcnow().strftime('%Y-%m-%d')
         assert today in result

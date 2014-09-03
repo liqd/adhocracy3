@@ -1,21 +1,80 @@
+import _ = require("lodash");
+
 import Util = require("../Util/Util");
 import MetaApi = require("../MetaApi/MetaApi");
+import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import Resources = require("../../Resources");
+import Resources_ = require("../../Resources_");
 
 
 /**
  * transform objects on the way in (all request methods)
  */
-export var importContent = <Content extends Resources.Content<any>>(response : {data : Content}) : Content => {
+export var importContent = <Content extends Resources.Content<any>>(
+    response : {data : Content},
+    metaApi : MetaApi.MetaApiQuery,
+    preliminaryNames : PreliminaryNames
+) : Content => {
     "use strict";
 
     var obj = response.data;
 
-    if (typeof obj === "object") {
-        return obj;
-    } else {
-        throw ("unexpected type: " + (typeof obj).toString() + " " + obj.toString());
+    // construct resource
+
+    if (typeof obj !== "object") {
+        throw ("unexpected type: " + (typeof obj).toString() + " " + JSON.stringify(obj, null, 2));
     }
+
+    if (!obj.hasOwnProperty("content_type")) {
+        throw ("resource has no content_type field: " + JSON.stringify(obj, null, 2));
+    }
+
+    if (!obj.hasOwnProperty("path")) {
+        throw ("resource has no path field: " + JSON.stringify(obj, null, 2));
+    }
+
+    if (!Resources_.resourceRegistry.hasOwnProperty(obj.content_type)) {
+        throw ("unknown content_type: " + obj.content_type + " " + JSON.stringify(obj, null, 2));
+    }
+
+    var _class = Resources_.resourceRegistry[obj.content_type];
+    var _obj = new _class({
+        preliminaryNames: preliminaryNames,
+        path: obj.path
+    });
+
+    if (obj.hasOwnProperty("first_version_path")) {
+        _obj.first_version_path = obj.first_version_path;
+    }
+
+    if (obj.hasOwnProperty("root_versions")) {
+        _obj.root_versions = obj.root_versions;
+    }
+
+    // iterate over all delivered sheets and construct instances
+
+    (() => {
+        _.forOwn(obj.data, (jsonSheet, sheetName) => {
+            if (!Resources_.sheetRegistry.hasOwnProperty(sheetName)) {
+                throw ("unknown property sheet: " + sheetName + " " + JSON.stringify(obj, null, 2));
+            }
+
+            var _class = Resources_.sheetRegistry[sheetName];
+            _obj.data[sheetName] = new _class({});
+            _.forOwn(jsonSheet, (val, key) => {
+                _obj.data[sheetName][key] = val;
+            });
+
+            // the above four lines compile because we leave
+            // typescript in the dark about the actual type of _class.
+            // har!
+        });
+    })();
+
+    // return
+
+    return _obj;
+
 
     // FIXME: it would be nice if this function could throw an
     // exception at run-time if the type of obj does not match
@@ -73,7 +132,11 @@ export var importContent = <Content extends Resources.Content<any>>(response : {
  * functions simultaneously and has not been deemed worthwhile so
  * far.
  */
-export var importBatchContent = <Content extends Resources.Content<any>>(responses : { data : {body : Content}[] }) : Content[] => {
+export var importBatchContent = <Content extends Resources.Content<any>>(
+    responses : { data : {body : Content}[] },
+    metaApi : MetaApi.MetaApiQuery,
+    preliminaryNames : PreliminaryNames
+) : Content[] => {
     // FIXME: description files don't appear to support array-typed
     // response bodies.  this might be a good thing (web security and
     // all).  change rest batch spec to wrap array in trivial object?
@@ -81,7 +144,7 @@ export var importBatchContent = <Content extends Resources.Content<any>>(respons
     return (<any>(responses.data)).map((response) => {
         response.data = response.body;
         delete response.body;
-        return importContent(response);
+        return importContent(response, metaApi, preliminaryNames);
     });
 };
 

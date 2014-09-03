@@ -2,8 +2,6 @@
 
 import JasmineHelpers = require("../../JasmineHelpers");
 
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-
 import AdhCommentAdapter = require("./Adapter");
 
 
@@ -64,8 +62,11 @@ export var register = () => {
         describe("CommentAdapter", () => {
             var resource;
             var adapter;
+            var adhPreliminaryNamesMock;
 
             beforeEach(() => {
+                adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
+
                 resource = {
                     data: {
                         "adhocracy_sample.sheets.comment.IComment": {
@@ -87,7 +88,7 @@ export var register = () => {
 
             describe("create", () => {
                 beforeEach(() => {
-                    resource = adapter.create(new AdhPreliminaryNames());
+                    resource = adapter.create({preliminaryNames: adhPreliminaryNamesMock, follows: "@foo"});
                 });
 
                 it("returns an adhocracy_sample.resources.comment.ICommentVersion resource", () => {
@@ -96,6 +97,53 @@ export var register = () => {
 
                 it("creates an empty adhocracy_sample.sheets.comment.IComment sheet", () => {
                     expect(resource.data["adhocracy_sample.sheets.comment.IComment"]).toBeDefined();
+                });
+
+                it("creates an adhocracy.sheets.versions.IVersionable sheet with the right follows field", () => {
+                    expect(resource.data["adhocracy.sheets.versions.IVersionable"]).toBeDefined();
+                    expect(resource.data["adhocracy.sheets.versions.IVersionable"].follows).toBe("@foo");
+                });
+            });
+
+            describe("createItem", () => {
+                beforeEach(() => {
+                    resource = adapter.createItem({preliminaryNames: adhPreliminaryNamesMock});
+                });
+
+                it("returns an adhocracy_sample.resources.comment.IComment resource", () => {
+                    expect(resource.content_type).toBe("adhocracy_sample.resources.comment.IComment");
+                });
+            });
+
+            describe("derive", () => {
+                var oldResource;
+                var resource;
+                var testResource = function(settings) {
+                    this.data = {};
+                    this.content_type = "test.resource";
+                };
+                var testSheet = function(settings) {
+                    this.foo = "bar";
+                };
+
+                beforeEach(() => {
+                    oldResource = new testResource({});
+                    oldResource.path = "/old/path";
+                    oldResource.data["test.sheet"] = new testSheet({});
+                    resource = adapter.derive(oldResource, {});
+                });
+
+                it("sets the right content type", () => {
+                    expect(resource.content_type).toBe("test.resource");
+                });
+
+                it("clones all sheets", () => {
+                    expect(resource.data["test.sheet"]).toBeDefined();
+                    expect(resource.data["test.sheet"].foo).toBe("bar");
+                });
+
+                it("creates a follos entry referencing the old version", () => {
+                    expect(resource.data["adhocracy.sheets.versions.IVersionable"].follows).toEqual(["/old/path"]);
                 });
             });
 

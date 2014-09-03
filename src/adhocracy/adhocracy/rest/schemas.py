@@ -4,7 +4,6 @@ import colander
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import AdhocracySchemaNode
 from adhocracy.schema import Email
-from adhocracy.schema import Identifier
 from adhocracy.schema import Password
 
 
@@ -177,7 +176,7 @@ class BatchMethod(colander.SchemaNode):
     """An HTTP method in a batch request."""
 
     schema_type = colander.String
-    validator = colander.OneOf(['GET', 'POST', 'PUT'])
+    validator = colander.OneOf(['GET', 'POST', 'PUT', 'OPTION'])
     missing = colander.required
 
 
@@ -185,15 +184,20 @@ class BatchRequestPath(AdhocracySchemaNode):
 
     """A path in a batch request.
 
-    Either an absolute path or a preliminary resource path (an identifier
-    preceded by '@' or '@@').
+    Either an absolute path or a preliminary resource path (a relative path
+    preceded by '@').
+
+    Example values: '@item/v1', '/adhocracy/item/v1'
     """
 
     schema_type = colander.String
     default = ''
     missing = colander.required
-    validator = colander.Regex('^(' + AbsolutePath.relative_regex + '|@@?'
-                               + Identifier.relative_regex + ')$')
+    absolutpath = AbsolutePath.relative_regex
+    preliminarypath = '[a-zA-Z0-9\_\-\.\/]+'
+    validator = colander.All(colander.Regex('^' + absolutpath + '|@'
+                                            + preliminarypath + '$'),
+                             colander.Length(min=1, max=100))
 
 
 class POSTBatchRequestItem(colander.Schema):
@@ -204,7 +208,8 @@ class POSTBatchRequestItem(colander.Schema):
     path = BatchRequestPath()
     body = colander.SchemaNode(colander.Mapping(unknown='preserve'),
                                missing={})
-    result_path = Identifier(missing='')
+    result_path = BatchRequestPath(missing='')
+    result_first_version_path = BatchRequestPath(missing='')
 
 
 class POSTBatchRequestSchema(colander.SequenceSchema):

@@ -8,7 +8,6 @@ from adhocracy.resources.resource import resource_metadata_defaults
 
 simple_metadata = \
     resource_metadata_defaults._replace(
-        content_name='Simple',
         iresource=ISimple,
         basic_sheets=[adhocracy.sheets.name.IName,
                       adhocracy.sheets.metadata.IMetadata,

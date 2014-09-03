@@ -8,7 +8,6 @@ import adhocracy.sheets.metadata
 
 
 tag_metadata = resource_metadata_defaults._replace(
-    content_name='Tag',
     iresource=ITag,
     basic_sheets=[adhocracy.sheets.name.IName,
                   adhocracy.sheets.metadata.IMetadata,
