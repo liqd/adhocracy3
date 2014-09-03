@@ -60,7 +60,7 @@ export var init = (config, meta_api) => {
 
     app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
         $routeProvider
-            .when("/static/root.html", {
+            .when("/", {
                 templateUrl: "/static/js/templates/Wrapper.html"
             })
             .when("/register", {

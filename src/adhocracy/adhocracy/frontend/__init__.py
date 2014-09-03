@@ -48,6 +48,7 @@ def includeme(config):
                     http_cache=0)
     add_frontend_route(config, 'embed', 'embed/{directive}')
     add_frontend_route(config, 'register', 'register')
+    add_frontend_route(config, 'root', '')
 
 
 def add_frontend_route(config, name, pattern):
