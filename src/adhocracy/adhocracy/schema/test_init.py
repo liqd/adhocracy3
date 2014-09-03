@@ -557,5 +557,5 @@ class DateTimeUnitTest(unittest.TestCase):
         inst = self._make_one().bind()
         result = inst.serialize()
         # we want an iso 8601 string with the current datetime
-        today = datetime.today().date().isoformat()
+        today = datetime.utcnow().strftime('%Y-%m-%d')
         assert today in result
