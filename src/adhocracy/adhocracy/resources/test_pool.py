@@ -1,6 +1,5 @@
 from pytest import mark
 from pytest import fixture
-from pyramid import testing
 
 
 @fixture
