@@ -119,6 +119,8 @@ class BatchView(RESTView):
 
         request = Request.blank(path, **keywords_args)
         request.root = self.request.root
+        self.copy_header_if_exists('X-User-Path', request)
+        self.copy_header_if_exists('X-User-Token', request)
         return request
 
     def _invoke_subrequest_and_handle_errors(
@@ -148,6 +150,11 @@ class BatchView(RESTView):
             path_map[result_path] = path
         if first_version_path:
             path_map[result_first_version_path] = first_version_path
+
+    def copy_header_if_exists(self, header: str, request: Request):
+        value = self.request.headers.get(header, None)
+        if value is not None:
+            request.headers[header] = value
 
     def _try_to_decode_json(self, body: bytes) -> dict:
         """Try to decode `body` as a JSON object.

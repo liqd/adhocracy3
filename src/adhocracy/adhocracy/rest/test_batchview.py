@@ -146,6 +146,15 @@ class TestBatchView:
         inst._extend_path_map(path_map, result_path, result_first_version_path, item_response)
         assert path_map == {'@newpath': '/adhocracy/new_item'}
 
+    def test_extend_path_map_just_path_and_missing_response_path(self, context, request):
+        inst = self._make_one(context, request)
+        path_map = {}
+        result_path = '@newpath'
+        result_first_version_path = ''
+        item_response = self._make_batch_response()
+        inst._extend_path_map(path_map, result_path, result_first_version_path, item_response)
+        assert path_map == {}
+
     def test_extend_path_map_path_and_first_version_path(self, context, request):
         inst = self._make_one(context, request)
         path_map = {}
@@ -157,6 +166,21 @@ class TestBatchView:
         inst._extend_path_map(path_map, result_path, result_first_version_path, item_response)
         assert path_map == {'@newpath': '/adhocracy/new_item',
                             '@newpath/v1': '/adhocracy/new_item/v0'}
+
+    def test_copy_header_if_exists_not_existing(self, context, request):
+        from copy import deepcopy
+        inst = self._make_one(context, request)
+        subrequest = deepcopy(request)
+        inst.copy_header_if_exists('non_existing', subrequest)
+        assert 'non_existing' not in subrequest.headers
+
+    def test_copy_header_if_exists_existing(self, context, request):
+        from copy import deepcopy
+        inst = self._make_one(context, request)
+        subrequest = deepcopy(request)
+        request.headers['existing'] = 'Test'
+        inst.copy_header_if_exists('existing', subrequest)
+        assert 'existing' in subrequest.headers
 
     def test_extend_path_map_no_result_path(self, context, request):
         inst = self._make_one(context, request)
