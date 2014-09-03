@@ -63,6 +63,9 @@ export var init = (config, meta_api) => {
             .when("/", {
                 templateUrl: "/static/js/templates/Wrapper.html"
             })
+            .when("/login", {
+                template: "<adh-login></adh-login>"
+            })
             .when("/register", {
                 template: "<adh-register></adh-register>"
             })
