@@ -16,7 +16,7 @@ SDK snippet
 
 Example::
 
-    <script type="text/javascript" src="https://adhocracy.lan/frontend_static/js/AdhocracySDK.js"></script>
+    <script type="text/javascript" src="https://adhocracy.lan/static/js/AdhocracySDK.js"></script>
     <script type="text/javascript">
         adhocracy.init('http://adhocracy.lan', function(adhocracy) {
             adhocracy.embed('.adhocracy_marker');

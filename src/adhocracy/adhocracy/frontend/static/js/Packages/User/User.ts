@@ -244,7 +244,7 @@ export var registerDirective = (adhConfig : AdhConfig.Type, $location : ng.ILoca
                     .then((response) => {
                         $scope.errors = [];
                         return adhUser.logIn($scope.input.username, $scope.input.password).then(
-                            () => { $location.path("/frontend_static/root.html"); },
+                            () => { $location.path("/static/root.html"); },
                             (errors) => bindServerErrors($scope, errors)
                         );
                     }, (errors) => bindServerErrors($scope, errors));

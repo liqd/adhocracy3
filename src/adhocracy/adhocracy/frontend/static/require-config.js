@@ -1,5 +1,5 @@
 require.config({
-    baseUrl: "/frontend_static/js/",
+    baseUrl: "/static/js/",
     paths: {
         text: "../lib/requirejs-text/text",
         jquery: "../lib/jquery/dist/jquery",
