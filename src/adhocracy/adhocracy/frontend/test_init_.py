@@ -70,7 +70,7 @@ class ViewsFunctionalTest(unittest.TestCase):
         assert '200' in resp.status
 
     def test_config_json_view(self):
-        resp = self.testapp.get('/frontend_config.json', status=200)
+        resp = self.testapp.get('/config.json', status=200)
         assert '200' in resp.status
 
     def test_embed_view(self):

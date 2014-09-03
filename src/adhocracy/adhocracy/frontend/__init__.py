@@ -43,7 +43,7 @@ def includeme(config):
     """Add routing and static view to deliver the frontend application."""
     config.add_static_view('static', 'adhocracy.frontend:static',
                            cache_max_age=0)
-    config.add_route('config_json', 'frontend_config.json')
+    config.add_route('config_json', 'config.json')
     config.add_view(config_view, route_name='config_json', renderer='json',
                     http_cache=0)
     add_frontend_route(config, 'embed', 'embed/{directive}')

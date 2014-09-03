@@ -31,7 +31,7 @@
         var originalJasmineExecute = jasmine.getEnv().execute;
         jasmine.getEnv().execute = function() { console.log("waiting for async rest suite registration..."); };
 
-        require(['angular', 'text!/frontend_config.json', 'text!/meta_api', 'AdhocracyIg'],
+        require(['angular', 'text!/config.json', 'text!/meta_api', 'AdhocracyIg'],
             function(angular, config_string, meta_api_string, spec) {
                 var config = JSON.parse(config_string);
                 var meta_api = JSON.parse(meta_api_string);
