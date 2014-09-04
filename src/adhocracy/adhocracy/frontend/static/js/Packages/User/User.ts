@@ -208,16 +208,15 @@ export var loginDirective = (adhConfig : AdhConfig.Type, $location : ng.ILocatio
             };
 
             $scope.logIn = () => {
-                var promise = adhUser.logIn(
+                return adhUser.logIn(
                     $scope.credentials.nameOrEmail,
                     $scope.credentials.password
                 ).then(() => {
                     $location.path("/");
                 }, (errors) => {
                     bindServerErrors($scope, errors);
+                    $scope.credentials.password = "";
                 });
-                $scope.resetCredentials();
-                return promise;
             };
         }]
     };

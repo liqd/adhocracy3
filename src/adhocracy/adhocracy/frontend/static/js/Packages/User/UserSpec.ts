@@ -281,12 +281,6 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("resets credentials", (done) => {
-                        $scopeMock.logIn().then(() => {
-                            expect($scopeMock.credentials).toEqual({nameOrEmail: "", password: ""});
-                            done();
-                        });
-                    });
                     it("redirects to / if everything goes well", (done) => {
                         $scopeMock.logIn().then(() => {
                             expect(locationMock.path).toHaveBeenCalledWith("/");
@@ -297,6 +291,13 @@ export var register = () => {
                         adhUserMock.logIn.and.returnValue(q.reject([{description: "error"}]));
                         $scopeMock.logIn().then(() => {
                             expect($scopeMock.errors.length).toBe(1);
+                            done();
+                        });
+                    });
+                    it("resets password if something goes wrong", (done) => {
+                        adhUserMock.logIn.and.returnValue(q.reject([{description: "error"}]));
+                        $scopeMock.logIn().then(() => {
+                            expect($scopeMock.credentials.password).toBe("");
                             done();
                         });
                     });
