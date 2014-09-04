@@ -36,7 +36,7 @@ class TestUserLogin:
 
     def test_register_error_wrong_password_repeat(self, browser):
         register(browser, 'user4', 'email4@example.com', 'password4',
-                 'wrong_repeated_password')
+                 'wrong_repeated_password', expect_success=False)
         assert browser.browser.is_element_present_by_css(
             '.register [type="submit"]:disabled')
 
@@ -48,7 +48,8 @@ class TestUserLogin:
         assert is_logged_in(browser)
 
 
-def register(browser, name, email, password, repeated_password=None):
+def register(browser, name, email, password, repeated_password=None,
+             expect_success=True):
     register_url = browser.app_url + 'register'
     browser.visit(register_url)
     fill_input(browser, '.register [name="username"]', name)
@@ -57,10 +58,13 @@ def register(browser, name, email, password, repeated_password=None):
     fill_input(browser, '.register [name="password_repeat"]',
                repeated_password or password)
     click_button(browser, '.register [type="submit"]')
+    if expect_success:
+        browser.wait_for_condition(is_logged_in, 2)
 
 
 def login(browser, name_or_email, password, expect_success=True):
-    browser.visit(browser.root_url)
+    login_url = browser.app_url + 'login'
+    browser.visit(login_url)
     fill_input(browser, '.login [name="nameOrEmail"]', name_or_email)
     fill_input(browser, '.login [name="password"]', password)
     click_button(browser, '.login [type="submit"]')

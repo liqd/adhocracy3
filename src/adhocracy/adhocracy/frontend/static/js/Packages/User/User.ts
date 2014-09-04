@@ -189,7 +189,7 @@ export class User {
 }
 
 
-export var loginDirective = (adhConfig : AdhConfig.Type) => {
+export var loginDirective = (adhConfig : AdhConfig.Type, $location : ng.ILocationService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
@@ -208,16 +208,15 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
             };
 
             $scope.logIn = () => {
-                var promise = adhUser.logIn(
+                return adhUser.logIn(
                     $scope.credentials.nameOrEmail,
                     $scope.credentials.password
                 ).then(() => {
-                    $scope.errors = [];
+                    $location.path("/");
                 }, (errors) => {
                     bindServerErrors($scope, errors);
+                    $scope.credentials.password = "";
                 });
-                $scope.resetCredentials();
-                return promise;
             };
         }]
     };
