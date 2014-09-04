@@ -18,7 +18,10 @@ export var register = () => {
             var adhUser;
             var adhHttpMock;
             var httpMock;
+            var rootScopeMock;
             var windowMock;
+            var elementMock;
+            var angularMock;
             var modernizrMock;
 
             beforeEach(() => {
@@ -38,16 +41,54 @@ export var register = () => {
                 };
                 httpMock.post.and.returnValue(q.when({data: {}}));
 
+                rootScopeMock = jasmine.createSpyObj("rootScope", ["$apply"]);
+
                 windowMock = {
                     localStorage: <any>jasmine.createSpyObj("localStorage", ["getItem", "setItem", "removeItem"])
                 };
                 windowMock.localStorage.getItem.and.returnValue(null);
 
+                elementMock = jasmine.createSpyObj("element", ["on"]);
+                angularMock = jasmine.createSpyObj("angular", ["element"]);
+                angularMock.element.and.returnValue(elementMock);
+
                 modernizrMock = {
                     localstorage: true
                 };
 
-                adhUser = new AdhUser.User(adhHttpMock, q, httpMock, windowMock, modernizrMock);
+                adhUser = new AdhUser.User(adhHttpMock, q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
+            });
+
+            it("registers a handler on 'storage' DOM events", () => {
+                expect(elementMock.on).toHaveBeenCalledWith("storage", jasmine.any(Function));
+            });
+
+            describe("on storage", () => {
+                var fn;
+
+                beforeEach(() => {
+                    spyOn(adhUser, "enableToken");
+                    spyOn(adhUser, "deleteToken");
+
+                    var args = elementMock.on.calls.mostRecent().args;
+                    expect(args[0]).toBe("storage");
+                    fn = <any>args[1];
+                });
+
+                it("calls 'enableToken' if 'user-token' and 'user-path' exist in storage", () => {
+                    windowMock.localStorage.getItem.and.returnValue("huhu");
+                    fn();
+                    expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu");
+                });
+
+                it("calls 'deleteToken' if neither 'user-token' nor 'user-path' exist in storage", () => {
+                    windowMock.localStorage.getItem.and.returnValue(null);
+                    fn();
+                    expect(rootScopeMock.$apply).toHaveBeenCalled();
+                    var callback = rootScopeMock.$apply.calls.mostRecent().args[0];
+                    callback();
+                    expect(adhUser.deleteToken).toHaveBeenCalled();
+                });
             });
 
             describe("login", () => {
