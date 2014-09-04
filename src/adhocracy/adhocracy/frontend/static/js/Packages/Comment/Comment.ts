@@ -139,3 +139,13 @@ export class CommentCreate extends CommentResource {
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentCreate.html";
     }
 }
+
+export var adhCommentListing = (adhConfig : AdhConfig.Type) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentListing.html",
+        scope: {
+            path: "@",
+        }
+    };
+};

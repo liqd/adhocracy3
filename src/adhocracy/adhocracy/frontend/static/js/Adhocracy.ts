@@ -119,9 +119,11 @@ export var init = (config, meta_api) => {
         ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
             new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
 
-    app.directive("adhCommentListing",
+    app.directive("adhCommentListingPartial",
         ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
             new Listing.Listing(new AdhCommentAdapter.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)]);
+
+    app.directive("adhCommentListing", ["adhConfig", AdhComment.adhCommentListing]);
 
     app.directive("adhWebSocketTest",
         ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>
@@ -132,7 +134,7 @@ export var init = (config, meta_api) => {
 
     // adhCrossWindowMessaging does work by itself. We only need to inject in anywhere in order to instantiate it.
     app.directive("adhDocumentWorkbench",
-        ["adhConfig", "adhCrossWindowMessaging", (adhConfig) =>
+        ["adhConfig", (adhConfig) =>
             new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig)]);
 
     app.directive("adhResourceWrapper", AdhResourceWidgets.resourceWrapper);
@@ -166,6 +168,8 @@ export var init = (config, meta_api) => {
 
     // get going
 
-    angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
+    var injector = angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
+    injector.get("adhCrossWindowMessaging");
+
     loadComplete();
 };
