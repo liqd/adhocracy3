@@ -9,7 +9,7 @@ import Util = require("../Util/Util");
  * lower-case with dashes, but without 'adh-' prefix.  (example:
  * 'document-workbench' for directive DocumentWorkbench.)
  */
-var embeddableDirectives = ["document-workbench", "paragraph-version-detail"];
+var embeddableDirectives = ["document-workbench", "paragraph-version-detail", "comment-listing"];
 
 export var route2template = ($route : ng.route.IRouteService) => {
     var params = $route.current.params;
