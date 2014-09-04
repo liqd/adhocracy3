@@ -60,7 +60,8 @@ def register(browser, name, email, password, repeated_password=None):
 
 
 def login(browser, name_or_email, password, expect_success=True):
-    browser.visit(browser.root_url)
+    login_url = browser.app_url + 'login'
+    browser.visit(login_url)
     fill_input(browser, '.login [name="nameOrEmail"]', name_or_email)
     fill_input(browser, '.login [name="password"]', password)
     click_button(browser, '.login [type="submit"]')
