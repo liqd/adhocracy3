@@ -34,7 +34,11 @@ export var factory = ($compile : ng.ICompileService, $route : ng.route.IRouteSer
         restrict: "E",
         scope: {},
         link: (scope, element) => {
-            element.html(route2template($route));
+            var template = "<header class=\"l-header main-header\">" +
+                "<adh-user-indicator></adh-user-indicator>" +
+                "</header>";
+            template += route2template($route);
+            element.html(template);
             $compile(element.contents())(scope);
         }
     };
