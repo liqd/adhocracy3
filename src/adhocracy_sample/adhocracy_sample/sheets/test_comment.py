@@ -19,6 +19,11 @@ class TestCommentableSheet:
         from adhocracy_sample.sheets.comment import commentable_meta
         return commentable_meta
 
+    @fixture
+    def context(self):
+        from adhocracy.interfaces import IItem
+        return testing.DummyResource(__provides__=IItem)
+
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy.interfaces import IResourceSheet

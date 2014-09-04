@@ -703,21 +703,25 @@ that aren't 'followed_by' any later version::
 FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
 
-FIXME: should the server tell in general where to post specific
-content types? (like 'like', 'discussion',..)?  in other words,
-should the client be able to ask (e.g. with an OPTIONS request)
-where to post a 'like'?
-
-
-Comments
---------
+Resources with PostPool, example Comments
+-------------------------------------------
 
 To give another example of a versionable content type, we can write comments
-about proposals::
+about proposals.
+The proposal has a commentable sheets that allows us to comment::
+
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> commentable = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']
+
+This sheet has a special field :term:`post_pool` referencing a pool::
+
+    >>> post_pool_path = commentable['post_pool']
+
+We can post comments to this pool only::
 
     >>> comment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
     ...            'data': {}}
-    >>> resp = testapp.post_json(pdag_path, comment)
+    >>> resp = testapp.post_json(post_pool_path, comment)
     >>> comment_path = resp.json["path"]
     >>> comment_path
     '/adhocracy/Proposals/kommunismus/comment_000...'
