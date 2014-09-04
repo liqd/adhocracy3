@@ -63,20 +63,35 @@ export class User {
         private adhHttp : AdhHttp.Service<any>,
         private $q : ng.IQService,
         private $http : ng.IHttpService,
+        private $rootScope : ng.IScope,
         private $window : Window,
+        private angular : ng.IAngularStatic,
         private Modernizr
     ) {
         var _self : User = this;
 
-        if (_self.Modernizr.localstorage) {
-            if (_self.$window.localStorage.getItem("user-token") !== null &&
-                    _self.$window.localStorage.getItem("user-path") !== null) {
-                _self.enableToken(
-                    _self.$window.localStorage.getItem("user-token"),
-                    _self.$window.localStorage.getItem("user-path")
-                );
+        var updateTokenFromStorage = () => {
+            if (_self.Modernizr.localstorage) {
+                if (_self.$window.localStorage.getItem("user-token") !== null &&
+                        _self.$window.localStorage.getItem("user-path") !== null) {
+                    _self.enableToken(
+                        _self.$window.localStorage.getItem("user-token"),
+                        _self.$window.localStorage.getItem("user-path")
+                    );
+                } else if (_self.$window.localStorage.getItem("user-token") === null &&
+                        _self.$window.localStorage.getItem("user-path") === null) {
+                    // For some reason, $apply is necessary here to trigger a UI update
+                    _self.$rootScope.$apply(() => {
+                        _self.deleteToken();
+                    });
+                }
             }
-        }
+        };
+
+        var win = _self.angular.element(_self.$window);
+        win.on("storage", updateTokenFromStorage);
+
+        updateTokenFromStorage();
     }
 
     private enableToken(token : string, userPath : string) : ng.IPromise<void> {
