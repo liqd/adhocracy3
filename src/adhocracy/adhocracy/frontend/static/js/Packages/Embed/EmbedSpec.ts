@@ -23,8 +23,8 @@ export var register = () => {
 
         describe("route2template", () => {
             it("compiles a template from the parameters given in $route", () => {
-                var expected = "<adh-document-workbench data-path=\"&#39;/this/is/a/path&#39;\" " +
-                    "data-test=\"&#39;&quot;\\&#39;&amp;&#39;\"></adh-document-workbench>";
+                var expected = "<adh-document-workbench data-path=\"/this/is/a/path\" " +
+                    "data-test=\"&quot;&#39;&amp;\"></adh-document-workbench>";
                 expect(Embed.route2template($routeMock)).toBe(expected);
             });
             it("throws if $route does not specify a widget", () => {
