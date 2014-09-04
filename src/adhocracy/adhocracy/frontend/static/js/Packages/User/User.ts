@@ -1,3 +1,5 @@
+import _ = require("lodash");
+
 import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
 
@@ -81,9 +83,9 @@ export class User {
                 } else if (_self.$window.localStorage.getItem("user-token") === null &&
                         _self.$window.localStorage.getItem("user-path") === null) {
                     // For some reason, $apply is necessary here to trigger a UI update
-                    _self.$rootScope.$apply(() => {
+                    _.defer(() => _self.$rootScope.$apply(() => {
                         _self.deleteToken();
-                    });
+                    }));
                 }
             }
         };
