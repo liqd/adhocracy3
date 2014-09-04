@@ -8,6 +8,11 @@ import q = require("q");
 
 export var register = () => {
     describe("User", () => {
+        var locationMock;
+
+        beforeEach(() => {
+            locationMock = <any>jasmine.createSpyObj("locationMock", ["path"]);
+        });
 
         describe("User", () => {
             var adhUser;
@@ -233,7 +238,7 @@ export var register = () => {
                     ws_url: "mock",
                     embedded: true
                 };
-                directive = AdhUser.loginDirective(adhConfigMock);
+                directive = AdhUser.loginDirective(adhConfigMock, locationMock);
             });
 
             describe("controller", () => {
@@ -282,10 +287,9 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("clears $scope.errors if everything goes well", (done) => {
-                        $scopeMock.errors = ["errors"];
+                    it("redirects to / if everything goes well", (done) => {
                         $scopeMock.logIn().then(() => {
-                            expect($scopeMock.errors.length).toBe(0);
+                            expect(locationMock.path).toHaveBeenCalledWith("/");
                             done();
                         });
                     });
@@ -303,7 +307,6 @@ export var register = () => {
         describe("registerDirective", () => {
             var directive;
             var adhConfigMock;
-            var locationMock;
 
             beforeEach(() => {
                 adhConfigMock = {
@@ -312,7 +315,6 @@ export var register = () => {
                     ws_url: "mock",
                     embedded: true
                 };
-                locationMock = <any>jasmine.createSpyObj("locationMock", ["path"]);
 
                 directive = AdhUser.registerDirective(adhConfigMock, locationMock);
             });
