@@ -470,7 +470,7 @@ def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
     return post_pool
 
 
-class PostPool(Reference):
+class PostPool(AbsolutePath):
 
     """Reference to the common place to post resources used by the this sheet.
 
@@ -507,8 +507,6 @@ def deferred_validate_references_post_pool(node: colander.SchemaNode,
 
 def _get_reference_childs(node):
     for child in node:
-        if isinstance(child, PostPool):
-            continue
         if isinstance(child, (Reference, AbstractReferenceIterable)):
             yield child
 

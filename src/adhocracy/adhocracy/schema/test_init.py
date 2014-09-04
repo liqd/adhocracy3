@@ -27,11 +27,6 @@ def _add_post_pool_node(inst: colander.Schema, iresource_or_service_name=IPool):
     inst.add(post_pool_node)
 
 
-def _add_other_node(inst: colander.Schema):
-    other_node = colander.MappingSchema(name='other_node')
-    inst.add(other_node)
-
-
 def _add_reference_node(inst: colander.Schema, target_isheet=None):
     from adhocracy.interfaces import ISheet
     from adhocracy.interfaces import SheetToSheet
@@ -698,7 +693,6 @@ class TestPostPoolMappingSchema:
         inst = self._make_one()
         _add_post_pool_node(inst)
         _add_reference_node(inst)
-        _add_other_node(inst)
         inst = inst.bind(context=pool['right'])
         assert inst.deserialize({'reference': '/right/child'})
 
