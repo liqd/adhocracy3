@@ -64,10 +64,10 @@ export var init = (config, meta_api) => {
                 templateUrl: "/static/js/templates/Wrapper.html"
             })
             .when("/login", {
-                template: "<adh-login></adh-login>"
+                templateUrl: "/static/js/templates/Login.html"
             })
             .when("/register", {
-                template: "<adh-register></adh-register>"
+                templateUrl: "/static/js/templates/Register.html"
             })
             .when("/embed/:widget", {
                 template: "<adh-embed></adh-embed>"
