@@ -70,6 +70,17 @@ def create_pool_with_graph() -> testing.DummyResource:
     return context
 
 
+def add_and_register_sheet(context, mock_sheet, registry):
+    """Add `mock_sheet` to `context`and register adapter."""
+    from zope.interface import alsoProvides
+    from adhocracy.interfaces import IResourceSheet
+    isheet = mock_sheet.meta.isheet
+    alsoProvides(context, isheet)
+    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
+                             IResourceSheet,
+                             isheet.__identifier__)
+
+
 ##################
 # Fixtures       #
 ##################
