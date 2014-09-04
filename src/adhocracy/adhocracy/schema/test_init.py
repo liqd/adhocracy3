@@ -4,6 +4,10 @@ from unittest.mock import Mock
 from pyramid import testing
 import colander
 from pytest import raises
+from pytest import fixture
+
+from adhocracy.interfaces import IPool
+from adhocracy.testing import add_and_register_sheet
 
 
 ############
@@ -14,6 +18,37 @@ def add_node_binding(node, context=None):
     node.bindings = dict()
     node.bindings['context'] = context
     return node
+
+
+def _add_post_pool_node(inst: colander.Schema, iresource_or_service_name=IPool):
+    from adhocracy.schema import PostPool
+    post_pool_node = PostPool(name='post_pool',
+                              iresource_or_service_name=iresource_or_service_name)
+    inst.add(post_pool_node)
+
+
+def _add_other_node(inst: colander.Schema):
+    other_node = colander.MappingSchema(name='other_node')
+    inst.add(other_node)
+
+
+def _add_reference_node(inst: colander.Schema, target_isheet=None):
+    from adhocracy.interfaces import ISheet
+    from adhocracy.interfaces import SheetToSheet
+    from adhocracy.schema import Reference
+    reference_node = Reference(name='reference')
+    isheet = target_isheet or ISheet
+    class PostPoolReference(SheetToSheet):
+        target_isheet = isheet
+    inst.add(reference_node)
+    inst['reference'].reftype = PostPoolReference
+
+
+def _add_references_node(inst: colander.Schema):
+    from adhocracy.schema import ListOfUniqueReferences
+    reference_node = ListOfUniqueReferences(name='references')
+    inst.add(reference_node)
+
 
 ###########
 #  tests  #
@@ -559,3 +594,152 @@ class DateTimeUnitTest(unittest.TestCase):
         # we want an iso 8601 string with the current datetime
         today = datetime.utcnow().strftime('%Y-%m-%d')
         assert today in result
+
+
+class TestPostPool:
+
+    def _make_one(self, **kwargs):
+        from adhocracy.schema import PostPool
+        return PostPool(**kwargs)
+
+    def test_create(self):
+        from adhocracy.interfaces import IPool
+        from adhocracy.schema import ResourceObject
+        inst = self._make_one()
+        assert inst.schema_type is ResourceObject
+        assert inst.iresource_or_service_name is IPool
+        assert inst.readonly is True
+        assert isinstance(inst.default, colander.deferred)
+        assert isinstance(inst.missing, colander.deferred)
+
+    def test_deserialize_empty(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize()
+
+    def test_bind_context_without_post_pool_and_deserialize_empty(self, context):
+        from adhocracy.exceptions import RuntimeConfigurationError
+        with raises(RuntimeConfigurationError):
+            self._make_one().bind(context=context)
+
+    def test_bind_context_with_post_pool_and_deserialize_empty(self, pool):
+        from adhocracy.interfaces import IPool
+        inst = self._make_one(iresource_or_service_name=IPool).bind(context=pool)
+        assert inst.deserialize() is pool
+
+    def test_bind_context_with_service_post_pool_and_deserialize_empty(self, pool):
+        from adhocracy.interfaces import IServicePool
+        pool['service'] = testing.DummyResource(__provides__=IServicePool,
+                                                __is_service__=True)
+        inst = self._make_one(iresource_or_service_name='service').bind(context=pool)
+        assert inst.deserialize() is pool['service']
+
+    def test_serialize_empty(self):
+        inst = self._make_one()
+        assert inst.serialize() is colander.null
+
+    def test_bind_context_with_post_pool_and_serialize_empty(self, pool):
+        from adhocracy.interfaces import IPool
+        inst = self._make_one(iresource_or_service_name=IPool).bind(context=pool)
+        assert inst.serialize() == '/'
+
+    def test_bind_context_without_post_pool_and_serialize_empty(self, context):
+        from adhocracy.exceptions import RuntimeConfigurationError
+        with raises(RuntimeConfigurationError):
+            self._make_one().bind(context=context)
+
+
+class TestPostPoolMappingSchema:
+
+    @fixture
+    def pool(self, pool):
+        from adhocracy.interfaces import ISheet
+        from adhocracy.interfaces import IPool
+        wrong_post_pool = testing.DummyResource()
+        wrong_post_pool['child'] = testing.DummyResource(__provides__=ISheet)
+        pool['wrong'] = wrong_post_pool
+        right_post_pool = testing.DummyResource(__provides__=IPool)
+        right_post_pool['child'] = testing.DummyResource(__provides__=ISheet)
+        pool['right'] = right_post_pool
+        return pool
+
+    @fixture
+    def mock_sheet(self, mock_sheet):
+        from adhocracy.interfaces import IPostPoolSheet
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPostPoolSheet)
+        schema = colander.MappingSchema()
+        _add_post_pool_node(schema)
+        mock_sheet.schema = schema
+        return mock_sheet
+
+    def _make_one(self, **kwargs):
+        from adhocracy.schema import PostPoolMappingSchema
+        return PostPoolMappingSchema(**kwargs)
+
+    def test_create(self):
+        inst = self._make_one()
+        assert isinstance(inst.validator, colander.deferred)
+
+    def test_deserialize_empty(self):
+        inst = self._make_one()
+        assert inst.deserialize() == {}
+
+    def test_deserialize_empty(self):
+        inst = self._make_one()
+        assert inst.serialize() == {}
+
+    def test_bind_context_without_reference_post_pool_and_deserialize(self, pool):
+        inst = self._make_one()
+        _add_reference_node(inst)
+        inst = inst.bind(context=pool['right'])
+        assert inst.deserialize({'reference': '/right/child'})
+
+    def test_bind_context_with_valid_reference_post_pool_and_deserialize(self, pool):
+        inst = self._make_one()
+        _add_post_pool_node(inst)
+        _add_reference_node(inst)
+        _add_other_node(inst)
+        inst = inst.bind(context=pool['right'])
+        assert inst.deserialize({'reference': '/right/child'})
+
+    def test_bind_context_with_nonvalid_reference_post_pool_and_deserialize(self, pool):
+        inst = self._make_one()
+        _add_post_pool_node(inst)
+        _add_reference_node(inst)
+        inst = inst.bind(context=pool['right'])
+        with raises(colander.Invalid):
+            inst.deserialize({'reference': '/wrong/child'})
+
+    def test_bind_context_with_valid_references_post_pool_and_deserialize(self, pool):
+        inst = self._make_one()
+        _add_post_pool_node(inst)
+        _add_references_node(inst)
+        inst = inst.bind(context=pool['right'])
+        assert inst.deserialize({'references': ['/right/child']})
+
+    def test_bind_context_with_valid_backreference_post_pool_and_deserialize(self, pool, mock_sheet, registry):
+        from adhocracy.interfaces import IPostPoolSheet
+        inst = self._make_one()
+
+        referenced = pool['right']['child']
+        add_and_register_sheet(referenced, mock_sheet, registry)
+        mock_sheet.schema = mock_sheet.schema.bind(context=referenced)
+
+        _add_reference_node(inst, target_isheet=IPostPoolSheet)
+        inst = inst.bind(context=pool['right'])
+
+        assert inst.deserialize({'reference': '/right/child'})
+
+    def test_bind_context_with_nonvalid_backreference_post_pool_and_deserialize(self, pool, mock_sheet, registry):
+        from adhocracy.interfaces import IPostPoolSheet
+        inst = self._make_one()
+
+        referenced = pool['right']['child']
+        add_and_register_sheet(referenced, mock_sheet, registry)
+        mock_sheet.schema = mock_sheet.schema.bind(context=referenced)
+
+        _add_reference_node(inst, target_isheet=IPostPoolSheet)
+        inst = inst.bind(context=pool['right'])
+
+        with raises(colander.Invalid):
+            inst.deserialize({'reference': '/wrong/child'})

@@ -43,6 +43,10 @@ class DummyPool(testing.DummyResource):
         resource.__is_service__ = True
         self.add(name, resource)
 
+    def find_service(self, service_name, *sub_service_names):
+        from substanced.util import find_service
+        return find_service(self, service_name, *sub_service_names)
+
 
 class DummyPoolWithObjectMap(DummyPool):
 
@@ -147,8 +151,9 @@ def context() -> testing.DummyResource:
 @fixture
 def pool() -> DummyPool:
     """ Return dummy pool with IPool interface."""
+    from substanced.interfaces import IFolder
     from adhocracy.interfaces import IPool
-    return DummyPool(__provides__=IPool)
+    return DummyPool(__provides__=(IPool, IFolder))
 
 
 @fixture

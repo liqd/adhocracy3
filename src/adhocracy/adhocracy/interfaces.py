@@ -76,6 +76,16 @@ class ISheetReferenceAutoUpdateMarker(ISheet):
     """
 
 
+class IPostPoolSheet(ISheet):
+
+    """Marker interfaces for sheets with :term:`post_pool` Attributes.
+
+    This implies the sheet schema is a subtype of
+    :class:`adhocracy.schema.PostPoolSchema` or has at least a
+    field node with :class:`adhocracy.Schema.PostPool`.
+    """
+
+
 class IResourceSheet(IPropertySheet):  # pragma: no cover
 
     """Sheet for resources to get/set the sheet data structure."""
