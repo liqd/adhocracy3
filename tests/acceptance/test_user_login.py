@@ -48,7 +48,8 @@ class TestUserLogin:
         assert is_logged_in(browser)
 
 
-def register(browser, name, email, password, repeated_password=None):
+def register(browser, name, email, password, repeated_password=None,
+             expect_success=True):
     register_url = browser.app_url + 'register'
     browser.visit(register_url)
     fill_input(browser, '.register [name="username"]', name)
@@ -57,6 +58,8 @@ def register(browser, name, email, password, repeated_password=None):
     fill_input(browser, '.register [name="password_repeat"]',
                repeated_password or password)
     click_button(browser, '.register [type="submit"]')
+    if expect_success:
+        browser.wait_for_condition(is_logged_in, 2)
 
 
 def login(browser, name_or_email, password, expect_success=True):
