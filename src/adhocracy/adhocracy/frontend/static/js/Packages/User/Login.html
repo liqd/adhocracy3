@@ -3,11 +3,26 @@
     <div class="form-error" data-ng-repeat="error in errors track by $index">
         <p>{{error}}</p>
     </div>
-    <form class="login-form">
-        <input type="text" name="nameOrEmail" placeholder="email or username" data-ng-model="credentials.nameOrEmail" />
-        <input type="password" name="password" placeholder="password" data-ng-model="credentials.password" />
+    <form  novalidate="novalidate" class="login-form" name="loginForm">
+        <input
+            type="text"
+            name="nameOrEmail"
+            placeholder="email or username"
+            required="required"
+            data-ng-model="credentials.nameOrEmail" />
+        <input
+            type="password"
+            name="password"
+            placeholder="password"
+            required="required"
+            data-ng-model="credentials.password" />
         <a>forgot password</a>
-        <input type="submit" value="login" class="m-call-to-action" data-ng-click="logIn()" />
+        <input
+            type="submit"
+            value="login"
+            class="m-call-to-action"
+            data-ng-click="logIn()"
+            data-ng-disabled="loginForm.$invalid" />
     </form>
     <div class="login-description box-with-button">
         <div class="text-box m-unobtrusive">
