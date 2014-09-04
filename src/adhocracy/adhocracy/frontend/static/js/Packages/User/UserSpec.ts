@@ -360,7 +360,7 @@ export var register = () => {
                     });
                     it("redirects to the root page after register ", (done) => {
                         $scopeMock.register().then(() => {
-                            expect(locationMock.path).toHaveBeenCalledWith("/frontend_static/root.html");
+                            expect(locationMock.path).toHaveBeenCalledWith("/");
                             done();
                         });
                     });

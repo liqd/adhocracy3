@@ -76,7 +76,7 @@
         origin = o;
         embedderOrigin = window.location.protocol + "//" + window.location.host;
 
-        loadScript(origin + "/frontend_static/lib/jquery/dist/jquery.js", () => {
+        loadScript(origin + "/static/lib/jquery/dist/jquery.js", () => {
             $ = (<any>window).jQuery.noConflict(true);
 
             $(window).on("message", (event) => {

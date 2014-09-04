@@ -394,7 +394,7 @@ def angular_app_loaded(browser: Browser) -> bool:
 def browser_root(browser, server) -> Browser:
     """Return test browser, start application and go to `root.html`."""
     add_helper_methods_to_splinter_browser_wrapper(browser)
-    url = server.application_url + 'frontend_static/root.html'
+    url = server.application_url
     browser.visit(url)
     browser.wait_for_condition(angular_app_loaded, 5)
     return browser
@@ -418,5 +418,5 @@ def browser_test_helper(browser, url) -> Browser:
 @fixture()
 def browser_test(browser, server_static) -> Browser:
     """Return test browser instance with url=test.html."""
-    url = server_static.application_url + 'frontend_static/test.html'
+    url = server_static.application_url + 'static/test.html'
     return browser_test_helper(browser, url)

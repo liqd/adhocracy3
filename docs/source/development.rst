@@ -28,7 +28,7 @@ frontend unit tests:
     B.  In browser::
 
             make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser
-            xdg-open http://localhost:6541/frontend_static/test.html
+            xdg-open http://localhost:6541/static/test.html
 
         Make sure backend is running (or some means of delivering html
         and js to the browser).
@@ -42,7 +42,7 @@ frontend unit tests:
            blanket in test.html.  You can do this thusly::
 
                make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser test_no_blanket
-               xdg-open http://localhost:6541/frontend_static/test-no-blanket.html
+               xdg-open http://localhost:6541/static/test-no-blanket.html
 
     C.  With node.js::
 
@@ -94,7 +94,7 @@ frontend integration tests:
     B.  In browser::
 
             make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser
-            xdg-open http://localhost:6541/frontend_static/igtest.html
+            xdg-open http://localhost:6541/static/igtest.html
 
         .. note::
 

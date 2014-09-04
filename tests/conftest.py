@@ -40,7 +40,7 @@ def browser(browser, server_sample) -> Browser:
     """
     from adhocracy.testing import angular_app_loaded
     app_url = server_sample.application_url
-    browser.root_url = app_url + 'frontend_static/root.html'
+    browser.root_url = app_url
     browser.app_url = app_url
     browser.visit(browser.root_url)
     browser.wait_for_condition(angular_app_loaded, 5)
@@ -50,6 +50,6 @@ def browser(browser, server_sample) -> Browser:
 @fixture
 def browser_embed(browser, server_sample) -> Browser:
     """Start embedder application."""
-    url = server_sample.application_url + 'frontend_static/embed.html'
+    url = server_sample.application_url + 'static/embed.html'
     browser.visit(url)
     return browser
