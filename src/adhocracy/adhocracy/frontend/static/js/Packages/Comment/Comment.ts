@@ -146,9 +146,6 @@ export var adhCommentListing = (adhConfig : AdhConfig.Type) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentListing.html",
         scope: {
             path: "@",
-        },
-        link: (scope) => {
-            scope.config = adhConfig;
         }
     };
 };
