@@ -98,22 +98,29 @@
     adhocracy.embed = (selector: string) => {
         $(selector).each((i, e) => {
             var marker = $(e);
-            var iframe = $("<iframe>");
-
-            iframe.css("border", "none");
-            iframe.css("width", "100%");
-
             var data = marker.data();
             var widget = data.widget;
+
             delete data.widget;
 
-            var url = origin + appUrl + widget + "?" + $.param(data, true);
-
-            iframe.attr("src", url);
-            iframe.addClass("adhocracy-embed");
+            var iframe = adhocracy.getIframe(widget, data);
 
             marker.append(iframe);
         });
+    };
+
+    adhocracy.getIframe = (widget : string, data : {}) => {
+        var iframe = $("<iframe>");
+
+        iframe.css("border", "none");
+        iframe.css("width", "100%");
+
+        var url = origin + appUrl + widget + "?" + $.param(data, true);
+
+        iframe.attr("src", url);
+        iframe.addClass("adhocracy-embed");
+
+        return iframe;
     };
 
     /**
