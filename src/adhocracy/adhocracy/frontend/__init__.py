@@ -17,10 +17,12 @@ def config_view(request):
     else:
         public_ws_url = _build_ws_url(request, internal_ws_url)
     config['ws_url'] = public_ws_url
+    config['rest_url'] = settings.get('adhocracy.frontend.rest_url',
+                                      'http://localhost:6541')
+    config['rest_platform_path'] = '/' + settings.get('adhocracy.platform_id',
+                                                      'adhocracy')
     config['pkg_path'] = settings.get('adhocracy.frontend.pkg_path',
                                       '/static/js/Packages')
-    config['root_path'] = '/' + settings.get('adhocracy.platform_id',
-                                             'adhocracy')
     return config
 
 
