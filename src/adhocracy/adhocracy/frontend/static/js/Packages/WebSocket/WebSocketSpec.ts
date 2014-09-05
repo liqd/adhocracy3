@@ -12,7 +12,8 @@ export var register = () => {
     describe("WebSocket", () => {
         var config: Config.Type = {
             pkg_path: "mock",
-            root_path: "mock",
+            rest_url: "mock",
+            rest_platform_path: "mock",
             ws_url: "mock",
             embedded: false
         };

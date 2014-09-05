@@ -133,7 +133,8 @@ export var register = () => {
             beforeEach(() => {
                 config = {
                     pkg_path: "mock",
-                    root_path: "mock",
+                    rest_url: "mock",
+                    rest_platform_path: "mock",
                     ws_url: "mock",
                     embedded: true
                 };

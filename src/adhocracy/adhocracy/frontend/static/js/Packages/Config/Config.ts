@@ -7,7 +7,8 @@
  */
 
 export interface Type {
-    root_path : string;
+    rest_url : string;
+    rest_platform_path : string;
     pkg_path : string;
     ws_url : string;
     embedded : boolean;

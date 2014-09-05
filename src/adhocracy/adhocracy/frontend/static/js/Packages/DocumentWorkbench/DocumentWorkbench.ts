@@ -24,7 +24,7 @@ export class DocumentWorkbench {
                 adhUser : AdhUser.User,
                 $scope : IDocumentWorkbenchScope
             ) : void => {
-                $scope.path = adhConfig.root_path;
+                $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
                 $scope.user = adhUser;
             }]
         };
