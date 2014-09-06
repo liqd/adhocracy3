@@ -59,7 +59,8 @@ var bindServerErrors = (
 export class User {
     public loggedIn : boolean = false;
     public data : IUserBasic;
-    private token : string;
+    public token : string;
+    public userPath : string;
 
     constructor(
         private adhHttp : AdhHttp.Service<any>,
@@ -102,6 +103,7 @@ export class User {
         var _self : User = this;
 
         _self.token = token;
+        _self.userPath = userPath;
         _self.$http.defaults.headers.common["X-User-Token"] = token;
         _self.$http.defaults.headers.common["X-User-Path"] = userPath;
         _self.loggedIn = true;
@@ -141,6 +143,7 @@ export class User {
         delete _self.$http.defaults.headers.common["X-User-Token"];
         delete _self.$http.defaults.headers.common["X-User-Path"];
         _self.token = undefined;
+        _self.userPath = undefined;
         _self.data = undefined;
         _self.loggedIn = false;
     }
