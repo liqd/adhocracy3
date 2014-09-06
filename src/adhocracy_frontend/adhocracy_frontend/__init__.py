@@ -1,5 +1,4 @@
 """Frontend view and simple pyramid app configurations."""
-from urllib.parse import urlparse
 import os
 
 from pyramid.config import Configurator

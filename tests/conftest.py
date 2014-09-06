@@ -44,7 +44,7 @@ def browser(browser, frontend_with_backend) -> Browser:
     Add attribute `root_url` pointing to the adhocracy root.html page.
     Add attribute `app_url` pointing to the adhocracy application page.
     Before visiting a new url the browser waits until the angular app is loaded
-     """
+    """
     from adhocracy_frontend.testing import angular_app_loaded
     app_url = frontend_with_backend.application_url
     browser.root_url = app_url
