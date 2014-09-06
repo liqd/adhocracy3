@@ -11,4 +11,5 @@ export interface Type {
     pkg_path : string;
     ws_url : string;
     embedded : boolean;
+    trusted_domains : string[];
 }

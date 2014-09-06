@@ -14,7 +14,8 @@ export var register = () => {
             pkg_path: "mock",
             root_path: "mock",
             ws_url: "mock",
-            embedded: false
+            embedded: false,
+            trusted_domains: []
         };
 
         // constructor for a mock raw web socket that leaks the

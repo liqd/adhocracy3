@@ -10,10 +10,12 @@ export var register = () => {
     describe("CrossWindowMessaging", () => {
         var windowMock;
         var rootScopeMock;
+        var adhUserMock;
 
         beforeEach(() => {
             windowMock = <any>jasmine.createSpyObj("windowMock", ["addEventListener"]);
             rootScopeMock = <any>jasmine.createSpyObj("rootScopeMock", ["$watch"]);
+            adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["loggedIn"]);
         });
 
         describe("Service", () => {
@@ -22,7 +24,7 @@ export var register = () => {
 
             beforeEach(() => {
                 postMessageMock = <any>jasmine.createSpy("postMessageMock");
-                service = new CrossWindowMessaging.Service(postMessageMock, windowMock, rootScopeMock);
+                service = new CrossWindowMessaging.Service(postMessageMock, windowMock, rootScopeMock, ["http://trusted.lan"], adhUserMock);
             });
 
             describe("registerMessageHandler", () => {
@@ -68,6 +70,20 @@ export var register = () => {
                 });
             });
 
+            describe("sendAuthMessages", () => {
+                it("returns true if embedderOrigin is trusted", () => {
+                    service.setup({embedderOrigin: "http://trusted.lan"});
+                    var sendAuth = service.sendAuthMessages();
+                    expect(sendAuth).toBe(true);
+                });
+
+                it("returns false if embedderOrigin is trusted", () => {
+                    service.setup({embedderOrigin: "http://untrusted.lan"});
+                    var sendAuth = service.sendAuthMessages();
+                    expect(sendAuth).toBe(false);
+                });
+            });
+
             describe("setup", () => {
                 it("sets up the service", () => {
                     var embedderOrigin = "http://embedder.lan";
@@ -81,6 +97,19 @@ export var register = () => {
                     service.setup({embedderOrigin: embedderOrigin2});
                     expect(service.embedderOrigin).toBe(embedderOrigin1);
                 });
+                it("registers watch on $rootScope that calls postMessage on login if embedder ist trusted", () => {
+                    service.setup({embedderOrigin: "http://trusted.lan"});
+                    var args = rootScopeMock.$watch.calls.mostRecent().args;
+                    args[1]("login");
+                    expect(postMessageMock).toHaveBeenCalled();
+                });
+                it("registers watch on $rootScope that calls postMessage on logout if embedder ist trusted", () => {
+                    service.setup({embedderOrigin: "http://trusted.lan"});
+                    var args = rootScopeMock.$watch.calls.mostRecent().args;
+                    args[1]("logout");
+                    expect(postMessageMock).toHaveBeenCalled();
+                });
+
             });
 
             describe("manageResize", () => {
@@ -135,7 +164,8 @@ export var register = () => {
                     pkg_path: "mock",
                     root_path: "mock",
                     ws_url: "mock",
-                    embedded: true
+                    embedded: true,
+                    trusted_domains: []
                 };
                 windowMock.parent = <any>jasmine.createSpyObj("parentMock", ["postMessage"]);
             });

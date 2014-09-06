@@ -16,6 +16,7 @@ class ConfigViewTest(unittest.TestCase):
             {'ws_url': 'ws://example.com:80',
              'pkg_path': '/static/js/Packages',
              'root_path': '/adhocracy',
+             'trusted_domains': [],
              }
 
     def test_ws_url_with_ws_url_settings(self):
