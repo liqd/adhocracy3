@@ -106,11 +106,11 @@ export class User {
         _self.userPath = userPath;
         _self.$http.defaults.headers.common["X-User-Token"] = token;
         _self.$http.defaults.headers.common["X-User-Path"] = userPath;
-        _self.loggedIn = true;
 
         return _self.adhHttp.get(userPath)
             .then((resource) => {
                 _self.data = resource.data["adhocracy.sheets.user.IUserBasic"];
+                _self.loggedIn = true;
                 return resource;  // FIXME this is only here because of a bug in DefinitelyTyped
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
