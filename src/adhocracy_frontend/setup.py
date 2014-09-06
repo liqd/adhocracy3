@@ -37,6 +37,8 @@ setup(name='adhocracy_frontend',
       entry_points="""\
       [paste.app_factory]
       main = adhocracy_frontend:main
+      [pytest11]
+      adhocracy_frontend = adhocracy_frontend.testing
       """,
       )
 

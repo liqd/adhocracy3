@@ -1,4 +1,4 @@
-exclude: '../src/adhocracy/adhocracy/frontend/static/stylesheets/scss/third_party/**'
+exclude: '../${adhocracy:frontend.static_dir}/stylesheets/scss/third_party/**'
 
 linters:
     ColorKeyword:

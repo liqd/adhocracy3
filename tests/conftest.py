@@ -23,23 +23,30 @@ def pytest_runtest_setup(item):
 
 
 @fixture(scope='class')
-def server_sample(request, app_sample) -> StopableWSGIServer:
-    """Return a http server with the sample adhocracy wsgi application."""
-    server = StopableWSGIServer.create(app_sample)
+def frontend_with_backend(request, backend_sample):
+    """Return the frontend http server and start the backend sample server."""
+    from pyramid.config import Configurator
+    from adhocracy_frontend import includeme
+    settings = {'adhocracy.frontend.rest_url': backend_sample.application_url,
+                }
+    config = Configurator(settings=settings)
+    includeme(config)
+    app = config.make_wsgi_app()
+    server = StopableWSGIServer.create(app)
     request.addfinalizer(server.shutdown)
     return server
 
 
 @fixture
-def browser(browser, server_sample) -> Browser:
+def browser(browser, frontend_with_backend) -> Browser:
     """Return test browser, start sample application and go to `root.html`.
 
     Add attribute `root_url` pointing to the adhocracy root.html page.
     Add attribute `app_url` pointing to the adhocracy application page.
     Before visiting a new url the browser waits until the angular app is loaded
-    """
-    from adhocracy.testing import angular_app_loaded
-    app_url = server_sample.application_url
+     """
+    from adhocracy_frontend.testing import angular_app_loaded
+    app_url = frontend_with_backend.application_url
     browser.root_url = app_url
     browser.app_url = app_url
     browser.visit(browser.root_url)
@@ -48,8 +55,8 @@ def browser(browser, server_sample) -> Browser:
 
 
 @fixture
-def browser_embed(browser, server_sample) -> Browser:
+def browser_embed(browser, frontend_with_backend) -> Browser:
     """Start embedder application."""
-    url = server_sample.application_url + 'static/embed.html'
+    url = frontend_with_backend.application_url + 'static/embed.html'
     browser.visit(url)
     return browser

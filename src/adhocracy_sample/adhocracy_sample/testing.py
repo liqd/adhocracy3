@@ -1,5 +1,6 @@
 """Public py.test fixtures."""
 from pytest import fixture
+from webtest.http import StopableWSGIServer
 
 
 @fixture(scope='class')
@@ -11,3 +12,11 @@ def app_sample(zeo, settings, websocket):
                                 root_factory=adhocracy_sample.root_factory)
     configurator.include(adhocracy_sample)
     return configurator.make_wsgi_app()
+
+
+@fixture(scope='class')
+def backend_sample(request, app_sample):
+    """Return a http server with the adhocracy wsgi application."""
+    server = StopableWSGIServer.create(app_sample)
+    request.addfinalizer(server.shutdown)
+    return server

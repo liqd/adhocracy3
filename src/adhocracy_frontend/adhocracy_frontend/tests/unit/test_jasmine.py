@@ -1,7 +1,7 @@
 import pytest
 
-from adhocracy.frontend.tests.unit.console import Parser
-from adhocracy.frontend.tests.unit.console import Formatter
+from adhocracy_frontend.tests.unit.console import Parser
+from adhocracy_frontend.tests.unit.console import Formatter
 
 
 pytestmark = pytest.mark.jasmine  # mark theses tests as jasmine tests

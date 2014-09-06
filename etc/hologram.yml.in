@@ -2,7 +2,7 @@
 # All paths should be relative to there
 
 # The directory containing the source files to parse recursively
-source: ${buildout:directory}/src/adhocracy/adhocracy/frontend/static/stylesheets/scss
+source: ${buildout:directory}/${adhocracy:frontend.static_dir}/stylesheets/scss
 
 # The directory that hologram will build to
 destination: ../docs/styleguide
@@ -16,7 +16,7 @@ documentation_assets: ../docs/styleguide_assets
 # folder. Typically this will include the css that you are trying to
 # document. May also include additional folders as needed.
 dependencies:
-  - ../src/adhocracy/adhocracy/frontend/static
+   - ../${adhocracy:frontend.static_dir}
 
 # Mark which category should be the index page
 # Alternatively, you may have an index.md in the documenatation assets
