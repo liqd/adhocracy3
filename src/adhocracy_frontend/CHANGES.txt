@@ -1,0 +1,7 @@
+adhocracy_frontend Changelog
+=====================
+
+0.0
+---
+
+-  Initial version

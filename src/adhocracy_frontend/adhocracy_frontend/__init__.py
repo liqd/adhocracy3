@@ -1,0 +1,12 @@
+"""Adhocracy frontend."""
+from pyramid.config import Configurator
+
+from adhocracy import root_factory
+
+
+def main(global_config, **settings):
+    """Return the adhocracy Pyramid WSGI application."""
+    config = Configurator(settings=settings, root_factory=root_factory)
+    config.include('adhocracy')
+    config.scan()
+    return config.make_wsgi_app()
