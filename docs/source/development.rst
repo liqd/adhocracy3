@@ -150,3 +150,10 @@ Recreate api documentation source files::
 Generate html documentation::
 
     bin/sphinx_build_adhocracy
+
+Create scaffold for extension packages
+---------------------------------------
+::
+
+    bin/pcreate -s adocracy_extension adhocracy_XX
+

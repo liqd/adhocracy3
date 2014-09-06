@@ -65,5 +65,7 @@ setup(name='adhocracy',
       adhocracy = adhocracy.testing
       [console_scripts]
       start_ws_server = adhocracy.websockets.start_ws_server:main
+      [pyramid.scaffold]
+        adhocracy_extension=adhocracy.scaffolds:AdhocracyExtensionTemplate
       """,
       )
