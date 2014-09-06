@@ -20,6 +20,7 @@
     var origin : string;
     var appUrl : string = "/embed/";
     var embedderOrigin : string;
+    var messageHandlers : any = {};
 
     /**
      * Load external JavaScript asynchronously.
@@ -64,6 +65,9 @@
                 break;
             case "requestSetup":
                 adhocracy.postMessage(source, "setup", {embedderOrigin: embedderOrigin});
+        }
+        if (messageHandlers.hasOwnProperty(name)) {
+            messageHandlers[name](data);
         }
     };
 
@@ -144,5 +148,9 @@
 
         // FIXME: use fallbacks here
         win.postMessage(messageString, origin);
+    };
+
+    adhocracy.registerMessageHandler = (name : string, callback) => {
+        messageHandlers[name] = callback;
     };
 })();
