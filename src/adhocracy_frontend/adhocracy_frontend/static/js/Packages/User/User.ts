@@ -66,7 +66,8 @@ export class User {
         private $rootScope : ng.IScope,
         private $window : Window,
         private angular : ng.IAngularStatic,
-        private Modernizr
+        private Modernizr,
+        private _
     ) {
         var _self : User = this;
 
@@ -81,9 +82,9 @@ export class User {
                 } else if (_self.$window.localStorage.getItem("user-token") === null &&
                         _self.$window.localStorage.getItem("user-path") === null) {
                     // For some reason, $apply is necessary here to trigger a UI update
-                    _self.$rootScope.$apply(() => {
+                    _.defer(() => _self.$rootScope.$apply(() => {
                         _self.deleteToken();
-                    });
+                    }));
                 }
             }
         };
