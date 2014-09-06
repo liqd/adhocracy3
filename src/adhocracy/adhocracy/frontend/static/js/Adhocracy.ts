@@ -111,7 +111,11 @@ export var init = (config, meta_api) => {
     app.service("adhHttp", ["$http", "$q", "adhMetaApi", "adhPreliminaryNames", AdhHttp.Service]);
     app.factory("adhWebSocket", ["Modernizr", "adhConfig", AdhWebSocket.factory]);
 
-    app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", "adhUser", AdhCrossWindowMessaging.factory]);
+    if (config.trustedDomains === []) {
+        app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", AdhCrossWindowMessaging.factory]);
+    } else {
+        app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", "adhUser", AdhCrossWindowMessaging.factory]);
+    }
 
     app.directive("adhEmbed", ["$compile", "$route", Embed.factory]);
 
