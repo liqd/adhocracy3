@@ -1,5 +1,14 @@
 require.config({
     baseUrl: "/static/js/",
+    config: {
+        text: {
+            useXhr: function (url, protocol, hostname, port) {
+                // we have CORS headers set for all text resources we load
+                // through require.
+                return true;
+            }
+        }
+    },
     paths: {
         text: "../lib/requirejs-text/text",
         jquery: "../lib/jquery/dist/jquery",
