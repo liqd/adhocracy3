@@ -35,12 +35,12 @@ class FilterablePool(Pool):
     def interface_filter(self, iface) -> Iterable:
         # TODO testing only
         catalog = find_catalog(self, 'system')
-        path = catalog['path']
-        assert len(path.docids()) == 1  # TODO why is this??
-        name = catalog['name']
-        assert len(name.docids()) == 1
+        # path = catalog['path']
+        # assert len(path.docids()) == 1  # TODO why is this??
+        # name = catalog['name']
+        # assert len(name.docids()) == 1
         interfaces = catalog['interfaces']
-        assert len(interfaces.docids()) == 1
+        # assert len(interfaces.docids()) == 1
         q = interfaces.eq(iface)
         resultset = q.execute()
         for result in resultset:
