@@ -8,6 +8,8 @@ import transaction
 from adhocracy.authentication import TokenHeaderAuthenticationPolicy
 from adhocracy.resources.root import IRootPool
 
+from pyramid.request import Response
+
 
 def root_factory(request, t=transaction, g=get_connection,
                  mark_unfinished_as_finished=False):
@@ -16,6 +18,11 @@ def root_factory(request, t=transaction, g=get_connection,
     It accepts a request and returns an instance of the ``Root`` content type.
 
     """
+    # Set CORS headers
+    request.response = Response()
+    request.response.headers.update({
+        'Access-Control-Allow-Origin': '*',
+    })
     # FIXME: Fix substanced bug: mark_unfinished_as_finished keyword
     # is not working.
     # Don't get the root object if the request already has one.
