@@ -60,6 +60,26 @@ def create_pool_with_graph() -> testing.DummyResource:
 ##################
 
 @fixture
+def pool_graph_catalog(config):
+    """Return pool wit graph and catalog for integration/functional tests."""
+    from adhocracy.resources.pool import Pool
+    from substanced.interfaces import MODE_IMMEDIATE
+    from adhocracy.resources.root import _add_objectmap_to_app_root
+    from adhocracy.resources.root import _add_catalog_service
+    from adhocracy.resources.root import _add_graph
+    config.include('adhocracy.registry')
+    config.include('adhocracy.graph')
+    config.include('adhocracy.catalog')
+    context = Pool()
+    _add_objectmap_to_app_root(context)
+    _add_graph(context, config.registry)
+    _add_catalog_service(context, config.registry)
+    context['catalogs']['system']['name'].action_mode = MODE_IMMEDIATE
+    context['catalogs']['system']['interfaces'].action_mode = MODE_IMMEDIATE
+    return context
+
+
+@fixture
 def resource_meta() -> ResourceMetadata:
     """ Return basic resource metadata."""
     from adhocracy.interfaces import resource_metadata
