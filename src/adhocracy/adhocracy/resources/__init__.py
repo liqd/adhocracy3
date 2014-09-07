@@ -66,7 +66,7 @@ class ResourceFactory:
             raise KeyError('Duplicate name: {}'.format(name))
         if name == '':
             raise KeyError('Empty name')
-        parent.add(name, resource, send_events=False)
+        parent.add(name, resource, send_events=True)
 
     def _notify_new_resource_created_and_added(self, resource, registry,
                                                creator):
