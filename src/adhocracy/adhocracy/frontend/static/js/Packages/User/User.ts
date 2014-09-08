@@ -1,6 +1,7 @@
 import _ = require("lodash");
 
 import AdhHttp = require("../Http/Http");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhConfig = require("../Config/Config");
 
 var pkgLocation = "/User";
@@ -217,7 +218,11 @@ export var loginDirective = (adhConfig : AdhConfig.Type, $location : ng.ILocatio
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
         scope: {},
-        controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeLogin) : void => {
+        controller: ["adhUser", "adhTopLevelState", "$scope", (
+            adhUser : User,
+            adhTopLevelState : AdhTopLevelState.TopLevelState,
+            $scope : IScopeLogin
+        ) : void => {
             $scope.errors = [];
 
             $scope.credentials = {
@@ -235,7 +240,8 @@ export var loginDirective = (adhConfig : AdhConfig.Type, $location : ng.ILocatio
                     $scope.credentials.nameOrEmail,
                     $scope.credentials.password
                 ).then(() => {
-                    $location.path("/");
+                    var returnToPage : string = adhTopLevelState.getCameFrom();
+                    $location.path((typeof returnToPage === "string") ? returnToPage : "/");
                 }, (errors) => {
                     bindServerErrors($scope, errors);
                     $scope.credentials.password = "";

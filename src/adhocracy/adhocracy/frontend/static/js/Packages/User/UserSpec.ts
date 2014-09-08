@@ -289,13 +289,15 @@ export var register = () => {
                 var controller;
                 var $scopeMock;
                 var adhUserMock;
+                var adhTopLevelStateMock;
 
                 beforeEach(() => {
                     $scopeMock = {};
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn"]);
+                    adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["getCameFrom", "setCameFrom"]);
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
-                    controller = <any>(directive.controller[2]);
-                    controller(adhUserMock, $scopeMock);
+                    controller = <any>(directive.controller[3]);
+                    controller(adhUserMock, adhTopLevelStateMock, $scopeMock);
                 });
 
                 it("creates an empty credentials object in scope", () => {
