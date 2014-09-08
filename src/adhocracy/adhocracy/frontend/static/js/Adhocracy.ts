@@ -5,7 +5,6 @@
 /// <reference path="../lib/DefinitelyTyped/moment/moment.d.ts"/>
 /// <reference path="./_all.d.ts"/>
 
-import lodash = require("lodash");
 import angular = require("angular");
 import angularRoute = require("angularRoute");  if (angularRoute) { return; };
 // (since angularRoute does not export any objects or types we would
@@ -85,7 +84,6 @@ export var init = (config, meta_api) => {
         $locationProvider.html5Mode(true);
     }]);
 
-    app.value("lodash", lodash);
     app.value("angular", angular);
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
@@ -93,7 +91,7 @@ export var init = (config, meta_api) => {
     app.filter("signum", () => (n : number) : string => n > 0 ? "+" + n.toString() : n.toString());
 
     app.service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", AdhProposal.Service]);
-    app.service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", "lodash", AdhUser.User]);
+    app.service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", AdhUser.User]);
     app.directive("adhLogin", ["adhConfig", "$location", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
     app.directive("adhUserIndicator", ["adhConfig", AdhUser.indicatorDirective]);

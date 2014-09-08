@@ -23,7 +23,6 @@ export var register = () => {
             var elementMock;
             var angularMock;
             var modernizrMock;
-            var lodashMock;
 
             beforeEach(() => {
                 adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "post"]);
@@ -57,10 +56,7 @@ export var register = () => {
                     localstorage: true
                 };
 
-                lodashMock = {
-                    defer: (fn) => fn()
-                };
-                adhUser = new AdhUser.User(adhHttpMock, q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock, lodashMock);
+                adhUser = new AdhUser.User(adhHttpMock, q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
             });
 
             it("registers a handler on 'storage' DOM events", () => {

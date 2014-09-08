@@ -1,3 +1,5 @@
+import _ = require("lodash");
+
 import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
 
@@ -66,8 +68,7 @@ export class User {
         private $rootScope : ng.IScope,
         private $window : Window,
         private angular : ng.IAngularStatic,
-        private Modernizr,
-        private _
+        private Modernizr
     ) {
         var _self : User = this;
 
