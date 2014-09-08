@@ -23,7 +23,6 @@ export var register = () => {
             var elementMock;
             var angularMock;
             var modernizrMock;
-            var lodashMock;
 
             beforeEach(() => {
                 adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "post"]);
@@ -57,10 +56,7 @@ export var register = () => {
                     localstorage: true
                 };
 
-                lodashMock = {
-                    defer: (fn) => fn()
-                };
-                adhUser = new AdhUser.User(adhHttpMock, q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock, lodashMock);
+                adhUser = new AdhUser.User(adhHttpMock, q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
             });
 
             it("registers a handler on 'storage' DOM events", () => {
@@ -85,13 +81,16 @@ export var register = () => {
                     expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu");
                 });
 
-                it("calls 'deleteToken' if neither 'user-token' nor 'user-path' exist in storage", () => {
+                it("calls 'deleteToken' if neither 'user-token' nor 'user-path' exist in storage", (done) => {
                     windowMock.localStorage.getItem.and.returnValue(null);
                     fn();
-                    expect(rootScopeMock.$apply).toHaveBeenCalled();
-                    var callback = rootScopeMock.$apply.calls.mostRecent().args[0];
-                    callback();
-                    expect(adhUser.deleteToken).toHaveBeenCalled();
+                    _.defer(() => {
+                        expect(rootScopeMock.$apply).toHaveBeenCalled();
+                        var callback = rootScopeMock.$apply.calls.mostRecent().args[0];
+                        callback();
+                        expect(adhUser.deleteToken).toHaveBeenCalled();
+                        done();
+                    });
                 });
             });
 
