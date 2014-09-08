@@ -81,7 +81,9 @@ export class User {
                     );
                 } else if (_self.$window.localStorage.getItem("user-token") === null &&
                         _self.$window.localStorage.getItem("user-path") === null) {
-                    // For some reason, $apply is necessary here to trigger a UI update
+                    // $apply is necessary here to trigger a UI
+                    // update.  the need for _.defer is explained
+                    // here: http://stackoverflow.com/a/17958847
                     _.defer(() => _self.$rootScope.$apply(() => {
                         _self.deleteToken();
                     }));
