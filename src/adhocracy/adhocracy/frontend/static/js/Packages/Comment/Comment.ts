@@ -1,6 +1,7 @@
 import AdhResource = require("../../Resources");
 
 import AdhConfig = require("../Config/Config");
+import AdhHttp = require("../Http/Http");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
@@ -131,7 +132,7 @@ export class CommentCreate extends CommentResource {
     constructor(
         adapter : ICommentAdapter<any>,
         adhConfig : AdhConfig.Type,
-        adhHttp,
+        adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames,
         $q : ng.IQService
     ) {
