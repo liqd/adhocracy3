@@ -347,6 +347,14 @@ export var register = () => {
                             done();
                         });
                     });
+                    it("navigates to TopLevelState.getCameFrom() after success", (done) => {
+                        var navigateToPath : string = "/osty";
+                        adhTopLevelStateMock.getCameFrom.and.returnValue(navigateToPath);
+                        $scopeMock.logIn().then(() => {
+                            expect(locationMock.path).toHaveBeenCalledWith(navigateToPath);
+                            done();
+                        });
+                    });
                 });
             });
         });
@@ -426,6 +434,14 @@ export var register = () => {
                         adhUserMock.register.and.returnValue(q.reject([{description: "error"}]));
                         $scopeMock.register().then(() => {
                             expect($scopeMock.errors.length).toBe(1);
+                            done();
+                        });
+                    });
+                    it("navigates to TopLevelState.getCameFrom() after success", (done) => {
+                        var navigateToPath : string = "/osty";
+                        adhTopLevelStateMock.getCameFrom.and.returnValue(navigateToPath);
+                        $scopeMock.register().then(() => {
+                            expect(locationMock.path).toHaveBeenCalledWith(navigateToPath);
                             done();
                         });
                     });
