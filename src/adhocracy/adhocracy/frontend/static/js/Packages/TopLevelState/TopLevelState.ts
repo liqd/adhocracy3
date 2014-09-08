@@ -52,14 +52,7 @@ export class TopLevelState {
     private cameFrom : string;
 
     public setCameFrom(path : string) : void {
-        // we don't want cameFrom to contain paths that point to other
-        // network end points, especially sind $location.path does not
-        // handle them.  so we silently remove network endpoints here.
-        var dropProtocolHostPort = (path : string) : string => {
-            return path.replace(/\w+:\/\/(\w+\.)*\w+(:\d+)?\//, "/");
-        };
-
-        this.cameFrom = dropProtocolHostPort(path);
+        this.cameFrom = path;
     }
 
     public getCameFrom() : string {

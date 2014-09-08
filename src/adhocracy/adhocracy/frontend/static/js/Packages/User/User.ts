@@ -237,7 +237,7 @@ export var loginController = (
             $scope.credentials.password
         ).then(() => {
             var returnToPage : string = adhTopLevelState.getCameFrom();
-            $location.path((typeof returnToPage === "string") ? returnToPage : "/");
+            $location.url((typeof returnToPage === "string") ? returnToPage : "/");
         }, (errors) => {
             bindServerErrors($scope, errors);
             $scope.credentials.password = "";

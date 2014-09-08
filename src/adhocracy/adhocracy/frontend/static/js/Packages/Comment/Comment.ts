@@ -153,7 +153,7 @@ export var adhCommentListing = (adhConfig : AdhConfig.Type) => {
             adhTopLevelState : AdhTopLevelState.TopLevelState,
             $location : ng.ILocationService
         ) : void => {
-            adhTopLevelState.setCameFrom($location.absUrl());
+            adhTopLevelState.setCameFrom($location.url());
         }]
     };
 };
