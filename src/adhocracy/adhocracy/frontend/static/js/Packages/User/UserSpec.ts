@@ -81,13 +81,16 @@ export var register = () => {
                     expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu");
                 });
 
-                it("calls 'deleteToken' if neither 'user-token' nor 'user-path' exist in storage", () => {
+                it("calls 'deleteToken' if neither 'user-token' nor 'user-path' exist in storage", (done) => {
                     windowMock.localStorage.getItem.and.returnValue(null);
                     fn();
-                    expect(rootScopeMock.$apply).toHaveBeenCalled();
-                    var callback = rootScopeMock.$apply.calls.mostRecent().args[0];
-                    callback();
-                    expect(adhUser.deleteToken).toHaveBeenCalled();
+                    _.defer(() => {
+                        expect(rootScopeMock.$apply).toHaveBeenCalled();
+                        var callback = rootScopeMock.$apply.calls.mostRecent().args[0];
+                        callback();
+                        expect(adhUser.deleteToken).toHaveBeenCalled();
+                        done();
+                    });
                 });
             });
 
