@@ -154,6 +154,10 @@ export class User {
         // implicitly does importContent / exportContent which expect
         // Types.Content)!
 
+        // FIXME: Use adhHttp.post, not $http.post.  In the future,
+        // there may be other features of adhHttp that we want to use
+        // implicitly, such as caching.
+
         if (nameOrEmail.indexOf("@") === -1) {
             promise = _self.$http.post("/login_username", {
                 name: nameOrEmail,
