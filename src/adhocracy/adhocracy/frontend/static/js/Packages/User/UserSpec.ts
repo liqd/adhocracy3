@@ -282,7 +282,7 @@ export var register = () => {
                     ws_url: "mock",
                     embedded: true
                 };
-                directive = AdhUser.loginDirective(adhConfigMock, locationMock);
+                directive = AdhUser.loginDirective(adhConfigMock);
             });
 
             describe("controller", () => {
@@ -296,8 +296,8 @@ export var register = () => {
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn"]);
                     adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["getCameFrom", "setCameFrom"]);
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
-                    controller = <any>(directive.controller[3]);
-                    controller(adhUserMock, adhTopLevelStateMock, $scopeMock);
+                    controller = <any>(directive.controller[4]);
+                    controller(adhUserMock, adhTopLevelStateMock, $scopeMock, locationMock);
                 });
 
                 it("creates an empty credentials object in scope", () => {
@@ -363,7 +363,7 @@ export var register = () => {
                     embedded: true
                 };
 
-                directive = AdhUser.registerDirective(adhConfigMock, locationMock);
+                directive = AdhUser.registerDirective(adhConfigMock);
             });
 
             describe("controller", () => {
@@ -376,8 +376,8 @@ export var register = () => {
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register", "logIn"]);
                     adhUserMock.register.and.returnValue(q.when(undefined));
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
-                    controller = <any>(directive.controller[2]);
-                    controller(adhUserMock, $scopeMock);
+                    controller = <any>(directive.controller[3]);
+                    controller(adhUserMock, $scopeMock, locationMock);
                 });
 
                 it("creates an empty input object in scope", () => {

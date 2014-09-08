@@ -13,7 +13,7 @@ export interface IUserBasic {
 }
 
 
-interface IScopeLogin {
+export interface IScopeLogin {
     user : User;
     credentials : {
         nameOrEmail : string;
@@ -26,7 +26,7 @@ interface IScopeLogin {
 }
 
 
-interface IScopeRegister {
+export interface IScopeRegister {
     input : {
         username : string;
         email : string;
@@ -213,71 +213,82 @@ export class User {
 }
 
 
-export var loginDirective = (adhConfig : AdhConfig.Type, $location : ng.ILocationService) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
-        scope: {},
-        controller: ["adhUser", "adhTopLevelState", "$scope", (
-            adhUser : User,
-            adhTopLevelState : AdhTopLevelState.TopLevelState,
-            $scope : IScopeLogin
-        ) : void => {
-            $scope.errors = [];
+export var loginController = (
+    adhUser : User,
+    adhTopLevelState : AdhTopLevelState.TopLevelState,
+    $scope : IScopeLogin,
+    $location : ng.ILocationService
+) : void => {
+    $scope.errors = [];
 
-            $scope.credentials = {
-                nameOrEmail: "",
-                password: ""
-            };
+    $scope.credentials = {
+        nameOrEmail: "",
+        password: ""
+    };
 
-            $scope.resetCredentials = () => {
-                $scope.credentials.nameOrEmail = "";
-                $scope.credentials.password = "";
-            };
+    $scope.resetCredentials = () => {
+        $scope.credentials.nameOrEmail = "";
+        $scope.credentials.password = "";
+    };
 
-            $scope.logIn = () => {
-                return adhUser.logIn(
-                    $scope.credentials.nameOrEmail,
-                    $scope.credentials.password
-                ).then(() => {
-                    var returnToPage : string = adhTopLevelState.getCameFrom();
-                    $location.path((typeof returnToPage === "string") ? returnToPage : "/");
-                }, (errors) => {
-                    bindServerErrors($scope, errors);
-                    $scope.credentials.password = "";
-                });
-            };
-        }]
+    $scope.logIn = () => {
+        return adhUser.logIn(
+            $scope.credentials.nameOrEmail,
+            $scope.credentials.password
+        ).then(() => {
+            var returnToPage : string = adhTopLevelState.getCameFrom();
+            $location.path((typeof returnToPage === "string") ? returnToPage : "/");
+        }, (errors) => {
+            bindServerErrors($scope, errors);
+            $scope.credentials.password = "";
+        });
     };
 };
 
 
-export var registerDirective = (adhConfig : AdhConfig.Type, $location : ng.ILocationService) => {
+export var loginDirective = (adhConfig : AdhConfig.Type) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
+        scope: {},
+        controller: ["adhUser", "adhTopLevelState", "$scope", "$location", loginController]
+    };
+};
+
+
+export var registerController = (
+    adhUser : User,
+    $scope : IScopeRegister,
+    $location : ng.ILocationService
+) => {
+    $scope.input = {
+        username: "",
+        email: "",
+        password: "",
+        passwordRepeat: ""
+    };
+
+    $scope.errors = [];
+
+    $scope.register = () : ng.IPromise<void> => {
+        return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
+            .then((response) => {
+                $scope.errors = [];
+                return adhUser.logIn($scope.input.username, $scope.input.password).then(
+                    () => { $location.path("/"); },
+                    (errors) => bindServerErrors($scope, errors)
+                );
+            }, (errors) => bindServerErrors($scope, errors));
+    };
+};
+
+
+export var registerDirective = (adhConfig : AdhConfig.Type) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeRegister) => {
-            $scope.input = {
-                username: "",
-                email: "",
-                password: "",
-                passwordRepeat: ""
-            };
-
-            $scope.errors = [];
-
-            $scope.register = () : ng.IPromise<void> => {
-                return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
-                    .then((response) => {
-                        $scope.errors = [];
-                        return adhUser.logIn($scope.input.username, $scope.input.password).then(
-                            () => { $location.path("/"); },
-                            (errors) => bindServerErrors($scope, errors)
-                        );
-                    }, (errors) => bindServerErrors($scope, errors));
-            };
-        }]
+        controller: ["adhUser", "$scope", "$location", registerController]
     };
 };
 
