@@ -258,6 +258,7 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
 
 export var registerController = (
     adhUser : User,
+    adhTopLevelState : AdhTopLevelState.TopLevelState,
     $scope : IScopeRegister,
     $location : ng.ILocationService
 ) => {
@@ -275,7 +276,10 @@ export var registerController = (
             .then((response) => {
                 $scope.errors = [];
                 return adhUser.logIn($scope.input.username, $scope.input.password).then(
-                    () => { $location.path("/"); },
+                    () => {
+                        var returnToPage : string = adhTopLevelState.getCameFrom();
+                        $location.path((typeof returnToPage === "string") ? returnToPage : "/");
+                    },
                     (errors) => bindServerErrors($scope, errors)
                 );
             }, (errors) => bindServerErrors($scope, errors));
@@ -288,7 +292,7 @@ export var registerDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        controller: ["adhUser", "$scope", "$location", registerController]
+        controller: ["adhUser", "adhTopLevelState", "$scope", "$location", registerController]
     };
 };
 
