@@ -2,6 +2,7 @@ import AdhResource = require("../../Resources");
 
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
@@ -147,6 +148,12 @@ export var adhCommentListing = (adhConfig : AdhConfig.Type) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentListing.html",
         scope: {
             path: "@",
-        }
+        },
+        controller: ["adhTopLevelState", "$location", (
+            adhTopLevelState : AdhTopLevelState.TopLevelState,
+            $location : ng.ILocationService
+        ) : void => {
+            adhTopLevelState.setCameFrom($location.absUrl());
+        }]
     };
 };
