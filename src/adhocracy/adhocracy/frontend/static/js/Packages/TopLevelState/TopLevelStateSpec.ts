@@ -74,11 +74,6 @@ export var register = () => {
             it("before first setCameFrom, getCameFrom reads 'undefined'", () => {
                 expect(typeof adhTopLevelState.getCameFrom()).toBe("undefined");
             });
-
-            it("setCameFrom drops protocol, host, port from paths", () => {
-                adhTopLevelState.setCameFrom("http://liqd.net/this/only?t=1");
-                expect(adhTopLevelState.getCameFrom()).toBe("/this/only?t=1");
-            });
         });
 
         describe("MovingColumns", () => {
