@@ -22,7 +22,8 @@ class FilterablePool(Pool):
 
     """A pool that can be filtered and aggregated."""
 
-    def filtered_elements(self, depth=1, ifaces: Iterable=None) -> Iterable:
+    def filtered_elements(self, depth=1, ifaces: Iterable=None,
+                          valuefilters: dict=None) -> Iterable:
         """See interface for docstring."""
         system_catalog = find_catalog(self, 'system')
         path_index = system_catalog['path']
@@ -31,6 +32,11 @@ class FilterablePool(Pool):
         if ifaces:
             interface_index = system_catalog['interfaces']
             query &= interface_index.all(ifaces)
+        if valuefilters:
+            adhocracy_catalog = find_catalog(self, 'adhocracy')
+            for name, value in valuefilters.items():
+                index = adhocracy_catalog[name]
+                query &= index.eq(value)
         resultset = query.execute()
         for result in resultset:
             yield result

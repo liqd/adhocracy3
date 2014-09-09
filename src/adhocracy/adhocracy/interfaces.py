@@ -221,13 +221,16 @@ class IFilterablePool(IPool):
 
     """A pool that can be filtered and aggregated."""
 
-    def filtered_elements(depth: int=1, ifaces: Iterable=None) -> Iterable:
+    def filtered_elements(depth: int=1, ifaces: Iterable=None,
+                          valuefilters: dict=None) -> Iterable:
         """Return elements accepted by all specified filters.
 
         :param depth: 1 to return only direct children, 2 to also return
-                      grandchildren, etc.; `None` to return descendants of
-                      arbitrary nesting depth
+                grandchildren, etc.; `None` to return descendants of
+                arbitrary nesting depth
         :param ifaces: return only elements that implement all these interfaces
+        :param valuefilters: mapping from index names to values; this can be
+                used to filter by Adhocracy-specific custom indexes
         """
 
 
