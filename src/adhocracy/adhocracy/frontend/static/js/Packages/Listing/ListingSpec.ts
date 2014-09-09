@@ -14,7 +14,8 @@ var config : Config.Type = {
     pkg_path: "mock",
     root_path: "mock",
     ws_url: "mock",
-    embedded: false
+    embedded: false,
+    trusted_domains: []
 };
 
 var createAdhHttpMock = () => {

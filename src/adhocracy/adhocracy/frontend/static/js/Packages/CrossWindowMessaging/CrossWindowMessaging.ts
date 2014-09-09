@@ -33,7 +33,10 @@
  * 10 in particular, but others may be affected.)
  */
 
+import _ = require("lodash");
+
 import AdhConfig = require("../Config/Config");
+import AdhUser = require("../User/User");
 
 
 export interface IMessage {
@@ -60,7 +63,17 @@ export class Service implements IService {
 
     private embedderOrigin : string = "*";
 
-    constructor(private _postMessage : IPostMessageService, private $window : Window, private $rootScope) {
+    /**
+     * Injection of the User service is only required if login information shall be
+     * passed to the embedding website. In that case trustedDomains must be set.
+     */
+    constructor(
+        private _postMessage : IPostMessageService,
+        private $window : Window,
+        private $rootScope,
+        private trustedDomains : string[],
+        private adhUser ?: AdhUser.User
+    ) {
         var _self : Service = this;
 
         _self.registerMessageHandler("setup", _self.setup.bind(_self));
@@ -101,11 +114,32 @@ export class Service implements IService {
         );
     }
 
+    private sendAuthMessages() {
+        var _self : Service = this;
+
+        return typeof _self.adhUser !== "undefined" && _.contains(_self.trustedDomains, _self.embedderOrigin);
+    }
+
     private setup(data: IMessageData) : void {
         var _self : Service = this;
 
         if (_self.embedderOrigin === "*") {
             _self.embedderOrigin = data.embedderOrigin;
+
+            if (_self.sendAuthMessages()) {
+                _self.$rootScope.$watch(() => _self.adhUser.loggedIn, (loggedIn) => {
+
+                    if (loggedIn) {
+                        _self.postMessage("login", {
+                            token: _self.adhUser.token,
+                            userPath: _self.adhUser.userPath,
+                            userData: _self.adhUser.data
+                        });
+                    } else {
+                        _self.postMessage("logout", {});
+                    }
+                });
+            }
         }
     }
 
@@ -155,10 +189,10 @@ export class Dummy implements IService {
 }
 
 
-export var factory = (adhConfig : AdhConfig.Type, $window : Window, $rootScope) : IService => {
+export var factory = (adhConfig : AdhConfig.Type, $window : Window, $rootScope, adhUser ?: AdhUser.User) : IService => {
     if (adhConfig.embedded) {
         var postMessageToParent = $window.parent.postMessage.bind($window.parent);
-        return new Service(postMessageToParent, $window, $rootScope);
+        return new Service(postMessageToParent, $window, $rootScope, adhConfig.trusted_domains, adhUser);
     } else {
         console.log("Using dummy CrossWindowMassaging because we are not embedded.");
         return new Dummy();

@@ -5,6 +5,7 @@ import os
 from pyramid.config import Configurator
 from pyramid.request import Request
 from pyramid.response import FileResponse
+from pyramid.settings import aslist
 
 
 def config_view(request):
@@ -21,6 +22,10 @@ def config_view(request):
                                       '/static/js/Packages')
     config['root_path'] = '/' + settings.get('adhocracy.platform_id',
                                              'adhocracy')
+    config['root_path'] = '/' + settings.get('adhocracy.platform_id',
+                                             'adhocracy')
+    config['trusted_domains'] = aslist(
+        settings.get('adhocracy.trusted_domains', []))
     return config
 
 
