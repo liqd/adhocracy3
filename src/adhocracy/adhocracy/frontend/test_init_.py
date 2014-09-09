@@ -14,7 +14,7 @@ class ConfigViewTest(unittest.TestCase):
         request.registry.settings = None
         assert self._call_fut(request) == \
             {'ws_url': 'ws://example.com:80',
-             'pkg_path': '/frontend_static/js/Packages',
+             'pkg_path': '/static/js/Packages',
              'root_path': '/adhocracy',
              }
 
@@ -66,11 +66,11 @@ class ViewsFunctionalTest(unittest.TestCase):
         self.testapp = TestApp(app)
 
     def test_static_view(self):
-        resp = self.testapp.get('/frontend_static/root.html', status=200)
+        resp = self.testapp.get('/static/root.html', status=200)
         assert '200' in resp.status
 
     def test_config_json_view(self):
-        resp = self.testapp.get('/frontend_config.json', status=200)
+        resp = self.testapp.get('/config.json', status=200)
         assert '200' in resp.status
 
     def test_embed_view(self):

@@ -1,6 +1,6 @@
 /**
  * The configuration is actually created by the server and provided
- * as a json file at `/frontend_config.json`.  It is then injected
+ * as a json file at `/config.json`.  It is then injected
  * as a service.
  *
  * This module only holds the interface for type-checking.

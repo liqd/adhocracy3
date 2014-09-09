@@ -80,8 +80,7 @@ Check that everything is running smoothly::
 
 Open the javascript front-end with your web browser::
 
-    xdg-open http://localhost:6541/frontend_static/root.html
-
+    xdg-open http://localhost:6541/
 
 Shutdown everything nicely::
 

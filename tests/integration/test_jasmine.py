@@ -20,7 +20,7 @@ pytestmark = mark.jasmine
 @fixture
 def browser_igtest(browser, server_sample) -> Browser:
     """Return test browser instance with url=igtest.html."""
-    url = server_sample.application_url + 'frontend_static/igtest.html'
+    url = server_sample.application_url + 'static/igtest.html'
     return browser_test_helper(browser, url)
 
 

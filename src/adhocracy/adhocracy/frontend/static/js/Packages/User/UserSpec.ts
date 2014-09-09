@@ -8,12 +8,20 @@ import q = require("q");
 
 export var register = () => {
     describe("User", () => {
+        var locationMock;
+
+        beforeEach(() => {
+            locationMock = <any>jasmine.createSpyObj("locationMock", ["path"]);
+        });
 
         describe("User", () => {
             var adhUser;
             var adhHttpMock;
             var httpMock;
+            var rootScopeMock;
             var windowMock;
+            var elementMock;
+            var angularMock;
             var modernizrMock;
 
             beforeEach(() => {
@@ -33,16 +41,57 @@ export var register = () => {
                 };
                 httpMock.post.and.returnValue(q.when({data: {}}));
 
+                rootScopeMock = jasmine.createSpyObj("rootScope", ["$apply"]);
+
                 windowMock = {
                     localStorage: <any>jasmine.createSpyObj("localStorage", ["getItem", "setItem", "removeItem"])
                 };
                 windowMock.localStorage.getItem.and.returnValue(null);
 
+                elementMock = jasmine.createSpyObj("element", ["on"]);
+                angularMock = jasmine.createSpyObj("angular", ["element"]);
+                angularMock.element.and.returnValue(elementMock);
+
                 modernizrMock = {
                     localstorage: true
                 };
 
-                adhUser = new AdhUser.User(adhHttpMock, q, httpMock, windowMock, modernizrMock);
+                adhUser = new AdhUser.User(adhHttpMock, q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
+            });
+
+            it("registers a handler on 'storage' DOM events", () => {
+                expect(elementMock.on).toHaveBeenCalledWith("storage", jasmine.any(Function));
+            });
+
+            describe("on storage", () => {
+                var fn;
+
+                beforeEach(() => {
+                    spyOn(adhUser, "enableToken");
+                    spyOn(adhUser, "deleteToken");
+
+                    var args = elementMock.on.calls.mostRecent().args;
+                    expect(args[0]).toBe("storage");
+                    fn = <any>args[1];
+                });
+
+                it("calls 'enableToken' if 'user-token' and 'user-path' exist in storage", () => {
+                    windowMock.localStorage.getItem.and.returnValue("huhu");
+                    fn();
+                    expect(adhUser.enableToken).toHaveBeenCalledWith("huhu", "huhu");
+                });
+
+                it("calls 'deleteToken' if neither 'user-token' nor 'user-path' exist in storage", (done) => {
+                    windowMock.localStorage.getItem.and.returnValue(null);
+                    fn();
+                    _.defer(() => {
+                        expect(rootScopeMock.$apply).toHaveBeenCalled();
+                        var callback = rootScopeMock.$apply.calls.mostRecent().args[0];
+                        callback();
+                        expect(adhUser.deleteToken).toHaveBeenCalled();
+                        done();
+                    });
+                });
             });
 
             describe("login", () => {
@@ -233,7 +282,7 @@ export var register = () => {
                     ws_url: "mock",
                     embedded: true
                 };
-                directive = AdhUser.loginDirective(adhConfigMock);
+                directive = AdhUser.loginDirective(adhConfigMock, locationMock);
             });
 
             describe("controller", () => {
@@ -276,16 +325,9 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("resets credentials", (done) => {
+                    it("redirects to / if everything goes well", (done) => {
                         $scopeMock.logIn().then(() => {
-                            expect($scopeMock.credentials).toEqual({nameOrEmail: "", password: ""});
-                            done();
-                        });
-                    });
-                    it("clears $scope.errors if everything goes well", (done) => {
-                        $scopeMock.errors = ["errors"];
-                        $scopeMock.logIn().then(() => {
-                            expect($scopeMock.errors.length).toBe(0);
+                            expect(locationMock.path).toHaveBeenCalledWith("/");
                             done();
                         });
                     });
@@ -296,6 +338,13 @@ export var register = () => {
                             done();
                         });
                     });
+                    it("resets password if something goes wrong", (done) => {
+                        adhUserMock.logIn.and.returnValue(q.reject([{description: "error"}]));
+                        $scopeMock.logIn().then(() => {
+                            expect($scopeMock.credentials.password).toBe("");
+                            done();
+                        });
+                    });
                 });
             });
         });
@@ -303,7 +352,6 @@ export var register = () => {
         describe("registerDirective", () => {
             var directive;
             var adhConfigMock;
-            var locationMock;
 
             beforeEach(() => {
                 adhConfigMock = {
@@ -312,7 +360,6 @@ export var register = () => {
                     ws_url: "mock",
                     embedded: true
                 };
-                locationMock = <any>jasmine.createSpyObj("locationMock", ["path"]);
 
                 directive = AdhUser.registerDirective(adhConfigMock, locationMock);
             });
@@ -360,7 +407,7 @@ export var register = () => {
                     });
                     it("redirects to the root page after register ", (done) => {
                         $scopeMock.register().then(() => {
-                            expect(locationMock.path).toHaveBeenCalledWith("/frontend_static/root.html");
+                            expect(locationMock.path).toHaveBeenCalledWith("/");
                             done();
                         });
                     });

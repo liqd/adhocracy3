@@ -32,6 +32,7 @@ import AdhComment = require("./Packages/Comment/Comment");
 import AdhCommentAdapter = require("./Packages/Comment/Adapter");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
+import AdhVote = require("./Packages/Vote/Vote");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -59,11 +60,14 @@ export var init = (config, meta_api) => {
 
     app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
         $routeProvider
-            .when("/frontend_static/root.html", {
-                templateUrl: "/frontend_static/js/templates/Wrapper.html"
+            .when("/", {
+                templateUrl: "/static/js/templates/Wrapper.html"
+            })
+            .when("/login", {
+                templateUrl: "/static/js/templates/Login.html"
             })
             .when("/register", {
-                template: "<adh-register></adh-register>"
+                templateUrl: "/static/js/templates/Register.html"
             })
             .when("/embed/:widget", {
                 template: "<adh-embed></adh-embed>"
@@ -80,12 +84,15 @@ export var init = (config, meta_api) => {
         $locationProvider.html5Mode(true);
     }]);
 
+    app.value("angular", angular);
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
 
+    app.filter("signum", () => (n : number) : string => n > 0 ? "+" + n.toString() : n.toString());
+
     app.service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", AdhProposal.Service]);
-    app.service("adhUser", ["adhHttp", "$q", "$http", "$window", "Modernizr", AdhUser.User]);
-    app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
+    app.service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", AdhUser.User]);
+    app.directive("adhLogin", ["adhConfig", "$location", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
     app.directive("adhUserIndicator", ["adhConfig", AdhUser.indicatorDirective]);
     app.directive("adhUserMeta", ["adhConfig", AdhUser.metaDirective]);
@@ -112,9 +119,11 @@ export var init = (config, meta_api) => {
         ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
             new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
 
-    app.directive("adhCommentListing",
+    app.directive("adhCommentListingPartial",
         ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
             new Listing.Listing(new AdhCommentAdapter.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)]);
+
+    app.directive("adhCommentListing", ["adhConfig", AdhComment.adhCommentListing]);
 
     app.directive("adhWebSocketTest",
         ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>
@@ -125,7 +134,7 @@ export var init = (config, meta_api) => {
 
     // adhCrossWindowMessaging does work by itself. We only need to inject in anywhere in order to instantiate it.
     app.directive("adhDocumentWorkbench",
-        ["adhConfig", "adhCrossWindowMessaging", (adhConfig) =>
+        ["adhConfig", (adhConfig) =>
             new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig)]);
 
     app.directive("adhResourceWrapper", AdhResourceWidgets.resourceWrapper);
@@ -155,8 +164,12 @@ export var init = (config, meta_api) => {
 
     app.directive("adhTime", ["moment", "$interval", AdhDateTime.createDirective]);
 
+    app.directive("adhVote", ["adhConfig", AdhVote.createDirective]);
+
     // get going
 
-    angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
+    var injector = angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
+    injector.get("adhCrossWindowMessaging");
+
     loadComplete();
 };

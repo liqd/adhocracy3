@@ -86,7 +86,6 @@ export var register = () => {
             describe("manageResize", () => {
                 beforeEach(() => {
                     windowMock.document = {body: {clientHeight: 0}};
-                    service.manageResize();
                 });
 
                 it("registers a resize event listener on $window that calls postMessage", () => {
