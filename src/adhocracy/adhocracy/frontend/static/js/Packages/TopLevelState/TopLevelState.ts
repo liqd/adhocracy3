@@ -38,6 +38,26 @@ export class TopLevelState {
     public onSetContent2Url(fn : (url : string) => void) : void {
         this.eventHandler.on("setContent2Url", fn);
     }
+
+    // FIXME: {set,get}CameFrom should be worked into the class
+    // doc-comment, but I don't feel I understand that comment well
+    // enough to edit it.  (also, the entire toplevelstate thingy will
+    // be refactored soon in order to get state mgmt with link support
+    // right.  see /docs/source/api/frontend-state.rst)
+    //
+    // Open problem: if the user navigates away from the, say, login,
+    // and the cameFrom stack will never be cleaned up...  how do we
+    // clean it up?
+
+    private cameFrom : string;
+
+    public setCameFrom(path : string) : void {
+        this.cameFrom = path;
+    }
+
+    public getCameFrom() : string {
+        return this.cameFrom;
+    }
 }
 
 

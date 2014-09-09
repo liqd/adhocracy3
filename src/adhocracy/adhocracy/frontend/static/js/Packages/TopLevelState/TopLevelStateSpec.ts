@@ -48,6 +48,34 @@ export var register = () => {
             });
         });
 
+        // (This is technically part of the TopLevelState block above,
+        // but its functionality is not very well integrated with the
+        // rest.  See also FIXME above the implementations of
+        // {get,set}CameFrom.)
+
+        describe("{get,set}CameFrom", () => {
+            var adhTopLevelState : AdhTopLevelState.TopLevelState;
+
+            beforeEach(() => {
+                adhTopLevelState = new AdhTopLevelState.TopLevelState(<any>(() => null));
+            });
+
+            it("getCameFrom reads what setCameFrom wrote", () => {
+                var msg : string;
+                msg = "wefoidsut";
+                adhTopLevelState.setCameFrom(msg);
+                expect(adhTopLevelState.getCameFrom()).toBe(msg);
+                msg = ".3587";
+                adhTopLevelState.setCameFrom(msg);
+                expect(adhTopLevelState.getCameFrom()).toBe(msg);
+                expect(adhTopLevelState.getCameFrom()).toBe(msg);
+            });
+
+            it("before first setCameFrom, getCameFrom reads 'undefined'", () => {
+                expect(typeof adhTopLevelState.getCameFrom()).toBe("undefined");
+            });
+        });
+
         describe("MovingColumns", () => {
             var directive;
             var topLevelStateMock;

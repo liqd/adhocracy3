@@ -92,8 +92,8 @@ export var init = (config, meta_api) => {
 
     app.service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", AdhProposal.Service]);
     app.service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", AdhUser.User]);
-    app.directive("adhLogin", ["adhConfig", "$location", AdhUser.loginDirective]);
-    app.directive("adhRegister", ["adhConfig", "$location", AdhUser.registerDirective]);
+    app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
+    app.directive("adhRegister", ["adhConfig", AdhUser.registerDirective]);
     app.directive("adhUserIndicator", ["adhConfig", AdhUser.indicatorDirective]);
     app.directive("adhUserMeta", ["adhConfig", AdhUser.metaDirective]);
     app.value("adhConfig", config);
