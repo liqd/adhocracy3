@@ -257,7 +257,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
     /**
      * Set the mode of a this widget to either "display" or "edit".
      *
-     * this method should  not be used directly. You should rather use
+     * this method should not be used directly. You should rather use
      * instance.wrapper.triggerSetMode in order to change the mode on all
      * resourceWidgets in this resourceWrapper.
      */
