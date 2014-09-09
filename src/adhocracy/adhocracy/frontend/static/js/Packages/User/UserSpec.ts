@@ -11,7 +11,7 @@ export var register = () => {
         var locationMock;
 
         beforeEach(() => {
-            locationMock = <any>jasmine.createSpyObj("locationMock", ["path"]);
+            locationMock = <any>jasmine.createSpyObj("locationMock", ["path", "url"]);
         });
 
         describe("User", () => {
@@ -331,13 +331,13 @@ export var register = () => {
                         var navigateToPath : string = "/osty";
                         adhTopLevelStateMock.getCameFrom.and.returnValue(navigateToPath);
                         $scopeMock.logIn().then(() => {
-                            expect(locationMock.path).toHaveBeenCalledWith(navigateToPath);
+                            expect(locationMock.url).toHaveBeenCalledWith(navigateToPath);
                             done();
                         });
                     });
                     it("redirects to '/' if everything goes well, but getCameFrom() is undefined", (done) => {
                         $scopeMock.logIn().then(() => {
-                            expect(locationMock.path).toHaveBeenCalledWith("/");
+                            expect(locationMock.url).toHaveBeenCalledWith("/");
                             done();
                         });
                     });
