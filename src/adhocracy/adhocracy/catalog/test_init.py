@@ -29,7 +29,3 @@ def test_index_resource(pool_graph_catalog,):
     pool.add('child', testing.DummyResource())
     name_index = find_service(pool, 'catalogs', 'system', 'name')
     assert 'child' in [x for x in name_index.unique_values()]
-
-
-
-
