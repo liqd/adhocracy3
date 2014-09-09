@@ -221,8 +221,14 @@ class IFilterablePool(IPool):
 
     """A pool that can be filtered and aggregated."""
 
-    def filtered_elements(*filters) -> Iterable:
-        """Return elements accepted by all specified filters."""
+    def filtered_elements(depth: int=1, ifaces: Iterable=None) -> Iterable:
+        """Return elements accepted by all specified filters.
+
+        :param depth: 1 to return only direct children, 2 to also return
+                      grandchildren, etc.; `None` to return descendants of
+                      arbitrary nesting depth
+        :param ifaces: return only elements that implement all these interfaces
+        """
 
 
 class IItem(IPool):
