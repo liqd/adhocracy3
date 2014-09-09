@@ -22,27 +22,16 @@ class FilterablePool(Pool):
 
     """A pool that can be filtered and aggregated."""
 
-    def filtered_elements(self, *filters) -> Iterable:
-        """Return elements accepted by all specified filters."""
-        catalog = find_catalog(self, 'system')
-        path = catalog['path']
-        # find all direct children of inst
-        q = path.eq(resource_path(self), depth=1, include_origin=False)
-        resultset = q.execute()
-        for result in resultset:
-            yield result
-
-    def interface_filter(self, iface) -> Iterable:
-        # TODO testing only
-        catalog = find_catalog(self, 'system')
-        # path = catalog['path']
-        # assert len(path.docids()) == 1  # TODO why is this??
-        # name = catalog['name']
-        # assert len(name.docids()) == 1
-        interfaces = catalog['interfaces']
-        # assert len(interfaces.docids()) == 1
-        q = interfaces.eq(iface)
-        resultset = q.execute()
+    def filtered_elements(self, depth=1, ifaces: Iterable=None) -> Iterable:
+        """See interface for docstring."""
+        system_catalog = find_catalog(self, 'system')
+        path_index = system_catalog['path']
+        query = path_index.eq(resource_path(self), depth=depth,
+                              include_origin=False)
+        if ifaces:
+            interface_index = system_catalog['interfaces']
+            query &= interface_index.all(ifaces)
+        resultset = query.execute()
         for result in resultset:
             yield result
 
