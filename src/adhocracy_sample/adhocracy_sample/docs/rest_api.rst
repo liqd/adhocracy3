@@ -704,11 +704,11 @@ FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
 
 Resources with PostPool, example Comments
--------------------------------------------
+-----------------------------------------
 
 To give another example of a versionable content type, we can write comments
 about proposals.
-The proposal has a commentable sheets that allows us to comment::
+The proposal has a commentable sheet::
 
     >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
     >>> commentable = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']
