@@ -294,8 +294,8 @@ export var register = () => {
                 beforeEach(() => {
                     $scopeMock = {};
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn"]);
-                    adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["getCameFrom", "setCameFrom"]);
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
+                    adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["getCameFrom", "setCameFrom"]);
                     controller = <any>(directive.controller[4]);
                     controller(adhUserMock, adhTopLevelStateMock, $scopeMock, locationMock);
                 });
@@ -327,7 +327,15 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("redirects to / if everything goes well", (done) => {
+                    it("redirects to TopLevelState.getCameFrom() if everything goes well", (done) => {
+                        var navigateToPath : string = "/osty";
+                        adhTopLevelStateMock.getCameFrom.and.returnValue(navigateToPath);
+                        $scopeMock.logIn().then(() => {
+                            expect(locationMock.path).toHaveBeenCalledWith(navigateToPath);
+                            done();
+                        });
+                    });
+                    it("redirects to '/' if everything goes well, but getCameFrom() is undefined", (done) => {
                         $scopeMock.logIn().then(() => {
                             expect(locationMock.path).toHaveBeenCalledWith("/");
                             done();
@@ -344,14 +352,6 @@ export var register = () => {
                         adhUserMock.logIn.and.returnValue(q.reject([{description: "error"}]));
                         $scopeMock.logIn().then(() => {
                             expect($scopeMock.credentials.password).toBe("");
-                            done();
-                        });
-                    });
-                    it("navigates to TopLevelState.getCameFrom() after success", (done) => {
-                        var navigateToPath : string = "/osty";
-                        adhTopLevelStateMock.getCameFrom.and.returnValue(navigateToPath);
-                        $scopeMock.logIn().then(() => {
-                            expect(locationMock.path).toHaveBeenCalledWith(navigateToPath);
                             done();
                         });
                     });
@@ -383,9 +383,9 @@ export var register = () => {
                 beforeEach(() => {
                     $scopeMock = {};
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register", "logIn"]);
-                    adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["getCameFrom", "setCameFrom"]);
                     adhUserMock.register.and.returnValue(q.when(undefined));
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
+                    adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["getCameFrom", "setCameFrom"]);
                     controller = <any>(directive.controller[4]);
                     controller(adhUserMock, adhTopLevelStateMock, $scopeMock, locationMock);
                 });
