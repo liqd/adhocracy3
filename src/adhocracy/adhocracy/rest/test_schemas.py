@@ -12,14 +12,6 @@ class ISheetA(ISheet):
     pass
 
 
-class JSONDummyRequest(testing.DummyRequest):
-
-    @property
-    def json_body(self):
-        return json.loads(self.body)
-
-
-
 @fixture
 def sheet_metas():
     from adhocracy.interfaces import sheet_metadata
@@ -115,10 +107,10 @@ class TestPOSTResourceRequestSchema:
 class TestDeferredValidatePostContentType:
 
     @fixture
-    def request(self, mock_resource_registry):
-        request = JSONDummyRequest()
-        request.registry.content = mock_resource_registry
-        return request
+    def request(self, mock_resource_registry, cornice_request):
+        cornice_request.body = '{}'
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
 
     def _call_fut(self, node, kw):
         from adhocracy.rest.schemas import deferred_validate_post_content_type
@@ -137,11 +129,10 @@ class TestDeferredValidatePostContentType:
 class TestAddPostRequestSubSchemas:
 
     @fixture
-    def request(self, mock_resource_registry):
-        request = JSONDummyRequest(body='{}')
-        request.registry.content = mock_resource_registry
-        return request
-
+    def request(self, mock_resource_registry, cornice_request):
+        cornice_request.body = '{}'
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
 
     def _call_fut(self, node, kw):
         from adhocracy.rest.schemas import add_post_data_subschemas
@@ -238,10 +229,10 @@ class TestPUTResourceRequestSchema:
 class TestAddPutRequestSubSchemasUnitTest:
 
     @fixture
-    def request(self, mock_resource_registry):
-        request = JSONDummyRequest(body='{}')
-        request.registry.content = mock_resource_registry
-        return request
+    def request(self, mock_resource_registry, cornice_request):
+        cornice_request.body = '{}'
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
 
     def _call_fut(self, node, kw):
         from adhocracy.rest.schemas import add_put_data_subschemas

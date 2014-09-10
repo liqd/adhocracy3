@@ -19,6 +19,7 @@ def root_factory(request, t=transaction, g=get_connection,
 
     """
     # Set CORS headers
+    # FIXME: use NewResponse subscriber instead and move it to adhocracy.rest
     request.response = Response()
     request.response.headers.update({
         'Access-Control-Allow-Origin': '*',

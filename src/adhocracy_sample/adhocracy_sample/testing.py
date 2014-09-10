@@ -11,7 +11,8 @@ def app_sample(zeo, settings, websocket):
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy_sample.root_factory)
     configurator.include(adhocracy_sample)
-    return configurator.make_wsgi_app()
+    app = configurator.make_wsgi_app()
+    return app
 
 
 @fixture(scope='class')

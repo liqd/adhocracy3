@@ -306,7 +306,8 @@ def app(zeo, settings, websocket):
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy.root_factory)
     configurator.include(adhocracy)
-    return configurator.make_wsgi_app()
+    app = configurator.make_wsgi_app()
+    return app
 
 
 @fixture(scope='class')

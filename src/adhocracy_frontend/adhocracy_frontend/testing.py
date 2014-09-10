@@ -15,7 +15,7 @@ def frontend(request) -> StopableWSGIServer:
     config = Configurator(settings={})
     includeme(config)
     app = config.make_wsgi_app()
-    server = StopableWSGIServer.create(app)
+    server = StopableWSGIServer.create(app, expose_tracebacks=False)
     request.addfinalizer(server.shutdown)
     return server
 
@@ -29,7 +29,7 @@ def frontend_with_backend(request, backend):
     config = Configurator(settings=settings)
     includeme(config)
     app = config.make_wsgi_app()
-    server = StopableWSGIServer.create(app)
+    server = StopableWSGIServer.create(app, expose_tracebacks=False)
     request.addfinalizer(server.shutdown)
     return server
 

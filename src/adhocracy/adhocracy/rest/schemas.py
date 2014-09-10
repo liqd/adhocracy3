@@ -171,7 +171,7 @@ class POSTLoginEmailRequestSchema(colander.Schema):
     password = Password(missing=colander.required)
 
 
-class BatchMethod(colander.SchemaNode):
+class BatchHTTPMethod(colander.SchemaNode):
 
     """An HTTP method in a batch request."""
 
@@ -204,7 +204,7 @@ class POSTBatchRequestItem(colander.Schema):
 
     """A single item in a batch request, encoding a single request."""
 
-    method = BatchMethod()
+    method = BatchHTTPMethod()
     path = BatchRequestPath()
     body = colander.SchemaNode(colander.Mapping(unknown='preserve'),
                                missing={})

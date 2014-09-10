@@ -10,9 +10,12 @@ from pytest import raises
 #  helper  #
 ############
 
-def add_node_binding(node, context=None):
+def add_node_binding(node, context=None, request=None):
     node.bindings = dict()
-    node.bindings['context'] = context
+    if context is not None:
+        node.bindings['context'] = context
+    if request is not None:
+        node.bindings['request'] = request
     return node
 
 ###########
