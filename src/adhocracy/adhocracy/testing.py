@@ -252,8 +252,8 @@ def ws_settings(request) -> Configurator:
 @fixture(scope='class')
 def zeo(request) -> bool:
     """Start the test zeo server."""
-    is_running = os.path.isfile('var/test_zeodata/ZEO.pid')
-    if is_running:
+    pid_file = 'var/test_zeodata/ZEO.pid'
+    if _is_running(pid_file):
         return True
     process = subprocess.Popen('bin/runzeo -Cetc/test_zeo.conf', shell=True,
                                stderr=subprocess.STDOUT)
@@ -262,7 +262,7 @@ def zeo(request) -> bool:
     def fin():
         print('teardown zeo server')
         process.kill()
-        _kill_pid_in_file('var/test_zeodata/ZEO.pid')
+        _kill_pid_in_file(pid_file)
 
     request.addfinalizer(fin)
     return True
@@ -271,8 +271,8 @@ def zeo(request) -> bool:
 @fixture(scope='class')
 def websocket(request, zeo, ws_settings) -> bool:
     """Start websocket server."""
-    is_running = os.path.isfile(ws_settings['pid_file'])
-    if is_running:
+    pid_file = ws_settings['pid_file']
+    if _is_running(pid_file):
         return True
     config_file = request.config.getvalue('pyramid_config')
     process = subprocess.Popen('bin/start_ws_server ' + config_file,
@@ -283,7 +283,7 @@ def websocket(request, zeo, ws_settings) -> bool:
     def fin():
         print('teardown websocket server')
         process.kill()
-        _kill_pid_in_file(ws_settings['pid_file'])
+        _kill_pid_in_file(pid_file)
 
     request.addfinalizer(fin)
     return True
@@ -295,8 +295,19 @@ def _kill_pid_in_file(path_to_pid_file):
         pid_int = int(pid)
         os.kill(pid_int, 15)
         time.sleep(1)
-        if os.path.isfile(path_to_pid_file):
+        subprocess.call(['rm', path_to_pid_file])
+
+
+def _is_running(path_to_pid_file) -> bool:
+    if os.path.isfile(path_to_pid_file):
+        pid = open(path_to_pid_file).read().strip()
+        pid_int = int(pid)
+        try:
+            os.kill(pid_int, 0)
+        except OSError:
             subprocess.call(['rm', path_to_pid_file])
+        else:
+            return True
 
 
 @fixture(scope='class')
