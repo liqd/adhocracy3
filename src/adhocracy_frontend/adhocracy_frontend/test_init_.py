@@ -17,6 +17,7 @@ class ConfigViewTest(unittest.TestCase):
              'pkg_path': '/static/js/Packages',
              'rest_url': 'http://localhost:6541',
              'rest_platform_path': '/adhocracy',
+             'trusted_domains': [],
              }
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):

@@ -15,7 +15,8 @@ export var register = () => {
             rest_url: "mock",
             rest_platform_path: "mock",
             ws_url: "mock",
-            embedded: false
+            embedded: false,
+            trusted_domains: []
         };
 
         // constructor for a mock raw web socket that leaks the

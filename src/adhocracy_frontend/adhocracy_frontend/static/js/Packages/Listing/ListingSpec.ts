@@ -15,7 +15,8 @@ var config : Config.Type = {
     rest_url: "mock",
     rest_platform_path: "mock",
     ws_url: "mock",
-    embedded: false
+    embedded: false,
+    trusted_domains: []
 };
 
 var createAdhHttpMock = () => {

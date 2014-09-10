@@ -1,4 +1,7 @@
+import _ = require("lodash");
+
 import AdhHttp = require("../Http/Http");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhConfig = require("../Config/Config");
 
 var pkgLocation = "/User";
@@ -10,7 +13,7 @@ export interface IUserBasic {
 }
 
 
-interface IScopeLogin {
+export interface IScopeLogin {
     user : User;
     credentials : {
         nameOrEmail : string;
@@ -23,7 +26,7 @@ interface IScopeLogin {
 }
 
 
-interface IScopeRegister {
+export interface IScopeRegister {
     input : {
         username : string;
         email : string;
@@ -57,7 +60,8 @@ var bindServerErrors = (
 export class User {
     public loggedIn : boolean = false;
     public data : IUserBasic;
-    private token : string;
+    public token : string;
+    public userPath : string;
 
     constructor(
         private adhHttp : AdhHttp.Service<any>,
@@ -66,8 +70,7 @@ export class User {
         private $rootScope : ng.IScope,
         private $window : Window,
         private angular : ng.IAngularStatic,
-        private Modernizr,
-        private _
+        private Modernizr
     ) {
         var _self : User = this;
 
@@ -81,7 +84,9 @@ export class User {
                     );
                 } else if (_self.$window.localStorage.getItem("user-token") === null &&
                         _self.$window.localStorage.getItem("user-path") === null) {
-                    // For some reason, $apply is necessary here to trigger a UI update
+                    // $apply is necessary here to trigger a UI
+                    // update.  the need for _.defer is explained
+                    // here: http://stackoverflow.com/a/17958847
                     _.defer(() => _self.$rootScope.$apply(() => {
                         _self.deleteToken();
                     }));
@@ -99,13 +104,14 @@ export class User {
         var _self : User = this;
 
         _self.token = token;
+        _self.userPath = userPath;
         _self.$http.defaults.headers.common["X-User-Token"] = token;
         _self.$http.defaults.headers.common["X-User-Path"] = userPath;
-        _self.loggedIn = true;
 
         return _self.adhHttp.get(userPath)
             .then((resource) => {
                 _self.data = resource.data["adhocracy.sheets.user.IUserBasic"];
+                _self.loggedIn = true;
                 return resource;  // FIXME this is only here because of a bug in DefinitelyTyped
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
@@ -138,6 +144,7 @@ export class User {
         delete _self.$http.defaults.headers.common["X-User-Token"];
         delete _self.$http.defaults.headers.common["X-User-Path"];
         _self.token = undefined;
+        _self.userPath = undefined;
         _self.data = undefined;
         _self.loggedIn = false;
     }
@@ -150,6 +157,10 @@ export class User {
         // the body, so adhHttp must not be used (because it
         // implicitly does importContent / exportContent which expect
         // Types.Content)!
+
+        // FIXME: Use adhHttp.post, not $http.post.  In the future,
+        // there may be other features of adhHttp that we want to use
+        // implicitly, such as caching.
 
         if (nameOrEmail.indexOf("@") === -1) {
             promise = _self.$http.post("/login_username", {
@@ -205,66 +216,86 @@ export class User {
 }
 
 
-export var loginDirective = (adhConfig : AdhConfig.Type, $location : ng.ILocationService) => {
-    return {
-        restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
-        scope: {},
-        controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeLogin) : void => {
-            $scope.errors = [];
+export var loginController = (
+    adhUser : User,
+    adhTopLevelState : AdhTopLevelState.TopLevelState,
+    $scope : IScopeLogin,
+    $location : ng.ILocationService
+) : void => {
+    $scope.errors = [];
 
-            $scope.credentials = {
-                nameOrEmail: "",
-                password: ""
-            };
+    $scope.credentials = {
+        nameOrEmail: "",
+        password: ""
+    };
 
-            $scope.resetCredentials = () => {
-                $scope.credentials.nameOrEmail = "";
-                $scope.credentials.password = "";
-            };
+    $scope.resetCredentials = () => {
+        $scope.credentials.nameOrEmail = "";
+        $scope.credentials.password = "";
+    };
 
-            $scope.logIn = () => {
-                return adhUser.logIn(
-                    $scope.credentials.nameOrEmail,
-                    $scope.credentials.password
-                ).then(() => {
-                    $location.path("/");
-                }, (errors) => {
-                    bindServerErrors($scope, errors);
-                    $scope.credentials.password = "";
-                });
-            };
-        }]
+    $scope.logIn = () => {
+        return adhUser.logIn(
+            $scope.credentials.nameOrEmail,
+            $scope.credentials.password
+        ).then(() => {
+            var returnToPage : string = adhTopLevelState.getCameFrom();
+            $location.url((typeof returnToPage === "string") ? returnToPage : "/");
+        }, (errors) => {
+            bindServerErrors($scope, errors);
+            $scope.credentials.password = "";
+        });
     };
 };
 
 
-export var registerDirective = (adhConfig : AdhConfig.Type, $location : ng.ILocationService) => {
+export var loginDirective = (adhConfig : AdhConfig.Type) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
+        scope: {},
+        controller: ["adhUser", "adhTopLevelState", "$scope", "$location", loginController]
+    };
+};
+
+
+export var registerController = (
+    adhUser : User,
+    adhTopLevelState : AdhTopLevelState.TopLevelState,
+    $scope : IScopeRegister,
+    $location : ng.ILocationService
+) => {
+    $scope.input = {
+        username: "",
+        email: "",
+        password: "",
+        passwordRepeat: ""
+    };
+
+    $scope.errors = [];
+
+    $scope.register = () : ng.IPromise<void> => {
+        return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
+            .then((response) => {
+                $scope.errors = [];
+                return adhUser.logIn($scope.input.username, $scope.input.password).then(
+                    () => {
+                        var returnToPage : string = adhTopLevelState.getCameFrom();
+                        $location.path((typeof returnToPage === "string") ? returnToPage : "/");
+                    },
+                    (errors) => bindServerErrors($scope, errors)
+                );
+            }, (errors) => bindServerErrors($scope, errors));
+    };
+};
+
+
+export var registerDirective = (adhConfig : AdhConfig.Type) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        controller: ["adhUser", "$scope", (adhUser : User, $scope : IScopeRegister) => {
-            $scope.input = {
-                username: "",
-                email: "",
-                password: "",
-                passwordRepeat: ""
-            };
-
-            $scope.errors = [];
-
-            $scope.register = () : ng.IPromise<void> => {
-                return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
-                    .then((response) => {
-                        $scope.errors = [];
-                        return adhUser.logIn($scope.input.username, $scope.input.password).then(
-                            () => { $location.path("/"); },
-                            (errors) => bindServerErrors($scope, errors)
-                        );
-                    }, (errors) => bindServerErrors($scope, errors));
-            };
-        }]
+        controller: ["adhUser", "adhTopLevelState", "$scope", "$location", registerController]
     };
 };
 
