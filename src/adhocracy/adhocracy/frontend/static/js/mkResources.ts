@@ -627,6 +627,9 @@ mkFieldType = (field : MetaApi.ISheetField) : string => {
     case "adhocracy.schema.Reference":
         result = "string";
         break;
+    case "adhocracy.schema.PostPool":
+        result = "string";
+        break;
     default:
         throw "mkFieldType: unknown value " + field.valuetype;
     }

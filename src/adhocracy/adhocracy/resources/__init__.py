@@ -12,6 +12,7 @@ from zope.interface import alsoProvides
 
 from adhocracy.interfaces import ResourceMetadata
 from adhocracy.interfaces import IPool
+from adhocracy.interfaces import IServicePool
 from adhocracy.interfaces import IItemVersion
 from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IResource
@@ -64,6 +65,10 @@ class ResourceFactory:
             name = parent.next_name(resource, prefix=prefix)
         if name in parent:
             raise KeyError('Duplicate name: {}'.format(name))
+        if IServicePool.providedBy(resource):
+            name = self.meta.content_name
+            parent.add_service(name, resource, send_events=False)
+            return
         if name == '':
             raise KeyError('Empty name')
         parent.add(name, resource, send_events=False)

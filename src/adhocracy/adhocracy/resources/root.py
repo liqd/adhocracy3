@@ -10,7 +10,7 @@ from adhocracy.interfaces import IPool
 from adhocracy.resources import add_resource_type_to_registry
 from adhocracy.resources.pool import pool_metadata
 from adhocracy.resources.pool import IBasicPool
-from adhocracy.resources.principal import IPrincipalsPool
+from adhocracy.resources.principal import IPrincipalsService
 
 
 class IRootPool(IPool, IRoot):
@@ -41,16 +41,13 @@ def _add_graph(context, registry):
 
 def _add_catalog_service(context, registry):
     catalogs = registry.content.create('Catalogs')
-    # FIXME add the 'add_service' method to IPool
     context.add_service('catalogs', catalogs, registry=registry)
     catalogs.add_catalog('system')
 
 
 def _add_principals_service(context, registry):
-    appstructs = {'adhocracy.sheets.name.IName': {'name': 'principals'}}
-    principals = registry.content.create(IPrincipalsPool.__identifier__,
-                                         appstructs=appstructs)
-    context.add_service('principals', principals, registry=registry)
+    registry.content.create(IPrincipalsService.__identifier__,
+                            parent=context)
 
 
 def _add_acl_to_app_root(context, registry):

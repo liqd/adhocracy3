@@ -66,7 +66,8 @@ export interface IResourceWrapperController {
 }
 
 /**
- * Directive that wraps resourceWidgets, manages communication and also takes
+ * Directive that wraps resourceWidgets, manages communication between
+ * parent and child resources in the DAG, and takes
  * care of dispatching a HTTP request on submit.
  *
  * You can pass two callbacks to this directive:
@@ -206,13 +207,18 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
                 mode: "@",
                 path: "@"
             },
-            link: (scope : S, element, attrs, wrapper : IResourceWrapperController) => {
+            link: (scope : S, element, attrs, wrapper) => {
                 self.link(scope, element, attrs, wrapper);
             }
         };
     }
 
-    public link(scope : S, element, attrs, wrapper : IResourceWrapperController) : IResourceWidgetInstance<R, S> {
+    public link(
+        scope : S,
+        element : ng.IAugmentedJQuery,
+        attrs : ng.IAttributes,
+        wrapper : IResourceWrapperController
+    ) : IResourceWidgetInstance<R, S> {
         var self : ResourceWidget<R, S> = this;
 
         var instance : IResourceWidgetInstance<R, S> = {
@@ -257,7 +263,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
     /**
      * Set the mode of a this widget to either "display" or "edit".
      *
-     * this method should  not be used directly. You should rather use
+     * this method should not be used directly. You should rather use
      * instance.wrapper.triggerSetMode in order to change the mode on all
      * resourceWidgets in this resourceWrapper.
      */
@@ -308,7 +314,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
     /**
      * Create resource(s) from scope.
      *
-     * Calls _create/_edit based on whether scope.path is preliminary.
+     * Calls _create/_edit if scope.path is preliminary/not preliminary.
      */
     public provide(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<R[]> {
         if (this.adhPreliminaryNames.isPreliminary(instance.scope.path)) {

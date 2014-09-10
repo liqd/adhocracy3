@@ -242,3 +242,22 @@ class GetUserUnitTest(unittest.TestCase):
         user = self.context['user']
         self.request._dummy_userid = '/user'
         assert self._make_one(self.request) == user
+
+
+class TestNormalizeToTuple:
+
+    def _call_fut(self, value):
+        from adhocracy.utils import normalize_to_tuple
+        return normalize_to_tuple(value)
+
+    def test_with_tuple(self):
+        assert self._call_fut((1,)) == (1,)
+
+    def test_with_string(self):
+        assert self._call_fut("ab") == ("ab",)
+
+    def test_with_non_string_sequence(self):
+        assert self._call_fut([1]) == (1,)
+
+    def test_with_dict(self):
+        assert self._call_fut({1: 2}) == ({1: 2},)

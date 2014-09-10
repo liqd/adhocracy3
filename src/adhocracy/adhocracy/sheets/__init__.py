@@ -15,6 +15,7 @@ from adhocracy.interfaces import sheet_metadata
 from adhocracy.interfaces import SheetMetadata
 from adhocracy.schema import Reference
 from adhocracy.utils import remove_keys_from_dict
+from adhocracy.utils import normalize_to_tuple
 
 
 @implementer(IResourceSheet)
@@ -130,8 +131,7 @@ class GenericResourceSheet(PropertySheet):
         return bool(appstruct)
 
     def _omit_forbidden_keys(self, appstruct: dict, omit=()):
-        omit = omit if isinstance(omit, tuple) else (omit,)
-        omit_keys = omit + tuple(self._readonly_keys)
+        omit_keys = normalize_to_tuple(omit) + tuple(self._readonly_keys)
         return remove_keys_from_dict(appstruct, keys_to_remove=omit_keys)
 
     @reify
