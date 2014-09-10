@@ -49,9 +49,14 @@ export var register = () => {
             });
 
             describe("poolPath", () => {
-                it("returns the parent path of the container path", () => {
+                it("returns the post_pool of the container path", () => {
                     var resource = {
-                        path: "some/path/parent"
+                        path: "some/path/parent",
+                        data: {
+                            "adhocracy_sample.sheets.comment.ICommentable": {
+                                post_pool: "some/path"
+                            }
+                        }
                     };
 
                     expect(adapter.poolPath(resource)).toEqual("some/path");

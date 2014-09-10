@@ -20,10 +20,7 @@ export class ListingCommentableAdapter implements AdhListing.IListingContainerAd
     }
 
     public poolPath(container : AdhResource.Content<SICommentable.HasAdhocracySampleSheetsCommentICommentable>) {
-        // NOTE: If poolPath is defined like this, answers to comments are placed
-        // inside other comment. This should be changed if we prefer to flatten
-        // the hierarchy.
-        return Util.parentPath(container.path);
+        return container.data["adhocracy_sample.sheets.comment.ICommentable"].post_pool;
     }
 }
 
