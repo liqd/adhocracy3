@@ -1,37 +1,58 @@
 """Public fixtures to work with the test browser and the adhocracy frontend."""
+import subprocess
+import time
 import types
 import json
 
 from pytest import fixture
-from pyramid.config import Configurator
 from splinter import Browser
-from webtest.http import StopableWSGIServer
+
+from adhocracy.testing import _get_settings
+from adhocracy.testing import _kill_pid_in_file
+from adhocracy.testing import _is_running
+
+
+def pytest_addoption(parser):
+    """Add pytest option `frontend_pc`."""
+    parser.addoption(
+        '--frontend_pc',
+        action='store',
+        default='etc/frontend_test.ini',
+        metavar='path',
+        dest='frontend_pyramid_config',
+    )
 
 
 @fixture(scope='session')
-def frontend(request) -> StopableWSGIServer:
-    """Return a http server that only serves the static frontend files."""
-    from adhocracy_frontend import includeme
-    config = Configurator(settings={})
-    includeme(config)
-    app = config.make_wsgi_app()
-    server = StopableWSGIServer.create(app, expose_tracebacks=False)
-    request.addfinalizer(server.shutdown)
-    return server
+def frontend_url(request) -> dict:
+    """Return the frontend url."""
+    settings = _get_settings(request, 'server:main', 'frontend_pyramid_config')
+    host = settings['host']
+    port = settings['port']
+    url = 'http://{}:{}/'.format(host, port)
+    return url
 
 
 @fixture(scope='class')
-def frontend_with_backend(request, backend):
-    """Return the frontend http server and start the backend server."""
-    from adhocracy_frontend import includeme
-    settings = {'adhocracy.frontend.rest_url': backend.application_url,
-                }
-    config = Configurator(settings=settings)
-    includeme(config)
-    app = config.make_wsgi_app()
-    server = StopableWSGIServer.create(app, expose_tracebacks=False)
-    request.addfinalizer(server.shutdown)
-    return server
+def frontend(request) -> bool:
+    """Return a http server that only serves the static frontend files."""
+    pid_file = 'var/frontend_pyramid.pid'
+    if _is_running(pid_file):
+        return True
+
+    def fin():
+        print('teardown zeo server')
+        process.kill()
+        _kill_pid_in_file(pid_file)
+
+    config_file = request.config.getvalue('frontend_pyramid_config')
+    process = subprocess.Popen('bin/pserve ' + config_file
+                               + ' --daemon --pid-file=' + pid_file,
+                               shell=True,
+                               stderr=subprocess.STDOUT)
+    time.sleep(1)
+    request.addfinalizer(fin)
+    return True
 
 
 def evaluate_script_with_kwargs(self, code: str, **kwargs) -> object:
@@ -88,11 +109,10 @@ def angular_app_loaded(browser: Browser) -> bool:
 
 
 @fixture
-def browser_root(browser, frontend_with_backend):
+def browser_root(browser, frontend, backend, frontend_url):
     """Return test browser, start application and go to `root.html`."""
     add_helper_methods_to_splinter_browser_wrapper(browser)
-    url = frontend_with_backend.application_url
-    browser.visit(url)
+    browser.visit(frontend_url)
     browser.wait_for_condition(angular_app_loaded, 5)
     return browser
 
@@ -113,7 +133,7 @@ def browser_test_helper(browser, url) -> Browser:
 
 
 @fixture
-def browser_test(browser, frontend) -> Browser:
+def browser_test(browser, frontend, frontend_url) -> Browser:
     """Return test browser instance with url=test.html."""
-    url = frontend.application_url + 'static/test.html'
+    url = frontend_url + 'static/test.html'
     return browser_test_helper(browser, url)

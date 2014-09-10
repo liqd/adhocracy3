@@ -226,10 +226,10 @@ def mock_user_locator(registry) -> Mock:
     return locator
 
 
-def _get_settings(request, part):
+def _get_settings(request, part, config_path_key='pyramid_config'):
     """Return settings of a config part."""
     config_parser = ConfigParser()
-    config_file = request.config.getvalue('pyramid_config')
+    config_file = request.config.getvalue(config_path_key)
     config_parser.read(config_file)
     settings = {}
     for option, value in config_parser.items(part):
@@ -239,8 +239,13 @@ def _get_settings(request, part):
 
 @fixture(scope='session')
 def settings(request) -> dict:
-    """Return pyramid settings."""
-    return _get_settings(request, 'app:main')
+    """Return app:main and server:main settings."""
+    settings = {}
+    app = _get_settings(request, 'app:main')
+    settings.update(app)
+    server = _get_settings(request, 'server:main')
+    settings.update(server)
+    return settings
 
 
 @fixture(scope='session')
@@ -322,10 +327,9 @@ def app(zeo, settings, websocket):
 
 
 @fixture(scope='class')
-def backend(request, ws_settings, app):
+def backend(request, settings, app):
     """Return a http server with the adhocracy wsgi application."""
-    rest_url = ws_settings['rest_url']
-    port = rest_url.split(':')[2]
+    port = settings['port']
     backend = StopableWSGIServer.create(app, port=port)
     request.addfinalizer(backend.shutdown)
     return backend
