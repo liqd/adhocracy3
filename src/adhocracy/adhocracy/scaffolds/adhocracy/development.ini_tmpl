@@ -26,6 +26,7 @@ substanced.autoevolve = true
 adhocracy.ws_url = ws://localhost:8080
 # The id for the root level adhocracy resource
 adhocracy.platform_id = adhocracy
+adhocracy.websockets.rest_url = http://localhost:6541
 
 mail.queue_path = %(here)s/../var/mail
 mail.default_sender = admin@example.com
@@ -38,6 +39,8 @@ port = 6541
 [websockets]
 port = 8080
 pid_file = var/WS_SERVER.pid
+# The URL prefix to let the websocket server create/resolve resource urls
+rest_url = http://localhost:6541
 
 # Begin logging configuration
 

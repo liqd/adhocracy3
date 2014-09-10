@@ -54,8 +54,14 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         zodb_root['app_root'] = app_root
         app_root.__name__ = app_root.__parent__ = None
         self._child = app_root['child']
+        rest_url = 'http://localhost:6541'
+        request = testing.DummyRequest()
+        request.root = app_root
+        request.application_url = rest_url
+        self.request = request
         QueueingClientCommunicator.zodb_connection = DummyZODBConnection(
             zodb_root=zodb_root)
+        QueueingClientCommunicator.rest_url = rest_url
         self._comm = QueueingClientCommunicator()
         self._peer = 'websocket peer'
         self._connect()
@@ -83,52 +89,52 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert len(self._comm.queue) == 0
 
     def test_onMessage_valid_subscribe(self):
-        msg = build_message({'action': 'subscribe', 'resource': '/child'})
+        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'status': 'ok',
                                        'action': 'subscribe',
-                                       'resource': '/child'}
+                                       'resource': self.request.application_url + '/child/'}
 
     def test_onMessage_valid_unsubscribe(self):
-        msg = build_message({'action': 'subscribe', 'resource': '/child'})
+        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
-        msg = build_message({'action': 'unsubscribe', 'resource': '/child'})
+        msg = build_message({'action': 'unsubscribe', 'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 2
         assert self._comm.queue[-1] == {'status': 'ok',
                                         'action': 'unsubscribe',
-                                        'resource': '/child'}
+                                        'resource': self.request.application_url + '/child/'}
 
     def test_onMessage_redundant_subscribe(self):
-        msg = build_message({'action': 'subscribe', 'resource': '/child'})
+        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 2
         assert self._comm.queue[-1] == {'status': 'redundant',
                                         'action': 'subscribe',
-                                        'resource': '/child'}
+                                        'resource': self.request.application_url + '/child/'}
 
     def test_onMessage_resubscribe_after_unsubscribe(self):
-        msg = build_message({'action': 'subscribe', 'resource': '/child'})
+        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
-        msg = build_message({'action': 'unsubscribe', 'resource': '/child'})
+        msg = build_message({'action': 'unsubscribe', 'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
-        msg = build_message({'action': 'subscribe', 'resource': '/child'})
+        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 3
         assert self._comm.queue[-1] == {'status': 'ok',
                                         'action': 'subscribe',
-                                        'resource': '/child'}
+                                        'resource': self.request.application_url + '/child/'}
 
     def test_onMessage_subscribe_item_version(self):
         from adhocracy.interfaces import IItemVersion
         alsoProvides(self._child, IItemVersion)
-        msg = build_message({'action': 'subscribe', 'resource': '/child'})
+        msg = build_message({'action': 'subscribe', 'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'error': 'subscribe_not_supported',
-                                       'details': '/child'}
+                                       'details': self.request.application_url + '/child/'}
 
     def test_onMessage_with_binary_message(self):
         self._comm.onMessage(b'DEADBEEF', True)
@@ -153,14 +159,14 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert 'not a mapping type' in last_message['details']
 
     def test_onMessage_with_wrong_field(self):
-        msg = build_message({'event': 'created', 'resource': '/child'})
+        msg = build_message({'event': 'created', 'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'error': 'invalid_json',
                                        'details': 'action: Required'}
 
     def test_onMessage_with_invalid_action(self):
-        msg = build_message({'action': 'just do it!', 'resource': '/child'})
+        msg = build_message({'action': 'just do it!', 'resource': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'error': 'unknown_action',
@@ -184,19 +190,30 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         assert 'action' in last_message['details']
         assert 'resource' in last_message['details']
 
-    def test_onMessage_with_invalid_json_type(self):
-        msg = build_message({'action': 'subscribe', 'resource': 7})
+    def test_onMessage_with_no_mapping(self):
+        self._comm.onMessage(b'1', False)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'error': 'invalid_json',
+            'details': ': "1" is not a mapping type: Does not implement dict-like functionality.'}
+
+    def test_onMessage_with_wrong_field_name(self):
+        msg = build_message({'action': 'subscribe', 'wrong_name': self.request.application_url + '/child/'})
         self._comm.onMessage(msg, False)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'error': 'invalid_json',
-            'details': 'coercing to str: need bytes, bytearray or '
-                       'buffer-like object, int found'}
+                                       'details': 'resource: Required'}
+
+    def test_onMessage_with_wrong_resource_value(self):
+        msg = build_message({'action': 'subscribe', 'resource': 7})
+        self._comm.onMessage(msg, False)
+        assert len(self._comm.queue) == 1
+        assert self._comm.queue[0] == {'error': 'unknown_resource', 'details': 7}
 
     def test_send_modified_notification(self):
         self._comm.send_modified_notification(self._child)
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'event': 'modified',
-                                       'resource': '/child'}
+                                       'resource': self.request.application_url + '/child/'}
 
     def test_send_child_notification(self):
         child = self._child
@@ -204,8 +221,8 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         self._comm.send_child_notification('new', child, child['grandchild'])
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'event': 'new_child',
-                                       'resource': '/child',
-                                       'child': '/child/grandchild'}
+                                       'resource': self.request.application_url + '/child/',
+                                       'child': self.request.application_url + '/child/grandchild/'}
 
     def test_send_new_version_notification(self):
         child = self._child
@@ -213,8 +230,8 @@ class ClientCommunicatorUnitTests(unittest.TestCase):
         self._comm.send_new_version_notification(child, child['version_007'])
         assert len(self._comm.queue) == 1
         assert self._comm.queue[0] == {'event': 'new_version',
-                                       'resource': '/child',
-                                       'version': '/child/version_007'}
+                                       'resource': self.request.application_url + '/child/',
+                                       'version': self.request.application_url + '/child/version_007/'}
 
     def test_client_may_send_notifications_if_localhost(self):
         self._connect('localhost:1234')
@@ -242,16 +259,22 @@ class EventDispatchUnitTests(unittest.TestCase):
         app_root.__name__ = app_root.__parent__ = None
         self._child = app_root['child']
         self._grandchild = app_root['child']['grandchild']
+        rest_url = 'http://localhost:6541'
+        request = testing.DummyRequest()
+        request.root = app_root
+        request.application_url = rest_url
+        self.request = request
         QueueingClientCommunicator.zodb_connection = DummyZODBConnection(
             zodb_root=zodb_root)
+        QueueingClientCommunicator.rest_url = rest_url
         self._subscriber = QueueingClientCommunicator()
-        request = DummyConnectionRequest('websocket peer')
-        self._subscriber.onConnect(request)
-        msg = build_message({'action': 'subscribe', 'resource': '/child'})
+        connection_request = DummyConnectionRequest('websocket peer')
+        self._subscriber.onConnect(connection_request)
+        msg = build_message({'action': 'subscribe', 'resource': request.application_url + '/child/'})
         self._subscriber.onMessage(msg, False)
         self._dispatcher = QueueingClientCommunicator()
-        request = DummyConnectionRequest('localhost:1234')
-        self._dispatcher.onConnect(request)
+        connection_request = DummyConnectionRequest('localhost:1234')
+        self._dispatcher.onConnect(connection_request)
 
     def tearDown(self):
         self._subscriber.onClose(True, 0, 'teardown')
@@ -263,8 +286,8 @@ class EventDispatchUnitTests(unittest.TestCase):
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {'event': 'new_child',
-                                              'resource': '/child',
-                                              'child': '/child/grandchild'}
+                                              'resource': self.request.application_url + '/child/',
+                                              'child': self.request.application_url + '/child/grandchild/'}
 
     def test_dispatch_created_notification_new_version(self):
         from adhocracy.interfaces import IItemVersion
@@ -274,15 +297,15 @@ class EventDispatchUnitTests(unittest.TestCase):
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {'event': 'new_version',
-                                              'resource': '/child',
-                                              'version': '/child/grandchild'}
+                                              'resource': self.request.application_url + '/child/',
+                                              'version': self.request.application_url + '/child/grandchild/'}
 
     def test_dispatch_modified_notification(self):
         msg = build_message({'event': 'modified', 'resource': '/child'})
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {'event': 'modified',
-                                              'resource': '/child'}
+                                              'resource': self.request.application_url + '/child/'}
 
     def test_dispatch_modified_child_notification(self):
         msg = build_message({'event': 'modified',
@@ -290,8 +313,8 @@ class EventDispatchUnitTests(unittest.TestCase):
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {'event': 'modified_child',
-                                              'resource': '/child',
-                                              'child': '/child/grandchild'}
+                                              'resource': self.request.application_url + '/child/',
+                                              'child': self.request.application_url + '/child/grandchild/'}
 
     def test_dispatch_deleted_notification(self):
         msg = build_message({'event': 'deleted',
@@ -299,8 +322,8 @@ class EventDispatchUnitTests(unittest.TestCase):
         self._dispatcher.onMessage(msg, False)
         assert len(self._dispatcher.queue) == 0
         assert self._subscriber.queue[-1] == {'event': 'removed_child',
-                                              'resource': '/child',
-                                              'child': '/child/grandchild'}
+                                              'resource': self.request.application_url + '/child/',
+                                              'child': self.request.application_url + '/child/grandchild/'}
 
     def test_dispatch_invalid_event_notification(self):
         msg = build_message({'event': 'new_child',
@@ -448,11 +471,10 @@ class ClientTrackerUnitTests(unittest.TestCase):
 class TestFunctionalClientCommunicator:
 
     @pytest.fixture
-    def connection(self, request, server, ws_settings):
+    def connection(self, request, backend, ws_settings, websocket):
         from websocket import create_connection
         connection = create_connection('ws://localhost:%s' %
                                        ws_settings['port'])
-
         def tearDown():
             print('teardown websocket connection')
             if connection.connected:
@@ -462,18 +484,19 @@ class TestFunctionalClientCommunicator:
 
         return connection
 
-    def _add_pool(self, server, path, name):
+    def _add_pool(self, backend, path, name):
         import json
         import requests
         from adhocracy.resources.pool import IBasicPool
-        url = server.application_url + 'adhocracy' + path
+        url = backend.application_url + 'adhocracy' + path
         data = {'content_type': IBasicPool.__identifier__,
                 'data': {'adhocracy.sheets.name.IName': {'name': name}}}
         requests.post(url, data=json.dumps(data),
                       headers={'content-type': 'application/json'})
 
-    def test_send_child_notification(self, server, connection):
-        connection.send('{"resource": "/adhocracy", "action": "subscribe"}')
+    def test_send_child_notification(self, backend, connection):
+        rest_url = backend.application_url
+        connection.send('{"resource": "' + rest_url + 'adhocracy/", "action": "subscribe"}')
         connection.recv()
-        self._add_pool(server, '/', 'Proposals')
+        self._add_pool(backend, '/', 'Proposals')
         assert 'Proposals' in connection.recv()

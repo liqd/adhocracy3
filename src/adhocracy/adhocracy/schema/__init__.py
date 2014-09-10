@@ -1,12 +1,14 @@
 """Colander schema extensions."""
+from collections import Sequence
+from collections import OrderedDict
 from datetime import datetime
-from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
+from pyramid.traversal import resource_path
 from pytz import UTC
-from substanced.schema import IdSet
 import colander
 import pytz
 
+from adhocracy.interfaces import ILocation
 from adhocracy.interfaces import SheetReference
 
 
@@ -35,44 +37,6 @@ def raise_attribute_error_if_not_location_aware(context) -> None:
     """
     context.__parent__
     context.__name__
-
-
-def serialize_path(node, value):
-    """Serialize object to path with 'pyramid.traveral.resource_path'.
-
-    :param node: the Colander node
-    :param value: the resource to serialize
-    :return: the path of that resource
-    """
-    if value in (colander.null, ''):
-        return value
-    try:
-        raise_attribute_error_if_not_location_aware(value)
-        return resource_path(value)
-    except AttributeError:
-        raise colander.Invalid(
-            node,
-            msg='This resource is not location aware', value=value)
-
-
-def deserialize_path(node, value):
-    """Deserialize path to object.
-
-    :param node: the Colander node
-    :param value: the path to deserialize
-    :return: the resource registered under that path
-    """
-    if value is colander.null:
-        return value
-    context = node.bindings['context']
-    try:
-        resource = find_resource(context, value)
-        raise_attribute_error_if_not_location_aware(resource)
-    except (KeyError, AttributeError):
-        raise colander.Invalid(
-            node,
-            msg='This resource path does not exist.', value=value)
-    return resource
 
 
 def validate_name_is_unique(node: colander.SchemaNode, value: str):
@@ -181,23 +145,105 @@ class AbsolutePath(AdhocracySchemaNode):
 
 class ResourceObject(colander.SchemaType):
 
-    """Resource object that automatically deserialized itself to a path.
+    """Schema type that serialized a :term:`location`-aware object to its url.
 
-    Example value: like AbsolutePath, e.g. '/bluaABC/_123/3'
+    Example value:  'http://a.org/bluaABC/_123/3'
     """
 
+    def __init__(self, use_resource_location=False):
+        self.use_resource_location = use_resource_location
+        """If `False` the :term:`request` binding is used to serialize
+        to the resource url.
+        Else the :term:`context` binding is used to  serialize to
+        the :term:`Resource Location`.
+        Default `False`.
+        """
+
     def serialize(self, node, value):
-        """Serialize object to path."""
-        return serialize_path(node, value)
+        """Serialize object to url.
+
+        :param node: the Colander node.
+        :param value: the resource to serialize
+        :return: the path of that resource
+        """
+        if value in (colander.null, ''):
+            return ''
+        try:
+            raise_attribute_error_if_not_location_aware(value)
+            return self._serialize_location_or_url(node, value)
+        except AttributeError:
+            raise colander.Invalid(node,
+                                   msg='This resource is not location aware',
+                                   value=value)
+
+    def _serialize_location_or_url(self, node, value):
+        if self.use_resource_location:
+            assert 'context' in node.bindings
+            return resource_path(value)
+        else:
+            assert 'request' in node.bindings
+            request = node.bindings['request']
+            return request.resource_url(value)
 
     def deserialize(self, node, value):
-        """Deserialize path to object."""
-        return deserialize_path(node, value)
+        """Deserialize url to object.
+
+        :param node: the Colander node.
+        :param value: the url ort :term:`Resource Location` to deserialize
+        :return: the resource registered under that path
+        :raise colander.Invalid: if the object does not exist.
+        """
+        if value is colander.null:
+            return value
+        try:
+            resource = self._deserialize_to_location_or_url(node, value)
+            raise_attribute_error_if_not_location_aware(resource)
+        except (KeyError, AttributeError):
+            raise colander.Invalid(
+                node,
+                msg='This resource path does not exist.', value=value)
+        return resource
+
+    def _deserialize_to_location_or_url(self, node, value):
+        if self.use_resource_location:
+            assert 'context' in node.bindings
+            context = node.bindings['context']
+            return find_resource(context, value)
+        else:
+            assert 'request' in node.bindings
+            request = node.bindings['request']
+            application_url_len = len(request.application_url)
+            if application_url_len > len(str(value)):
+                raise KeyError
+            # Fixme: This does not work with :term:`virtual hosting`
+            path = value[application_url_len:]
+            return find_resource(request.root, path)
 
 
-class Reference(AbsolutePath):
+class Resource(AdhocracySchemaNode):
 
-    """Reference to a resource that implements a specific sheet.
+    """A resource SchemaNode.
+
+    Example value:  'http://a.org/bluaABC/_123/3'
+    """
+
+    default = ''
+    missing = colander.drop
+    schema_type = ResourceObject
+
+
+def _validate_reftype(node: colander.SchemaNode, value: ILocation):
+        reftype = node.reftype
+        isheet = reftype.getTaggedValue('target_isheet')
+        if not isheet.providedBy(value):
+            error = 'This Resource does not provide interface %s' % \
+                    (isheet.__identifier__)
+            raise colander.Invalid(node, msg=error, value=value)
+
+
+class Reference(Resource):
+
+    """Schema Node to reference a resource that implements a specific sheet.
 
     The constructor accepts these additional keyword arguments:
 
@@ -212,151 +258,61 @@ class Reference(AbsolutePath):
                        Default: False.
     """
 
-    default = ''
-    missing = colander.drop
-    schema_type = ResourceObject
     reftype = SheetReference
     backref = False
-
-    def validator(self, node, value):
-        """Validate."""
-        reftype = self.reftype
-        isheet = reftype.getTaggedValue('target_isheet')
-        if not isheet.providedBy(value):
-            error = 'This Resource does not provide interface %s' % \
-                    (isheet.__identifier__)
-            raise colander.Invalid(node, msg=error, value=value)
+    validator = colander.All(_validate_reftype)
 
 
-class AbstractIterableOfPaths(IdSet):
+class Resources(colander.SequenceSchema):
 
-    """Abstract Colander type to store multiple object paths.
+    """List of :class:`Resource:`s."""
 
-    Serialize a list of ILocation aware objects to paths (['/o1/o2', '/o3']).
-    Deserialize to an iterable of objects.
+    resource = Resource()
+    default = []
+    missing = []
 
-    Raise colander.Invalid if path does not exist.
 
-    Child classes must overwrite the `create_empty_appstruct` and
-    `add_to_appstruct` methods for the specific iterable to use for
-    deserialization (e.g. list or set).
+def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
+    for resource in value:
+        _validate_reftype(node, resource)
+
+
+class References(Resources):
+
+    """Schema Node to reference resources that implements a specific sheet.
+
+    The constructor accepts these additional keyword arguments:
+
+        - ``reftype``: :class:`adhocracy.interfaces.SheetReference`.
+                       The `target_isheet` attribute of the `reftype` specifies
+                       the sheet that accepted resources must implement.
+                       Storing another kind of resource will trigger a
+                       validation error.
+        - ``backref``: marks this Reference as a back reference.
+                       :class:`adhocracy.sheet.ResourceSheet` can use this
+                       information to autogenerate the appstruct/cstruct.
+                       Default: False.
     """
 
-    def create_empty_appstruct(self):
-        """Create an empty iterable container."""
-        raise NotImplementedError()  # pragma: no cover
-
-    def add_to_appstruct(self, appstruct, element):
-        """Add an element to the container to used to store paths."""
-        raise NotImplementedError()  # pragma: no cover
-
-    def serialize(self, node, value):
-        """Serialize object to path with 'pyramid.traveral.resource_path'.
-
-        Return list with paths.
-
-        """
-        if value is colander.null:
-            return value
-        self._check_nonstr_iterable(node, value)
-        paths = []
-        for resource in value:
-            paths.append(serialize_path(node, resource))
-        return paths
-
-    def _check_nonstr_iterable(self, node, value):
-        if isinstance(value, str) or not hasattr(value, '__iter__'):
-            raise colander.Invalid(node, '{} is not list-like'.format(value))
-
-    def deserialize(self, node, value):
-        """Deserialize path to object.
-
-        Return iterable with objects.
-
-        Raises:
-            KeyError: if path cannot be traversed to an ILocation aware object.
-        """
-        if value is colander.null:
-            return value
-        self._check_nonstr_iterable(node, value)
-        resources = self.create_empty_appstruct()
-        for path in value:
-            resource = deserialize_path(node, path)
-            self.add_to_appstruct(resources, resource)
-        return resources
+    reftype = SheetReference
+    backref = False
+    validator = colander.All(_validate_reftypes)
 
 
-class ListOfUniquePaths(AbstractIterableOfPaths):
+class UniqueReferences(References):
 
-    """List of :class:`AbsolutePath`.
+    """Schema Node to reference resources that implements a specific sheet.
 
     The order is preserved, duplicates are removed.
 
-    Example value: [/bluaABC, /_123/3]
+    Example value: ["http:a.org/bluaABC"]
     """
 
-    def create_empty_appstruct(self):
-        """Create and return an empty list."""
-        return []
-
-    def add_to_appstruct(self, appstruct, element):
-        """Add an element to a list if it is no duplicate."""
-        if not hasattr(self, '_elements'):
-            self._elements = set()
-        if element not in self._elements:
-            appstruct.append(element)
-            self._elements.add(element)
-
-
-class SetOfPaths(AbstractIterableOfPaths):
-
-    """Set of :class:`AbsolutePath`.
-
-    The order is not preserved, duplicates are removed.
-
-    Example value: [/bluaABC, /_123/3]
-    """
-
-    def create_empty_appstruct(self):
-        """Create and return an empty set."""
-        return set()
-
-    def add_to_appstruct(self, appstruct, element):
-        """Add an element to a set."""
-        appstruct.add(element)
-
-
-class AbstractReferenceIterable(AdhocracySchemaNode):
-
-    """Abstract Colander SchemaNode to store multiple references.
-
-    This is is an abstract class, only subclasses that set `schema_type` to a
-    concrete subclass of `AbstractIterableOfPaths` can be instantiated.
-    """
-
-    schema_type = AbstractIterableOfPaths
-
-    default = []
-    missing = colander.drop
-    reftype = SheetReference
-    backref = False
-
-    def validator(self, node, value):
-        """Validate."""
-        reftype = self.reftype
-        isheet = reftype.getTaggedValue('target_isheet')
-        for resource in value:
-            if not isheet.providedBy(resource):
-                error = 'This Resource does not provide interface %s' % \
-                        (isheet.__identifier__)
-                raise colander.Invalid(node, msg=error, value=resource)
-
-
-class ListOfUniqueReferences(AbstractReferenceIterable):
-
-    """Colander SchemaNode to store a list of references without duplicates."""
-
-    schema_type = ListOfUniquePaths
+    def preparer(self, value: Sequence) -> list:
+        if value is colander.null:
+            return value
+        value_dict = OrderedDict.fromkeys(value)
+        return list(value_dict)
 
 
 def string_has_no_newlines_validator(value: str) -> bool:

@@ -23,6 +23,12 @@ def sheet_metas():
 
 class TestResourceResponseSchema:
 
+    @fixture
+    def request(self, context):
+        request = testing.DummyRequest()
+        request.root = context
+        return request
+
     def make_one(self):
         from adhocracy.rest.schemas import ResourceResponseSchema
         return ResourceResponseSchema()
@@ -32,13 +38,19 @@ class TestResourceResponseSchema:
         wanted = {'content_type': '', 'path': ''}
         assert inst.serialize() == wanted
 
-    def test_serialize_with_appstruct(self):
-        inst = self.make_one()
-        wanted = {'content_type': 'x', 'path': '/'}
-        assert inst.serialize({'content_type': 'x', 'path': '/'}) == wanted
+    def test_serialize_with_appstruct(self, request):
+        inst = self.make_one().bind(request=request)
+        wanted = {'content_type': 'x', 'path': request.application_url + '/'}
+        assert inst.serialize({'content_type': 'x', 'path': request.root}) == wanted
 
 
 class TestItemResponseSchema:
+
+    @fixture
+    def request(self, context):
+        request = testing.DummyRequest()
+        request.root = context
+        return request
 
     def make_one(self):
         from adhocracy.rest.schemas import ItemResponseSchema
@@ -49,11 +61,12 @@ class TestItemResponseSchema:
         wanted = {'content_type': '', 'path': '', 'first_version_path': ''}
         assert inst.serialize() == wanted
 
-    def test_serialize_with_appstruct(self):
-        inst = self.make_one()
-        wanted = {'content_type': 'x', 'path': '/', 'first_version_path': '/v'}
-        assert inst.serialize({'content_type': 'x', 'path': '/',
-                               'first_version_path': '/v'}) == wanted
+    def test_serialize_with_appstruct(self, request):
+        inst = self.make_one().bind(request=request)
+        wanted = {'content_type': 'x', 'path': request.application_url + '/',
+                  'first_version_path': request.application_url + '/'}
+        assert inst.serialize({'content_type': 'x', 'path': request.root,
+                               'first_version_path': request.root}) == wanted
 
 
 class TestPOSTResourceRequestSchema:
@@ -174,28 +187,31 @@ class TestAddPostRequestSubSchemas:
 
 class TestPOSTItemRequestSchemaUnitTest:
 
+    @fixture
+    def request(self, mock_resource_registry, cornice_request, context):
+        cornice_request.body = '{}'
+        mock_resource_registry.resource_addables.return_value = {'VALID': {}}
+        cornice_request.registry.content = mock_resource_registry
+        cornice_request.root = context
+        return cornice_request
+
     def make_one(self):
         from adhocracy.rest.schemas import POSTItemRequestSchema
         return POSTItemRequestSchema()
 
-    def test_deserialize_without_root_versions(self):
+    def test_deserialize_without_binding_and_root_versions(self):
         inst = self.make_one()
         result = inst.deserialize({'content_type': 'VALID', 'data': {}})
         assert result == {'content_type': 'VALID', 'data': {},
                           'root_versions': []}
 
-    def test_deserialize_with_root_versions(self):
-        inst = self.make_one()
+    def test_deserialize_with_binding_and_root_versions(self, request, context):
+        inst = self.make_one().bind(request=request, context=context)
+        root_version_path = request.resource_url(request.root)
         result = inst.deserialize({'content_type': "VALID", 'data': {},
-                                   'root_versions': ["/path"]})
+                                   'root_versions': [root_version_path]})
         assert result == {'content_type': 'VALID', 'data': {},
-                          'root_versions': ['/path']}
-
-    def test_deserialize_with_root_versions_but_wrong_type(self):
-        inst = self.make_one()
-        with raises(colander.Invalid):
-            inst.deserialize({'content_type': "VALID", 'data': {},
-                              'root_versions': ["?path"]})
+                          'root_versions': [request.root]}
 
 
 class TestPUTResourceRequestSchema:
@@ -284,33 +300,28 @@ class TestBatchRequestPath:
         from adhocracy.rest.schemas import BatchRequestPath
         return BatchRequestPath()
 
-    def test_deserialize_valid_perliminary_path(self):
+    def test_deserialize_valid_preliminary_path(self):
         inst = self.make_one()
         assert inst.deserialize('@item/v1') == '@item/v1'
 
-    def test_deserialize_valid_absolute_path(self):
+    def test_deserialize_valid_url(self):
         inst = self.make_one()
-        assert inst.deserialize('/item/v1') == '/item/v1'
+        assert inst.deserialize('http://a.org/a') == 'http://a.org/a'
 
-    def test_deserialize_nonvalid_long_absolute_path(self):
+    def test_deserialize_nonvalid_absolute_path(self):
         inst = self.make_one()
         with raises(colander.Invalid):
-            assert inst.deserialize('/a' * 100) == '@item/v1'
+            inst.deserialize('/item/v1')
 
-    def test_deserialize_nonvalid_relativ_path_depth2(self):
+    def test_deserialize_nonvalid_long_preliminary_path(self):
         inst = self.make_one()
         with raises(colander.Invalid):
-            inst.deserialize('item/v1')
-
-    def test_deserialize_nonvalid_relativ_path_depth1(self):
-        inst = self.make_one()
-        with raises(colander.Invalid):
-            inst.deserialize('item')
+            assert inst.deserialize('@item/' + 'v1' * 200)
 
     def test_deserialize_nonvalid_special_characters(self):
         inst = self.make_one()
         with raises(colander.Invalid):
-            inst.deserialize('ö/v1')
+            inst.deserialize('@item/ö')
 
 
 class TestPOSTBatchRequestItem:
@@ -323,7 +334,7 @@ class TestPOSTBatchRequestItem:
         inst = self.make_one()
         data = {
             'method': 'POST',
-            'path': '/adhocracy/Proposal/kommunismus',
+            'path': 'http://a.org/adhocracy/Proposal/kommunismus',
             'body': {'content_type': 'adhocracy.resources.IParagraph'},
             'result_path': '@part1_item',
             'result_first_version_path': '@part1_item'
@@ -355,7 +366,7 @@ class TestPOSTBatchRequestItem:
         inst = self.make_one()
         data = {
             'method': 'BRIEF',
-            'path': '/adhocracy/Proposal/kommunismus',
+            'path': 'http://a.org/adhocracy/Proposal/kommunismus',
             'body': {'content_type': 'adhocracy.resources.IParagraph'},
             'result_path': '@par1_item'
         }
@@ -366,7 +377,7 @@ class TestPOSTBatchRequestItem:
         inst = self.make_one()
         data = {
             'method': 'POST',
-            'path': '/adhocracy/Proposal/kommunismus',
+            'path': 'http://a.org/adhocracy/Proposal/kommunismus',
             'body': 'This is not a JSON dict',
             'result_path': '@par1_item'
         }
@@ -377,7 +388,7 @@ class TestPOSTBatchRequestItem:
         inst = self.make_one()
         data = {
             'method': 'POST',
-            'path': '/adhocracy/Proposal/kommunismus',
+            'path': 'http://a.org/adhocracy/Proposal/kommunismus',
             'body': {'content_type': 'adhocracy.resources.IParagraph'},
             'result_path': ''
         }
@@ -388,7 +399,7 @@ class TestPOSTBatchRequestItem:
         inst = self.make_one()
         data = {
             'method': 'POST',
-            'path': '/adhocracy/Proposal/kommunismus',
+            'path': 'http://a.org/adhocracy/Proposal/kommunismus',
             'body': {'content_type': 'adhocracy.resources.IParagraph'}
         }
         deserialized = inst.deserialize(data)
@@ -409,7 +420,7 @@ class TestPOSTBatchRequestItem:
         inst = self.make_one()
         data = {
             'method': 'POST',
-            'path': '/adhocracy/Proposal/kommunismus',
+            'path': 'http://a.org/adhocracy/Proposal/kommunismus',
             'body': {'content_type': 'adhocracy.resources.IParagraph'},
             'result_path': '@par1_item',
         }
@@ -419,7 +430,7 @@ class TestPOSTBatchRequestItem:
         inst = self.make_one()
         data = {
             'method': 'POST',
-            'path': '/adhocracy/Proposal/kommunismus',
+            'path': 'http://a.org/adhocracy/Proposal/kommunismus',
             'body': {'content_type': 'adhocracy.resources.IParagraph'},
             'result_first_version_path': '',
         }
@@ -436,7 +447,7 @@ class TestPOSTBatchRequestSchema:
         inst = self.make_one()
         data = [{
                 'method': 'POST',
-                'path': '/adhocracy/Proposal/kommunismus',
+                'path': 'http://a.org/adhocracy/Proposal/kommunismus',
                 'body': {'content_type': 'adhocracy.resources.IParagraph'},
                 'result_first_version_path': '@par1_item',
                 'result_path': '@par1_item'

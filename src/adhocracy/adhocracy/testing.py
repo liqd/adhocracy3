@@ -311,8 +311,10 @@ def app(zeo, settings, websocket):
 
 
 @fixture(scope='class')
-def backend(request, app):
+def backend(request, ws_settings, app):
     """Return a http server with the adhocracy wsgi application."""
-    server = StopableWSGIServer.create(app)
-    request.addfinalizer(server.shutdown)
-    return server
+    rest_url = ws_settings['rest_url']
+    port = rest_url.split(':')[2]
+    backend = StopableWSGIServer.create(app, port=port)
+    request.addfinalizer(backend.shutdown)
+    return backend

@@ -16,8 +16,10 @@ def app_sample(zeo, settings, websocket):
 
 
 @fixture(scope='class')
-def backend_sample(request, app_sample):
+def backend_sample(request, ws_settings, app_sample):
     """Return a http server with the adhocracy wsgi application."""
-    server = StopableWSGIServer.create(app_sample)
+    rest_url = ws_settings['rest_url']
+    port = rest_url.split(':')[2]
+    server = StopableWSGIServer.create(app_sample, port=port)
     request.addfinalizer(server.shutdown)
     return server

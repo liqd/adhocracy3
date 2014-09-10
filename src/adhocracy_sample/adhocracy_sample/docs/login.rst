@@ -17,6 +17,7 @@ Start Adhocracy testapp::
     >>> app = getfixture('app_sample')
     >>> websocket = getfixture('websocket')
     >>> testapp = TestApp(app)
+    >>> rest_url = 'http://localhost'
 
 
 Test that the relevant resources and sheets exist:
@@ -43,12 +44,12 @@ path of the new user::
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy.sheets.user.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp_data = testapp.post_json("/principals/users", prop).json
+    >>> resp_data = testapp.post_json(rest_url + "/principals/users", prop).json
     >>> resp_data["content_type"]
     'adhocracy.resources.principal.IUser'
     >>> user_path = resp_data["path"]
     >>> user_path
-    '/principals/users/00...
+    '.../principals/users/00...
 
 Like every resource the user has a metadata sheet with creation information::
     >>> resp_data = testapp.get(user_path).json
@@ -57,7 +58,7 @@ Like every resource the user has a metadata sheet with creation information::
 Even though he is not logged in yet, the creator points to his user resource::
 
     >>> resp_metadata['creator']
-    '/principals/users/00...
+    '.../principals/users/00...
 
 The "name" field in the "IUserBasic" schema is a non-empty string that
 can contain any characters except '@' (to make user names distinguishable
@@ -85,7 +86,7 @@ E.g. when we try to register a user with an empty password::
     ...                  'email': 'annina@example.org'},
     ...              'adhocracy.sheets.user.IPasswordAuthentication': {
     ...                  'password': ''}}}
-    >>> resp_data = testapp.post_json("/principals/users", prop,
+    >>> resp_data = testapp.post_json(rest_url + "/principals/users", prop,
     ...                               status=400).json
     >>> pprint(resp_data)
     {'errors': [{'description': 'Required',
@@ -114,7 +115,7 @@ registered:
     ...                  'email': 'anna@example.org'},
     ...              'adhocracy.sheets.user.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
-    >>> resp_data = testapp.post_json("/principals/users", prop,
+    >>> resp_data = testapp.post_json(rest_url + "/principals/users", prop,
     ...                               status=400).json
     >>> pprint(resp_data)
     {'errors': [{'description': 'The user login email is not unique',
@@ -154,7 +155,7 @@ to the URL ``login_username`` with a user name and password::
     >>> resp_data = testapp.post_json('/login_username', prop).json
     >>> pprint(resp_data)
     {'status': 'success',
-     'user_path': '/principals/users/...',
+     'user_path': '.../principals/users/...',
      'user_token': '...'}
     >>> user_path = resp_data['user_path']
     >>> user_token_via_username = resp_data['user_token']
@@ -166,7 +167,7 @@ Or to ``login_email``, specifying the user's email address instead of name::
     >>> resp_data = testapp.post_json('/login_email', prop).json
     >>> pprint(resp_data)
     {'status': 'success',
-     'user_path': '/principals/users/...',
+     'user_path': '.../principals/users/...',
      'user_token': '...'}
     >>> user_token_via_email = resp_data['user_token']
 

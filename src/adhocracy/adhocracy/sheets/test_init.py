@@ -27,9 +27,9 @@ class TestResourcePropertySheet:
 
     @fixture
     def mock_node_unique_references(self):
-        from adhocracy.schema import ListOfUniqueReferences
+        from adhocracy.schema import UniqueReferences
         from adhocracy.schema import SheetReference
-        mock = Mock(spec=ListOfUniqueReferences)
+        mock = Mock(spec=UniqueReferences)
         mock.readonly = False
         mock.name = 'references'
         mock.backref = False

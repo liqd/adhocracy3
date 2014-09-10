@@ -6,7 +6,7 @@ from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets import add_sheet_to_registry
-from adhocracy.schema import ListOfUniqueReferences
+from adhocracy.schema import UniqueReferences
 from adhocracy.schema import Text
 from adhocracy.schema import SingleLine
 
@@ -64,7 +64,7 @@ class DocumentSchema(colander.MappingSchema):
 
     title = SingleLine()
     description = Text()
-    elements = ListOfUniqueReferences(reftype=DocumentElementsReference)
+    elements = UniqueReferences(reftype=DocumentElementsReference)
 
 
 document_meta = sheet_metadata_defaults._replace(isheet=IDocument,
@@ -81,8 +81,8 @@ class SectionSchema(colander.MappingSchema):
     """
 
     title = SingleLine()
-    elements = ListOfUniqueReferences(reftype=SectionElementsReference)
-    subsections = ListOfUniqueReferences(reftype=SectionSubsectionsReference)
+    elements = UniqueReferences(reftype=SectionElementsReference)
+    subsections = UniqueReferences(reftype=SectionSubsectionsReference)
 
 
 section_meta = sheet_metadata_defaults._replace(isheet=ISection,

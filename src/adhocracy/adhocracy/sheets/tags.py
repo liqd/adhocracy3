@@ -7,7 +7,7 @@ from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets.versions import IVersionable
 from adhocracy.sheets.pool import PoolSheet
-from adhocracy.schema import ListOfUniqueReferences
+from adhocracy.schema import UniqueReferences
 
 
 class ITag(ISheet):
@@ -31,7 +31,7 @@ class TagSchema(colander.MappingSchema):
     `elements`: Resources with this Tag
     """
 
-    elements = ListOfUniqueReferences(reftype=TagElementsReference)
+    elements = UniqueReferences(reftype=TagElementsReference)
 
 
 tag_metadata = sheet_metadata_defaults._replace(isheet=ITag,
@@ -60,7 +60,7 @@ class TagsSchema(colander.MappingSchema):
     `elements`: Tags in this Pool
     """
 
-    elements = ListOfUniqueReferences(reftype=TagsElementsReference)
+    elements = UniqueReferences(reftype=TagsElementsReference)
 
 
 tags_metadata = sheet_metadata_defaults._replace(isheet=ITags,

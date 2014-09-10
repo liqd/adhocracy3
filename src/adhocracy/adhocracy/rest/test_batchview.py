@@ -50,7 +50,7 @@ class TestBatchView:
         from adhocracy.rest.batchview import BatchView
         return BatchView(context, request)
 
-    def _make_subrequest_cstruct(self, path: str='/adhocracy/blah',
+    def _make_subrequest_cstruct(self, path: str='http://a.org/adhocracy/blah',
                                  result_path: str='@newpath',
                                  method: str='PUT',
                                  body: dict={},
@@ -142,9 +142,9 @@ class TestBatchView:
         path_map = {}
         result_path = '@newpath'
         result_first_version_path = ''
-        item_response = self._make_batch_response(path='/adhocracy/new_item')
+        item_response = self._make_batch_response(path='http://a.org/adhocracy/new_item')
         inst._extend_path_map(path_map, result_path, result_first_version_path, item_response)
-        assert path_map == {'@newpath': '/adhocracy/new_item'}
+        assert path_map == {'@newpath': 'http://a.org/adhocracy/new_item'}
 
     def test_extend_path_map_just_path_and_missing_response_path(self, context, request):
         inst = self._make_one(context, request)

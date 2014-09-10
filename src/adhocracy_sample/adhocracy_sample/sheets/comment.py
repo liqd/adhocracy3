@@ -5,7 +5,7 @@ from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.sheets import add_sheet_to_registry
-from adhocracy.schema import ListOfUniqueReferences
+from adhocracy.schema import UniqueReferences
 from adhocracy.schema import Reference
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.schema import Text
@@ -52,9 +52,9 @@ class CommentableSchema(colander.MappingSchema):
     `comments`: list of comments (not stored)
     """
 
-    comments = ListOfUniqueReferences(readonly=True,
-                                      backref=True,
-                                      reftype=CommentRefersToReference)
+    comments = UniqueReferences(readonly=True,
+                                backref=True,
+                                reftype=CommentRefersToReference)
 
 
 commentable_meta = sheet_metadata_defaults._replace(
