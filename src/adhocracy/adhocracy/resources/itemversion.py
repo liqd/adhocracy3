@@ -1,5 +1,5 @@
 """ItemVersion resource type."""
-from pyramid.traversal import find_interface, find_resource
+from pyramid.traversal import find_interface
 
 from adhocracy.events import ItemVersionNewVersionAdded
 from adhocracy.events import SheetReferencedItemHasNewVersion
@@ -93,12 +93,10 @@ def _update_last_tag(context, registry, old_versions):
         return
 
     tag_sheet = get_sheet(parent_item, tags.ITags)
-    taglist = tag_sheet.get_cstruct()['elements']
+    taglist = tag_sheet.get()['elements']
 
     for tag in taglist:
-        tag_name = tag.split('/')[-1]
-        if tag_name == 'LAST':
-            tag = find_resource(context, tag)
+        if tag.__name__ == 'LAST':
             sheet = get_sheet(tag, tags.ITag)
             data = sheet.get()
             updated_references = []

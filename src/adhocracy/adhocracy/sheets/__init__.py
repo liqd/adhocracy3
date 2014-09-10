@@ -155,12 +155,6 @@ class GenericResourceSheet(PropertySheet):
                                           self.registry)
             self.registry.notify(event)
 
-    def get_cstruct(self) -> dict:
-        """Return schema :term:`cstruct`."""
-        struct = self.get()
-        cstruct = self.schema.serialize(struct)
-        return cstruct
-
 
 sheet_metadata_defaults = sheet_metadata._replace(
     isheet=ISheet,
