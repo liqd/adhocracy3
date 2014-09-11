@@ -5,6 +5,7 @@ from adhocracy.resources import add_resource_type_to_registry
 from adhocracy.resources.itemversion import itemversion_metadata
 from adhocracy.resources.item import item_metadata
 
+from adhocracy.sheets.rating import IRateable
 from adhocracy_sample.sheets.comment import IComment
 from adhocracy_sample.sheets.comment import ICommentable
 
@@ -18,7 +19,8 @@ commentversion_meta = itemversion_metadata._replace(
     content_name='CommentVersion',
     iresource=ICommentVersion,
     extended_sheets=[IComment,
-                     ICommentable],
+                     ICommentable,
+                     IRateable],
 )
 
 

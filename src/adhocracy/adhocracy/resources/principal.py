@@ -14,6 +14,7 @@ from adhocracy.resources.service import service_metadata
 import adhocracy.sheets.user
 import adhocracy.sheets.pool
 import adhocracy.sheets.metadata
+import adhocracy.sheets.rating
 
 
 class IPrincipalsService(IServicePool):
@@ -83,7 +84,7 @@ user_metadata = pool_metadata._replace(
                   adhocracy.sheets.pool.IPool,
                   ],
     extended_sheets=[adhocracy.sheets.user.IPasswordAuthentication,
-                     ],
+                     adhocracy.sheets.rating.ICanRate],
     element_types=[],  # we don't want the frontend to post resources here
     use_autonaming=True
 )
