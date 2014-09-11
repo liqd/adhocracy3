@@ -23,10 +23,11 @@ substanced.initial_email = admin@example.com
 substanced.uploads_tempdir = %(here)s/../var/uploads_tmp
 substanced.autosync_catalogs = true
 substanced.autoevolve = true
+
+# The websocket url to notify about resource modifications
 adhocracy.ws_url = ws://localhost:8080
 # The id for the root level adhocracy resource
 adhocracy.platform_id = adhocracy
-adhocracy.websockets.rest_url = http://localhost:6541
 
 mail.queue_path = %(here)s/../var/mail
 mail.default_sender = admin@example.com
