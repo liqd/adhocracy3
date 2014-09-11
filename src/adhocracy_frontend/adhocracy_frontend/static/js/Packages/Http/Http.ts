@@ -11,6 +11,7 @@ import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhTransaction = require("./Transaction");
 import AdhError = require("./Error");
 import AdhConvert = require("./Convert");
+import AdhConfig = require("../Config/Config");
 
 // re-exports
 export interface ITransactionResult extends AdhTransaction.ITransactionResult {};
@@ -35,12 +36,16 @@ export class Service<Content extends Resources.Content<any>> {
         private $http : ng.IHttpService,
         private $q : ng.IQService,
         private adhMetaApi : MetaApi.MetaApiQuery,
-        private adhPreliminaryNames : PreliminaryNames
+        private adhPreliminaryNames : PreliminaryNames,
+        private adhConfig : AdhConfig.Type
     ) {}
 
     public get(path : string) : ng.IPromise<Content> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-get preliminary path: " + path;
+        }
+        if (path.lastIndexOf("/", 0) === 0) {
+            path = this.adhConfig.rest_url + path;
         }
         return this.$http
             .get(path)
@@ -53,6 +58,9 @@ export class Service<Content extends Resources.Content<any>> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-put preliminary path: " + path;
         }
+        if (path.lastIndexOf("/", 0) === 0) {
+            path = this.adhConfig.rest_url + path;
+        }
         return this.$http
             .put(path, AdhConvert.exportContent(this.adhMetaApi, obj))
             .then(
@@ -63,6 +71,9 @@ export class Service<Content extends Resources.Content<any>> {
     public post(path : string, obj : Content) : ng.IPromise<Content> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-post preliminary path: " + path;
+        }
+        if (path.lastIndexOf("/", 0) === 0) {
+            path = this.adhConfig.rest_url + path;
         }
         return this.$http
             .post(path, AdhConvert.exportContent(this.adhMetaApi, obj))
@@ -214,6 +225,6 @@ export class Service<Content extends Resources.Content<any>> {
      *     };
      */
     public withTransaction<Result>(callback : (httpTrans : AdhTransaction.Transaction) => ng.IPromise<Result>) : ng.IPromise<Result> {
-        return callback(new AdhTransaction.Transaction(this.$http, this.adhMetaApi, this.adhPreliminaryNames));
+        return callback(new AdhTransaction.Transaction(this.$http, this.adhMetaApi, this.adhPreliminaryNames, this.adhConfig));
     }
 }

@@ -68,12 +68,14 @@ export var register = () => {
             var adhMetaApiMock;
             var adhPreliminaryNames;
             var adhHttp;
+            var adhConfigMock;
 
             beforeEach(() => {
                 $httpMock = mkHttpMock();
                 adhMetaApiMock = mkAdhMetaApiMock();
                 adhPreliminaryNames = new PreliminaryNames();
-                adhHttp = new AdhHttp.Service($httpMock, q, adhMetaApiMock, adhPreliminaryNames);
+                adhConfigMock = {};
+                adhHttp = new AdhHttp.Service($httpMock, q, adhMetaApiMock, adhPreliminaryNames, adhConfigMock);
             });
 
             describe("get", () => {
