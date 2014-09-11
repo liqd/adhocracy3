@@ -246,8 +246,8 @@ class GETPoolRequestSchema(colander.MappingSchema):
 
     """GET parameters accepted for pool queries."""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # Extra key/value pairs should be preserved when deserializing data
         self.typ.unknown = 'preserve'
 

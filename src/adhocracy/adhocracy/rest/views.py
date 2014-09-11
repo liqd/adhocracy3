@@ -5,6 +5,7 @@ from logging import getLogger
 from colander import drop
 from colander import Invalid
 from colander import MappingSchema
+from colander import Schema
 from colander import SchemaNode
 from colander import SequenceSchema
 from cornice.util import json_error
@@ -31,6 +32,7 @@ from adhocracy.rest.schemas import POSTLoginEmailRequestSchema
 from adhocracy.rest.schemas import POSTLoginUsernameRequestSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
 from adhocracy.rest.schemas import PUTResourceRequestSchema
+from adhocracy.rest.schemas import GETPoolRequestSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
@@ -95,10 +97,18 @@ def validate_request_data(context: ILocation, request: Request,
     schema_with_binding = schema.bind(context=context, request=request,
                                       parent_pool=parent)
     qs, headers, body, path = extract_request_data(request)
-    _validate_schema(body, schema_with_binding, request, location='body')
-    _validate_schema(qs, schema_with_binding, request, location='querystring')
+    validate_body_or_querystring(body, qs, schema_with_binding, request)
     _validate_extra_validators(extra_validators, context, request)
     _raise_if_errors(request)
+
+
+def validate_body_or_querystring(body, qs, schema_with_binding: Schema,
+                                 request: Request):
+    if request.method.upper() == 'GET':
+        _validate_schema(qs, schema_with_binding, request,
+                         location='querystring')
+    else:
+        _validate_schema(body, schema_with_binding, request, location='body')
 
 
 def _validate_schema(cstruct: object, schema: MappingSchema, request: Request,
@@ -133,10 +143,9 @@ def _validate_list_schema(schema: SequenceSchema, cstruct: list,
 
 def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
                           request: Request, location='body'):
-    nodes = [n for n in schema if getattr(n, 'location', 'body') == location]
     validated = {}
-    nodes_with_cstruct = [n for n in nodes if n.name in cstruct]
-    nodes_without_cstruct = [n for n in nodes if n.name not in cstruct]
+    nodes_with_cstruct = [n for n in schema if n.name in cstruct]
+    nodes_without_cstruct = [n for n in schema if n.name not in cstruct]
     for node in nodes_without_cstruct:
         appstruct = node.deserialize()
         if appstruct is not drop:
@@ -274,12 +283,13 @@ class ResourceRESTView(RESTView):
     @view_config(request_method='GET')
     def get(self) -> dict:
         """Get resource data."""
+        queryparams = self.request.validated if self.request.validated else {}
         sheets_view = self.registry.resource_sheets(self.context, self.request,
                                                     onlyviewable=True)
         struct = {'data': {}}
         for sheet in sheets_view.values():
             key = sheet.meta.isheet.__identifier__
-            struct['data'][key] = sheet.get_cstruct()
+            struct['data'][key] = sheet.get_cstruct(params=queryparams)
         struct['path'] = resource_path(self.context)
         iresource = get_iresource(self.context)
         struct['content_type'] = iresource.__identifier__
@@ -323,7 +333,16 @@ class PoolRESTView(SimpleRESTView):
 
     """View for Pools, implements get, options, put and post."""
 
+    validation_GET = (GETPoolRequestSchema, [])
+
     validation_POST = (POSTResourceRequestSchema, [])
+
+    @view_config(request_method='GET')
+    def get(self) -> dict:
+        """Get resource data."""
+        # This delegation method is necessary since otherwise validation_GET
+        # won't be found.
+        return super().get()
 
     def build_post_response(self, resource) -> dict:
         """Build response data structure for a POST request. """
