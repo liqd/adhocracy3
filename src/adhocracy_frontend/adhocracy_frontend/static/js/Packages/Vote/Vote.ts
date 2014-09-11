@@ -17,6 +17,8 @@ export interface IVoteScope extends ng.IScope {
         contra : number;
         neutral : number;
     };
+    active : VoteValue;
+    isActive : (VoteValue) => string;  // css class name if VoteValue is active, or "" otherwise.
     cast(value : VoteValue) : void;
     update() : void;
 }
@@ -31,8 +33,22 @@ export var createDirective = (adhConfig : AdhConfig.Type) => {
         },
         link: (scope : IVoteScope) => {
             scope.cast = (value : VoteValue) : void => {
-                scope.votes[VoteValue[value]] += 1;
+                if (scope.isActive(value)) {
+                    scope.votes[VoteValue[value]] -= 1;
+                    delete scope.active;
+                } else {
+                    // decrease old value
+                    if (scope.hasOwnProperty("active")) {
+                        scope.votes[VoteValue[scope.active]] -= 1;
+                    }
+                    // increase new value
+                    scope.votes[VoteValue[value]] += 1;
+                    scope.active = value;
+                }
             };
+
+            delete scope.active;
+            scope.isActive = (value : VoteValue) => (value === scope.active) ? "vote-button-active" : "";
 
             scope.update = () : void => {
                 // FIXME: This sets some arbitrary data for now.
