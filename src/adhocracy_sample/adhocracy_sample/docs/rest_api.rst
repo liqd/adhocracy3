@@ -999,13 +999,17 @@ any), but not for any further failed requests. The backend stops processing
 encoded requests once the first of them has failed, since further processing
 would probably only lead to further errors.
 
-FIXME: I don't think the tests are supposed to work as is, but they
-should be clear enough to serve as documentation.  Fix this once the
-application code that it is testing is supposed to work?  --mf
+Filtering Pools
+---------------
 
-FIXME: The response does not have to have this particular type.  I
-would prefer it if I could get the individual request responses (even
-if they are obsolete), but in which syntax I don't care.  --mf
+It's possible to filter and aggregate the information collected in pools by
+adding suitable GET parameters. For example, we can only retrieve children
+of a specific content type::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/').json
+    >>> resp_data
+
+# TODO
 
 
 Other stuff
