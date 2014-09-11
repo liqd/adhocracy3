@@ -104,6 +104,10 @@ def validate_request_data(context: ILocation, request: Request,
 
 def validate_body_or_querystring(body, qs, schema_with_binding: Schema,
                                  request: Request):
+    """Validate the querystring if this is a GET request, the body otherwise.
+
+    This allows using just a single schema for all kinds of requests.
+    """
     if request.method.upper() == 'GET':
         _validate_schema(qs, schema_with_binding, request,
                          location='querystring')
