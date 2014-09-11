@@ -768,11 +768,12 @@ Currently there are two very simple conflict resolution strategies:
 
 The backend must to two things::
 
-- Add a 'forkable' flag to the IVersionable sheet.  (There are
-  possibly other ways to model this -- suggestions welcome.)
+1. Add a 'forkable' flag to the IVersionable sheet.  (There are
+   possibly other ways to model this.  Suggestions welcome.)
 
-- If a non-forkable, non-head version appears as a predecessor in a
-  post, respond with an error.
+2. If a non-forkable, non-head version appears as a predecessor in a
+   post, respond with an error.
+
 
 FIXME: add tests for this!
 
