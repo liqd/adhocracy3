@@ -762,7 +762,7 @@ Currently there are two very simple conflict resolution strategies:
    that it's best to get on the phone and talk it through before
    generating more merge conflicts.  :)
 
-4. (Future work): Ideally, we would the user to be notified that there
+4. (Future work): Ideally, the user would to be notified that there
    is a conflict, display the differences between the three versions,
    and allow the user to merge his changes into the current HEAD.
 
