@@ -6,11 +6,11 @@ import unittest
 class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        from adhocracy.testing import create_pool_with_graph
+        from adhocracy_core.testing import create_pool_with_graph
         config = testing.setUp()
-        config.include('adhocracy.registry')
-        config.include('adhocracy.events')
-        config.include('adhocracy.sheets')
+        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.events')
+        config.include('adhocracy_core.sheets')
         config.include('adhocracy_sample.resources.paragraph')
         self.config = config
         self.context = create_pool_with_graph()

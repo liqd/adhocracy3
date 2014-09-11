@@ -6,11 +6,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 
 requires = [
-    'adhocracy',
+    'adhocracy_core',
     ]
 
 test_requires = [
-    'adhocracy[test]',
+    'adhocracy_core[test]',
     ]
 
 setup(name='adhocracy_sample',

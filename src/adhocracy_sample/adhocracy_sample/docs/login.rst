@@ -23,11 +23,11 @@ Start Adhocracy testapp::
 Test that the relevant resources and sheets exist:
 
     >>> resp_data = testapp.get("/meta_api/").json
-    >>> 'adhocracy.sheets.versions.IVersions' in resp_data['sheets']
+    >>> 'adhocracy_core.sheets.versions.IVersions' in resp_data['sheets']
     True
-    >>> 'adhocracy.sheets.user.IUserBasic' in resp_data['sheets']
+    >>> 'adhocracy_core.sheets.user.IUserBasic' in resp_data['sheets']
     True
-    >>> 'adhocracy.sheets.user.IPasswordAuthentication' in resp_data['sheets']
+    >>> 'adhocracy_core.sheets.user.IPasswordAuthentication' in resp_data['sheets']
     True
 
 User Creation (Registration)
@@ -37,23 +37,23 @@ A new user is registered by creating a user object under the
 ``/principals/users`` pool. On success, the response contains the
 path of the new user::
 
-    >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
+    >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
-    ...              'adhocracy.sheets.user.IUserBasic': {
+    ...              'adhocracy_core.sheets.user.IUserBasic': {
     ...                  'name': 'Anna Müller',
     ...                  'email': 'anna@example.org'},
-    ...              'adhocracy.sheets.user.IPasswordAuthentication': {
+    ...              'adhocracy_core.sheets.user.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
     >>> resp_data = testapp.post_json(rest_url + "/principals/users", prop).json
     >>> resp_data["content_type"]
-    'adhocracy.resources.principal.IUser'
+    'adhocracy_core.resources.principal.IUser'
     >>> user_path = resp_data["path"]
     >>> user_path
     '.../principals/users/00...
 
 Like every resource the user has a metadata sheet with creation information::
     >>> resp_data = testapp.get(user_path).json
-    >>> resp_metadata = resp_data['data']['adhocracy.sheets.metadata.IMetadata']
+    >>> resp_metadata = resp_data['data']['adhocracy_core.sheets.metadata.IMetadata']
 
 Even though he is not logged in yet, the creator points to his user resource::
 
@@ -79,19 +79,19 @@ send an explicit login request afterwards.
 On failure, the backend responds with status code 400 and an error message.
 E.g. when we try to register a user with an empty password::
 
-    >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
+    >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
-    ...              'adhocracy.sheets.user.IUserBasic': {
+    ...              'adhocracy_core.sheets.user.IUserBasic': {
     ...                  'name': 'Other User',
     ...                  'email': 'annina@example.org'},
-    ...              'adhocracy.sheets.user.IPasswordAuthentication': {
+    ...              'adhocracy_core.sheets.user.IPasswordAuthentication': {
     ...                  'password': ''}}}
     >>> resp_data = testapp.post_json(rest_url + "/principals/users", prop,
     ...                               status=400).json
     >>> pprint(resp_data)
     {'errors': [{'description': 'Required',
                  'location': 'body',
-                 'name': 'data.adhocracy.sheets.user.IPasswordAuthentication.password'}],
+                 'name': 'data.adhocracy_core.sheets.user.IPasswordAuthentication.password'}],
      'status': 'error'}
 
 <errors> is a list of errors. The above error indicates that a required
@@ -108,19 +108,19 @@ conditions can occur:
 For example, if we try to register a user whose email address is ready
 registered:
 
-    >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
+    >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
-    ...              'adhocracy.sheets.user.IUserBasic': {
+    ...              'adhocracy_core.sheets.user.IUserBasic': {
     ...                  'name': 'New user with old password',
     ...                  'email': 'anna@example.org'},
-    ...              'adhocracy.sheets.user.IPasswordAuthentication': {
+    ...              'adhocracy_core.sheets.user.IPasswordAuthentication': {
     ...                  'password': 'EckVocUbs3'}}}
     >>> resp_data = testapp.post_json(rest_url + "/principals/users", prop,
     ...                               status=400).json
     >>> pprint(resp_data)
     {'errors': [{'description': 'The user login email is not unique',
                  'location': 'body',
-                 'name': 'data.adhocracy.sheets.user.IUserBasic.email'}],
+                 'name': 'data.adhocracy_core.sheets.user.IUserBasic.email'}],
      'status': 'error'}
 
 *Note:* in the future, the registration request may contain additional
@@ -128,12 +128,12 @@ personal data for the user. This data will probably be collected in one or
 several additional sheets, e.g.::
 
     'data': {
-        'adhocracy.sheets.user.IUserBasic': {
+        'adhocracy_core.sheets.user.IUserBasic': {
             'name': 'Anna Müller',
             'email': 'anna@example.org'},
-        'adhocracy.sheets.user.IPasswordAuthentication': {
+        'adhocracy_core.sheets.user.IPasswordAuthentication': {
             'password': '...'},
-        'adhocracy.sheets.user.IUserDetails': {
+        'adhocracy_core.sheets.user.IUserDetails': {
           'forename': '...',
           'surname': '...',
           'day_of_birth': '...',

@@ -1,12 +1,12 @@
 """Section resource type."""
-from adhocracy.interfaces import IItemVersion
-from adhocracy.interfaces import IItem
-from adhocracy.interfaces import ITag
-from adhocracy.resources import add_resource_type_to_registry
-from adhocracy.resources.itemversion import itemversion_metadata
-from adhocracy.resources.item import item_metadata
+from adhocracy_core.interfaces import IItemVersion
+from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import ITag
+from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.resources.itemversion import itemversion_metadata
+from adhocracy_core.resources.item import item_metadata
 
-import adhocracy.sheets.document
+import adhocracy_core.sheets.document
 
 
 class ISectionVersion(IItemVersion):
@@ -17,7 +17,7 @@ class ISectionVersion(IItemVersion):
 sectionversion_meta = itemversion_metadata._replace(
     content_name='SectionVersion',
     iresource=ISectionVersion,
-    extended_sheets=[adhocracy.sheets.document.ISection,
+    extended_sheets=[adhocracy_core.sheets.document.ISection,
                      ],
 )
 

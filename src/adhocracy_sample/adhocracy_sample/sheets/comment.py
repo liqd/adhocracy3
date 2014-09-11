@@ -1,14 +1,14 @@
 """Comment sheet."""
 import colander
 
-from adhocracy.interfaces import ISheet
-from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
-from adhocracy.interfaces import SheetToSheet
-from adhocracy.sheets import add_sheet_to_registry
-from adhocracy.schema import UniqueReferences
-from adhocracy.schema import Reference
-from adhocracy.sheets import sheet_metadata_defaults
-from adhocracy.schema import Text
+from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
+from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.sheets import add_sheet_to_registry
+from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import Reference
+from adhocracy_core.sheets import sheet_metadata_defaults
+from adhocracy_core.schema import Text
 
 
 class IComment(ISheet, ISheetReferenceAutoUpdateMarker):

@@ -6,7 +6,7 @@ from pytest import fixture
 
 def test_includeme_register_comment_sheet(config):
     from adhocracy_sample.sheets.comment import IComment
-    from adhocracy.utils import get_sheet
+    from adhocracy_core.utils import get_sheet
     config.include('adhocracy_sample.sheets.comment')
     context = testing.DummyResource(__provides__=IComment)
     assert get_sheet(context, IComment)
@@ -21,7 +21,7 @@ class TestCommentableSheet:
 
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
-        from adhocracy.interfaces import IResourceSheet
+        from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_sample.sheets.comment import ICommentable
         from adhocracy_sample.sheets.comment import CommentableSchema
         inst = meta.sheet_class(meta, context)

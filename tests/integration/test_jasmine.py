@@ -9,10 +9,10 @@ adhocracy_sample.
 from pytest import fixture
 from pytest import mark
 
-from adhocracy.testing import Browser
-from adhocracy.testing import browser_test_helper
-from adhocracy.frontend.tests.unit.console import Parser
-from adhocracy.frontend.tests.unit.console import Formatter
+from adhocracy_core.testing import Browser
+from adhocracy_core.testing import browser_test_helper
+from adhocracy_core.frontend.tests.unit.console import Parser
+from adhocracy_core.frontend.tests.unit.console import Formatter
 
 pytestmark = mark.jasmine
 

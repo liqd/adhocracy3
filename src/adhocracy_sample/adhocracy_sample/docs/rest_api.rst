@@ -28,7 +28,7 @@ Resource structure
 ------------------
 
 Resources have one content interface to set its type, like
-"adhocracy.resources.pool.IBasicPool".
+"adhocracy_core.resources.pool.IBasicPool".
 
 Terminology: we refer to content interfaces and the objects specified
 by content interfaces as "resources"; resources consist of "sheets"
@@ -106,16 +106,16 @@ The "resources" key points to an object whose keys are all the resources
 (content types) defined by the system::
 
     >>> sorted(resp_data['resources'].keys())
-    [...'adhocracy.resources.pool.IBasicPool', ...'adhocracy_sample.resources.section.ISection'...]
+    [...'adhocracy_core.resources.pool.IBasicPool', ...'adhocracy_sample.resources.section.ISection'...]
 
 Each of these keys points to an object describing the resource. If the
 resource implements sheets (and a resource that doesn't would be
 rather useless!), the object will have a "sheets" key whose value is a list
 of the sheets implemented by the resource::
 
-    >>> basicpool_desc = resp_data['resources']['adhocracy.resources.pool.IBasicPool']
+    >>> basicpool_desc = resp_data['resources']['adhocracy_core.resources.pool.IBasicPool']
     >>> sorted(basicpool_desc['sheets'])
-    ['adhocracy.sheets.metadata.IMetadata', 'adhocracy.sheets.name.IName', 'adhocracy.sheets.pool.IPool'...]
+    ['adhocracy_core.sheets.metadata.IMetadata', 'adhocracy_core.sheets.name.IName', 'adhocracy_core.sheets.pool.IPool'...]
 
 If the resource is an item, it will also have a "item_type" key whose value
 is the type of versions managed by this item (e.g. a Section will manage
@@ -131,27 +131,27 @@ pool/item can contain (including the "item_type" if it's an item). For
 example, a pool can contain other pools; a section can contain tags. ::
 
     >>> basicpool_desc['element_types']
-    ['adhocracy.interfaces.IPool'...]
+    ['adhocracy_core.interfaces.IPool'...]
     >>> sorted(section_desc['element_types'])
-    ['adhocracy.interfaces.ITag', ...'adhocracy_sample.resources.section.ISectionVersion'...]
+    ['adhocracy_core.interfaces.ITag', ...'adhocracy_sample.resources.section.ISectionVersion'...]
 
 The "sheets" key points to an object whose keys are all the sheets
 implemented by any of the resources::
 
      >>> sorted(resp_data['sheets'].keys())
-     [...'adhocracy.sheets.name.IName', ...'adhocracy.sheets.pool.IPool'...]
+     [...'adhocracy_core.sheets.name.IName', ...'adhocracy_core.sheets.pool.IPool'...]
 
 Each of these keys points to an object describing the resource. Each of
 these objects has a "fields" key whose value is a list of objects
 describing the fields defined by the sheet:
 
-    >>> pprint(resp_data['sheets']['adhocracy.sheets.name.IName']['fields'][0])
+    >>> pprint(resp_data['sheets']['adhocracy_core.sheets.name.IName']['fields'][0])
     {'creatable': True,
      'create_mandatory': True,
      'editable': False,
      'name': 'name',
      'readable': True,
-     'valuetype': 'adhocracy.schema.Name'}
+     'valuetype': 'adhocracy_core.schema.Name'}
 
 Each field definition has the following keys:
 
@@ -176,7 +176,7 @@ creatable
 valuetype
     The type of values stored in the field, either a basic type (as defined
     by Colander) such as "String" or "Integer", or a custom-defined type
-    such as "adhocracy.schema.AbsolutePath"
+    such as "adhocracy_core.schema.AbsolutePath"
 
 There also are some optional keys:
 
@@ -188,7 +188,7 @@ containertype
 
 targetsheet
     Only present if "valuetype" is a path
-    ("adhocracy.schema.AbsolutePath"). If present, it gives the name of the
+    ("adhocracy_core.schema.AbsolutePath"). If present, it gives the name of the
     sheet that all pointed-to resources will implement (they might possibly
     be of different types, but they will always implement the given sheet
     or they wouldn't be valid link targets).
@@ -196,7 +196,7 @@ targetsheet
 For example, the 'subsections' field of ISection is an ordered list
 pointing to other ISection's:
 
-    >>> secfields = resp_data['sheets']['adhocracy.sheets.document.ISection']['fields']
+    >>> secfields = resp_data['sheets']['adhocracy_core.sheets.document.ISection']['fields']
     >>> for field in secfields:
     ...     if field['name'] == 'subsections':
     ...         pprint(field)
@@ -207,13 +207,13 @@ pointing to other ISection's:
      'editable': True,
      'name': 'subsections',
      'readable': True,
-     'targetsheet': 'adhocracy.sheets.document.ISection',
-     'valuetype': 'adhocracy.schema.AbsolutePath'}
+     'targetsheet': 'adhocracy_core.sheets.document.ISection',
+     'valuetype': 'adhocracy_core.schema.AbsolutePath'}
 
 The 'follows' field of IVersionable is an unordered set pointing to other
 IVersionable's:
 
-...    >>> verfields = resp_data['sheets']['adhocracy.sheets.versions.IVersionable']['fields']
+...    >>> verfields = resp_data['sheets']['adhocracy_core.sheets.versions.IVersionable']['fields']
 ...    >>> for field in verfields:
 ...    ...     if field['name'] == 'follows':
 ...    ...         pprint(field)
@@ -224,8 +224,8 @@ IVersionable's:
 ...     'name': 'follows',
 ...     'editable': True,
 ...     'readable': True,
-...     'targetsheet': 'adhocracy.sheets.versions.IVersionable',
-...     'valuetype': 'adhocracy.schema.AbsolutePath'}
+...     'targetsheet': 'adhocracy_core.sheets.versions.IVersionable',
+...     'valuetype': 'adhocracy_core.schema.AbsolutePath'}
 
 OPTIONS
 ~~~~~~~
@@ -254,7 +254,7 @@ the actual response body that will be returned::
 
     >>> pprint(resp_data['GET']['response_body'])
     {'content_type': '',
-     'data': {...'adhocracy.sheets.name.IName': {}...},
+     'data': {...'adhocracy_core.sheets.name.IName': {}...},
      'path': ''}
 
 "content_type" and "path" will be filled in responses returned by an actual
@@ -267,8 +267,8 @@ If the current user has the right to post new versions of the resource or
 add new details to it, the "request_body" sub-key returned for POST points
 to a array of stub views of allowed requests::
 
-    >>> data_post_pool = {'content_type': 'adhocracy.resources.pool.IBasicPool',
-    ...                   'data': {'adhocracy.sheets.name.IName': {}}}
+    >>> data_post_pool = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    ...                   'data': {'adhocracy_core.sheets.name.IName': {}}}
     >>> data_post_pool in resp_data["POST"]["request_body"]
     True
 
@@ -283,7 +283,7 @@ If the current user has the right to modify the resource in-place, the
 request should look like::
 
 ...     >>> pprint(resp_data['PUT']['request_body'])
-...     {'data': {...'adhocracy.sheets.name.IName': {}...}}
+...     {'data': {...'adhocracy_core.sheets.name.IName': {}...}}
 
 The "response_body" sub-key gives, as usual, a stub view of the resulting
 response body::
@@ -317,22 +317,22 @@ Returns resource and child elements meta data and all sheet with data::
 
     >>> resp_data = testapp.get(rest_url + "/adhocracy").json
     >>> pprint(resp_data["data"])
-    {'adhocracy.sheets.metadata.IMetadata': ...
-     'adhocracy.sheets.name.IName': {'name': 'adhocracy'},
-     'adhocracy.sheets.pool.IPool': {'elements': [...]}}
+    {'adhocracy_core.sheets.metadata.IMetadata': ...
+     'adhocracy_core.sheets.name.IName': {'name': 'adhocracy'},
+     'adhocracy_core.sheets.pool.IPool': {'elements': [...]}}
 
 POST
 ~~~~
 
 Create a new resource ::
 
-    >>> prop = {'content_type': 'adhocracy.resources.pool.IBasicPool',
+    >>> prop = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {
-    ...              'adhocracy.sheets.name.IName': {
+    ...              'adhocracy_core.sheets.name.IName': {
     ...                  'name': 'Proposals'}}}
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy", prop).json
     >>> resp_data["content_type"]
-    'adhocracy.resources.pool.IBasicPool'
+    'adhocracy_core.resources.pool.IBasicPool'
     >>> resp_data["path"]
     '.../adhocracy/Proposals/'
 
@@ -344,17 +344,17 @@ Modify data of an existing resource ::
     FIXME: disable because IName.name is not editable.  use another example!
     FIXME: what we do here is a `patch` actually, so we should rename this.
 
-...    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
-...    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
+...    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+...    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
 ...    >>> resp_data = testapp.put_json(rest_url + "/adhocracy/Proposals", data).json
 ...    >>> pprint(resp_data)
-...    {'content_type': 'adhocracy.resources.pool.IBasicPool',
+...    {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
 ...     'path': rest_url + '/adhocracy/Proposals'}
 
 Check the changed resource ::
 
 ...   >>> resp_data = testapp.get(rest_url + "/adhocracy/Proposals").json
-...   >>> resp_data["data"]["adhocracy.sheets.name.IName"]["name"]
+...   >>> resp_data["data"]["adhocracy_core.sheets.name.IName"]["name"]
 ...   'youdidntexpectthis'
 
 FIXME: write test cases for attributes with "create_mandatory",
@@ -369,16 +369,16 @@ FIXME: ... is not working anymore in this doctest
 
 The normal return code is 200 ::
 
-    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
-    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'Proposals'}}}
+    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
 
 .. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data)
 .. 200 OK application/json ...
 
 If you submit invalid data the return error code is 400 ::
 
-    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
-    ...         'data': {'adhocracy.sheets.example.WRONGINTERFACE': {'name': 'Proposals'}}}
+    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    ...         'data': {'adhocracy_core.sheets.example.WRONGINTERFACE': {'name': 'Proposals'}}}
 
 .. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data)
 .. Traceback (most recent call last):
@@ -471,7 +471,7 @@ Create a Proposal (a subclass of Item which pools ProposalVersion's) ::
 
     >>> pdag = {'content_type': 'adhocracy_sample.resources.proposal.IProposal',
     ...         'data': {
-    ...              'adhocracy.sheets.name.IName': {
+    ...              'adhocracy_core.sheets.name.IName': {
     ...                  'name': 'kommunismus'}
     ...              }
     ...         }
@@ -495,10 +495,10 @@ sheet ITags.
 The Proposal has the IVersions and ITags interfaces to work with Versions::
 
     >>> resp = testapp.get(pdag_path)
-    >>> resp.json['data']['adhocracy.sheets.versions.IVersions']['elements']
+    >>> resp.json['data']['adhocracy_core.sheets.versions.IVersions']['elements']
     ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/']
 
-    >>> resp.json['data']['adhocracy.sheets.tags.ITags']['elements']
+    >>> resp.json['data']['adhocracy_core.sheets.tags.ITags']['elements']
     ['.../adhocracy/Proposals/kommunismus/FIRST/', '.../adhocracy/Proposals/kommunismus/LAST/']
 
 Update
@@ -507,20 +507,20 @@ Update
 Fetch the first Proposal version, it is empty ::
 
     >>> resp = testapp.get(pvrs0_path)
-    >>> pprint(resp.json['data']['adhocracy.sheets.document.IDocument'])
+    >>> pprint(resp.json['data']['adhocracy_core.sheets.document.IDocument'])
     {'description': '', 'elements': [], 'title': ''}
 
-    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersionable'])
+    >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersionable'])
     {'followed_by': [], 'follows': []}
 
 Create a new version of the proposal that follows the first version ::
 
     >>> pvrs = {'content_type': 'adhocracy_sample.resources.proposal.IProposalVersion',
-    ...         'data': {'adhocracy.sheets.document.IDocument': {
+    ...         'data': {'adhocracy_core.sheets.document.IDocument': {
     ...                     'title': 'kommunismus jetzt!',
     ...                     'description': 'blabla!',
     ...                     'elements': []},
-    ...                  'adhocracy.sheets.versions.IVersionable': {
+    ...                  'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [pvrs0_path]}},
     ...          'root_versions': [pvrs0_path]}
     >>> resp = testapp.post_json(pdag_path, pvrs)
@@ -536,7 +536,7 @@ We expect certain Versionable fields for the rest of this test suite
 to work ::
 
     >>> resp = testapp.get('/meta_api')
-    >>> vers_fields = resp.json['sheets']['adhocracy.sheets.versions.IVersionable']['fields']
+    >>> vers_fields = resp.json['sheets']['adhocracy_core.sheets.versions.IVersionable']['fields']
     >>> pprint(sorted(vers_fields, key=itemgetter('name')))
     [{'containertype': 'list',
       'creatable': False,
@@ -544,16 +544,16 @@ to work ::
       'editable': False,
       'name': 'followed_by',
       'readable': True,
-      'targetsheet': 'adhocracy.sheets.versions.IVersionable',
-      'valuetype': 'adhocracy.schema.AbsolutePath'},
+      'targetsheet': 'adhocracy_core.sheets.versions.IVersionable',
+      'valuetype': 'adhocracy_core.schema.AbsolutePath'},
      {'containertype': 'list',
       'creatable': True,
       'create_mandatory': False,
       'editable': True,
       'name': 'follows',
       'readable': True,
-      'targetsheet': 'adhocracy.sheets.versions.IVersionable',
-      'valuetype': 'adhocracy.schema.AbsolutePath'}]
+      'targetsheet': 'adhocracy_core.sheets.versions.IVersionable',
+      'valuetype': 'adhocracy_core.schema.AbsolutePath'}]
 
 The 'follows' element must be set by the client when it creates a new
 version that is the successor of one or several earlier versions. The
@@ -564,7 +564,7 @@ Therefore 'followed_by' is read-only, while 'follows' is writable.
 Create a Section item inside the Proposal item ::
 
     >>> sdag = {'content_type': 'adhocracy_sample.resources.section.ISection',
-    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel1'},}
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kapitel1'},}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag)
     >>> sdag_path = resp.json["path"]
@@ -573,7 +573,7 @@ Create a Section item inside the Proposal item ::
 and a second Section ::
 
     >>> sdag = {'content_type': 'adhocracy_sample.resources.section.ISection',
-    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'kapitel2'},}
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kapitel2'},}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag)
     >>> s2dag_path = resp.json["path"]
@@ -583,9 +583,9 @@ Create a third Proposal version and add the two Sections in their
 initial versions ::
 
     >>> pvrs = {'content_type': 'adhocracy_sample.resources.proposal.IProposalVersion',
-    ...         'data': {'adhocracy.sheets.document.IDocument': {
+    ...         'data': {'adhocracy_core.sheets.document.IDocument': {
     ...                     'elements': [svrs0_path, s2vrs0_path]},
-    ...                  'adhocracy.sheets.versions.IVersionable': {
+    ...                  'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [pvrs1_path],}
     ...                 },
     ...          'root_versions': [pvrs1_path]}
@@ -596,10 +596,10 @@ If we create a second version of kapitel1 ::
 
     >>> svrs = {'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
     ...         'data': {
-    ...              'adhocracy.sheets.document.ISection': {
+    ...              'adhocracy_core.sheets.document.ISection': {
     ...                  'title': 'Kapitel Überschrift Bla',
     ...                  'elements': []},
-    ...               'adhocracy.sheets.versions.IVersionable': {
+    ...               'adhocracy_core.sheets.versions.IVersionable': {
     ...                  'follows': [svrs0_path]
     ...                  }
     ...          },
@@ -621,7 +621,7 @@ or otherwise linking to the updated item. In this case, a fourth Proposal
 version is automatically created along with the updated Section version::
 
     >>> resp = testapp.get(pdag_path)
-    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersions'])
+    >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
     {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/',
                   '.../adhocracy/Proposals/kommunismus/VERSION_0000001/',
                   '.../adhocracy/Proposals/kommunismus/VERSION_0000002/',
@@ -634,10 +634,10 @@ More interestingly, if we then create a second version of kapitel2::
 
     >>> svrs = {'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
     ...         'data': {
-    ...              'adhocracy.sheets.document.ISection': {
+    ...              'adhocracy_core.sheets.document.ISection': {
     ...                  'title': 'on the hardness of version control',
     ...                  'elements': []},
-    ...               'adhocracy.sheets.versions.IVersionable': {
+    ...               'adhocracy_core.sheets.versions.IVersionable': {
     ...                  'follows': [s2vrs0_path]
     ...                  }
     ...          },
@@ -652,7 +652,7 @@ a Proposal version is automatically created only for pvrs3, not for
 pvrs2 (which also contains s2vrs0_path) ::
 
     >>> resp = testapp.get(pdag_path)
-    >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersions'])
+    >>> pprint(resp.json['data']['adhocracy_core.sheets.versions.IVersions'])
     {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/',
                   '.../adhocracy/Proposals/kommunismus/VERSION_0000001/',
                   '.../adhocracy/Proposals/kommunismus/VERSION_0000002/',
@@ -662,14 +662,14 @@ pvrs2 (which also contains s2vrs0_path) ::
     >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000004')
     >>> pvrs4_path = resp.json['path']
     >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000002')
-    >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
+    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
     1
 
-    >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
+    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
     1
 
     >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000004')
-    >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
+    >>> len(resp.json['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by'])
     0
 
 FIXME: If two frontends post competing sections simultaneously,
@@ -685,10 +685,10 @@ Each Versionable has a FIRST tag that points to the initial version::
 
     >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/FIRST')
     >>> pprint(resp.json)
-    {'content_type': 'adhocracy.interfaces.ITag',
+    {'content_type': 'adhocracy_core.interfaces.ITag',
      'data': {...
-              'adhocracy.sheets.name.IName': {'name': 'FIRST'},
-              'adhocracy.sheets.tags.ITag': {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/']}},
+              'adhocracy_core.sheets.name.IName': {'name': 'FIRST'},
+              'adhocracy_core.sheets.tags.ITag': {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/']}},
      'path': '.../adhocracy/Proposals/kommunismus/FIRST/'}
 
 It also has a LAST tag that points to the newest versions -- any versions
@@ -696,10 +696,10 @@ that aren't 'followed_by' any later version::
 
     >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/LAST')
     >>> pprint(resp.json)
-    {'content_type': 'adhocracy.interfaces.ITag',
+    {'content_type': 'adhocracy_core.interfaces.ITag',
      'data': {...
-              'adhocracy.sheets.name.IName': {'name': 'LAST'},
-              'adhocracy.sheets.tags.ITag': {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000004/']}},
+              'adhocracy_core.sheets.name.IName': {'name': 'LAST'},
+              'adhocracy_core.sheets.tags.ITag': {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000004/']}},
      'path': '.../adhocracy/Proposals/kommunismus/LAST/'}
 
 FIXME: the elements listing in the ITags interface is not very helpful, the
@@ -736,7 +736,7 @@ another version to say something meaningful. A comment contains *content*
     ...                 'adhocracy_sample.sheets.comment.IComment': {
     ...                     'refers_to': pvrs4_path,
     ...                     'content': 'Gefällt mir, toller Vorschlag!'},
-    ...                 'adhocracy.sheets.versions.IVersionable': {
+    ...                 'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [first_commvers_path]}},
     ...             'root_versions': [first_commvers_path]}
     >>> resp = testapp.post_json(comment_path, commvers)
@@ -766,7 +766,7 @@ As usual, we have to add another version to actually say something::
     ...                     'adhocracy_sample.sheets.comment.IComment': {
     ...                         'refers_to': snd_commvers_path,
     ...                         'content': 'Find ich nicht!'},
-    ...                     'adhocracy.sheets.versions.IVersionable': {
+    ...                     'adhocracy_core.sheets.versions.IVersionable': {
     ...                         'follows': [first_metacommvers_path]}},
     ...                 'root_versions': [first_metacommvers_path]}
     >>> resp = testapp.post_json(metacomment_path, metacommvers)
@@ -779,7 +779,7 @@ Lets view all the comments referring to the proposal.
 First find the path of the newest version of the proposal::
 
     >>> resp = testapp.get(pdag_path + '/LAST')
-    >>> newest_prop_vers = resp.json['data']['adhocracy.sheets.tags.ITag']['elements'][-1]
+    >>> newest_prop_vers = resp.json['data']['adhocracy_core.sheets.tags.ITag']['elements'][-1]
 
 Now we can retrieve that version and consult the 'comments' fields of its
 'adhocracy_sample.sheets.comment.ICommentable' sheet::
@@ -885,7 +885,7 @@ Let's add some more paragraphs to the second section above ::
     ...             'path': pdag_path,
     ...             'body': {
     ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
-    ...                 'data': {'adhocracy.sheets.name.IName':
+    ...                 'data': {'adhocracy_core.sheets.name.IName':
     ...                              {'name': 'par1'}
     ...                         }
     ...             },
@@ -898,10 +898,10 @@ Let's add some more paragraphs to the second section above ::
     ...             'body': {
     ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
     ...                 'data': {
-    ...                     'adhocracy.sheets.versions.IVersionable': {
+    ...                     'adhocracy_core.sheets.versions.IVersionable': {
     ...                         'follows': ['@par1_item/v1']
     ...                     },
-    ...                     'adhocracy.sheets.document.IParagraph': {
+    ...                     'adhocracy_core.sheets.document.IParagraph': {
     ...                         'content': 'sein blick ist vom vorüberziehn der stäbchen'
     ...                     }
     ...                 },
@@ -930,14 +930,14 @@ Let's add some more paragraphs to the second section above ::
               'data': {...},
               'path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/'},
      'code': 200}
-     >>> batch_resp[2]['body']['data']['adhocracy.sheets.document.IParagraph']['content']
+     >>> batch_resp[2]['body']['data']['adhocracy_core.sheets.document.IParagraph']['content']
      'sein blick ist vom vorüberziehn der stäbchen'
 
 
 Now the first, empty paragraph version should contain the newly
 created paragraph version as its only successor ::
 
-    .. >>> v1 = batch_resp[2]['body']['data']['adhocracy.sheets.versions.IVersionable']['followed_by']
+    .. >>> v1 = batch_resp[2]['body']['data']['adhocracy_core.sheets.versions.IVersionable']['followed_by']
     .. >>> v2 = [batch_resp[1]['path']]
     .. >>> v1 == v2
     .. True
@@ -947,7 +947,7 @@ created paragraph version as its only successor ::
 The LAST tag should point to the version we created within the batch request::
 
     >>> resp_data = testapp.get(rest_url + "/adhocracy/Proposals/kommunismus/par1/LAST").json
-    >>> resp_data['data']['adhocracy.sheets.tags.ITag']['elements']
+    >>> resp_data['data']['adhocracy_core.sheets.tags.ITag']['elements']
     ['.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/']
 
 Post another paragraph item and a version.  If the version post fails,
@@ -958,7 +958,7 @@ the paragraph will not be present in the database ::
     ...             'path': pdag_path,
     ...             'body': {
     ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
-    ...                 'data': {'adhocracy.sheets.name.IName':
+    ...                 'data': {'adhocracy_core.sheets.name.IName':
     ...                              {'name': 'par2'}
     ...                         }
     ...             },
@@ -970,10 +970,10 @@ the paragraph will not be present in the database ::
     ...             'body': {
     ...                 'content_type': 'NOT_A_CONTENT_TYPE_AT_ALL',
     ...                 'data': {
-    ...                     'adhocracy.sheets.versions.IVersionable': {
+    ...                     'adhocracy_core.sheets.versions.IVersionable': {
     ...                         'follows': ['@par2_item/v1']
     ...                     },
-    ...                     'adhocracy.sheets.document.IParagraph': {
+    ...                     'adhocracy_core.sheets.document.IParagraph': {
     ...                         'content': 'das wird eh nich gepostet'
     ...                     }
     ...                 }

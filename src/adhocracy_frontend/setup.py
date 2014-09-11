@@ -7,11 +7,11 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
-    'adhocracy',
+    'adhocracy_core',
     ]
 
 test_requires = [
-    'adhocracy[test]',
+    'adhocracy_core[test]',
     ]
 
 setup(name='adhocracy_frontend',
