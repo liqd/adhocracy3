@@ -1006,10 +1006,64 @@ It's possible to filter and aggregate the information collected in pools by
 adding suitable GET parameters. For example, we can only retrieve children
 of a specific content type::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/').json
-    >>> resp_data
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISection'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['/adhocracy/Proposals/kommunismus/kapitel1',
+     '/adhocracy/Proposals/kommunismus/kapitel2']
 
-# TODO
+Or only children that implement a specific sheet::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sheet': 'adhocracy.sheets.tags.ITag'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['/adhocracy/Proposals/kommunismus/FIRST',
+     '/adhocracy/Proposals/kommunismus/LAST']
+
+By default, only direct children of a pool are listed as elements,
+i.e. the standard depth is 1. Setting the *depth* parameter to a higher
+value allows also including grandchildren (depth=2) or even great-grandchildren
+(depth=3) etc. To get nested elements of arbitrary nesting depth, use
+*depth=all*::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    ...             'depth': 'all'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    [...'/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001'...]
+
+Without specifying a deeper depth, the above query for ISectionVersion's
+wouldn't have found anything, since they are children of children of the pool::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion'
+    ...             }).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    []
+
+To retrieve a count of the elements matching your query, specify
+*count=true* or just *count*. If you do so, an additional *count* field will
+be added to the returned IPool sheet::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...             'count': 'true'}).json
+    >>> resp_data['data']['adhocracy.sheets.pool.IPool']['count']
+    '2'
+
+*Note:* due to limitations of our (de)serialization library (Colander),
+the count is returned as a string, though it is actually a number.
+
+If you specify *count* without any other query parameters,
+you'll get the number of children in the pool::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'count': 'true'}).json
+    >>> child_count = resp_data['data']['adhocracy.sheets.pool.IPool']['count']
+    >>> assert int(child_count) >= 10
+
+# TODO Document elements=paths/content/omit, aggregateby, tag, custom filters.
+Note all multiple filters are combined by AND.
 
 
 Other stuff
