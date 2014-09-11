@@ -10,6 +10,8 @@ from colander import SequenceSchema
 from cornice.util import json_error
 from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
+from pyramid.events import NewResponse
+from pyramid.events import subscriber
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.request import Request
 from pyramid.view import view_config
@@ -651,3 +653,13 @@ class LoginEmailView(RESTView):
 def includeme(config):  # pragma: no cover
     """Register Views."""
     config.scan('.views')
+
+
+@subscriber(NewResponse)
+def add_cors_headers(event):
+    """Add CORS headers to response."""
+    event.response.headers.update({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept',
+        'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
+    })
