@@ -4,6 +4,7 @@ import colander
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import AdhocracySchemaNode
 from adhocracy.schema import Email
+from adhocracy.schema import Interface
 from adhocracy.schema import Password
 
 
@@ -217,6 +218,46 @@ class POSTBatchRequestSchema(colander.SequenceSchema):
     """Schema for batch requests (list of POSTBatchRequestItem's)."""
 
     items = POSTBatchRequestItem()
+
+
+class PoolElementsForm(colander.SchemaNode):
+
+    """The form of the elements attribute returned by the pool sheet."""
+
+    schema_type = colander.String
+    validator = colander.OneOf(['paths', 'content', 'omit'])
+    missing = 'paths'
+
+
+class PoolQueryDepth(colander.SchemaNode):
+
+    """The nesting depth of descendants in a pool response.
+
+    Either a positive number or the string 'all' to return descendants of
+    arbitrary depth.
+    """
+
+    schema_type = colander.String
+    validator = colander.Regex(r'^\d+|all$')
+    missing = '1'
+
+
+class GETPoolRequestSchema(colander.MappingSchema):
+
+    """GET parameters accepted for pool queries."""
+
+    def __init__(self):
+        super().__init__()
+        # Extra key/value pairs should be preserved when deserializing data
+        self.typ.unknown = 'preserve'
+
+    content_type = colander.SchemaNode(Interface(), missing=None)
+    sheet = colander.SchemaNode(Interface(), missing=None)
+    depth = PoolQueryDepth()
+    elements = PoolElementsForm()
+    count = colander.SchemaNode(colander.Boolean(), missing=False)
+    aggregateby = colander.SchemaNode(colander.String(), missing='')
+    tag = colander.SchemaNode(colander.String(), missing='')
 
 
 class OPTIONResourceResponseSchema(colander.Schema):

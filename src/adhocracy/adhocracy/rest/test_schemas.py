@@ -499,3 +499,79 @@ class TestPOSTBatchRequestSchema:
         }
         with raises(colander.Invalid):
             inst.deserialize(data)
+
+
+class TestGETPoolRequestSchema():
+
+    @fixture
+    def inst(self):
+        from adhocracy.rest.schemas import GETPoolRequestSchema
+        return GETPoolRequestSchema()
+
+    @fixture
+    def defaults(self):
+        return {'content_type': None,
+                'sheet': None,
+                'depth': '1',
+                'elements': 'paths',
+                'count': False,
+                'aggregateby': '',
+                'tag': ''}
+
+    def test_deserialize_empty(self, inst, defaults):
+        assert inst.deserialize({}) == defaults
+
+    def test_deserialize_valid(self, inst):
+        from adhocracy.sheets.name import IName
+        data = {'content_type': 'adhocracy.sheets.name.IName',
+                'sheet': 'adhocracy.sheets.name.IName',
+                'depth': '100',
+                'elements': 'content',
+                'count': 'true',
+                'aggregateby': 'rating.opinion',
+                'tag': 'LAST'}
+        expected = {'content_type': IName,
+                    'sheet': IName,
+                    'depth': '100',
+                    'elements': 'content',
+                    'count': True,
+                    'aggregateby': 'rating.opinion',
+                    'tag': 'LAST'}
+        assert inst.deserialize(data) == expected
+
+    def test_deserialize_content_type_invalid(self, inst):
+        data = {'content_type': 'adhocracy.sheets.name.NoName'}
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_depth_all(self, inst, defaults):
+        data = {'depth': 'all'}
+        expected = defaults.copy()
+        expected['depth'] = 'all'
+        assert inst.deserialize(data) == expected
+
+    def test_deserialize_depth_invalid(self, inst):
+        data = {'depth': '-7'}
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_count_explicit_false(self, inst, defaults):
+        data = {'count': 'false'}
+        expected = defaults.copy()
+        assert expected['count'] == False
+        assert inst.deserialize(data) == expected
+
+    def test_deserialize_count_empty(self, inst, defaults):
+        """Empty count is considered as True."""
+        data = {'count': ''}
+        expected = defaults.copy()
+        expected['count'] = True
+        assert inst.deserialize(data) == expected
+
+    def test_deserialize_extra_values_are_preserved(self, inst, defaults):
+        data = {'extra1': 'blah',
+                'another_extra': 'blub'}
+        expected = defaults.copy()
+        expected.update(data)
+        assert inst.typ.unknown == 'preserve'
+        assert inst.deserialize(data) == expected
