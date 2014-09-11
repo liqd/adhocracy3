@@ -65,6 +65,18 @@ class BatchView(RESTView):
                 raise err
         return self._response_list_to_json(response_list)
 
+    @view_config(name='batch',
+                 request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for batch view.
+
+        FIXME: Return something useful. This currently only exist in order to
+        satisfy the preflight request, which browsers do in CORS situations
+        before doing the actual POST.
+
+        """
+        return {}
+
     def _process_nested_request(self, nested_request: dict,
                                 path_map: dict) -> BatchItemResponse:
         result_path = nested_request['result_path']
