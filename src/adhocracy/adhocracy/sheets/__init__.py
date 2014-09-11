@@ -1,4 +1,4 @@
-"""Adhocarcy sheets."""
+"""Adhocracy sheets."""
 from persistent.mapping import PersistentMapping
 from pyramid.decorator import reify
 from pyramid.registry import Registry
@@ -38,12 +38,12 @@ class GenericResourceSheet(PropertySheet):
         self._data_key = self.meta.isheet.__identifier__
         self._graph = find_graph(context)
 
-    def get(self) -> dict:
+    def get(self, params: dict={}) -> dict:
         """Return appstruct."""
         appstruct = self._default_appstruct
-        appstruct.update(self._get_data_appstruct())
-        appstruct.update(self._get_reference_appstruct())
-        appstruct.update(self._get_back_reference_appstruct())
+        appstruct.update(self._get_data_appstruct(params))
+        appstruct.update(self._get_reference_appstruct(params))
+        appstruct.update(self._get_back_reference_appstruct(params))
         return appstruct
 
     @reify
@@ -51,7 +51,7 @@ class GenericResourceSheet(PropertySheet):
         items = [(n.name, n.default) for n in self.schema]
         return dict(items)
 
-    def _get_data_appstruct(self) -> iter:
+    def _get_data_appstruct(self, params: dict={}) -> iter:
         for key in self._data_keys:
             if key in self._data:
                 yield (key, self._data[key])
@@ -68,7 +68,7 @@ class GenericResourceSheet(PropertySheet):
             self.context._sheets[self._data_key] = PersistentMapping()
         return self.context._sheets[self._data_key]
 
-    def _get_reference_appstruct(self) -> iter:
+    def _get_reference_appstruct(self, params: dict={}) -> iter:
         references = self._get_references()
         for key, node in self._reference_nodes.items():
             node_references = references.get(key, None)
@@ -93,7 +93,7 @@ class GenericResourceSheet(PropertySheet):
                 nodes[node.name] = node
         return nodes
 
-    def _get_back_reference_appstruct(self) -> dict:
+    def _get_back_reference_appstruct(self, params: dict={}) -> dict:
         for key, node in self._back_reference_nodes.items():
             node_backrefs = self._get_backrefs(node)
             if not node_backrefs:
@@ -155,9 +155,9 @@ class GenericResourceSheet(PropertySheet):
                                           self.registry)
             self.registry.notify(event)
 
-    def get_cstruct(self) -> dict:
+    def get_cstruct(self, params: dict={}) -> dict:
         """Return schema :term:`cstruct`."""
-        struct = self.get()
+        struct = self.get(params)
         cstruct = self.schema.serialize(struct)
         return cstruct
 

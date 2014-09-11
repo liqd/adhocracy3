@@ -132,7 +132,7 @@ class PasswordAuthenticationSheet(GenericResourceSheet):
             self.context.pwd_manager = BCRYPTPasswordManager()
         self.context.password = self.context.pwd_manager.encode(password)
 
-    def _get_data_appstruct(self):
+    def _get_data_appstruct(self, params: dict={}):
         password = getattr(self.context, 'password', '')
         return {'password': password}
 

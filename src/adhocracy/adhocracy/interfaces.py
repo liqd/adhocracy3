@@ -85,11 +85,19 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
     def set(appstruct, omit=(), send_event=True) -> bool:
         """ Store ``appstruct`` dictionary data."""
 
-    def get() -> dict:
-        """ Get ``appstruct`` dictionary data."""
+    def get(params: dict={}) -> dict:
+        """ Get ``appstruct`` dictionary data.
 
-    def get_cstruct() -> dict:
-        """ Return a serialized dictionary representing the sheet state."""
+        :param params: optional parameters that can modify the appearance
+        of the returned dictionary, e.g. query parameters in a GET request
+        """
+
+    def get_cstruct(params: dict={}) -> dict:
+        """ Return a serialized dictionary representing the sheet state.
+
+        :param params: optional parameters that can modify the appearance
+        of the returned dictionary, e.g. query parameters in a GET request
+        """
 
 
 RESOURCE_METADATA = OrderedDict({
@@ -215,23 +223,6 @@ class IPool(IResource):  # pragma: no cover
 
     def add_next(subobject, prefix='') -> str:
         """Add new subobject and auto generate name."""
-
-
-class IFilterablePool(IPool):
-
-    """A pool that can be filtered and aggregated."""
-
-    def filtered_elements(depth: int=1, ifaces: Iterable=None,
-                          valuefilters: dict=None) -> Iterable:
-        """Return elements accepted by all specified filters.
-
-        :param depth: 1 to return only direct children, 2 to also return
-                grandchildren, etc.; `None` to return descendants of
-                arbitrary nesting depth
-        :param ifaces: return only elements that implement all these interfaces
-        :param valuefilters: mapping from index names to values; this can be
-                used to filter by Adhocracy-specific custom indexes
-        """
 
 
 class IItem(IPool):
