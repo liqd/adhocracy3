@@ -1,9 +1,12 @@
 """Colander schema extensions."""
 from datetime import datetime
+
+from pyramid.path import DottedNameResolver
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
 from pytz import UTC
 from substanced.schema import IdSet
+from substanced.util import get_dotted_name
 import colander
 import pytz
 
@@ -165,6 +168,29 @@ class TimeZoneName(AdhocracySchemaNode):
     default = 'UTC'
     missing = colander.drop
     validator = colander.OneOf(_ZONES)
+
+
+class Interface(colander.SchemaType):
+
+    """A ZOPE interface in dotted name notation.
+
+    Example value: adhocracy.sheets.name.IName
+    """
+
+    def serialize(self, node, value):
+        """Serialize interface to dotted name."""
+        if value in (colander.null, ''):
+            return value
+        return get_dotted_name(value)
+
+    def deserialize(self, node, value):
+        """Deserialize path to object."""
+        if value in (colander.null, ''):
+            return value
+        try:
+            return DottedNameResolver().resolve(value)
+        except Exception as err:
+            raise colander.Invalid(node, msg=str(err), value=value)
 
 
 class AbsolutePath(AdhocracySchemaNode):
