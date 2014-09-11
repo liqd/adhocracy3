@@ -766,6 +766,10 @@ Currently there are two very simple conflict resolution strategies:
    is a conflict, display the differences between the three versions,
    and allow the user to merge his changes into the current HEAD.
 
+5. (Future work): It is allowed to have multiple heads in the DAG, e.g.
+   different preferred versions by different principals. This however still
+   requires a lot of UX work to be done.
+
 The backend must to two things::
 
 1. Add a 'forkable' flag to the IVersionable sheet.  (There are
