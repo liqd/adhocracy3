@@ -704,6 +704,80 @@ that aren't 'followed_by' any later version::
 FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
 
+
+Forks and forkability
+~~~~~~~~~~~~~~~~~~~~~
+
+This api has been designed to allow implementation of complex merge
+conflict resolution, both automatic and with user-involvement.  For
+now, however, it only supports a simplified version control strategy:
+If any version that is not head is used as a predecessor, the backend
+responds with an error.  The frontend has to handle these errors, as
+they can always occur in race conditions with other users.
+
+Currently there are two very simple conflict resolution strategies:
+
+1. If a race condition is reported by the backend, the frontend
+   updates the predecessor version to head and tries again.  (In the
+   unlikely case where lots of post activity is going on, it may be
+   necessary to repeat this several times.)
+
+   Example: IRatingVersion can only legally be modified by one user
+   and should not experience any race conditions.  If it does, the
+   second post wins and silently reverts the previous one.
+
+2. Like 1., but the frontend posts two new versions on top of HEAD.
+   If this is the situation of the conflict::
+
+    Doc     v0----v1
+                \
+                 -----v1'
+
+          >-----> time >-------->
+
+   Then it is resolved as follows (by the frontend of the author of
+   v1')::
+
+    Doc     v0----v1
+                    \
+                     -----v0'----v1'
+
+          >-----> time >-------->
+
+   v0' is a copy of v0 that differs only in its predecessor.  It is
+   called a 'revert' version.  (FIXME: is there a way to enrich the
+   data with a 'is_revert' flag?)
+
+   This must be done in a batch request (a transaction) in order to
+   avoid that only the revert is successfully posted, but the actual
+   change fails.  Again, it is possible that this batch request fails,
+   and has to be attempted several times.
+
+   Example: IProposalVersion can be modified by many users
+   concurrently.
+
+3. (Future work): Both authors of the conflict are notified (email,
+   dashboard, ...), and explained how they can inspect the situation
+   and add new versions.  (The email should probably contain a warning
+   that it's best to get on the phone and talk it through before
+   generating more merge conflicts.  :)
+
+4. (Future work): Ideally, we would the user to be notified that there
+   is a conflict, display the differences between the three versions,
+   and allow the user to merge his changes into the current HEAD.
+
+The backend must to two things::
+
+- Add a 'forkable' flag to the IVersionable sheet.  (There are
+  possibly other ways to model this -- suggestions welcome.)
+
+- If a non-forkable, non-head version appears as a predecessor in a
+  post, respond with an error.
+
+FIXME: add tests for this!
+
+
+
 Resources with PostPool, example Comments
 -----------------------------------------
 
