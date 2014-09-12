@@ -25,14 +25,19 @@ export interface IRatingScope extends ng.IScope {
 }
 
 
+// (this type is over-restrictive in that T is used for both the
+// rating, the subject, and the target.  luckily, subtype-polymorphism
+// is too cool to complain about it here.  :-)
 export interface IRatingAdapter<T extends AdhResource.Content<any>> {
     create(settings : any) : T;
     createItem(settings : any) : any;
     derive(oldVersion : T, settings : any) : T;
     content(resource : T) : string;
     content(resource : T, value : string) : T;
-    refersTo(resource : T) : string;
-    refersTo(resource : T, value : string) : T;
+    subject(resource : T) : string;
+    subject(resource : T, value : string) : T;
+    target(resource : T) : string;
+    target(resource : T, value : string) : T;
     creator(resource : T) : string;
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;

@@ -69,9 +69,20 @@ export class RatingAdapter implements AdhRating.IRatingAdapter<RIRatingVersion> 
         }
     }
 
-    refersTo(resource : RIRatingVersion) : string;
-    refersTo(resource : RIRatingVersion, value : string) : RIRatingVersion;
-    refersTo(resource, value?) {
+    subject(resource : RIRatingVersion) : string;
+    subject(resource : RIRatingVersion, value : string) : RIRatingVersion;
+    subject(resource, value?) {
+        if (typeof value !== "undefined") {
+            resource.data["adhocracy.sheets.rating.IRating"].subject = value;
+            return resource;
+        } else {
+            return resource.data["adhocracy.sheets.rating.IRating"].subject;
+        }
+    }
+
+    target(resource : RIRatingVersion) : string;
+    target(resource : RIRatingVersion, value : string) : RIRatingVersion;
+    target(resource, value?) {
         if (typeof value !== "undefined") {
             resource.data["adhocracy.sheets.rating.IRating"].target = value;
             return resource;
