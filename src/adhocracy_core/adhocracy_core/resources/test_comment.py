@@ -1,6 +1,6 @@
-from pyramid import testing
-
 import unittest
+
+from pyramid import testing
 
 
 class IncludemeIntegrationTest(unittest.TestCase):
@@ -11,8 +11,8 @@ class IncludemeIntegrationTest(unittest.TestCase):
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
         config.include('adhocracy_core.sheets')
-        config.include('adhocracy_sample.sheets.comment')
-        config.include('adhocracy_sample.resources.proposal')
+        config.include('adhocracy_core.sheets.comment')
+        config.include('adhocracy_core.resources.comment')
         self.config = config
         self.context = create_pool_with_graph()
 
@@ -20,14 +20,14 @@ class IncludemeIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_includeme_registry_register_factories(self):
-        from adhocracy_sample.resources.proposal import IProposalVersion
-        from adhocracy_sample.resources.proposal import IProposal
+        from adhocracy_core.resources.comment import ICommentVersion
+        from adhocracy_core.resources.comment import IComment
         content_types = self.config.registry.content.factory_types
-        assert IProposal.__identifier__ in content_types
-        assert IProposalVersion.__identifier__ in content_types
+        assert IComment.__identifier__ in content_types
+        assert ICommentVersion.__identifier__ in content_types
 
     def test_includeme_registry_create_content(self):
-        from adhocracy_sample.resources.proposal import IProposalVersion
-        res = self.config.registry.content.create(IProposalVersion.__identifier__,
+        from adhocracy_core.resources.comment import ICommentVersion
+        res = self.config.registry.content.create(ICommentVersion.__identifier__,
                                                   self.context)
-        assert IProposalVersion.providedBy(res)
+        assert ICommentVersion.providedBy(res)

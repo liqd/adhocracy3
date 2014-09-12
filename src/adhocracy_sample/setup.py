@@ -13,7 +13,7 @@ test_requires = [
     'adhocracy_core[test]',
     ]
 
-setup(name='adhocracy_sample',
+setup(name='adhocracy_core',
       version='0.0',
       description='adhocracy sample app',
       long_description=README,
@@ -34,8 +34,8 @@ setup(name='adhocracy_sample',
       extras_require={'test': test_requires},
       entry_points="""\
       [paste.app_factory]
-      main = adhocracy_sample:main
+      main = adhocracy_core:main
       [pytest11]
-      adhocracy_sample = adhocracy_sample.testing
+      adhocracy_core = adhocracy_core.testing
       """,
       )

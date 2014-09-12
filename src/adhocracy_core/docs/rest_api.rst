@@ -19,7 +19,7 @@ Some imports to work with rest api calls::
 Start Adhocracy testapp::
 
     >>> from webtest import TestApp
-    >>> app = getfixture('app_sample')
+    >>> app = getfixture('app')
     >>> websocket = getfixture('websocket')
     >>> testapp = TestApp(app)
     >>> rest_url = 'http://localhost'
@@ -106,7 +106,7 @@ The "resources" key points to an object whose keys are all the resources
 (content types) defined by the system::
 
     >>> sorted(resp_data['resources'].keys())
-    [...'adhocracy_core.resources.pool.IBasicPool', ...'adhocracy_sample.resources.section.ISection'...]
+    [...'adhocracy_core.resources.pool.IBasicPool', ...'adhocracy_core.resources.sample_section.ISection'...]
 
 Each of these keys points to an object describing the resource. If the
 resource implements sheets (and a resource that doesn't would be
@@ -121,9 +121,9 @@ If the resource is an item, it will also have a "item_type" key whose value
 is the type of versions managed by this item (e.g. a Section will manage
 SectionVersions as main element type)::
 
-    >>> section_desc = resp_data['resources']['adhocracy_sample.resources.section.ISection']
+    >>> section_desc = resp_data['resources']['adhocracy_core.resources.sample_section.ISection']
     >>> section_desc['item_type']
-    'adhocracy_sample.resources.section.ISectionVersion'
+    'adhocracy_core.resources.sample_section.ISectionVersion'
 
 If the resource is a pool or item that can contain resources, it will also
 have an "element_types" key whose value is the list of all resources the
@@ -133,7 +133,7 @@ example, a pool can contain other pools; a section can contain tags. ::
     >>> basicpool_desc['element_types']
     ['adhocracy_core.interfaces.IPool'...]
     >>> sorted(section_desc['element_types'])
-    ['adhocracy_core.interfaces.ITag', ...'adhocracy_sample.resources.section.ISectionVersion'...]
+    ['adhocracy_core.interfaces.ITag', ...'adhocracy_core.resources.sample_section.ISectionVersion'...]
 
 The "sheets" key points to an object whose keys are all the sheets
 implemented by any of the resources::
@@ -469,7 +469,7 @@ Create
 
 Create a Proposal (a subclass of Item which pools ProposalVersion's) ::
 
-    >>> pdag = {'content_type': 'adhocracy_sample.resources.proposal.IProposal',
+    >>> pdag = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
     ...         'data': {
     ...              'adhocracy_core.sheets.name.IName': {
     ...                  'name': 'kommunismus'}
@@ -515,7 +515,7 @@ Fetch the first Proposal version, it is empty ::
 
 Create a new version of the proposal that follows the first version ::
 
-    >>> pvrs = {'content_type': 'adhocracy_sample.resources.proposal.IProposalVersion',
+    >>> pvrs = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposalVersion',
     ...         'data': {'adhocracy_core.sheets.document.IDocument': {
     ...                     'title': 'kommunismus jetzt!',
     ...                     'description': 'blabla!',
@@ -563,7 +563,7 @@ Therefore 'followed_by' is read-only, while 'follows' is writable.
 
 Create a Section item inside the Proposal item ::
 
-    >>> sdag = {'content_type': 'adhocracy_sample.resources.section.ISection',
+    >>> sdag = {'content_type': 'adhocracy_core.resources.sample_section.ISection',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kapitel1'},}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag)
@@ -572,7 +572,7 @@ Create a Section item inside the Proposal item ::
 
 and a second Section ::
 
-    >>> sdag = {'content_type': 'adhocracy_sample.resources.section.ISection',
+    >>> sdag = {'content_type': 'adhocracy_core.resources.sample_section.ISection',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kapitel2'},}
     ...         }
     >>> resp = testapp.post_json(pdag_path, sdag)
@@ -582,7 +582,7 @@ and a second Section ::
 Create a third Proposal version and add the two Sections in their
 initial versions ::
 
-    >>> pvrs = {'content_type': 'adhocracy_sample.resources.proposal.IProposalVersion',
+    >>> pvrs = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposalVersion',
     ...         'data': {'adhocracy_core.sheets.document.IDocument': {
     ...                     'elements': [svrs0_path, s2vrs0_path]},
     ...                  'adhocracy_core.sheets.versions.IVersionable': {
@@ -594,7 +594,7 @@ initial versions ::
 
 If we create a second version of kapitel1 ::
 
-    >>> svrs = {'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    >>> svrs = {'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...         'data': {
     ...              'adhocracy_core.sheets.document.ISection': {
     ...                  'title': 'Kapitel Überschrift Bla',
@@ -632,7 +632,7 @@ version is automatically created along with the updated Section version::
 
 More interestingly, if we then create a second version of kapitel2::
 
-    >>> svrs = {'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    >>> svrs = {'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...         'data': {
     ...              'adhocracy_core.sheets.document.ISection': {
     ...                  'title': 'on the hardness of version control',
@@ -717,7 +717,7 @@ Comments
 To give another example of a versionable content type, we can write comments
 about proposals::
 
-    >>> comment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
+    >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...            'data': {}}
     >>> resp = testapp.post_json(pdag_path, comment)
     >>> comment_path = resp.json["path"]
@@ -731,9 +731,9 @@ The first comment version is empty (as with all versionables), so lets add
 another version to say something meaningful. A comment contains *content*
 (arbitrary text) and *refers_to* a specific version of a proposal. ::
 
-    >>> commvers = {'content_type': 'adhocracy_sample.resources.comment.ICommentVersion',
+    >>> commvers = {'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
     ...             'data': {
-    ...                 'adhocracy_sample.sheets.comment.IComment': {
+    ...                 'adhocracy_core.sheets.comment.IComment': {
     ...                     'refers_to': pvrs4_path,
     ...                     'content': 'Gefällt mir, toller Vorschlag!'},
     ...                 'adhocracy_core.sheets.versions.IVersionable': {
@@ -747,7 +747,7 @@ another version to say something meaningful. A comment contains *content*
 Comments can be about any versionable that allows posting comments. Hence
 it's also possible to write a comment about another comment::
 
-    >>> metacomment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
+    >>> metacomment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...                 'data': {}}
     >>> resp = testapp.post_json(pdag_path, metacomment)
     >>> metacomment_path = resp.json["path"]
@@ -761,9 +761,9 @@ it's also possible to write a comment about another comment::
 
 As usual, we have to add another version to actually say something::
 
-    >>> metacommvers = {'content_type': 'adhocracy_sample.resources.comment.ICommentVersion',
+    >>> metacommvers = {'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
     ...                 'data': {
-    ...                     'adhocracy_sample.sheets.comment.IComment': {
+    ...                     'adhocracy_core.sheets.comment.IComment': {
     ...                         'refers_to': snd_commvers_path,
     ...                         'content': 'Find ich nicht!'},
     ...                     'adhocracy_core.sheets.versions.IVersionable': {
@@ -782,10 +782,10 @@ First find the path of the newest version of the proposal::
     >>> newest_prop_vers = resp.json['data']['adhocracy_core.sheets.tags.ITag']['elements'][-1]
 
 Now we can retrieve that version and consult the 'comments' fields of its
-'adhocracy_sample.sheets.comment.ICommentable' sheet::
+'adhocracy_core.sheets.comment.ICommentable' sheet::
 
     >>> resp = testapp.get(newest_prop_vers)
-    >>> comlist = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']['comments']
+    >>> comlist = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']['comments']
     >>> comlist == [snd_commvers_path]
     True
 
@@ -794,7 +794,7 @@ comments, they have it as well. Lets find out which other comments refer to
 this comment version::
 
     >>> resp = testapp.get(snd_commvers_path)
-    >>> comlist = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']['comments']
+    >>> comlist = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']['comments']
     >>> comlist == [snd_metacommvers_path]
     True
 
@@ -850,7 +850,7 @@ omitted or left empty. ::
     >>> encoded_request_with_name = {
     ...     'method': 'POST',
     ...     'path': rest_url + '/adhocracy/Proposal/kommunismus',
-    ...     'body': { 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph' },
+    ...     'body': { 'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph' },
     ...     'result_path': '@par1_item',
     ...     'result_first_version_path': '@par1_item/v1'
     ... }
@@ -884,7 +884,7 @@ Let's add some more paragraphs to the second section above ::
     ...             'method': 'POST',
     ...             'path': pdag_path,
     ...             'body': {
-    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+    ...                 'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
     ...                 'data': {'adhocracy_core.sheets.name.IName':
     ...                              {'name': 'par1'}
     ...                         }
@@ -896,7 +896,7 @@ Let's add some more paragraphs to the second section above ::
     ...             'method': 'POST',
     ...             'path': '@par1_item',
     ...             'body': {
-    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
+    ...                 'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraphVersion',
     ...                 'data': {
     ...                     'adhocracy_core.sheets.versions.IVersionable': {
     ...                         'follows': ['@par1_item/v1']
@@ -917,16 +917,16 @@ Let's add some more paragraphs to the second section above ::
     >>> len(batch_resp)
     3
     >>> pprint(batch_resp[0])
-    {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+    {'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
               'first_version_path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000000/',
               'path': '.../adhocracy/Proposals/kommunismus/par1/'},
      'code': 200}
     >>> pprint(batch_resp[1])
-    {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
+    {'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraphVersion',
               'path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/'},
      'code': 200}
     >>> pprint(batch_resp[2])
-    {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
+    {'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraphVersion',
               'data': {...},
               'path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/'},
      'code': 200}
@@ -957,7 +957,7 @@ the paragraph will not be present in the database ::
     ...             'method': 'POST',
     ...             'path': pdag_path,
     ...             'body': {
-    ...                 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+    ...                 'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
     ...                 'data': {'adhocracy_core.sheets.name.IName':
     ...                              {'name': 'par2'}
     ...                         }
@@ -984,7 +984,7 @@ the paragraph will not be present in the database ::
     >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch,
     ...                                        status=400).json
     >>> pprint(invalid_batch_resp)
-    [{'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
+    [{'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
                'first_version_path': '...',
                'path': '...'},
       'code': 200},

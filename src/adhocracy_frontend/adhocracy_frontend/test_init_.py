@@ -27,22 +27,22 @@ class ConfigViewTest(unittest.TestCase):
 
     def test_ws_url_with_ws_url_settings(self):
         request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {'adhocracy_corefrontend.ws_url': 'ws://l.x'}
+        request.registry.settings = {'adhocracy.frontend.ws_url': 'ws://l.x'}
         assert self._call_fut(request)['ws_url'] == 'ws://l.x'
 
     def test_pkg_path_with_pkg_path_settings(self):
         request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {'adhocracy_corefrontend.pkg_path': '/t'}
+        request.registry.settings = {'adhocracy.frontend.pkg_path': '/t'}
         assert self._call_fut(request)['pkg_path'] == '/t'
 
     def test_root_path_with_platform_settings(self):
         request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {'adhocracy_coreplatform_id': 'adhocracy2'}
+        request.registry.settings = {'adhocracy.platform_id': 'adhocracy2'}
         assert self._call_fut(request)['rest_platform_path'] == '/adhocracy2'
 
     def test_root_path_with_rest_url_settings(self):
         request = testing.DummyRequest(scheme='http')
-        request.registry.settings = {'adhocracy_corefrontend.rest_url': 'x.org'}
+        request.registry.settings = {'adhocracy.frontend.rest_url': 'x.org'}
         assert self._call_fut(request)['rest_url'] == 'x.org'
 
 

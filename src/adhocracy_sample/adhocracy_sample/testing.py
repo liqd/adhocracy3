@@ -7,10 +7,10 @@ from webtest.http import StopableWSGIServer
 def app_sample(zeo, settings, websocket):
     """Return the adhocracy sample wsgi application."""
     from pyramid.config import Configurator
-    import adhocracy_sample
+    import adhocracy_core
     configurator = Configurator(settings=settings,
-                                root_factory=adhocracy_sample.root_factory)
-    configurator.include(adhocracy_sample)
+                                root_factory=adhocracy_core.root_factory)
+    configurator.include(adhocracy_core)
     app = configurator.make_wsgi_app()
     return app
 

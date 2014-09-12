@@ -75,6 +75,7 @@ def includeme(config):
     config.include('.resources.pool')
     config.include('.resources.root')
     config.include('.resources.tag')
+    config.include('.resources.comment')
     config.include('.resources.principal')
     config.include('.resources.subscriber')
     config.include('.websockets')

@@ -2,15 +2,15 @@
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ITag
 from adhocracy_core.interfaces import IItem
-from adhocracy_sample.resources.comment import IComment
-from adhocracy_sample.resources.section import ISection
-from adhocracy_sample.resources.paragraph import IParagraph
+from adhocracy_core.resources.comment import IComment
+from adhocracy_core.resources.sample_section import ISection
+from adhocracy_core.resources.sample_paragraph import IParagraph
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_metadata
 from adhocracy_core.resources.item import item_metadata
 
 import adhocracy_core.sheets.document
-import adhocracy_sample.sheets.comment
+import adhocracy_core.sheets.comment
 
 
 class IProposalVersion(IItemVersion):
@@ -22,7 +22,7 @@ proposalversion_meta = itemversion_metadata._replace(
     content_name='ProposalVersion',
     iresource=IProposalVersion,
     extended_sheets=[adhocracy_core.sheets.document.IDocument,
-                     adhocracy_sample.sheets.comment.ICommentable
+                     adhocracy_core.sheets.comment.ICommentable
                      ],
 )
 

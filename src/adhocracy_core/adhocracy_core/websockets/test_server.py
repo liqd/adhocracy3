@@ -491,7 +491,7 @@ class TestFunctionalClientCommunicator:
         url = backend.application_url + 'adhocracy' + path
         data = {'content_type': IBasicPool.__identifier__,
                 'data': {'adhocracy_core.sheets.name.IName': {'name': name}}}
-        requests.post(url, data=json.dumps(data),
+        resp = requests.post(url, data=json.dumps(data),
                       headers={'content-type': 'application/json'})
 
     def test_send_child_notification(self, backend, connection):

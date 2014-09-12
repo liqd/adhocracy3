@@ -5,11 +5,14 @@ from pyramid.config import Configurator
 
 def includeme(config):
     """Setup sample app."""
+    # include adocracy_core
     config.include('adhocracy_core')
     # include custom resource types
-    config.include('adhocracy_sample.resources')
+    config.include('adhocracy_core.resources.sample_paragraph')
+    config.include('adhocracy_core.resources.sample_section')
+    config.include('adhocracy_core.resources.sample_proposal')
     # include custom sheets
-    config.include('adhocracy_sample.sheets.comment')
+    config.include('adhocracy_core.sheets.sample_sheets')
 
 
 def main(global_config, **settings):

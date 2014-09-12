@@ -3,7 +3,7 @@
 The difference is that it runs igtest.html instead of test.html.
 also, it is located next to acceptance tests, because it has to
 be allowed to import components other than adhocracy, like
-adhocracy_sample.
+adhocracy_core.
 """
 
 from pytest import fixture

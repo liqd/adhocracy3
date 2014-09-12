@@ -319,9 +319,15 @@ def _is_running(path_to_pid_file) -> bool:
 def app(zeo, settings, websocket):
     """Return the adhocracy wsgi application."""
     import adhocracy_core
+    import adhocracy_core.resources.sample_paragraph
+    import adhocracy_core.resources.sample_section
+    import adhocracy_core.resources.sample_proposal
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy_core.root_factory)
     configurator.include(adhocracy_core)
+    configurator.include(adhocracy_core.resources.sample_paragraph)
+    configurator.include(adhocracy_core.resources.sample_proposal)
+    configurator.include(adhocracy_core.resources.sample_section)
     app = configurator.make_wsgi_app()
     return app
 
