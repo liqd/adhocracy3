@@ -1,11 +1,12 @@
 """Simple sample app using the Adhocracy core."""
-from adhocracy_core import root_factory
 from pyramid.config import Configurator
+
+from adhocracy_core import root_factory
 
 
 def includeme(config):
     """Setup sample app."""
-    # include adocracy_core
+    # include adhocracy_core
     config.include('adhocracy_core')
     # include custom resource types
     config.include('adhocracy_core.resources.sample_paragraph')
