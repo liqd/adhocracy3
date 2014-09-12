@@ -25,6 +25,21 @@ export class ListingCommentableAdapter implements AdhListing.IListingContainerAd
 }
 
 export class CommentAdapter extends ListingCommentableAdapter implements AdhComment.ICommentAdapter<RICommentVersion> {
+    // FIXME: settings here is expected to be the union of the
+    // constructor arguments of the resource and all sheets.  i would
+    // like to suggest a couple of tasks:
+    //
+    // (0) rename "settings" to "args" for naming consistency with
+    //     resource classes.
+    // (1) annotate arguments with types to make this appearent.
+    // (2) cast sheet parameters to restricted types.
+    // (3) re-think whether we *really* want to pass around unions of
+    //     argument sets.  not only is this weird to use for the
+    //     caller, but it will fail tragically as soon as some sheet
+    //     uses the a constructor parameter already used by some other
+    //     sheet or by the resource.
+    //
+    // See ../Rating/Adapter for matthias' approach.
     create(settings) : RICommentVersion {
         var resource = new RICommentVersion(settings);
         resource.data["adhocracy_sample.sheets.comment.IComment"] =
