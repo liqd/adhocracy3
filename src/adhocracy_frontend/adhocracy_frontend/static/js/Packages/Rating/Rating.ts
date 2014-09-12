@@ -27,14 +27,6 @@ export interface IRatingScope extends ng.IScope {
     active : RatingValue;
     isActive : (RatingValue) => string;  // css class name if RatingValue is active, or "" otherwise.
     cast(RatingValue) : void;
-
-    // these functions should be private to the controller, but we
-    // need to export them somehow for jasmine, and we want to
-    // implement them inside the controller because we need its local
-    // variables.
-    postPoolPathPromise : ng.IPromise<string>;
-    resetRatings() : void;
-    updateRatings() : ng.IPromise<void>;
 }
 
 
@@ -57,81 +49,105 @@ export interface IRatingAdapter<T extends AdhResource.Content<any>> {
 }
 
 
+/**
+ * initialise ratings
+ */
+export var resetRatings = ($scope : IRatingScope) : void => {
+    $scope.ratings = {
+        pro: 0,
+        contra: 0,
+        neutral: 0
+    };
+
+    delete $scope.thisUsersRating;
+};
+
+
+/**
+ * fetch post pool path with coordinates given in scope
+ */
+export var postPoolPathPromise = (
+    $scope : IRatingScope,
+    adhHttp : AdhHttp.Service<any>
+) : ng.IPromise<string> => {
+    return adhHttp.get($scope.refersTo).then((rateable : ResourcesBase.Resource) => {
+        if (rateable.hasOwnProperty("data")) {
+            if (rateable.data.hasOwnProperty($scope.postPoolSheet)) {
+                if (rateable.data[$scope.postPoolSheet].hasOwnProperty($scope.postPoolField)) {
+                    return rateable.data[$scope.postPoolSheet][$scope.postPoolField];
+                }
+            }
+        }
+
+        throw "post pool field in " + $scope.postPoolSheet + "/" + $scope.postPoolField +
+            " not found in content type " + rateable.content_type;
+    });
+}
+
+
+/**
+ * Update state from server: Fetch post pool, query it for all
+ * ratings, and store and render them.  If a rating of the current
+ * user exists, store and render that separately.
+ */
+export var updateRatings = (
+    $scope : IRatingScope,
+    $q : ng.IQService,
+    adhHttp : AdhHttp.Service<any>,
+    adhUser : AdhUser.User
+) : ng.IPromise<void> => {
+    return postPoolPathPromise($scope, adhHttp)
+        .then((postPoolPath) => adhHttp.get(postPoolPath))
+        .then((postPool) => {
+            var ratingPromises : ng.IPromise<ResourcesBase.Resource>[] =
+                postPool.data["adhocracy.sheets.pool.IPool"].elements
+                .map((index : number, path : string) => adhHttp.get(path));
+
+            $q.all(ratingPromises).then((ratings) => {
+                resetRatings($scope);
+                _.forOwn(ratings, (rating) => {
+
+                    // FIXME: these need to be calculated properly, not just declared!
+                    var __ispro;
+                    var __iscontra;
+                    var __isneutral;
+                    var __iscurrentuser;
+
+                    if (__ispro) {
+                        $scope.ratings.pro += 1;
+                    }
+
+                    if (__iscontra) {
+                        $scope.ratings.contra += 1;
+                    }
+
+                    if (__isneutral) {
+                        $scope.ratings.neutral += 1;
+                    }
+
+                    if (__iscurrentuser) {
+                        $scope.thisUsersRating = rating;
+                    }
+                });
+            });
+        });
+};
+
+
+/**
+ * controller for rating widget.  promises a void in order to notify
+ * the unit test suite that it is done setting up its state.  (the
+ * widget will ignore this promise.)
+ */
 export var ratingController = (
     adapter : IRatingAdapter<any>,
     $scope : IRatingScope,
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.User
-) => {
-
-    // fetch post pool path with coordinates given in scope
-    $scope.postPoolPathPromise =
-        adhHttp.get($scope.refersTo).then((rateable : ResourcesBase.Resource) => {
-            if (rateable.hasOwnProperty("data")) {
-                if (rateable.data.hasOwnProperty($scope.postPoolSheet)) {
-                    if (rateable.data[$scope.postPoolSheet].hasOwnProperty($scope.postPoolField)) {
-                        return rateable.data[$scope.postPoolSheet][$scope.postPoolField];
-                    }
-                }
-            }
-
-            throw "post pool field in " + $scope.postPoolSheet + "/" + $scope.postPoolField +
-                " not found in content type " + rateable.content_type;
-        });
-
-    // initialise ratings
-    $scope.resetRatings = () => {
-        $scope.ratings = {
-            pro: 0,
-            contra: 0,
-            neutral: 0
-        };
-
-        delete $scope.thisUsersRating;
-    };
-
-    // Update state from server: Fetch post pool, query it for all
-    // ratings, and store and render them.  If a rating of the current
-    // user exists, store and render that separately.
-    $scope.updateRatings = () : ng.IPromise<void> =>
-        $scope.postPoolPathPromise.then((postPoolPath) =>
-            adhHttp.get(postPoolPath).then((pool) => {
-                var ratingPromises : ng.IPromise<ResourcesBase.Resource>[] =
-                    pool.data["adhocracy.sheets.pool.IPool"].elements
-                        .map((index : number, path : string) => adhHttp.get(path));
-
-                $q.all(ratingPromises).then((ratings) => {
-                    $scope.resetRatings();
-                    _.forOwn(ratings, (rating) => {
-
-                        // FIXME: these need to be calculated properly, not just declared!
-                        var __ispro;
-                        var __iscontra;
-                        var __isneutral;
-                        var __iscurrentuser;
-
-                        if (__ispro) {
-                            $scope.ratings.pro += 1;
-                        }
-
-                        if (__iscontra) {
-                            $scope.ratings.contra += 1;
-                        }
-
-                        if (__isneutral) {
-                            $scope.ratings.neutral += 1;
-                        }
-
-                        if (__iscurrentuser) {
-                            $scope.thisUsersRating = rating;
-                        }
-                    });
-                });
-            }));
-
-    $scope.resetRatings();
-    $scope.updateRatings();
+) : ng.IPromise<void> => {
+    resetRatings($scope);
+    return updateRatings($scope, $q, adhHttp, adhUser);
 };
 
 
