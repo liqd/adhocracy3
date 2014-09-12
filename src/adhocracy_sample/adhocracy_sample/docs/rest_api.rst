@@ -501,6 +501,7 @@ The Proposal has the IVersions and ITags interfaces to work with Versions::
     >>> resp.json['data']['adhocracy.sheets.tags.ITags']['elements']
     ['.../adhocracy/Proposals/kommunismus/FIRST/', '.../adhocracy/Proposals/kommunismus/LAST/']
 
+
 Update
 ~~~~~~
 
@@ -705,21 +706,104 @@ that aren't 'followed_by' any later version::
 FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
 
-FIXME: should the server tell in general where to post specific
-content types? (like 'like', 'discussion',..)?  in other words,
-should the client be able to ask (e.g. with an OPTIONS request)
-where to post a 'like'?
+
+Forks and forkability
+~~~~~~~~~~~~~~~~~~~~~
+
+This api has been designed to allow implementation of complex merge
+conflict resolution, both automatic and with user-involvement.  For
+now, however, it only supports a simplified version control strategy:
+If any version that is not head is used as a predecessor, the backend
+responds with an error.  The frontend has to handle these errors, as
+they can always occur in race conditions with other users.
+
+Currently there are two very simple conflict resolution strategies:
+
+1. If a race condition is reported by the backend, the frontend
+   updates the predecessor version to head and tries again.  (In the
+   unlikely case where lots of post activity is going on, it may be
+   necessary to repeat this several times.)
+
+   Example: IRatingVersion can only legally be modified by one user
+   and should not experience any race conditions.  If it does, the
+   second post wins and silently reverts the previous one.
+
+2. Like 1., but the frontend posts two new versions on top of HEAD.
+   If this is the situation of the conflict::
+
+    Doc     v0----v1
+                \
+                 -----v1'
+
+          >-----> time >-------->
+
+   Then it is resolved as follows (by the frontend of the author of
+   v1')::
+
+    Doc     v0----v1
+                    \
+                     -----v0'----v1'
+
+          >-----> time >-------->
+
+   v0' is a copy of v0 that differs only in its predecessor.  It is
+   called a 'revert' version.  (FIXME: is there a way to enrich the
+   data with a 'is_revert' flag?)
+
+   This must be done in a batch request (a transaction) in order to
+   avoid that only the revert is successfully posted, but the actual
+   change fails.  Again, it is possible that this batch request fails,
+   and has to be attempted several times.
+
+   Example: IProposalVersion can be modified by many users
+   concurrently.
+
+3. (Future work): Both authors of the conflict are notified (email,
+   dashboard, ...), and explained how they can inspect the situation
+   and add new versions.  (The email should probably contain a warning
+   that it's best to get on the phone and talk it through before
+   generating more merge conflicts.  :)
+
+4. (Future work): Ideally, the user would to be notified that there
+   is a conflict, display the differences between the three versions,
+   and allow the user to merge his changes into the current HEAD.
+
+5. (Future work): It is allowed to have multiple heads in the DAG, e.g.
+   different preferred versions by different principals. This however still
+   requires a lot of UX work to be done.
+
+The backend must to two things::
+
+1. Add a 'forkable' flag to the IVersionable sheet.  (There are
+   possibly other ways to model this.  Suggestions welcome.)
+
+2. If a non-forkable, non-head version appears as a predecessor in a
+   post, respond with an error.
 
 
-Comments
---------
+FIXME: add tests for this!
+
+
+
+Resources with PostPool, example Comments
+-----------------------------------------
 
 To give another example of a versionable content type, we can write comments
-about proposals::
+about proposals.
+The proposal has a commentable sheet::
+
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> commentable = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']
+
+This sheet has a special field :term:`post_pool` referencing a pool::
+
+    >>> post_pool_path = commentable['post_pool']
+
+We can post comments to this pool only::
 
     >>> comment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
     ...            'data': {}}
-    >>> resp = testapp.post_json(pdag_path, comment)
+    >>> resp = testapp.post_json(post_pool_path, comment)
     >>> comment_path = resp.json["path"]
     >>> comment_path
     '.../adhocracy/Proposals/kommunismus/comment_000...'
