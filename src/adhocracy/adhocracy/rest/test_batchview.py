@@ -289,3 +289,7 @@ class TestBatchView:
         payload = b'{this is not a JSON object}'
         result = inst._try_to_decode_json(payload)
         assert result == {'error': '{this is not a JSON object}'}
+
+    def test_options_empty(self, context, request):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}

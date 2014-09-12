@@ -216,7 +216,7 @@ class ClientCommunicator(WebSocketServerProtocol):
             self._raise_if_unknown_field_value('action', err, json_object)
             self._raise_if_unknown_field_value('resource', err, json_object)
             self._raise_invalid_json_from_colander_invalid(err)
-        except Exception as err:
+        except Exception as err:  # pragma: no cover
             self._raise_invalid_json_from_exception(err)
 
     def _handle_client_request_and_send_response(self, request: dict):
@@ -274,7 +274,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         raise WebSocketError('invalid_json', details)
 
     def _raise_invalid_json_from_exception(self, err: Exception):
-        raise WebSocketError('invalid_json', str(err))
+        raise WebSocketError('invalid_json', str(err))  # pragma: no cover
 
     def _raise_if_forbidden_request(self, action: str, resource: IResource):
         """Raise an error if a client tries to subscribe to an ItemVersion."""

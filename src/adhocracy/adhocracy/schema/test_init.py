@@ -48,6 +48,11 @@ def _add_references_node(inst: colander.Schema):
     inst.add(reference_node)
 
 
+def _add_other_node(inst: colander.Schema):
+    other_node = colander.MappingSchema(name='other', missing={})
+    inst.add(other_node)
+
+
 ###########
 #  tests  #
 ###########
@@ -269,7 +274,7 @@ class ResourceObjectUnitTests(unittest.TestCase):
         inst = self._make_one()
         node = add_node_binding(colander.Mapping(), request=self.request)
         with raises(colander.Invalid):
-            inst.deserialize(node, self.request.application_url + '/wrong_child')
+            inst.deserialize(node, 'htp://x.x')
 
     def test_deserialize_value_path_location_aware(self):
         inst = self._make_one()
@@ -438,6 +443,10 @@ class TestUniqueReferences:
         from adhocracy.schema import References
         inst = self._make_one()
         assert isinstance(inst, References)
+
+    def test_valid_deserialize_with_colander_null(self, request):
+        inst = self._make_one().bind(request=request)
+        assert inst.deserialize(colander.null) == []
 
     def test_valid_deserialize_with_duplication(self, request):
         inst = self._make_one().bind(request=request)
@@ -679,6 +688,7 @@ class TestPostPoolMappingSchema:
     def test_bind_context_without_reference_post_context_and_deserialize(self, context, request_):
         inst = self._make_one()
         _add_reference_node(inst)
+        _add_other_node(inst)
         inst = inst.bind(context=context['right'], request=request_)
         assert inst.deserialize({'reference': request_.application_url + '/right/child/'})
 

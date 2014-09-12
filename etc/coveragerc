@@ -6,6 +6,7 @@ omit =
     src/adhocracy/adhocracy/websockets/start_ws_server.py
     # no unit test coverage
     src/adhocracy/adhocracy/__init__.py
+    src/adhocracy/adhocracy/scaffolds/__init__
     src/adhocracy_sample/adhocracy_sample/__init__.py
     src/adhocracy/setup.py
     src/adhocracy_sample/setup.py
