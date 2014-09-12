@@ -153,26 +153,34 @@ class AbsolutePath(AdhocracySchemaNode):
 
 class ResourceObject(colander.SchemaType):
 
-    """Schema type that serialized a :term:`location`-aware object to its url.
+    """Schema type that de/serialized a :term:`location`-aware object.
 
-    Example value:  'http://a.org/bluaABC/_123/3'
+    Example values:  'http://a.org/bluaABC/_123/3' '/blua/ABC/'
+
+    If the value is an url with fqdn the the :term:`request` binding is used to
+    deserialize the resource.
+
+    If the value is an absolute path the :term:`context` binding is used
+    to  deserialize the resource.
+
+    The default serialization is the resource url.
     """
 
-    def __init__(self, use_resource_location=False):
-        self.use_resource_location = use_resource_location
+    def __init__(self, serialize_to_path=False):
+        self.serialize_to_path = serialize_to_path
         """If `False` the :term:`request` binding is used to serialize
         to the resource url.
         Else the :term:`context` binding is used to  serialize to
-        the :term:`Resource Location`.
+        the :term:`Resource Location` path.
         Default `False`.
         """
 
     def serialize(self, node, value):
-        """Serialize object to url.
+        """Serialize object to url or path.
 
         :param node: the Colander node.
         :param value: the resource to serialize
-        :return: the path of that resource
+        :return: the url or path of that resource
         """
         if value in (colander.null, ''):
             return ''
@@ -185,7 +193,7 @@ class ResourceObject(colander.SchemaType):
                                    value=value)
 
     def _serialize_location_or_url(self, node, value):
-        if self.use_resource_location:
+        if self.serialize_to_path:
             assert 'context' in node.bindings
             return resource_path(value)
         else:
@@ -194,17 +202,17 @@ class ResourceObject(colander.SchemaType):
             return request.resource_url(value)
 
     def deserialize(self, node, value):
-        """Deserialize url to object.
+        """Deserialize url or path to object.
 
         :param node: the Colander node.
-        :param value: the url ort :term:`Resource Location` to deserialize
+        :param value: the url or path :term:`Resource Location` to deserialize
         :return: the resource registered under that path
         :raise colander.Invalid: if the object does not exist.
         """
         if value is colander.null:
             return value
         try:
-            resource = self._deserialize_to_location_or_url(node, value)
+            resource = self._deserialize_location_or_url(node, value)
             raise_attribute_error_if_not_location_aware(resource)
         except (KeyError, AttributeError):
             raise colander.Invalid(
@@ -212,8 +220,8 @@ class ResourceObject(colander.SchemaType):
                 msg='This resource path does not exist.', value=value)
         return resource
 
-    def _deserialize_to_location_or_url(self, node, value):
-        if self.use_resource_location:
+    def _deserialize_location_or_url(self, node, value):
+        if value.startswith('/'):
             assert 'context' in node.bindings
             context = node.bindings['context']
             return find_resource(context, value)
@@ -426,7 +434,7 @@ def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
     return post_pool
 
 
-class PostPool(AbsolutePath):
+class PostPool(Reference):
 
     """Reference to the common place to post resources used by the this sheet.
 
@@ -463,7 +471,9 @@ def deferred_validate_references_post_pool(node: colander.SchemaNode,
 
 def _get_reference_childs(node):
     for child in node:
-        if isinstance(child, (Reference, AbstractReferenceIterable)):
+        if isinstance(child, PostPool):
+            continue
+        if isinstance(child, (Reference, References)):
             yield child
 
 
