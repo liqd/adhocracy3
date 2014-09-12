@@ -19,7 +19,7 @@ export interface IRatingScope extends ng.IScope {
     };
     active : RatingValue;
     isActive : (RatingValue) => string;  // css class name if RatingValue is active, or "" otherwise.
-    cast(value : RatingValue) : void;
+    cast(RatingValue) : void;
     update() : void;
 }
 
@@ -32,9 +32,9 @@ export var createDirective = (adhConfig : AdhConfig.Type) => {
             refersTo: "@"
         },
         link: (scope : IRatingScope) => {
-            scope.cast = (value : RatingValue) : void => {
-                if (scope.isActive(value)) {
-                    scope.ratings[RatingValue[value]] -= 1;
+            scope.cast = (rating : RatingValue) : void => {
+                if (scope.isActive(rating)) {
+                    scope.ratings[RatingValue[rating]] -= 1;
                     delete scope.active;
                 } else {
                     // decrease old value
@@ -42,13 +42,13 @@ export var createDirective = (adhConfig : AdhConfig.Type) => {
                         scope.ratings[RatingValue[scope.active]] -= 1;
                     }
                     // increase new value
-                    scope.ratings[RatingValue[value]] += 1;
-                    scope.active = value;
+                    scope.ratings[RatingValue[rating]] += 1;
+                    scope.active = rating;
                 }
             };
 
             delete scope.active;
-            scope.isActive = (value : RatingValue) => (value === scope.active) ? "rating-button-active" : "";
+            scope.isActive = (rating : RatingValue) => (rating === scope.active) ? "rating-button-active" : "";
 
             scope.update = () : void => {
                 // FIXME: This sets some arbitrary data for now.
