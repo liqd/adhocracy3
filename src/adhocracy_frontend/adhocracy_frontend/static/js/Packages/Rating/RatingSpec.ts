@@ -1,12 +1,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhVote = require("./Vote");
+import AdhRating = require("./Rating");
 
 
 export var register = () => {
-    describe("Vote", () => {
+    describe("Rating", () => {
         xit("dummy", () => {
-            expect(AdhVote).toBeDefined();
+            expect(AdhRating).toBeDefined();
         });
     });
 };
