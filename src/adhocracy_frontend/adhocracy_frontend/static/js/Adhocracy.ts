@@ -33,7 +33,7 @@ import AdhCommentAdapter = require("./Packages/Comment/Adapter");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
 import AdhRating = require("./Packages/Rating/Rating");
-// import AdhRatingAdapter = require("./Packages/Rating/Adapter");
+import AdhRatingAdapter = require("./Packages/Rating/Adapter");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -169,7 +169,11 @@ export var init = (config, meta_api) => {
 
     app.directive("adhTime", ["moment", "$interval", AdhDateTime.createDirective]);
 
-    app.directive("adhRating", ["adhConfig", AdhRating.createDirective]);
+    app.directive("adhRating", ["adhConfig", (adhConfig) =>
+        AdhRating.createDirective(
+            new AdhRatingAdapter.RatingAdapter(),
+            adhConfig
+        )]);
 
     // get going
 

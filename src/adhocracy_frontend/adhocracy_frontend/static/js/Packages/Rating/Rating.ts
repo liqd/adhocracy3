@@ -1,5 +1,8 @@
-import AdhResource = require("../../Resources");
 import AdhConfig = require("../Config/Config");
+import AdhHttp = require("../Http/Http");
+import AdhResource = require("../../Resources");
+import AdhUser = require("../User/User");
+import ResourcesBase = require("../../ResourcesBase");
 
 var pkgLocation = "/Rating";
 
@@ -13,11 +16,14 @@ export enum RatingValue {
 
 export interface IRatingScope extends ng.IScope {
     refersTo : string;
+    postPoolSheet : string;
+    postPoolField : string;
     ratings : {
         pro : number;
         contra : number;
         neutral : number;
     };
+    thisUsersRating : ResourcesBase.Resource;
     active : RatingValue;
     isActive : (RatingValue) => string;  // css class name if RatingValue is active, or "" otherwise.
     cast(RatingValue) : void;
@@ -44,19 +50,103 @@ export interface IRatingAdapter<T extends AdhResource.Content<any>> {
 }
 
 
-export var createDirective = (adhConfig : AdhConfig.Type) => {
+var ratingController = (
+    adapter : IRatingAdapter<any>,
+    $scope : IRatingScope,
+    $q : ng.IQService,
+    adhHttp : AdhHttp.Service<any>,
+    adhUser : AdhUser.User
+) => {
+
+    var postPoolPathPromise : ng.IPromise<string> =
+        adhHttp.get($scope.refersTo).then((rateable : ResourcesBase.Resource) => {
+            if (rateable.hasOwnProperty("data")) {
+                if (rateable.data.hasOwnProperty($scope.postPoolSheet)) {
+                    if (rateable.data[$scope.postPoolSheet].hasOwnProperty($scope.postPoolField)) {
+                        return rateable.data[$scope.postPoolSheet][$scope.postPoolField];
+                    }
+                }
+            }
+
+            throw "post pool field in " + $scope.postPoolSheet + "/" + $scope.postPoolField +
+                " not found in content type " + rateable.content_type;
+        });
+
+    // initialise ratings
+    var reset = () : void => {
+        $scope.ratings = {
+            pro: 0,
+            contra: 0,
+            neutral: 0
+        };
+
+        delete $scope.thisUsersRating;
+    };
+
+    // Update state from server: Fetch post pool, query it for all
+    // ratings, and store and render them.  If a rating of the current
+    // user exists, store and render that separately.
+    var update = () : void => {
+        postPoolPathPromise.then((postPoolPath) =>
+            adhHttp.get(postPoolPath).then((pool) => {
+                var ratingPromises : ng.IPromise<ResourcesBase.Resource>[] =
+                    pool.data["adhocracy.sheets.pool.IPool"].elements
+                        .map((index : number, path : string) => adhHttp.get(path));
+
+                $q.all(ratingPromises).then((ratings) => {
+                    reset();
+                    _.forOwn(ratings, (rating) => {
+
+                        // FIXME: these need to be calculated properly, not just declared!
+                        var __ispro;
+                        var __iscontra;
+                        var __isneutral;
+                        var __iscurrentuser;
+
+                        if (__ispro) {
+                            $scope.ratings.pro += 1;
+                        }
+
+                        if (__iscontra) {
+                            $scope.ratings.contra += 1;
+                        }
+
+                        if (__isneutral) {
+                            $scope.ratings.neutral += 1;
+                        }
+
+                        if (__iscurrentuser) {
+                            $scope.thisUsersRating = rating;
+                        }
+                    });
+                });
+            }));
+    };
+
+    reset();
+    update();
+};
+
+
+export var createDirective = (adapter : IRatingAdapter<any>, adhConfig : AdhConfig.Type) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Rating.html",
         scope: {
-            refersTo: "@"
+            refersTo: "@",
+            postPoolSheet : "@",
+            postPoolField : "@"
         },
         link: (scope : IRatingScope) => {
             scope.cast = (rating : RatingValue) : void => {
                 if (scope.isActive(rating)) {
+                    // click on active button to un-rate
+
                     scope.ratings[RatingValue[rating]] -= 1;
                     delete scope.active;
                 } else {
+                    // click on inactive button to (re-)rate
+
                     // decrease old value
                     if (scope.hasOwnProperty("active")) {
                         scope.ratings[RatingValue[scope.active]] -= 1;
@@ -67,20 +157,10 @@ export var createDirective = (adhConfig : AdhConfig.Type) => {
                 }
             };
 
-            delete scope.active;
-            scope.isActive = (rating : RatingValue) => (rating === scope.active) ? "rating-button-active" : "";
-
-            scope.update = () : void => {
-                // FIXME: This sets some arbitrary data for now.
-                // Instead, this should get the data from the server.
-                scope.ratings = {
-                    pro: 10,
-                    contra: 5,
-                    neutral: 3
-                };
-            };
-
-            scope.update();
-        }
+            scope.isActive = (rating : RatingValue) =>
+                (rating === scope.active) ? "rating-button-active" : "";
+        },
+        controller: ["$scope", "$q", "adhHttp", "adhUser", ($scope, $q, adhHttp, adhUser) =>
+            ratingController(adapter, $scope, $q, adhHttp, adhUser)]
     };
 };

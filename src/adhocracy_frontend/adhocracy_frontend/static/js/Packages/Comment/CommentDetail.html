@@ -20,7 +20,10 @@
     <div class="comment-main">
         <div class="comment-title">
             <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
-            <adh-rating data-refers-to="{{path}}"></adh-rating>
+            <adh-rating data-refers-to="{{path}}"
+                        data-post-pool-sheet="adhocracy_sample.sheets.comment.IComment"
+                        data-post-pool-field="post_pool">
+            </adh-rating>
         </div>
         <div data-ng-switch-when="1">
             <div class="form-error" data-ng-repeat="error in errors">
