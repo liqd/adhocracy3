@@ -1,3 +1,4 @@
+import AdhResource = require("../../Resources");
 import AdhConfig = require("../Config/Config");
 
 var pkgLocation = "/Rating";
@@ -21,6 +22,20 @@ export interface IRatingScope extends ng.IScope {
     isActive : (RatingValue) => string;  // css class name if RatingValue is active, or "" otherwise.
     cast(RatingValue) : void;
     update() : void;
+}
+
+
+export interface IRatingAdapter<T extends AdhResource.Content<any>> {
+    create(settings : any) : T;
+    createItem(settings : any) : any;
+    derive(oldVersion : T, settings : any) : T;
+    content(resource : T) : string;
+    content(resource : T, value : string) : T;
+    refersTo(resource : T) : string;
+    refersTo(resource : T, value : string) : T;
+    creator(resource : T) : string;
+    creationDate(resource : T) : string;
+    modificationDate(resource : T) : string;
 }
 
 

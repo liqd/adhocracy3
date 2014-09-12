@@ -38,7 +38,7 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
         return new RIComment(settings);
     }
 
-    // FIXME: move to a service
+    // FIXME: move to a service (also do it in Rating)
     derive<R extends ResourcesBase.Resource>(oldVersion : R, settings) : R {
         var resource = new (<any>oldVersion).constructor(settings);
 
