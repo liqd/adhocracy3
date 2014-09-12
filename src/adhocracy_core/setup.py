@@ -39,7 +39,7 @@ test_requires = [
 ]
 
 
-setup(name='adhocracy_core.',
+setup(name='adhocracy_core',
       version='0.0',
       description='adhocracy_core',
       long_description=README + '\n\n' + CHANGES,
