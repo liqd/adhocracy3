@@ -13,7 +13,7 @@ test_requires = [
     'adhocracy_core[test]',
     ]
 
-setup(name='adhocracy_core',
+setup(name='adhocracy_sample',
       version='0.0',
       description='adhocracy sample app',
       long_description=README,
