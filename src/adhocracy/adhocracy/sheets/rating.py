@@ -67,7 +67,8 @@ class RatingSchema(colander.MappingSchema):
 
 
 rating_meta = sheet_metadata_defaults._replace(isheet=IRating,
-                                               schema_class=RatingSchema)
+                                               schema_class=RatingSchema,
+                                               create_mandatory=True)
 
 
 class CanRateSchema(colander.MappingSchema):
