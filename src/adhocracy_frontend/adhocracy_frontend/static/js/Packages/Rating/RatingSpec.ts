@@ -5,8 +5,22 @@ import AdhRating = require("./Rating");
 
 export var register = () => {
     describe("Rating", () => {
-        xit("dummy", () => {
-            expect(AdhRating).toBeDefined();
+        describe("Controller", () => {
+            beforeEach(() => {
+                return;
+            });
+
+            xit("postPoolPathPromise promises the thing it is pointed to.", () => {
+                expect(true).toBe(false);
+            });
+
+            xit("resetRatings clears ratings and user rating in scope.", () => {
+                expect(true).toBe(false);
+            });
+
+            xit("updateRatings calculates the right totals for pro, contra, neutral and stores them in the scope.", () => {
+                expect(true).toBe(false);
+            });
         });
     });
 };

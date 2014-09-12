@@ -27,7 +27,14 @@ export interface IRatingScope extends ng.IScope {
     active : RatingValue;
     isActive : (RatingValue) => string;  // css class name if RatingValue is active, or "" otherwise.
     cast(RatingValue) : void;
-    update() : void;
+
+    // these functions should be private to the controller, but we
+    // need to export them somehow for jasmine, and we want to
+    // implement them inside the controller because we need its local
+    // variables.
+    postPoolPathPromise : ng.IPromise<string>;
+    resetRatings() : void;
+    updateRatings() : ng.IPromise<void>;
 }
 
 
@@ -50,7 +57,7 @@ export interface IRatingAdapter<T extends AdhResource.Content<any>> {
 }
 
 
-var ratingController = (
+export var ratingController = (
     adapter : IRatingAdapter<any>,
     $scope : IRatingScope,
     $q : ng.IQService,
@@ -58,7 +65,8 @@ var ratingController = (
     adhUser : AdhUser.User
 ) => {
 
-    var postPoolPathPromise : ng.IPromise<string> =
+    // fetch post pool path with coordinates given in scope
+    $scope.postPoolPathPromise =
         adhHttp.get($scope.refersTo).then((rateable : ResourcesBase.Resource) => {
             if (rateable.hasOwnProperty("data")) {
                 if (rateable.data.hasOwnProperty($scope.postPoolSheet)) {
@@ -73,7 +81,7 @@ var ratingController = (
         });
 
     // initialise ratings
-    var reset = () : void => {
+    $scope.resetRatings = () => {
         $scope.ratings = {
             pro: 0,
             contra: 0,
@@ -86,15 +94,15 @@ var ratingController = (
     // Update state from server: Fetch post pool, query it for all
     // ratings, and store and render them.  If a rating of the current
     // user exists, store and render that separately.
-    var update = () : void => {
-        postPoolPathPromise.then((postPoolPath) =>
+    $scope.updateRatings = () : ng.IPromise<void> =>
+        $scope.postPoolPathPromise.then((postPoolPath) =>
             adhHttp.get(postPoolPath).then((pool) => {
                 var ratingPromises : ng.IPromise<ResourcesBase.Resource>[] =
                     pool.data["adhocracy.sheets.pool.IPool"].elements
                         .map((index : number, path : string) => adhHttp.get(path));
 
                 $q.all(ratingPromises).then((ratings) => {
-                    reset();
+                    $scope.resetRatings();
                     _.forOwn(ratings, (rating) => {
 
                         // FIXME: these need to be calculated properly, not just declared!
@@ -121,10 +129,9 @@ var ratingController = (
                     });
                 });
             }));
-    };
 
-    reset();
-    update();
+    $scope.resetRatings();
+    $scope.updateRatings();
 };
 
 
