@@ -465,7 +465,7 @@ no way of knowing that it should update v1 of Doc, BUT NOT v0!
 Create
 ~~~~~~
 
-Create a Proposal (a subclass of Item which pools ProposalVersion's) ::
+Create a Proposal (a subclass of Item which pools ProposalVersions) ::
 
     >>> pdag = {'content_type': 'adhocracy_sample.resources.proposal.IProposal',
     ...         'data': {
@@ -1020,6 +1020,10 @@ Or only children that implement a specific sheet::
     ['/adhocracy/Proposals/kommunismus/FIRST',
      '/adhocracy/Proposals/kommunismus/LAST']
 
+TODO: the next section sounds like depth only understands {1, 2, 3,
+all} as arguments.  if it understands any positive integer and
+'all'. it should make that clearer.
+
 By default, only direct children of a pool are listed as elements,
 i.e. the standard depth is 1. Setting the *depth* parameter to a higher
 value allows also including grandchildren (depth=2) or even great-grandchildren
@@ -1032,7 +1036,7 @@ value allows also including grandchildren (depth=2) or even great-grandchildren
     >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
     [...'/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001'...]
 
-Without specifying a deeper depth, the above query for ISectionVersion's
+Without specifying a deeper depth, the above query for ISectionVersions
 wouldn't have found anything, since they are children of children of the pool::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
