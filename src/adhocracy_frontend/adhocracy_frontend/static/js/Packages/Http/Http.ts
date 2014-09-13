@@ -44,7 +44,7 @@ export class Service<Content extends Resources.Content<any>> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-get preliminary path: " + path;
         }
-        if (path.lastIndexOf("/", 0) === 0) {
+        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
             path = this.adhConfig.rest_url + path;
         }
         return this.$http
@@ -62,7 +62,7 @@ export class Service<Content extends Resources.Content<any>> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-put preliminary path: " + path;
         }
-        if (path.lastIndexOf("/", 0) === 0) {
+        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
             path = this.adhConfig.rest_url + path;
         }
         return this.$http
@@ -80,7 +80,7 @@ export class Service<Content extends Resources.Content<any>> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-post preliminary path: " + path;
         }
-        if (path.lastIndexOf("/", 0) === 0) {
+        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
             path = this.adhConfig.rest_url + path;
         }
         return this.$http
@@ -237,6 +237,6 @@ export class Service<Content extends Resources.Content<any>> {
      *     };
      */
     public withTransaction<Result>(callback : (httpTrans : AdhTransaction.Transaction) => ng.IPromise<Result>) : ng.IPromise<Result> {
-        return callback(new AdhTransaction.Transaction(this.$http, this.adhMetaApi, this.adhPreliminaryNames, this.adhConfig));
+        return callback(new AdhTransaction.Transaction(this, this.adhMetaApi, this.adhPreliminaryNames, this.adhConfig));
     }
 }
