@@ -157,12 +157,27 @@ export var trickle = <T>($timeout: ng.ITimeoutService, maxdelay: number, xs: T[]
 
 
 /**
- * Remove last hierarchy level from path (uris or directory paths).
+ * Check whether str ends with suffix.
+ */
+export function endsWith(str : string, suffix : string) {
+    "use strict";
+
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+};
+
+
+/**
+ * Remove last hierarchy level from path (uris or directory paths). If given
+ * url has a trailing slash, the returned url will also have a trailing slash.
  */
 export function parentPath(url : string) : string {
     "use strict";
 
-    return url.substring(0, url.lastIndexOf("/"));
+    if (endsWith(url, "/")) {
+        return url.substring(0, url.lastIndexOf("/", url.length - 2) + 1);
+    } else {
+        return url.substring(0, url.lastIndexOf("/"));
+    }
 };
 
 
