@@ -1,7 +1,7 @@
 SHELL=/bin/bash --login
-TSC=../../../../../../bin/tsc
-TSLINT=../../../../../../bin/tslint
-NODE=../../../../../../bin/node
+TSC=../../../../../bin/tsc
+TSLINT=../../../../../bin/tslint
+NODE=../../../../../bin/node
 # (for more info on tsc, see http://www.typescriptlang.org/)
 FIX_TSC_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\((\d+),(\d+)\):(.*)/) { print "$$1:$$2:$$3:\n$$4\n\n"; } else { print "$$_\n"; }'
 # (this line makes tsc output work for IDEs that expect gcc error message syntax.)
@@ -43,7 +43,7 @@ warn_orphan_js:
 test: warn_orphan_js tslint compile_tests_node test_node
 
 tslint:
-	../../../../../../bin/tslint_check_adhocracy | $(FIX_TSLINT_ERROR_FORMAT)
+	../../../../../bin/tslint_check_adhocracy | $(FIX_TSLINT_ERROR_FORMAT)
 
 tslint_fast:
 	@echo "\n\n"
@@ -71,12 +71,12 @@ tslint_fast:
 		-f ./Adhocracy.ts
 
 test_node:
-	../../../../../../bin/jasmine-node .
+	../../../../../bin/jasmine-node .
 	@echo "NOTE: leaving commonjs modules in place."
 	@echo "      'make compile_tests_browser' if you need to run js code in browser again!"
 
 test_py:
-	../../../../../../bin/py.test ../../tests/unit
+	../../../../../bin/py.test ../../tests/unit
 
 
 # cleanup, word count, aux
@@ -120,7 +120,7 @@ tags: .dummy
 mkResources: .dummy
 	git ls-files --other Resources_ | xargs rm -f
 	$(TSC) --module commonjs --sourcemap mkResources.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
-	$(TSLINT) -c ../../../../../../etc/tslint.json -f mkResources.ts 2>&1 | $(FIX_TSLINT_ERROR_FORMAT)
+	$(TSLINT) -c ../../../../../etc/tslint.json -f mkResources.ts 2>&1 | $(FIX_TSLINT_ERROR_FORMAT)
 	$(NODE) mkResources.js
 
 
