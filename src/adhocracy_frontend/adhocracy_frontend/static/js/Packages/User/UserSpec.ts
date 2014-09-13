@@ -233,11 +233,11 @@ export var register = () => {
                         expect(adhUser.data).not.toBeDefined();
                     });
                     it("unsets token", () => {
-                        expect(adhUser.token).not.toBeDefined;
+                        expect(adhUser.token).not.toBeDefined();
                     });
                     it("unsets default http headers for the http service", () => {
-                        expect(httpMock.defaults.headers.common["X-User-Token"]).not.toBeDefined;
-                        expect(httpMock.defaults.headers.common["X-User-Path"]).not.toBeDefined;
+                        expect(httpMock.defaults.headers.common["X-User-Token"]).not.toBeDefined();
+                        expect(httpMock.defaults.headers.common["X-User-Path"]).not.toBeDefined();
                     });
                 };
 
