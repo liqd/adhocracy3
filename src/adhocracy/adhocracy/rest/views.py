@@ -677,7 +677,8 @@ def add_cors_headers_subscriber(event):
     """Add CORS headers to response."""
     event.response.headers.update({
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept',
+        'Access-Control-Allow-Headers':
+        'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
     })
 
