@@ -20,11 +20,8 @@ export var register = (angular, config, meta_api) => {
 
     describe("withTransaction", () => {
         var adhHttp : AdhHttp.Service<any> = (() => {
-            var adhConfig = <any>{
-                rest_url: "mock"
-            };
             var factory = ($http, $q) => {
-                return (new AdhHttp.Service($http, $q, new AdhMetaApi.MetaApiQuery(meta_api), new AdhPreliminaryNames, adhConfig));
+                return (new AdhHttp.Service($http, $q, new AdhMetaApi.MetaApiQuery(meta_api), new AdhPreliminaryNames, config));
             };
             factory.$inject = ["$http", "$q"];
             return angular.injector(["ng"]).invoke(factory);

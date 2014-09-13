@@ -31,16 +31,20 @@
         var originalJasmineExecute = jasmine.getEnv().execute;
         jasmine.getEnv().execute = function() { console.log("waiting for async rest suite registration..."); };
 
-        require(['angular', 'text!/config.json', 'text!/meta_api', 'AdhocracyIg'],
-            function(angular, config_string, meta_api_string, spec) {
-                var config = JSON.parse(config_string);
-                var meta_api = JSON.parse(meta_api_string);
-                spec.register(angular, config, meta_api);
+        require(["text!/config.json"], function(config_string) {
+            var config = JSON.parse(config_string);
+            var rest_url = config.rest_url;
 
-                jasmine.getEnv().execute = originalJasmineExecute;
-                jasmine.getEnv().execute();
-            }
-        );
+            require(['angular', 'text!' + rest_url + '/meta_api', 'AdhocracyIg'],
+                function(angular, meta_api_string, spec) {
+                    var meta_api = JSON.parse(meta_api_string);
+                    spec.register(angular, config, meta_api);
+
+                    jasmine.getEnv().execute = originalJasmineExecute;
+                    jasmine.getEnv().execute();
+                }
+            );
+        });
     </script>
 </body>
 </html>
