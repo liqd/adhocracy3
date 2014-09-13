@@ -252,7 +252,7 @@ export var register = () => {
                     });
                 });
 
-                describe("localStorage unavaliable", () => {
+                describe("localStorage unavailable", () => {
                     testLogout((done) => {
                         adhUser.Modernizr.localstorage = false;
                         done();
