@@ -40,7 +40,7 @@ export class Service<Content extends Resources.Content<any>> {
         private adhConfig : AdhConfig.Type
     ) {}
 
-    public get(path : string) : ng.IPromise<Content> {
+    public getRaw(path : string) : ng.IHttpPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-get preliminary path: " + path;
         }
@@ -48,13 +48,17 @@ export class Service<Content extends Resources.Content<any>> {
             path = this.adhConfig.rest_url + path;
         }
         return this.$http
-            .get(path)
+            .get(path);
+    }
+
+    public get(path : string) : ng.IPromise<Content> {
+        return this.getRaw(path)
             .then(
                 (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
                 AdhError.logBackendError);
     }
 
-    public put(path : string, obj : Content) : ng.IPromise<Content> {
+    public putRaw(path : string, obj : Content) : ng.IHttpPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-put preliminary path: " + path;
         }
@@ -62,13 +66,17 @@ export class Service<Content extends Resources.Content<any>> {
             path = this.adhConfig.rest_url + path;
         }
         return this.$http
-            .put(path, AdhConvert.exportContent(this.adhMetaApi, obj))
+            .put(path, AdhConvert.exportContent(this.adhMetaApi, obj));
+    }
+
+    public put(path : string, obj : Content) : ng.IPromise<Content> {
+        return this.putRaw(path, obj)
             .then(
                 (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
                 AdhError.logBackendError);
     }
 
-    public post(path : string, obj : Content) : ng.IPromise<Content> {
+    public postRaw(path : string, obj : Content) : ng.IHttpPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-post preliminary path: " + path;
         }
@@ -76,7 +84,11 @@ export class Service<Content extends Resources.Content<any>> {
             path = this.adhConfig.rest_url + path;
         }
         return this.$http
-            .post(path, AdhConvert.exportContent(this.adhMetaApi, obj))
+            .post(path, AdhConvert.exportContent(this.adhMetaApi, obj));
+    }
+
+    public post(path : string, obj : Content) : ng.IPromise<Content> {
+        return this.postRaw(path, obj)
             .then(
                 (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
                 AdhError.logBackendError);
