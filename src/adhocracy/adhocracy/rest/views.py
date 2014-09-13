@@ -610,6 +610,18 @@ class LoginUsernameView(RESTView):
                        [validate_login_name, validate_login_password])
 
     @view_config(name='login_username',
+                 request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for login_username view.
+
+        FIXME: Return something useful. This currently only exist in order to
+        satisfy the preflight request, which browsers do in CORS situations
+        before doing the actual POST.
+
+        """
+        return {}
+
+    @view_config(name='login_username',
                  request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
@@ -640,6 +652,18 @@ class LoginEmailView(RESTView):
 
     validation_POST = (POSTLoginEmailRequestSchema,
                        [validate_login_email, validate_login_password])
+
+    @view_config(name='login_email',
+                 request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for login_email view.
+
+        FIXME: Return something useful. This currently only exist in order to
+        satisfy the preflight request, which browsers do in CORS situations
+        before doing the actual POST.
+
+        """
+        return {}
 
     @view_config(name='login_email',
                  request_method='POST',
