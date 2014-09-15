@@ -144,6 +144,8 @@ class BatchView(RESTView):
         except HTTPException as err:
             code = err.status_code
             body = self._try_to_decode_json(err.body)
+        # FIXME catch PredicateMismatch, if you do a put instead of post
+        # you dont't get any help what is going wrong.
         except Exception as err:
             code = 500
             error_dict = internal_exception_to_dict(err)
