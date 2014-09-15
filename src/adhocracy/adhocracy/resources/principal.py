@@ -3,6 +3,7 @@ from pyramid.registry import Registry
 from zope.interface import Interface
 from substanced.util import find_service
 from substanced.interfaces import IUserLocator
+from substanced.interfaces import IService
 from zope.interface import implementer
 
 from adhocracy.interfaces import IPool
@@ -14,7 +15,7 @@ import adhocracy.sheets.pool
 import adhocracy.sheets.metadata
 
 
-class IPrincipalsPool(IPool):
+class IPrincipalsPool(IPool, IService):
 
     """Pool representing a collection of principals.
 
@@ -88,7 +89,7 @@ user_metadata = pool_metadata._replace(
 )
 
 
-class IUsersPool(IPool):
+class IUsersPool(IPool, IService):
 
     """Pool for Users."""
 
