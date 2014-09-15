@@ -251,6 +251,19 @@ class GETPoolRequestSchema(colander.MappingSchema):
         # Extra key/value pairs should be preserved when deserializing data
         self.typ.unknown = 'preserve'
 
+    # FIXME For now we don't have a way to specify GET parameters that can
+    # be repeated, e.g. 'sheet=Blah&sheet=Blub'. The querystring is converted
+    # by Cornice into a MultiDict (http://docs.pylonsproject.org/projects
+    # /pyramid/en/master/api/interfaces.html#pyramid.interfaces.IMultiDict),
+    # which by default will only return the LAST value if a key is specified
+    # several times. One possible workaround is to allow specifying multiple
+    # values as a comma-separated list instead of repeated key=value pairs,
+    # e.g. 'sheet=Blah,Blub'. This would require a custom Multiple SchemaNode
+    # that wraps a SchemaType, e.g.
+    # sheet = Multiple(Interface(), missing=None, sep=',')
+    # Elements in this schema were multiple values should be allowed:
+    # sheet, aggregateby, tag.
+
     content_type = colander.SchemaNode(Interface(), missing=None)
     sheet = colander.SchemaNode(Interface(), missing=None)
     depth = PoolQueryDepth()

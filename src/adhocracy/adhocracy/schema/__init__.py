@@ -285,8 +285,13 @@ class AbstractIterableOfPaths(IdSet):
         if value is colander.null:
             return value
         self._check_nonstr_iterable(node, value)
+        # Honor form attribute, if present
+        form = getattr(value, 'form', None)
+        if form == 'omit':
+            return colander.drop
         paths = []
         for resource in value:
+            # TODO if form == 'content' ...
             paths.append(serialize_path(node, resource))
         return paths
 
