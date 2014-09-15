@@ -30,7 +30,7 @@ done
 
 echo
 
-echo "jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;"
+echo "jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;"
 echo
 
 echo "export var register = (angular, config, meta_api) => {"
