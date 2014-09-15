@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from pyramid.path import DottedNameResolver
+from pyramid.request import Request
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
 from pytz import UTC
@@ -10,7 +11,10 @@ from substanced.util import get_dotted_name
 import colander
 import pytz
 
+from adhocracy.interfaces import IResource
 from adhocracy.interfaces import SheetReference
+from adhocracy.registry import ResourceContentRegistry
+from adhocracy.utils import get_iresource
 
 
 class AdhocracySchemaNode(colander.SchemaNode):
@@ -76,6 +80,27 @@ def deserialize_path(node, value):
             node,
             msg='This resource path does not exist.', value=value)
     return resource
+
+
+def serialize_resource(resource: IResource, registry: ResourceContentRegistry,
+                       request: Request=None, params: dict={}) -> dict:
+    """Serialize a resource.
+
+    :param resource: the resource
+    :param registry: the registry
+    :param request: used for permission checks, if given
+    :param params: optional (query) parameters passed to the resource
+    """
+    sheets_view = registry.resource_sheets(resource, request,
+                                           onlyviewable=True)
+    struct = {'data': {}}
+    for sheet in sheets_view.values():
+        key = sheet.meta.isheet.__identifier__
+        struct['data'][key] = sheet.get_cstruct(params=params)
+    struct['path'] = resource_path(resource)
+    iresource = get_iresource(resource)
+    struct['content_type'] = iresource.__identifier__
+    return struct
 
 
 def validate_name_is_unique(node: colander.SchemaNode, value: str):
@@ -289,11 +314,14 @@ class AbstractIterableOfPaths(IdSet):
         form = getattr(value, 'form', None)
         if form == 'omit':
             return colander.drop
-        paths = []
-        for resource in value:
-            # TODO if form == 'content' ...
-            paths.append(serialize_path(node, resource))
-        return paths
+        elements = []
+        for resource in elements:
+            if form == 'content':
+                # TODO need a registry here!
+                elements.append(serialize_resource(resource, None))
+            else:
+                elements.append(serialize_path(node, resource))
+        return elements
 
     def _check_nonstr_iterable(self, node, value):
         if isinstance(value, str) or not hasattr(value, '__iter__'):

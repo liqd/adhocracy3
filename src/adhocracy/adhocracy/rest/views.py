@@ -33,11 +33,12 @@ from adhocracy.rest.schemas import POSTLoginUsernameRequestSchema
 from adhocracy.rest.schemas import POSTResourceRequestSchema
 from adhocracy.rest.schemas import PUTResourceRequestSchema
 from adhocracy.rest.schemas import GETPoolRequestSchema
-from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
+from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import AbstractReferenceIterable
+from adhocracy.schema import serialize_resource
 from adhocracy.utils import get_iresource
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
@@ -288,15 +289,8 @@ class ResourceRESTView(RESTView):
     def get(self) -> dict:
         """Get resource data."""
         queryparams = self.request.validated if self.request.validated else {}
-        sheets_view = self.registry.resource_sheets(self.context, self.request,
-                                                    onlyviewable=True)
-        struct = {'data': {}}
-        for sheet in sheets_view.values():
-            key = sheet.meta.isheet.__identifier__
-            struct['data'][key] = sheet.get_cstruct(params=queryparams)
-        struct['path'] = resource_path(self.context)
-        iresource = get_iresource(self.context)
-        struct['content_type'] = iresource.__identifier__
+        struct = serialize_resource(self.context, self.registry, self.request,
+                                    queryparams)
         return GETResourceResponseSchema().serialize(struct)
 
 

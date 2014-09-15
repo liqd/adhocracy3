@@ -1082,15 +1082,14 @@ elements::
     >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool'])
     {'count': '2'}
 
-TODO Not implemented yet:
 Setting *elements=content* will instead return the complete contents of all
 matching elements -- what you would get by making a GET request on each of
 their paths::
 
-    >> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
     ...             'elements': 'content'}).json
-    >> resp_data['data']['adhocracy.sheets.pool.IPool']['elements']
+    >>> resp_data['data']['adhocracy.sheets.pool.IPool']['elements']
     blah
 
 # TODO aggregateby, tag, custom filters. Note that multiple filters are
