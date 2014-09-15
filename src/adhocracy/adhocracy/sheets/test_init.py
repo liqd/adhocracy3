@@ -27,9 +27,9 @@ class TestResourcePropertySheet:
 
     @fixture
     def mock_node_unique_references(self):
-        from adhocracy.schema import ListOfUniqueReferences
+        from adhocracy.schema import UniqueReferences
         from adhocracy.schema import SheetReference
-        mock = Mock(spec=ListOfUniqueReferences)
+        mock = Mock(spec=UniqueReferences)
         mock.readonly = False
         mock.name = 'references'
         mock.backref = False
@@ -121,15 +121,6 @@ class TestResourcePropertySheet:
 
         assert inst_a.get() == {'count': 1}
         assert inst_b.get() == {'count': 2}
-
-    def test_get_cstruct_empty(self, sheet_meta, context):
-        inst = self.make_one(sheet_meta, context)
-        assert inst.get_cstruct() == {'count': '0'}
-
-    def test_get_cstruct_non_empty(self, sheet_meta, context):
-        inst = self.make_one(sheet_meta, context)
-        inst._data['count'] = 11
-        assert inst.get_cstruct() == {'count': '11'}
 
     def test_set_valid_references(self, sheet_meta, context, mock_graph,
                                   mock_node_unique_references, registry):

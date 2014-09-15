@@ -1,0 +1,24 @@
+<div data-adh-moving-columns="" class="moving-columns">
+    <div class="moving-column-structure">
+        <adh-web-socket-test data-paths="{{websocketTestPaths}}"></adh-web-socket-test>
+    </div>
+    <div class="moving-column-content">
+        <adh-listing data-path="{{path}}" data-action-column="action-column">
+            <div data-ng-switch="transclusionId">
+                <adh-proposal-version-new
+                    data-on-new-proposal="onCreate"
+                    data-on-cancel="hideCreateForm"
+                    data-pool-path="{{poolPath}}"
+                    data-ng-switch-when="create-form-id">
+                </adh-proposal-version-new>
+                <adh-proposal-detail
+                    data-path="element"
+                    data-ng-switch-when="element-id">
+                </adh-proposal-detail>
+            </div>
+        </adh-listing>
+    </div>
+    <div class="moving-column-content2">
+        <adh-comment-listing data-path="{{content2Url}}">
+    </div>
+</div>

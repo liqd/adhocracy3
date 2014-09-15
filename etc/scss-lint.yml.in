@@ -1,0 +1,29 @@
+exclude: '../${adhocracy:frontend.static_dir}/stylesheets/scss/third_party/**'
+
+linters:
+    ColorKeyword:
+        enabled: false
+
+    Comment:
+        enabled: false
+
+    Compass::*:
+        enabled: true
+
+    Indentation:
+        width: 4
+
+    LeadingZero:
+        style: 'include_zero'
+
+    PropertySortOrder:
+        enabled: false
+
+    SingleLinePerSelector:
+        enabled: false
+
+    StringQuotes:
+        style: 'double_quotes'
+
+    MergeableSelector:
+        force_nesting: false

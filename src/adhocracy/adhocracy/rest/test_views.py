@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
 import colander
 import pytest
 
@@ -196,8 +197,7 @@ class TestValidatePOSTRootVersions:
         from adhocracy.interfaces import IItemVersion
         from adhocracy.interfaces import ISheet
         root = testing.DummyResource(__provides__=(IItemVersion, ISheet))
-        context['root'] = root
-        request.validated = {'root_versions': ["/root"]}
+        request.validated = {'root_versions': [root]}
 
         self.make_one(context, request)
 
@@ -207,17 +207,10 @@ class TestValidatePOSTRootVersions:
     def test_non_valid_value_has_wrong_iface(self, request, context):
         from adhocracy.interfaces import ISheet
         root = testing.DummyResource(__provides__=(IResourceX, ISheet))
-        context['root'] = root
-        request.validated = {'root_versions': ["/root"]}
+        request.validated = {'root_versions': [root]}
 
         self.make_one(context, request)
 
-        assert request.errors != []
-        assert request.validated == {'root_versions': []}
-
-    def test_non_valid_value_does_not_exists(self, request, context):
-        request.validated = {'root_versions': ["/root"]}
-        self.make_one(context, request)
         assert request.errors != []
         assert request.validated == {'root_versions': []}
 
@@ -296,20 +289,22 @@ class TestResourceRESTView:
         response = inst.get()
 
         wanted = GETResourceResponseSchema().serialize()
-        wanted['path'] = '/'
+        wanted['path'] = request.application_url + '/'
         wanted['data'] = {}
         wanted['content_type'] = IResource.__identifier__
         assert wanted == response
 
     def test_get_valid_with_sheets(self, request, context, mock_sheet):
         mock_sheet.meta = mock_sheet.meta._replace(isheet=ISheetB)
-        mock_sheet.get_cstruct.return_value = 'dummy_cstruct'
+        mock_sheet.get.return_value = {'dummy': 'data'}
+        schema = colander.SchemaNode(colander.Mapping(unknown='preserve'))
+        mock_sheet.schema.bind.return_value = schema
         request.registry.content.resource_sheets.return_value = {ISheetB.__identifier__: mock_sheet}
 
         inst = self.make_one(context, request)
         response = inst.get()
 
-        wanted = {ISheetB.__identifier__: 'dummy_cstruct'}
+        wanted = {ISheetB.__identifier__: {'dummy': 'data'}}
         assert wanted == response['data']
 
 
@@ -340,7 +335,7 @@ class TestSimpleRESTView:
         inst = self.make_one(context, request)
         response = inst.put()
 
-        wanted = {'path': '/', 'content_type': IResource.__identifier__}
+        wanted = {'path': request.application_url + '/', 'content_type': IResource.__identifier__}
         assert wanted == response
 
     def test_put_valid_with_sheets(self, request, context, mock_sheet):
@@ -352,7 +347,7 @@ class TestSimpleRESTView:
         inst = self.make_one(context, request)
         response = inst.put()
 
-        wanted = {'path': '/', 'content_type': IResource.__identifier__}
+        wanted = {'path': request.application_url + '/', 'content_type': IResource.__identifier__}
         assert wanted == response
         assert mock_sheet.set.call_args[0][0] == {'x': 'y'}
 
@@ -389,7 +384,7 @@ class TestPoolRESTView:
         inst = self.make_one(context, request)
         response = inst.post()
 
-        wanted = {'path': '/child', 'content_type': IResourceX.__identifier__}
+        wanted = {'path': request.application_url + '/child/', 'content_type': IResourceX.__identifier__}
         assert wanted == response
 
 
@@ -425,9 +420,9 @@ class TestItemRESTView:
 
         inst = self.make_one(context, request)
 
-        wanted = {'path': '/', 'data': {},
+        wanted = {'path': request.application_url + '/',  'data': {},
                   'content_type': IItem.__identifier__,
-                  'first_version_path': '/first'}
+                  'first_version_path': request.application_url + '/first/'}
         assert inst.get() == wanted
 
     def test_get_item_without_first_version(self, request, context):
@@ -437,7 +432,7 @@ class TestItemRESTView:
 
         inst = self.make_one(context, request)
 
-        wanted = {'path': '/', 'data': {},
+        wanted = {'path': request.application_url + '/',  'data': {},
                   'content_type': IItem.__identifier__,
                   'first_version_path': ''}
         assert inst.get() == wanted
@@ -456,7 +451,7 @@ class TestItemRESTView:
         inst = self.make_one(context, request)
         response = inst.post()
 
-        wanted = {'path': '/child', 'content_type': IResourceX.__identifier__}
+        wanted = {'path': request.application_url + '/child/', 'content_type': IResourceX.__identifier__}
         request.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
                                        creator=None,
                                        appstructs={},
@@ -478,9 +473,9 @@ class TestItemRESTView:
         inst = self.make_one(context, request)
         response = inst.post()
 
-        wanted = {'path': '/child',
+        wanted = {'path': request.application_url + '/child/',
                   'content_type': IItem.__identifier__,
-                  'first_version_path': '/child/first'}
+                  'first_version_path': request.application_url + '/child/first/'}
         assert wanted == response
 
     def test_post_valid_itemversion(self, request, context):
@@ -498,7 +493,7 @@ class TestItemRESTView:
         inst = self.make_one(context, request)
         response = inst.post()
 
-        wanted = {'path': '/child',
+        wanted = {'path': request.application_url + '/child/',
                   'content_type': IItemVersion.__identifier__}
         assert request.registry.content.create.call_args[1]['root_versions'] == [root]
         assert wanted == response
@@ -645,9 +640,9 @@ class TestMetaApiView:
 
     def test_get_sheets_with_field_adhocracy_referencelist(self, request, context, sheet_meta):
         from adhocracy.interfaces import SheetToSheet
-        from adhocracy.schema import ListOfUniqueReferences
+        from adhocracy.schema import UniqueReferences
         class SchemaF(colander.MappingSchema):
-            test = ListOfUniqueReferences(reftype=SheetToSheet)
+            test = UniqueReferences(reftype=SheetToSheet)
         metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
         request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)
@@ -661,10 +656,10 @@ class TestMetaApiView:
 
     def test_get_sheets_with_field_adhocracy_back_referencelist(self, request, context, sheet_meta):
         from adhocracy.interfaces import SheetToSheet
-        from adhocracy.schema import ListOfUniqueReferences
+        from adhocracy.schema import UniqueReferences
         SheetToSheet.setTaggedValue('source_isheet', ISheetB)
         class SchemaF(colander.MappingSchema):
-            test = ListOfUniqueReferences(reftype=SheetToSheet, backref=True)
+            test = UniqueReferences(reftype=SheetToSheet, backref=True)
         metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
         request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)
@@ -769,7 +764,7 @@ class TestLoginUserName:
 
     @fixture
     def request(self, cornice_request, registry):
-        cornice_request.registry=registry
+        cornice_request.registry = registry
         cornice_request.validated['user'] = testing.DummyResource()
         cornice_request.validated['password'] = 'lalala'
         return cornice_request
@@ -790,6 +785,10 @@ class TestLoginUserName:
         assert inst.post() == {'status': 'success',
                                'user_path': '/user',
                                'user_token': 'token'}
+
+    def test_options(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}
 
 
 class TestLoginEmailView:
@@ -817,10 +816,40 @@ class TestLoginEmailView:
                                'user_path': '/user',
                                'user_token': 'token'}
 
+    def test_options(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}
 
+
+def test_add_cors_headers_subscriber(context):
+    from adhocracy.rest.views import add_cors_headers_subscriber
+    headers = {}
+    response = testing.DummyResource(headers=headers)
+    event = testing.DummyResource(response=response)
+
+    add_cors_headers_subscriber(event)
+
+    assert headers == \
+        {'Access-Control-Allow-Origin': '*',
+         'Access-Control-Allow-Headers':
+         'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
+         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS'}
+
+
+@fixture()
+def integration(config):
+    config.include('cornice')
+    config.include('adhocracy.rest.views')
+
+
+@mark.usefixtures('integration')
 class TestIntegrationIncludeme:
 
-    def test_includeme(self, config):
-        """Check that include me runs without errors."""
-        config.include('cornice')
-        config.include('adhocracy.rest.views')
+    def test_includeme(self):
+        """Check that includeme runs without errors."""
+        assert True
+
+    def test_register_subscriber(self, registry):
+        from adhocracy.rest.views import add_cors_headers_subscriber
+        handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
+        assert add_cors_headers_subscriber.__name__ in handlers

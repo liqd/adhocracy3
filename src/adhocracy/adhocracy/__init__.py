@@ -78,7 +78,6 @@ def includeme(config):
     config.include('.resources.subscriber')
     config.include('.websockets')
     config.include('.rest')
-    config.include('.frontend')
 
 
 def main(global_config, **settings):

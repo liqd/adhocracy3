@@ -1,0 +1,31 @@
+$l-header-height: 3.5em;
+$l-nav-width: 3em;
+
+.l-header {
+    height: $l-header-height;
+}
+
+.l-nav,
+.l-content {
+    position: absolute;
+    top: $l-header-height;
+    bottom: 0;
+}
+
+.l-nav {
+    left: 0;
+    width: $l-nav-width;
+    z-index: 1;
+}
+
+.l-content {
+    left: $l-nav-width;
+    right: 0;
+    overflow: hidden;
+}
+
+.l-center {
+    max-width: 50em;
+    margin: 5em auto 10em;
+    padding: 0.5em;
+}

@@ -6,22 +6,25 @@ from adhocracy.schema import AdhocracySchemaNode
 from adhocracy.schema import Email
 from adhocracy.schema import Interface
 from adhocracy.schema import Password
+from adhocracy.schema import Resource
+from adhocracy.schema import Resources
+from adhocracy.schema import SingleLine
 
 
 class ResourceResponseSchema(colander.Schema):
 
     """Data structure for responses of Resource requests."""
 
-    content_type = colander.SchemaNode(colander.String(), default='')
+    content_type = SingleLine()
 
-    path = AbsolutePath(default='')
+    path = Resource()
 
 
 class ItemResponseSchema(ResourceResponseSchema):
 
     """Data structure for responses of IItem requests."""
 
-    first_version_path = AbsolutePath(default='')
+    first_version_path = Resource()
 
 
 class GETResourceResponseSchema(ResourceResponseSchema):
@@ -36,7 +39,7 @@ class GETItemResponseSchema(GETResourceResponseSchema):
 
     """Data structure for responses of IItem requests."""
 
-    first_version_path = AbsolutePath(default='')
+    first_version_path = Resource()
 
 
 def add_put_data_subschemas(node: colander.MappingSchema, kw: dict):
@@ -99,10 +102,9 @@ class POSTResourceRequestSchema(PUTResourceRequestSchema):
 
     """Data structure for Resource POST requests."""
 
-    content_type = colander.SchemaNode(
-        colander.String(),
-        validator=deferred_validate_post_content_type,
-        default='')
+    content_type = SingleLine(validator=deferred_validate_post_content_type,
+                              missing=colander.required)
+
     data = colander.SchemaNode(colander.Mapping(unknown='raise'),
                                after_bind=add_post_data_subschemas,
                                default={})
@@ -119,7 +121,7 @@ class POSTItemRequestSchema(POSTResourceRequestSchema):
 
     """Data structure for Item and ItemVersion POST requests."""
 
-    root_versions = AbsolutePaths(missing=[])
+    root_versions = Resources(missing=[])
 
 
 class POSTResourceRequestSchemaList(colander.List):
@@ -172,7 +174,7 @@ class POSTLoginEmailRequestSchema(colander.Schema):
     password = Password(missing=colander.required)
 
 
-class BatchMethod(colander.SchemaNode):
+class BatchHTTPMethod(colander.SchemaNode):
 
     """An HTTP method in a batch request."""
 
@@ -185,10 +187,10 @@ class BatchRequestPath(AdhocracySchemaNode):
 
     """A path in a batch request.
 
-    Either an absolute path or a preliminary resource path (a relative path
-    preceded by '@').
+    Either a resource url or a preliminary resource path (a relative path
+    preceded by '@') or an absolute path.
 
-    Example values: '@item/v1', '/adhocracy/item/v1'
+    Example values: '@item/v1', 'http://a.org/adhocracy/item/v1', '/item/v1/'
     """
 
     schema_type = colander.String
@@ -196,16 +198,17 @@ class BatchRequestPath(AdhocracySchemaNode):
     missing = colander.required
     absolutpath = AbsolutePath.relative_regex
     preliminarypath = '[a-zA-Z0-9\_\-\.\/]+'
-    validator = colander.All(colander.Regex('^' + absolutpath + '|@'
+    validator = colander.All(colander.Regex('^' + colander.URL_REGEX + '|'
+                                            + absolutpath + '|@'
                                             + preliminarypath + '$'),
-                             colander.Length(min=1, max=100))
+                             colander.Length(min=1, max=200))
 
 
 class POSTBatchRequestItem(colander.Schema):
 
     """A single item in a batch request, encoding a single request."""
 
-    method = BatchMethod()
+    method = BatchHTTPMethod()
     path = BatchRequestPath()
     body = colander.SchemaNode(colander.Mapping(unknown='preserve'),
                                missing={})
@@ -280,5 +283,5 @@ class OPTIONResourceResponseSchema(colander.Schema):
     GET = GETLocationMapping()
     PUT = PUTLocationMapping()
     POST = POSTLocationMapping()
-    HEAD = colander.SchemaNode(colander.Mapping(), default={})
-    OPTION = colander.SchemaNode(colander.Mapping(), default={})
+    HEAD = colander.MappingSchema(default={})
+    OPTION = colander.MappingSchema(default={})

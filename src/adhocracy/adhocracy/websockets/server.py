@@ -15,6 +15,7 @@ from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItemVersion
 from adhocracy.websockets import WebSocketError
 from adhocracy.websockets.schemas import ClientRequestSchema
+from adhocracy.websockets.schemas import ServerNotification
 from adhocracy.websockets.schemas import Notification
 from adhocracy.websockets.schemas import StatusConfirmation
 from adhocracy.websockets.schemas import ChildNotification
@@ -93,6 +94,26 @@ class ClientTracker():
                 yield client
 
 
+class DummyRequest:
+
+    """Dummy :term:`request` to create/resolve resource urls.
+
+    This is needed to de/serialize SchemaNodes with
+    :class:`adhocracy.schema.ResourceObject` schema type.
+    """
+
+    def __init__(self, application_url, root):
+        self.application_url = application_url
+        """URL prefix used to extract resource paths."""
+        self.root = root
+        """The root resource to resolve resource paths"""
+
+    def resource_url(self, resource):
+        """Return the pyramid resource url."""
+        path = resource_path(resource)
+        return self.application_url + path + '/'
+
+
 class ClientCommunicator(WebSocketServerProtocol):
 
     """Communicates with a client through a WebSocket connection.
@@ -105,8 +126,24 @@ class ClientCommunicator(WebSocketServerProtocol):
     zodb_connection = None
     # All instances of this class share the same tracker
     _tracker = ClientTracker()
+    # All instances of this class share the same rest server url
+    # This is used to generate the resource URLs. It is equal to the
+    # url the adhocracy frontend is using to communicate with the rest server.
+    rest_url = 'http://localhost:6541'
 
-    def _get_context(self):
+    def _create_schema(self, schema_class: colander.Schema):
+        """Create schema object and bind `context` and `request`."""
+        context = self._get_context()
+        request = self._get_dummy_request()
+        schema = schema_class()
+        return schema.bind(context=context, request=request)
+
+    def _get_dummy_request(self) -> DummyRequest:
+        """Return a dummy :term:`request` object to resolve resource paths."""
+        context = self._get_context()
+        return DummyRequest(self.rest_url, context)
+
+    def _get_context(self) -> IResource:
         """Get a context object to resolve resource paths.
 
         :raises KeyError: if the zodb root has no app_root child.
@@ -132,12 +169,10 @@ class ClientCommunicator(WebSocketServerProtocol):
     def onMessage(self, payload: bytes, is_binary: bool):    # noqa
         try:
             json_object = self._parse_message(payload, is_binary)
-            if self._handle_if_event_notification(json_object):
+            if self._handle_if_server_notification(json_object):
                 return
-            context = self._get_context()
             request = self._parse_json_via_schema(json_object,
-                                                  ClientRequestSchema,
-                                                  context)
+                                                  ClientRequestSchema)
             self._handle_client_request_and_send_response(request)
         except Exception as err:
             self._send_error_message(err)
@@ -158,7 +193,7 @@ class ClientCommunicator(WebSocketServerProtocol):
         except ValueError as err:
             raise WebSocketError('malformed_message', err.args[0])
 
-    def _handle_if_event_notification(self, json_object) -> bool:
+    def _handle_if_server_notification(self, json_object) -> bool:
         """Handle message if it's a notifications from our Pyramid app.
 
         :return: True if the message is a valid event notification from our
@@ -166,25 +201,22 @@ class ClientCommunicator(WebSocketServerProtocol):
         """
         if (self._client_may_send_notifications and
                 self._looks_like_event_notification(json_object)):
-            context = self._get_context()
             notification = self._parse_json_via_schema(json_object,
-                                                       Notification,
-                                                       context,)
+                                                       ServerNotification)
             self._dispatch_event_notification_to_subscribers(notification)
             return True
         else:
             return False
 
-    def _parse_json_via_schema(self, json_object, schema:
-                               colander.MappingSchema, context) -> dict:
+    def _parse_json_via_schema(self, json_object, schema_class) -> dict:
         try:
-            schema_with_context = schema().bind(context=context)
-            return schema_with_context.deserialize(json_object)
+            schema = self._create_schema(schema_class)
+            return schema.deserialize(json_object)
         except colander.Invalid as err:
             self._raise_if_unknown_field_value('action', err, json_object)
             self._raise_if_unknown_field_value('resource', err, json_object)
             self._raise_invalid_json_from_colander_invalid(err)
-        except Exception as err:
+        except Exception as err:  # pragma: no cover
             self._raise_invalid_json_from_exception(err)
 
     def _handle_client_request_and_send_response(self, request: dict):
@@ -242,13 +274,14 @@ class ClientCommunicator(WebSocketServerProtocol):
         raise WebSocketError('invalid_json', details)
 
     def _raise_invalid_json_from_exception(self, err: Exception):
-        raise WebSocketError('invalid_json', str(err))
+        raise WebSocketError('invalid_json', str(err))  # pragma: no cover
 
     def _raise_if_forbidden_request(self, action: str, resource: IResource):
         """Raise an error if a client tries to subscribe to an ItemVersion."""
         if action == 'subscribe' and IItemVersion.providedBy(resource):
-            raise WebSocketError('subscribe_not_supported',
-                                 resource_path(resource))
+            request = self._get_dummy_request()
+            resource_path = request.resource_url(resource)
+            raise WebSocketError('subscribe_not_supported', resource_path)
 
     def _update_resource_subscription(self, action: str,
                                       resource: str) -> bool:
@@ -265,8 +298,7 @@ class ClientCommunicator(WebSocketServerProtocol):
     def _send_status_confirmation(self, update_was_necessary: bool,
                                   action: str, resource: IResource):
         status = 'ok' if update_was_necessary else 'redundant'
-        context = self._get_context()
-        schema = StatusConfirmation().bind(context=context)
+        schema = self._create_schema(StatusConfirmation)
         json_message = schema.serialize(
             {'status': status, 'action': action, 'resource': resource})
         self._send_json_message(json_message)
@@ -320,8 +352,7 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def send_modified_notification(self, resource: IResource):
         """Send notification about a modified resource."""
-        context = self._get_context()
-        schema = Notification().bind(context=context)
+        schema = self._create_schema(Notification)
         data = schema.serialize({'event': 'modified', 'resource': resource})
         self._send_json_message(data)
 
@@ -331,8 +362,7 @@ class ClientCommunicator(WebSocketServerProtocol):
 
         :param status: should be 'new', 'removed', or 'modified'
         """
-        context = self._get_context()
-        schema = ChildNotification().bind(context=context)
+        schema = self._create_schema(ChildNotification)
         data = schema.serialize({'event': status + '_child',
                                  'resource': resource,
                                  'child': child})
@@ -341,8 +371,7 @@ class ClientCommunicator(WebSocketServerProtocol):
     def send_new_version_notification(self, resource: IResource,
                                       new_version: IResource):
         """Send notification if a new version has been added."""
-        context = self._get_context()
-        schema = VersionNotification().bind(context=context)
+        schema = self._create_schema(VersionNotification)
         data = schema.serialize({'event': 'new_version',
                                  'resource': resource,
                                  'version': new_version})

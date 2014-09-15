@@ -10,7 +10,7 @@ from adhocracy.interfaces import SheetToSheet
 from adhocracy.sheets import GenericResourceSheet
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets import add_sheet_to_registry
-from adhocracy.schema import ListOfUniqueReferences
+from adhocracy.schema import UniqueReferences
 from adhocracy.utils import append_if_not_none
 from adhocracy.utils import FormList
 
@@ -113,8 +113,8 @@ class PoolSchema(colander.MappingSchema):
     `elements`: children of this resource (object hierarchy).
     """
 
-    elements = ListOfUniqueReferences(reftype=PoolElementsReference,
-                                      readonly=True)
+    elements = UniqueReferences(reftype=PoolElementsReference,
+                                readonly=True)
     count = colander.SchemaNode(colander.Integer(), default=colander.drop)
 
 

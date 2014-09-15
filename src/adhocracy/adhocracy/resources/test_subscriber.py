@@ -5,6 +5,7 @@ from pyramid import testing
 
 from adhocracy.interfaces import ISheet
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
+from adhocracy.testing import add_and_register_sheet
 
 
 class IDummySheetAutoUpdate(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -15,14 +16,6 @@ class IDummySheetNoAutoUpdate(ISheet):
     pass
 
 
-def add_and_register_sheet(context, mock_sheet, registry):
-    from zope.interface import alsoProvides
-    from adhocracy.interfaces import IResourceSheet
-    isheet = mock_sheet.meta.isheet
-    alsoProvides(context, isheet)
-    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
-                             IResourceSheet,
-                             isheet.__identifier__)
 
 
 def _create_new_version_event_with_isheet(context, isheet, registry, creator=None):

@@ -1,0 +1,53 @@
+<form novalidate="novalidate" class="register" name="registerForm">
+    <h1 class="title">Register!</h1>
+    <div class="form-error" ng-repeat="error in errors track by $index">
+        <p>{{error}}</p>
+    </div>
+    <div class="register-inputs">
+        <input
+            type="text"
+            name="username"
+            placeholder="username"
+            data-ng-model="input.username"
+            required="required" />
+        <input
+            type="email"
+            name="email"
+            placeholder="email"
+            data-ng-model="input.email"
+            required="required" />
+        <input
+            type="password"
+            name="password"
+            placeholder="password"
+            data-ng-model="input.password"
+            required="required"
+            data-ng-minlength="6"
+            data-ng-maxlength="100" />
+        <input
+            type="password"
+            name="password_repeat"
+            placeholder="password repeat"
+            data-ng-model="input.passwordRepeat"
+            required="required" />
+        <span class="input-error" data-ng-show="(!registerForm.password.$error.minlength) && (input.password !== input.passwordRepeat)">
+            Password fields do not match.
+        </span>
+        <span class="input-error" data-ng-show="registerForm.password.$error.minlength">
+            Password too short.
+        </span>
+    </div>
+    <div class="register-description box-with-button">
+        <div class="textbox m-unobtrusive">
+            <p>Disclaimer</p>
+        </div>
+        <input
+            type="submit"
+            name="register"
+            value="register"
+            class="m-call-to-action"
+            data-ng-click="register()"
+            data-ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
+        <a href="/login">LogIn instead</a>
+    </div>
+</form>

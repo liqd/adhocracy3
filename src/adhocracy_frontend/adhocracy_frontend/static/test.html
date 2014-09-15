@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>adhocracy 3 frontend tests (unit plus coverage)</title>
+
+    <script type="text/javascript" src="/static/lib/requirejs/require.js"></script>
+    <script type="text/javascript" src="/static/require-config.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="lib/jasmine/lib/jasmine-core/jasmine.css">
+    <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/jasmine.js"></script>
+    <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+    <script type="text/javascript" src="lib/jasmine/lib/jasmine-core/boot.js"></script>
+
+    <script type="text/javascript" src="js/AdhocracySDK.js"></script>
+
+</head>
+
+<body>
+    <script type="text/javascript">
+        // phantom.js is missing bind(), so here is a simplified polyfill
+        Function.prototype.bind = Function.prototype.bind || function(thisp) {
+            var fn = this;
+            return function() {
+                return fn.apply(thisp, arguments);
+            };
+        };
+
+        require(['AdhocracySpec'], function(spec) {
+            jasmine.getEnv().execute()
+        });
+    </script>
+</body>
+</html>

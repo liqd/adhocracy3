@@ -20,8 +20,9 @@ Start Adhocracy testapp::
 
     >>> from webtest import TestApp
     >>> app = getfixture('app_sample')
+    >>> websocket = getfixture('websocket')
     >>> testapp = TestApp(app)
-
+    >>> rest_url = 'http://localhost'
 
 Resource structure
 ------------------
@@ -233,7 +234,7 @@ Returns possible methods for this resource, example request/response data
 structures and available interfaces with resource data. The result is a
 JSON object that has the allowed request methods as keys::
 
-    >>> resp_data = testapp.options("/adhocracy").json
+    >>> resp_data = testapp.options(rest_url + "/adhocracy").json
     >>> sorted(resp_data.keys())
     ['GET', 'HEAD', 'OPTION', 'POST', 'PUT']
 
@@ -302,7 +303,7 @@ HEAD
 
 Returns only http headers::
 
-    >>> resp = testapp.head("/adhocracy")
+    >>> resp = testapp.head(rest_url + "/adhocracy")
     >>> resp.headerlist # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
     [...('Content-Type', 'application/json; charset=UTF-8'), ...
     >>> resp.text
@@ -314,7 +315,7 @@ GET
 
 Returns resource and child elements meta data and all sheet with data::
 
-    >>> resp_data = testapp.get("/adhocracy").json
+    >>> resp_data = testapp.get(rest_url + "/adhocracy").json
     >>> pprint(resp_data["data"])
     {'adhocracy.sheets.metadata.IMetadata': ...
      'adhocracy.sheets.name.IName': {'name': 'adhocracy'},
@@ -329,11 +330,11 @@ Create a new resource ::
     ...         'data': {
     ...              'adhocracy.sheets.name.IName': {
     ...                  'name': 'Proposals'}}}
-    >>> resp_data = testapp.post_json("/adhocracy", prop).json
+    >>> resp_data = testapp.post_json(rest_url + "/adhocracy", prop).json
     >>> resp_data["content_type"]
     'adhocracy.resources.pool.IBasicPool'
     >>> resp_data["path"]
-    '/adhocracy/Proposals'
+    '.../adhocracy/Proposals/'
 
 PUT
 ~~~
@@ -341,17 +342,18 @@ PUT
 Modify data of an existing resource ::
 
     FIXME: disable because IName.name is not editable.  use another example!
+    FIXME: what we do here is a `patch` actually, so we should rename this.
 
 ...    >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
 ...    ...         'data': {'adhocracy.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
-...    >>> resp_data = testapp.put_json("/adhocracy/Proposals", data).json
+...    >>> resp_data = testapp.put_json(rest_url + "/adhocracy/Proposals", data).json
 ...    >>> pprint(resp_data)
 ...    {'content_type': 'adhocracy.resources.pool.IBasicPool',
-...     'path': '/adhocracy/Proposals'}
+...     'path': rest_url + '/adhocracy/Proposals'}
 
 Check the changed resource ::
 
-...   >>> resp_data = testapp.get("/adhocracy/Proposals").json
+...   >>> resp_data = testapp.get(rest_url + "/adhocracy/Proposals").json
 ...   >>> resp_data["data"]["adhocracy.sheets.name.IName"]["name"]
 ...   'youdidntexpectthis'
 
@@ -370,7 +372,7 @@ The normal return code is 200 ::
     >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
     ...         'data': {'adhocracy.sheets.name.IName': {'name': 'Proposals'}}}
 
-.. >>> testapp.put_json("/adhocracy/Proposals", data)
+.. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data)
 .. 200 OK application/json ...
 
 If you submit invalid data the return error code is 400 ::
@@ -378,7 +380,7 @@ If you submit invalid data the return error code is 400 ::
     >>> data = {'content_type': 'adhocracy.resources.pool.IBasicPool',
     ...         'data': {'adhocracy.sheets.example.WRONGINTERFACE': {'name': 'Proposals'}}}
 
-.. >>> testapp.put_json("/adhocracy/Proposals", data)
+.. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data)
 .. Traceback (most recent call last):
 .. ...
 .. {"errors": [{"description": ...
@@ -473,16 +475,16 @@ Create a Proposal (a subclass of Item which pools ProposalVersions) ::
     ...                  'name': 'kommunismus'}
     ...              }
     ...         }
-    >>> resp = testapp.post_json("/adhocracy/Proposals", pdag)
+    >>> resp = testapp.post_json(rest_url + "/adhocracy/Proposals", pdag)
     >>> pdag_path = resp.json["path"]
     >>> pdag_path
-    '/adhocracy/Proposals/kommunismus'
+    '.../adhocracy/Proposals/kommunismus/'
 
 The return data has the new attribute 'first_version_path' to get the path first Version::
 
     >>> pvrs0_path = resp.json['first_version_path']
     >>> pvrs0_path
-    '/adhocracy/Proposals/kommunismus/VERSION_0000000'
+    '.../adhocracy/Proposals/kommunismus/VERSION_0000000/'
 
 Version IDs are numeric and assigned by the server.  The front-end has
 no control over them, and they are not supposed to be human-memorable.
@@ -494,10 +496,11 @@ The Proposal has the IVersions and ITags interfaces to work with Versions::
 
     >>> resp = testapp.get(pdag_path)
     >>> resp.json['data']['adhocracy.sheets.versions.IVersions']['elements']
-    ['/adhocracy/Proposals/kommunismus/VERSION_0000000']
+    ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/']
 
     >>> resp.json['data']['adhocracy.sheets.tags.ITags']['elements']
-    ['/adhocracy/Proposals/kommunismus/FIRST', '/adhocracy/Proposals/kommunismus/LAST']
+    ['.../adhocracy/Proposals/kommunismus/FIRST/', '.../adhocracy/Proposals/kommunismus/LAST/']
+
 
 Update
 ~~~~~~
@@ -620,12 +623,12 @@ version is automatically created along with the updated Section version::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersions'])
-    {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000000',
-                  '/adhocracy/Proposals/kommunismus/VERSION_0000001',
-                  '/adhocracy/Proposals/kommunismus/VERSION_0000002',
-                  '/adhocracy/Proposals/kommunismus/VERSION_0000003']}
+    {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/',
+                  '.../adhocracy/Proposals/kommunismus/VERSION_0000001/',
+                  '.../adhocracy/Proposals/kommunismus/VERSION_0000002/',
+                  '.../adhocracy/Proposals/kommunismus/VERSION_0000003/']}
 
-    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000003')
+    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000003')
     >>> pvrs3_path = resp.json['path']
 
 More interestingly, if we then create a second version of kapitel2::
@@ -651,22 +654,22 @@ pvrs2 (which also contains s2vrs0_path) ::
 
     >>> resp = testapp.get(pdag_path)
     >>> pprint(resp.json['data']['adhocracy.sheets.versions.IVersions'])
-    {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000000',
-                  '/adhocracy/Proposals/kommunismus/VERSION_0000001',
-                  '/adhocracy/Proposals/kommunismus/VERSION_0000002',
-                  '/adhocracy/Proposals/kommunismus/VERSION_0000003',
-                  '/adhocracy/Proposals/kommunismus/VERSION_0000004']}
+    {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/',
+                  '.../adhocracy/Proposals/kommunismus/VERSION_0000001/',
+                  '.../adhocracy/Proposals/kommunismus/VERSION_0000002/',
+                  '.../adhocracy/Proposals/kommunismus/VERSION_0000003/',
+                  '.../adhocracy/Proposals/kommunismus/VERSION_0000004/']}
 
-    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000004')
     >>> pvrs4_path = resp.json['path']
-    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000002')
+    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000002')
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     1
 
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     1
 
-    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/VERSION_0000004')
     >>> len(resp.json['data']['adhocracy.sheets.versions.IVersionable']['followed_by'])
     0
 
@@ -681,49 +684,132 @@ Tags
 
 Each Versionable has a FIRST tag that points to the initial version::
 
-    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/FIRST')
+    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/FIRST')
     >>> pprint(resp.json)
     {'content_type': 'adhocracy.interfaces.ITag',
      'data': {...
               'adhocracy.sheets.name.IName': {'name': 'FIRST'},
-              'adhocracy.sheets.tags.ITag': {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000000']}},
-     'path': '/adhocracy/Proposals/kommunismus/FIRST'}
+              'adhocracy.sheets.tags.ITag': {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000000/']}},
+     'path': '.../adhocracy/Proposals/kommunismus/FIRST/'}
 
 It also has a LAST tag that points to the newest versions -- any versions
 that aren't 'followed_by' any later version::
 
-    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/LAST')
+    >>> resp = testapp.get(rest_url + '/adhocracy/Proposals/kommunismus/LAST')
     >>> pprint(resp.json)
     {'content_type': 'adhocracy.interfaces.ITag',
      'data': {...
               'adhocracy.sheets.name.IName': {'name': 'LAST'},
-              'adhocracy.sheets.tags.ITag': {'elements': ['/adhocracy/Proposals/kommunismus/VERSION_0000004']}},
-     'path': '/adhocracy/Proposals/kommunismus/LAST'}
+              'adhocracy.sheets.tags.ITag': {'elements': ['.../adhocracy/Proposals/kommunismus/VERSION_0000004/']}},
+     'path': '.../adhocracy/Proposals/kommunismus/LAST/'}
 
 FIXME: the elements listing in the ITags interface is not very helpful, the
 tag names (like 'FIRST') are missing.
 
-FIXME: should the server tell in general where to post specific
-content types? (like 'like', 'discussion',..)?  in other words,
-should the client be able to ask (e.g. with an OPTIONS request)
-where to post a 'like'?
+
+Forks and forkability
+~~~~~~~~~~~~~~~~~~~~~
+
+This api has been designed to allow implementation of complex merge
+conflict resolution, both automatic and with user-involvement.  For
+now, however, it only supports a simplified version control strategy:
+If any version that is not head is used as a predecessor, the backend
+responds with an error.  The frontend has to handle these errors, as
+they can always occur in race conditions with other users.
+
+Currently there are two very simple conflict resolution strategies:
+
+1. If a race condition is reported by the backend, the frontend
+   updates the predecessor version to head and tries again.  (In the
+   unlikely case where lots of post activity is going on, it may be
+   necessary to repeat this several times.)
+
+   Example: IRatingVersion can only legally be modified by one user
+   and should not experience any race conditions.  If it does, the
+   second post wins and silently reverts the previous one.
+
+2. Like 1., but the frontend posts two new versions on top of HEAD.
+   If this is the situation of the conflict::
+
+    Doc     v0----v1
+                \
+                 -----v1'
+
+          >-----> time >-------->
+
+   Then it is resolved as follows (by the frontend of the author of
+   v1')::
+
+    Doc     v0----v1
+                    \
+                     -----v0'----v1'
+
+          >-----> time >-------->
+
+   v0' is a copy of v0 that differs only in its predecessor.  It is
+   called a 'revert' version.  (FIXME: is there a way to enrich the
+   data with a 'is_revert' flag?)
+
+   This must be done in a batch request (a transaction) in order to
+   avoid that only the revert is successfully posted, but the actual
+   change fails.  Again, it is possible that this batch request fails,
+   and has to be attempted several times.
+
+   Example: IProposalVersion can be modified by many users
+   concurrently.
+
+3. (Future work): Both authors of the conflict are notified (email,
+   dashboard, ...), and explained how they can inspect the situation
+   and add new versions.  (The email should probably contain a warning
+   that it's best to get on the phone and talk it through before
+   generating more merge conflicts.  :)
+
+4. (Future work): Ideally, the user would to be notified that there
+   is a conflict, display the differences between the three versions,
+   and allow the user to merge his changes into the current HEAD.
+
+5. (Future work): It is allowed to have multiple heads in the DAG, e.g.
+   different preferred versions by different principals. This however still
+   requires a lot of UX work to be done.
+
+The backend must to two things::
+
+1. Add a 'forkable' flag to the IVersionable sheet.  (There are
+   possibly other ways to model this.  Suggestions welcome.)
+
+2. If a non-forkable, non-head version appears as a predecessor in a
+   post, respond with an error.
 
 
-Comments
---------
+FIXME: add tests for this!
+
+
+
+Resources with PostPool, example Comments
+-----------------------------------------
 
 To give another example of a versionable content type, we can write comments
-about proposals::
+about proposals.
+The proposal has a commentable sheet::
+
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> commentable = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']
+
+This sheet has a special field :term:`post_pool` referencing a pool::
+
+    >>> post_pool_path = commentable['post_pool']
+
+We can post comments to this pool only::
 
     >>> comment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
     ...            'data': {}}
-    >>> resp = testapp.post_json(pdag_path, comment)
+    >>> resp = testapp.post_json(post_pool_path, comment)
     >>> comment_path = resp.json["path"]
     >>> comment_path
-    '/adhocracy/Proposals/kommunismus/comment_000...'
+    '.../adhocracy/Proposals/kommunismus/comment_000...'
     >>> first_commvers_path = resp.json['first_version_path']
     >>> first_commvers_path
-    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000'
+    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000/'
 
 The first comment version is empty (as with all versionables), so lets add
 another version to say something meaningful. A comment contains *content*
@@ -740,7 +826,7 @@ another version to say something meaningful. A comment contains *content*
     >>> resp = testapp.post_json(comment_path, commvers)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
-    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001'
+    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001/'
 
 Comments can be about any versionable that allows posting comments. Hence
 it's also possible to write a comment about another comment::
@@ -750,12 +836,12 @@ it's also possible to write a comment about another comment::
     >>> resp = testapp.post_json(pdag_path, metacomment)
     >>> metacomment_path = resp.json["path"]
     >>> metacomment_path
-    '/adhocracy/Proposals/kommunismus/comment_000...'
+    '.../adhocracy/Proposals/kommunismus/comment_000...'
     >>> comment_path != metacomment_path
     True
     >>> first_metacommvers_path = resp.json['first_version_path']
     >>> first_metacommvers_path
-    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000'
+    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000/'
 
 As usual, we have to add another version to actually say something::
 
@@ -770,7 +856,7 @@ As usual, we have to add another version to actually say something::
     >>> resp = testapp.post_json(metacomment_path, metacommvers)
     >>> snd_metacommvers_path = resp.json['path']
     >>> snd_metacommvers_path
-    '/adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001'
+    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001/'
 
 
 Lets view all the comments referring to the proposal.
@@ -847,7 +933,7 @@ omitted or left empty. ::
 
     >>> encoded_request_with_name = {
     ...     'method': 'POST',
-    ...     'path': '/adhocracy/Proposal/kommunismus',
+    ...     'path': rest_url + '/adhocracy/Proposal/kommunismus',
     ...     'body': { 'content_type': 'adhocracy_sample.resources.paragraph.IParagraph' },
     ...     'result_path': '@par1_item',
     ...     'result_first_version_path': '@par1_item/v1'
@@ -916,17 +1002,17 @@ Let's add some more paragraphs to the second section above ::
     3
     >>> pprint(batch_resp[0])
     {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraph',
-              'first_version_path': '/adhocracy/Proposals/kommunismus/par1/VERSION_0000000',
-              'path': '/adhocracy/Proposals/kommunismus/par1'},
+              'first_version_path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000000/',
+              'path': '.../adhocracy/Proposals/kommunismus/par1/'},
      'code': 200}
     >>> pprint(batch_resp[1])
     {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
-              'path': '/adhocracy/Proposals/kommunismus/par1/VERSION_0000001'},
+              'path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/'},
      'code': 200}
     >>> pprint(batch_resp[2])
     {'body': {'content_type': 'adhocracy_sample.resources.paragraph.IParagraphVersion',
               'data': {...},
-              'path': '/adhocracy/Proposals/kommunismus/par1/VERSION_0000001'},
+              'path': '.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/'},
      'code': 200}
      >>> batch_resp[2]['body']['data']['adhocracy.sheets.document.IParagraph']['content']
      'sein blick ist vom vorüberziehn der stäbchen'
@@ -944,9 +1030,9 @@ created paragraph version as its only successor ::
 
 The LAST tag should point to the version we created within the batch request::
 
-    >>> resp_data = testapp.get("/adhocracy/Proposals/kommunismus/par1/LAST").json
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/Proposals/kommunismus/par1/LAST").json
     >>> resp_data['data']['adhocracy.sheets.tags.ITag']['elements']
-    ['/adhocracy/Proposals/kommunismus/par1/VERSION_0000001']
+    ['.../adhocracy/Proposals/kommunismus/par1/VERSION_0000001/']
 
 Post another paragraph item and a version.  If the version post fails,
 the paragraph will not be present in the database ::

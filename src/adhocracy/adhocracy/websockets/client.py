@@ -11,7 +11,7 @@ from websocket import WebSocketConnectionClosedException
 from websocket import WebSocketTimeoutException
 
 from adhocracy.utils import exception_to_str
-from adhocracy.websockets.schemas import Notification
+from adhocracy.websockets.schemas import ServerNotification
 
 logger = logging.getLogger(__name__)
 
@@ -140,7 +140,7 @@ class Client:
                 self._send_resource_event(meta, 'modified')
 
     def _send_resource_event(self, changelog_meta, event_type: str):
-        schema = Notification()
+        schema = ServerNotification().bind(context=changelog_meta.resource)
         message = schema.serialize({'event': event_type,
                                     'resource': changelog_meta.resource})
         message_text = json.dumps(message)
