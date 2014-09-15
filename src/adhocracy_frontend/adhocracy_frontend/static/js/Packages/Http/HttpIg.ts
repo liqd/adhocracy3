@@ -66,7 +66,7 @@ export var register = (angular, config, meta_api) => {
                     .then((lastTag : RITag) => {
                         var lastVersionPaths : string[] = lastTag.data["adhocracy.sheets.tags.ITag"].elements;
                         expect(lastVersionPaths.length).toBe(1);
-                        expect(lastVersionPaths[0].substring(lastVersionPaths[0].length - 4)).toBe("0001");
+                        expect(lastVersionPaths[0].substring(lastVersionPaths[0].length - 4)).toBe("001/");
                     })
                     .then(() => {
                         done();
