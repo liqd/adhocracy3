@@ -94,12 +94,21 @@ export class Service<Content extends Resources.Content<any>> {
                 AdhError.logBackendError);
     }
 
-    public getNewestVersionPath(path : string) : ng.IPromise<string> {
-        // FIXME: This works under the assumption that there is always only
-        // *one* latest version. This is not neccesserily true for multi-user
-        // scenarios.
+    /**
+     * For resources that do not support fork: Return the unique head
+     * version provided by the LAST tag.  If there is no or more than
+     * one version in LAST, throw an exception.
+     */
+    public getNewestVersionPathNoFork(path : string) : ng.IPromise<string> {
         return this.get(path + "/LAST")
-            .then((tag) => tag.data["adhocracy.sheets.tags.ITag"].elements[0]);
+            .then((tag) => {
+                var heads = tag.data["adhocracy.sheets.tags.ITag"].elements;
+                if (heads.length !== 1) {
+                    throw ("Cannot handle this LAST tag: " + heads.toString());
+                } else {
+                    return heads[0];
+                }
+            });
     }
 
     /**
@@ -146,16 +155,52 @@ export class Service<Content extends Resources.Content<any>> {
         });
     }
 
-    public postNewVersion(oldVersionPath : string, obj : Content, rootVersions? : string[]) : ng.IPromise<Content> {
+    /**
+     * For resources that do not support fork: Post a new version.  If
+     * the backend responds with a "no fork allowed" error, fetch LAST
+     * tag and try again.
+     *
+     * The return value is an object containing the resource from the
+     * response, plus a flag whether the post resulted in an implicit
+     * merge.  If this flag is true, the caller may want to take
+     * further action, such as notifying the (two or more) users
+     * involved in the conflict.
+     */
+    public postNewVersionNoFork(
+        oldVersionPath : string,
+        obj : Content, rootVersions? : string[]
+    ) : ng.IPromise<{ value: Content; isMerge: boolean; }> {
+        var _self = this;
+
         var dagPath = Util.parentPath(oldVersionPath);
         var _obj = Util.deepcp(obj);
-        _obj.data["adhocracy.sheets.versions.IVersionable"] = {
-            follows: [oldVersionPath]
-        };
         if (typeof rootVersions !== "undefined") {
             _obj.root_versions = rootVersions;
         }
-        return this.post(dagPath, _obj);
+
+        var retry = (
+            nextOldVersionPath : string,
+            isMerge : boolean
+        ) : ng.IPromise<{ value : Content; isMerge : boolean; }> => {
+            _obj.data["adhocracy.sheets.versions.IVersionable"] = {
+                follows: [nextOldVersionPath]
+            };
+
+            var handleSuccess = (content) => {
+                return { value: content, isMerge: isMerge };
+            };
+
+            var handleConflict = (msg) => {
+                return _self.getNewestVersionPathNoFork(dagPath)
+                    .then((nextOldVersionPath) => retry(nextOldVersionPath, true));
+            };
+
+            return _self
+                .post(dagPath, _obj)
+                .then(handleSuccess, <any>handleConflict);
+        };
+
+        return retry(oldVersionPath, false);
     }
 
     public postToPool(poolPath : string, obj : Content) : ng.IPromise<Content> {

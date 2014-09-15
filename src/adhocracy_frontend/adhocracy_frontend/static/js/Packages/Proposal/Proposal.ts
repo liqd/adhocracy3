@@ -125,7 +125,7 @@ export class ProposalVersionDetail {
                 };
 
                 $scope.commit = () => {
-                    adhHttp.postNewVersion($scope.content.path, $scope.content);
+                    adhHttp.postNewVersionNoFork($scope.content.path, $scope.content);
 
                     $scope.$broadcast("commit");
                     $scope.viewmode = "display";
@@ -218,7 +218,7 @@ export class SectionVersionDetail {
                 $scope : DetailRefScope<SISection.HasAdhocracySheetsDocumentISection>
             ) : void => {
                 var commit = (event, ...args) => {
-                    adhHttp.postNewVersion($scope.content.path, $scope.content);
+                    adhHttp.postNewVersionNoFork($scope.content.path, $scope.content);
                 };
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
@@ -249,7 +249,7 @@ export class ParagraphVersionDetail {
                 $scope : DetailRefScope<SIParagraph.HasAdhocracySheetsDocumentIParagraph>
             ) : void => {
                 var commit = (event, ...args) => {
-                    adhHttp.postNewVersion($scope.content.path, $scope.content);
+                    adhHttp.postNewVersionNoFork($scope.content.path, $scope.content);
                 };
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
@@ -301,13 +301,13 @@ export class Service {
 
     private postVersion(path : string, data) : ng.IPromise<any> {
         var _self = this;
-        return _self.adhHttp.getNewestVersionPath(path)
-            .then((versionPath) => _self.adhHttp.postNewVersion(versionPath, data));
+        return _self.adhHttp.getNewestVersionPathNoFork(path)
+            .then((versionPath) => _self.adhHttp.postNewVersionNoFork(versionPath, data));
     }
 
     private postProposalVersion(proposal, data, sections, scope) : ng.IPromise<void> {
         var _self = this;
-        return _self.$q.all(sections.map((section) => _self.adhHttp.getNewestVersionPath(section.path)))
+        return _self.$q.all(sections.map((section) => _self.adhHttp.getNewestVersionPathNoFork(section.path)))
             .then((sectionVersionPaths) => {
                 var _data = Util.deepcp(data);
                 _data.data["adhocracy.sheets.document.IDocument"].elements = sectionVersionPaths;
@@ -317,7 +317,7 @@ export class Service {
 
     private postSectionVersion(section, data, paragraphs, scope) : ng.IPromise<void> {
         var _self = this;
-        return _self.$q.all(paragraphs.map((paragraph) => _self.adhHttp.getNewestVersionPath(paragraph.path)))
+        return _self.$q.all(paragraphs.map((paragraph) => _self.adhHttp.getNewestVersionPathNoFork(paragraph.path)))
             .then((paragraphVersionPaths) => {
                 var _data = Util.deepcp(data);
                 _data.data["adhocracy.sheets.document.ISection"].elements = paragraphVersionPaths;
@@ -327,7 +327,7 @@ export class Service {
 
     private postParagraphVersion(paragraph, data, scope : {proposal : any}) : ng.IPromise<void> {
         var _self = this;
-        return _self.adhHttp.getNewestVersionPath(scope.proposal.path)
+        return _self.adhHttp.getNewestVersionPathNoFork(scope.proposal.path)
             .then((proposalVersionPath) => {
                 var _data = Util.deepcp(data);
                 _data.root_versions = [proposalVersionPath];
@@ -400,7 +400,7 @@ export class Service {
             ))
 
             // return the latest proposal Version
-            .then(() => _self.adhHttp.getNewestVersionPath(scope.proposal.path))
+            .then(() => _self.adhHttp.getNewestVersionPathNoFork(scope.proposal.path))
             .then((proposalVersionPath) => _self.adhHttp.get(proposalVersionPath));
     }
 
