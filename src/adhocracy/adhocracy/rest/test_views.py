@@ -776,6 +776,10 @@ class TestLoginUserName:
                                'user_path': '/user',
                                'user_token': 'token'}
 
+    def test_options(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}
+
 
 class TestLoginEmailView:
 
@@ -801,6 +805,10 @@ class TestLoginEmailView:
         assert inst.post() == {'status': 'success',
                                'user_path': '/user',
                                'user_token': 'token'}
+
+    def test_options(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}
 
 
 def test_add_cors_headers_subscriber(context):
