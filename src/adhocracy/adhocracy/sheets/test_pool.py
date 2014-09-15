@@ -79,7 +79,7 @@ class TestIntegrationPoolSheet:
         child1 = self._make_resource(registry, parent=pool, name='child1')
         child2 = self._make_resource(registry, parent=pool, name='child2')
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet.filter_elements())
+        result = set(poolsheet._filter_elements())
         assert result == {child1, child2}
 
     def test_filter_elements_no_filters_with_grandchildren_depth1(
@@ -90,7 +90,7 @@ class TestIntegrationPoolSheet:
         child = self._make_resource(registry, parent=pool, name='child')
         self._make_resource(registry, parent=child, name='grandchild')
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet.filter_elements())
+        result = set(poolsheet._filter_elements())
         assert result == {child}
 
     def test_filter_elements_no_filters_with_grandchildren_depth2(
@@ -104,7 +104,7 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=grandchild,
                             name='greatgrandchild')
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet.filter_elements(depth=2))
+        result = set(poolsheet._filter_elements(depth=2))
         assert result == {child, grandchild}
 
     def test_filter_elements_no_filters_with_grandchildren_unlimited_depth(
@@ -118,7 +118,7 @@ class TestIntegrationPoolSheet:
         greatgrandchild = self._make_resource(registry, parent=grandchild,
                                               name='greatgrandchild')
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet.filter_elements(depth=None))
+        result = set(poolsheet._filter_elements(depth=None))
         assert result == {child, grandchild, greatgrandchild}
 
     def test_filter_elements_by_interface(
@@ -134,7 +134,7 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=pool_graph_catalog,
                             name='nonchild', restype=ITag)
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet.filter_elements(ifaces=[ITag]))
+        result = set(poolsheet._filter_elements(ifaces=[ITag]))
         assert result == {right_type_child}
 
     def test_filter_elements_by_two_interfaces_both_present(
@@ -149,7 +149,7 @@ class TestIntegrationPoolSheet:
                                                name='right_type_child',
                                                restype=ITag)
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet.filter_elements(ifaces=[ITag, IName]))
+        result = set(poolsheet._filter_elements(ifaces=[ITag, IName]))
         assert result == {right_type_child}
 
     def test_filter_elements_by_two_interfaces_just_one_present(
@@ -162,7 +162,7 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=pool, name='child1')
         self._make_resource(registry, parent=pool, name='child2', restype=ITag)
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet.filter_elements(ifaces=[ITag, IItemVersion]))
+        result = set(poolsheet._filter_elements(ifaces=[ITag, IItemVersion]))
         assert result == set()
 
 
