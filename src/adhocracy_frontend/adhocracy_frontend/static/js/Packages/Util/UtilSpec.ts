@@ -242,8 +242,11 @@ export var register = () => {
             it("returns '/foo' for '/foo/bar'", () => {
                 expect(Util.parentPath("/foo/bar")).toBe("/foo");
             });
-            it("returns '' for '/'", () => {
-                expect(Util.parentPath("/")).toBe("");
+            it("returns '/foo/' for '/foo/bar/'", () => {
+                expect(Util.parentPath("/foo/bar/")).toBe("/foo/");
+            });
+            it("returns '/' for '/'", () => {
+                expect(Util.parentPath("/")).toBe("/");
             });
         });
 

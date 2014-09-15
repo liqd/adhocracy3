@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
 import colander
 import pytest
 
@@ -775,6 +776,10 @@ class TestLoginUserName:
                                'user_path': '/user',
                                'user_token': 'token'}
 
+    def test_options(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}
+
 
 class TestLoginEmailView:
 
@@ -801,10 +806,40 @@ class TestLoginEmailView:
                                'user_path': '/user',
                                'user_token': 'token'}
 
+    def test_options(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}
 
+
+def test_add_cors_headers_subscriber(context):
+    from adhocracy.rest.views import add_cors_headers_subscriber
+    headers = {}
+    response = testing.DummyResource(headers=headers)
+    event = testing.DummyResource(response=response)
+
+    add_cors_headers_subscriber(event)
+
+    assert headers == \
+        {'Access-Control-Allow-Origin': '*',
+         'Access-Control-Allow-Headers':
+         'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
+         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS'}
+
+
+@fixture()
+def integration(config):
+    config.include('cornice')
+    config.include('adhocracy_core.rest.views')
+
+
+@mark.usefixtures('integration')
 class TestIntegrationIncludeme:
 
-    def test_includeme(self, config):
-        """Check that include me runs without errors."""
-        config.include('cornice')
-        config.include('adhocracy_core.rest.views')
+    def test_includeme(self):
+        """Check that includeme runs without errors."""
+        assert True
+
+    def test_register_subscriber(self, registry):
+        from adhocracy.rest.views import add_cors_headers_subscriber
+        handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
+        assert add_cors_headers_subscriber.__name__ in handlers

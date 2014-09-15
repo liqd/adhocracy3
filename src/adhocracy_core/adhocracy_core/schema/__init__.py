@@ -5,11 +5,19 @@ from datetime import datetime
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
 from pytz import UTC
+from pyramid.traversal import find_interface
+from zope.interface.interfaces import IInterface
 import colander
 import pytz
 
 from adhocracy_core.interfaces import ILocation
 from adhocracy_core.interfaces import SheetReference
+from adhocracy.utils import normalize_to_tuple
+from adhocracy.utils import get_shee
+from adhocracy.exceptions import RuntimeConfigurationError
+from adhocracy.interfaces import IPool
+from adhocracy.interfaces import IResource
+from adhocracy.interfaces import IPostPoolSheet
 
 
 class AdhocracySchemaNode(colander.SchemaNode):
@@ -146,26 +154,34 @@ class AbsolutePath(AdhocracySchemaNode):
 
 class ResourceObject(colander.SchemaType):
 
-    """Schema type that serialized a :term:`location`-aware object to its url.
+    """Schema type that de/serialized a :term:`location`-aware object.
 
-    Example value:  'http://a.org/bluaABC/_123/3'
+    Example values:  'http://a.org/bluaABC/_123/3' '/blua/ABC/'
+
+    If the value is an url with fqdn the the :term:`request` binding is used to
+    deserialize the resource.
+
+    If the value is an absolute path the :term:`context` binding is used
+    to  deserialize the resource.
+
+    The default serialization is the resource url.
     """
 
-    def __init__(self, use_resource_location=False):
-        self.use_resource_location = use_resource_location
+    def __init__(self, serialize_to_path=False):
+        self.serialize_to_path = serialize_to_path
         """If `False` the :term:`request` binding is used to serialize
         to the resource url.
         Else the :term:`context` binding is used to  serialize to
-        the :term:`Resource Location`.
+        the :term:`Resource Location` path.
         Default `False`.
         """
 
     def serialize(self, node, value):
-        """Serialize object to url.
+        """Serialize object to url or path.
 
         :param node: the Colander node.
         :param value: the resource to serialize
-        :return: the path of that resource
+        :return: the url or path of that resource
         """
         if value in (colander.null, ''):
             return ''
@@ -178,7 +194,7 @@ class ResourceObject(colander.SchemaType):
                                    value=value)
 
     def _serialize_location_or_url(self, node, value):
-        if self.use_resource_location:
+        if self.serialize_to_path:
             assert 'context' in node.bindings
             return resource_path(value)
         else:
@@ -187,17 +203,17 @@ class ResourceObject(colander.SchemaType):
             return request.resource_url(value)
 
     def deserialize(self, node, value):
-        """Deserialize url to object.
+        """Deserialize url or path to object.
 
         :param node: the Colander node.
-        :param value: the url ort :term:`Resource Location` to deserialize
+        :param value: the url or path :term:`Resource Location` to deserialize
         :return: the resource registered under that path
         :raise colander.Invalid: if the object does not exist.
         """
         if value is colander.null:
             return value
         try:
-            resource = self._deserialize_to_location_or_url(node, value)
+            resource = self._deserialize_location_or_url(node, value)
             raise_attribute_error_if_not_location_aware(resource)
         except (KeyError, AttributeError):
             raise colander.Invalid(
@@ -205,8 +221,8 @@ class ResourceObject(colander.SchemaType):
                 msg='This resource path does not exist.', value=value)
         return resource
 
-    def _deserialize_to_location_or_url(self, node, value):
-        if self.use_resource_location:
+    def _deserialize_location_or_url(self, node, value):
+        if value.startswith('/'):
             assert 'context' in node.bindings
             context = node.bindings['context']
             return find_resource(context, value)
@@ -391,3 +407,129 @@ class DateTime(AdhocracySchemaNode):
     schema_type = colander.DateTime
     default = deferred_date_default
     missing = deferred_date_default
+
+
+def _get_post_pool(context: IPool, iresource_or_service_name) -> IResource:
+    if IInterface.providedBy(iresource_or_service_name):
+        return find_interface(context, iresource_or_service_name)
+    else:
+        return context.find_service(iresource_or_service_name)
+
+
+@colander.deferred
+def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
+    """Return the post_pool path for the given `context`.
+
+    :raises adhocracy.excecptions.RuntimeConfigurationError:
+        if the :term:`post_pool` does not exists in the term:`lineage`
+        of `context`.
+    """
+    context = kw['context']
+    post_pool = _get_post_pool(context, node.iresource_or_service_name)
+    if post_pool is None:
+        context_path = resource_path(context)
+        post_pool_type = str(node.iresource_or_service_name)
+        msg = 'Cannot find post_pool with interface or service name {}'\
+              ' for context {}.'.format(post_pool_type, context_path)
+        raise RuntimeConfigurationError(msg)
+    return post_pool
+
+
+class PostPool(Reference):
+
+    """Reference to the common place to post resources used by the this sheet.
+
+    Constructor arguments:
+
+    :param 'iresource_or_service_name`:
+        The resource interface/:term:`service` name of this
+        :term:`post_pool`. If it is a :term:`interface` the
+        :term:`lineage` of the `context` is searched for the first matching
+        `interface`. If it is a `string` the lineage and the lineage children
+        are search for a `service` with this name.
+        Defaults to :class:`adhocracy.interfaces.IPool`.
+    """
+
+    readonly = True
+    default = deferred_get_post_pool
+    missing = deferred_get_post_pool
+    schema_type = ResourceObject
+    iresource_or_service_name = IPool
+
+
+@colander.deferred
+def deferred_validate_references_post_pool(node: colander.SchemaNode,
+                                           kw: dict) -> callable:
+    """Validate the :term:`post_pool` for all reference children of `node`."""
+    context = kw['context']
+    reference_nodes = _get_reference_childs(node)
+    validators = []
+    for child in reference_nodes:
+        _add_post_pool_validator(node, child, context, validators)
+        _add_referenced_post_pool_validator(node, child, validators)
+    return colander.All(*validators)
+
+
+def _get_reference_childs(node):
+    for child in node:
+        if isinstance(child, PostPool):
+            continue
+        if isinstance(child, (Reference, References)):
+            yield child
+
+
+def _add_post_pool_validator(node, child, context, validators):
+    post_pool = _get_post_pool_from_node(node, context)
+
+    def validate_node(node, value):
+        references = node.get_value(value, child.name)
+        references = normalize_to_tuple(references)
+        _validate_post_pool(child, references, post_pool)
+
+    if post_pool is not None:
+        validators.append(validate_node)
+
+
+def _add_referenced_post_pool_validator(node, child, validators):
+    referenced_isheet = child.reftype.getTaggedValue('target_isheet')
+
+    def validate_node(node, value):
+        references = node.get_value(value, child.name)
+        references = normalize_to_tuple(references)
+        for reference in references:
+            sheet = get_sheet(reference, referenced_isheet)
+            post_pool = _get_post_pool_from_node(sheet.schema, reference)
+            _validate_post_pool(child, (reference,), post_pool)
+
+    if referenced_isheet.isOrExtends(IPostPoolSheet):
+        validators.append(validate_node)
+
+
+def _get_post_pool_from_node(node, context):
+    post_pool_nodes = [child for child in node if isinstance(child, PostPool)]
+    for child in post_pool_nodes:
+        type = child.iresource_or_service_name
+        return _get_post_pool(context, type)
+
+
+def _validate_post_pool(node, references: list, post_pool: IPool):
+    post_pool_path = resource_path(post_pool)
+    for reference in references:
+        if reference.__parent__ is post_pool:
+            continue
+        msg = 'You can only add references inside {}'.format(post_pool_path)
+        raise colander.Invalid(node, msg)
+
+
+class PostPoolMappingSchema(colander.MappingSchema):
+
+    """Check that the referenced nodes respect the :term:`post_pool`.
+
+    To validate `references` (:class:`adhocracy.schems.Reference`) you
+    need to add a :class:`adhocracy.schema.PostPool` node to this schema.
+    To validate `backreferences` the referenced sheet needs to be a subtype
+    of :class:`adhocracy.intefaces.IPostPoolSheet and the schema needs a
+    a :class:`adhocracy.schema.PostPool` node.
+    """
+
+    validator = deferred_validate_references_post_pool

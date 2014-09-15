@@ -15,6 +15,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IResource
+from adhocracy.interfaces import IServicePool
 from adhocracy_core.events import ResourceCreatedAndAdded
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.metadata import IMetadata
@@ -64,6 +65,10 @@ class ResourceFactory:
             name = parent.next_name(resource, prefix=prefix)
         if name in parent:
             raise KeyError('Duplicate name: {}'.format(name))
+        if IServicePool.providedBy(resource):
+            name = self.meta.content_name
+            parent.add_service(name, resource, send_events=False)
+            return
         if name == '':
             raise KeyError('Empty name')
         parent.add(name, resource, send_events=False)

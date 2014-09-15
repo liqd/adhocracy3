@@ -390,8 +390,8 @@ export var factoryIService = (
             var checkCompare = (req : Request, resp : ResponseOk) => {
                 if (req.action !== resp.action || req.resource !== resp.resource) {
                     throw ("WebSocket: onmessage: response does not match request!\n"
-                           + req.toString() + "\n"
-                           + resp.toString());
+                           + req.action + " " + req.resource + "\n"
+                           + resp.action + " " + resp.resource);
                 }
             };
 

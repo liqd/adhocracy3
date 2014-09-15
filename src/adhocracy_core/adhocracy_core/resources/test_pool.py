@@ -1,3 +1,4 @@
+from pyramid import testing
 from pytest import mark
 from pytest import fixture
 
@@ -74,3 +75,10 @@ class TestPool:
         inst = self._makeOne()
         inst.add_next(context, prefix='prefix')
         assert 'prefix' + '0'.zfill(7) in inst
+
+    def test_find_service(self):
+        inst = self._makeOne()
+        inst['service'] = testing.DummyResource()
+        inst['service'].__is_service__ = True
+        service = inst.find_service('service')
+        assert service is inst['service']

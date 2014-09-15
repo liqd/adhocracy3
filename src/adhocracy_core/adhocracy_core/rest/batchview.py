@@ -122,7 +122,8 @@ class BatchView(RESTView):
         path = nested_request['path']
         method = nested_request['method']
         json_body = nested_request['body']
-        keywords_args = {'method': method}
+        keywords_args = {'method': method,
+                         'base_url': self.request.host_url}
 
         if json_body:
             keywords_args['body'] = dumps(json_body).encode()
@@ -144,6 +145,8 @@ class BatchView(RESTView):
         except HTTPException as err:
             code = err.status_code
             body = self._try_to_decode_json(err.body)
+        # FIXME catch PredicateMismatch, if you do a put instead of post
+        # you dont't get any help what is going wrong.
         except Exception as err:
             code = 500
             error_dict = internal_exception_to_dict(err)

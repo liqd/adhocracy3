@@ -20,21 +20,32 @@ class PrincipalIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_create_principals(self):
-        from adhocracy_core.resources.principal import IPrincipalsPool
-        from adhocracy_core.resources.principal import IUsersPool
-        from adhocracy_core.resources.principal import IGroupsPool
-        from adhocracy_core.resources.principal import IPasswordResetsPool
+        from adhocracy.resources.principal import IPrincipalsService
+        from adhocracy.resources.principal import IUsersService
+        from adhocracy.resources.principal import IGroupsService
+        from adhocracy.resources.principal import IPasswordResetsService
 
         inst = self.config.registry.content.create(
-            IPrincipalsPool.__identifier__)
+            IPrincipalsService.__identifier__, parent=self.context)
 
-        assert IPrincipalsPool.providedBy(inst)
+        assert IPrincipalsService.providedBy(inst)
         assert 'users' in inst
         assert 'groups' in inst
         assert 'resets' in inst
-        assert IUsersPool.providedBy(inst['users'])
-        assert IGroupsPool.providedBy(inst['groups'])
-        assert IPasswordResetsPool.providedBy(inst['resets'])
+        assert IUsersService.providedBy(inst['users'])
+        assert IGroupsService.providedBy(inst['groups'])
+        assert IPasswordResetsService.providedBy(inst['resets'])
+
+    def test_register_services(self):
+        from adhocracy.resources.principal import IPrincipalsService
+
+        self.config.registry.content.create(IPrincipalsService.__identifier__,
+                                            parent=self.context)
+
+        from substanced.util import find_service
+        assert find_service(self.context, 'principals', 'users')
+        assert find_service(self.context, 'principals', 'groups')
+        assert find_service(self.context, 'principals', 'resets')
 
     def test_create_user(self):
         from adhocracy_core.resources.principal import IUser
@@ -46,7 +57,7 @@ class PrincipalIntegrationTest(unittest.TestCase):
         assert isinstance(inst, User)
 
     def test_create_and_add_user(self):
-        from adhocracy_core.resources.principal import IPrincipalsPool
+        from adhocracy.resources.principal import IPrincipalsService
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.sheets.user import IPasswordAuthentication
         from adhocracy_core.sheets.user import IUserBasic
@@ -54,7 +65,7 @@ class PrincipalIntegrationTest(unittest.TestCase):
         self.config.include('adhocracy_core.sheets.user')
 
         principals_pool = self.config.registry.content.create(
-            IPrincipalsPool.__identifier__)
+            IPrincipalsService.__identifier__)
         users_pool = principals_pool['users']
         appstructs = {
             IUserBasic.__identifier__ : {

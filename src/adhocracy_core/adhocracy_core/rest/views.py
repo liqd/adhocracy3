@@ -11,7 +11,6 @@ from cornice.util import json_error
 from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
 from pyramid.events import NewResponse
-from pyramid.events import subscriber
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.request import Request
 from pyramid.view import view_config
@@ -611,6 +610,18 @@ class LoginUsernameView(RESTView):
                        [validate_login_name, validate_login_password])
 
     @view_config(name='login_username',
+                 request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for login_username view.
+
+        FIXME: Return something useful. This currently only exist in order to
+        satisfy the preflight request, which browsers do in CORS situations
+        before doing the actual POST.
+
+        """
+        return {}
+
+    @view_config(name='login_username',
                  request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
@@ -643,6 +654,18 @@ class LoginEmailView(RESTView):
                        [validate_login_email, validate_login_password])
 
     @view_config(name='login_email',
+                 request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for login_email view.
+
+        FIXME: Return something useful. This currently only exist in order to
+        satisfy the preflight request, which browsers do in CORS situations
+        before doing the actual POST.
+
+        """
+        return {}
+
+    @view_config(name='login_email',
                  request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
@@ -650,16 +673,17 @@ class LoginEmailView(RESTView):
         return _login_user(self.request)
 
 
-def includeme(config):  # pragma: no cover
-    """Register Views."""
-    config.scan('.views')
-
-
-@subscriber(NewResponse)
-def add_cors_headers(event):
+def add_cors_headers_subscriber(event):
     """Add CORS headers to response."""
     event.response.headers.update({
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept',
+        'Access-Control-Allow-Headers':
+        'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
     })
+
+
+def includeme(config):
+    """Register Views."""
+    config.scan('.views')
+    config.add_subscriber(add_cors_headers_subscriber, NewResponse)

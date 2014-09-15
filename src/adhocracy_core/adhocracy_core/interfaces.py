@@ -76,6 +76,16 @@ class ISheetReferenceAutoUpdateMarker(ISheet):
     """
 
 
+class IPostPoolSheet(ISheet):
+
+    """Marker interfaces for sheets with :term:`post_pool` Attributes.
+
+    This implies the sheet schema is a subtype of
+    :class:`adhocracy.schema.PostPoolSchema` or has at least a
+    field node with :class:`adhocracy.Schema.PostPool`.
+    """
+
+
 class IResourceSheet(IPropertySheet):  # pragma: no cover
 
     """Sheet for resources to get/set the sheet data structure."""
@@ -212,6 +222,30 @@ class IPool(IResource):  # pragma: no cover
 
     def add_next(subobject, prefix='') -> str:
         """Add new subobject and auto generate name."""
+
+    def add_service(service_name: str, other) -> str:
+        """Add a term:`service` to this folder named `service_name`."""
+
+    def find_service(service_name: str, *sub_service_names) -> IResource:
+        """ Return a :term:`service` named by `service_name`.
+
+        :param service_name: Search in this pool and his :term:`lineage` for a
+                             service named `service_name`
+        :param sub_service_names: If provided traverse the service to find
+                                  the give sub service name. If the sub service
+                                  is found, use it to travers to the next
+                                  sub service name.
+
+        :return: Return  the :term:`service` for the given context.
+                 If nothing is found return None.
+
+        This is a shortcut for :func:`substanced.service.find_service`.
+        """
+
+
+class IServicePool(IPool):
+
+    """Pool serving as a :term:`service`."""
 
 
 class IItem(IPool):

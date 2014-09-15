@@ -304,19 +304,28 @@ class TestBatchRequestPath:
         inst = self.make_one()
         assert inst.deserialize('@item/v1') == '@item/v1'
 
+    def test_deserialize_valid_absolute_path(self):
+        inst = self.make_one()
+        assert inst.deserialize('/item/v1') == '/item/v1'
+
+    def test_deserialize_nonvalid_long_absolute_path(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            assert inst.deserialize('/a' * 200)
+
+    def test_deserialize_nonvalid_relativ_path_depth2(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('item/v1')
+
+    def test_deserialize_nonvalid_relativ_path_depth1(self):
+        inst = self.make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('item')
+
     def test_deserialize_valid_url(self):
         inst = self.make_one()
         assert inst.deserialize('http://a.org/a') == 'http://a.org/a'
-
-    def test_deserialize_nonvalid_absolute_path(self):
-        inst = self.make_one()
-        with raises(colander.Invalid):
-            inst.deserialize('/item/v1')
-
-    def test_deserialize_nonvalid_long_preliminary_path(self):
-        inst = self.make_one()
-        with raises(colander.Invalid):
-            assert inst.deserialize('@item/' + 'v1' * 200)
 
     def test_deserialize_nonvalid_special_characters(self):
         inst = self.make_one()

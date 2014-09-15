@@ -1,5 +1,6 @@
 """Helper functions."""
 from collections.abc import Iterator
+from collections import Sequence
 from datetime import datetime
 from functools import reduce
 import copy
@@ -207,3 +208,15 @@ def get_user(request: Request) -> object:
         return find_resource(request.root, str(user_path))
     except KeyError:
         return None
+
+
+def normalize_to_tuple(context) -> tuple:
+    """Convert `context` to :class:`tuple`."""
+    if isinstance(context, tuple):
+        return context
+    elif isinstance(context, str):
+        return context,
+    elif isinstance(context, Sequence):
+        return tuple(context)
+    else:
+        return context,

@@ -38,18 +38,18 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
     def test_deserialize_invalid_action(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
-            inst.deserialize({'action': 'blah', 'resource': '/child'})
+            inst.deserialize({'action': 'blah', 'resource': self.request.application_url + '/child'})
 
     def test_deserialize_invalid_resource(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
             inst.deserialize(
-                {'action': 'subscribe', 'resource': '/wrong_child'})
+                {'action': 'subscribe', 'resource': self.request.application_url + '/wrong_child'})
 
     def test_deserialize_no_action(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
-            inst.deserialize({'resource': '/child'})
+            inst.deserialize({'resource': self.request.application_url + '/child'})
 
     def test_deserialize_no_resource(self):
         inst = self._make_one()
@@ -64,12 +64,12 @@ class ClientRequestSchemaUnitTests(unittest.TestCase):
     def test_deserialize_wrong_field(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
-            inst.deserialize({'event': 'created', 'resource': '/child'})
+            inst.deserialize({'event': 'created', 'resource': self.request.application_url + '/child'})
 
     def test_deserialize_wrong_inner_type(self):
         inst = self._make_one()
         with pytest.raises(colander.Invalid):
-            inst.deserialize({'action': 7, 'resource': '/child'})
+            inst.deserialize({'action': 7, 'resource': self.request.application_url + '/child'})
 
     def test_deserialize_wrong_outer_type(self):
         inst = self._make_one()

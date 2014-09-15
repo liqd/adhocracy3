@@ -8,6 +8,7 @@ var pkgLocation = "/DocumentWorkbench";
 interface IDocumentWorkbenchScope extends ng.IScope {
     path : string;
     user : AdhUser.User;
+    websocketTestPaths : string;
 }
 
 export class DocumentWorkbench {
@@ -26,6 +27,7 @@ export class DocumentWorkbench {
             ) : void => {
                 $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
                 $scope.user = adhUser;
+                $scope.websocketTestPaths = JSON.stringify([$scope.path]);
             }]
         };
     }

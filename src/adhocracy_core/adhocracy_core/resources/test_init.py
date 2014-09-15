@@ -219,6 +219,15 @@ class TestResourceFactory:
 
         assert 'prefix_0000000' in pool
 
+    def test_with_parent_and_resource_implements_postpool(self, pool, resource_meta, registry, mock_sheet):
+        from adhocracy.interfaces import IServicePool
+        meta = resource_meta._replace(iresource=IServicePool,
+                                      content_name='Service')
+
+        resource = self.make_one(meta)(parent=pool)
+        assert 'Service' in pool
+        assert resource.__is_service__
+
     def test_without_creator_and_resource_implements_imetadata(self, resource_meta, registry, mock_sheet):
         from datetime import datetime
         from adhocracy_core.sheets.metadata import IMetadata
