@@ -37,12 +37,12 @@ export interface IRatingAdapter<T extends AdhResource.Content<any>> {
     create(settings : any) : T;
     createItem(settings : any) : any;
     derive(oldVersion : T, settings : any) : T;
-    content(resource : T) : string;
-    content(resource : T, value : string) : T;
     subject(resource : T) : string;
     subject(resource : T, value : string) : T;
     target(resource : T) : string;
     target(resource : T, value : string) : T;
+    value(resource : T) : RatingValue;
+    value(resource : T, value : RatingValue) : T;
     creator(resource : T) : string;
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;
@@ -89,8 +89,12 @@ export var postPoolPathPromise = (
  * Update state from server: Fetch post pool, query it for all
  * ratings, and store and render them.  If a rating of the current
  * user exists, store and render that separately.
+ *
+ * FIXME: this function will have a much shorter implementation once
+ * get search requests are available.
  */
 export var updateRatings = (
+    adapter : IRatingAdapter<any>,
     $scope : IRatingScope,
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
@@ -103,29 +107,25 @@ export var updateRatings = (
                 postPool.data["adhocracy.sheets.pool.IPool"].elements
                 .map((index : number, path : string) => adhHttp.get(path));
 
-            $q.all(ratingPromises).then((ratings) => {
+            return $q.all(ratingPromises).then((ratings) => {
                 resetRatings($scope);
                 _.forOwn(ratings, (rating) => {
 
-                    // FIXME: these need to be calculated properly, not just declared!
-                    var __ispro;
-                    var __iscontra;
-                    var __isneutral;
-                    var __iscurrentuser;
+                    var checkValue = (rating, value : RatingValue) : boolean =>
+                        adapter.value(rating) === value;
 
-                    if (__ispro) {
+                    var iscurrentuser = (rating) : boolean =>
+                        adapter.subject(rating) === adhUser.userPath;
+
+                    if (checkValue(rating, RatingValue.pro)) {
                         $scope.ratings.pro += 1;
-                    }
-
-                    if (__iscontra) {
+                    } else if (checkValue(rating, RatingValue.contra)) {
                         $scope.ratings.contra += 1;
-                    }
-
-                    if (__isneutral) {
+                    } else if (checkValue(rating, RatingValue.neutral)) {
                         $scope.ratings.neutral += 1;
                     }
 
-                    if (__iscurrentuser) {
+                    if (iscurrentuser(rating)) {
                         $scope.thisUsersRating = rating;
                     }
                 });
@@ -147,7 +147,7 @@ export var ratingController = (
     adhUser : AdhUser.User
 ) : ng.IPromise<void> => {
     resetRatings($scope);
-    return updateRatings($scope, $q, adhHttp, adhUser);
+    return updateRatings(adapter, $scope, $q, adhHttp, adhUser);
 };
 
 

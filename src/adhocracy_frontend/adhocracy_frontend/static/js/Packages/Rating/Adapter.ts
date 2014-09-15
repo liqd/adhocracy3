@@ -58,17 +58,6 @@ export class RatingAdapter implements AdhRating.IRatingAdapter<RIRatingVersion> 
         return resource;
     }
 
-    content(resource : RIRatingVersion) : string;
-    content(resource : RIRatingVersion, value : string) : RIRatingVersion;
-    content(resource, value?) {
-        if (typeof value !== "undefined") {
-            resource.data["adhocracy.sheets.rating.IRating"].content = value;
-            return resource;
-        } else {
-            return resource.data["adhocracy.sheets.rating.IRating"].content;
-        }
-    }
-
     subject(resource : RIRatingVersion) : string;
     subject(resource : RIRatingVersion, value : string) : RIRatingVersion;
     subject(resource, value?) {
@@ -88,6 +77,17 @@ export class RatingAdapter implements AdhRating.IRatingAdapter<RIRatingVersion> 
             return resource;
         } else {
             return resource.data["adhocracy.sheets.rating.IRating"].target;
+        }
+    }
+
+    value(resource : RIRatingVersion) : AdhRating.RatingValue;
+    value(resource : RIRatingVersion, value : AdhRating.RatingValue) : RIRatingVersion;
+    value(resource, value?) {
+        if (typeof value !== "undefined") {
+            resource.data["adhocracy.sheets.rating.IRating"].value = AdhRating.RatingValue[value];
+            return resource;
+        } else {
+            return resource.data["adhocracy.sheets.rating.IRating"].value;
         }
     }
 
