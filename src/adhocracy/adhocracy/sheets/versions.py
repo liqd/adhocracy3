@@ -7,7 +7,7 @@ from adhocracy.interfaces import NewVersionToOldVersion
 from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets.pool import PoolSheet
-from adhocracy.schema import ListOfUniqueReferences
+from adhocracy.schema import UniqueReferences
 
 
 class IVersionable(ISheet):
@@ -32,10 +32,10 @@ class VersionableSchema(colander.MappingSchema):
     of this resource.
     """
 
-    follows = ListOfUniqueReferences(reftype=VersionableFollowsReference)
-    followed_by = ListOfUniqueReferences(readonly=True,
-                                         backref=True,
-                                         reftype=VersionableFollowsReference)
+    follows = UniqueReferences(reftype=VersionableFollowsReference)
+    followed_by = UniqueReferences(readonly=True,
+                                   backref=True,
+                                   reftype=VersionableFollowsReference)
 
 
 versionable_metadata = sheet_metadata_defaults._replace(
@@ -66,7 +66,7 @@ class VersionsSchema(colander.MappingSchema):
     `elements`: Dag for collecting all versions of one item.
     """
 
-    elements = ListOfUniqueReferences(
+    elements = UniqueReferences(
         reftype=IVersionsElementsReference)
 
 

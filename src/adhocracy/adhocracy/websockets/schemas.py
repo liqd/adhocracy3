@@ -2,6 +2,7 @@
 import colander
 
 from adhocracy.schema import ResourceObject
+from adhocracy.schema import Resource
 
 
 class Action(colander.SchemaNode):
@@ -16,8 +17,8 @@ class ClientRequestSchema(colander.MappingSchema):
 
     """Data structure for client requests."""
 
-    action = Action()
-    resource = colander.SchemaNode(ResourceObject())
+    action = Action(missing=colander.required)
+    resource = Resource(missing=colander.required)
 
 
 class Status(colander.SchemaNode):
@@ -41,7 +42,7 @@ class Event(colander.SchemaNode):
     """The type of event notifications sent to the client."""
 
     schema_type = colander.String
-    validator = colander.OneOf(['modified',
+    validator = colander.OneOf(['modified',  # Used internally / for the client
                                 'new_child',
                                 'removed_child',
                                 'modified_child',
@@ -51,23 +52,31 @@ class Event(colander.SchemaNode):
     default = 'modified'
 
 
+class ServerNotification(colander.MappingSchema):
+
+    """Notification sent to the server from the Pyramid WS client."""
+
+    event = Event()
+    resource = colander.SchemaNode(ResourceObject(serialize_to_path=True))
+
+
 class Notification(colander.MappingSchema):
 
     """Notification sent to a client if a resource has changed."""
 
     event = Event()
-    resource = colander.SchemaNode(ResourceObject())
+    resource = Resource()
 
 
 class ChildNotification(Notification):
 
-    """Notification involving a child resource."""
+    """ServerNotification involving a child resource."""
 
-    child = colander.SchemaNode(ResourceObject())
+    child = Resource()
 
 
 class VersionNotification(Notification):
 
-    """Notification involving a version."""
+    """ServerNotification involving a version."""
 
-    version = colander.SchemaNode(ResourceObject())
+    version = Resource()

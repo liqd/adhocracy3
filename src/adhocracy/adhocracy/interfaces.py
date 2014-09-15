@@ -98,9 +98,6 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
     def get() -> dict:
         """ Get ``appstruct`` dictionary data."""
 
-    def get_cstruct() -> dict:
-        """ Return a serialized dictionary representing the sheet state."""
-
 
 RESOURCE_METADATA = OrderedDict({
     'content_name': '',

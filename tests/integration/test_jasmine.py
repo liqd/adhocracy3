@@ -9,18 +9,18 @@ adhocracy_sample.
 from pytest import fixture
 from pytest import mark
 
-from adhocracy.testing import Browser
-from adhocracy.testing import browser_test_helper
-from adhocracy.frontend.tests.unit.console import Parser
-from adhocracy.frontend.tests.unit.console import Formatter
+from adhocracy_frontend.testing import Browser
+from adhocracy_frontend.testing import browser_test_helper
+from adhocracy_frontend.tests.unit.console import Parser
+from adhocracy_frontend.tests.unit.console import Formatter
 
 pytestmark = mark.jasmine
 
 
 @fixture
-def browser_igtest(browser, server_sample) -> Browser:
+def browser_igtest(browser, frontend, backend_sample, frontend_url) -> Browser:
     """Return test browser instance with url=igtest.html."""
-    url = server_sample.application_url + 'static/igtest.html'
+    url = frontend_url + 'static/igtest.html'
     return browser_test_helper(browser, url)
 
 

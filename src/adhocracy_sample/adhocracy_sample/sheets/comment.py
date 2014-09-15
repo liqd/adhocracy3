@@ -7,7 +7,7 @@ from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import SheetToSheet
 from adhocracy.interfaces import IItem
 from adhocracy.sheets import add_sheet_to_registry
-from adhocracy.schema import ListOfUniqueReferences
+from adhocracy.schema import UniqueReferences
 from adhocracy.schema import Reference
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.schema import Text
@@ -57,9 +57,9 @@ class CommentableSchema(PostPoolMappingSchema):
     `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IComment`.
     """
 
-    comments = ListOfUniqueReferences(readonly=True,
-                                      backref=True,
-                                      reftype=CommentRefersToReference)
+    comments = UniqueReferences(readonly=True,
+                                backref=True,
+                                reftype=CommentRefersToReference)
     post_pool = PostPool(iresource_or_service_name=IItem)
 
 

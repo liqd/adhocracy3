@@ -10,13 +10,12 @@ from colander import SequenceSchema
 from cornice.util import json_error
 from cornice.util import extract_request_data
 from substanced.interfaces import IUserLocator
+from pyramid.events import NewResponse
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
-from pyramid.traversal import resource_path
-from pyramid.traversal import find_resource
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IItem
@@ -35,7 +34,7 @@ from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.schema import AbsolutePath
-from adhocracy.schema import AbstractReferenceIterable
+from adhocracy.schema import References
 from adhocracy.utils import get_iresource
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
@@ -52,24 +51,17 @@ def validate_post_root_versions(context, request: Request):
     """Check and transform the 'root_version' paths to resources."""
     # FIXME: make this a colander validator and move to schema.py
     # use the catalog to find IItemversions
-    root_paths = request.validated.get('root_versions', [])
-    root_resources = []
-    for path in root_paths:
-        path_tuple = tuple(str(path).split('/'))
-        try:
-            res = find_resource(context, path_tuple)
-        except KeyError:
-            error = 'This resource path does not exist: {p}'.format(p=path)
-            request.errors.add('body', 'root_versions', error)
-            continue
-        if not IItemVersion.providedBy(res):
+    root_versions = request.validated.get('root_versions', [])
+    valid_root_versions = []
+    for root in root_versions:
+        if not IItemVersion.providedBy(root):
             error = 'This resource is not a valid ' \
-                    'root version: {p}'.format(p=path)
+                    'root version: {}'.format(request.resource_url(root))
             request.errors.add('body', 'root_versions', error)
             continue
-        root_resources.append(res)
+        valid_root_versions.append(root)
 
-    request.validated['root_versions'] = root_resources
+    request.validated['root_versions'] = valid_root_versions
 
 
 def validate_request_data(context: ILocation, request: Request,
@@ -274,16 +266,32 @@ class ResourceRESTView(RESTView):
     @view_config(request_method='GET')
     def get(self) -> dict:
         """Get resource data."""
+        schema = GETResourceResponseSchema().bind(request=self.request)
+        appstruct = _get_resource_response_appstruct(self.context)
+        cstruct = schema.serialize(appstruct)
+        cstruct['data'] = self._get_sheets_data_cstruct()
+        return cstruct
+
+    def _get_sheets_data_cstruct(self):
         sheets_view = self.registry.resource_sheets(self.context, self.request,
                                                     onlyviewable=True)
-        struct = {'data': {}}
+        data_cstruct = {}
         for sheet in sheets_view.values():
             key = sheet.meta.isheet.__identifier__
-            struct['data'][key] = sheet.get_cstruct()
-        struct['path'] = resource_path(self.context)
-        iresource = get_iresource(self.context)
-        struct['content_type'] = iresource.__identifier__
-        return GETResourceResponseSchema().serialize(struct)
+            schema = sheet.schema.bind(context=self.context,
+                                       request=self.request)
+            appstruct = sheet.get()
+            cstruct = schema.serialize(appstruct)
+            data_cstruct[key] = cstruct
+        return data_cstruct
+
+
+def _get_resource_response_appstruct(resource: IResource) -> dict:
+        iresource = get_iresource(resource)
+        return {
+            'path': resource,
+            'content_type': iresource.__identifier__,
+        }
 
 
 @view_defaults(
@@ -307,11 +315,10 @@ class SimpleRESTView(ResourceRESTView):
         for sheetname, appstruct in appstructs.items():
             sheet = sheets[sheetname]
             sheet.set(appstruct)
-        struct = {}
-        struct['path'] = resource_path(self.context)
-        iresource = get_iresource(self.context)
-        struct['content_type'] = iresource.__identifier__
-        return ResourceResponseSchema().serialize(struct)
+        schema = ResourceResponseSchema().bind(request=self.request)
+        appstruct = _get_resource_response_appstruct(self.context)
+        cstruct = schema.serialize(appstruct)
+        return cstruct
 
 
 @view_defaults(
@@ -327,22 +334,18 @@ class PoolRESTView(SimpleRESTView):
 
     def build_post_response(self, resource) -> dict:
         """Build response data structure for a POST request. """
-        struct = {}
-        struct['path'] = resource_path(resource)
-        iresource = get_iresource(resource)
-        struct['content_type'] = iresource.__identifier__
+        appstruct = _get_resource_response_appstruct(resource)
         if IItem.providedBy(resource):
-            struct.update(self._get_dict_with_first_version_path(resource))
-            return ItemResponseSchema().serialize(struct)
+            appstruct['first_version_path'] = self._get_first_version(resource)
+            schema = ItemResponseSchema().bind(request=self.request)
         else:
-            return ResourceResponseSchema().serialize(struct)
+            schema = ResourceResponseSchema().bind(request=self.request)
+        return schema.serialize(appstruct)
 
-    def _get_dict_with_first_version_path(self, item: IItem) -> dict:
-        first_path = ''
+    def _get_first_version(self, item: IItem) -> IItemVersion:
         for child in item.values():
             if IItemVersion.providedBy(child):
-                first_path = resource_path(child)
-        return {'first_version_path': first_path}
+                return child
 
     @view_config(request_method='POST',
                  content_type='application/json')
@@ -371,9 +374,14 @@ class ItemRESTView(PoolRESTView):
     @view_config(request_method='GET')
     def get(self) -> dict:
         """Get resource data."""
-        struct = super().get()
-        struct.update(self._get_dict_with_first_version_path(self.context))
-        return GETItemResponseSchema().serialize(struct)
+        schema = GETItemResponseSchema().bind(request=self.request)
+        appstruct = _get_resource_response_appstruct(self.context)
+        first_version = self._get_first_version(self.context)
+        if first_version is not None:
+            appstruct['first_version_path'] = first_version
+        cstruct = schema.serialize(appstruct)
+        cstruct['data'] = self._get_sheets_data_cstruct()
+        return cstruct
 
     @view_config(request_method='POST',
                  content_type='application/json')
@@ -480,11 +488,8 @@ class MetaApiView(RESTView):
                 if valuetype is not SchemaNode:
                     typ = to_dotted_name(valuetype)
 
-                if issubclass(valuetype,
-                              AbstractReferenceIterable):
-                    # Workaround for AbstractIterableOfPaths:
-                    # it's a list/set of AbsolutePath's
-                    empty_appstruct = valuetyp().create_empty_appstruct()
+                if issubclass(valuetype, References):
+                    empty_appstruct = node.default
                     containertype = empty_appstruct.__class__.__name__
                     typ = to_dotted_name(AbsolutePath)
 
@@ -605,6 +610,18 @@ class LoginUsernameView(RESTView):
                        [validate_login_name, validate_login_password])
 
     @view_config(name='login_username',
+                 request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for login_username view.
+
+        FIXME: Return something useful. This currently only exist in order to
+        satisfy the preflight request, which browsers do in CORS situations
+        before doing the actual POST.
+
+        """
+        return {}
+
+    @view_config(name='login_username',
                  request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
@@ -615,7 +632,7 @@ class LoginUsernameView(RESTView):
 def _login_user(request: Request) -> dict:
     """Log-in a user and return a response indicating success."""
     user = request.validated['user']
-    user_path = resource_path(user)
+    user_path = request.resource_url(user)
     headers = remember(request, user_path) or {}
     user_path = headers['X-User-Path']
     user_token = headers['X-User-Token']
@@ -637,6 +654,18 @@ class LoginEmailView(RESTView):
                        [validate_login_email, validate_login_password])
 
     @view_config(name='login_email',
+                 request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for login_email view.
+
+        FIXME: Return something useful. This currently only exist in order to
+        satisfy the preflight request, which browsers do in CORS situations
+        before doing the actual POST.
+
+        """
+        return {}
+
+    @view_config(name='login_email',
                  request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
@@ -644,6 +673,17 @@ class LoginEmailView(RESTView):
         return _login_user(self.request)
 
 
-def includeme(config):  # pragma: no cover
+def add_cors_headers_subscriber(event):
+    """Add CORS headers to response."""
+    event.response.headers.update({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers':
+        'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
+        'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
+    })
+
+
+def includeme(config):
     """Register Views."""
     config.scan('.views')
+    config.add_subscriber(add_cors_headers_subscriber, NewResponse)

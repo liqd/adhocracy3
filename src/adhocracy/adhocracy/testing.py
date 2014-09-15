@@ -1,7 +1,6 @@
 """Public py.test fixtures: http://pytest.org/latest/fixture.html. """
 from unittest.mock import Mock
 from configparser import ConfigParser
-import types
 import json
 import os
 import subprocess
@@ -12,11 +11,10 @@ from cornice.errors import Errors
 from pyramid.config import Configurator
 from pyramid import testing
 from pyramid.traversal import resource_path_tuple
+from pytest import fixture
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import find_objectmap
-from splinter import Browser
 from webtest.http import StopableWSGIServer
-from pytest import fixture
 import colander
 
 from adhocracy.interfaces import SheetMetadata, ChangelogMetadata
@@ -245,10 +243,10 @@ def mock_user_locator(registry) -> Mock:
     return locator
 
 
-def _get_settings(request, part):
+def _get_settings(request, part, config_path_key='pyramid_config'):
     """Return settings of a config part."""
     config_parser = ConfigParser()
-    config_file = request.config.getvalue('pyramid_config')
+    config_file = request.config.getvalue(config_path_key)
     config_parser.read(config_file)
     settings = {}
     for option, value in config_parser.items(part):
@@ -258,8 +256,13 @@ def _get_settings(request, part):
 
 @fixture(scope='session')
 def settings(request) -> dict:
-    """Return pyramid settings."""
-    return _get_settings(request, 'app:main')
+    """Return app:main and server:main settings."""
+    settings = {}
+    app = _get_settings(request, 'app:main')
+    settings.update(app)
+    server = _get_settings(request, 'server:main')
+    settings.update(server)
+    return settings
 
 
 @fixture(scope='session')
@@ -271,8 +274,8 @@ def ws_settings(request) -> Configurator:
 @fixture(scope='class')
 def zeo(request) -> bool:
     """Start the test zeo server."""
-    is_running = os.path.isfile('var/test_zeodata/ZEO.pid')
-    if is_running:
+    pid_file = 'var/test_zeodata/ZEO.pid'
+    if _is_running(pid_file):
         return True
     process = subprocess.Popen('bin/runzeo -Cetc/test_zeo.conf', shell=True,
                                stderr=subprocess.STDOUT)
@@ -281,7 +284,7 @@ def zeo(request) -> bool:
     def fin():
         print('teardown zeo server')
         process.kill()
-        _kill_pid_in_file('var/test_zeodata/ZEO.pid')
+        _kill_pid_in_file(pid_file)
 
     request.addfinalizer(fin)
     return True
@@ -290,8 +293,8 @@ def zeo(request) -> bool:
 @fixture(scope='class')
 def websocket(request, zeo, ws_settings) -> bool:
     """Start websocket server."""
-    is_running = os.path.isfile(ws_settings['pid_file'])
-    if is_running:
+    pid_file = ws_settings['pid_file']
+    if _is_running(pid_file):
         return True
     config_file = request.config.getvalue('pyramid_config')
     process = subprocess.Popen('bin/start_ws_server ' + config_file,
@@ -302,7 +305,7 @@ def websocket(request, zeo, ws_settings) -> bool:
     def fin():
         print('teardown websocket server')
         process.kill()
-        _kill_pid_in_file(ws_settings['pid_file'])
+        _kill_pid_in_file(pid_file)
 
     request.addfinalizer(fin)
     return True
@@ -314,8 +317,19 @@ def _kill_pid_in_file(path_to_pid_file):
         pid_int = int(pid)
         os.kill(pid_int, 15)
         time.sleep(1)
-        if os.path.isfile(path_to_pid_file):
+        subprocess.call(['rm', path_to_pid_file])
+
+
+def _is_running(path_to_pid_file) -> bool:
+    if os.path.isfile(path_to_pid_file):
+        pid = open(path_to_pid_file).read().strip()
+        pid_int = int(pid)
+        try:
+            os.kill(pid_int, 0)
+        except OSError:
             subprocess.call(['rm', path_to_pid_file])
+        else:
+            return True
 
 
 @fixture(scope='class')
@@ -325,115 +339,14 @@ def app(zeo, settings, websocket):
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy.root_factory)
     configurator.include(adhocracy)
-    return configurator.make_wsgi_app()
+    app = configurator.make_wsgi_app()
+    return app
 
 
 @fixture(scope='class')
-def server(request, app) -> StopableWSGIServer:
+def backend(request, settings, app):
     """Return a http server with the adhocracy wsgi application."""
-    server = StopableWSGIServer.create(app)
-    request.addfinalizer(server.shutdown)
-    return server
-
-
-@fixture(scope='session')
-def server_static(request) -> StopableWSGIServer:
-    """Return a http server that only serves the static files."""
-    from adhocracy.frontend import includeme
-    config = Configurator(settings={})
-    includeme(config)
-    app = config.make_wsgi_app()
-
-    server = StopableWSGIServer.create(app)
-
-    def fin():
-        print('teardown static http server')
-        server.shutdown()
-
-    request.addfinalizer(fin)
-    return server
-
-
-def evaluate_script_with_kwargs(self, code: str, **kwargs) -> object:
-    """Replace kwargs in javascript code and evaluate."""
-    code_with_kwargs = self.compile_js_code(code, **kwargs)
-    return self.evaluate_script(code_with_kwargs)
-
-
-def compile_js_code(self, code: str, **kwargs) -> str:
-    """Generate a single JavaScript expression from complex code.
-
-    This is accomplished by wrapping the code in a JavaScript function
-    and passing any key word arguments to that function.  All arguments
-    will be JSON encoded.
-
-    :param code: any JavaScript code
-    :param kwargs: arguments that will be passed to the wrapper function
-
-    :returns: a string containing a single JavaScript expression suitable
-        for consumption by splinter's ``evaluate_script``
-
-    >>> code = "var a = 1; test.y = a; return test;"
-    >>> compile_js_code(code, test={"x": 2})
-    '(function(test) {var a = 1; test.y = a; return test;})({"x": 2})'
-
-    """
-    # make sure keys and values are in the same order
-    keys = []
-    values = []
-    for key in kwargs:
-        keys.append(key)
-        values.append(kwargs[key])
-
-    keys = ', '.join(keys)
-    values = ', '.join((json.dumps(v) for v in values))
-
-    return '(function({}) {{{}}})({})'.format(keys, code, values)
-
-
-def add_helper_methods_to_splinter_browser_wrapper(inst: Browser) -> Browser:
-    """Add additional helper functions to the splinter browser wrapper."""
-    inst.compile_js_code = types.MethodType(compile_js_code, inst)
-    inst.evaluate_script_with_kwargs = types.MethodType(
-        evaluate_script_with_kwargs, inst)
-    return inst
-
-
-def angular_app_loaded(browser: Browser) -> bool:
-    """Check that the angular app is loaded."""
-    code = 'window.hasOwnProperty("adhocracy") '\
-           '&& window.adhocracy.hasOwnProperty("loadState") '\
-           '&& window.adhocracy.loadState === "complete";'
-    return browser.evaluate_script(code)
-
-
-@fixture
-def browser_root(browser, server) -> Browser:
-    """Return test browser, start application and go to `root.html`."""
-    add_helper_methods_to_splinter_browser_wrapper(browser)
-    url = server.application_url
-    browser.visit(url)
-    browser.wait_for_condition(angular_app_loaded, 5)
-    return browser
-
-
-def browser_test_helper(browser, url) -> Browser:
-    """Return test browser and go to url."""
-    add_helper_methods_to_splinter_browser_wrapper(browser)
-
-    browser.visit(url)
-
-    def jasmine_finished(browser):
-        code = 'jsApiReporter.finished'
-        return browser.browser.evaluate_script(code)
-
-    browser.wait_for_condition(jasmine_finished, 5)
-
-    return browser
-
-
-@fixture()
-def browser_test(browser, server_static) -> Browser:
-    """Return test browser instance with url=test.html."""
-    url = server_static.application_url + 'static/test.html'
-    return browser_test_helper(browser, url)
+    port = settings['port']
+    backend = StopableWSGIServer.create(app, port=port)
+    request.addfinalizer(backend.shutdown)
+    return backend
