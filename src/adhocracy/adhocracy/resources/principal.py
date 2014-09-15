@@ -3,25 +3,26 @@ from pyramid.registry import Registry
 from zope.interface import Interface
 from substanced.util import find_service
 from substanced.interfaces import IUserLocator
-from substanced.interfaces import IService
 from zope.interface import implementer
 
 from adhocracy.interfaces import IPool
+from adhocracy.interfaces import IServicePool
 from adhocracy.resources import add_resource_type_to_registry
 from adhocracy.resources.pool import Pool
 from adhocracy.resources.pool import pool_metadata
+from adhocracy.resources.service import service_metadata
 import adhocracy.sheets.user
 import adhocracy.sheets.pool
 import adhocracy.sheets.metadata
 
 
-class IPrincipalsPool(IPool, IService):
+class IPrincipalsService(IServicePool):
 
-    """Pool representing a collection of principals.
+    """Service Pool representing a collection of principals.
 
     If the object is created via
     :func:`substanced.content.ContentRegistry.create`, it will contain
-    three subobjects:
+    three sub services:
 
       users: an instance of the content type :class:`IUsers`
 
@@ -34,18 +35,17 @@ class IPrincipalsPool(IPool, IService):
 def create_initial_content_for_principals(context: IPool, registry: Registry,
                                           options: dict):
     """Add users, groups and resets subobjects to context."""
-    users = registry.content.create(IUsersPool.__identifier__)
-    context.add('users', users)
-    groups = registry.content.create(IGroupsPool.__identifier__)
-    context.add('groups', groups)
-    resets = registry.content.create(IPasswordResetsPool.__identifier__)
-    context.add('resets', resets)
+    registry.content.create(IUsersService.__identifier__, parent=context)
+    registry.content.create(IGroupsService.__identifier__, parent=context)
+    registry.content.create(IPasswordResetsService.__identifier__,
+                            parent=context)
 
 
-principals_metadata = pool_metadata._replace(
-    iresource=IPrincipalsPool,
+principals_metadata = service_metadata._replace(
+    iresource=IPrincipalsService,
+    content_name='principals',
     after_creation=[create_initial_content_for_principals] +
-    pool_metadata.after_creation,
+    service_metadata.after_creation,
     element_types=[]  # we don't want the frontend to post resources here
 )
 
@@ -89,35 +89,38 @@ user_metadata = pool_metadata._replace(
 )
 
 
-class IUsersPool(IPool, IService):
+class IUsersService(IServicePool):
 
-    """Pool for Users."""
+    """Service Pool for Users."""
 
 
-users_metadata = pool_metadata._replace(
-    iresource=IUsersPool,
+users_metadata = service_metadata._replace(
+    iresource=IUsersService,
+    content_name='users',
     element_types=[IUser]
 )
 
 
-class IGroupsPool(IPool):
+class IGroupsService(IServicePool):
 
     """Pool for Groups."""
 
 
-groups_metadata = pool_metadata._replace(
-    iresource=IGroupsPool,
+groups_metadata = service_metadata._replace(
+    iresource=IGroupsService,
+    content_name='groups',
     element_types=[]
 )
 
 
-class IPasswordResetsPool(IPool):
+class IPasswordResetsService(IServicePool):
 
-    """Pool for Password Resets."""
+    """Service Pool for Password Resets."""
 
 
-passwordresets_metadata = pool_metadata._replace(
-    iresource=IPasswordResetsPool,
+passwordresets_metadata = service_metadata._replace(
+    iresource=IPasswordResetsService,
+    content_name='resets',
     element_types=[]
 )
 

@@ -6,6 +6,9 @@ import colander
 from pytest import raises
 from pytest import fixture
 
+from adhocracy.interfaces import IPool
+from adhocracy.testing import add_and_register_sheet
+
 
 ############
 #  helper  #
@@ -18,6 +21,37 @@ def add_node_binding(node, context=None, request=None):
     if request is not None:
         node.bindings['request'] = request
     return node
+
+
+def _add_post_pool_node(inst: colander.Schema, iresource_or_service_name=IPool):
+    from adhocracy.schema import PostPool
+    post_pool_node = PostPool(name='post_pool',
+                              iresource_or_service_name=iresource_or_service_name)
+    inst.add(post_pool_node)
+
+
+def _add_reference_node(inst: colander.Schema, target_isheet=None):
+    from adhocracy.interfaces import ISheet
+    from adhocracy.interfaces import SheetToSheet
+    from adhocracy.schema import Reference
+    reference_node = Reference(name='reference')
+    isheet = target_isheet or ISheet
+    class PostPoolReference(SheetToSheet):
+        target_isheet = isheet
+    inst.add(reference_node)
+    inst['reference'].reftype = PostPoolReference
+
+
+def _add_references_node(inst: colander.Schema):
+    from adhocracy.schema import UniqueReferences
+    reference_node = UniqueReferences(name='references')
+    inst.add(reference_node)
+
+
+def _add_other_node(inst: colander.Schema):
+    other_node = colander.MappingSchema(name='other', missing={})
+    inst.add(other_node)
+
 
 ###########
 #  tests  #
@@ -175,21 +209,21 @@ class ResourceObjectUnitTests(unittest.TestCase):
         result = inst.serialize(None, colander.null)
         assert result == ''
 
-    def test_serialize_value_location_aware(self):
+    def test_serialize_value_url_location_aware(self):
         inst = self._make_one()
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping(), request=self.request)
         result = inst.serialize(node, self.child)
         assert result == self.request.application_url + '/child/'
 
-    def test_serialize_value_location_aware_but_missing_request(self):
+    def test_serialize_value_url_location_aware_but_missing_request(self):
         inst = self._make_one()
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping())
         with raises(AssertionError):
             inst.serialize(node, self.child)
 
-    def test_serialize_value_not_location_aware(self):
+    def test_serialize_value_url_not_location_aware(self):
         inst = self._make_one()
         del self.child.__parent__
         del self.child.__name__
@@ -197,21 +231,21 @@ class ResourceObjectUnitTests(unittest.TestCase):
         with raises(colander.Invalid):
             inst.serialize(node, self.child)
 
-    def test_serialize_value_location_aware_without_parent_and_name(self):
+    def test_serialize_value_url_location_aware_without_parent_and_name(self):
         inst = self._make_one()
         node = add_node_binding(colander.Mapping(), request=self.request)
         result = inst.serialize(node, self.child)
         assert result == self.request.application_url + '/'
 
-    def test_serialize_value_location_aware_with_use_resource_location(self):
-        inst = self._make_one(use_resource_location=True)
+    def test_serialize_value_url_location_aware_with_serialize_to_path(self):
+        inst = self._make_one(serialize_to_path=True)
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping(), context=self.context)
         result = inst.serialize(node, self.child)
         assert result == '/child'
 
-    def test_serialize_value_location_aware_with_use_resource_location_without_context_binding(self):
-        inst = self._make_one(use_resource_location=True)
+    def test_serialize_value_url_location_aware_with_serialize_to_path_without_context_binding(self):
+        inst = self._make_one(serialize_to_path=True)
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping())
         with raises(AssertionError):
@@ -223,38 +257,38 @@ class ResourceObjectUnitTests(unittest.TestCase):
         result = inst.deserialize(node, colander.null)
         assert result == colander.null
 
-    def test_deserialize_value_valid_path(self):
+    def test_deserialize_value_url_valid_path(self):
         inst = self._make_one()
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping(), request=self.request)
         result = inst.deserialize(node, self.request.application_url + '/child')
         assert result == self.child
 
-    def test_deserialize_value_invalid_path_wrong_child_name(self):
+    def test_deserialize_value_url_invalid_path_wrong_child_name(self):
         inst = self._make_one()
         node = add_node_binding(colander.Mapping(), request=self.request)
         with raises(colander.Invalid):
             inst.deserialize(node, self.request.application_url + '/wrong_child')
 
-    def test_deserialize_value_invalid_path_to_short(self):
+    def test_deserialize_value_url_invalid_path_to_short(self):
         inst = self._make_one()
         node = add_node_binding(colander.Mapping(), request=self.request)
         with raises(colander.Invalid):
-            inst.deserialize(node, '/wrong_child')
+            inst.deserialize(node, 'htp://x.x')
 
-    def test_deserialize_value_location_aware_with_use_resource_location(self):
-        inst = self._make_one(use_resource_location=True)
+    def test_deserialize_value_path_location_aware(self):
+        inst = self._make_one()
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping(), context=self.context)
-        child_url = self.request.application_url + '/child/'
+        child_url = '/child/'
         result = inst.deserialize(node, child_url)
         assert result == self.child
 
-    def test_deserialize_value_location_aware_with_use_resource_location_without_context_binding(self):
-        inst = self._make_one(use_resource_location=True)
+    def test_deserialize_value_path_location_aware_without_context_binding(self):
+        inst = self._make_one()
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping())
-        child_url = self.request.application_url + '/child/'
+        child_url = '/child/'
         with raises(AssertionError):
             inst.deserialize(node, child_url)
 
@@ -410,6 +444,10 @@ class TestUniqueReferences:
         inst = self._make_one()
         assert isinstance(inst, References)
 
+    def test_valid_deserialize_with_colander_null(self, request):
+        inst = self._make_one().bind(request=request)
+        assert inst.deserialize(colander.null) == []
+
     def test_valid_deserialize_with_duplication(self, request):
         inst = self._make_one().bind(request=request)
         target = request.root['target']
@@ -538,3 +576,167 @@ class DateTimeUnitTest(unittest.TestCase):
         # we want an iso 8601 string with the current datetime
         today = datetime.utcnow().strftime('%Y-%m-%d')
         assert today in result
+
+
+class TestPostPool:
+
+    @fixture
+    def request(self, context):
+        request = testing.DummyRequest()
+        request.root = context
+        return request
+
+    def _make_one(self, **kwargs):
+        from adhocracy.schema import PostPool
+        return PostPool(**kwargs)
+
+    def test_create(self):
+        from adhocracy.interfaces import IPool
+        from adhocracy.schema import ResourceObject
+        inst = self._make_one()
+        assert inst.schema_type is ResourceObject
+        assert inst.iresource_or_service_name is IPool
+        assert inst.readonly is True
+        assert isinstance(inst.default, colander.deferred)
+        assert isinstance(inst.missing, colander.deferred)
+
+    def test_deserialize_empty(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize()
+
+    def test_bind_context_without_post_pool_and_deserialize_empty(self, context):
+        from adhocracy.exceptions import RuntimeConfigurationError
+        with raises(RuntimeConfigurationError):
+            self._make_one().bind(context=context)
+
+    def test_bind_context_with_post_pool_and_deserialize_empty(self, pool):
+        from adhocracy.interfaces import IPool
+        inst = self._make_one(iresource_or_service_name=IPool).bind(context=pool)
+        assert inst.deserialize() is pool
+
+    def test_bind_context_with_service_post_pool_and_deserialize_empty(self, pool):
+        from adhocracy.interfaces import IServicePool
+        pool['service'] = testing.DummyResource(__provides__=IServicePool,
+                                                __is_service__=True)
+        inst = self._make_one(iresource_or_service_name='service').bind(context=pool)
+        assert inst.deserialize() is pool['service']
+
+    def test_serialize_empty(self):
+        inst = self._make_one()
+        assert inst.serialize() == ''
+
+    def test_bind_context_with_post_pool_and_serialize_empty(self, pool, request):
+        from adhocracy.interfaces import IPool
+        inst = self._make_one(iresource_or_service_name=IPool).bind(context=pool,
+                                                                    request=request)
+        assert inst.serialize() == request.resource_url(pool)
+
+    def test_bind_context_without_post_pool_and_serialize_empty(self, context, request):
+        from adhocracy.exceptions import RuntimeConfigurationError
+        with raises(RuntimeConfigurationError):
+            self._make_one().bind(context=context,
+                                  request=request)
+
+
+class TestPostPoolMappingSchema:
+
+
+    @fixture
+    def context(self, pool):
+        from adhocracy.interfaces import ISheet
+        from adhocracy.interfaces import IPool
+        wrong_post_pool = testing.DummyResource()
+        wrong_post_pool['child'] = testing.DummyResource(__provides__=ISheet)
+        pool['wrong'] = wrong_post_pool
+        right_post_pool = testing.DummyResource(__provides__=IPool)
+        right_post_pool['child'] = testing.DummyResource(__provides__=ISheet)
+        pool['right'] = right_post_pool
+        return pool
+
+    @fixture
+    def mock_sheet(self, mock_sheet):
+        from adhocracy.interfaces import IPostPoolSheet
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPostPoolSheet)
+        schema = colander.MappingSchema()
+        _add_post_pool_node(schema)
+        mock_sheet.schema = schema
+        return mock_sheet
+
+    @fixture
+    def request_(self, context):
+        request = testing.DummyRequest()
+        request.root = context
+        return request
+
+    def _make_one(self, **kwargs):
+        from adhocracy.schema import PostPoolMappingSchema
+        return PostPoolMappingSchema(**kwargs)
+
+    def test_create(self):
+        inst = self._make_one()
+        assert isinstance(inst.validator, colander.deferred)
+
+    def test_deserialize_empty(self):
+        inst = self._make_one()
+        assert inst.deserialize() == {}
+
+    def test_deserialize_empty(self):
+        inst = self._make_one()
+        assert inst.serialize() == {}
+
+    def test_bind_context_without_reference_post_context_and_deserialize(self, context, request_):
+        inst = self._make_one()
+        _add_reference_node(inst)
+        _add_other_node(inst)
+        inst = inst.bind(context=context['right'], request=request_)
+        assert inst.deserialize({'reference': request_.application_url + '/right/child/'})
+
+    def test_bind_context_with_valid_reference_post_context_and_deserialize(self, context, request_):
+        inst = self._make_one()
+        _add_post_pool_node(inst)
+        _add_reference_node(inst)
+        inst = inst.bind(context=context['right'], request=request_)
+        assert inst.deserialize({'reference': request_.application_url + '/right/child/'})
+
+    def test_bind_context_with_nonvalid_reference_post_context_and_deserialize(self, context, request_):
+        inst = self._make_one()
+        _add_post_pool_node(inst)
+        _add_reference_node(inst)
+        inst = inst.bind(context=context['right'], request=request_)
+        with raises(colander.Invalid):
+            inst.deserialize({'reference': request_.application_url + '/wrong/child'})
+
+    def test_bind_context_with_valid_references_post_context_and_deserialize(self, context, request_):
+        inst = self._make_one()
+        _add_post_pool_node(inst)
+        _add_references_node(inst)
+        inst = inst.bind(context=context['right'], request=request_)
+        assert inst.deserialize({'references': [request_.application_url + '/right/child']})
+
+    def test_bind_context_with_valid_backreference_post_context_and_deserialize(self, context, mock_sheet, registry, request_):
+        from adhocracy.interfaces import IPostPoolSheet
+        inst = self._make_one()
+
+        referenced = context['right']['child']
+        add_and_register_sheet(referenced, mock_sheet, registry)
+        mock_sheet.schema = mock_sheet.schema.bind(context=referenced)
+
+        _add_reference_node(inst, target_isheet=IPostPoolSheet)
+        inst = inst.bind(context=context['right'], request=request_)
+
+        assert inst.deserialize({'reference': request_.application_url + '/right/child'})
+
+    def test_bind_context_with_nonvalid_backreference_post_context_and_deserialize(self, context, mock_sheet, registry, request_):
+        from adhocracy.interfaces import IPostPoolSheet
+        inst = self._make_one()
+
+        referenced = context['right']['child']
+        add_and_register_sheet(referenced, mock_sheet, registry)
+        mock_sheet.schema = mock_sheet.schema.bind(context=referenced)
+
+        _add_reference_node(inst, target_isheet=IPostPoolSheet)
+        inst = inst.bind(context=context['right'], request=request_)
+
+        with raises(colander.Invalid):
+            inst.deserialize({'reference': request_.application_url + '/wrong/child'})

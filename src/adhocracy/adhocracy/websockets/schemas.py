@@ -57,7 +57,7 @@ class ServerNotification(colander.MappingSchema):
     """Notification sent to the server from the Pyramid WS client."""
 
     event = Event()
-    resource = colander.SchemaNode(ResourceObject(use_resource_location=True))
+    resource = colander.SchemaNode(ResourceObject(serialize_to_path=True))
 
 
 class Notification(colander.MappingSchema):

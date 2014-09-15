@@ -41,6 +41,10 @@ class DummyPool(testing.DummyResource):
         resource.__is_service__ = True
         self.add(name, resource)
 
+    def find_service(self, service_name, *sub_service_names):
+        from substanced.util import find_service
+        return find_service(self, service_name, *sub_service_names)
+
 
 class DummyPoolWithObjectMap(DummyPool):
 
@@ -57,14 +61,26 @@ class DummyPoolWithObjectMap(DummyPool):
 
 def create_pool_with_graph() -> testing.DummyResource:
     """Return pool like dummy object with objectmap and graph."""
+    from substanced.interfaces import IFolder
     from adhocracy.interfaces import IPool
     from adhocracy.graph import Graph
     context = DummyPoolWithObjectMap(__oid__=0,
-                                     __provides__=IPool)
+                                     __provides__=(IPool, IFolder))
     objectmap = ObjectMap(context)
     context.__objectmap__ = objectmap
     context.__graph__ = Graph(context)
     return context
+
+
+def add_and_register_sheet(context, mock_sheet, registry):
+    """Add `mock_sheet` to `context`and register adapter."""
+    from zope.interface import alsoProvides
+    from adhocracy.interfaces import IResourceSheet
+    isheet = mock_sheet.meta.isheet
+    alsoProvides(context, isheet)
+    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
+                             IResourceSheet,
+                             isheet.__identifier__)
 
 
 ##################
@@ -133,8 +149,9 @@ def context() -> testing.DummyResource:
 @fixture
 def pool() -> DummyPool:
     """ Return dummy pool with IPool interface."""
+    from substanced.interfaces import IFolder
     from adhocracy.interfaces import IPool
-    return DummyPool(__provides__=IPool)
+    return DummyPool(__provides__=(IPool, IFolder))
 
 
 @fixture

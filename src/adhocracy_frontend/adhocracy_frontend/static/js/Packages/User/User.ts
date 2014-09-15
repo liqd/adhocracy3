@@ -163,12 +163,12 @@ export class User {
         // implicitly, such as caching.
 
         if (nameOrEmail.indexOf("@") === -1) {
-            promise = _self.$http.post("/login_username", {
+            promise = _self.adhHttp.postRaw("/login_username", {
                 name: nameOrEmail,
                 password: password
             });
         } else {
-            promise = _self.$http.post("/login_email", {
+            promise = _self.adhHttp.postRaw("/login_email", {
                 email: nameOrEmail,
                 password: password
             });

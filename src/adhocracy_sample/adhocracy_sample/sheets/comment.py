@@ -2,13 +2,17 @@
 import colander
 
 from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IPostPoolSheet
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import SheetToSheet
+from adhocracy.interfaces import IItem
 from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.schema import UniqueReferences
 from adhocracy.schema import Reference
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.schema import Text
+from adhocracy.schema import PostPoolMappingSchema
+from adhocracy.schema import PostPool
 
 
 class IComment(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -16,7 +20,7 @@ class IComment(ISheet, ISheetReferenceAutoUpdateMarker):
     """Marker interface for the comment sheet."""
 
 
-class ICommentable(ISheet, ISheetReferenceAutoUpdateMarker):
+class ICommentable(IPostPoolSheet, ISheetReferenceAutoUpdateMarker):
 
     """Marker interface for resources that can be commented upon."""
 
@@ -45,16 +49,18 @@ comment_meta = sheet_metadata_defaults._replace(isheet=IComment,
                                                 schema_class=CommentSchema)
 
 
-class CommentableSchema(colander.MappingSchema):
+class CommentableSchema(PostPoolMappingSchema):
 
     """Commentable sheet data structure.
 
     `comments`: list of comments (not stored)
+    `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IComment`.
     """
 
     comments = UniqueReferences(readonly=True,
                                 backref=True,
                                 reftype=CommentRefersToReference)
+    post_pool = PostPool(iresource_or_service_name=IItem)
 
 
 commentable_meta = sheet_metadata_defaults._replace(

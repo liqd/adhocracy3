@@ -19,6 +19,11 @@ class TestCommentableSheet:
         from adhocracy_sample.sheets.comment import commentable_meta
         return commentable_meta
 
+    @fixture
+    def context(self):
+        from adhocracy.interfaces import IItem
+        return testing.DummyResource(__provides__=IItem)
+
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy.interfaces import IResourceSheet
@@ -40,6 +45,7 @@ class TestCommentableSheet:
         inst = meta.sheet_class(meta, context)
         inst._graph = mock_graph
         mock_graph.get_back_references_for_isheet.return_value = {'refers_to': [comment]}
+        mock_graph.get_references_for_isheet.return_value = {}
         data = inst.get()
         assert list(data['comments']) == [comment]
 

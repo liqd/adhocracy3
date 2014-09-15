@@ -25,7 +25,7 @@ export var register = () => {
             var modernizrMock;
 
             beforeEach(() => {
-                adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "post"]);
+                adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["get", "post", "postRaw"]);
                 adhHttpMock.post.and.returnValue(q.when({}));
                 adhHttpMock.get.and.returnValue(q.when({
                     data: {
@@ -96,7 +96,7 @@ export var register = () => {
 
             describe("login", () => {
                 beforeEach(() => {
-                    adhUser.$http.post.and.returnValue(q.when({
+                    adhHttpMock.postRaw.and.returnValue(q.when({
                         data: {
                             status: "success",
                             user_path: "user1_path",
@@ -133,7 +133,7 @@ export var register = () => {
                     testLogin();
 
                     it("requests the API endpoint /login_username", () => {
-                        expect(httpMock.post).toHaveBeenCalledWith("/login_username", {
+                        expect(adhHttpMock.postRaw).toHaveBeenCalledWith("/login_username", {
                             name: "user1",
                             password: "user1_pass"
                         });
@@ -153,7 +153,7 @@ export var register = () => {
                     testLogin();
 
                     it("requests the API endpoint /login_email", () => {
-                        expect(httpMock.post).toHaveBeenCalledWith("/login_email", {
+                        expect(adhHttpMock.postRaw).toHaveBeenCalledWith("/login_email", {
                             email: "user1@somedomain",
                             password: "user1_pass"
                         });
@@ -189,7 +189,7 @@ export var register = () => {
                     };
 
                     beforeEach((done) => {
-                        adhUser.$http.post.and.returnValue(q.reject(fullError));
+                        adhUser.adhHttp.postRaw.and.returnValue(q.reject(fullError));
                         adhUser.logIn("user1", "user1_wrong_pass").then(
                             done,
                             (reason) => {
@@ -213,6 +213,13 @@ export var register = () => {
             describe("logOut", () => {
                 var testLogout = (_beforeEach : (done : () => void) => void) => {
                     beforeEach((done) => {
+                        adhHttpMock.postRaw.and.returnValue(q.when({
+                            data: {
+                                status: "success",
+                                user_path: "user1_path",
+                                user_token: "user1_tok"
+                            }
+                        }));
                         adhUser.logIn("user1", "user1_pass").then(() => {
                             adhUser.logOut();
                             _beforeEach(done);
@@ -226,11 +233,11 @@ export var register = () => {
                         expect(adhUser.data).not.toBeDefined();
                     });
                     it("unsets token", () => {
-                        expect(adhUser.token).not.toBeDefined;
+                        expect(adhUser.token).not.toBeDefined();
                     });
                     it("unsets default http headers for the http service", () => {
-                        expect(httpMock.defaults.headers.common["X-User-Token"]).not.toBeDefined;
-                        expect(httpMock.defaults.headers.common["X-User-Path"]).not.toBeDefined;
+                        expect(httpMock.defaults.headers.common["X-User-Token"]).not.toBeDefined();
+                        expect(httpMock.defaults.headers.common["X-User-Path"]).not.toBeDefined();
                     });
                 };
 
@@ -245,7 +252,7 @@ export var register = () => {
                     });
                 });
 
-                describe("localStorage unavaliable", () => {
+                describe("localStorage unavailable", () => {
                     testLogout((done) => {
                         adhUser.Modernizr.localstorage = false;
                         done();

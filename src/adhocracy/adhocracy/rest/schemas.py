@@ -187,16 +187,18 @@ class BatchRequestPath(AdhocracySchemaNode):
     """A path in a batch request.
 
     Either a resource url or a preliminary resource path (a relative path
-    preceded by '@').
+    preceded by '@') or an absolute path.
 
-    Example values: '@item/v1', 'http://a.org/adhocracy/item/v1'
+    Example values: '@item/v1', 'http://a.org/adhocracy/item/v1', '/item/v1/'
     """
 
     schema_type = colander.String
     default = ''
     missing = colander.required
+    absolutpath = AbsolutePath.relative_regex
     preliminarypath = '[a-zA-Z0-9\_\-\.\/]+'
-    validator = colander.All(colander.Regex('^' + colander.URL_REGEX + '|@'
+    validator = colander.All(colander.Regex('^' + colander.URL_REGEX + '|'
+                                            + absolutpath + '|@'
                                             + preliminarypath + '$'),
                              colander.Length(min=1, max=200))
 

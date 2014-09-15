@@ -20,11 +20,8 @@ export var register = (angular, config, meta_api) => {
 
     describe("withTransaction", () => {
         var adhHttp : AdhHttp.Service<any> = (() => {
-            var adhConfig = <any>{
-                rest_url: "mock"
-            };
             var factory = ($http, $q) => {
-                return (new AdhHttp.Service($http, $q, new AdhMetaApi.MetaApiQuery(meta_api), new AdhPreliminaryNames, adhConfig));
+                return (new AdhHttp.Service($http, $q, new AdhMetaApi.MetaApiQuery(meta_api), new AdhPreliminaryNames, config));
             };
             factory.$inject = ["$http", "$q"];
             return angular.injector(["ng"]).invoke(factory);
@@ -63,7 +60,7 @@ export var register = (angular, config, meta_api) => {
 
                 return transaction.commit()
                     .then((responses) : ng.IPromise<Resources.Content<any>> => {
-                        var lastTagPath : string = responses[proposal.index].path + "/LAST";
+                        var lastTagPath : string = responses[proposal.index].path + "LAST";
                         return adhHttp.get(lastTagPath);
                     })
                     .then((lastTag : RITag) => {
