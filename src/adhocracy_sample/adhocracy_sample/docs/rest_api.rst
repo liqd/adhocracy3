@@ -1020,15 +1020,11 @@ Or only children that implement a specific sheet::
     ['/adhocracy/Proposals/kommunismus/FIRST',
      '/adhocracy/Proposals/kommunismus/LAST']
 
-TODO: the next section sounds like depth only understands {1, 2, 3,
-all} as arguments.  if it understands any positive integer and
-'all'. it should make that clearer.
-
 By default, only direct children of a pool are listed as elements,
 i.e. the standard depth is 1. Setting the *depth* parameter to a higher
 value allows also including grandchildren (depth=2) or even great-grandchildren
-(depth=3) etc. To get nested elements of arbitrary nesting depth, use
-*depth=all*::
+(depth=3) etc. Allowed values are arbitrary positive numbers and *all*.
+*all* can be used to get nested elements of arbitrary nesting depth::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
