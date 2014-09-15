@@ -199,8 +199,7 @@ class ResourceObject(colander.SchemaType):
         else:
             assert 'request' in node.bindings
             request = node.bindings['request']
-            # FIXME urls in barch requests response are missing the port
-            return request.resource_url(value, port=request.server_port)
+            return request.resource_url(value)
 
     def deserialize(self, node, value):
         """Deserialize url or path to object.

@@ -123,7 +123,7 @@ class BatchView(RESTView):
         method = nested_request['method']
         json_body = nested_request['body']
         keywords_args = {'method': method,
-                         'server_port': self.request.server_port}
+                         'base_url': self.request.host_url}
 
         if json_body:
             keywords_args['body'] = dumps(json_body).encode()
