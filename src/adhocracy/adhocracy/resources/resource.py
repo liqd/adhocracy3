@@ -25,7 +25,6 @@ class Base(Persistent):
 
 
 resource_metadata_defaults = resource_metadata._replace(
-    content_name=IResource.__identifier__,
     iresource=IResource,
     content_class=Base,
     permission_add='add',

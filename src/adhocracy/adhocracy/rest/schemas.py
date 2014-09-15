@@ -177,7 +177,7 @@ class BatchMethod(colander.SchemaNode):
     """An HTTP method in a batch request."""
 
     schema_type = colander.String
-    validator = colander.OneOf(['GET', 'POST', 'PUT'])
+    validator = colander.OneOf(['GET', 'POST', 'PUT', 'OPTION'])
     missing = colander.required
 
 

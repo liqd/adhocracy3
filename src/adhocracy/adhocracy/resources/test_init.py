@@ -230,7 +230,7 @@ class TestResourceFactory:
 
         set_appstructs = dummy_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] is None
-        today = datetime.today().date()
+        today = datetime.utcnow().date()
         assert set_appstructs['creation_date'].date() == today
         assert set_appstructs['item_creation_date'] == set_appstructs['creation_date']
         assert set_appstructs['modification_date'].date() == today
