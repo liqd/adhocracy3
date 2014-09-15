@@ -169,10 +169,12 @@ export var init = (config, meta_api) => {
 
     app.directive("adhTime", ["moment", "$interval", AdhDateTime.createDirective]);
 
-    app.directive("adhRating", ["adhConfig", (adhConfig) =>
+    app.directive("adhRating", ["$q", "adhConfig", "adhPreliminaryNames", ($q, adhConfig, adhPreliminaryNames) =>
         AdhRating.createDirective(
             new AdhRatingAdapter.RatingAdapter(),
-            adhConfig
+            $q,
+            adhConfig,
+            adhPreliminaryNames
         )]);
 
     // get going

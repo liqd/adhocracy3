@@ -1,4 +1,5 @@
 import AdhConfig = require("../Config/Config");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhHttp = require("../Http/Http");
 import AdhResource = require("../../Resources");
 import AdhUser = require("../User/User");
@@ -23,10 +24,11 @@ export interface IRatingScope extends ng.IScope {
         contra : number;
         neutral : number;
     };
-    thisUsersRating : ResourcesBase.Resource;
-    active : RatingValue;
+    thisUsersRating : any;  // resource matching IRatingAdapter (this is tricky to type, so we leave it blank for now.)
     isActive : (RatingValue) => string;  // css class name if RatingValue is active, or "" otherwise.
     cast(RatingValue) : void;
+    assureUserRatingExists() : ng.IPromise<void>;
+    postUpdate() : ng.IPromise<void>;
 }
 
 
@@ -82,7 +84,7 @@ export var postPoolPathPromise = (
         throw "post pool field in " + $scope.postPoolSheet + "/" + $scope.postPoolField +
             " not found in content type " + rateable.content_type;
     });
-}
+};
 
 
 /**
@@ -151,7 +153,12 @@ export var ratingController = (
 };
 
 
-export var createDirective = (adapter : IRatingAdapter<any>, adhConfig : AdhConfig.Type) => {
+export var createDirective = (
+    adapter : IRatingAdapter<any>,
+    $q : ng.IQService,
+    adhConfig : AdhConfig.Type,
+    adhPreliminaryNames : AdhPreliminaryNames
+) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Rating.html",
@@ -161,27 +168,44 @@ export var createDirective = (adapter : IRatingAdapter<any>, adhConfig : AdhConf
             postPoolField : "@"
         },
         link: (scope : IRatingScope) => {
+            scope.isActive = (rating : RatingValue) =>
+                (typeof scope.thisUsersRating !== "undefined" &&
+                 rating === adapter.value(scope.thisUsersRating)) ? "rating-button-active" : "";
+
             scope.cast = (rating : RatingValue) : void => {
                 if (scope.isActive(rating)) {
                     // click on active button to un-rate
 
+                    adapter.value(scope.thisUsersRating, <any>false);  // FIXME: we need to decide how we want to handle deletion!
                     scope.ratings[RatingValue[rating]] -= 1;
-                    delete scope.active;
+                    scope.postUpdate();
                 } else {
                     // click on inactive button to (re-)rate
 
-                    // decrease old value
-                    if (scope.hasOwnProperty("active")) {
-                        scope.ratings[RatingValue[scope.active]] -= 1;
-                    }
                     // increase new value
                     scope.ratings[RatingValue[rating]] += 1;
-                    scope.active = rating;
+
+                    scope.assureUserRatingExists()
+                        .then(() => {
+                            // update thisUsersRating
+                            adapter.value(scope.thisUsersRating, rating);
+
+                            // decrease old value
+                            scope.ratings[adapter.value(scope.thisUsersRating)] -= 1;
+
+                            // send new rating to server
+                            scope.postUpdate();
+                        });
                 }
             };
 
-            scope.isActive = (rating : RatingValue) =>
-                (rating === scope.active) ? "rating-button-active" : "";
+            scope.assureUserRatingExists = () : ng.IPromise<void> => {
+                return $q.when(<any>undefined);
+            };
+
+            scope.postUpdate = () : ng.IPromise<void> => {
+                return $q.when(<any>undefined);
+            };
         },
         controller: ["$scope", "$q", "adhHttp", "adhUser", ($scope, $q, adhHttp, adhUser) =>
             ratingController(adapter, $scope, $q, adhHttp, adhUser)]

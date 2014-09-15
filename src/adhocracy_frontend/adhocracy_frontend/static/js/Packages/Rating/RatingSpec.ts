@@ -10,15 +10,12 @@ export var register = () => {
     describe("Rating", () => {
         describe("Controller", () => {
             var scopeMock;
-            var qMock;
             var httpMock;
             var userMock;
 
             var rateableResource;
             var postPoolResource;
             var ratingResources;
-
-            var controller;
 
             beforeEach(() => {
                 scopeMock = {
@@ -93,7 +90,7 @@ export var register = () => {
 
                 userMock = {
                     userPath: "user3"
-                }
+                };
             });
 
             it("resetRatings clears ratings and user rating in scope.", () => {
