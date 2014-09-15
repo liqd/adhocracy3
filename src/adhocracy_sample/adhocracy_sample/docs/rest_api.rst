@@ -1062,8 +1062,39 @@ you'll get the number of children in the pool::
     >>> child_count = resp_data['data']['adhocracy.sheets.pool.IPool']['count']
     >>> assert int(child_count) >= 10
 
-# TODO Document elements=paths/content/omit, aggregateby, tag, custom filters.
-Note all multiple filters are combined by AND.
+The *elements* parameter allows controlling how matching element are
+returned. By default, 'elements' in the IPool sheet contains a list of paths.
+This corresponds to setting *elements=paths*.
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...             'elements': 'paths'}).json
+    >>> resp_data['data']['adhocracy.sheets.pool.IPool']['elements']
+    ['/adhocracy/Proposals/kommunismus/FIRST', '/adhocracy/Proposals/kommunismus/LAST']
+
+Setting *elements=omit* will yield a response without an 'elements' listing.
+This makes only if you ask for something else instead, e.g. a count of
+elements::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...             'elements': 'omit', 'count': 'true'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool'])
+    {'count': '2'}
+
+TODO Not implemented yet:
+Setting *elements=content* will instead return the complete contents of all
+matching elements -- what you would get by making a GET request on each of
+their paths::
+
+    >> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...             'elements': 'content'}).json
+    >> resp_data['data']['adhocracy.sheets.pool.IPool']['elements']
+    blah
+
+# TODO aggregateby, tag, custom filters. Note that multiple filters are
+combined by AND.
 
 
 Other stuff
