@@ -41,6 +41,10 @@ class TestTagsSheet:
 def test_includeme_register_tags_sheet(config):
     from adhocracy.sheets.tags import ITags
     from adhocracy.utils import get_sheet
+    config.include('adhocracy.registry')
+    config.include('adhocracy.events')
+    config.include('adhocracy.graph')
+    config.include('adhocracy.catalog')
     config.include('adhocracy.sheets.tags')
     context = testing.DummyResource(__provides__=ITags)
     assert get_sheet(context, ITags)
@@ -56,10 +60,10 @@ class TestTagSheet:
     def test_create(self, meta, context):
         from adhocracy.sheets.tags import ITag
         from adhocracy.sheets.tags import TagSchema
-        from adhocracy.sheets import GenericResourceSheet
+        from adhocracy.sheets.tags import TagSheet
         inst = meta.sheet_class(meta, context)
         assert inst.meta.isheet == ITag
-        assert inst.meta.sheet_class == GenericResourceSheet
+        assert inst.meta.sheet_class == TagSheet
         assert inst.meta.schema_class == TagSchema
 
     def test_get_empty(self, meta, context):
@@ -70,6 +74,10 @@ class TestTagSheet:
 def test_includeme_register_tag_sheet(config):
     from adhocracy.sheets.tags import ITag
     from adhocracy.utils import get_sheet
+    config.include('adhocracy.registry')
+    config.include('adhocracy.events')
+    config.include('adhocracy.graph')
+    config.include('adhocracy.catalog')
     config.include('adhocracy.sheets.tags')
     context = testing.DummyResource(__provides__=ITag)
     assert get_sheet(context, ITag)

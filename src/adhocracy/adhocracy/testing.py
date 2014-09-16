@@ -61,6 +61,7 @@ class DummyPoolWithObjectMap(DummyPool):
 
 def create_pool_with_graph() -> testing.DummyResource:
     """Return pool like dummy object with objectmap and graph."""
+    # FIXME use pool_graph or pool_graph_catalog fixture instead
     from substanced.interfaces import IFolder
     from adhocracy.interfaces import IPool
     from adhocracy.graph import Graph
@@ -95,6 +96,7 @@ def pool_graph(config):
     from adhocracy.resources.root import _add_graph
     from adhocracy.resources.root import _add_objectmap_to_app_root
     config.include('adhocracy.registry')
+    config.include('adhocracy.events')
     config.include('adhocracy.graph')
     context = Pool()
     _add_objectmap_to_app_root(context)
