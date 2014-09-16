@@ -4,11 +4,11 @@ from collections import OrderedDict
 from datetime import datetime
 
 from pyramid.path import DottedNameResolver
-from pyramid.request import Request
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
 from pytz import UTC
 from pyramid.traversal import find_interface
+from substanced.util import get_dotted_name
 from zope.interface.interfaces import IInterface
 import colander
 import pytz
@@ -21,7 +21,6 @@ from adhocracy.interfaces import SheetReference
 from adhocracy.interfaces import IPool
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IPostPoolSheet
-from adhocracy.registry import ResourceContentRegistry
 
 
 class AdhocracySchemaNode(colander.SchemaNode):
@@ -87,27 +86,6 @@ def deserialize_path(node, value):
             node,
             msg='This resource path does not exist.', value=value)
     return resource
-
-
-def serialize_resource(resource: IResource, registry: ResourceContentRegistry,
-                       request: Request=None, params: dict={}) -> dict:
-    """Serialize a resource.
-
-    :param resource: the resource
-    :param registry: the registry
-    :param request: used for permission checks, if given
-    :param params: optional (query) parameters passed to the resource
-    """
-    sheets_view = registry.resource_sheets(resource, request,
-                                           onlyviewable=True)
-    struct = {'data': {}}
-    for sheet in sheets_view.values():
-        key = sheet.meta.isheet.__identifier__
-        struct['data'][key] = sheet.get_cstruct(params=params)
-    struct['path'] = resource_path(resource)
-    iresource = get_iresource(resource)
-    struct['content_type'] = iresource.__identifier__
-    return struct
 
 
 def validate_name_is_unique(node: colander.SchemaNode, value: str):
@@ -372,6 +350,15 @@ class Resources(colander.SequenceSchema):
     resource = Resource()
     default = []
     missing = []
+
+    def serialize(self, appstruct=colander.null):
+        # Honor form attribute, if present
+        form = getattr(appstruct, 'form', None)
+        if form == 'omit':
+            return colander.drop
+        # FIXME Not implemented yet: form == 'content' should serialize
+        # complete elements instead of just their paths
+        return super().serialize(appstruct)
 
 
 def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
