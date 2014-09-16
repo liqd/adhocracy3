@@ -1,4 +1,5 @@
 """Rate sheet."""
+from pyramid.traversal import resource_path
 import colander
 
 from adhocracy.interfaces import ISheet
@@ -13,6 +14,7 @@ from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.schema import PostPoolMappingSchema
 from adhocracy.schema import PostPool
 from adhocracy.schema import Rate
+from adhocracy.utils import get_sheet
 
 
 class IRate(IPredicateSheet, ISheetReferenceAutoUpdateMarker):
@@ -92,8 +94,30 @@ rateable_meta = sheet_metadata_defaults._replace(
 )
 
 
+def index_subject(resource, default):
+    """Return path of the :class:`IRate`.subject field resource.."""
+    sheet = get_sheet(resource, IRate)
+    subject = sheet.get()['subject']
+    return resource_path(subject)
+
+
+def index_object(resource, default):
+    """Return path of :class:`IRate`.subject field. resource."""
+    sheet = get_sheet(resource, IRate)
+    object = sheet.get()['object']
+    return resource_path(object)
+
+
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(rate_meta, config.registry)
     add_sheet_to_registry(can_rate_meta, config.registry)
     add_sheet_to_registry(rateable_meta, config.registry)
+    config.add_indexview(index_subject,
+                         catalog_name='adhocracy',
+                         index_name='subject',
+                         context=IRate)
+    config.add_indexview(index_subject,
+                         catalog_name='adhocracy',
+                         index_name='object',
+                         context=IRate)

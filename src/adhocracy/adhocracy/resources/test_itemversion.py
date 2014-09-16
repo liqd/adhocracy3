@@ -13,6 +13,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
     def setUp(self):
         from adhocracy.testing import create_pool_with_graph
         config = testing.setUp()
+        config.include('adhocracy.catalog')
         config.include('adhocracy.registry')
         config.include('adhocracy.events')
         config.include('adhocracy.sheets')

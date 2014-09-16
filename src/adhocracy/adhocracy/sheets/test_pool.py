@@ -9,6 +9,7 @@ from adhocracy.resources.pool import IBasicPool
 def integration(config):
     config.include('adhocracy.events')
     config.include('adhocracy.registry')
+    config.include('adhocracy.catalog')
     config.include('adhocracy.resources.pool')
     config.include('adhocracy.resources.tag')
     config.include('adhocracy.sheets')

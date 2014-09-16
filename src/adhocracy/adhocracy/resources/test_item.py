@@ -31,6 +31,7 @@ class TestItemIntegrationTest(unittest.TestCase):
         from adhocracy.testing import create_pool_with_graph
         from adhocracy.resources.item import item_metadata
         config = testing.setUp()
+        config.include('adhocracy.catalog')
         config.include('adhocracy.registry')
         config.include('adhocracy.events')
         config.include('adhocracy.sheets')
