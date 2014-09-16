@@ -2,8 +2,6 @@
 from logging import getLogger
 
 from pyramid.traversal import resource_path
-from substanced.catalog import indexview
-from substanced.catalog import indexview_defaults
 from substanced.util import find_catalog
 import colander
 
@@ -102,31 +100,26 @@ tags_metadata = sheet_metadata_defaults._replace(isheet=ITags,
                                                  )
 
 
-@indexview_defaults(catalog_name='adhocracy')
-class VersionsCatalogViews(object):
-
-    def __init__(self, resource):
-        self.resource = resource
-
-    @indexview()
-    def tag(self, default):
-        if IVersionable.providedBy(self.resource):
-            graph = find_graph(self.resource)
-            if graph is None:
-                logger.warning(
-                    'Cannot update tag index: No graph found for %s',
-                    resource_path(self.resource))
-                return default
-            tags = graph.get_back_reference_sources(self.resource,
-                                                    TagElementsReference)
-            tagnames = [tag.__name__ for tag in tags]
-            return tagnames if tagnames else default
-        else:
-            return default
+def index_tag(resource, default):
+    """Return value for the tag index."""
+    graph = find_graph(resource)
+    if graph is None:
+        logger.warning(
+            'Cannot update tag index: No graph found for %s',
+            resource_path(resource))
+        return default
+    tags = graph.get_back_reference_sources(resource,
+                                            TagElementsReference)
+    tagnames = [tag.__name__ for tag in tags]
+    return tagnames if tagnames else default
 
 
 def includeme(config):
-    """Register sheets and scan indexview."""
+    """Register sheets and add indexviews."""
     add_sheet_to_registry(tag_metadata, config.registry)
     add_sheet_to_registry(tags_metadata, config.registry)
-    config.scan('.')
+    config.add_indexview(index_tag,
+                         catalog_name='adhocracy',
+                         index_name='tag',
+                         context=IVersionable,
+                         )
