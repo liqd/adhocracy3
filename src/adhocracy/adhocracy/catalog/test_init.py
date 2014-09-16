@@ -29,6 +29,8 @@ def test_create_adhocracy_catalog(pool_graph, registry):
 
     assert isinstance(catalogs['adhocracy'], Catalog)
     assert 'tag' in catalogs['adhocracy']
+    assert 'subject' in catalogs['adhocracy']
+    assert 'object' in catalogs['adhocracy']
 
 
 @mark.usefixtures('integration')

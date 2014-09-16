@@ -7,6 +7,8 @@ from zope.interface import Interface
 @catalog.catalog_factory('adhocracy')
 class AdhocracyCatalogFactory:
     tag = catalog.Keyword()
+    subject = catalog.Path()
+    object = catalog.Path()
 
 
 def includeme(config):
