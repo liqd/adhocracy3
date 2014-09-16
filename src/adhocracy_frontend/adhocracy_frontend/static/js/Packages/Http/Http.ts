@@ -35,6 +35,7 @@ export class Service<Content extends Resources.Content<any>> {
     constructor(
         private $http : ng.IHttpService,
         private $q : ng.IQService,
+        private $timeout : ng.ITimeoutService,
         private adhMetaApi : MetaApi.MetaApiQuery,
         private adhPreliminaryNames : PreliminaryNames,
         private adhConfig : AdhConfig.Type
@@ -165,12 +166,20 @@ export class Service<Content extends Resources.Content<any>> {
      * merge.  If this flag is true, the caller may want to take
      * further action, such as notifying the (two or more) users
      * involved in the conflict.
+     *
+     * There is a max number of retries and a randomized and
+     * exponentially growing sleep period between retries hard-wired
+     * into the function.  If the max number of retries is exceeded,
+     * an exception is thrown.
      */
     public postNewVersionNoFork(
         oldVersionPath : string,
         obj : Content, rootVersions? : string[]
     ) : ng.IPromise<{ value: Content; isMerge: boolean; }> {
         var _self = this;
+
+        var timeoutRounds : number = 5;
+        var waitms : number = 100;
 
         var dagPath = Util.parentPath(oldVersionPath);
         var _obj = Util.deepcp(obj);
@@ -180,8 +189,13 @@ export class Service<Content extends Resources.Content<any>> {
 
         var retry = (
             nextOldVersionPath : string,
-            isMerge : boolean
+            isMerge : boolean,
+            roundsLeft : number
         ) : ng.IPromise<{ value : Content; isMerge : boolean; }> => {
+            if (roundsLeft === 0) {
+                throw "Tried to post new version of " + dagPath + " " + timeoutRounds.toString() + " times, giving up.";
+            }
+
             _obj.data["adhocracy.sheets.versions.IVersionable"] = {
                 follows: [nextOldVersionPath]
             };
@@ -191,8 +205,15 @@ export class Service<Content extends Resources.Content<any>> {
             };
 
             var handleConflict = (msg) => {
-                return _self.getNewestVersionPathNoFork(dagPath)
-                    .then((nextOldVersionPath) => retry(nextOldVersionPath, true));
+                // double waitms (fuzzed for avoiding network congestion).
+                waitms *= 2 * (Math.random() / 2 - 0.25);
+
+                // wait then retry
+                return _self.$timeout(
+                    () => _self.getNewestVersionPathNoFork(dagPath)
+                        .then((nextOldVersionPath) => retry(nextOldVersionPath, true, roundsLeft - 1)),
+                    waitms,
+                    true);
             };
 
             return _self
@@ -200,7 +221,7 @@ export class Service<Content extends Resources.Content<any>> {
                 .then(handleSuccess, <any>handleConflict);
         };
 
-        return retry(oldVersionPath, false);
+        return retry(oldVersionPath, false, timeoutRounds);
     }
 
     public postToPool(poolPath : string, obj : Content) : ng.IPromise<Content> {

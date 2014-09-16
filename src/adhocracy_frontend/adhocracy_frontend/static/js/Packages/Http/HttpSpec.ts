@@ -65,6 +65,7 @@ export var register = () => {
     describe("Http", () => {
         describe("Service", () => {
             var $httpMock;
+            var $timeoutMock;
             var adhMetaApiMock;
             var adhPreliminaryNames;
             var adhHttp;
@@ -72,10 +73,11 @@ export var register = () => {
 
             beforeEach(() => {
                 $httpMock = mkHttpMock();
+                $timeoutMock = {};
                 adhMetaApiMock = mkAdhMetaApiMock();
                 adhPreliminaryNames = new PreliminaryNames();
                 adhConfigMock = {};
-                adhHttp = new AdhHttp.Service($httpMock, q, adhMetaApiMock, adhPreliminaryNames, adhConfigMock);
+                adhHttp = new AdhHttp.Service($httpMock, q, $timeoutMock, adhMetaApiMock, adhPreliminaryNames, adhConfigMock);
             });
 
             describe("get", () => {
