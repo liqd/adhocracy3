@@ -7,6 +7,7 @@ from adhocracy.resources.pool import IBasicPool
 
 @fixture
 def integration(config):
+    config.include('adhocracy.catalog')
     config.include('adhocracy.events')
     config.include('adhocracy.registry')
     config.include('adhocracy.resources.pool')

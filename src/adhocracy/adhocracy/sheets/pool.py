@@ -31,7 +31,7 @@ class PoolSheet(GenericResourceSheet):
 
 class FilteringPoolSheet(PoolSheet):
 
-    """Resource sheet that allows filtering and aggregating pools.."""
+    """Resource sheet that allows filtering and aggregating pools."""
 
     def _get_reference_appstruct(self, params):
         if not params:
