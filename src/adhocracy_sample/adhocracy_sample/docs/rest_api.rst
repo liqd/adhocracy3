@@ -1095,16 +1095,16 @@ of a specific content type::
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_sample.resources.section.ISection'}).json
     >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
-    ['/adhocracy/Proposals/kommunismus/kapitel1',
-     '/adhocracy/Proposals/kommunismus/kapitel2']
+    ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/',
+     'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/']
 
 Or only children that implement a specific sheet::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'sheet': 'adhocracy.sheets.tags.ITag'}).json
     >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
-    ['/adhocracy/Proposals/kommunismus/FIRST',
-     '/adhocracy/Proposals/kommunismus/LAST']
+    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/',
+     'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
 
 By default, only direct children of a pool are listed as elements,
 i.e. the standard depth is 1. Setting the *depth* parameter to a higher
@@ -1116,7 +1116,7 @@ value allows also including grandchildren (depth=2) or even great-grandchildren
     ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
     ...             'depth': 'all'}).json
     >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
-    [...'/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001'...]
+    [...'http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/'...]
 
 Without specifying a deeper depth, the above query for ISectionVersions
 wouldn't have found anything, since they are children of children of the pool::
@@ -1155,8 +1155,9 @@ This corresponds to setting *elements=paths*.
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
     ...             'elements': 'paths'}).json
-    >>> resp_data['data']['adhocracy.sheets.pool.IPool']['elements']
-    ['/adhocracy/Proposals/kommunismus/FIRST', '/adhocracy/Proposals/kommunismus/LAST']
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/',
+     'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
 
 Setting *elements=omit* will yield a response without an 'elements' listing.
 This makes only if you ask for something else instead, e.g. a count of
@@ -1168,14 +1169,15 @@ elements::
     >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool'])
     {'count': '2'}
 
+FIXME Not yet implemented:
 Setting *elements=content* will instead return the complete contents of all
 matching elements -- what you would get by making a GET request on each of
 their paths::
 
-    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
     ...             'elements': 'content'}).json
-    >>> resp_data['data']['adhocracy.sheets.pool.IPool']['elements']
+    >> resp_data['data']['adhocracy.sheets.pool.IPool']['elements']
     blah
 
 # TODO aggregateby, tag, custom filters. Note that multiple filters are
