@@ -1,9 +1,8 @@
-"""Rating sheet."""
-from enum import Enum
-
+"""Rate sheet."""
 import colander
 
 from adhocracy.interfaces import ISheet
+from adhocracy.interfaces import IPredicateSheet
 from adhocracy.interfaces import IPostPoolSheet
 from adhocracy.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy.interfaces import SheetToSheet
@@ -13,17 +12,12 @@ from adhocracy.schema import Reference
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.schema import PostPoolMappingSchema
 from adhocracy.schema import PostPool
+from adhocracy.schema import Rate
 
 
-class RatingValue(Enum):
-    contra = -1
-    neutral = 0
-    pro = 1
+class IRate(IPredicateSheet, ISheetReferenceAutoUpdateMarker):
 
-
-class IRating(ISheet, ISheetReferenceAutoUpdateMarker):
-
-    """Marker interface for the rating sheet."""
+    """Marker interface for the rate sheet."""
 
 
 class IRateable(IPostPoolSheet, ISheetReferenceAutoUpdateMarker):
@@ -36,39 +30,39 @@ class ICanRate(ISheet):
     """Marker interface for resources that can rate."""
 
 
-class RatingSubjectReference(SheetToSheet):
+class RateSubjectReference(SheetToSheet):
 
     """Reference from comment version to the commented-on item version."""
 
-    source_isheet = IRating
+    source_isheet = IRate
     source_isheet_field = 'subject'
     target_isheet = ICanRate
 
 
-class RatingTargetReference(SheetToSheet):
+class RateObjectReference(SheetToSheet):
 
     """Reference from comment version to the commented-on item version."""
 
-    source_isheet = IRating
-    source_isheet_field = 'target'
+    source_isheet = IRate
+    source_isheet_field = 'object'
     target_isheet = IRateable
 
 
-class RatingSchema(colander.MappingSchema):
+class RateSchema(colander.MappingSchema):
 
-    """Rating sheet data structure.
+    """Rate sheet data structure.
 
-    `value`:  Integer
+    `rate`: 1, 0, or -1
     """
 
-    subject = Reference(reftype=RatingSubjectReference)
-    target = Reference(reftype=RatingTargetReference)
-    value = colander.Integer()
+    subject = Reference(reftype=RateSubjectReference)
+    object = Reference(reftype=RateObjectReference)
+    rate = Rate()
 
 
-rating_meta = sheet_metadata_defaults._replace(isheet=IRating,
-                                               schema_class=RatingSchema,
-                                               create_mandatory=True)
+rate_meta = sheet_metadata_defaults._replace(isheet=IRate,
+                                             schema_class=RateSchema,
+                                             create_mandatory=True)
 
 
 class CanRateSchema(colander.MappingSchema):
@@ -84,7 +78,7 @@ class RateableSchema(PostPoolMappingSchema):
 
     """Commentable sheet data structure.
 
-    `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IRating`.
+    `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IRate`.
     """
 
     post_pool = PostPool(iresource_or_service_name=IItem)
@@ -100,6 +94,6 @@ rateable_meta = sheet_metadata_defaults._replace(
 
 def includeme(config):
     """Register sheets."""
-    add_sheet_to_registry(rating_meta, config.registry)
+    add_sheet_to_registry(rate_meta, config.registry)
     add_sheet_to_registry(can_rate_meta, config.registry)
     add_sheet_to_registry(rateable_meta, config.registry)
