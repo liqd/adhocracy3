@@ -37,7 +37,6 @@ from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import References
-from adhocracy.schema import serialize_resource
 from adhocracy.utils import get_iresource
 from adhocracy.utils import strip_optional_prefix
 from adhocracy.utils import to_dotted_name
