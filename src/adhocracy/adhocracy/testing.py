@@ -87,20 +87,28 @@ def add_and_register_sheet(context, mock_sheet, registry):
 # Fixtures       #
 ##################
 
+
 @fixture
-def pool_graph_catalog(config):
-    """Return pool wit graph and catalog for integration/functional tests."""
+def pool_graph(config):
+    """Return pool with graph for integration/functional tests."""
     from adhocracy.resources.pool import Pool
-    from substanced.interfaces import MODE_IMMEDIATE
-    from adhocracy.resources.root import _add_objectmap_to_app_root
-    from adhocracy.resources.root import _add_catalog_service
     from adhocracy.resources.root import _add_graph
+    from adhocracy.resources.root import _add_objectmap_to_app_root
     config.include('adhocracy.registry')
     config.include('adhocracy.graph')
-    config.include('adhocracy.catalog')
     context = Pool()
     _add_objectmap_to_app_root(context)
     _add_graph(context, config.registry)
+    return context
+
+
+@fixture
+def pool_graph_catalog(config, pool_graph):
+    """Return pool wit graph and catalog for integration/functional tests."""
+    from substanced.interfaces import MODE_IMMEDIATE
+    from adhocracy.resources.root import _add_catalog_service
+    config.include('adhocracy.catalog')
+    context = pool_graph
     _add_catalog_service(context, config.registry)
     context['catalogs']['system']['name'].action_mode = MODE_IMMEDIATE
     context['catalogs']['system']['interfaces'].action_mode = MODE_IMMEDIATE
