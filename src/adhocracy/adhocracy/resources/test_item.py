@@ -114,7 +114,7 @@ class IncludemeIntegrationTest(unittest.TestCase):
         config.include('adhocracy.sheets.metadata')
         self.config = config
         self.context = create_pool_with_graph()
-        self.metyyadata = item_metadata
+        self.metadata = item_metadata
 
     def tearDown(self):
         testing.tearDown()

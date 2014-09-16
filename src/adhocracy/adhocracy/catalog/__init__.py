@@ -4,6 +4,11 @@ from substanced.interfaces import IIndexingActionProcessor
 from zope.interface import Interface
 
 
+@catalog.catalog_factory('adhocracy')
+class AdhocracyCatalogFactory:
+    tag = catalog.Keyword()
+
+
 def includeme(config):
     """Register catalog utilities."""
     config.add_view_predicate('catalogable', catalog._CatalogablePredicate)
@@ -15,3 +20,4 @@ def includeme(config):
                                     (Interface,),
                                     IIndexingActionProcessor)
     config.scan('substanced.catalog')
+    config.scan('.')

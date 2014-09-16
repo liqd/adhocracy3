@@ -2,10 +2,13 @@
 from collections import Sequence
 from collections import OrderedDict
 from datetime import datetime
+
+from pyramid.path import DottedNameResolver
 from pyramid.traversal import find_resource
 from pyramid.traversal import resource_path
 from pytz import UTC
 from pyramid.traversal import find_interface
+from substanced.util import get_dotted_name
 from zope.interface.interfaces import IInterface
 import colander
 import pytz
@@ -45,6 +48,44 @@ def raise_attribute_error_if_not_location_aware(context) -> None:
     """
     context.__parent__
     context.__name__
+
+
+def serialize_path(node, value):
+    """Serialize object to path with 'pyramid.traveral.resource_path'.
+
+    :param node: the Colander node
+    :param value: the resource to serialize
+    :return: the path of that resource
+    """
+    if value in (colander.null, ''):
+        return value
+    try:
+        raise_attribute_error_if_not_location_aware(value)
+        return resource_path(value)
+    except AttributeError:
+        raise colander.Invalid(
+            node,
+            msg='This resource is not location aware', value=value)
+
+
+def deserialize_path(node, value):
+    """Deserialize path to object.
+
+    :param node: the Colander node
+    :param value: the path to deserialize
+    :return: the resource registered under that path
+    """
+    if value is colander.null:
+        return value
+    context = node.bindings['context']
+    try:
+        resource = find_resource(context, value)
+        raise_attribute_error_if_not_location_aware(resource)
+    except (KeyError, AttributeError):
+        raise colander.Invalid(
+            node,
+            msg='This resource path does not exist.', value=value)
+    return resource
 
 
 def validate_name_is_unique(node: colander.SchemaNode, value: str):
@@ -137,6 +178,29 @@ class TimeZoneName(AdhocracySchemaNode):
     default = 'UTC'
     missing = colander.drop
     validator = colander.OneOf(_ZONES)
+
+
+class Interface(colander.SchemaType):
+
+    """A ZOPE interface in dotted name notation.
+
+    Example value: adhocracy.sheets.name.IName
+    """
+
+    def serialize(self, node, value):
+        """Serialize interface to dotted name."""
+        if value in (colander.null, ''):
+            return value
+        return get_dotted_name(value)
+
+    def deserialize(self, node, value):
+        """Deserialize path to object."""
+        if value in (colander.null, ''):
+            return value
+        try:
+            return DottedNameResolver().resolve(value)
+        except Exception as err:
+            raise colander.Invalid(node, msg=str(err), value=value)
 
 
 class AbsolutePath(AdhocracySchemaNode):
@@ -286,6 +350,15 @@ class Resources(colander.SequenceSchema):
     resource = Resource()
     default = []
     missing = []
+
+    def serialize(self, appstruct=colander.null):
+        # Honor form attribute, if present
+        form = getattr(appstruct, 'form', None)
+        if form == 'omit':
+            return colander.drop
+        # FIXME Not implemented yet: form == 'content' should serialize
+        # complete elements instead of just their paths
+        return super().serialize(appstruct)
 
 
 def _validate_reftypes(node: colander.SchemaNode, value: Sequence):

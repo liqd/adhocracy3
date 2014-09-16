@@ -89,13 +89,13 @@ class TestValidateRequest:
 
     def test_valid_with_schema_with_data(self, context, request):
         request.body = '{"count": "1"}'
+        request.method = 'PUT'
         self._make_one(context, request, schema=CountSchema())
         assert request.validated == {'count': 1}
 
     def test_valid_with_schema_with_data_in_querystring(self, context, request):
         class QueryStringSchema(colander.MappingSchema):
-            count = colander.SchemaNode(colander.Int(),
-                                        location='querystring')
+            count = colander.SchemaNode(colander.Int())
         request.GET = {'count': 1}
         self._make_one(context, request, schema=QueryStringSchema())
         assert request.validated == {'count': 1}
@@ -103,6 +103,7 @@ class TestValidateRequest:
     def test_non_valid_with_schema_wrong_data(self, context, request):
         from cornice.util import _JSONError
         request.body = '{"count": "wrong_value"}'
+        request.method = 'POST'
         with pytest.raises(_JSONError):
             self._make_one(context, request, schema=CountSchema())
         assert request.errors == [{'location': 'body',
@@ -113,6 +114,7 @@ class TestValidateRequest:
         from cornice.util import _JSONError
         request.validated = {'secret_data': 'buh'}
         request.body = '{"count": "wrong_value"}'
+        request.method = 'POST'
         with pytest.raises(_JSONError):
             self._make_one(context, request, schema=CountSchema())
         assert request.validated == {}
@@ -128,6 +130,7 @@ class TestValidateRequest:
         def validator1(context, request):
             request._validator_called = True
         request.body = '{"count": "wrong"}'
+        request.method = 'POST'
         with pytest.raises(_JSONError):
             self._make_one(context, request, schema=CountSchema(),
                            extra_validators=[validator1])
@@ -138,6 +141,7 @@ class TestValidateRequest:
             elements = colander.SchemaNode(colander.String())
 
         request.body = '["alpha", "beta", "gamma"]'
+        request.method = 'POST'
         self._make_one(context, request, schema=TestListSchema())
         assert request.validated == ['alpha', 'beta', 'gamma']
 
@@ -147,6 +151,7 @@ class TestValidateRequest:
             nonsense_node = colander.SchemaNode(colander.String())
 
         request.body = '["alpha", "beta", "gamma"]'
+        request.method = 'POST'
         with pytest.raises(colander.Invalid):
             self._make_one(context, request, schema=TestListSchema())
         assert request.validated == {}
@@ -157,11 +162,13 @@ class TestValidateRequest:
 
         from cornice.util import _JSONError
         request.body = '[1, 2, "three"]'
+        request.method = 'POST'
         with pytest.raises(_JSONError):
             self._make_one(context, request, schema=TestListSchema())
         assert request.validated == {}
 
-    def test_invalid_with_not_sequence_and_not_mapping_schema(self, context, request):
+    def test_invalid_with_not_sequence_and_not_mapping_schema(self, context,
+                                                              request):
         schema = colander.SchemaNode(colander.Int())
         with pytest.raises(Exception):
             self._make_one(context, request, schema=schema)
@@ -432,6 +439,9 @@ class TestItemRESTView:
 
     def test_post_valid(self, request, context):
         request.root = context
+        # Little cheat to prevent the POST validator from kicking in --
+        # we're working with already-validated data here
+        request.method = 'OPTIONS'
         child = testing.DummyResource(__provides__=IResourceX,
                                       __parent__=context,
                                       __name__='child')

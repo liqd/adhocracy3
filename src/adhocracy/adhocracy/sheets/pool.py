@@ -1,4 +1,8 @@
 """Pool Sheet."""
+from collections.abc import Iterable
+
+from pyramid.traversal import resource_path
+from substanced.util import find_catalog
 import colander
 
 from adhocracy.interfaces import ISheet
@@ -7,13 +11,15 @@ from adhocracy.sheets import GenericResourceSheet
 from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.schema import UniqueReferences
+from adhocracy.utils import append_if_not_none
+from adhocracy.utils import FormList
 
 
 class PoolSheet(GenericResourceSheet):
 
-    """Pool resource sheet."""
+    """Generic pool resource sheet."""
 
-    def _get_reference_appstruct(self):
+    def _get_reference_appstruct(self, params):
         appstruct = {'elements': []}
         reftype = self._reference_nodes['elements'].reftype
         target_isheet = reftype.getTaggedValue('target_isheet')
@@ -21,6 +27,69 @@ class PoolSheet(GenericResourceSheet):
             if target_isheet.providedBy(child):
                 appstruct['elements'].append(child)
         return appstruct
+
+
+class FilteringPoolSheet(PoolSheet):
+
+    """Resource sheet that allows filtering and aggregating pools.."""
+
+    def _get_reference_appstruct(self, params):
+        if not params:
+            return super()._get_reference_appstruct(params)
+        raw_depth = params['depth']
+        iface_filter = []
+        append_if_not_none(iface_filter, params['content_type'])
+        append_if_not_none(iface_filter, params['sheet'])
+        count_matching_elements = params['count']
+        elements_form = params['elements']
+        if self._custom_filtering_necessary(raw_depth, iface_filter,
+                                            count_matching_elements,
+                                            elements_form):
+            return self._build_filtered_appstruct(raw_depth, iface_filter,
+                                                  count_matching_elements,
+                                                  elements_form)
+        else:
+            return super()._get_reference_appstruct(params)
+
+    def _custom_filtering_necessary(self, raw_depth: str,
+                                    iface_filter: Iterable,
+                                    count_matching_elements: bool,
+                                    elements_form: str):
+        return (raw_depth != '1' or iface_filter or
+                count_matching_elements or elements_form != 'paths')
+
+    def _build_filtered_appstruct(self, raw_depth: str, iface_filter: Iterable,
+                                  count_matching_elements: bool,
+                                  elements_form: str):
+        depth = None if raw_depth == 'all' else int(raw_depth)
+        appstruct = {}
+        elements = FormList(form=elements_form)
+        for element in self._filter_elements(depth=depth,
+                                             ifaces=iface_filter):
+            elements.append(element)
+        appstruct['elements'] = elements
+        if count_matching_elements:
+            appstruct['count'] = len(elements)
+        return appstruct
+
+    def _filter_elements(self, depth=1, ifaces: Iterable=None,
+                         valuefilters: dict=None) -> Iterable:
+        """See interface for docstring."""
+        system_catalog = find_catalog(self.context, 'system')
+        path_index = system_catalog['path']
+        query = path_index.eq(resource_path(self.context), depth=depth,
+                              include_origin=False)
+        if ifaces:
+            interface_index = system_catalog['interfaces']
+            query &= interface_index.all(ifaces)
+        if valuefilters:
+            adhocracy_catalog = find_catalog(self.context, 'adhocracy')
+            for name, value in valuefilters.items():
+                index = adhocracy_catalog[name]
+                query &= index.eq(value)
+        resultset = query.execute()
+        for result in resultset:
+            yield result
 
 
 class IPool(ISheet):
@@ -46,14 +115,16 @@ class PoolSchema(colander.MappingSchema):
 
     elements = UniqueReferences(reftype=PoolElementsReference,
                                 readonly=True)
+    count = colander.SchemaNode(colander.Integer(), default=colander.drop)
 
 
-pool_metadata = sheet_metadata_defaults._replace(isheet=IPool,
-                                                 schema_class=PoolSchema,
-                                                 sheet_class=PoolSheet,
-                                                 editable=False,
-                                                 creatable=False,
-                                                 )
+pool_metadata = sheet_metadata_defaults._replace(
+    isheet=IPool,
+    schema_class=PoolSchema,
+    sheet_class=FilteringPoolSheet,
+    editable=False,
+    creatable=False,
+)
 
 
 def includeme(config):
