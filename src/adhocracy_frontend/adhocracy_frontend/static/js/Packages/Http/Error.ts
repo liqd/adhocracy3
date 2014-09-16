@@ -26,7 +26,7 @@ var renderBackendError = (errors : IBackendErrorItem[]) : void => {
 export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendError>) : void => {
     "use strict";
 
-    var errors = response.data.errors;
+    var errors : IBackendErrorItem[] = response.data.errors;
 
     console.log("http response with error status: " + response.status);
     console.log(response.config);

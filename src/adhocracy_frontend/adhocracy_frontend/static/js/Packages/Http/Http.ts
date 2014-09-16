@@ -78,20 +78,24 @@ export class Service<Content extends Resources.Content<any>> {
     }
 
     public postRaw(path : string, obj : Content) : ng.IHttpPromise<any> {
-        if (this.adhPreliminaryNames.isPreliminary(path)) {
+        var _self = this;
+
+        if (_self.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-post preliminary path: " + path;
         }
-        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
-            path = this.adhConfig.rest_url + path;
+        if (path.lastIndexOf("/", 0) === 0 && typeof _self.adhConfig.rest_url !== "undefined") {
+            path = _self.adhConfig.rest_url + path;
         }
-        return this.$http
-            .post(path, AdhConvert.exportContent(this.adhMetaApi, obj));
+        return _self.$http
+            .post(path, AdhConvert.exportContent(_self.adhMetaApi, obj));
     }
 
     public post(path : string, obj : Content) : ng.IPromise<Content> {
-        return this.postRaw(path, obj)
+        var _self = this;
+
+        return _self.postRaw(path, obj)
             .then(
-                (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
+                (response) => AdhConvert.importContent(<any>response, _self.adhMetaApi, _self.adhPreliminaryNames),
                 AdhError.logBackendError);
     }
 
@@ -205,15 +209,28 @@ export class Service<Content extends Resources.Content<any>> {
             };
 
             var handleConflict = (msg) => {
-                // double waitms (fuzzed for avoiding network congestion).
-                waitms *= 2 * (Math.random() / 2 - 0.25);
+                // re-throw all exception lists other than ["no-fork"].
+                if (msg.length === 1 && msg[0].name === "__NO_FORK__") {
 
-                // wait then retry
-                return _self.$timeout(
-                    () => _self.getNewestVersionPathNoFork(dagPath)
-                        .then((nextOldVersionPath) => retry(nextOldVersionPath, true, roundsLeft - 1)),
-                    waitms,
-                    true);
+                    // FIXME: msg[0].name is the name of the field that
+                    // the colander error message is about.  for the
+                    // current situation we need a different error
+                    // message.  once the backend has specified the format
+                    // of that error, we need to adapt the following
+                    // condition.
+
+                    // double waitms (fuzzed for avoiding network congestion).
+                    waitms *= 2 * (Math.random() / 2 - 0.25);
+
+                    // wait then retry
+                    return _self.$timeout(
+                        () => _self.getNewestVersionPathNoFork(dagPath)
+                            .then((nextOldVersionPath) => retry(nextOldVersionPath, true, roundsLeft - 1)),
+                        waitms,
+                        true);
+                } else {
+                    throw msg;
+                }
             };
 
             return _self
