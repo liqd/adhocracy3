@@ -113,6 +113,10 @@ export var updateRatings = (
                 resetRatings($scope);
                 _.forOwn(ratings, (rating) => {
 
+                    if (adapter.target(rating) !== $scope.refersTo) {
+                        return;
+                    }
+
                     var checkValue = (rating, value : RatingValue) : boolean =>
                         adapter.value(rating) === value;
 
