@@ -30,10 +30,12 @@ class TestItemIntegrationTest(unittest.TestCase):
     def setUp(self):
         from adhocracy.testing import create_pool_with_graph
         from adhocracy.resources.item import item_metadata
+        from adhocracy.resources.root import _add_catalog_service
         config = testing.setUp()
         config.include('adhocracy.catalog')
         config.include('adhocracy.registry')
         config.include('adhocracy.events')
+        config.include('adhocracy.catalog')
         config.include('adhocracy.sheets')
         config.include('adhocracy.resources.itemversion')
         config.include('adhocracy.resources.item')
@@ -41,6 +43,7 @@ class TestItemIntegrationTest(unittest.TestCase):
         config.include('adhocracy.resources.subscriber')
         self.config = config
         self.context = create_pool_with_graph()
+        _add_catalog_service(self.context, config.registry)
         self.objectmap = self.context.__objectmap__
         self.graph = self.context.__graph__
         self.metadata = item_metadata

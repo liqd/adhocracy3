@@ -31,41 +31,48 @@ class PoolSheet(GenericResourceSheet):
 
 class FilteringPoolSheet(PoolSheet):
 
-    """Resource sheet that allows filtering and aggregating pools.."""
+    """Resource sheet that allows filtering and aggregating pools."""
 
     def _get_reference_appstruct(self, params):
         if not params:
             return super()._get_reference_appstruct(params)
-        raw_depth = params['depth']
+        local_params = params.copy()  # local copy were we can delete elements
+        raw_depth = local_params.pop('depth', '1')
         iface_filter = []
-        append_if_not_none(iface_filter, params['content_type'])
-        append_if_not_none(iface_filter, params['sheet'])
-        count_matching_elements = params['count']
-        elements_form = params['elements']
+        append_if_not_none(iface_filter,
+                           local_params.pop('content_type', None))
+        append_if_not_none(iface_filter, local_params.pop('sheet', None))
+        count_matching_elements = local_params.pop('count', False)
+        elements_form = local_params.pop('elements', 'paths')
+        del local_params['aggregateby']  # FIXME implement aggregateby
         if self._custom_filtering_necessary(raw_depth, iface_filter,
                                             count_matching_elements,
-                                            elements_form):
+                                            elements_form, local_params):
             return self._build_filtered_appstruct(raw_depth, iface_filter,
                                                   count_matching_elements,
-                                                  elements_form)
+                                                  elements_form, local_params)
         else:
             return super()._get_reference_appstruct(params)
 
     def _custom_filtering_necessary(self, raw_depth: str,
                                     iface_filter: Iterable,
                                     count_matching_elements: bool,
-                                    elements_form: str):
+                                    elements_form: str,
+                                    remaining_params: dict):
         return (raw_depth != '1' or iface_filter or
-                count_matching_elements or elements_form != 'paths')
+                count_matching_elements or elements_form != 'paths' or
+                remaining_params)
 
     def _build_filtered_appstruct(self, raw_depth: str, iface_filter: Iterable,
                                   count_matching_elements: bool,
-                                  elements_form: str):
+                                  elements_form: str,
+                                  remaining_params: dict):
         depth = None if raw_depth == 'all' else int(raw_depth)
         appstruct = {}
         elements = FormList(form=elements_form)
         for element in self._filter_elements(depth=depth,
-                                             ifaces=iface_filter):
+                                             ifaces=iface_filter,
+                                             valuefilters=remaining_params):
             elements.append(element)
         appstruct['elements'] = elements
         if count_matching_elements:
@@ -85,6 +92,10 @@ class FilteringPoolSheet(PoolSheet):
         if valuefilters:
             adhocracy_catalog = find_catalog(self.context, 'adhocracy')
             for name, value in valuefilters.items():
+                # FIXME This will raise a KeyError if no such index exists.
+                # Better validate first whether all remaining parameters
+                # indicate existing catalogs and raise colander.Invalid
+                # otherwise.
                 index = adhocracy_catalog[name]
                 query &= index.eq(value)
         resultset = query.execute()

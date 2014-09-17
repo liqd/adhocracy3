@@ -142,6 +142,7 @@ def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
     validated = {}
     nodes_with_cstruct = [n for n in schema if n.name in cstruct]
     nodes_without_cstruct = [n for n in schema if n.name not in cstruct]
+
     for node in nodes_without_cstruct:
         appstruct = node.deserialize()
         if appstruct is not drop:
@@ -152,6 +153,11 @@ def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
             validated[node.name] = node.deserialize(node_cstruct)
         except Invalid as err:
             _add_colander_invalid_error_to_request(err, request, location)
+    if getattr(schema.typ, 'unknown', None) == 'preserve':
+        # Schema asks us to preserve other cstruct values
+        for name, value in cstruct.items():
+            if name not in validated:
+                validated[name] = value
     request.validated.update(validated)
 
 

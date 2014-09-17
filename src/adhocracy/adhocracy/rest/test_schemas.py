@@ -526,8 +526,7 @@ class TestGETPoolRequestSchema():
                 'depth': '1',
                 'elements': 'paths',
                 'count': False,
-                'aggregateby': '',
-                'tag': ''}
+                'aggregateby': ''}
 
     def test_deserialize_empty(self, inst, defaults):
         assert inst.deserialize({}) == defaults

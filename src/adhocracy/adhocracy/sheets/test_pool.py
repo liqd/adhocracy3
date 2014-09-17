@@ -167,9 +167,9 @@ class TestIntegrationPoolSheet:
         assert result == set()
 
 
+@mark.usefixtures('integration')
 def test_includeme_register_pool_sheet(config):
     from adhocracy.sheets.pool import IPool
     from adhocracy.utils import get_sheet
-    config.include('adhocracy.sheets.pool')
     context = testing.DummyResource(__provides__=IPool)
     assert get_sheet(context, IPool)
