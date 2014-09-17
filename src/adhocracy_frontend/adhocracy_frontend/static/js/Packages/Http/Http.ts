@@ -183,7 +183,7 @@ export class Service<Content extends Resources.Content<any>> {
         var _self = this;
 
         var timeoutRounds : number = 5;
-        var waitms : number = 100;
+        var waitms : number = 250;
 
         var dagPath = Util.parentPath(oldVersionPath);
         var _obj = Util.deepcp(obj);
@@ -210,7 +210,7 @@ export class Service<Content extends Resources.Content<any>> {
 
             var handleConflict = (msg) => {
                 // re-throw all exception lists other than ["no-fork"].
-                if (msg.length === 1 && msg[0].name === "__NO_FORK__") {
+                if (msg.hasOwnProperty("length") && msg.length === 1 && msg[0].name === "__NO_FORK__") {
 
                     // FIXME: msg[0].name is the name of the field that
                     // the colander error message is about.  for the

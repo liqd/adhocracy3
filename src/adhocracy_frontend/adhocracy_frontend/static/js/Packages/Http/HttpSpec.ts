@@ -23,15 +23,7 @@ var mkHttpMock = (adhPreliminaryNames : PreliminaryNames) => {
 };
 
 var mkTimeoutMock = () => {
-    var mock = {
-        timeout: (fn, timeoutms, invokeApply) => {
-            fn();
-        }
-    };
-
-    spyOn(mock, "timeout").and.callThrough();
-
-    return mock.timeout;
+    return jasmine.createSpy("timeoutMock").and.callFake((fn, ms, invokeApply) => fn());
 };
 
 var mkAdhMetaApiMock = () => {
@@ -191,8 +183,7 @@ export var register = () => {
                 });
             });
             describe("postNewVersionNoFork", () => {
-                // XXXXX
-                xit("posts to parent pool, adds IVersionable sheet with correct follows field", (done) => {
+                it("posts to parent pool, adds IVersionable sheet with correct follows field", (done) => {
                     adhHttp.postNewVersionNoFork("/ome/path", {data: {}}).then(
                         (resource) => {
                             expect($httpMock.post).toHaveBeenCalledWith("/ome", {
@@ -211,16 +202,65 @@ export var register = () => {
                     );
                 });
 
-                xit("does NOT catch any other exceptions (more precisely: rethrows them).", (done) => {
-                    done();
+                it("catches single \"no-fork\" exceptions and retries 4 more times.", (done) => {
+                    var error = {
+                        status: "error",
+                        errors: [{name: "__NO_FORK__", location: "", description: ""}]
+                    };
+                    $httpMock.post.and.returnValue(q.reject({ data: error }));
+
+                    var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
+                    dag.data["adhocracy.sheets.tags.ITag"] = new SITag.AdhocracySheetsTagsITag({ elements: ["not_important"] });
+                    $httpMock.get.and.returnValue(q.when({ data: dag }));
+
+                    /* NOTE: I first tried this:
+
+                         | spyOn(adhHttp, "getNewestVersionPathNoFork").and.returnValue(
+                         |     q.when("next_head"));
+
+                       The result is that from within this test case,
+                       adhHttp.getNewestversionPathNoFork is mocked,
+                       but from within adhHttp.postNewVersionNoFork,
+                       the old, unmocked method is still visible.
+                       There may be a good solution for this, but for
+                       now we'll just stick with mocking the
+                       underlying services, and treating the class
+                       under scrutiny as monolithic.
+
+                    */
+
+                    adhHttp.postNewVersionNoFork("/somee/path", {data: {}}).then(
+                        () => {
+                            expect("postNewVersionNoFork should have failed!").toBe(false);
+                            done();
+                        },
+                        (msg) => {
+                            expect($httpMock.post.calls.count()).toEqual(5);
+                            done();
+                        }
+                    );
                 });
 
-                xit("catches \"no-fork\" exceptions and retries.", (done) => {
-                    done();
+                it("does NOT catch any other (lists of) exceptions (more precisely: rethrows them).", (done) => {
+                    var error = {
+                        status: "error",
+                        errors: [{name: "i am not a no-fork error", location: "", description: ""}]
+                    };
+                    $httpMock.post.and.returnValue(q.reject({ data: error }));
+
+                    adhHttp.postNewVersionNoFork("/somee/path", {data: {}}).then(
+                        () => {
+                            expect("postNewVersionNoFork should have failed!").toBe(false);
+                            done();
+                        },
+                        (msg) => {
+                            expect($httpMock.post.calls.count()).toEqual(1);
+                            done();
+                        }
+                    );
                 });
 
-                // XXXXX
-                xit("adds a root_versions field if rootVersions is passed", (done) => {
+                it("adds a root_versions field if rootVersions is passed", (done) => {
                     adhHttp.postNewVersionNoFork("/somee/path", {data: {}}, ["foo", "bar"]).then(
                         () => {
                             expect($httpMock.post).toHaveBeenCalledWith("/somee", {
@@ -240,22 +280,49 @@ export var register = () => {
                     );
                 });
 
-                xit("Uses response from getNewestVersionNoFork for each retry.", (done) => {
+                it("Calls timeout; then calls post again with new HEAD as predecessor version.", (done) => {
+                    var error = {
+                        status: "error",
+                        errors: [{name: "__NO_FORK__", location: "", description: ""}]
+                    };
 
-                    // expect getNewestVersionNoFork toBeCalled
+                    var newHead = "new_head";
+                    var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
+                    dag.data["adhocracy.sheets.tags.ITag"] = new SITag.AdhocracySheetsTagsITag({ elements: [newHead] });
 
-                    // expect timeout mock to be called with increasing intervals
+                    var postResponses = [q.reject({ data: error }), q.when({ data: dag })].reverse();
 
-                    // expect post toBeCalledWith(<expected predecessor>)
+                    $httpMock.post.and.callFake(() => postResponses.pop());
+                    $httpMock.get.and.returnValue(q.when({ data: dag }));
 
-                    done();
-                });
+                    spyOn(adhHttp, "getNewestVersionPathNoFork").and.callThrough();
 
-                xit("Times out if the server insists that every post is a \"no-fork\" error.", (done) => {
+                    adhHttp.postNewVersionNoFork("/somee/path", {data: {}}).then(
+                        () => {
+                            expect($httpMock.post.calls.count()).toEqual(2);
 
-                    // ...
-
-                    done();
+                            var extractFollowsRef = (resource) => {
+                                try {
+                                    var follows = resource.data["adhocracy.sheets.versions.IVersionable"].follows;
+                                    if (follows.length !== 1) {
+                                        throw "blä!";
+                                    }
+                                    return follows[0];
+                                } catch (e) {
+                                    return false;
+                                }
+                            };
+                            expect(extractFollowsRef($httpMock.post.calls.argsFor(1)[1])).toEqual(newHead);
+                            expect($httpMock.get.calls.count()).toEqual(1);
+                            expect(adhHttp.getNewestVersionPathNoFork).toHaveBeenCalledWith("/somee");
+                            expect($timeoutMock.calls.count()).toEqual(1);
+                            done();
+                        },
+                        (msg) => {
+                            expect(msg).toBe(false);
+                            done();
+                        }
+                    );
                 });
             });
 
