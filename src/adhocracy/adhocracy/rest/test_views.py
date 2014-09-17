@@ -93,12 +93,34 @@ class TestValidateRequest:
         self._make_one(context, request, schema=CountSchema())
         assert request.validated == {'count': 1}
 
-    def test_valid_with_schema_with_data_in_querystring(self, context, request):
+    def test_valid_with_schema_with_data_in_querystring(self, context,
+                                                        request):
         class QueryStringSchema(colander.MappingSchema):
             count = colander.SchemaNode(colander.Int())
         request.GET = {'count': 1}
         self._make_one(context, request, schema=QueryStringSchema())
         assert request.validated == {'count': 1}
+
+    def test_valid_with_schema_with_extra_fields_in_querystring_discarded(
+            self, context, request):
+        class QueryStringSchema(colander.MappingSchema):
+            count = colander.SchemaNode(colander.Int())
+        request.GET = {'count': 1, 'extraflag': 'extra value'}
+        self._make_one(context, request, schema=QueryStringSchema())
+        assert request.validated == {'count': 1}
+
+    def test_valid_with_schema_with_extra_fields_in_querystring_preserved(
+            self, context, request):
+
+        class PreservingQueryStringSchema(colander.MappingSchema):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.typ.unknown = 'preserve'
+            count = colander.SchemaNode(colander.Int())
+
+        request.GET = {'count': 1, 'extraflag': 'extra value'}
+        self._make_one(context, request, schema=PreservingQueryStringSchema())
+        assert request.validated == {'count': 1, 'extraflag': 'extra value'}
 
     def test_non_valid_with_schema_wrong_data(self, context, request):
         from cornice.util import _JSONError
@@ -144,6 +166,23 @@ class TestValidateRequest:
         request.method = 'POST'
         self._make_one(context, request, schema=TestListSchema())
         assert request.validated == ['alpha', 'beta', 'gamma']
+
+    def test_valid_with_sequence_schema_in_querystring(self, context, request):
+        class TestListSchema(colander.SequenceSchema):
+            elements = colander.SchemaNode(colander.String())
+        self._make_one(context, request, schema=TestListSchema())
+        # since this doesn't make much sense, the validator is just a no-op
+        assert request.validated == {}
+
+    def test_valid_with_schema_with_data_in_querystring(self, context,
+                                                        request):
+        class QueryStringSchema(colander.MappingSchema):
+            count = colander.SchemaNode(colander.Int())
+        request.GET = {'count': 1}
+        self._make_one(context, request, schema=QueryStringSchema())
+        assert request.validated == {'count': 1}
+
+
 
     def test_with_invalid_sequence_schema(self, context, request):
         class TestListSchema(colander.SequenceSchema):
@@ -372,6 +411,18 @@ class TestPoolRESTView:
         assert 'options' in dir(inst)
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
+
+    def test_get_valid_no_sheets(self, request, context):
+        from adhocracy.rest.schemas import GETResourceResponseSchema
+
+        inst = self.make_one(context, request)
+        response = inst.get()
+
+        wanted = GETResourceResponseSchema().serialize()
+        wanted['path'] = request.application_url + '/'
+        wanted['data'] = {}
+        wanted['content_type'] = IResource.__identifier__
+        assert wanted == response
 
     def test_post_valid(self, request, context):
         request.root = context

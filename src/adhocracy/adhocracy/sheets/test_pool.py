@@ -3,6 +3,7 @@ from pytest import fixture
 from pytest import mark
 
 from adhocracy.resources.pool import IBasicPool
+from adhocracy.sheets.pool import FilteringPoolSheet
 
 
 @fixture
@@ -15,12 +16,31 @@ def integration(config):
     config.include('adhocracy.sheets')
 
 
-class TestPoolSheet:
+class MockFilteringPoolSheet(FilteringPoolSheet):
+
+    """Replace _filter_elements with dummy implementation."""
+
+    def __init__(self, meta, context):
+        super().__init__(meta, context)
+        self._filter_elements_called = False
+        self.callargs = {}
+
+    def _filter_elements(self, **kwargs):
+        self._filter_elements_called = True
+        self.callargs = kwargs
+        return ['Dummy']
+
+
+class TestFilteringPoolSheet:
 
     @fixture
     def meta(self):
         from adhocracy.sheets.pool import pool_metadata
         return pool_metadata
+
+    @fixture
+    def mock_filtering_pool_sheet(self, meta, context):
+        return MockFilteringPoolSheet(meta, context)
 
     def test_create(self, meta, context):
         from adhocracy.interfaces import IResourceSheet
@@ -59,6 +79,64 @@ class TestPoolSheet:
         context['child1'] = child
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': [], 'count': colander.drop}
+
+    def test_get_reference_appstruct_without_params(
+            self, mock_filtering_pool_sheet):
+        appstruct = mock_filtering_pool_sheet._get_reference_appstruct()
+        assert mock_filtering_pool_sheet._filter_elements_called is False
+        assert appstruct == {'elements': []}
+
+    def test_get_reference_appstruct_with_custom_params(
+            self, mock_filtering_pool_sheet):
+        appstruct = mock_filtering_pool_sheet._get_reference_appstruct(
+            {'depth': '3', 'content_type': 'BlahType', 'count': True})
+        assert mock_filtering_pool_sheet._filter_elements_called is True
+        assert mock_filtering_pool_sheet.callargs == {'depth': 3,
+                                                      'ifaces': ['BlahType'],
+                                                      'valuefilters': {}}
+        assert appstruct == {'elements': ['Dummy'], 'count': 1}
+
+    def test_get_reference_appstruct_with_two_ifaces_and_two_valuefilters(
+            self, mock_filtering_pool_sheet):
+        appstruct = mock_filtering_pool_sheet._get_reference_appstruct(
+            {'content_type': 'BlahType', 'sheet': 'BlubSheet',
+             'tag': 'BEST', 'rating': 'outstanding'})
+        assert mock_filtering_pool_sheet._filter_elements_called is True
+        assert mock_filtering_pool_sheet.callargs == {
+            'depth': 1,
+            'ifaces': ['BlahType', 'BlubSheet'],
+            'valuefilters': {'tag': 'BEST', 'rating': 'outstanding'}}
+        assert appstruct == {'elements': ['Dummy']}
+
+    def test_get_reference_appstruct_with_default_params(
+            self, mock_filtering_pool_sheet):
+        appstruct = mock_filtering_pool_sheet._get_reference_appstruct(
+            {'depth': '1', 'sheet': None, 'count': False})
+        assert mock_filtering_pool_sheet._filter_elements_called is False
+        assert appstruct == {'elements': []}
+
+    def test_get_reference_appstruct_with_depth_all(
+            self, mock_filtering_pool_sheet):
+        appstruct = mock_filtering_pool_sheet._get_reference_appstruct(
+            {'depth': 'all'})
+        assert mock_filtering_pool_sheet._filter_elements_called is True
+        assert mock_filtering_pool_sheet.callargs == {'depth': None,
+                                                      'ifaces': [],
+                                                      'valuefilters': {}}
+        assert appstruct == {'elements': ['Dummy']}
+
+    def test_get_reference_appstruct_with_elements_omit(
+            self, mock_filtering_pool_sheet):
+        from adhocracy.utils import FormList
+        appstruct = mock_filtering_pool_sheet._get_reference_appstruct(
+            {'elements': 'omit'})
+        assert mock_filtering_pool_sheet._filter_elements_called is True
+        assert mock_filtering_pool_sheet.callargs == {'depth': 1,
+                                                      'ifaces': [],
+                                                      'valuefilters': {}}
+        assert 'elements' in appstruct
+        assert isinstance(appstruct['elements'], FormList)
+        assert appstruct['elements'].form == 'omit'
 
 
 @mark.usefixtures('integration')
@@ -164,6 +242,17 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=pool, name='child2', restype=ITag)
         poolsheet = get_sheet(pool, IPool)
         result = set(poolsheet._filter_elements(ifaces=[ITag, IItemVersion]))
+        assert result == set()
+
+    def test_filter_elements_by_valuefilter(
+            self, registry, pool_graph_catalog):
+        from adhocracy.sheets.pool import IPool
+        from adhocracy.utils import get_sheet
+        pool = self._make_resource(registry, parent=pool_graph_catalog)
+        untagged_child = self._make_resource(registry, parent=pool,
+                                             name='untagged_child')
+        poolsheet = get_sheet(pool, IPool)
+        result = set(poolsheet._filter_elements(valuefilters={'tag': 'LAST'}))
         assert result == set()
 
 
