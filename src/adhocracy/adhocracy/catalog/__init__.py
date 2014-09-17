@@ -14,7 +14,6 @@ class AdhocracyCatalogFactory:
     reference = Reference()
 
 
-
 def includeme(config):
     """Register catalog utilities."""
     config.add_view_predicate('catalogable', catalog._CatalogablePredicate)

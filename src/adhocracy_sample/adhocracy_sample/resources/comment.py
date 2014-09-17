@@ -5,7 +5,7 @@ from adhocracy.resources import add_resource_type_to_registry
 from adhocracy.resources.itemversion import itemversion_metadata
 from adhocracy.resources.item import item_metadata
 
-from adhocracy.sheets.rating import IRateable
+from adhocracy.sheets.rate import IRateable
 from adhocracy_sample.sheets.comment import IComment
 from adhocracy_sample.sheets.comment import ICommentable
 
