@@ -25,6 +25,7 @@ export enum RatingValue {
 
 export interface IRatingScope extends ng.IScope {
     refersTo : string;
+    postPoolPath : string;
     postPoolSheet : string;
     postPoolField : string;
     ratings : {
@@ -84,7 +85,8 @@ export var postPoolPathPromise = (
         if (rateable.hasOwnProperty("data")) {
             if (rateable.data.hasOwnProperty($scope.postPoolSheet)) {
                 if (rateable.data[$scope.postPoolSheet].hasOwnProperty($scope.postPoolField)) {
-                    return rateable.data[$scope.postPoolSheet][$scope.postPoolField];
+                    $scope.postPoolPath = rateable.data[$scope.postPoolSheet][$scope.postPoolField];
+                    return $scope.postPoolPath;
                 }
             }
         }
@@ -207,11 +209,34 @@ export var ratingController = (
     };
 
     $scope.assureUserRatingExists = () : ng.IPromise<void> => {
-        return $q.when(<any>undefined);
+        if (typeof $scope.thisUsersRating !== "undefined") {
+            return $q.when();
+        } else {
+            return adhHttp
+                .withTransaction((transaction) : ng.IPromise<void> => {
+                    var item : AdhHttp.ITransactionResult =
+                        transaction.post($scope.postPoolPath, new RIRate({ preliminaryNames: adhPreliminaryNames }));
+                    var version : AdhHttp.ITransactionResult =
+                        transaction.get(item.first_version_path);
+
+                    return transaction.commit()
+                        .then((responses) : void => {
+                            $scope.thisUsersRating = responses[version.index]
+                        });
+                })
+        }
     };
 
     $scope.postUpdate = () : ng.IPromise<void> => {
-        return $q.when(<any>undefined);
+        if (typeof $scope.thisUsersRating !== "undefined") {
+            throw "internal error";
+        } else {
+            return adhHttp
+                .postNewVersion(Util.parentPath($scope.thisUsersRating), $scope.thisUsersRating)
+                .then((response : RIRate) => {
+                    $scope.thisUsersRating = response;
+                });
+        }
     };
 
     resetRatings($scope);
