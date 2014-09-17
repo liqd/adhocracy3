@@ -107,7 +107,7 @@ export var updateRatings = (
         .then((postPool) => {
             var ratingPromises : ng.IPromise<ResourcesBase.Resource>[] =
                 postPool.data["adhocracy.sheets.pool.IPool"].elements
-                .map((index : number, path : string) => adhHttp.get(path));
+                    .map((index : number, path : string) => adhHttp.get(path));
 
             return $q.all(ratingPromises).then((ratings) => {
                 resetRatings($scope);
