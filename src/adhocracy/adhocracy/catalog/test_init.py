@@ -6,8 +6,10 @@ from pytest import mark
 def test_create_adhocracy_catalog_factory():
     from substanced.catalog import Keyword
     from . import AdhocracyCatalogFactory
+    from .index import Reference
     inst = AdhocracyCatalogFactory()
     assert isinstance(inst.tag, Keyword)
+    assert isinstance(inst.reference, Reference)
 
 
 @fixture

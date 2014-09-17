@@ -3,12 +3,16 @@ from substanced import catalog
 from substanced.interfaces import IIndexingActionProcessor
 from zope.interface import Interface
 
+from .index import Reference
+
 
 @catalog.catalog_factory('adhocracy')
 class AdhocracyCatalogFactory:
     tag = catalog.Keyword()
     subject = catalog.Path()
     object = catalog.Path()
+    reference = Reference()
+
 
 
 def includeme(config):
