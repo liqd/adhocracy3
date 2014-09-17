@@ -176,9 +176,20 @@ export var createDirective = (
                 if (scope.isActive(rating)) {
                     // click on active button to un-rate
 
-                    adapter.value(scope.thisUsersRating, <any>false);  // FIXME: we need to decide how we want to handle deletion!
+                    /*
+
+                      (the current implementation does not allow
+                      withdrawing of ratings, so if you click on "pro"
+                      twice in a row, the second time will have no
+                      effect.  the work-around is for the user to rate
+                      something "neutral".  a proper fixed will be
+                      provided later.)
+
+                    adapter.value(scope.thisUsersRating, <any>false);
                     scope.ratings[RatingValue[rating]] -= 1;
                     scope.postUpdate();
+
+                    */
                 } else {
                     // click on inactive button to (re-)rate
 
