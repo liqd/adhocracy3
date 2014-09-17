@@ -148,6 +148,56 @@ export var ratingController = (
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.User
 ) : ng.IPromise<void> => {
+
+    $scope.isActive = (rating : RatingValue) =>
+        (typeof $scope.thisUsersRating !== "undefined" &&
+         rating === adapter.value($scope.thisUsersRating)) ? "rating-button-active" : "";
+
+    $scope.cast = (rating : RatingValue) : void => {
+        if ($scope.isActive(rating)) {
+            // click on active button to un-rate
+
+            /*
+
+              (the current implementation does not allow withdrawing
+              of ratings, so if you click on "pro" twice in a row, the
+              second time will have no effect.  the work-around is for
+              the user to rate something "neutral".  a proper fixed
+              will be provided later.)
+
+              adapter.value($scope.thisUsersRating, <any>false);
+              $scope.ratings[RatingValue[rating]] -= 1;
+              $scope.postUpdate();
+
+            */
+        } else {
+            // click on inactive button to (re-)rate
+
+            // increase new value
+            $scope.ratings[RatingValue[rating]] += 1;
+
+            $scope.assureUserRatingExists()
+                .then(() => {
+                    // update thisUsersRating
+                    adapter.value($scope.thisUsersRating, rating);
+
+                    // decrease old value
+                    $scope.ratings[adapter.value($scope.thisUsersRating)] -= 1;
+
+                    // send new rating to server
+                    $scope.postUpdate();
+                });
+        }
+    };
+
+    $scope.assureUserRatingExists = () : ng.IPromise<void> => {
+        return $q.when(<any>undefined);
+    };
+
+    $scope.postUpdate = () : ng.IPromise<void> => {
+        return $q.when(<any>undefined);
+    };
+
     resetRatings($scope);
     return updateRatings(adapter, $scope, $q, adhHttp, adhUser);
 };
@@ -166,57 +216,6 @@ export var createDirective = (
             refersTo: "@",
             postPoolSheet : "@",
             postPoolField : "@"
-        },
-        link: (scope : IRatingScope) => {
-            scope.isActive = (rating : RatingValue) =>
-                (typeof scope.thisUsersRating !== "undefined" &&
-                 rating === adapter.value(scope.thisUsersRating)) ? "rating-button-active" : "";
-
-            scope.cast = (rating : RatingValue) : void => {
-                if (scope.isActive(rating)) {
-                    // click on active button to un-rate
-
-                    /*
-
-                      (the current implementation does not allow
-                      withdrawing of ratings, so if you click on "pro"
-                      twice in a row, the second time will have no
-                      effect.  the work-around is for the user to rate
-                      something "neutral".  a proper fixed will be
-                      provided later.)
-
-                    adapter.value(scope.thisUsersRating, <any>false);
-                    scope.ratings[RatingValue[rating]] -= 1;
-                    scope.postUpdate();
-
-                    */
-                } else {
-                    // click on inactive button to (re-)rate
-
-                    // increase new value
-                    scope.ratings[RatingValue[rating]] += 1;
-
-                    scope.assureUserRatingExists()
-                        .then(() => {
-                            // update thisUsersRating
-                            adapter.value(scope.thisUsersRating, rating);
-
-                            // decrease old value
-                            scope.ratings[adapter.value(scope.thisUsersRating)] -= 1;
-
-                            // send new rating to server
-                            scope.postUpdate();
-                        });
-                }
-            };
-
-            scope.assureUserRatingExists = () : ng.IPromise<void> => {
-                return $q.when(<any>undefined);
-            };
-
-            scope.postUpdate = () : ng.IPromise<void> => {
-                return $q.when(<any>undefined);
-            };
         },
         controller: ["$scope", "$q", "adhHttp", "adhUser", ($scope, $q, adhHttp, adhUser) =>
             ratingController(adapter, $scope, $q, adhHttp, adhUser)]
