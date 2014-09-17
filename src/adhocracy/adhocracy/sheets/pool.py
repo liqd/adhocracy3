@@ -36,14 +36,12 @@ class FilteringPoolSheet(PoolSheet):
     def _get_reference_appstruct(self, params):
         if not params:
             return super()._get_reference_appstruct(params)
-        raw_depth = params['depth']
-        # FIXME why do we require some keys in params instead of useing
-        # sane defaults? joka
+        raw_depth = params.get('depth', '1')
         iface_filter = []
-        append_if_not_none(iface_filter, params['content_type'])
-        append_if_not_none(iface_filter, params['sheet'])
-        count_matching_elements = params['count']
-        elements_form = params['elements']
+        append_if_not_none(iface_filter, params.get('content_type', None))
+        append_if_not_none(iface_filter, params.get('sheet', None))
+        count_matching_elements = params.get('count', False)
+        elements_form = params.get('elements', 'paths')
         if self._custom_filtering_necessary(raw_depth, iface_filter,
                                             count_matching_elements,
                                             elements_form):
