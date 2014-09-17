@@ -3,17 +3,17 @@ import _ = require("lodash");
 import ResourcesBase = require("../../ResourcesBase");
 import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
-import RIRating = require("../../Resources_/adhocracy/resources/rating/IRating");
-import RIRatingVersion = require("../../Resources_/adhocracy/resources/rating/IRatingVersion");
-// import SICanRate = require("../../Resources_/adhocracy/sheets/rating/ICanRate");
-// import SIRateable = require("../../Resources_/adhocracy/sheets/rating/IRateable");
-import SIRating = require("../../Resources_/adhocracy/sheets/rating/IRating");
+import RIRate = require("../../Resources_/adhocracy/resources/rate/IRate");
+import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
+// import SICanRate = require("../../Resources_/adhocracy/sheets/rate/ICanRate");
+// import SIRateable = require("../../Resources_/adhocracy/sheets/rate/IRateable");
+import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
 import SIVersionable = require("../../Resources_/adhocracy/sheets/versions/IVersionable");
 
 import AdhRating = require("./Rating");
 
 
-export class RatingAdapter implements AdhRating.IRatingAdapter<RIRatingVersion> {
+export class RatingAdapter implements AdhRating.IRatingAdapter<RIRateVersion> {
     create(args : {
         preliminaryNames : PreliminaryNames;
         path ?: string;
@@ -21,14 +21,14 @@ export class RatingAdapter implements AdhRating.IRatingAdapter<RIRatingVersion> 
         subject : string;
         target : string;
         follows : string;
-    }) : RIRatingVersion {
-        var resource = new RIRatingVersion({
+    }) : RIRateVersion {
+        var resource = new RIRateVersion({
             preliminaryNames: args.preliminaryNames,
             path: args.path,
             name: args.name
         });
-        resource.data["adhocracy.sheets.rating.IRating"] =
-            new SIRating.AdhocracySheetsRatingIRating({subject: args.subject, target: args.target});
+        resource.data["adhocracy.sheets.rate.IRate"] =
+            new SIRate.AdhocracySheetsRateIRate({subject: args.subject, object: args.target, rate: 0});
 
         resource.data["adhocracy.sheets.versions.IVersionable"] =
             new SIVersionable.AdhocracySheetsVersionsIVersionable({follows: [args.follows]});
@@ -36,8 +36,8 @@ export class RatingAdapter implements AdhRating.IRatingAdapter<RIRatingVersion> 
         return resource;
     }
 
-    createItem(args : { preliminaryNames : PreliminaryNames; path ?: string }) : RIRating {
-        return new RIRating(args);
+    createItem(args : { preliminaryNames : PreliminaryNames; path ?: string }) : RIRate {
+        return new RIRate(args);
     }
 
     // FIXME: move to a service (also do it in Comment)
@@ -58,19 +58,19 @@ export class RatingAdapter implements AdhRating.IRatingAdapter<RIRatingVersion> 
         return resource;
     }
 
-    subject(resource : RIRatingVersion) : string;
-    subject(resource : RIRatingVersion, value : string) : RIRatingVersion;
+    subject(resource : RIRateVersion) : string;
+    subject(resource : RIRateVersion, value : string) : RIRateVersion;
     subject(resource, value?) {
         if (typeof value !== "undefined") {
-            resource.data["adhocracy.sheets.rating.IRating"].subject = value;
+            resource.data["adhocracy.sheets.rate.IRate"].subject = value;
             return resource;
         } else {
-            return resource.data["adhocracy.sheets.rating.IRating"].subject;
+            return resource.data["adhocracy.sheets.rate.IRate"].subject;
         }
     }
 
-    target(resource : RIRatingVersion) : string;
-    target(resource : RIRatingVersion, value : string) : RIRatingVersion;
+    target(resource : RIRateVersion) : string;
+    target(resource : RIRateVersion, value : string) : RIRateVersion;
     target(resource, value?) {
         if (typeof value !== "undefined") {
             resource.data["adhocracy.sheets.rating.IRating"].target = value;
@@ -80,8 +80,8 @@ export class RatingAdapter implements AdhRating.IRatingAdapter<RIRatingVersion> 
         }
     }
 
-    value(resource : RIRatingVersion) : AdhRating.RatingValue;
-    value(resource : RIRatingVersion, value : AdhRating.RatingValue) : RIRatingVersion;
+    value(resource : RIRateVersion) : AdhRating.RatingValue;
+    value(resource : RIRateVersion, value : AdhRating.RatingValue) : RIRateVersion;
     value(resource, value?) {
         if (typeof value !== "undefined") {
             resource.data["adhocracy.sheets.rating.IRating"].value = AdhRating.RatingValue[value];
@@ -91,15 +91,15 @@ export class RatingAdapter implements AdhRating.IRatingAdapter<RIRatingVersion> 
         }
     }
 
-    creator(resource : RIRatingVersion) : string {
+    creator(resource : RIRateVersion) : string {
         return resource.data["adhocracy.sheets.metadata.IMetadata"].creator;
     }
 
-    creationDate(resource : RIRatingVersion) : string {
+    creationDate(resource : RIRateVersion) : string {
         return resource.data["adhocracy.sheets.metadata.IMetadata"].item_creation_date;
     }
 
-    modificationDate(resource : RIRatingVersion) : string {
+    modificationDate(resource : RIRateVersion) : string {
         return resource.data["adhocracy.sheets.metadata.IMetadata"].modification_date;
     }
 }

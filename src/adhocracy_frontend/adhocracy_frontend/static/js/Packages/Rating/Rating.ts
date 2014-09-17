@@ -3,8 +3,15 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhHttp = require("../Http/Http");
 import AdhResource = require("../../Resources");
 import AdhUser = require("../User/User");
+import Util = require("../Util/Util");
+
 import ResourcesBase = require("../../ResourcesBase");
-import Util = require("../../Util/Util");
+
+import RIRate = require("../../Resources_/adhocracy/resources/rate/IRate");
+import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
+import SICanRate = require("../../Resources_/adhocracy/sheets/rate/ICanRate");
+import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
+import SIRateable = require("../../Resources_/adhocracy/sheets/rate/IRateable");
 
 var pkgLocation = "/Rating";
 
@@ -154,7 +161,8 @@ export var ratingController = (
     $scope : IRatingScope,
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
-    adhUser : AdhUser.User
+    adhUser : AdhUser.User,
+    adhPreliminaryNames : AdhPreliminaryNames
 ) : ng.IPromise<void> => {
 
     $scope.isActive = (rating : RatingValue) =>
@@ -213,9 +221,7 @@ export var ratingController = (
 
 export var createDirective = (
     adapter : IRatingAdapter<any>,
-    $q : ng.IQService,
-    adhConfig : AdhConfig.Type,
-    adhPreliminaryNames : AdhPreliminaryNames
+    adhConfig : AdhConfig.Type
 ) => {
     return {
         restrict: "E",
@@ -225,7 +231,7 @@ export var createDirective = (
             postPoolSheet : "@",
             postPoolField : "@"
         },
-        controller: ["$scope", "$q", "adhHttp", "adhUser", ($scope, $q, adhHttp, adhUser) =>
-            ratingController(adapter, $scope, $q, adhHttp, adhUser)]
+        controller: ["$scope", "$q", "adhHttp", "adhUser", "adhPreliminaryNames", ($scope, $q, adhHttp, adhUser, adhPreliminaryNames) =>
+            ratingController(adapter, $scope, $q, adhHttp, adhUser, adhPreliminaryNames)]
     };
 };
