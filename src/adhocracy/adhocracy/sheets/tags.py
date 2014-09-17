@@ -1,4 +1,5 @@
 """Sheets for tagging."""
+from collections.abc import Iterable
 from logging import getLogger
 
 from pyramid.traversal import resource_path
@@ -53,13 +54,14 @@ class TagSheet(GenericResourceSheet):
         new_element_set = set(appstruct.get('elements', []))
         newly_tagged_or_untagged_resources = old_element_set ^ new_element_set
         result = super().set(appstruct, omit, send_event)
-
         if newly_tagged_or_untagged_resources:
-            adhocracy_catalog = find_catalog(self.context, 'adhocracy')
-            for resource in newly_tagged_or_untagged_resources:
-                adhocracy_catalog.reindex_resource(resource)
-
+            self._reindex_resources(newly_tagged_or_untagged_resources)
         return result
+
+    def _reindex_resources(self, resources: Iterable):
+        adhocracy_catalog = find_catalog(self.context, 'adhocracy')
+        for resource in resources:
+            adhocracy_catalog.reindex_resource(resource)
 
 
 tag_metadata = sheet_metadata_defaults._replace(isheet=ITag,
@@ -103,7 +105,7 @@ tags_metadata = sheet_metadata_defaults._replace(isheet=ITags,
 def index_tag(resource, default):
     """Return value for the tag index."""
     graph = find_graph(resource)
-    if graph is None:
+    if graph is None:  # pragma: no cover
         logger.warning(
             'Cannot update tag index: No graph found for %s',
             resource_path(resource))
