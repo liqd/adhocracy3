@@ -117,7 +117,7 @@ export var updateRates = (
         .then((postPool) => {
             var ratePromises : ng.IPromise<ResourcesBase.Resource>[] =
                 postPool.data["adhocracy.sheets.pool.IPool"].elements
-                    .map((index : number, path : string) =>
+                    .map((path : string, index : number) =>
                         adhHttp
                            .getNewestVersionPath(Util.parentPath(path))
                            .then(adhHttp.get));
