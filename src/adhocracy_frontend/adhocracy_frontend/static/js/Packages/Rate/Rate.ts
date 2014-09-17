@@ -13,47 +13,47 @@ import SICanRate = require("../../Resources_/adhocracy/sheets/rate/ICanRate");
 import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
 import SIRateable = require("../../Resources_/adhocracy/sheets/rate/IRateable");
 
-var pkgLocation = "/Rating";
+var pkgLocation = "/Rate";
 
 
-export enum RatingValue {
+export enum RateValue {
     pro,
     contra,
     neutral
 };
 
 
-export interface IRatingScope extends ng.IScope {
+export interface IRateScope extends ng.IScope {
     refersTo : string;
     postPoolPath : string;
     postPoolSheet : string;
     postPoolField : string;
-    ratings : {
+    rates : {
         pro : number;
         contra : number;
         neutral : number;
     };
-    thisUsersRating : any;  // resource matching IRatingAdapter (this is tricky to type, so we leave it blank for now.)
-    isActive : (RatingValue) => string;  // css class name if RatingValue is active, or "" otherwise.
-    cast(RatingValue) : void;
-    assureUserRatingExists() : ng.IPromise<void>;
+    thisUsersRate : any;  // resource matching IRateAdapter (this is tricky to type, so we leave it blank for now.)
+    isActive : (RateValue) => string;  // css class name if RateValue is active, or "" otherwise.
+    cast(RateValue) : void;
+    assureUserRateExists() : ng.IPromise<void>;
     postUpdate() : ng.IPromise<void>;
 }
 
 
 // (this type is over-restrictive in that T is used for both the
-// rating, the subject, and the target.  luckily, subtype-polymorphism
+// rate, the subject, and the target.  luckily, subtype-polymorphism
 // is too cool to complain about it here.  :-)
-export interface IRatingAdapter<T extends AdhResource.Content<any>> {
+export interface IRateAdapter<T extends AdhResource.Content<any>> {
     create(settings : any) : T;
     createItem(settings : any) : any;
     derive(oldVersion : T, settings : any) : T;
     subject(resource : T) : string;
     subject(resource : T, value : string) : T;
-    target(resource : T) : string;
-    target(resource : T, value : string) : T;
-    value(resource : T) : RatingValue;
-    value(resource : T, value : RatingValue) : T;
+    object(resource : T) : string;
+    object(resource : T, value : string) : T;
+    rate(resource : T) : RateValue;
+    rate(resource : T, value : RateValue) : T;
     creator(resource : T) : string;
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;
@@ -61,16 +61,16 @@ export interface IRatingAdapter<T extends AdhResource.Content<any>> {
 
 
 /**
- * initialise ratings
+ * initialise rates
  */
-export var resetRatings = ($scope : IRatingScope) : void => {
-    $scope.ratings = {
+export var resetRates = ($scope : IRateScope) : void => {
+    $scope.rates = {
         pro: 0,
         contra: 0,
         neutral: 0
     };
 
-    delete $scope.thisUsersRating;
+    delete $scope.thisUsersRate;
 };
 
 
@@ -78,7 +78,7 @@ export var resetRatings = ($scope : IRatingScope) : void => {
  * fetch post pool path with coordinates given in scope
  */
 export var postPoolPathPromise = (
-    $scope : IRatingScope,
+    $scope : IRateScope,
     adhHttp : AdhHttp.Service<any>
 ) : ng.IPromise<string> => {
     return adhHttp.get($scope.refersTo).then((rateable : ResourcesBase.Resource) => {
@@ -99,15 +99,15 @@ export var postPoolPathPromise = (
 
 /**
  * Update state from server: Fetch post pool, query it for all
- * ratings, and store and render them.  If a rating of the current
+ * rates, and store and render them.  If a rate of the current
  * user exists, store and render that separately.
  *
  * FIXME: this function will have a much shorter implementation once
  * get search requests are available.
  */
-export var updateRatings = (
-    adapter : IRatingAdapter<any>,
-    $scope : IRatingScope,
+export var updateRates = (
+    adapter : IRateAdapter<any>,
+    $scope : IRateScope,
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.User
@@ -115,37 +115,37 @@ export var updateRatings = (
     return postPoolPathPromise($scope, adhHttp)
         .then((postPoolPath) => adhHttp.get(postPoolPath))
         .then((postPool) => {
-            var ratingPromises : ng.IPromise<ResourcesBase.Resource>[] =
+            var ratePromises : ng.IPromise<ResourcesBase.Resource>[] =
                 postPool.data["adhocracy.sheets.pool.IPool"].elements
                     .map((index : number, path : string) =>
                         adhHttp
                            .getNewestVersionPath(Util.parentPath(path))
                            .then(adhHttp.get));
 
-            return $q.all(ratingPromises).then((ratings) => {
-                resetRatings($scope);
-                _.forOwn(ratings, (rating) => {
+            return $q.all(ratePromises).then((rates) => {
+                resetRates($scope);
+                _.forOwn(rates, (rate) => {
 
-                    if (adapter.target(rating) !== $scope.refersTo) {
+                    if (adapter.object(rate) !== $scope.refersTo) {
                         return;
                     }
 
-                    var checkValue = (rating, value : RatingValue) : boolean =>
-                        adapter.value(rating) === value;
+                    var checkValue = (rate, value : RateValue) : boolean =>
+                        adapter.rate(rate) === value;
 
-                    var iscurrentuser = (rating) : boolean =>
-                        adapter.subject(rating) === adhUser.userPath;
+                    var iscurrentuser = (rate) : boolean =>
+                        adapter.subject(rate) === adhUser.userPath;
 
-                    if (checkValue(rating, RatingValue.pro)) {
-                        $scope.ratings.pro += 1;
-                    } else if (checkValue(rating, RatingValue.contra)) {
-                        $scope.ratings.contra += 1;
-                    } else if (checkValue(rating, RatingValue.neutral)) {
-                        $scope.ratings.neutral += 1;
+                    if (checkValue(rate, RateValue.pro)) {
+                        $scope.rates.pro += 1;
+                    } else if (checkValue(rate, RateValue.contra)) {
+                        $scope.rates.contra += 1;
+                    } else if (checkValue(rate, RateValue.neutral)) {
+                        $scope.rates.neutral += 1;
                     }
 
-                    if (iscurrentuser(rating)) {
-                        $scope.thisUsersRating = rating;
+                    if (iscurrentuser(rate)) {
+                        $scope.thisUsersRate = rate;
                     }
                 });
             });
@@ -154,37 +154,37 @@ export var updateRatings = (
 
 
 /**
- * controller for rating widget.  promises a void in order to notify
+ * controller for rate widget.  promises a void in order to notify
  * the unit test suite that it is done setting up its state.  (the
  * widget will ignore this promise.)
  */
-export var ratingController = (
-    adapter : IRatingAdapter<any>,
-    $scope : IRatingScope,
+export var rateController = (
+    adapter : IRateAdapter<any>,
+    $scope : IRateScope,
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.User,
     adhPreliminaryNames : AdhPreliminaryNames
 ) : ng.IPromise<void> => {
 
-    $scope.isActive = (rating : RatingValue) =>
-        (typeof $scope.thisUsersRating !== "undefined" &&
-         rating === adapter.value($scope.thisUsersRating)) ? "rating-button-active" : "";
+    $scope.isActive = (rate : RateValue) =>
+        (typeof $scope.thisUsersRate !== "undefined" &&
+         rate === adapter.rate($scope.thisUsersRate)) ? "rate-button-active" : "";
 
-    $scope.cast = (rating : RatingValue) : void => {
-        if ($scope.isActive(rating)) {
+    $scope.cast = (rate : RateValue) : void => {
+        if ($scope.isActive(rate)) {
             // click on active button to un-rate
 
             /*
 
               (the current implementation does not allow withdrawing
-              of ratings, so if you click on "pro" twice in a row, the
+              of rates, so if you click on "pro" twice in a row, the
               second time will have no effect.  the work-around is for
               the user to rate something "neutral".  a proper fixed
               will be provided later.)
 
-              adapter.value($scope.thisUsersRating, <any>false);
-              $scope.ratings[RatingValue[rating]] -= 1;
+              adapter.rate($scope.thisUsersRate, <any>false);
+              $scope.rates[RateValue[rate]] -= 1;
               $scope.postUpdate();
 
             */
@@ -192,24 +192,24 @@ export var ratingController = (
             // click on inactive button to (re-)rate
 
             // increase new value
-            $scope.ratings[RatingValue[rating]] += 1;
+            $scope.rates[RateValue[rate]] += 1;
 
-            $scope.assureUserRatingExists()
+            $scope.assureUserRateExists()
                 .then(() => {
-                    // update thisUsersRating
-                    adapter.value($scope.thisUsersRating, rating);
+                    // update thisUsersRate
+                    adapter.rate($scope.thisUsersRate, rate);
 
                     // decrease old value
-                    $scope.ratings[adapter.value($scope.thisUsersRating)] -= 1;
+                    $scope.rates[adapter.rate($scope.thisUsersRate)] -= 1;
 
-                    // send new rating to server
+                    // send new rate to server
                     $scope.postUpdate();
                 });
         }
     };
 
-    $scope.assureUserRatingExists = () : ng.IPromise<void> => {
-        if (typeof $scope.thisUsersRating !== "undefined") {
+    $scope.assureUserRateExists = () : ng.IPromise<void> => {
+        if (typeof $scope.thisUsersRate !== "undefined") {
             return $q.when();
         } else {
             return adhHttp
@@ -221,42 +221,42 @@ export var ratingController = (
 
                     return transaction.commit()
                         .then((responses) : void => {
-                            $scope.thisUsersRating = responses[version.index]
+                            $scope.thisUsersRate = responses[version.index]
                         });
                 })
         }
     };
 
     $scope.postUpdate = () : ng.IPromise<void> => {
-        if (typeof $scope.thisUsersRating !== "undefined") {
+        if (typeof $scope.thisUsersRate !== "undefined") {
             throw "internal error";
         } else {
             return adhHttp
-                .postNewVersion(Util.parentPath($scope.thisUsersRating), $scope.thisUsersRating)
+                .postNewVersion(Util.parentPath($scope.thisUsersRate), $scope.thisUsersRate)
                 .then((response : RIRate) => {
-                    $scope.thisUsersRating = response;
+                    $scope.thisUsersRate = response;
                 });
         }
     };
 
-    resetRatings($scope);
-    return updateRatings(adapter, $scope, $q, adhHttp, adhUser);
+    resetRates($scope);
+    return updateRates(adapter, $scope, $q, adhHttp, adhUser);
 };
 
 
 export var createDirective = (
-    adapter : IRatingAdapter<any>,
+    adapter : IRateAdapter<any>,
     adhConfig : AdhConfig.Type
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Rating.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Rate.html",
         scope: {
             refersTo: "@",
             postPoolSheet : "@",
             postPoolField : "@"
         },
         controller: ["$scope", "$q", "adhHttp", "adhUser", "adhPreliminaryNames", ($scope, $q, adhHttp, adhUser, adhPreliminaryNames) =>
-            ratingController(adapter, $scope, $q, adhHttp, adhUser, adhPreliminaryNames)]
+            rateController(adapter, $scope, $q, adhHttp, adhUser, adhPreliminaryNames)]
     };
 };

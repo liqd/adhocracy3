@@ -10,16 +10,17 @@ import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateV
 import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
 import SIVersionable = require("../../Resources_/adhocracy/sheets/versions/IVersionable");
 
-import AdhRating = require("./Rating");
+import AdhRate = require("./Rate");
 
 
-export class RatingAdapter implements AdhRating.IRatingAdapter<RIRateVersion> {
+export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
     create(args : {
         preliminaryNames : PreliminaryNames;
         path ?: string;
         name ?: string;
         subject : string;
-        target : string;
+        object : string;
+        rate ?: number;
         follows : string;
     }) : RIRateVersion {
         var resource = new RIRateVersion({
@@ -27,8 +28,12 @@ export class RatingAdapter implements AdhRating.IRatingAdapter<RIRateVersion> {
             path: args.path,
             name: args.name
         });
+        if (typeof args.rate === "undefined") {
+            args.rate = 0;
+        }
+
         resource.data["adhocracy.sheets.rate.IRate"] =
-            new SIRate.AdhocracySheetsRateIRate({subject: args.subject, object: args.target, rate: 0});
+            new SIRate.AdhocracySheetsRateIRate({subject: args.subject, object: args.object, rate: args.rate });
 
         resource.data["adhocracy.sheets.versions.IVersionable"] =
             new SIVersionable.AdhocracySheetsVersionsIVersionable({follows: [args.follows]});
@@ -69,25 +74,25 @@ export class RatingAdapter implements AdhRating.IRatingAdapter<RIRateVersion> {
         }
     }
 
-    target(resource : RIRateVersion) : string;
-    target(resource : RIRateVersion, value : string) : RIRateVersion;
-    target(resource, value?) {
+    object(resource : RIRateVersion) : string;
+    object(resource : RIRateVersion, value : string) : RIRateVersion;
+    object(resource, value?) {
         if (typeof value !== "undefined") {
-            resource.data["adhocracy.sheets.rating.IRating"].target = value;
+            resource.data["adhocracy.sheets.rate.IRate"].object = value;
             return resource;
         } else {
-            return resource.data["adhocracy.sheets.rating.IRating"].target;
+            return resource.data["adhocracy.sheets.rate.IRate"].object;
         }
     }
 
-    value(resource : RIRateVersion) : AdhRating.RatingValue;
-    value(resource : RIRateVersion, value : AdhRating.RatingValue) : RIRateVersion;
-    value(resource, value?) {
+    rate(resource : RIRateVersion) : AdhRate.RateValue;
+    rate(resource : RIRateVersion, value : AdhRate.RateValue) : RIRateVersion;
+    rate(resource, value?) {
         if (typeof value !== "undefined") {
-            resource.data["adhocracy.sheets.rating.IRating"].value = AdhRating.RatingValue[value];
+            resource.data["adhocracy.sheets.rate.IRate"].rate = AdhRate.RateValue[value];
             return resource;
         } else {
-            return resource.data["adhocracy.sheets.rating.IRating"].value;
+            return resource.data["adhocracy.sheets.rate.IRate"].rate;
         }
     }
 

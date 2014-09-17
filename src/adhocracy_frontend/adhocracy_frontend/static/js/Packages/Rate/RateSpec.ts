@@ -2,12 +2,12 @@
 
 import q = require("q");
 
-import AdhRating = require("./Rating");
-import AdhRatingAdapter = require("./Adapter");
+import AdhRate = require("./Rate");
+import AdhRateAdapter = require("./Adapter");
 
 
 export var register = () => {
-    describe("Rating", () => {
+    describe("Rate", () => {
         describe("Controller", () => {
             var scopeMock;
             var httpMock;
@@ -15,7 +15,7 @@ export var register = () => {
 
             var rateableResource;
             var postPoolResource;
-            var ratingResources;
+            var rateResources;
 
             beforeEach(() => {
                 scopeMock = {
@@ -24,49 +24,36 @@ export var register = () => {
                 };
                 httpMock = { get: () => null };
 
-                // FIXME: rating value is not visible in the meta api
-                // yet.
-
-                // FIXME: do we have to filter for target manually
-                // here, or can we assume we only get matching targets
-                // from our post pool?  right now in these tests we
-                // ignore target entirely.
-
-                // FIXME: when sending an aggregate request, we also
-                // need to be able to extract the rating for the
-                // matching user explicitly, possibly in a separate
-                // request.  will that be implemented?
-
-                ratingResources = [
+                rateResources = [
                     { path: "r1",
                       data: {
-                          "adhocracy.sheets.rating.IRating": {
+                          "adhocracy.sheets.rate.IRate": {
                               subject: "user1",
-                              value: AdhRating.RatingValue.pro
+                              value: AdhRate.RateValue.pro
                           }
                       }
                     },
                     { path: "r2",
                       data: {
-                          "adhocracy.sheets.rating.IRating": {
+                          "adhocracy.sheets.rate.IRate": {
                               subject: "user2",
-                              value: AdhRating.RatingValue.pro
+                              value: AdhRate.RateValue.pro
                           }
                       }
                     },
                     { path: "r3",
                       data: {
-                          "adhocracy.sheets.rating.IRating": {
+                          "adhocracy.sheets.rate.IRate": {
                               subject: "user3",
-                              value: AdhRating.RatingValue.neutral
+                              value: AdhRate.RateValue.neutral
                           }
                       }
                     },
                     { path: "r4",
                       data: {
-                          "adhocracy.sheets.rating.IRating": {
+                          "adhocracy.sheets.rate.IRate": {
                               subject: "user4",
-                              value: AdhRating.RatingValue.contra
+                              value: AdhRate.RateValue.contra
                           }
                       }
                     }
@@ -75,7 +62,7 @@ export var register = () => {
                 postPoolResource = {
                     data : {
                         "adhocracy.sheets.pool.IPool": {
-                            elements: ratingResources.map((r) => r.path)
+                            elements: rateResources.map((r) => r.path)
                         }
                     }
                 };
@@ -93,25 +80,25 @@ export var register = () => {
                 };
             });
 
-            it("resetRatings clears ratings and user rating in scope.", () => {
-                scopeMock.ratings = {
+            it("resetRates clears rates and user rate in scope.", () => {
+                scopeMock.rates = {
                     pro: 1,
                     contra: 1,
                     neutral: 1
                 };
-                scopeMock.thisUsersRating = "notnull";
+                scopeMock.thisUsersRate = "notnull";
 
-                AdhRating.resetRatings(scopeMock);
-                expect(scopeMock.ratings.pro).toBe(0);
-                expect(scopeMock.ratings.contra).toBe(0);
-                expect(scopeMock.ratings.neutral).toBe(0);
-                expect(scopeMock.thisUserRating).toBeUndefined();
+                AdhRate.resetRates(scopeMock);
+                expect(scopeMock.rates.pro).toBe(0);
+                expect(scopeMock.rates.contra).toBe(0);
+                expect(scopeMock.rates.neutral).toBe(0);
+                expect(scopeMock.thisUserRate).toBeUndefined();
             });
 
             it("postPoolPathPromise promises post pool path.", (done) => {
                 spyOn(httpMock, "get").and.returnValue(q.when(rateableResource));
 
-                AdhRating.postPoolPathPromise(scopeMock, httpMock).then(
+                AdhRate.postPoolPathPromise(scopeMock, httpMock).then(
                     (path) => {
                         expect(path).toBe("post_pool_path");
                         done();
@@ -123,28 +110,28 @@ export var register = () => {
                 );
             });
 
-            it("updateRatings calculates the right totals for pro, contra, neutral and stores them in the scope.", (done) => {
-                scopeMock.ratings = {
+            it("updateRates calculates the right totals for pro, contra, neutral and stores them in the scope.", (done) => {
+                scopeMock.rates = {
                     pro: 1,
                     contra: 1,
                     neutral: 1
                 };
-                scopeMock.thisUsersRating = "notnull";
+                scopeMock.thisUsersRate = "notnull";
 
                 var httpResponseStack =
                     [rateableResource, postPoolResource]
-                    .concat(ratingResources)
+                    .concat(rateResources)
                     .reverse();
                 spyOn(httpMock, "get").and.callFake(() => q.when(httpResponseStack.pop()));
 
-                var adapter = new AdhRatingAdapter.RatingAdapter();
+                var adapter = new AdhRateAdapter.RateAdapter();
 
-                AdhRating.updateRatings(adapter, scopeMock, q, httpMock, userMock).then(
+                AdhRate.updateRates(adapter, scopeMock, q, httpMock, userMock).then(
                     () => {
-                        expect(scopeMock.ratings.pro).toBe(2);
-                        expect(scopeMock.ratings.contra).toBe(1);
-                        expect(scopeMock.ratings.neutral).toBe(1);
-                        expect(scopeMock.thisUsersRating.data["adhocracy.sheets.rating.IRating"].subject).toBe(userMock.userPath);
+                        expect(scopeMock.rates.pro).toBe(2);
+                        expect(scopeMock.rates.contra).toBe(1);
+                        expect(scopeMock.rates.neutral).toBe(1);
+                        expect(scopeMock.thisUsersRate.data["adhocracy.sheets.rate.IRate"].subject).toBe(userMock.userPath);
                         done();
                     },
                     (msg) => {
