@@ -20,4 +20,4 @@ def includeme(config):
                                     (Interface,),
                                     IIndexingActionProcessor)
     config.scan('substanced.catalog')
-    config.scan('.')
+    config.add_catalog_factory('adhocracy', AdhocracyCatalogFactory)
