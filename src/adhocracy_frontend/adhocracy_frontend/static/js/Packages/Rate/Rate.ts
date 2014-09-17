@@ -8,10 +8,10 @@ import Util = require("../Util/Util");
 import ResourcesBase = require("../../ResourcesBase");
 
 import RIRate = require("../../Resources_/adhocracy/resources/rate/IRate");
-import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
-import SICanRate = require("../../Resources_/adhocracy/sheets/rate/ICanRate");
-import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
-import SIRateable = require("../../Resources_/adhocracy/sheets/rate/IRateable");
+// import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
+// import SICanRate = require("../../Resources_/adhocracy/sheets/rate/ICanRate");
+// import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
+// import SIRateable = require("../../Resources_/adhocracy/sheets/rate/IRateable");
 
 var pkgLocation = "/Rate";
 
@@ -221,9 +221,9 @@ export var rateController = (
 
                     return transaction.commit()
                         .then((responses) : void => {
-                            $scope.thisUsersRate = responses[version.index]
+                            $scope.thisUsersRate = responses[version.index];
                         });
-                })
+                });
         }
     };
 
