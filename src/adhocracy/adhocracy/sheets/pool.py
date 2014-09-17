@@ -33,10 +33,10 @@ class FilteringPoolSheet(PoolSheet):
 
     """Resource sheet that allows filtering and aggregating pools."""
 
-    def _get_reference_appstruct(self, params):
+    def _get_reference_appstruct(self, params: dict={}) -> dict:
         if not params:
             return super()._get_reference_appstruct(params)
-        local_params = params.copy()  # local copy were we can delete elements
+        local_params = params.copy()  # Local copy where we can delete elements
         raw_depth = local_params.pop('depth', '1')
         iface_filter = []
         append_if_not_none(iface_filter,
@@ -44,7 +44,7 @@ class FilteringPoolSheet(PoolSheet):
         append_if_not_none(iface_filter, local_params.pop('sheet', None))
         count_matching_elements = local_params.pop('count', False)
         elements_form = local_params.pop('elements', 'paths')
-        del local_params['aggregateby']  # FIXME implement aggregateby
+        local_params.pop('aggregateby', None)  # FIXME implement aggregateby
         if self._custom_filtering_necessary(raw_depth, iface_filter,
                                             count_matching_elements,
                                             elements_form, local_params):
