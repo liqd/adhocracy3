@@ -1106,8 +1106,17 @@ Or only children that implement a specific sheet::
     ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/',
      'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
 
+Note that multiple filters are combined by AND. If we specify a content_type
+filter and a sheet filter, only the elements matched by *both* filters will be
+returned. The same applies to all other filters as well.
+
+Note: Currently it's not possible to specify multiple values for the *sheet*
+filter (which would be combined by AND or possibly -- using a different
+syntax -- by OR). We may add this functionality in the future if there is a
+need for it.
+
 By default, only direct children of a pool are listed as elements,
-i.e. the standard depth is 1. Setting the *depth* parameter to a higher
+i.e. the standard depth is 1. Setting the *depth* filter to a higher
 value allows also including grandchildren (depth=2) or even great-grandchildren
 (depth=3) etc. Allowed values are arbitrary positive numbers and *all*.
 *all* can be used to get nested elements of arbitrary nesting depth::
@@ -1180,8 +1189,22 @@ their paths::
     >> resp_data['data']['adhocracy.sheets.pool.IPool']['elements']
     blah
 
-# TODO aggregateby, tag, custom filters. Note that multiple filters are
-combined by AND.
+*tag* is a custom filter that allows filtering only resources with a
+specific tag. Often we are only interested in the newest versions of
+Versionables. We can get them by setting *tag=LAST*. Let's find the latest
+versions of all sections::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    ...             'depth': 'all', 'tag': 'LAST'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/',
+     'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
+
+FIXME Demonstrate custom filters, using the Rating resource as example
+(subject or object, actual rating).
+
+FIXME Not yet implemented: aggregateby
 
 
 Other stuff
