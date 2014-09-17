@@ -4,6 +4,7 @@ import AdhHttp = require("../Http/Http");
 import AdhResource = require("../../Resources");
 import AdhUser = require("../User/User");
 import ResourcesBase = require("../../ResourcesBase");
+import Util = require("../../Util/Util");
 
 var pkgLocation = "/Rating";
 
@@ -107,7 +108,10 @@ export var updateRatings = (
         .then((postPool) => {
             var ratingPromises : ng.IPromise<ResourcesBase.Resource>[] =
                 postPool.data["adhocracy.sheets.pool.IPool"].elements
-                    .map((index : number, path : string) => adhHttp.get(path));
+                    .map((index : number, path : string) =>
+                        adhHttp
+                           .getNewestVersionPath(Util.parentPath(path))
+                           .then(adhHttp.get));
 
             return $q.all(ratingPromises).then((ratings) => {
                 resetRatings($scope);
