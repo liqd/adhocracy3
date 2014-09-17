@@ -273,7 +273,6 @@ class GETPoolRequestSchema(colander.MappingSchema):
     elements = PoolElementsForm()
     count = colander.SchemaNode(colander.Boolean(), missing=False)
     aggregateby = colander.SchemaNode(colander.String(), missing='')
-    tag = colander.SchemaNode(colander.String(), missing='')
 
 
 class OPTIONResourceResponseSchema(colander.Schema):
