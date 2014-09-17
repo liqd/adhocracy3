@@ -19,8 +19,8 @@ def test_rate_meta():
 
 @fixture
 def integration(config):
-    config.include('adhocracy.catalog')
     config.include('adhocracy.registry')
+    config.include('adhocracy.catalog')
     config.include('adhocracy.events')
     config.include('adhocracy.sheets')
     config.include('adhocracy.resources.rate')

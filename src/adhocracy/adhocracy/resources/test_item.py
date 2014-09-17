@@ -32,7 +32,6 @@ class TestItemIntegrationTest(unittest.TestCase):
         from adhocracy.resources.item import item_metadata
         from adhocracy.resources.root import _add_catalog_service
         config = testing.setUp()
-        config.include('adhocracy.catalog')
         config.include('adhocracy.registry')
         config.include('adhocracy.events')
         config.include('adhocracy.catalog')
