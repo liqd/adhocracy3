@@ -37,6 +37,8 @@ class FilteringPoolSheet(PoolSheet):
         if not params:
             return super()._get_reference_appstruct(params)
         raw_depth = params['depth']
+        # FIXME why do we require some keys in params instead of useing
+        # sane defaults? joka
         iface_filter = []
         append_if_not_none(iface_filter, params['content_type'])
         append_if_not_none(iface_filter, params['sheet'])
