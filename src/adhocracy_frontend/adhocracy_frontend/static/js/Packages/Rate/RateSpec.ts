@@ -20,16 +20,22 @@ export var register = () => {
             beforeEach(() => {
                 scopeMock = {
                     postPoolSheet: "rateable",
-                    postPoolField: "post_pool"
+                    postPoolField: "post_pool",
+                    refersTo: "comment_or_something"
                 };
-                httpMock = { get: () => null };
+
+                httpMock = {
+                    get: () => null,
+                    getNewestVersionPath: () => q.when(null)
+                };
 
                 rateResources = [
                     { path: "r1",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user1",
-                              value: AdhRate.RateValue.pro
+                              object: "comment_or_something",
+                              rate: AdhRate.RateValue.pro
                           }
                       }
                     },
@@ -37,7 +43,8 @@ export var register = () => {
                       data: {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user2",
-                              value: AdhRate.RateValue.pro
+                              object: "comment_or_something",
+                              rate: AdhRate.RateValue.pro
                           }
                       }
                     },
@@ -45,7 +52,8 @@ export var register = () => {
                       data: {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user3",
-                              value: AdhRate.RateValue.neutral
+                              object: "comment_or_something",
+                              rate: AdhRate.RateValue.neutral
                           }
                       }
                     },
@@ -53,7 +61,17 @@ export var register = () => {
                       data: {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user4",
-                              value: AdhRate.RateValue.contra
+                              object: "comment_or_something",
+                              rate: AdhRate.RateValue.contra
+                          }
+                      }
+                    },
+                    { path: "r5",
+                      data: {
+                          "adhocracy.sheets.rate.IRate": {
+                              subject: "user3",
+                              object: "something_irrelevant",
+                              rate: AdhRate.RateValue.contra
                           }
                       }
                     }
