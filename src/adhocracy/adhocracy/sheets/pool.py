@@ -13,6 +13,11 @@ from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.schema import UniqueReferences
 from adhocracy.utils import append_if_not_none
 from adhocracy.utils import FormList
+from adhocracy.utils import remove_keys_from_dict
+
+
+filtering_pool_default_filter = ['depth', 'content_type', 'sheet', 'elements',
+                                 'count', 'aggregateby']
 
 
 class PoolSheet(GenericResourceSheet):
@@ -34,53 +39,51 @@ class FilteringPoolSheet(PoolSheet):
     """Resource sheet that allows filtering and aggregating pools."""
 
     def _get_reference_appstruct(self, params):
-        if not params:
+        if not params or not self._custom_filtering_necessary(params):
             return super()._get_reference_appstruct(params)
-        local_params = params.copy()  # local copy were we can delete elements
-        raw_depth = local_params.pop('depth', '1')
-        iface_filter = []
-        append_if_not_none(iface_filter,
-                           local_params.pop('content_type', None))
-        append_if_not_none(iface_filter, local_params.pop('sheet', None))
-        count_matching_elements = local_params.pop('count', False)
-        elements_form = local_params.pop('elements', 'paths')
-        del local_params['aggregateby']  # FIXME implement aggregateby
-        if self._custom_filtering_necessary(raw_depth, iface_filter,
-                                            count_matching_elements,
-                                            elements_form, local_params):
-            return self._build_filtered_appstruct(raw_depth, iface_filter,
-                                                  count_matching_elements,
-                                                  elements_form, local_params)
-        else:
-            return super()._get_reference_appstruct(params)
-
-    def _custom_filtering_necessary(self, raw_depth: str,
-                                    iface_filter: Iterable,
-                                    count_matching_elements: bool,
-                                    elements_form: str,
-                                    remaining_params: dict):
-        return (raw_depth != '1' or iface_filter or
-                count_matching_elements or elements_form != 'paths' or
-                remaining_params)
-
-    def _build_filtered_appstruct(self, raw_depth: str, iface_filter: Iterable,
-                                  count_matching_elements: bool,
-                                  elements_form: str,
-                                  remaining_params: dict):
-        depth = None if raw_depth == 'all' else int(raw_depth)
         appstruct = {}
-        elements = FormList(form=elements_form)
-        for element in self._filter_elements(depth=depth,
-                                             ifaces=iface_filter,
-                                             valuefilters=remaining_params):
-            elements.append(element)
+        depth = self._build_depth(params)
+        iface_filter = self._build_iface_filter(params)
+        arbitrary_filters = self._get_arbitrary_filters(params)
+        elements = self._build_elements_form_list(params)
+        elements.extend(self._filter_elements(depth,
+                                              iface_filter,
+                                              arbitrary_filters,
+                                              ))
         appstruct['elements'] = elements
-        if count_matching_elements:
+        if self._count_matching_elements(params):
             appstruct['count'] = len(elements)
+        # FIXME implement aggregateby
         return appstruct
 
+    def _custom_filtering_necessary(self, params: dict) -> bool:
+        params_copy = params.copy()
+        return params_copy.pop('depth', '1') != '1' or\
+            params_copy.pope('elements', 'path') != 'path' or\
+            params_copy != {}
+
+    def _get_arbitrary_filters(self, params):
+        return remove_keys_from_dict(params, filtering_pool_default_filter)
+
+    def _build_iface_filter(self, params: dict) -> dict:
+        iface_filter = []
+        append_if_not_none(iface_filter, params.get('content_type', None))
+        append_if_not_none(iface_filter, params.get('sheet', None))
+        return iface_filter
+
+    def _build_elements_form_list(self, param) -> FormList:
+        elements_serialization_form = param.get('elements', 'path')
+        return FormList(form=elements_serialization_form)
+
+    def _build_depth(self, params) -> int:
+        raw_depth = params.get('depth', '1')
+        return None if raw_depth == 'all' else int(raw_depth)
+
+    def _count_matching_elements(self, params) -> bool:
+        return params.get('count', False)
+
     def _filter_elements(self, depth=1, ifaces: Iterable=None,
-                         valuefilters: dict=None) -> Iterable:
+                         arbitrary_filters: dict=None) -> Iterable:
         """See interface for docstring."""
         system_catalog = find_catalog(self.context, 'system')
         path_index = system_catalog['path']
@@ -89,13 +92,14 @@ class FilteringPoolSheet(PoolSheet):
         if ifaces:
             interface_index = system_catalog['interfaces']
             query &= interface_index.all(ifaces)
-        if valuefilters:
+        if arbitrary_filters:
             adhocracy_catalog = find_catalog(self.context, 'adhocracy')
             for name, value in valuefilters.items():
                 # FIXME This will raise a KeyError if no such index exists.
                 # Better validate first whether all remaining parameters
                 # indicate existing catalogs and raise colander.Invalid
                 # otherwise.
+            for name, value in arbitrary_filters.items():
                 index = adhocracy_catalog[name]
                 query &= index.eq(value)
         resultset = query.execute()

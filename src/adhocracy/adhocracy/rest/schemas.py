@@ -267,12 +267,13 @@ class GETPoolRequestSchema(colander.MappingSchema):
     # Elements in this schema were multiple values should be allowed:
     # sheet, aggregateby, tag.
 
-    content_type = colander.SchemaNode(Interface(), missing=None)
-    sheet = colander.SchemaNode(Interface(), missing=None)
-    depth = PoolQueryDepth()
-    elements = PoolElementsForm()
-    count = colander.SchemaNode(colander.Boolean(), missing=False)
-    aggregateby = colander.SchemaNode(colander.String(), missing='')
+    content_type = colander.SchemaNode(Interface(), missing=colander.drop)
+    sheet = colander.SchemaNode(Interface(), missing=colander.drop)
+    depth = PoolQueryDepth(missing=colander.drop)
+    elements = PoolElementsForm(missing=colander.drop)
+    count = colander.SchemaNode(colander.Boolean(), missing=colander.drop)
+    aggregateby = colander.SchemaNode(colander.String(), missing=colander.drop)
+
 
 
 class OPTIONResourceResponseSchema(colander.Schema):

@@ -29,7 +29,7 @@ class FormList(list):
     def __init__(self, iterable=[], form: str=None):
         super().__init__(iterable)
         self.form = form
-        """The external form of the list."""
+        """The external form of the list. For example serialization info."""
 
 
 def append_if_not_none(lst: list, element: object):

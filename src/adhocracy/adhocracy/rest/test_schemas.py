@@ -519,17 +519,8 @@ class TestGETPoolRequestSchema():
         from adhocracy.rest.schemas import GETPoolRequestSchema
         return GETPoolRequestSchema()
 
-    @fixture
-    def defaults(self):
-        return {'content_type': None,
-                'sheet': None,
-                'depth': '1',
-                'elements': 'paths',
-                'count': False,
-                'aggregateby': ''}
-
-    def test_deserialize_empty(self, inst, defaults):
-        assert inst.deserialize({}) == defaults
+    def test_deserialize_empty(self, inst):
+        assert inst.deserialize({}) == {}
 
     def test_deserialize_valid(self, inst):
         from adhocracy.sheets.name import IName
@@ -554,34 +545,19 @@ class TestGETPoolRequestSchema():
         with raises(colander.Invalid):
             inst.deserialize(data)
 
-    def test_deserialize_depth_all(self, inst, defaults):
+    def test_deserialize_depth_all(self, inst):
         data = {'depth': 'all'}
-        expected = defaults.copy()
-        expected['depth'] = 'all'
-        assert inst.deserialize(data) == expected
+        assert inst.deserialize(data) == {'depth': 'all'}
 
     def test_deserialize_depth_invalid(self, inst):
         data = {'depth': '-7'}
         with raises(colander.Invalid):
             inst.deserialize(data)
 
-    def test_deserialize_count_explicit_false(self, inst, defaults):
+    def test_deserialize_count_explicit_false(self, inst):
         data = {'count': 'false'}
-        expected = defaults.copy()
-        assert expected['count'] == False
-        assert inst.deserialize(data) == expected
+        assert inst.deserialize(data) == {'count': False}
 
-    def test_deserialize_count_empty(self, inst, defaults):
-        """Empty count is considered as True."""
-        data = {'count': ''}
-        expected = defaults.copy()
-        expected['count'] = True
-        assert inst.deserialize(data) == expected
-
-    def test_deserialize_extra_values_are_preserved(self, inst, defaults):
+    def test_deserialize_extra_values_are_preserved(self, inst):
         data = {'extra1': 'blah',
                 'another_extra': 'blub'}
-        expected = defaults.copy()
-        expected.update(data)
-        assert inst.typ.unknown == 'preserve'
-        assert inst.deserialize(data) == expected

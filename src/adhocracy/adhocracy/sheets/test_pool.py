@@ -60,6 +60,15 @@ class TestPoolSheet:
         inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': [], 'count': colander.drop}
 
+    def test_get_arbitrary_filters(self, meta, context):
+        """remove all standard filter parameter in get pool requests."""
+        from adhocracy.rest.schemas import GETPoolRequestSchema
+        inst = meta.sheet_class(meta, context)
+        filters = GETPoolRequestSchema().serialize({})
+        arbitrary_filters = {'index1': None}
+        filters.update(arbitrary_filters)
+        assert inst._get_arbitrary_filters(filters) == arbitrary_filters
+
 
 @mark.usefixtures('integration')
 class TestIntegrationPoolSheet:
@@ -165,6 +174,7 @@ class TestIntegrationPoolSheet:
         poolsheet = get_sheet(pool, IPool)
         result = set(poolsheet._filter_elements(ifaces=[ITag, IItemVersion]))
         assert result == set()
+
 
 
 @mark.usefixtures('integration')
