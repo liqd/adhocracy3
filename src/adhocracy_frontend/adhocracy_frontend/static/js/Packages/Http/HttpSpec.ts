@@ -211,23 +211,9 @@ export var register = () => {
 
                     var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
                     dag.data["adhocracy.sheets.tags.ITag"] = new SITag.AdhocracySheetsTagsITag({ elements: ["not_important"] });
-                    $httpMock.get.and.returnValue(q.when({ data: dag }));
 
-                    /* NOTE: I first tried this:
-
-                         | spyOn(adhHttp, "getNewestVersionPathNoFork").and.returnValue(
-                         |     q.when("next_head"));
-
-                       The result is that from within this test case,
-                       adhHttp.getNewestversionPathNoFork is mocked,
-                       but from within adhHttp.postNewVersionNoFork,
-                       the old, unmocked method is still visible.
-                       There may be a good solution for this, but for
-                       now we'll just stick with mocking the
-                       underlying services, and treating the class
-                       under scrutiny as monolithic.
-
-                    */
+                    adhHttp.getNewestVersionPathNoFork = (<any>jasmine.createSpy("getNewestVersionPathNoForkSpy"))
+                        .and.returnValue(q.when("next_head"));
 
                     adhHttp.postNewVersionNoFork("/somee/path", {data: {}}).then(
                         () => {
