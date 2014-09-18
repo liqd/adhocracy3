@@ -33,8 +33,8 @@ export interface IRateScope extends ng.IScope {
         contra : number;
         neutral : number;
     };
-    thisUsersRate : any;  // resource matching IRateAdapter (this is tricky to type, so we leave it blank for now.)
-    allRates : any[];
+    thisUsersRate : AdhResource.Content<any>;
+    allRates : AdhResource.Content<any>[];
     isActive : (RateValue) => string;  // css class name if RateValue is active, or "" otherwise.
     toggleShowDetails() : void;
     cast(RateValue) : void;
