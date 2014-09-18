@@ -235,15 +235,15 @@ export var rateController = (
             // click on inactive button to (re-)rate
 
             // increase new value
-            $scope.rates[RateValue[rate]] += 1;
+            $scope.rates[rate] += 1;
 
             $scope.assureUserRateExists()
                 .then(() => {
-                    // update thisUsersRate
-                    adapter.rate($scope.thisUsersRate, rate);
-
                     // decrease old value
                     $scope.rates[adapter.rate($scope.thisUsersRate)] -= 1;
+
+                    // set new value
+                    adapter.rate($scope.thisUsersRate, rate);
 
                     // send new rate to server
                     $scope.postUpdate();
