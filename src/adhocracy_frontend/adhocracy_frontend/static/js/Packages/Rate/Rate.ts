@@ -140,44 +140,43 @@ export var updateRates = (
 ) : ng.IPromise<void> => {
     return postPoolContentsPromise($scope, adhHttp)
         .then((rates) => {
-                resetRates($scope);
-                _.forOwn(rates, (rate) => {
+            resetRates($scope);
+            _.forOwn(rates, (rate) => {
 
-                    // FIXME: (summary of a conversation between mf
-                    // and joka on this) rateable post pools *should*
-                    // just contain ratings, but that's not the case
-                    // at the writing of these lines.  we add a little
-                    // filter condition here, but in the future, it
-                    // should probably be ok to trust the backend on
-                    // this.
-                    if (!adapter.is(rate)) {
-                        return;
-                    }
+                // FIXME: (summary of a conversation between mf and
+                // joka on this) rateable post pools *should* just
+                // contain ratings, but that's not the case at the
+                // writing of these lines.  we add a little filter
+                // condition here, but in the future, it should
+                // probably be ok to trust the backend on this.
+                if (!adapter.is(rate)) {
+                    return;
+                }
 
-                    // if this is a rating of another content object:
-                    // ignore.
-                    if (adapter.object(rate) !== $scope.refersTo) {
-                        return;
-                    }
+                // if this is a rating of another content object:
+                // ignore.
+                if (adapter.object(rate) !== $scope.refersTo) {
+                    return;
+                }
 
-                    var checkValue = (rate, value : RateValue) : boolean =>
-                        adapter.rate(rate) === value;
+                var checkValue = (rate, value : RateValue) : boolean =>
+                    adapter.rate(rate) === value;
 
-                    var iscurrentuser = (rate) : boolean =>
-                        adapter.subject(rate) === adhUser.userPath;
+                var iscurrentuser = (rate) : boolean =>
+                    adapter.subject(rate) === adhUser.userPath;
 
-                    if (checkValue(rate, RateValue.pro)) {
-                        $scope.rates.pro += 1;
-                    } else if (checkValue(rate, RateValue.contra)) {
-                        $scope.rates.contra += 1;
-                    } else if (checkValue(rate, RateValue.neutral)) {
-                        $scope.rates.neutral += 1;
-                    }
+                if (checkValue(rate, RateValue.pro)) {
+                    $scope.rates.pro += 1;
+                } else if (checkValue(rate, RateValue.contra)) {
+                    $scope.rates.contra += 1;
+                } else if (checkValue(rate, RateValue.neutral)) {
+                    $scope.rates.neutral += 1;
+                }
 
-                    if (iscurrentuser(rate)) {
-                        $scope.thisUsersRate = rate;
-                    }
-                });
+                if (iscurrentuser(rate)) {
+                    $scope.thisUsersRate = rate;
+                }
+            });
         });
 };
 
