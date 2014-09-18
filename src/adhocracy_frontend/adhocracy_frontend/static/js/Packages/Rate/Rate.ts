@@ -271,8 +271,8 @@ export var rateController = (
     };
 
     $scope.postUpdate = () : ng.IPromise<void> => {
-        if (typeof $scope.thisUsersRate !== "undefined") {
-            throw "internal error";
+        if (typeof $scope.thisUsersRate === "undefined") {
+            throw "internal error?!";
         } else {
             return adhHttp
                 .postNewVersionNoFork(Util.parentPath($scope.thisUsersRate), $scope.thisUsersRate)
