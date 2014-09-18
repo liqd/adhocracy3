@@ -220,7 +220,7 @@ export class Service<Content extends Resources.Content<any>> {
                     // condition.
 
                     // double waitms (fuzzed for avoiding network congestion).
-                    waitms *= 2 * (Math.random() / 2 - 0.25);
+                    waitms *= 2 * (1 + (Math.random() / 2 - 0.25));
 
                     // wait then retry
                     return _self.$timeout(
