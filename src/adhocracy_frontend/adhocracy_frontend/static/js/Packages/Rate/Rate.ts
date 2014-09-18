@@ -99,6 +99,31 @@ export var postPoolPathPromise = (
 
 
 /**
+ * Use postPoolPathPromise to fetch post pool path, then fetch the
+ * post pool and all latest versions of the items contained in it.
+ *
+ * Promise an array of those versions.
+ */
+export var postPoolContentsPromise = (
+    $scope : IRateScope,
+    adhHttp : AdhHttp.Service<any>
+) : ng.IPromise<string> => {
+    return postPoolPathPromise($scope, adhHttp)
+        .then((postPoolPath) => adhHttp.get(postPoolPath))
+        .then((postPool) => {
+            var ratePromises : ng.IPromise<ResourcesBase.Resource>[] =
+                postPool.data["adhocracy.sheets.pool.IPool"].elements
+                    .map((path : string, index : number) =>
+                        adhHttp
+                           .getNewestVersionPathNoFork(Util.parentPath(path))
+                           .then((path) => adhHttp.get(path)));
+
+            return $q.all(ratePromises);
+        });
+};
+
+
+/**
  * Update state from server: Fetch post pool, query it for all
  * rates, and store and render them.  If a rate of the current
  * user exists, store and render that separately.
@@ -113,17 +138,8 @@ export var updateRates = (
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.User
 ) : ng.IPromise<void> => {
-    return postPoolPathPromise($scope, adhHttp)
-        .then((postPoolPath) => adhHttp.get(postPoolPath))
-        .then((postPool) => {
-            var ratePromises : ng.IPromise<ResourcesBase.Resource>[] =
-                postPool.data["adhocracy.sheets.pool.IPool"].elements
-                    .map((path : string, index : number) =>
-                        adhHttp
-                           .getNewestVersionPathNoFork(Util.parentPath(path))
-                           .then((path) => adhHttp.get(path)));
-
-            return $q.all(ratePromises).then((rates) => {
+    return postPoolContentsPromise($scope, adhHttp)
+        .then((rates) => {
                 resetRates($scope);
                 _.forOwn(rates, (rate) => {
 
@@ -162,7 +178,6 @@ export var updateRates = (
                         $scope.thisUsersRate = rate;
                     }
                 });
-            });
         });
 };
 
