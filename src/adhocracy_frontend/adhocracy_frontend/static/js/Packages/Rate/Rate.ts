@@ -267,6 +267,8 @@ export var rateController = (
                     return transaction.commit()
                         .then((responses) : boolean => {
                             $scope.thisUsersRate = responses[version.index];
+                            adapter.subject($scope.thisUsersRate, adhUser.userPath);
+                            adapter.object($scope.thisUsersRate, $scope.refersTo);
                             return false;
                         });
                 });
