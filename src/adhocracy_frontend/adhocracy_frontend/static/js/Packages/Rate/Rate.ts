@@ -119,7 +119,7 @@ export var updateRates = (
                 postPool.data["adhocracy.sheets.pool.IPool"].elements
                     .map((path : string, index : number) =>
                         adhHttp
-                           .getNewestVersionPath(Util.parentPath(path))
+                           .getNewestVersionPathNoFork(Util.parentPath(path))
                            .then(adhHttp.get));
 
             return $q.all(ratePromises).then((rates) => {
@@ -232,9 +232,9 @@ export var rateController = (
             throw "internal error";
         } else {
             return adhHttp
-                .postNewVersion(Util.parentPath($scope.thisUsersRate), $scope.thisUsersRate)
-                .then((response : RIRate) => {
-                    $scope.thisUsersRate = response;
+                .postNewVersionNoFork(Util.parentPath($scope.thisUsersRate), $scope.thisUsersRate)
+                .then((response : { value: RIRate }) => {
+                    $scope.thisUsersRate = response.value;
                 });
         }
     };
