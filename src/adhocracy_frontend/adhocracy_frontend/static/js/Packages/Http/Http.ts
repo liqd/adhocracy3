@@ -167,9 +167,9 @@ export class Service<Content extends Resources.Content<any>> {
      *
      * The return value is an object containing the resource from the
      * response, plus a flag whether the post resulted in an implicit
-     * merge.  If this flag is true, the caller may want to take
-     * further action, such as notifying the (two or more) users
-     * involved in the conflict.
+     * transplant (or change of parent).  If this flag is true, the
+     * caller may want to take further action, such as notifying the
+     * (two or more) users involved in the conflict.
      *
      * There is a max number of retries and a randomized and
      * exponentially growing sleep period between retries hard-wired
@@ -179,7 +179,7 @@ export class Service<Content extends Resources.Content<any>> {
     public postNewVersionNoFork(
         oldVersionPath : string,
         obj : Content, rootVersions? : string[]
-    ) : ng.IPromise<{ value: Content; isMerge: boolean; }> {
+    ) : ng.IPromise<{ value: Content; parentChanged: boolean; }> {
         var _self = this;
 
         var timeoutRounds : number = 5;
@@ -193,9 +193,9 @@ export class Service<Content extends Resources.Content<any>> {
 
         var retry = (
             nextOldVersionPath : string,
-            isMerge : boolean,
+            parentChanged : boolean,
             roundsLeft : number
-        ) : ng.IPromise<{ value : Content; isMerge : boolean; }> => {
+        ) : ng.IPromise<{ value : Content; parentChanged : boolean; }> => {
             if (roundsLeft === 0) {
                 throw "Tried to post new version of " + dagPath + " " + timeoutRounds.toString() + " times, giving up.";
             }
@@ -205,7 +205,7 @@ export class Service<Content extends Resources.Content<any>> {
             };
 
             var handleSuccess = (content) => {
-                return { value: content, isMerge: isMerge };
+                return { value: content, parentChanged: parentChanged };
             };
 
             var handleConflict = (msg) => {
