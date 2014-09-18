@@ -783,6 +783,12 @@ The backend must to two things::
 
 FIXME: add tests for this!
 
+FIXME: in the frontend, we check if the name of some error is
+__NO_FORK__ to decide whether to fetch a new HEAD and retry post, but
+this seems wrong, since colander uses the error fields differently.
+the error format needs to be adapted to the new requirements.  (See
+files Http.ts and HttpSpec.ts in the frontend.)
+
 
 
 Resources with PostPool, example Comments

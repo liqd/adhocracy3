@@ -20,10 +20,10 @@ export var register = (angular, config, meta_api) => {
 
     describe("withTransaction", () => {
         var adhHttp : AdhHttp.Service<any> = (() => {
-            var factory = ($http, $q) => {
-                return (new AdhHttp.Service($http, $q, new AdhMetaApi.MetaApiQuery(meta_api), new AdhPreliminaryNames, config));
+            var factory = ($http, $q, $timeout) => {
+                return (new AdhHttp.Service($http, $q, $timeout, new AdhMetaApi.MetaApiQuery(meta_api), new AdhPreliminaryNames, config));
             };
-            factory.$inject = ["$http", "$q"];
+            factory.$inject = ["$http", "$q", "$timeout"];
             return angular.injector(["ng"]).invoke(factory);
         })();
 
