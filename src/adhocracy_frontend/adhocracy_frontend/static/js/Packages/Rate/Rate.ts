@@ -17,9 +17,9 @@ var pkgLocation = "/Rate";
 
 
 export enum RateValue {
-    pro,
-    contra,
-    neutral
+    contra = -1,
+    neutral,
+    pro
 };
 
 
