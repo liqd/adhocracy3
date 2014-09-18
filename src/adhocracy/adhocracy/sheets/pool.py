@@ -59,7 +59,7 @@ class FilteringPoolSheet(PoolSheet):
     def _custom_filtering_necessary(self, params: dict) -> bool:
         params_copy = params.copy()
         return params_copy.pop('depth', '1') != '1' or\
-            params_copy.pope('elements', 'path') != 'path' or\
+            params_copy.pop('elements', 'path') != 'path' or\
             params_copy != {}
 
     def _get_arbitrary_filters(self, params):
@@ -94,12 +94,11 @@ class FilteringPoolSheet(PoolSheet):
             query &= interface_index.all(ifaces)
         if arbitrary_filters:
             adhocracy_catalog = find_catalog(self.context, 'adhocracy')
-            for name, value in valuefilters.items():
+            for name, value in arbitrary_filters.items():
                 # FIXME This will raise a KeyError if no such index exists.
                 # Better validate first whether all remaining parameters
                 # indicate existing catalogs and raise colander.Invalid
                 # otherwise.
-            for name, value in arbitrary_filters.items():
                 index = adhocracy_catalog[name]
                 query &= index.eq(value)
         resultset = query.execute()
