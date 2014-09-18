@@ -209,9 +209,6 @@ export var register = () => {
                     };
                     $httpMock.post.and.returnValue(q.reject({ data: error }));
 
-                    var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy.sheets.tags.ITag"] = new SITag.AdhocracySheetsTagsITag({ elements: ["not_important"] });
-
                     adhHttp.getNewestVersionPathNoFork = (<any>jasmine.createSpy("getNewestVersionPathNoForkSpy"))
                         .and.returnValue(q.when("next_head"));
 
