@@ -215,6 +215,11 @@ export var rateController = (
     }
 
     $scope.cast = (rate : RateValue) : void => {
+        if (!adhUser.userPath) {
+            // if user is not logged in, rating silently refuses to work.
+            return;
+        }
+
         if ($scope.isActive(rate)) {
             // click on active button to un-rate
 
