@@ -58,7 +58,7 @@ export class ProposalDetail {
                 var wsHandle;
 
                 var fetchAndUpdateContent = (itemPath : string) : void => {
-                    adhHttp.getNewestVersionPath(itemPath)
+                    adhHttp.getNewestVersionPathNoFork(itemPath)
                         .then((versionPath) => adhHttp.get(versionPath))
                         .then((content) => {
                             $scope.content = content;
