@@ -275,7 +275,6 @@ class GETPoolRequestSchema(colander.MappingSchema):
     aggregateby = colander.SchemaNode(colander.String(), missing=colander.drop)
 
 
-
 class OPTIONResourceResponseSchema(colander.Schema):
 
     """Overview of all request/response data structures."""
