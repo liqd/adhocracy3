@@ -34,7 +34,9 @@ export interface IRateScope extends ng.IScope {
         neutral : number;
     };
     thisUsersRate : any;  // resource matching IRateAdapter (this is tricky to type, so we leave it blank for now.)
+    allRates : any[];
     isActive : (RateValue) => string;  // css class name if RateValue is active, or "" otherwise.
+    toggleShowDetails() : void;
     cast(RateValue) : void;
     assureUserRateExists() : ng.IPromise<void>;
     postUpdate() : ng.IPromise<void>;
@@ -106,6 +108,7 @@ export var postPoolPathPromise = (
  */
 export var postPoolContentsPromise = (
     $scope : IRateScope,
+    $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>
 ) : ng.IPromise<RIRate[]> => {
     return postPoolPathPromise($scope, adhHttp)
@@ -138,7 +141,7 @@ export var updateRates = (
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.User
 ) : ng.IPromise<void> => {
-    return postPoolContentsPromise($scope, adhHttp)
+    return postPoolContentsPromise($scope, $q, adhHttp)
         .then((rates) => {
             resetRates($scope);
             _.forOwn(rates, (rate) => {
@@ -198,6 +201,18 @@ export var rateController = (
     $scope.isActive = (rate : RateValue) =>
         (typeof $scope.thisUsersRate !== "undefined" &&
          rate === adapter.rate($scope.thisUsersRate)) ? "rate-button-active" : "";
+
+    $scope.toggleShowDetails = () => {
+        if (typeof $scope.allRates === "undefined") {
+            $scope.allRates = [];
+            postPoolContentsPromise($scope, $q, adhHttp)
+                .then((rates) => {
+                    $scope.allRates = rates;
+                });
+        } else {
+            delete $scope.allRates;
+        }
+    }
 
     $scope.cast = (rate : RateValue) : void => {
         if ($scope.isActive(rate)) {

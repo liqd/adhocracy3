@@ -1,6 +1,13 @@
 <div class="rate">
-    <span class="rate-difference">{{rates.pro - rates.contra | signum}}</span>
+    <span class="rate-difference">
+        <a href="" data-ng-click="toggleShowDetails()">
+            {{rates.pro - rates.contra | signum}}
+        </a>
+    </span>
     <a href="" class="rate-pro {{isActive(0)}}" data-ng-click="cast(0)">pro: {{rates.pro}}</a>
     <a href="" class="rate-contra {{isActive(1)}}" data-ng-click="cast(1)">contra: {{rates.contra}}</a>
     <a href="" class="rate-neutral {{isActive(2)}}" data-ng-click="cast(2)">neutral: {{rates.neutral}}</a>
 </div>
+<pre class="rate-details" data-ng-if="allRates">
+    {{allRates}}
+</pre>
