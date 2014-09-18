@@ -120,7 +120,7 @@ export var updateRates = (
                     .map((path : string, index : number) =>
                         adhHttp
                            .getNewestVersionPathNoFork(Util.parentPath(path))
-                           .then(adhHttp.get));
+                           .then((path) => adhHttp.get(path)));
 
             return $q.all(ratePromises).then((rates) => {
                 resetRates($scope);
