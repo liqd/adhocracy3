@@ -38,7 +38,7 @@ export interface IRateScope extends ng.IScope {
     isActive : (RateValue) => string;  // css class name if RateValue is active, or "" otherwise.
     toggleShowDetails() : void;
     cast(RateValue) : void;
-    assureUserRateExists() : ng.IPromise<void>;
+    assureUserRateExists() : ng.IPromise<boolean>;
     postUpdate() : ng.IPromise<void>;
 }
 
@@ -234,37 +234,40 @@ export var rateController = (
         } else {
             // click on inactive button to (re-)rate
 
-            // increase new value
-            $scope.rates[rate] += 1;
-
             $scope.assureUserRateExists()
-                .then(() => {
-                    // decrease old value
-                    $scope.rates[adapter.rate($scope.thisUsersRate)] -= 1;
+                .then((didExistBefore) => {
+                    if (didExistBefore) {
+                        // decrease old value
+                        $scope.rates[adapter.rate($scope.thisUsersRate)] -= 1;
+                    }
 
-                    // set new value
-                    adapter.rate($scope.thisUsersRate, rate);
+                    if ((!didExistBefore) || (<any>$scope.thisUsersRate).rate === rate) {
+                        // set new value
+                        adapter.rate($scope.thisUsersRate, rate);
+                        $scope.rates[rate] += 1;
 
-                    // send new rate to server
-                    $scope.postUpdate();
+                        // send new rate to server
+                        $scope.postUpdate();
+                    }
                 });
         }
     };
 
-    $scope.assureUserRateExists = () : ng.IPromise<void> => {
+    $scope.assureUserRateExists = () : ng.IPromise<boolean> => {
         if (typeof $scope.thisUsersRate !== "undefined") {
-            return $q.when();
+            return $q.when(true);
         } else {
             return adhHttp
-                .withTransaction((transaction) : ng.IPromise<void> => {
+                .withTransaction((transaction) : ng.IPromise<boolean> => {
                     var item : AdhHttp.ITransactionResult =
                         transaction.post($scope.postPoolPath, new RIRate({ preliminaryNames: adhPreliminaryNames }));
                     var version : AdhHttp.ITransactionResult =
                         transaction.get(item.first_version_path);
 
                     return transaction.commit()
-                        .then((responses) : void => {
+                        .then((responses) : boolean => {
                             $scope.thisUsersRate = responses[version.index];
+                            return false;
                         });
                 });
         }
