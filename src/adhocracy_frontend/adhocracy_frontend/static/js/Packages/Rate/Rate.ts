@@ -275,7 +275,7 @@ export var rateController = (
             throw "internal error?!";
         } else {
             return adhHttp
-                .postNewVersionNoFork(Util.parentPath($scope.thisUsersRate.path), $scope.thisUsersRate)
+                .postNewVersionNoFork($scope.thisUsersRate.path, $scope.thisUsersRate)
                 .then((response : { value: RIRate }) => {
                     $scope.thisUsersRate = response.value;
                 });
