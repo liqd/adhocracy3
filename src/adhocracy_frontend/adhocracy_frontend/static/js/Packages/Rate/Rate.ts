@@ -107,7 +107,7 @@ export var postPoolPathPromise = (
 export var postPoolContentsPromise = (
     $scope : IRateScope,
     adhHttp : AdhHttp.Service<any>
-) : ng.IPromise<string> => {
+) : ng.IPromise<RIRate[]> => {
     return postPoolPathPromise($scope, adhHttp)
         .then((postPoolPath) => adhHttp.get(postPoolPath))
         .then((postPool) => {
