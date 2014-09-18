@@ -38,17 +38,17 @@ class FilteringPoolSheet(PoolSheet):
 
     """Resource sheet that allows filtering and aggregating pools."""
 
-    def _get_reference_appstruct(self, params):
+    def _get_reference_appstruct(self, params: dict={}) -> dict:
         if not params or not self._custom_filtering_necessary(params):
             return super()._get_reference_appstruct(params)
         appstruct = {}
         depth = self._build_depth(params)
-        iface_filter = self._build_iface_filter(params)
-        arbitrary_filters = self._get_arbitrary_filters(params)
+        ifaces = self._build_iface_filter(params)
+        arbitraries = self._get_arbitrary_filters(params)
         elements = self._build_elements_form_list(params)
-        elements.extend(self._filter_elements(depth,
-                                              iface_filter,
-                                              arbitrary_filters,
+        elements.extend(self._filter_elements(depth=depth,
+                                              ifaces=ifaces,
+                                              arbitrary_filters=arbitraries,
                                               ))
         appstruct['elements'] = elements
         if self._count_matching_elements(params):
@@ -59,7 +59,8 @@ class FilteringPoolSheet(PoolSheet):
     def _custom_filtering_necessary(self, params: dict) -> bool:
         params_copy = params.copy()
         return params_copy.pop('depth', '1') != '1' or\
-            params_copy.pop('elements', 'path') != 'path' or\
+            params_copy.pop('elements', 'path') != 'path' or \
+            params_copy.pop('count', False) is not False or\
             params_copy != {}
 
     def _get_arbitrary_filters(self, params):
