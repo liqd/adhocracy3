@@ -50,44 +50,6 @@ def raise_attribute_error_if_not_location_aware(context) -> None:
     context.__name__
 
 
-def serialize_path(node, value):
-    """Serialize object to path with 'pyramid.traveral.resource_path'.
-
-    :param node: the Colander node
-    :param value: the resource to serialize
-    :return: the path of that resource
-    """
-    if value in (colander.null, ''):
-        return value
-    try:
-        raise_attribute_error_if_not_location_aware(value)
-        return resource_path(value)
-    except AttributeError:
-        raise colander.Invalid(
-            node,
-            msg='This resource is not location aware', value=value)
-
-
-def deserialize_path(node, value):
-    """Deserialize path to object.
-
-    :param node: the Colander node
-    :param value: the path to deserialize
-    :return: the resource registered under that path
-    """
-    if value is colander.null:
-        return value
-    context = node.bindings['context']
-    try:
-        resource = find_resource(context, value)
-        raise_attribute_error_if_not_location_aware(resource)
-    except (KeyError, AttributeError):
-        raise colander.Invalid(
-            node,
-            msg='This resource path does not exist.', value=value)
-    return resource
-
-
 def validate_name_is_unique(node: colander.SchemaNode, value: str):
     """Validate if `value` is name that does not exists in the parent object.
 
