@@ -95,8 +95,12 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
     def set(appstruct, omit=(), send_event=True) -> bool:
         """ Store ``appstruct`` dictionary data."""
 
-    def get() -> dict:
-        """ Get ``appstruct`` dictionary data."""
+    def get(params: dict={}) -> dict:
+        """ Get ``appstruct`` dictionary data.
+
+        :param params: optional parameters that can modify the appearance
+        of the returned dictionary, e.g. query parameters in a GET request
+        """
 
 
 RESOURCE_METADATA = OrderedDict({
@@ -209,7 +213,7 @@ class IPool(IResource):  # pragma: no cover
         """
 
     def check_name(name: str) -> str:
-        """ Check and the name passed for validity.
+        """ Check that the passed name is valid.
 
         :returns: The name.
         :raises substanced.folder.FolderKeyError:

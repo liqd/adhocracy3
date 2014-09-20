@@ -81,6 +81,36 @@ class AdhocracySchemaNodeUnitTest(unittest.TestCase):
             inst.deserialize('1')
 
 
+class TestInterface():
+
+    @fixture
+    def inst(self):
+        from adhocracy.schema import Interface
+        return Interface()
+
+    def test_serialize_colander_null(self, inst):
+        result = inst.serialize(None, colander.null)
+        assert result == colander.null
+
+    def test_serialize_valid(self, inst):
+        from adhocracy.sheets.tags import ITag
+        result = inst.serialize(None, ITag)
+        assert result == 'adhocracy.sheets.tags.ITag'
+
+    def test_deserialize_empty_string(self, inst):
+        result = inst.deserialize(None, '')
+        assert result == ''
+
+    def test_deserialize_valid(self, inst):
+        from adhocracy.sheets.tags import ITag
+        result = inst.deserialize(None, 'adhocracy.sheets.tags.ITag')
+        assert result == ITag
+
+    def test_deserialize_valid(self, inst):
+        with raises(colander.Invalid):
+            inst.deserialize(None, 'adhocracy.sheets.tags.NoSuchTag')
+
+
 class NameUnitTest(unittest.TestCase):
 
     def setUp(self):
@@ -380,6 +410,14 @@ class TestResources:
         request.root['child'] = child
         child_url = request.resource_url(child)
         assert inst.deserialize([child_url]) == [child]
+
+    def test_serialize_form_omit(self, request):
+        from adhocracy.utils import FormList
+        inst = self._make_one().bind(request=request)
+        child = testing.DummyResource()
+        request.root['child'] = child
+        form_list = FormList([child], form='omit')
+        assert inst.serialize(form_list) == colander.drop
 
 
 class TestReferences:

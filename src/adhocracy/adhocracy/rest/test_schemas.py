@@ -510,3 +510,54 @@ class TestPOSTBatchRequestSchema:
         }
         with raises(colander.Invalid):
             inst.deserialize(data)
+
+
+class TestGETPoolRequestSchema():
+
+    @fixture
+    def inst(self):
+        from adhocracy.rest.schemas import GETPoolRequestSchema
+        return GETPoolRequestSchema()
+
+    def test_deserialize_empty(self, inst):
+        assert inst.deserialize({}) == {}
+
+    def test_deserialize_valid(self, inst):
+        from adhocracy.sheets.name import IName
+        data = {'content_type': 'adhocracy.sheets.name.IName',
+                'sheet': 'adhocracy.sheets.name.IName',
+                'depth': '100',
+                'elements': 'content',
+                'count': 'true',
+                'aggregateby': 'rating.opinion',
+                'tag': 'LAST'}
+        expected = {'content_type': IName,
+                    'sheet': IName,
+                    'depth': '100',
+                    'elements': 'content',
+                    'count': True,
+                    'aggregateby': 'rating.opinion',
+                    'tag': 'LAST'}
+        assert inst.deserialize(data) == expected
+
+    def test_deserialize_content_type_invalid(self, inst):
+        data = {'content_type': 'adhocracy.sheets.name.NoName'}
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_depth_all(self, inst):
+        data = {'depth': 'all'}
+        assert inst.deserialize(data) == {'depth': 'all'}
+
+    def test_deserialize_depth_invalid(self, inst):
+        data = {'depth': '-7'}
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_count_explicit_false(self, inst):
+        data = {'count': 'false'}
+        assert inst.deserialize(data) == {'count': False}
+
+    def test_deserialize_extra_values_are_preserved(self, inst):
+        data = {'extra1': 'blah',
+                'another_extra': 'blub'}

@@ -10,6 +10,7 @@ class IncludemeIntegrationTest(unittest.TestCase):
         config = testing.setUp()
         config.include('adhocracy.registry')
         config.include('adhocracy.events')
+        config.include('adhocracy.catalog')
         config.include('adhocracy.sheets')
         config.include('adhocracy_sample.resources.paragraph')
         self.config = config

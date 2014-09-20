@@ -43,6 +43,7 @@ def _add_catalog_service(context, registry):
     catalogs = registry.content.create('Catalogs')
     context.add_service('catalogs', catalogs, registry=registry)
     catalogs.add_catalog('system')
+    catalogs.add_catalog('adhocracy')
 
 
 def _add_principals_service(context, registry):

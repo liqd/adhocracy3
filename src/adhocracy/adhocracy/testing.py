@@ -61,6 +61,7 @@ class DummyPoolWithObjectMap(DummyPool):
 
 def create_pool_with_graph() -> testing.DummyResource:
     """Return pool like dummy object with objectmap and graph."""
+    # FIXME use pool_graph or pool_graph_catalog fixture instead
     from substanced.interfaces import IFolder
     from adhocracy.interfaces import IPool
     from adhocracy.graph import Graph
@@ -86,6 +87,35 @@ def add_and_register_sheet(context, mock_sheet, registry):
 ##################
 # Fixtures       #
 ##################
+
+
+@fixture
+def pool_graph(config):
+    """Return pool with graph for integration/functional tests."""
+    from adhocracy.resources.pool import Pool
+    from adhocracy.resources.root import _add_graph
+    from adhocracy.resources.root import _add_objectmap_to_app_root
+    config.include('adhocracy.registry')
+    config.include('adhocracy.events')
+    config.include('adhocracy.graph')
+    context = Pool()
+    _add_objectmap_to_app_root(context)
+    _add_graph(context, config.registry)
+    return context
+
+
+@fixture
+def pool_graph_catalog(config, pool_graph):
+    """Return pool wit graph and catalog for integration/functional tests."""
+    from substanced.interfaces import MODE_IMMEDIATE
+    from adhocracy.resources.root import _add_catalog_service
+    config.include('adhocracy.catalog')
+    context = pool_graph
+    _add_catalog_service(context, config.registry)
+    context['catalogs']['system']['name'].action_mode = MODE_IMMEDIATE
+    context['catalogs']['system']['interfaces'].action_mode = MODE_IMMEDIATE
+    return context
+
 
 @fixture
 def resource_meta() -> ResourceMetadata:
