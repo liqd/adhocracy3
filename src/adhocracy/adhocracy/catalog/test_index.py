@@ -34,7 +34,7 @@ class TestReference:
         inst = self._make_one()
         inst._not_indexed.add(1)
         inst.reset()
-        assert 1 not in inst._no_indexed
+        assert 1 not in inst._not_indexed
 
     def test_document_repr(self, context, catalog):
         from substanced.util import get_oid
