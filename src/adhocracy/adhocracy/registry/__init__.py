@@ -1,12 +1,18 @@
 """Content registry."""
 from pyramid.security import has_permission
 from pyramid.request import Request
+from pyramid.util import DottedNameResolver
 from substanced.content import ContentRegistry
 from substanced.content import add_content_type
 from substanced.content import add_service_type
+from zope.interface.interfaces import IInterface
 
 from adhocracy.utils import get_iresource
 from adhocracy.utils import get_all_sheets
+from adhocracy.interfaces import ISheet
+
+
+dotted_name_resolver = DottedNameResolver()
 
 
 class ResourceContentRegistry(ContentRegistry):
@@ -114,6 +120,30 @@ class ResourceContentRegistry(ContentRegistry):
             types_with_sheetnames[type_iface.__identifier__] = sheetnames
 
         return types_with_sheetnames
+
+    def resolve_isheet_field_from_dotted_string(self, dotted: str) -> tuple:
+        """Resolve `dotted` string to isheet and field name and schema node.
+
+        :dotted: isheet.__identifier__ and field_name seperated by ':'
+        :return: tuple with isheet (ISheet), field_name (str), field schema
+                 node (colander.SchemaNode).
+        :raise ValueError: If the string is not dotted or it cannot be
+            resolved to isheet and field name.
+        """
+        if ':' not in dotted:
+            raise ValueError
+        name = ''.join(dotted.split(':')[:-1])
+        field = dotted.split(':')[-1]
+        isheet = dotted_name_resolver.resolve(name)
+        if not IInterface.providedBy(isheet):
+            raise ValueError
+        if not isheet.isOrExtends(ISheet):
+            raise ValueError
+        schema = self.sheets_meta[isheet.__identifier__].schema_class()
+        node = schema.get(field, None)
+        if not node:
+            raise ValueError
+        return isheet, field, node
 
 
 def includeme(config):  # pragma: no cover
