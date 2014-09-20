@@ -85,7 +85,6 @@ class FilteringPoolSheet(PoolSheet):
 
     def _filter_elements(self, depth=1, ifaces: Iterable=None,
                          arbitrary_filters: dict=None) -> Iterable:
-        """See interface for docstring."""
         system_catalog = find_catalog(self.context, 'system')
         path_index = system_catalog['path']
         query = path_index.eq(resource_path(self.context), depth=depth,
