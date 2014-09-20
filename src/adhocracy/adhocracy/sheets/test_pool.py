@@ -1,9 +1,9 @@
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
+from unittest.mock import Mock
 
 from adhocracy.resources.pool import IBasicPool
-from adhocracy.sheets.pool import FilteringPoolSheet
 
 
 @fixture
@@ -16,21 +16,6 @@ def integration(config):
     config.include('adhocracy.sheets')
 
 
-class MockFilteringPoolSheet(FilteringPoolSheet):
-
-    """Replace _filter_elements with dummy implementation."""
-
-    def __init__(self, meta, context):
-        super().__init__(meta, context)
-        self._filter_elements_called = False
-        self.callargs = {}
-
-    def _filter_elements(self, **kwargs):
-        self._filter_elements_called = True
-        self.callargs = kwargs
-        return ['Dummy']
-
-
 class TestFilteringPoolSheet:
 
     @fixture
@@ -39,16 +24,18 @@ class TestFilteringPoolSheet:
         return pool_metadata
 
     @fixture
-    def mock_filtering_pool_sheet(self, meta, context):
-        return MockFilteringPoolSheet(meta, context)
+    def inst(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        inst._filter_elements = Mock(spec=inst._filter_elements)
+        inst._filter_elements.return_value = []
+        return inst
 
-    def test_create(self, meta, context):
+    def test_create(self, inst):
         from adhocracy.interfaces import IResourceSheet
         from adhocracy.sheets.pool import IPool
         from adhocracy.sheets.pool import PoolSchema
         from adhocracy.sheets.pool import PoolSheet
         from zope.interface.verify import verifyObject
-        inst = meta.sheet_class(meta, context)
         assert isinstance(inst, PoolSheet)
         assert verifyObject(IResourceSheet, inst)
         assert IResourceSheet.providedBy(inst)
@@ -57,84 +44,70 @@ class TestFilteringPoolSheet:
         assert inst.meta.editable is False
         assert inst.meta.creatable is False
 
-    def test_get_empty(self, meta, context):
+    def test_get_empty(self, inst):
         import colander
-        inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': [], 'count': colander.drop}
 
     #FIXME: add check if the schema has a children named 'elements' with tagged
     #Value 'target_isheet'. This isheet is used to filter return data.
 
-    def test_get_not_empty_with_target_isheet(self, meta, context):
+    def test_get_not_empty_with_target_isheet(self, inst, context):
         from adhocracy.interfaces import ISheet
         import colander
         child = testing.DummyResource(__provides__=ISheet)
         context['child1'] = child
-        inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': [child], 'count': colander.drop}
 
-    def test_get_not_empty_without_target_isheet(self, meta, context):
+    def test_get_not_empty_without_target_isheet(self, inst, context):
         import colander
         child = testing.DummyResource()
         context['child1'] = child
-        inst = meta.sheet_class(meta, context)
         assert inst.get() == {'elements': [], 'count': colander.drop}
 
-    def test_get_reference_appstruct_without_params(
-            self, mock_filtering_pool_sheet):
-        appstruct = mock_filtering_pool_sheet._get_reference_appstruct()
-        assert mock_filtering_pool_sheet._filter_elements_called is False
+    def test_get_reference_appstruct_without_params(self, inst):
+        appstruct = inst._get_reference_appstruct()
+        assert inst._filter_elements.called is False
         assert appstruct == {'elements': []}
 
-    def test_get_reference_appstruct_with_custom_params(
-            self, mock_filtering_pool_sheet):
-        appstruct = mock_filtering_pool_sheet._get_reference_appstruct(
+    def test_get_reference_appstruct_with_custom_params(self, inst):
+        inst._filter_elements.return_value = ['Dummy']
+        appstruct = inst._get_reference_appstruct(
             {'depth': '3', 'content_type': 'BlahType', 'count': True})
-        assert mock_filtering_pool_sheet._filter_elements_called is True
-        assert mock_filtering_pool_sheet.callargs == {'depth': 3,
-                                                      'ifaces': ['BlahType'],
+        assert inst._filter_elements.called
+        assert inst._filter_elements.call_args[1] == {'depth': 3, 'ifaces': ['BlahType'],
                                                       'arbitrary_filters': {}}
         assert appstruct == {'elements': ['Dummy'], 'count': 1}
 
-    def test_get_reference_appstruct_with_two_ifaces_and_two_arbitraryfilters(
-            self, mock_filtering_pool_sheet):
-        appstruct = mock_filtering_pool_sheet._get_reference_appstruct(
+    def test_get_reference_appstruct_with_two_ifaces_and_two_arbitraryfilters(self, inst):
+        inst._filter_elements.return_value = ['Dummy']
+        appstruct = inst._get_reference_appstruct(
             {'content_type': 'BlahType', 'sheet': 'BlubSheet',
              'tag': 'BEST', 'rating': 'outstanding'})
-        assert mock_filtering_pool_sheet._filter_elements_called is True
-        assert mock_filtering_pool_sheet.callargs == {
+        assert inst._filter_elements.called is True
+        assert inst._filter_elements.call_args[1] == {
             'depth': 1,
             'ifaces': ['BlahType', 'BlubSheet'],
             'arbitrary_filters': {'tag': 'BEST', 'rating': 'outstanding'}}
         assert appstruct == {'elements': ['Dummy']}
 
-    def test_get_reference_appstruct_with_default_params(
-            self, mock_filtering_pool_sheet):
-        appstruct = mock_filtering_pool_sheet._get_reference_appstruct(
+    def test_get_reference_appstruct_with_default_params(self, inst):
+        appstruct = inst._get_reference_appstruct(
             {'depth': '1', 'count': False})
-        assert mock_filtering_pool_sheet._filter_elements_called is False
+        assert inst._filter_elements.called is False
         assert appstruct == {'elements': []}
 
-    def test_get_reference_appstruct_with_depth_all(
-            self, mock_filtering_pool_sheet):
-        appstruct = mock_filtering_pool_sheet._get_reference_appstruct(
-            {'depth': 'all'})
-        assert mock_filtering_pool_sheet._filter_elements_called is True
-        assert mock_filtering_pool_sheet.callargs == {'depth': None,
-                                                      'ifaces': [],
-                                                      'arbitrary_filters': {}}
+    def test_get_reference_appstruct_with_depth_all(self, inst):
+        inst._filter_elements.return_value = ['Dummy']
+        appstruct = inst._get_reference_appstruct({'depth': 'all'})
+        assert inst._filter_elements.called
+        assert inst._filter_elements.call_args[1] == {'depth': None, 'ifaces': [], 'arbitrary_filters': {}}
         assert appstruct == {'elements': ['Dummy']}
 
-    def test_get_reference_appstruct_with_elements_omit(
-            self, mock_filtering_pool_sheet):
+    def test_get_reference_appstruct_with_elements_omit(self, inst):
         from adhocracy.utils import FormList
-        appstruct = mock_filtering_pool_sheet._get_reference_appstruct(
-            {'elements': 'omit'})
-        assert mock_filtering_pool_sheet._filter_elements_called is True
-        assert mock_filtering_pool_sheet.callargs == {'depth': 1,
-                                                      'ifaces': [],
-                                                      'arbitrary_filters': {}}
-        assert 'elements' in appstruct
+        appstruct = inst._get_reference_appstruct({'elements': 'omit'})
+        assert inst._filter_elements.called
+        assert inst._filter_elements.call_args[1] == {'depth': 1, 'ifaces': [], 'arbitrary_filters': {}}
         assert isinstance(appstruct['elements'], FormList)
         assert appstruct['elements'].form == 'omit'
 
@@ -263,6 +236,18 @@ class TestIntegrationPoolSheet:
         poolsheet = get_sheet(pool, IPool)
         result = set(poolsheet._filter_elements(arbitrary_filters={'tag': 'LAST'}))
         assert result == set()
+
+    def test_filter_elements_by_referencefilter(
+            self, registry, pool_graph_catalog):
+        from adhocracy.sheets.pool import IPool
+        from adhocracy.utils import get_sheet
+        pool = self._make_resource(registry, parent=pool_graph_catalog)
+        untagged_child = self._make_resource(registry, parent=pool,
+                                             name='untagged_child')
+        poolsheet = get_sheet(pool, IPool)
+        result = set(poolsheet._filter_elements(arbitrary_filters={'tag': 'LAST'}))
+        assert result == set()
+
 
 
 
