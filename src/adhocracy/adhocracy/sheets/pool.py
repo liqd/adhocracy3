@@ -2,6 +2,7 @@
 from collections.abc import Iterable
 
 from pyramid.traversal import resource_path
+from hypatia.interfaces import IResultSet
 from substanced.util import find_catalog
 import colander
 
@@ -12,7 +13,6 @@ from adhocracy.sheets import sheet_metadata_defaults
 from adhocracy.sheets import add_sheet_to_registry
 from adhocracy.schema import UniqueReferences
 from adhocracy.utils import append_if_not_none
-from adhocracy.utils import FormList
 from adhocracy.utils import remove_keys_from_dict
 
 
@@ -41,16 +41,19 @@ class FilteringPoolSheet(PoolSheet):
     def _get_reference_appstruct(self, params: dict={}) -> dict:
         if not params or not self._custom_filtering_necessary(params):
             return super()._get_reference_appstruct(params)
-        appstruct = {}
         depth = self._build_depth(params)
         ifaces = self._build_iface_filter(params)
         arbitraries = self._get_arbitrary_filters(params)
-        elements = self._build_elements_form_list(params)
-        elements.extend(self._filter_elements(depth=depth,
-                                              ifaces=ifaces,
-                                              arbitrary_filters=arbitraries,
-                                              ))
-        appstruct['elements'] = elements
+        serialization_form = self._get_serialization_form(params)
+        resolve_resources = serialization_form != 'omit'
+        elements = self._filter_elements(depth=depth,
+                                         ifaces=ifaces,
+                                         arbitrary_filters=arbitraries,
+                                         resolve_resources=resolve_resources,
+                                         )
+        appstruct = {'elements': []}
+        if serialization_form != 'omit':
+            appstruct['elements'] = elements
         if self._count_matching_elements(params):
             appstruct['count'] = len(elements)
         # FIXME implement aggregateby
@@ -72,9 +75,8 @@ class FilteringPoolSheet(PoolSheet):
         append_if_not_none(iface_filter, params.get('sheet', None))
         return iface_filter
 
-    def _build_elements_form_list(self, param) -> FormList:
-        elements_serialization_form = param.get('elements', 'path')
-        return FormList(form=elements_serialization_form)
+    def _get_serialization_form(self, param) -> str:
+        return param.get('elements', 'path')
 
     def _build_depth(self, params) -> int:
         raw_depth = params.get('depth', '1')
@@ -84,7 +86,8 @@ class FilteringPoolSheet(PoolSheet):
         return params.get('count', False)
 
     def _filter_elements(self, depth=1, ifaces: Iterable=None,
-                         arbitrary_filters: dict=None) -> Iterable:
+                         arbitrary_filters: dict=None,
+                         resolve_resources=True) -> IResultSet:
         system_catalog = find_catalog(self.context, 'system')
         path_index = system_catalog['path']
         query = path_index.eq(resource_path(self.context), depth=depth,
@@ -101,9 +104,10 @@ class FilteringPoolSheet(PoolSheet):
                 # otherwise.
                 index = adhocracy_catalog[name]
                 query &= index.eq(value)
-        resultset = query.execute()
-        for result in resultset:
-            yield result
+        resolver = None
+        if not resolve_resources:
+            resolver = lambda x: x
+        return query.execute(resolver=resolver)
 
 
 class IPool(ISheet):

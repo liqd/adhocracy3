@@ -268,14 +268,15 @@ class ResourceObjectUnitTests(unittest.TestCase):
         assert result == self.request.application_url + '/'
 
     def test_serialize_value_url_location_aware_with_serialize_to_path(self):
-        inst = self._make_one(serialize_to_path=True)
+        inst = self._make_one(serialization_form='path')
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping(), context=self.context)
         result = inst.serialize(node, self.child)
         assert result == '/child'
 
     def test_serialize_value_url_location_aware_with_serialize_to_path_without_context_binding(self):
-        inst = self._make_one(serialize_to_path=True)
+        inst = self._make_one(serialization_form='path')
+        self.context['child'] = self.child
         self.context['child'] = self.child
         node = add_node_binding(colander.Mapping())
         with raises(AssertionError):
@@ -410,14 +411,6 @@ class TestResources:
         request.root['child'] = child
         child_url = request.resource_url(child)
         assert inst.deserialize([child_url]) == [child]
-
-    def test_serialize_form_omit(self, request):
-        from adhocracy.utils import FormList
-        inst = self._make_one().bind(request=request)
-        child = testing.DummyResource()
-        request.root['child'] = child
-        form_list = FormList([child], form='omit')
-        assert inst.serialize(form_list) == colander.drop
 
 
 class TestReferences:

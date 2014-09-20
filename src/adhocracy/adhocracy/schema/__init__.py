@@ -192,14 +192,17 @@ class ResourceObject(colander.SchemaType):
     The default serialization is the resource url.
     """
 
-    def __init__(self, serialize_to_path=False):
-        self.serialize_to_path = serialize_to_path
-        """If `False` the :term:`request` binding is used to serialize
-        to the resource url.
-        Else the :term:`context` binding is used to  serialize to
-        the :term:`Resource Location` path.
-        Default `False`.
+    def __init__(self, serialization_form='url'):
+        self.serialization_form = serialization_form
         """
+        :param:`serialization_form`:
+            If 'url` the :term:`request` binding is used to serialize
+            to the resource url.
+            If `path` the :term:`context` binding is used to  serialize to
+            the :term:`Resource Location` path.
+            Default `url`.
+        """
+        # FIXME serialize the complete resource
 
     def serialize(self, node, value):
         """Serialize object to url or path.
@@ -219,7 +222,7 @@ class ResourceObject(colander.SchemaType):
                                    value=value)
 
     def _serialize_location_or_url(self, node, value):
-        if self.serialize_to_path:
+        if self.serialization_form == 'path':
             assert 'context' in node.bindings
             return resource_path(value)
         else:
@@ -312,15 +315,6 @@ class Resources(colander.SequenceSchema):
     resource = Resource()
     default = []
     missing = []
-
-    def serialize(self, appstruct=colander.null):
-        # Honor form attribute, if present
-        form = getattr(appstruct, 'form', None)
-        if form == 'omit':
-            return colander.drop
-        # FIXME Not implemented yet: form == 'content' should serialize
-        # complete elements instead of just their paths
-        return super().serialize(appstruct)
 
 
 def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
