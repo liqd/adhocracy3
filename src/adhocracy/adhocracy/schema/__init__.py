@@ -210,6 +210,21 @@ def deferred_content_type_default(node: colander.MappingSchema,
 class ContentType(SingleLine):
 
     default = deferred_content_type_default
+
+
+def get_sheet_cstructs(context: IResource, request) -> dict:
+    """Serialize and return the `viewable`resource sheet data."""
+    sheets = request.registry.content.resource_sheets(context, request,
+                                                      onlyviewable=True)
+    cstructs = {}
+    for name, sheet in sheets.items():
+        appstruct = sheet.get()
+        schema = sheet.schema.bind(context=context, request=request)
+        cstruct = schema.serialize(appstruct)
+        cstructs[name] = cstruct
+    return cstructs
+
+
 class ResourceObject(colander.SchemaType):
 
     """Schema type that de/serialized a :term:`location`-aware object.
@@ -233,9 +248,10 @@ class ResourceObject(colander.SchemaType):
             to the resource url.
             If `path` the :term:`context` binding is used to  serialize to
             the :term:`Resource Location` path.
+            If `content` the :term:`request` and  'context' binding is used to
+            serialize the complete resource content and metadata.
             Default `url`.
         """
-        # FIXME serialize the complete resource
 
     def serialize(self, node, value):
         """Serialize object to url or path.
@@ -248,16 +264,25 @@ class ResourceObject(colander.SchemaType):
             return ''
         try:
             raise_attribute_error_if_not_location_aware(value)
-            return self._serialize_location_or_url(node, value)
+            return self._serialize_location_or_url_or_content(node, value)
         except AttributeError:
             raise colander.Invalid(node,
                                    msg='This resource is not location aware',
                                    value=value)
 
-    def _serialize_location_or_url(self, node, value):
+    def _serialize_location_or_url_or_content(self, node, value):
         if self.serialization_form == 'path':
             assert 'context' in node.bindings
             return resource_path(value)
+        if self.serialization_form == 'content':
+            assert 'request' in node.bindings
+            request = node.bindings['request']
+            schema = ResourcePathAndContentSchema().bind(request=request,
+                                                         context=value)
+            cstruct = schema.serialize({'path': value})
+            sheet_cstructs = get_sheet_cstructs(value, request)
+            cstruct['data'] = sheet_cstructs
+            return cstruct
         else:
             assert 'request' in node.bindings
             request = node.bindings['request']

@@ -238,6 +238,31 @@ def test_deferred_content_type_default_call_without_iresource():
     assert deferred_content_type_default(node, bindings) == ''
 
 
+class TestGetSheetCstructs:
+
+    @fixture
+    def request(self, mock_resource_registry):
+        request = testing.DummyRequest()
+        request.registry.content = mock_resource_registry
+        return request
+
+    def _call_fut(self, context, request):
+        from . import get_sheet_cstructs
+        return get_sheet_cstructs(context, request)
+
+    def test_call_with_context_without_sheets(self, context, request):
+        assert self._call_fut(context, request) == {}
+
+    def test_call_with_context_with_sheets(self, context, request, mock_resource_registry, mock_sheet):
+        mock_sheet.get.return_value = {}
+        mock_sheet.schema = colander.MappingSchema()
+        isheet = mock_sheet.meta.isheet
+        mock_resource_registry.resource_sheets.return_value = {isheet.__identifier__: mock_sheet}
+        assert self._call_fut(context, request) == {isheet.__identifier__: {}}
+        assert mock_resource_registry.resource_sheets.call_args[0] == (context, request)
+        assert mock_resource_registry.resource_sheets.call_args[1] == {'onlyviewable': True}
+
+
 class TestResourceObjectUnitTests:
 
     def _make_one(self, **kwargs):
@@ -285,6 +310,19 @@ class TestResourceObjectUnitTests:
         result = inst.serialize(node, child)
         assert result == request.application_url + '/'
 
+    def test_serialize_value_url_location_aware_with_serialize_to_content(self, context, request):
+        from adhocracy.interfaces import IResource
+        inst = self._make_one(serialization_form='content')
+        context['child'] = testing.DummyResource(__provides__=IResource)
+        node = add_node_binding(colander.Mapping(),
+                                context=context['child'],
+                                request=request)
+        result = inst.serialize(node, context['child'])
+        assert result == {'content_type': 'adhocracy.interfaces.IResource',
+                          'data': {},
+                          'path': request.application_url + '/child/'}
+
+    def test_serialize_value_url_location_aware_with_serialize_to_path(self, context):
         inst = self._make_one(serialization_form='path')
         context['child'] = testing.DummyResource()
         node = add_node_binding(colander.Mapping(), context=context)
