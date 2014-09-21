@@ -114,7 +114,7 @@ class TestFilteringPoolSheet:
         inst._filter_elements.return_value = ['Dummy']
         appstruct = inst._get_reference_appstruct({'elements': 'omit'})
         assert inst._filter_elements.call_args[1]['resolve_resources'] is False
-        assert appstruct['elements'] == []
+        assert 'elements' not in appstruct
 
     def test_get_arbitrary_filters(self, meta, context):
         """remove all standard filter parameter in get pool requests."""
