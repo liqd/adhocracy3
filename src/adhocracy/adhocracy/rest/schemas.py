@@ -324,8 +324,6 @@ def _maybe_arbitrary_filter_node(name, context):
     catalog = find_catalog(context, 'adhocracy')
     if not catalog:
         return False
-    if ':' in name:
-        return False
     if name in catalog:
         return True
     else:

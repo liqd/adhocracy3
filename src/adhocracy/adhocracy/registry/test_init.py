@@ -232,14 +232,22 @@ class TestResourceContentRegistryResolveISheetFieldFromDottedString:
         with raises(ValueError):
             self._call_fut(self_, dotted)
 
-    def test_call_with_non_isheet_dotted_string(self, mock_resource_registry, sheet_meta):
+    def test_call_with_non_interface_dotted_string(self, mock_resource_registry, sheet_meta):
         field = 'field1'
         dotted = 'colander.SchemaNode' + ':' + field
         self_ = mock_resource_registry
         with raises(ValueError):
             self._call_fut(self_, dotted)
 
-    def test_call_with_isheet_but_wront_field_dotted_string(self, mock_resource_registry, sheet_meta):
+    def test_call_with_non_isheet_dotted_string(self, mock_resource_registry, sheet_meta):
+        from zope.interface import Interface
+        field = 'field1'
+        dotted = Interface.__identifier__ + ':' + field
+        self_ = mock_resource_registry
+        with raises(ValueError):
+            self._call_fut(self_, dotted)
+
+    def test_call_with_isheet_but_wrong_field_dotted_string(self, mock_resource_registry, sheet_meta):
         isheet = sheet_meta.isheet
         field = 'WRONG'
         dotted = isheet.__identifier__ + ':' + field
