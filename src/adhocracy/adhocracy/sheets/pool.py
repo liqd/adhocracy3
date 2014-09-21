@@ -51,7 +51,7 @@ class FilteringPoolSheet(PoolSheet):
                                          arbitrary_filters=arbitraries,
                                          resolve_resources=resolve_resources,
                                          )
-        appstruct = {'elements': []}
+        appstruct = {}
         if serialization_form != 'omit':
             appstruct['elements'] = elements
         if self._count_matching_elements(params):
@@ -132,7 +132,8 @@ class PoolSchema(colander.MappingSchema):
     """
 
     elements = UniqueReferences(reftype=PoolElementsReference,
-                                readonly=True)
+                                readonly=True,
+                                default=colander.drop)
     count = colander.SchemaNode(colander.Integer(), default=colander.drop)
 
 
