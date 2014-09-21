@@ -35,6 +35,7 @@ from adhocracy.rest.schemas import GETPoolRequestSchema
 from adhocracy.rest.schemas import GETItemResponseSchema
 from adhocracy.rest.schemas import GETResourceResponseSchema
 from adhocracy.rest.schemas import OPTIONResourceResponseSchema
+from adhocracy.rest.schemas import add_get_pool_request_extra_fields
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import References
 from adhocracy.utils import get_iresource
@@ -89,22 +90,26 @@ def validate_request_data(context: ILocation, request: Request,
     schema_with_binding = schema.bind(context=context, request=request,
                                       parent_pool=parent)
     qs, headers, body, path = extract_request_data(request)
-    validate_body_or_querystring(body, qs, schema_with_binding, request)
+    validate_body_or_querystring(body, qs, schema_with_binding, context,
+                                 request)
     _validate_extra_validators(extra_validators, context, request)
     _raise_if_errors(request)
 
 
-def validate_body_or_querystring(body, qs, schema_with_binding: Schema,
+def validate_body_or_querystring(body, qs, schema: Schema, context: IResource,
                                  request: Request):
     """Validate the querystring if this is a GET request, the body otherwise.
 
     This allows using just a single schema for all kinds of requests.
     """
+    if isinstance(schema, GETPoolRequestSchema):
+        schema = add_get_pool_request_extra_fields(qs, schema, context,
+                                                   request.registry)
     if request.method.upper() == 'GET':
-        _validate_schema(qs, schema_with_binding, request,
+        _validate_schema(qs, schema, request,
                          location='querystring')
     else:
-        _validate_schema(body, schema_with_binding, request, location='body')
+        _validate_schema(body, schema, request, location='body')
 
 
 def _validate_schema(cstruct: object, schema: MappingSchema, request: Request,

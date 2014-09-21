@@ -1207,8 +1207,17 @@ versions of all sections::
     ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/',
      'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
-FIXME Demonstrate custom filters, using the Rating resource as example
-(subject or object, actual rating).
+
+*package.sheets.sheet.ISheet.FieldName*: you can add arbitrary custom filter that refer to
+sheet fields with references. The key is the name of the isheet plus the field name separated 
+by ':' The value is the wanted reference target.
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    ...             'adhocracy.sheets.versions.IVersionable:follows': 'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000000/',
+    ...             'depth': 'all', 'tag': 'LAST'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
 FIXME Not yet implemented: aggregateby
 

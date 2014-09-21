@@ -1,4 +1,5 @@
 """Cornice colander schemas und validators to validate request data."""
+from substanced.util import find_catalog
 import colander
 
 from adhocracy.schema import AbsolutePath
@@ -8,7 +9,10 @@ from adhocracy.schema import Interface
 from adhocracy.schema import Password
 from adhocracy.schema import Resource
 from adhocracy.schema import Resources
+from adhocracy.schema import Reference
+from adhocracy.schema import References
 from adhocracy.schema import SingleLine
+from adhocracy.interfaces import IResource
 
 
 class ResourceResponseSchema(colander.Schema):
@@ -251,8 +255,8 @@ class GETPoolRequestSchema(colander.MappingSchema):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Extra key/value pairs should be preserved when deserializing data
-        self.typ.unknown = 'preserve'
+        # Raise if unknown to tell client the query parameters are wrong.
+        self.typ.unknown = 'raise'
 
     # FIXME For now we don't have a way to specify GET parameters that can
     # be repeated, e.g. 'sheet=Blah&sheet=Blub'. The querystring is converted
@@ -273,6 +277,64 @@ class GETPoolRequestSchema(colander.MappingSchema):
     elements = PoolElementsForm(missing=colander.drop)
     count = colander.SchemaNode(colander.Boolean(), missing=colander.drop)
     aggregateby = colander.SchemaNode(colander.String(), missing=colander.drop)
+
+
+def add_get_pool_request_extra_fields(cstruct: dict,
+                                      schema: GETPoolRequestSchema,
+                                      context: IResource,
+                                      registry) -> GETPoolRequestSchema:
+    """Validate arbitrary fields in GETPoolRequestSchema data."""
+    extra_fields = _get_unknown_fields(cstruct, schema)
+    if not extra_fields:
+        return schema
+    schema_extra = schema.clone()
+    for name in extra_fields:
+        if _maybe_reference_filter_node(name, registry):
+            _add_reference_filter_node(name, schema_extra)
+        elif _maybe_arbitrary_filter_node(name, context):
+            _add_arbitrary_filter_node(name, schema_extra)
+    return schema_extra
+
+
+def _get_unknown_fields(cstruct, schema):
+    unknown_fields = [key for key in cstruct if key not in schema]
+    return unknown_fields
+
+
+def _maybe_reference_filter_node(name, registry):
+    if ':' not in name:
+        return False
+    resolve = registry.content.resolve_isheet_field_from_dotted_string
+    try:
+        isheet, field, node = resolve(name)
+    except ValueError:
+        return False
+    if isinstance(node, (Reference, References)):
+        return True
+    else:
+        return False
+
+
+def _add_reference_filter_node(name, schema):
+    node = Resource(name=name).bind(**schema.bindings)
+    schema.add(node)
+
+
+def _maybe_arbitrary_filter_node(name, context):
+    catalog = find_catalog(context, 'adhocracy')
+    if not catalog:
+        return False
+    if ':' in name:
+        return False
+    if name in catalog:
+        return True
+    else:
+        return False
+
+
+def _add_arbitrary_filter_node(name, schema):
+    node = SingleLine(name=name).bind(**schema.bindings)
+    schema.add(node)
 
 
 class OPTIONResourceResponseSchema(colander.Schema):
