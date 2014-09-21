@@ -1,12 +1,16 @@
 """ Catalog utilities."""
 from substanced import catalog
+from substanced.catalog.factories import IndexFactory
 from substanced.interfaces import IIndexingActionProcessor
 from zope.interface import Interface
 
-from .index import Reference
+from .index import ReferenceIndex
 
 
-@catalog.catalog_factory('adhocracy')
+class Reference(IndexFactory):
+    index_type = ReferenceIndex
+
+
 class AdhocracyCatalogFactory:
     tag = catalog.Keyword()
     reference = Reference()
@@ -24,3 +28,4 @@ def includeme(config):
                                     IIndexingActionProcessor)
     config.scan('substanced.catalog')
     config.add_catalog_factory('adhocracy', AdhocracyCatalogFactory)
+    config.scan('adhocracy.catalog.index')
