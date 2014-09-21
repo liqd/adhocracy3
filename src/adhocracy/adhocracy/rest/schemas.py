@@ -9,15 +9,13 @@ from adhocracy.schema import Password
 from adhocracy.schema import Resource
 from adhocracy.schema import Resources
 from adhocracy.schema import SingleLine
+from adhocracy.schema import ResourcePathSchema
+from adhocracy.schema import ResourcePathAndContentSchema
 
 
-class ResourceResponseSchema(colander.Schema):
+class ResourceResponseSchema(ResourcePathSchema):
 
     """Data structure for responses of Resource requests."""
-
-    content_type = SingleLine()
-
-    path = Resource()
 
 
 class ItemResponseSchema(ResourceResponseSchema):
@@ -27,15 +25,12 @@ class ItemResponseSchema(ResourceResponseSchema):
     first_version_path = Resource()
 
 
-class GETResourceResponseSchema(ResourceResponseSchema):
+class GETResourceResponseSchema(ResourcePathAndContentSchema):
 
     """Data structure for Resource GET requests."""
 
-    data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
-                               default={})
 
-
-class GETItemResponseSchema(GETResourceResponseSchema):
+class GETItemResponseSchema(ResourcePathAndContentSchema):
 
     """Data structure for responses of IItem requests."""
 

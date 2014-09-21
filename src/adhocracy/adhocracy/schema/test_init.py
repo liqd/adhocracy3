@@ -221,6 +221,23 @@ class AbsolutePath(unittest.TestCase):
             inst.validator(inst, 'blu.ABC_12-3')
 
 
+def test_deferred_content_type_default_call_with_iresource():
+    from adhocracy.interfaces import IResource
+    from adhocracy.schema import deferred_content_type_default
+    context = testing.DummyResource(__provides__=IResource)
+    node = None
+    bindings = {'context': context}
+    assert deferred_content_type_default(node, bindings) == IResource.__identifier__
+
+
+def test_deferred_content_type_default_call_without_iresource():
+    from adhocracy.schema import deferred_content_type_default
+    context = testing.DummyResource()
+    node = None
+    bindings = {'context': context}
+    assert deferred_content_type_default(node, bindings) == ''
+
+
 class TestResourceObjectUnitTests:
 
     def _make_one(self, **kwargs):

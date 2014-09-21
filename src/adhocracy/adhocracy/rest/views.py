@@ -273,13 +273,18 @@ class ResourceRESTView(RESTView):
         cstruct = deepcopy(cstruct_singleton)
         for sheet in sheets_edit:
             cstruct['PUT']['request_body']['data'][sheet] = {}
+            cstruct['PUT']['request_body']['content_type'] = ''
+            cstruct['PUT']['response_body']['content_type'] = ''
+        cstruct['PUT']['response_body']['content_type'] = ''
         for sheet in sheets_view:
             cstruct['GET']['response_body']['data'][sheet] = {}
+            cstruct['GET']['response_body']['content_type'] = ''
         for type, sheets in addables.items():
             names = sheets['sheets_optional'] + sheets['sheets_mandatory']
             sheets_dict = dict([(s, {}) for s in names])
             post_data = {'content_type': type, 'data': sheets_dict}
             cstruct['POST']['request_body'].append(post_data)
+            cstruct['POST']['response_body']['content_type'] = ''
         return cstruct
 
     @view_config(request_method='GET')

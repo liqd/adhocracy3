@@ -17,6 +17,7 @@ from adhocracy.interfaces import ILocation
 from adhocracy.exceptions import RuntimeConfigurationError
 from adhocracy.utils import normalize_to_tuple
 from adhocracy.utils import get_sheet
+from adhocracy.utils import get_iresource
 from adhocracy.interfaces import SheetReference
 from adhocracy.interfaces import IPool
 from adhocracy.interfaces import IResource
@@ -177,6 +178,38 @@ class AbsolutePath(AdhocracySchemaNode):
     validator = colander.Regex('^' + relative_regex + '$')
 
 
+def string_has_no_newlines_validator(value: str) -> bool:
+    """Check for new line characters."""
+    return False if '\n' in value or '\r' in value else True  # noqa
+
+
+class SingleLine(colander.SchemaNode):  # noqa
+
+    """ UTF-8 encoded String without line breaks.
+
+    Disallowed characters are linebreaks like: \n, \r.
+    Example value: This is a something.
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+    validator = colander.Function(string_has_no_newlines_validator,
+                                  msg='New line characters are not allowed.')
+
+
+@colander.deferred
+def deferred_content_type_default(node: colander.MappingSchema,
+                                  kw: dict) -> str:
+    """Return the content_type for the given `context`."""
+    context = kw.get('context', None)
+    iresource = get_iresource(context)
+    return iresource.__identifier__ if iresource else ''
+
+
+class ContentType(SingleLine):
+
+    default = deferred_content_type_default
 class ResourceObject(colander.SchemaType):
 
     """Schema type that de/serialized a :term:`location`-aware object.
@@ -277,6 +310,19 @@ class Resource(AdhocracySchemaNode):
     schema_type = ResourceObject
 
 
+class ResourcePathSchema(colander.MappingSchema):
+
+    content_type = ContentType()
+
+    path = Resource()
+
+
+class ResourcePathAndContentSchema(ResourcePathSchema):
+
+    data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
+                               default={})
+
+
 def _validate_reftype(node: colander.SchemaNode, value: ILocation):
         reftype = node.reftype
         isheet = reftype.getTaggedValue('target_isheet')
@@ -358,26 +404,6 @@ class UniqueReferences(References):
             return value
         value_dict = OrderedDict.fromkeys(value)
         return list(value_dict)
-
-
-def string_has_no_newlines_validator(value: str) -> bool:
-    """Check for new line characters."""
-    return False if '\n' in value or '\r' in value else True  # noqa
-
-
-class SingleLine(colander.SchemaNode):  # noqa
-
-    """ UTF-8 encoded String without line breaks.
-
-    Disallowed characters are linebreaks like: \n, \r.
-    Example value: This is a something.
-    """
-
-    schema_type = colander.String
-    default = ''
-    missing = colander.drop
-    validator = colander.Function(string_has_no_newlines_validator,
-                                  msg='New line characters are not allowed.')
 
 
 class Text(AdhocracySchemaNode):
