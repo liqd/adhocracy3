@@ -253,7 +253,7 @@ export var rateController = (
                     if ((!didExistBefore) || (<any>$scope.thisUsersRate).rate === rate) {
                         // set new value
                         adapter.rate($scope.thisUsersRate, rate);
-                        $scope.rates[rate] += 1;
+                        $scope.rates[RateValue[rate]] += 1;
 
                         // send new rate to server
                         $scope.postUpdate();

@@ -92,11 +92,12 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
     rate(resource : RIRateVersion) : AdhRate.RateValue;
     rate(resource : RIRateVersion, value : AdhRate.RateValue) : RIRateVersion;
     rate(resource, value?) {
+        var sheet : { rate: number } = resource.data["adhocracy.sheets.rate.IRate"].rate;
         if (typeof value !== "undefined") {
-            resource.data["adhocracy.sheets.rate.IRate"].rate = value;
+            sheet.rate = value;
             return resource;
         } else {
-            return AdhRate.RateValue[resource.data["adhocracy.sheets.rate.IRate"].rate];
+            return sheet.rate;
         }
     }
 
