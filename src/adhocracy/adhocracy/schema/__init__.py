@@ -17,6 +17,7 @@ from adhocracy.interfaces import ILocation
 from adhocracy.exceptions import RuntimeConfigurationError
 from adhocracy.utils import normalize_to_tuple
 from adhocracy.utils import get_sheet
+from adhocracy.utils import get_iresource
 from adhocracy.interfaces import SheetReference
 from adhocracy.interfaces import IPool
 from adhocracy.interfaces import IResource
@@ -48,44 +49,6 @@ def raise_attribute_error_if_not_location_aware(context) -> None:
     """
     context.__parent__
     context.__name__
-
-
-def serialize_path(node, value):
-    """Serialize object to path with 'pyramid.traveral.resource_path'.
-
-    :param node: the Colander node
-    :param value: the resource to serialize
-    :return: the path of that resource
-    """
-    if value in (colander.null, ''):
-        return value
-    try:
-        raise_attribute_error_if_not_location_aware(value)
-        return resource_path(value)
-    except AttributeError:
-        raise colander.Invalid(
-            node,
-            msg='This resource is not location aware', value=value)
-
-
-def deserialize_path(node, value):
-    """Deserialize path to object.
-
-    :param node: the Colander node
-    :param value: the path to deserialize
-    :return: the resource registered under that path
-    """
-    if value is colander.null:
-        return value
-    context = node.bindings['context']
-    try:
-        resource = find_resource(context, value)
-        raise_attribute_error_if_not_location_aware(resource)
-    except (KeyError, AttributeError):
-        raise colander.Invalid(
-            node,
-            msg='This resource path does not exist.', value=value)
-    return resource
 
 
 def validate_name_is_unique(node: colander.SchemaNode, value: str):
@@ -215,6 +178,53 @@ class AbsolutePath(AdhocracySchemaNode):
     validator = colander.Regex('^' + relative_regex + '$')
 
 
+def string_has_no_newlines_validator(value: str) -> bool:
+    """Check for new line characters."""
+    return False if '\n' in value or '\r' in value else True  # noqa
+
+
+class SingleLine(colander.SchemaNode):  # noqa
+
+    """ UTF-8 encoded String without line breaks.
+
+    Disallowed characters are linebreaks like: \n, \r.
+    Example value: This is a something.
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+    validator = colander.Function(string_has_no_newlines_validator,
+                                  msg='New line characters are not allowed.')
+
+
+@colander.deferred
+def deferred_content_type_default(node: colander.MappingSchema,
+                                  kw: dict) -> str:
+    """Return the content_type for the given `context`."""
+    context = kw.get('context', None)
+    iresource = get_iresource(context)
+    return iresource.__identifier__ if iresource else ''
+
+
+class ContentType(SingleLine):
+
+    default = deferred_content_type_default
+
+
+def get_sheet_cstructs(context: IResource, request) -> dict:
+    """Serialize and return the `viewable`resource sheet data."""
+    sheets = request.registry.content.resource_sheets(context, request,
+                                                      onlyviewable=True)
+    cstructs = {}
+    for name, sheet in sheets.items():
+        appstruct = sheet.get()
+        schema = sheet.schema.bind(context=context, request=request)
+        cstruct = schema.serialize(appstruct)
+        cstructs[name] = cstruct
+    return cstructs
+
+
 class ResourceObject(colander.SchemaType):
 
     """Schema type that de/serialized a :term:`location`-aware object.
@@ -230,13 +240,17 @@ class ResourceObject(colander.SchemaType):
     The default serialization is the resource url.
     """
 
-    def __init__(self, serialize_to_path=False):
-        self.serialize_to_path = serialize_to_path
-        """If `False` the :term:`request` binding is used to serialize
-        to the resource url.
-        Else the :term:`context` binding is used to  serialize to
-        the :term:`Resource Location` path.
-        Default `False`.
+    def __init__(self, serialization_form='url'):
+        self.serialization_form = serialization_form
+        """
+        :param:`serialization_form`:
+            If 'url` the :term:`request` binding is used to serialize
+            to the resource url.
+            If `path` the :term:`context` binding is used to  serialize to
+            the :term:`Resource Location` path.
+            If `content` the :term:`request` and  'context' binding is used to
+            serialize the complete resource content and metadata.
+            Default `url`.
         """
 
     def serialize(self, node, value):
@@ -250,16 +264,25 @@ class ResourceObject(colander.SchemaType):
             return ''
         try:
             raise_attribute_error_if_not_location_aware(value)
-            return self._serialize_location_or_url(node, value)
+            return self._serialize_location_or_url_or_content(node, value)
         except AttributeError:
             raise colander.Invalid(node,
                                    msg='This resource is not location aware',
                                    value=value)
 
-    def _serialize_location_or_url(self, node, value):
-        if self.serialize_to_path:
+    def _serialize_location_or_url_or_content(self, node, value):
+        if self.serialization_form == 'path':
             assert 'context' in node.bindings
             return resource_path(value)
+        if self.serialization_form == 'content':
+            assert 'request' in node.bindings
+            request = node.bindings['request']
+            schema = ResourcePathAndContentSchema().bind(request=request,
+                                                         context=value)
+            cstruct = schema.serialize({'path': value})
+            sheet_cstructs = get_sheet_cstructs(value, request)
+            cstruct['data'] = sheet_cstructs
+            return cstruct
         else:
             assert 'request' in node.bindings
             request = node.bindings['request']
@@ -312,6 +335,19 @@ class Resource(AdhocracySchemaNode):
     schema_type = ResourceObject
 
 
+class ResourcePathSchema(colander.MappingSchema):
+
+    content_type = ContentType()
+
+    path = Resource()
+
+
+class ResourcePathAndContentSchema(ResourcePathSchema):
+
+    data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
+                               default={})
+
+
 def _validate_reftype(node: colander.SchemaNode, value: ILocation):
         reftype = node.reftype
         isheet = reftype.getTaggedValue('target_isheet')
@@ -350,15 +386,6 @@ class Resources(colander.SequenceSchema):
     resource = Resource()
     default = []
     missing = []
-
-    def serialize(self, appstruct=colander.null):
-        # Honor form attribute, if present
-        form = getattr(appstruct, 'form', None)
-        if form == 'omit':
-            return colander.drop
-        # FIXME Not implemented yet: form == 'content' should serialize
-        # complete elements instead of just their paths
-        return super().serialize(appstruct)
 
 
 def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
@@ -402,26 +429,6 @@ class UniqueReferences(References):
             return value
         value_dict = OrderedDict.fromkeys(value)
         return list(value_dict)
-
-
-def string_has_no_newlines_validator(value: str) -> bool:
-    """Check for new line characters."""
-    return False if '\n' in value or '\r' in value else True  # noqa
-
-
-class SingleLine(colander.SchemaNode):  # noqa
-
-    """ UTF-8 encoded String without line breaks.
-
-    Disallowed characters are linebreaks like: \n, \r.
-    Example value: This is a something.
-    """
-
-    schema_type = colander.String
-    default = ''
-    missing = colander.drop
-    validator = colander.Function(string_has_no_newlines_validator,
-                                  msg='New line characters are not allowed.')
 
 
 class Text(AdhocracySchemaNode):

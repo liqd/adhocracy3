@@ -35,13 +35,14 @@ class TestResourceResponseSchema:
 
     def test_serialize_no_appstruct(self):
         inst = self.make_one()
-        wanted = {'content_type': '', 'path': ''}
+        wanted = {'content_type': colander.null, 'path': ''}
         assert inst.serialize() == wanted
 
-    def test_serialize_with_appstruct(self, request):
-        inst = self.make_one().bind(request=request)
-        wanted = {'content_type': 'x', 'path': request.application_url + '/'}
-        assert inst.serialize({'content_type': 'x', 'path': request.root}) == wanted
+    def test_serialize_with_appstruct(self, request, context):
+        from adhocracy.interfaces import IResource
+        inst = self.make_one().bind(request=request, context=context)
+        wanted = {'content_type': IResource.__identifier__, 'path': request.application_url + '/'}
+        assert inst.serialize({'path': request.root}) == wanted
 
 
 class TestItemResponseSchema:
@@ -58,11 +59,11 @@ class TestItemResponseSchema:
 
     def test_serialize_no_appstruct(self):
         inst = self.make_one()
-        wanted = {'content_type': '', 'path': '', 'first_version_path': ''}
+        wanted = {'content_type': colander.null, 'path': '', 'first_version_path': ''}
         assert inst.serialize() == wanted
 
-    def test_serialize_with_appstruct(self, request):
-        inst = self.make_one().bind(request=request)
+    def test_serialize_with_appstruct(self, request, context):
+        inst = self.make_one().bind(request=request, context=context)
         wanted = {'content_type': 'x', 'path': request.application_url + '/',
                   'first_version_path': request.application_url + '/'}
         assert inst.serialize({'content_type': 'x', 'path': request.root,
@@ -283,14 +284,14 @@ class TestOPTIONResourceResponseSchema:
         wanted =\
             {'GET': {'request_body': {},
                      'request_querystring': {},
-                     'response_body': {'content_type': '', 'data': {},
+                     'response_body': {'content_type': colander.null, 'data': {},
                                        'path': ''}},
              'HEAD': {},
              'OPTION': {},
              'POST': {'request_body': [],
-                      'response_body': {'content_type': '', 'path': ''}},
+                      'response_body': {'content_type': colander.null, 'path': ''}},
              'PUT': {'request_body': {'data': {}},
-                     'response_body': {'content_type': '', 'path': ''}}}
+                     'response_body': {'content_type': colander.null, 'path': ''}}}
         assert inst.serialize() == wanted
 
 
@@ -515,21 +516,12 @@ class TestPOSTBatchRequestSchema:
 class TestGETPoolRequestSchema():
 
     @fixture
-    def inst(self):
+    def inst(self, context):
         from adhocracy.rest.schemas import GETPoolRequestSchema
-        return GETPoolRequestSchema()
+        return GETPoolRequestSchema().bind(context=context)
 
-    @fixture
-    def defaults(self):
-        return {'content_type': None,
-                'sheet': None,
-                'depth': '1',
-                'elements': 'paths',
-                'count': False,
-                'aggregateby': ''}
-
-    def test_deserialize_empty(self, inst, defaults):
-        assert inst.deserialize({}) == defaults
+    def test_deserialize_empty(self, inst):
+        assert inst.deserialize({}) == {}
 
     def test_deserialize_valid(self, inst):
         from adhocracy.sheets.name import IName
@@ -554,34 +546,19 @@ class TestGETPoolRequestSchema():
         with raises(colander.Invalid):
             inst.deserialize(data)
 
-    def test_deserialize_depth_all(self, inst, defaults):
+    def test_deserialize_depth_all(self, inst):
         data = {'depth': 'all'}
-        expected = defaults.copy()
-        expected['depth'] = 'all'
-        assert inst.deserialize(data) == expected
+        assert inst.deserialize(data) == {'depth': 'all'}
 
     def test_deserialize_depth_invalid(self, inst):
         data = {'depth': '-7'}
         with raises(colander.Invalid):
             inst.deserialize(data)
 
-    def test_deserialize_count_explicit_false(self, inst, defaults):
+    def test_deserialize_count_explicit_false(self, inst):
         data = {'count': 'false'}
-        expected = defaults.copy()
-        assert expected['count'] == False
-        assert inst.deserialize(data) == expected
+        assert inst.deserialize(data) == {'count': False}
 
-    def test_deserialize_count_empty(self, inst, defaults):
-        """Empty count is considered as True."""
-        data = {'count': ''}
-        expected = defaults.copy()
-        expected['count'] = True
-        assert inst.deserialize(data) == expected
-
-    def test_deserialize_extra_values_are_preserved(self, inst, defaults):
+    def test_deserialize_extra_values_are_preserved(self, inst):
         data = {'extra1': 'blah',
                 'another_extra': 'blub'}
-        expected = defaults.copy()
-        expected.update(data)
-        assert inst.typ.unknown == 'preserve'
-        assert inst.deserialize(data) == expected

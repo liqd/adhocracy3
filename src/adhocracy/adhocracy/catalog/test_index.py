@@ -30,6 +30,12 @@ class TestReference:
         assert IIndex.providedBy(inst)
         assert verifyObject(IIndex, inst)
 
+    def test_reset(self):
+        inst = self._make_one()
+        inst._not_indexed.add(1)
+        inst.reset()
+        assert 1 not in inst._not_indexed
+
     def test_document_repr(self, context, catalog):
         from substanced.util import get_oid
         inst = self._make_one()
@@ -76,6 +82,21 @@ class TestReference:
          result = inst._search(ISheet, '', target)
 
          assert list(result) == [context.__oid__]
+
+    def test_search_reference_exits_wrong_field_name(self, context, catalog):
+         from adhocracy.utils import find_graph
+         from adhocracy.interfaces import SheetToSheet
+         from adhocracy.interfaces import ISheet
+         inst = self._make_one()
+         catalog['index'] = inst
+         graph = find_graph(context)
+         target = testing.DummyResource()
+         context.add('target', target)
+         graph.set_references(context, [target], SheetToSheet)
+
+         result = inst._search(ISheet, 'WRONG_FIELD', target)
+
+         assert list(result) == []
 
     def test_search_reference_nonexists(self, context, catalog):
          from adhocracy.interfaces import ISheet

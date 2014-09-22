@@ -22,16 +22,6 @@ from adhocracy.interfaces import IResourceSheet
 from adhocracy.interfaces import ISheet
 
 
-class FormList(list):
-
-    """List with an attrib that specifies in which form it should be used."""
-
-    def __init__(self, iterable=[], form: str=None):
-        super().__init__(iterable)
-        self.form = form
-        """The external form of the list."""
-
-
 def append_if_not_none(lst: list, element: object):
     """Append `element` to `lst`, unless `element` is None."""
     if element is not None:
