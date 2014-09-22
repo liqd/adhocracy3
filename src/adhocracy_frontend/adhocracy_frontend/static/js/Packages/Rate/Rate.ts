@@ -8,7 +8,7 @@ import Util = require("../Util/Util");
 import ResourcesBase = require("../../ResourcesBase");
 
 import RIRate = require("../../Resources_/adhocracy/resources/rate/IRate");
-// import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
+import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
 // import SICanRate = require("../../Resources_/adhocracy/sheets/rate/ICanRate");
 // import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
 // import SIRateable = require("../../Resources_/adhocracy/sheets/rate/IRateable");
@@ -104,7 +104,7 @@ export var postPoolContentsPromise = (
     $scope : IRateScope,
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>
-) : ng.IPromise<RIRate[]> => {
+) : ng.IPromise<RIRateVersion[]> => {
     return postPoolPathPromise($scope, adhHttp)
         .then((postPoolPath) => adhHttp.get(postPoolPath))
         .then((postPool) => {
