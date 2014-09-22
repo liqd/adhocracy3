@@ -28,16 +28,11 @@ export var register = () => {
 
             it("rate returns rate correctly", () => {
                 debugger;
-                expect(adapter.rate(rateVersion)).toEqual("pro");
+                expect(adapter.rate(rateVersion)).toEqual(1);
             });
 
             it("rate sets rate correctly", () => {
-                console.log(JSON.stringify(rateVersion, null, 2));
-                adapter.rate(rateVersion, AdhRate.RateValue.contra);
-                console.log(JSON.stringify(rateVersion, null, 2));
-
-                debugger;
-
+                adapter.rate(rateVersion, -1);
                 expect(rateVersion.data["adhocracy.sheets.rate.IRate"].rate).toEqual(-1);
             });
         });
@@ -69,7 +64,7 @@ export var register = () => {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user1",
                               object: "comment_or_something",
-                              rate: AdhRate.RateValue.pro
+                              rate: 1
                           }
                       }
                     },
@@ -78,7 +73,7 @@ export var register = () => {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user2",
                               object: "comment_or_something",
-                              rate: AdhRate.RateValue.pro
+                              rate: 1
                           }
                       }
                     },
@@ -87,7 +82,7 @@ export var register = () => {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user3",
                               object: "comment_or_something",
-                              rate: AdhRate.RateValue.neutral
+                              rate: 0
                           }
                       }
                     },
@@ -96,7 +91,7 @@ export var register = () => {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user4",
                               object: "comment_or_something",
-                              rate: AdhRate.RateValue.contra
+                              rate: -1
                           }
                       }
                     },
@@ -105,7 +100,7 @@ export var register = () => {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user3",
                               object: "something_irrelevant",
-                              rate: AdhRate.RateValue.contra
+                              rate: -1
                           }
                       }
                     }
