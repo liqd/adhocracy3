@@ -291,7 +291,11 @@ export var rateController = (
             return adhHttp
                 .postNewVersionNoFork($scope.thisUsersRate.path, $scope.thisUsersRate)
                 .then((response : { value: RIRate }) => {
-                    $scope.thisUsersRate = response.value;
+                    return adhHttp.get(response.value.path)
+                        .then((response : { value : RIRate }) => {
+                            $scope.thisUsersRate = response.value;
+                            return;
+                        });
                 });
         }
     };
