@@ -182,7 +182,7 @@ export var register = () => {
                         expect(scopeMock.rates.pro).toBe(2);
                         expect(scopeMock.rates.contra).toBe(1);
                         expect(scopeMock.rates.neutral).toBe(1);
-                        expect(scopeMock.thisUsersRate.data["adhocracy.sheets.rate.IRateVersion"].subject).toBe(userMock.userPath);
+                        expect(scopeMock.thisUsersRate.data["adhocracy.sheets.rate.IRate"].subject).toBe(userMock.userPath);
                         done();
                     },
                     (msg) => {
