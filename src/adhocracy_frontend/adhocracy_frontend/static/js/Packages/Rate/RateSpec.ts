@@ -2,12 +2,46 @@
 
 import q = require("q");
 
+// import RIRate = require("../../Resources_/adhocracy/resources/rate/IRate");
+import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
+import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
 import AdhRate = require("./Rate");
 import AdhRateAdapter = require("./Adapter");
+import PreliminaryNames = require ("../PreliminaryNames/PreliminaryNames");
 
 
 export var register = () => {
     describe("Rate", () => {
+        describe("Adapter", () => {
+            var adapter : AdhRateAdapter.RateAdapter;
+            var rateVersion : RIRateVersion;
+
+            beforeEach(() => {
+                adapter = new AdhRateAdapter.RateAdapter();
+                rateVersion = new RIRateVersion({ preliminaryNames: new PreliminaryNames() });
+                rateVersion.data["adhocracy.sheets.rate.IRate"] = new SIRate.AdhocracySheetsRateIRate({
+                    subject: "sub",
+                    object: "obj",
+                    rate: 1
+                });
+            });
+
+            it("rate returns rate correctly", () => {
+                debugger;
+                expect(adapter.rate(rateVersion)).toEqual("pro");
+            });
+
+            it("rate sets rate correctly", () => {
+                console.log(JSON.stringify(rateVersion, null, 2));
+                adapter.rate(rateVersion, AdhRate.RateValue.contra);
+                console.log(JSON.stringify(rateVersion, null, 2));
+
+                debugger;
+
+                expect(rateVersion.data["adhocracy.sheets.rate.IRate"].rate).toEqual(-1);
+            });
+        });
+
         describe("Controller", () => {
             var scopeMock;
             var httpMock;
