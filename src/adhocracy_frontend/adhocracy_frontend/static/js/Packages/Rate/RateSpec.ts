@@ -54,11 +54,12 @@ export var register = () => {
 
                 httpMock = {
                     get: () => null,
-                    getNewestVersionPath: () => q.when(null)
+                    getNewestVersionPathNoFork: () => q.when(null)
                 };
 
                 rateResources = [
-                    { path: "r1",
+                    { content_type: "adhocracy.resources.rate.IRate",
+                      path: "r1",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user1",
@@ -67,7 +68,8 @@ export var register = () => {
                           }
                       }
                     },
-                    { path: "r2",
+                    { content_type: "adhocracy.resources.rate.IRate",
+                      path: "r2",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user2",
@@ -76,7 +78,8 @@ export var register = () => {
                           }
                       }
                     },
-                    { path: "r3",
+                    { content_type: "adhocracy.resources.rate.IRate",
+                      path: "r3",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user3",
@@ -85,7 +88,8 @@ export var register = () => {
                           }
                       }
                     },
-                    { path: "r4",
+                    { content_type: "adhocracy.resources.rate.IRate",
+                      path: "r4",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user4",
@@ -94,7 +98,8 @@ export var register = () => {
                           }
                       }
                     },
-                    { path: "r5",
+                    { content_type: "adhocracy.resources.rate.IRate",
+                      path: "r5",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user3",
