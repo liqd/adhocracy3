@@ -192,15 +192,9 @@ export var rateController = (
     adhPreliminaryNames : AdhPreliminaryNames
 ) : ng.IPromise<void> => {
 
-    $scope.isActive = (rate : number) : boolean => {
-        console.log(rate,
-                    typeof $scope.thisUsersRate !== "undefined" &&
-                        adapter.rate($scope.thisUsersRate),
-                    typeof $scope.thisUsersRate !== "undefined" &&
-                        (rate === adapter.rate($scope.thisUsersRate)));
-        return (typeof $scope.thisUsersRate !== "undefined" &&
-                rate === adapter.rate($scope.thisUsersRate));
-    };
+    $scope.isActive = (rate : number) : boolean =>
+        typeof $scope.thisUsersRate !== "undefined" &&
+            rate === adapter.rate($scope.thisUsersRate);
 
     $scope.isActiveClass = (rate : number) : string =>
         $scope.isActive(rate) ? "rate-button-active" : "";
