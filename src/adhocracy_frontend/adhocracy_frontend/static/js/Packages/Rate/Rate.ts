@@ -8,7 +8,7 @@ import Util = require("../Util/Util");
 import ResourcesBase = require("../../ResourcesBase");
 
 import RIRate = require("../../Resources_/adhocracy/resources/rate/IRate");
-// import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
+import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
 // import SICanRate = require("../../Resources_/adhocracy/sheets/rate/ICanRate");
 // import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
 // import SIRateable = require("../../Resources_/adhocracy/sheets/rate/IRateable");
@@ -27,7 +27,7 @@ export interface IRateScope extends ng.IScope {
         neutral : number;
     };
     thisUsersRate : AdhResource.Content<any>;
-    allRates : AdhResource.Content<any>[];
+    allRates : RIRateVersion[];
     isActive : (RateValue) => boolean;
     isActiveClass : (RateValue) => string;  // css class name if RateValue is active, or "" otherwise.
     toggleShowDetails() : void;
@@ -104,7 +104,7 @@ export var postPoolContentsPromise = (
     $scope : IRateScope,
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>
-) : ng.IPromise<RIRate[]> => {
+) : ng.IPromise<RIRateVersion[]> => {
     return postPoolPathPromise($scope, adhHttp)
         .then((postPoolPath) => adhHttp.get(postPoolPath))
         .then((postPool) => {
@@ -192,15 +192,9 @@ export var rateController = (
     adhPreliminaryNames : AdhPreliminaryNames
 ) : ng.IPromise<void> => {
 
-    $scope.isActive = (rate : number) : boolean => {
-        console.log(rate,
-                    typeof $scope.thisUsersRate !== "undefined" &&
-                        adapter.rate($scope.thisUsersRate),
-                    typeof $scope.thisUsersRate !== "undefined" &&
-                        (rate === adapter.rate($scope.thisUsersRate)));
-        return (typeof $scope.thisUsersRate !== "undefined" &&
-                rate === adapter.rate($scope.thisUsersRate));
-    };
+    $scope.isActive = (rate : number) : boolean =>
+        typeof $scope.thisUsersRate !== "undefined" &&
+            rate === adapter.rate($scope.thisUsersRate);
 
     $scope.isActiveClass = (rate : number) : string =>
         $scope.isActive(rate) ? "rate-button-active" : "";
@@ -210,7 +204,9 @@ export var rateController = (
             $scope.allRates = [];
             postPoolContentsPromise($scope, $q, adhHttp)
                 .then((rates) => {
-                    $scope.allRates = rates;
+                    $scope.allRates = _.filter(rates, (rate) => {
+                        return adapter.is(rate) && adapter.object(rate) === $scope.refersTo;
+                    });
                 });
         } else {
             delete $scope.allRates;
