@@ -27,7 +27,6 @@ export var register = () => {
             });
 
             it("rate returns rate correctly", () => {
-                debugger;
                 expect(adapter.rate(rateVersion)).toEqual(1);
             });
 

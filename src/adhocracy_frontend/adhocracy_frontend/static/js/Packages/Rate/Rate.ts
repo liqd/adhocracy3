@@ -215,7 +215,7 @@ export var rateController = (
         } else {
             delete $scope.allRates;
         }
-    }
+    };
 
     $scope.cast = (rate : number) : void => {
         if (!adhUser.userPath) {
