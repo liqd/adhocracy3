@@ -97,7 +97,7 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
             sheet.rate = value;
             return resource;
         } else {
-            return sheet.rate;
+            return parseInt(<any>sheet.rate);
         }
     }
 
