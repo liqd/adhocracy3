@@ -72,6 +72,30 @@ export var resetRates = ($scope : IRateScope) : void => {
 
 
 /**
+ * add number to pro / contra / neutral count.
+ */
+export var addToRate = ($scope : IRateScope, rate : number, delta : number) : void => {
+    switch (rate) {
+    case 1: {
+        $scope.rates.pro += delta;
+        break;
+    }
+    case -1: {
+        $scope.rates.contra += delta;
+        break;
+    }
+    case 0: {
+        $scope.rates.neutral += delta;
+        break;
+    }
+    default: {
+        throw "unknown rate value: " + rate.toString();
+    }
+    }
+};
+
+
+/**
  * fetch post pool path with coordinates given in scope
  */
 export var postPoolPathPromise = (
@@ -244,29 +268,13 @@ export var rateController = (
                 .then((didExistBefore) => {
                     if (didExistBefore) {
                         // decrease old value
-                        $scope.rates[adapter.rate($scope.thisUsersRate)] -= 1;
+                        addToRate($scope, adapter.rate($scope.thisUsersRate), -1);
                     }
 
                     if ((!didExistBefore) || (<any>$scope.thisUsersRate).rate === rate) {
                         // set new value
                         adapter.rate($scope.thisUsersRate, rate);
-                        switch (rate) {
-                            case 1: {
-                                $scope.rates.pro += 1;
-                                break;
-                            }
-                            case -1: {
-                                $scope.rates.contra += 1;
-                                break;
-                            }
-                            case 0: {
-                                $scope.rates.neutral += 1;
-                                break;
-                            }
-                            default: {
-                                throw "unknown rate value: " + rate.toString();
-                            }
-                        }
+                        addToRate($scope, rate, 1);
 
                         // send new rate to server
                         $scope.postUpdate();
