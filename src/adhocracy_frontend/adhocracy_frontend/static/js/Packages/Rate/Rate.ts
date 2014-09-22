@@ -112,7 +112,7 @@ export var postPoolContentsPromise = (
                 postPool.data["adhocracy.sheets.pool.IPool"].elements
                     .map((path : string, index : number) =>
                         adhHttp
-                           .getNewestVersionPathNoFork(Util.parentPath(path))
+                           .getNewestVersionPathNoFork(path)
                            .then((path) => adhHttp.get(path)));
 
             return $q.all(ratePromises);
