@@ -3,7 +3,6 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhHttp = require("../Http/Http");
 import AdhResource = require("../../Resources");
 import AdhUser = require("../User/User");
-import Util = require("../Util/Util");
 
 import ResourcesBase = require("../../ResourcesBase");
 
