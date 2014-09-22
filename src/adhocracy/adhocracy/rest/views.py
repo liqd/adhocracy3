@@ -290,6 +290,7 @@ class ResourceRESTView(RESTView):
             post_data = {'content_type': type, 'data': sheets_dict}
             cstruct['POST']['request_body'].append(post_data)
             cstruct['POST']['response_body']['content_type'] = ''
+        cstruct['POST']['response_body']['content_type'] = ''
         return cstruct
 
     @view_config(request_method='GET')
