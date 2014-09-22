@@ -271,7 +271,7 @@ export var rateController = (
                         addToRate($scope, adapter.rate($scope.thisUsersRate), -1);
                     }
 
-                    if ((!didExistBefore) || (<any>$scope.thisUsersRate).rate === rate) {
+                    if ((!didExistBefore) || adapter.rate($scope.thisUsersRate) !== rate) {
                         // set new value
                         adapter.rate($scope.thisUsersRate, rate);
                         addToRate($scope, rate, 1);
