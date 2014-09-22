@@ -35,7 +35,8 @@ export interface IRateScope extends ng.IScope {
     };
     thisUsersRate : AdhResource.Content<any>;
     allRates : AdhResource.Content<any>[];
-    isActive : (RateValue) => string;  // css class name if RateValue is active, or "" otherwise.
+    isActive : (RateValue) => boolean;
+    isActiveClass : (RateValue) => string;  // css class name if RateValue is active, or "" otherwise.
     toggleShowDetails() : void;
     cast(RateValue) : void;
     assureUserRateExists() : ng.IPromise<boolean>;
@@ -198,9 +199,12 @@ export var rateController = (
     adhPreliminaryNames : AdhPreliminaryNames
 ) : ng.IPromise<void> => {
 
-    $scope.isActive = (rate : RateValue) =>
-        (typeof $scope.thisUsersRate !== "undefined" &&
-         rate === adapter.rate($scope.thisUsersRate)) ? "rate-button-active" : "";
+    $scope.isActive = (rate : RateValue) : boolean =>
+        typeof $scope.thisUsersRate !== "undefined" &&
+        rate === adapter.rate($scope.thisUsersRate);
+
+    $scope.isActiveClass = (rate : RateValue) : string =>
+        $scope.isActive ? "rate-button-active" : "";
 
     $scope.toggleShowDetails = () => {
         if (typeof $scope.allRates === "undefined") {

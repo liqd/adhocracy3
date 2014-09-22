@@ -4,9 +4,9 @@
             {{rates.pro - rates.contra | signum}}
         </a>
     </span>
-    <a href="" class="rate-pro {{isActive(1)}}" data-ng-click="cast(1)">pro: {{rates.pro}}</a>
-    <a href="" class="rate-contra {{isActive(-1)}}" data-ng-click="cast(-1)">contra: {{rates.contra}}</a>
-    <a href="" class="rate-neutral {{isActive(0)}}" data-ng-click="cast(0)">neutral: {{rates.neutral}}</a>
+    <a href="" class="rate-pro {{isActiveClass(1)}}" data-ng-click="cast(1)">pro: {{rates.pro}}</a>
+    <a href="" class="rate-contra {{isActiveClass(-1)}}" data-ng-click="cast(-1)">contra: {{rates.contra}}</a>
+    <a href="" class="rate-neutral {{isActiveClass(0)}}" data-ng-click="cast(0)">neutral: {{rates.neutral}}</a>
 </div>
 <pre class="rate-details" data-ng-if="allRates">
     {{allRates}}
