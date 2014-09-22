@@ -1184,16 +1184,18 @@ elements::
     >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool'])
     {'count': '2'}
 
-FIXME Not yet implemented:
 Setting *elements=content* will instead return the complete contents of all
 matching elements -- what you would get by making a GET request on each of
 their paths::
 
-    >> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
     ...             'elements': 'content'}).json
-    >> resp_data['data']['adhocracy.sheets.pool.IPool']['elements']
-    blah
+    >>> tag = resp_data['data']['adhocracy.sheets.pool.IPool']['elements'][0]
+    >>> pprint(tag)
+    {'content_type': 'adhocracy.interfaces.ITag',...'path': 'http://localhost/adhocracy/Proposals/kommunismus/FIRST/'...
+
+
 
 *tag* is a custom filter that allows filtering only resources with a
 specific tag. Often we are only interested in the newest versions of

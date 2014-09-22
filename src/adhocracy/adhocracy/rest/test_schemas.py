@@ -35,13 +35,14 @@ class TestResourceResponseSchema:
 
     def test_serialize_no_appstruct(self):
         inst = self.make_one()
-        wanted = {'content_type': '', 'path': ''}
+        wanted = {'content_type': colander.null, 'path': ''}
         assert inst.serialize() == wanted
 
-    def test_serialize_with_appstruct(self, request):
-        inst = self.make_one().bind(request=request)
-        wanted = {'content_type': 'x', 'path': request.application_url + '/'}
-        assert inst.serialize({'content_type': 'x', 'path': request.root}) == wanted
+    def test_serialize_with_appstruct(self, request, context):
+        from adhocracy.interfaces import IResource
+        inst = self.make_one().bind(request=request, context=context)
+        wanted = {'content_type': IResource.__identifier__, 'path': request.application_url + '/'}
+        assert inst.serialize({'path': request.root}) == wanted
 
 
 class TestItemResponseSchema:
@@ -58,11 +59,11 @@ class TestItemResponseSchema:
 
     def test_serialize_no_appstruct(self):
         inst = self.make_one()
-        wanted = {'content_type': '', 'path': '', 'first_version_path': ''}
+        wanted = {'content_type': colander.null, 'path': '', 'first_version_path': ''}
         assert inst.serialize() == wanted
 
-    def test_serialize_with_appstruct(self, request):
-        inst = self.make_one().bind(request=request)
+    def test_serialize_with_appstruct(self, request, context):
+        inst = self.make_one().bind(request=request, context=context)
         wanted = {'content_type': 'x', 'path': request.application_url + '/',
                   'first_version_path': request.application_url + '/'}
         assert inst.serialize({'content_type': 'x', 'path': request.root,
@@ -283,14 +284,14 @@ class TestOPTIONResourceResponseSchema:
         wanted =\
             {'GET': {'request_body': {},
                      'request_querystring': {},
-                     'response_body': {'content_type': '', 'data': {},
+                     'response_body': {'content_type': colander.null, 'data': {},
                                        'path': ''}},
              'HEAD': {},
              'OPTION': {},
              'POST': {'request_body': [],
-                      'response_body': {'content_type': '', 'path': ''}},
+                      'response_body': {'content_type': colander.null, 'path': ''}},
              'PUT': {'request_body': {'data': {}},
-                     'response_body': {'content_type': '', 'path': ''}}}
+                     'response_body': {'content_type': colander.null, 'path': ''}}}
         assert inst.serialize() == wanted
 
 
@@ -515,9 +516,9 @@ class TestPOSTBatchRequestSchema:
 class TestGETPoolRequestSchema():
 
     @fixture
-    def inst(self):
+    def inst(self, context):
         from adhocracy.rest.schemas import GETPoolRequestSchema
-        return GETPoolRequestSchema()
+        return GETPoolRequestSchema().bind(context=context)
 
     def test_deserialize_empty(self, inst):
         assert inst.deserialize({}) == {}

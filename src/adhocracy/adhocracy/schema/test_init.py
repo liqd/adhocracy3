@@ -221,66 +221,120 @@ class AbsolutePath(unittest.TestCase):
             inst.validator(inst, 'blu.ABC_12-3')
 
 
-class ResourceObjectUnitTests(unittest.TestCase):
+def test_deferred_content_type_default_call_with_iresource():
+    from adhocracy.interfaces import IResource
+    from adhocracy.schema import deferred_content_type_default
+    context = testing.DummyResource(__provides__=IResource)
+    node = None
+    bindings = {'context': context}
+    assert deferred_content_type_default(node, bindings) == IResource.__identifier__
+
+
+def test_deferred_content_type_default_call_without_iresource():
+    from adhocracy.schema import deferred_content_type_default
+    context = testing.DummyResource()
+    node = None
+    bindings = {'context': context}
+    assert deferred_content_type_default(node, bindings) == ''
+
+
+class TestGetSheetCstructs:
+
+    @fixture
+    def request(self, mock_resource_registry):
+        request = testing.DummyRequest()
+        request.registry.content = mock_resource_registry
+        return request
+
+    def _call_fut(self, context, request):
+        from . import get_sheet_cstructs
+        return get_sheet_cstructs(context, request)
+
+    def test_call_with_context_without_sheets(self, context, request):
+        assert self._call_fut(context, request) == {}
+
+    def test_call_with_context_with_sheets(self, context, request, mock_resource_registry, mock_sheet):
+        mock_sheet.get.return_value = {}
+        mock_sheet.schema = colander.MappingSchema()
+        isheet = mock_sheet.meta.isheet
+        mock_resource_registry.resource_sheets.return_value = {isheet.__identifier__: mock_sheet}
+        assert self._call_fut(context, request) == {isheet.__identifier__: {}}
+        assert mock_resource_registry.resource_sheets.call_args[0] == (context, request)
+        assert mock_resource_registry.resource_sheets.call_args[1] == {'onlyviewable': True}
+
+
+class TestResourceObjectUnitTests:
 
     def _make_one(self, **kwargs):
         from adhocracy.schema import ResourceObject
         return ResourceObject(**kwargs)
 
-    def setUp(self):
-        self.context = testing.DummyResource()
-        self.child = testing.DummyResource()
+    @fixture
+    def request(self, context, mock_resource_registry):
         request = testing.DummyRequest()
-        request.root = self.context
-        self.request = request
+        request.registry.content = mock_resource_registry
+        request.root = context
+        return request
 
     def test_serialize_colander_null(self):
         inst = self._make_one()
         result = inst.serialize(None, colander.null)
         assert result == ''
 
-    def test_serialize_value_url_location_aware(self):
+    def test_serialize_value_url_location_aware(self, context, request):
         inst = self._make_one()
-        self.context['child'] = self.child
-        node = add_node_binding(colander.Mapping(), request=self.request)
-        result = inst.serialize(node, self.child)
-        assert result == self.request.application_url + '/child/'
+        context['child'] = testing.DummyResource()
+        node = add_node_binding(colander.Mapping(), request=request)
+        result = inst.serialize(node, context['child'])
+        assert result == request.application_url + '/child/'
 
-    def test_serialize_value_url_location_aware_but_missing_request(self):
+    def test_serialize_value_url_location_aware_but_missing_request(self, context):
         inst = self._make_one()
-        self.context['child'] = self.child
+        context['child'] = testing.DummyResource()
         node = add_node_binding(colander.Mapping())
         with raises(AssertionError):
-            inst.serialize(node, self.child)
+            inst.serialize(node, context['child'])
 
-    def test_serialize_value_url_not_location_aware(self):
+    def test_serialize_value_url_not_location_aware(self, request):
         inst = self._make_one()
-        del self.child.__parent__
-        del self.child.__name__
-        node = add_node_binding(colander.Mapping(), request=self.request)
+        child = testing.DummyResource()
+        del child.__name__
+        node = add_node_binding(colander.Mapping(), request=request)
         with raises(colander.Invalid):
-            inst.serialize(node, self.child)
+            inst.serialize(node, child)
 
-    def test_serialize_value_url_location_aware_without_parent_and_name(self):
+    def test_serialize_value_url_location_aware_without_parent_and_name(self, context, request):
         inst = self._make_one()
-        node = add_node_binding(colander.Mapping(), request=self.request)
-        result = inst.serialize(node, self.child)
-        assert result == self.request.application_url + '/'
+        child = testing.DummyResource()
+        node = add_node_binding(colander.Mapping(), request=request)
+        result = inst.serialize(node, child)
+        assert result == request.application_url + '/'
 
-    def test_serialize_value_url_location_aware_with_serialize_to_path(self):
+    def test_serialize_value_url_location_aware_with_serialize_to_content(self, context, request):
+        from adhocracy.interfaces import IResource
+        inst = self._make_one(serialization_form='content')
+        context['child'] = testing.DummyResource(__provides__=IResource)
+        node = add_node_binding(colander.Mapping(),
+                                context=context['child'],
+                                request=request)
+        result = inst.serialize(node, context['child'])
+        assert result == {'content_type': 'adhocracy.interfaces.IResource',
+                          'data': {},
+                          'path': request.application_url + '/child/'}
+
+    def test_serialize_value_url_location_aware_with_serialize_to_path(self, context):
         inst = self._make_one(serialization_form='path')
-        self.context['child'] = self.child
-        node = add_node_binding(colander.Mapping(), context=self.context)
-        result = inst.serialize(node, self.child)
+        context['child'] = testing.DummyResource()
+        node = add_node_binding(colander.Mapping(), context=context)
+        result = inst.serialize(node, context['child'])
         assert result == '/child'
 
-    def test_serialize_value_url_location_aware_with_serialize_to_path_without_context_binding(self):
+    def test_serialize_value_url_location_aware_with_serialize_to_path_without_context_binding(self, context):
         inst = self._make_one(serialization_form='path')
-        self.context['child'] = self.child
-        self.context['child'] = self.child
+        context['child'] = testing.DummyResource()
         node = add_node_binding(colander.Mapping())
         with raises(AssertionError):
-            inst.serialize(node, self.child)
+            inst.serialize(node, context['child'])
 
     def test_deserialize_value_null(self):
         inst = self._make_one()
@@ -288,36 +342,36 @@ class ResourceObjectUnitTests(unittest.TestCase):
         result = inst.deserialize(node, colander.null)
         assert result == colander.null
 
-    def test_deserialize_value_url_valid_path(self):
+    def test_deserialize_value_url_valid_path(self, context, request):
         inst = self._make_one()
-        self.context['child'] = self.child
-        node = add_node_binding(colander.Mapping(), request=self.request)
-        result = inst.deserialize(node, self.request.application_url + '/child')
-        assert result == self.child
+        context['child'] = testing.DummyResource()
+        node = add_node_binding(colander.Mapping(), request=request)
+        result = inst.deserialize(node, request.application_url + '/child')
+        assert result == context['child']
 
-    def test_deserialize_value_url_invalid_path_wrong_child_name(self):
+    def test_deserialize_value_url_invalid_path_wrong_child_name(self, request):
         inst = self._make_one()
-        node = add_node_binding(colander.Mapping(), request=self.request)
+        node = add_node_binding(colander.Mapping(), request=request)
         with raises(colander.Invalid):
-            inst.deserialize(node, self.request.application_url + '/wrong_child')
+            inst.deserialize(node, request.application_url + '/wrong_child')
 
-    def test_deserialize_value_url_invalid_path_to_short(self):
+    def test_deserialize_value_url_invalid_path_to_short(self, request):
         inst = self._make_one()
-        node = add_node_binding(colander.Mapping(), request=self.request)
+        node = add_node_binding(colander.Mapping(), request=request)
         with raises(colander.Invalid):
             inst.deserialize(node, 'htp://x.x')
 
-    def test_deserialize_value_path_location_aware(self):
+    def test_deserialize_value_path_location_aware(self, context):
         inst = self._make_one()
-        self.context['child'] = self.child
-        node = add_node_binding(colander.Mapping(), context=self.context)
+        context['child'] = testing.DummyResource()
+        node = add_node_binding(colander.Mapping(), context=context)
         child_url = '/child/'
         result = inst.deserialize(node, child_url)
-        assert result == self.child
+        assert result == context['child']
 
-    def test_deserialize_value_path_location_aware_without_context_binding(self):
+    def test_deserialize_value_path_location_aware_without_context_binding(self, context):
         inst = self._make_one()
-        self.context['child'] = self.child
+        context['child'] = testing.DummyResource()
         node = add_node_binding(colander.Mapping())
         child_url = '/child/'
         with raises(AssertionError):
