@@ -204,7 +204,7 @@ export var rateController = (
         rate === adapter.rate($scope.thisUsersRate);
 
     $scope.isActiveClass = (rate : RateValue) : string =>
-        $scope.isActive ? "rate-button-active" : "";
+        $scope.isActive(rate) ? "rate-button-active" : "";
 
     $scope.toggleShowDetails = () => {
         if (typeof $scope.allRates === "undefined") {
