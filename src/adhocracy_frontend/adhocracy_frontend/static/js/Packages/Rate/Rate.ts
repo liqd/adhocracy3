@@ -27,7 +27,7 @@ export interface IRateScope extends ng.IScope {
         neutral : number;
     };
     thisUsersRate : AdhResource.Content<any>;
-    allRates : AdhResource.Content<any>[];
+    allRates : RIRateVersion[];
     isActive : (RateValue) => boolean;
     isActiveClass : (RateValue) => string;  // css class name if RateValue is active, or "" otherwise.
     toggleShowDetails() : void;
@@ -204,7 +204,9 @@ export var rateController = (
             $scope.allRates = [];
             postPoolContentsPromise($scope, $q, adhHttp)
                 .then((rates) => {
-                    $scope.allRates = rates;
+                    $scope.allRates = _.filter(rates, (rate) => {
+                        return adapter.is(rate) && adapter.object(rate) === $scope.refersTo;
+                    });
                 });
         } else {
             delete $scope.allRates;
