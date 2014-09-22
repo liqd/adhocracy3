@@ -3,6 +3,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
+import _ = require("lodash");
+
 import Resources = require("../../Resources");
 import ResourcesBase = require("../../ResourcesBase");
 import Util = require("../Util/Util");
@@ -186,10 +188,7 @@ export class Service<Content extends Resources.Content<any>> {
         var waitms : number = 250;
 
         var dagPath = Util.parentPath(oldVersionPath);
-        var _obj = Util.deepcp(obj);
-        if (typeof rootVersions !== "undefined") {
-            _obj.root_versions = rootVersions;
-        }
+        var _obj = _.cloneDeep(obj);
 
         var retry = (
             nextOldVersionPath : string,
