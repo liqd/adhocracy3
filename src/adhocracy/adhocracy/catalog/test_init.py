@@ -6,7 +6,7 @@ from pytest import mark
 def test_create_adhocracy_catalog_factory():
     from substanced.catalog import Keyword
     from . import AdhocracyCatalogFactory
-    from .index import Reference
+    from . import Reference
     inst = AdhocracyCatalogFactory()
     assert isinstance(inst.tag, Keyword)
     assert isinstance(inst.reference, Reference)
@@ -26,11 +26,11 @@ def test_create_adhocracy_catalog(pool_graph, registry):
     context = pool_graph
     catalogs = registry.content.create('Catalogs')
     context.add_service('catalogs', catalogs, registry=registry)
-
     catalogs.add_catalog('adhocracy')
 
     assert isinstance(catalogs['adhocracy'], Catalog)
     assert 'tag' in catalogs['adhocracy']
+    assert 'reference' in catalogs['adhocracy']
 
 
 @mark.usefixtures('integration')

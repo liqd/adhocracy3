@@ -77,6 +77,7 @@ class TestFilteringPoolSheet:
                                                       'ifaces': ['BlahType'],
                                                       'arbitrary_filters': {},
                                                       'resolve_resources': True,
+                                                      'references': {},
                                                       }
         assert appstruct == {'elements': ['Dummy'], 'count': 1}
 
@@ -90,6 +91,7 @@ class TestFilteringPoolSheet:
             'ifaces': ['BlahType', 'BlubSheet'],
             'arbitrary_filters': {'tag': 'BEST', 'rating': 'outstanding'},
             'resolve_resources': True,
+            'references': {},
             }
         assert appstruct == {'elements': ['Dummy']}
 
@@ -107,6 +109,7 @@ class TestFilteringPoolSheet:
                 'ifaces': [],
                 'arbitrary_filters': {},
                 'resolve_resources': True,
+                'references': {},
                 }
         assert appstruct == {'elements': ['Dummy']}
 
@@ -117,7 +120,7 @@ class TestFilteringPoolSheet:
         assert 'elements' not in appstruct
 
     def test_get_arbitrary_filters(self, meta, context):
-        """remove all standard filter parameter in get pool requests."""
+        """remove all standard  and reference filter in get pool requests."""
         from adhocracy.rest.schemas import GETPoolRequestSchema
         inst = meta.sheet_class(meta, context)
         filters = GETPoolRequestSchema().serialize({})
@@ -125,16 +128,25 @@ class TestFilteringPoolSheet:
         filters.update(arbitrary_filters)
         assert inst._get_arbitrary_filters(filters) == arbitrary_filters
 
+    def test_get_reference_filters(self, meta, context):
+        """remove all standard  and arbitrary filter in get pool requests."""
+        from adhocracy.rest.schemas import GETPoolRequestSchema
+        inst = meta.sheet_class(meta, context)
+        filters = GETPoolRequestSchema().serialize({})
+        reference_filters = {'sheet.ISheet1.reference:field1': None}
+        filters.update(reference_filters)
+        assert inst._get_reference_filters(filters) == reference_filters
+
 
 @mark.usefixtures('integration')
 class TestIntegrationPoolSheet:
 
     def _make_resource(self, registry, parent=None, name='pool',
-                  restype=IBasicPool):
+                       content_type=IBasicPool):
         from adhocracy.sheets.name import IName
         appstructs = {IName.__identifier__: {'name': name}}
         return registry.content.create(
-            restype.__identifier__, parent, appstructs)
+            content_type.__identifier__, parent, appstructs)
 
     def test_filter_elements_no_filters_with_direct_children(
             self, registry, pool_graph_catalog):
@@ -196,9 +208,9 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=pool, name='wrong_type_child')
         right_type_child = self._make_resource(registry, parent=pool,
                                                name='right_type_child',
-                                               restype=ITag)
+                                               content_type=ITag)
         self._make_resource(registry, parent=pool_graph_catalog,
-                            name='nonchild', restype=ITag)
+                            name='nonchild', content_type=ITag)
         poolsheet = get_sheet(pool, IPool)
         result = set(poolsheet._filter_elements(ifaces=[ITag]))
         assert result == {right_type_child}
@@ -212,9 +224,9 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=pool, name='wrong_type_child')
         right_type_child = self._make_resource(registry, parent=pool,
                                                name='right_type_child',
-                                               restype=ITag)
+                                               content_type=ITag)
         self._make_resource(registry, parent=pool_graph_catalog,
-                            name='nonchild', restype=ITag)
+                            name='nonchild', content_type=ITag)
         poolsheet = get_sheet(pool, IPool)
         result = set(poolsheet._filter_elements(resolve_resources=False, ifaces=[ITag]))
         assert result == {right_type_child.__oid__}
@@ -229,7 +241,7 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=pool, name='wrong_type_child')
         right_type_child = self._make_resource(registry, parent=pool,
                                                name='right_type_child',
-                                               restype=ITag)
+                                               content_type=ITag)
         poolsheet = get_sheet(pool, IPool)
         result = set(poolsheet._filter_elements(ifaces=[ITag, IName]))
         assert result == {right_type_child}
@@ -242,7 +254,7 @@ class TestIntegrationPoolSheet:
         from adhocracy.utils import get_sheet
         pool = self._make_resource(registry, parent=pool_graph_catalog)
         self._make_resource(registry, parent=pool, name='child1')
-        self._make_resource(registry, parent=pool, name='child2', restype=ITag)
+        self._make_resource(registry, parent=pool, name='child2', content_type=ITag)
         poolsheet = get_sheet(pool, IPool)
         result = set(poolsheet._filter_elements(ifaces=[ITag, IItemVersion]))
         assert result == set()
@@ -258,16 +270,22 @@ class TestIntegrationPoolSheet:
         result = set(poolsheet._filter_elements(arbitrary_filters={'tag': 'LAST'}))
         assert result == set()
 
-    def test_filter_elements_by_referencefilter(
-            self, registry, pool_graph_catalog):
+    def test_filter_elements_by_referencefilter(self, registry, pool_graph_catalog):
         from adhocracy.sheets.pool import IPool
+        from adhocracy.interfaces import ITag
+        from adhocracy.sheets import tags
         from adhocracy.utils import get_sheet
         pool = self._make_resource(registry, parent=pool_graph_catalog)
-        untagged_child = self._make_resource(registry, parent=pool,
-                                             name='untagged_child')
+        other_child = self._make_resource(registry, parent=pool,
+                                          name='other_child')
+        tag_child = self._make_resource(registry, parent=pool, content_type=ITag,
+                                        name='tag_child')
+        tagsheet = get_sheet(tag_child, tags.ITag)
+        tagsheet.set({'elements': [pool]})
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet._filter_elements(arbitrary_filters={'tag': 'LAST'}))
-        assert result == set()
+        reference_filters = {tags.ITag.__identifier__ + ':' + 'elements': pool}
+        result = set(poolsheet._filter_elements(references=reference_filters))
+        assert result == set([tag_child])
 
 
 

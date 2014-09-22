@@ -1196,7 +1196,6 @@ their paths::
     {'content_type': 'adhocracy.interfaces.ITag',...'path': 'http://localhost/adhocracy/Proposals/kommunismus/FIRST/'...
 
 
-
 *tag* is a custom filter that allows filtering only resources with a
 specific tag. Often we are only interested in the newest versions of
 Versionables. We can get them by setting *tag=LAST*. Let's find the latest
@@ -1209,8 +1208,19 @@ versions of all sections::
     ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/',
      'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
-FIXME Demonstrate custom filters, using the Rating resource as example
-(subject or object, actual rating).
+
+*package.sheets.sheet.ISheet:FieldName* filters: you can add arbitrary custom
+filters that refer to sheet fields with references. The key is the name of
+the isheet plus the field name separated by ':' The value is the wanted
+reference target.
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    ...             'adhocracy.sheets.versions.IVersionable:follows':
+    ...             'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000000/',
+    ...             'depth': 'all', 'tag': 'LAST'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
 FIXME Not yet implemented: aggregateby
 

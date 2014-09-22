@@ -17,7 +17,7 @@ from adhocracy.utils import find_graph
          is_index=True,
          )
 @implementer(IIndex)
-class Reference(SDIndex, BaseIndexMixin, Persistent):
+class ReferenceIndex(SDIndex, BaseIndexMixin, Persistent):
 
     """Uses the graph query isheet references."""
 

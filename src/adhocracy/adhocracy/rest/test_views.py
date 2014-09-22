@@ -437,7 +437,7 @@ class TestPoolRESTView:
         mock_sheet.get.return_value = {}
         mock_sheet.schema = colander.MappingSchema()
         request.registry.content.resource_sheets.return_value = {IPool.__identifier__: mock_sheet}
-        request.GET['param1'] = 1
+        request.validated['param1'] = 1
 
         inst = self.make_one(context, request)
         response = inst.get()
