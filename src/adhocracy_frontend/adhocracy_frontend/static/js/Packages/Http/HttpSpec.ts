@@ -144,7 +144,7 @@ export var register = () => {
                     adhHttp.getNewestVersionPathNoFork(path).then(
                         (ret) => {
                             expect(ret).toBe(returnPath1);
-                            expect($httpMock.get).toHaveBeenCalledWith(path + "/LAST");
+                            expect($httpMock.get).toHaveBeenCalledWith(path + "/LAST", { params: undefined });
                             done();
                         },
                         (msg) => {

@@ -58,7 +58,7 @@ export var register = () => {
                 };
 
                 rateResources = [
-                    { content_type: "adhocracy.resources.rate.IRate",
+                    { content_type: "adhocracy.resources.rate.IRateVersion",
                       path: "r1",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
@@ -68,7 +68,7 @@ export var register = () => {
                           }
                       }
                     },
-                    { content_type: "adhocracy.resources.rate.IRate",
+                    { content_type: "adhocracy.resources.rate.IRateVersion",
                       path: "r2",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
@@ -78,7 +78,7 @@ export var register = () => {
                           }
                       }
                     },
-                    { content_type: "adhocracy.resources.rate.IRate",
+                    { content_type: "adhocracy.resources.rate.IRateVersion",
                       path: "r3",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
@@ -88,7 +88,7 @@ export var register = () => {
                           }
                       }
                     },
-                    { content_type: "adhocracy.resources.rate.IRate",
+                    { content_type: "adhocracy.resources.rate.IRateVersion",
                       path: "r4",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
@@ -98,7 +98,7 @@ export var register = () => {
                           }
                       }
                     },
-                    { content_type: "adhocracy.resources.rate.IRate",
+                    { content_type: "adhocracy.resources.rate.IRateVersion",
                       path: "r5",
                       data: {
                           "adhocracy.sheets.rate.IRate": {
@@ -182,7 +182,7 @@ export var register = () => {
                         expect(scopeMock.rates.pro).toBe(2);
                         expect(scopeMock.rates.contra).toBe(1);
                         expect(scopeMock.rates.neutral).toBe(1);
-                        expect(scopeMock.thisUsersRate.data["adhocracy.sheets.rate.IRate"].subject).toBe(userMock.userPath);
+                        expect(scopeMock.thisUsersRate.data["adhocracy.sheets.rate.IRateVersion"].subject).toBe(userMock.userPath);
                         done();
                     },
                     (msg) => {
