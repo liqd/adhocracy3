@@ -64,7 +64,7 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
     }
 
     is(resource : ResourcesBase.Resource) : boolean {
-        return resource.content_type === "adhocracy.resources.rate.IRate";
+        return resource.content_type === "adhocracy.resources.rate.IRateVersion";
     }
 
     subject(resource : RIRateVersion) : string;
