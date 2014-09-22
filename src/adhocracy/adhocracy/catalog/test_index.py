@@ -19,8 +19,8 @@ class TestReference:
         return pool_graph
 
     def _make_one(self):
-        from .index import Reference
-        index = Reference()
+        from .index import ReferenceIndex
+        index = ReferenceIndex()
         return index
 
     def test_create(self):

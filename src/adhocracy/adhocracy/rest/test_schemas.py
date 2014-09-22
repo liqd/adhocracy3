@@ -531,14 +531,14 @@ class TestGETPoolRequestSchema():
                 'elements': 'content',
                 'count': 'true',
                 'aggregateby': 'rating.opinion',
-                'tag': 'LAST'}
+                }
         expected = {'content_type': IName,
                     'sheet': IName,
                     'depth': '100',
                     'elements': 'content',
                     'count': True,
                     'aggregateby': 'rating.opinion',
-                    'tag': 'LAST'}
+                    }
         assert inst.deserialize(data) == expected
 
     def test_deserialize_content_type_invalid(self, inst):
@@ -562,3 +562,82 @@ class TestGETPoolRequestSchema():
     def test_deserialize_extra_values_are_preserved(self, inst):
         data = {'extra1': 'blah',
                 'another_extra': 'blub'}
+        assert inst.typ.unknown == 'raise'
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+
+class TestAddGetPoolRequestExtraFields:
+
+    @fixture
+    def schema(self):
+        from adhocracy.rest.schemas import GETPoolRequestSchema
+        schema = GETPoolRequestSchema()
+        return schema.bind()
+
+    @fixture
+    def context(self, pool_graph_catalog):
+        return pool_graph_catalog
+
+    @fixture
+    def registry(self, mock_resource_registry):
+        return testing.DummyResource(content=mock_resource_registry)
+
+    def _call_fut(self, *args):
+        from adhocracy.rest.schemas import add_get_pool_request_extra_fields
+        return add_get_pool_request_extra_fields(*args)
+
+    def test_call_without_extra_fields(self, schema):
+        cstruct = {}
+        assert self._call_fut(cstruct, schema, None, None) == schema
+
+    def test_call_with_missing_catalog(self, schema):
+        index_name = 'index1'
+        cstruct = {index_name: 'keyword'}
+        schema_extended = self._call_fut(cstruct, schema, None, None)
+        assert index_name not in schema_extended
+
+    def test_call_with_extra_filter_wrong(self, schema, context):
+        index_name = 'index1'
+        cstruct = {index_name: 'keyword'}
+        schema_extended = self._call_fut(cstruct, schema, context, None)
+        assert index_name not in schema_extended
+
+    def test_call_with_extra_filter(self, schema, context):
+        from adhocracy.schema import SingleLine
+        index_name = 'index1'
+        index = testing.DummyResource()
+        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
+        cstruct = {index_name: 'keyword'}
+        schema_extended = self._call_fut(cstruct, schema, context, None)
+        assert isinstance(schema_extended[index_name], SingleLine)
+
+    def test_call_with_extra_reference_name(self, schema, registry):
+        from adhocracy.schema import Resource
+        from adhocracy.schema import Reference
+        isheet = ISheet.__identifier__
+        field = 'reference'
+        reference_name = isheet + ':' + field
+        cstruct = {reference_name: '/referenced'}
+        registry.content.resolve_isheet_field_from_dotted_string.return_value = (ISheet, 'reference', Reference())
+        schema_extended = self._call_fut(cstruct, schema, None, registry)
+        assert isinstance(schema_extended[reference_name], Resource)
+
+    def test_call_with_extra_reference_name_wrong_type(self, schema, registry):
+        from adhocracy.schema import SingleLine
+        isheet = ISheet.__identifier__
+        field = 'reference'
+        reference_name = isheet + ':' + field
+        cstruct = {reference_name: '/referenced'}
+        registry.content.resolve_isheet_field_from_dotted_string.return_value = (ISheet, 'reference', SingleLine())
+        schema_extended = self._call_fut(cstruct, schema, None, registry)
+        assert reference_name not in schema_extended
+
+    def test_call_with_extra_reference_name_wrong(self, schema, registry):
+        isheet = ISheet.__identifier__
+        field = 'reference'
+        reference_name = isheet + ':' + field
+        cstruct = {reference_name: '/referenced'}
+        registry.content.resolve_isheet_field_from_dotted_string.side_effect = ValueError
+        schema_extended = self._call_fut(cstruct, schema, None, registry)
+        assert reference_name not in schema_extended
