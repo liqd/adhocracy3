@@ -106,7 +106,9 @@ export var postPoolContentsPromise = (
     adhHttp : AdhHttp.Service<any>
 ) : ng.IPromise<RIRateVersion[]> => {
     return postPoolPathPromise($scope, adhHttp)
-        .then((postPoolPath) => adhHttp.get(postPoolPath))
+        .then((postPoolPath) => adhHttp.get(postPoolPath, {
+            content_type: "adhocracy.resources.rate.IRate"
+        }))
         .then((postPool) => {
             var ratePromises : ng.IPromise<ResourcesBase.Resource>[] =
                 postPool.data["adhocracy.sheets.pool.IPool"].elements

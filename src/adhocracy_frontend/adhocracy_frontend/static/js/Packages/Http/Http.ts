@@ -43,7 +43,7 @@ export class Service<Content extends Resources.Content<any>> {
         private adhConfig : AdhConfig.Type
     ) {}
 
-    public getRaw(path : string) : ng.IHttpPromise<any> {
+    public getRaw(path : string, params ?: { [key : string] : string }) : ng.IHttpPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-get preliminary path: " + path;
         }
@@ -51,11 +51,11 @@ export class Service<Content extends Resources.Content<any>> {
             path = this.adhConfig.rest_url + path;
         }
         return this.$http
-            .get(path);
+            .get(path, { params : params });
     }
 
-    public get(path : string) : ng.IPromise<Content> {
-        return this.getRaw(path)
+    public get(path : string, params ?: { [key : string] : string }) : ng.IPromise<Content> {
+        return this.getRaw(path, params)
             .then(
                 (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
                 AdhError.logBackendError);
