@@ -189,6 +189,9 @@ export class Service<Content extends Resources.Content<any>> {
 
         var dagPath = Util.parentPath(oldVersionPath);
         var _obj = _.cloneDeep(obj);
+        if (typeof rootVersions !== "undefined") {
+            _obj.root_versions = rootVersions;
+        }
 
         var retry = (
             nextOldVersionPath : string,

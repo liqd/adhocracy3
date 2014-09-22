@@ -64,7 +64,7 @@ export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBacken
         throw "no batch item responses!";
     }
 
-    var lastBatchItemResponse : IBackendError = response.data[response.data.length - 1];
+    var lastBatchItemResponse : IBackendError = (<any>response.data[response.data.length - 1]).body;
     console.log(lastBatchItemResponse);
 
     var errors : IBackendErrorItem[] = lastBatchItemResponse.errors;

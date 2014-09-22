@@ -2,12 +2,40 @@
 
 import q = require("q");
 
+// import RIRate = require("../../Resources_/adhocracy/resources/rate/IRate");
+import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
+import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
 import AdhRate = require("./Rate");
 import AdhRateAdapter = require("./Adapter");
+import PreliminaryNames = require ("../PreliminaryNames/PreliminaryNames");
 
 
 export var register = () => {
     describe("Rate", () => {
+        describe("Adapter", () => {
+            var adapter : AdhRateAdapter.RateAdapter;
+            var rateVersion : RIRateVersion;
+
+            beforeEach(() => {
+                adapter = new AdhRateAdapter.RateAdapter();
+                rateVersion = new RIRateVersion({ preliminaryNames: new PreliminaryNames() });
+                rateVersion.data["adhocracy.sheets.rate.IRate"] = new SIRate.AdhocracySheetsRateIRate({
+                    subject: "sub",
+                    object: "obj",
+                    rate: 1
+                });
+            });
+
+            it("rate returns rate correctly", () => {
+                expect(adapter.rate(rateVersion)).toEqual(1);
+            });
+
+            it("rate sets rate correctly", () => {
+                adapter.rate(rateVersion, -1);
+                expect(rateVersion.data["adhocracy.sheets.rate.IRate"].rate).toEqual(-1);
+            });
+        });
+
         describe("Controller", () => {
             var scopeMock;
             var httpMock;
@@ -35,7 +63,7 @@ export var register = () => {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user1",
                               object: "comment_or_something",
-                              rate: AdhRate.RateValue.pro
+                              rate: 1
                           }
                       }
                     },
@@ -44,7 +72,7 @@ export var register = () => {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user2",
                               object: "comment_or_something",
-                              rate: AdhRate.RateValue.pro
+                              rate: 1
                           }
                       }
                     },
@@ -53,7 +81,7 @@ export var register = () => {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user3",
                               object: "comment_or_something",
-                              rate: AdhRate.RateValue.neutral
+                              rate: 0
                           }
                       }
                     },
@@ -62,7 +90,7 @@ export var register = () => {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user4",
                               object: "comment_or_something",
-                              rate: AdhRate.RateValue.contra
+                              rate: -1
                           }
                       }
                     },
@@ -71,7 +99,7 @@ export var register = () => {
                           "adhocracy.sheets.rate.IRate": {
                               subject: "user3",
                               object: "something_irrelevant",
-                              rate: AdhRate.RateValue.contra
+                              rate: -1
                           }
                       }
                     }

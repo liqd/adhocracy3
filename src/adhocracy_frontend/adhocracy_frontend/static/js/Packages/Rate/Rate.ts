@@ -16,13 +16,6 @@ import RIRate = require("../../Resources_/adhocracy/resources/rate/IRate");
 var pkgLocation = "/Rate";
 
 
-export enum RateValue {
-    contra = -1,
-    neutral,
-    pro
-};
-
-
 export interface IRateScope extends ng.IScope {
     refersTo : string;
     postPoolPath : string;
@@ -56,8 +49,8 @@ export interface IRateAdapter<T extends AdhResource.Content<any>> {
     subject(resource : T, value : string) : T;
     object(resource : T) : string;
     object(resource : T, value : string) : T;
-    rate(resource : T) : RateValue;
-    rate(resource : T, value : RateValue) : T;
+    rate(resource : T) : number;
+    rate(resource : T, value : number) : T;
     creator(resource : T) : string;
     creationDate(resource : T) : string;
     modificationDate(resource : T) : string;
@@ -163,17 +156,17 @@ export var updateRates = (
                     return;
                 }
 
-                var checkValue = (rate, value : RateValue) : boolean =>
+                var checkValue = (rate, value : number) : boolean =>
                     adapter.rate(rate) === value;
 
                 var iscurrentuser = (rate) : boolean =>
                     adapter.subject(rate) === adhUser.userPath;
 
-                if (checkValue(rate, RateValue.pro)) {
+                if (checkValue(rate, 1)) {
                     $scope.rates.pro += 1;
-                } else if (checkValue(rate, RateValue.contra)) {
+                } else if (checkValue(rate, -1)) {
                     $scope.rates.contra += 1;
-                } else if (checkValue(rate, RateValue.neutral)) {
+                } else if (checkValue(rate, 0)) {
                     $scope.rates.neutral += 1;
                 }
 
@@ -199,11 +192,17 @@ export var rateController = (
     adhPreliminaryNames : AdhPreliminaryNames
 ) : ng.IPromise<void> => {
 
-    $scope.isActive = (rate : RateValue) : boolean =>
-        typeof $scope.thisUsersRate !== "undefined" &&
-        rate === adapter.rate($scope.thisUsersRate);
+    $scope.isActive = (rate : number) : boolean => {
+        console.log(rate,
+                    typeof $scope.thisUsersRate !== "undefined" &&
+                        adapter.rate($scope.thisUsersRate),
+                    typeof $scope.thisUsersRate !== "undefined" &&
+                        (rate === adapter.rate($scope.thisUsersRate)));
+        return (typeof $scope.thisUsersRate !== "undefined" &&
+                rate === adapter.rate($scope.thisUsersRate));
+    };
 
-    $scope.isActiveClass = (rate : RateValue) : string =>
+    $scope.isActiveClass = (rate : number) : string =>
         $scope.isActive(rate) ? "rate-button-active" : "";
 
     $scope.toggleShowDetails = () => {
@@ -216,9 +215,9 @@ export var rateController = (
         } else {
             delete $scope.allRates;
         }
-    }
+    };
 
-    $scope.cast = (rate : RateValue) : void => {
+    $scope.cast = (rate : number) : void => {
         if (!adhUser.userPath) {
             // if user is not logged in, rating silently refuses to work.
             return;
@@ -253,7 +252,23 @@ export var rateController = (
                     if ((!didExistBefore) || (<any>$scope.thisUsersRate).rate === rate) {
                         // set new value
                         adapter.rate($scope.thisUsersRate, rate);
-                        $scope.rates[RateValue[rate]] += 1;
+                        switch (rate) {
+                            case 1: {
+                                $scope.rates.pro += 1;
+                                break;
+                            }
+                            case -1: {
+                                $scope.rates.contra += 1;
+                                break;
+                            }
+                            case 0: {
+                                $scope.rates.neutral += 1;
+                                break;
+                            }
+                            default: {
+                                throw "unknown rate value: " + rate.toString();
+                            }
+                        }
 
                         // send new rate to server
                         $scope.postUpdate();
