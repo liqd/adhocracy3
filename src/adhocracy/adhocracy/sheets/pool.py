@@ -58,7 +58,7 @@ class FilteringPoolSheet(PoolSheet):
                                          references=references,
                                          )
         appstruct = {}
-        if serialization_form != 'omit':
+        if resolve_resources:
             appstruct['elements'] = elements
         if self._count_matching_elements(params):
             appstruct['count'] = len(elements)
