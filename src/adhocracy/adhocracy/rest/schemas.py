@@ -2,6 +2,7 @@
 from substanced.util import find_catalog
 import colander
 
+from adhocracy.interfaces import IResource
 from adhocracy.schema import AbsolutePath
 from adhocracy.schema import AdhocracySchemaNode
 from adhocracy.schema import Email
@@ -12,16 +13,13 @@ from adhocracy.schema import Resources
 from adhocracy.schema import Reference
 from adhocracy.schema import References
 from adhocracy.schema import SingleLine
-from adhocracy.interfaces import IResource
+from adhocracy.schema import ResourcePathSchema
+from adhocracy.schema import ResourcePathAndContentSchema
 
 
-class ResourceResponseSchema(colander.Schema):
+class ResourceResponseSchema(ResourcePathSchema):
 
     """Data structure for responses of Resource requests."""
-
-    content_type = SingleLine()
-
-    path = Resource()
 
 
 class ItemResponseSchema(ResourceResponseSchema):
@@ -31,15 +29,12 @@ class ItemResponseSchema(ResourceResponseSchema):
     first_version_path = Resource()
 
 
-class GETResourceResponseSchema(ResourceResponseSchema):
+class GETResourceResponseSchema(ResourcePathAndContentSchema):
 
     """Data structure for Resource GET requests."""
 
-    data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
-                               default={})
 
-
-class GETItemResponseSchema(GETResourceResponseSchema):
+class GETItemResponseSchema(ResourcePathAndContentSchema):
 
     """Data structure for responses of IItem requests."""
 

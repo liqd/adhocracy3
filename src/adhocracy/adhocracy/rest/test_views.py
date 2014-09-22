@@ -300,10 +300,10 @@ class TestResourceRESTView:
         inst = self.make_one(context, request)
         response = inst.options()
         wanted = OPTIONResourceResponseSchema().serialize()
+        wanted['PUT']['response_body']['content_type'] = ''
         assert wanted == response
 
     def test_options_valid_with_sheets_and_addables(self, request, context):
-        from adhocracy.rest.schemas import OPTIONResourceResponseSchema
         registry = request.registry.content
         registry.resource_sheets.return_value = {'ipropertyx': object()}
         registry.resource_addables.return_value = \
@@ -313,12 +313,19 @@ class TestResourceRESTView:
         inst = self.make_one(context, request)
         response = inst.options()
 
-        wanted = OPTIONResourceResponseSchema().serialize()
-        wanted['PUT']['request_body'] = {'data': {'ipropertyx': {}}}
-        wanted['GET']['response_body']['data']['ipropertyx'] = {}
-        wanted['POST']['request_body'] = [{'content_type': 'iresourcex',
-                                           'data': {'ipropertyx': {}}}]
-
+        wanted = \
+        {'GET': {'request_body': {},
+         'request_querystring': {},
+         'response_body': {'content_type': '',
+                           'data': {'ipropertyx': {}},
+                           'path': ''}},
+         'HEAD': {},
+         'OPTION': {},
+         'POST': {'request_body': [{'content_type': 'iresourcex',
+                                    'data': {'ipropertyx': {}}}],
+                  'response_body': {'content_type': '', 'path': ''}},
+         'PUT': {'request_body': {'content_type': '', 'data': {'ipropertyx': {}}},
+                 'response_body': {'content_type': '', 'path': ''}}}
         assert wanted == response
 
     def test_get_valid_no_sheets(self, request, context):
@@ -423,6 +430,39 @@ class TestPoolRESTView:
         wanted['data'] = {}
         wanted['content_type'] = IResource.__identifier__
         assert wanted == response
+
+    def test_get_valid_pool_sheet_with_queryparams(self, request, context, mock_sheet):
+        from adhocracy.sheets.pool import IPool
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
+        mock_sheet.get.return_value = {}
+        mock_sheet.schema = colander.MappingSchema()
+        request.registry.content.resource_sheets.return_value = {IPool.__identifier__: mock_sheet}
+        request.GET['param1'] = 1
+
+        inst = self.make_one(context, request)
+        response = inst.get()
+
+        assert response['data'] == {IPool.__identifier__: {}}
+        assert mock_sheet.get.call_args[1] == {'params': {'param1': 1}}
+
+    def test_get_valid_pool_sheet_with_elements_content_param(self, request, context, mock_sheet):
+        from adhocracy.sheets.pool import IPool
+        from adhocracy.sheets.pool import PoolSchema
+        child = testing.DummyResource(__provides__=IResource)
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
+        mock_sheet.get.return_value = {'elements': [child],
+                                       'count': 1}  # FIXME remove 'count', this is a test fixture bug
+        mock_sheet.schema = PoolSchema()
+        request.registry.content.resource_sheets.return_value = {IPool.__identifier__: mock_sheet}
+        request.GET['elements'] = 'content'
+
+        inst = self.make_one(context, request)
+        response = inst.get()
+
+        response_elements_child = response['data'][IPool.__identifier__]['elements'][0]
+        assert 'path' in response_elements_child
+        assert 'content_type' in response_elements_child
+        assert 'data' in response_elements_child
 
     def test_post_valid(self, request, context):
         request.root = context

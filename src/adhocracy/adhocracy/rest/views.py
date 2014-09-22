@@ -45,7 +45,7 @@ from adhocracy.utils import get_sheet
 from adhocracy.utils import get_user
 from adhocracy.resources.root import IRootPool
 from adhocracy.sheets.user import IPasswordAuthentication
-
+import adhocracy.sheets.pool
 
 logger = getLogger(__name__)
 
@@ -278,13 +278,18 @@ class ResourceRESTView(RESTView):
         cstruct = deepcopy(cstruct_singleton)
         for sheet in sheets_edit:
             cstruct['PUT']['request_body']['data'][sheet] = {}
+            cstruct['PUT']['request_body']['content_type'] = ''
+            cstruct['PUT']['response_body']['content_type'] = ''
+        cstruct['PUT']['response_body']['content_type'] = ''
         for sheet in sheets_view:
             cstruct['GET']['response_body']['data'][sheet] = {}
+            cstruct['GET']['response_body']['content_type'] = ''
         for type, sheets in addables.items():
             names = sheets['sheets_optional'] + sheets['sheets_mandatory']
             sheets_dict = dict([(s, {}) for s in names])
             post_data = {'content_type': type, 'data': sheets_dict}
             cstruct['POST']['request_body'].append(post_data)
+            cstruct['POST']['response_body']['content_type'] = ''
         return cstruct
 
     @view_config(request_method='GET')
@@ -306,9 +311,25 @@ class ResourceRESTView(RESTView):
             schema = sheet.schema.bind(context=self.context,
                                        request=self.request)
             appstruct = sheet.get(params=queryparams)
+            if sheet.meta.isheet is adhocracy.sheets.pool.IPool:
+                _set_pool_sheet_elements_serialization_form(schema,
+                                                            queryparams)
+                # FIXME? readd the get_cstruct method but with parameters
+                # 'request'/'context'. Then we can handle this stuff at
+                #  one place, the pool sheet package.
             cstruct = schema.serialize(appstruct)
             data_cstruct[key] = cstruct
         return data_cstruct
+
+
+def _set_pool_sheet_elements_serialization_form(schema: MappingSchema,
+                                                queryparams: dict):
+    if queryparams.get('elements', 'path') != 'content':
+        return
+    elements_node = schema['elements']
+    elements_typ_copy = deepcopy(elements_node.children[0].typ)
+    elements_typ_copy.serialization_form = 'content'
+    elements_node.children[0].typ = elements_typ_copy
 
 
 def _get_resource_response_appstruct(resource: IResource) -> dict:
