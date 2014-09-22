@@ -37,12 +37,25 @@ def test_includeme_registry_register_factories(registry):
 
 
 @mark.usefixtures('integration')
-def test_includeme_registry_create_rate(registry, pool):
+def test_includeme_registry_create_rate(registry, pool_graph_catalog):
     from adhocracy.resources.rate import IRate
+    pool = pool_graph_catalog
     assert registry.content.create(IRate.__identifier__, parent=pool)
 
 
 @mark.usefixtures('integration')
-def test_includeme_registry_create_rateversion(registry, pool):
+def test_includeme_registry_create_rateversion(registry, pool_graph_catalog):
     from adhocracy.resources.rate import IRateVersion
+    pool = pool_graph_catalog
     assert registry.content.create(IRateVersion.__identifier__, parent=pool)
+
+
+@mark.usefixtures('integration')
+def test_includeme_registry_search_rateversion(registry, pool_graph_catalog):
+    from adhocracy.resources.rate import IRateVersion
+    pool = pool_graph_catalog
+    rate = registry.content.create(IRateVersion.__identifier__, parent=pool)
+    rate_index = pool['catalogs']['adhocracy']['rate']
+    rate_index.reindex_resource(rate)
+    search_result = set(rate_index.eq(0).execute())
+    assert rate in search_result
