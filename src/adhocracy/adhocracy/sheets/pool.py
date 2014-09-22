@@ -133,7 +133,7 @@ class PoolSchema(colander.MappingSchema):
 
     elements = UniqueReferences(reftype=PoolElementsReference,
                                 readonly=True,
-                                default=colander.drop)
+                                )
     count = colander.SchemaNode(colander.Integer(), default=colander.drop)
 
 

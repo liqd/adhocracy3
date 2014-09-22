@@ -1174,7 +1174,7 @@ This corresponds to setting *elements=paths*.
     ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/',
      'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
 
-Setting *elements=omit* will yield a response without an 'elements' listing.
+Setting *elements=omit* will yield a response with an empty 'elements' listing.
 This makes only if you ask for something else instead, e.g. a count of
 elements::
 
@@ -1182,7 +1182,7 @@ elements::
     ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
     ...             'elements': 'omit', 'count': 'true'}).json
     >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool'])
-    {'count': '2'}
+    {'count': '2', 'elements': []}
 
 Setting *elements=content* will instead return the complete contents of all
 matching elements -- what you would get by making a GET request on each of
