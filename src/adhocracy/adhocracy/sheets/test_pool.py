@@ -13,6 +13,8 @@ def integration(config):
     config.include('adhocracy.catalog')
     config.include('adhocracy.resources.pool')
     config.include('adhocracy.resources.tag')
+    config.include('adhocracy.resources.item')
+    config.include('adhocracy.resources.itemversion')
     config.include('adhocracy.sheets')
 
 
@@ -25,9 +27,11 @@ class TestFilteringPoolSheet:
 
     @fixture
     def inst(self, meta, context):
+        from adhocracy.sheets.pool import filter_elements_result
         inst = meta.sheet_class(meta, context)
         inst._filter_elements = Mock(spec=inst._filter_elements)
-        inst._filter_elements.return_value = []
+        inst._filter_elements.return_value = filter_elements_result(['Dummy'],
+                                                                    1, {})
         return inst
 
     def test_create(self, inst):
@@ -68,7 +72,6 @@ class TestFilteringPoolSheet:
         assert appstruct == {'elements': []}
 
     def test_get_reference_appstruct_with_depth(self, inst):
-        inst._filter_elements.return_value = ['Dummy']
         appstruct = inst._get_reference_appstruct(
             {'depth': '3', 'content_type': 'BlahType', 'count': True})
         assert inst._filter_elements.call_args[1] == {'depth': 3,
@@ -76,11 +79,11 @@ class TestFilteringPoolSheet:
                                                       'arbitrary_filters': {},
                                                       'resolve_resources': True,
                                                       'references': {},
+                                                      'aggregate_filter': '',
                                                       }
         assert appstruct == {'elements': ['Dummy'], 'count': 1}
 
     def test_get_reference_appstruct_with_two_ifaces_and_two_arbitraryfilters(self, inst):
-        inst._filter_elements.return_value = ['Dummy']
         appstruct = inst._get_reference_appstruct(
             {'content_type': 'BlahType', 'sheet': 'BlubSheet',
              'tag': 'BEST', 'rating': 'outstanding'})
@@ -90,6 +93,7 @@ class TestFilteringPoolSheet:
             'arbitrary_filters': {'tag': 'BEST', 'rating': 'outstanding'},
             'resolve_resources': True,
             'references': {},
+            'aggregate_filter': '',
             }
         assert appstruct == {'elements': ['Dummy']}
 
@@ -100,7 +104,6 @@ class TestFilteringPoolSheet:
         assert appstruct == {'elements': []}
 
     def test_get_reference_appstruct_with_depth_all(self, inst):
-        inst._filter_elements.return_value = ['Dummy']
         appstruct = inst._get_reference_appstruct({'depth': 'all'})
         assert inst._filter_elements.call_args[1] == \
                {'depth': None,
@@ -108,14 +111,26 @@ class TestFilteringPoolSheet:
                 'arbitrary_filters': {},
                 'resolve_resources': True,
                 'references': {},
+                'aggregate_filter': '',
                 }
         assert appstruct == {'elements': ['Dummy']}
 
     def test_get_reference_appstruct_with_elements_omit(self, inst):
-        inst._filter_elements.return_value = ['Dummy']
         appstruct = inst._get_reference_appstruct({'elements': 'omit'})
         assert inst._filter_elements.call_args[1]['resolve_resources'] is False
         assert 'elements' not in appstruct
+
+    def test_get_reference_appstruct_aggregateby(self, inst):
+        appstruct = inst._get_reference_appstruct({'aggregateby': 'interfaces'})
+        assert inst._filter_elements.call_args[1] == \
+               {'depth': 1,
+                'ifaces': [],
+                'arbitrary_filters': {},
+                'resolve_resources': True,
+                'references': {},
+                'aggregate_filter': 'interfaces',
+                }
+        assert appstruct == {'elements': ['Dummy'], 'aggregateby': {}}
 
     def test_get_arbitrary_filters(self, meta, context):
         """remove all standard  and reference filter in get pool requests."""
@@ -155,7 +170,7 @@ class TestIntegrationPoolSheet:
         child1 = self._make_resource(registry, parent=pool, name='child1')
         child2 = self._make_resource(registry, parent=pool, name='child2')
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet._filter_elements())
+        result = set(poolsheet._filter_elements().elements)
         assert result == {child1, child2}
 
     def test_filter_elements_no_filters_with_grandchildren_depth1(
@@ -166,7 +181,7 @@ class TestIntegrationPoolSheet:
         child = self._make_resource(registry, parent=pool, name='child')
         self._make_resource(registry, parent=child, name='grandchild')
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet._filter_elements())
+        result = set(poolsheet._filter_elements().elements)
         assert result == {child}
 
     def test_filter_elements_no_filters_with_grandchildren_depth2(
@@ -180,7 +195,7 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=grandchild,
                             name='greatgrandchild')
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet._filter_elements(depth=2))
+        result = set(poolsheet._filter_elements(depth=2).elements)
         assert result == {child, grandchild}
 
     def test_filter_elements_no_filters_with_grandchildren_unlimited_depth(
@@ -194,7 +209,7 @@ class TestIntegrationPoolSheet:
         greatgrandchild = self._make_resource(registry, parent=grandchild,
                                               name='greatgrandchild')
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet._filter_elements(depth=None))
+        result = set(poolsheet._filter_elements(depth=None).elements)
         assert result == {child, grandchild, greatgrandchild}
 
     def test_filter_elements_by_interface(
@@ -210,7 +225,7 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=pool_graph_catalog,
                             name='nonchild', content_type=ITag)
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet._filter_elements(ifaces=[ITag]))
+        result = set(poolsheet._filter_elements(ifaces=[ITag]).elements)
         assert result == {right_type_child}
 
     def test_filter_elements_by_interface_elements_omit(
@@ -226,7 +241,8 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=pool_graph_catalog,
                             name='nonchild', content_type=ITag)
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet._filter_elements(resolve_resources=False, ifaces=[ITag]))
+        result = set(poolsheet._filter_elements(resolve_resources=False,
+                                                ifaces=[ITag]).elements)
         assert result == {right_type_child.__oid__}
 
     def test_filter_elements_by_two_interfaces_both_present(
@@ -241,7 +257,7 @@ class TestIntegrationPoolSheet:
                                                name='right_type_child',
                                                content_type=ITag)
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet._filter_elements(ifaces=[ITag, IName]))
+        result = set(poolsheet._filter_elements(ifaces=[ITag, IName]).elements)
         assert result == {right_type_child}
 
     def test_filter_elements_by_two_interfaces_just_one_present(
@@ -254,7 +270,7 @@ class TestIntegrationPoolSheet:
         self._make_resource(registry, parent=pool, name='child1')
         self._make_resource(registry, parent=pool, name='child2', content_type=ITag)
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet._filter_elements(ifaces=[ITag, IItemVersion]))
+        result = set(poolsheet._filter_elements(ifaces=[ITag, IItemVersion]).elements)
         assert result == set()
 
     def test_filter_elements_by_arbitraryfilter(
@@ -265,7 +281,7 @@ class TestIntegrationPoolSheet:
         untagged_child = self._make_resource(registry, parent=pool,
                                              name='untagged_child')
         poolsheet = get_sheet(pool, IPool)
-        result = set(poolsheet._filter_elements(arbitrary_filters={'tag': 'LAST'}))
+        result = set(poolsheet._filter_elements(arbitrary_filters={'tag': 'LAST'}).elements)
         assert result == set()
 
     def test_filter_elements_by_referencefilter(self, registry, pool_graph_catalog):
@@ -282,9 +298,20 @@ class TestIntegrationPoolSheet:
         tagsheet.set({'elements': [pool]})
         poolsheet = get_sheet(pool, IPool)
         reference_filters = {tags.ITag.__identifier__ + ':' + 'elements': pool}
-        result = set(poolsheet._filter_elements(references=reference_filters))
+        result = set(poolsheet._filter_elements(references=reference_filters).elements)
         assert result == set([tag_child])
 
+    def test_filter_elements_with_aggregateby(self, registry, pool_graph_catalog):
+        from adhocracy.resources.item import IItem
+        from adhocracy.resources.itemversion import IItemVersion
+        from adhocracy.sheets.pool import IPool
+        from adhocracy.utils import get_sheet
+        item = self._make_resource(registry, parent=pool_graph_catalog,
+                                   content_type=IItem)
+        poolsheet = get_sheet(item, IPool)
+        result = poolsheet._filter_elements(aggregate_filter='interfaces').aggregateby
+        assert result['interfaces'][str(IItem)] == 0
+        assert result['interfaces'][str(IItemVersion)] == 1
 
 
 @mark.usefixtures('integration')
