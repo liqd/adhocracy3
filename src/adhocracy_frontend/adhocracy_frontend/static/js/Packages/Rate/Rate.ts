@@ -277,6 +277,8 @@ export var rateController = (
 
             $scope.assureUserRateExists()
                 .then((didExistBefore) => {
+                    delete $scope.allRates;
+
                     if (didExistBefore) {
                         // decrease old value
                         addToRate($scope, adapter.rate($scope.thisUsersRate), -1);
