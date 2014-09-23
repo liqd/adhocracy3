@@ -173,6 +173,8 @@ export var updateRates = (
 
                 // if this is a rating of another content object:
                 // ignore.
+                //
+                // FIXME: should be done in query filter api, and dropped here.  see FIXME above.
                 if (adapter.object(rate) !== $scope.refersTo) {
                     return;
                 }
