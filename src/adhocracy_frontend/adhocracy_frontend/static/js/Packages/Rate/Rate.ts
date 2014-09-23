@@ -100,7 +100,7 @@ export var addToRateCount = ($scope : IRateScope, rate : number, delta : number)
 
 
 /**
- * fetch post pool path with coordinates given in scope  // FIXME: better doc?  inline into postPoolContentsPromise?
+ * fetch post pool path with coordinates given in scope  // FIXME: better doc?  inline into fetchAllRates?
  */
 export var postPoolPathPromise = (
     $scope : IRateScope,
@@ -123,12 +123,14 @@ export var postPoolPathPromise = (
 
 
 /**
- * Use postPoolPathPromise to fetch post pool path, then fetch the
- * post pool and all latest versions of the items contained in it.
+ * Take the rateable in $scope.refersTo and collect all ratings that
+ * rate this resource from its post pool.  Promise an array of latest
+ * rating versions.
  *
- * Promise an array of those versions.
+ * FIXME: make better use of the query filter api.
  */
-export var postPoolContentsPromise = (
+export var fetchAllRates = (
+    adapter : IRateAdapter<any>,
     $scope : IRateScope,
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>
@@ -136,7 +138,6 @@ export var postPoolContentsPromise = (
     return postPoolPathPromise($scope, adhHttp)
         .then((postPoolPath) => adhHttp.get(postPoolPath, {
             content_type: "adhocracy.resources.rate.IRate"
-            // FIXME: filter for target.  (also write a test for this.)
         }))
         .then((postPool) => {
             var ratePromises : ng.IPromise<ResourcesBase.Resource>[] =
@@ -146,7 +147,11 @@ export var postPoolContentsPromise = (
                            .getNewestVersionPathNoFork(path)
                            .then((path) => adhHttp.get(path)));
 
-            return $q.all(ratePromises);
+            var hasMatchingRefersTo = (rate) =>
+                adapter.object(rate) === $scope.refersTo;
+
+            return $q.all(ratePromises)
+                .then((rates) => _.filter(rates, hasMatchingRefersTo));
         });
 };
 
@@ -166,19 +171,10 @@ export var updateRates = (
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.User
 ) : ng.IPromise<void> => {
-    return postPoolContentsPromise($scope, $q, adhHttp)  // FIXME: rename to getAllRates?
+    return fetchAllRates(adapter, $scope, $q, adhHttp)
         .then((rates) => {
             resetRates($scope);
             _.forOwn(rates, (rate) => {
-
-                // if this is a rating of another content object:
-                // ignore.
-                //
-                // FIXME: should be done in query filter api, and dropped here.  see FIXME above.
-                if (adapter.object(rate) !== $scope.refersTo) {
-                    return;
-                }
-
                 addToRateCount($scope, adapter.rate(rate), 1);
 
                 if (adapter.subject(rate) === adhUser.userPath) {
@@ -217,20 +213,17 @@ export var rateController = (
     $scope.toggleShowDetails = () => {
         if (typeof $scope.allRates === "undefined") {
             $scope.allRates = [];
-            postPoolContentsPromise($scope, $q, adhHttp)
+            fetchAllRates(adapter, $scope, $q, adhHttp)
                 .then((rates) => {
-                    var promises : ng.IPromise<{ subject : string; rate : number }>[] = _
-                        .filter(rates, (rate) => {
-                            return adapter.is(rate) && adapter.object(rate) === $scope.refersTo;
-                        }).map((rate) => {
-                            return adhHttp.get(adapter.subject(rate)).then((user) => {
-                                return {
-                                    subject: user.data["adhocracy.sheets.user.IUserBasic"].name,
-                                        // FIXME: use adapter?  (which one?)
-                                    rate: adapter.rate(rate)
-                                };
-                            });
+                    var promises : ng.IPromise<{ subject : string; rate : number }>[] = rates.map((rate) => {
+                        return adhHttp.get(adapter.subject(rate)).then((user) => {
+                            return {
+                                subject: user.data["adhocracy.sheets.user.IUserBasic"].name,
+                                // FIXME: use adapter?  (which one?)
+                                rate: adapter.rate(rate)
+                            };
                         });
+                    });
 
                     $q.all(promises).then((renderables) => {
                         $scope.allRates = renderables;
