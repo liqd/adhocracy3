@@ -26,7 +26,7 @@ export interface IRateScope extends ng.IScope {
         neutral : number;
     };
     thisUsersRate : AdhResource.Content<any>;
-    allRates : RIRateVersion[];
+    allRates : { subject: string; rate: number }[];
     isActive : (RateValue) => boolean;
     isActiveClass : (RateValue) => string;  // css class name if RateValue is active, or "" otherwise.
     toggleShowDetails() : void;
@@ -231,7 +231,10 @@ export var rateController = (
                 .then((rates) => {
                     $scope.allRates = _.filter(rates, (rate) => {
                         return adapter.is(rate) && adapter.object(rate) === $scope.refersTo;
-                    });
+                    }).map((rate) => { return { subject: adapter.subject(rate), rate: adapter.rate(rate) }; }) ;
+
+                    // FIXME: fetch user resource, use name attribute instead of resource URL in UI.
+
                 });
         } else {
             delete $scope.allRates;
