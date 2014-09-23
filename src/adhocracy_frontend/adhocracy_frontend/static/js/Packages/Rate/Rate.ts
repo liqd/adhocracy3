@@ -284,14 +284,12 @@ export var rateController = (
                         addToRateCount($scope, adapter.rate($scope.thisUsersRate), -1);
                     }
 
-                    if ((!didExistBefore) || adapter.rate($scope.thisUsersRate) !== rate) {
-                        // set new value
-                        adapter.rate($scope.thisUsersRate, rate);
-                        addToRateCount($scope, rate, 1);
+                    // set new value
+                    adapter.rate($scope.thisUsersRate, rate);
+                    addToRateCount($scope, rate, 1);
 
-                        // send new rate to server
-                        $scope.postUpdate();
-                    }
+                    // send new rate to server
+                    $scope.postUpdate();
                 });
         }
     };
