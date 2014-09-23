@@ -99,7 +99,7 @@ def _update_last_tag(context: IResource, registry, old_versions: list):
     tag_sheet = get_sheet(parent_item, tags.ITags)
     taglist = tag_sheet.get()['elements']
 
-    for tag in taglist:
+    for tag in taglist:  # pragma: no branch
         if tag.__name__ == 'LAST':
             sheet = get_sheet(tag, tags.ITag)
             data = sheet.get()
