@@ -24,6 +24,10 @@ filtering_pool_default_filter = ['depth', 'content_type', 'sheet', 'elements',
                                  'count', 'aggregateby']
 
 
+filter_elements_result = namedtuple('FilterElementsResult',
+                                    ['elements', 'count', 'aggregateby'])
+
+
 class PoolSheet(GenericResourceSheet):
 
     """Generic pool resource sheet."""
@@ -36,10 +40,6 @@ class PoolSheet(GenericResourceSheet):
             if target_isheet.providedBy(child):
                 appstruct['elements'].append(child)
         return appstruct
-
-
-filter_elements_result = namedtuple('FilterElementsResult',
-                                    ['elements', 'count', 'aggregateby'])
 
 
 class FilteringPoolSheet(PoolSheet):
@@ -134,9 +134,8 @@ class FilteringPoolSheet(PoolSheet):
                 isheet_name, isheet_field = name.split(':')
                 isheet = dotted_name_resolver.resolve(isheet_name)
                 query &= index.eq(isheet, isheet_field, value)
-        resolver = None
-        if not resolve_resources:
-            resolver = lambda x: x
+        identity = lambda x: x  # pragma: no branch
+        resolver = None if resolve_resources else identity
         elements = query.execute(resolver=resolver)
         count = len(elements)
         aggregateby = {}
@@ -146,7 +145,7 @@ class FilteringPoolSheet(PoolSheet):
                 or system_catalog.get(aggregate_filter)
             for value in index.unique_values():
                 value_query = query & index.eq(value)
-                value_elements = value_query.execute(resolver=lambda x: x)
+                value_elements = value_query.execute(resolver=identity)
                 aggregateby[aggregate_filter][str(value)] = len(value_elements)
         return filter_elements_result(elements, count, aggregateby)
 
