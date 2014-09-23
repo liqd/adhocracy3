@@ -146,21 +146,6 @@ export var register = () => {
                 expect(scopeMock.thisUserRate).toBeUndefined();
             });
 
-            it("postPoolPathPromise promises post pool path.", (done) => {
-                spyOn(httpMock, "get").and.returnValue(q.when(rateableResource));
-
-                AdhRate.postPoolPathPromise(scopeMock, httpMock).then(
-                    (path) => {
-                        expect(path).toBe("post_pool_path");
-                        done();
-                    },
-                    (msg) => {
-                        expect(msg).toBe(false);
-                        done();
-                    }
-                );
-            });
-
             it("updateRates calculates the right totals for pro, contra, neutral and stores them in the scope.", (done) => {
                 scopeMock.rates = {
                     pro: 1,

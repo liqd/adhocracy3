@@ -100,29 +100,6 @@ export var addToRateCount = ($scope : IRateScope, rate : number, delta : number)
 
 
 /**
- * fetch post pool path with coordinates given in scope  // FIXME: better doc?  inline into fetchAllRates?
- */
-export var postPoolPathPromise = (
-    $scope : IRateScope,
-    adhHttp : AdhHttp.Service<any>
-) : ng.IPromise<string> => {
-    return adhHttp.get($scope.refersTo).then((rateable : ResourcesBase.Resource) => {
-        if (rateable.hasOwnProperty("data")) {
-            if (rateable.data.hasOwnProperty($scope.postPoolSheet)) {
-                if (rateable.data[$scope.postPoolSheet].hasOwnProperty($scope.postPoolField)) {
-                    $scope.postPoolPath = rateable.data[$scope.postPoolSheet][$scope.postPoolField];
-                    return $scope.postPoolPath;
-                }
-            }
-        }
-
-        throw "post pool field in " + $scope.postPoolSheet + "/" + $scope.postPoolField +
-            " not found in content type " + rateable.content_type;
-    });
-};
-
-
-/**
  * Take the rateable in $scope.refersTo and collect all ratings that
  * rate this resource from its post pool.  Promise an array of latest
  * rating versions.
@@ -135,7 +112,11 @@ export var fetchAllRates = (
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>
 ) : ng.IPromise<RIRateVersion[]> => {
-    return postPoolPathPromise($scope, adhHttp)
+    return adhHttp
+        .get($scope.refersTo).then((rateable : ResourcesBase.Resource) => {
+            $scope.postPoolPath = rateable.data[$scope.postPoolSheet][$scope.postPoolField];
+            return $scope.postPoolPath;
+        })
         .then((postPoolPath) => adhHttp.get(postPoolPath, {
             content_type: "adhocracy.resources.rate.IRate"
         }))
