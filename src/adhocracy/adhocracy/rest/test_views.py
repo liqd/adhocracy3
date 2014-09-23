@@ -747,9 +747,11 @@ class TestMetaApiView:
     def test_get_sheets_with_field_adhocracy_back_referencelist(self, request, context, sheet_meta):
         from adhocracy.interfaces import SheetToSheet
         from adhocracy.schema import UniqueReferences
-        SheetToSheet.setTaggedValue('source_isheet', ISheetB)
+        class BSheetToSheet(SheetToSheet):
+            pass
+        BSheetToSheet.setTaggedValue('source_isheet', ISheetB)
         class SchemaF(colander.MappingSchema):
-            test = UniqueReferences(reftype=SheetToSheet, backref=True)
+            test = UniqueReferences(reftype=BSheetToSheet, backref=True)
         metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
         request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)
