@@ -32,7 +32,9 @@ class TestHandleError400ColanderInvalid:
         assert isinstance(inst, _JSONError)
         assert inst.status == '400 Bad Request'
         wanted = {'status': 'error',
-                  'errors': [['body', 'parent0.child1.child2', '']]}
+                  'errors': [{'location': 'body',
+                              'name': 'parent0.child1.child2',
+                              'description': ''}]}
         assert json.loads(inst.body.decode()) == wanted
 
 

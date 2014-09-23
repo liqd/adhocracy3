@@ -22,8 +22,12 @@ def handle_error_400_colander_invalid(error, request):
     """Return 400 JSON error."""
     errors = []
     for path, description in error.asdict().items():
-        errors.append(('body', path, description))
+        errors.append(_build_error_dict('body', path, description))
     return _JSONError(errors, 400)
+
+
+def _build_error_dict(location, name, description):
+    return {'location': location, 'name': name, 'description': description}
 
 
 @view_config(
@@ -42,9 +46,7 @@ def internal_exception_to_dict(error: Exception) -> dict:
     """Convert an internal exception into a Colander-style dictionary."""
     description = '{}; time: {}'.format(exception_to_str(error),
                                         log_compatible_datetime())
-    return {'location': 'internal',
-            'description': description,
-            'name': ''}
+    return _build_error_dict('internal', '', description)
 
 
 def includeme(config):  # pragma: no cover
