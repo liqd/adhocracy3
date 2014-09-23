@@ -18,6 +18,33 @@ def integration(config):
     config.include('adhocracy.sheets')
 
 
+class TestPoolSchema:
+
+    @fixture
+    def request(self, cornice_request):
+        return cornice_request
+
+    def _make_one(self):
+        from .pool import PoolSchema
+        return PoolSchema()
+
+    def test_serialize_empty(self):
+        inst = self._make_one()
+        assert inst.serialize() == {'elements': []}
+
+    def test_serialize_empty_with_count_request_param(self, request):
+        request.validated['count'] = True
+        inst = self._make_one().bind(request=request)
+        assert inst.serialize() == {'elements': [],
+                                    'count': '0'}
+
+    def test_serialize_empty_with_aggregateby_request_param(self, request):
+        request.validated['aggregateby'] = 'index1'
+        inst = self._make_one().bind(request=request)
+        assert inst.serialize() == {'elements': [],
+                                    'aggregateby': {}}
+
+
 class TestFilteringPoolSheet:
 
     @fixture
@@ -49,7 +76,6 @@ class TestFilteringPoolSheet:
         assert inst.meta.creatable is False
 
     def test_get_empty(self, inst):
-        import colander
         assert inst.get() == {'elements': []}
 
     #FIXME: add check if the schema has a children named 'elements' with tagged
