@@ -229,12 +229,21 @@ export var rateController = (
             $scope.allRates = [];
             postPoolContentsPromise($scope, $q, adhHttp)
                 .then((rates) => {
-                    $scope.allRates = _.filter(rates, (rate) => {
-                        return adapter.is(rate) && adapter.object(rate) === $scope.refersTo;
-                    }).map((rate) => { return { subject: adapter.subject(rate), rate: adapter.rate(rate) }; }) ;
+                    var promises : ng.IPromise<{ subject : string; rate : number }>[] = _
+                        .filter(rates, (rate) => {
+                            return adapter.is(rate) && adapter.object(rate) === $scope.refersTo;
+                        }).map((rate) => {
+                            return adhHttp.get(adapter.subject(rate)).then((user) => {
+                                return {
+                                    subject: user.data["adhocracy.sheets.user.IUserBasic"].name,
+                                    rate: adapter.rate(rate)
+                                };
+                            });
+                        });
 
-                    // FIXME: fetch user resource, use name attribute instead of resource URL in UI.
-
+                    $q.all(promises).then((renderables) => {
+                        $scope.allRates = renderables;
+                    });
                 });
         } else {
             delete $scope.allRates;
