@@ -27,10 +27,10 @@ export interface IRateScope extends ng.IScope {
     };
     thisUsersRate : AdhResource.Content<any>;
     allRates : { subject: string; rate: number }[];
-    isActive : (RateValue) => boolean;
-    isActiveClass : (RateValue) => string;  // css class name if RateValue is active, or "" otherwise.
+    isActive : (value : number) => boolean;
+    isActiveClass : (value : number) => string;  // css class name if RateValue is active, or "" otherwise.
     toggleShowDetails() : void;
-    cast(RateValue) : void;
+    cast(value : number) : void;
     assureUserRateExists() : ng.IPromise<boolean>;
     postUpdate() : ng.IPromise<void>;
 }
@@ -73,23 +73,23 @@ export var resetRates = ($scope : IRateScope) : void => {
 /**
  * add number to pro / contra / neutral count.
  */
-export var addToRate = ($scope : IRateScope, rate : number, delta : number) : void => {
+export var addToRateCount = ($scope : IRateScope, rate : number, delta : number) : void => {
     switch (rate) {
-    case 1: {
-        $scope.rates.pro += delta;
-        break;
-    }
-    case -1: {
-        $scope.rates.contra += delta;
-        break;
-    }
-    case 0: {
-        $scope.rates.neutral += delta;
-        break;
-    }
-    default: {
-        throw "unknown rate value: " + rate.toString();
-    }
+        case 1: {
+            $scope.rates.pro += delta;
+            break;
+        }
+        case -1: {
+            $scope.rates.contra += delta;
+            break;
+        }
+        case 0: {
+            $scope.rates.neutral += delta;
+            break;
+        }
+        default: {
+            throw "unknown rate value: " + rate.toString();
+        }
     }
 };
 
@@ -281,13 +281,13 @@ export var rateController = (
 
                     if (didExistBefore) {
                         // decrease old value
-                        addToRate($scope, adapter.rate($scope.thisUsersRate), -1);
+                        addToRateCount($scope, adapter.rate($scope.thisUsersRate), -1);
                     }
 
                     if ((!didExistBefore) || adapter.rate($scope.thisUsersRate) !== rate) {
                         // set new value
                         adapter.rate($scope.thisUsersRate, rate);
-                        addToRate($scope, rate, 1);
+                        addToRateCount($scope, rate, 1);
 
                         // send new rate to server
                         $scope.postUpdate();
