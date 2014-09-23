@@ -179,7 +179,7 @@ export var updateRates = (
                     return;
                 }
 
-                addToRateCount($scope, rate, 1);
+                addToRateCount($scope, adapter.rate(rate), 1);
 
                 if (adapter.subject(rate) === adhUser.userPath) {
                     $scope.thisUsersRate = rate;
