@@ -179,21 +179,9 @@ export var updateRates = (
                     return;
                 }
 
-                var checkValue = (rate, value : number) : boolean =>
-                    adapter.rate(rate) === value;
+                addToRateCount($scope, rate, 1);
 
-                var iscurrentuser = (rate) : boolean =>
-                    adapter.subject(rate) === adhUser.userPath;
-
-                if (checkValue(rate, 1)) {
-                    $scope.rates.pro += 1;
-                } else if (checkValue(rate, -1)) {
-                    $scope.rates.contra += 1;
-                } else if (checkValue(rate, 0)) {
-                    $scope.rates.neutral += 1;
-                }
-
-                if (iscurrentuser(rate)) {
+                if (adapter.subject(rate) === adhUser.userPath) {
                     $scope.thisUsersRate = rate;
                 }
             });
