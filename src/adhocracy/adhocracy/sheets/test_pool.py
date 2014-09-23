@@ -46,23 +46,21 @@ class TestFilteringPoolSheet:
 
     def test_get_empty(self, inst):
         import colander
-        assert inst.get() == {'elements': [], 'count': colander.drop}
+        assert inst.get() == {'elements': []}
 
     #FIXME: add check if the schema has a children named 'elements' with tagged
     #Value 'target_isheet'. This isheet is used to filter return data.
 
     def test_get_not_empty_with_target_isheet(self, inst, context):
         from adhocracy.interfaces import ISheet
-        import colander
         child = testing.DummyResource(__provides__=ISheet)
         context['child1'] = child
-        assert inst.get() == {'elements': [child], 'count': colander.drop}
+        assert inst.get() == {'elements': [child]}
 
     def test_get_not_empty_without_target_isheet(self, inst, context):
-        import colander
         child = testing.DummyResource()
         context['child1'] = child
-        assert inst.get() == {'elements': [], 'count': colander.drop}
+        assert inst.get() == {'elements': []}
 
     def test_get_reference_appstruct_without_params(self, inst):
         appstruct = inst._get_reference_appstruct()

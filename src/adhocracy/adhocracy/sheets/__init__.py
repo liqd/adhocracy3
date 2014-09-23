@@ -181,6 +181,7 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
     schema = metadata.schema_class()
     for child in schema.children:
         assert child.default != colander.null
+        assert child.default != colander.drop
     assert issubclass(schema.__class__, colander.MappingSchema)
     _assert_schema_preserves_super_type_data_structure(schema)
 

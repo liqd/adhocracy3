@@ -153,7 +153,23 @@ class PoolSchema(colander.MappingSchema):
     elements = UniqueReferences(reftype=PoolElementsReference,
                                 readonly=True,
                                 )
-    count = colander.SchemaNode(colander.Integer(), default=colander.drop)
+
+    def after_bind(self, node: colander.MappingSchema, kw: dict):
+        request = kw.get('request', None)
+        if request is None:
+            return
+        if request.validated.get('count', False):
+            child = colander.SchemaNode(colander.Integer(),
+                                        default=0,
+                                        missing=colander.drop,
+                                        name='count')
+            node.add(child)
+        if request.validated.get('aggregateby', ''):
+            child = colander.SchemaNode(colander.Mapping(unknown='preserve'),
+                                        default={},
+                                        missing=colander.drop,
+                                        name='aggregateby')
+            node.add(child)
 
 
 pool_metadata = sheet_metadata_defaults._replace(
