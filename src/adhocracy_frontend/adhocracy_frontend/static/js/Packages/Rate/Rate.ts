@@ -171,16 +171,6 @@ export var updateRates = (
             resetRates($scope);
             _.forOwn(rates, (rate) => {
 
-                // FIXME: (summary of a conversation between mf and
-                // joka on this) rateable post pools *should* just
-                // contain ratings, but that's not the case at the
-                // writing of these lines.  we add a little filter
-                // condition here, but in the future, it should
-                // probably be ok to trust the backend on this.
-                if (!adapter.is(rate)) {
-                    return;
-                }
-
                 // if this is a rating of another content object:
                 // ignore.
                 if (adapter.object(rate) !== $scope.refersTo) {
