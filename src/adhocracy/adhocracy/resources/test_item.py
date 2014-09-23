@@ -1,6 +1,8 @@
 import unittest
 
 from pyramid import testing
+from pytest import raises
+import colander
 
 from adhocracy.interfaces import IItem
 from adhocracy.interfaces import IItemVersion
@@ -87,8 +89,8 @@ class TestItemIntegrationTest(unittest.TestCase):
         assert last_targets == [version1]
 
     def test_update_last_tag_two_versions(self):
-        """Test that if two versions are branched off the from the same
-        version, both of them get the LAST tag.
+        """Test that an error is thrown if we try to branch off two versions
+        from the same version (since items have a linear history).
         """
         from adhocracy.sheets.tags import ITag as ITagS
         self.config.include('adhocracy.sheets.versions')
@@ -98,11 +100,12 @@ class TestItemIntegrationTest(unittest.TestCase):
         version0 = item['VERSION_0000000']
 
         version1 = make_itemversion(parent=item, follows=[version0])
-        version2 = make_itemversion(parent=item, follows=[version0])
+        with raises(colander.Invalid):
+            make_itemversion(parent=item, follows=[version0])
 
         last_tag = item['LAST']
         last_targets = self.graph.get_references_for_isheet(last_tag, ITagS)['elements']
-        assert last_targets == [version1, version2]
+        assert last_targets == [version1]
 
 
 class IncludemeIntegrationTest(unittest.TestCase):

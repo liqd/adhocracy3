@@ -14,8 +14,10 @@ from substanced.util import get_dotted_name
 from substanced.util import acquire
 from zope.component import getAdapter
 from zope.interface import directlyProvidedBy
+from zope.interface import Interface
 from zope.interface import providedBy
 from zope.interface.interfaces import IInterface
+import colander
 
 from adhocracy.interfaces import IResource
 from adhocracy.interfaces import IResourceSheet
@@ -165,6 +167,29 @@ def to_dotted_name(context) -> str:
         return context
     else:
         return get_dotted_name(context)
+
+
+class _NamedObject:
+
+    """An object that has a name (and nothing else)."""
+
+    def __init__(self, name):
+        """Create a new instance."""
+        self.name = name
+        """The name of this instance"""
+
+
+def raise_colander_style_error(sheet: Interface, field_name: str,
+                               description: str):
+    """Raise a Colander Invalid error without requiring a node object.
+
+    :param sheet: the error will be located within this sheet
+    :param field_name: the error will be located within this field in the sheet
+    :param description: the description of the error
+    :raises colander.Invalid: constructed from the given parameters
+    """
+    name = 'data.{}.{}'.format(sheet.__identifier__, field_name)
+    raise colander.Invalid(_NamedObject(name), description)
 
 
 def remove_keys_from_dict(dictionary: dict, keys_to_remove=()) -> dict:
