@@ -453,7 +453,7 @@ class TestPoolRESTView:
         mock_sheet.get.return_value = {'elements': [child]}
         mock_sheet.schema = PoolSchema()
         request.registry.content.resource_sheets.return_value = {IPool.__identifier__: mock_sheet}
-        request.GET['elements'] = 'content'
+        request.validated['elements'] = 'content'
 
         inst = self.make_one(context, request)
         response = inst.get()
