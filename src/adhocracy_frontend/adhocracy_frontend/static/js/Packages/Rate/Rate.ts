@@ -18,8 +18,8 @@ var pkgLocation = "/Rate";
 export interface IRateScope extends ng.IScope {
     refersTo : string;
     postPoolPath : string;
-    postPoolSheet : string;
-    postPoolField : string;
+    postPoolSheet : string;  // FIXME: move to adapter
+    postPoolField : string;  // FIXME: move to adapter
     rates : {
         pro : number;
         contra : number;
@@ -70,6 +70,11 @@ export var resetRates = ($scope : IRateScope) : void => {
 };
 
 
+
+// FIXME: updateRates on postUpdate; updateRates on toggleBla; eliminate manual aggr. maintenance.
+
+
+
 /**
  * add number to pro / contra / neutral count.
  */
@@ -95,7 +100,7 @@ export var addToRateCount = ($scope : IRateScope, rate : number, delta : number)
 
 
 /**
- * fetch post pool path with coordinates given in scope
+ * fetch post pool path with coordinates given in scope  // FIXME: better doc?  inline into postPoolContentsPromise?
  */
 export var postPoolPathPromise = (
     $scope : IRateScope,
@@ -131,6 +136,7 @@ export var postPoolContentsPromise = (
     return postPoolPathPromise($scope, adhHttp)
         .then((postPoolPath) => adhHttp.get(postPoolPath, {
             content_type: "adhocracy.resources.rate.IRate"
+            // FIXME: filter for target.  (also write a test for this.)
         }))
         .then((postPool) => {
             var ratePromises : ng.IPromise<ResourcesBase.Resource>[] =
@@ -160,7 +166,7 @@ export var updateRates = (
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.User
 ) : ng.IPromise<void> => {
-    return postPoolContentsPromise($scope, $q, adhHttp)
+    return postPoolContentsPromise($scope, $q, adhHttp)  // FIXME: rename to getAllRates?
         .then((rates) => {
             resetRates($scope);
             _.forOwn(rates, (rate) => {
@@ -224,6 +230,10 @@ export var rateController = (
     $scope.isActiveClass = (rate : number) : string =>
         $scope.isActive(rate) ? "is-rate-button-active" : "";
 
+    // FIXME: if we were using web sockets, this would be done quite
+    // differently.  toggleShowDetails should just toggle some
+    // visibility flag, while $scope.allRates would be kept in sync
+    // with the backend elsewhere.
     $scope.toggleShowDetails = () => {
         if (typeof $scope.allRates === "undefined") {
             $scope.allRates = [];
@@ -236,6 +246,7 @@ export var rateController = (
                             return adhHttp.get(adapter.subject(rate)).then((user) => {
                                 return {
                                     subject: user.data["adhocracy.sheets.user.IUserBasic"].name,
+                                        // FIXME: use adapter?  (which one?)
                                     rate: adapter.rate(rate)
                                 };
                             });
