@@ -41,7 +41,20 @@ class VersionableSchema(colander.MappingSchema):
 versionable_metadata = sheet_metadata_defaults._replace(
     isheet=IVersionable,
     schema_class=VersionableSchema,
+)
 
+
+class IForkableVersionable(IVersionable):
+
+    """Maker interface for resources that support forking.
+
+    This means that the multiple heads are allowed (the LAST tag can point
+    to two or more versions).
+    """
+
+
+forkable_versionable_metadata = versionable_metadata._replace(
+    isheet=IForkableVersionable,
 )
 
 
@@ -82,4 +95,5 @@ versions_metadata = sheet_metadata_defaults._replace(
 def includeme(config):
     """Register sheets."""
     add_sheet_to_registry(versionable_metadata, config.registry)
+    add_sheet_to_registry(forkable_versionable_metadata, config.registry)
     add_sheet_to_registry(versions_metadata, config.registry)
