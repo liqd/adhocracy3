@@ -32,7 +32,8 @@ import AdhComment = require("./Packages/Comment/Comment");
 import AdhCommentAdapter = require("./Packages/Comment/Adapter");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
-import AdhVote = require("./Packages/Vote/Vote");
+import AdhRate = require("./Packages/Rate/Rate");
+import AdhRateAdapter = require("./Packages/Rate/Adapter");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -55,6 +56,9 @@ export var init = (config, meta_api) => {
     if (config.embedded) {
         window.document.body.className += " is-embedded";
     }
+
+    // FIXME: The functionality to set the locale is not yet done
+    config.locale = "de";
 
     var app = angular.module("adhocracy3SampleFrontend", ["ngRoute", "ngAnimate"]);
 
@@ -166,9 +170,13 @@ export var init = (config, meta_api) => {
     app.directive("adhParagraphVersionDetail",
         ["adhConfig", (adhConfig) => new AdhProposal.ParagraphVersionDetail().createDirective(adhConfig)]);
 
-    app.directive("adhTime", ["moment", "$interval", AdhDateTime.createDirective]);
+    app.directive("adhTime", ["adhConfig", "moment", "$interval", AdhDateTime.createDirective]);
 
-    app.directive("adhVote", ["adhConfig", AdhVote.createDirective]);
+    app.directive("adhRate", ["$q", "adhConfig", "adhPreliminaryNames", ($q, adhConfig, adhPreliminaryNames) =>
+        AdhRate.createDirective(
+            new AdhRateAdapter.RateAdapter(),
+            adhConfig
+        )]);
 
     // get going
 

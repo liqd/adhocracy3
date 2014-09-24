@@ -86,6 +86,16 @@ class IPostPoolSheet(ISheet):
     """
 
 
+class IPredicateSheet(ISheet):
+
+    """Marker interface for predicate sheets.
+
+    A predicate sheet has outgoing references named `subject`
+    and  `object`. It represents a subject-predicate-object data
+    structure like :term:`RDF` triples.
+    """
+
+
 class IResourceSheet(IPropertySheet):  # pragma: no cover
 
     """Sheet for resources to get/set the sheet data structure."""

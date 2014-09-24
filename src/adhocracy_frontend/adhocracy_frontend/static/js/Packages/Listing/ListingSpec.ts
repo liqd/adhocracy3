@@ -10,7 +10,7 @@ import q = require("q");
 import Listing = require("./Listing");
 
 
-var config : Config.Type = {
+var config : Config.Type = <any>{
     pkg_path: "mock",
     rest_url: "mock",
     rest_platform_path: "mock",

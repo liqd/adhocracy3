@@ -218,3 +218,4 @@ def includeme(config):  # pragma: no cover
     config.include('.user')
     config.include('.metadata')
     config.include('.comment')
+    config.include('.rate')
