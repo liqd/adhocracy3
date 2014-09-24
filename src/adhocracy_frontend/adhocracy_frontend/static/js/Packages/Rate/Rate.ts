@@ -141,9 +141,6 @@ export var fetchAllRates = (
  * Update state from server: Fetch post pool, query it for all
  * rates, and store and render them.  If a rate of the current
  * user exists, store and render that separately.
- *
- * FIXME: this function will have a much shorter implementation once
- * get search requests are available.
  */
 export var updateRates = (
     adapter : IRateAdapter<any>,
