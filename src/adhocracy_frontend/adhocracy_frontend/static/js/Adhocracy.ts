@@ -13,6 +13,8 @@ import angularRoute = require("angularRoute");  if (angularRoute) { return; };
 // runtime effects.)
 
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { return; };
+import angularTranslate = require("angularTranslate");  if (angularTranslate) { return; };
+import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { return; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
