@@ -46,16 +46,13 @@ export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendErro
  *
  * NOTE: See documentation of `importBatchContent`.
  */
-export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBackendError[]>) : void => {
+export var logBackendBatchError = (
+    response : ng.IHttpPromiseCallbackArg<{
+        code : number;
+        body : IBackendError;
+    }[]>
+) : void => {
     "use strict";
-
-    // if the response list has length 1, the backend does not bother
-    // with the brackets, and just sends the single list item without
-    // the list.  FIXME: the only reasonable thing is for the backend
-    // to always send a list, even if it only contains one element!
-    if (!response.data.hasOwnProperty("length")) {
-        response.data = [<any>response.data];
-    }
 
     console.log("http batch response with error status: " + response.status);
     console.log(response.config);
@@ -64,7 +61,7 @@ export var logBackendBatchError = (response : ng.IHttpPromiseCallbackArg<IBacken
         throw "no batch item responses!";
     }
 
-    var lastBatchItemResponse : IBackendError = (<any>response.data[response.data.length - 1]).body;
+    var lastBatchItemResponse : IBackendError = response.data[response.data.length - 1].body;
     console.log(lastBatchItemResponse);
 
     var errors : IBackendErrorItem[] = lastBatchItemResponse.errors;
