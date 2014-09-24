@@ -1,6 +1,7 @@
 """Helper functions."""
+from collections import namedtuple
 from collections.abc import Iterator
-from collections import Sequence
+from collections.abc import Sequence
 from datetime import datetime
 from functools import reduce
 import copy
@@ -14,8 +15,10 @@ from substanced.util import get_dotted_name
 from substanced.util import acquire
 from zope.component import getAdapter
 from zope.interface import directlyProvidedBy
+from zope.interface import Interface
 from zope.interface import providedBy
 from zope.interface.interfaces import IInterface
+import colander
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IResourceSheet
@@ -170,6 +173,23 @@ def to_dotted_name(context) -> str:
         return context
     else:
         return get_dotted_name(context)
+
+
+_named_object = namedtuple('NamedObject', ['name'])
+"""An object that has a name (and nothing else)."""
+
+
+def raise_colander_style_error(sheet: Interface, field_name: str,
+                               description: str):
+    """Raise a Colander Invalid error without requiring a node object.
+
+    :param sheet: the error will be located within this sheet
+    :param field_name: the error will be located within this field in the sheet
+    :param description: the description of the error
+    :raises colander.Invalid: constructed from the given parameters
+    """
+    name = 'data.{}.{}'.format(sheet.__identifier__, field_name)
+    raise colander.Invalid(_named_object(name), description)
 
 
 def remove_keys_from_dict(dictionary: dict, keys_to_remove=()) -> dict:

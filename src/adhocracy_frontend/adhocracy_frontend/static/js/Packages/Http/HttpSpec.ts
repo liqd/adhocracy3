@@ -183,6 +183,12 @@ export var register = () => {
                 });
             });
             describe("postNewVersionNoFork", () => {
+                var noForkError = {
+                    description: "No fork allowed",
+                    location: "body",
+                    name: "data.adhocracy.sheets.versions.IVersionable.follows"
+                };
+
                 it("posts to parent pool, adds IVersionable sheet with correct follows field", (done) => {
                     adhHttp.postNewVersionNoFork("/ome/path", {data: {}}).then(
                         (resource) => {
@@ -205,7 +211,7 @@ export var register = () => {
                 it("catches single \"no-fork\" exceptions and retries 4 more times.", (done) => {
                     var error = {
                         status: "error",
-                        errors: [{name: "__NO_FORK__", location: "", description: ""}]
+                        errors: [noForkError]
                     };
                     $httpMock.post.and.returnValue(q.reject({ data: error }));
 
@@ -266,7 +272,7 @@ export var register = () => {
                 it("Calls timeout; then calls post again with new HEAD as predecessor version.", (done) => {
                     var error = {
                         status: "error",
-                        errors: [{name: "__NO_FORK__", location: "", description: ""}]
+                        errors: [noForkError]
                     };
 
                     var newHead = "new_head";

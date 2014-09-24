@@ -711,13 +711,13 @@ Forks and forkability
 ~~~~~~~~~~~~~~~~~~~~~
 
 This api has been designed to allow implementation of complex merge
-conflict resolution, both automatic and with user-involvement.  For
-now, however, it only supports a simplified version control strategy:
-If any version that is not head is used as a predecessor, the backend
-responds with an error.  The frontend has to handle these errors, as
-they can always occur in race conditions with other users.
+conflict resolution, both automatic and with user-involvement. Many
+resource types, however, only supports a simplified version control strategy
+with a *linear history*: If any version that is not head is used as a
+predecessor, the backend responds with an error.  The frontend has to handle
+these errors, as they can always occur in race conditions with other users.
 
-Currently there are two very simple conflict resolution strategies:
+Current and potential future conflict resolution strategies are:
 
 1. If a race condition is reported by the backend, the frontend
    updates the predecessor version to head and tries again.  (In the
@@ -728,8 +728,8 @@ Currently there are two very simple conflict resolution strategies:
    and should not experience any race conditions.  If it does, the
    second post wins and silently reverts the previous one.
 
-2. Like 1., but the frontend posts two new versions on top of HEAD.
-   If this is the situation of the conflict::
+2. (Future work) Like 1., but the frontend posts two new versions on top of
+   HEAD. If this is the situation of the conflict::
 
     Doc     v0----v1
                 \
@@ -758,37 +758,68 @@ Currently there are two very simple conflict resolution strategies:
    Example: IProposalVersion can be modified by many users
    concurrently.
 
-3. (Future work): Both authors of the conflict are notified (email,
+3. (Future work) Both authors of the conflict are notified (email,
    dashboard, ...), and explained how they can inspect the situation
    and add new versions.  (The email should probably contain a warning
    that it's best to get on the phone and talk it through before
    generating more merge conflicts.  :)
 
-4. (Future work): Ideally, the user would to be notified that there
+4. (Future work) Ideally, the user would to be notified that there
    is a conflict, display the differences between the three versions,
    and allow the user to merge his changes into the current HEAD.
 
-5. (Future work): It is allowed to have multiple heads in the DAG, e.g.
+5. (Future work) It is allowed to have multiple heads in the DAG, e.g.
    different preferred versions by different principals. This however still
    requires a lot of UX work to be done.
 
-The backend must to two things::
+To give an example, *Comments* only allow a linear version history (just a
+single heads). Lets create a comment with an initial version (see below
+for more on comments and *post pools*)::
 
-1. Add a 'forkable' flag to the IVersionable sheet.  (There are
-   possibly other ways to model this.  Suggestions welcome.)
+    >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
+    >>> commentable = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']
+    >>> post_pool_path = commentable['post_pool']
+    >>> comment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
+    ...            'data': {}}
+    >>> resp = testapp.post_json(post_pool_path, comment)
+    >>> comment_path = resp.json["path"]
+    >>> first_commvers_path = resp.json['first_version_path']
+    >>> first_commvers_path
+    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000/'
 
-2. If a non-forkable, non-head version appears as a predecessor in a
-   post, respond with an error.
+We can create a second version that refers to the first (auto-created)
+version as predecessor::
 
+    >>> commvers = {'content_type': 'adhocracy_sample.resources.comment.ICommentVersion',
+    ...             'data': {
+    ...                 'adhocracy_core.sheets.comment.IComment': {
+    ...                     'refers_to': pvrs4_path,
+    ...                     'content': 'Bla bla bla!'},
+    ...                 'adhocracy.sheets.versions.IVersionable': {
+    ...                     'follows': [first_commvers_path]}},
+    ...             'root_versions': [first_commvers_path]}
+    >>> resp = testapp.post_json(comment_path, commvers)
+    >>> snd_commvers_path = resp.json['path']
+    >>> snd_commvers_path
+    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001/'
 
-FIXME: add tests for this!
+However, if we try to add another version that *also* gives the first
+version (no longer head) as predecessor, we get an error::
 
-FIXME: in the frontend, we check if the name of some error is
-__NO_FORK__ to decide whether to fetch a new HEAD and retry post, but
-this seems wrong, since colander uses the error fields differently.
-the error format needs to be adapted to the new requirements.  (See
-files Http.ts and HttpSpec.ts in the frontend.)
+    >>> resp_data = testapp.post_json(comment_path, commvers, status=400).json
+    >>> pprint(resp_data)
+    {'errors': [{'description': 'No fork allowed',
+                 'location': 'body',
+                 'name': 'data.adhocracy_core.sheets.versions.IVersionable.follows'}],
+     'status': 'error'}
 
+The *description* of the error will always be 'No fork allowed'. This allows
+distinguishing this error from other kinds of errors.
+
+Only resources that implement the
+`adhocracy_core.sheets.versions.IForkableVersionable` sheet (instead of
+`adhocracy_core.sheets.versions.IVersionable`) allow forking (multiple heads).
+For now, none of our standard resource types does this.
 
 
 Resources with PostPool, example Comments
@@ -876,7 +907,7 @@ Now we can retrieve that version and consult the 'comments' fields of its
 
     >>> resp = testapp.get(newest_prop_vers)
     >>> comlist = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']['comments']
-    >>> comlist == [snd_commvers_path]
+    >>> snd_commvers_path in comlist
     True
 
 Any commentable resource has this sheet. Since comments can refer to other
@@ -1222,8 +1253,17 @@ reference target.
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
-FIXME Not yet implemented: aggregateby
+*aggregateby* allows you to add the additional field `aggregateby` with
+aggregated index values of all result resources. You have to set the value
+to an existing filter like *aggregateby=tag*. Only index values that exist in
+the query result will be reported, i.e. the count reported for each value
+will be 1 or higher. ::
 
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_core.resources.section.ISectionVersion',
+    ...             'depth': 'all', 'aggregateby': 'tag'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['aggregateby'])
+    {'tag': {'FIRST': 2, 'LAST': 2}}
 
 Other stuff
 -----------

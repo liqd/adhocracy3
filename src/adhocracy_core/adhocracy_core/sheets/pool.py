@@ -1,9 +1,9 @@
 """Pool Sheet."""
 from collections.abc import Iterable
+from collections import namedtuple
 
 from pyramid.traversal import resource_path
 from pyramid.util import DottedNameResolver
-from hypatia.interfaces import IResultSet
 from substanced.util import find_catalog
 import colander
 
@@ -22,6 +22,10 @@ dotted_name_resolver = DottedNameResolver()
 
 filtering_pool_default_filter = ['depth', 'content_type', 'sheet', 'elements',
                                  'count', 'aggregateby']
+
+
+filter_elements_result = namedtuple('FilterElementsResult',
+                                    ['elements', 'count', 'aggregateby'])
 
 
 class PoolSheet(GenericResourceSheet):
@@ -51,18 +55,21 @@ class FilteringPoolSheet(PoolSheet):
         references = self._get_reference_filters(params)
         serialization_form = self._get_serialization_form(params)
         resolve_resources = serialization_form != 'omit'
-        elements = self._filter_elements(depth=depth,
-                                         ifaces=ifaces,
-                                         arbitrary_filters=arbitraries,
-                                         resolve_resources=resolve_resources,
-                                         references=references,
-                                         )
+        aggregate_filter = self._get_aggregate_filter(params)
+        result = self._filter_elements(depth=depth,
+                                       ifaces=ifaces,
+                                       arbitrary_filters=arbitraries,
+                                       resolve_resources=resolve_resources,
+                                       references=references,
+                                       aggregate_filter=aggregate_filter,
+                                       )
         appstruct = {}
         if resolve_resources:
-            appstruct['elements'] = elements
+            appstruct['elements'] = result.elements
         if self._count_matching_elements(params):
-            appstruct['count'] = len(elements)
-        # FIXME implement aggregateby
+            appstruct['count'] = result.count
+        if aggregate_filter:
+            appstruct['aggregateby'] = result.aggregateby
         return appstruct
 
     def _custom_filtering_necessary(self, params: dict) -> bool:
@@ -101,10 +108,14 @@ class FilteringPoolSheet(PoolSheet):
     def _count_matching_elements(self, params) -> bool:
         return params.get('count', False)
 
+    def _get_aggregate_filter(self, params: dict) -> str:
+        return params.get('aggregateby', '')
+
     def _filter_elements(self, depth=1, ifaces: Iterable=None,
                          arbitrary_filters: dict=None,
                          resolve_resources=True,
-                         references: dict=None) -> IResultSet:
+                         references: dict=None,
+                         aggregate_filter: str=None) -> filter_elements_result:
         system_catalog = find_catalog(self.context, 'system')
         path_index = system_catalog['path']
         query = path_index.eq(resource_path(self.context), depth=depth,
@@ -123,10 +134,22 @@ class FilteringPoolSheet(PoolSheet):
                 isheet_name, isheet_field = name.split(':')
                 isheet = dotted_name_resolver.resolve(isheet_name)
                 query &= index.eq(isheet, isheet_field, value)
-        resolver = None
-        if not resolve_resources:
-            resolver = lambda x: x
-        return query.execute(resolver=resolver)
+        identity = lambda x: x  # pragma: no branch
+        resolver = None if resolve_resources else identity
+        elements = query.execute(resolver=resolver)
+        count = len(elements)
+        aggregateby = {}
+        if aggregate_filter:
+            aggregateby[aggregate_filter] = {}
+            index = adhocracy_catalog.get(aggregate_filter, None)\
+                or system_catalog.get(aggregate_filter)
+            for value in index.unique_values():
+                value_query = query & index.eq(value)
+                value_elements = value_query.execute(resolver=identity)
+                if value_elements:
+                    aggregateby[aggregate_filter][str(value)] = len(
+                        value_elements)
+        return filter_elements_result(elements, count, aggregateby)
 
 
 class IPool(ISheet):
@@ -153,7 +176,23 @@ class PoolSchema(colander.MappingSchema):
     elements = UniqueReferences(reftype=PoolElementsReference,
                                 readonly=True,
                                 )
-    count = colander.SchemaNode(colander.Integer(), default=colander.drop)
+
+    def after_bind(self, node: colander.MappingSchema, kw: dict):
+        request = kw.get('request', None)
+        if request is None:
+            return
+        if request.validated.get('count', False):
+            child = colander.SchemaNode(colander.Integer(),
+                                        default=0,
+                                        missing=colander.drop,
+                                        name='count')
+            node.add(child)
+        if request.validated.get('aggregateby', ''):
+            child = colander.SchemaNode(colander.Mapping(unknown='preserve'),
+                                        default={},
+                                        missing=colander.drop,
+                                        name='aggregateby')
+            node.add(child)
 
 
 pool_metadata = sheet_metadata_defaults._replace(

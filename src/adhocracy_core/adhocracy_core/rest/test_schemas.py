@@ -516,30 +516,66 @@ class TestPOSTBatchRequestSchema:
 class TestGETPoolRequestSchema():
 
     @fixture
-    def inst(self, context):
+    def context(self, pool):
+        from substanced.interfaces import IFolder
+        pool['catalogs'] = testing.DummyResource(__is_service__=True,
+                                                 __provides__=IFolder)
+        pool['catalogs']['adhocracy'] = testing.DummyResource(__is_service__=True,
+                                                              __provides__=IFolder)
+        pool['catalogs']['system'] = testing.DummyResource(__is_service__=True,
+                                                           __provides__=IFolder)
+        return pool
+
+    @fixture
+    def inst(self):
         from adhocracy_core.rest.schemas import GETPoolRequestSchema
-        return GETPoolRequestSchema().bind(context=context)
+        return GETPoolRequestSchema()
 
     def test_deserialize_empty(self, inst):
         assert inst.deserialize({}) == {}
 
-    def test_deserialize_valid(self, inst):
+    def test_deserialize_valid(self, inst, context):
         from adhocracy_core.sheets.name import IName
+        catalog = context['catalogs']['adhocracy']
+        catalog['index1'] = testing.DummyResource(unique_values=lambda x: x)
+        inst = inst.bind(context=context)
         data = {'content_type': 'adhocracy_core.sheets.name.IName',
                 'sheet': 'adhocracy_core.sheets.name.IName',
                 'depth': '100',
                 'elements': 'content',
                 'count': 'true',
-                'aggregateby': 'rating.opinion',
+                'aggregateby': 'index1',
                 }
         expected = {'content_type': IName,
                     'sheet': IName,
                     'depth': '100',
                     'elements': 'content',
                     'count': True,
-                    'aggregateby': 'rating.opinion',
+                    'aggregateby': 'index1',
                     }
         assert inst.deserialize(data) == expected
+
+    def test_deserialize_valid_aggregateby_system_index(self, inst, context):
+        catalog = context['catalogs']['system']
+        catalog['index1'] = testing.DummyResource(unique_values=lambda x: x)
+        inst = inst.bind(context=context)
+        data = {'aggregateby': 'index1'}
+        assert inst.deserialize(data)['aggregateby'] == 'index1'
+
+    def test_deserialize_aggregateby_invalid_wrong_index_name(self, inst, context):
+        inst = inst.bind(context=context)
+        data = {'aggregateby': 'index1'}
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_aggregateby_invalid_index_without_unique_values(
+            self, inst, context):
+        catalog = context['catalogs']['adhocracy']
+        catalog['index1'] = testing.DummyResource()
+        inst = inst.bind(context=context)
+        data = {'aggregateby': 'index1'}
+        with raises(colander.Invalid):
+            inst.deserialize(data)
 
     def test_deserialize_content_type_invalid(self, inst):
         data = {'content_type': 'adhocracy_core.sheets.name.NoName'}
@@ -570,10 +606,10 @@ class TestGETPoolRequestSchema():
 class TestAddGetPoolRequestExtraFields:
 
     @fixture
-    def schema(self):
+    def schema(self, context):
         from adhocracy_core.rest.schemas import GETPoolRequestSchema
         schema = GETPoolRequestSchema()
-        return schema.bind()
+        return schema.bind(context=context)
 
     @fixture
     def context(self, pool_graph_catalog):

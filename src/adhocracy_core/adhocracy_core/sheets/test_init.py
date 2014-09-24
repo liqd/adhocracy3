@@ -251,6 +251,11 @@ class TestAddSheetToRegistry:
         with raises(AssertionError):
             self._call_fut(sheet_meta, registry)
 
+    def test_register_non_valid_schema_with_default_colander_drop(self, sheet_meta, registry):
+        sheet_meta.schema_class.__class_schema_nodes__[0].default = colander.drop
+        with raises(AssertionError):
+            self._call_fut(sheet_meta, registry)
+
     def test_register_non_valid_non_mapping_schema(self, sheet_meta, registry):
         meta = sheet_meta._replace(schema_class=colander.TupleSchema)
         with raises(AssertionError):

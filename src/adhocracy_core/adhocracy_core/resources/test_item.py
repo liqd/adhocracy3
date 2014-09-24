@@ -1,6 +1,8 @@
 import unittest
 
 from pyramid import testing
+from pytest import raises
+import colander
 
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IItemVersion
@@ -18,6 +20,18 @@ def make_itemversion(parent=None, follows=[]):
     appstructs = {IVersionable.__identifier__: {'follows': follows}}
     return ResourceFactory(itemversion_metadata)(parent=parent,
                                                  appstructs=appstructs)
+
+
+def make_forkable_itemversion(parent=None, follows=[]):
+    from adhocracy.resources import ResourceFactory
+    from adhocracy.sheets.versions import IForkableVersionable
+    from adhocracy.resources.itemversion import itemversion_metadata
+    forkable_itemversion_metadata = itemversion_metadata._replace(
+        extended_sheets=[IForkableVersionable]
+    )
+    appstructs = {IForkableVersionable.__identifier__: {'follows': follows}}
+    return ResourceFactory(forkable_itemversion_metadata)(
+        parent=parent, appstructs=appstructs)
 
 
 ###########
@@ -87,8 +101,8 @@ class TestItemIntegrationTest(unittest.TestCase):
         assert last_targets == [version1]
 
     def test_update_last_tag_two_versions(self):
-        """Test that if two versions are branched off the from the same
-        version, both of them get the LAST tag.
+        """Test that an error is thrown if we try to branch off two versions
+        from the same version (since items have a linear history).
         """
         from adhocracy_core.sheets.tags import ITag as ITagS
         self.config.include('adhocracy_core.sheets.versions')
@@ -98,10 +112,30 @@ class TestItemIntegrationTest(unittest.TestCase):
         version0 = item['VERSION_0000000']
 
         version1 = make_itemversion(parent=item, follows=[version0])
-        version2 = make_itemversion(parent=item, follows=[version0])
+        with raises(colander.Invalid):
+            make_itemversion(parent=item, follows=[version0])
 
         last_tag = item['LAST']
         last_targets = self.graph.get_references_for_isheet(last_tag, ITagS)['elements']
+        assert last_targets == [version1]
+
+    def test_update_last_tag_two_versions_with_forkable(self):
+        """Test branching off two versions from the same version,
+        using forkable versionables.
+        """
+        from adhocracy.sheets.tags import ITag as ITagS
+        self.config.include('adhocracy.sheets.versions')
+        self.config.include('adhocracy.events')
+        self.config.include('adhocracy.resources.subscriber')
+        item = self.make_one()
+        version0 = item['VERSION_0000000']
+
+        version1 = make_forkable_itemversion(parent=item, follows=[version0])
+        version2 = make_forkable_itemversion(parent=item, follows=[version0])
+
+        last_tag = item['LAST']
+        last_targets = self.graph.get_references_for_isheet(last_tag,
+                                                            ITagS)['elements']
         assert last_targets == [version1, version2]
 
 
