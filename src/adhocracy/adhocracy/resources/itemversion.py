@@ -115,9 +115,9 @@ def _update_last_tag(context: IResource, registry, old_versions: list):
             break
 
 
-def _determine_elements_for_forkable_last_tag(
-        context: IResource, old_last_tagged_versions: list,
-        predecessors: list) -> list:
+def _determine_elements_for_forkable_last_tag(context: IResource,
+                                              old_last_tagged_versions: list,
+                                              predecessors: list) -> list:
     updated_references = []
     # Remove predecessors, keep the rest
     for reference in old_last_tagged_versions:
@@ -128,9 +128,9 @@ def _determine_elements_for_forkable_last_tag(
     return updated_references
 
 
-def _determine_elements_for_linear_last_tag(
-        context: IResource, old_last_tagged_versions: list,
-        predecessors: list) -> list:
+def _determine_elements_for_linear_last_tag(context: IResource,
+                                            old_last_tagged_versions: list,
+                                            predecessors: list) -> list:
     # Linear version history means that the last tag has a single value
     # and there is a single predecessor and both must be the same
     if len(predecessors) == 1 and old_last_tagged_versions == predecessors:
