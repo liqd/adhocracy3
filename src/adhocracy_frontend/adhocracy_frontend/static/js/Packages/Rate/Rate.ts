@@ -240,7 +240,7 @@ export var rateController = (
 
     $scope.assureUserRateExists = () : ng.IPromise<void> => {
         if (typeof $scope.thisUsersRate !== "undefined") {
-            return;
+            return $q.when();
         } else {
             return adhHttp
                 .withTransaction((transaction) : ng.IPromise<void> => {
