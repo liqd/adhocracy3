@@ -18,7 +18,7 @@ require.config({
         lodash: "../lib/lodash/dist/lodash",
         q: "../lib/q/q",
         modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
-        moment: "../lib/moment/moment"
+        moment: "../lib/moment/min/moment-with-locales"
     },
     shim: {
         jquery: {

@@ -169,7 +169,7 @@ export var init = (config, meta_api) => {
     app.directive("adhParagraphVersionDetail",
         ["adhConfig", (adhConfig) => new AdhProposal.ParagraphVersionDetail().createDirective(adhConfig)]);
 
-    app.directive("adhTime", ["moment", "$interval", AdhDateTime.createDirective]);
+    app.directive("adhTime", ["adhConfig", "moment", "$interval", AdhDateTime.createDirective]);
 
     app.directive("adhVote", ["adhConfig", AdhVote.createDirective]);
 
