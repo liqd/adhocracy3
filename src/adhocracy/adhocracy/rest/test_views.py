@@ -431,7 +431,7 @@ class TestPoolRESTView:
         wanted['content_type'] = IResource.__identifier__
         assert wanted == response
 
-    def test_get_valid_pool_sheet_with_queryparams(self, request, context, mock_sheet):
+    def test_get_valid_pool_sheet_with_query_params(self, request, context, mock_sheet):
         from adhocracy.sheets.pool import IPool
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
         mock_sheet.get.return_value = {}
@@ -450,11 +450,10 @@ class TestPoolRESTView:
         from adhocracy.sheets.pool import PoolSchema
         child = testing.DummyResource(__provides__=IResource)
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
-        mock_sheet.get.return_value = {'elements': [child],
-                                       'count': 1}  # FIXME remove 'count', this is a test fixture bug
+        mock_sheet.get.return_value = {'elements': [child]}
         mock_sheet.schema = PoolSchema()
         request.registry.content.resource_sheets.return_value = {IPool.__identifier__: mock_sheet}
-        request.GET['elements'] = 'content'
+        request.validated['elements'] = 'content'
 
         inst = self.make_one(context, request)
         response = inst.get()
@@ -748,9 +747,11 @@ class TestMetaApiView:
     def test_get_sheets_with_field_adhocracy_back_referencelist(self, request, context, sheet_meta):
         from adhocracy.interfaces import SheetToSheet
         from adhocracy.schema import UniqueReferences
-        SheetToSheet.setTaggedValue('source_isheet', ISheetB)
+        class BSheetToSheet(SheetToSheet):
+            pass
+        BSheetToSheet.setTaggedValue('source_isheet', ISheetB)
         class SchemaF(colander.MappingSchema):
-            test = UniqueReferences(reftype=SheetToSheet, backref=True)
+            test = UniqueReferences(reftype=BSheetToSheet, backref=True)
         metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
         request.registry.content.sheets_meta = metas
         inst = self.make_one(request, context)

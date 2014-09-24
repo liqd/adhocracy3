@@ -244,6 +244,22 @@ class PoolQueryDepth(colander.SchemaNode):
     missing = '1'
 
 
+@colander.deferred
+def deferred_validate_aggregateby(node: colander.MappingSchema, kw):
+    """Validate if `value` is an catalog index with `unique_values`."""
+    # FIXME In the future we may have indexes where aggregateby doesn't make
+    # sense, e.g. username or email. We should have a blacklist to prohibit
+    # calling aggregateby on such indexes.
+    context = kw['context']
+    adhocracy = find_catalog(context, 'adhocracy') or {}
+    adhocracy_index = [k for k, v in adhocracy.items()
+                       if 'unique_values' in v.__dir__()]
+    system = find_catalog(context, 'system') or {}
+    system_index = [k for k, v in system.items()
+                    if 'unique_values' in v.__dir__()]
+    return colander.OneOf(adhocracy_index + system_index)
+
+
 class GETPoolRequestSchema(colander.MappingSchema):
 
     """GET parameters accepted for pool queries."""
@@ -271,7 +287,8 @@ class GETPoolRequestSchema(colander.MappingSchema):
     depth = PoolQueryDepth(missing=colander.drop)
     elements = PoolElementsForm(missing=colander.drop)
     count = colander.SchemaNode(colander.Boolean(), missing=colander.drop)
-    aggregateby = colander.SchemaNode(colander.String(), missing=colander.drop)
+    aggregateby = colander.SchemaNode(colander.String(), missing=colander.drop,
+                                      validator=deferred_validate_aggregateby)
 
 
 def add_get_pool_request_extra_fields(cstruct: dict,
