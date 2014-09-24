@@ -23,7 +23,7 @@ export interface IRateScope extends ng.IScope {
         contra : number;
         neutral : number;
     };
-    thisUsersRate : AdhResource.Content<any>;
+    thisUsersRate : RIRateVersion;
     allRates : { subject: string; rate: number }[];
     isActive : (value : number) => boolean;
     isActiveClass : (value : number) => string;  // css class name if RateValue is active, or "" otherwise.
@@ -286,7 +286,7 @@ export var rateController = (
                 .postNewVersionNoFork($scope.thisUsersRate.path, $scope.thisUsersRate)
                 .then((response : { value: RIRate }) => {
                     return adhHttp.get(response.value.path)
-                        .then((response : RIRate) => {
+                        .then((response : RIRateVersion) => {
                             $scope.thisUsersRate = response;
                             return;
                         });
