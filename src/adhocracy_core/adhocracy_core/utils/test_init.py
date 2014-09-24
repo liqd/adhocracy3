@@ -247,7 +247,7 @@ class GetUserUnitTest(unittest.TestCase):
 class TestNormalizeToTuple:
 
     def _call_fut(self, value):
-        from adhocracy.utils import normalize_to_tuple
+        from adhocracy_core.utils import normalize_to_tuple
         return normalize_to_tuple(value)
 
     def test_with_tuple(self):

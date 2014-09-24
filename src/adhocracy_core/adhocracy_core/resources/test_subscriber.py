@@ -5,7 +5,7 @@ from pyramid import testing
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
-from adhocracy.testing import add_and_register_sheet
+from adhocracy_core.testing import add_and_register_sheet
 
 
 class IDummySheetAutoUpdate(ISheet, ISheetReferenceAutoUpdateMarker):

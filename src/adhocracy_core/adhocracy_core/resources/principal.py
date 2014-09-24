@@ -6,11 +6,11 @@ from substanced.interfaces import IUserLocator
 from zope.interface import implementer
 
 from adhocracy_core.interfaces import IPool
-from adhocracy.interfaces import IServicePool
+from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import Pool
-from adhocracy_core.resources.pool import pool_metadat
-from adhocracy.resources.service import service_metadata
+from adhocracy_core.resources.pool import pool_metadata
+from adhocracy_core.resources.service import service_metadata
 import adhocracy_core.sheets.user
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.metadata

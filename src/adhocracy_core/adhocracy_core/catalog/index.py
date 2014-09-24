@@ -10,7 +10,7 @@ from zope.interface import implementer
 import BTrees
 import hypatia.query
 
-from adhocracy.utils import find_graph
+from adhocracy_core.utils import find_graph
 
 
 @content('Reference Index',

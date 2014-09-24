@@ -96,8 +96,8 @@ def validate_request_data(context: ILocation, request: Request,
     _raise_if_errors(request)
 
 
-def validate_body_or_querystring(body, qs, schema: Schema, context: IResource,
-                                 request: Request):
+def validate_body_or_querystring(body, qs, schema: MappingSchema,
+                                 context: IResource, request: Request):
     """Validate the querystring if this is a GET request, the body otherwise.
 
     This allows using just a single schema for all kinds of requests.
@@ -312,7 +312,7 @@ class ResourceRESTView(RESTView):
             schema = sheet.schema.bind(context=self.context,
                                        request=self.request)
             appstruct = sheet.get(params=queryparams)
-            if sheet.meta.isheet is adhocracy.sheets.pool.IPool:
+            if sheet.meta.isheet is adhocracy_core.sheets.pool.IPool:
                 _set_pool_sheet_elements_serialization_form(schema,
                                                             queryparams)
                 # FIXME? readd the get_cstruct method but with parameters

@@ -15,7 +15,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.interfaces import IResource
-from adhocracy.interfaces import IServicePool
+from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.events import ResourceCreatedAndAdded
 from adhocracy_core.sheets.name import IName
 from adhocracy_core.sheets.metadata import IMetadata

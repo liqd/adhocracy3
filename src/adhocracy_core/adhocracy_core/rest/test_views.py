@@ -300,10 +300,11 @@ class TestResourceRESTView:
         inst = self.make_one(context, request)
         response = inst.options()
         wanted = OPTIONResourceResponseSchema().serialize()
+        wanted['POST']['response_body']['content_type'] = ''
+        wanted['PUT']['response_body']['content_type'] = ''
         assert wanted == response
 
     def test_options_valid_with_sheets_and_addables(self, request, context):
-        from adhocracy_core.rest.schemas import OPTIONResourceResponseSchema
         registry = request.registry.content
         registry.resource_sheets.return_value = {'ipropertyx': object()}
         registry.resource_addables.return_value = \
@@ -420,7 +421,7 @@ class TestPoolRESTView:
         assert 'put' in dir(inst)
 
     def test_get_valid_no_sheets(self, request, context):
-        from adhocracy.rest.schemas import GETResourceResponseSchema
+        from adhocracy_core.rest.schemas import GETResourceResponseSchema
 
         inst = self.make_one(context, request)
         response = inst.get()
@@ -432,7 +433,7 @@ class TestPoolRESTView:
         assert wanted == response
 
     def test_get_valid_pool_sheet_with_queryparams(self, request, context, mock_sheet):
-        from adhocracy.sheets.pool import IPool
+        from adhocracy_core.sheets.pool import IPool
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
         mock_sheet.get.return_value = {}
         mock_sheet.schema = colander.MappingSchema()
@@ -446,8 +447,8 @@ class TestPoolRESTView:
         assert mock_sheet.get.call_args[1] == {'params': {'param1': 1}}
 
     def test_get_valid_pool_sheet_with_elements_content_param(self, request, context, mock_sheet):
-        from adhocracy.sheets.pool import IPool
-        from adhocracy.sheets.pool import PoolSchema
+        from adhocracy_core.sheets.pool import IPool
+        from adhocracy_core.sheets.pool import PoolSchema
         child = testing.DummyResource(__provides__=IResource)
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
         mock_sheet.get.return_value = {'elements': [child],
@@ -913,7 +914,7 @@ class TestLoginEmailView:
 
 
 def test_add_cors_headers_subscriber(context):
-    from adhocracy.rest.views import add_cors_headers_subscriber
+    from adhocracy_core.rest.views import add_cors_headers_subscriber
     headers = {}
     response = testing.DummyResource(headers=headers)
     event = testing.DummyResource(response=response)
@@ -941,6 +942,6 @@ class TestIntegrationIncludeme:
         assert True
 
     def test_register_subscriber(self, registry):
-        from adhocracy.rest.views import add_cors_headers_subscriber
+        from adhocracy_core.rest.views import add_cors_headers_subscriber
         handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
         assert add_cors_headers_subscriber.__name__ in handlers

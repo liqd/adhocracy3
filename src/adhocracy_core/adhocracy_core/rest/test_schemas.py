@@ -39,7 +39,7 @@ class TestResourceResponseSchema:
         assert inst.serialize() == wanted
 
     def test_serialize_with_appstruct(self, request, context):
-        from adhocracy.interfaces import IResource
+        from adhocracy_core.interfaces import IResource
         inst = self.make_one().bind(request=request, context=context)
         wanted = {'content_type': IResource.__identifier__, 'path': request.application_url + '/'}
         assert inst.serialize({'path': request.root}) == wanted
@@ -517,16 +517,16 @@ class TestGETPoolRequestSchema():
 
     @fixture
     def inst(self, context):
-        from adhocracy.rest.schemas import GETPoolRequestSchema
+        from adhocracy_core.rest.schemas import GETPoolRequestSchema
         return GETPoolRequestSchema().bind(context=context)
 
     def test_deserialize_empty(self, inst):
         assert inst.deserialize({}) == {}
 
     def test_deserialize_valid(self, inst):
-        from adhocracy.sheets.name import IName
-        data = {'content_type': 'adhocracy.sheets.name.IName',
-                'sheet': 'adhocracy.sheets.name.IName',
+        from adhocracy_core.sheets.name import IName
+        data = {'content_type': 'adhocracy_core.sheets.name.IName',
+                'sheet': 'adhocracy_core.sheets.name.IName',
                 'depth': '100',
                 'elements': 'content',
                 'count': 'true',
@@ -542,7 +542,7 @@ class TestGETPoolRequestSchema():
         assert inst.deserialize(data) == expected
 
     def test_deserialize_content_type_invalid(self, inst):
-        data = {'content_type': 'adhocracy.sheets.name.NoName'}
+        data = {'content_type': 'adhocracy_core.sheets.name.NoName'}
         with raises(colander.Invalid):
             inst.deserialize(data)
 
@@ -571,7 +571,7 @@ class TestAddGetPoolRequestExtraFields:
 
     @fixture
     def schema(self):
-        from adhocracy.rest.schemas import GETPoolRequestSchema
+        from adhocracy_core.rest.schemas import GETPoolRequestSchema
         schema = GETPoolRequestSchema()
         return schema.bind()
 
@@ -584,7 +584,7 @@ class TestAddGetPoolRequestExtraFields:
         return testing.DummyResource(content=mock_resource_registry)
 
     def _call_fut(self, *args):
-        from adhocracy.rest.schemas import add_get_pool_request_extra_fields
+        from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
         return add_get_pool_request_extra_fields(*args)
 
     def test_call_without_extra_fields(self, schema):
@@ -604,7 +604,7 @@ class TestAddGetPoolRequestExtraFields:
         assert index_name not in schema_extended
 
     def test_call_with_extra_filter(self, schema, context):
-        from adhocracy.schema import SingleLine
+        from adhocracy_core.schema import SingleLine
         index_name = 'index1'
         index = testing.DummyResource()
         context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
@@ -613,8 +613,8 @@ class TestAddGetPoolRequestExtraFields:
         assert isinstance(schema_extended[index_name], SingleLine)
 
     def test_call_with_extra_reference_name(self, schema, registry):
-        from adhocracy.schema import Resource
-        from adhocracy.schema import Reference
+        from adhocracy_core.schema import Resource
+        from adhocracy_core.schema import Reference
         isheet = ISheet.__identifier__
         field = 'reference'
         reference_name = isheet + ':' + field
@@ -624,7 +624,7 @@ class TestAddGetPoolRequestExtraFields:
         assert isinstance(schema_extended[reference_name], Resource)
 
     def test_call_with_extra_reference_name_wrong_type(self, schema, registry):
-        from adhocracy.schema import SingleLine
+        from adhocracy_core.schema import SingleLine
         isheet = ISheet.__identifier__
         field = 'reference'
         reference_name = isheet + ':' + field

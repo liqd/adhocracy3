@@ -76,7 +76,7 @@ def create_pool_with_graph() -> testing.DummyResource:
 def add_and_register_sheet(context, mock_sheet, registry):
     """Add `mock_sheet` to `context`and register adapter."""
     from zope.interface import alsoProvides
-    from adhocracy.interfaces import IResourceSheet
+    from adhocracy_core.interfaces import IResourceSheet
     isheet = mock_sheet.meta.isheet
     alsoProvides(context, isheet)
     registry.registerAdapter(lambda x: mock_sheet, (isheet,),
@@ -95,9 +95,9 @@ def pool_graph(config):
     from adhocracy_core.resources.pool import Pool
     from adhocracy_core.resources.root import _add_graph
     from adhocracy_core.resources.root import _add_objectmap_to_app_root
-    config.include('adhocracy.registry')
-    config.include('adhocracy.events')
-    config.include('adhocracy.graph')
+    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.events')
+    config.include('adhocracy_core.graph')
     context = Pool()
     _add_objectmap_to_app_root(context)
     _add_graph(context, config.registry)
@@ -108,8 +108,8 @@ def pool_graph(config):
 def pool_graph_catalog(config, pool_graph):
     """Return pool wit graph and catalog for integration/functional tests."""
     from substanced.interfaces import MODE_IMMEDIATE
-    from adhocracy.resources.root import _add_catalog_service
-    config.include('adhocracy.catalog')
+    from adhocracy_core.resources.root import _add_catalog_service
+    config.include('adhocracy_core.catalog')
     context = pool_graph
     _add_catalog_service(context, config.registry)
     context['catalogs']['system']['name'].action_mode = MODE_IMMEDIATE

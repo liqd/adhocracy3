@@ -28,7 +28,7 @@ def make_itemversion(parent=None, follows=[]):
 class TestItemIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        from adhocracy.testing import create_pool_with_graph
+        from adhocracy_core.testing import create_pool_with_graph
         from adhocracy_core.resources.item import item_metadata
         from adhocracy_core.resources.root import _add_catalog_service
         config = testing.setUp()

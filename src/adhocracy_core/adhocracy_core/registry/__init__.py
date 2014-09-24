@@ -1,6 +1,7 @@
 """Content registry."""
 from pyramid.security import has_permission
 from pyramid.request import Request
+from pyramid.util import DottedNameResolver
 from substanced.content import ContentRegistry
 from substanced.content import add_content_type
 from substanced.content import add_service_type

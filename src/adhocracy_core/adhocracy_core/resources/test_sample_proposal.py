@@ -13,7 +13,7 @@ class IncludemeIntegrationTest(unittest.TestCase):
         config.include('adhocracy_core.catalog')
         config.include('adhocracy_core.sheets')
         config.include('adhocracy_core.sheets.comment')
-        config.include('adhocracy_core.resources.proposal')
+        config.include('adhocracy_core.resources.sample_proposal')
         self.config = config
         self.context = create_pool_with_graph()
 

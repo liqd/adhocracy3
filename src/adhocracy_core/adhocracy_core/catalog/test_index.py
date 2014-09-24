@@ -69,9 +69,9 @@ class TestReference:
          assert list(inst.not_indexed()) == []
 
     def test_search_reference_exists(self, context, catalog):
-         from adhocracy.utils import find_graph
-         from adhocracy.interfaces import SheetToSheet
-         from adhocracy.interfaces import ISheet
+         from adhocracy_core.utils import find_graph
+         from adhocracy_core.interfaces import SheetToSheet
+         from adhocracy_core.interfaces import ISheet
          inst = self._make_one()
          catalog['index'] = inst
          graph = find_graph(context)
@@ -84,9 +84,9 @@ class TestReference:
          assert list(result) == [context.__oid__]
 
     def test_search_reference_exits_wrong_field_name(self, context, catalog):
-         from adhocracy.utils import find_graph
-         from adhocracy.interfaces import SheetToSheet
-         from adhocracy.interfaces import ISheet
+         from adhocracy_core.utils import find_graph
+         from adhocracy_core.interfaces import SheetToSheet
+         from adhocracy_core.interfaces import ISheet
          inst = self._make_one()
          catalog['index'] = inst
          graph = find_graph(context)
@@ -99,7 +99,7 @@ class TestReference:
          assert list(result) == []
 
     def test_search_reference_nonexists(self, context, catalog):
-         from adhocracy.interfaces import ISheet
+         from adhocracy_core.interfaces import ISheet
          inst = self._make_one()
          catalog['index'] = inst
          target = testing.DummyResource()
@@ -110,7 +110,7 @@ class TestReference:
          assert list(result) == []
 
     def test_apply_with_valid_query(self, context, catalog):
-        from adhocracy.interfaces import ISheet
+        from adhocracy_core.interfaces import ISheet
         inst = self._make_one()
         catalog['index'] = inst
         target = testing.DummyResource()
@@ -134,7 +134,7 @@ class TestReference:
     def test_apply_intersect_reference_not_exists(self, context):
         # actually we test the default implementation in hypatia.util
         import BTrees
-        from adhocracy.interfaces import ISheet
+        from adhocracy_core.interfaces import ISheet
         inst = self._make_one()
         target = testing.DummyResource()
         context.add('target', inst)
@@ -147,7 +147,7 @@ class TestReference:
         assert list(result) == []
 
     def test_eq(self):
-        from adhocracy.interfaces import ISheet
+        from adhocracy_core.interfaces import ISheet
         inst = self._make_one()
         wanted = {'isheet': ISheet,
                   'isheet_field': '',

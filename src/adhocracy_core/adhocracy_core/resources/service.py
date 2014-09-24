@@ -1,11 +1,11 @@
 """Pool resource type and zodb persistent IPool implementation."""
 
-import adhocracy.sheets.name
-import adhocracy.sheets.pool
-import adhocracy.sheets.metadata
-from adhocracy.interfaces import IServicePool
-from adhocracy.resources.pool import pool_metadata
-from adhocracy.resources import add_resource_type_to_registry
+from adhocracy_core.interfaces import IServicePool
+from adhocracy_core.resources.pool import pool_metadata
+from adhocracy_core.resources import add_resource_type_to_registry
+import adhocracy_core.sheets.name
+import adhocracy_core.sheets.pool
+import adhocracy_core.sheets.metadata
 
 
 class IBasicService(IServicePool):
@@ -19,8 +19,8 @@ class IBasicService(IServicePool):
 service_metadata = pool_metadata._replace(
     content_name='Service',
     iresource=IBasicService,
-    basic_sheets=[adhocracy.sheets.pool.IPool,
-                  adhocracy.sheets.metadata.IMetadata,
+    basic_sheets=[adhocracy_core.sheets.pool.IPool,
+                  adhocracy_core.sheets.metadata.IMetadata,
                   ],
 )
 

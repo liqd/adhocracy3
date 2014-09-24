@@ -21,7 +21,7 @@ class TestCommentableSheet:
 
     @fixture
     def context(self):
-        from adhocracy.interfaces import IItem
+        from adhocracy_core.interfaces import IItem
         return testing.DummyResource(__provides__=IItem)
 
     def test_create_valid(self, meta, context):

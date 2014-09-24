@@ -6,8 +6,8 @@ import colander
 from pytest import raises
 from pytest import fixture
 
-from adhocracy.interfaces import IPool
-from adhocracy.testing import add_and_register_sheet
+from adhocracy_core.interfaces import IPool
+from adhocracy_core.testing import add_and_register_sheet
 
 
 ############
@@ -24,16 +24,16 @@ def add_node_binding(node, context=None, request=None):
 
 
 def _add_post_pool_node(inst: colander.Schema, iresource_or_service_name=IPool):
-    from adhocracy.schema import PostPool
+    from adhocracy_core.schema import PostPool
     post_pool_node = PostPool(name='post_pool',
                               iresource_or_service_name=iresource_or_service_name)
     inst.add(post_pool_node)
 
 
 def _add_reference_node(inst: colander.Schema, target_isheet=None):
-    from adhocracy.interfaces import ISheet
-    from adhocracy.interfaces import SheetToSheet
-    from adhocracy.schema import Reference
+    from adhocracy_core.interfaces import ISheet
+    from adhocracy_core.interfaces import SheetToSheet
+    from adhocracy_core.schema import Reference
     reference_node = Reference(name='reference')
     isheet = target_isheet or ISheet
     class PostPoolReference(SheetToSheet):
@@ -43,7 +43,7 @@ def _add_reference_node(inst: colander.Schema, target_isheet=None):
 
 
 def _add_references_node(inst: colander.Schema):
-    from adhocracy.schema import UniqueReferences
+    from adhocracy_core.schema import UniqueReferences
     reference_node = UniqueReferences(name='references')
     inst.add(reference_node)
 
@@ -85,7 +85,7 @@ class TestInterface():
 
     @fixture
     def inst(self):
-        from adhocracy.schema import Interface
+        from adhocracy_core.schema import Interface
         return Interface()
 
     def test_serialize_colander_null(self, inst):
@@ -93,22 +93,22 @@ class TestInterface():
         assert result == colander.null
 
     def test_serialize_valid(self, inst):
-        from adhocracy.sheets.tags import ITag
+        from adhocracy_core.sheets.tags import ITag
         result = inst.serialize(None, ITag)
-        assert result == 'adhocracy.sheets.tags.ITag'
+        assert result == 'adhocracy_core.sheets.tags.ITag'
 
     def test_deserialize_empty_string(self, inst):
         result = inst.deserialize(None, '')
         assert result == ''
 
     def test_deserialize_valid(self, inst):
-        from adhocracy.sheets.tags import ITag
-        result = inst.deserialize(None, 'adhocracy.sheets.tags.ITag')
+        from adhocracy_core.sheets.tags import ITag
+        result = inst.deserialize(None, 'adhocracy_core.sheets.tags.ITag')
         assert result == ITag
 
     def test_deserialize_valid(self, inst):
         with raises(colander.Invalid):
-            inst.deserialize(None, 'adhocracy.sheets.tags.NoSuchTag')
+            inst.deserialize(None, 'adhocracy_core.sheets.tags.NoSuchTag')
 
 
 class NameUnitTest(unittest.TestCase):
@@ -222,8 +222,8 @@ class AbsolutePath(unittest.TestCase):
 
 
 def test_deferred_content_type_default_call_with_iresource():
-    from adhocracy.interfaces import IResource
-    from adhocracy.schema import deferred_content_type_default
+    from adhocracy_core.interfaces import IResource
+    from adhocracy_core.schema import deferred_content_type_default
     context = testing.DummyResource(__provides__=IResource)
     node = None
     bindings = {'context': context}
@@ -231,7 +231,7 @@ def test_deferred_content_type_default_call_with_iresource():
 
 
 def test_deferred_content_type_default_call_without_iresource():
-    from adhocracy.schema import deferred_content_type_default
+    from adhocracy_core.schema import deferred_content_type_default
     context = testing.DummyResource()
     node = None
     bindings = {'context': context}
@@ -311,14 +311,14 @@ class TestResourceObjectUnitTests:
         assert result == request.application_url + '/'
 
     def test_serialize_value_url_location_aware_with_serialize_to_content(self, context, request):
-        from adhocracy.interfaces import IResource
+        from adhocracy_core.interfaces import IResource
         inst = self._make_one(serialization_form='content')
         context['child'] = testing.DummyResource(__provides__=IResource)
         node = add_node_binding(colander.Mapping(),
                                 context=context['child'],
                                 request=request)
         result = inst.serialize(node, context['child'])
-        assert result == {'content_type': 'adhocracy.interfaces.IResource',
+        assert result == {'content_type': 'adhocracy_core.interfaces.IResource',
                           'data': {},
                           'path': request.application_url + '/child/'}
 
@@ -672,12 +672,12 @@ class TestPostPool:
         return request
 
     def _make_one(self, **kwargs):
-        from adhocracy.schema import PostPool
+        from adhocracy_core.schema import PostPool
         return PostPool(**kwargs)
 
     def test_create(self):
-        from adhocracy.interfaces import IPool
-        from adhocracy.schema import ResourceObject
+        from adhocracy_core.interfaces import IPool
+        from adhocracy_core.schema import ResourceObject
         inst = self._make_one()
         assert inst.schema_type is ResourceObject
         assert inst.iresource_or_service_name is IPool
@@ -691,17 +691,17 @@ class TestPostPool:
             inst.deserialize()
 
     def test_bind_context_without_post_pool_and_deserialize_empty(self, context):
-        from adhocracy.exceptions import RuntimeConfigurationError
+        from adhocracy_core.exceptions import RuntimeConfigurationError
         with raises(RuntimeConfigurationError):
             self._make_one().bind(context=context)
 
     def test_bind_context_with_post_pool_and_deserialize_empty(self, pool):
-        from adhocracy.interfaces import IPool
+        from adhocracy_core.interfaces import IPool
         inst = self._make_one(iresource_or_service_name=IPool).bind(context=pool)
         assert inst.deserialize() is pool
 
     def test_bind_context_with_service_post_pool_and_deserialize_empty(self, pool):
-        from adhocracy.interfaces import IServicePool
+        from adhocracy_core.interfaces import IServicePool
         pool['service'] = testing.DummyResource(__provides__=IServicePool,
                                                 __is_service__=True)
         inst = self._make_one(iresource_or_service_name='service').bind(context=pool)
@@ -712,13 +712,13 @@ class TestPostPool:
         assert inst.serialize() == ''
 
     def test_bind_context_with_post_pool_and_serialize_empty(self, pool, request):
-        from adhocracy.interfaces import IPool
+        from adhocracy_core.interfaces import IPool
         inst = self._make_one(iresource_or_service_name=IPool).bind(context=pool,
                                                                     request=request)
         assert inst.serialize() == request.resource_url(pool)
 
     def test_bind_context_without_post_pool_and_serialize_empty(self, context, request):
-        from adhocracy.exceptions import RuntimeConfigurationError
+        from adhocracy_core.exceptions import RuntimeConfigurationError
         with raises(RuntimeConfigurationError):
             self._make_one().bind(context=context,
                                   request=request)
@@ -729,8 +729,8 @@ class TestPostPoolMappingSchema:
 
     @fixture
     def context(self, pool):
-        from adhocracy.interfaces import ISheet
-        from adhocracy.interfaces import IPool
+        from adhocracy_core.interfaces import ISheet
+        from adhocracy_core.interfaces import IPool
         wrong_post_pool = testing.DummyResource()
         wrong_post_pool['child'] = testing.DummyResource(__provides__=ISheet)
         pool['wrong'] = wrong_post_pool
@@ -741,7 +741,7 @@ class TestPostPoolMappingSchema:
 
     @fixture
     def mock_sheet(self, mock_sheet):
-        from adhocracy.interfaces import IPostPoolSheet
+        from adhocracy_core.interfaces import IPostPoolSheet
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPostPoolSheet)
         schema = colander.MappingSchema()
         _add_post_pool_node(schema)
@@ -755,7 +755,7 @@ class TestPostPoolMappingSchema:
         return request
 
     def _make_one(self, **kwargs):
-        from adhocracy.schema import PostPoolMappingSchema
+        from adhocracy_core.schema import PostPoolMappingSchema
         return PostPoolMappingSchema(**kwargs)
 
     def test_create(self):
@@ -800,7 +800,7 @@ class TestPostPoolMappingSchema:
         assert inst.deserialize({'references': [request_.application_url + '/right/child']})
 
     def test_bind_context_with_valid_backreference_post_context_and_deserialize(self, context, mock_sheet, registry, request_):
-        from adhocracy.interfaces import IPostPoolSheet
+        from adhocracy_core.interfaces import IPostPoolSheet
         inst = self._make_one()
 
         referenced = context['right']['child']
@@ -813,7 +813,7 @@ class TestPostPoolMappingSchema:
         assert inst.deserialize({'reference': request_.application_url + '/right/child'})
 
     def test_bind_context_with_nonvalid_backreference_post_context_and_deserialize(self, context, mock_sheet, registry, request_):
-        from adhocracy.interfaces import IPostPoolSheet
+        from adhocracy_core.interfaces import IPostPoolSheet
         inst = self._make_one()
 
         referenced = context['right']['child']

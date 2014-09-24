@@ -799,7 +799,7 @@ about proposals.
 The proposal has a commentable sheet::
 
     >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
-    >>> commentable = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']
+    >>> commentable = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']
 
 This sheet has a special field :term:`post_pool` referencing a pool::
 
@@ -1099,16 +1099,16 @@ adding suitable GET parameters. For example, we can only retrieve children
 of a specific content type::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'content_type': 'adhocracy_sample.resources.section.ISection'}).json
-    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISection'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/',
      'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/']
 
 Or only children that implement a specific sheet::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'sheet': 'adhocracy.sheets.tags.ITag'}).json
-    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag'}).json
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/',
      'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
 
@@ -1128,18 +1128,18 @@ value allows also including grandchildren (depth=2) or even great-grandchildren
 *all* can be used to get nested elements of arbitrary nesting depth::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...             'depth': 'all'}).json
-    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     [...'http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/'...]
 
 Without specifying a deeper depth, the above query for ISectionVersions
 wouldn't have found anything, since they are children of children of the pool::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion'
+    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion'
     ...             }).json
-    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     []
 
 To retrieve a count of the elements matching your query, specify
@@ -1147,9 +1147,9 @@ To retrieve a count of the elements matching your query, specify
 be added to the returned IPool sheet::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
     ...             'count': 'true'}).json
-    >>> resp_data['data']['adhocracy.sheets.pool.IPool']['count']
+    >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
     '2'
 
 *Note:* due to limitations of our (de)serialization library (Colander),
@@ -1160,7 +1160,7 @@ you'll get the number of children in the pool::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'count': 'true'}).json
-    >>> child_count = resp_data['data']['adhocracy.sheets.pool.IPool']['count']
+    >>> child_count = resp_data['data']['adhocracy_core.sheets.pool.IPool']['count']
     >>> assert int(child_count) >= 10
 
 The *elements* parameter allows controlling how matching element are
@@ -1168,9 +1168,9 @@ returned. By default, 'elements' in the IPool sheet contains a list of paths.
 This corresponds to setting *elements=paths*.
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
     ...             'elements': 'paths'}).json
-    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/',
      'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
 
@@ -1179,9 +1179,9 @@ This makes only if you ask for something else instead, e.g. a count of
 elements::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
     ...             'elements': 'omit', 'count': 'true'}).json
-    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool'])
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool'])
     {'count': '2', 'elements': []}
 
 Setting *elements=content* will instead return the complete contents of all
@@ -1189,11 +1189,11 @@ matching elements -- what you would get by making a GET request on each of
 their paths::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...     params={'sheet': 'adhocracy_core.sheets.tags.ITag',
     ...             'elements': 'content'}).json
-    >>> tag = resp_data['data']['adhocracy.sheets.pool.IPool']['elements'][0]
+    >>> tag = resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'][0]
     >>> pprint(tag)
-    {'content_type': 'adhocracy.interfaces.ITag',...'path': 'http://localhost/adhocracy/Proposals/kommunismus/FIRST/'...
+    {'content_type': 'adhocracy_core.interfaces.ITag',...'path': 'http://localhost/adhocracy/Proposals/kommunismus/FIRST/'...
 
 
 *tag* is a custom filter that allows filtering only resources with a
@@ -1202,9 +1202,9 @@ Versionables. We can get them by setting *tag=LAST*. Let's find the latest
 versions of all sections::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...             'depth': 'all', 'tag': 'LAST'}).json
-    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/',
      'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
@@ -1215,11 +1215,11 @@ the isheet plus the field name separated by ':' The value is the wanted
 reference target.
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
-    ...             'adhocracy.sheets.versions.IVersionable:follows':
+    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
+    ...             'adhocracy_core.sheets.versions.IVersionable:follows':
     ...             'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000000/',
     ...             'depth': 'all', 'tag': 'LAST'}).json
-    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
 FIXME Not yet implemented: aggregateby

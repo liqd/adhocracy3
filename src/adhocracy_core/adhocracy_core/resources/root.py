@@ -10,7 +10,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import pool_metadata
 from adhocracy_core.resources.pool import IBasicPool
-from adhocracy.resources.principal import IPrincipalsService
+from adhocracy_core.resources.principal import IPrincipalsService
 
 
 class IRootPool(IPool, IRoot):

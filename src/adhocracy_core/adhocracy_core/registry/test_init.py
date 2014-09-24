@@ -214,7 +214,7 @@ class TestResourceContentRegistryResolveISheetFieldFromDottedString:
         return mock_resource_registry
 
     def _call_fut(self, mock_registry, dotted_string):
-        from adhocracy.registry import ResourceContentRegistry
+        from adhocracy_core.registry import ResourceContentRegistry
         return ResourceContentRegistry.resolve_isheet_field_from_dotted_string(
             mock_registry, dotted_string)
 

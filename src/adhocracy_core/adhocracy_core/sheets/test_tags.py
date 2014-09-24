@@ -1,5 +1,9 @@
+from collections import Iterable
+
 from pyramid import testing
 from pytest import fixture
+
+from adhocracy_core.sheets.tags import TagSheet
 
 
 class TestTagsSheet:
@@ -102,10 +106,10 @@ class TestTagSheet:
 def test_includeme_register_tag_sheet(config):
     from adhocracy_core.sheets.tags import ITag
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy.registry')
-    config.include('adhocracy.events')
-    config.include('adhocracy.graph')
-    config.include('adhocracy.catalog')
-    config.include('adhocracy.sheets.tags')
+    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.events')
+    config.include('adhocracy_core.graph')
+    config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.sheets.tags')
     context = testing.DummyResource(__provides__=ITag)
     assert get_sheet(context, ITag)

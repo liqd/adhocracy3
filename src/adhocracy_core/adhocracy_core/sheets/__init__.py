@@ -15,7 +15,7 @@ from adhocracy_core.interfaces import sheet_metadata
 from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.schema import Reference
 from adhocracy_core.utils import remove_keys_from_dict
-from adhocracy.utils import normalize_to_tuple
+from adhocracy_core.utils import normalize_to_tuple
 
 
 @implementer(IResourceSheet)

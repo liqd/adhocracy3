@@ -20,10 +20,10 @@ class PrincipalIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_create_principals(self):
-        from adhocracy.resources.principal import IPrincipalsService
-        from adhocracy.resources.principal import IUsersService
-        from adhocracy.resources.principal import IGroupsService
-        from adhocracy.resources.principal import IPasswordResetsService
+        from adhocracy_core.resources.principal import IPrincipalsService
+        from adhocracy_core.resources.principal import IUsersService
+        from adhocracy_core.resources.principal import IGroupsService
+        from adhocracy_core.resources.principal import IPasswordResetsService
 
         inst = self.config.registry.content.create(
             IPrincipalsService.__identifier__, parent=self.context)
@@ -37,7 +37,7 @@ class PrincipalIntegrationTest(unittest.TestCase):
         assert IPasswordResetsService.providedBy(inst['resets'])
 
     def test_register_services(self):
-        from adhocracy.resources.principal import IPrincipalsService
+        from adhocracy_core.resources.principal import IPrincipalsService
 
         self.config.registry.content.create(IPrincipalsService.__identifier__,
                                             parent=self.context)
@@ -57,7 +57,7 @@ class PrincipalIntegrationTest(unittest.TestCase):
         assert isinstance(inst, User)
 
     def test_create_and_add_user(self):
-        from adhocracy.resources.principal import IPrincipalsService
+        from adhocracy_core.resources.principal import IPrincipalsService
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.sheets.user import IPasswordAuthentication
         from adhocracy_core.sheets.user import IUserBasic

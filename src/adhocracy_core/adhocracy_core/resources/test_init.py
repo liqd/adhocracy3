@@ -220,7 +220,7 @@ class TestResourceFactory:
         assert 'prefix_0000000' in pool
 
     def test_with_parent_and_resource_implements_postpool(self, pool, resource_meta, registry, mock_sheet):
-        from adhocracy.interfaces import IServicePool
+        from adhocracy_core.interfaces import IServicePool
         meta = resource_meta._replace(iresource=IServicePool,
                                       content_name='Service')
 
