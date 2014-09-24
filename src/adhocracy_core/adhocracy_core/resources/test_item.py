@@ -23,9 +23,9 @@ def make_itemversion(parent=None, follows=[]):
 
 
 def make_forkable_itemversion(parent=None, follows=[]):
-    from adhocracy.resources import ResourceFactory
-    from adhocracy.sheets.versions import IForkableVersionable
-    from adhocracy.resources.itemversion import itemversion_metadata
+    from adhocracy_core.resources import ResourceFactory
+    from adhocracy_core.sheets.versions import IForkableVersionable
+    from adhocracy_core.resources.itemversion import itemversion_metadata
     forkable_itemversion_metadata = itemversion_metadata._replace(
         extended_sheets=[IForkableVersionable]
     )
@@ -123,10 +123,10 @@ class TestItemIntegrationTest(unittest.TestCase):
         """Test branching off two versions from the same version,
         using forkable versionables.
         """
-        from adhocracy.sheets.tags import ITag as ITagS
-        self.config.include('adhocracy.sheets.versions')
-        self.config.include('adhocracy.events')
-        self.config.include('adhocracy.resources.subscriber')
+        from adhocracy_core.sheets.tags import ITag as ITagS
+        self.config.include('adhocracy_core.sheets.versions')
+        self.config.include('adhocracy_core.events')
+        self.config.include('adhocracy_core.resources.subscriber')
         item = self.make_one()
         version0 = item['VERSION_0000000']
 

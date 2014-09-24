@@ -777,9 +777,9 @@ single heads). Lets create a comment with an initial version (see below
 for more on comments and *post pools*)::
 
     >>> resp = testapp.get('/adhocracy/Proposals/kommunismus/VERSION_0000004')
-    >>> commentable = resp.json['data']['adhocracy_sample.sheets.comment.ICommentable']
+    >>> commentable = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']
     >>> post_pool_path = commentable['post_pool']
-    >>> comment = {'content_type': 'adhocracy_sample.resources.comment.IComment',
+    >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...            'data': {}}
     >>> resp = testapp.post_json(post_pool_path, comment)
     >>> comment_path = resp.json["path"]
@@ -790,12 +790,12 @@ for more on comments and *post pools*)::
 We can create a second version that refers to the first (auto-created)
 version as predecessor::
 
-    >>> commvers = {'content_type': 'adhocracy_sample.resources.comment.ICommentVersion',
+    >>> commvers = {'content_type': 'adhocracy_core.resources.comment.ICommentVersion',
     ...             'data': {
     ...                 'adhocracy_core.sheets.comment.IComment': {
     ...                     'refers_to': pvrs4_path,
     ...                     'content': 'Bla bla bla!'},
-    ...                 'adhocracy.sheets.versions.IVersionable': {
+    ...                 'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [first_commvers_path]}},
     ...             'root_versions': [first_commvers_path]}
     >>> resp = testapp.post_json(comment_path, commvers)
@@ -1260,7 +1260,7 @@ the query result will be reported, i.e. the count reported for each value
 will be 1 or higher. ::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
-    ...     params={'content_type': 'adhocracy_core.resources.section.ISectionVersion',
+    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
     ...             'depth': 'all', 'aggregateby': 'tag'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['aggregateby'])
     {'tag': {'FIRST': 2, 'LAST': 2}}
