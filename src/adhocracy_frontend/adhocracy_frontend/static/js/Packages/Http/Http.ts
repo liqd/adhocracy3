@@ -210,15 +210,12 @@ export class Service<Content extends Resources.Content<any>> {
 
             var handleConflict = (msg) => {
                 // re-throw all exception lists other than ["no-fork"].
-                if (msg.hasOwnProperty("length") && msg.length === 1 && msg[0].name === "__NO_FORK__") {
-
-                    // FIXME: msg[0].name is the name of the field that
-                    // the colander error message is about.  for the
-                    // current situation we need a different error
-                    // message.  once the backend has specified the format
-                    // of that error, we need to adapt the following
-                    // condition.
-
+                if (msg.hasOwnProperty("length") &&
+                    msg.length === 1 &&
+                    msg[0].name === "data.adhocracy.sheets.versions.IVersionable.follows" &&
+                    msg[0].location === "body" &&
+                    msg[0].description === "No fork allowed"
+                   ) {
                     // double waitms (fuzzed for avoiding network congestion).
                     waitms *= 2 * (1 + (Math.random() / 2 - 0.25));
 
