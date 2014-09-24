@@ -63,8 +63,16 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
         return resource;
     }
 
-    is(resource : ResourcesBase.Resource) : boolean {
+    isRate(resource : ResourcesBase.Resource) : boolean {
         return resource.content_type === "adhocracy.resources.rate.IRateVersion";
+    }
+
+    isRateable(resource : ResourcesBase.Resource) : boolean {
+        return resource.data.hasOwnProperty("adhocracy.sheets.rate.IRateable");
+    }
+
+    rateablePostPoolPath(resource : ResourcesBase.Resource) : string {
+        return resource.data["adhocracy.sheets.rate.IRateable"].post_pool;
     }
 
     subject(resource : RIRateVersion) : string;

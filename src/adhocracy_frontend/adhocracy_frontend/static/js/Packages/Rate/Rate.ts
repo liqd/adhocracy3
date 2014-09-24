@@ -18,8 +18,6 @@ var pkgLocation = "/Rate";
 export interface IRateScope extends ng.IScope {
     refersTo : string;
     postPoolPath : string;
-    postPoolSheet : string;  // FIXME: move to adapter
-    postPoolField : string;  // FIXME: move to adapter
     rates : {
         pro : number;
         contra : number;
@@ -43,7 +41,9 @@ export interface IRateAdapter<T extends AdhResource.Content<any>> {
     create(settings : any) : T;
     createItem(settings : any) : any;
     derive(oldVersion : T, settings : any) : T;
-    is(resource : T) : boolean;
+    isRate(resource : T) : boolean;
+    isRateable(resource : T) : boolean;
+    rateablePostPoolPath(resource : T) : string;
     subject(resource : T) : string;
     subject(resource : T, value : string) : T;
     object(resource : T) : string;
@@ -114,7 +114,7 @@ export var fetchAllRates = (
 ) : ng.IPromise<RIRateVersion[]> => {
     return adhHttp
         .get($scope.refersTo).then((rateable : ResourcesBase.Resource) => {
-            $scope.postPoolPath = rateable.data[$scope.postPoolSheet][$scope.postPoolField];
+            $scope.postPoolPath = adapter.rateablePostPoolPath(rateable);
             return $scope.postPoolPath;
         })
         .then((postPoolPath) => adhHttp.get(postPoolPath, {
