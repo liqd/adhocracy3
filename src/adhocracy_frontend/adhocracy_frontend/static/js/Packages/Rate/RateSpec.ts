@@ -47,8 +47,6 @@ export var register = () => {
 
             beforeEach(() => {
                 scopeMock = {
-                    postPoolSheet: "rateable",
-                    postPoolField: "post_pool",
                     refersTo: "comment_or_something"
                 };
 
@@ -120,7 +118,7 @@ export var register = () => {
 
                 rateableResource = {
                     data: {
-                        rateable: {
+                        "adhocracy.sheets.rate.IRateable": {
                             post_pool: "post_pool_path"
                         }
                     }
