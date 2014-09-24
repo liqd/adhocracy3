@@ -1,5 +1,6 @@
 from copy import deepcopy
 from pytest import fixture
+from pytest import raises
 
 from pyramid import testing
 
@@ -195,6 +196,64 @@ class TestResourceContentRegistryResourceAddables:
         assert result == {ISimple.__identifier__: {
                           'sheets_optional': [ISheet.__identifier__],
                           'sheets_mandatory': [ISheetA.__identifier__]}}
+
+
+class TestResourceContentRegistryResolveISheetFieldFromDottedString:
+
+
+    @fixture
+    def sheet_meta(self, sheet_meta):
+        from colander import MappingSchema
+        class ASchema(MappingSchema):
+            field1 = MappingSchema()
+        return sheet_meta._replace(isheet=ISheet, schema_class=ASchema)
+
+    @fixture
+    def mock_resource_registry(self, mock_resource_registry, sheet_meta):
+        mock_resource_registry.sheets_meta[sheet_meta.isheet.__identifier__] = sheet_meta
+        return mock_resource_registry
+
+    def _call_fut(self, mock_registry, dotted_string):
+        from adhocracy.registry import ResourceContentRegistry
+        return ResourceContentRegistry.resolve_isheet_field_from_dotted_string(
+            mock_registry, dotted_string)
+
+    def test_call_with_isheet_field_dotted_string(self, mock_resource_registry, sheet_meta):
+        isheet = sheet_meta.isheet
+        node = sheet_meta.schema_class()['field1']
+        field = 'field1'
+        dotted = isheet.__identifier__ + ':' + field
+        self_ = mock_resource_registry
+        assert self._call_fut(self_, dotted) == (isheet, field, node)
+
+    def test_call_with_non_dotted_string(self, mock_resource_registry):
+        dotted = 'colander'
+        self_ = mock_resource_registry
+        with raises(ValueError):
+            self._call_fut(self_, dotted)
+
+    def test_call_with_non_interface_dotted_string(self, mock_resource_registry, sheet_meta):
+        field = 'field1'
+        dotted = 'colander.SchemaNode' + ':' + field
+        self_ = mock_resource_registry
+        with raises(ValueError):
+            self._call_fut(self_, dotted)
+
+    def test_call_with_non_isheet_dotted_string(self, mock_resource_registry, sheet_meta):
+        from zope.interface import Interface
+        field = 'field1'
+        dotted = Interface.__identifier__ + ':' + field
+        self_ = mock_resource_registry
+        with raises(ValueError):
+            self._call_fut(self_, dotted)
+
+    def test_call_with_isheet_but_wrong_field_dotted_string(self, mock_resource_registry, sheet_meta):
+        isheet = sheet_meta.isheet
+        field = 'WRONG'
+        dotted = isheet.__identifier__ + ':' + field
+        self_ = mock_resource_registry
+        with raises(ValueError):
+            self._call_fut(self_, dotted)
 
 
 class TestResourceContentRegistyIncludeme:

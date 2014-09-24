@@ -144,5 +144,6 @@ class _InterfacePredicate:
 
 def includeme(config):
     """ register event subscriber predicates 'isheet' and 'interface'."""
+    config.include('substanced.event')
     config.add_subscriber_predicate('isheet', _ISheetPredicate)
     config.add_subscriber_predicate('interface', _InterfacePredicate)

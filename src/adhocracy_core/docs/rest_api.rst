@@ -467,7 +467,7 @@ no way of knowing that it should update v1 of Doc, BUT NOT v0!
 Create
 ~~~~~~
 
-Create a Proposal (a subclass of Item which pools ProposalVersion's) ::
+Create a Proposal (a subclass of Item which pools ProposalVersions) ::
 
     >>> pdag = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
     ...         'data': {
@@ -783,6 +783,12 @@ The backend must to two things::
 
 FIXME: add tests for this!
 
+FIXME: in the frontend, we check if the name of some error is
+__NO_FORK__ to decide whether to fetch a new HEAD and retry post, but
+this seems wrong, since colander uses the error fields differently.
+the error format needs to be adapted to the new requirements.  (See
+files Http.ts and HttpSpec.ts in the frontend.)
+
 
 
 Resources with PostPool, example Comments
@@ -1085,13 +1091,138 @@ any), but not for any further failed requests. The backend stops processing
 encoded requests once the first of them has failed, since further processing
 would probably only lead to further errors.
 
-FIXME: I don't think the tests are supposed to work as is, but they
-should be clear enough to serve as documentation.  Fix this once the
-application code that it is testing is supposed to work?  --mf
+Filtering Pools
+---------------
 
-FIXME: The response does not have to have this particular type.  I
-would prefer it if I could get the individual request responses (even
-if they are obsolete), but in which syntax I don't care.  --mf
+It's possible to filter and aggregate the information collected in pools by
+adding suitable GET parameters. For example, we can only retrieve children
+of a specific content type::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISection'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/',
+     'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/']
+
+Or only children that implement a specific sheet::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sheet': 'adhocracy.sheets.tags.ITag'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/',
+     'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
+
+Note that multiple filters are combined by AND. If we specify a content_type
+filter and a sheet filter, only the elements matched by *both* filters will be
+returned. The same applies to all other filters as well.
+
+Note: Currently it's not possible to specify multiple values for the *sheet*
+filter (which would be combined by AND or possibly -- using a different
+syntax -- by OR). We may add this functionality in the future if there is a
+need for it.
+
+By default, only direct children of a pool are listed as elements,
+i.e. the standard depth is 1. Setting the *depth* filter to a higher
+value allows also including grandchildren (depth=2) or even great-grandchildren
+(depth=3) etc. Allowed values are arbitrary positive numbers and *all*.
+*all* can be used to get nested elements of arbitrary nesting depth::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    ...             'depth': 'all'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    [...'http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/'...]
+
+Without specifying a deeper depth, the above query for ISectionVersions
+wouldn't have found anything, since they are children of children of the pool::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion'
+    ...             }).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    []
+
+To retrieve a count of the elements matching your query, specify
+*count=true* or just *count*. If you do so, an additional *count* field will
+be added to the returned IPool sheet::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...             'count': 'true'}).json
+    >>> resp_data['data']['adhocracy.sheets.pool.IPool']['count']
+    '2'
+
+*Note:* due to limitations of our (de)serialization library (Colander),
+the count is returned as a string, though it is actually a number.
+
+If you specify *count* without any other query parameters,
+you'll get the number of children in the pool::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'count': 'true'}).json
+    >>> child_count = resp_data['data']['adhocracy.sheets.pool.IPool']['count']
+    >>> assert int(child_count) >= 10
+
+The *elements* parameter allows controlling how matching element are
+returned. By default, 'elements' in the IPool sheet contains a list of paths.
+This corresponds to setting *elements=paths*.
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...             'elements': 'paths'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['http://localhost/adhocracy/Proposals/kommunismus/FIRST/',
+     'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
+
+Setting *elements=omit* will yield a response with an empty 'elements' listing.
+This makes only if you ask for something else instead, e.g. a count of
+elements::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...             'elements': 'omit', 'count': 'true'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool'])
+    {'count': '2', 'elements': []}
+
+Setting *elements=content* will instead return the complete contents of all
+matching elements -- what you would get by making a GET request on each of
+their paths::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'sheet': 'adhocracy.sheets.tags.ITag',
+    ...             'elements': 'content'}).json
+    >>> tag = resp_data['data']['adhocracy.sheets.pool.IPool']['elements'][0]
+    >>> pprint(tag)
+    {'content_type': 'adhocracy.interfaces.ITag',...'path': 'http://localhost/adhocracy/Proposals/kommunismus/FIRST/'...
+
+
+*tag* is a custom filter that allows filtering only resources with a
+specific tag. Often we are only interested in the newest versions of
+Versionables. We can get them by setting *tag=LAST*. Let's find the latest
+versions of all sections::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    ...             'depth': 'all', 'tag': 'LAST'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/',
+     'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
+
+
+*package.sheets.sheet.ISheet:FieldName* filters: you can add arbitrary custom
+filters that refer to sheet fields with references. The key is the name of
+the isheet plus the field name separated by ':' The value is the wanted
+reference target.
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',
+    ...             'adhocracy.sheets.versions.IVersionable:follows':
+    ...             'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000000/',
+    ...             'depth': 'all', 'tag': 'LAST'}).json
+    >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
+    ['http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
+
+FIXME Not yet implemented: aggregateby
 
 
 Other stuff

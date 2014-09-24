@@ -1,6 +1,6 @@
-import unittest
-
 from pyramid import testing
+
+import unittest
 
 
 class IncludemeIntegrationTest(unittest.TestCase):
@@ -10,6 +10,7 @@ class IncludemeIntegrationTest(unittest.TestCase):
         config = testing.setUp()
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
+        config.include('adhocracy_core.catalog')
         config.include('adhocracy_core.sheets')
         config.include('adhocracy_core.resources.sample_section')
         self.config = config

@@ -89,20 +89,43 @@ class TestValidateRequest:
 
     def test_valid_with_schema_with_data(self, context, request):
         request.body = '{"count": "1"}'
+        request.method = 'PUT'
         self._make_one(context, request, schema=CountSchema())
         assert request.validated == {'count': 1}
 
-    def test_valid_with_schema_with_data_in_querystring(self, context, request):
+    def test_valid_with_schema_with_data_in_querystring(self, context,
+                                                        request):
         class QueryStringSchema(colander.MappingSchema):
-            count = colander.SchemaNode(colander.Int(),
-                                        location='querystring')
+            count = colander.SchemaNode(colander.Int())
         request.GET = {'count': 1}
         self._make_one(context, request, schema=QueryStringSchema())
         assert request.validated == {'count': 1}
 
+    def test_valid_with_schema_with_extra_fields_in_querystring_discarded(
+            self, context, request):
+        class QueryStringSchema(colander.MappingSchema):
+            count = colander.SchemaNode(colander.Int())
+        request.GET = {'count': 1, 'extraflag': 'extra value'}
+        self._make_one(context, request, schema=QueryStringSchema())
+        assert request.validated == {'count': 1}
+
+    def test_valid_with_schema_with_extra_fields_in_querystring_preserved(
+            self, context, request):
+
+        class PreservingQueryStringSchema(colander.MappingSchema):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.typ.unknown = 'preserve'
+            count = colander.SchemaNode(colander.Int())
+
+        request.GET = {'count': 1, 'extraflag': 'extra value'}
+        self._make_one(context, request, schema=PreservingQueryStringSchema())
+        assert request.validated == {'count': 1, 'extraflag': 'extra value'}
+
     def test_non_valid_with_schema_wrong_data(self, context, request):
         from cornice.util import _JSONError
         request.body = '{"count": "wrong_value"}'
+        request.method = 'POST'
         with pytest.raises(_JSONError):
             self._make_one(context, request, schema=CountSchema())
         assert request.errors == [{'location': 'body',
@@ -113,6 +136,7 @@ class TestValidateRequest:
         from cornice.util import _JSONError
         request.validated = {'secret_data': 'buh'}
         request.body = '{"count": "wrong_value"}'
+        request.method = 'POST'
         with pytest.raises(_JSONError):
             self._make_one(context, request, schema=CountSchema())
         assert request.validated == {}
@@ -128,6 +152,7 @@ class TestValidateRequest:
         def validator1(context, request):
             request._validator_called = True
         request.body = '{"count": "wrong"}'
+        request.method = 'POST'
         with pytest.raises(_JSONError):
             self._make_one(context, request, schema=CountSchema(),
                            extra_validators=[validator1])
@@ -138,8 +163,26 @@ class TestValidateRequest:
             elements = colander.SchemaNode(colander.String())
 
         request.body = '["alpha", "beta", "gamma"]'
+        request.method = 'POST'
         self._make_one(context, request, schema=TestListSchema())
         assert request.validated == ['alpha', 'beta', 'gamma']
+
+    def test_valid_with_sequence_schema_in_querystring(self, context, request):
+        class TestListSchema(colander.SequenceSchema):
+            elements = colander.SchemaNode(colander.String())
+        self._make_one(context, request, schema=TestListSchema())
+        # since this doesn't make much sense, the validator is just a no-op
+        assert request.validated == {}
+
+    def test_valid_with_schema_with_data_in_querystring(self, context,
+                                                        request):
+        class QueryStringSchema(colander.MappingSchema):
+            count = colander.SchemaNode(colander.Int())
+        request.GET = {'count': 1}
+        self._make_one(context, request, schema=QueryStringSchema())
+        assert request.validated == {'count': 1}
+
+
 
     def test_with_invalid_sequence_schema(self, context, request):
         class TestListSchema(colander.SequenceSchema):
@@ -147,6 +190,7 @@ class TestValidateRequest:
             nonsense_node = colander.SchemaNode(colander.String())
 
         request.body = '["alpha", "beta", "gamma"]'
+        request.method = 'POST'
         with pytest.raises(colander.Invalid):
             self._make_one(context, request, schema=TestListSchema())
         assert request.validated == {}
@@ -157,11 +201,13 @@ class TestValidateRequest:
 
         from cornice.util import _JSONError
         request.body = '[1, 2, "three"]'
+        request.method = 'POST'
         with pytest.raises(_JSONError):
             self._make_one(context, request, schema=TestListSchema())
         assert request.validated == {}
 
-    def test_invalid_with_not_sequence_and_not_mapping_schema(self, context, request):
+    def test_invalid_with_not_sequence_and_not_mapping_schema(self, context,
+                                                              request):
         schema = colander.SchemaNode(colander.Int())
         with pytest.raises(Exception):
             self._make_one(context, request, schema=schema)
@@ -267,12 +313,19 @@ class TestResourceRESTView:
         inst = self.make_one(context, request)
         response = inst.options()
 
-        wanted = OPTIONResourceResponseSchema().serialize()
-        wanted['PUT']['request_body'] = {'data': {'ipropertyx': {}}}
-        wanted['GET']['response_body']['data']['ipropertyx'] = {}
-        wanted['POST']['request_body'] = [{'content_type': 'iresourcex',
-                                           'data': {'ipropertyx': {}}}]
-
+        wanted = \
+        {'GET': {'request_body': {},
+         'request_querystring': {},
+         'response_body': {'content_type': '',
+                           'data': {'ipropertyx': {}},
+                           'path': ''}},
+         'HEAD': {},
+         'OPTION': {},
+         'POST': {'request_body': [{'content_type': 'iresourcex',
+                                    'data': {'ipropertyx': {}}}],
+                  'response_body': {'content_type': '', 'path': ''}},
+         'PUT': {'request_body': {'content_type': '', 'data': {'ipropertyx': {}}},
+                 'response_body': {'content_type': '', 'path': ''}}}
         assert wanted == response
 
     def test_get_valid_no_sheets(self, request, context):
@@ -366,6 +419,51 @@ class TestPoolRESTView:
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
+    def test_get_valid_no_sheets(self, request, context):
+        from adhocracy.rest.schemas import GETResourceResponseSchema
+
+        inst = self.make_one(context, request)
+        response = inst.get()
+
+        wanted = GETResourceResponseSchema().serialize()
+        wanted['path'] = request.application_url + '/'
+        wanted['data'] = {}
+        wanted['content_type'] = IResource.__identifier__
+        assert wanted == response
+
+    def test_get_valid_pool_sheet_with_queryparams(self, request, context, mock_sheet):
+        from adhocracy.sheets.pool import IPool
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
+        mock_sheet.get.return_value = {}
+        mock_sheet.schema = colander.MappingSchema()
+        request.registry.content.resource_sheets.return_value = {IPool.__identifier__: mock_sheet}
+        request.validated['param1'] = 1
+
+        inst = self.make_one(context, request)
+        response = inst.get()
+
+        assert response['data'] == {IPool.__identifier__: {}}
+        assert mock_sheet.get.call_args[1] == {'params': {'param1': 1}}
+
+    def test_get_valid_pool_sheet_with_elements_content_param(self, request, context, mock_sheet):
+        from adhocracy.sheets.pool import IPool
+        from adhocracy.sheets.pool import PoolSchema
+        child = testing.DummyResource(__provides__=IResource)
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
+        mock_sheet.get.return_value = {'elements': [child],
+                                       'count': 1}  # FIXME remove 'count', this is a test fixture bug
+        mock_sheet.schema = PoolSchema()
+        request.registry.content.resource_sheets.return_value = {IPool.__identifier__: mock_sheet}
+        request.GET['elements'] = 'content'
+
+        inst = self.make_one(context, request)
+        response = inst.get()
+
+        response_elements_child = response['data'][IPool.__identifier__]['elements'][0]
+        assert 'path' in response_elements_child
+        assert 'content_type' in response_elements_child
+        assert 'data' in response_elements_child
+
     def test_post_valid(self, request, context):
         request.root = context
         child = testing.DummyResource(__provides__=IResourceX)
@@ -432,6 +530,9 @@ class TestItemRESTView:
 
     def test_post_valid(self, request, context):
         request.root = context
+        # Little cheat to prevent the POST validator from kicking in --
+        # we're working with already-validated data here
+        request.method = 'OPTIONS'
         child = testing.DummyResource(__provides__=IResourceX,
                                       __parent__=context,
                                       __name__='child')

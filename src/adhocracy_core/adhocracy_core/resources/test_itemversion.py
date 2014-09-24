@@ -15,6 +15,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         config = testing.setUp()
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
+        config.include('adhocracy.catalog')
         config.include('adhocracy_core.sheets')
         config.include('adhocracy_core.resources.itemversion')
         config.include('adhocracy_core.resources.subscriber')

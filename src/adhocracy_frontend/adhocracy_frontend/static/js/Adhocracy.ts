@@ -108,7 +108,7 @@ export var init = (config, meta_api) => {
     app.factory("recursionHelper", ["$compile", AdhRecursionHelper.factory]);
     app.directive("inject", AdhInject.factory);
     app.service("adhPreliminaryNames", AdhPreliminaryNames);
-    app.service("adhHttp", ["$http", "$q", "adhMetaApi", "adhPreliminaryNames", "adhConfig", AdhHttp.Service]);
+    app.service("adhHttp", ["$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", AdhHttp.Service]);
     app.factory("adhWebSocket", ["Modernizr", "adhConfig", AdhWebSocket.factory]);
 
     if (config.trustedDomains === []) {

@@ -35,13 +35,14 @@ class TestResourceResponseSchema:
 
     def test_serialize_no_appstruct(self):
         inst = self.make_one()
-        wanted = {'content_type': '', 'path': ''}
+        wanted = {'content_type': colander.null, 'path': ''}
         assert inst.serialize() == wanted
 
-    def test_serialize_with_appstruct(self, request):
-        inst = self.make_one().bind(request=request)
-        wanted = {'content_type': 'x', 'path': request.application_url + '/'}
-        assert inst.serialize({'content_type': 'x', 'path': request.root}) == wanted
+    def test_serialize_with_appstruct(self, request, context):
+        from adhocracy.interfaces import IResource
+        inst = self.make_one().bind(request=request, context=context)
+        wanted = {'content_type': IResource.__identifier__, 'path': request.application_url + '/'}
+        assert inst.serialize({'path': request.root}) == wanted
 
 
 class TestItemResponseSchema:
@@ -58,11 +59,11 @@ class TestItemResponseSchema:
 
     def test_serialize_no_appstruct(self):
         inst = self.make_one()
-        wanted = {'content_type': '', 'path': '', 'first_version_path': ''}
+        wanted = {'content_type': colander.null, 'path': '', 'first_version_path': ''}
         assert inst.serialize() == wanted
 
-    def test_serialize_with_appstruct(self, request):
-        inst = self.make_one().bind(request=request)
+    def test_serialize_with_appstruct(self, request, context):
+        inst = self.make_one().bind(request=request, context=context)
         wanted = {'content_type': 'x', 'path': request.application_url + '/',
                   'first_version_path': request.application_url + '/'}
         assert inst.serialize({'content_type': 'x', 'path': request.root,
@@ -283,14 +284,14 @@ class TestOPTIONResourceResponseSchema:
         wanted =\
             {'GET': {'request_body': {},
                      'request_querystring': {},
-                     'response_body': {'content_type': '', 'data': {},
+                     'response_body': {'content_type': colander.null, 'data': {},
                                        'path': ''}},
              'HEAD': {},
              'OPTION': {},
              'POST': {'request_body': [],
-                      'response_body': {'content_type': '', 'path': ''}},
+                      'response_body': {'content_type': colander.null, 'path': ''}},
              'PUT': {'request_body': {'data': {}},
-                     'response_body': {'content_type': '', 'path': ''}}}
+                     'response_body': {'content_type': colander.null, 'path': ''}}}
         assert inst.serialize() == wanted
 
 
@@ -510,3 +511,133 @@ class TestPOSTBatchRequestSchema:
         }
         with raises(colander.Invalid):
             inst.deserialize(data)
+
+
+class TestGETPoolRequestSchema():
+
+    @fixture
+    def inst(self, context):
+        from adhocracy.rest.schemas import GETPoolRequestSchema
+        return GETPoolRequestSchema().bind(context=context)
+
+    def test_deserialize_empty(self, inst):
+        assert inst.deserialize({}) == {}
+
+    def test_deserialize_valid(self, inst):
+        from adhocracy.sheets.name import IName
+        data = {'content_type': 'adhocracy.sheets.name.IName',
+                'sheet': 'adhocracy.sheets.name.IName',
+                'depth': '100',
+                'elements': 'content',
+                'count': 'true',
+                'aggregateby': 'rating.opinion',
+                }
+        expected = {'content_type': IName,
+                    'sheet': IName,
+                    'depth': '100',
+                    'elements': 'content',
+                    'count': True,
+                    'aggregateby': 'rating.opinion',
+                    }
+        assert inst.deserialize(data) == expected
+
+    def test_deserialize_content_type_invalid(self, inst):
+        data = {'content_type': 'adhocracy.sheets.name.NoName'}
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_depth_all(self, inst):
+        data = {'depth': 'all'}
+        assert inst.deserialize(data) == {'depth': 'all'}
+
+    def test_deserialize_depth_invalid(self, inst):
+        data = {'depth': '-7'}
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+    def test_deserialize_count_explicit_false(self, inst):
+        data = {'count': 'false'}
+        assert inst.deserialize(data) == {'count': False}
+
+    def test_deserialize_extra_values_are_preserved(self, inst):
+        data = {'extra1': 'blah',
+                'another_extra': 'blub'}
+        assert inst.typ.unknown == 'raise'
+        with raises(colander.Invalid):
+            inst.deserialize(data)
+
+
+class TestAddGetPoolRequestExtraFields:
+
+    @fixture
+    def schema(self):
+        from adhocracy.rest.schemas import GETPoolRequestSchema
+        schema = GETPoolRequestSchema()
+        return schema.bind()
+
+    @fixture
+    def context(self, pool_graph_catalog):
+        return pool_graph_catalog
+
+    @fixture
+    def registry(self, mock_resource_registry):
+        return testing.DummyResource(content=mock_resource_registry)
+
+    def _call_fut(self, *args):
+        from adhocracy.rest.schemas import add_get_pool_request_extra_fields
+        return add_get_pool_request_extra_fields(*args)
+
+    def test_call_without_extra_fields(self, schema):
+        cstruct = {}
+        assert self._call_fut(cstruct, schema, None, None) == schema
+
+    def test_call_with_missing_catalog(self, schema):
+        index_name = 'index1'
+        cstruct = {index_name: 'keyword'}
+        schema_extended = self._call_fut(cstruct, schema, None, None)
+        assert index_name not in schema_extended
+
+    def test_call_with_extra_filter_wrong(self, schema, context):
+        index_name = 'index1'
+        cstruct = {index_name: 'keyword'}
+        schema_extended = self._call_fut(cstruct, schema, context, None)
+        assert index_name not in schema_extended
+
+    def test_call_with_extra_filter(self, schema, context):
+        from adhocracy.schema import SingleLine
+        index_name = 'index1'
+        index = testing.DummyResource()
+        context['catalogs']['adhocracy'].add(index_name, index, send_events=False)
+        cstruct = {index_name: 'keyword'}
+        schema_extended = self._call_fut(cstruct, schema, context, None)
+        assert isinstance(schema_extended[index_name], SingleLine)
+
+    def test_call_with_extra_reference_name(self, schema, registry):
+        from adhocracy.schema import Resource
+        from adhocracy.schema import Reference
+        isheet = ISheet.__identifier__
+        field = 'reference'
+        reference_name = isheet + ':' + field
+        cstruct = {reference_name: '/referenced'}
+        registry.content.resolve_isheet_field_from_dotted_string.return_value = (ISheet, 'reference', Reference())
+        schema_extended = self._call_fut(cstruct, schema, None, registry)
+        assert isinstance(schema_extended[reference_name], Resource)
+
+    def test_call_with_extra_reference_name_wrong_type(self, schema, registry):
+        from adhocracy.schema import SingleLine
+        isheet = ISheet.__identifier__
+        field = 'reference'
+        reference_name = isheet + ':' + field
+        cstruct = {reference_name: '/referenced'}
+        registry.content.resolve_isheet_field_from_dotted_string.return_value = (ISheet, 'reference', SingleLine())
+        schema_extended = self._call_fut(cstruct, schema, None, registry)
+        assert reference_name not in schema_extended
+
+    def test_call_with_extra_reference_name_wrong(self, schema, registry):
+        isheet = ISheet.__identifier__
+        field = 'reference'
+        reference_name = isheet + ':' + field
+        cstruct = {reference_name: '/referenced'}
+        registry.content.resolve_isheet_field_from_dotted_string.side_effect = ValueError
+        schema_extended = self._call_fut(cstruct, schema, None, registry)
+        assert reference_name not in schema_extended

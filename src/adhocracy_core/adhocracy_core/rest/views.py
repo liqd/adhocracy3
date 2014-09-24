@@ -30,9 +30,11 @@ from adhocracy_core.rest.schemas import POSTLoginEmailRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginUsernameRequestSchema
 from adhocracy_core.rest.schemas import POSTResourceRequestSchema
 from adhocracy_core.rest.schemas import PUTResourceRequestSchema
-from adhocracy_core.rest.schemas import GETResourceResponseSchema
+from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
+from adhocracy_core.rest.schemas import GETResourceResponseSchema
 from adhocracy_core.rest.schemas import OPTIONResourceResponseSchema
+from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.utils import get_iresource
@@ -42,6 +44,7 @@ from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
 from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets.user import IPasswordAuthentication
+import adhocracy_core.sheets.pool
 
 
 logger = getLogger(__name__)
@@ -87,10 +90,26 @@ def validate_request_data(context: ILocation, request: Request,
     schema_with_binding = schema.bind(context=context, request=request,
                                       parent_pool=parent)
     qs, headers, body, path = extract_request_data(request)
-    _validate_schema(body, schema_with_binding, request, location='body')
-    _validate_schema(qs, schema_with_binding, request, location='querystring')
+    validate_body_or_querystring(body, qs, schema_with_binding, context,
+                                 request)
     _validate_extra_validators(extra_validators, context, request)
     _raise_if_errors(request)
+
+
+def validate_body_or_querystring(body, qs, schema: Schema, context: IResource,
+                                 request: Request):
+    """Validate the querystring if this is a GET request, the body otherwise.
+
+    This allows using just a single schema for all kinds of requests.
+    """
+    if isinstance(schema, GETPoolRequestSchema):
+        schema = add_get_pool_request_extra_fields(qs, schema, context,
+                                                   request.registry)
+    if request.method.upper() == 'GET':
+        _validate_schema(qs, schema, request,
+                         location='querystring')
+    else:
+        _validate_schema(body, schema, request, location='body')
 
 
 def _validate_schema(cstruct: object, schema: MappingSchema, request: Request,
@@ -125,10 +144,10 @@ def _validate_list_schema(schema: SequenceSchema, cstruct: list,
 
 def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
                           request: Request, location='body'):
-    nodes = [n for n in schema if getattr(n, 'location', 'body') == location]
     validated = {}
-    nodes_with_cstruct = [n for n in nodes if n.name in cstruct]
-    nodes_without_cstruct = [n for n in nodes if n.name not in cstruct]
+    nodes_with_cstruct = [n for n in schema if n.name in cstruct]
+    nodes_without_cstruct = [n for n in schema if n.name not in cstruct]
+
     for node in nodes_without_cstruct:
         appstruct = node.deserialize()
         if appstruct is not drop:
@@ -139,6 +158,11 @@ def _validate_dict_schema(schema: MappingSchema, cstruct: dict,
             validated[node.name] = node.deserialize(node_cstruct)
         except Invalid as err:
             _add_colander_invalid_error_to_request(err, request, location)
+    if getattr(schema.typ, 'unknown', None) == 'preserve':
+        # Schema asks us to preserve other cstruct values
+        for name, value in cstruct.items():
+            if name not in validated:
+                validated[name] = value
     request.validated.update(validated)
 
 
@@ -254,13 +278,19 @@ class ResourceRESTView(RESTView):
         cstruct = deepcopy(cstruct_singleton)
         for sheet in sheets_edit:
             cstruct['PUT']['request_body']['data'][sheet] = {}
+            cstruct['PUT']['request_body']['content_type'] = ''
+            cstruct['PUT']['response_body']['content_type'] = ''
+        cstruct['PUT']['response_body']['content_type'] = ''
         for sheet in sheets_view:
             cstruct['GET']['response_body']['data'][sheet] = {}
+            cstruct['GET']['response_body']['content_type'] = ''
         for type, sheets in addables.items():
             names = sheets['sheets_optional'] + sheets['sheets_mandatory']
             sheets_dict = dict([(s, {}) for s in names])
             post_data = {'content_type': type, 'data': sheets_dict}
             cstruct['POST']['request_body'].append(post_data)
+            cstruct['POST']['response_body']['content_type'] = ''
+        cstruct['POST']['response_body']['content_type'] = ''
         return cstruct
 
     @view_config(request_method='GET')
@@ -273,6 +303,7 @@ class ResourceRESTView(RESTView):
         return cstruct
 
     def _get_sheets_data_cstruct(self):
+        queryparams = self.request.validated if self.request.validated else {}
         sheets_view = self.registry.resource_sheets(self.context, self.request,
                                                     onlyviewable=True)
         data_cstruct = {}
@@ -280,10 +311,26 @@ class ResourceRESTView(RESTView):
             key = sheet.meta.isheet.__identifier__
             schema = sheet.schema.bind(context=self.context,
                                        request=self.request)
-            appstruct = sheet.get()
+            appstruct = sheet.get(params=queryparams)
+            if sheet.meta.isheet is adhocracy.sheets.pool.IPool:
+                _set_pool_sheet_elements_serialization_form(schema,
+                                                            queryparams)
+                # FIXME? readd the get_cstruct method but with parameters
+                # 'request'/'context'. Then we can handle this stuff at
+                #  one place, the pool sheet package.
             cstruct = schema.serialize(appstruct)
             data_cstruct[key] = cstruct
         return data_cstruct
+
+
+def _set_pool_sheet_elements_serialization_form(schema: MappingSchema,
+                                                queryparams: dict):
+    if queryparams.get('elements', 'path') != 'content':
+        return
+    elements_node = schema['elements']
+    elements_typ_copy = deepcopy(elements_node.children[0].typ)
+    elements_typ_copy.serialization_form = 'content'
+    elements_node.children[0].typ = elements_typ_copy
 
 
 def _get_resource_response_appstruct(resource: IResource) -> dict:
@@ -330,7 +377,16 @@ class PoolRESTView(SimpleRESTView):
 
     """View for Pools, implements get, options, put and post."""
 
+    validation_GET = (GETPoolRequestSchema, [])
+
     validation_POST = (POSTResourceRequestSchema, [])
+
+    @view_config(request_method='GET')
+    def get(self) -> dict:
+        """Get resource data."""
+        # This delegation method is necessary since otherwise validation_GET
+        # won't be found.
+        return super().get()
 
     def build_post_response(self, resource) -> dict:
         """Build response data structure for a POST request. """

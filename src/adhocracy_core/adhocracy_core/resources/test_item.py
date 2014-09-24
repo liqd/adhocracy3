@@ -28,11 +28,13 @@ def make_itemversion(parent=None, follows=[]):
 class TestItemIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        from adhocracy_core.testing import create_pool_with_graph
+        from adhocracy.testing import create_pool_with_graph
         from adhocracy_core.resources.item import item_metadata
+        from adhocracy_core.resources.root import _add_catalog_service
         config = testing.setUp()
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
+        config.include('adhocracy_core.catalog')
         config.include('adhocracy_core.sheets')
         config.include('adhocracy_core.resources.itemversion')
         config.include('adhocracy_core.resources.item')
@@ -40,6 +42,7 @@ class TestItemIntegrationTest(unittest.TestCase):
         config.include('adhocracy_core.resources.subscriber')
         self.config = config
         self.context = create_pool_with_graph()
+        _add_catalog_service(self.context, config.registry)
         self.objectmap = self.context.__objectmap__
         self.graph = self.context.__graph__
         self.metadata = item_metadata
@@ -114,7 +117,7 @@ class IncludemeIntegrationTest(unittest.TestCase):
         config.include('adhocracy_core.sheets.metadata')
         self.config = config
         self.context = create_pool_with_graph()
-        self.metyyadata = item_metadata
+        self.metadata = item_metadata
 
     def tearDown(self):
         testing.tearDown()

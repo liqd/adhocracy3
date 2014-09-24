@@ -46,6 +46,7 @@ class RootPoolIntegrationTest(unittest.TestCase):
         assert find_graph(inst) is not None
         assert find_graph(inst)._objectmap is not None
         assert find_catalog(inst, 'system') is not None
+        assert find_catalog(inst, 'adhocracy') is not None
         assert find_service(inst, 'principals', 'users') is not None
         assert len(get_acl(inst)) > 0
 

@@ -1,22 +1,25 @@
 """Cornice colander schemas und validators to validate request data."""
+from substanced.util import find_catalog
 import colander
 
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Email
+from adhocracy_core.schema import Interface
 from adhocracy_core.schema import Password
 from adhocracy_core.schema import Resource
 from adhocracy_core.schema import Resources
+from adhocracy_core.schema import Reference
+from adhocracy_core.schema import References
 from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import ResourcePathSchema
+from adhocracy_core.schema import ResourcePathAndContentSchema
 
 
-class ResourceResponseSchema(colander.Schema):
+class ResourceResponseSchema(ResourcePathSchema):
 
     """Data structure for responses of Resource requests."""
-
-    content_type = SingleLine()
-
-    path = Resource()
 
 
 class ItemResponseSchema(ResourceResponseSchema):
@@ -26,15 +29,12 @@ class ItemResponseSchema(ResourceResponseSchema):
     first_version_path = Resource()
 
 
-class GETResourceResponseSchema(ResourceResponseSchema):
+class GETResourceResponseSchema(ResourcePathAndContentSchema):
 
     """Data structure for Resource GET requests."""
 
-    data = colander.SchemaNode(colander.Mapping(unknown='preserve'),
-                               default={})
 
-
-class GETItemResponseSchema(GETResourceResponseSchema):
+class GETItemResponseSchema(ResourcePathAndContentSchema):
 
     """Data structure for responses of IItem requests."""
 
@@ -220,6 +220,114 @@ class POSTBatchRequestSchema(colander.SequenceSchema):
     """Schema for batch requests (list of POSTBatchRequestItem's)."""
 
     items = POSTBatchRequestItem()
+
+
+class PoolElementsForm(colander.SchemaNode):
+
+    """The form of the elements attribute returned by the pool sheet."""
+
+    schema_type = colander.String
+    validator = colander.OneOf(['paths', 'content', 'omit'])
+    missing = 'paths'
+
+
+class PoolQueryDepth(colander.SchemaNode):
+
+    """The nesting depth of descendants in a pool response.
+
+    Either a positive number or the string 'all' to return descendants of
+    arbitrary depth.
+    """
+
+    schema_type = colander.String
+    validator = colander.Regex(r'^\d+|all$')
+    missing = '1'
+
+
+class GETPoolRequestSchema(colander.MappingSchema):
+
+    """GET parameters accepted for pool queries."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Raise if unknown to tell client the query parameters are wrong.
+        self.typ.unknown = 'raise'
+
+    # FIXME For now we don't have a way to specify GET parameters that can
+    # be repeated, e.g. 'sheet=Blah&sheet=Blub'. The querystring is converted
+    # by Cornice into a MultiDict (http://docs.pylonsproject.org/projects
+    # /pyramid/en/master/api/interfaces.html#pyramid.interfaces.IMultiDict),
+    # which by default will only return the LAST value if a key is specified
+    # several times. One possible workaround is to allow specifying multiple
+    # values as a comma-separated list instead of repeated key=value pairs,
+    # e.g. 'sheet=Blah,Blub'. This would require a custom Multiple SchemaNode
+    # that wraps a SchemaType, e.g.
+    # sheet = Multiple(Interface(), missing=None, sep=',')
+    # Elements in this schema were multiple values should be allowed:
+    # sheet, aggregateby, tag.
+
+    content_type = colander.SchemaNode(Interface(), missing=colander.drop)
+    sheet = colander.SchemaNode(Interface(), missing=colander.drop)
+    depth = PoolQueryDepth(missing=colander.drop)
+    elements = PoolElementsForm(missing=colander.drop)
+    count = colander.SchemaNode(colander.Boolean(), missing=colander.drop)
+    aggregateby = colander.SchemaNode(colander.String(), missing=colander.drop)
+
+
+def add_get_pool_request_extra_fields(cstruct: dict,
+                                      schema: GETPoolRequestSchema,
+                                      context: IResource,
+                                      registry) -> GETPoolRequestSchema:
+    """Validate arbitrary fields in GETPoolRequestSchema data."""
+    extra_fields = _get_unknown_fields(cstruct, schema)
+    if not extra_fields:
+        return schema
+    schema_extra = schema.clone()
+    for name in extra_fields:
+        if _maybe_reference_filter_node(name, registry):
+            _add_reference_filter_node(name, schema_extra)
+        elif _maybe_arbitrary_filter_node(name, context):
+            _add_arbitrary_filter_node(name, schema_extra)
+    return schema_extra
+
+
+def _get_unknown_fields(cstruct, schema):
+    unknown_fields = [key for key in cstruct if key not in schema]
+    return unknown_fields
+
+
+def _maybe_reference_filter_node(name, registry):
+    if ':' not in name:
+        return False
+    resolve = registry.content.resolve_isheet_field_from_dotted_string
+    try:
+        isheet, field, node = resolve(name)
+    except ValueError:
+        return False
+    if isinstance(node, (Reference, References)):
+        return True
+    else:
+        return False
+
+
+def _add_reference_filter_node(name, schema):
+    node = Resource(name=name).bind(**schema.bindings)
+    schema.add(node)
+
+
+def _maybe_arbitrary_filter_node(name, context):
+    catalog = find_catalog(context, 'adhocracy')
+    if not catalog:
+        return False
+    if name in catalog:
+        return True
+    else:
+        return False
+
+
+def _add_arbitrary_filter_node(name, schema):
+    node = SingleLine(name=name).bind(**schema.bindings)
+    schema.add(node)
 
 
 class OPTIONResourceResponseSchema(colander.Schema):
