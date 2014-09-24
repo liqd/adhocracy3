@@ -624,7 +624,7 @@ mkFieldType = (field : MetaApi.ISheetField) : string => {
     case "Integer":
         result = "number";
         break;
-    case "adhocracy.schema.Rate":
+    case "adhocracy_core.schema.Rate":
         result = "number";
         break;
     case "adhocracy_core.schema.TimeZoneName":
