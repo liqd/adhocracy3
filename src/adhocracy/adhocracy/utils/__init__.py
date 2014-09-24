@@ -1,6 +1,7 @@
 """Helper functions."""
+from collections import namedtuple
 from collections.abc import Iterator
-from collections import Sequence
+from collections.abc import Sequence
 from datetime import datetime
 from functools import reduce
 import copy
@@ -169,14 +170,8 @@ def to_dotted_name(context) -> str:
         return get_dotted_name(context)
 
 
-class _NamedObject:
-
-    """An object that has a name (and nothing else)."""
-
-    def __init__(self, name):
-        """Create a new instance."""
-        self.name = name
-        """The name of this instance"""
+_named_object = namedtuple('NamedObject', ['name'])
+"""An object that has a name (and nothing else)."""
 
 
 def raise_colander_style_error(sheet: Interface, field_name: str,
@@ -189,7 +184,7 @@ def raise_colander_style_error(sheet: Interface, field_name: str,
     :raises colander.Invalid: constructed from the given parameters
     """
     name = 'data.{}.{}'.format(sheet.__identifier__, field_name)
-    raise colander.Invalid(_NamedObject(name), description)
+    raise colander.Invalid(_named_object(name), description)
 
 
 def remove_keys_from_dict(dictionary: dict, keys_to_remove=()) -> dict:
