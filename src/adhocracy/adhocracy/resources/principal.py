@@ -75,9 +75,15 @@ class User(Pool):
     name = ''
 
 
+def send_registration_mail(context: IPool, registry: Registry, options: dict):
+    """Send a registration mail to validate the email of a user account."""
+    # TODO implement
+
+
 user_metadata = pool_metadata._replace(
     iresource=IUser,
     content_class=User,
+    after_creation=[send_registration_mail] + pool_metadata.after_creation,
     basic_sheets=[adhocracy.sheets.user.IUserBasic,
                   adhocracy.sheets.metadata.IMetadata,
                   adhocracy.sheets.pool.IPool,
