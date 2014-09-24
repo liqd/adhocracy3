@@ -287,7 +287,7 @@ export var register = () => {
                 "/foo/version2"
             ];
 
-            it("returns only the most recent versions from the adhocracy_sample.sheets.comment.ICommentable sheet", () => {
+            it("returns only the most recent versions from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
                 jasmine.addMatchers(JasmineHelpers.customMatchers);
 
                 var result = Util.latestVersionsOnly(testCase);

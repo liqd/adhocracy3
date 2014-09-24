@@ -110,7 +110,7 @@ export class User {
 
         return _self.adhHttp.get(userPath)
             .then((resource) => {
-                _self.data = resource.data["adhocracy.sheets.user.IUserBasic"];
+                _self.data = resource.data["adhocracy_core.sheets.user.IUserBasic"];
                 _self.loggedIn = true;
                 return resource;  // FIXME this is only here because of a bug in DefinitelyTyped
             }, (reason) => {
@@ -194,13 +194,13 @@ export class User {
         var _self : User = this;
 
         return _self.adhHttp.post("/principals/users/", {
-            "content_type": "adhocracy.resources.principal.IUser",
+            "content_type": "adhocracy_core.resources.principal.IUser",
             "data": {
-                "adhocracy.sheets.user.IUserBasic": {
+                "adhocracy_core.sheets.user.IUserBasic": {
                     "name": username,
                     "email": email
                 },
-                "adhocracy.sheets.user.IPasswordAuthentication": {
+                "adhocracy_core.sheets.user.IPasswordAuthentication": {
                     "password": password
                 }
             }
@@ -328,7 +328,7 @@ export var metaDirective = (adhConfig : AdhConfig.Type) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
-                        $scope.userBasic = res.data["adhocracy.sheets.user.IUserBasic"];
+                        $scope.userBasic = res.data["adhocracy_core.sheets.user.IUserBasic"];
                         $scope.isAnonymous = false;
                     });
             } else {

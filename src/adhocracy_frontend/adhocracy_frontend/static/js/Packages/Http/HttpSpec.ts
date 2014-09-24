@@ -8,8 +8,8 @@ import Error = require("./Error");
 import AdhConvert = require("./Convert");
 import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
-import RIParagraph = require("../../Resources_/adhocracy_sample/resources/paragraph/IParagraph");
-import SITag = require("../../Resources_/adhocracy/sheets/tags/ITag");
+import RIParagraph = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraph");
+import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
 
 var mkHttpMock = (adhPreliminaryNames : PreliminaryNames) => {
     var mock = jasmine.createSpyObj("$httpMock", ["get", "post", "put"]);
@@ -138,7 +138,7 @@ export var register = () => {
                     var returnPath1 = "path1";
 
                     var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy.sheets.tags.ITag"] = new SITag.AdhocracySheetsTagsITag({ elements: [returnPath1] });
+                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.AdhocracyCoreSheetsTagsITag({ elements: [returnPath1] });
                     $httpMock.get.and.returnValue(q.when({ data: dag }));
 
                     adhHttp.getNewestVersionPathNoFork(path).then(
@@ -157,7 +157,7 @@ export var register = () => {
                 it("throws an exception if LAST.length !== 1", (done) => {
                     $httpMock.get.and.returnValue(q.when({
                         data: {
-                            "adhocracy.sheets.tags.ITag": {
+                            "adhocracy_core.sheets.tags.ITag": {
                                 elements: []
                             }
                         }
@@ -170,7 +170,7 @@ export var register = () => {
 
                     $httpMock.get.and.returnValue(q.when({
                         data: {
-                            "adhocracy.sheets.tags.ITag": {
+                            "adhocracy_core.sheets.tags.ITag": {
                                 elements: ["p1", "p2"]
                             }
                         }
@@ -194,7 +194,7 @@ export var register = () => {
                         (resource) => {
                             expect($httpMock.post).toHaveBeenCalledWith("/ome", {
                                 data: {
-                                    "adhocracy.sheets.versions.IVersionable": {
+                                    "adhocracy_core.sheets.versions.IVersionable": {
                                         follows: ["/ome/path"]
                                     }
                                 }
@@ -254,7 +254,7 @@ export var register = () => {
                         () => {
                             expect($httpMock.post).toHaveBeenCalledWith("/somee", {
                                 data: {
-                                    "adhocracy.sheets.versions.IVersionable": {
+                                    "adhocracy_core.sheets.versions.IVersionable": {
                                         follows: ["/somee/path"]
                                     }
                                 },
@@ -277,7 +277,7 @@ export var register = () => {
 
                     var newHead = "new_head";
                     var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy.sheets.tags.ITag"] = new SITag.AdhocracySheetsTagsITag({ elements: [newHead] });
+                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.AdhocracyCoreSheetsTagsITag({ elements: [newHead] });
 
                     var postResponses = [q.reject({ data: error }), q.when({ data: dag })].reverse();
 
@@ -292,7 +292,7 @@ export var register = () => {
 
                             var extractFollowsRef = (resource) => {
                                 try {
-                                    var follows = resource.data["adhocracy.sheets.versions.IVersionable"].follows;
+                                    var follows = resource.data["adhocracy_core.sheets.versions.IVersionable"].follows;
                                     if (follows.length !== 1) {
                                         throw "blä!";
                                     }
@@ -369,11 +369,11 @@ export var register = () => {
 
                 beforeEach((done) => {
                     $httpMock.post.and.returnValue(q.when({data: [
-                        {body: {content_type: "adhocracy.resources.pool.IBasicPool", path: "get response"}},
-                        {body: {content_type: "adhocracy.resources.pool.IBasicPool", path: "put response"}},
-                        {body: {content_type: "adhocracy.resources.pool.IBasicPool", path: "post1 response"}},
-                        {body: {content_type: "adhocracy.resources.pool.IBasicPool", path: "post2 response"}},
-                        {body: {content_type: "adhocracy.resources.pool.IBasicPool", path: "get2 response"}}
+                        {body: {content_type: "adhocracy_core.resources.pool.IBasicPool", path: "get response"}},
+                        {body: {content_type: "adhocracy_core.resources.pool.IBasicPool", path: "put response"}},
+                        {body: {content_type: "adhocracy_core.resources.pool.IBasicPool", path: "post1 response"}},
+                        {body: {content_type: "adhocracy_core.resources.pool.IBasicPool", path: "post2 response"}},
+                        {body: {content_type: "adhocracy_core.resources.pool.IBasicPool", path: "get2 response"}}
                     ]}));
 
                     adhHttp.withTransaction((httpTrans) => {
@@ -453,7 +453,7 @@ export var register = () => {
         describe("importContent", () => {
             it("returns response.data if it is an object", () => {
                 var obj = {
-                    content_type: "adhocracy.resources.pool.IBasicPool",
+                    content_type: "adhocracy_core.resources.pool.IBasicPool",
                     path: "p",
                     data: {}
                 };

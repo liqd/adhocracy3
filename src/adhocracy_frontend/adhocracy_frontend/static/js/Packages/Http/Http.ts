@@ -107,7 +107,7 @@ export class Service<Content extends Resources.Content<any>> {
     public getNewestVersionPathNoFork(path : string) : ng.IPromise<string> {
         return this.get(path + "/LAST")
             .then((tag) => {
-                var heads = tag.data["adhocracy.sheets.tags.ITag"].elements;
+                var heads = tag.data["adhocracy_core.sheets.tags.ITag"].elements;
                 if (heads.length !== 1) {
                     throw ("Cannot handle this LAST tag: " + heads.toString());
                 } else {
@@ -200,7 +200,7 @@ export class Service<Content extends Resources.Content<any>> {
                 throw "Tried to post new version of " + dagPath + " " + timeoutRounds.toString() + " times, giving up.";
             }
 
-            _obj.data["adhocracy.sheets.versions.IVersionable"] = {
+            _obj.data["adhocracy_core.sheets.versions.IVersionable"] = {
                 follows: [nextOldVersionPath]
             };
 
@@ -300,7 +300,7 @@ export class Service<Content extends Resources.Content<any>> {
      *
      *             var version = {
      *                 data: {
-     *                     "adhocracy.sheets.versions.IVersionable": {
+     *                     "adhocracy_core.sheets.versions.IVersionable": {
      *                         follows: resourcePost.first_version_path
      *                     },
      *                     ...

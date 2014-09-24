@@ -4,11 +4,11 @@ import AdhMetaApi = require("./MetaApi");
 
 var sampleMetaApi : AdhMetaApi.IMetaApi = {
     "resources" : {
-        "adhocracy.resources.root.IRootPool" : {
+        "adhocracy_core.resources.root.IRootPool" : {
             "sheets" : [
-                "adhocracy.sheets.name.IName",
-                "adhocracy.sheets.pool.IPool",
-                "adhocracy.sheets.metadata.IMetadata"
+                "adhocracy_core.sheets.name.IName",
+                "adhocracy_core.sheets.pool.IPool",
+                "adhocracy_core.sheets.metadata.IMetadata"
             ],
             "element_types" : [
                 "adhocracy.interfaces.IPool"
@@ -16,7 +16,7 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
         }
     },
     "sheets" : {
-        "adhocracy.sheets.metadata.IMetadata" : {
+        "adhocracy_core.sheets.metadata.IMetadata" : {
             "fields" : [
                 {
                     "name" : "creator",
@@ -24,7 +24,7 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
                     "editable" : false,
                     "create_mandatory" : false,
                     "valuetype" : "adhocracy.schema.AbsolutePath",
-                    "targetsheet" : "adhocracy.sheets.user.IUserBasic",
+                    "targetsheet" : "adhocracy_core.sheets.user.IUserBasic",
                     "containertype" : "list",
                     "creatable" : false
                 },
@@ -46,7 +46,7 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
                 }
             ]
         },
-        "adhocracy.sheets.name.IName" : {
+        "adhocracy_core.sheets.name.IName" : {
             "fields" : [
                 {
                     "readable" : true,
@@ -58,7 +58,7 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
                 }
             ]
         },
-        "adhocracy.sheets.pool.IPool" : {
+        "adhocracy_core.sheets.pool.IPool" : {
             "fields" : [
                 {
                     "name" : "elements",
@@ -85,23 +85,23 @@ export var register = () => {
         });
 
         it("returns the right resource meta data.", () => {
-            var sheetsList = adhMetaApi.resource("adhocracy.resources.root.IRootPool").sheets;
-            expect(sheetsList.indexOf("adhocracy.sheets.name.IName") >= 0).toBe(true);
+            var sheetsList = adhMetaApi.resource("adhocracy_core.resources.root.IRootPool").sheets;
+            expect(sheetsList.indexOf("adhocracy_core.sheets.name.IName") >= 0).toBe(true);
         });
 
         it("returns the right sheet meta data.", () => {
-            expect(adhMetaApi.sheet("adhocracy.sheets.metadata.IMetadata")).toBeTruthy();
+            expect(adhMetaApi.sheet("adhocracy_core.sheets.metadata.IMetadata")).toBeTruthy();
         });
 
         it("returns the right field meta data.", () => {
-            expect(adhMetaApi.field("adhocracy.sheets.pool.IPool", "elements").name).toBe("elements");
-            expect(adhMetaApi.field("adhocracy.sheets.pool.IPool", "elements").editable).toBe(false);
+            expect(adhMetaApi.field("adhocracy_core.sheets.pool.IPool", "elements").name).toBe("elements");
+            expect(adhMetaApi.field("adhocracy_core.sheets.pool.IPool", "elements").editable).toBe(false);
         });
 
         it("crashes if unhappy", () => {
             expect(() => adhMetaApi.resource("blörg")).toThrow();
             expect(() => adhMetaApi.sheet("blürg")).toThrow();
-            expect(() => adhMetaApi.field("adhocracy.sheets.name.IName", "fee")).toThrow();
+            expect(() => adhMetaApi.field("adhocracy_core.sheets.name.IName", "fee")).toThrow();
         });
     });
 };
