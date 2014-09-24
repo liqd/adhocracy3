@@ -114,6 +114,8 @@ def pool_graph_catalog(config, pool_graph):
     _add_catalog_service(context, config.registry)
     context['catalogs']['system']['name'].action_mode = MODE_IMMEDIATE
     context['catalogs']['system']['interfaces'].action_mode = MODE_IMMEDIATE
+    context['catalogs']['adhocracy']['tag'].action_mode = MODE_IMMEDIATE
+    context['catalogs']['adhocracy']['rate'].action_mode = MODE_IMMEDIATE
     return context
 
 

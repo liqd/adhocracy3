@@ -248,6 +248,12 @@ export var register = () => {
             it("returns '/' for '/'", () => {
                 expect(Util.parentPath("/")).toBe("/");
             });
+            it("returns '/' for 'bla'", () => {
+                expect(Util.parentPath("bla")).toBe("/");
+            });
+            it("returns '/' for ''", () => {
+                expect(Util.parentPath("")).toBe("/");
+            });
         });
 
         describe("normalizeName", () => {
