@@ -336,8 +336,10 @@ class TestIntegrationPoolSheet:
                                    content_type=IItem)
         poolsheet = get_sheet(item, IPool)
         result = poolsheet._filter_elements(aggregate_filter='interfaces').aggregateby
-        assert result['interfaces'][str(IItem)] == 0
         assert result['interfaces'][str(IItemVersion)] == 1
+        # Values not matched by the query shouldn't be reported in the
+        # aggregate
+        assert str(IItem) not in result['interfaces']
 
 
 @mark.usefixtures('integration')

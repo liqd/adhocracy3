@@ -1195,7 +1195,6 @@ their paths::
     >>> pprint(tag)
     {'content_type': 'adhocracy.interfaces.ITag',...'path': 'http://localhost/adhocracy/Proposals/kommunismus/FIRST/'...
 
-
 *tag* is a custom filter that allows filtering only resources with a
 specific tag. Often we are only interested in the newest versions of
 Versionables. We can get them by setting *tag=LAST*. Let's find the latest
@@ -1207,7 +1206,6 @@ versions of all sections::
     >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
     ['http://localhost/adhocracy/Proposals/kommunismus/kapitel1/VERSION_0000001/',
      'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
-
 
 *package.sheets.sheet.ISheet:FieldName* filters: you can add arbitrary custom
 filters that refer to sheet fields with references. The key is the name of
@@ -1222,10 +1220,11 @@ reference target.
     >>> pprint(resp_data['data']['adhocracy.sheets.pool.IPool']['elements'])
     ['http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
 
-
-*aggregateby* allows  you to add the addtional field `aggregateby` with aggregated
-index values of all result resources. You have to set the value to an existing
-filter like *aggregateby=tag*:
+*aggregateby* allows you to add the additional field `aggregateby` with
+aggregated index values of all result resources. You have to set the value
+to an existing filter like *aggregateby=tag*. Only index values that exist in
+the query result will be reported, i.e. the count reported for each value
+will be 1 or higher. ::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_sample.resources.section.ISectionVersion',

@@ -146,7 +146,9 @@ class FilteringPoolSheet(PoolSheet):
             for value in index.unique_values():
                 value_query = query & index.eq(value)
                 value_elements = value_query.execute(resolver=identity)
-                aggregateby[aggregate_filter][str(value)] = len(value_elements)
+                if value_elements:
+                    aggregateby[aggregate_filter][str(value)] = len(
+                        value_elements)
         return filter_elements_result(elements, count, aggregateby)
 
 
