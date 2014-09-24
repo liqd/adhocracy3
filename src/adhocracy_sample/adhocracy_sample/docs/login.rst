@@ -67,14 +67,12 @@ single spaces, preceded and followed by non-whitespace (no whitespace at
 begin or end, multiple subsequent spaces are forbidden,
 tabs and newlines are forbidden).
 
-The "email" field must looks like a valid email address.
+The "email" field must be a valid email address.
 
-*Note:* for now, we **don't validate** email addresses to ensure that they
-exist and really belong to the user -- email verification is part of a
-future story.
-
-Creating a new user will not automatically log them in. The frontend need to
-send an explicit login request afterwards.
+Creating a new user will not automatically log them in. First, the backend
+will send a registration message to the specified email address. Once the user
+has clicked on the activation link in the message, the user account is ready
+to be used (see "Account Activation" below).
 
 On failure, the backend responds with status code 400 and an error message.
 E.g. when we try to register a user with an empty password::
@@ -101,6 +99,7 @@ conditions can occur:
   * username does already exist
   * email does already exist
   * email is invalid (doesn't look like an email address)
+  * couldn't send a registration mail to the email address
   * password is too short (less than 6 chars)
   * password is too long (more than 100 chars)
   * internal error: something went wrong in the backend
@@ -144,11 +143,54 @@ several additional sheets, e.g.::
         }
      }
 
+
+Account Activation
+------------------
+
+On user registration, the backend sends a mail with an activation link to the
+specified email address. The user has to click on the activation link to
+activate their account. The *path* component all such links starts with
+``/activate/``. Once the frontend receives a click on such a link, it must post
+a JSON request containing the path to the ``activate_account`` endpoint of the
+backend::
+
+    >> prop = {'path': '/activate/blahblah'}
+    >> resp_data = testapp.post_json('/activate_account', prop).json
+    >> pprint(resp_data)
+    {'details': 'unknown_path',
+     'status': 'error'}
+
+FIXME Make the above a real test once that endpoint exists.
+
+The backend responds with either 'status': 'success' and 'user_path' and
+'user_token', just like after a successful login request (see next section).
+This means that the user account has been activated and the user is now
+logged in.
+
+Or it responds with 'status': 'error' and a 'details' field that contains
+one of the following values:
+
+* 'unknown_path' if the activation path is unknown to the backend
+* 'expired_path' if the activation path has expired since it was generated more
+  than 7 days ago. In this case, user activation is no longer possible for
+  security reasons and the user has to call support or register again,
+  using a different email. (More user-friendly options are planned but haven't
+  been implemented yet!)
+
+Note that activation links are deleted from the backend once the account has
+been successfully activated. (In the future, they may also be deleted if the
+user didn't click on them within 7 days.) 'unknown_path' can therefore mean
+two things: either the activation link was was never valid (the user
+mistyped it or just tried to guess one), or it used to be valid but has been
+deleted. There is no way to distinguish between these cases.
+
+FIXME How to test this without actually sending an email?
+
 User Login
 ----------
 
-To log-in an existing user via password, the frontend sends a JSON request
-to the URL ``login_username`` with a user name and password::
+To log-in an existing and activated user via password, the frontend posts a
+JSON request to the URL ``login_username`` with a user name and password::
 
     >>> prop = {'name': 'Anna Müller',
     ...         'password': 'EckVocUbs3'}
@@ -188,6 +230,10 @@ cases.
                  'location': 'body',
                  'name': 'password'}],
      'status': 'error'}
+
+A different error message is given if username and password are valid but
+the user account hasn't been activated yet:
+FIXME document exact contents and test.
 
 
 User Authentication
