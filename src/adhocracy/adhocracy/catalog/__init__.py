@@ -13,6 +13,7 @@ class Reference(IndexFactory):
 
 class AdhocracyCatalogFactory:
     tag = catalog.Keyword()
+    rate = catalog.Field()
     reference = Reference()
 
 

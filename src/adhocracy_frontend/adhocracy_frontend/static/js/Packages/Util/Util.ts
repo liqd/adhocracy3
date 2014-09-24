@@ -173,11 +173,19 @@ export function endsWith(str : string, suffix : string) {
 export function parentPath(url : string) : string {
     "use strict";
 
+    var result;
+
     if (endsWith(url, "/")) {
-        return url.substring(0, url.lastIndexOf("/", url.length - 2) + 1);
+        result = url.substring(0, url.lastIndexOf("/", url.length - 2) + 1);
     } else {
-        return url.substring(0, url.lastIndexOf("/"));
+        result = url.substring(0, url.lastIndexOf("/"));
     }
+
+    if (result === "") {
+        result = "/";
+    }
+
+    return result;
 };
 
 

@@ -4,7 +4,9 @@ from adhocracy.interfaces import IItem
 from adhocracy.resources import add_resource_type_to_registry
 from adhocracy.resources.itemversion import itemversion_metadata
 from adhocracy.resources.item import item_metadata
+from adhocracy.resources.rate import IRate
 
+from adhocracy.sheets.rate import IRateable
 from adhocracy_sample.sheets.comment import IComment
 from adhocracy_sample.sheets.comment import ICommentable
 
@@ -18,7 +20,8 @@ commentversion_meta = itemversion_metadata._replace(
     content_name='CommentVersion',
     iresource=ICommentVersion,
     extended_sheets=[IComment,
-                     ICommentable],
+                     ICommentable,
+                     IRateable],
 )
 
 
@@ -31,7 +34,8 @@ comment_meta = item_metadata._replace(
     content_name='Comment',
     iresource=IComment,
     element_types=[IComment,
-                   ICommentVersion],
+                   ICommentVersion,
+                   IRate],
     item_type=ICommentVersion,
     use_autonaming=True,
     autonaming_prefix='comment_',
