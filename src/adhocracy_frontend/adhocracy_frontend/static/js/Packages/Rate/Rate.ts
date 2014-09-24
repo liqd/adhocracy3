@@ -24,12 +24,14 @@ export interface IRateScope extends ng.IScope {
         neutral : number;
     };
     thisUsersRate : RIRateVersion;
-    allRates : { subject: string; rate: number }[];
+    allRateResources : RIRateVersion[];
+    auditTrail : { subject: string; rate: number }[];
+    auditTrailVisible : boolean;
     isActive : (value : number) => boolean;
     isActiveClass : (value : number) => string;  // css class name if RateValue is active, or "" otherwise.
     toggleShowDetails() : void;
     cast(value : number) : void;
-    assureUserRateExists() : ng.IPromise<boolean>;
+    assureUserRateExists() : ng.IPromise<void>;
     postUpdate() : ng.IPromise<void>;
 }
 
@@ -67,35 +69,6 @@ export var resetRates = ($scope : IRateScope) : void => {
     };
 
     delete $scope.thisUsersRate;
-};
-
-
-
-// FIXME: updateRates on postUpdate; updateRates on toggleBla; eliminate manual aggr. maintenance.
-
-
-
-/**
- * add number to pro / contra / neutral count.
- */
-export var addToRateCount = ($scope : IRateScope, rate : number, delta : number) : void => {
-    switch (rate) {
-        case 1: {
-            $scope.rates.pro += delta;
-            break;
-        }
-        case -1: {
-            $scope.rates.contra += delta;
-            break;
-        }
-        case 0: {
-            $scope.rates.neutral += delta;
-            break;
-        }
-        default: {
-            throw "unknown rate value: " + rate.toString();
-        }
-    }
 };
 
 
@@ -149,12 +122,52 @@ export var updateRates = (
     adhHttp : AdhHttp.Service<any>,
     adhUser : AdhUser.User
 ) : ng.IPromise<void> => {
+
+    var addToRateCount = ($scope : IRateScope, rate : number, delta : number) : void => {
+        switch (rate) {
+            case 1: {
+                $scope.rates.pro += delta;
+                break;
+            }
+            case -1: {
+                $scope.rates.contra += delta;
+                break;
+            }
+            case 0: {
+                $scope.rates.neutral += delta;
+                break;
+            }
+            default: {
+                throw "unknown rate value: " + rate.toString();
+            }
+        }
+    };
+
+    var updateAuditTrail = (rates : RIRateVersion[]) : ng.IPromise<void> => {
+        var auditTrailPromises : ng.IPromise<{ subject : string; rate : number }>[] = rates.map((rate) =>
+            adhHttp.get(adapter.subject(rate)).then((user) => {
+                return {
+                    subject: user.data["adhocracy.sheets.user.IUserBasic"].name,  // (use adapter for user, too?)
+                    rate: adapter.rate(rate)
+                };
+            }));
+
+        return $q.all(auditTrailPromises).then((auditTrail) => {
+            $scope.auditTrail = auditTrail;
+        });
+    };
+
     return fetchAllRates(adapter, $scope, $q, adhHttp)
-        .then((rates) => {
+        .then((rates : RIRateVersion[]) => {
             resetRates($scope);
+            $scope.allRateResources = rates;
+
+            if ($scope.auditTrailVisible) {
+                updateAuditTrail(rates);
+            }
+
             _.forOwn(rates, (rate) => {
                 addToRateCount($scope, adapter.rate(rate), 1);
-
                 if (adapter.subject(rate) === adhUser.userPath) {
                     $scope.thisUsersRate = rate;
                 }
@@ -184,31 +197,13 @@ export var rateController = (
     $scope.isActiveClass = (rate : number) : string =>
         $scope.isActive(rate) ? "is-rate-button-active" : "";
 
-    // FIXME: if we were using web sockets, this would be done quite
-    // differently.  toggleShowDetails should just toggle some
-    // visibility flag, while $scope.allRates would be kept in sync
-    // with the backend elsewhere.
     $scope.toggleShowDetails = () => {
-        if (typeof $scope.allRates === "undefined") {
-            $scope.allRates = [];
-            fetchAllRates(adapter, $scope, $q, adhHttp)
-                .then((rates) => {
-                    var promises : ng.IPromise<{ subject : string; rate : number }>[] = rates.map((rate) => {
-                        return adhHttp.get(adapter.subject(rate)).then((user) => {
-                            return {
-                                subject: user.data["adhocracy.sheets.user.IUserBasic"].name,
-                                // FIXME: use adapter?  (which one?)
-                                rate: adapter.rate(rate)
-                            };
-                        });
-                    });
-
-                    $q.all(promises).then((renderables) => {
-                        $scope.allRates = renderables;
-                    });
-                });
+        if ($scope.auditTrailVisible) {
+            $scope.auditTrailVisible = false;
+            delete $scope.auditTrail;
         } else {
-            delete $scope.allRates;
+            $scope.auditTrailVisible = true;
+            updateRates(adapter, $scope, $q, adhHttp, adhUser);
         }
     };
 
@@ -230,49 +225,36 @@ export var rateController = (
               will be provided later.)
 
               adapter.rate($scope.thisUsersRate, <any>false);
-              $scope.rates[RateValue[rate]] -= 1;
               $scope.postUpdate();
 
             */
         } else {
             // click on inactive button to (re-)rate
-
             $scope.assureUserRateExists()
-                .then((didExistBefore) => {
-                    delete $scope.allRates;
-
-                    if (didExistBefore) {
-                        // decrease old value
-                        addToRateCount($scope, adapter.rate($scope.thisUsersRate), -1);
-                    }
-
-                    // set new value
+                .then(() => {
                     adapter.rate($scope.thisUsersRate, rate);
-                    addToRateCount($scope, rate, 1);
-
-                    // send new rate to server
                     $scope.postUpdate();
                 });
         }
     };
 
-    $scope.assureUserRateExists = () : ng.IPromise<boolean> => {
+    $scope.assureUserRateExists = () : ng.IPromise<void> => {
         if (typeof $scope.thisUsersRate !== "undefined") {
-            return $q.when(true);
+            return;
         } else {
             return adhHttp
-                .withTransaction((transaction) : ng.IPromise<boolean> => {
+                .withTransaction((transaction) : ng.IPromise<void> => {
                     var item : AdhHttp.ITransactionResult =
                         transaction.post($scope.postPoolPath, new RIRate({ preliminaryNames: adhPreliminaryNames }));
                     var version : AdhHttp.ITransactionResult =
                         transaction.get(item.first_version_path);
 
                     return transaction.commit()
-                        .then((responses) : boolean => {
+                        .then((responses) : void => {
                             $scope.thisUsersRate = responses[version.index];
                             adapter.subject($scope.thisUsersRate, adhUser.userPath);
                             adapter.object($scope.thisUsersRate, $scope.refersTo);
-                            return false;
+                            return;
                         });
                 });
         }
@@ -285,11 +267,7 @@ export var rateController = (
             return adhHttp
                 .postNewVersionNoFork($scope.thisUsersRate.path, $scope.thisUsersRate)
                 .then((response : { value: RIRate }) => {
-                    return adhHttp.get(response.value.path)
-                        .then((response : RIRateVersion) => {
-                            $scope.thisUsersRate = response;
-                            return;
-                        });
+                    return updateRates(adapter, $scope, $q, adhHttp, adhUser);
                 });
         }
     };

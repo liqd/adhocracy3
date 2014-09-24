@@ -8,9 +8,9 @@
     <a href="" class="rate-contra {{isActiveClass(-1)}}" data-ng-click="cast(-1)">contra: {{rates.contra}}</a>
     <a href="" class="rate-neutral {{isActiveClass(0)}}" data-ng-click="cast(0)">neutral: {{rates.neutral}}</a>
 </div>
-<div class="rate-details" data-ng-if="allRates">
+<div class="rate-details" data-ng-if="auditTrailVisible">
     <table>
-        <tr data-ng-repeat="rate in allRates">
+        <tr data-ng-repeat="rate in auditTrail">
             <td>{{rate.subject}}</td>
             <td>{{rate.rate}}</td>
         </tr>
