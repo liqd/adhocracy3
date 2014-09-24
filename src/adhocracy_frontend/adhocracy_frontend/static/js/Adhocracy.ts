@@ -56,6 +56,9 @@ export var init = (config, meta_api) => {
         window.document.body.className += " is-embedded";
     }
 
+    // FIXME: The functionality to set the locale is not yet done
+    config.locale = "de";
+
     var app = angular.module("adhocracy3SampleFrontend", ["ngRoute", "ngAnimate"]);
 
     app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
@@ -166,7 +169,7 @@ export var init = (config, meta_api) => {
     app.directive("adhParagraphVersionDetail",
         ["adhConfig", (adhConfig) => new AdhProposal.ParagraphVersionDetail().createDirective(adhConfig)]);
 
-    app.directive("adhTime", ["moment", "$interval", AdhDateTime.createDirective]);
+    app.directive("adhTime", ["adhConfig", "moment", "$interval", AdhDateTime.createDirective]);
 
     app.directive("adhVote", ["adhConfig", AdhVote.createDirective]);
 
