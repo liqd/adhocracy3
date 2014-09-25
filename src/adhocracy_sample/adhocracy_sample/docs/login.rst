@@ -164,12 +164,14 @@ backend::
 
 FIXME Make the above a real test once that endpoint exists.
 
-The backend responds with either 'status': 'success' and 'user_path' and
+The backend responds with either 2xx response code and
+'status': 'success' and 'user_path' and
 'user_token', just like after a successful login request (see next section).
 This means that the user account has been activated and the user is now
 logged in.
 
-Or it responds with 'status': 'error' and a 'details' field that contains
+Or it responds with 4xx response code and
+'status': 'error' and a 'details' field that contains
 one of the following values:
 
 * 'unknown_path' if the activation path is unknown to the backend
