@@ -151,7 +151,7 @@ On user registration, the backend sends a mail with an activation link to the
 specified email address and sends a 200 HTTP response to the frontend,
 so the frontend can tell the user to expect an email.
 The user has to click on the activation link to
-activate their account. The *path* component all such links starts with
+activate their account. The *path* component of all such links starts with
 ``/activate/``. Once the frontend receives a click on such a link, it must post
 a JSON request containing the path to the ``activate_account`` endpoint of the
 backend::
