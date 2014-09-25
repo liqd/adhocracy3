@@ -148,7 +148,7 @@ Account Activation
 ------------------
 
 On user registration, the backend sends a mail with an activation link to the
-specified email address and sends a 200 HTTP response to the frontend,
+specified email address and sends a 2xx HTTP response to the frontend,
 so the frontend can tell the user to expect an email.
 The user has to click on the activation link to
 activate their account. The *path* component of all such links starts with
