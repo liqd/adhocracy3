@@ -182,9 +182,10 @@ Or it responds with 4xx response code and 'status': 'error' and a
 Note that activation links are deleted from the backend once the account has
 been successfully activated. (In the future, they may also be deleted if the
 user didn't click on them within 7 days.) 'unknown_path' can therefore mean
-two things: either the activation link was was never valid (the user
+two things: either the activation link was never valid (the user
 mistyped it or just tried to guess one), or it used to be valid but has been
-deleted. There is no way to distinguish between these cases.
+deleted. There is no way to distinguish between these cases.  The message
+displayed to the user should explain that.
 
 FIXME How to test this without actually sending an email?
 
