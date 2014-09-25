@@ -207,6 +207,18 @@ export class User {
         });
     }
 
+    public activate(path : string) {
+        var _self : User = this;
+
+        var success = (response) => {
+            // FIXME use websockets for updates
+            return _self.storeAndEnableToken(response.data.user_token, response.data.user_path);
+        };
+
+        return _self.adhHttp.postRaw("/activate_account", {path: path})
+            .then(success, AdhHttp.logBackendError);
+    }
+
     public can(permission : string) {
         var _self : User = this;
 
@@ -214,6 +226,32 @@ export class User {
         return _self.loggedIn;
     }
 }
+
+
+export var activateController = (
+    adhUser : User,
+    adhTopLevelState : AdhTopLevelState.TopLevelState,
+    adhDone,
+    $location : ng.ILocationService,
+    $route : ng.route.IRouteService
+) : void => {
+    var key = $route.current.params.key;
+    var path = "/activate/" + key;
+
+    var success = () => {
+        // FIXME show success message in UI
+        var returnToPage : string = adhTopLevelState.getCameFrom();
+        $location.url((typeof returnToPage === "string") ? returnToPage : "/");
+    };
+
+    var error = (error) => {
+        // FIXME show error message in UI
+    };
+
+    adhUser.activate(path)
+        .then(success, error)
+        .then(adhDone);
+};
 
 
 export var loginController = (
