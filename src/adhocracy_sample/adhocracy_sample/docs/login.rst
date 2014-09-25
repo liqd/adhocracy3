@@ -104,7 +104,7 @@ conditions can occur:
   * password is too long (more than 100 chars)
   * internal error: something went wrong in the backend
 
-For example, if we try to register a user whose email address is ready
+For example, if we try to register a user whose email address is already
 registered:
 
     >>> prop = {'content_type': 'adhocracy.resources.principal.IUser',
@@ -148,7 +148,9 @@ Account Activation
 ------------------
 
 On user registration, the backend sends a mail with an activation link to the
-specified email address. The user has to click on the activation link to
+specified email address and sends a 200 HTTP response to the frontend,
+so the frontend can tell the user to expect an email.
+The user has to click on the activation link to
 activate their account. The *path* component all such links starts with
 ``/activate/``. Once the frontend receives a click on such a link, it must post
 a JSON request containing the path to the ``activate_account`` endpoint of the
