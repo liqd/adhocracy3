@@ -147,14 +147,14 @@ several additional sheets, e.g.::
 Account Activation
 ------------------
 
-On user registration, the backend sends a mail with an activation link to the
-specified email address and sends a 2xx HTTP response to the frontend,
-so the frontend can tell the user to expect an email.
-The user has to click on the activation link to
-activate their account. The *path* component of all such links starts with
-``/activate/``. Once the frontend receives a click on such a link, it must post
-a JSON request containing the path to the ``activate_account`` endpoint of the
-backend::
+On user registration, the backend sends a mail with an activation link
+to the specified email address and sends a 2xx HTTP response to the
+frontend, so the frontend can tell the user to expect an email.  The
+user has to click on the activation link to activate their
+account. The *path* component of all such links starts with
+``/activate/``. Once the frontend receives a click on such a link, it
+must post a JSON request containing the path to the
+``activate_account`` endpoint of the backend::
 
     >> prop = {'path': '/activate/blahblah'}
     >> resp_data = testapp.post_json('/activate_account', prop).json
@@ -164,15 +164,13 @@ backend::
 
 FIXME Make the above a real test once that endpoint exists.
 
-The backend responds with either 2xx response code and
-'status': 'success' and 'user_path' and
-'user_token', just like after a successful login request (see next section).
-This means that the user account has been activated and the user is now
-logged in.
+The backend responds with either 2xx response code and 'status':
+'success' and 'user_path' and 'user_token', just like after a
+successful login request (see next section).  This means that the user
+account has been activated and the user is now logged in.
 
-Or it responds with 4xx response code and
-'status': 'error' and a 'details' field that contains
-one of the following values:
+Or it responds with 4xx response code and 'status': 'error' and a
+'details' field that contains one of the following values:
 
 * 'unknown_path' if the activation path is unknown to the backend
 * 'expired_path' if the activation path has expired since it was generated more
