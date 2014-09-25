@@ -232,7 +232,6 @@ export var activateController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
     adhDone,
-    $location : ng.ILocationService,
     $route : ng.route.IRouteService
 ) : void => {
     var key = $route.current.params.key;
@@ -240,8 +239,7 @@ export var activateController = (
 
     var success = () => {
         // FIXME show success message in UI
-        var returnToPage : string = adhTopLevelState.getCameFrom();
-        $location.url((typeof returnToPage === "string") ? returnToPage : "/");
+        adhTopLevelState.redirectToCameFrom("/");
     };
 
     var error = (error) => {
@@ -257,8 +255,7 @@ export var activateController = (
 export var loginController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
-    $scope : IScopeLogin,
-    $location : ng.ILocationService
+    $scope : IScopeLogin
 ) : void => {
     $scope.errors = [];
 
@@ -277,8 +274,7 @@ export var loginController = (
             $scope.credentials.nameOrEmail,
             $scope.credentials.password
         ).then(() => {
-            var returnToPage : string = adhTopLevelState.getCameFrom();
-            $location.url((typeof returnToPage === "string") ? returnToPage : "/");
+            adhTopLevelState.redirectToCameFrom("/");
         }, (errors) => {
             bindServerErrors($scope, errors);
             $scope.credentials.password = "";
@@ -292,7 +288,7 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "$scope", "$location", loginController]
+        controller: ["adhUser", "adhTopLevelState", "$scope", loginController]
     };
 };
 
@@ -300,8 +296,7 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
 export var registerController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
-    $scope : IScopeRegister,
-    $location : ng.ILocationService
+    $scope : IScopeRegister
 ) => {
     $scope.input = {
         username: "",
@@ -317,10 +312,7 @@ export var registerController = (
             .then((response) => {
                 $scope.errors = [];
                 return adhUser.logIn($scope.input.username, $scope.input.password).then(
-                    () => {
-                        var returnToPage : string = adhTopLevelState.getCameFrom();
-                        $location.path((typeof returnToPage === "string") ? returnToPage : "/");
-                    },
+                    () => adhTopLevelState.redirectToCameFrom("/"),
                     (errors) => bindServerErrors($scope, errors)
                 );
             }, (errors) => bindServerErrors($scope, errors));
@@ -333,7 +325,7 @@ export var registerDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "$scope", "$location", registerController]
+        controller: ["adhUser", "adhTopLevelState", "$scope", registerController]
     };
 };
 
