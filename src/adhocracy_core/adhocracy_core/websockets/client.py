@@ -181,7 +181,7 @@ def includeme(config):
 
     """
     settings = config.registry.settings
-    ws_url = settings.get('adhocracy_core.ws_url', '')
+    ws_url = settings.get('adhocracy.ws_url', '')
     if ws_url:
         ws_client = Client(ws_url=ws_url)
         config.registry.ws_client = ws_client
