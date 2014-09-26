@@ -13,6 +13,8 @@ import angularRoute = require("angularRoute");  if (angularRoute) { return; };
 // runtime effects.)
 
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { return; };
+import angularTranslate = require("angularTranslate");  if (angularTranslate) { return; };
+import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { return; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
@@ -60,9 +62,13 @@ export var init = (config, meta_api) => {
     // FIXME: The functionality to set the locale is not yet done
     config.locale = "de";
 
-    var app = angular.module("adhocracy3SampleFrontend", ["ngRoute", "ngAnimate"]);
+    var app = angular.module("adhocracy3SampleFrontend", ["pascalprecht.translate", "ngRoute", "ngAnimate"]);
 
-    app.config(["$routeProvider", "$locationProvider", ($routeProvider, $locationProvider) => {
+    app.config(["$translateProvider", "$routeProvider", "$locationProvider", (
+        $translateProvider,
+        $routeProvider,
+        $locationProvider
+    ) => {
         $routeProvider
             .when("/", {
                 templateUrl: "/static/js/templates/Wrapper.html"
@@ -86,6 +92,13 @@ export var init = (config, meta_api) => {
         // for conversion between history API and #!-URLs.  See
         // angular documentation for details.)
         $locationProvider.html5Mode(true);
+
+        $translateProvider.useStaticFilesLoader({
+            prefix: "/static/i18n/",
+            suffix: ".json"
+        });
+        $translateProvider.fallbackLanguage("en");
+        $translateProvider.preferredLanguage(config.locale);
     }]);
 
     app.value("angular", angular);

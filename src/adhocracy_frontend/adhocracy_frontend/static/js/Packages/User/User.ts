@@ -324,7 +324,7 @@ export var metaDirective = (adhConfig : AdhConfig.Type) => {
         scope: {
             path: "@"
         },
-        controller: ["adhHttp", "$scope", (adhHttp : AdhHttp.Service<any>, $scope) => {
+        controller: ["adhHttp", "$translate", "$scope", (adhHttp : AdhHttp.Service<any>, $translate, $scope) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
@@ -332,9 +332,11 @@ export var metaDirective = (adhConfig : AdhConfig.Type) => {
                         $scope.isAnonymous = false;
                     });
             } else {
-                $scope.userBasic = {
-                    name: "guest",
-                };
+                $translate("guest").then((translated) => {
+                    $scope.userBasic = {
+                        name: translated,
+                    };
+                });
                 $scope.isAnonymous = true;
             }
         }]

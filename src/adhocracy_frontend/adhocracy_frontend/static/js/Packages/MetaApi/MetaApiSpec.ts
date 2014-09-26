@@ -11,7 +11,7 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
                 "adhocracy_core.sheets.metadata.IMetadata"
             ],
             "element_types" : [
-                "adhocracy.interfaces.IPool"
+                "adhocracy_core.interfaces.IPool"
             ]
         }
     },
@@ -23,7 +23,7 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
                     "readable" : true,
                     "editable" : false,
                     "create_mandatory" : false,
-                    "valuetype" : "adhocracy.schema.AbsolutePath",
+                    "valuetype" : "adhocracy_core.schema.AbsolutePath",
                     "targetsheet" : "adhocracy_core.sheets.user.IUserBasic",
                     "containertype" : "list",
                     "creatable" : false
@@ -33,7 +33,7 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
                     "creatable" : false,
                     "readable" : true,
                     "editable" : false,
-                    "valuetype" : "adhocracy.schema.DateTime",
+                    "valuetype" : "adhocracy_core.schema.DateTime",
                     "name" : "creation_date"
                 },
                 {
@@ -41,7 +41,7 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
                     "readable" : true,
                     "create_mandatory" : false,
                     "creatable" : false,
-                    "valuetype" : "adhocracy.schema.DateTime",
+                    "valuetype" : "adhocracy_core.schema.DateTime",
                     "name" : "modification_date"
                 }
             ]
@@ -53,7 +53,7 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
                     "editable" : false,
                     "create_mandatory" : true,
                     "creatable" : true,
-                    "valuetype" : "adhocracy.schema.Name",
+                    "valuetype" : "adhocracy_core.schema.Name",
                     "name" : "name"
                 }
             ]
@@ -65,8 +65,8 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
                     "create_mandatory" : false,
                     "readable" : true,
                     "editable" : false,
-                    "valuetype" : "adhocracy.schema.AbsolutePath",
-                    "targetsheet" : "adhocracy.interfaces.ISheet",
+                    "valuetype" : "adhocracy_core.schema.AbsolutePath",
+                    "targetsheet" : "adhocracy_core.interfaces.ISheet",
                     "containertype" : "list",
                     "creatable" : false
                 }
