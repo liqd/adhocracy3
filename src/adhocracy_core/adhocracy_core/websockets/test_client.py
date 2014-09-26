@@ -239,7 +239,7 @@ class TestFunctionalClient:
 
     def test_includeme_without_ws_url_setting(self, config):
         from adhocracy_core.websockets.client import includeme
-        config.registry.settings['adhocracy_core.ws_url'] = ''
+        config.registry.settings['adhocracy.ws_url'] = ''
         includeme(config)
         assert not hasattr(config.registry, 'ws_client')
 
@@ -247,7 +247,7 @@ class TestFunctionalClient:
         from adhocracy_core.websockets.client import includeme
         from adhocracy_core.websockets.client import Client
         settings = config.registry.settings
-        settings['adhocracy_core.ws_url'] = 'ws://localhost:8080'
+        settings['adhocracy.ws_url'] = 'ws://localhost:8080'
         includeme(config)
         assert isinstance(config.registry.ws_client, Client)
 
