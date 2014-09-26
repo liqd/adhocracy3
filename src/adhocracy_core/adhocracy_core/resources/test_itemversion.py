@@ -78,7 +78,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         assert events[0].creator == creator
 
     def test_autoupdate_with_referencing_items(self):
-        # for more tests see adhocracy.resources.subscriber
+        # for more tests see adhocracy_core.resources.subscriber
         from adhocracy_core.sheets.document import ISection
         from adhocracy_core.resources.itemversion import itemversion_metadata
         from adhocracy_core.resources import add_resource_type_to_registry

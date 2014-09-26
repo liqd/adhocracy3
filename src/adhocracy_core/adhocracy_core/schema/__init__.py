@@ -148,7 +148,7 @@ class Interface(colander.SchemaType):
 
     """A ZOPE interface in dotted name notation.
 
-    Example value: adhocracy.sheets.name.IName
+    Example value: adhocracy_core.sheets.name.IName
     """
 
     def serialize(self, node, value):
@@ -364,7 +364,7 @@ class Reference(Resource):
 
     The constructor accepts these additional keyword arguments:
 
-        - ``reftype``: :class:` adhocracy.interfaces.SheetReference`.
+        - ``reftype``: :class:` adhocracy_core.interfaces.SheetReference`.
                        The `target_isheet` attribute of the `reftype` specifies
                        the sheet that accepted resources must implement.
                        Storing another kind of resource will trigger a
@@ -500,7 +500,7 @@ def _get_post_pool(context: IPool, iresource_or_service_name) -> IResource:
 def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
     """Return the post_pool path for the given `context`.
 
-    :raises adhocracy.excecptions.RuntimeConfigurationError:
+    :raises adhocracy_core.excecptions.RuntimeConfigurationError:
         if the :term:`post_pool` does not exists in the term:`lineage`
         of `context`.
     """
@@ -527,7 +527,7 @@ class PostPool(Reference):
         :term:`lineage` of the `context` is searched for the first matching
         `interface`. If it is a `string` the lineage and the lineage children
         are search for a `service` with this name.
-        Defaults to :class:`adhocracy.interfaces.IPool`.
+        Defaults to :class:`adhocracy_core.interfaces.IPool`.
     """
 
     readonly = True
@@ -605,11 +605,11 @@ class PostPoolMappingSchema(colander.MappingSchema):
 
     """Check that the referenced nodes respect the :term:`post_pool`.
 
-    To validate `references` (:class:`adhocracy.schems.Reference`) you
-    need to add a :class:`adhocracy.schema.PostPool` node to this schema.
+    To validate `references` (:class:`adhocracy_core.schems.Reference`) you
+    need to add a :class:`adhocracy_core.schema.PostPool` node to this schema.
     To validate `backreferences` the referenced sheet needs to be a subtype
-    of :class:`adhocracy.intefaces.IPostPoolSheet and the schema needs a
-    a :class:`adhocracy.schema.PostPool` node.
+    of :class:`adhocracy_core.intefaces.IPostPoolSheet and the schema needs a
+    a :class:`adhocracy_core.schema.PostPool` node.
     """
 
     validator = deferred_validate_references_post_pool

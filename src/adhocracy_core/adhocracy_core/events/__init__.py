@@ -20,10 +20,10 @@ class ResourceCreatedAndAdded:
 
     """An event type sent when a new IResource is created and added.
 
-    :param object(adhocracy.interfaces.IResource):
-    :param parent(adhocracy.interfaces.IResource):
+    :param object(adhocracy_core.interfaces.IResource):
+    :param parent(adhocracy_core.interfaces.IResource):
     :param registry(pyramid.registry.Request):
-    :param creator(adhocracy.resource.principal.IUser):
+    :param creator(adhocracy_core.resource.principal.IUser):
     """
 
     def __init__(self, object, parent, registry, creator):
@@ -38,8 +38,8 @@ class ResourceSheetModified:
 
     """An event type sent when a resource sheet is modified.
 
-    :param object(adhocracy.interfaces.IResource):
-    :param isheet(adhocracy.interfaces.IISheet):
+    :param object(adhocracy_core.interfaces.IResource):
+    :param isheet(adhocracy_core.interfaces.IISheet):
     :param registry(pyramid.registry.Request):
     """
 
@@ -54,10 +54,10 @@ class ItemVersionNewVersionAdded:
 
     """ An event sent when a new IItemVersion is being added.
 
-    :param object(adhocracy.interfaces.IItem):
-    :param new_version(adhocracy.interfaces.IItemVersion):
+    :param object(adhocracy_core.interfaces.IItem):
+    :param new_version(adhocracy_core.interfaces.IItemVersion):
     :param registry(pyramid.registry.Request):
-    :param creator(adhocracy.resource.principal.IUser':
+    :param creator(adhocracy_core.resource.principal.IUser':
     """
 
     def __init__(self, object, new_version, registry, creator):
@@ -72,18 +72,18 @@ class SheetReferencedItemHasNewVersion:
 
     """ An event type sent when a referenced ItemVersion has a new follower.
 
-    :param object(adhocracy.interfaces.IResource):
-    :param isheet(adhocracy.interfaces.IISheet):
+    :param object(adhocracy_core.interfaces.IResource):
+    :param isheet(adhocracy_core.interfaces.IISheet):
     :param isheet_field(str): field name with updated reference
-    :param old_version(adhocracy.interfaces.IItemVersion): old referenced
+    :param old_version(adhocracy_core.interfaces.IItemVersion): old referenced
                                                            resource
-    :param new_version(adhocracy.interfaces.IItemVersion): new referenced
+    :param new_version(adhocracy_core.interfaces.IItemVersion): new referenced
                                                            resource
     :param registry(pyramid.registry.Request):
     :param root_versions(list): IItemVersions not in the subtree of
                                 these root resources should ignore
                                 this event. Optional.
-    :param creator(adhocracy.resource.principal.IUser':
+    :param creator(adhocracy_core.resource.principal.IUser':
     """
 
     def __init__(self,
