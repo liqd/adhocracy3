@@ -65,44 +65,6 @@ export var register = () => {
             });
         });
 
-        describe("deepcp", () => {
-            var samples = [
-                null,
-                1,
-                "test",
-                [1, 2, "test"],
-                {
-                    foo: 1,
-                    bar: 2,
-                    point: {
-                        x: 0,
-                        y: 0
-                    }
-                },
-                [null],  // (interesting because it breaks webdriver
-                         // array transport through executeJS)
-                {"a": 3, "b": null, "c": [null]}
-            ];
-
-            it("outputs something that equals input", () => {
-                samples.forEach((ob) => {
-                    expect(Util.deepcp(ob)).toEqual(ob);
-                });
-            });
-            it("outputs an object that shares no members with the input object", () => {
-                var input: {point: {x: number}} = <any>(samples[4]);
-                var output = Util.deepcp(input);
-                output.point.x = 1;
-                expect(input.point.x).not.toBe(1);
-            });
-            it("does not support copying functions", () => {
-                expect(() => Util.deepcp(() => null)).toThrow();
-            });
-            it("does supports copying undefined", () => {
-                expect(Util.deepcp(undefined)).toBe(undefined);
-            });
-        });
-
         describe("deepoverwrite", () => {
             it("copies all properties of source to target", () => {
                 var source = {

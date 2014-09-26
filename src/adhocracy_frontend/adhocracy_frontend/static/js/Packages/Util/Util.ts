@@ -1,5 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
+import _ = require("lodash");
+
 /**
  * cut ranges out of an array - original by John Resig (MIT Licensed)
  */
@@ -21,51 +23,6 @@ export function cutArray(a : any[], from : number, to ?: number) : any[] {
 export function isArrayMember(member : any, array : any[]) : boolean {
     "use strict";
     return array.indexOf(member) > -1;
-}
-
-
-/**
- * FIXME: replace with _.cloneDeep and remove.
- *
- * Do a deep copy on any javascript object.  The resuling object does
- * not share sub-structures as the original.  (I think instances of
- * classes other than Object, Array are not treated properly either.)
- *
- * A competing (and possibly more sophisticated) implementation is
- * available as `cloneDeep` in <a href="http://lodash.com/">lo-dash</a>
- */
-export function deepcp(i) {
-    "use strict";
-
-    // base types
-    if (i === null || ["number", "boolean", "string"].indexOf(typeof(i)) > -1) {
-        return i;
-    }
-
-    if (typeof i === "undefined") {
-        return undefined;
-    }
-
-    // structured types
-    var o;
-    switch (Object.prototype.toString.call(i)) {
-        case "[object Object]":
-            o = new Object();
-            break;
-        case "[object Array]":
-            o = new Array();
-            break;
-        default:
-            throw "deepcp: unsupported object type!";
-    }
-
-    for (var x in i) {
-        if (i.hasOwnProperty(x)) {
-            o[x] = deepcp(i[x]);
-        }
-    }
-
-    return o;
 }
 
 
@@ -95,7 +52,7 @@ export function deepoverwrite(source, target) {
     }
     for (k in source) {
         if (source.hasOwnProperty(k)) {
-            target[k] = deepcp(source[k]);
+            target[k] = _.cloneDeep(source[k]);
         }
     }
 }
@@ -240,7 +197,7 @@ export function latestVersionsOnly(refs : string[]) : string[] {
     var latestVersions : string[] = [];
     var lastCommentPath : string = undefined;
 
-    deepcp(refs).sort().reverse().forEach((versionPath : string) => {
+    _.cloneDeep(refs).sort().reverse().forEach((versionPath : string) => {
         var commentPath = parentPath(versionPath);
         if (commentPath !== lastCommentPath) {
             latestVersions.push(versionPath);
