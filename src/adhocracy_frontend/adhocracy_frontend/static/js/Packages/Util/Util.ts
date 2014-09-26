@@ -27,38 +27,6 @@ export function isArrayMember(member : any, array : any[]) : boolean {
 
 
 /**
- * Do a deep copy of a javascript source object into a target object.
- * References to the target object are not severed; rather, all fields
- * in the target object are deleted, and all fields in the source
- * object are copied using deepcp().  Since this function only makes
- * sense on objects, and not on other types, it crashes if either
- * argument is not an object.
- */
-export function deepoverwrite(source, target) {
-    "use strict";
-
-    if (Object.prototype.toString.call(source) !== "[object Object]") {
-        throw "Util.deepoverwrite: source object " + source + " not of type 'object'!";
-    }
-    if (Object.prototype.toString.call(target) !== "[object Object]") {
-        throw "Util.deepoverwrite: target object " + target + " not of type 'object'!";
-    }
-
-    var k;
-    for (k in target) {
-        if (target.hasOwnProperty(k)) {
-            delete target[k];
-        }
-    }
-    for (k in source) {
-        if (source.hasOwnProperty(k)) {
-            target[k] = _.cloneDeep(source[k]);
-        }
-    }
-}
-
-
-/**
  * Compare two objects, and return a boolen that states whether they
  * are equal.  (This is likely to be an approximation, but it should
  * work at least for json objects.)

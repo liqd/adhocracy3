@@ -65,31 +65,6 @@ export var register = () => {
             });
         });
 
-        describe("deepoverwrite", () => {
-            it("copies all properties of source to target", () => {
-                var source = {
-                    foo: 2,
-                    bar: 3
-                };
-                var _target = {
-                    foo: 1,
-                    baz: 4
-                };
-                Util.deepoverwrite(source, _target);
-                expect(_target.foo).toBe(2);
-                expect((<any>_target).bar).toBe(3);
-                expect(_target.baz).toBeUndefined();
-            });
-            it("crashes if either argument is not an object", () => {
-                expect(() => Util.deepoverwrite({}, 1)).toThrow();
-                expect(() => Util.deepoverwrite({}, "test")).toThrow();
-                expect(() => Util.deepoverwrite({}, [])).toThrow();
-                expect(() => Util.deepoverwrite(1, {})).toThrow();
-                expect(() => Util.deepoverwrite("test", {})).toThrow();
-                expect(() => Util.deepoverwrite([], {})).toThrow();
-            });
-        });
-
         describe("deepeq", () => {
             var samples = [
                 null,
