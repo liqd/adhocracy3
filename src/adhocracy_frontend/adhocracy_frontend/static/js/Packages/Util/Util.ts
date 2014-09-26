@@ -27,48 +27,6 @@ export function isArrayMember(member : any, array : any[]) : boolean {
 
 
 /**
- * Compare two objects, and return a boolen that states whether they
- * are equal.  (This is likely to be an approximation, but it should
- * work at least for json objects.)
- */
-export function deepeq(a : any, b : any) : boolean {
-    "use strict";
-
-    if (Object.prototype.toString.call(a) !== Object.prototype.toString.call(b)) {
-        return false;
-    }
-
-    if (typeof(a) === "object") {
-        if (a === null) {
-            return (b === null);
-        }
-
-        for (var x in a) {
-            if (a.hasOwnProperty(x)) {
-                if (!(x in b)) {
-                    return false;
-                }
-                if (!deepeq(a[x], b[x])) {
-                    return false;
-                }
-            }
-        }
-
-        for (var y in b) {
-            if (b.hasOwnProperty(y)) {
-                if (!(y in a)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    } else {
-        return a === b;
-    }
-}
-
-
-/**
  * Take a maximum delay time, an array of arguments and a function.
  * Generate random delays (in ms) for each and calls the function
  * asynchronously (out of order) on each element of the array.  Ignore
