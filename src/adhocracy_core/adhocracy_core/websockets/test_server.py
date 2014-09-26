@@ -493,7 +493,9 @@ class TestFunctionalClientCommunicator:
                 'data': {'adhocracy_core.sheets.name.IName': {'name': name}}}
         resp = requests.post(url, data=json.dumps(data),
                       headers={'content-type': 'application/json'})
+        assert resp.status_code == 200
 
+    @pytest.mark.timeout(500)
     def test_send_child_notification(self, backend, connection):
         rest_url = backend.application_url
         connection.send('{"resource": "' + rest_url + 'adhocracy/", "action": "subscribe"}')
