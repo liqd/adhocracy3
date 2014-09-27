@@ -862,3 +862,55 @@ class TestRate:
         with raises(colander.Invalid):
             inst.deserialize('-12')
 
+
+class TestRole:
+
+    @fixture
+    def inst(self):
+        from adhocracy_core.schema import Role
+        return Role()
+
+    def test_create(self, inst):
+        assert inst.validator.choices == ['reader', 'contributor', 'editor',
+                                          'manager', 'admin', 'god']
+        assert inst.schema_type == colander.String
+        assert inst.default == 'reader'
+
+    def test_deserialize_valid(self, inst):
+        assert inst.deserialize('reader') == 'reader'
+
+    def test_deserialize_notvalid(self, inst):
+        with raises(colander.Invalid):
+            inst.deserialize(['WRONG'])
+
+
+class TestRoles:
+
+    @fixture
+    def inst(self):
+        from adhocracy_core.schema import Roles
+        return Roles()
+
+    def test_create(self, inst):
+        from adhocracy_core.schema import Role
+        assert inst.validator.min == 0
+        assert inst.validator.max == 6
+        assert inst.schema_type == colander.Sequence
+        assert inst.default == []
+        assert isinstance(inst['role'], Role)
+
+    def test_deserialize_empty(self, inst):
+        assert inst.deserialize() == colander.drop
+
+    def test_deserialize_with_role(self, inst):
+        assert inst.deserialize(['reader']) == ['reader']
+
+    def test_deserialize_with_duplicates(self, inst):
+        assert inst.deserialize(['reader', 'reader']) == ['reader']
+
+    def test_deserialize_empty_list(self, inst):
+        assert inst.deserialize([]) == []
+
+    def test_deserialize_wrong(self, inst):
+        with raises(colander.Invalid):
+            inst.deserialize(['WRONG'])

@@ -215,7 +215,16 @@ def includeme(config):  # pragma: no cover
     config.include('.document')
     config.include('.versions')
     config.include('.tags')
-    config.include('.user')
+    config.include('.principal')
     config.include('.metadata')
     config.include('.comment')
     config.include('.rate')
+
+
+class AttributeStorageSheet(GenericResourceSheet):
+
+    """Sheet class that stores data as context attributes."""
+
+    @reify
+    def _data(self):
+        return self.context.__dict__

@@ -8,7 +8,7 @@ from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
-from adhocracy_core.sheets.user import IUserBasic
+from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
 from adhocracy_core.utils import get_sheet

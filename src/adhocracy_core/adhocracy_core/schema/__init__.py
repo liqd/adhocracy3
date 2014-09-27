@@ -144,6 +144,45 @@ class TimeZoneName(AdhocracySchemaNode):
     validator = colander.OneOf(_ZONES)
 
 
+class Role(AdhocracySchemaNode):
+
+    """Permssion :term:`role` name.
+
+    Example value: 'reader'
+    """
+
+    schema_type = colander.String
+    default = 'reader'
+    missing = colander.drop
+    validator = colander.OneOf(['reader',
+                                'contributor',
+                                'editor',
+                                'manager',
+                                'admin',
+                                'god',
+                                ])
+
+
+class Roles(colander.SequenceSchema):
+
+    """List of Permssion :term:`role` names.
+
+    Example value: ['reader', 'editor']
+    """
+
+    default = []
+    missing = colander.drop
+    validator = colander.Length(min=0, max=6)
+
+    role = Role()
+
+    def preparer(self, value: Sequence) -> list:
+        if value is colander.null:
+            return value
+        value_dict = OrderedDict.fromkeys(value)
+        return list(value_dict)
+
+
 class Interface(colander.SchemaType):
 
     """A ZOPE interface in dotted name notation.

@@ -25,3 +25,13 @@ Glossary
       :func:`adhocracy.interfaces.IPool.find_service`.
       The `service` has to be in :term:`lineage` or a child of a
       :term:`lineage` pool for a given `context`.
+
+   principal
+       `User` or :term:`group`.
+
+   group
+       A set of users. Can be mapped to permission :term:`role`s.
+
+   role:
+       A set of permissions..
+

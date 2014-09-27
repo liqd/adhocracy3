@@ -8,15 +8,15 @@ class TestPasswordSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.user import password_metadata
+        from adhocracy_core.sheets.principal import password_metadata
         return password_metadata
 
     def test_create(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_core.sheets.user import IPasswordAuthentication
-        from adhocracy_core.sheets.user import PasswordAuthenticationSheet
-        from adhocracy_core.sheets.user import PasswordAuthenticationSchema
+        from adhocracy_core.sheets.principal import IPasswordAuthentication
+        from adhocracy_core.sheets.principal import PasswordAuthenticationSheet
+        from adhocracy_core.sheets.principal import PasswordAuthenticationSchema
         inst = meta.sheet_class(meta, context)
         assert isinstance(inst, PasswordAuthenticationSheet)
         assert IResourceSheet.providedBy(inst)
@@ -68,11 +68,10 @@ class TestPasswordSheet:
             inst.check_plaintext_password(password)
 
 
-
 def test_includeme_register_password_sheet(config):
-    from adhocracy_core.sheets.user import IPasswordAuthentication
+    from adhocracy_core.sheets.principal import IPasswordAuthentication
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.sheets.user')
+    config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IPasswordAuthentication)
     assert get_sheet(context, IPasswordAuthentication)
 
@@ -80,13 +79,14 @@ def test_includeme_register_password_sheet(config):
 class TestUserBasicSchemaSchema:
 
     def make_one(self):
-        from adhocracy_core.sheets.user import UserBasicSchema
+        from adhocracy_core.sheets.principal import UserBasicSchema
         return UserBasicSchema()
 
     def test_deserialize_all(self):
         inst = self.make_one()
         cstruct = {'email': 'test@test.de',
                    'name': 'login',
+                   'groups': [],
                    'tzname': 'Europe/Berlin'}
         assert inst.deserialize(cstruct) == cstruct
 
@@ -102,7 +102,8 @@ class TestUserBasicSchemaSchema:
 
     def test_deserialize_name(self):
         inst = self.make_one()
-        assert inst.deserialize({'name': 'login'}) == {'name': 'login'}
+        assert inst.deserialize({'name': 'login'}) == {'name': 'login',
+                                                       'groups': []}
 
     def test_name_has_deferred_validator(self):
         inst = self.make_one()
@@ -121,7 +122,7 @@ class TestDeferredValidateUserName:
                                     registry=registry)
 
     def _call_fut(self, node, kw):
-        from adhocracy_core.sheets.user import deferred_validate_user_name
+        from adhocracy_core.sheets.principal import deferred_validate_user_name
         return deferred_validate_user_name(node, kw)
 
     def test_name_is_empty_and_no_request_kw(self, node, mock_user_locator):
@@ -153,7 +154,7 @@ class TestDeferredValidateUserEmail:
                                     registry=registry)
 
     def _call_fut(self, node, kw):
-        from adhocracy_core.sheets.user import deferred_validate_user_email
+        from adhocracy_core.sheets.principal import deferred_validate_user_email
         return deferred_validate_user_email(node, kw)
 
     def test_email_is_empty(self, node, request, mock_user_locator):
@@ -183,12 +184,12 @@ class TestUserBasicSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.user import userbasic_metadata
+        from adhocracy_core.sheets.principal import userbasic_metadata
         return userbasic_metadata
 
     def test_create(self, meta, context):
-        from adhocracy_core.sheets.user import IUserBasic
-        from adhocracy_core.sheets.user import UserBasicSchema
+        from adhocracy_core.sheets.principal import IUserBasic
+        from adhocracy_core.sheets.principal import UserBasicSchema
         from adhocracy_core.sheets import GenericResourceSheet
         inst = meta.sheet_class(meta, context)
         assert isinstance(inst, GenericResourceSheet)
@@ -197,12 +198,47 @@ class TestUserBasicSheet:
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
-        assert inst.get() == {'name': '', 'email': '', 'tzname': 'UTC'}
+        assert inst.get() == {'name': '',
+                              'email': '',
+                              'tzname': 'UTC',
+                              'groups': []}
 
 
 def test_includeme_register_userbasic_sheet(config):
-    from adhocracy_core.sheets.user import IUserBasic
+    from adhocracy_core.sheets.principal import IUserBasic
     from adhocracy_core.utils import get_sheet
-    config.include('adhocracy_core.sheets.user')
+    config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IUserBasic)
     assert get_sheet(context, IUserBasic)
+
+
+class TestGroupSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.principal import group_metadata
+        return group_metadata
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.principal import IGroup
+        from adhocracy_core.sheets.principal import GroupSchema
+        from adhocracy_core.sheets import GenericResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert isinstance(inst, GenericResourceSheet)
+        assert inst.meta.isheet == IGroup
+        assert inst.meta.schema_class == GroupSchema
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'users': [],
+                              'roles': [],
+                              }
+
+
+def test_includeme_register_group_sheet(config):
+    from adhocracy_core.sheets.principal import IGroup
+    from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.sheets.principal')
+    context = testing.DummyResource(__provides__=IGroup)
+    inst = get_sheet(context, IGroup)
+    assert inst.meta.isheet is IGroup

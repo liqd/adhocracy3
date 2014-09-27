@@ -1,22 +1,55 @@
-"""User Sheet."""
+"""Sheets for :term:`principal`s."""
 import colander
 from cryptacular.bcrypt import BCRYPTPasswordManager
-from substanced.interfaces import IUserLocator
-from pyramid.decorator import reify
 
 from adhocracy_core.interfaces import ISheet
+from substanced.interfaces import IUserLocator
+from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets import GenericResourceSheet
+from adhocracy_core.sheets import AttributeStorageSheet
 from adhocracy_core.schema import Email
 from adhocracy_core.schema import Password
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import TimeZoneName
+from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import Roles
+
+
+class IGroup(ISheet):
+
+    """Market interface for the group sheet."""
 
 
 class IUserBasic(ISheet):
 
     """Market interface for the userbasic sheet."""
+
+
+class UserBasicGroupsReference(SheetToSheet):
+
+    """versionable sheet reference to preceding versions."""
+
+    source_isheet = IUserBasic
+    source_isheet_field = 'groups'
+    target_isheet = IGroup
+
+
+class GroupSchema(colander.MappingSchema):
+
+    """Group sheet data structure."""
+
+    users = UniqueReferences(readonly=True,
+                             backref=True,
+                             reftype=UserBasicGroupsReference)
+    roles = Roles()
+
+
+group_metadata = sheet_metadata_defaults._replace(
+    isheet=IGroup,
+    schema_class=GroupSchema,
+)
 
 
 @colander.deferred
@@ -73,21 +106,14 @@ class UserBasicSchema(colander.MappingSchema):
     `email`: email address
     `name`: visible name
     `tzname`: time zone
+    `groups`: groups this user joined
     """
 
     email = Email(validator=deferred_validate_user_email)
     name = SingleLine(missing=colander.required,
                       validator=deferred_validate_user_name)
     tzname = TimeZoneName()
-
-
-class AttributeStorageSheet(GenericResourceSheet):
-
-    """Sheet class that stores data as context attributes."""
-
-    @reify
-    def _data(self):
-        return self.context.__dict__
+    groups = UniqueReferences(reftype=UserBasicGroupsReference)
 
 
 userbasic_metadata = sheet_metadata_defaults._replace(
@@ -170,5 +196,6 @@ def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_metadata, config.registry)
     add_sheet_to_registry(password_metadata, config.registry)
+    add_sheet_to_registry(group_metadata, config.registry)
     # config.scan('.')
     # config.add_evolution_step(add_user_catalog)

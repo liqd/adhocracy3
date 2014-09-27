@@ -12,6 +12,7 @@ class PrincipalIntegrationTest(unittest.TestCase):
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
         config.include('adhocracy_core.sheets.metadata')
+        config.include('adhocracy_core.sheets.principal')
         config.include('adhocracy_core.resources.principal')
         self.config = config
         self.context = create_pool_with_graph()
@@ -59,10 +60,10 @@ class PrincipalIntegrationTest(unittest.TestCase):
     def test_create_and_add_user(self):
         from adhocracy_core.resources.principal import IPrincipalsService
         from adhocracy_core.resources.principal import IUser
-        from adhocracy_core.sheets.user import IPasswordAuthentication
-        from adhocracy_core.sheets.user import IUserBasic
+        from adhocracy_core.sheets.principal import IPasswordAuthentication
+        from adhocracy_core.sheets.principal import IUserBasic
 
-        self.config.include('adhocracy_core.sheets.user')
+        self.config.include('adhocracy_core.sheets.principal')
 
         principals_pool = self.config.registry.content.create(
             IPrincipalsService.__identifier__)

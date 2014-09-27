@@ -11,7 +11,7 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
 from adhocracy_core.resources.service import service_metadata
-import adhocracy_core.sheets.user
+import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.rate
@@ -79,11 +79,11 @@ class User(Pool):
 user_metadata = pool_metadata._replace(
     iresource=IUser,
     content_class=User,
-    basic_sheets=[adhocracy_core.sheets.user.IUserBasic,
+    basic_sheets=[adhocracy_core.sheets.principal.IUserBasic,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.pool.IPool,
                   ],
-    extended_sheets=[adhocracy_core.sheets.user.IPasswordAuthentication,
+    extended_sheets=[adhocracy_core.sheets.principal.IPasswordAuthentication,
                      adhocracy_core.sheets.rate.ICanRate],
     element_types=[],  # we don't want the frontend to post resources here
     use_autonaming=True
