@@ -66,7 +66,7 @@ class User(Pool):
 
     """User implementation.
 
-    With attributes to be compatible with :class:`substanced.prinipals.User`
+    With attributes to be compatible with :class:`substanced.principals.User`
 
     """
 
@@ -74,6 +74,7 @@ class User(Pool):
     password = ''
     email = ''
     name = ''
+    # fixme? let __init__ create the attributes
 
 
 user_metadata = pool_metadata._replace(

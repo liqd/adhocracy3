@@ -109,8 +109,8 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     Constructor Arguments
 
-    :param groupfinder: callable that accepts `request` and returns the
-                        ACL groups of the current user.
+    :param groupfinder: callable that accepts `userid` and `request` and
+                        returns the ACL groups of this user.
                         The `None` value is allowed to ease unit testing.
     :param secret: random string to salt the generated token.
     :param timeout:  Maximum number of seconds which a newly create token
@@ -122,7 +122,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
                     This is used to create the authentication token.
     """
 
-    def __init__(self, secret,
+    def __init__(self, secret: str,
                  groupfinder: callable=None,
                  timeout: float=None,
                  get_tokenmanager: callable=get_tokenmanager,

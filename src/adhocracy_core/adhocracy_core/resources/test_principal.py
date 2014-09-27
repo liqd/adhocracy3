@@ -2,6 +2,7 @@
 import unittest
 
 from pyramid import testing
+from pytest import fixture
 
 
 class PrincipalIntegrationTest(unittest.TestCase):
@@ -77,16 +78,11 @@ class PrincipalIntegrationTest(unittest.TestCase):
                 'password': 'fodThyd2'
             },
         }
-        inst = self.config.registry.content.create(IUser.__identifier__,
+        user = self.config.registry.content.create(IUser.__identifier__,
                                                    parent=users_pool,
                                                    appstructs=appstructs)
+        assert users_pool['0000000'] is user
 
-        got_it = False
-        for child in users_pool:
-            if users_pool[child] == inst:
-                got_it = True
-                break
-        assert got_it
 
 
 class UserUnitTest(unittest.TestCase):
@@ -102,23 +98,20 @@ class UserUnitTest(unittest.TestCase):
         assert user.tzname == 'UTC'
 
 
-class UserLocatorAdapterUnitTest(unittest.TestCase):
+class TestUserLocatorAdapter:
 
     def _make_one(self, context=None, request=None):
         from adhocracy_core.resources.principal import UserLocatorAdapter
         return UserLocatorAdapter(context, request)
 
-    def setUp(self):
+    @fixture
+    def context(self, pool):
         from substanced.interfaces import IFolder
-        self.config = testing.setUp()
-        context = testing.DummyResource(__provides__=IFolder)
-        context['principals'] = testing.DummyResource(__is_service__=True,
-                                                       __provides__=IFolder)
-        context['principals']['users'] = testing.DummyResource()
-        self.context = context
-
-    def tearDown(self):
-        testing.tearDown()
+        pool['principals'] = testing.DummyResource(__is_service__=True,
+                                                   __provides__=IFolder)
+        pool['principals']['users'] = testing.DummyResource(__is_service__=True,
+                                                            __provides__=IFolder)
+        return pool
 
     def test_create(self):
         from substanced.interfaces import IUserLocator
@@ -127,28 +120,28 @@ class UserLocatorAdapterUnitTest(unittest.TestCase):
         assert IUserLocator.providedBy(inst)
         assert verifyObject(IUserLocator, inst)
 
-    def test_get_user_by_email_user_exists(self):
+    def test_get_user_by_email_user_exists(self, context):
         user = testing.DummyResource(email='test@test.de')
-        self.context['principals']['users']['User1'] = user
-        inst = self._make_one(self.context, testing.DummyRequest())
+        context['principals']['users']['User1'] = user
+        inst = self._make_one(context, testing.DummyRequest())
         assert inst.get_user_by_email('test@test.de') is user
 
-    def test_get_user_by_email_user_not_exists(self):
+    def test_get_user_by_email_user_not_exists(self, context):
         user = testing.DummyResource(email='')
-        self.context['principals']['users']['User1'] = user
-        inst = self._make_one(self.context, testing.DummyRequest())
+        context['principals']['users']['User1'] = user
+        inst = self._make_one(context, testing.DummyRequest())
         assert inst.get_user_by_email('wrong@test.de') is None
 
-    def test_get_user_by_login_user_exists(self):
+    def test_get_user_by_login_user_exists(self, context):
         user = testing.DummyResource(name='login name')
-        self.context['principals']['users']['User1'] = user
-        inst = self._make_one(self.context, testing.DummyRequest())
+        context['principals']['users']['User1'] = user
+        inst = self._make_one(context, testing.DummyRequest())
         assert inst.get_user_by_login('login name') is user
 
-    def test_get_user_by_login_user_not_exists(self):
+    def test_get_user_by_login_user_not_exists(self, context):
         user = testing.DummyResource(name='')
-        self.context['principals']['users']['User1'] = user
-        inst = self._make_one(self.context, testing.DummyRequest())
+        context['principals']['users']['User1'] = user
+        inst = self._make_one(context, testing.DummyRequest())
         assert inst.get_user_by_login('wrong login name') is None
 
 
