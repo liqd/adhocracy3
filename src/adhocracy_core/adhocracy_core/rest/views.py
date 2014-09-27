@@ -43,7 +43,7 @@ from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
 from adhocracy_core.resources.root import IRootPool
-from adhocracy_core.sheets.user import IPasswordAuthentication
+from adhocracy_core.sheets.principal import IPasswordAuthentication
 import adhocracy_core.sheets.pool
 
 

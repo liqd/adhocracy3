@@ -38,8 +38,8 @@ def mock_authpolicy(registry):
 @fixture
 def mock_password_sheet(registry):
     from adhocracy_core.interfaces import IResourceSheet
-    from adhocracy_core.sheets.user import IPasswordAuthentication
-    from adhocracy_core.sheets.user import PasswordAuthenticationSheet
+    from adhocracy_core.sheets.principal import IPasswordAuthentication
+    from adhocracy_core.sheets.principal import PasswordAuthenticationSheet
     isheet = IPasswordAuthentication
     sheet = Mock(spec=PasswordAuthenticationSheet)
     registry.registerAdapter(lambda x: sheet, (isheet,),
@@ -819,7 +819,7 @@ class TestValidateLoginPasswordUnitTest:
 
     @fixture
     def request(self, cornice_request, registry):
-        from adhocracy_core.sheets.user import IPasswordAuthentication
+        from adhocracy_core.sheets.principal import IPasswordAuthentication
         cornice_request.registry = registry
         user = testing.DummyResource(__provides__=IPasswordAuthentication)
         cornice_request.validated['user'] = user
