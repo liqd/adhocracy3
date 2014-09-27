@@ -32,6 +32,11 @@ Glossary
    group
        A set of users. Can be mapped to permission :term:`role`s.
 
+   groupid
+       Unique id of one :term:`group`: "group:<name>"
+
    role:
        A set of permissions..
 
+   roleid
+       Unique id of one permission :term:`role`: "role:<name>"

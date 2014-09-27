@@ -275,6 +275,18 @@ def mock_user_locator(registry) -> Mock:
     return locator
 
 
+@fixture
+def mock_group_locator(registry) -> Mock:
+    """Mock :class:`adhocracy.resource.principal.GroupLocatorAdapter`."""
+    from zope.interface import Interface
+    from adhocracy_core.interfaces import IGroupLocator
+    from adhocracy_core.resources.principal import GroupLocatorAdapter
+    locator = Mock(spec=GroupLocatorAdapter)
+    registry.registerAdapter(lambda x: locator, (Interface,),
+                             IGroupLocator)
+    return locator
+
+
 def _get_settings(request, part, config_path_key='pyramid_config'):
     """Return settings of a config part."""
     config_parser = ConfigParser()

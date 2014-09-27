@@ -13,6 +13,7 @@ class PrincipalIntegrationTest(unittest.TestCase):
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
         config.include('adhocracy_core.sheets.metadata')
+        config.include('adhocracy_core.sheets.name')
         config.include('adhocracy_core.sheets.principal')
         config.include('adhocracy_core.resources.principal')
         self.config = config
@@ -83,6 +84,41 @@ class PrincipalIntegrationTest(unittest.TestCase):
                                                    appstructs=appstructs)
         assert users_pool['0000000'] is user
 
+    def test_create_group(self):
+        from adhocracy_core.resources.principal import IGroup
+        inst = self.config.registry.content.create(IGroup.__identifier__)
+        assert IGroup.providedBy(inst)
+
+    def test_create_and_add_group(self):
+        from adhocracy_core.utils import get_sheet
+        from adhocracy_core.resources.principal import IPrincipalsService
+        from adhocracy_core.resources.principal import IUser
+        from adhocracy_core.resources.principal import IGroup
+        from adhocracy_core.sheets.principal import IUserBasic
+        from adhocracy_core.sheets.name import IName
+        import adhocracy_core.sheets.principal
+
+        self.config.include('adhocracy_core.sheets.principal')
+
+        principals_pool = self.config.registry.content.create(
+            IPrincipalsService.__identifier__,
+            parent=self.context)
+        groups_pool = principals_pool['groups']
+        appstructs = {IName.__identifier__: {'name': 'Group1'},
+                      adhocracy_core.sheets.principal.IGroup.__identifier__:
+                          {'roles': ['reader']}}
+        group = self.config.registry.content.create(IGroup.__identifier__,
+                                                    parent=groups_pool,
+                                                    appstructs=appstructs)
+        users_pool = principals_pool['users']
+        appstructs = {IUserBasic.__identifier__: {'groups': [group]}}
+        user = self.config.registry.content.create(IUser.__identifier__,
+                                                   parent=users_pool,
+                                                   appstructs=appstructs)
+        group_sheet = get_sheet(group, adhocracy_core.sheets.principal.IGroup)
+        assert groups_pool['Group1'] is group
+        assert group_sheet.get()['users'] == [user]
+        assert group_sheet.get()['roles'] == ['reader']
 
 
 class UserUnitTest(unittest.TestCase):
@@ -144,6 +180,32 @@ class TestUserLocatorAdapter:
         inst = self._make_one(context, testing.DummyRequest())
         assert inst.get_user_by_login('wrong login name') is None
 
+    def test_get_user_by_userid_user_exists(self, context):
+        user = testing.DummyResource()
+        context['principals']['users']['User1'] = user
+        inst = self._make_one(context, testing.DummyRequest())
+        assert inst.get_user_by_userid('/principals/users/User1') is user
+
+    def test_get_user_by_userid_user_not_exists(self, context):
+        inst = self._make_one(context, testing.DummyRequest())
+        assert inst.get_user_by_userid('/principals/users/User1') is None
+
+    def test_get_groupids_user_exists(self, context, mock_sheet, registry):
+        from adhocracy_core.sheets.principal import IUserBasic
+        from adhocracy_core.testing import add_and_register_sheet
+        group = testing.DummyResource(__name__='group1')
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IUserBasic)
+        mock_sheet.get.return_value = {'groups': [group]}
+        user = testing.DummyResource()
+        add_and_register_sheet(user, mock_sheet, registry)
+        context['principals']['users']['User1'] = user
+        inst = self._make_one(context, testing.DummyRequest())
+        assert inst.get_groupids('/principals/users/User1') == ['group:group1']
+
+    def test_get_groupids_user_not_exists(self, context):
+        inst = self._make_one(context, testing.DummyRequest())
+        assert inst.get_groupids('/principals/users/User1') is None
+
 
 class UserLocatorAdapterIntegrationTest(unittest.TestCase):
 
@@ -160,3 +222,79 @@ class UserLocatorAdapterIntegrationTest(unittest.TestCase):
         from substanced.interfaces import IUserLocator
         from zope.component import getMultiAdapter
         assert getMultiAdapter((self.context, testing.DummyRequest), IUserLocator)
+
+
+class TestGroupLocatorAdapter:
+
+    @fixture
+    def context(self, pool):
+        from substanced.interfaces import IFolder
+        pool['principals'] = testing.DummyResource(__is_service__=True,
+                                                   __provides__=IFolder)
+        pool['principals']['groups'] = testing.DummyResource(__is_service=True,
+                                                             __provides__=IFolder)
+        return pool
+
+    @fixture
+    def inst(self, context):
+        from adhocracy_core.resources.principal import GroupLocatorAdapter
+        return GroupLocatorAdapter(context)
+
+    def test_create(self, inst):
+        from adhocracy_core.interfaces import IGroupLocator
+        from zope.interface.verify import verifyObject
+        assert IGroupLocator.providedBy(inst)
+        assert verifyObject(IGroupLocator, inst)
+
+    def test_get_roleids_group_exists_no_roles(self, inst, context, mock_sheet, registry):
+        from adhocracy_core.sheets.principal import IGroup
+        from adhocracy_core.testing import add_and_register_sheet
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IGroup)
+        mock_sheet.get.return_value = {'roles': []}
+        group = testing.DummyResource()
+        context['principals']['groups']['Group1'] = group
+        add_and_register_sheet(group, mock_sheet, registry)
+        assert inst.get_roleids('Group1') == []
+
+    def test_get_roleids_group_exists_roles(self, inst, context, mock_sheet, registry):
+        from adhocracy_core.sheets.principal import IGroup
+        from adhocracy_core.testing import add_and_register_sheet
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IGroup)
+        mock_sheet.get.return_value = {'roles': ['role1']}
+        group = testing.DummyResource()
+        context['principals']['groups']['Group1'] = group
+        add_and_register_sheet(group, mock_sheet, registry)
+        assert inst.get_roleids('Group1') == ['role:role1']
+
+    def test_get_roleids_by_id_group_not_exists(self, inst):
+        assert inst.get_roleids('Group1') is None
+
+    def test_get_group_by_id_with_prefix_group_exists(self, inst, context):
+        group = testing.DummyResource()
+        context['principals']['groups']['Group1'] = group
+        assert inst.get_group_by_id('group:Group1') is group
+
+    def test_get_group_by_id_without_prefix_group_exists(self, inst, context):
+        group = testing.DummyResource()
+        context['principals']['groups']['Group1'] = group
+        assert inst.get_group_by_id('Group1') is group
+
+    def test_get_group_by_id_group_not_exists(self, inst):
+        assert inst.get_group_by_id('Group1') is None
+
+
+class GroupLocatorAdapterIntegrationTest(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+        self.config.include('adhocracy_core.registry')
+        self.config.include('adhocracy_core.resources.principal')
+        self.context = testing.DummyResource()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_create(self):
+        from adhocracy_core.interfaces import IGroupLocator
+        from zope.component import getAdapter
+        assert getAdapter(self.context, IGroupLocator)

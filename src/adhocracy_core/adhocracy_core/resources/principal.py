@@ -1,5 +1,6 @@
 """Resources to handle users and groups."""
 from pyramid.registry import Registry
+from pyramid.traversal import find_resource
 from zope.interface import Interface
 from substanced.util import find_service
 from substanced.interfaces import IUserLocator
@@ -8,9 +9,11 @@ from zope.interface import implementer
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.resources import add_resource_type_to_registry
+from adhocracy_core.interfaces import IGroupLocator
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
 from adhocracy_core.resources.service import service_metadata
+from adhocracy_core.utils import get_sheet
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.metadata
@@ -74,6 +77,7 @@ class User(Pool):
     password = ''
     email = ''
     name = ''
+    groupids = []
     # fixme? let __init__ create the attributes
 
 
@@ -115,6 +119,19 @@ groups_metadata = service_metadata._replace(
 )
 
 
+class IGroup(IPool):
+
+    """Group for Users."""
+
+
+group_metadata = pool_metadata._replace(
+    iresource=IGroup,
+    extended_sheets=[adhocracy_core.sheets.principal.IGroup,
+                     ],
+    element_types=[],  # we don't want the frontend to post resources here
+)
+
+
 class IPasswordResetsService(IServicePool):
 
     """Service Pool for Password Resets."""
@@ -143,9 +160,12 @@ class UserLocatorAdapter(object):
             if user.name == login:
                 return user
 
-    def get_user_by_userid(self, user_id: int) -> IUser:
-        """Find user per `user_id` (zodb oid) or return None."""
-        raise NotImplementedError
+    def get_user_by_userid(self, user_id: str) -> IUser:
+        """Find user per `user_id`(location path) or return None."""
+        try:
+            return find_resource(self.context, user_id)
+        except KeyError:
+            return None
 
     def get_user_by_email(self, email: str) -> IUser:
         """Find user per email or return None."""
@@ -154,9 +174,43 @@ class UserLocatorAdapter(object):
             if user.email == email:
                 return user
 
-    def get_groupids(self, user_id: int):
-        """Get user groups for `user_id` (zodb oid)."""
-        raise NotImplementedError
+    def get_groupids(self, user_id: str) -> list:
+        """Get :term:`groupid`s for `user_id`(location path) or return None."""
+        user = self.get_user_by_userid(user_id)
+        if user is None:
+            return None
+        user_sheet = get_sheet(user,
+                               adhocracy_core.sheets.principal.IUserBasic)
+        groups = user_sheet.get()['groups']
+        groupids = ['group:' + g.__name__ for g in groups]
+        return groupids
+
+
+@implementer(IGroupLocator)
+class GroupLocatorAdapter:
+
+    """Provides helper methods to get information about groups."""
+
+    def __init__(self, context):
+        self.context = context
+
+    def get_roleids(self, groupid: str) -> list:
+        """Return the roles for `groupid` or None. Read the interface."""
+        group = self.get_group_by_id(groupid)
+        if group is None:
+            return None
+        group_sheet = get_sheet(group, adhocracy_core.sheets.principal.IGroup)
+        roles = group_sheet.get()['roles']
+        roleids = ['role:' + r for r in roles]
+        return roleids
+
+    def get_group_by_id(self, groupid: str) -> IGroup:
+        """Return the group for :term:`groupid` or None. Read the interface."""
+        groups = find_service(self.context, 'principals', 'groups')
+        if ':' not in groupid:
+            return groups.get(groupid, None)
+        name = groupid.split(':')[1]
+        return groups.get(name, None)
 
 
 def includeme(config):
@@ -164,8 +218,12 @@ def includeme(config):
     add_resource_type_to_registry(principals_metadata, config)
     add_resource_type_to_registry(user_metadata, config)
     add_resource_type_to_registry(users_metadata, config)
+    add_resource_type_to_registry(group_metadata, config)
     add_resource_type_to_registry(groups_metadata, config)
     add_resource_type_to_registry(passwordresets_metadata, config)
     config.registry.registerAdapter(UserLocatorAdapter,
                                     (Interface, Interface),
                                     IUserLocator)
+    config.registry.registerAdapter(GroupLocatorAdapter,
+                                    (Interface,),
+                                    IGroupLocator)

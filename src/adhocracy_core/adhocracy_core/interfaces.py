@@ -4,6 +4,8 @@ from collections import namedtuple
 from collections import OrderedDict
 
 from pyramid.interfaces import ILocation
+from pyramid.interfaces import IAuthorizationPolicy
+from pyramid.security import ACLPermitsResult
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface.interface import InterfaceClass
@@ -410,3 +412,38 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     resource (None or IResource):
         The resource that is modified/created.
     """
+
+
+class IGroupLocator(Interface):  # pragma: no cover
+
+    """Adapter responsible for returning a group or get info about it."""
+
+    def get_roleids(groupid: str) -> list:
+        """Return the roles for :term:`groupid` or `None`.
+
+        We return 'None' if the the group does not exists to provide a similar
+        behavior as :func:`substanced.interfaces.IUserLocator.get_groupids`.
+        """
+        # FIXME?: better raise an exception if the group does not exists?
+
+    def get_group_by_id(groupid: str) -> IResource:
+        """Return the group for :term:`groupid` or None."""
+
+
+class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
+
+    """A :term:`authorization policy` supporting rule based permissions."""
+
+    group_prefix = Attribute('Prefix to generate the :term:`groupid`')
+
+    role_prefix = Attribute('Prefix to generate the :term:`roleid`')
+
+    def permits(context, principals: list, permission: str)\
+            -> ACLPermitsResult:
+        """Check that one `principal` has the `permission` for `context`.
+
+        This method extends the behavior of :func:`ACLAuthorizationPolicy`.
+        If a principal has the suffix 'group:' the :class:`IGroupLocator` is
+        called to retrieve the list of roles for this principal. These
+        roles extend the given `principals`.
+        """
