@@ -34,8 +34,8 @@ class TestResourceResponseSchema:
         return ResourceResponseSchema()
 
     def test_serialize_no_appstruct(self):
-        inst = self.make_one()
-        wanted = {'content_type': colander.null, 'path': ''}
+        inst = self.make_one().bind()
+        wanted = {'content_type': '', 'path': ''}
         assert inst.serialize() == wanted
 
     def test_serialize_with_appstruct(self, request, context):
@@ -58,8 +58,8 @@ class TestItemResponseSchema:
         return ItemResponseSchema()
 
     def test_serialize_no_appstruct(self):
-        inst = self.make_one()
-        wanted = {'content_type': colander.null, 'path': '', 'first_version_path': ''}
+        inst = self.make_one().bind()
+        wanted = {'content_type': '', 'path': '', 'first_version_path': ''}
         assert inst.serialize() == wanted
 
     def test_serialize_with_appstruct(self, request, context):
@@ -280,18 +280,18 @@ class TestOPTIONResourceResponseSchema:
         return OPTIONResourceResponseSchema()
 
     def test_serialize_no_sheets_and_no_addables(self):
-        inst = self.make_one()
+        inst = self.make_one().bind()
         wanted =\
             {'GET': {'request_body': {},
                      'request_querystring': {},
-                     'response_body': {'content_type': colander.null, 'data': {},
+                     'response_body': {'content_type': '', 'data': {},
                                        'path': ''}},
              'HEAD': {},
              'OPTION': {},
              'POST': {'request_body': [],
-                      'response_body': {'content_type': colander.null, 'path': ''}},
+                      'response_body': {'content_type': '', 'path': ''}},
              'PUT': {'request_body': {'data': {}},
-                     'response_body': {'content_type': colander.null, 'path': ''}}}
+                     'response_body': {'content_type': '', 'path': ''}}}
         assert inst.serialize() == wanted
 
 

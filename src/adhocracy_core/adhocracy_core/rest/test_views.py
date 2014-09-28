@@ -299,10 +299,7 @@ class TestResourceRESTView:
         from adhocracy_core.rest.schemas import OPTIONResourceResponseSchema
         inst = self.make_one(context, request)
         response = inst.options()
-        wanted = OPTIONResourceResponseSchema().serialize()
-        wanted['POST']['response_body']['content_type'] = ''
-        wanted['PUT']['response_body']['content_type'] = ''
-        wanted['POST']['response_body']['content_type'] = ''
+        wanted = OPTIONResourceResponseSchema().bind().serialize()
         assert wanted == response
 
     def test_options_valid_with_sheets_and_addables(self, request, context):

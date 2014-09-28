@@ -43,8 +43,10 @@ class GETItemResponseSchema(ResourcePathAndContentSchema):
 
 def add_put_data_subschemas(node: colander.MappingSchema, kw: dict):
     """Add the resource sheet colander schemas that are 'editable'."""
-    context = kw['context']
-    request = kw['request']
+    context = kw.get('context', None)
+    request = kw.get('request', None)
+    if context is None or request is None:
+        return
     sheets = request.registry.content.resource_sheets(context, request,
                                                       onlyeditable=True)
     data = request.json_body.get('data', {})
