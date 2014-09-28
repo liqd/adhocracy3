@@ -25,6 +25,13 @@ from adhocracy_core.interfaces import ResourceMetadata
 # Integration/Function test helper  #
 #####################################
 
+god_authentication_header = {'X-User-Path': '/principals/users/0000000',
+                             'X-User-Token': 'SECRET_ADMIN'}
+"""The authentication headers for the `god` user, used by functional fixtures.
+This assumes the initial user is created and has the `god` role.
+"""
+
+
 class DummyPool(testing.DummyResource):
 
     """Dummy Pool based on :class:`pyramid.testing.DummyResource`."""
@@ -390,7 +397,36 @@ def app(zeo, settings, websocket):
     configurator.include(adhocracy_core.resources.sample_proposal)
     configurator.include(adhocracy_core.resources.sample_section)
     app = configurator.make_wsgi_app()
+    root = get_root(app)
+    add_user_authentication(user_id=god_authentication_header['X-User-Path'],
+                            token=god_authentication_header['X-User-Token'],
+                            root=root,
+                            registry=app.registry)
+
+    def root_factory_wrapper(request):
+        request.root = root
+        return adhocracy_core.root_factory(request)
+    app.root_factory = root_factory_wrapper
+
     return app
+
+
+def get_root(app):
+    """Get the root object of the :term:`Pyramid` app."""
+    request = testing.DummyRequest()
+    request.registry = app.registry
+    return app.root_factory(request)
+
+
+def add_user_authentication(user_id: str, token: str, root, registry):
+    """Add user authentication token to :app:`Pyramid`."""
+    from datetime import datetime
+    import transaction
+    from adhocracy_core.interfaces import ITokenManger
+    timestamp = datetime.now()
+    token_manager = registry.getAdapter(root, ITokenManger)
+    token_manager.token_to_user_id_timestamp[token] = (user_id, timestamp)
+    transaction.commit()
 
 
 @fixture(scope='class')

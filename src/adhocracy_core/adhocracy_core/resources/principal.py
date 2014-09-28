@@ -91,7 +91,9 @@ user_metadata = pool_metadata._replace(
     extended_sheets=[adhocracy_core.sheets.principal.IPasswordAuthentication,
                      adhocracy_core.sheets.rate.ICanRate],
     element_types=[],  # we don't want the frontend to post resources here
-    use_autonaming=True
+    use_autonaming=True,
+    permission_add='add_user',
+    is_implicit_addable=False,
 )
 
 

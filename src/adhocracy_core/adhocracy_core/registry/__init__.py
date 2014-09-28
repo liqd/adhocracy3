@@ -102,7 +102,7 @@ class ResourceContentRegistry(ContentRegistry):
                 is_is = metdata.iresource is addable
                 add_permission = metdata.permission_add
                 is_allowed = has_permission(add_permission, context, request)
-                if is_subtype or is_is and is_allowed:
+                if (is_subtype or is_is) and is_allowed:
                     addable_types.append(metdata.iresource)
         # add propertysheet names
         types_with_sheetnames = {}

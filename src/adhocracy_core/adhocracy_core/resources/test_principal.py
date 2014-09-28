@@ -121,6 +121,20 @@ class PrincipalIntegrationTest(unittest.TestCase):
         assert group_sheet.get()['roles'] == ['reader']
 
 
+class UserMetaUnitTest(unittest.TestCase):
+
+    def _make_one(self):
+        from adhocracy_core.resources.principal import user_metadata
+        return user_metadata
+
+    def test_meta(self):
+        from adhocracy_core.resources.principal import IUser
+        meta = self._make_one()
+        assert meta.iresource is IUser
+        assert meta.permission_add == 'add_user'
+        assert meta.is_implicit_addable is False
+
+
 class UserUnitTest(unittest.TestCase):
 
     def _makeOne(self):

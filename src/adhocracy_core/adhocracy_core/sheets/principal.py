@@ -119,7 +119,8 @@ class UserBasicSchema(colander.MappingSchema):
 userbasic_metadata = sheet_metadata_defaults._replace(
     isheet=IUserBasic,
     schema_class=UserBasicSchema,
-    sheet_class=AttributeStorageSheet
+    sheet_class=AttributeStorageSheet,
+    permission_create='create_sheet_userbasic',
 )
 
 
@@ -182,6 +183,7 @@ password_metadata = sheet_metadata_defaults._replace(
     readable=False,
     creatable=True,
     editable=True,
+    permission_create='create_sheet_password',
 )
 
 

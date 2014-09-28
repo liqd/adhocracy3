@@ -23,6 +23,7 @@ class TestPasswordSheet:
         assert verifyObject(IResourceSheet, inst)
         assert inst.meta.isheet == IPasswordAuthentication
         assert inst.meta.schema_class == PasswordAuthenticationSchema
+        assert inst.meta.permission_create == 'create_sheet_password'
 
     def test_set_password(self, meta, context):
         inst = meta.sheet_class(meta, context)
@@ -195,6 +196,7 @@ class TestUserBasicSheet:
         assert isinstance(inst, GenericResourceSheet)
         assert inst.meta.isheet == IUserBasic
         assert inst.meta.schema_class == UserBasicSchema
+        assert inst.meta.permission_create == 'create_sheet_userbasic'
 
     def test_get_empty(self, meta, context):
         inst = meta.sheet_class(meta, context)
