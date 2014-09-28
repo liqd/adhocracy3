@@ -28,6 +28,7 @@ $InstallScript = <<SCRIPT
   cd python
   python ./bootstrap.py               
   ./bin/buildout                      
+  .bin/install-links
  
   echo"install adhocracy"
   cd ..    
