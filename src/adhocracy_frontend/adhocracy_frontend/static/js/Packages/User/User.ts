@@ -232,7 +232,8 @@ export var activateController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
     adhDone,
-    $route : ng.route.IRouteService
+    $route : ng.route.IRouteService,
+    $location : ng.ILocationService
 ) : void => {
     var key = $route.current.params.key;
     var path = "/activate/" + key;
@@ -243,8 +244,8 @@ export var activateController = (
         adhTopLevelState.redirectToCameFrom("/");
     };
 
-    var error = (error) => {
-        // FIXME show error message in UI
+    var error = () => {
+        $location.url("activation_error");
     };
 
     adhUser.activate(path)

@@ -77,6 +77,9 @@ export var init = (config, meta_api) => {
                 controller: ["adhUser", "adhTopLevelState", "adhDone", "$route", AdhUser.activateController],
                 template: ""
             })
+            .when("/activation_error", {
+                templateUrl: "/static/js/templates/ActivationError.html"
+            })
             .when("/embed/:widget", {
                 template: "<adh-embed></adh-embed>"
             })
