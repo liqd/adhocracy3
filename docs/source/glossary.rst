@@ -36,7 +36,12 @@ Glossary
        Unique id of one :term:`group`: "group:<name>"
 
    role:
-       A set of permissions..
+       A set of permissions.
 
    roleid
        Unique id of one permission :term:`role`: "role:<name>"
+
+   local role:
+       A :term:`role` mapped to a :term:`group` within a local context and all
+       his children.
+
