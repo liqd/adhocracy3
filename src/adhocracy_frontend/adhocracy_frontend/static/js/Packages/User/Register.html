@@ -48,6 +48,10 @@
             class="m-call-to-action"
             data-ng-click="register()"
             data-ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
+        <div class="register-support">
+            {{ "Having trouble with registration?" | translate}} <br />
+            <a href="mailto:support@adhocracy.de?subject=Trouble%20with%20registration">support@adhocracy.de</a>
+        </div>
         <a href="/login">{{ "LogIn instead" | translate }}</a>
     </div>
 </form>

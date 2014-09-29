@@ -145,3 +145,9 @@ Register Dialog.
         }
     }
 }
+
+.register-support,
+.login-support {
+    @include text(functional-introvert);
+    text-align: center;
+}
