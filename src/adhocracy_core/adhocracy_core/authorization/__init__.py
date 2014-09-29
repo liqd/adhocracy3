@@ -1,7 +1,9 @@
 """ACL Authorization with support for rules mapped to adhocracy principals."""
+from collections import defaultdict
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import ACLPermitsResult
 from pyramid.testing import DummyRequest
+from pyramid.traversal import lineage
 from zope.interface import implementer
 from zope.component import queryMultiAdapter
 
@@ -14,10 +16,19 @@ from adhocracy_core.interfaces import IRoleACLAuthorizationPolicy
 @implementer(IRoleACLAuthorizationPolicy)
 class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
 
-    """A :term:`authorization policy` supporting rules based permissions."""
+    """A :term:`authorization policy` supporting (local) permissions rules.
+
+    You can set :term:`local role`s if you add the `__local_roles__` attribute
+    to the context object.
+    The value is an dictionary with a :term:`groupid` or  :term:`userid` as key
+    and a list of :term:`roleid`s as value::
+
+        {'system.Everyone': ['role:reader']}
+    """
 
     group_prefix = 'group:'
     role_prefix = 'role:'
+    local_roles_key = '__local_roles__'
 
     def permits(self, context: IResource,
                 principals: list,
@@ -27,6 +38,7 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
         # groupfinder function that is passed to the Authentication policy.
         self._add_groups_roles_to_principals(context, principals)
         self._add_user_roles_to_principals(context, principals)
+        self._add_local_roles_to_principals(context, principals)
         return super().permits(context, principals, permission)
 
     def _add_groups_roles_to_principals(self, context, principals):
@@ -50,3 +62,17 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
         for user in users:
             user_roles = locator.get_roleids(user) or []
             principals.extend(user_roles)
+
+    def _add_local_roles_to_principals(self, context, principals):
+        local_roles_map = self._get_local_role_candidates_from_lineage(context)
+        for canidate, roles in local_roles_map.items():
+            if canidate in principals:
+                principals.extend(list(roles))
+
+    def _get_local_role_candidates_from_lineage(self, context) -> dict:
+        local_roles_map = defaultdict(set)
+        for location in lineage(context):
+            local_roles = getattr(location, self.local_roles_key, {})
+            for principal, roles in local_roles.items():
+                local_roles_map[principal].update(roles)
+        return local_roles_map

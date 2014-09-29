@@ -18,6 +18,7 @@ class TestRuleACLAuthorizaitonPolicy:
         assert verifyObject(IAuthorizationPolicy, inst)
         assert inst.group_prefix == 'group:'
         assert inst.role_prefix == 'role:'
+        assert inst.local_roles_key == '__local_roles__'
 
     def test_permits_no_acl(self, inst, context):
         from pyramid.security import ACLDenied
@@ -111,3 +112,23 @@ class TestRuleACLAuthorizaitonPolicy:
         context.__acl__ = [(Allow, 'role:admin', 'view')]
         assert not inst.permits(context, ['system.Authenticated', 'Admin',
                                           'group:Admin'],  'view')
+
+    def test_permits_acl_with_local_roles(self, inst, context):
+        from pyramid.security import Allow
+        context.__local_roles__ = {'system.Authenticated': ['role:admin']}
+        context.__acl__ = [(Allow, 'role:admin', 'view')]
+        assert inst.permits(context, ['system.Authenticated', 'Admin',
+                                      'group:Admin'],  'view')
+
+    def test_permits_acl_with_inherited_local_roles(self, inst, context):
+        from pyramid.security import Allow
+        context.__acl__ = [(Allow, 'role:admin', 'view'),
+                           (Allow, 'role:contributor', 'add')]
+        context['child'] = testing.DummyResource(
+            __local_roles__={'system.Authenticated': ['role:admin']})
+        context['child']['grandchild'] = testing.DummyResource(
+            __local_roles__={'system.Authenticated': ['role:contributor']})
+        assert inst.permits(context['child']['grandchild'],
+                            ['system.Authenticated'], 'view')
+        assert inst.permits(context['child']['grandchild'],
+                            ['system.Authenticated'], 'add')
