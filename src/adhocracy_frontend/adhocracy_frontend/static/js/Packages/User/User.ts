@@ -239,6 +239,7 @@ export var activateController = (
 
     var success = () => {
         // FIXME show success message in UI
+        // FIXME extract cameFrom from activation key (involves BE)
         adhTopLevelState.redirectToCameFrom("/");
     };
 
