@@ -3,6 +3,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
+import _ = require("lodash");
+
 import Resources = require("../../Resources");
 import ResourcesBase = require("../../ResourcesBase");
 import Util = require("../Util/Util");
@@ -41,7 +43,7 @@ export class Service<Content extends Resources.Content<any>> {
         private adhConfig : AdhConfig.Type
     ) {}
 
-    public getRaw(path : string) : ng.IHttpPromise<any> {
+    public getRaw(path : string, params ?: { [key : string] : string }) : ng.IHttpPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-get preliminary path: " + path;
         }
@@ -49,11 +51,11 @@ export class Service<Content extends Resources.Content<any>> {
             path = this.adhConfig.rest_url + path;
         }
         return this.$http
-            .get(path);
+            .get(path, { params : params });
     }
 
-    public get(path : string) : ng.IPromise<Content> {
-        return this.getRaw(path)
+    public get(path : string, params ?: { [key : string] : string }) : ng.IPromise<Content> {
+        return this.getRaw(path, params)
             .then(
                 (response) => AdhConvert.importContent(<any>response, this.adhMetaApi, this.adhPreliminaryNames),
                 AdhError.logBackendError);
@@ -107,7 +109,7 @@ export class Service<Content extends Resources.Content<any>> {
     public getNewestVersionPathNoFork(path : string) : ng.IPromise<string> {
         return this.get(path + "/LAST")
             .then((tag) => {
-                var heads = tag.data["adhocracy.sheets.tags.ITag"].elements;
+                var heads = tag.data["adhocracy_core.sheets.tags.ITag"].elements;
                 if (heads.length !== 1) {
                     throw ("Cannot handle this LAST tag: " + heads.toString());
                 } else {
@@ -186,7 +188,7 @@ export class Service<Content extends Resources.Content<any>> {
         var waitms : number = 250;
 
         var dagPath = Util.parentPath(oldVersionPath);
-        var _obj = Util.deepcp(obj);
+        var _obj = _.cloneDeep(obj);
         if (typeof rootVersions !== "undefined") {
             _obj.root_versions = rootVersions;
         }
@@ -200,7 +202,7 @@ export class Service<Content extends Resources.Content<any>> {
                 throw "Tried to post new version of " + dagPath + " " + timeoutRounds.toString() + " times, giving up.";
             }
 
-            _obj.data["adhocracy.sheets.versions.IVersionable"] = {
+            _obj.data["adhocracy_core.sheets.versions.IVersionable"] = {
                 follows: [nextOldVersionPath]
             };
 
@@ -300,7 +302,7 @@ export class Service<Content extends Resources.Content<any>> {
      *
      *             var version = {
      *                 data: {
-     *                     "adhocracy.sheets.versions.IVersionable": {
+     *                     "adhocracy_core.sheets.versions.IVersionable": {
      *                         follows: resourcePost.first_version_path
      *                     },
      *                     ...
