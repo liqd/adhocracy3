@@ -121,6 +121,8 @@ export class User {
             });
     }
 
+    // FIXME: whoever call this function needs to keep the token in
+    // sync with the backend (e.g. via WebSocket?)
     private storeAndEnableToken(token : string, userPath : string) : ng.IPromise<void> {
         var _self : User = this;
 
@@ -175,7 +177,6 @@ export class User {
         }
 
         var success = (response) => {
-            // FIXME use websockets for updates
             return _self.storeAndEnableToken(response.data.user_token, response.data.user_path);
         };
 
@@ -211,7 +212,6 @@ export class User {
         var _self : User = this;
 
         var success = (response) => {
-            // FIXME use websockets for updates
             return _self.storeAndEnableToken(response.data.user_token, response.data.user_path);
         };
 
