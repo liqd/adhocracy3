@@ -40,13 +40,15 @@ A generic box with a single button.
 */
 .box-with-button {
     border: 1px solid $color-structure-border;
-    padding: 1em;
+    padding: 1em 1em 0;
+    margin-bottom: 2em;
 
     .button,
     button,
     input[type="submit"],
     input[type="reset"] {
         width: 100%;
+        margin-bottom: -1em;
     }
 }
 
