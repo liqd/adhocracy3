@@ -208,7 +208,7 @@ export class User {
         });
     }
 
-    public activate(path : string) {
+    public activate(path : string) : ng.IPromise<void> {
         var _self : User = this;
 
         var success = (response) => {
@@ -219,7 +219,7 @@ export class User {
             .then(success, AdhHttp.logBackendError);
     }
 
-    public can(permission : string) {
+    public can(permission : string) : boolean {
         var _self : User = this;
 
         // FIXME this is only a dummy implementation
