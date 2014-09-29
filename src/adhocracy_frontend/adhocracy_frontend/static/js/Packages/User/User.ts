@@ -34,7 +34,6 @@ export interface IScopeRegister {
         passwordRepeat : string;
     };
     errors : string[];
-    success : boolean;
 
     register : () => ng.IPromise<void>;
 }
@@ -279,7 +278,13 @@ export var registerController = (
         return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
             .then((response) => {
                 $scope.errors = [];
-                $scope.success = true;
+                return adhUser.logIn($scope.input.username, $scope.input.password).then(
+                    () => {
+                        var returnToPage : string = adhTopLevelState.getCameFrom();
+                        $location.path((typeof returnToPage === "string") ? returnToPage : "/");
+                    },
+                    (errors) => bindServerErrors($scope, errors)
+                );
             }, (errors) => bindServerErrors($scope, errors));
     };
 };
