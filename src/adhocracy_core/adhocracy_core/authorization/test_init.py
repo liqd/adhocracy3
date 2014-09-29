@@ -28,48 +28,48 @@ class TestRuleACLAuthorizaitonPolicy:
     def test_permits_acl(self, inst, context):
         from pyramid.security import Allow
         from pyramid.security import ACLAllowed
-        context.__acl__ = [(Allow, 'Authenticated', 'view')]
-        result = inst.permits(context, ['Authenticated'], 'view')
+        context.__acl__ = [(Allow, 'system.Authenticated', 'view')]
+        result = inst.permits(context, ['system.Authenticated'], 'view')
         assert result
         assert isinstance(result, ACLAllowed)
 
     def test_permits_acl_deny(self, inst, context):
         from pyramid.security import Deny
-        context.__acl__ = [(Deny, 'Authenticated', 'view')]
-        assert not inst.permits(context, ['Authenticated'], 'view')
+        context.__acl__ = [(Deny, 'system.Authenticated', 'view')]
+        assert not inst.permits(context, ['system.Authenticated'], 'view')
 
     def test_permits_acl_wrong_principal(self, inst, context):
         from pyramid.security import Allow
-        context.__acl__ = [(Allow, 'Authenticated', 'view')]
+        context.__acl__ = [(Allow, 'system.Authenticated', 'view')]
         assert not inst.permits(context, ['WRONG'], 'view')
 
     def test_permits_acl_wrong_permission(self, inst, context):
         from pyramid.security import Allow
-        context.__acl__ = [(Allow, 'Authenticated', 'view')]
-        assert not inst.permits(context, ['Authenticated'], 'WRONG')
+        context.__acl__ = [(Allow, 'system.Authenticated', 'view')]
+        assert not inst.permits(context, ['system.Authenticated'], 'WRONG')
 
     def test_permits_inherited_acl(self, inst, context):
         from pyramid.security import Allow
-        context.__acl__ = [(Allow, 'Authenticated', 'view')]
+        context.__acl__ = [(Allow, 'system.Authenticated', 'view')]
         context['child'] = testing.DummyResource()
-        assert inst.permits(context['child'], ['Authenticated'], 'view')
+        assert inst.permits(context['child'], ['system.Authenticated'], 'view')
 
     def test_permits_inherited_acl_multiple_principals(self, inst, context):
         from pyramid.security import Allow
-        context.__acl__ = [(Allow, 'Authenticated', 'view')]
+        context.__acl__ = [(Allow, 'system.Authenticated', 'view')]
         context['child'] = testing.DummyResource()
         context['child'].__acl__ = [(Allow, 'Everybody', 'view')]
-        assert inst.permits(context['child'], ['Authenticated', 'Everybody'],
-                            'view')
+        assert inst.permits(context['child'], ['system.Authenticated',
+                                               'Everybody'], 'view')
 
     def test_permits_inherited_acl_multiple_principals_local_deny(self, inst, context):
         from pyramid.security import Allow
         from pyramid.security import Deny
-        context.__acl__ = [(Allow, 'Authenticated', 'view')]
+        context.__acl__ = [(Allow, 'system.Authenticated', 'view')]
         context['child'] = testing.DummyResource()
         context['child'].__acl__ = [(Deny, 'Everybody', 'view')]
-        assert not inst.permits(context['child'], ['Authenticated', 'Everybody'],
-                                'view')
+        assert not inst.permits(context['child'], ['system.Authenticated',
+                                                   'Everybody'], 'view')
 
     # Additional features to support group roles mapped to permissions
 
@@ -77,23 +77,24 @@ class TestRuleACLAuthorizaitonPolicy:
         from pyramid.security import Allow
         mock_group_locator.get_roleids.return_value = ['role:admin']
         context.__acl__ = [(Allow, 'role:admin', 'view')]
-        assert inst.permits(context, ['Authenticated', 'group:Admins'], 'view')
+        assert inst.permits(context, ['system.Authenticated', 'group:Admins'],
+                            'view')
         assert mock_group_locator.get_roleids.call_args[0] == ('group:Admins',)
 
     def test_permits_acl_wrong_group(self, inst, context, mock_group_locator):
         from pyramid.security import Allow
         mock_group_locator.get_roleids.return_value = None
         context.__acl__ = [(Allow, 'role:admin', 'view')]
-        assert not inst.permits(context, ['Authenticated', 'group:Admins'],
-                                'view')
+        assert not inst.permits(context, ['system.Authenticated',
+                                          'group:Admins'], 'view')
 
     def test_permits_acl_inherited_acl(self, inst, context, mock_group_locator):
         from pyramid.security import Allow
         mock_group_locator.get_roleids.return_value = ['role:admin']
         context.__acl__ = [(Allow, 'role:admin', 'view')]
         context['child'] = testing.DummyResource()
-        assert inst.permits(context['child'], ['Authenticated', 'group:Admins'],
-                            'view')
+        assert inst.permits(context['child'], ['system.Authenticated',
+                                               'group:Admins'], 'view')
         assert mock_group_locator.get_roleids.call_args[0] == ('group:Admins',)
 
 

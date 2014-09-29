@@ -25,7 +25,9 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
 
     def _add_groups_roles_to_principals(self, context, principals):
         groups = [p for p in principals if p.startswith(self.group_prefix)]
-        locator = IGroupLocator(context, None)  # default=None to ease testing
+        locator = IGroupLocator(context, None)
+        if locator is None:
+            return  # for testing
         for group in groups:
             group_roles = locator.get_roleids(group) or []
             principals.extend(group_roles)
