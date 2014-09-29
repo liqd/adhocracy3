@@ -8,3 +8,4 @@ API
    authentication_api
    rest_api
    websockets
+   authorization
