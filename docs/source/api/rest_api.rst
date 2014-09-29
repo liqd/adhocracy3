@@ -1,1 +1,1 @@
-../../../src/adhocracy_sample/adhocracy_sample/docs/rest_api.rst
+../../../src/adhocracy_core/docs/rest_api.rst
