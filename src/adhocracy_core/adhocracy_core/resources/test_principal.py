@@ -2,6 +2,8 @@
 import unittest
 
 from pyramid import testing
+from pytest import fixture
+from pytest import mark
 
 
 class PrincipalIntegrationTest(unittest.TestCase):
@@ -9,6 +11,8 @@ class PrincipalIntegrationTest(unittest.TestCase):
     def setUp(self):
         from adhocracy_core.testing import create_pool_with_graph
         config = testing.setUp()
+        config.include('pyramid_mailer.testing')
+        config.include('pyramid_mako')
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
         config.include('adhocracy_core.sheets.metadata')
@@ -166,3 +170,32 @@ class UserLocatorAdapterIntegrationTest(unittest.TestCase):
         from substanced.interfaces import IUserLocator
         from zope.component import getMultiAdapter
         assert getMultiAdapter((self.context, testing.DummyRequest), IUserLocator)
+
+
+class TestIntegrationSendRegistrationMail():
+
+    @fixture
+    def integration(self, config):
+        config.include('pyramid_mailer.testing')
+        config.include('pyramid_mako')
+        config.include('adhocracy_core.registry')
+
+    @mark.usefixtures('integration')
+    def test_send_registration_mail(self, registry):
+        from adhocracy_core.messaging import _get_mailer
+        from adhocracy_core.resources.principal import User
+        from adhocracy_core.resources.principal import send_registration_mail
+        mailer = _get_mailer(registry)
+        assert len(mailer.outbox) == 0
+        user = User()
+        user.name = 'Anna Müller'
+        user.email = 'anna@example.org'
+        send_registration_mail(context=user, registry=registry)
+        assert user.verification_path.startswith('activate/')
+        assert len(mailer.outbox) == 1
+        msg = mailer.outbox[0]
+        # The DummyMailer is too stupid to use a default sender, hence we add
+        # one manually
+        msg.sender = 'support@adhocracy.de'
+        msgtext = str(msg.to_message())
+        assert user.verification_path in msgtext

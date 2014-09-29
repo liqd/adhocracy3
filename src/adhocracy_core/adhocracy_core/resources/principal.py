@@ -1,12 +1,17 @@
 """Resources to handle users and groups."""
+from base64 import b64encode
+from logging import getLogger
+from os import urandom
+
 from pyramid.registry import Registry
-from zope.interface import Interface
 from substanced.util import find_service
 from substanced.interfaces import IUserLocator
+from zope.interface import Interface
 from zope.interface import implementer
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
+from adhocracy_core.messaging import render_and_send_mail
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
@@ -15,6 +20,9 @@ import adhocracy_core.sheets.user
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.rate
+
+
+logger = getLogger(__name__)
 
 
 class IPrincipalsService(IServicePool):
@@ -74,11 +82,34 @@ class User(Pool):
     password = ''
     email = ''
     name = ''
+    # Set to a string for not-yet-verified users, to None for verified users
+    verification_path = 'unknown'
 
 
-def send_registration_mail(context: IPool, registry: Registry, options: dict):
+def send_registration_mail(context: IUser,
+                           registry: Registry,
+                           options: dict={}):
     """Send a registration mail to validate the email of a user account."""
-    # TODO implement
+    # FIXME subject should be configurable
+    subject = 'Adhocracy Account Authentication'
+    name = context.name
+    email = context.email
+    verification_path = _generate_verification_path()
+    context.verification_path = verification_path
+    logger.warn('Sending registration mail to %s for new user named %s, '
+                'verification path=%s', email, name, context.verification_path)
+    args = {'name': name, 'verification_path': verification_path}
+    render_and_send_mail(
+        registry=registry,
+        subject=subject,
+        recipients=[email],
+        template_asset_base='adhocracy_core:templates/registration_mail',
+        args=args)
+
+
+def _generate_verification_path() -> str:
+    random_bytes = urandom(18)
+    return 'activate/' + b64encode(random_bytes, altchars=b'-_').decode()
 
 
 user_metadata = pool_metadata._replace(
