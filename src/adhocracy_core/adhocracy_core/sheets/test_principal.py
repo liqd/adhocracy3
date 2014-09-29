@@ -87,7 +87,6 @@ class TestUserBasicSchemaSchema:
         inst = self.make_one()
         cstruct = {'email': 'test@test.de',
                    'name': 'login',
-                   'groups': [],
                    'tzname': 'Europe/Berlin'}
         assert inst.deserialize(cstruct) == cstruct
 
@@ -103,8 +102,7 @@ class TestUserBasicSchemaSchema:
 
     def test_deserialize_name(self):
         inst = self.make_one()
-        assert inst.deserialize({'name': 'login'}) == {'name': 'login',
-                                                       'groups': []}
+        assert inst.deserialize({'name': 'login'}) == {'name': 'login'}
 
     def test_name_has_deferred_validator(self):
         inst = self.make_one()
@@ -203,7 +201,7 @@ class TestUserBasicSheet:
         assert inst.get() == {'name': '',
                               'email': '',
                               'tzname': 'UTC',
-                              'groups': []}
+                              }
 
 
 def test_includeme_register_userbasic_sheet(config):
@@ -212,6 +210,102 @@ def test_includeme_register_userbasic_sheet(config):
     config.include('adhocracy_core.sheets.principal')
     context = testing.DummyResource(__provides__=IUserBasic)
     assert get_sheet(context, IUserBasic)
+
+
+class TestPermissionsSchemaSchema:
+
+
+    @fixture
+    def request(self, context, registry):
+        request = testing.DummyRequest()
+        request.registry = registry
+        request.root = context
+        return request
+
+    @fixture
+    def group(self, context):
+        group = testing.DummyResource()
+        context['group'] = group
+        return group
+
+    @fixture
+    def group_sheet(self, group, registry, mock_sheet):
+        from adhocracy_core.sheets.principal import IGroup
+        from adhocracy_core.testing import add_and_register_sheet
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IGroup)
+        add_and_register_sheet(group, mock_sheet, registry)
+        return mock_sheet
+
+    @fixture
+    def permissions_sheet(self, context, registry, mock_sheet):
+        import copy
+        from adhocracy_core.sheets.principal import IPermissions
+        from adhocracy_core.testing import add_and_register_sheet
+        mock_sheet = copy.deepcopy(mock_sheet)
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
+        add_and_register_sheet(context, mock_sheet, registry)
+        return mock_sheet
+
+    def make_one(self):
+        from adhocracy_core.sheets.principal import PermissionsSchema
+        return PermissionsSchema()
+
+    def test_deserialize_empty(self):
+        inst = self.make_one()
+        assert inst.deserialize({}) == {'groups': []}
+
+    def test_serialize_empty(self):
+        inst = self.make_one().bind()
+        assert inst.serialize({}) == {'groups': [],
+                                      'roles': [],
+                                      'roles_and_group_roles': []}
+
+    def test_serialize_with_groups_and_roles(self, context, group, request,
+                                             group_sheet, permissions_sheet):
+        permissions_sheet.get.return_value = {'roles': ['view'],
+                                              'groups': [group]}
+        group_sheet.get.return_value = {'roles': ['admin']}
+        appstruct = {'groups': [group], 'roles': ['view']}
+        inst = self.make_one().bind(context=context, request=request)
+        assert inst.serialize(appstruct) == \
+            {'groups': [request.application_url + '/group/'],
+             'roles': ['view'],
+             'roles_and_group_roles': ['admin', 'view']}
+
+
+class TestPermissionsSheet:
+
+    @fixture
+    def meta(self):
+        from adhocracy_core.sheets.principal import permissions_metadata
+        return permissions_metadata
+
+    def test_create(self, meta, context):
+        from adhocracy_core.sheets.principal import IPermissions
+        from adhocracy_core.sheets.principal import PermissionsSchema
+        from adhocracy_core.sheets import GenericResourceSheet
+        inst = meta.sheet_class(meta, context)
+        assert isinstance(inst, GenericResourceSheet)
+        assert inst.meta.isheet == IPermissions
+        assert inst.meta.schema_class == PermissionsSchema
+        assert inst.meta.permission_create == 'manage_principals'
+        assert inst.meta.permission_edit == 'manage_principals'
+        assert inst.meta.permission_view == 'view'
+
+    def test_get_empty(self, meta, context):
+        inst = meta.sheet_class(meta, context)
+        assert inst.get() == {'groups': [],
+                              'roles': [],
+                              'roles_and_group_roles': [],
+                              }
+
+
+def test_includeme_register_permissions_sheet(config):
+    from adhocracy_core.sheets.principal import IPermissions
+    from adhocracy_core.utils import get_sheet
+    config.include('adhocracy_core.sheets.principal')
+    context = testing.DummyResource(__provides__=IPermissions)
+    assert get_sheet(context, IPermissions)
 
 
 class TestGroupSheet:

@@ -91,8 +91,9 @@ def _add_initial_user_and_group(context, registry):
     users = find_service(context, 'principals', 'users')
     password_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
     appstruct = {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
-                 {'groups': [group],
-                  'name': user_name},
+                 {'name': user_name},
+                 adhocracy_core.sheets.principal.IPermissions.__identifier__:
+                 {'groups': [group]},
                  password_sheet.__identifier__:
                  {'password': user_password},
                  }

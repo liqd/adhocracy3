@@ -3,6 +3,7 @@ import unittest
 
 from pyramid import testing
 from pytest import fixture
+from pytest import mark
 
 
 class PrincipalIntegrationTest(unittest.TestCase):
@@ -94,7 +95,7 @@ class PrincipalIntegrationTest(unittest.TestCase):
         from adhocracy_core.resources.principal import IPrincipalsService
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.resources.principal import IGroup
-        from adhocracy_core.sheets.principal import IUserBasic
+        from adhocracy_core.sheets.principal import IPermissions
         from adhocracy_core.sheets.name import IName
         import adhocracy_core.sheets.principal
 
@@ -111,7 +112,7 @@ class PrincipalIntegrationTest(unittest.TestCase):
                                                     parent=groups_pool,
                                                     appstructs=appstructs)
         users_pool = principals_pool['users']
-        appstructs = {IUserBasic.__identifier__: {'groups': [group]}}
+        appstructs = {IPermissions.__identifier__: {'groups': [group]}}
         user = self.config.registry.content.create(IUser.__identifier__,
                                                    parent=users_pool,
                                                    appstructs=appstructs)
@@ -129,10 +130,21 @@ class UserMetaUnitTest(unittest.TestCase):
 
     def test_meta(self):
         from adhocracy_core.resources.principal import IUser
+        import adhocracy_core.sheets
         meta = self._make_one()
         assert meta.iresource is IUser
         assert meta.permission_add == 'add_user'
         assert meta.is_implicit_addable is False
+        assert meta.basic_sheets ==\
+            [adhocracy_core.sheets.principal.IUserBasic,
+             adhocracy_core.sheets.principal.IPermissions,
+             adhocracy_core.sheets.metadata.IMetadata,
+             adhocracy_core.sheets.pool.IPool,
+             ]
+        assert meta.extended_sheets ==\
+               [adhocracy_core.sheets.principal.IPasswordAuthentication,
+                adhocracy_core.sheets.rate.ICanRate,
+               ]
 
 
 class UserUnitTest(unittest.TestCase):
@@ -205,10 +217,10 @@ class TestUserLocatorAdapter:
         assert inst.get_user_by_userid('/principals/users/User1') is None
 
     def test_get_groupids_user_exists(self, context, mock_sheet, registry):
-        from adhocracy_core.sheets.principal import IUserBasic
+        from adhocracy_core.sheets.principal import IPermissions
         from adhocracy_core.testing import add_and_register_sheet
         group = testing.DummyResource(__name__='group1')
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=IUserBasic)
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
         mock_sheet.get.return_value = {'groups': [group]}
         user = testing.DummyResource()
         add_and_register_sheet(user, mock_sheet, registry)

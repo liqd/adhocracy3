@@ -15,6 +15,7 @@ from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import TimeZoneName
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Roles
+from adhocracy_core.utils import get_sheet
 
 
 class IGroup(ISheet):
@@ -27,11 +28,16 @@ class IUserBasic(ISheet):
     """Market interface for the userbasic sheet."""
 
 
-class UserBasicGroupsReference(SheetToSheet):
+class IPermissions(ISheet):
 
-    """versionable sheet reference to preceding versions."""
+    """Market interface for the permissions sheet."""
 
-    source_isheet = IUserBasic
+
+class PermissionsGroupsReference(SheetToSheet):
+
+    """permissions sheet reference to preceding versions."""
+
+    source_isheet = IPermissions
     source_isheet_field = 'groups'
     target_isheet = IGroup
 
@@ -42,7 +48,7 @@ class GroupSchema(colander.MappingSchema):
 
     users = UniqueReferences(readonly=True,
                              backref=True,
-                             reftype=UserBasicGroupsReference)
+                             reftype=PermissionsGroupsReference)
     roles = Roles()
 
 
@@ -106,14 +112,12 @@ class UserBasicSchema(colander.MappingSchema):
     `email`: email address
     `name`: visible name
     `tzname`: time zone
-    `groups`: groups this user joined
     """
 
     email = Email(validator=deferred_validate_user_email)
     name = SingleLine(missing=colander.required,
                       validator=deferred_validate_user_name)
     tzname = TimeZoneName()
-    groups = UniqueReferences(reftype=UserBasicGroupsReference)
 
 
 userbasic_metadata = sheet_metadata_defaults._replace(
@@ -121,6 +125,54 @@ userbasic_metadata = sheet_metadata_defaults._replace(
     schema_class=UserBasicSchema,
     sheet_class=AttributeStorageSheet,
     permission_create='create_sheet_userbasic',
+)
+
+
+@colander.deferred
+def deferred_roles_and_group_roles(node: colander.SchemaNode, kw: dict)\
+        -> list:
+    """Return roles and groups roles for `context`.
+
+    :param kw: dictionary with 'context' key and
+              :class:`adhocracy_core.sheets.principal.IPermissions` object.
+    :return: list of :term:`roles` or [].
+    """
+    context = kw.get('context', None)
+    request = kw.get('request', None)
+    # FIXME Getting the request binding is just a HACK to prevent circle
+    # in adhocracy_core.sheets.GenericResourceSheet.__init__ schema binding.
+    if not IPermissions.providedBy(context) or request is None:
+        return []
+    permissions_sheet = get_sheet(context, IPermissions)
+    roles = permissions_sheet.get()['roles']
+    groups = permissions_sheet.get()['groups']
+    for group in groups:
+        group_sheet = get_sheet(group, IGroup)
+        group_roles = group_sheet.get()['roles']
+        roles.extend(group_roles)
+    roles_sorted = sorted(list(set(roles)))
+    return roles_sorted
+
+
+class PermissionsSchema(colander.MappingSchema):
+
+    """Userbasic sheet data structure.
+
+    `groups`: groups this user joined
+    """
+
+    roles = Roles()
+    groups = UniqueReferences(reftype=PermissionsGroupsReference)
+    roles_and_group_roles = Roles(readonly=True,
+                                  default=deferred_roles_and_group_roles)
+
+
+permissions_metadata = sheet_metadata_defaults._replace(
+    isheet=IPermissions,
+    schema_class=PermissionsSchema,
+    sheet_class=AttributeStorageSheet,
+    permission_create='manage_principals',
+    permission_edit='manage_principals',
 )
 
 
@@ -199,5 +251,6 @@ def includeme(config):
     add_sheet_to_registry(userbasic_metadata, config.registry)
     add_sheet_to_registry(password_metadata, config.registry)
     add_sheet_to_registry(group_metadata, config.registry)
+    add_sheet_to_registry(permissions_metadata, config.registry)
     # config.scan('.')
     # config.add_evolution_step(add_user_catalog)
