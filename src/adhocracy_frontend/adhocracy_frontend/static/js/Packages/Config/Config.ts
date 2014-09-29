@@ -14,4 +14,5 @@ export interface Type {
     embedded : boolean;
     trusted_domains : string[];
     locale : string;
+    support_email : string;
 }

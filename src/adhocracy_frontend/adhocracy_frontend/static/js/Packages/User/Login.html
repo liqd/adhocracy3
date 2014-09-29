@@ -25,7 +25,7 @@
             data-ng-disabled="loginForm.$invalid" />
         <div class="login-support">
             {{ "Having trouble with login?" | translate}} <br />
-            <a href="mailto:support@adhocracy.de?subject=Trouble%20with%20login">support@adhocracy.de</a>
+            <a href="mailto:{{supportEmail}}?subject=Trouble%20with%20login">{{ supportEmail }}</a>
         </div>
     </form>
 

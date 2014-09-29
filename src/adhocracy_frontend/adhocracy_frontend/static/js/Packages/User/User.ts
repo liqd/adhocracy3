@@ -219,10 +219,12 @@ export class User {
 export var loginController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
+    adhConfig : AdhConfig.Type,
     $scope : IScopeLogin,
     $location : ng.ILocationService
 ) : void => {
     $scope.errors = [];
+    $scope.supportEmail = adhConfig.support_email;
 
     $scope.credentials = {
         nameOrEmail: "",
@@ -254,7 +256,7 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "$scope", "$location", loginController]
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", "$location", loginController]
     };
 };
 
@@ -262,6 +264,7 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
 export var registerController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
+    adhConfig : AdhConfig.Type,
     $scope : IScopeRegister,
     $location : ng.ILocationService
 ) => {
@@ -273,6 +276,7 @@ export var registerController = (
     };
 
     $scope.errors = [];
+    $scope.supportEmail = adhConfig.support_email;
 
     $scope.register = () : ng.IPromise<void> => {
         return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
@@ -295,7 +299,7 @@ export var registerDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "$scope", "$location", registerController]
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", "$location", registerController]
     };
 };
 

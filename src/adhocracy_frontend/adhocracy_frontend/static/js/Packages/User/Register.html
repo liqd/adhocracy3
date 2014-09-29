@@ -46,7 +46,7 @@
             data-ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
         <div class="register-support">
             {{ "Having trouble with registration?" | translate}} <br />
-            <a href="mailto:support@adhocracy.de?subject=Trouble%20with%20registration">support@adhocracy.de</a>
+            <a href="mailto:{{supportEmail}}?subject=Trouble%20with%20registration">{{ supportEmail }}</a>
         </div>
     </form>
 
