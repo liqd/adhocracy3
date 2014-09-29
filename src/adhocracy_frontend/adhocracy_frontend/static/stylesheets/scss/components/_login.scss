@@ -71,13 +71,14 @@ Login Dialog.
     <form class="login-form">
         <input type="text" name="name" placeholder="email or username" />
         <input type="password" name="password" placeholder="password" />
-        <a>forgot password</a>
-        <input type="submit" value="login" />
+        <input type="submit" class="m-call-to-action" value="login" />
+        <div class="login-support">
+            Having trouble with login? <br />
+            <a href="mailto:support@adhocracy.de?subject=Trouble%20with%20login">support@adhocracy.de</a>
+        </div>
     </form>
     <div class="login-description box-with-button">
-        <div class="textbox m-unobtrusive">
-            <p>Description</p>
-        </div>
+        <p>In case you do not have an account yet, sign up to a free account and participate!</p>
         <a class="button">register</a>
     </div>
 </div>
@@ -94,21 +95,24 @@ category: Widgets
 Register Dialog.
 
 ```html_example
-<form class="register">
+<div class="register">
     <h1 class="title">Register!</h1>
-    <div class="register-inputs">
+    <form class="register-form">
         <input type="text" name="username" placeholder="username" />
         <input type="email" name="email" placeholder="email" />
         <input type="password" name="password" placeholder="password" />
         <input type="password" name="password_repeat" placeholder="password repeat" />
-    </div>
-    <div class="register-description box-with-button">
-        <div class="textbox m-unobtrusive">
-            <p>Disclaimer</p>
+        <input type="submit" class="m-call-to-action" name="register" value="register" />
+        <div class="register-support">
+            Having trouble with registration? <br />
+            <a href="mailto:support@adhocracy.de?subject=Trouble%20with%20registration">support@adhocracy.de</a>
         </div>
-        <input type="submit" name="register" value="register" />
+    </form>
+    <div class="box-with-button">
+        <p>You already have an account? Go to the LogIn window.</p>
+        <a class="button" href="">LogIn</a>
     </div>
-</form>
+</div>
 ```
 */
 
@@ -117,38 +121,20 @@ Register Dialog.
     text-transform: uppercase;
 }
 
-.register,
-.login {
-    @include container;
-
-    .register-inputs,
-    .login-form {
-        @include span(3 of 5);
-    }
-
-    .register-description,
-    .login-description {
-        @include span(2 of 5);
-        margin: 0;  // remove gutter
-    }
-}
-
-.register-inputs,
+.register-form,
 .login-form {
+    margin-bottom: 1em;
+
     input[type="text"],
     input[type="email"],
-    input[type="password"] {
+    input[type="password"],
+    input[type="submit"] {
         width: 100%;
     }
 
-    a,
     input[type="submit"] {
-        @include span(1 of 2);
+        margin: 0.5em 0;
         @include text-align(center);
-
-        &:last-child {
-            margin: 0;  // remove gutter
-        }
     }
 }
 

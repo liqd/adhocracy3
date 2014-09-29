@@ -1,9 +1,10 @@
 <div class="login">
     <h1 class="title">{{ "Log in!" | translate }}</h1>
-    <div class="form-error" data-ng-repeat="error in errors track by $index">
-        <p>{{error}}</p>
-    </div>
-    <form  novalidate="novalidate" class="login-form" name="loginForm">
+
+    <form novalidate="novalidate" class="login-form" name="loginForm">
+        <div class="form-error" data-ng-repeat="error in errors track by $index">
+            <p>{{error}}</p>
+        </div>
         <input
             type="text"
             name="nameOrEmail"
@@ -16,7 +17,6 @@
             placeholder="{{ 'password' | translate }}"
             required="required"
             data-ng-model="credentials.password" />
-        <a>{{ "forgot password" | translate }}</a>
         <input
             type="submit"
             value="{{ 'login' | translate }}"
@@ -28,10 +28,9 @@
             <a href="mailto:support@adhocracy.de?subject=Trouble%20with%20login">support@adhocracy.de</a>
         </div>
     </form>
-    <div class="login-description box-with-button">
-        <div class="text-box m-unobtrusive">
-            <p>{{ "In case you do not have an account yet, sign up to a free account and participate!" | translate }}</p>
-        </div>
+
+    <div class="box-with-button">
+        <p>{{ "In case you do not have an account yet, sign up to a free account and participate!" | translate }}</p>
         <a class="button" href="/register">{{ "register" | translate }}</a>
     </div>
 </div>
