@@ -17,6 +17,10 @@ A simple box containing text.
 ```
 */
 .textbox {
+    padding: 1em;
+    margin-bottom: 1em;
+    background-color: $color-structure-surface;
+
     .m-unobtrusive {
         color: $color-secondary-extrovert;
     }
@@ -39,7 +43,7 @@ A generic box with a single button.
 ```
 */
 .box-with-button {
-    border: 1px solid $color-structure-border;
+    background-color: $color-structure-surface;
     padding: 1em 1em 0;
     margin-bottom: 2em;
 
