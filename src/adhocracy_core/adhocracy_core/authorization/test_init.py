@@ -97,4 +97,17 @@ class TestRuleACLAuthorizaitonPolicy:
                                                'group:Admins'], 'view')
         assert mock_group_locator.get_roleids.call_args[0] == ('group:Admins',)
 
+    def test_permits_acl_with_user_roles(self, inst, context, mock_user_locator):
+        from pyramid.security import Allow
+        mock_user_locator.get_roleids.return_value = ['role:admin']
+        context.__acl__ = [(Allow, 'role:admin', 'view')]
+        assert inst.permits(context, ['system.Authenticated', 'Admin',
+                                      'group:Admin'], 'view')
+        assert mock_user_locator.get_roleids.call_args[0] == ('Admin',)
 
+    def test_permits_acl_wrong_user(self, inst, context, mock_user_locator):
+        from pyramid.security import Allow
+        mock_user_locator.get_roleids.return_value = None
+        context.__acl__ = [(Allow, 'role:admin', 'view')]
+        assert not inst.permits(context, ['system.Authenticated', 'Admin',
+                                          'group:Admin'],  'view')

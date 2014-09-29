@@ -164,11 +164,11 @@ class TestUserLocatorAdapter:
         return pool
 
     def test_create(self):
-        from substanced.interfaces import IUserLocator
+        from adhocracy_core.interfaces import IRolesUserLocator
         from zope.interface.verify import verifyObject
         inst = self._make_one()
-        assert IUserLocator.providedBy(inst)
-        assert verifyObject(IUserLocator, inst)
+        assert IRolesUserLocator.providedBy(inst)
+        assert verifyObject(IRolesUserLocator, inst)
 
     def test_get_user_by_email_user_exists(self, context):
         user = testing.DummyResource(email='test@test.de')
@@ -219,6 +219,21 @@ class TestUserLocatorAdapter:
     def test_get_groupids_user_not_exists(self, context):
         inst = self._make_one(context, testing.DummyRequest())
         assert inst.get_groupids('/principals/users/User1') is None
+
+    def test_get_roleids_user_exists(self, context, mock_sheet, registry):
+        from adhocracy_core.sheets.principal import IPermissions
+        from adhocracy_core.testing import add_and_register_sheet
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
+        mock_sheet.get.return_value = {'roles': ['role1']}
+        user = testing.DummyResource()
+        add_and_register_sheet(user, mock_sheet, registry)
+        context['principals']['users']['User1'] = user
+        inst = self._make_one(context, testing.DummyRequest())
+        assert inst.get_roleids('/principals/users/User1') == ['role:role1']
+
+    def test_get_roleids_user_not_exists(self, context):
+        inst = self._make_one(context, testing.DummyRequest())
+        assert inst.get_roleids('/principals/users/User1') is None
 
 
 class UserLocatorAdapterIntegrationTest(unittest.TestCase):
