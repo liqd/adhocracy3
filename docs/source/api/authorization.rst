@@ -60,7 +60,7 @@ The creator role is automatically set for a specific local context and is not
 inherited.
 
 ACL (Access Control List):
-...........................
+..........................
 
 List with ACEs (Access Control Entry): [<Action>, <Principal>, <Permission>]
 
@@ -80,14 +80,15 @@ Customizing
 
 1. map users to group
 2. map roles to principals
-3. use workflow system to add :term:`local roles` mapped to principals
-4. manually add :term:`local roles` (change permission to allow others to edit)
+3. use workflow system to  locally add :term:`local roles` mapped to principals
+4. locally add :term:`local roles` (change permission to allow others to edit)
 5. map permissions to roles:
     - use only configuration for this
     - default mapping should just work for most use cases
 
 Questions
 ---------
+FIXME: remove this section?
 
 what is the difference between role and group, on a conceptual level?
 (why do we need both?)  i'm assuming that groups are a pyramid
@@ -102,6 +103,11 @@ is there multiple inheritance?
 
 - no
 
+does "inheritance" always mean "content type inheritance"?
+
+- in this context `inheritance` means inheritance from parent to child in
+  the object hierarchy
+
 can groups be members of groups?
 
 - no. but it would be easy to implement that.
@@ -111,51 +117,33 @@ run time?
 
 - For the year 2014: ACL won't change during runtime and workflows are not needed
 
-Random notes (matthias):
-------------------------
-FIXME: cleanup the following stuff
-
-draw a graph with all mappings, and mark them as
- - 1:n vs. n:1 vs. n:m
- - dynamic (workflows) vs. static (config files)
-
-identify minimal subset that
- - satisfies requirements for merkator.
- - can be implemented efficiently, and the rest can be added efficiently later.
 
 API
-...
+---
 
-an operation is a tuple (user, resource, permission).  example::
+The user object must contain a list of roles and a list of groups she
+is a member of.  This is necessary because the UI looks different for
+different roles (at the very least, we want to see a different icon
+for every role in the login widget).
 
-    ( joe,
-      /adhocracy/proposals/against_curtains/version_000043,
-      edit )
+If the FE sends a request to the BE that it has no authorisation for,
+it will receive an error (depending on the situation either 4xx to
+conceal the existence of secret resources, or 3xx to explicitly deny
+access).
 
-we wants to
- - ask if an operation is allowed (so it can render an object as non-editable, for instance).
- - try an operation, and get a "denied" error that it can handle gracefully.
+There are (at least) four approaches to implement an API that the FE
+can use to query BE about permissions without actually performin an
+access operation an observing the response:
 
-mappings from users, groups, roles to each other must be contained in
-resources.  (and only visible to authorized users!)  (it is a security
-requirement that these resources are in sync with the backend!)
+1. OPTIONS protocol.  This is expressive enough to decide if user is
+   allowed to edit a resource or not, but not enough to inspect or
+   edit permissions of self (by ordinary users) or other users (by
+   admin).
 
+2. (future work) Add permission object to meta api (CAVEAT: this makes
+   version resources change unexpectedly).
 
-notes from meeting with joka
-............................
+3. (future work) Change HTTP response to contain not only the resource
+   but also permission information in a larger json object.
 
-FIXME: If FE wants to ask BE about permissions, there are many ways to
-implement this:
-
- - OPTIONS protocol (already implemented, and expressive enough to
-   decide if we can eit a resource or not)
-
-this is what we want to do for merkator.  future alternatives:
-
- - add permission object to meta api (CAVEAT: this makes version
-   resources change unexpectedly).
-
- - change HTTP response to contain not only the resource but also
-   permission information in a larger json object.
-
- - new http endpoint for permission requests.
+4. (future work) New HTTP end-point for permission requests.
