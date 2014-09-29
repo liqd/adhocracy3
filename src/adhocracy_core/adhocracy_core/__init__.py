@@ -57,6 +57,7 @@ def includeme(config):
     config.include('pyramid_zodbconn')
     config.include('pyramid_mailer')
     config.include('pyramid_exclog')
+    config.include('pyramid_mako')
     config.hook_zca()  # enable global adapter lookup (used by adhocracy.utils)
     authz_policy = ACLAuthorizationPolicy()
     config.set_authorization_policy(authz_policy)

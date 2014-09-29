@@ -1,7 +1,9 @@
 """Messaging support."""
 from collections.abc import Sequence
 
+from pkg_resources import resource_exists
 from pyramid.registry import Registry
+from pyramid.renderers import render
 from pyramid_mailer.interfaces import IMailer
 from pyramid_mailer.message import Message
 
@@ -41,3 +43,48 @@ def send_mail(registry: Registry,
 
 def _get_mailer(registry: Registry) -> IMailer:
     return registry.getUtility(IMailer)
+
+
+def render_and_send_mail(registry: Registry,
+                         subject: str,
+                         recipients: Sequence,
+                         template_asset_base: str,
+                         args: dict={},
+                         sender: str=None):
+    """Render a message from a template and send it as mail.
+
+    The message can contain just a plain text part, an HTML part, or both,
+    depending on the templates provided. For example, if you set
+    ``template_asset_base`` to 'adhocracy_core:templates/sample', the file
+    'adhocracy_core:templates/sample.txt.mako' (if it exists) will be used to
+    render the plain text view, and 'adhocracy_core:templates/sample.html.mako'
+    (if it exists) will be used to render the HTML view. If neither file
+    exists, a ValueError is thrown.
+
+    Template files are parsed by `Mako <http://www.makotemplates.org/>`, see
+    `Mako Syntax <http://docs.makotemplates.org/en/latest/syntax.html>`.
+
+    :param registry: used to retrieve the mailer
+    :param subject: the subject of the message
+    :param recipients: non-empty list of the email addresses of recipients
+    :param template_asset_base: the base name of template file(s) to use,
+        in format: ``packagename:path/to/file``
+    :param args: dictionary or arguments to pass to the renderer
+    :param sender: the email message of the sender; if None, the configured
+        default sender address will be used
+    """
+    package, path = template_asset_base.split(':', 1)
+    if resource_exists(package, path + '.txt.mako'):
+        body = render(template_asset_base + '.txt.mako', args, None)
+    else:
+        body = None
+    if resource_exists(package, path + '.html.mako'):
+        html = render(template_asset_base + '.html.mako', args, None)
+    else:
+        html = None
+    return send_mail(registry=registry,
+                     subject=subject,
+                     recipients=recipients,
+                     sender=sender,
+                     body=body,
+                     html=html)
