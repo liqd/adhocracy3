@@ -26,7 +26,7 @@ export interface IListingContainerAdapter {
 
 export class ListingPoolAdapter implements IListingContainerAdapter {
     public elemRefs(container : Resources.Content<SIPool.HasAdhocracyCoreSheetsPoolIPool>) {
-        return container.data["adhocracy_core.sheets.pool.IPool"].elements;
+        return container.data[SIPool.nick].elements;
     }
 
     public poolPath(container : Resources.Content<SIPool.HasAdhocracyCoreSheetsPoolIPool>) {

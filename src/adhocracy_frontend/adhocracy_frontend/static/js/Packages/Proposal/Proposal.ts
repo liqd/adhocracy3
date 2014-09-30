@@ -178,7 +178,7 @@ export class ProposalVersionNew {
                 $scope.viewmode = "edit";
 
                 $scope.content = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
-                $scope.content.data["adhocracy_core.sheets.document.IDocument"] =
+                $scope.content.data[SIDocument.nick] =
                     new SIDocument.AdhocracyCoreSheetsDocumentIDocument({
                         title: "",
                         description: "",
@@ -188,7 +188,7 @@ export class ProposalVersionNew {
 
                 $scope.addParagraphVersion = () => {
                     var pv = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
-                    pv.data["adhocracy_core.sheets.document.IParagraph"] =
+                    pv.data[SIParagraph.nick] =
                         new SIParagraph.AdhocracyCoreSheetsDocumentIParagraph({
                             content: ""
                         });
@@ -278,6 +278,7 @@ export class Service {
         private $q : ng.IQService
     ) {}
 
+
     public postProposalWithParagraphs(
         poolPath : string,
         proposalVersion : RIProposalVersion,
@@ -286,14 +287,14 @@ export class Service {
         var _self = this;
 
         var sectionVersion : RISectionVersion = new RISectionVersion({preliminaryNames: _self.adhPreliminaryNames});
-        sectionVersion.data["adhocracy_core.sheets.document.ISection"] =
+        sectionVersion.data[SISection.nick] =
             new SISection.AdhocracyCoreSheetsDocumentISection({
                 title : "single_section",
                 elements : [],
                 subsections : []
             });
 
-        var name = proposalVersion.data["adhocracy_core.sheets.document.IDocument"].title;
+        var name = proposalVersion.data[SIDocument.nick].title;
         name = Util.normalizeName(name);
 
         // this is the batch-request logic.  it works a bit different
@@ -321,25 +322,25 @@ export class Service {
 
                 // versions
                 var postParagraphVersions = paragraphVersions.map((paragraphVersion, i) => {
-                    paragraphVersion.data["adhocracy_core.sheets.versions.IVersionable"] =
+                    paragraphVersion.data[SIVersionable.nick] =
                         new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
                             follows: [postParagraphs[i].first_version_path]
                         });
                     return transaction.post(postParagraphs[i].path, paragraphVersion);
                 });
 
-                sectionVersion.data["adhocracy_core.sheets.versions.IVersionable"] =
+                sectionVersion.data[SIVersionable.nick] =
                     new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
                         follows: [postSection.first_version_path]
                     });
-                sectionVersion.data["adhocracy_core.sheets.document.ISection"].elements = postParagraphVersions.map((p) => p.path);
+                sectionVersion.data[SISection.nick].elements = postParagraphVersions.map((p) => p.path);
                 var postSectionVersion = transaction.post(postSection.path, sectionVersion);
 
-                proposalVersion.data["adhocracy_core.sheets.versions.IVersionable"] =
+                proposalVersion.data[SIVersionable.nick] =
                     new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
                         follows: [postProposal.first_version_path]
                     });
-                proposalVersion.data["adhocracy_core.sheets.document.IDocument"].elements = [postSectionVersion.path];
+                proposalVersion.data[SIDocument.nick].elements = [postSectionVersion.path];
                 var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
 
                 return transaction.commit()
