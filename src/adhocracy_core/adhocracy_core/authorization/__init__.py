@@ -5,7 +5,6 @@ from pyramid.security import ACLPermitsResult
 from pyramid.testing import DummyRequest
 from pyramid.traversal import lineage
 from zope.interface import implementer
-from zope.component import queryMultiAdapter
 
 from adhocracy_core.interfaces import IGroupLocator
 from adhocracy_core.interfaces import IRolesUserLocator
@@ -58,7 +57,8 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
                  not p.startswith(self.role_prefix) and
                  not p.startswith('system.')]
         request = DummyRequest()
-        locator = queryMultiAdapter((context, request), IRolesUserLocator)
+        locator = request.registry.queryMultiAdapter((context, request),
+                                                     IRolesUserLocator)
         if locator is None:  # for testing
             return
         for user in users:

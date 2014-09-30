@@ -34,8 +34,6 @@ class GenericResourceSheet(PropertySheet):
         """Resource to adapt."""
         self.meta = metadata
         """SheetMetadata"""
-        self.registry = get_current_registry(context)
-        """class:`Registry` to add events and references."""
         self._data_key = self.meta.isheet.__identifier__
         self._graph = find_graph(context)
 
@@ -121,13 +119,17 @@ class GenericResourceSheet(PropertySheet):
                 nodes[node.name] = node
         return nodes
 
-    def set(self, appstruct: dict, omit=(), send_event=True) -> bool:
+    def set(self, appstruct: dict, omit=(), send_event=True,
+            registry=None) -> bool:
         """Store appstruct."""
         appstruct = self._omit_forbidden_keys(appstruct, omit)
         self._store_data(appstruct)
-        self._store_references(appstruct)
+        if registry is None:
+            registry = get_current_registry(self.context)
+        """class:`Registry` to add events and references."""
+        self._store_references(appstruct, registry)
         # FIXME: only store struct if values have changed
-        self._notify_resource_sheet_modified(send_event)
+        self._notify_resource_sheet_modified(send_event, registry)
         return bool(appstruct)
 
     def _omit_forbidden_keys(self, appstruct: dict, omit=()):
@@ -141,19 +143,19 @@ class GenericResourceSheet(PropertySheet):
     def _store_data(self, appstruct):
         self._data.update(appstruct)
 
-    def _store_references(self, appstruct):
+    def _store_references(self, appstruct, registry):
         if self._graph:
             self._graph.set_references_for_isheet(self.context,
                                                   self.meta.isheet,
                                                   appstruct,
-                                                  self.registry)
+                                                  registry)
 
-    def _notify_resource_sheet_modified(self, send_event):
+    def _notify_resource_sheet_modified(self, send_event, registry):
         if send_event:
             event = ResourceSheetModified(self.context,
                                           self.meta.isheet,
-                                          self.registry)
-            self.registry.notify(event)
+                                          registry)
+            registry.notify(event)
 
 
 sheet_metadata_defaults = sheet_metadata._replace(

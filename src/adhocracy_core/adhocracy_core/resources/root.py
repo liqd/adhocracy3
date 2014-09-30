@@ -54,7 +54,8 @@ def _add_catalog_service(context, registry):
 
 def _add_principals_service(context, registry):
     registry.content.create(IPrincipalsService.__identifier__,
-                            parent=context)
+                            parent=context,
+                            registry=registry)
 
 
 def _add_acl_to_app_root(context, registry):
@@ -72,7 +73,7 @@ def _add_platform(context, registry):
     platform_id = registry.settings.get('adhocracy.platform_id', 'adhocracy')
     appstructs = {'adhocracy_core.sheets.name.IName': {'name': platform_id}}
     registry.content.create(IBasicPool.__identifier__, context,
-                            appstructs=appstructs)
+                            appstructs=appstructs, registry=registry)
 
 
 def _add_initial_user_and_group(context, registry):
@@ -87,7 +88,8 @@ def _add_initial_user_and_group(context, registry):
                  adhocracy_core.sheets.name.IName.__identifier__:
                  {'name': group_name},
                  }
-    group = registry.content.create(IGroup.__identifier__, groups, appstruct)
+    group = registry.content.create(IGroup.__identifier__, groups, appstruct,
+                                    registry=registry)
     users = find_service(context, 'principals', 'users')
     password_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
     appstruct = {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
@@ -97,7 +99,8 @@ def _add_initial_user_and_group(context, registry):
                  password_sheet.__identifier__:
                  {'password': user_password},
                  }
-    registry.content.create(IUser.__identifier__, users, appstruct)
+    registry.content.create(IUser.__identifier__, users, appstruct,
+                            registry=registry)
 
 
 root_metadata = pool_metadata._replace(

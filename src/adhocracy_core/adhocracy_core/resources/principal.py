@@ -39,10 +39,12 @@ class IPrincipalsService(IServicePool):
 def create_initial_content_for_principals(context: IPool, registry: Registry,
                                           options: dict):
     """Add users, groups and resets subobjects to context."""
-    registry.content.create(IUsersService.__identifier__, parent=context)
-    registry.content.create(IGroupsService.__identifier__, parent=context)
+    registry.content.create(IUsersService.__identifier__,
+                            parent=context, registry=registry)
+    registry.content.create(IGroupsService.__identifier__,
+                            parent=context, registry=registry)
     registry.content.create(IPasswordResetsService.__identifier__,
-                            parent=context)
+                            parent=context, registry=registry)
 
 
 principals_metadata = service_metadata._replace(

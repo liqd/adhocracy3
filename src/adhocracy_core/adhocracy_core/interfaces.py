@@ -105,7 +105,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
     meta = Attribute('SheetMetadata')
 
-    def set(appstruct, omit=(), send_event=True) -> bool:
+    def set(appstruct, omit=(), send_event=True, registry=None) -> bool:
         """ Store ``appstruct`` dictionary data."""
 
     def get(params: dict={}) -> dict:

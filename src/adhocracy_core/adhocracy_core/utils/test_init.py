@@ -193,6 +193,18 @@ def test_get_sheet_adapter_exists(config, context):
     assert get_sheet(context, ISheet) is adapter
 
 
+def test_get_sheet_with_registry_adapter_exists(registry, context):
+    from adhocracy_core.interfaces import IResourceSheet
+    from adhocracy_core.interfaces import ISheet
+    from adhocracy_core.utils import get_sheet
+    adapter = testing.DummyResource(__provides__=IResourceSheet)
+    context = testing.DummyResource(__provides__=ISheet)
+    registry.registerAdapter(lambda x: adapter, (ISheet,),
+                             IResourceSheet,
+                             ISheet.__identifier__)
+    assert get_sheet(context, ISheet, registry=registry) is adapter
+
+
 def test_get_sheet_adapter_does_not_exists(config, context):
     from adhocracy_core.interfaces import ISheet
     from zope.component import ComponentLookupError
@@ -211,6 +223,18 @@ def test_get_all_sheets_adapter_exists(config):
                                     (ISheet,), IResourceSheet,
                                     ISheet.__identifier__)
     assert adapter in get_all_sheets(context)
+
+
+def test_get_all_sheets_adapter_exists(registry):
+    from adhocracy_core.interfaces import IResourceSheet
+    from adhocracy_core.interfaces import ISheet
+    from . import get_all_sheets
+    adapter = testing.DummyResource(__provides__=IResourceSheet)
+    context = testing.DummyResource(__provides__=ISheet)
+    registry.registerAdapter(lambda x: adapter,
+                             (ISheet,), IResourceSheet,
+                              ISheet.__identifier__)
+    assert adapter in get_all_sheets(context, registry=registry)
 
 
 class GetUserUnitTest(unittest.TestCase):

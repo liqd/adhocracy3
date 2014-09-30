@@ -20,6 +20,7 @@ class RootPoolIntegrationTest(unittest.TestCase):
         request = testing.DummyRequest()
         request.registry = config.registry
         self.request = request
+        self.registry = config.registry
 
     def tearDown(self):
         testing.tearDown()
@@ -74,9 +75,9 @@ class RootPoolIntegrationTest(unittest.TestCase):
     def test_includeme_registry_add_initial_god_user(self):
         from substanced.interfaces import IUserLocator
         from adhocracy_core.resources.root import IRootPool
-        from zope.component import getMultiAdapter
         inst = self.config.registry.content.create(IRootPool.__identifier__)
-        locator = getMultiAdapter((inst, self.request), IUserLocator)
+        locator = self.registry.getMultiAdapter((inst, self.request),
+                                                IUserLocator)
         user_god = locator.get_user_by_login('god')
         assert not user_god is None
         assert user_god.password != ''
@@ -84,11 +85,11 @@ class RootPoolIntegrationTest(unittest.TestCase):
     def test_includeme_registry_add_initial_god_user_with_custom_login(self):
         from substanced.interfaces import IUserLocator
         from adhocracy_core.resources.root import IRootPool
-        from zope.component import getMultiAdapter
         self.config.registry.settings['adhocracy.initial_login'] = 'custom'
         self.config.registry.settings['adhocracy.initial_password'] = 'password'
         inst = self.config.registry.content.create(IRootPool.__identifier__)
-        locator = getMultiAdapter((inst, self.request), IUserLocator)
+        locator = self.registry.getMultiAdapter((inst, self.request),
+                                                IUserLocator)
         user_god = locator.get_user_by_login('custom')
         assert not user_god is None
         assert user_god.password != ''
@@ -98,9 +99,8 @@ class RootPoolIntegrationTest(unittest.TestCase):
         from adhocracy_core.interfaces import IGroupLocator
         from adhocracy_core.sheets.principal import IGroup
         from adhocracy_core.utils import get_sheet
-        from zope.component import getAdapter
         inst = self.config.registry.content.create(IRootPool.__identifier__)
-        locator = getAdapter(inst, IGroupLocator)
+        locator = self.registry.getAdapter(inst, IGroupLocator)
         group_gods = locator.get_group_by_id('gods')
         group_sheet = get_sheet(group_gods, IGroup)
         group_users = [x.__name__ for x in group_sheet.get()['users']]

@@ -28,7 +28,8 @@ def root_factory(request, t=transaction, connection=None,
     zodb_root = connection.root()
     if 'app_root' not in zodb_root:
         registry = request.registry
-        app_root = registry.content.create(IRootPool.__identifier__)
+        app_root = registry.content.create(IRootPool.__identifier__,
+                                           registry=request.registry)
         zodb_root['app_root'] = app_root
         t.savepoint()  # give app_root a _p_jar
         if mark_unfinished_as_finished:

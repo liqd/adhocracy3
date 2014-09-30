@@ -48,12 +48,13 @@ class TagSheet(GenericResourceSheet):
 
     """Resource sheet for a tag."""
 
-    def set(self, appstruct: dict, omit=(), send_event=True) -> bool:
+    def set(self, appstruct: dict, omit=(), send_event=True, registry=None)\
+            -> bool:
         """Store appstruct, updating the catalog."""
         old_element_set = set(self._get_references().get('elements', []))
         new_element_set = set(appstruct.get('elements', []))
         newly_tagged_or_untagged_resources = old_element_set ^ new_element_set
-        result = super().set(appstruct, omit, send_event)
+        result = super().set(appstruct, omit, send_event, registry=registry)
         if newly_tagged_or_untagged_resources:
             self._reindex_resources(newly_tagged_or_untagged_resources)
         return result

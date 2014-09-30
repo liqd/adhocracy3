@@ -120,6 +120,13 @@ class TestRuleACLAuthorizaitonPolicy:
         assert inst.permits(context, ['system.Authenticated', 'Admin',
                                       'group:Admin'],  'view')
 
+    def test_permits_acl_with_wrong_local_roles(self, inst, context):
+        from pyramid.security import Allow
+        context.__local_roles__ = {'WRONG_PRINCIPAL': ['role:admin']}
+        context.__acl__ = [(Allow, 'role:admin', 'view')]
+        assert not inst.permits(context, ['system.Authenticated', 'Admin',
+                                          'group:Admin'],  'view')
+
     def test_permits_acl_with_inherited_local_roles(self, inst, context):
         from pyramid.security import Allow
         context.__acl__ = [(Allow, 'role:admin', 'view'),

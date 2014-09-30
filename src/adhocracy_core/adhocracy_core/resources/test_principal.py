@@ -255,15 +255,15 @@ class UserLocatorAdapterIntegrationTest(unittest.TestCase):
         self.config.include('adhocracy_core.registry')
         self.config.include('adhocracy_core.resources.principal')
         self.context = testing.DummyResource()
+        self.registry = self.config.registry
 
     def tearDown(self):
         testing.tearDown()
 
     def test_create(self):
         from adhocracy_core.interfaces import IRolesUserLocator
-        from zope.component import getMultiAdapter
-        assert getMultiAdapter((self.context, testing.DummyRequest),
-                               IRolesUserLocator)
+        assert self.registry.getMultiAdapter(
+            (self.context,  testing.DummyRequest), IRolesUserLocator)
 
 
 class TestGroupLocatorAdapter:
@@ -332,11 +332,11 @@ class GroupLocatorAdapterIntegrationTest(unittest.TestCase):
         self.config.include('adhocracy_core.registry')
         self.config.include('adhocracy_core.resources.principal')
         self.context = testing.DummyResource()
+        self.registry = self.config.registry
 
     def tearDown(self):
         testing.tearDown()
 
     def test_create(self):
         from adhocracy_core.interfaces import IGroupLocator
-        from zope.component import getAdapter
-        assert getAdapter(self.context, IGroupLocator)
+        assert self.registry.getAdapter(self.context, IGroupLocator)

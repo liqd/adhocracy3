@@ -313,7 +313,7 @@ class TestResourceFactory:
 
         meta = resource_meta._replace(iresource=IResource,
                                       use_autonaming=True)
-        user = object()
+        user = testing.DummyResource()
 
         resource = self.make_one(meta)(parent=pool, creator=user)
 

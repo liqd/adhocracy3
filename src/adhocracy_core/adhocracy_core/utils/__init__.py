@@ -10,10 +10,11 @@ import pprint
 
 from pyramid.compat import is_nonstr_iter
 from pyramid.request import Request
+from pyramid.registry import Registry
 from pyramid.traversal import find_resource
+from pyramid.threadlocal import get_current_registry
 from substanced.util import get_dotted_name
 from substanced.util import acquire
-from zope.component import getAdapter
 from zope.interface import directlyProvidedBy
 from zope.interface import Interface
 from zope.interface import providedBy
@@ -57,17 +58,21 @@ def get_isheets(context) -> [IInterface]:
     return [i for i in ifaces if i.isOrExtends(ISheet)]
 
 
-def get_sheet(context, isheet: IInterface) -> IResourceSheet:
+def get_sheet(context, isheet: IInterface, registry: Registry=None)\
+        -> IResourceSheet:
     """Get sheet adapter for the `isheet` interface.
 
     :raises zope.component.ComponentLookupError:
         if there is no sheet adapter registered for `isheet`.
 
     """
-    return getAdapter(context, IResourceSheet, name=isheet.__identifier__)
+    if registry is None:
+        registry = get_current_registry(context)
+    return registry.getAdapter(context, IResourceSheet,
+                               name=isheet.__identifier__)
 
 
-def get_all_sheets(context) -> Iterator:
+def get_all_sheets(context, registry: Registry=None) -> Iterator:
     """Get the sheet adapters for all ISheet interfaces of `context`.
 
     :returns: generator of :class:`adhocracy_core.interfaces.IResourceSheet`
@@ -76,8 +81,10 @@ def get_all_sheets(context) -> Iterator:
 
     """
     isheets = get_isheets(context)
+    if registry is None:
+        registry = get_current_registry(context)
     for isheet in isheets:
-        yield(get_sheet(context, isheet))
+        yield(get_sheet(context, isheet, registry=registry))
 
 
 def get_all_taggedvalues(iface: IInterface) -> dict:
