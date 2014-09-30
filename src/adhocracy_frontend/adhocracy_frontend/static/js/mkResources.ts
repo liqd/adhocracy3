@@ -114,30 +114,30 @@ var config : IConfig = {
  * types
  */
 
-var compileAll : (IMetaApiResponse, string) => void;
+var compileAll : (metaApi: IMetaApiResponse, outPath : string) => void;
 
-var renderSheet : (string, ISheet, IModuleDict, IMetaApi) => void;
+var renderSheet : (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) => void;
 var mkFieldSignatures : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
 var mkFieldAssignments : (fields : MetaApi.ISheetField[], tab : string) => string;
 var enabledFields : (fields : MetaApi.ISheetField[], enableFlags ?: string) => MetaApi.ISheetField[];
 var mkSheetSetter : (modulePath : string, fields : MetaApi.ISheetField[], _selfType : string) => string;
 var mkSheetGetter : (modulePath : string, _selfType : string) => string;
 
-var renderResource : (string, IResource, IModuleDict, IMetaApi) => void;
+var renderResource : (modulePath : string, resource : MetaApi.IResource, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) => void;
 
-var mkSheetName : (string) => string;
-var mkHasSheetName : (string) => string;
-var mkResourceClassName : (string) => string;
-var mkModuleName : (string, metaApi : MetaApi.IMetaApi) => string;
+var mkSheetName : (sheet : string) => string;
+var mkHasSheetName : (sheet : string) => string;
+var mkResourceClassName : (resource : string) => string;
+var mkModuleName : (module : string, metaApi : MetaApi.IMetaApi) => string;
 var mkImportStatement : (modulePath : string, relativeRoot : string, metaApi : MetaApi.IMetaApi) => string;
 var mkNick : (modulePath : string, metaApi : MetaApi.IMetaApi) => string;
-var mkFieldType : (ISheetField) => string;
+var mkFieldType : (field : ISheetField) => string;
 var mkFlags : (field : MetaApi.ISheetField, comment ?: boolean) => string;
 
-var mkdirForFile : (string) => void;
-var pyModuleToTsModule : (string) => string;
+var mkdirForFile : (file : string) => void;
+var pyModuleToTsModule : (module : string) => string;
 var mkRelativeRoot : (source : string) => string;
-var canonicalizePath : (string) => string;
+var canonicalizePath : (path : string) => string;
 
 
 /***********************************************************************
