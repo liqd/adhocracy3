@@ -170,6 +170,8 @@ class Roles(colander.SequenceSchema):
     Example value: ['reader', 'editor']
     """
 
+    # FIXME support the 'readonly' keyword, inherit AdhocracySchemaNode
+
     default = []
     missing = colander.drop
     validator = colander.Length(min=0, max=6)

@@ -274,11 +274,11 @@ def registry(config) -> object:
 def mock_user_locator(registry) -> Mock:
     """Mock :class:`adhocracy_core.resource.principal.UserLocatorAdapter`."""
     from zope.interface import Interface
-    from substanced.interfaces import IUserLocator
+    from adhocracy_core.interfaces import IRolesUserLocator
     from adhocracy_core.resources.principal import UserLocatorAdapter
     locator = Mock(spec=UserLocatorAdapter)
     registry.registerAdapter(lambda y, x: locator, (Interface, Interface),
-                             IUserLocator)
+                             IRolesUserLocator)
     return locator
 
 

@@ -8,6 +8,7 @@ from zope.interface import implementer
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
+from adhocracy_core.interfaces import IRolesUserLocator
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.interfaces import IGroupLocator
 from adhocracy_core.resources.pool import Pool
@@ -85,6 +86,7 @@ user_metadata = pool_metadata._replace(
     iresource=IUser,
     content_class=User,
     basic_sheets=[adhocracy_core.sheets.principal.IUserBasic,
+                  adhocracy_core.sheets.principal.IPermissions,
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.pool.IPool,
                   ],
@@ -146,7 +148,7 @@ passwordresets_metadata = service_metadata._replace(
 )
 
 
-@implementer(IUserLocator)
+@implementer(IRolesUserLocator)
 class UserLocatorAdapter(object):
 
     """Provides helper methods to find users."""
@@ -182,10 +184,21 @@ class UserLocatorAdapter(object):
         if user is None:
             return None
         user_sheet = get_sheet(user,
-                               adhocracy_core.sheets.principal.IUserBasic)
+                               adhocracy_core.sheets.principal.IPermissions)
         groups = user_sheet.get()['groups']
         groupids = ['group:' + g.__name__ for g in groups]
         return groupids
+
+    def get_roleids(self, user_id: str) -> list:
+        """Return the roles for `user_id`  or None."""
+        user = self.get_user_by_userid(user_id)
+        if user is None:
+            return None
+        roles_sheet = get_sheet(user,
+                                adhocracy_core.sheets.principal.IPermissions)
+        roles = roles_sheet.get()['roles']
+        roleids = ['role:' + r for r in roles]
+        return roleids
 
 
 @implementer(IGroupLocator)

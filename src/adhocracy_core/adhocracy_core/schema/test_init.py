@@ -914,3 +914,10 @@ class TestRoles:
     def test_deserialize_wrong(self, inst):
         with raises(colander.Invalid):
             inst.deserialize(['WRONG'])
+
+    def test_serialize_empty(self, inst):
+        assert inst.serialize() == []
+
+    def test_serialize_with_role(self, inst):
+        assert inst.serialize(['reader']) == ['reader']
+

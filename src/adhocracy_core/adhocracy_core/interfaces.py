@@ -13,6 +13,7 @@ from zope.interface.interfaces import IObjectEvent
 
 from substanced.interfaces import IPropertySheet
 from substanced.interfaces import ReferenceClass
+from substanced.interfaces import IUserLocator
 
 
 class ISheet(Interface):
@@ -412,6 +413,18 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     resource (None or IResource):
         The resource that is modified/created.
     """
+
+
+class IRolesUserLocator(IUserLocator):  # pragma: no cover
+
+    """Adapter responsible for returning a user or get info about it."""
+
+    def get_roleids(userid: str) -> list:
+        """Return the roles for :term:`userid` or `None`.
+
+        We return 'None' if the the user does not exists to provide a similar
+        behavior as :func:`substanced.interfaces.IUserLocator.get_groupids`.
+        """
 
 
 class IGroupLocator(Interface):  # pragma: no cover
