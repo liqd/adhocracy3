@@ -82,8 +82,8 @@ class User(Pool):
     password = ''
     email = ''
     name = ''
-    # Set to a string for not-yet-verified users, to None for verified users
-    verification_path = 'unknown'
+    active = False
+    activation_path = None
 
 
 def send_registration_mail(context: IUser,
@@ -94,11 +94,11 @@ def send_registration_mail(context: IUser,
     subject = 'Adhocracy Account Authentication'
     name = context.name
     email = context.email
-    verification_path = _generate_verification_path()
-    context.verification_path = verification_path
+    activation_path = _generate_activation_path()
+    context.activation_path = activation_path
     logger.warn('Sending registration mail to %s for new user named %s, '
-                'verification path=%s', email, name, context.verification_path)
-    args = {'name': name, 'verification_path': verification_path}
+                'activation path=%s', email, name, context.activation_path)
+    args = {'name': name, 'activation_path': activation_path}
     render_and_send_mail(
         registry=registry,
         subject=subject,
@@ -107,9 +107,9 @@ def send_registration_mail(context: IUser,
         args=args)
 
 
-def _generate_verification_path() -> str:
+def _generate_activation_path() -> str:
     random_bytes = urandom(18)
-    return 'activate/' + b64encode(random_bytes, altchars=b'-_').decode()
+    return '/activate/' + b64encode(random_bytes, altchars=b'-_').decode()
 
 
 user_metadata = pool_metadata._replace(
@@ -174,6 +174,7 @@ class UserLocatorAdapter(object):
 
     def get_user_by_login(self, login: str) -> IUser:
         """Find user per `login` name or return None."""
+        # FIXME use catalog for all get_user_by_ methods
         users = find_service(self.context, 'principals', 'users')
         for user in users.values():
             if user.name == login:
@@ -188,6 +189,13 @@ class UserLocatorAdapter(object):
         users = find_service(self.context, 'principals', 'users')
         for user in users.values():
             if user.email == email:
+                return user
+
+    def get_user_by_activation_path(self, activation_path: str) -> IUser:
+        """Find user per activation path or return None."""
+        users = find_service(self.context, 'principals', 'users')
+        for user in users.values():
+            if user.activation_path == activation_path:
                 return user
 
     def get_groupids(self, user_id: int):

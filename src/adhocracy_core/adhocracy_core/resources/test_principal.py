@@ -191,11 +191,11 @@ class TestIntegrationSendRegistrationMail():
         user.name = 'Anna Müller'
         user.email = 'anna@example.org'
         send_registration_mail(context=user, registry=registry)
-        assert user.verification_path.startswith('activate/')
+        assert user.activation_path.startswith('/activate/')
         assert len(mailer.outbox) == 1
         msg = mailer.outbox[0]
         # The DummyMailer is too stupid to use a default sender, hence we add
         # one manually
         msg.sender = 'support@adhocracy.de'
         msgtext = str(msg.to_message())
-        assert user.verification_path in msgtext
+        assert user.activation_path in msgtext
