@@ -97,9 +97,26 @@ def get_tokenmanager(request: Request, **kwargs) -> ITokenManger:
         return None
 
 
+def _get_raw_x_user_headers(request: Request) -> tuple:
+    """Return not validated tuple with the X-User-Path/Token values."""
+    user_url = request.headers.get('X-User-Path', '')
+    # FIXME find a proper solution, user_url/path as userid does not work
+    # well with the pyramid authentication system. We don't have the
+    # a context or root object to resolve the resource path when processing
+    # the unauthenticated_userid and effective_principals methods.
+    app_url_length = len(request.application_url)
+    user_path = None
+    if len(user_url) >= app_url_length:
+        user_path = user_url[app_url_length:][:-1]
+    if user_url.startswith('/'):
+        user_path = user_url
+    token = request.headers.get('X-User-Token', None)
+    return user_path, token
+
+
 def _get_x_user_headers(request: Request) -> tuple:
     """Return tuple with the X-User-Path/Token values or (None, None)."""
-    schema = Resource().bind(request=request)
+    schema = Resource().bind(request=request, context=request.context)
     user_url = request.headers.get('X-User-Path', None)
     user_path = None
     try:
@@ -150,7 +167,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.hashalg = hashalg
 
     def unauthenticated_userid(self, request):
-        return _get_x_user_headers(request)[0]
+        return _get_raw_x_user_headers(request)[0]
 
     def authenticated_userid(self, request):
         tokenmanager = self.get_tokenmanager(request)
@@ -172,15 +189,17 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     def remember(self, request, userid, **kw) -> dict:
         tokenmanager = self.get_tokenmanager(request)
-        if tokenmanager:
+        if tokenmanager:  # for testing
             token = tokenmanager.create_token(userid, secret=self.secret,
                                               hashalg=self.hashalg)
         else:
             token = None
-        from zope.component import queryMultiAdapter
-        locator = queryMultiAdapter((request.context, request),
-                                    IRolesUserLocator)
-        user = locator.get_user_by_userid(userid) if locator else None
+        locator = request.registry.queryMultiAdapter(
+            (request.context, request), IRolesUserLocator)
+        if locator is not None:  # for testing
+            user = locator.get_user_by_userid(userid)
+        else:
+            user = None
         if user is not None:
             url = request.resource_url(user)
         else:

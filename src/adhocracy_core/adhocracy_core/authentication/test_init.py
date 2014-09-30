@@ -123,8 +123,14 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         inst = self._make_one('')
         assert inst.unauthenticated_userid(self.request) is None
 
-    def test_unauthenticated_userid_with_header(self):
+    def test_unauthenticated_userid_with_header_and_user_url(self):
         inst = self._make_one('')
+        self.request.headers = self.token_and_user_id_headers
+        assert inst.unauthenticated_userid(self.request) == self.userid
+
+    def test_unauthenticated_userid_with_header_and_user_path(self):
+        inst = self._make_one('')
+        self.token_and_user_id_headers['X-User-Path'] = self.userid
         self.request.headers = self.token_and_user_id_headers
         assert inst.unauthenticated_userid(self.request) == self.userid
 
@@ -146,6 +152,14 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         tokenmanager = Mock()
         tokenmanager.get_user_id.return_value = self.userid + 'WRONG_ID'
         inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager)
+        self.request.headers = self.token_and_user_id_headers
+        assert inst.authenticated_userid(self.request) is None
+
+    def test_authenticated_userid_with_tokenmanger_valid_token_but_invalid_user_id(self):
+        tokenmanager = Mock()
+        tokenmanager.get_user_id.return_value = None
+        inst = self._make_one('', get_tokenmanager=lambda x: tokenmanager)
+        self.token_and_user_id_headers['X-User-Path'] = 'INVALID_PATH/URL'
         self.request.headers = self.token_and_user_id_headers
         assert inst.authenticated_userid(self.request) is None
 
@@ -296,12 +310,12 @@ class IncludemeIntegrationTest(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
+        self.registry = self.config.registry
         self.config.include('adhocracy_core.authentication')
         self.context = testing.DummyResource()
 
     def test_get_tokenmanager_adapter(self):
-        from zope.component import getAdapter
         from adhocracy_core.interfaces import ITokenManger
         from zope.interface.verify import verifyObject
-        inst = getAdapter(self.context, ITokenManger)
+        inst = self.registry.getAdapter(self.context, ITokenManger)
         assert verifyObject(ITokenManger, inst)
