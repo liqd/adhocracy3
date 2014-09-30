@@ -39,6 +39,7 @@ export interface ListingScope<Container> extends ng.IScope {
     actionColumn : boolean;
     container : Container;
     poolPath : string;
+    poolOptions : AdhHttp.IOptions;
     createPath? : string;
     elements : string[];
     update : () => ng.IPromise<void>;
@@ -103,6 +104,10 @@ export class Listing<Container extends Resources.Content<any>> {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
+
+                        return adhHttp.options($scope.poolPath).then((options) => {
+                            $scope.poolOptions = options;
+                        });
                     });
                 };
 
