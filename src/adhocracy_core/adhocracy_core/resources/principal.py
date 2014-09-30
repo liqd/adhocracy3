@@ -3,7 +3,6 @@ from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from zope.interface import Interface
 from substanced.util import find_service
-from substanced.interfaces import IUserLocator
 from zope.interface import implementer
 
 from adhocracy_core.interfaces import IPool
@@ -238,7 +237,7 @@ def includeme(config):
     add_resource_type_to_registry(passwordresets_metadata, config)
     config.registry.registerAdapter(UserLocatorAdapter,
                                     (Interface, Interface),
-                                    IUserLocator)
+                                    IRolesUserLocator)
     config.registry.registerAdapter(GroupLocatorAdapter,
                                     (Interface,),
                                     IGroupLocator)

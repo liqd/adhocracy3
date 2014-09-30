@@ -260,9 +260,10 @@ class UserLocatorAdapterIntegrationTest(unittest.TestCase):
         testing.tearDown()
 
     def test_create(self):
-        from substanced.interfaces import IUserLocator
+        from adhocracy_core.interfaces import IRolesUserLocator
         from zope.component import getMultiAdapter
-        assert getMultiAdapter((self.context, testing.DummyRequest), IUserLocator)
+        assert getMultiAdapter((self.context, testing.DummyRequest),
+                               IRolesUserLocator)
 
 
 class TestGroupLocatorAdapter:
