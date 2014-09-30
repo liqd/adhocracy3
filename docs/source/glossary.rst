@@ -27,21 +27,29 @@ Glossary
       :term:`lineage` pool for a given `context`.
 
    principal
-       `User` or :term:`group`.
+       A principal is a string representing a :term:`userid`, :term:`groupid`,
+       or :term:`roleid`. It is provided by an :term:`authentication policy`.
+       For more information about the permission system read
+       :doc:`api/authentication_api`.
+
+   userid:
+      The unique id for one userique id of one :term:`group`: "group:<name>".
 
    group
        A set of users. Can be mapped to permission :term:`role`s.
 
    groupid
-       Unique id of one :term:`group`: "group:<name>"
+       Unique id of one :term:`group`: "group:<name>".
 
    role:
-       A set of permissions.
+       A set of permissions that can be mapped to :term:`group`s
+       or :term:`user`.
 
    roleid
-       Unique id of one permission :term:`role`: "role:<name>"
+       Unique id of one permission :term:`role`: "role:<name>".
 
    local role:
-       A :term:`role` mapped to a :term:`group` within a local context and all
-       his children.
+       A :term:`role` mapped to a :term:`group` or :term:`user` within a local
+       context and all his children.
+
 
