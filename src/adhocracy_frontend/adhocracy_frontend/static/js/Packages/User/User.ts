@@ -5,6 +5,8 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhConfig = require("../Config/Config");
 
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
+import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/user/IPasswordAuthentication");
+
 var pkgLocation = "/User";
 
 export interface IUserBasic {
@@ -194,18 +196,19 @@ export class User {
     public register(username : string, email : string, password : string, passwordRepeat : string) : ng.IPromise<IRegisterResponse> {
         var _self : User = this;
 
-        return _self.adhHttp.post("/principals/users/", {
+        var resource = {
             "content_type": "adhocracy_core.resources.principal.IUser",
-            "data": {
-                "adhocracy_core.sheets.user.IUserBasic": {
-                    "name": username,
-                    "email": email
-                },
-                "adhocracy_core.sheets.user.IPasswordAuthentication": {
-                    "password": password
-                }
-            }
-        });
+            "data": {}
+        };
+        resource.data[SIUserBasic.nick] = {
+            "name": username,
+            "email": email
+        };
+        resource.data[SIPasswordAuthentication.nick] = {
+            "password": password
+        };
+
+        return _self.adhHttp.post("/principals/users/", resource);
     }
 
     public can(permission : string) {
