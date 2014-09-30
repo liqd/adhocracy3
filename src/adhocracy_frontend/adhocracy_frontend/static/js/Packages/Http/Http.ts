@@ -23,11 +23,11 @@ export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendErro
 
 
 export interface IOptions {
-   "OPTIONS" : boolean;
-   "PUT" : boolean;
-   "GET" : boolean;
-   "POST" : boolean;
-   "HEAD" : boolean;
+    OPTIONS : boolean;
+    PUT : boolean;
+    GET : boolean;
+    POST : boolean;
+    HEAD : boolean;
 };
 
 
