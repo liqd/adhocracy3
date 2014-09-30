@@ -202,8 +202,3 @@ var quickAndDirtyUnitTest = () => {
 quickAndDirtyUnitTest();
 
 */
-
-
-// NOTE: in the futur, we may have to worry about how generated code
-// API changes in places that have always been there, just because
-// new sheets and resources have been introduced.
