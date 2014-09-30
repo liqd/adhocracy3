@@ -27,6 +27,9 @@ export var register = (angular, config, meta_api) => {
             return angular.injector(["ng"]).invoke(factory);
         })();
 
+        $http.defaults.headers.common["X-User-Token"] = "bla";
+        $http.defaults.headers.common["X-User-Path"] = "blu";
+
         var adhPreliminaryNames = new AdhPreliminaryNames();
 
         it("Deep-rewrites preliminary resource paths.", (done) => {
