@@ -333,7 +333,8 @@ export var register = () => {
                     pkg_path: "mock",
                     root_path: "mock",
                     ws_url: "mock",
-                    embedded: true
+                    embedded: true,
+                    support_email: "support@adhocracy.com"
                 };
                 directive = AdhUser.loginDirective(adhConfigMock);
             });
@@ -349,8 +350,8 @@ export var register = () => {
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn"]);
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
                     adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
-                    controller = <any>(directive.controller[3]);
-                    controller(adhUserMock, adhTopLevelStateMock, $scopeMock);
+                    controller = <any>(directive.controller[4]);
+                    controller(adhUserMock, adhTopLevelStateMock, adhConfigMock, $scopeMock);
                 });
 
                 it("creates an empty credentials object in scope", () => {
@@ -413,7 +414,8 @@ export var register = () => {
                     pkg_path: "mock",
                     root_path: "mock",
                     ws_url: "mock",
-                    embedded: true
+                    embedded: true,
+                    support_email: "support@adhocracy.com"
                 };
 
                 directive = AdhUser.registerDirective(adhConfigMock);
@@ -431,8 +433,8 @@ export var register = () => {
                     adhUserMock.register.and.returnValue(q.when(undefined));
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
                     adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
-                    controller = <any>(directive.controller[3]);
-                    controller(adhUserMock, adhTopLevelStateMock, $scopeMock);
+                    controller = <any>(directive.controller[4]);
+                    controller(adhUserMock, adhTopLevelStateMock, adhConfigMock, $scopeMock);
                 });
 
                 it("creates an empty input object in scope", () => {

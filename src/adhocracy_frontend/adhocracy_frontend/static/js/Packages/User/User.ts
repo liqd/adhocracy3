@@ -23,6 +23,7 @@ export interface IScopeLogin {
         password : string;
     };
     errors : string[];
+    supportEmail : string;
 
     resetCredentials : () => void;
     logIn : () => ng.IPromise<void>;
@@ -37,6 +38,7 @@ export interface IScopeRegister {
         passwordRepeat : string;
     };
     errors : string[];
+    supportEmail : string;
 
     register : () => ng.IPromise<void>;
 }
@@ -252,9 +254,11 @@ export var activateController = (
 export var loginController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
+    adhConfig : AdhConfig.Type,
     $scope : IScopeLogin
 ) : void => {
     $scope.errors = [];
+    $scope.supportEmail = adhConfig.support_email;
 
     $scope.credentials = {
         nameOrEmail: "",
@@ -285,7 +289,7 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "$scope", loginController]
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", loginController]
     };
 };
 
@@ -293,6 +297,7 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
 export var registerController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
+    adhConfig : AdhConfig.Type,
     $scope : IScopeRegister
 ) => {
     $scope.input = {
@@ -303,6 +308,7 @@ export var registerController = (
     };
 
     $scope.errors = [];
+    $scope.supportEmail = adhConfig.support_email;
 
     $scope.register = () : ng.IPromise<void> => {
         return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
@@ -322,7 +328,7 @@ export var registerDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "$scope", registerController]
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", registerController]
     };
 };
 
