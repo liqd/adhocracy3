@@ -16,6 +16,7 @@ from substanced.objectmap import ObjectMap
 from substanced.objectmap import find_objectmap
 from webtest.http import StopableWSGIServer
 import colander
+import transaction
 
 from adhocracy_core.interfaces import SheetMetadata, ChangelogMetadata
 from adhocracy_core.interfaces import ResourceMetadata
@@ -33,6 +34,40 @@ This assumes the initial user is created and has the `god` role.
 god_login = 'god'
 """The login name for the god user, default value."""
 god_password = 'password'
+"""The password for the god user, default value."""
+reader_header = {'X-User-Path': '/principals/users/0000001',
+                 'X-User-Token': 'SECRET_READER'}
+"""The authentication headers for the `reader`, used by functional fixtures.
+This assumes the user exists with path == 'X-User-Path'.
+"""
+reader_login = 'reader'
+reader_password = 'password'
+reader_roles = ['reader']
+contributor_header = {'X-User-Path': '/principals/users/0000002',
+                      'X-User-Token': 'SECRET_CONTRIBUTOR'}
+contributor_login = 'contributor'
+contributor_password = 'password'
+contributor_roles = ['contributor']
+editor_header = {'X-User-Path': '/principals/users/0000003',
+                 'X-User-Token': 'SECRET_EDITOR'}
+editor_login = 'editor'
+editor_password = 'password'
+editor_roles = ['editor']
+reviewer_header = {'X-User-Path': '/principals/users/0000004',
+                   'X-User-Token': 'SECRET_REVIEWER'}
+reviewer_login = 'reviewer'
+reviewer_password = 'password'
+reviewer_roles = ['reviewer']
+manager_header = {'X-User-Path': '/principals/users/0000005',
+                  'X-User-Token': 'SECRET_EDITOR'}
+manager_login = 'manager'
+manager_password = 'password'
+manager_roles = ['manager']
+admin_header = {'X-User-Path': '/principals/users/0000006',
+                'X-User-Token': 'SECRET_ADMIN'}
+admin_login = 'admin'
+admin_password = 'password'
+admin_roles = ['admin']
 
 
 class DummyPool(testing.DummyResource):
@@ -386,6 +421,52 @@ def _is_running(path_to_pid_file) -> bool:
             return True
 
 
+class ManageAppAPI:
+
+    # FIXME move this some where else
+
+    def __init__(self, app):
+        request = testing.DummyRequest()
+        request.registry = app.registry
+        self.request = request
+        self.registry = app.registry
+        self.root = app.root_factory(request)
+
+    def add_user_token(self, userid: str, token: str):
+        """Add user authentication token to :app:`Pyramid`."""
+        from datetime import datetime
+        from adhocracy_core.interfaces import ITokenManger
+        timestamp = datetime.now()
+        token_manager = self.registry.getAdapter(self.root, ITokenManger)
+        token_manager.token_to_user_id_timestamp[token] = (userid, timestamp)
+        transaction.commit()
+
+    def add_user(self, login: str=None, password: str=None, roles=None) -> str:
+        """Add user to :app:`Pyramid`."""
+        # FIXME? add option to set the userid
+        from substanced.util import find_service
+        from pyramid.traversal import resource_path
+        from adhocracy_core.resources.principal import IUser
+        import adhocracy_core.sheets
+        users = find_service(self.root, 'principals', 'users')
+        roles = roles or []
+        passwd_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
+        appstruct =\
+            {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
+             {'name': login},
+             adhocracy_core.sheets.principal.IPermissions.__identifier__:
+             {'roles': roles},
+             passwd_sheet.__identifier__:
+             {'password': password},
+             }
+        user = self.registry.content.create(IUser.__identifier__,
+                                            parent=users,
+                                            appstruct=appstruct,
+                                            registry=self.registry)
+        transaction.commit()
+        return resource_path(user)
+
+
 @fixture(scope='class')
 def app(zeo, settings, websocket):
     """Return the adhocracy wsgi application."""
@@ -400,36 +481,21 @@ def app(zeo, settings, websocket):
     configurator.include(adhocracy_core.resources.sample_proposal)
     configurator.include(adhocracy_core.resources.sample_section)
     app = configurator.make_wsgi_app()
-    root = get_root(app)
-    add_user_authentication(userid=god_authentication_header['X-User-Path'],
-                            token=god_authentication_header['X-User-Token'],
-                            root=root,
-                            registry=app.registry)
+    manageapi = ManageAppAPI(app)
+    manageapi.add_user_token(userid=god_header['X-User-Path'],
+                             token=god_header['X-User-Token'])
+    manageapi.add_user(login='contributor',
+                       password='contributor',
+                       roles=['contributor'])
+    manageapi.add_user_token(userid=contributor_header['X-User-Path'],
+                             token=contributor_header['X-User-Token'])
 
     def root_factory_wrapper(request):
-        request.root = root
+        request.root = manageapi.root
         return adhocracy_core.root_factory(request)
     app.root_factory = root_factory_wrapper
 
     return app
-
-
-def get_root(app):
-    """Get the root object of the :term:`Pyramid` app."""
-    request = testing.DummyRequest()
-    request.registry = app.registry
-    return app.root_factory(request)
-
-
-def add_user_authentication(userid: str, token: str, root, registry):
-    """Add user authentication token to :app:`Pyramid`."""
-    from datetime import datetime
-    import transaction
-    from adhocracy_core.interfaces import ITokenManger
-    timestamp = datetime.now()
-    token_manager = registry.getAdapter(root, ITokenManger)
-    token_manager.token_to_user_id_timestamp[token] = (userid, timestamp)
-    transaction.commit()
 
 
 @fixture(scope='class')
