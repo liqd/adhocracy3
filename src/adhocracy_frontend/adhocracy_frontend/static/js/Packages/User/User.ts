@@ -210,13 +210,6 @@ export class User {
 
         return _self.adhHttp.post("/principals/users/", resource);
     }
-
-    public can(permission : string) {
-        var _self : User = this;
-
-        // FIXME this is only a dummy implementation
-        return _self.loggedIn;
-    }
 }
 
 
