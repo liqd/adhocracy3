@@ -133,6 +133,7 @@ export var register = () => {
                             done();
                         },
                         (msg) => {
+                            expect(true).toBe(true);
                             done();
                         });
                 });
