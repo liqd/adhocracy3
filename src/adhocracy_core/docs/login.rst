@@ -156,20 +156,19 @@ account. The *path* component of all such links starts with
 must post a JSON request containing the path to the
 ``activate_account`` endpoint of the backend::
 
-    >> prop = {'path': '/activate/blahblah'}
-    >> resp_data = testapp.post_json('/activate_account', prop).json
-    >> pprint(resp_data)
-    {'details': 'unknown_path',
-     'status': 'error'}
+    >>> prop = {'path': '/activate/blahblah'}
+    >>> resp_data = testapp.post_json('/activate_account', prop).json
+    >>> pprint(resp_data)
+    {'details': 'unknown_path', 'status': 'error'}
 
-FIXME Make the above a real test once that endpoint exists.
+FIXME The above should return 400 and probably just a list of errors.
 
-The backend responds with either 2xx response code and 'status':
+The backend responds with either response code 200 and 'status':
 'success' and 'user_path' and 'user_token', just like after a
 successful login request (see next section).  This means that the user
 account has been activated and the user is now logged in.
 
-Or it responds with 4xx response code and 'status': 'error' and a
+Or it responds with response code 400 and 'status': 'error' and a
 'details' field that contains one of the following values:
 
 * 'unknown_path' if the activation path is unknown to the backend
