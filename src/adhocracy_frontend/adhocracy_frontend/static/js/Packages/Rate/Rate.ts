@@ -6,11 +6,11 @@ import AdhUser = require("../User/User");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIRate = require("../../Resources_/adhocracy/resources/rate/IRate");
-import RIRateVersion = require("../../Resources_/adhocracy/resources/rate/IRateVersion");
-// import SICanRate = require("../../Resources_/adhocracy/sheets/rate/ICanRate");
-// import SIRate = require("../../Resources_/adhocracy/sheets/rate/IRate");
-// import SIRateable = require("../../Resources_/adhocracy/sheets/rate/IRateable");
+import RIRate = require("../../Resources_/adhocracy_core/resources/rate/IRate");
+import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
+// import SICanRate = require("../../Resources_/adhocracy_core/sheets/rate/ICanRate");
+// import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
+// import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
 
 var pkgLocation = "/Rate";
 
@@ -91,11 +91,11 @@ export var fetchAllRates = (
             return $scope.postPoolPath;
         })
         .then((postPoolPath) => adhHttp.get(postPoolPath, {
-            content_type: "adhocracy.resources.rate.IRate"
+            content_type: "adhocracy_core.resources.rate.IRate"
         }))
         .then((postPool) => {
             var ratePromises : ng.IPromise<ResourcesBase.Resource>[] =
-                postPool.data["adhocracy.sheets.pool.IPool"].elements
+                postPool.data["adhocracy_core.sheets.pool.IPool"].elements
                     .map((path : string, index : number) =>
                         adhHttp
                            .getNewestVersionPathNoFork(path)
@@ -147,7 +147,7 @@ export var updateRates = (
         var auditTrailPromises : ng.IPromise<{ subject : string; rate : number }>[] = rates.map((rate) =>
             adhHttp.get(adapter.subject(rate)).then((user) => {
                 return {
-                    subject: user.data["adhocracy.sheets.user.IUserBasic"].name,  // (use adapter for user, too?)
+                    subject: user.data["adhocracy_core.sheets.user.IUserBasic"].name,  // (use adapter for user, too?)
                     rate: adapter.rate(rate)
                 };
             }));
