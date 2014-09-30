@@ -2,15 +2,19 @@
 import hashlib
 from datetime import datetime
 
+from colander import Invalid
 from persistent.dict import PersistentDict
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
+from pyramid.traversal import resource_path
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import ComponentLookupError
 
 from adhocracy_core.interfaces import ITokenManger
+from adhocracy_core.interfaces import IRolesUserLocator
+from adhocracy_core.schema import Resource
 
 
 @implementer(ITokenManger)
@@ -95,8 +99,19 @@ def get_tokenmanager(request: Request, **kwargs) -> ITokenManger:
 
 def _get_x_user_headers(request: Request) -> tuple:
     """Return tuple with the X-User-Path/Token values or (None, None)."""
-    return (request.headers.get('X-User-Path', None),
-            request.headers.get('X-User-Token', None))
+    schema = Resource().bind(request=request)
+    user_url = request.headers.get('X-User-Path', None)
+    user_path = None
+    try:
+        user = schema.deserialize(user_url)
+        user_path = resource_path(user)
+    except Invalid:
+        # FIXME if we want to use multiple authentication policies we should
+        # ignore exceptions at all.
+        # Else we should raise a proper colander error.
+        pass
+    token = request.headers.get('X-User-Token', None)
+    return (user_path, token)
 
 
 @implementer(IAuthenticationPolicy)
@@ -155,15 +170,22 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
             raise KeyError
         return authenticated_user_id
 
-    def remember(self, request, user_id, **kw):
+    def remember(self, request, user_id, **kw) -> dict:
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager:
             token = tokenmanager.create_token(user_id, secret=self.secret,
                                               hashalg=self.hashalg)
         else:
             token = None
-            user_id = None
-        return {'X-User-Path': user_id,
+        from zope.component import queryMultiAdapter
+        locator = queryMultiAdapter((request.context, request),
+                                    IRolesUserLocator)
+        user = locator.get_user_by_userid(user_id) if locator else None
+        if user is not None:
+            url = request.resource_url(user)
+        else:
+            url = None
+        return {'X-User-Path': url,
                 'X-User-Token': token}
 
     def forget(self, request):

@@ -85,11 +85,21 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         return TokenHeaderAuthenticationPolicy(secret, **kw)
 
     def setUp(self):
-        self.request = testing.DummyRequest()
-        self.user_id = 'principals/users/1'
+        context = testing.DummyResource()
+        user = testing.DummyResource()
+        self.user = user
+        context['user'] = user
+        self.config = testing.setUp()
+        self.request = testing.DummyRequest(root=context,
+                                            registry=self.config.registry)
+        self.user_url = self.request.application_url + '/user/'
+        self.user_id = '/user'
         self.token = 'secret'
         self.token_and_user_id_headers = {'X-User-Token': self.token,
-                                          'X-User-Path': self.user_id}
+                                          'X-User-Path': self.user_url}
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_create(self):
         from pyramid.interfaces import IAuthenticationPolicy
@@ -168,19 +178,36 @@ class TokenHeaderAuthenticationPolicy(unittest.TestCase):
         result = inst.effective_principals(self.request)
         assert result == [Everyone, Authenticated, self.user_id, 'group']
 
-    def test_remember_without_tokenmanager(self):
+    def test_remember_without_tokenmanager_without_user_locator(self):
         inst = self._make_one('', get_tokenmanager=lambda x: None)
         result = inst.remember(self.request, self.user_id)
-        assert result == {'X-User-Path': None, 'X-User-Token': None}
+        assert result['X-User-Token'] is None
+        assert result['X-User-Path'] is None
 
     def test_remember_with_tokenmanger(self):
         tokenmanager = Mock()
         inst = self._make_one('secret', get_tokenmanager=lambda x: tokenmanager)
         tokenmanager.create_token.return_value = self.token
         result = inst.remember(self.request, self.user_id)
-        assert result == self.token_and_user_id_headers
-        assert tokenmanager.create_token.call_args[1] =={'secret': 'secret',
-                                                         'hashalg': 'sha512'}
+        assert not result['X-User-Token'] is None
+        assert tokenmanager.create_token.call_args[1] == {'secret': 'secret',
+                                                          'hashalg': 'sha512'}
+
+    def test_remember_with_user_locator(self):
+        inst = self._make_one('', get_tokenmanager=lambda x: None)
+        from adhocracy_core.testing import mock_user_locator
+        locator = mock_user_locator(self.config.registry)
+        locator.get_user_by_userid.return_value = self.user
+        result = inst.remember(self.request, self.user_id)
+        assert result['X-User-Path'] == 'http://example.com/user/'
+
+    def test_remember_with_user_locator_wrong_user_id(self):
+        inst = self._make_one('', get_tokenmanager=lambda x: None)
+        from adhocracy_core.testing import mock_user_locator
+        locator = mock_user_locator(self.config.registry)
+        locator.get_user_by_userid.return_value = None
+        result = inst.remember(self.request, self.user_id + 'WRONGID')
+        assert result['X-User-Path'] is None
 
     def test_forget_without_tokenmanager(self):
         inst = self._make_one('', get_tokenmanager=lambda x: None)
@@ -228,12 +255,26 @@ class GetTokenManagerUnitTest(unittest.TestCase):
 class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
 
     def setUp(self):
+        from substanced.interfaces import IFolder
         config = testing.setUp()
+        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.resources.principal')
         config.include('adhocracy_core.authentication')
         self.config = config
-        self.request = testing.DummyRequest(registry=self.config.registry,
-                                            root=testing.DummyResource())
-        self.user_id = '/principals/user/1'
+        context = testing.DummyResource(__provides__=IFolder,
+                                        __is_service__=True)
+        context['principals'] = testing.DummyResource(__provides__=IFolder,
+                                                      __is_service__=True)
+        context['principals']['users'] = testing.DummyResource(
+            __provides__=IFolder,
+            __is_service__=True)
+        user = testing.DummyResource()
+        context['principals']['users']['1'] = user
+        self.user_id = '/principals/users/1'
+        self.request = testing.DummyRequest(registry=config.registry,
+                                            root=context,
+                                            context=user)
+        self.user_url = self.request.application_url + self.user_id + '/'
 
     def _register_authentication_policy(self):
         from adhocracy_core.authentication import TokenHeaderAuthenticationPolicy
@@ -247,7 +288,7 @@ class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
         from pyramid.security import remember
         self._register_authentication_policy()
         headers = remember(self.request, self.user_id)
-        assert headers['X-User-Path'] == self.user_id
+        assert headers['X-User-Path'] == self.user_url
         assert headers['X-User-Token'] is not None
 
 

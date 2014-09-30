@@ -16,6 +16,7 @@ from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
+from pyramid.traversal import resource_path
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
@@ -685,8 +686,8 @@ class LoginUsernameView(RESTView):
 def _login_user(request: Request) -> dict:
     """Log-in a user and return a response indicating success."""
     user = request.validated['user']
-    user_path = request.resource_url(user)
-    headers = remember(request, user_path) or {}
+    user_id = resource_path(user)
+    headers = remember(request, user_id) or {}
     user_path = headers['X-User-Path']
     user_token = headers['X-User-Token']
     return {'status': 'success',
