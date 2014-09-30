@@ -35,6 +35,11 @@ import MetaApi = require("./Packages/MetaApi/MetaApi");
  * from the generated modules.  If they change, they will do so
  * transparently, and the code will use the new names consistently.
  *
+ * To make sure that no string literals are used anywhere outside the
+ * generated modules for namign content_type fields of resources or
+ * sheet keys, there is a script that scans for them.
+ * [FIXME: write that script!]
+ *
  * Changes that may require changing code manually:
  *
  *   1. module path changes (e.g., RIProposal moves from
