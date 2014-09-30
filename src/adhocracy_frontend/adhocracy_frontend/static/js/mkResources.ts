@@ -16,46 +16,48 @@ import MetaApi = require("./Packages/MetaApi/MetaApi");
 
 
 
-// How to handle API changes
-// ~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-// The effect of changes in the meta api on the existing code are very
-// limited.  The local name of an imported module never has to change,
-// because it is local, and new names can be chosen such that name
-// clashes are always avoided.  For example, if some module in some
-// package contains the line:
-//
-// | import RIPropsal = "...";
-//
-// The name RIProposal never needs to change.
-//
-// The content_type strings and the dictionary keys for the sheets
-// never need to be changed in the code either, as they are exported
-// from the generated modules.  If they change, they will do so
-// transparently, and the code will use the new names consistently.
-//
-// Changes that may require changing code manually:
-//
-//   1. module path changes (e.g., RIProposal moves from
-//      ".../adh/IProposal.ts" to ".../adh/core/IProposal.ts"
-//
-//   2. a resource drops a sheet (that is used somewhere).
-//
-//   3. a sheet drops a field (that is used somewhere).
-//
-//   4. a sheet changes its type and semantics without changing its
-//      name.
-//
-// (4) is bad practice and therefore disallowed.  All other changes
-// will be caught by the compiler and have to be fixed before the code
-// builds again, so they impose a very small productivity penalty on
-// the evolution of the content type hierarchy.
-//
-// (The only CAVEAT is that if you change the path of one module to be
-// the path of another, formerly existing module, you may get
-// confusing type errors or unit test failures instead of "import path
-// does not exist".  But even then, the errors should point you in the
-// right direction if you know about the recent API changes.)
+/**
+ * How to handle API changes
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * The effect of changes in the meta api on the existing code are very
+ * limited.  The local name of an imported module never has to change,
+ * because it is local, and new names can be chosen such that name
+ * clashes are always avoided.  For example, if some module in some
+ * package contains the line:
+ *
+ * | import RIPropsal = "...";
+ *
+ * The name RIProposal never needs to change.
+ *
+ * The content_type strings and the dictionary keys for the sheets
+ * never need to be changed in the code either, as they are exported
+ * from the generated modules.  If they change, they will do so
+ * transparently, and the code will use the new names consistently.
+ *
+ * Changes that may require changing code manually:
+ *
+ *   1. module path changes (e.g., RIProposal moves from
+ *      ".../adh/IProposal.ts" to ".../adh/core/IProposal.ts"
+ *
+ *   2. a resource drops a sheet (that is used somewhere).
+ *
+ *   3. a sheet drops a field (that is used somewhere).
+ *
+ *   4. a sheet changes its type and semantics without changing its
+ *      name.
+ *
+ * (4) is bad practice and therefore disallowed.  All other changes
+ * will be caught by the compiler and have to be fixed before the code
+ * builds again, so they impose a very small productivity penalty on
+ * the evolution of the content type hierarchy.
+ *
+ * (The only CAVEAT is that if you change the path of one module to be
+ * the path of another, formerly existing module, you may get
+ * confusing type errors or unit test failures instead of "import path
+ * does not exist".  But even then, the errors should point you in the
+ * right direction if you know about the recent API changes.)
+ */
 
 
 // FIXME: adapter code will be written manually written files in the
