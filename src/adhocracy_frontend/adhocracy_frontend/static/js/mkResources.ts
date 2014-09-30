@@ -307,6 +307,8 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
         }
     };
 
+    sheetI += "export var nick : string = \"" + sheet.nick + "\";\n\n";
+
     sheetI += "export class " + mkSheetName(sheet.nick) + " extends Base.Sheet {\n";
 
     sheetI += "    public static _meta : Base.ISheetMetaApi = {\n";
