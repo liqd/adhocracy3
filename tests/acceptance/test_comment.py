@@ -4,8 +4,15 @@ from .shared import wait
 from .shared import get_column_listing
 from .shared import get_list_element
 from .shared import get_listing_create_form
+from .shared import login
 from .test_proposal import proposal
 from .test_user_login import user
+
+
+@fixture
+def browser(browser):
+    login(browser, 'god', 'password')
+    return browser
 
 
 @fixture
@@ -20,6 +27,7 @@ def test_create(browser, proposal):
     show_proposal_comments(proposal)
     listing = get_column_listing(browser, 'content2')
     comment = create_top_level_comment(listing, 'somecomment')
+    import pdb;pdb.set_trace()
     assert comment is not None
 
 

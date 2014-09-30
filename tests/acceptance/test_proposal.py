@@ -6,12 +6,18 @@ from .shared import wait
 from .shared import get_listing_create_form
 from .shared import get_column_listing
 from .shared import get_list_element
-from .shared import title_is_in_listing
+from .shared import login
 
+
+@fixture
+def browser(browser):
+    login(browser, 'god', 'password')
+    return browser
 
 @fixture
 def proposal(browser):
     """Go to content listing and create proposal with title `test proposal`."""
+    login(browser, 'god', 'password')
     listing = get_column_listing(browser, 'content')
     return create_proposal(listing, 'test proposal')
 

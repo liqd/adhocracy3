@@ -27,8 +27,8 @@ export var register = (angular, config, meta_api) => {
             return angular.injector(["ng"]).invoke(factory);
         })();
 
-        $http.defaults.headers.common["X-User-Token"] = "bla";
-        $http.defaults.headers.common["X-User-Path"] = "blu";
+        $http.defaults.headers.common["X-User-Token"] = "SECRET_GOD";
+        $http.defaults.headers.common["X-User-Path"] = "/principals/users/0000000";
 
         var adhPreliminaryNames = new AdhPreliminaryNames();
 

@@ -2,6 +2,9 @@
 from pytest import fixture
 from .shared import fill_input
 from .shared import click_button
+from .shared import login
+from .shared import logout
+from .shared import is_logged_in
 
 
 @fixture
@@ -60,21 +63,3 @@ def register(browser, name, email, password, repeated_password=None,
     click_button(browser, '.register [type="submit"]')
     if expect_success:
         browser.wait_for_condition(is_logged_in, 2)
-
-
-def login(browser, name_or_email, password, expect_success=True):
-    login_url = browser.app_url + 'login'
-    browser.visit(login_url)
-    fill_input(browser, '.login [name="nameOrEmail"]', name_or_email)
-    fill_input(browser, '.login [name="password"]', password)
-    click_button(browser, '.login [type="submit"]')
-    if expect_success:
-        browser.wait_for_condition(is_logged_in, 2)
-
-
-def logout(browser):
-    click_button(browser, '.user-indicator-logout')
-
-
-def is_logged_in(browser):
-    return browser.browser.is_element_present_by_css('.user-indicator-logout')

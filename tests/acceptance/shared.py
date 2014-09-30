@@ -14,6 +14,30 @@ def wait(condition, step=0.1, max_steps=10) -> bool:
     return condition()
 
 
+def login(browser, name_or_email, password, expect_success=True):
+    """Login user with name and password."""
+    if is_logged_in(browser):
+        return
+    login_url = browser.app_url + 'login'
+    browser.visit(login_url)
+    fill_input(browser, '.login [name="nameOrEmail"]', name_or_email)
+    fill_input(browser, '.login [name="password"]', password)
+    click_button(browser, '.login [type="submit"]')
+    if expect_success:
+        browser.wait_for_condition(is_logged_in, 5)
+    browser.visit(browser.root_url)
+
+
+def logout(browser):
+    """Logout user."""
+    click_button(browser, '.user-indicator-logout')
+
+
+def is_logged_in(browser):
+    """Check if user is logged out."""
+    return browser.browser.is_element_present_by_css('.user-indicator-logout')
+
+
 def fill_input(browser, css_selector, value):
     """Find `css_selector` and fill value."""
     element = browser.browser.find_by_css(css_selector).first
