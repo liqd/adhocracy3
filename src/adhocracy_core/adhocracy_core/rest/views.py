@@ -229,7 +229,15 @@ class RESTView:
                               extra_validators=validators)
 
     def options(self) -> dict:
-        raise HTTPMethodNotAllowed()
+        """Return options for view.
+
+        Note: This default implementation currently only exist in order to
+        satisfy the preflight request, which browsers do in CORS situations
+        before doing an actual POST request. Subclasses still have to
+        configure the view and delegate to this implementation explictly if
+        they want to use it.
+        """
+        return {}
 
     def get(self) -> dict:
         raise HTTPMethodNotAllowed()
@@ -657,6 +665,7 @@ def validate_login_password(context, request: Request):
     renderer='simplejson',
     context=IRootPool,
     http_cache=0,
+    name='login_username',
 )
 class LoginUsernameView(RESTView):
 
@@ -665,20 +674,12 @@ class LoginUsernameView(RESTView):
     validation_POST = (POSTLoginUsernameRequestSchema,
                        [validate_login_name, validate_login_password])
 
-    @view_config(name='login_username',
-                 request_method='OPTIONS')
+    @view_config(request_method='OPTIONS')
     def options(self) -> dict:
-        """Return options for login_username view.
+        """Return options for view."""
+        return super().options()
 
-        FIXME: Return something useful. This currently only exist in order to
-        satisfy the preflight request, which browsers do in CORS situations
-        before doing the actual POST.
-
-        """
-        return {}
-
-    @view_config(name='login_username',
-                 request_method='POST',
+    @view_config(request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
@@ -687,6 +688,7 @@ class LoginUsernameView(RESTView):
 
 def _login_user(request: Request) -> dict:
     """Log-in a user and return a response indicating success."""
+    # FIXME don't allow login if the user isn't authenticated yet
     user = request.validated['user']
     user_path = request.resource_url(user)
     headers = remember(request, user_path) or {}
@@ -701,6 +703,7 @@ def _login_user(request: Request) -> dict:
     renderer='simplejson',
     context=IRootPool,
     http_cache=0,
+    name='login_email',
 )
 class LoginEmailView(RESTView):
 
@@ -709,20 +712,12 @@ class LoginEmailView(RESTView):
     validation_POST = (POSTLoginEmailRequestSchema,
                        [validate_login_email, validate_login_password])
 
-    @view_config(name='login_email',
-                 request_method='OPTIONS')
+    @view_config(request_method='OPTIONS')
     def options(self) -> dict:
-        """Return options for login_email view.
+        """Return options for view."""
+        return super().options()
 
-        FIXME: Return something useful. This currently only exist in order to
-        satisfy the preflight request, which browsers do in CORS situations
-        before doing the actual POST.
-
-        """
-        return {}
-
-    @view_config(name='login_email',
-                 request_method='POST',
+    @view_config(request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
@@ -737,6 +732,33 @@ def add_cors_headers_subscriber(event):
         'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
     })
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IRootPool,
+    http_cache=0,
+    name='activate_account',
+)
+class ActivateAccountView(RESTView):
+
+    """Log in a user via their name."""
+
+    # TODO adapt
+    ##validation_POST = (POSTLoginUsernameRequestSchema,
+    ##                   [validate_login_name, validate_login_password])
+
+    @view_config(request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for view."""
+        return super().options()
+
+    @view_config(request_method='POST',
+                 content_type='application/json')
+    def post(self) -> dict:
+        """Create new resource and get response data."""
+        # TODO adapt
+        return {'details': 'unknown_path', 'status': 'error'}
 
 
 def includeme(config):
