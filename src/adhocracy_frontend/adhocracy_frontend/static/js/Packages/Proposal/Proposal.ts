@@ -1,7 +1,5 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
-import _ = require("lodash");
-
 import Util = require("../Util/Util");
 import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
@@ -275,83 +273,6 @@ export class Service {
         private adhPreliminaryNames : AdhPreliminaryNames,
         private $q : ng.IQService
     ) {}
-
-    private postProposal(path : string, name : string, scope : {proposal ?: any}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new RIProposal({preliminaryNames: this.adhPreliminaryNames, name: name}))
-            .then((ret) => { scope.proposal = ret; });
-    }
-
-    private postSection(path : string, name : string, scope : {section ?: any}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new RISection({preliminaryNames: this.adhPreliminaryNames, name: name}))
-            .then((ret) => { scope.section = ret; });
-    }
-
-    private postParagraph(path : string, name : string, scope : {paragraphs ?: any}) : ng.IPromise<void> {
-        return this.adhHttp.postToPool(path, new RIParagraph({preliminaryNames: this.adhPreliminaryNames, name: name}))
-            .then((ret) => { scope.paragraphs[name] = ret; });
-    }
-
-    private postParagraphs(path : string, names : string[], scope) : ng.IPromise<void> {
-        var _self = this;
-
-        // we need to post the paragraph versions one after another in order to guarantee
-        // the right order
-        if (names.length > 0) {
-            return _self.postParagraph(path, names[0], scope)
-                .then(() => _self.postParagraphs(path, names.slice(1), scope));
-        } else {
-            return _self.$q.when();
-        }
-    }
-
-    private postVersion(path : string, data) : ng.IPromise<any> {
-        var _self = this;
-        return _self.adhHttp.getNewestVersionPathNoFork(path)
-            .then((versionPath) => _self.adhHttp.postNewVersionNoFork(versionPath, data));
-    }
-
-    private postProposalVersion(proposal, data, sections, scope) : ng.IPromise<void> {
-        var _self = this;
-        return _self.$q.all(sections.map((section) => _self.adhHttp.getNewestVersionPathNoFork(section.path)))
-            .then((sectionVersionPaths) => {
-                var _data = _.cloneDeep(data);
-                _data.data["adhocracy_core.sheets.document.IDocument"].elements = sectionVersionPaths;
-                return _self.postVersion(proposal.path, _data);
-            });
-    }
-
-    private postSectionVersion(section, data, paragraphs, scope) : ng.IPromise<void> {
-        var _self = this;
-        return _self.$q.all(paragraphs.map((paragraph) => _self.adhHttp.getNewestVersionPathNoFork(paragraph.path)))
-            .then((paragraphVersionPaths) => {
-                var _data = _.cloneDeep(data);
-                _data.data["adhocracy_core.sheets.document.ISection"].elements = paragraphVersionPaths;
-                return _self.postVersion(section.path, _data);
-            });
-    }
-
-    private postParagraphVersion(paragraph, data, scope : {proposal : any}) : ng.IPromise<void> {
-        var _self = this;
-        return _self.adhHttp.getNewestVersionPathNoFork(scope.proposal.path)
-            .then((proposalVersionPath) => {
-                var _data = _.cloneDeep(data);
-                _data.root_versions = [proposalVersionPath];
-                return _self.postVersion(paragraph.path, _data);
-            });
-    }
-
-    private postParagraphVersions(paragraphs : any[], datas : any[], scope) : ng.IPromise<void> {
-        var _self = this;
-
-        // we need to post the paragraph versions one after another in order to guarantee
-        // that the final section version contains all new proposal versions
-        if (paragraphs.length > 0) {
-            return _self.postParagraphVersion(paragraphs[0], datas[0], scope)
-                .then(() => _self.postParagraphVersions(paragraphs.slice(1), datas.slice(1), scope));
-        } else {
-            return _self.$q.when();
-        }
-    }
 
     public postProposalWithParagraphs(
         poolPath : string,
