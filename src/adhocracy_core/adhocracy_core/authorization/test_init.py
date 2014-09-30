@@ -132,3 +132,13 @@ class TestRuleACLAuthorizaitonPolicy:
                             ['system.Authenticated'], 'view')
         assert inst.permits(context['child']['grandchild'],
                             ['system.Authenticated'], 'add')
+
+    def test_permits_acl_with_inherited_creator_local_role(self, inst, context):
+        """We do not want to inherit the 'creator' local role."""
+        from pyramid.security import Allow
+        context.__acl__ = [(Allow, 'role:creator', 'view')]
+        context['child'] = testing.DummyResource(
+            __local_roles__={'system.Authenticated': ['role:creator']})
+        context['child']['grandchild'] = testing.DummyResource()
+        assert not inst.permits(context['child']['grandchild'],
+                                ['system.Authenticated'], 'view')

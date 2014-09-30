@@ -5,6 +5,7 @@ from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from pyramid.config import Configurator
 from pyramid.traversal import find_interface
+from pyramid.traversal import resource_path
 from pytz import UTC
 from substanced.content import add_content_type
 from zope.interface import directlyProvides
@@ -151,6 +152,10 @@ class ResourceFactory:
         from adhocracy_core.resources.principal import IUser
         if IUser.providedBy(resource):
             creator = resource
+
+        if creator is not None:
+            userid = resource_path(creator)
+            resource.__local_roles__ = {userid: ['creator']}
 
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator)

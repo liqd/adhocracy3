@@ -24,6 +24,8 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
     and a list of :term:`roleid`s as value::
 
         {'system.Everyone': ['role:reader']}
+
+    `local role`s are inherited in the object hierarchy except `creator`.
     """
 
     group_prefix = 'group:'
@@ -65,8 +67,11 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
 
     def _add_local_roles_to_principals(self, context, principals):
         local_roles_map = self._get_local_role_candidates_from_lineage(context)
+        creator_role = self.role_prefix + 'creator'
         for canidate, roles in local_roles_map.items():
             if canidate in principals:
+                if creator_role in roles:
+                    roles.remove(creator_role)
                 principals.extend(list(roles))
 
     def _get_local_role_candidates_from_lineage(self, context) -> dict:
