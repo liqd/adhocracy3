@@ -36,7 +36,7 @@ import MetaApi = require("./Packages/MetaApi/MetaApi");
  * transparently, and the code will use the new names consistently.
  *
  * To make sure that no string literals are used anywhere outside the
- * generated modules for namign content_type fields of resources or
+ * generated modules for naming content_type fields of resources or
  * sheet keys, there is a script that scans for them.
  * [FIXME: write that script!]
  *
