@@ -25,7 +25,7 @@ def config_view(request):
     config['trusted_domains'] = aslist(
         settings.get('adhocracy.trusted_domains', []))
     config['support_email'] = settings.get('adhocracy.frontend.support_email',
-                                           'support@adhocracy.de')
+                                           'support@unconfigured.domain')
     return config
 
 
