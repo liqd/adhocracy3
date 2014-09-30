@@ -621,6 +621,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
     };
 
     resourceC += "class " + mkResourceClassName(mkNick(modulePath, metaApi)) + " extends Base.Resource {\n";
+    resourceC += "    public static content_type = \"" + modulePath + "\";\n\n";
     resourceC += mkConstructor("    ") + "\n\n";
     resourceC += mkDataDeclaration("    ") + "\n\n";
     resourceC += mkGettersSetters("    ") + "\n";
