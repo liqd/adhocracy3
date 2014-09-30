@@ -43,13 +43,19 @@ export class Service<Content extends Resources.Content<any>> {
         private adhConfig : AdhConfig.Type
     ) {}
 
+    private formatUrl(path) {
+        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
+            return this.adhConfig.rest_url + path;
+        } else {
+            return path;
+        }
+    }
+
     public getRaw(path : string, params ?: { [key : string] : string }) : ng.IHttpPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-get preliminary path: " + path;
         }
-        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
-            path = this.adhConfig.rest_url + path;
-        }
+        path = this.formatUrl(path);
         return this.$http
             .get(path, { params : params });
     }
@@ -65,9 +71,7 @@ export class Service<Content extends Resources.Content<any>> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-put preliminary path: " + path;
         }
-        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
-            path = this.adhConfig.rest_url + path;
-        }
+        path = this.formatUrl(path);
         return this.$http
             .put(path, AdhConvert.exportContent(this.adhMetaApi, obj));
     }
@@ -85,9 +89,7 @@ export class Service<Content extends Resources.Content<any>> {
         if (_self.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-post preliminary path: " + path;
         }
-        if (path.lastIndexOf("/", 0) === 0 && typeof _self.adhConfig.rest_url !== "undefined") {
-            path = _self.adhConfig.rest_url + path;
-        }
+        path = this.formatUrl(path);
         return _self.$http
             .post(path, AdhConvert.exportContent(_self.adhMetaApi, obj));
     }
