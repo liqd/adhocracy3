@@ -439,7 +439,6 @@ class ManageAppAPI:
         timestamp = datetime.now()
         token_manager = self.registry.getAdapter(self.root, ITokenManger)
         token_manager.token_to_user_id_timestamp[token] = (userid, timestamp)
-        transaction.commit()
 
     def add_user(self, login: str=None, password: str=None, roles=None) -> str:
         """Add user to :app:`Pyramid`."""
@@ -463,7 +462,6 @@ class ManageAppAPI:
                                             parent=users,
                                             appstruct=appstruct,
                                             registry=self.registry)
-        transaction.commit()
         return resource_path(user)
 
 
@@ -489,12 +487,7 @@ def app(zeo, settings, websocket):
                        roles=['contributor'])
     manageapi.add_user_token(userid=contributor_header['X-User-Path'],
                              token=contributor_header['X-User-Token'])
-
-    def root_factory_wrapper(request):
-        request.root = manageapi.root
-        return adhocracy_core.root_factory(request)
-    app.root_factory = root_factory_wrapper
-
+    transaction.commit()
     return app
 
 
