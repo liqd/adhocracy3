@@ -1,8 +1,8 @@
 Development
-============
+===========
 
-Development
------------
+General Remarks
+---------------
 
 Use test driven development and check code style bevore pushing commits
 (see `Coding Style Guideline` ).
