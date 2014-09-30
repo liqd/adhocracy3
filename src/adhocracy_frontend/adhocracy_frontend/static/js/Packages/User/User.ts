@@ -121,8 +121,6 @@ export class User {
             });
     }
 
-    // FIXME: whoever call this function needs to keep the token in
-    // sync with the backend (e.g. via WebSocket?)
     private storeAndEnableToken(token : string, userPath : string) : ng.IPromise<void> {
         var _self : User = this;
 
