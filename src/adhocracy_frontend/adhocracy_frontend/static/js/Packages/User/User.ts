@@ -220,13 +220,6 @@ export class User {
         return _self.adhHttp.postRaw("/activate_account", {path: path})
             .then(success, AdhHttp.logBackendError);
     }
-
-    public can(permission : string) : boolean {
-        var _self : User = this;
-
-        // FIXME this is only a dummy implementation
-        return _self.loggedIn;
-    }
 }
 
 
