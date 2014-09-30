@@ -113,7 +113,7 @@ var config : IConfig = {
  * types
  */
 
-var compileAll : (metaApi: IMetaApiResponse, outPath : string) => void;
+var compileAll : (metaApi: MetaApi.IMetaApi, outPath : string) => void;
 
 var renderSheet : (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IModuleDict, metaApi : MetaApi.IMetaApi) => void;
 var mkFieldSignatures : (fields : MetaApi.ISheetField[], tab : string, separator : string) => string;
@@ -130,7 +130,7 @@ var mkResourceClassName : (resource : string) => string;
 var mkModuleName : (module : string, metaApi : MetaApi.IMetaApi) => string;
 var mkImportStatement : (modulePath : string, relativeRoot : string, metaApi : MetaApi.IMetaApi) => string;
 var mkNick : (modulePath : string, metaApi : MetaApi.IMetaApi) => string;
-var mkFieldType : (field : ISheetField) => string;
+var mkFieldType : (field : MetaApi.ISheetField) => string;
 var mkFlags : (field : MetaApi.ISheetField, comment ?: boolean) => string;
 
 var mkdirForFile : (file : string) => void;
@@ -138,7 +138,7 @@ var pyModuleToTsModule : (module : string) => string;
 var mkRelativeRoot : (source : string) => string;
 var canonicalizePath : (path : string) => string;
 
-var checkCode : (metaApi : IMetaApiResponse) => void;
+var checkCode : (metaApi : MetaApi.IMetaApi) => void;
 
 
 /***********************************************************************
@@ -786,6 +786,5 @@ canonicalizePath = (filepath : string) : string => {
  * content_type or sheet key literals.
  */
 
-var checkCode = (metaApi : IMetaApiResponse) : void => {
-
-}
+checkCode = (metaApi : MetaApi.IMetaApi) : void => {
+};
