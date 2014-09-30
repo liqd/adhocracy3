@@ -1,8 +1,8 @@
 Development
-============
+===========
 
-Development
------------
+General Remarks
+---------------
 
 Use test driven development and check code style bevore pushing commits
 (see `Coding Style Guideline` ).
@@ -15,6 +15,10 @@ Example Vim config according to coding guideline::
 
     https://github.com/liqd/vim_config
 
+When changing the api, the frontend needs to re-generate the
+TypeScript modules providing the resource classes.  This may trigger
+compiler errors that have to be resolved manually.  For more details,
+see comment in the beginning of mkResources.ts.
 
 Running the Testsuite
 ---------------------

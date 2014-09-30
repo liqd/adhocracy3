@@ -7,7 +7,7 @@
         </div>
         <div data-ng-switch-when="display">
             <div class="buttons_box">
-                <button type="button" class="edit_button" data-ng-click="edit()">{{ "edit" | translate }}</button>
+                <button type="button" data-ng-if="options.POST" class="edit_button" data-ng-click="edit()">{{ "edit" | translate }}</button>
                 <button type="button" class="close_button" data-ng-click="list()">{{ "close" | translate }}</button>
                 <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</a>
             </div>

@@ -11,6 +11,8 @@ import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/I
 // import SICanRate = require("../../Resources_/adhocracy_core/sheets/rate/ICanRate");
 // import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 // import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
 
 var pkgLocation = "/Rate";
 
@@ -95,7 +97,7 @@ export var fetchAllRates = (
         }))
         .then((postPool) => {
             var ratePromises : ng.IPromise<ResourcesBase.Resource>[] =
-                postPool.data["adhocracy_core.sheets.pool.IPool"].elements
+                postPool.data[SIPool.nick].elements
                     .map((path : string, index : number) =>
                         adhHttp
                            .getNewestVersionPathNoFork(path)
@@ -147,7 +149,7 @@ export var updateRates = (
         var auditTrailPromises : ng.IPromise<{ subject : string; rate : number }>[] = rates.map((rate) =>
             adhHttp.get(adapter.subject(rate)).then((user) => {
                 return {
-                    subject: user.data["adhocracy_core.sheets.user.IUserBasic"].name,  // (use adapter for user, too?)
+                    subject: user.data[SIUserBasic.nick].name,  // (use adapter for user, too?)
                     rate: adapter.rate(rate)
                 };
             }));
