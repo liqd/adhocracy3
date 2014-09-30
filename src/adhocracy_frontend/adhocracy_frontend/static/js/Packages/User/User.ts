@@ -23,6 +23,7 @@ export interface IScopeLogin {
         password : string;
     };
     errors : string[];
+    supportEmail : string;
 
     resetCredentials : () => void;
     logIn : () => ng.IPromise<void>;
@@ -37,6 +38,7 @@ export interface IScopeRegister {
         passwordRepeat : string;
     };
     errors : string[];
+    supportEmail : string;
 
     register : () => ng.IPromise<void>;
 }
