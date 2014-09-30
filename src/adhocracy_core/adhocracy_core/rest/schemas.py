@@ -165,6 +165,15 @@ class POSTLoginUsernameRequestSchema(colander.Schema):
     password = Password(missing=colander.required)
 
 
+class POSTActivateAccountViewRequestSchema(colander.Schema):
+
+    """Schema for account activation."""
+
+    path = colander.SchemaNode(colander.String(),
+                               missing=colander.required,
+                               validator=colander.Regex('^/activate/'))
+
+
 class POSTLoginEmailRequestSchema(colander.Schema):
 
     """Schema for login requests via email and password."""

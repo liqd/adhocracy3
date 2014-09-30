@@ -1,5 +1,7 @@
 """Rest API views."""
 from copy import deepcopy
+from datetime import datetime
+from datetime import timezone
 from logging import getLogger
 
 from colander import drop
@@ -23,8 +25,10 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ILocation
+from adhocracy_core.resources.principal import IUser
 from adhocracy_core.rest.schemas import ResourceResponseSchema
 from adhocracy_core.rest.schemas import ItemResponseSchema
+from adhocracy_core.rest.schemas import POSTActivateAccountViewRequestSchema
 from adhocracy_core.rest.schemas import POSTItemRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginEmailRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginUsernameRequestSchema
@@ -37,6 +41,7 @@ from adhocracy_core.rest.schemas import OPTIONResourceResponseSchema
 from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
+from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import get_iresource
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
@@ -614,7 +619,7 @@ def _add_no_such_user_or_wrong_password_error(request: Request):
 def validate_login_name(context, request: Request):
     """Validate the user name of a login request.
 
-    If valid, the user object is added as 'user' to
+    If valid and activated, the user object is added as 'user' to
     `request.validated`.
     """
     name = request.validated['name']
@@ -623,6 +628,8 @@ def validate_login_name(context, request: Request):
     user = locator.get_user_by_login(name)
     if user is None:
         _add_no_such_user_or_wrong_password_error(request)
+    elif not user.active:
+        request.errors.add('body', 'name', 'User account not yet activated')
     else:
         request.validated['user'] = user
 
@@ -688,7 +695,6 @@ class LoginUsernameView(RESTView):
 
 def _login_user(request: Request) -> dict:
     """Log-in a user and return a response indicating success."""
-    # FIXME don't allow login if the user isn't authenticated yet
     user = request.validated['user']
     user_path = request.resource_url(user)
     headers = remember(request, user_path) or {}
@@ -734,6 +740,34 @@ def add_cors_headers_subscriber(event):
     })
 
 
+def validate_activation_path(context, request: Request):
+    """Validate the user name of a login request.
+
+    If valid and activated, the user object is added as 'user' to
+    `request.validated`.
+    """
+    path = request.validated['path']
+    locator = request.registry.getMultiAdapter((context, request),
+                                               IUserLocator)
+    user = locator.get_user_by_activation_path(path)
+    if user is None or _activation_time_window_has_expired(user):
+        request.errors.add('body', 'path',
+                           'Unknown or expired activation path')
+    else:
+        user.active = True
+        request.validated['user'] = user
+    if user is not None:
+        user.activation_path = None  # activation path can only be used once
+
+
+def _activation_time_window_has_expired(user: IUser) -> bool:
+    """Check that user account was created less than 7 days ago."""
+    metadata = get_sheet(user, IMetadata)
+    creation_date = metadata.get()['creation_date']
+    timedelta = datetime.now(timezone.utc) - creation_date
+    return timedelta.days < 7
+
+
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
@@ -744,9 +778,8 @@ class ActivateAccountView(RESTView):
 
     """Log in a user via their name."""
 
-    # TODO adapt
-    # validation_POST = (POSTLoginUsernameRequestSchema,
-    #                    [validate_login_name, validate_login_password])
+    validation_POST = (POSTActivateAccountViewRequestSchema,
+                       [validate_activation_path])
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -756,9 +789,8 @@ class ActivateAccountView(RESTView):
     @view_config(request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
-        """Create new resource and get response data."""
-        # TODO adapt
-        return {'details': 'unknown_path', 'status': 'error'}
+        """Activate a user account and log the user in."""
+        return _login_user(self.request)
 
 
 def includeme(config):
