@@ -22,6 +22,15 @@ export interface IBackendErrorItem extends AdhError.IBackendErrorItem {};
 export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void = AdhError.logBackendError;
 
 
+export interface IOptions {
+   "OPTIONS" : boolean;
+   "PUT" : boolean;
+   "GET" : boolean;
+   "POST" : boolean;
+   "HEAD" : boolean;
+};
+
+
 /**
  * send and receive objects with adhocracy data model awareness
  *
@@ -49,6 +58,33 @@ export class Service<Content extends Resources.Content<any>> {
         } else {
             return path;
         }
+    }
+
+    public options(path : string) : ng.IPromise<IOptions> {
+        if (this.adhPreliminaryNames.isPreliminary(path)) {
+            throw "attempt to http-options preliminary path: " + path;
+        }
+        path = this.formatUrl(path);
+
+        var importOptions = (raw : { data : IOptions }) : IOptions => {
+            // FIXME: work around typo in backend
+            if (raw.data.hasOwnProperty("OPTION")) {
+                console.log("WARNING: please fix this typo in backend.");
+                raw.data.OPTIONS = (<any>raw).OPTION;
+                (<any>raw.data).OPTION = undefined;
+            }
+
+            return {
+                OPTIONS: raw.data.hasOwnProperty("OPTIONS") && raw.data.OPTIONS ? true : false,
+                PUT: raw.data.hasOwnProperty("PUT") && raw.data.PUT ? true : false,
+                GET: raw.data.hasOwnProperty("GET") && raw.data.GET ? true : false,
+                POST: raw.data.hasOwnProperty("POST") && raw.data.POST ? true : false,
+                HEAD: raw.data.hasOwnProperty("HEAD") && raw.data.HEAD ? true : false
+            };
+        }
+
+        return this.$http({method: "OPTIONS", url: path})
+            .then(importOptions, AdhError.logBackendError);
     }
 
     public getRaw(path : string, params ?: { [key : string] : string }) : ng.IHttpPromise<any> {
