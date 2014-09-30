@@ -79,7 +79,8 @@ def _add_platform(context, registry):
 def _add_initial_user_and_group(context, registry):
 
     user_name = registry.settings.get('adhocracy.initial_login', 'god')
-    user_password = registry.settings.get('adhocracy.initial_password', 'god')
+    user_password = registry.settings.get('adhocracy.initial_password',
+                                          'password')
     group_name = registry.settings.get('adhocracy.initial_group_name', 'gods')
     group_roles = ['god']
     groups = find_service(context, 'principals', 'groups')
