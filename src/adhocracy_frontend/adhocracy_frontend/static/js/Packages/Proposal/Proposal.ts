@@ -30,6 +30,7 @@ var pkgLocation = "/Proposal";
 interface DetailScope<Data> extends ng.IScope {
     viewmode : string;
     content : Resources.Content<Data>;
+    path : string;
 }
 
 interface DetailRefScope<Data> extends DetailScope<Data> {
@@ -54,7 +55,11 @@ export class ProposalDetail {
             scope: {
                 path: "="
             },
-            controller: ["adhHttp", "adhWebSocket", "$scope", (adhHttp, adhWebSocket, $scope) => {
+            controller: ["adhHttp", "adhWebSocket", "$scope", (
+                adhHttp : AdhHttp.Service<any>,
+                adhWebSocket : AdhWebSocket.IService,
+                $scope : DetailScope<RIProposal>
+            ) => {
                 var wsHandle;
 
                 var fetchAndUpdateContent = (itemPath : string) : void => {
