@@ -1,8 +1,12 @@
-Permission system:
-------------------
+Permission system
+-----------------
 
-Principals:
-...........
+Principals
+..........
+
+There are two types of :term:`principals`: users and groups.
+
+On the technical level, roles are also called principles.
 
 groups (set of users):
 
@@ -17,12 +21,12 @@ users:
    - god (initial user)
    ...
 
-Principals are mapped to global permission :term:`roles` or :term:`local roles`
-(only for a specific context).
+Principals are mapped to a set of global permission :term:`roles` and
+:term:`local roles` (only for a specific context).
 
 
-Roles (mapping to permissions):
-...............................
+Roles (mapping to permissions)
+..............................
 
 Roles with example permission mapping:
 
@@ -54,13 +58,15 @@ Roles with example permission mapping:
         set workflow
         manage principals
 
-Roles are inherited within the object hierarchy in the database.
+Mappings of principals to local roles are associate with resources and
+are inherited within the object hierarchy in the database.
 The creator is the principal who created the local context.
 The creator role is automatically set for a specific local context and is not
 inherited.
 
-ACL (Access Control List):
-..........................
+
+ACL (Access Control List)
+.........................
 
 List with ACEs (Access Control Entry): [<Action>, <Principal>, <Permission>]
 
@@ -86,13 +92,11 @@ Customizing
     - use only configuration for this
     - default mapping should just work for most use cases
 
+
 Questions
 ---------
-FIXME: remove this section?
 
-what is the difference between role and group, on a conceptual level?
-(why do we need both?)  i'm assuming that groups are a pyramid
-concept, and roles are something we want to build on top?
+What is the difference (conceptually) between a role and a group?
 
 - For the basic pyramid authorization system there are only principals, no
   matter if you call them user/group or role.
