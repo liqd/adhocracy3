@@ -30,6 +30,7 @@ One or more markers can appear anywhere in the document::
     </div>
     <div class="adhocracy_marker"
          data-widget="paragraph-version-detail"
+         data-locale="en"
          data-ref="..." data-viewmode="display">
     </div>
 
@@ -39,6 +40,7 @@ Widget markers
 A widget is defined by
 
 - One angular directive (presentation)
+- Optionally a locale
 - Multiple directive parameters, e.g.
 
   - One or multiple resources (content)

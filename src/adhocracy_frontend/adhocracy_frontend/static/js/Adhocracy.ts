@@ -80,7 +80,13 @@ export var init = (config, meta_api) => {
                 templateUrl: "/static/js/templates/Register.html"
             })
             .when("/embed/:widget", {
-                template: "<adh-embed></adh-embed>"
+                template: "<adh-embed></adh-embed>",
+                controller: ["$translate", "$route", ($translate, $route : ng.route.IRouteService) => {
+                    var params = $route.current.params;
+                    if (params.hasOwnProperty("locale")) {
+                        $translate.use(params.locale);
+                    }
+                }]
             })
             .otherwise({
                 // FIXME: proper error template

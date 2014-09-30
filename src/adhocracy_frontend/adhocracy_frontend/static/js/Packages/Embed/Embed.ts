@@ -22,7 +22,7 @@ export var route2template = ($route : ng.route.IRouteService) => {
         throw "unknown widget: " + params.widget;
     }
     for (var key in params) {
-        if (params.hasOwnProperty(key) && key !== "widget") {
+        if (params.hasOwnProperty(key) && key !== "widget" && key !== "locale") {
             attrs.push(Util.formatString("data-{0}=\"{1}\"", _.escape(key), _.escape(params[key])));
         }
     }
