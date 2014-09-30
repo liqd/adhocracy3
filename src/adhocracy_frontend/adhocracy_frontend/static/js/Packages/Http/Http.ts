@@ -15,6 +15,9 @@ import AdhError = require("./Error");
 import AdhConvert = require("./Convert");
 import AdhConfig = require("../Config/Config");
 
+import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
+import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+
 // re-exports
 export interface ITransactionResult extends AdhTransaction.ITransactionResult {};
 export interface IBackendError extends AdhError.IBackendError {};
@@ -109,7 +112,7 @@ export class Service<Content extends Resources.Content<any>> {
     public getNewestVersionPathNoFork(path : string) : ng.IPromise<string> {
         return this.get(path + "/LAST")
             .then((tag) => {
-                var heads = tag.data["adhocracy_core.sheets.tags.ITag"].elements;
+                var heads = tag.data[SITag.nick].elements;
                 if (heads.length !== 1) {
                     throw ("Cannot handle this LAST tag: " + heads.toString());
                 } else {
@@ -202,7 +205,7 @@ export class Service<Content extends Resources.Content<any>> {
                 throw "Tried to post new version of " + dagPath + " " + timeoutRounds.toString() + " times, giving up.";
             }
 
-            _obj.data["adhocracy_core.sheets.versions.IVersionable"] = {
+            _obj.data[SIVersionable.nick] = {
                 follows: [nextOldVersionPath]
             };
 

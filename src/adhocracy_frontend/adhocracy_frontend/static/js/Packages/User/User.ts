@@ -4,6 +4,7 @@ import AdhHttp = require("../Http/Http");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhConfig = require("../Config/Config");
 
+import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
 var pkgLocation = "/User";
 
 export interface IUserBasic {
@@ -110,7 +111,7 @@ export class User {
 
         return _self.adhHttp.get(userPath)
             .then((resource) => {
-                _self.data = resource.data["adhocracy_core.sheets.user.IUserBasic"];
+                _self.data = resource.data[SIUserBasic.nick];
                 _self.loggedIn = true;
                 return resource;  // FIXME this is only here because of a bug in DefinitelyTyped
             }, (reason) => {
@@ -328,7 +329,7 @@ export var metaDirective = (adhConfig : AdhConfig.Type) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
-                        $scope.userBasic = res.data["adhocracy_core.sheets.user.IUserBasic"];
+                        $scope.userBasic = res.data[SIUserBasic.nick];
                         $scope.isAnonymous = false;
                     });
             } else {
