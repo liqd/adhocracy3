@@ -38,7 +38,6 @@ import MetaApi = require("./Packages/MetaApi/MetaApi");
  * To make sure that no string literals are used anywhere outside the
  * generated modules for naming content_type fields of resources or
  * sheet keys, there is a script that scans for them.
- * [FIXME: write that script!]
  *
  * Changes that may require changing code manually:
  *
@@ -783,8 +782,8 @@ canonicalizePath = (filepath : string) : string => {
 
 
 /***********************************************************************
- * check manually written code for illegal use of content_type or
- * sheet key literals.
+ * check manually written code (*.ts, *.html) for illegal use of
+ * content_type or sheet key literals.
  */
 
 var checkCode = (metaApi : IMetaApiResponse) : void => {
