@@ -21,10 +21,6 @@ export var register = () => {
         describe("Service", () => {
             var adhProposal : AdhProposal.Service;
             var adhHttpMock;
-            var scopeTemplate = {
-                options: { POST: true },
-                paragraphs: {}
-            };
 
             beforeEach(() => {
                 adhHttpMock = createAdhHttpMock();
