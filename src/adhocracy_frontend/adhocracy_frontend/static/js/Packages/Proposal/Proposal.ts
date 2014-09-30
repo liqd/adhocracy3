@@ -29,6 +29,7 @@ interface DetailScope<Data> extends ng.IScope {
     viewmode : string;
     content : Resources.Content<Data>;
     path : string;
+    options : AdhHttp.IOptions;
 }
 
 interface DetailRefScope<Data> extends DetailScope<Data> {
@@ -66,6 +67,9 @@ export class ProposalDetail {
                         .then((content) => {
                             $scope.content = content;
                         });
+
+                    $scope.options = AdhHttp.emptyOptions;
+                    adhHttp.options(itemPath).then((options) => { $scope.options = options; });
                 };
 
                 var wsHandler = (event : AdhWebSocket.IServerEvent) : void => {
