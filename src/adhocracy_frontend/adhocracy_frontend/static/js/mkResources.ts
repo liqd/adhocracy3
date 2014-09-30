@@ -37,7 +37,7 @@ import MetaApi = require("./Packages/MetaApi/MetaApi");
  *
  * To make sure that no string literals are used anywhere outside the
  * generated modules for naming content_type fields of resources or
- * sheet keys, there is a script that scans for them.
+ * sheet keys, there is a script that scans for them.  FIXME: to be done!
  *
  * Changes that may require changing code manually:
  *
@@ -109,6 +109,7 @@ var config : IConfig = {
 };
 
 
+
 /***********************************************************************
  * types
  */
@@ -138,7 +139,6 @@ var pyModuleToTsModule : (module : string) => string;
 var mkRelativeRoot : (source : string) => string;
 var canonicalizePath : (path : string) => string;
 
-var checkCode : (metaApi : MetaApi.IMetaApi) => void;
 
 
 /***********************************************************************
@@ -181,13 +181,14 @@ if (process.argv.length > 2) {
     fs.readFile(process.argv[2], "utf8", (err, data) => {
         var bodyJs = JSON.parse(data);
         compileAll(bodyJs, process.argv[3]);
-        checkCode(bodyJs);
     });
 } else {
     // Use JSON data from a running server if called without
     // further argument, e.g. `node mkResources.js`
     http.request(config.httpOptions, callback).end();
 }
+
+
 
 /***********************************************************************
  * renderers
@@ -777,14 +778,4 @@ canonicalizePath = (filepath : string) : string => {
     return filepath
         .replace(/([^\.])\.\//g, "$1")
         .replace(/(\/)[^\/\.]+\/\.\.\//g, "$1");
-};
-
-
-
-/***********************************************************************
- * check manually written code (*.ts, *.html) for illegal use of
- * content_type or sheet key literals.
- */
-
-checkCode = (metaApi : MetaApi.IMetaApi) : void => {
 };
