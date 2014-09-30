@@ -745,8 +745,8 @@ class ActivateAccountView(RESTView):
     """Log in a user via their name."""
 
     # TODO adapt
-    ##validation_POST = (POSTLoginUsernameRequestSchema,
-    ##                   [validate_login_name, validate_login_password])
+    # validation_POST = (POSTLoginUsernameRequestSchema,
+    #                    [validate_login_name, validate_login_password])
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
