@@ -139,6 +139,8 @@ var pyModuleToTsModule : (module : string) => string;
 var mkRelativeRoot : (source : string) => string;
 var canonicalizePath : (path : string) => string;
 
+var checkCode : (metaApi : IMetaApiResponse) => void;
+
 
 /***********************************************************************
  * fetch api
@@ -180,6 +182,7 @@ if (process.argv.length > 2) {
     fs.readFile(process.argv[2], "utf8", (err, data) => {
         var bodyJs = JSON.parse(data);
         compileAll(bodyJs, process.argv[3]);
+        checkCode(bodyJs);
     });
 } else {
     // Use JSON data from a running server if called without
@@ -776,3 +779,14 @@ canonicalizePath = (filepath : string) : string => {
         .replace(/([^\.])\.\//g, "$1")
         .replace(/(\/)[^\/\.]+\/\.\.\//g, "$1");
 };
+
+
+
+/***********************************************************************
+ * check manually written code for illegal use of content_type or
+ * sheet key literals.
+ */
+
+var checkCode = (metaApi : IMetaApiResponse) : void => {
+
+}
