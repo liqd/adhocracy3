@@ -25,8 +25,8 @@ from adhocracy_core.interfaces import ResourceMetadata
 # Integration/Function test helper  #
 #####################################
 
-god_authentication_header = {'X-User-Path': '/principals/users/0000000',
-                             'X-User-Token': 'SECRET_ADMIN'}
+god_header = {'X-User-Path': '/principals/users/0000000',
+              'X-User-Token': 'SECRET_GOD'}
 """The authentication headers for the `god` user, used by functional fixtures.
 This assumes the initial user is created and has the `god` role.
 """

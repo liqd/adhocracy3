@@ -10,6 +10,7 @@ Prerequisites
 Some imports to work with rest api calls::
 
     >>> from pprint import pprint
+    >>> from adhocracy_core.testing import god_header
 
 Start Adhocracy testapp::
 
@@ -257,9 +258,7 @@ Without authentication we may not post anything::
 
 With authentication instead we may::
 
-    >>> from adhocracy_core.testing import god_authentication_header
-    >>> user_god = god_authentication_header
-    >>> resp_data = testapp.options(rest_url + "/adhocracy", headers=user_god).json
+    >>> resp_data = testapp.options(rest_url + "/adhocracy", headers=god_header).json
     >>> pprint(resp_data['POST']['request_body'])
     [...'adhocracy_core.resources.pool.IBasicPool',...]
 
