@@ -4,6 +4,9 @@ import AdhHttp = require("../Http/Http");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhConfig = require("../Config/Config");
 
+import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
+import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/user/IPasswordAuthentication");
+
 var pkgLocation = "/User";
 
 export interface IUserBasic {
@@ -110,7 +113,7 @@ export class User {
 
         return _self.adhHttp.get(userPath)
             .then((resource) => {
-                _self.data = resource.data["adhocracy_core.sheets.user.IUserBasic"];
+                _self.data = resource.data[SIUserBasic.nick];
                 _self.loggedIn = true;
                 return resource;  // FIXME this is only here because of a bug in DefinitelyTyped
             }, (reason) => {
@@ -175,7 +178,6 @@ export class User {
         }
 
         var success = (response) => {
-            // FIXME use websockets for updates
             return _self.storeAndEnableToken(response.data.user_token, response.data.user_path);
         };
 
@@ -193,35 +195,65 @@ export class User {
     public register(username : string, email : string, password : string, passwordRepeat : string) : ng.IPromise<IRegisterResponse> {
         var _self : User = this;
 
-        return _self.adhHttp.post("/principals/users/", {
+        var resource = {
             "content_type": "adhocracy_core.resources.principal.IUser",
-            "data": {
-                "adhocracy_core.sheets.user.IUserBasic": {
-                    "name": username,
-                    "email": email
-                },
-                "adhocracy_core.sheets.user.IPasswordAuthentication": {
-                    "password": password
-                }
-            }
-        });
+            "data": {}
+        };
+        resource.data[SIUserBasic.nick] = {
+            "name": username,
+            "email": email
+        };
+        resource.data[SIPasswordAuthentication.nick] = {
+            "password": password
+        };
+
+        return _self.adhHttp.post("/principals/users/", resource);
     }
 
-    public can(permission : string) {
+    public activate(path : string) : ng.IPromise<void> {
         var _self : User = this;
 
-        // FIXME this is only a dummy implementation
-        return _self.loggedIn;
+        var success = (response) => {
+            return _self.storeAndEnableToken(response.data.user_token, response.data.user_path);
+        };
+
+        return _self.adhHttp.postRaw("/activate_account", {path: path})
+            .then(success, AdhHttp.logBackendError);
     }
 }
+
+
+export var activateController = (
+    adhUser : User,
+    adhTopLevelState : AdhTopLevelState.TopLevelState,
+    adhDone,
+    $route : ng.route.IRouteService,
+    $location : ng.ILocationService
+) : void => {
+    var key = $route.current.params.key;
+    var path = "/activate/" + key;
+
+    var success = () => {
+        // FIXME show success message in UI
+        // FIXME extract cameFrom from activation key (involves BE)
+        adhTopLevelState.redirectToCameFrom("/");
+    };
+
+    var error = () => {
+        $location.url("activation_error");
+    };
+
+    adhUser.activate(path)
+        .then(success, error)
+        .then(adhDone);
+};
 
 
 export var loginController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
     adhConfig : AdhConfig.Type,
-    $scope : IScopeLogin,
-    $location : ng.ILocationService
+    $scope : IScopeLogin
 ) : void => {
     $scope.errors = [];
     $scope.supportEmail = adhConfig.support_email;
@@ -241,8 +273,7 @@ export var loginController = (
             $scope.credentials.nameOrEmail,
             $scope.credentials.password
         ).then(() => {
-            var returnToPage : string = adhTopLevelState.getCameFrom();
-            $location.url((typeof returnToPage === "string") ? returnToPage : "/");
+            adhTopLevelState.redirectToCameFrom("/");
         }, (errors) => {
             bindServerErrors($scope, errors);
             $scope.credentials.password = "";
@@ -256,7 +287,7 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", "$location", loginController]
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", loginController]
     };
 };
 
@@ -265,8 +296,7 @@ export var registerController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
     adhConfig : AdhConfig.Type,
-    $scope : IScopeRegister,
-    $location : ng.ILocationService
+    $scope : IScopeRegister
 ) => {
     $scope.input = {
         username: "",
@@ -283,10 +313,7 @@ export var registerController = (
             .then((response) => {
                 $scope.errors = [];
                 return adhUser.logIn($scope.input.username, $scope.input.password).then(
-                    () => {
-                        var returnToPage : string = adhTopLevelState.getCameFrom();
-                        $location.path((typeof returnToPage === "string") ? returnToPage : "/");
-                    },
+                    () => adhTopLevelState.redirectToCameFrom("/"),
                     (errors) => bindServerErrors($scope, errors)
                 );
             }, (errors) => bindServerErrors($scope, errors));
@@ -299,7 +326,7 @@ export var registerDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", "$location", registerController]
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", registerController]
     };
 };
 
@@ -332,7 +359,7 @@ export var metaDirective = (adhConfig : AdhConfig.Type) => {
             if ($scope.path) {
                 adhHttp.resolve($scope.path)
                     .then((res) => {
-                        $scope.userBasic = res.data["adhocracy_core.sheets.user.IUserBasic"];
+                        $scope.userBasic = res.data[SIUserBasic.nick];
                         $scope.isAnonymous = false;
                     });
             } else {

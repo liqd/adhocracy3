@@ -5,7 +5,7 @@
 var _s : any = require("underscore.string");
 /* tslint:enable:no-var-requires */
 
-import Util = require("../Packages/Util/Util");
+import _ = require("lodash");
 
 export var mkThingList : <T>(things : T[], render : (T) => string, tab : string, separator : string) => string;
 export var dotAndUnderscoreToCaml : (string) => string;
@@ -113,7 +113,7 @@ mkNickDictFromNamesX = (fullNames : string[][]) : { [index : string] : string } 
     var clashes : string[][] = [];
 
     var chopClashes = (clashes : string[][]) : string[][] => {
-        var clashesX = Util.deepcp(clashes);
+        var clashesX = _.cloneDeep(clashes);
         clashesX.forEach((fullName : string[]) => fullName.shift());
         return clashesX;
     };
@@ -121,7 +121,7 @@ mkNickDictFromNamesX = (fullNames : string[][]) : { [index : string] : string } 
     var flushClashes = () : void => {
         if (clashes.length === 1) {
             var nick = clashes[0][0];
-            var full = intercalate(Util.deepcp(clashes[0]).reverse(), ".");
+            var full = intercalate(_.cloneDeep(clashes[0]).reverse(), ".");
             nicksRec[full] = nick;
         } else {
             var chopOk : boolean = true;
@@ -145,7 +145,7 @@ mkNickDictFromNamesX = (fullNames : string[][]) : { [index : string] : string } 
                 }
             } else {
                 clashes.forEach((clash) => {
-                    var n = intercalate(Util.deepcp(clash).reverse(), ".");
+                    var n = intercalate(_.cloneDeep(clash).reverse(), ".");
                     nicksRec[n] = n;
                 });
             }
@@ -202,8 +202,3 @@ var quickAndDirtyUnitTest = () => {
 quickAndDirtyUnitTest();
 
 */
-
-
-// NOTE: in the futur, we may have to worry about how generated code
-// API changes in places that have always been there, just because
-// new sheets and resources have been introduced.
