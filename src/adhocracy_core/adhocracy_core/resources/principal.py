@@ -163,10 +163,10 @@ class UserLocatorAdapter(object):
             if user.name == login:
                 return user
 
-    def get_user_by_userid(self, user_id: str) -> IUser:
-        """Find user per `user_id`(location path) or return None."""
+    def get_user_by_userid(self, userid: str) -> IUser:
+        """Find user by :term:`userid` or return None."""
         try:
-            return find_resource(self.context, user_id)
+            return find_resource(self.context, userid)
         except KeyError:
             return None
 
@@ -177,9 +177,9 @@ class UserLocatorAdapter(object):
             if user.email == email:
                 return user
 
-    def get_groupids(self, user_id: str) -> list:
-        """Get :term:`groupid`s for `user_id`(location path) or return None."""
-        user = self.get_user_by_userid(user_id)
+    def get_groupids(self, userid: str) -> list:
+        """Get :term:`groupid`s for _term:`userid` or return None."""
+        user = self.get_user_by_userid(userid)
         if user is None:
             return None
         user_sheet = get_sheet(user,
@@ -188,9 +188,9 @@ class UserLocatorAdapter(object):
         groupids = ['group:' + g.__name__ for g in groups]
         return groupids
 
-    def get_roleids(self, user_id: str) -> list:
-        """Return the roles for `user_id`  or None."""
-        user = self.get_user_by_userid(user_id)
+    def get_roleids(self, userid: str) -> list:
+        """Return the roles for :term:`userid` or None."""
+        user = self.get_user_by_userid(userid)
         if user is None:
             return None
         roles_sheet = get_sheet(user,

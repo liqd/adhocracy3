@@ -686,8 +686,8 @@ class LoginUsernameView(RESTView):
 def _login_user(request: Request) -> dict:
     """Log-in a user and return a response indicating success."""
     user = request.validated['user']
-    user_id = resource_path(user)
-    headers = remember(request, user_id) or {}
+    userid = resource_path(user)
+    headers = remember(request, userid) or {}
     user_path = headers['X-User-Path']
     user_token = headers['X-User-Token']
     return {'status': 'success',

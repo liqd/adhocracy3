@@ -379,14 +379,14 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
 
 class ITokenManger(Interface):  # pragma: no cover
 
-    def create_token(user_id: str) -> str:
-        """ Create authentication token for user_id."""
+    def create_token(userid: str) -> str:
+        """ Create authentication token for :term:`userid`."""
 
     def get_user_id(token: str) -> str:
-        """ Get user_id for authentication token.
+        """ Get :term:`userid` for authentication token.
 
         :returns: user id for this token
-        :raises KeyError: if there is no corresponding user_id
+        :raises KeyError: if there is no corresponding `userid`
         """
 
     def delete_token(token: str):

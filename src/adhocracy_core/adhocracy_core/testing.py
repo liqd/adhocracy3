@@ -398,7 +398,7 @@ def app(zeo, settings, websocket):
     configurator.include(adhocracy_core.resources.sample_section)
     app = configurator.make_wsgi_app()
     root = get_root(app)
-    add_user_authentication(user_id=god_authentication_header['X-User-Path'],
+    add_user_authentication(userid=god_authentication_header['X-User-Path'],
                             token=god_authentication_header['X-User-Token'],
                             root=root,
                             registry=app.registry)
@@ -418,14 +418,14 @@ def get_root(app):
     return app.root_factory(request)
 
 
-def add_user_authentication(user_id: str, token: str, root, registry):
+def add_user_authentication(userid: str, token: str, root, registry):
     """Add user authentication token to :app:`Pyramid`."""
     from datetime import datetime
     import transaction
     from adhocracy_core.interfaces import ITokenManger
     timestamp = datetime.now()
     token_manager = registry.getAdapter(root, ITokenManger)
-    token_manager.token_to_user_id_timestamp[token] = (user_id, timestamp)
+    token_manager.token_to_user_id_timestamp[token] = (userid, timestamp)
     transaction.commit()
 
 

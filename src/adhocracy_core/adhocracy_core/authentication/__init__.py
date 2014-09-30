@@ -38,7 +38,7 @@ class TokenMangerAnnotationStorage:
             setattr(self.context, self.annotation_key, PersistentDict())
         return getattr(self.context, self.annotation_key)
 
-    def create_token(self, user_id: str, secret='', hashalg='sha512') -> str:
+    def create_token(self, userid: str, secret='', hashalg='sha512') -> str:
         """Create authentication token for user_id.
 
         :param secret:  the secret used to salt the generated token.
@@ -46,9 +46,9 @@ class TokenMangerAnnotationStorage:
                         This is used to create the authentication token.
         """
         timestamp = datetime.now()
-        value = self._build_token_value(user_id, timestamp, secret)
+        value = self._build_token_value(userid, timestamp, secret)
         token = hashlib.new(hashalg, value).hexdigest()
-        self.token_to_user_id_timestamp[token] = (user_id, timestamp)
+        self.token_to_user_id_timestamp[token] = (userid, timestamp)
         return token
 
     def _build_token_value(self, user_id: str, timestamp: datetime,
@@ -67,11 +67,11 @@ class TokenMangerAnnotationStorage:
         :returns: user id for this token
         :raises KeyError: if there is no corresponding user_id
         """
-        user_id, timestamp = self.token_to_user_id_timestamp[token]
+        userid, timestamp = self.token_to_user_id_timestamp[token]
         if self._is_expired(timestamp, timeout):
             del self.token_to_user_id_timestamp[token]
             raise KeyError
-        return user_id
+        return userid
 
     def _is_expired(self, timestamp: datetime, timeout: float=None) -> bool:
         if timeout is None:
@@ -163,24 +163,24 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     def _get_authenticated_user_id(self, request: Request,
                                    tokenmanager: ITokenManger) -> str:
-        user_id, token = _get_x_user_headers(request)
-        authenticated_user_id = tokenmanager.get_user_id(token,
-                                                         timeout=self.timeout)
-        if authenticated_user_id != user_id:
+        userid, token = _get_x_user_headers(request)
+        authenticated_userid = tokenmanager.get_user_id(token,
+                                                        timeout=self.timeout)
+        if authenticated_userid != userid:
             raise KeyError
-        return authenticated_user_id
+        return authenticated_userid
 
-    def remember(self, request, user_id, **kw) -> dict:
+    def remember(self, request, userid, **kw) -> dict:
         tokenmanager = self.get_tokenmanager(request)
         if tokenmanager:
-            token = tokenmanager.create_token(user_id, secret=self.secret,
+            token = tokenmanager.create_token(userid, secret=self.secret,
                                               hashalg=self.hashalg)
         else:
             token = None
         from zope.component import queryMultiAdapter
         locator = queryMultiAdapter((request.context, request),
                                     IRolesUserLocator)
-        user = locator.get_user_by_userid(user_id) if locator else None
+        user = locator.get_user_by_userid(userid) if locator else None
         if user is not None:
             url = request.resource_url(user)
         else:
