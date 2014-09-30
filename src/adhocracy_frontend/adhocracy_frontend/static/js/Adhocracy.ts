@@ -103,8 +103,8 @@ export var init = (config, meta_api) => {
             prefix: "/static/i18n/",
             suffix: ".json"
         });
-        $translateProvider.fallbackLanguage("en");
         $translateProvider.preferredLanguage(config.locale);
+        $translateProvider.fallbackLanguage("en");
     }]);
 
     app.value("angular", angular);
