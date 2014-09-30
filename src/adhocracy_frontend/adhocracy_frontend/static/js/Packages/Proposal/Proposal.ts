@@ -348,63 +348,7 @@ export class Service {
         }
     }
 
-    public postProposalWithParagraphsOld(
-        poolPath : string,
-        proposalVersion : RIProposalVersion,
-        paragraphVersions : RIParagraphVersion[]
-    ) {
-        var _self = this;
-
-        var sectionVersion : RISectionVersion = new RISectionVersion({preliminaryNames: _self.adhPreliminaryNames});
-        sectionVersion.data["adhocracy_core.sheets.document.ISection"] =
-            new SISection.AdhocracyCoreSheetsDocumentISection({
-                title : "single section",
-                elements : [],
-                subsections : []
-            });
-
-        var name = proposalVersion.data["adhocracy_core.sheets.document.IDocument"].title;
-        name = Util.normalizeName(name);
-
-        var scope : {proposal? : any; section? : any; paragraphs : {}} = {
-            paragraphs: {}
-        };
-
-        return _self.postProposal(poolPath, name, scope)
-            .then(() => _self.postSection(
-                scope.proposal.path,
-                "section",
-                scope
-            ))
-            .then(() => _self.postParagraphs(
-                scope.proposal.path,
-                paragraphVersions.map((paragraphVersion, i) => "paragraph" + i),
-                scope
-            ))
-            .then(() => _self.postProposalVersion(
-                scope.proposal,
-                proposalVersion,
-                [scope.section],
-                scope
-            ))
-            .then(() => _self.postSectionVersion(
-                scope.section,
-                sectionVersion,
-                _.values(scope.paragraphs),
-                scope
-            ))
-            .then(() => _self.postParagraphVersions(
-                paragraphVersions.map((paragraphVersion, i) => scope.paragraphs["paragraph" + i]),
-                paragraphVersions,
-                scope
-            ))
-
-            // return the latest proposal Version
-            .then(() => _self.adhHttp.getNewestVersionPathNoFork(scope.proposal.path))
-            .then((proposalVersionPath) => _self.adhHttp.get(proposalVersionPath));
-    }
-
-    public postProposalWithParagraphsBatched(
+    public postProposalWithParagraphs(
         poolPath : string,
         proposalVersion : RIProposalVersion,
         paragraphVersions : RIParagraphVersion[]
@@ -474,15 +418,5 @@ export class Service {
                         return responses[postProposalVersion.index];
                     });
             });
-    }
-
-    // FIXME: there are two implementations of
-    // postProposalWithParagraph.  both will be obsoleted by upcoming
-    // changes in surrounding the high-level-api user story, so we
-    // keep both of them in the code for reference for now.  They need
-    // to be cleaned up together once the high-level api is stable.
-    public postProposalWithParagraphs(p, v, pvs) {
-        // return this.postProposalWithParagraphsOld(p, v, pvs);
-        return this.postProposalWithParagraphsBatched(p, v, pvs);
     }
 };
