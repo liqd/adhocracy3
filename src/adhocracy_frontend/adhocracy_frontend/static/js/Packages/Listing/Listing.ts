@@ -7,6 +7,7 @@ import AdhHttp = require("../Http/Http");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 import AdhConfig = require("../Config/Config");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhPermissions = require("../Permissions/Permissions");
 
 import Resources = require("../../Resources");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
@@ -83,10 +84,11 @@ export class Listing<Container extends Resources.Content<any>> {
                     unregisterWebsocket(scope);
                 });
             },
-            controller: ["$scope", "adhHttp", "adhPreliminaryNames", (
+            controller: ["$scope", "adhHttp", "adhPreliminaryNames", "adhPermissions", (
                 $scope: ListingScope<Container>,
                 adhHttp: AdhHttp.Service<Container>,
-                adhPreliminaryNames : AdhPreliminaryNames
+                adhPreliminaryNames : AdhPreliminaryNames,
+                adhPermissions : AdhPermissions.Service
             ) : void => {
                 $scope.show = {createForm: false};
 
@@ -105,9 +107,7 @@ export class Listing<Container extends Resources.Content<any>> {
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
 
-                        return adhHttp.options($scope.poolPath).then((options) => {
-                            $scope.poolOptions = options;
-                        });
+                        return adhPermissions.bindScope($scope, $scope.poolPath, "poolOptions");
                     });
                 };
 
