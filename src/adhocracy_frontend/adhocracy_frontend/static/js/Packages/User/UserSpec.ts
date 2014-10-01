@@ -342,18 +342,16 @@ export var register = () => {
             describe("controller", () => {
                 var controller;
                 var $scopeMock;
-                var $translateMock;
                 var adhUserMock;
                 var adhTopLevelStateMock;
 
                 beforeEach(() => {
                     $scopeMock = {};
-                    $translateMock = jasmine.createSpy("£translateMock");
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn"]);
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
                     adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
-                    controller = <any>(directive.controller[5]);
-                    controller(adhUserMock, adhTopLevelStateMock, adhConfigMock, $scopeMock, $translateMock);
+                    controller = <any>(directive.controller[4]);
+                    controller(adhUserMock, adhTopLevelStateMock, adhConfigMock, $scopeMock);
                 });
 
                 it("creates an empty credentials object in scope", () => {
@@ -426,19 +424,17 @@ export var register = () => {
             describe("controller", () => {
                 var controller;
                 var $scopeMock;
-                var $translateMock;
                 var adhUserMock;
                 var adhTopLevelStateMock;
 
                 beforeEach(() => {
                     $scopeMock = {};
-                    $translateMock = jasmine.createSpy("$translateMock");
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register", "logIn"]);
                     adhUserMock.register.and.returnValue(q.when(undefined));
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
                     adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
-                    controller = <any>(directive.controller[5]);
-                    controller(adhUserMock, adhTopLevelStateMock, adhConfigMock, $scopeMock, $translateMock);
+                    controller = <any>(directive.controller[4]);
+                    controller(adhUserMock, adhTopLevelStateMock, adhConfigMock, $scopeMock);
                 });
 
                 it("creates an empty input object in scope", () => {
