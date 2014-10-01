@@ -61,7 +61,6 @@ def _ignored_test_multi_edits(browser, comment):
 
 
 def test_author(comment):
-    time.sleep(3)  # FIXME this takes way to long...
     # NOTE why the value is first 'guest' and then 'god'? joka
     actual = comment.find_by_css("adh-user-meta").first.text
     # the captialisation might be changed by CSS
@@ -78,7 +77,6 @@ def create_top_level_comment(listing, content):
     form = get_listing_create_form(listing)
     form.find_by_css('textarea').first.fill(content)
     form.find_by_css('input[type="submit"]').first.click()
-    time.sleep(3)  # FIXME this takes way to long...
     comment = get_list_element(listing, content, descendant='.comment-content')
     return comment
 
@@ -88,7 +86,6 @@ def create_reply_comment(parent, content):
     form = get_comment_create_form(parent)
     form.find_by_css('textarea').first.fill(content)
     form.find_by_css('input[type="submit"]').first.click()
-    time.sleep(2)  # FIXME this takes way to long...
     reply = get_reply(parent, content)
     return reply
 
@@ -97,7 +94,6 @@ def edit_comment(comment, content):
     comment.find_by_css('.comment-meta a')[0].click()
     comment.find_by_css('textarea').first.fill(content)
     comment.find_by_css('.comment-meta a')[0].click()
-    time.sleep(3)  # FIXME this takes way to long...
     wait(lambda: comment.find_by_css('.comment-content').first.text == content)
 
 
@@ -109,7 +105,6 @@ def get_comment_create_form(comment):
 
 def get_reply(parent, content):
     """Return reply to comment `parent` with content == `content`."""
-    time.sleep(1)  # FIXME this takes way to long...
     for element in parent.find_by_css('.comment'):
         wait(lambda: element.text, max_steps=100)
         if element.find_by_css('.comment-content').first.text == content:
