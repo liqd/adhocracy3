@@ -765,7 +765,7 @@ def _activation_time_window_has_expired(user: IUser) -> bool:
     metadata = get_sheet(user, IMetadata)
     creation_date = metadata.get()['creation_date']
     timedelta = datetime.now(timezone.utc) - creation_date
-    return timedelta.days < 7
+    return timedelta.days >= 7
 
 
 @view_defaults(
