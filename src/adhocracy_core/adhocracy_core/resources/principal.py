@@ -11,7 +11,6 @@ from zope.interface import implementer
 
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
-from adhocracy_core.messaging import render_and_send_mail
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
@@ -99,8 +98,7 @@ def send_registration_mail(context: IUser,
     logger.warn('Sending registration mail to %s for new user named %s, '
                 'activation path=%s', email, name, context.activation_path)
     args = {'name': name, 'activation_path': activation_path}
-    render_and_send_mail(
-        registry=registry,
+    registry.messenger.render_and_send_mail(
         subject=subject,
         recipients=[email],
         template_asset_base='adhocracy_core:templates/registration_mail',

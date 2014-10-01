@@ -15,6 +15,7 @@ class PrincipalIntegrationTest(unittest.TestCase):
         config.include('pyramid_mako')
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
+        config.include('adhocracy_core.messaging')
         config.include('adhocracy_core.sheets.metadata')
         config.include('adhocracy_core.resources.principal')
         self.config = config
@@ -154,6 +155,18 @@ class UserLocatorAdapterUnitTest(unittest.TestCase):
         inst = self._make_one(self.context, testing.DummyRequest())
         assert inst.get_user_by_login('wrong login name') is None
 
+    def test_get_user_by_activation_path_user_exists(self):
+        user = testing.DummyResource(activation_path='/activate/foo')
+        self.context['principals']['users']['User1'] = user
+        inst = self._make_one(self.context, testing.DummyRequest())
+        assert inst.get_user_by_activation_path('/activate/foo') is user
+
+    def test_get_user_by_activation_path_user_not_exists(self):
+        user = testing.DummyResource(activation_path=None)
+        self.context['principals']['users']['User1'] = user
+        inst = self._make_one(self.context, testing.DummyRequest())
+        assert inst.get_user_by_activation_path('/activate/no_such_link') is None
+
 
 class UserLocatorAdapterIntegrationTest(unittest.TestCase):
 
@@ -179,13 +192,13 @@ class TestIntegrationSendRegistrationMail():
         config.include('pyramid_mailer.testing')
         config.include('pyramid_mako')
         config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.messaging')
 
     @mark.usefixtures('integration')
     def test_send_registration_mail(self, registry):
-        from adhocracy_core.messaging import _get_mailer
         from adhocracy_core.resources.principal import User
         from adhocracy_core.resources.principal import send_registration_mail
-        mailer = _get_mailer(registry)
+        mailer = registry.messenger._get_mailer()
         assert len(mailer.outbox) == 0
         user = User()
         user.name = 'Anna Müller'
