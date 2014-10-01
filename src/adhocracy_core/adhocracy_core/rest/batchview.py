@@ -127,7 +127,7 @@ class BatchView(RESTView):
 
         if json_body:
             keywords_args['body'] = dumps(json_body).encode()
-        if method not in ['GET', 'OPTION', 'HEAD']:
+        if method not in ['GET', 'OPTIONS', 'HEAD']:
             keywords_args['content_type'] = 'application/json'
 
         request = Request.blank(path, **keywords_args)

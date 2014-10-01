@@ -3,7 +3,7 @@
 
     <form novalidate="novalidate" class="register-form" name="registerForm">
         <div class="form-error" ng-repeat="error in errors track by $index">
-            <p>{{error}}</p>
+            <p>{{ error | translate }}</p>
         </div>
         <input
             type="text"

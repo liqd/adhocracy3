@@ -7,6 +7,7 @@ import AdhHttp = require("../Http/Http");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 import AdhConfig = require("../Config/Config");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhPermissions = require("../Permissions/Permissions");
 
 import Resources = require("../../Resources");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
@@ -39,6 +40,7 @@ export interface ListingScope<Container> extends ng.IScope {
     actionColumn : boolean;
     container : Container;
     poolPath : string;
+    poolOptions : AdhHttp.IOptions;
     createPath? : string;
     elements : string[];
     update : () => ng.IPromise<void>;
@@ -82,10 +84,11 @@ export class Listing<Container extends Resources.Content<any>> {
                     unregisterWebsocket(scope);
                 });
             },
-            controller: ["$scope", "adhHttp", "adhPreliminaryNames", (
+            controller: ["$scope", "adhHttp", "adhPreliminaryNames", "adhPermissions", (
                 $scope: ListingScope<Container>,
                 adhHttp: AdhHttp.Service<Container>,
-                adhPreliminaryNames : AdhPreliminaryNames
+                adhPreliminaryNames : AdhPreliminaryNames,
+                adhPermissions : AdhPermissions.Service
             ) : void => {
                 $scope.show = {createForm: false};
 
@@ -103,6 +106,8 @@ export class Listing<Container extends Resources.Content<any>> {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
+
+                        return adhPermissions.bindScope($scope, $scope.poolPath, "poolOptions");
                     });
                 };
 

@@ -36,6 +36,7 @@ import AdhDateTime = require("./Packages/DateTime/DateTime");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
 import AdhRate = require("./Packages/Rate/Rate");
 import AdhRateAdapter = require("./Packages/Rate/Adapter");
+import AdhPermissions = require("./Packages/Permissions/Permissions");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -84,7 +85,12 @@ export var init = (config, meta_api) => {
                 template: ""
             })
             .when("/activation_error", {
-                templateUrl: "/static/js/templates/ActivationError.html"
+                templateUrl: "/static/js/templates/ActivationError.html",
+                controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
+                    $scope.translationData = {
+                        supportEmail: adhConfig.support_email
+                    };
+                }]
             })
             .when("/embed/:widget", {
                 template: "<adh-embed></adh-embed>",
@@ -131,6 +137,7 @@ export var init = (config, meta_api) => {
     app.value("adhDone", AdhDone.done);
     app.value("adhEventHandlerClass", AdhEventHandler.EventHandler);
 
+    app.service("adhPermissions", ["adhHttp", "adhUser", AdhPermissions.Service]);
     app.service("adhTopLevelState", ["adhEventHandlerClass", "$location", AdhTopLevelState.TopLevelState]);
     app.directive("adhMovingColumns", ["adhTopLevelState", AdhTopLevelState.movingColumns]);
     app.directive("adhFocusSwitch", ["adhTopLevelState", AdhTopLevelState.adhFocusSwitch]);

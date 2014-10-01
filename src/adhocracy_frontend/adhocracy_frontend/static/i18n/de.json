@@ -35,5 +35,7 @@
     "Save": "Speichern",
     "Show comments": "Kommentare anzeigen",
     "title": "Titel",
-    "username": "Nutzername"
+    "username": "Nutzername",
+    "Shorter than minimum length 6": "Kürzer als minimale Länge 6",
+    "User doesn't exist or password is wrong": "Nutzer*in existiert nicht oder Passwort ist falsch"
 }

@@ -296,10 +296,13 @@ class TestResourceRESTView:
         assert inst.registry is request.registry.content
 
     def test_options_valid_no_sheets_and_addables(self, request, context):
-        from adhocracy_core.rest.schemas import OPTIONResourceResponseSchema
+        from adhocracy_core.rest.schemas import OPTIONSResourceResponseSchema
         inst = self.make_one(context, request)
         response = inst.options()
-        wanted = OPTIONResourceResponseSchema().bind().serialize()
+        wanted = OPTIONSResourceResponseSchema().bind().serialize()
+        wanted['POST']['response_body']['content_type'] = ''
+        wanted['PUT']['response_body']['content_type'] = ''
+        wanted['POST']['response_body']['content_type'] = ''
         assert wanted == response
 
     def test_options_valid_with_sheets_and_addables(self, request, context):
@@ -319,7 +322,7 @@ class TestResourceRESTView:
                            'data': {'ipropertyx': {}},
                            'path': ''}},
          'HEAD': {},
-         'OPTION': {},
+         'OPTIONS': {},
          'POST': {'request_body': [{'content_type': 'iresourcex',
                                     'data': {'ipropertyx': {}}}],
                   'response_body': {'content_type': '', 'path': ''}},
