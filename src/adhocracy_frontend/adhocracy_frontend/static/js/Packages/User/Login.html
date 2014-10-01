@@ -3,7 +3,7 @@
 
     <form novalidate="novalidate" class="login-form" name="loginForm">
         <div class="form-error" data-ng-repeat="error in errors track by $index">
-            <p>{{error}}</p>
+            <p>{{ error | translate }}</p>
         </div>
         <input
             type="text"
