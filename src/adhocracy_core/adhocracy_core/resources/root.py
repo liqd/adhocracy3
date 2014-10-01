@@ -81,6 +81,8 @@ def _add_initial_user_and_group(context, registry):
     user_name = registry.settings.get('adhocracy.initial_login', 'god')
     user_password = registry.settings.get('adhocracy.initial_password',
                                           'password')
+    user_email = registry.settings.get('adhocracy.initial_email',
+                                       'sysadmin@test.de')
     group_name = registry.settings.get('adhocracy.initial_group_name', 'gods')
     group_roles = ['god']
     groups = find_service(context, 'principals', 'groups')
@@ -94,7 +96,8 @@ def _add_initial_user_and_group(context, registry):
     users = find_service(context, 'principals', 'users')
     password_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
     appstruct = {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
-                 {'name': user_name},
+                 {'name': user_name,
+                  'email': user_email},
                  adhocracy_core.sheets.principal.IPermissions.__identifier__:
                  {'groups': [group]},
                  password_sheet.__identifier__:

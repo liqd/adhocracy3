@@ -81,18 +81,21 @@ class RootPoolIntegrationTest(unittest.TestCase):
         user_god = locator.get_user_by_login('god')
         assert not user_god is None
         assert user_god.password != ''
+        assert user_god.email == 'sysadmin@test.de'
 
     def test_includeme_registry_add_initial_god_user_with_custom_login(self):
         from substanced.interfaces import IUserLocator
         from adhocracy_core.resources.root import IRootPool
         self.config.registry.settings['adhocracy.initial_login'] = 'custom'
         self.config.registry.settings['adhocracy.initial_password'] = 'password'
+        self.config.registry.settings['adhocracy.initial_email'] = 'c@test.de'
         inst = self.config.registry.content.create(IRootPool.__identifier__)
         locator = self.registry.getMultiAdapter((inst, self.request),
                                                 IUserLocator)
         user_god = locator.get_user_by_login('custom')
         assert not user_god is None
         assert user_god.password != ''
+        assert user_god.email == 'c@test.de'
 
     def test_includeme_registry_add_initial_god_group(self):
         from adhocracy_core.resources.root import IRootPool
