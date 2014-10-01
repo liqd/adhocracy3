@@ -105,7 +105,7 @@ conditions can occur:
   * internal error: something went wrong in the backend
 
 For example, if we try to register a user whose email address is already
-registered:
+registered::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
@@ -156,6 +156,19 @@ account. The *path* component of all such links starts with
 must post a JSON request containing the path to the
 ``activate_account`` endpoint of the backend::
 
+    >>> newest_activation_path = getfixture('newest_activation_path')
+    >>> prop = {'path': newest_activation_path}
+    >>> resp_data = testapp.post_json('/activate_account', prop).json
+    >>> pprint(resp_data)
+    {'status': 'success',
+     'user_path': '.../principals/users/...',
+     'user_token': '...'}
+
+The backend responds with either response code 200 and 'status':
+'success' and 'user_path' and 'user_token', just like after a
+successful login request (see next section).  This means that the user
+account has been activated and the user is now logged in. ::
+
     >>> prop = {'path': '/activate/blahblah'}
     >>> resp_data = testapp.post_json('/activate_account', prop,
     ...                               status=400).json
@@ -165,13 +178,8 @@ must post a JSON request containing the path to the
                  'name': 'path'}],
      'status': 'error'}
 
-The backend responds with either response code 200 and 'status':
-'success' and 'user_path' and 'user_token', just like after a
-successful login request (see next section).  This means that the user
-account has been activated and the user is now logged in.
-
-Or it responds with response code 400 and 'status': 'error'. The error
-description will be
+Or it responds with response code 400 and 'status': 'error'. Usually the error
+description will be one of:
 
 * 'String does not match expected pattern' if the path doesn't start with
   '/activate/'
@@ -189,7 +197,6 @@ reasons and the user has to call support or register again, using a different
 email. (More user-friendly options are planned but haven't been implemented
 yet!)
 
-FIXME How to test this without actually sending an email?
 
 User Login
 ----------
