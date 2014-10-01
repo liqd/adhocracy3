@@ -11,8 +11,37 @@ import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/I
 // import SICanRate = require("../../Resources_/adhocracy_core/sheets/rate/ICanRate");
 // import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 // import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
 
 var pkgLocation = "/Rate";
+
+
+/**
+ *
+ *
+ * Motivation and UI
+ * ~~~~~~~~~~~~~~~~~
+ *
+ * The UI should show the rating button as follows::
+ *
+ *     Count:  Pros  Cons  Neutrals
+ *      +13    14    1     118
+ *
+ * The words "Props", "Cons", Neutrals" are buttons.  If the user clicks
+ * on any one, it becomes active, and all other buttons become inactive.
+ * Initially, all buttons are inactive.
+ *
+ * The current design: Once any of the buttons is activated, the rating
+ * cannot be taken back.  The user can only click on "neutral" if she
+ * wants to change her mind about having an opinion.
+ *
+ * The final design: if an active button is clicked, it becomes inactive,
+ * and the rating object will be deleted.  (FIXME: This requires a
+ * deletion semantics, which should also become a section in this
+ * document.)
+ *
+ */
 
 
 export interface IRateScope extends ng.IScope {
@@ -95,7 +124,7 @@ export var fetchAllRates = (
         }))
         .then((postPool) => {
             var ratePromises : ng.IPromise<ResourcesBase.Resource>[] =
-                postPool.data["adhocracy_core.sheets.pool.IPool"].elements
+                postPool.data[SIPool.nick].elements
                     .map((path : string, index : number) =>
                         adhHttp
                            .getNewestVersionPathNoFork(path)
@@ -147,7 +176,7 @@ export var updateRates = (
         var auditTrailPromises : ng.IPromise<{ subject : string; rate : number }>[] = rates.map((rate) =>
             adhHttp.get(adapter.subject(rate)).then((user) => {
                 return {
-                    subject: user.data["adhocracy_core.sheets.user.IUserBasic"].name,  // (use adapter for user, too?)
+                    subject: user.data[SIUserBasic.nick].name,  // (use adapter for user, too?)
                     rate: adapter.rate(rate)
                 };
             }));

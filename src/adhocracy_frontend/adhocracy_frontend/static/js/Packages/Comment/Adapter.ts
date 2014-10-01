@@ -7,6 +7,7 @@ import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IC
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 
 import AdhListing = require("../Listing/Listing");
 import Util = require("../Util/Util");
@@ -16,11 +17,11 @@ import AdhComment = require("./Comment");
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
     public elemRefs(container : AdhResource.Content<SICommentable.HasAdhocracyCoreSheetsCommentICommentable>) {
-        return Util.latestVersionsOnly(container.data["adhocracy_core.sheets.comment.ICommentable"].comments);
+        return Util.latestVersionsOnly(container.data[SICommentable.nick].comments);
     }
 
     public poolPath(container : AdhResource.Content<SICommentable.HasAdhocracyCoreSheetsCommentICommentable>) {
-        return container.data["adhocracy_core.sheets.comment.ICommentable"].post_pool;
+        return container.data[SICommentable.nick].post_pool;
     }
 }
 
@@ -42,9 +43,9 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
     // See ../Rating/Adapter for matthias' approach.
     create(settings) : RICommentVersion {
         var resource = new RICommentVersion(settings);
-        resource.data["adhocracy_core.sheets.comment.IComment"] =
+        resource.data[SIComment.nick] =
             new SIComment.AdhocracyCoreSheetsCommentIComment(settings);
-        resource.data["adhocracy_core.sheets.versions.IVersionable"] =
+        resource.data[SIVersionable.nick] =
             new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable(settings);
         return resource;
     }
@@ -65,7 +66,7 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
             });
         });
 
-        resource.data["adhocracy_core.sheets.versions.IVersionable"] =
+        resource.data[SIVersionable.nick] =
             new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({follows: [oldVersion.path]});
 
         return resource;
@@ -75,10 +76,10 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
     content(resource : RICommentVersion, value : string) : RICommentVersion;
     content(resource, value?) {
         if (typeof value !== "undefined") {
-            resource.data["adhocracy_core.sheets.comment.IComment"].content = value;
+            resource.data[SIComment.nick].content = value;
             return resource;
         } else {
-            return resource.data["adhocracy_core.sheets.comment.IComment"].content;
+            return resource.data[SIComment.nick].content;
         }
     }
 
@@ -86,26 +87,26 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
     refersTo(resource : RICommentVersion, value : string) : RICommentVersion;
     refersTo(resource, value?) {
         if (typeof value !== "undefined") {
-            resource.data["adhocracy_core.sheets.comment.IComment"].refers_to = value;
+            resource.data[SIComment.nick].refers_to = value;
             return resource;
         } else {
-            return resource.data["adhocracy_core.sheets.comment.IComment"].refers_to;
+            return resource.data[SIComment.nick].refers_to;
         }
     }
 
     creator(resource : RICommentVersion) : string {
-        return resource.data["adhocracy_core.sheets.metadata.IMetadata"].creator;
+        return resource.data[SIMetadata.nick].creator;
     }
 
     creationDate(resource : RICommentVersion) : string {
-        return resource.data["adhocracy_core.sheets.metadata.IMetadata"].item_creation_date;
+        return resource.data[SIMetadata.nick].item_creation_date;
     }
 
     modificationDate(resource : RICommentVersion) : string {
-        return resource.data["adhocracy_core.sheets.metadata.IMetadata"].modification_date;
+        return resource.data[SIMetadata.nick].modification_date;
     }
 
     commentCount(resource : RICommentVersion) : number {
-        return Util.latestVersionsOnly(resource.data["adhocracy_core.sheets.comment.ICommentable"].comments).length;
+        return Util.latestVersionsOnly(resource.data[SICommentable.nick].comments).length;
     }
 }

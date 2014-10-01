@@ -15,11 +15,23 @@ import AdhError = require("./Error");
 import AdhConvert = require("./Convert");
 import AdhConfig = require("../Config/Config");
 
+import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
+import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+
 // re-exports
 export interface ITransactionResult extends AdhTransaction.ITransactionResult {};
 export interface IBackendError extends AdhError.IBackendError {};
 export interface IBackendErrorItem extends AdhError.IBackendErrorItem {};
 export var logBackendError : (response : ng.IHttpPromiseCallbackArg<IBackendError>) => void = AdhError.logBackendError;
+
+
+export interface IOptions {
+    OPTIONS : boolean;
+    PUT : boolean;
+    GET : boolean;
+    POST : boolean;
+    HEAD : boolean;
+};
 
 
 /**
@@ -43,13 +55,39 @@ export class Service<Content extends Resources.Content<any>> {
         private adhConfig : AdhConfig.Type
     ) {}
 
+    private formatUrl(path) {
+        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
+            return this.adhConfig.rest_url + path;
+        } else {
+            return path;
+        }
+    }
+
+    public options(path : string) : ng.IPromise<IOptions> {
+        if (this.adhPreliminaryNames.isPreliminary(path)) {
+            throw "attempt to http-options preliminary path: " + path;
+        }
+        path = this.formatUrl(path);
+
+        var importOptions = (raw : { data : IOptions }) : IOptions => {
+            return {
+                OPTIONS: raw.data.hasOwnProperty("OPTIONS") && raw.data.OPTIONS ? true : false,
+                PUT: raw.data.hasOwnProperty("PUT") && raw.data.PUT ? true : false,
+                GET: raw.data.hasOwnProperty("GET") && raw.data.GET ? true : false,
+                POST: raw.data.hasOwnProperty("POST") && raw.data.POST ? true : false,
+                HEAD: raw.data.hasOwnProperty("HEAD") && raw.data.HEAD ? true : false
+            };
+        };
+
+        return this.$http({method: "OPTIONS", url: path})
+            .then(importOptions, AdhError.logBackendError);
+    }
+
     public getRaw(path : string, params ?: { [key : string] : string }) : ng.IHttpPromise<any> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-get preliminary path: " + path;
         }
-        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
-            path = this.adhConfig.rest_url + path;
-        }
+        path = this.formatUrl(path);
         return this.$http
             .get(path, { params : params });
     }
@@ -65,9 +103,7 @@ export class Service<Content extends Resources.Content<any>> {
         if (this.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-put preliminary path: " + path;
         }
-        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
-            path = this.adhConfig.rest_url + path;
-        }
+        path = this.formatUrl(path);
         return this.$http
             .put(path, AdhConvert.exportContent(this.adhMetaApi, obj));
     }
@@ -85,9 +121,7 @@ export class Service<Content extends Resources.Content<any>> {
         if (_self.adhPreliminaryNames.isPreliminary(path)) {
             throw "attempt to http-post preliminary path: " + path;
         }
-        if (path.lastIndexOf("/", 0) === 0 && typeof _self.adhConfig.rest_url !== "undefined") {
-            path = _self.adhConfig.rest_url + path;
-        }
+        path = this.formatUrl(path);
         return _self.$http
             .post(path, AdhConvert.exportContent(_self.adhMetaApi, obj));
     }
@@ -109,7 +143,7 @@ export class Service<Content extends Resources.Content<any>> {
     public getNewestVersionPathNoFork(path : string) : ng.IPromise<string> {
         return this.get(path + "/LAST")
             .then((tag) => {
-                var heads = tag.data["adhocracy_core.sheets.tags.ITag"].elements;
+                var heads = tag.data[SITag.nick].elements;
                 if (heads.length !== 1) {
                     throw ("Cannot handle this LAST tag: " + heads.toString());
                 } else {
@@ -202,7 +236,7 @@ export class Service<Content extends Resources.Content<any>> {
                 throw "Tried to post new version of " + dagPath + " " + timeoutRounds.toString() + " times, giving up.";
             }
 
-            _obj.data["adhocracy_core.sheets.versions.IVersionable"] = {
+            _obj.data[SIVersionable.nick] = {
                 follows: [nextOldVersionPath]
             };
 

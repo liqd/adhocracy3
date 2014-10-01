@@ -2,7 +2,6 @@
 
 import q = require("q");
 
-import Util = require("../Util/Util");
 import AdhHttp = require("./Http");
 import Error = require("./Error");
 import AdhConvert = require("./Convert");
@@ -12,13 +11,14 @@ import RIParagraph = require("../../Resources_/adhocracy_core/resources/sample_p
 import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
 
 var mkHttpMock = (adhPreliminaryNames : PreliminaryNames) => {
-    var mock = jasmine.createSpyObj("$httpMock", ["get", "post", "put"]);
+    var mock = jasmine.createSpy("$httpMock");
 
     var response = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
 
-    mock.get.and.returnValue(q.when({ data: response }));
-    mock.post.and.returnValue(q.when({ data: response }));
-    mock.put.and.returnValue(q.when({ data: response }));
+    (<any>mock).get = jasmine.createSpy("$httpMock.get").and.returnValue(q.when({ data: response }));
+    (<any>mock).post = jasmine.createSpy("$httpMock.post").and.returnValue(q.when({ data: response }));
+    (<any>mock).put = jasmine.createSpy("$httpMock.put").and.returnValue(q.when({ data: response }));
+
     return mock;
 };
 
@@ -90,6 +90,54 @@ export var register = () => {
                 adhHttp = new AdhHttp.Service($httpMock, q, $timeoutMock, adhMetaApiMock, adhPreliminaryNames, adhConfigMock);
             });
 
+            describe("options", () => {
+                it("calls $http().", (done) => {
+                    $httpMock.and.returnValue(q.when({ data: {} }));
+                    adhHttp.options("/some/path").then(
+                        () => {
+                            expect($httpMock).toHaveBeenCalled();
+                            done();
+                        },
+                        (msg) => {
+                            expect(msg).toBe(false);
+                            done();
+                        }
+                    );
+                });
+                it("returns a streamlined, aggregated OPTIONS structure.", (done) => {
+                    $httpMock.and.returnValue(q.when({ data: {
+                        OPTIONS: { arg: 3, bloo: false },
+                        GET: true,
+                        PUT: false
+                    }}));
+                    adhHttp.options("/some/path").then(
+                        (options) => {
+                            expect(options).toEqual({
+                                OPTIONS: true,
+                                PUT: false,
+                                GET: true,
+                                POST: false,
+                                HEAD: false
+                            });
+                            done();
+                        },
+                        (msg) => {
+                            expect(msg).toBe(false);
+                        });
+                });
+                it("crashes if data field is missing in response.", (done) => {
+                    $httpMock.and.returnValue(q.when({ doto: false }));
+                    adhHttp.options("/some/path").then(
+                        () => {
+                            expect("should have thrown").toBe(false);
+                            done();
+                        },
+                        (msg) => {
+                            expect(true).toBe(true);
+                            done();
+                        });
+                });
+            });
             describe("get", () => {
                 it("calls $http.get", (done) => {
                     adhHttp.get("/some/path").then(
@@ -491,7 +539,7 @@ export var register = () => {
             it("deletes read-only properties", () => {
                 var x = AdhConvert.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
                 var y = adhMetaApiMock.objAfter;
-                expect(Util.deepeq(x, y)).toBe(true);
+                expect(x).toEqual(y);  // (yes, this appears to do deep comparison of the entire structure.)
                 expect(adhMetaApiMock.field).toHaveBeenCalled();
             });
         });

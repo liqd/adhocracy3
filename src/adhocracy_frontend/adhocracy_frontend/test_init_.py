@@ -18,6 +18,7 @@ class ConfigViewTest(unittest.TestCase):
              'rest_url': 'http://localhost:6541',
              'rest_platform_path': '/adhocracy/',
              'trusted_domains': [],
+             'support_email': 'support@adhocracy.de',
              }
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):
@@ -44,6 +45,13 @@ class ConfigViewTest(unittest.TestCase):
         request = testing.DummyRequest(scheme='http')
         request.registry.settings = {'adhocracy.frontend.rest_url': 'x.org'}
         assert self._call_fut(request)['rest_url'] == 'x.org'
+
+    def test_support_email_with_support_email_settings(self):
+        request = testing.DummyRequest(scheme='http')
+        request.registry.settings = {
+            'adhocracy.frontend.support_email': 'x.org'
+        }
+        assert self._call_fut(request)['support_email'] == 'x.org'
 
 
 class RootViewTest(unittest.TestCase):

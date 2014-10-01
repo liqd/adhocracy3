@@ -8,12 +8,6 @@ import q = require("q");
 
 export var register = () => {
     describe("User", () => {
-        var locationMock;
-
-        beforeEach(() => {
-            locationMock = <any>jasmine.createSpyObj("locationMock", ["path", "url"]);
-        });
-
         describe("User", () => {
             var adhUser;
             var adhHttpMock;
@@ -276,6 +270,58 @@ export var register = () => {
                     expect(data["adhocracy_core.sheets.user.IPasswordAuthentication"].password).toBe("password");
                 });
             });
+
+            describe("activate", () => {
+                var threw : boolean;
+                var activateUrl : string = "lYjaoXbEo3U/I";
+
+                var myBeforeEach = (postRawResponse) => (done) => {
+                    adhHttpMock.postRaw.and.callFake(() =>
+                        q.when(postRawResponse));
+
+                    adhUser.activate(activateUrl).then(
+                        () => { threw = false; done(); },
+                        () => { threw = true; done(); }
+                    );
+                };
+
+                describe("(success case)", () => {
+                    var postRawResponse = {
+                        data: {
+                            user_token: "user_token_8427",
+                            user_path: "user_path_we7t",
+                        }
+                    };
+
+                    beforeEach(myBeforeEach(postRawResponse));
+
+                    it("does not throw when response is 'success'", () => {
+                        expect(threw).toBe(false);
+                    });
+                    it("posts to '/activate_account' (using postRaw)", () => {
+                        var args = adhHttpMock.postRaw.calls.mostRecent().args;
+                        expect(args[0]).toBe("/activate_account");
+                    });
+                    it("posts its argument as activation URL", () => {
+                        var args = adhHttpMock.postRaw.calls.mostRecent().args;
+                        expect(args[1].hasOwnProperty("path")).toBe(true);
+                        expect(args[1].path).toBe(activateUrl);
+                    });
+                    it("logs in user on success", () => {
+                        expect(adhUser.userPath).toEqual(postRawResponse.data.user_path);
+                        expect(adhUser.$http.defaults.headers.common["X-User-Token"]).toEqual(postRawResponse.data.user_token);
+                        expect(adhUser.$http.defaults.headers.common["X-User-Path"]).toEqual(postRawResponse.data.user_path);
+                    });
+                });
+
+                describe("activate (failure case)", () => {
+                    beforeEach(myBeforeEach("ef"));
+
+                    it("throws when response is anything but 'success'", () => {
+                        expect(threw).toBe(true);
+                    });
+                });
+            });
         });
 
         describe("loginDirective", () => {
@@ -287,7 +333,8 @@ export var register = () => {
                     pkg_path: "mock",
                     root_path: "mock",
                     ws_url: "mock",
-                    embedded: true
+                    embedded: true,
+                    support_email: "support@adhocracy.com"
                 };
                 directive = AdhUser.loginDirective(adhConfigMock);
             });
@@ -302,9 +349,9 @@ export var register = () => {
                     $scopeMock = {};
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["logIn"]);
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
-                    adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["getCameFrom", "setCameFrom"]);
+                    adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
                     controller = <any>(directive.controller[4]);
-                    controller(adhUserMock, adhTopLevelStateMock, $scopeMock, locationMock);
+                    controller(adhUserMock, adhTopLevelStateMock, adhConfigMock, $scopeMock);
                 });
 
                 it("creates an empty credentials object in scope", () => {
@@ -334,17 +381,9 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("redirects to TopLevelState.getCameFrom() if everything goes well", (done) => {
-                        var navigateToPath : string = "/osty";
-                        adhTopLevelStateMock.getCameFrom.and.returnValue(navigateToPath);
+                    it("redirects to cameFrom or / if everything goes well", (done) => {
                         $scopeMock.logIn().then(() => {
-                            expect(locationMock.url).toHaveBeenCalledWith(navigateToPath);
-                            done();
-                        });
-                    });
-                    it("redirects to '/' if everything goes well, but getCameFrom() is undefined", (done) => {
-                        $scopeMock.logIn().then(() => {
-                            expect(locationMock.url).toHaveBeenCalledWith("/");
+                            expect(adhTopLevelStateMock.redirectToCameFrom).toHaveBeenCalledWith("/");
                             done();
                         });
                     });
@@ -375,7 +414,8 @@ export var register = () => {
                     pkg_path: "mock",
                     root_path: "mock",
                     ws_url: "mock",
-                    embedded: true
+                    embedded: true,
+                    support_email: "support@adhocracy.com"
                 };
 
                 directive = AdhUser.registerDirective(adhConfigMock);
@@ -392,9 +432,9 @@ export var register = () => {
                     adhUserMock = <any>jasmine.createSpyObj("adhUserMock", ["register", "logIn"]);
                     adhUserMock.register.and.returnValue(q.when(undefined));
                     adhUserMock.logIn.and.returnValue(q.when(undefined));
-                    adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["getCameFrom", "setCameFrom"]);
+                    adhTopLevelStateMock = <any>jasmine.createSpyObj("adhTopLevelStateMock", ["redirectToCameFrom"]);
                     controller = <any>(directive.controller[4]);
-                    controller(adhUserMock, adhTopLevelStateMock, $scopeMock, locationMock);
+                    controller(adhUserMock, adhTopLevelStateMock, adhConfigMock, $scopeMock);
                 });
 
                 it("creates an empty input object in scope", () => {
@@ -424,9 +464,9 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("redirects to the root page after register ", (done) => {
+                    it("redirects came from or / page after register ", (done) => {
                         $scopeMock.register().then(() => {
-                            expect(locationMock.path).toHaveBeenCalledWith("/");
+                            expect(adhTopLevelStateMock.redirectToCameFrom).toHaveBeenCalledWith("/");
                             done();
                         });
                     });
@@ -444,11 +484,9 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("navigates to TopLevelState.getCameFrom() after success", (done) => {
-                        var navigateToPath : string = "/osty";
-                        adhTopLevelStateMock.getCameFrom.and.returnValue(navigateToPath);
+                    it("navigates to cameFrom or / after success", (done) => {
                         $scopeMock.register().then(() => {
-                            expect(locationMock.path).toHaveBeenCalledWith(navigateToPath);
+                            expect(adhTopLevelStateMock.redirectToCameFrom).toHaveBeenCalledWith("/");
                             done();
                         });
                     });

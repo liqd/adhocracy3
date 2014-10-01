@@ -24,6 +24,8 @@ def config_view(request):
                                       '/static/js/Packages')
     config['trusted_domains'] = aslist(
         settings.get('adhocracy.trusted_domains', []))
+    config['support_email'] = settings.get('adhocracy.frontend.support_email',
+                                           'support@unconfigured.domain')
     return config
 
 
@@ -51,6 +53,8 @@ def includeme(config):
     add_frontend_route(config, 'embed', 'embed/{directive}')
     add_frontend_route(config, 'register', 'register')
     add_frontend_route(config, 'login', 'login')
+    add_frontend_route(config, 'activate', 'activate/{key}')
+    add_frontend_route(config, 'activation_error', 'activation_error')
     add_frontend_route(config, 'root', '')
 
 

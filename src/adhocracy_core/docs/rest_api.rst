@@ -236,7 +236,7 @@ JSON object that has the allowed request methods as keys::
 
     >>> resp_data = testapp.options(rest_url + "/adhocracy").json
     >>> sorted(resp_data.keys())
-    ['GET', 'HEAD', 'OPTION', 'POST', 'PUT']
+    ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
 
 If a GET, POST, or PUT request is allowed, the corresponding key will point
 to an object that contains at least "request_body" and "response_body" as

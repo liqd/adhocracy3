@@ -273,11 +273,11 @@ class TestAddPutRequestSubSchemasUnitTest:
         assert node.children[0].bindings == {'context': context, 'request': request}
 
 
-class TestOPTIONResourceResponseSchema:
+class TestOPTIONSResourceResponseSchema:
 
     def make_one(self):
-        from adhocracy_core.rest.schemas import OPTIONResourceResponseSchema
-        return OPTIONResourceResponseSchema()
+        from adhocracy_core.rest.schemas import OPTIONSResourceResponseSchema
+        return OPTIONSResourceResponseSchema()
 
     def test_serialize_no_sheets_and_no_addables(self):
         inst = self.make_one()
@@ -287,7 +287,7 @@ class TestOPTIONResourceResponseSchema:
                      'response_body': {'content_type': colander.null, 'data': {},
                                        'path': ''}},
              'HEAD': {},
-             'OPTION': {},
+             'OPTIONS': {},
              'POST': {'request_body': [],
                       'response_body': {'content_type': colander.null, 'path': ''}},
              'PUT': {'request_body': {'data': {}},

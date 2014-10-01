@@ -4,6 +4,8 @@ import JasmineHelpers = require("../../JasmineHelpers");
 
 import AdhCommentAdapter = require("./Adapter");
 
+import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
+
 
 export var register = () => {
     describe("CommentAdapter", () => {
@@ -97,7 +99,7 @@ export var register = () => {
                 });
 
                 it("returns an adhocracy_core.resources.comment.ICommentVersion resource", () => {
-                    expect(resource.content_type).toBe("adhocracy_core.resources.comment.ICommentVersion");
+                    expect(resource.content_type).toBe(RICommentVersion.content_type);
                 });
 
                 it("creates an empty adhocracy_core.sheets.comment.IComment sheet", () => {

@@ -1,9 +1,10 @@
-<form novalidate="novalidate" class="register" name="registerForm">
+<div class="register">
     <h1 class="title">{{ "Register!" | translate }}</h1>
-    <div class="form-error" ng-repeat="error in errors track by $index">
-        <p>{{error}}</p>
-    </div>
-    <div class="register-inputs">
+
+    <form novalidate="novalidate" class="register-form" name="registerForm">
+        <div class="form-error" ng-repeat="error in errors track by $index">
+            <p>{{ error | translate }}</p>
+        </div>
         <input
             type="text"
             name="username"
@@ -36,11 +37,6 @@
         <span class="input-error" data-ng-show="registerForm.password.$error.minlength">
             {{ "Password too short." | translate }}
         </span>
-    </div>
-    <div class="register-description box-with-button">
-        <div class="textbox m-unobtrusive">
-            <p>{{ "Disclaimer" | translate }}</p>
-        </div>
         <input
             type="submit"
             name="register"
@@ -48,6 +44,14 @@
             class="m-call-to-action"
             data-ng-click="register()"
             data-ng-disabled="registerForm.$invalid || input.password !== input.passwordRepeat" />
-        <a href="/login">{{ "LogIn instead" | translate }}</a>
+        <div class="register-support">
+            {{ "Having trouble with registration?" | translate}} <br />
+            <a href="mailto:{{supportEmail}}?subject=Trouble%20with%20registration">{{ supportEmail }}</a>
+        </div>
+    </form>
+
+    <div class="box-with-button">
+        <p>{{ "You already have an account? Go to the LogIn window." | translate }}</p>
+        <a class="button" href="/login">{{ "login" | translate }}</a>
     </div>
-</form>
+</div>

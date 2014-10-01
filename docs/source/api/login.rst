@@ -1,1 +1,1 @@
-../../../src/adhocracy_sample/adhocracy_sample/docs/login.rst
+../../../src/adhocracy_core/docs/login.rst
