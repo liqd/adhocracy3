@@ -854,6 +854,38 @@ class TestValidateLoginPasswordUnitTest:
         assert request.errors == []
 
 
+class TestValidateAccountActiveUnitTest:
+
+    @fixture
+    def request(self, cornice_request, registry):
+        cornice_request.registry = registry
+        return cornice_request
+
+    def _call_fut(self, context, request):
+        from adhocracy_core.rest.views import validate_account_active
+        return validate_account_active(context, request)
+
+    def test_valid(self, request, context):
+        user = testing.DummyResource(active=True)
+        request.validated['user'] = user
+        self._call_fut(context, request)
+        assert not request.errors
+
+    def test_invalid(self, request, context):
+        user = testing.DummyResource(active=False)
+        request.validated['user'] = user
+        self._call_fut(context, request)
+        assert 'not yet activated' in request.errors[0]['description']
+
+    def test_no_error_added_after_other_errors(self, request, context):
+        user = testing.DummyResource(active=False)
+        request.validated['user'] = user
+        request.errors.add('blah', 'blah', 'blah')
+        assert len(request.errors) == 1
+        self._call_fut(context, request)
+        assert len(request.errors) == 1
+
+
 class TestLoginUserName:
 
     @fixture
@@ -928,6 +960,82 @@ def test_add_cors_headers_subscriber(context):
          'Access-Control-Allow-Headers':
          'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
          'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS'}
+
+
+class TestValidateActivationPathUnitTest:
+
+    @fixture
+    def request(self, cornice_request, registry):
+        cornice_request.registry = registry
+        cornice_request.validated['path'] = '/foo'
+        return cornice_request
+
+    @fixture
+    def user_with_metadata(self, config):
+        from adhocracy_core.sheets.metadata import IMetadata
+        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.events')
+        config.include('adhocracy_core.sheets.metadata')
+        return testing.DummyResource(__provides__=IMetadata)
+
+    def _call_fut(self, context, request):
+        from adhocracy_core.rest.views import validate_activation_path
+        return validate_activation_path(context, request)
+
+    def test_valid(self, request, user_with_metadata, context,
+                   mock_user_locator):
+        mock_user_locator.get_user_by_activation_path.return_value = \
+            user_with_metadata
+        self._call_fut(context, request)
+        assert request.validated['user'] == user_with_metadata
+
+    def test_not_found(self, request, context, mock_user_locator):
+        mock_user_locator.get_user_by_activation_path.return_value = None
+        self._call_fut(context, request)
+        assert 'Unknown or expired activation path' == request.errors[0][
+            'description']
+
+    def test_found_but_expired(self, request, user_with_metadata, context,
+                               mock_user_locator):
+        from datetime import datetime
+        from datetime import timezone
+        from adhocracy_core.sheets.metadata import IMetadata
+        from adhocracy_core.utils import get_sheet
+        mock_user_locator.get_user_by_activation_path.return_value = \
+            user_with_metadata
+        metadata = get_sheet(user_with_metadata, IMetadata)
+        appstruct = metadata.get()
+        appstruct['creation_date'] = datetime(
+            year=2010, month=1, day=1, tzinfo=timezone.utc)
+        metadata.set(appstruct)
+        self._call_fut(context, request)
+        assert 'Unknown or expired activation path' == request.errors[0][
+            'description']
+
+
+class TestActivateAccountView:
+
+    @fixture
+    def request(self, cornice_request, registry):
+        cornice_request.registry=registry
+        cornice_request.validated['user'] = testing.DummyResource()
+        return cornice_request
+
+    def _make_one(self, context, request):
+        from adhocracy_core.rest.views import ActivateAccountView
+        return ActivateAccountView(context, request)
+
+    def test_post(self, request, context, mock_authpolicy):
+        mock_authpolicy.remember.return_value = {'X-User-Path': '/user',
+                                                 'X-User-Token': 'token'}
+        inst = self._make_one(context, request)
+        assert inst.post() == {'status': 'success',
+                               'user_path': '/user',
+                               'user_token': 'token'}
+
+    def test_options(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}
 
 
 @fixture()

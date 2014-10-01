@@ -628,8 +628,6 @@ def validate_login_name(context, request: Request):
     user = locator.get_user_by_login(name)
     if user is None:
         _add_no_such_user_or_wrong_password_error(request)
-    elif not user.active:
-        request.errors.add('body', 'name', 'User account not yet activated')
     else:
         request.validated['user'] = user
 
@@ -668,6 +666,22 @@ def validate_login_password(context, request: Request):
         _add_no_such_user_or_wrong_password_error(request)
 
 
+def validate_account_active(context, request: Request):
+    """Ensure that the user account is already active.
+
+    Requires the user object as `user` in `request.validated`.
+
+    No error message is added if there were earlier errors, as that would
+    leak information (indicating that a not-yet-activated account already
+    exists).
+    """
+    user = request.validated.get('user', None)
+    if user is None or request.errors:
+        return
+    if not user.active:
+        request.errors.add('body', 'name', 'User account not yet activated')
+
+
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
@@ -679,7 +693,9 @@ class LoginUsernameView(RESTView):
     """Log in a user via their name."""
 
     validation_POST = (POSTLoginUsernameRequestSchema,
-                       [validate_login_name, validate_login_password])
+                       [validate_login_name,
+                        validate_login_password,
+                        validate_account_active])
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
@@ -716,7 +732,9 @@ class LoginEmailView(RESTView):
     """Log in a user via their email address."""
 
     validation_POST = (POSTLoginEmailRequestSchema,
-                       [validate_login_email, validate_login_password])
+                       [validate_login_email,
+                        validate_login_password,
+                        validate_account_active])
 
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
