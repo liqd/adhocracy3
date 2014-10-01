@@ -24,6 +24,8 @@ def config_view(request):
                                       '/static/js/Packages')
     config['trusted_domains'] = aslist(
         settings.get('adhocracy.trusted_domains', []))
+    config['support_email'] = settings.get('adhocracy.frontend.support_email',
+                                           'support@unconfigured.domain')
     return config
 
 
