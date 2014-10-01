@@ -33,7 +33,7 @@ from adhocracy_core.rest.schemas import PUTResourceRequestSchema
 from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
-from adhocracy_core.rest.schemas import OPTIONResourceResponseSchema
+from adhocracy_core.rest.schemas import OPTIONSResourceResponseSchema
 from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
@@ -274,7 +274,7 @@ class ResourceRESTView(RESTView):
         sheets_edit = self.registry.resource_sheets(self.context, self.request,
                                                     onlyeditable=True)
 
-        cstruct_singleton = OPTIONResourceResponseSchema().serialize()
+        cstruct_singleton = OPTIONSResourceResponseSchema().serialize()
         cstruct = deepcopy(cstruct_singleton)
         for sheet in sheets_edit:
             cstruct['PUT']['request_body']['data'][sheet] = {}

@@ -178,7 +178,7 @@ class BatchHTTPMethod(colander.SchemaNode):
     """An HTTP method in a batch request."""
 
     schema_type = colander.String
-    validator = colander.OneOf(['GET', 'POST', 'PUT', 'OPTION'])
+    validator = colander.OneOf(['GET', 'POST', 'PUT', 'OPTIONS'])
     missing = colander.required
 
 
@@ -347,7 +347,7 @@ def _add_arbitrary_filter_node(name, schema):
     schema.add(node)
 
 
-class OPTIONResourceResponseSchema(colander.Schema):
+class OPTIONSResourceResponseSchema(colander.Schema):
 
     """Overview of all request/response data structures."""
 
@@ -355,4 +355,4 @@ class OPTIONResourceResponseSchema(colander.Schema):
     PUT = PUTLocationMapping()
     POST = POSTLocationMapping()
     HEAD = colander.MappingSchema(default={})
-    OPTION = colander.MappingSchema(default={})
+    OPTIONS = colander.MappingSchema(default={})
