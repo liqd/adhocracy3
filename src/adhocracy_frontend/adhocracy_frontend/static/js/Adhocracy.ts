@@ -84,7 +84,12 @@ export var init = (config, meta_api) => {
                 template: ""
             })
             .when("/activation_error", {
-                templateUrl: "/static/js/templates/ActivationError.html"
+                templateUrl: "/static/js/templates/ActivationError.html",
+                controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
+                    $scope.translationData = {
+                        supportEmail: adhConfig.support_email
+                    };
+                }]
             })
             .when("/embed/:widget", {
                 template: "<adh-embed></adh-embed>",
