@@ -25,7 +25,7 @@ class TestUserLogin:
         assert is_logged_in(browser)
 
     def test_login_email(self, browser):
-        login(browser, god_name, god_password)
+        login(browser, god_email, god_password)
         assert is_logged_in(browser)
 
     def test_login_name(self, browser):
