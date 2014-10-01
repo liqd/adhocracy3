@@ -48,17 +48,25 @@ export interface IRegisterResponse {}
 
 
 var bindServerErrors = (
+    $translate,
     $scope : {errors : string[]},
     errors : AdhHttp.IBackendErrorItem[]
 ) => {
     $scope.errors = [];
     if (!errors.length) {
-        $scope.errors.push("Unknown error from server (no details provided)");
-    } else {
-        errors.forEach((e) => {
-            $scope.errors.push(e.description);
+        errors.push({
+            name: "unknown",
+            location: "unknown",
+            description: "Unknown error from server (no details provided)"
         });
     }
+    errors.forEach((e) => {
+        $translate(e.description)
+            .then((translated) => translated, () => e.description)
+            .then((text) => {
+                $scope.errors.push(text);
+            });
+    });
 };
 
 
@@ -255,7 +263,8 @@ export var loginController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
     adhConfig : AdhConfig.Type,
-    $scope : IScopeLogin
+    $scope : IScopeLogin,
+    $translate
 ) : void => {
     $scope.errors = [];
     $scope.supportEmail = adhConfig.support_email;
@@ -277,7 +286,7 @@ export var loginController = (
         ).then(() => {
             adhTopLevelState.redirectToCameFrom("/");
         }, (errors) => {
-            bindServerErrors($scope, errors);
+            bindServerErrors($translate, $scope, errors);
             $scope.credentials.password = "";
         });
     };
@@ -289,7 +298,7 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", loginController]
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", "$translate", loginController]
     };
 };
 
@@ -298,7 +307,8 @@ export var registerController = (
     adhUser : User,
     adhTopLevelState : AdhTopLevelState.TopLevelState,
     adhConfig : AdhConfig.Type,
-    $scope : IScopeRegister
+    $scope : IScopeRegister,
+    $translate
 ) => {
     $scope.input = {
         username: "",
@@ -315,10 +325,9 @@ export var registerController = (
             .then((response) => {
                 $scope.errors = [];
                 return adhUser.logIn($scope.input.username, $scope.input.password).then(
-                    () => adhTopLevelState.redirectToCameFrom("/"),
-                    (errors) => bindServerErrors($scope, errors)
+                    () => adhTopLevelState.redirectToCameFrom("/")
                 );
-            }, (errors) => bindServerErrors($scope, errors));
+            }, (errors) => bindServerErrors($translate, $scope, errors));
     };
 };
 
@@ -328,7 +337,7 @@ export var registerDirective = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
         scope: {},
-        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", registerController]
+        controller: ["adhUser", "adhTopLevelState", "adhConfig", "$scope", "$translate", registerController]
     };
 };
 
