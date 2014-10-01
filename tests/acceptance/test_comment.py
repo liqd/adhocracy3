@@ -1,17 +1,18 @@
+import time
 from pytest import fixture
 
+from adhocracy_core.testing import god_name
 from .shared import wait
 from .shared import get_column_listing
 from .shared import get_list_element
 from .shared import get_listing_create_form
-from .shared import login
+from .shared import login_god
 from .test_proposal import proposal
-from .test_user_login import user
 
 
 @fixture
 def browser(browser):
-    login(browser, 'god', 'password')
+    login_god(browser)
     return browser
 
 
@@ -20,14 +21,14 @@ def comment(browser, proposal):
     """Go to content2 column and create comment with content 'comment1'."""
     show_proposal_comments(proposal)
     listing = get_column_listing(browser, 'content2')
-    return create_top_level_comment(listing, 'comment1')
+    comment = create_top_level_comment(listing, 'comment1')
+    return comment
 
 
 def test_create(browser, proposal):
     show_proposal_comments(proposal)
     listing = get_column_listing(browser, 'content2')
-    comment = create_top_level_comment(listing, 'somecomment')
-    import pdb;pdb.set_trace()
+    comment = create_top_level_comment(listing, 'somecomment', )
     assert comment is not None
 
 
@@ -59,10 +60,12 @@ def _ignored_test_multi_edits(browser, comment):
     assert parent.find_by_css('.comment-content').first.text == 'edited'
 
 
-def test_author(browser, user, comment):
+def test_author(comment):
+    time.sleep(3)  # FIXME this takes way to long...
+    # NOTE why the value is first 'guest' and then 'god'? joka
     actual = comment.find_by_css("adh-user-meta").first.text
     # the captialisation might be changed by CSS
-    assert actual.lower() == user.lower()
+    assert actual.lower() == god_name.lower()
 
 
 def show_proposal_comments(proposal):
@@ -75,7 +78,9 @@ def create_top_level_comment(listing, content):
     form = get_listing_create_form(listing)
     form.find_by_css('textarea').first.fill(content)
     form.find_by_css('input[type="submit"]').first.click()
-    return get_list_element(listing, content, descendant='.comment-content')
+    time.sleep(3)  # FIXME this takes way to long...
+    comment = get_list_element(listing, content, descendant='.comment-content')
+    return comment
 
 
 def create_reply_comment(parent, content):
@@ -83,13 +88,16 @@ def create_reply_comment(parent, content):
     form = get_comment_create_form(parent)
     form.find_by_css('textarea').first.fill(content)
     form.find_by_css('input[type="submit"]').first.click()
-    return get_reply(parent, content)
+    time.sleep(2)  # FIXME this takes way to long...
+    reply = get_reply(parent, content)
+    return reply
 
 
 def edit_comment(comment, content):
     comment.find_by_css('.comment-meta a')[0].click()
     comment.find_by_css('textarea').first.fill(content)
     comment.find_by_css('.comment-meta a')[0].click()
+    time.sleep(3)  # FIXME this takes way to long...
     wait(lambda: comment.find_by_css('.comment-content').first.text == content)
 
 
@@ -101,7 +109,8 @@ def get_comment_create_form(comment):
 
 def get_reply(parent, content):
     """Return reply to comment `parent` with content == `content`."""
+    time.sleep(1)  # FIXME this takes way to long...
     for element in parent.find_by_css('.comment'):
-        wait(lambda: element.text)
+        wait(lambda: element.text, max_steps=100)
         if element.find_by_css('.comment-content').first.text == content:
             return element
