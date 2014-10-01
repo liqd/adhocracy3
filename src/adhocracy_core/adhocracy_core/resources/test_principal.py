@@ -209,6 +209,6 @@ class TestIntegrationSendRegistrationMail():
         msg = mailer.outbox[0]
         # The DummyMailer is too stupid to use a default sender, hence we add
         # one manually
-        msg.sender = 'support@adhocracy.de'
+        msg.sender = 'support@unconfigured.domain'
         msgtext = str(msg.to_message())
         assert user.activation_path in msgtext
