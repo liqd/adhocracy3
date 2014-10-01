@@ -2,6 +2,7 @@ import AdhResource = require("../../Resources");
 
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhPermissions = require("../Permissions/Permissions");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
@@ -27,9 +28,12 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> extends Adh
 }
 
 
+// FIXME: this signature is out of date.  figure out what it is
+// supposed to look like, and change it!  add type annotations!
 export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidgetScope {
     refersTo : string;
     poolPath : string;
+    poolOptions : AdhHttp.IOptions;
     createPath : string;
     show : {
         createForm : boolean;
@@ -37,6 +41,15 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     createComment() : void;
     cancelCreateComment() : void;
     afterCreateComment() : ng.IPromise<void>;
+    data : {
+        content : any;
+        creator : any;
+        creationDate : any;
+        modificationDate : any;
+        commentCount : any;
+        comments : any;
+        replyPoolPath : any;
+    };
 }
 
 export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICommentResourceScope> {
@@ -44,6 +57,7 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
         private adapter : ICommentAdapter<any>,
         adhConfig : AdhConfig.Type,
         adhHttp,
+        public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames,
         $q : ng.IQService
     ) {
@@ -91,7 +105,8 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
     }
 
     public _update(instance, resource) {
-        instance.scope.data = {
+        var scope : ICommentResourceScope = instance.scope;
+        scope.data = {
             content: this.adapter.content(resource),
             creator: this.adapter.creator(resource),
             creationDate: this.adapter.creationDate(resource),
@@ -100,6 +115,7 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
             comments: this.adapter.elemRefs(resource),
             replyPoolPath: this.adapter.poolPath(resource)
         };
+        this.adhPermissions.bindScope(scope, scope.data.replyPoolPath, "poolOptions");
         return this.$q.when();
     }
 
@@ -134,10 +150,11 @@ export class CommentCreate extends CommentResource {
         adapter : ICommentAdapter<any>,
         adhConfig : AdhConfig.Type,
         adhHttp : AdhHttp.Service<any>,
+        public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames,
         $q : ng.IQService
     ) {
-        super(adapter, adhConfig, adhHttp, adhPreliminaryNames, $q);
+        super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentCreate.html";
     }
 }
