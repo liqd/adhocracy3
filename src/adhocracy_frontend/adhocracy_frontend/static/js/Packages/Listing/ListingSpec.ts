@@ -104,12 +104,15 @@ export var register = () => {
                 describe("controller", () => {
                     var adhHttpMock;
                     var adhPreliminaryNamesMock;
+                    var adhPermissionsMock;
                     var scope;
 
                     beforeEach(() => {
                         adhHttpMock = createAdhHttpMock();
                         adhHttpMock.get.and.callFake(() => q.when(container));
                         adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
+                        adhPermissionsMock = jasmine.createSpyObj("adhPermissionsMock", ["bindScope"]);
+                        adhPermissionsMock.bindScope.and.returnValue(q.when());
 
                         scope = {
                             // arbitrary values
@@ -119,8 +122,8 @@ export var register = () => {
                             $watch: jasmine.createSpy("$watch")
                         };
 
-                        var controller = directive.controller[3];
-                        controller(scope, adhHttpMock, adhPreliminaryNamesMock);
+                        var controller = directive.controller[4];
+                        controller(scope, adhHttpMock, adhPreliminaryNamesMock, adhPermissionsMock);
                     });
 
                     it("defines scope.show", () => {
