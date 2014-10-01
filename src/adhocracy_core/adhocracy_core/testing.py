@@ -31,10 +31,12 @@ god_header = {'X-User-Path': '/principals/users/0000000',
 """The authentication headers for the `god` user, used by functional fixtures.
 This assumes the initial user is created and has the `god` role.
 """
-god_login = 'god'
+god_name = 'god'
 """The login name for the god user, default value."""
 god_password = 'password'
 """The password for the god user, default value."""
+god_email = 'sysadmin@test.de'
+"""The email for the god user, default value."""
 reader_header = {'X-User-Path': '/principals/users/0000001',
                  'X-User-Token': 'SECRET_READER'}
 """The authentication headers for the `reader`, used by functional fixtures.
@@ -478,8 +480,8 @@ def app(zeo, settings, websocket):
     configurator.include(adhocracy_core.resources.sample_paragraph)
     configurator.include(adhocracy_core.resources.sample_proposal)
     configurator.include(adhocracy_core.resources.sample_section)
-    app = configurator.make_wsgi_app()
-    manageapi = ManageAppAPI(app)
+    manageapp = configurator.make_wsgi_app()
+    manageapi = ManageAppAPI(manageapp)
     manageapi.add_user_token(userid=god_header['X-User-Path'],
                              token=god_header['X-User-Token'])
     manageapi.add_user(login='contributor',
@@ -488,6 +490,7 @@ def app(zeo, settings, websocket):
     manageapi.add_user_token(userid=contributor_header['X-User-Path'],
                              token=contributor_header['X-User-Token'])
     transaction.commit()
+    app = configurator.make_wsgi_app()
     return app
 
 
