@@ -33,14 +33,6 @@ export interface IOptions {
     HEAD : boolean;
 };
 
-export var emptyOptions = {
-    OPTIONS: false,
-    PUT: false,
-    GET: false,
-    POST: false,
-    HEAD: false
-};
-
 
 /**
  * send and receive objects with adhocracy data model awareness
