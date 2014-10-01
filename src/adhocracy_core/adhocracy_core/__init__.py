@@ -55,7 +55,6 @@ def includeme(config):
     """Setup basic adhocracy."""
     settings = config.registry.settings
     config.include('pyramid_zodbconn')
-    config.include('pyramid_mailer')
     config.include('pyramid_exclog')
     config.include('pyramid_mako')
     config.hook_zca()  # enable global adapter lookup (used by adhocracy.utils)
