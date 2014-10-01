@@ -28,19 +28,19 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> extends Adh
 }
 
 
-// FIXME: this signature is out of date.  figure out what it is
-// supposed to look like, and change it!  add type annotations!
+// FIXME: i think this signature is semantically broken.  (different
+// part of the code using it store the same data in different places.)
+// streamline the type and then fix everybody who uses it.
 export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidgetScope {
     refersTo : string;
     poolPath : string;
-    poolOptions : AdhHttp.IOptions;
-    createPath : string;
     show : {
         createForm : boolean;
     };
     createComment() : void;
     cancelCreateComment() : void;
     afterCreateComment() : ng.IPromise<void>;
+    createPath : string;
     data : {
         content : any;
         creator : any;
@@ -71,8 +71,10 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
         var directive = this.createDirective();
         directive.compile = (element) => recursionHelper.compile(element, directive.link);
 
-        directive.scope.refersTo = "@";
-        directive.scope.poolPath = "@";
+        var scope : ICommentResourceScope = directive.scope;
+
+        scope.refersTo = "@";
+        scope.poolPath = "@";
 
         directive.link = (scope : ICommentResourceScope, element, attrs, wrapper) => {
             var instance = self.link(scope, element, attrs, wrapper);
@@ -124,14 +126,15 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
             preliminaryNames: this.adhPreliminaryNames,
             name: "comment"
         });
-        item.parent = instance.scope.poolPath;
+        var scope : ICommentResourceScope = instance.scope;
+        item.parent = scope.poolPath;
 
         var version = this.adapter.create({
             preliminaryNames: this.adhPreliminaryNames,
             follows: [item.first_version_path]
         });
-        this.adapter.content(version, instance.scope.data.content);
-        this.adapter.refersTo(version, instance.scope.refersTo);
+        this.adapter.content(version, scope.data.content);
+        this.adapter.refersTo(version, scope.refersTo);
         version.parent = item.path;
 
         return this.$q.when([item, version]);
@@ -139,7 +142,9 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
 
     public _edit(instance, oldVersion) {
         var resource = this.adapter.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
-        this.adapter.content(resource, instance.scope.data.content);
+        var scope : ICommentResourceScope = instance.scope;
+
+        this.adapter.content(resource, scope.data.content);
         resource.parent = Util.parentPath(oldVersion.path);
         return this.$q.when([resource]);
     }
