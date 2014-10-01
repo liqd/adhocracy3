@@ -77,7 +77,7 @@ export class Service<Content extends Resources.Content<any>> {
                 POST: raw.data.hasOwnProperty("POST") && raw.data.POST ? true : false,
                 HEAD: raw.data.hasOwnProperty("HEAD") && raw.data.HEAD ? true : false
             };
-        }
+        };
 
         return this.$http({method: "OPTIONS", url: path})
             .then(importOptions, AdhError.logBackendError);
