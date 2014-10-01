@@ -70,13 +70,6 @@ export class Service<Content extends Resources.Content<any>> {
         path = this.formatUrl(path);
 
         var importOptions = (raw : { data : IOptions }) : IOptions => {
-            // FIXME: work around typo in backend
-            if (raw.data.hasOwnProperty("OPTION")) {
-                console.log("WARNING: please fix this typo in backend.");
-                raw.data.OPTIONS = (<any>raw).OPTION;
-                (<any>raw.data).OPTION = undefined;
-            }
-
             return {
                 OPTIONS: raw.data.hasOwnProperty("OPTIONS") && raw.data.OPTIONS ? true : false,
                 PUT: raw.data.hasOwnProperty("PUT") && raw.data.PUT ? true : false,
