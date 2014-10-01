@@ -61,10 +61,9 @@ def _ignored_test_multi_edits(browser, comment):
 
 
 def test_author(comment):
-    # NOTE why the value is first 'guest' and then 'god'? joka
-    actual = comment.find_by_css("adh-user-meta").first.text
+    actual = lambda element: element.find_by_css("adh-user-meta").first.text
     # the captialisation might be changed by CSS
-    assert actual.lower() == god_name.lower()
+    assert wait(lambda: actual(comment).lower() == god_name.lower())
 
 
 def show_proposal_comments(proposal):
