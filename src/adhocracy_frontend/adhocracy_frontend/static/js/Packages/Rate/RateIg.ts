@@ -159,10 +159,14 @@ export var register = (angular, config, meta_api) => {
         });
 
         describe("filter pools", () => {
-            it("setup", () => {
+            it("sets up fixtures properly", () => {
                 expect(_proposalVersion.content_type).toEqual(RIProposalVersion.content_type);
                 expect(_commentVersion.content_type).toEqual(RICommentVersion.content_type);
                 expect(_rateVersion.content_type).toEqual(RIRateVersion.content_type);
+            });
+
+            it("logs in god", () => {
+                expect(adhUser.userPath).toContain("/principals/users/0000000/");
             });
 
             it("query 1: user's own rating", (done) => {
