@@ -158,6 +158,13 @@ export var register = () => {
                 };
                 scopeMock.thisUsersRate = "notnull";
 
+                // FIXME: httpResponseStack is not the way to do this
+                // any more.  AdhRate is non-deterministic in the
+                // order in which it gets things from the backend, so
+                // we need to actually examine the requests instead of
+                // just blinding munching through a list of responses.
+                //
+                // also the structure of the data has changed.
                 var httpResponseStack =
                     [rateableResource, postPoolResource]
                     .concat(rateResources)
@@ -166,7 +173,7 @@ export var register = () => {
 
                 var adapter = new AdhRateAdapter.RateAdapter();
 
-                AdhRate.updateRates(adapter, scopeMock, q, httpMock, userMock).then(
+                AdhRate.fetchAggregateRates(adapter, scopeMock, q, httpMock, userMock).then(
                     () => {
                         expect(scopeMock.rates.pro).toBe(2);
                         expect(scopeMock.rates.contra).toBe(1);
