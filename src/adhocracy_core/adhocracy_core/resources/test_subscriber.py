@@ -147,6 +147,8 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         sheet_versionable.meta = mock_sheet.meta._replace(isheet=IVersionable)
         sheet_versionable.get.return_value = {'follows': []}
         add_and_register_sheet(context, sheet_versionable, registry)
+        registry.content.get_sheets_all.return_value = [sheet_autoupdate,
+                                                        sheet_versionable]
         return event
 
     def test_call_versionable_with_autoupdate_sheet_once(self, itemversion, registry, mock_sheet):

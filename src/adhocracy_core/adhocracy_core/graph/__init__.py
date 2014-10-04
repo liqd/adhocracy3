@@ -130,7 +130,7 @@ class Graph(Persistent):
                          :class:`adhocracy_core.registry.ResourceContentRegistry`
                          attribute named `content`.
         """
-        sheet_meta = registry.content.sheets_meta[isheet.__identifier__]
+        sheet_meta = registry.content.sheets_meta[isheet]
         schema = sheet_meta.schema_class()
         for field_name, targets in references.items():
             assert field_name in schema

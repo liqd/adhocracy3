@@ -7,6 +7,7 @@ from pytest import raises
 from pytest import fixture
 
 from adhocracy_core.interfaces import IPool
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.testing import add_and_register_sheet
 
 
@@ -223,19 +224,24 @@ class AbsolutePath(unittest.TestCase):
 
 def test_deferred_content_type_default_call_with_iresource():
     from adhocracy_core.interfaces import IResource
+    class IResourceA(IResource):
+        pass
     from adhocracy_core.schema import deferred_content_type_default
-    context = testing.DummyResource(__provides__=IResource)
+    context = testing.DummyResource(__provides__=IResourceA)
     node = None
     bindings = {'context': context}
-    assert deferred_content_type_default(node, bindings) == IResource.__identifier__
+    assert deferred_content_type_default(node, bindings) == IResourceA
 
 
 def test_deferred_content_type_default_call_without_iresource():
+    """If no IResource subtype interface is found, we return IResource to
+    have valid default value.
+    """
     from adhocracy_core.schema import deferred_content_type_default
     context = testing.DummyResource()
     node = None
     bindings = {'context': context}
-    assert deferred_content_type_default(node, bindings) == ''
+    assert deferred_content_type_default(node, bindings) == IResource
 
 
 class TestGetSheetCstructs:
@@ -257,10 +263,9 @@ class TestGetSheetCstructs:
         mock_sheet.get.return_value = {}
         mock_sheet.schema = colander.MappingSchema()
         isheet = mock_sheet.meta.isheet
-        mock_resource_registry.resource_sheets.return_value = {isheet.__identifier__: mock_sheet}
+        mock_resource_registry.get_sheets_read.return_value = [mock_sheet]
         assert self._call_fut(context, request) == {isheet.__identifier__: {}}
-        assert mock_resource_registry.resource_sheets.call_args[0] == (context, request)
-        assert mock_resource_registry.resource_sheets.call_args[1] == {'onlyviewable': True}
+        assert mock_resource_registry.get_sheets_read.call_args[0] == (context, request)
 
 
 class TestResourceObjectUnitTests:

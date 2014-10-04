@@ -1,19 +1,19 @@
 from copy import deepcopy
 from pytest import fixture
 from pytest import raises
+from pytest import mark
 
 from pyramid import testing
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResource
-from adhocracy_core.interfaces import IPool
 
 
 class ISimple(IResource):
     pass
 
 
-class ISimpleSubtype(ISimple):
+class ISimpleS(ISimple):
     pass
 
 
@@ -21,247 +21,194 @@ class ISheetA(ISheet):
     pass
 
 
-def add_resource_meta(request, *metas):
-    resource_metas = {}
-    for meta in metas:
-        iresource = meta.iresource
-        resource_metas[iresource.__identifier__] = meta
-    request.registry.content.resources_meta = resource_metas
-
-
-def register_and_add_sheet(context, registry, mock_sheet):
-    from zope.interface import alsoProvides
-    from adhocracy_core.interfaces import IResourceSheet
-    isheet = mock_sheet.meta.isheet
-    alsoProvides(context, isheet)
-    registry.registerAdapter(lambda x: mock_sheet, (isheet,),
-                             IResourceSheet,
-                             isheet.__identifier__)
-
-
-class TestResourceContentRegistryResourceSheets:
-
-    @fixture
-    def request(self, registry, mock_resource_registry):
-        request = testing.DummyRequest(registry=registry)
-        request.registry.content = mock_resource_registry
-        return request
-
-    def _call_fut(self, context, request, **kwargs):
-        from adhocracy_core.registry import ResourceContentRegistry
-        mock_registry = request.registry.content
-        return ResourceContentRegistry.resource_sheets(
-            mock_registry, context, request, **kwargs)
-
-    def test_sheets_without_sheets(self, context, request):
-        assert self._call_fut(context, request) == {}
-
-    def test_sheets_with_sheets(self, context, request, mock_sheet):
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        sheets = self._call_fut(context, request)
-        assert sheets[ISheet.__identifier__].meta.isheet == ISheet
-
-    def test_sheets_with_sheets_onlyviewable_readable(self, context, request, mock_sheet):
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        sheets = self._call_fut(context, request, onlyviewable=True)
-        assert ISheet.__identifier__ in sheets
-
-    def test_sheets_with_sheets_onlyviewable_no_permission(self, context, request, mock_sheet, config):
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        config.testing_securitypolicy(userid='reader', permissive=False)
-        assert self._call_fut(context, request, onlyviewable=True) == {}
-
-    def test_sheets_with_sheets_onlyviewable_not_readable(self, context, request, mock_sheet):
-        mock_sheet.meta = mock_sheet.meta._replace(readable=False)
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        assert self._call_fut(context, request, onlyviewable=True) == {}
-
-    def test_sheets_with_sheets_onlyeditable_editable(self, context, request, mock_sheet):
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        sheets = self._call_fut(context, request, onlyeditable=True)
-        assert ISheet.__identifier__ in sheets
-
-    def test_sheets_with_sheets_onlyeditable_no_permission(self, context, request, mock_sheet, config):
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        config.testing_securitypolicy(userid='reader', permissive=False)
-        assert self._call_fut(context, request, onlyeditable=True) == {}
-
-    def test_sheets_with_sheets_onlyeditable_not_readable(self, context, request, mock_sheet):
-        mock_sheet.meta = mock_sheet.meta._replace(editable=False)
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        assert self._call_fut(context, request, onlyeditable=True) == {}
-
-    def test_sheets_with_sheets_onlycreatable_creatable(self, context, request, mock_sheet):
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        sheets = self._call_fut(context, request, onlycreatable=True)
-        assert ISheet.__identifier__ in sheets
-
-    def test_sheets_with_sheets_onlycreatable_no_permission(self, context, request, mock_sheet, config):
-        config.testing_securitypolicy(userid='reader', permissive=False)
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        assert self._call_fut(context, request, onlycreatable=True) == {}
-
-    def test_sheets_with_sheets_onlcreatable_not_createable(self, context, request, mock_sheet):
-        mock_sheet.meta = mock_sheet.meta._replace(creatable=False)
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        assert self._call_fut(context, request, onlycreatable=True) == {}
-
-    def test_sheets_with_sheets_onlymandatory_createmandatory(self, context, request, mock_sheet):
-        mock_sheet.meta = mock_sheet.meta._replace(create_mandatory=True)
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        sheets = self._call_fut(context, request, onlymandatorycreatable=True)
-        assert ISheet.__identifier__ in sheets
-
-    def test_sheets_with_sheets_onlymandatory_not_createmandatory(self, context, request, mock_sheet):
-        mock_sheet.meta = mock_sheet.meta._replace(create_mandatory=False)
-        register_and_add_sheet(context, request.registry, mock_sheet)
-        sheets = self._call_fut(context, request, onlymandatorycreatable=True)
-        assert sheets == {}
-
-
 class TestResourceContentRegistry:
 
-    def _make_one(self, registry):
+    @fixture
+    def resource_meta(self, resource_meta):
+        return resource_meta._replace(basic_sheets=[ISheet])
+
+    @fixture
+    def sheet_meta(self, sheet_meta, mock_sheet):
+        sheet_meta = sheet_meta._replace(isheet=ISheet,
+                                         creatable=True,
+                                         create_mandatory=True,
+                                         editable=True,
+                                         readable=True,
+                                         sheet_class=lambda x, y: mock_sheet,
+                                       )
+        mock_sheet.meta = sheet_meta
+        return sheet_meta
+
+    @fixture
+    def inst(self, resource_meta, sheet_meta):
+        inst = self.make_one(None)
+        inst.resources_meta = {IResource: resource_meta}
+        inst.sheets_meta = {ISheet: sheet_meta}
+        return inst
+
+    @fixture
+    def request_(self, inst):
+        request = testing.DummyRequest()
+        request.registry.content = inst
+        return request
+
+    def make_one(self, registry):
         from adhocracy_core.registry import ResourceContentRegistry
         return ResourceContentRegistry(registry)
 
-    def test_create(self):
+    def test_create(self, inst):
         registry = object()
-        inst = self._make_one(registry)
+        inst = self.make_one(registry)
         assert inst.registry == registry
         assert inst.sheets_meta == {}
         assert inst.resources_meta == {}
+        assert inst.resources_meta_addable == {}
 
+    def test_sheets_all(self, inst, mock_sheet):
+        assert inst.sheets_all == {IResource: [mock_sheet]}
 
-class TestResourceContentRegistryResourceAddables:
+    def test_sheets_create(self, inst, mock_sheet):
+        assert inst.sheets_create == {IResource: [mock_sheet]}
+
+    def test_sheets_create_mandatory(self, inst, mock_sheet):
+        assert inst.sheets_create_mandatory == {IResource: [mock_sheet]}
+
+    def test_sheets_read(self, inst, mock_sheet):
+        assert inst.sheets_read == {IResource: [mock_sheet]}
+
+    def test_sheets_edit(self, inst, mock_sheet):
+        assert inst.sheets_edit == {IResource: [mock_sheet]}
+
+    def test_get_sheets_all(self, inst, context, mock_sheet):
+        assert inst.get_sheets_all(context) == [mock_sheet]
+        assert mock_sheet.context is context
+
+    def test_get_sheets_read(self, inst, context, mock_sheet):
+        assert inst.get_sheets_read(context) == [mock_sheet]
+        assert mock_sheet.context is context
+
+    def test_get_sheets_read_with_request_no_permission(self, inst, context,
+                                                        config, request_):
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.get_sheets_read(context, request_) == []
+
+    def test_get_sheets_read_with_request_with_permission(
+           self, inst, context, config, request_, mock_sheet):
+        config.testing_securitypolicy(userid='hank', permissive=True)
+        assert inst.get_sheets_read(context, request_) == [mock_sheet]
+
+    def test_get_sheets_edit(self, inst, context, mock_sheet):
+        assert inst.get_sheets_edit(context) == [mock_sheet]
+        assert mock_sheet.context is context
+
+    def test_get_sheets_edit_with_request_no_permission(self, inst, context,
+                                                        config, request_):
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.get_sheets_edit(context, request_) == []
+
+    def test_get_sheets_create(self, inst, context, mock_sheet):
+        assert inst.get_sheets_create(context) == [mock_sheet]
+        assert mock_sheet.context is context
+
+    def test_get_sheets_create_with_iresource(self, inst, context, mock_sheet):
+        inst.sheets_all[ISimple] = [mock_sheet]
+        assert inst.get_sheets_create(context, iresource=ISimple) == [mock_sheet]
+
+    def test_get_sheets_create_with_wrong_iresource(self, inst, context):
+        with raises(KeyError):
+            inst.get_sheets_create(context, iresource=ISimple)
+
+    def test_get_sheets_create_with_request_no_permission(self, inst, context,
+                                                          config, request_):
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.get_sheets_create(context, request_) == []
+
+    def test_resources_meta_addable_without_addables(self, inst, resource_meta):
+        inst.resources_meta[IResource] = resource_meta
+        assert inst.resources_meta_addable[IResource] == []
+
+    def test_resources_meta_addable_with_addables(self, inst, resource_meta):
+        simple_meta = deepcopy(resource_meta)._replace(iresource=ISimple)
+        inst.resources_meta[ISimple] = simple_meta
+        resource_meta = resource_meta._replace(element_types= [ISimple])
+        inst.resources_meta[IResource] = resource_meta
+        assert inst.resources_meta_addable[IResource] == [simple_meta]
+
+    def test_resources_meta_addable_with_addables_implicit(self, inst,
+                                                           resource_meta):
+        simple_meta = deepcopy(resource_meta)._replace(iresource=ISimple)
+        inst.resources_meta[ISimple] = simple_meta
+        simples_meta = deepcopy(resource_meta)._replace(iresource=ISimpleS,
+                                                        is_implicit_addable=True)
+        inst.resources_meta[ISimpleS] = simples_meta
+        resource_meta = resource_meta._replace(element_types= [ISimple])
+        inst.resources_meta[IResource] = resource_meta
+        assert simple_meta in inst.resources_meta_addable[IResource]
+        assert simples_meta in inst.resources_meta_addable[IResource]
+
+    def test_get_resources_meta_addable(
+            self, inst, context, request_, resource_meta):
+        simple_meta = resource_meta._replace(iresource=ISimple)
+        inst.resources_meta_addable = {IResource: [simple_meta]}
+        assert inst.get_resources_meta_addable(context, request_) ==\
+               [simple_meta]
+
+    def test_get_resources_meta_addable_no_permission(
+            self, inst, context, config, request_, resource_meta):
+        simple_meta = resource_meta._replace(iresource=ISimple)
+        inst.resources_meta_addable = {IResource: [simple_meta]}
+        config.testing_securitypolicy(userid='hank', permissive=False)
+        assert inst.get_resources_meta_addable(context, request_) == []
 
     @fixture
-    def request(self, registry, mock_resource_registry):
-        request = testing.DummyRequest(registry=registry)
-        request.registry.content = mock_resource_registry
-        return request
-
-    @fixture
-    def pool(self, context, request):
-        return testing.DummyResource(__provides__=IPool)
-
-    def _call_fut(self, context, request):
-        from adhocracy_core.registry import ResourceContentRegistry
-        mock_registry = request.registry.content
-        return ResourceContentRegistry.resource_addables(
-            mock_registry, context, request)
-
-    def test_addables_valid_context_is_no_iresource(self, request):
-        assert self._call_fut(object(), request) == {}
-
-    def test_addables_valid_context_is_no_ipool(self, context, request, resource_meta):
-        add_resource_meta(request, resource_meta)
-        assert self._call_fut(context, request) == {}
-
-    def test_addables_valid_no_addables(self, pool, request, resource_meta):
-        add_resource_meta(request, resource_meta._replace(iresource=IPool))
-        assert self._call_fut(pool, request) == {}
-
-    def test_addables_valid_with_addables(self, pool, request, resource_meta):
-        add_resource_meta(request,
-                          resource_meta._replace(iresource=IPool, element_types=[ISimple]),
-                          resource_meta._replace(iresource=ISimple))
-        result = self._call_fut(pool, request)
-        assert result == {ISimple.__identifier__: {'sheets_optional': [],
-                                                   'sheets_mandatory': []}}
-
-    def test_addables_valid_with_addables_implicit_inherit(self, pool, request, resource_meta):
-        add_resource_meta(request,
-                          resource_meta._replace(iresource=IPool, element_types=[ISimple]),
-                          resource_meta._replace(iresource=ISimple, is_implicit_addable=True),
-                          resource_meta._replace(iresource=ISimpleSubtype, is_implicit_addable=True))
-        result = self._call_fut(pool, request)
-        assert sorted(result.keys()) == [ISimple.__identifier__,
-                                         ISimpleSubtype.__identifier__]
-
-    def test_addables_valid_with_addables_with_sheets(self, pool, request, resource_meta, mock_sheet):
-        add_resource_meta(request,
-                          resource_meta._replace(iresource=IPool, element_types=[ISimple]),
-                          resource_meta._replace(iresource=ISimple,
-                                                 basic_sheets=[ISheetA, ISheet]))
-        mock_sheet.meta = mock_sheet.meta._replace(create_mandatory=False)
-        mock_sheeta = deepcopy(mock_sheet)
-        mock_sheeta.meta = mock_sheeta.meta._replace(create_mandatory=True)
-        request.registry.content.resource_sheets.return_value =\
-            {ISheet.__identifier__: mock_sheet,
-             ISheetA.__identifier__: mock_sheeta}
-
-        result = self._call_fut(pool, request)
-
-        assert result == {ISimple.__identifier__: {
-                          'sheets_optional': [ISheet.__identifier__],
-                          'sheets_mandatory': [ISheetA.__identifier__]}}
-
-
-class TestResourceContentRegistryResolveISheetFieldFromDottedString:
-
-
-    @fixture
-    def sheet_meta(self, sheet_meta):
+    def sheet_meta_a(self, sheet_meta):
         from colander import MappingSchema
         class ASchema(MappingSchema):
             field1 = MappingSchema()
-        return sheet_meta._replace(isheet=ISheet, schema_class=ASchema)
+        return sheet_meta._replace(isheet=ISheet,
+                                   schema_class=ASchema)
 
-    @fixture
-    def mock_resource_registry(self, mock_resource_registry, sheet_meta):
-        mock_resource_registry.sheets_meta[sheet_meta.isheet.__identifier__] = sheet_meta
-        return mock_resource_registry
-
-    def _call_fut(self, mock_registry, dotted_string):
-        from adhocracy_core.registry import ResourceContentRegistry
-        return ResourceContentRegistry.resolve_isheet_field_from_dotted_string(
-            mock_registry, dotted_string)
-
-    def test_call_with_isheet_field_dotted_string(self, mock_resource_registry, sheet_meta):
-        isheet = sheet_meta.isheet
-        node = sheet_meta.schema_class()['field1']
+    def test_resolve_with_isheet_field_dotted_string(self, inst, sheet_meta_a):
+        node = sheet_meta_a.schema_class()['field1']
+        inst.sheets_meta[ISheet] = sheet_meta_a
         field = 'field1'
-        dotted = isheet.__identifier__ + ':' + field
-        self_ = mock_resource_registry
-        assert self._call_fut(self_, dotted) == (isheet, field, node)
+        dotted = ISheet.__identifier__ + ':' + field
+        assert inst.resolve_isheet_field_from_dotted_string(dotted) ==\
+            (ISheet, field, node)
 
-    def test_call_with_non_dotted_string(self, mock_resource_registry):
+    def test_resolve_with_non_dotted_string(self, inst):
         dotted = 'colander'
-        self_ = mock_resource_registry
         with raises(ValueError):
-            self._call_fut(self_, dotted)
+            inst.resolve_isheet_field_from_dotted_string(dotted)
 
-    def test_call_with_non_interface_dotted_string(self, mock_resource_registry, sheet_meta):
+    def test_resolve_with_non_interface_dotted_string(self, inst):
         field = 'field1'
         dotted = 'colander.SchemaNode' + ':' + field
-        self_ = mock_resource_registry
         with raises(ValueError):
-            self._call_fut(self_, dotted)
+            inst.resolve_isheet_field_from_dotted_string(dotted)
 
-    def test_call_with_non_isheet_dotted_string(self, mock_resource_registry, sheet_meta):
+    def test_resolve_with_non_isheet_dotted_string(self, inst):
         from zope.interface import Interface
         field = 'field1'
         dotted = Interface.__identifier__ + ':' + field
-        self_ = mock_resource_registry
         with raises(ValueError):
-            self._call_fut(self_, dotted)
+            inst.resolve_isheet_field_from_dotted_string(dotted)
 
-    def test_call_with_isheet_but_wrong_field_dotted_string(self, mock_resource_registry, sheet_meta):
-        isheet = sheet_meta.isheet
+    def test_resolve_with_isheet_but_wrong_field_dotted_string(self, inst,
+                                                               sheet_meta_a):
+        isheet = sheet_meta_a.isheet
         field = 'WRONG'
         dotted = isheet.__identifier__ + ':' + field
-        self_ = mock_resource_registry
         with raises(ValueError):
-            self._call_fut(self_, dotted)
+            inst.resolve_isheet_field_from_dotted_string(dotted)
 
 
-class TestResourceContentRegistyIncludeme:
+@fixture
+def integration(config):
+    config.include('adhocracy_core.registry')
 
-    def test_includeme(self, config):
-        from adhocracy_core.registry import includeme
-        from adhocracy_core.registry import ResourceContentRegistry
-        config.include('substanced.content')
-        config.commit()
-        includeme(config)
-        isinstance(config.registry.content, ResourceContentRegistry)
+
+@mark.usefixtures('integration')
+def test_includeme_register_pool_sheet(config):
+    from adhocracy_core.registry import ResourceContentRegistry
+    assert isinstance(config.registry.content, ResourceContentRegistry)
