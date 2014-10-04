@@ -2,12 +2,12 @@
 from pyramid.config import Configurator
 from pyramid_zodbconn import get_connection
 from substanced.evolution import mark_unfinished_as_finished as markunf
-from substanced.principal import groupfinder
 import transaction
 
 from adhocracy_core.authentication import TokenHeaderAuthenticationPolicy
 from adhocracy_core.authorization import RoleACLAuthorizationPolicy
 from adhocracy_core.resources.root import IRootPool
+from adhocracy_core.resources.principal import groups_and_roles_finder
 
 
 def root_factory(request, t=transaction, connection=None,
@@ -65,9 +65,10 @@ def includeme(config):
     config.set_authorization_policy(authz_policy)
     authn_secret = settings.get('substanced.secret')
     authn_timeout = 60 * 60 * 24 * 30
-    authn_policy = TokenHeaderAuthenticationPolicy(authn_secret,
-                                                   groupfinder=groupfinder,
-                                                   timeout=authn_timeout)
+    authn_policy = TokenHeaderAuthenticationPolicy(
+        authn_secret,
+        groupfinder=groups_and_roles_finder,
+        timeout=authn_timeout)
     config.set_authentication_policy(authn_policy)
     config.include('.authentication')
     config.include('.evolution')

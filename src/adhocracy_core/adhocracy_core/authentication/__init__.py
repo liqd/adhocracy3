@@ -214,6 +214,18 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
             tokenmanager.delete_token(token)
         return {}
 
+    def effective_principals(self, request: Request) -> list:
+        """Return roles and groups for the current user.
+
+        THE RESULT IS CACHED for the current request!
+        """
+        cached_principals = getattr(request, '__cached_principals__', None)
+        if cached_principals:
+            return cached_principals
+        principals = super().effective_principals(request)
+        request.__cached_principals__ = principals
+        return principals
+
 
 def includeme(config):
     """Register the TokenManger adapter."""

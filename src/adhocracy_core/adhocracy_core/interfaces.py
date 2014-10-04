@@ -437,7 +437,6 @@ class IGroupLocator(Interface):  # pragma: no cover
         We return 'None' if the the group does not exists to provide a similar
         behavior as :func:`substanced.interfaces.IUserLocator.get_groupids`.
         """
-        # FIXME?: better raise an exception if the group does not exists?
 
     def get_group_by_id(groupid: str) -> IResource:
         """Return the group for :term:`groupid` or None."""
