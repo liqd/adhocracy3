@@ -16,8 +16,7 @@ class TestRuleACLAuthorizaitonPolicy:
         from zope.interface.verify import verifyObject
         assert IAuthorizationPolicy.providedBy(inst)
         assert verifyObject(IAuthorizationPolicy, inst)
-        assert inst.group_prefix == 'group:'
-        assert inst.role_prefix == 'role:'
+        assert inst.creator_role == 'role:creator'
         assert inst.local_roles_key == '__local_roles__'
 
     def test_permits_no_acl(self, inst, context):
@@ -73,45 +72,6 @@ class TestRuleACLAuthorizaitonPolicy:
                                                    'Everybody'], 'view')
 
     # Additional features to support group roles mapped to permissions
-
-    def test_permits_acl_with_group_roles(self, inst, context, mock_group_locator):
-        from pyramid.security import Allow
-        mock_group_locator.get_roleids.return_value = ['role:admin']
-        context.__acl__ = [(Allow, 'role:admin', 'view')]
-        assert inst.permits(context, ['system.Authenticated', 'group:Admins'],
-                            'view')
-        assert mock_group_locator.get_roleids.call_args[0] == ('group:Admins',)
-
-    def test_permits_acl_wrong_group(self, inst, context, mock_group_locator):
-        from pyramid.security import Allow
-        mock_group_locator.get_roleids.return_value = None
-        context.__acl__ = [(Allow, 'role:admin', 'view')]
-        assert not inst.permits(context, ['system.Authenticated',
-                                          'group:Admins'], 'view')
-
-    def test_permits_acl_inherited_acl(self, inst, context, mock_group_locator):
-        from pyramid.security import Allow
-        mock_group_locator.get_roleids.return_value = ['role:admin']
-        context.__acl__ = [(Allow, 'role:admin', 'view')]
-        context['child'] = testing.DummyResource()
-        assert inst.permits(context['child'], ['system.Authenticated',
-                                               'group:Admins'], 'view')
-        assert mock_group_locator.get_roleids.call_args[0] == ('group:Admins',)
-
-    def test_permits_acl_with_user_roles(self, inst, context, mock_user_locator):
-        from pyramid.security import Allow
-        mock_user_locator.get_roleids.return_value = ['role:admin']
-        context.__acl__ = [(Allow, 'role:admin', 'view')]
-        assert inst.permits(context, ['system.Authenticated', 'Admin',
-                                      'group:Admin'], 'view')
-        assert mock_user_locator.get_roleids.call_args[0] == ('Admin',)
-
-    def test_permits_acl_wrong_user(self, inst, context, mock_user_locator):
-        from pyramid.security import Allow
-        mock_user_locator.get_roleids.return_value = None
-        context.__acl__ = [(Allow, 'role:admin', 'view')]
-        assert not inst.permits(context, ['system.Authenticated', 'Admin',
-                                          'group:Admin'],  'view')
 
     def test_permits_acl_with_local_roles(self, inst, context):
         from pyramid.security import Allow

@@ -325,18 +325,37 @@ class TestGroupLocatorAdapter:
         assert inst.get_group_by_id('Group1') is None
 
 
-class GroupLocatorAdapterIntegrationTest(unittest.TestCase):
+class TestGroupsAndRolesFinder:
 
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy_core.registry')
-        self.config.include('adhocracy_core.resources.principal')
-        self.context = testing.DummyResource()
-        self.registry = self.config.registry
+    @fixture
+    def request(self, context, registry):
+        request = testing.DummyRequest(context=context)
+        request.registry = registry
+        return request
 
-    def tearDown(self):
-        testing.tearDown()
+    def _call_fut(self, userid, request):
+        from adhocracy_core.resources.principal import groups_and_roles_finder
+        return groups_and_roles_finder(userid, request)
 
-    def test_create(self):
-        from adhocracy_core.interfaces import IGroupLocator
-        assert self.registry.getAdapter(self.context, IGroupLocator)
+    def test_userid_wrong(self, request, mock_group_locator, mock_user_locator):
+        assert self._call_fut('WRONG', request) == []
+        assert mock_user_locator.get_groupids.call_args[0] == ('WRONG',)
+        assert mock_user_locator.get_roleids.call_args[0] == ('WRONG',)
+
+    def test_userid_with_roles(self, request, mock_group_locator,
+                               mock_user_locator):
+        mock_user_locator.get_roleids.return_value = ['role:reader']
+        assert self._call_fut('userid', request) == ['role:reader']
+
+    def test_userid_with_groups(self, request, mock_group_locator,
+                                mock_user_locator):
+        mock_user_locator.get_groupids.return_value = ['group:Readers']
+        assert self._call_fut('userid', request) == ['group:Readers']
+
+
+    def test_userid_with_groups_roles(self, request, mock_group_locator,
+                                      mock_user_locator):
+        mock_user_locator.get_groupids.return_value = ['group:Readers']
+        mock_group_locator.get_roleids.return_value = ['role:reader']
+        self._call_fut('userid', request) == ['group:Readers', 'role:reader']
+        assert mock_group_locator.get_roleids.call_args[0] == ('group:Readers',)

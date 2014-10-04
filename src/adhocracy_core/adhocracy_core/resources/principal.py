@@ -1,6 +1,7 @@
 """Resources to handle users and groups."""
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
+from pyramid.request import Request
 from zope.interface import Interface
 from substanced.util import find_service
 from zope.interface import implementer
@@ -227,6 +228,22 @@ class GroupLocatorAdapter:
             return groups.get(groupid, None)
         name = groupid.split(':')[1]
         return groups.get(name, None)
+
+
+def groups_and_roles_finder(userid: str, request: Request) -> list:
+    """A Pyramid authentication policy groupfinder callback."""
+    context = request.context
+    userlocator = request.registry.getMultiAdapter((context, request),
+                                                   IRolesUserLocator)
+    groupids = userlocator.get_groupids(userid) or []
+    roleids = userlocator.get_roleids(userid) or []
+    grouplocator = request.registry.getAdapter(context, IGroupLocator)
+    groups_roleids = []
+    for groupid in groupids:
+        group_roleids = grouplocator.get_roleids(groupid) or []
+        groups_roleids.extend(group_roleids)
+    groups_and_roles = set(groupids + roleids + groups_roleids)
+    return sorted(list(groups_and_roles))
 
 
 def includeme(config):

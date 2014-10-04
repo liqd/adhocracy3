@@ -317,6 +317,11 @@ def mock_user_locator(registry) -> Mock:
     from adhocracy_core.interfaces import IRolesUserLocator
     from adhocracy_core.resources.principal import UserLocatorAdapter
     locator = Mock(spec=UserLocatorAdapter)
+    locator.get_groupids.return_value = None
+    locator.get_roleids.return_value = None
+    locator.get_user_by_userid.return_value = None
+    locator.get_user_by_login.return_value = None
+    locator.get_user_by_email.return_value = None
     registry.registerAdapter(lambda y, x: locator, (Interface, Interface),
                              IRolesUserLocator)
     return locator
@@ -329,6 +334,8 @@ def mock_group_locator(registry) -> Mock:
     from adhocracy_core.interfaces import IGroupLocator
     from adhocracy_core.resources.principal import GroupLocatorAdapter
     locator = Mock(spec=GroupLocatorAdapter)
+    locator.get_group_by_id.return_value = None
+    locator.get_roleids.return_value = None
     registry.registerAdapter(lambda x: locator, (Interface,),
                              IGroupLocator)
     return locator
