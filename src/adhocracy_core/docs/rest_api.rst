@@ -780,7 +780,7 @@ for more on comments and *post pools*)::
     >>> commentable = resp.json['data']['adhocracy_core.sheets.comment.ICommentable']
     >>> post_pool_path = commentable['post_pool']
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
-    ...            'data': {}}
+    ...            'data': {'adhocracy_core.sheets.name.IName': {'name': 'com'}}}
     >>> resp = testapp.post_json(post_pool_path, comment)
     >>> comment_path = resp.json["path"]
     >>> first_commvers_path = resp.json['first_version_path']
@@ -839,7 +839,7 @@ This sheet has a special field :term:`post_pool` referencing a pool::
 We can post comments to this pool only::
 
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
-    ...            'data': {}}
+    ...            'data': {'adhocracy_core.sheets.name.IName': {'name': 'c1'}}}
     >>> resp = testapp.post_json(post_pool_path, comment)
     >>> comment_path = resp.json["path"]
     >>> comment_path
@@ -869,7 +869,7 @@ Comments can be about any versionable that allows posting comments. Hence
 it's also possible to write a comment about another comment::
 
     >>> metacomment = {'content_type': 'adhocracy_core.resources.comment.IComment',
-    ...                 'data': {}}
+    ...                 'data': {'adhocracy_core.sheets.name.IName': {'name': 'c2'}}}
     >>> resp = testapp.post_json(pdag_path, metacomment)
     >>> metacomment_path = resp.json["path"]
     >>> metacomment_path
