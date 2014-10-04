@@ -12,7 +12,7 @@ from adhocracy_core.utils import get_all_sheets
 from adhocracy_core.interfaces import ISheet
 
 
-dotted_name_resolver = DottedNameResolver()
+resolver = DottedNameResolver()
 
 
 class ResourceContentRegistry(ContentRegistry):
@@ -134,7 +134,7 @@ class ResourceContentRegistry(ContentRegistry):
             raise ValueError
         name = ''.join(dotted.split(':')[:-1])
         field = dotted.split(':')[-1]
-        isheet = dotted_name_resolver.resolve(name)
+        isheet = resolver.resolve(name)
         if not IInterface.providedBy(isheet):
             raise ValueError
         if not isheet.isOrExtends(ISheet):
