@@ -1,6 +1,8 @@
 import unittest
 
 from pyramid import testing
+from pytest import fixture
+from pytest import mark
 
 
 class ConfigViewTest(unittest.TestCase):
@@ -90,3 +92,21 @@ class ViewsFunctionalTest(unittest.TestCase):
     def test_register_view(self):
         resp = self.testapp.get('/register', status=200)
         assert '200' in resp.status
+
+
+@fixture()
+def integration(config):
+    config.include('adhocracy_frontend')
+
+
+@mark.usefixtures('integration')
+class TestIntegrationIncludeme:
+
+    def test_includeme(self):
+        """Check that includeme runs without errors."""
+        assert True
+
+    def test_register_subscriber(self, registry):
+        from adhocracy_core.rest.views import add_cors_headers_subscriber
+        handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
+        assert add_cors_headers_subscriber.__name__ in handlers

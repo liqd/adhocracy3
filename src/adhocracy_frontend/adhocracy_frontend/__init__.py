@@ -2,9 +2,12 @@
 import os
 
 from pyramid.config import Configurator
+from pyramid.events import NewResponse
 from pyramid.request import Request
 from pyramid.response import FileResponse
 from pyramid.settings import aslist
+
+from adhocracy_core.rest.views import add_cors_headers_subscriber
 
 
 def config_view(request):
@@ -56,6 +59,7 @@ def includeme(config):
     add_frontend_route(config, 'activate', 'activate/{key}')
     add_frontend_route(config, 'activation_error', 'activation_error')
     add_frontend_route(config, 'root', '')
+    config.add_subscriber(add_cors_headers_subscriber, NewResponse)
 
 
 def add_frontend_route(config, name, pattern):
