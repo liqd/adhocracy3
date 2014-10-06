@@ -309,7 +309,6 @@ export var rateController = (
     return updateRates(adapter, $scope, $q, adhHttp, adhUser)
         .then(() => {
             adhPermissions.bindScope($scope, $scope.postPoolPath, "optionsPostPool");
-            return;
         });
 };
 
