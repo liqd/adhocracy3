@@ -130,13 +130,13 @@ is a member of.  This is necessary because the UI looks different for
 different roles (at the very least, we want to see a different icon
 for every role in the login widget).
 
-If the FE sends a request to the BE that it has no authorisation for,
+If the FE sends a request to the BE that it has no authorization for,
 it will receive an error (depending on the situation either 4xx to
 conceal the existence of secret resources, or 3xx to explicitly deny
 access).
 
 There are (at least) four approaches to implement an API that the FE
-can use to query BE about permissions without actually performin an
+can use to query BE about permissions without actually performing an
 access operation an observing the response:
 
 1. OPTIONS protocol.  This is expressive enough to decide if user is
@@ -144,10 +144,10 @@ access operation an observing the response:
    edit permissions of self (by ordinary users) or other users (by
    admin).
 
-2. (future work) Add permission object to meta api (CAVEAT: this makes
+2. (future work) Add permission object to meta API (CAVEAT: this makes
    version resources change unexpectedly).
 
 3. (future work) Change HTTP response to contain not only the resource
-   but also permission information in a larger json object.
+   but also permission information in a larger JSON object.
 
 4. (future work) New HTTP end-point for permission requests.
