@@ -20,7 +20,7 @@ class ConfigViewTest(unittest.TestCase):
              'rest_url': 'http://localhost:6541',
              'rest_platform_path': '/adhocracy/',
              'trusted_domains': [],
-             'support_email': 'support@adhocracy.de',
+             'support_email': 'support@unconfigured.domain',
              }
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):
