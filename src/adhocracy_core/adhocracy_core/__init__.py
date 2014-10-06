@@ -1,15 +1,16 @@
 """Setup pyramid wsgi app."""
 from pyramid.config import Configurator
 from pyramid_zodbconn import get_connection
-from pyramid.authorization import ACLAuthorizationPolicy
 from substanced.evolution import mark_unfinished_as_finished as markunf
 import transaction
 
 from adhocracy_core.authentication import TokenHeaderAuthenticationPolicy
+from adhocracy_core.authorization import RoleACLAuthorizationPolicy
 from adhocracy_core.resources.root import IRootPool
+from adhocracy_core.resources.principal import groups_and_roles_finder
 
 
-def root_factory(request, t=transaction, g=get_connection,
+def root_factory(request, t=transaction, connection=None,
                  mark_unfinished_as_finished=False):
     """ A function which can be used as a Pyramid ``root_factory``.
 
@@ -22,11 +23,13 @@ def root_factory(request, t=transaction, g=get_connection,
     # Workaround to make the subrequests in adhocracy_core.rest.batchview work.
     if getattr(request, 'root', False):
         return request.root
-    conn = g(request)
-    zodb_root = conn.root()
+    if connection is None:
+        connection = get_connection(request)
+    zodb_root = connection.root()
     if 'app_root' not in zodb_root:
         registry = request.registry
-        app_root = registry.content.create(IRootPool.__identifier__)
+        app_root = registry.content.create(IRootPool.__identifier__,
+                                           registry=request.registry)
         zodb_root['app_root'] = app_root
         t.savepoint()  # give app_root a _p_jar
         if mark_unfinished_as_finished:
@@ -55,15 +58,19 @@ def includeme(config):
     """Setup basic adhocracy."""
     settings = config.registry.settings
     config.include('pyramid_zodbconn')
-    config.include('pyramid_mailer')
     config.include('pyramid_exclog')
+    config.include('pyramid_mako')
     config.hook_zca()  # enable global adapter lookup (used by adhocracy.utils)
-    authz_policy = ACLAuthorizationPolicy()
+    authz_policy = RoleACLAuthorizationPolicy()
+    config.hook_zca()  # global adapter lookup (used by adhocracy_core.utils)
+    authz_policy = RoleACLAuthorizationPolicy()
     config.set_authorization_policy(authz_policy)
     authn_secret = settings.get('substanced.secret')
     authn_timeout = 60 * 60 * 24 * 30
-    authn_policy = TokenHeaderAuthenticationPolicy(authn_secret,
-                                                   timeout=authn_timeout)
+    authn_policy = TokenHeaderAuthenticationPolicy(
+        authn_secret,
+        groupfinder=groups_and_roles_finder,
+        timeout=authn_timeout)
     config.set_authentication_policy(authn_policy)
     config.include('.authentication')
     config.include('.evolution')
@@ -71,6 +78,7 @@ def includeme(config):
     config.include('.registry')
     config.include('.graph')
     config.include('.catalog')
+    config.include('.messaging')
     config.include('.sheets')
     config.include('.resources.pool')
     config.include('.resources.root')

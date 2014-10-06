@@ -15,6 +15,7 @@ Some imports to work with rest api calls::
     >>> import os
     >>> import requests
     >>> from pprint import pprint
+    >>> from adhocracy_core.testing import god_header
 
 Start Adhocracy testapp::
 
@@ -234,7 +235,7 @@ Returns possible methods for this resource, example request/response data
 structures and available interfaces with resource data. The result is a
 JSON object that has the allowed request methods as keys::
 
-    >>> resp_data = testapp.options(rest_url + "/adhocracy").json
+    >>> resp_data = testapp.options(rest_url + "/adhocracy", headers=god_header).json
     >>> sorted(resp_data.keys())
     ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
 
@@ -330,7 +331,7 @@ Create a new resource ::
     ...         'data': {
     ...              'adhocracy_core.sheets.name.IName': {
     ...                  'name': 'Proposals'}}}
-    >>> resp_data = testapp.post_json(rest_url + "/adhocracy", prop).json
+    >>> resp_data = testapp.post_json(rest_url + "/adhocracy", prop, headers=god_header).json
     >>> resp_data["content_type"]
     'adhocracy_core.resources.pool.IBasicPool'
     >>> resp_data["path"]
@@ -346,7 +347,7 @@ Modify data of an existing resource ::
 
 ...    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
 ...    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'youdidntexpectthis'}}}
-...    >>> resp_data = testapp.put_json(rest_url + "/adhocracy/Proposals", data).json
+...    >>> resp_data = testapp.put_json(rest_url + "/adhocracy/Proposals", data, headers=god_header).json
 ...    >>> pprint(resp_data)
 ...    {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
 ...     'path': rest_url + '/adhocracy/Proposals'}
@@ -372,7 +373,7 @@ The normal return code is 200 ::
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
 
-.. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data)
+.. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data, headers=god_header)
 .. 200 OK application/json ...
 
 If you submit invalid data the return error code is 400 ::
@@ -380,7 +381,7 @@ If you submit invalid data the return error code is 400 ::
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.example.WRONGINTERFACE': {'name': 'Proposals'}}}
 
-.. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data)
+.. >>> testapp.put_json(rest_url + "/adhocracy/Proposals", data, headers=god_header)
 .. Traceback (most recent call last):
 .. ...
 .. {"errors": [{"description": ...
@@ -475,7 +476,7 @@ Create a Proposal (a subclass of Item which pools ProposalVersions) ::
     ...                  'name': 'kommunismus'}
     ...              }
     ...         }
-    >>> resp = testapp.post_json(rest_url + "/adhocracy/Proposals", pdag)
+    >>> resp = testapp.post_json(rest_url + "/adhocracy/Proposals", pdag, headers=god_header)
     >>> pdag_path = resp.json["path"]
     >>> pdag_path
     '.../adhocracy/Proposals/kommunismus/'
@@ -524,7 +525,7 @@ Create a new version of the proposal that follows the first version ::
     ...                  'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [pvrs0_path]}},
     ...          'root_versions': [pvrs0_path]}
-    >>> resp = testapp.post_json(pdag_path, pvrs)
+    >>> resp = testapp.post_json(pdag_path, pvrs, headers=god_header)
     >>> pvrs1_path = resp.json["path"]
     >>> pvrs1_path != pvrs0_path
     True
@@ -567,7 +568,7 @@ Create a Section item inside the Proposal item ::
     >>> sdag = {'content_type': 'adhocracy_core.resources.sample_section.ISection',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kapitel1'},}
     ...         }
-    >>> resp = testapp.post_json(pdag_path, sdag)
+    >>> resp = testapp.post_json(pdag_path, sdag, headers=god_header)
     >>> sdag_path = resp.json["path"]
     >>> svrs0_path = resp.json["first_version_path"]
 
@@ -576,7 +577,7 @@ and a second Section ::
     >>> sdag = {'content_type': 'adhocracy_core.resources.sample_section.ISection',
     ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kapitel2'},}
     ...         }
-    >>> resp = testapp.post_json(pdag_path, sdag)
+    >>> resp = testapp.post_json(pdag_path, sdag, headers=god_header)
     >>> s2dag_path = resp.json["path"]
     >>> s2vrs0_path = resp.json["first_version_path"]
 
@@ -590,7 +591,7 @@ initial versions ::
     ...                     'follows': [pvrs1_path],}
     ...                 },
     ...          'root_versions': [pvrs1_path]}
-    >>> resp = testapp.post_json(pdag_path, pvrs)
+    >>> resp = testapp.post_json(pdag_path, pvrs, headers=god_header)
     >>> pvrs2_path = resp.json["path"]
 
 If we create a second version of kapitel1 ::
@@ -606,7 +607,7 @@ If we create a second version of kapitel1 ::
     ...          },
     ...          'root_versions': [pvrs2_path]
     ...         }
-    >>> resp = testapp.post_json(sdag_path, svrs)
+    >>> resp = testapp.post_json(sdag_path, svrs, headers=god_header)
     >>> svrs1_path = resp.json['path']
     >>> svrs1_path != svrs0_path
     True
@@ -644,7 +645,7 @@ More interestingly, if we then create a second version of kapitel2::
     ...          },
     ...          'root_versions': [pvrs3_path]
     ...         }
-    >>> resp = testapp.post_json(s2dag_path, svrs)
+    >>> resp = testapp.post_json(s2dag_path, svrs, headers=god_header)
     >>> s2vrs1_path = resp.json['path']
     >>> s2vrs1_path != s2vrs0_path
     True
@@ -781,7 +782,7 @@ for more on comments and *post pools*)::
     >>> post_pool_path = commentable['post_pool']
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...            'data': {'adhocracy_core.sheets.name.IName': {'name': 'com'}}}
-    >>> resp = testapp.post_json(post_pool_path, comment)
+    >>> resp = testapp.post_json(post_pool_path, comment, headers=god_header)
     >>> comment_path = resp.json["path"]
     >>> first_commvers_path = resp.json['first_version_path']
     >>> first_commvers_path
@@ -798,7 +799,7 @@ version as predecessor::
     ...                 'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [first_commvers_path]}},
     ...             'root_versions': [first_commvers_path]}
-    >>> resp = testapp.post_json(comment_path, commvers)
+    >>> resp = testapp.post_json(comment_path, commvers, headers=god_header)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
     '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001/'
@@ -806,7 +807,7 @@ version as predecessor::
 However, if we try to add another version that *also* gives the first
 version (no longer head) as predecessor, we get an error::
 
-    >>> resp_data = testapp.post_json(comment_path, commvers, status=400).json
+    >>> resp_data = testapp.post_json(comment_path, commvers, status=400, headers=god_header).json
     >>> pprint(resp_data)
     {'errors': [{'description': 'No fork allowed',
                  'location': 'body',
@@ -840,7 +841,7 @@ We can post comments to this pool only::
 
     >>> comment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...            'data': {'adhocracy_core.sheets.name.IName': {'name': 'c1'}}}
-    >>> resp = testapp.post_json(post_pool_path, comment)
+    >>> resp = testapp.post_json(post_pool_path, comment, headers=god_header)
     >>> comment_path = resp.json["path"]
     >>> comment_path
     '.../adhocracy/Proposals/kommunismus/comment_000...'
@@ -860,7 +861,7 @@ another version to say something meaningful. A comment contains *content*
     ...                 'adhocracy_core.sheets.versions.IVersionable': {
     ...                     'follows': [first_commvers_path]}},
     ...             'root_versions': [first_commvers_path]}
-    >>> resp = testapp.post_json(comment_path, commvers)
+    >>> resp = testapp.post_json(comment_path, commvers, headers=god_header)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
     '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001/'
@@ -870,7 +871,7 @@ it's also possible to write a comment about another comment::
 
     >>> metacomment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...                 'data': {'adhocracy_core.sheets.name.IName': {'name': 'c2'}}}
-    >>> resp = testapp.post_json(pdag_path, metacomment)
+    >>> resp = testapp.post_json(pdag_path, metacomment, headers=god_header)
     >>> metacomment_path = resp.json["path"]
     >>> metacomment_path
     '.../adhocracy/Proposals/kommunismus/comment_000...'
@@ -890,7 +891,7 @@ As usual, we have to add another version to actually say something::
     ...                     'adhocracy_core.sheets.versions.IVersionable': {
     ...                         'follows': [first_metacommvers_path]}},
     ...                 'root_versions': [first_metacommvers_path]}
-    >>> resp = testapp.post_json(metacomment_path, metacommvers)
+    >>> resp = testapp.post_json(metacomment_path, metacommvers, headers=god_header)
     >>> snd_metacommvers_path = resp.json['path']
     >>> snd_metacommvers_path
     '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001/'
@@ -1034,7 +1035,7 @@ Let's add some more paragraphs to the second section above ::
     ...             'path': '@par1_item/v2'
     ...           },
     ...         ]
-    >>> batch_resp = testapp.post_json(batch_url, batch).json
+    >>> batch_resp = testapp.post_json(batch_url, batch, headers=god_header).json
     >>> len(batch_resp)
     3
     >>> pprint(batch_resp[0])
@@ -1103,7 +1104,7 @@ the paragraph will not be present in the database ::
     ...           }
     ...         ]
     >>> invalid_batch_resp = testapp.post_json(batch_url, invalid_batch,
-    ...                                        status=400).json
+    ...                                        status=400, headers=god_header).json
     >>> pprint(invalid_batch_resp)
     [{'body': {'content_type': 'adhocracy_core.resources.sample_paragraph.IParagraph',
                'first_version_path': '...',

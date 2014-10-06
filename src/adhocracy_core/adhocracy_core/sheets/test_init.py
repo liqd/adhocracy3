@@ -47,6 +47,11 @@ class TestResourcePropertySheet:
         mock.reftype = SheetReference
         return mock
 
+    @fixture
+    def context(self, context, mock_graph):
+        context.__graph__ = mock_graph
+        return context
+
     def make_one(self, sheet_meta, context):
         from adhocracy_core.sheets import GenericResourceSheet
         return GenericResourceSheet(sheet_meta, context)
@@ -128,7 +133,7 @@ class TestResourcePropertySheet:
         inst = self.make_one(sheet_meta, context)
         node = mock_node_unique_references
         inst.schema.children.append(node)
-        inst._graph = mock_graph
+        inst.context._graph = mock_graph
         target = testing.DummyResource()
 
         inst.set({'references': [target]})
@@ -144,7 +149,7 @@ class TestResourcePropertySheet:
         inst.schema.children.append(node)
         source = testing.DummyResource()
         mock_graph.get_back_references_for_isheet.return_value = {'': [source]}
-        inst._graph = mock_graph
+        inst.context._graph = mock_graph
 
         appstruct = inst.get()
 
@@ -156,7 +161,6 @@ class TestResourcePropertySheet:
         inst = self.make_one(sheet_meta, context)
         node = mock_node_single_reference
         inst.schema.children.append(node)
-        inst._graph = mock_graph
         target = testing.DummyResource()
         inst.set({'reference': target})
         graph_set_args = mock_graph.set_references_for_isheet.call_args[0]
@@ -171,7 +175,6 @@ class TestResourcePropertySheet:
         target = testing.DummyResource()
         mock_graph.get_references_for_isheet.return_value = {'reference':
                                                              [target]}
-        inst._graph = mock_graph
         appstruct = inst.get()
         assert appstruct['reference'] == target
 
@@ -184,7 +187,6 @@ class TestResourcePropertySheet:
         inst.schema.children.append(node)
         source = testing.DummyResource()
         mock_graph.get_back_references_for_isheet.return_value = {'': [source]}
-        inst._graph = mock_graph
         appstruct = inst.get()
         assert appstruct['reference'] == source
         mock_graph.get_back_references_for_isheet.assert_called_with(context, ISheet)
@@ -222,8 +224,7 @@ class TestAddSheetToRegistry:
     def test_register_valid_sheet_sheet_meta(self, sheet_meta, registry, mock_resource_registry, context):
         registry.content = mock_resource_registry
         self._call_fut(sheet_meta, registry)
-        assert registry.content.sheets_meta ==\
-            {sheet_meta.isheet.__identifier__: sheet_meta}
+        assert registry.content.sheets_meta == {sheet_meta.isheet: sheet_meta}
 
     def test_register_valid_sheet_sheet_meta_replace_exiting(self, sheet_meta, registry, context):
         from adhocracy_core.utils import get_sheet

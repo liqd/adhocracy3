@@ -13,7 +13,7 @@ import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/I
 // import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 // import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
+import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
 
 var pkgLocation = "/Rate";
 

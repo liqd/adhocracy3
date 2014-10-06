@@ -38,8 +38,8 @@ def mock_authpolicy(registry):
 @fixture
 def mock_password_sheet(registry):
     from adhocracy_core.interfaces import IResourceSheet
-    from adhocracy_core.sheets.user import IPasswordAuthentication
-    from adhocracy_core.sheets.user import PasswordAuthenticationSheet
+    from adhocracy_core.sheets.principal import IPasswordAuthentication
+    from adhocracy_core.sheets.principal import PasswordAuthenticationSheet
     isheet = IPasswordAuthentication
     sheet = Mock(spec=PasswordAuthenticationSheet)
     registry.registerAdapter(lambda x: sheet, (isheet,),
@@ -295,38 +295,30 @@ class TestResourceRESTView:
         assert isinstance(inst, RESTView)
         assert inst.registry is request.registry.content
 
-    def test_options_valid_no_sheets_and_addables(self, request, context):
-        from adhocracy_core.rest.schemas import OPTIONSResourceResponseSchema
-        inst = self.make_one(context, request)
-        response = inst.options()
-        wanted = OPTIONSResourceResponseSchema().serialize()
-        wanted['POST']['response_body']['content_type'] = ''
-        wanted['PUT']['response_body']['content_type'] = ''
-        wanted['POST']['response_body']['content_type'] = ''
-        assert wanted == response
-
-    def test_options_valid_with_sheets_and_addables(self, request, context):
+    def test_options_valid_with_sheets_and_addables(
+            self, request, context, resource_meta, mock_sheet):
         registry = request.registry.content
-        registry.resource_sheets.return_value = {'ipropertyx': object()}
-        registry.resource_addables.return_value = \
-            {'iresourcex': {'sheets_mandatory': [],
-                            'sheets_optional': ['ipropertyx']}}
-
+        registry.get_sheets_edit.return_value = [mock_sheet]
+        registry.get_sheets_read.return_value = [mock_sheet]
+        registry.get_resources_meta_addable.return_value = [resource_meta]
+        registry.get_sheets_create.return_value = [mock_sheet]
         inst = self.make_one(context, request)
+
         response = inst.options()
 
         wanted = \
         {'GET': {'request_body': {},
          'request_querystring': {},
          'response_body': {'content_type': '',
-                           'data': {'ipropertyx': {}},
+                           'data': {ISheet.__identifier__: {}},
                            'path': ''}},
          'HEAD': {},
          'OPTIONS': {},
-         'POST': {'request_body': [{'content_type': 'iresourcex',
-                                    'data': {'ipropertyx': {}}}],
+         'POST': {'request_body': [{'content_type': IResource.__identifier__,
+                                    'data': {ISheet.__identifier__: {}}}],
                   'response_body': {'content_type': '', 'path': ''}},
-         'PUT': {'request_body': {'content_type': '', 'data': {'ipropertyx': {}}},
+         'PUT': {'request_body': {'content_type': '',
+                                  'data': {ISheet.__identifier__: {}}},
                  'response_body': {'content_type': '', 'path': ''}}}
         assert wanted == response
 
@@ -343,17 +335,11 @@ class TestResourceRESTView:
         assert wanted == response
 
     def test_get_valid_with_sheets(self, request, context, mock_sheet):
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=ISheetB)
-        mock_sheet.get.return_value = {'dummy': 'data'}
-        schema = colander.SchemaNode(colander.Mapping(unknown='preserve'))
-        mock_sheet.schema.bind.return_value = schema
-        request.registry.content.resource_sheets.return_value = {ISheetB.__identifier__: mock_sheet}
-
+        mock_sheet.get.return_value = {'name': 1}
+        mock_sheet.schema.add(colander.SchemaNode(colander.Int(), name='name'))
+        request.registry.content.get_sheets_read.return_value = [mock_sheet]
         inst = self.make_one(context, request)
-        response = inst.get()
-
-        wanted = {ISheetB.__identifier__: {'dummy': 'data'}}
-        assert wanted == response['data']
+        assert inst.get()['data'][ISheet.__identifier__] ==  {'name': '1'}
 
 
 class TestSimpleRESTView:
@@ -377,7 +363,8 @@ class TestSimpleRESTView:
         assert 'get' in dir(inst)
         assert 'put' in dir(inst)
 
-    def test_put_valid_no_sheets(self, request, context):
+    def test_put_valid_no_sheets(self, request, context, mock_sheet):
+        request.registry.content.get_sheets_edit.return_value = [mock_sheet]
         request.validated = {"content_type": "X", "data": {}}
 
         inst = self.make_one(context, request)
@@ -387,9 +374,9 @@ class TestSimpleRESTView:
         assert wanted == response
 
     def test_put_valid_with_sheets(self, request, context, mock_sheet):
-        request.registry.content.resource_sheets.return_value = {ISheetB.__identifier__: mock_sheet}
+        request.registry.content.get_sheets_edit.return_value = [mock_sheet]
         data = {'content_type': 'X',
-                'data': {ISheetB.__identifier__: {'x': 'y'}}}
+                'data': {ISheet.__identifier__: {'x': 'y'}}}
         request.validated = data
 
         inst = self.make_one(context, request)
@@ -436,9 +423,7 @@ class TestPoolRESTView:
     def test_get_valid_pool_sheet_with_query_params(self, request, context, mock_sheet):
         from adhocracy_core.sheets.pool import IPool
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
-        mock_sheet.get.return_value = {}
-        mock_sheet.schema = colander.MappingSchema()
-        request.registry.content.resource_sheets.return_value = {IPool.__identifier__: mock_sheet}
+        request.registry.content.get_sheets_read.return_value = [mock_sheet]
         request.validated['param1'] = 1
 
         inst = self.make_one(context, request)
@@ -454,7 +439,7 @@ class TestPoolRESTView:
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPool)
         mock_sheet.get.return_value = {'elements': [child]}
         mock_sheet.schema = PoolSchema()
-        request.registry.content.resource_sheets.return_value = {IPool.__identifier__: mock_sheet}
+        request.registry.content.get_sheets_read.return_value = [mock_sheet]
         request.validated['elements'] = 'content'
 
         inst = self.make_one(context, request)
@@ -471,8 +456,7 @@ class TestPoolRESTView:
         child.__parent__ = context
         child.__name__ = 'child'
         request.registry.content.create.return_value = child
-        request.validated = {'content_type': IResourceX.__identifier__,
-                                  'data': {}}
+        request.validated = {'content_type': IResourceX, 'data': {}}
         inst = self.make_one(context, request)
         response = inst.post()
 
@@ -538,7 +522,7 @@ class TestItemRESTView:
                                       __parent__=context,
                                       __name__='child')
         request.registry.content.create.return_value = child
-        request.validated = {'content_type': IResourceX.__identifier__,
+        request.validated = {'content_type': IResourceX,
                                   'data': {}}
         inst = self.make_one(context, request)
         response = inst.post()
@@ -560,7 +544,7 @@ class TestItemRESTView:
         first = testing.DummyResource(__provides__=IItemVersion)
         child['first'] = first
         request.registry.content.create.return_value = child
-        request.validated = {'content_type': IItemVersion.__identifier__,
+        request.validated = {'content_type': IItemVersion,
                                   'data': {}}
         inst = self.make_one(context, request)
         response = inst.post()
@@ -579,7 +563,7 @@ class TestItemRESTView:
         root = testing.DummyResource(__provides__=IItemVersion)
         request.registry.content.create.return_value = child
         request.validated = {'content_type':
-                                      IItemVersion.__identifier__,
+                                      IItemVersion,
                                   'data': {},
                                   'root_versions': [root]}
         inst = self.make_one(context, request)
@@ -621,18 +605,16 @@ class TestMetaApiView:
         assert response['sheets'] == {}
 
     def test_get_resources(self, request, context, resource_meta):
-        metas = {IResource.__identifier__: resource_meta}
-        request.registry.content.resources_meta = metas
+        request.registry.content.resources_meta[IResource] = resource_meta
         inst = self.make_one(request, context)
         resp = inst.get()
         assert IResource.__identifier__ in resp['resources']
         assert resp['resources'][IResource.__identifier__] == {'sheets': []}
 
     def test_get_resources_with_sheets_meta(self, request, context, resource_meta):
-        metas = {IResource.__identifier__: resource_meta._replace(
-            basic_sheets=[ISheet],
-            extended_sheets=[ISheetB])}
-        request.registry.content.resources_meta = metas
+        resource_meta = resource_meta._replace(basic_sheets=[ISheet],
+                                               extended_sheets=[ISheetB])
+        request.registry.content.resources_meta[IResource] = resource_meta
         inst = self.make_one(request, context)
 
         resp = inst.get()['resources']
@@ -641,9 +623,9 @@ class TestMetaApiView:
         assert wanted_sheets == resp[IResource.__identifier__]['sheets']
 
     def test_get_resources_with_element_types_metadata(self, request, context, resource_meta):
-        metas = {IResource.__identifier__: resource_meta._replace(
-            element_types=[IResource, IResourceX])}
-        request.registry.content.resources_meta = metas
+        resource_meta = resource_meta._replace(element_types=[IResource,
+                                                              IResourceX])
+        request.registry.content.resources_meta[IResource] = resource_meta
         inst = self.make_one(request, context)
 
         resp = inst.get()['resources']
@@ -652,9 +634,8 @@ class TestMetaApiView:
         assert wanted == resp[IResource.__identifier__]['element_types']
 
     def test_get_resources_with_item_type_metadata(self, request, context, resource_meta):
-        metas = {IResource.__identifier__: resource_meta._replace(
-            item_type=IResourceX)}
-        request.registry.content.resources_meta = metas
+        resource_meta = resource_meta._replace(item_type=IResourceX)
+        request.registry.content.resources_meta[IResource] = resource_meta
         inst = self.make_one(request, context)
 
         resp = inst.get()['resources']
@@ -663,8 +644,7 @@ class TestMetaApiView:
         assert wanted == resp[IResource.__identifier__]['item_type']
 
     def test_get_sheets(self, request, context, sheet_meta):
-        metas = {ISheet.__identifier__: sheet_meta}
-        request.registry.content.sheets_meta = metas
+        request.registry.content.sheets_meta[ISheet] = sheet_meta
         inst = self.make_one(request, context)
         response = inst.get()
         assert ISheet.__identifier__ in response['sheets']
@@ -674,8 +654,8 @@ class TestMetaApiView:
     def test_get_sheets_with_field(self, request, context, sheet_meta):
         class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(colander.Int())
-        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_meta = metas
+        sheet_meta = sheet_meta._replace(schema_class=SchemaF)
+        request.registry.content.sheets_meta[ISheet] = sheet_meta
         inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
@@ -692,8 +672,8 @@ class TestMetaApiView:
     def test_get_sheet_with_readonly_field(self, request, context, sheet_meta):
         class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(colander.Int(), readonly=True)
-        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_meta = metas
+        sheet_meta = sheet_meta._replace(schema_class=SchemaF)
+        request.registry.content.sheets_meta[ISheet] = sheet_meta
         inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
@@ -706,8 +686,8 @@ class TestMetaApiView:
     def test_get_sheets_with_field_colander_noniteratable(self, request, context, sheet_meta):
         class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(colander.Int())
-        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_meta = metas
+        sheet_meta = sheet_meta._replace(schema_class=SchemaF)
+        request.registry.content.sheets_meta[ISheet] = sheet_meta
         inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
@@ -720,8 +700,8 @@ class TestMetaApiView:
         from adhocracy_core.schema import Name
         class SchemaF(colander.MappingSchema):
             test = colander.SchemaNode(Name())
-        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_meta = metas
+        sheet_meta = sheet_meta._replace(schema_class=SchemaF)
+        request.registry.content.sheets_meta[ISheet] = sheet_meta
         inst = self.make_one(request, context)
 
         response = inst.get()['sheets'][ISheet.__identifier__]
@@ -735,8 +715,8 @@ class TestMetaApiView:
         from adhocracy_core.schema import UniqueReferences
         class SchemaF(colander.MappingSchema):
             test = UniqueReferences(reftype=SheetToSheet)
-        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_meta = metas
+        sheet_meta = sheet_meta._replace(schema_class=SchemaF)
+        request.registry.content.sheets_meta[ISheet] = sheet_meta
         inst = self.make_one(request, context)
 
         sheet_metadata = inst.get()['sheets'][ISheet.__identifier__]
@@ -754,8 +734,8 @@ class TestMetaApiView:
         BSheetToSheet.setTaggedValue('source_isheet', ISheetB)
         class SchemaF(colander.MappingSchema):
             test = UniqueReferences(reftype=BSheetToSheet, backref=True)
-        metas = {ISheet.__identifier__: sheet_meta._replace(schema_class=SchemaF)}
-        request.registry.content.sheets_meta = metas
+        sheet_meta = sheet_meta._replace(schema_class=SchemaF)
+        request.registry.content.sheets_meta[ISheet] = sheet_meta
         inst = self.make_one(request, context)
 
         sheet_metadata = inst.get()['sheets'][ISheet.__identifier__]
@@ -819,7 +799,7 @@ class TestValidateLoginPasswordUnitTest:
 
     @fixture
     def request(self, cornice_request, registry):
-        from adhocracy_core.sheets.user import IPasswordAuthentication
+        from adhocracy_core.sheets.principal import IPasswordAuthentication
         cornice_request.registry = registry
         user = testing.DummyResource(__provides__=IPasswordAuthentication)
         cornice_request.validated['user'] = user
@@ -852,6 +832,38 @@ class TestValidateLoginPasswordUnitTest:
         request.validated['user'] = None
         self._call_fut(context, request)
         assert request.errors == []
+
+
+class TestValidateAccountActiveUnitTest:
+
+    @fixture
+    def request(self, cornice_request, registry):
+        cornice_request.registry = registry
+        return cornice_request
+
+    def _call_fut(self, context, request):
+        from adhocracy_core.rest.views import validate_account_active
+        return validate_account_active(context, request)
+
+    def test_valid(self, request, context):
+        user = testing.DummyResource(active=True)
+        request.validated['user'] = user
+        self._call_fut(context, request)
+        assert not request.errors
+
+    def test_invalid(self, request, context):
+        user = testing.DummyResource(active=False)
+        request.validated['user'] = user
+        self._call_fut(context, request)
+        assert 'not yet activated' in request.errors[0]['description']
+
+    def test_no_error_added_after_other_errors(self, request, context):
+        user = testing.DummyResource(active=False)
+        request.validated['user'] = user
+        request.errors.add('blah', 'blah', 'blah')
+        assert len(request.errors) == 1
+        self._call_fut(context, request)
+        assert len(request.errors) == 1
 
 
 class TestLoginUserName:
@@ -928,6 +940,82 @@ def test_add_cors_headers_subscriber(context):
          'Access-Control-Allow-Headers':
          'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
          'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS'}
+
+
+class TestValidateActivationPathUnitTest:
+
+    @fixture
+    def request(self, cornice_request, registry):
+        cornice_request.registry = registry
+        cornice_request.validated['path'] = '/foo'
+        return cornice_request
+
+    @fixture
+    def user_with_metadata(self, config):
+        from adhocracy_core.sheets.metadata import IMetadata
+        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.events')
+        config.include('adhocracy_core.sheets.metadata')
+        return testing.DummyResource(__provides__=IMetadata)
+
+    def _call_fut(self, context, request):
+        from adhocracy_core.rest.views import validate_activation_path
+        return validate_activation_path(context, request)
+
+    def test_valid(self, request, user_with_metadata, context,
+                   mock_user_locator):
+        mock_user_locator.get_user_by_activation_path.return_value = \
+            user_with_metadata
+        self._call_fut(context, request)
+        assert request.validated['user'] == user_with_metadata
+
+    def test_not_found(self, request, context, mock_user_locator):
+        mock_user_locator.get_user_by_activation_path.return_value = None
+        self._call_fut(context, request)
+        assert 'Unknown or expired activation path' == request.errors[0][
+            'description']
+
+    def test_found_but_expired(self, request, user_with_metadata, context,
+                               mock_user_locator):
+        from datetime import datetime
+        from datetime import timezone
+        from adhocracy_core.sheets.metadata import IMetadata
+        from adhocracy_core.utils import get_sheet
+        mock_user_locator.get_user_by_activation_path.return_value = \
+            user_with_metadata
+        metadata = get_sheet(user_with_metadata, IMetadata)
+        appstruct = metadata.get()
+        appstruct['creation_date'] = datetime(
+            year=2010, month=1, day=1, tzinfo=timezone.utc)
+        metadata.set(appstruct)
+        self._call_fut(context, request)
+        assert 'Unknown or expired activation path' == request.errors[0][
+            'description']
+
+
+class TestActivateAccountView:
+
+    @fixture
+    def request(self, cornice_request, registry):
+        cornice_request.registry=registry
+        cornice_request.validated['user'] = testing.DummyResource()
+        return cornice_request
+
+    def _make_one(self, context, request):
+        from adhocracy_core.rest.views import ActivateAccountView
+        return ActivateAccountView(context, request)
+
+    def test_post(self, request, context, mock_authpolicy):
+        mock_authpolicy.remember.return_value = {'X-User-Path': '/user',
+                                                 'X-User-Token': 'token'}
+        inst = self._make_one(context, request)
+        assert inst.post() == {'status': 'success',
+                               'user_path': '/user',
+                               'user_token': 'token'}
+
+    def test_options(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}
 
 
 @fixture()

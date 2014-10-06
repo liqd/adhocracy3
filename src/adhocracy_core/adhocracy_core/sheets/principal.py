@@ -1,22 +1,61 @@
-"""User Sheet."""
+"""Sheets for :term:`principal`s."""
 import colander
 from cryptacular.bcrypt import BCRYPTPasswordManager
-from substanced.interfaces import IUserLocator
-from pyramid.decorator import reify
 
 from adhocracy_core.interfaces import ISheet
+from substanced.interfaces import IUserLocator
+from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets import GenericResourceSheet
+from adhocracy_core.sheets import AttributeStorageSheet
 from adhocracy_core.schema import Email
 from adhocracy_core.schema import Password
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import TimeZoneName
+from adhocracy_core.schema import UniqueReferences
+from adhocracy_core.schema import Roles
+from adhocracy_core.utils import get_sheet
+
+
+class IGroup(ISheet):
+
+    """Market interface for the group sheet."""
 
 
 class IUserBasic(ISheet):
 
     """Market interface for the userbasic sheet."""
+
+
+class IPermissions(ISheet):
+
+    """Market interface for the permissions sheet."""
+
+
+class PermissionsGroupsReference(SheetToSheet):
+
+    """permissions sheet reference to preceding versions."""
+
+    source_isheet = IPermissions
+    source_isheet_field = 'groups'
+    target_isheet = IGroup
+
+
+class GroupSchema(colander.MappingSchema):
+
+    """Group sheet data structure."""
+
+    users = UniqueReferences(readonly=True,
+                             backref=True,
+                             reftype=PermissionsGroupsReference)
+    roles = Roles()
+
+
+group_metadata = sheet_metadata_defaults._replace(
+    isheet=IGroup,
+    schema_class=GroupSchema,
+)
 
 
 @colander.deferred
@@ -81,19 +120,59 @@ class UserBasicSchema(colander.MappingSchema):
     tzname = TimeZoneName()
 
 
-class AttributeStorageSheet(GenericResourceSheet):
-
-    """Sheet class that stores data as context attributes."""
-
-    @reify
-    def _data(self):
-        return self.context.__dict__
-
-
 userbasic_metadata = sheet_metadata_defaults._replace(
     isheet=IUserBasic,
     schema_class=UserBasicSchema,
-    sheet_class=AttributeStorageSheet
+    sheet_class=AttributeStorageSheet,
+    permission_create='create_sheet_userbasic',
+)
+
+
+@colander.deferred
+def deferred_roles_and_group_roles(node: colander.SchemaNode, kw: dict)\
+        -> list:
+    """Return roles and groups roles for `context`.
+
+    :param kw: dictionary with 'context' key and
+              :class:`adhocracy_core.sheets.principal.IPermissions` object.
+    :return: list of :term:`roles` or [].
+    """
+    context = kw.get('context', None)
+    request = kw.get('request', None)
+    # FIXME Getting the request binding is just a HACK to prevent circle
+    # in adhocracy_core.sheets.GenericResourceSheet.__init__ schema binding.
+    if not IPermissions.providedBy(context) or request is None:
+        return []
+    permissions_sheet = get_sheet(context, IPermissions)
+    roles = permissions_sheet.get()['roles']
+    groups = permissions_sheet.get()['groups']
+    for group in groups:
+        group_sheet = get_sheet(group, IGroup)
+        group_roles = group_sheet.get()['roles']
+        roles.extend(group_roles)
+    roles_sorted = sorted(list(set(roles)))
+    return roles_sorted
+
+
+class PermissionsSchema(colander.MappingSchema):
+
+    """Userbasic sheet data structure.
+
+    `groups`: groups this user joined
+    """
+
+    roles = Roles()
+    groups = UniqueReferences(reftype=PermissionsGroupsReference)
+    roles_and_group_roles = Roles(readonly=True,
+                                  default=deferred_roles_and_group_roles)
+
+
+permissions_metadata = sheet_metadata_defaults._replace(
+    isheet=IPermissions,
+    schema_class=PermissionsSchema,
+    sheet_class=AttributeStorageSheet,
+    permission_create='manage_principals',
+    permission_edit='manage_principals',
 )
 
 
@@ -156,6 +235,7 @@ password_metadata = sheet_metadata_defaults._replace(
     readable=False,
     creatable=True,
     editable=True,
+    permission_create='create_sheet_password',
 )
 
 
@@ -170,5 +250,7 @@ def includeme(config):
     """Register sheets and activate catalog factory."""
     add_sheet_to_registry(userbasic_metadata, config.registry)
     add_sheet_to_registry(password_metadata, config.registry)
+    add_sheet_to_registry(group_metadata, config.registry)
+    add_sheet_to_registry(permissions_metadata, config.registry)
     # config.scan('.')
     # config.add_evolution_step(add_user_catalog)

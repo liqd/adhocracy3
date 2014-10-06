@@ -33,8 +33,8 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
 checkout source code ::
 
-    git clone git@github.com:liqd/adhocracy3.git
-    cd adhocracy3
+    git clone ssh://git@foucault.liqd.net:22012/a3.git
+    cd a3
     git submodule init
     git submodule update
 

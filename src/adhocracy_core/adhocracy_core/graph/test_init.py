@@ -316,7 +316,7 @@ class TestGraphSetReferencesForIsheet:
     @fixture
     def registry(self, mock_resource_registry, sheet_meta):
         registry = testing.DummyResource(content=mock_resource_registry)
-        registry.content.sheets_meta = {ISheet.__identifier__: sheet_meta}
+        registry.content.sheets_meta = {ISheet: sheet_meta}
         return registry
 
     @fixture
