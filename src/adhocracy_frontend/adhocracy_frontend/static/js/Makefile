@@ -82,7 +82,7 @@ test_py:
 # cleanup, word count, aux
 
 clean:
-	rm -rf Adhocracy/Resources_/
+	rm -rf Resources_/
 	find . -name '*~' -exec rm {} \;
 	find . -name '*.js' -exec rm {} \;
 	find . -name '*.js.map' -exec rm {} \;
