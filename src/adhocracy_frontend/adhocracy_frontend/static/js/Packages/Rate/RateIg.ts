@@ -198,21 +198,21 @@ export var register = (angular, config, meta_api) => {
             it("query 2: rating totals", (done) => {
                 var ratePostPoolPath = _commentVersion.data[SICommentable.nick].post_pool;
 
+                var aggrkey : string = "rate";
                 var query : any = {};
                 query.content_type = RIRateVersion.content_type;
                 query.depth = 2;
                 query.tag = "LAST";
                 query.count = "true";
-                query.aggregateby = SIRate.nick + ":rate";
-
-                console.log(JSON.stringify(query, null, 2));  // FIXME: remove once this test works!
+                query.aggregateby = aggrkey;
 
                 adhHttp.get(ratePostPoolPath, query)
                     .then(
                         (poolRsp) => {
                             var rspCounts = poolRsp.data[SIPool.nick].aggregateby;
-                            expect(rspCounts.toHaveOwnProperty(SIRate.nick + ":rate"));
-                            expect(rspCounts[SIRate.nick + ":rate"]).toEqual({"-1": 0, "0": 0, "1": 1});
+                            expect(rspCounts.hasOwnProperty(aggrkey)).toBe(true);
+                            expect(rspCounts[aggrkey]).toEqual({"1": 1});  // 0-counts are omitted
+                            done();
                         },
                         (msg) => {
                             expect(msg).toBe(false);
