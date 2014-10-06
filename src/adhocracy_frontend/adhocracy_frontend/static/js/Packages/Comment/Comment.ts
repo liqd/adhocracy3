@@ -1,4 +1,4 @@
-import AdhResource = require("../../Resources");
+import AdhResourcesBase = require("../../ResourcesBase");
 
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
@@ -13,7 +13,7 @@ import Util = require("../Util/Util");
 var pkgLocation = "/Comment";
 
 
-export interface ICommentAdapter<T extends AdhResource.Content<any>> extends AdhListing.IListingContainerAdapter {
+export interface ICommentAdapter<T extends AdhResourcesBase.Resource> extends AdhListing.IListingContainerAdapter {
     create(settings : any) : T;
     createItem(settings : any) : any;
     derive(oldVersion : T, settings : any) : T;
@@ -28,8 +28,6 @@ export interface ICommentAdapter<T extends AdhResource.Content<any>> extends Adh
 }
 
 
-// FIXME: this signature is out of date.  figure out what it is
-// supposed to look like, and change it!  add type annotations!
 export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidgetScope {
     refersTo : string;
     poolPath : string;
@@ -52,11 +50,11 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     };
 }
 
-export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICommentResourceScope> {
+export class CommentResource<R extends AdhResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, ICommentResourceScope> {
     constructor(
-        private adapter : ICommentAdapter<any>,
+        private adapter : ICommentAdapter<R>,
         adhConfig : AdhConfig.Type,
-        adhHttp,
+        adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames,
         $q : ng.IQService
@@ -100,11 +98,11 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
         return directive;
     }
 
-    public _handleDelete(instance, path : string) {
+    public _handleDelete(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, path : string) {
         return this.$q.when();
     }
 
-    public _update(instance, resource) {
+    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, resource : R) {
         var scope : ICommentResourceScope = instance.scope;
         scope.data = {
             content: this.adapter.content(resource),
@@ -119,7 +117,7 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
         return this.$q.when();
     }
 
-    public _create(instance) {
+    public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>) {
         var item = this.adapter.createItem({
             preliminaryNames: this.adhPreliminaryNames,
             name: "comment"
@@ -137,7 +135,7 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
         return this.$q.when([item, version]);
     }
 
-    public _edit(instance, oldVersion) {
+    public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, oldVersion : R) {
         var resource = this.adapter.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
         this.adapter.content(resource, instance.scope.data.content);
         resource.parent = Util.parentPath(oldVersion.path);
@@ -145,9 +143,9 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
     }
 }
 
-export class CommentCreate extends CommentResource {
+export class CommentCreate<R extends AdhResourcesBase.Resource> extends CommentResource<R> {
     constructor(
-        adapter : ICommentAdapter<any>,
+        adapter : ICommentAdapter<R>,
         adhConfig : AdhConfig.Type,
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
