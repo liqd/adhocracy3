@@ -1,5 +1,7 @@
 """Rest API views."""
 from copy import deepcopy
+from datetime import datetime
+from datetime import timezone
 from logging import getLogger
 
 from colander import drop
@@ -16,6 +18,7 @@ from pyramid.request import Request
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
+from pyramid.traversal import resource_path
 
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import IItem
@@ -23,8 +26,10 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ILocation
+from adhocracy_core.resources.principal import IUser
 from adhocracy_core.rest.schemas import ResourceResponseSchema
 from adhocracy_core.rest.schemas import ItemResponseSchema
+from adhocracy_core.rest.schemas import POSTActivateAccountViewRequestSchema
 from adhocracy_core.rest.schemas import POSTItemRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginEmailRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginUsernameRequestSchema
@@ -33,17 +38,17 @@ from adhocracy_core.rest.schemas import PUTResourceRequestSchema
 from adhocracy_core.rest.schemas import GETPoolRequestSchema
 from adhocracy_core.rest.schemas import GETItemResponseSchema
 from adhocracy_core.rest.schemas import GETResourceResponseSchema
-from adhocracy_core.rest.schemas import OPTIONSResourceResponseSchema
+from adhocracy_core.rest.schemas import options_resource_response_data_dict
 from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
-from adhocracy_core.utils import get_iresource
+from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
 from adhocracy_core.resources.root import IRootPool
-from adhocracy_core.sheets.user import IPasswordAuthentication
+from adhocracy_core.sheets.principal import IPasswordAuthentication
 import adhocracy_core.sheets.pool
 
 
@@ -229,7 +234,15 @@ class RESTView:
                               extra_validators=validators)
 
     def options(self) -> dict:
-        raise HTTPMethodNotAllowed()
+        """Return options for view.
+
+        Note: This default implementation currently only exist in order to
+        satisfy the preflight request, which browsers do in CORS situations
+        before doing an actual POST request. Subclasses still have to
+        configure the view and delegate to this implementation explictly if
+        they want to use it.
+        """
+        return {}
 
     def get(self) -> dict:
         raise HTTPMethodNotAllowed()
@@ -268,46 +281,47 @@ class ResourceRESTView(RESTView):
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
         """Get possible request/response data structures and http methods."""
-        addables = self.registry.resource_addables(self.context, self.request)
-        sheets_view = self.registry.resource_sheets(self.context, self.request,
-                                                    onlyviewable=True)
-        sheets_edit = self.registry.resource_sheets(self.context, self.request,
-                                                    onlyeditable=True)
+        empty = {}  # tiny performance tweak
+        cstruct = deepcopy(options_resource_response_data_dict)
+        edits = self.registry.get_sheets_edit(self.context, self.request)
+        put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
+        cstruct['PUT']['request_body']['data'] = dict(put_sheets)
 
-        cstruct_singleton = OPTIONSResourceResponseSchema().serialize()
-        cstruct = deepcopy(cstruct_singleton)
-        for sheet in sheets_edit:
-            cstruct['PUT']['request_body']['data'][sheet] = {}
-            cstruct['PUT']['request_body']['content_type'] = ''
-            cstruct['PUT']['response_body']['content_type'] = ''
-        cstruct['PUT']['response_body']['content_type'] = ''
-        for sheet in sheets_view:
-            cstruct['GET']['response_body']['data'][sheet] = {}
-            cstruct['GET']['response_body']['content_type'] = ''
-        for type, sheets in addables.items():
-            names = sheets['sheets_optional'] + sheets['sheets_mandatory']
-            sheets_dict = dict([(s, {}) for s in names])
-            post_data = {'content_type': type, 'data': sheets_dict}
+        views = self.registry.get_sheets_read(self.context, self.request)
+        get_sheets = [(s.meta.isheet.__identifier__, empty) for s in views]
+        cstruct['GET']['response_body']['data'] = dict(get_sheets)
+
+        addables = self.registry.get_resources_meta_addable(self.context,
+                                                            self.request)
+        for resource_meta in addables:
+            iresource = resource_meta.iresource
+            resource_typ = iresource.__identifier__
+            creates = self.registry.get_sheets_create(self.context,
+                                                      self.request,
+                                                      iresource)
+            sheet_typs = [s.meta.isheet.__identifier__ for s in creates]
+            sheets_dict = dict.fromkeys(sheet_typs, empty)
+            post_data = {'content_type': resource_typ,
+                         'data': sheets_dict}
             cstruct['POST']['request_body'].append(post_data)
-            cstruct['POST']['response_body']['content_type'] = ''
-        cstruct['POST']['response_body']['content_type'] = ''
+
         return cstruct
 
     @view_config(request_method='GET')
     def get(self) -> dict:
         """Get resource data."""
-        schema = GETResourceResponseSchema().bind(request=self.request)
-        appstruct = _get_resource_response_appstruct(self.context)
-        cstruct = schema.serialize(appstruct)
+        schema = GETResourceResponseSchema().bind(request=self.request,
+                                                  context=self.context)
+        cstruct = schema.serialize()
         cstruct['data'] = self._get_sheets_data_cstruct()
         return cstruct
 
     def _get_sheets_data_cstruct(self):
         queryparams = self.request.validated if self.request.validated else {}
-        sheets_view = self.registry.resource_sheets(self.context, self.request,
-                                                    onlyviewable=True)
+        sheets_view = self.registry.get_sheets_read(self.context,
+                                                    self.request)
         data_cstruct = {}
-        for sheet in sheets_view.values():
+        for sheet in sheets_view:
             key = sheet.meta.isheet.__identifier__
             schema = sheet.schema.bind(context=self.context,
                                        request=self.request)
@@ -333,14 +347,6 @@ def _set_pool_sheet_elements_serialization_form(schema: MappingSchema,
     elements_node.children[0].typ = elements_typ_copy
 
 
-def _get_resource_response_appstruct(resource: IResource) -> dict:
-        iresource = get_iresource(resource)
-        return {
-            'path': resource,
-            'content_type': iresource.__identifier__,
-        }
-
-
 @view_defaults(
     renderer='simplejson',
     context=ISimple,
@@ -356,15 +362,15 @@ class SimpleRESTView(ResourceRESTView):
                  content_type='application/json')
     def put(self) -> dict:
         """Edit resource and get response data."""
-        sheets = self.registry.resource_sheets(self.context, self.request,
-                                               onlyeditable=True)
+        sheets = self.registry.get_sheets_edit(self.context, self.request)
         appstructs = self.request.validated.get('data', {})
-        for sheetname, appstruct in appstructs.items():
-            sheet = sheets[sheetname]
-            sheet.set(appstruct)
-        schema = ResourceResponseSchema().bind(request=self.request)
-        appstruct = _get_resource_response_appstruct(self.context)
-        cstruct = schema.serialize(appstruct)
+        for sheet in sheets:
+            name = sheet.meta.isheet.__identifier__
+            if name in appstructs:
+                sheet.set(appstructs[name], registry=self.request.registry)
+        schema = ResourceResponseSchema().bind(request=self.request,
+                                               context=self.context)
+        cstruct = schema.serialize()
         return cstruct
 
 
@@ -390,12 +396,14 @@ class PoolRESTView(SimpleRESTView):
 
     def build_post_response(self, resource) -> dict:
         """Build response data structure for a POST request. """
-        appstruct = _get_resource_response_appstruct(resource)
+        appstruct = {}
         if IItem.providedBy(resource):
             appstruct['first_version_path'] = self._get_first_version(resource)
-            schema = ItemResponseSchema().bind(request=self.request)
+            schema = ItemResponseSchema().bind(request=self.request,
+                                               context=resource)
         else:
-            schema = ResourceResponseSchema().bind(request=self.request)
+            schema = ResourceResponseSchema().bind(request=self.request,
+                                                   context=resource)
         return schema.serialize(appstruct)
 
     def _get_first_version(self, item: IItem) -> IItemVersion:
@@ -407,7 +415,8 @@ class PoolRESTView(SimpleRESTView):
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
-        resource_type = self.request.validated['content_type']
+        iresource = self.request.validated['content_type']
+        resource_type = iresource.__identifier__
         appstructs = self.request.validated.get('data', {})
         creator = get_user(self.request)
         resource = self.registry.create(resource_type, self.context,
@@ -430,8 +439,9 @@ class ItemRESTView(PoolRESTView):
     @view_config(request_method='GET')
     def get(self) -> dict:
         """Get resource data."""
-        schema = GETItemResponseSchema().bind(request=self.request)
-        appstruct = _get_resource_response_appstruct(self.context)
+        schema = GETItemResponseSchema().bind(request=self.request,
+                                              context=self.context)
+        appstruct = {}
         first_version = self._get_first_version(self.context)
         if first_version is not None:
             appstruct['first_version_path'] = first_version
@@ -443,7 +453,8 @@ class ItemRESTView(PoolRESTView):
                  content_type='application/json')
     def post(self):
         """Create new resource and get response data."""
-        resource_type = self.request.validated['content_type']
+        iresource = self.request.validated['content_type']
+        resource_type = iresource.__identifier__
         appstructs = self.request.validated.get('data', {})
         creator = get_user(self.request)
         root_versions = self.request.validated.get('root_versions', [])
@@ -471,7 +482,7 @@ class MetaApiView(RESTView):
         """Build a description of the resources registered in the system.
 
         Args:
-          resources_meta (dict): mapping from resources names to metadata
+          resources_meta (dict): mapping from iresource interfaces to metadata
 
         Returns:
           resource_map (dict): a dict (suitable for JSON serialization) that
@@ -480,27 +491,27 @@ class MetaApiView(RESTView):
         """
         resource_map = {}
 
-        for name, metadata in resources_meta.items():
+        for iresource, resource_meta in resources_meta.items():
             prop_map = {}
 
             # List of sheets
             sheets = []
-            sheets.extend(metadata.basic_sheets)
-            sheets.extend(metadata.extended_sheets)
+            sheets.extend(resource_meta.basic_sheets)
+            sheets.extend(resource_meta.extended_sheets)
             prop_map['sheets'] = [to_dotted_name(s) for s in sheets]
 
             # Main element type if this is a pool or item
-            if metadata.item_type:
-                prop_map['item_type'] = to_dotted_name(metadata.item_type)
+            if resource_meta.item_type:
+                prop_map['item_type'] = to_dotted_name(resource_meta.item_type)
 
             # Other addable element types
-            if metadata.element_types:
+            if resource_meta.element_types:
                 element_names = []
-                for typ in metadata.element_types:
+                for typ in resource_meta.element_types:
                     element_names.append(to_dotted_name(typ))
                 prop_map['element_types'] = element_names
 
-            resource_map[name] = prop_map
+            resource_map[to_dotted_name(iresource)] = prop_map
         return resource_map
 
     def _describe_sheets(self, sheet_metadata):
@@ -516,7 +527,7 @@ class MetaApiView(RESTView):
 
         """
         sheet_map = {}
-        for sheet_name, metadata in sheet_metadata.items():
+        for isheet, sheet_meta in sheet_metadata.items():
             # readable and create_mandatory flags are currently defined for
             # the whole sheet, but we copy them as attributes into each field
             # definition, since this might change in the future.
@@ -526,7 +537,7 @@ class MetaApiView(RESTView):
             fields = []
 
             # Create field definitions
-            for node in metadata.schema_class().children:
+            for node in sheet_meta.schema_class().children:
 
                 fieldname = node.name
                 valuetype = type(node)
@@ -554,8 +565,8 @@ class MetaApiView(RESTView):
                     reftype = node.reftype
                     target_isheet = reftype.getTaggedValue('target_isheet')
                     source_isheet = reftype.getTaggedValue('source_isheet')
-                    isheet = source_isheet if node.backref else target_isheet
-                    targetsheet = to_dotted_name(isheet)
+                    isheet_ = source_isheet if node.backref else target_isheet
+                    targetsheet = to_dotted_name(isheet_)
 
                 typ_stripped = strip_optional_prefix(typ, 'colander.')
 
@@ -563,10 +574,10 @@ class MetaApiView(RESTView):
                     'name': fieldname,
                     'valuetype': typ_stripped,
                     'create_mandatory':
-                        False if readonly else metadata.create_mandatory,
-                    'editable': False if readonly else metadata.editable,
-                    'creatable': False if readonly else metadata.creatable,
-                    'readable': metadata.readable,
+                        False if readonly else sheet_meta.create_mandatory,
+                    'editable': False if readonly else sheet_meta.editable,
+                    'creatable': False if readonly else sheet_meta.creatable,
+                    'readable': sheet_meta.readable,
                 }
                 if containertype is not None:
                     fielddesc['containertype'] = containertype
@@ -577,7 +588,7 @@ class MetaApiView(RESTView):
 
             # For now, each sheet definition only contains a 'fields' attribute
             # listing the defined fields
-            sheet_map[sheet_name] = {'fields': fields}
+            sheet_map[to_dotted_name(isheet)] = {'fields': fields}
 
         return sheet_map
 
@@ -606,7 +617,7 @@ def _add_no_such_user_or_wrong_password_error(request: Request):
 def validate_login_name(context, request: Request):
     """Validate the user name of a login request.
 
-    If valid, the user object is added as 'user' to
+    If valid and activated, the user object is added as 'user' to
     `request.validated`.
     """
     name = request.validated['name']
@@ -653,32 +664,43 @@ def validate_login_password(context, request: Request):
         _add_no_such_user_or_wrong_password_error(request)
 
 
+def validate_account_active(context, request: Request):
+    """Ensure that the user account is already active.
+
+    Requires the user object as `user` in `request.validated`.
+
+    No error message is added if there were earlier errors, as that would
+    leak information (indicating that a not-yet-activated account already
+    exists).
+    """
+    user = request.validated.get('user', None)
+    if user is None or request.errors:
+        return
+    if not user.active:
+        request.errors.add('body', 'name', 'User account not yet activated')
+
+
 @view_defaults(
     renderer='simplejson',
     context=IRootPool,
     http_cache=0,
+    name='login_username',
 )
 class LoginUsernameView(RESTView):
 
     """Log in a user via their name."""
 
     validation_POST = (POSTLoginUsernameRequestSchema,
-                       [validate_login_name, validate_login_password])
+                       [validate_login_name,
+                        validate_login_password,
+                        validate_account_active])
 
-    @view_config(name='login_username',
-                 request_method='OPTIONS')
+    @view_config(request_method='OPTIONS')
     def options(self) -> dict:
-        """Return options for login_username view.
+        """Return options for view."""
+        return super().options()
 
-        FIXME: Return something useful. This currently only exist in order to
-        satisfy the preflight request, which browsers do in CORS situations
-        before doing the actual POST.
-
-        """
-        return {}
-
-    @view_config(name='login_username',
-                 request_method='POST',
+    @view_config(request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
@@ -688,8 +710,8 @@ class LoginUsernameView(RESTView):
 def _login_user(request: Request) -> dict:
     """Log-in a user and return a response indicating success."""
     user = request.validated['user']
-    user_path = request.resource_url(user)
-    headers = remember(request, user_path) or {}
+    userid = resource_path(user)
+    headers = remember(request, userid) or {}
     user_path = headers['X-User-Path']
     user_token = headers['X-User-Token']
     return {'status': 'success',
@@ -701,28 +723,23 @@ def _login_user(request: Request) -> dict:
     renderer='simplejson',
     context=IRootPool,
     http_cache=0,
+    name='login_email',
 )
 class LoginEmailView(RESTView):
 
     """Log in a user via their email address."""
 
     validation_POST = (POSTLoginEmailRequestSchema,
-                       [validate_login_email, validate_login_password])
+                       [validate_login_email,
+                        validate_login_password,
+                        validate_account_active])
 
-    @view_config(name='login_email',
-                 request_method='OPTIONS')
+    @view_config(request_method='OPTIONS')
     def options(self) -> dict:
-        """Return options for login_email view.
+        """Return options for view."""
+        return super().options()
 
-        FIXME: Return something useful. This currently only exist in order to
-        satisfy the preflight request, which browsers do in CORS situations
-        before doing the actual POST.
-
-        """
-        return {}
-
-    @view_config(name='login_email',
-                 request_method='POST',
+    @view_config(request_method='POST',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
@@ -737,6 +754,59 @@ def add_cors_headers_subscriber(event):
         'Origin, Content-Type, Accept, X-User-Path, X-User-Token',
         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
     })
+
+
+def validate_activation_path(context, request: Request):
+    """Validate the user name of a login request.
+
+    If valid and activated, the user object is added as 'user' to
+    `request.validated`.
+    """
+    path = request.validated['path']
+    locator = request.registry.getMultiAdapter((context, request),
+                                               IUserLocator)
+    user = locator.get_user_by_activation_path(path)
+    if user is None or _activation_time_window_has_expired(user):
+        request.errors.add('body', 'path',
+                           'Unknown or expired activation path')
+    else:
+        user.active = True
+        request.validated['user'] = user
+    if user is not None:
+        user.activation_path = None  # activation path can only be used once
+
+
+def _activation_time_window_has_expired(user: IUser) -> bool:
+    """Check that user account was created less than 7 days ago."""
+    metadata = get_sheet(user, IMetadata)
+    creation_date = metadata.get()['creation_date']
+    timedelta = datetime.now(timezone.utc) - creation_date
+    return timedelta.days >= 7
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IRootPool,
+    http_cache=0,
+    name='activate_account',
+)
+class ActivateAccountView(RESTView):
+
+    """Log in a user via their name."""
+
+    validation_POST = (POSTActivateAccountViewRequestSchema,
+                       [validate_activation_path])
+
+    @view_config(request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for view."""
+        return super().options()
+
+    @view_config(request_method='POST',
+                 content_type='application/json')
+    def post(self) -> dict:
+        """Activate a user account and log the user in."""
+        return _login_user(self.request)
 
 
 def includeme(config):

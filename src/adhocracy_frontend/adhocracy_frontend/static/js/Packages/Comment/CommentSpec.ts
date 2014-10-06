@@ -41,11 +41,14 @@ export var register = () => {
             var widget;
             var wrapperMock;
             var instanceMock;
+            var adhPermissionsMock;
             var adhPreliminaryNamesMock;
 
             beforeEach(() => {
                 adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
-                widget = new AdhComment.CommentResource(adapterMock, adhConfigMock, adhHttpMock, adhPreliminaryNamesMock, q);
+                adhPermissionsMock = jasmine.createSpyObj("adhPermissions", ["bindScope"]);
+                widget = new AdhComment.CommentResource(
+                    adapterMock, adhConfigMock, adhHttpMock, adhPermissionsMock, adhPreliminaryNamesMock, q);
 
                 wrapperMock = {
                     eventHandler: jasmine.createSpyObj("eventHandler", ["on", "off", "trigger"])
@@ -245,7 +248,9 @@ export var register = () => {
 
             beforeEach(() => {
                 var adhPreliminaryNamesMock = jasmine.createSpyObj("adhPreliminaryNames", ["isPreliminary", "nextPreliminary"]);
-                widget = new AdhComment.CommentCreate(adapterMock, adhConfigMock, adhHttpMock, adhPreliminaryNamesMock, q);
+                var adhPermissionsMock = jasmine.createSpyObj("adhPermissions", ["bindScope"]);
+                widget = new AdhComment.CommentCreate(
+                    adapterMock, adhConfigMock, adhHttpMock, adhPermissionsMock, adhPreliminaryNamesMock, q);
             });
 
             it("sets 'templateUrl' on construction", () => {

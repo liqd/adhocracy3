@@ -5,21 +5,17 @@
  
 #WORK IN PROGRESSS"
 $InstallScript = <<SCRIPT
-
-  echo "update debian"
-  #apt-get update 
-  #apt-get remove exim4 ntp bind9 
-  # BUG update libssl fails
-  #apt-get -o Dpkg::Options::='--force-confold' -f -y dist-upgrade
-
+if [ ! -e /home/vagrant/adhocracy-3/buildout.cfg ]
+then
   echo "install adhocracy 3 dependencies"
-  #apt-get -y install python python-setuptools vim git build-essential graphviz  
+  apt-get update 
+  apt-get dist-upgrade -y
+  apt-get -y install python python-setuptools vim git build-essential graphviz  
 
   echo "checkout source code"
   su vagrant
   cd /home/vagrant
-  # We use the vagrant sync folder instead of checking out the repository again
-  # git clone git@github.com:liqd/adhocracy3.git
+  git clone https://github.com/adhocracy/adhocracy-3
   cd adhocracy-3                      
   git submodule init                  
   git submodule update                
@@ -28,16 +24,12 @@ $InstallScript = <<SCRIPT
   cd python
   python ./bootstrap.py               
   ./bin/buildout                      
-  .bin/install-links
  
   echo"install adhocracy"
   cd ..    
-  ./bin/python3.4 ./bootstrap.py
+  ./python/python-3.3/bin/python ./bootstrap.py
   ./bin/buildout                   
-
-  echo"update shell environment"
-  sudo -u vagrant echo "source ~/adhocracy-3/source_env" > /home/vagrant/.bashrc
-
+fi
 SCRIPT
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
@@ -77,7 +69,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  config.vm.synced_folder ".", "/home/vagrant/adhocracy-3"
+  # config.vm.synced_folder "../data", "/vagrant_data"
 
   # run shell scrip to configure the vm 
   config.vm.provision :shell, inline: $InstallScript

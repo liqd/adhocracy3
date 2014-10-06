@@ -49,12 +49,15 @@ class TestAddResourceTypeToRegistry:
         resource = config.registry.content.create(IResource.__identifier__)
         assert IResource.providedBy(resource)
 
-    def test_add_resource_type_metadata(self, config, resource_meta):
+    def test_add_resource_type_metadata(self, config, registry, resource_meta):
         config.include('adhocracy_core.registry')
-        type_id = IResource.__identifier__
+        iresource = IResource
+        resource_type = iresource.__identifier__
         self.make_one(resource_meta, config)
-        assert config.registry.content.meta[type_id]['content_name'] == type_id
-        assert config.registry.content.resources_meta[type_id] == resource_meta
+        assert registry.content.meta[resource_type]['content_name'] ==\
+               resource_type  # substance uses strings for content type ids
+        assert registry.content.resources_meta[iresource] == \
+               resource_meta  # adhocracy uses interfaces for content types ids
 
     def test_add_resource_type_metadata_with_content_name(self, config, resource_meta):
         config.include('adhocracy_core.registry')
@@ -277,19 +280,23 @@ class TestResourceFactory:
 
     def test_with_creator_and_resource_implements_imetadata(self, resource_meta, registry, mock_sheet):
         from adhocracy_core.sheets.metadata import IMetadata
+        from pyramid.traversal import resource_path
         meta = resource_meta._replace(iresource=IResource,
                                       basic_sheets=[IMetadata])
         dummy_sheet = register_sheet(IMetadata, mock_sheet, registry)
-        authenticated_user = object()
+        authenticated_user = testing.DummyResource()
 
-        self.make_one(meta)(creator=authenticated_user)
+        resource = self.make_one(meta)(creator=authenticated_user)
 
         set_appstructs = dummy_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] == authenticated_user
+        userid = resource_path(authenticated_user)
+        assert resource.__local_roles__ == {userid: ['creator']}
 
     def test_with_creator_and_resource_implements_imetadata_and_iuser(self, resource_meta, registry, mock_sheet):
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.sheets.metadata import IMetadata
+        from pyramid.traversal import resource_path
         meta = resource_meta._replace(iresource=IUser,
                                       basic_sheets=[IMetadata])
         dummy_sheet = register_sheet(IMetadata, mock_sheet, registry)
@@ -299,6 +306,8 @@ class TestResourceFactory:
 
         set_appstructs = dummy_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] == created_user
+        userid = resource_path(created_user)
+        assert created_user.__local_roles__ == {userid: ['creator']}
 
     def test_notify_new_resource_created_and_added(self, resource_meta, config, pool):
         events = []
@@ -307,7 +316,7 @@ class TestResourceFactory:
 
         meta = resource_meta._replace(iresource=IResource,
                                       use_autonaming=True)
-        user = object()
+        user = testing.DummyResource()
 
         resource = self.make_one(meta)(parent=pool, creator=user)
 

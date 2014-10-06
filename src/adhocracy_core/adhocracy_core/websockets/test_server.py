@@ -488,11 +488,13 @@ class TestFunctionalClientCommunicator:
         import json
         import requests
         from adhocracy_core.resources.pool import IBasicPool
+        from adhocracy_core.testing import god_header
         url = backend.application_url + 'adhocracy' + path
         data = {'content_type': IBasicPool.__identifier__,
                 'data': {'adhocracy_core.sheets.name.IName': {'name': name}}}
-        resp = requests.post(url, data=json.dumps(data),
-                      headers={'content-type': 'application/json'})
+        headers = {'content-type': 'application/json'}
+        headers.update(god_header)
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
         assert resp.status_code == 200
 
     @pytest.mark.timeout(500)

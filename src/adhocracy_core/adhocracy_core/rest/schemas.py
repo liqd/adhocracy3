@@ -1,4 +1,5 @@
 """Cornice colander schemas und validators to validate request data."""
+from pyramid.util import DottedNameResolver
 from substanced.util import find_catalog
 import colander
 
@@ -6,6 +7,7 @@ from adhocracy_core.interfaces import IResource
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Email
+from adhocracy_core.schema import ContentType
 from adhocracy_core.schema import Interface
 from adhocracy_core.schema import Password
 from adhocracy_core.schema import Resource
@@ -15,6 +17,9 @@ from adhocracy_core.schema import References
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import ResourcePathSchema
 from adhocracy_core.schema import ResourcePathAndContentSchema
+
+
+resolver = DottedNameResolver()
 
 
 class ResourceResponseSchema(ResourcePathSchema):
@@ -43,14 +48,15 @@ class GETItemResponseSchema(ResourcePathAndContentSchema):
 
 def add_put_data_subschemas(node: colander.MappingSchema, kw: dict):
     """Add the resource sheet colander schemas that are 'editable'."""
-    context = kw['context']
-    request = kw['request']
-    sheets = request.registry.content.resource_sheets(context, request,
-                                                      onlyeditable=True)
+    context = kw.get('context', None)
+    request = kw.get('request', None)
+    sheets = request.registry.content.get_sheets_edit(context, request)
     data = request.json_body.get('data', {})
-    sheets_meta = request.registry.content.sheets_meta
-    for name in [x for x in sheets if x in data]:
-        subschema = sheets_meta[name].schema_class(name=name)
+    for sheet in sheets:
+        name = sheet.meta.isheet.__identifier__
+        if name not in data:
+            continue
+        subschema = sheet.meta.schema_class(name=name)
         node.add(subschema.bind(**kw))
 
 
@@ -70,20 +76,18 @@ def add_post_data_subschemas(node: colander.MappingSchema, kw: dict):
     """Add the resource sheet colander schemas that are 'creatable'."""
     context = kw['context']
     request = kw['request']
-    resource_type = request.json_body.get('content_type', None)
-    data = request.json_body.get('data', {})
-    addables = request.registry.content.resource_addables(context, request)
-    resource_sheets = addables.get(resource_type, {'sheets_mandatory': [],
-                                                   'sheets_optional': []})
-    sheets_meta = request.registry.content.sheets_meta
-    subschemas = []
-    for name in [x for x in resource_sheets['sheets_mandatory'] if x in data]:
-        schema = sheets_meta[name].schema_class(name=name)
-        subschemas.append(schema)
-    for name in [x for x in resource_sheets['sheets_optional'] if x in data]:
-        schema = sheets_meta[name].schema_class(name=name, missing={})
-        subschemas.append(schema)
-    for schema in subschemas:
+    content_typ = request.json_body.get('content_type')
+    try:
+        iresource = ContentType().deserialize(content_typ)
+    except colander.Invalid:
+        return  # the content type is validated later, so we just ignore errors
+    registry = request.registry.content
+    creates = registry.get_sheets_create(context, request, iresource)
+    for sheet in creates:
+        name = sheet.meta.isheet.__identifier__
+        is_mandatory = sheet.meta.create_mandatory
+        missing = colander.required if is_mandatory else colander.drop
+        schema = sheet.meta.schema_class(name=name, missing=missing)
         node.add(schema.bind(**kw))
 
 
@@ -92,17 +96,18 @@ def deferred_validate_post_content_type(node, kw):
     """Validate the addable content type for post requests."""
     context = kw['context']
     request = kw['request']
-    resource_addables = request.registry.content.resource_addables
-    addable_content_types = resource_addables(context, request)
-    return colander.OneOf(addable_content_types.keys())
+    addables = request.registry.content.get_resources_meta_addable(context,
+                                                                   request)
+    addable_iresources = [r.iresource for r in addables]
+    return colander.OneOf(addable_iresources)
 
 
 class POSTResourceRequestSchema(PUTResourceRequestSchema):
 
     """Data structure for Resource POST requests."""
 
-    content_type = SingleLine(validator=deferred_validate_post_content_type,
-                              missing=colander.required)
+    content_type = ContentType(validator=deferred_validate_post_content_type,
+                               missing=colander.required)
 
     data = colander.SchemaNode(colander.Mapping(unknown='raise'),
                                after_bind=add_post_data_subschemas,
@@ -163,6 +168,15 @@ class POSTLoginUsernameRequestSchema(colander.Schema):
     name = colander.SchemaNode(colander.String(),
                                missing=colander.required)
     password = Password(missing=colander.required)
+
+
+class POSTActivateAccountViewRequestSchema(colander.Schema):
+
+    """Schema for account activation."""
+
+    path = colander.SchemaNode(colander.String(),
+                               missing=colander.required,
+                               validator=colander.Regex('^/activate/'))
 
 
 class POSTLoginEmailRequestSchema(colander.Schema):
@@ -282,7 +296,7 @@ class GETPoolRequestSchema(colander.MappingSchema):
     # Elements in this schema were multiple values should be allowed:
     # sheet, aggregateby, tag.
 
-    content_type = colander.SchemaNode(Interface(), missing=colander.drop)
+    content_type = ContentType(missing=colander.drop)
     sheet = colander.SchemaNode(Interface(), missing=colander.drop)
     depth = PoolQueryDepth(missing=colander.drop)
     elements = PoolElementsForm(missing=colander.drop)
@@ -347,12 +361,18 @@ def _add_arbitrary_filter_node(name, schema):
     schema.add(node)
 
 
-class OPTIONSResourceResponseSchema(colander.Schema):
-
-    """Overview of all request/response data structures."""
-
-    GET = GETLocationMapping()
-    PUT = PUTLocationMapping()
-    POST = POSTLocationMapping()
-    HEAD = colander.MappingSchema(default={})
-    OPTIONS = colander.MappingSchema(default={})
+options_resource_response_data_dict =\
+    {'GET': {'request_body': {},
+             'request_querystring': {},
+             'response_body': {'content_type': '',
+                               'data': {},
+                               'path': ''}},
+     'HEAD': {},
+     'OPTIONS': {},
+     'POST': {'request_body': [],
+              'response_body': {'content_type': '',
+                                'path': ''}},
+     'PUT': {'request_body': {'content_type': '',
+                              'data': {}},
+             'response_body': {'content_type': '',
+                               'path': ''}}}

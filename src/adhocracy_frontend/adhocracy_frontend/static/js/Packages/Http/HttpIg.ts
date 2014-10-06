@@ -21,6 +21,9 @@ export var register = (angular, config, meta_api) => {
     describe("withTransaction", () => {
         var adhHttp : AdhHttp.Service<any> = (() => {
             var factory = ($http, $q, $timeout) => {
+                $http.defaults.headers.common["X-User-Token"] = "SECRET_GOD";
+                $http.defaults.headers.common["X-User-Path"] = "/principals/users/0000000";
+
                 return (new AdhHttp.Service($http, $q, $timeout, new AdhMetaApi.MetaApiQuery(meta_api), new AdhPreliminaryNames, config));
             };
             factory.$inject = ["$http", "$q", "$timeout"];

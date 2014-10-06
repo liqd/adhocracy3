@@ -4,8 +4,8 @@ import AdhHttp = require("../Http/Http");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhConfig = require("../Config/Config");
 
-import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
-import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/user/IPasswordAuthentication");
+import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
+import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
 
 var pkgLocation = "/User";
 

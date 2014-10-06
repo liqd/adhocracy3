@@ -6,14 +6,22 @@ from .shared import wait
 from .shared import get_listing_create_form
 from .shared import get_column_listing
 from .shared import get_list_element
-from .shared import title_is_in_listing
+from .shared import login_god
+
+
+@fixture
+def browser(browser):
+    login_god(browser)
+    return browser
 
 
 @fixture
 def proposal(browser):
     """Go to content listing and create proposal with title `test proposal`."""
+    login_god(browser)
     listing = get_column_listing(browser, 'content')
-    return create_proposal(listing, 'test proposal')
+    proposal = create_proposal(listing, 'test proposal')
+    return proposal
 
 
 def test_proposal_create(browser):
@@ -46,7 +54,7 @@ def create_proposal(listing: WebDriverElement, title: str, description='',
 
     # FIXME Remove max_steps param once proposal creation is faster, see above!
     wait(lambda: get_list_element(listing, title), max_steps=40)
-    return get_list_element(listing, title)
+    return get_list_element(listing, title, max_steps=40)
 
 
 def proposal_details_are_in_listing(listing: WebDriverElement, title: str) -> bool:

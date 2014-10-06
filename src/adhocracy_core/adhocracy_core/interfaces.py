@@ -4,6 +4,8 @@ from collections import namedtuple
 from collections import OrderedDict
 
 from pyramid.interfaces import ILocation
+from pyramid.interfaces import IAuthorizationPolicy
+from pyramid.security import ACLPermitsResult
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface.interface import InterfaceClass
@@ -11,6 +13,7 @@ from zope.interface.interfaces import IObjectEvent
 
 from substanced.interfaces import IPropertySheet
 from substanced.interfaces import ReferenceClass
+from substanced.interfaces import IUserLocator
 
 
 class ISheet(Interface):
@@ -102,7 +105,7 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
     meta = Attribute('SheetMetadata')
 
-    def set(appstruct, omit=(), send_event=True) -> bool:
+    def set(appstruct, omit=(), send_event=True, registry=None) -> bool:
         """ Store ``appstruct`` dictionary data."""
 
     def get(params: dict={}) -> dict:
@@ -376,14 +379,14 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
 
 class ITokenManger(Interface):  # pragma: no cover
 
-    def create_token(user_id: str) -> str:
-        """ Create authentication token for user_id."""
+    def create_token(userid: str) -> str:
+        """ Create authentication token for :term:`userid`."""
 
     def get_user_id(token: str) -> str:
-        """ Get user_id for authentication token.
+        """ Get :term:`userid` for authentication token.
 
         :returns: user id for this token
-        :raises KeyError: if there is no corresponding user_id
+        :raises KeyError: if there is no corresponding `userid`
         """
 
     def delete_token(token: str):
@@ -410,3 +413,52 @@ class ChangelogMetadata(namedtuple('ChangelogMetadata',
     resource (None or IResource):
         The resource that is modified/created.
     """
+
+
+class IRolesUserLocator(IUserLocator):  # pragma: no cover
+
+    """Adapter responsible for returning a user or get info about it."""
+
+    def get_roleids(userid: str) -> list:
+        """Return the roles for :term:`userid` or `None`.
+
+        We return 'None' if the the user does not exists to provide a similar
+        behavior as :func:`substanced.interfaces.IUserLocator.get_groupids`.
+        """
+
+    def get_user_by_activation_path(activation_path: str) -> IResource:
+        """Find user per activation path or return None."""
+
+
+class IGroupLocator(Interface):  # pragma: no cover
+
+    """Adapter responsible for returning a group or get info about it."""
+
+    def get_roleids(groupid: str) -> list:
+        """Return the roles for :term:`groupid` or `None`.
+
+        We return 'None' if the the group does not exists to provide a similar
+        behavior as :func:`substanced.interfaces.IUserLocator.get_groupids`.
+        """
+
+    def get_group_by_id(groupid: str) -> IResource:
+        """Return the group for :term:`groupid` or None."""
+
+
+class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
+
+    """A :term:`authorization policy` supporting rule based permissions."""
+
+    group_prefix = Attribute('Prefix to generate the :term:`groupid`')
+
+    role_prefix = Attribute('Prefix to generate the :term:`roleid`')
+
+    def permits(context, principals: list, permission: str)\
+            -> ACLPermitsResult:
+        """Check that one `principal` has the `permission` for `context`.
+
+        This method extends the behavior of :func:`ACLAuthorizationPolicy`.
+        If a principal has the suffix 'group:' the :class:`IGroupLocator` is
+        called to retrieve the list of roles for this principal. These
+        roles extend the given `principals`.
+        """

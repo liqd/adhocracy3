@@ -14,7 +14,7 @@ from adhocracy_core.utils import get_iresource
 def create_initial_content_for_item(context, registry, options):
     """Add first version and the Tags LAST and FIRST."""
     iresource = get_iresource(context)
-    metadata = registry.content.resources_meta[iresource.__identifier__]
+    metadata = registry.content.resources_meta[iresource]
     item_type = metadata.item_type
     create = registry.content.create
     first_version = create(item_type.__identifier__, parent=context)

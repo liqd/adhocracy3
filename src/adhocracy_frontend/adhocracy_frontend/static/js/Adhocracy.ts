@@ -179,16 +179,16 @@ export var init = (config, meta_api) => {
             new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig)]);
 
     app.directive("adhResourceWrapper", AdhResourceWidgets.resourceWrapper);
-    app.directive("adhCommentResource", ["adhConfig", "adhHttp", "adhPreliminaryNames", "recursionHelper", "$q",
-        (adhConfig, adhHttp, adhPreliminaryNames, recursionHelper, $q) => {
+    app.directive("adhCommentResource", ["adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "recursionHelper", "$q",
+        (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, recursionHelper, $q) => {
             var adapter = new AdhCommentAdapter.CommentAdapter();
-            var widget = new AdhComment.CommentResource(adapter, adhConfig, adhHttp, adhPreliminaryNames, $q);
+            var widget = new AdhComment.CommentResource(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
             return widget.createRecursionDirective(recursionHelper);
         }]);
-    app.directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "recursionHelper", "$q",
-        (adhConfig, adhHttp, adhPreliminaryNames, recursionHelper, $q) => {
+    app.directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "recursionHelper", "$q",
+        (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, recursionHelper, $q) => {
             var adapter = new AdhCommentAdapter.CommentAdapter();
-            var widget = new AdhComment.CommentCreate(adapter, adhConfig, adhHttp, adhPreliminaryNames, $q);
+            var widget = new AdhComment.CommentCreate(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
             return widget.createRecursionDirective(recursionHelper);
         }]);
     app.directive("adhProposalDetail", () => new AdhProposal.ProposalDetail().createDirective());

@@ -24,7 +24,7 @@ var sampleMetaApi : AdhMetaApi.IMetaApi = {
                     "editable" : false,
                     "create_mandatory" : false,
                     "valuetype" : "adhocracy_core.schema.AbsolutePath",
-                    "targetsheet" : "adhocracy_core.sheets.user.IUserBasic",
+                    "targetsheet" : "adhocracy_core.sheets.principal.IUserBasic",
                     "containertype" : "list",
                     "creatable" : false
                 },
