@@ -9,6 +9,7 @@ from .shared import fill_input
 from .shared import click_button
 from .shared import login
 from .shared import logout
+from .shared import login_god
 from .shared import is_logged_in
 
 
@@ -21,8 +22,9 @@ def browser(browser):
 class TestUserLogin:
 
     def test_register(self, browser):
-        register(browser, 'user2', 'email2@example.com', 'password2')
-        assert is_logged_in(browser)
+        register(browser, 'user2', 'email2@example.com', 'password2',
+                 expect_success=False)
+        assert is_not_yet_activated(browser)
 
     def test_login_email(self, browser):
         login(browser, god_email, god_password)
@@ -46,9 +48,7 @@ class TestUserLogin:
             '.register [type="submit"]:disabled', wait_time=1)
 
     def test_login_persistence(self, browser):
-        register(browser, 'user5', 'email5@example.com', 'password5')
-        logout(browser)
-        login(browser, 'user5', 'password5')
+        login_god(browser)
         browser.reload()
         assert is_logged_in(browser)
 
@@ -65,3 +65,7 @@ def register(browser, name, email, password, repeated_password=None,
     click_button(browser, '.register [type="submit"]')
     if expect_success:
         browser.wait_for_condition(is_logged_in, 2)
+
+
+def is_not_yet_activated(browser):
+    return browser.browser.is_text_present("User account not yet activated")
