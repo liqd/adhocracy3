@@ -9,9 +9,14 @@ export class Service {
 
     /**
      * Set result of OPTIONS request to scope.key and keep it fresh.
+     * Before sending async http requests, initialize scope.key with
+     * all-falses in order to avoid exceptions when scope.key is
+     * accessed in javascript code (rather than ng templates).
      */
     public bindScope(scope : ng.IScope, path : string, key = "options") : ng.IPromise<void> {
         var self : Service = this;
+
+        scope[key] = AdhHttp.emptyOptions;
 
         var update = () => {
             return self.adhHttp.options(path).then((options) => {

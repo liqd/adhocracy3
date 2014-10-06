@@ -1,6 +1,7 @@
 import AdhConfig = require("../Config/Config");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhHttp = require("../Http/Http");
+import AdhPermissions = require("../Permissions/Permissions");
 import AdhResource = require("../../Resources");
 import AdhUser = require("../User/User");
 
@@ -62,6 +63,7 @@ export interface IRateScope extends ng.IScope {
     cast(value : number) : void;
     assureUserRateExists() : ng.IPromise<void>;
     postUpdate() : ng.IPromise<void>;
+    optionsPostPool : AdhHttp.IOptions;
 }
 
 
@@ -215,6 +217,7 @@ export var rateController = (
     $scope : IRateScope,
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
+    adhPermissions : AdhPermissions.Service,
     adhUser : AdhUser.User,
     adhPreliminaryNames : AdhPreliminaryNames
 ) : ng.IPromise<void> => {
@@ -237,8 +240,9 @@ export var rateController = (
     };
 
     $scope.cast = (rate : number) : void => {
-        if (!adhUser.userPath) {
-            // if user is not logged in, rating silently refuses to work.
+        if (!$scope.optionsPostPool.POST) {
+            // if POST is not allowed on the Rateable's post_pool,
+            // rating silently refuses to work.
             return;
         }
 
@@ -302,7 +306,10 @@ export var rateController = (
     };
 
     resetRates($scope);
-    return updateRates(adapter, $scope, $q, adhHttp, adhUser);
+    return updateRates(adapter, $scope, $q, adhHttp, adhUser)
+        .then(() => {
+            adhPermissions.bindScope($scope, $scope.postPoolPath, "optionsPostPool");
+        });
 };
 
 
@@ -318,7 +325,9 @@ export var createDirective = (
             postPoolSheet : "@",
             postPoolField : "@"
         },
-        controller: ["$scope", "$q", "adhHttp", "adhUser", "adhPreliminaryNames", ($scope, $q, adhHttp, adhUser, adhPreliminaryNames) =>
-            rateController(adapter, $scope, $q, adhHttp, adhUser, adhPreliminaryNames)]
+        controller:
+            ["$scope", "$q", "adhHttp", "adhPermissions", "adhUser", "adhPreliminaryNames",
+                ($scope, $q, adhHttp, adhPermissions, adhUser, adhPreliminaryNames) =>
+                    rateController(adapter, $scope, $q, adhHttp, adhPermissions, adhUser, adhPreliminaryNames)]
     };
 };

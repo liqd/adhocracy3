@@ -38,8 +38,18 @@
             <adh-time data-datetime="{{data.modificationDate}}"></adh-time>
 
             <div class="comment-actions">
-                <a href="" class="comment-action" data-ng-switch-default="" data-ng-click="edit()">{{ "Edit" | translate }}</a>
-                <a href="" class="comment-action m-comment-reply" data-ng-switch-default="" data-ng-click="createComment()">{{ "Add Comment" | translate }}</a>
+                <span data-ng-switch-default="">
+                    <a href=""
+                       data-ng-if="poolOptions.POST"
+                       class="comment-action"
+                       data-ng-click="edit()">
+                        {{ "Edit" | translate }}</a>
+                    <a href=""
+                       data-ng-if="poolOptions.POST"
+                       class="comment-action m-comment-reply"
+                       data-ng-click="createComment()">
+                        {{ "Add Comment" | translate }}</a>
+                </span>
                 <a href="" class="comment-action" data-ng-switch-when="1" data-ng-click="submit()">{{ "Save" | translate }}</a>
                 <a href="" class="comment-action" data-ng-switch-when="1" data-ng-click="cancel()">{{ "Cancel" | translate }}</a>
                 <span class="comment-count">
