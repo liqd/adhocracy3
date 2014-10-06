@@ -520,4 +520,5 @@ def backend(request, settings, app):
     port = settings['port']
     backend = StopableWSGIServer.create(app, port=port)
     request.addfinalizer(backend.shutdown)
+    time.sleep(0.5)  # give the application some time to start
     return backend
