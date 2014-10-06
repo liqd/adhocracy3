@@ -174,12 +174,9 @@ export var register = (angular, config, meta_api) => {
 
                 var query : any = {};
                 query.content_type = RIRateVersion.content_type;
-                query.depth = "all";
+                query.depth = 2;
                 query.tag = "LAST";
                 query[SIRate.nick + ":subject"] = adhUser.userPath;
-
-                console.log(ratePostPoolPath);
-                console.log(JSON.stringify(query, null, 2));
 
                 adhHttp.get(ratePostPoolPath, query)
                     .then(
