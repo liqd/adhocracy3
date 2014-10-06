@@ -174,8 +174,8 @@ export var register = (angular, config, meta_api) => {
 
                 var query : any = {};
                 query.content_type = RIRateVersion.content_type;
-                query.depth = 2;
-                query.tag = 'last';
+                query.depth = "all";
+//                query.tag = "last";
                 query[SIRate.nick + ":subject"] = adhUser.userPath;
 
                 console.log(ratePostPoolPath);
@@ -183,9 +183,14 @@ export var register = (angular, config, meta_api) => {
 
                 adhHttp.get(ratePostPoolPath, query)
                     .then(
-                        (rsp) => {
-                            expect(rsp.content_type).toEqual(RIRateVersion.content_type);
-                            done();
+                        (poolRsp) => {
+                            var elements : string[] = poolRsp.data[SIPool.nick].elements;
+                            expect(elements.length).toEqual(1);
+                            adhHttp.get(elements[0])
+                                .then((rateRsp) => {
+                                    expect(rateRsp.content_type).toEqual(RIRateVersion.content_type);
+                                    done();
+                                });
                         },
                         (msg) => {
                             expect(msg).toBe(false);
