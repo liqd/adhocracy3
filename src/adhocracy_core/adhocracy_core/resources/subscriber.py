@@ -17,7 +17,6 @@ from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
-from adhocracy_core.utils import get_all_sheets
 
 
 changelog_metadata = ChangelogMetadata(False, False, None, None)
@@ -106,7 +105,7 @@ def _update_versionable(resource, isheet, appstruct, root_versions, registry,
     if root_versions and not graph.is_in_subtree(resource, root_versions):
         return resource
     else:
-        appstructs = _get_writable_appstructs(resource)
+        appstructs = _get_writable_appstructs(resource, registry)
         appstructs[IVersionable.__identifier__]['follows'] = [resource]
         appstructs[isheet.__identifier__] = appstruct
         iresource = get_iresource(resource)
@@ -114,18 +113,18 @@ def _update_versionable(resource, isheet, appstruct, root_versions, registry,
                                                parent=resource.__parent__,
                                                appstructs=appstructs,
                                                creator=creator,
+                                               registry=registry,
                                                options=root_versions)
         return new_resource
 
 
-def _get_writable_appstructs(resource) -> dict:
-    # FIXME maybe move this to utils or better use resource registry
+def _get_writable_appstructs(resource, registry) -> dict:
     appstructs = {}
-    for sheet in get_all_sheets(resource):
+    sheets = registry.content.get_sheets_all(resource)
+    for sheet in sheets:
         editable = sheet.meta.editable
         creatable = sheet.meta.creatable
-        writable = editable or creatable
-        if writable:
+        if editable or creatable:
             appstructs[sheet.meta.isheet.__identifier__] = sheet.get()
     return appstructs
 

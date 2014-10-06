@@ -27,15 +27,13 @@ class GenericResourceSheet(PropertySheet):
     """Pyramid request object, just to fulfill the interface."""
 
     def __init__(self, metadata, context):
-        schema = metadata.schema_class()
-        self.schema = schema.bind(context=context)
+        self.schema = metadata.schema_class()
         """:class:`colander.MappingSchema` to define the data structure."""
         self.context = context
         """Resource to adapt."""
         self.meta = metadata
         """SheetMetadata"""
         self._data_key = self.meta.isheet.__identifier__
-        self._graph = find_graph(context)
 
     def get(self, params: dict={}) -> dict:
         """Return appstruct."""
@@ -45,9 +43,11 @@ class GenericResourceSheet(PropertySheet):
         appstruct.update(self._get_back_reference_appstruct(params))
         return appstruct
 
-    @reify
+    @property
     def _default_appstruct(self) -> dict:
-        items = [(n.name, n.default) for n in self.schema]
+        # context might have changed, so we don`t bind bind it unit needed
+        schema = self.schema.bind(context=self.context)
+        items = [(n.name, n.default) for n in schema]
         return dict(items)
 
     def _get_data_appstruct(self, params: dict={}) -> iter:
@@ -59,7 +59,11 @@ class GenericResourceSheet(PropertySheet):
     def _data_keys(self) -> list:
         return [n.name for n in self.schema if not hasattr(n, 'reftype')]
 
-    @reify
+    @property
+    def _graph(self):
+        return find_graph(self.context)
+
+    @property
     def _data(self):
         if not hasattr(self.context, '_sheets'):
             self.context._sheets = PersistentMapping()
@@ -126,7 +130,6 @@ class GenericResourceSheet(PropertySheet):
         self._store_data(appstruct)
         if registry is None:
             registry = get_current_registry(self.context)
-        """class:`Registry` to add events and references."""
         self._store_references(appstruct, registry)
         # FIXME: only store struct if values have changed
         self._notify_resource_sheet_modified(send_event, registry)
@@ -175,9 +178,9 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
     :class:`adhocracy_core.registry.ResourceRegistry` to store the metadata.
     """
     assert metadata.isheet.isOrExtends(ISheet)
+    isheet = metadata.isheet
     if hasattr(registry, 'content'):
-        sheets_meta = registry.content.sheets_meta
-        sheets_meta[metadata.isheet.__identifier__] = metadata
+        registry.content.sheets_meta[isheet] = metadata
     if metadata.create_mandatory:
         assert metadata.creatable and metadata.create_mandatory
     schema = metadata.schema_class()
@@ -191,9 +194,9 @@ def add_sheet_to_registry(metadata: SheetMetadata, registry: Registry):
         return metadata.sheet_class(metadata, context)
 
     registry.registerAdapter(generic_resource_property_sheet_adapter,
-                             required=(metadata.isheet,),
+                             required=(isheet,),
                              provided=IResourceSheet,
-                             name=metadata.isheet.__identifier__
+                             name=isheet.__identifier__
                              )
 
 
@@ -227,6 +230,6 @@ class AttributeStorageSheet(GenericResourceSheet):
 
     """Sheet class that stores data as context attributes."""
 
-    @reify
+    @property
     def _data(self):
         return self.context.__dict__

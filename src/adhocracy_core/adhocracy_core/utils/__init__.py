@@ -1,6 +1,5 @@
 """Helper functions."""
 from collections import namedtuple
-from collections.abc import Iterator
 from collections.abc import Sequence
 from datetime import datetime
 from functools import reduce
@@ -66,25 +65,11 @@ def get_sheet(context, isheet: IInterface, registry: Registry=None)\
         if there is no sheet adapter registered for `isheet`.
 
     """
+    # FIXME return cached sheet instance instead of creating a new one
     if registry is None:
         registry = get_current_registry(context)
     return registry.getAdapter(context, IResourceSheet,
                                name=isheet.__identifier__)
-
-
-def get_all_sheets(context, registry: Registry=None) -> Iterator:
-    """Get the sheet adapters for all ISheet interfaces of `context`.
-
-    :returns: generator of :class:`adhocracy_core.interfaces.IResourceSheet`
-              objects
-    :raises zope.component.ComponentLookupError:
-
-    """
-    isheets = get_isheets(context)
-    if registry is None:
-        registry = get_current_registry(context)
-    for isheet in isheets:
-        yield(get_sheet(context, isheet, registry=registry))
 
 
 def get_all_taggedvalues(iface: IInterface) -> dict:
