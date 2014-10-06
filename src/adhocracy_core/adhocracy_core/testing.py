@@ -187,6 +187,15 @@ def pool() -> DummyPool:
 
 
 @fixture
+def service() -> DummyPool:
+    """ Return dummy pool with IServicePool interface."""
+    from adhocracy_core.interfaces import IServicePool
+    from substanced.interfaces import IFolder
+    return DummyPool(__provides__=(IServicePool, IFolder),
+                     __is_service__=True)
+
+
+@fixture
 def item() -> DummyPool:
     """ Return dummy pool with IItem and IMetadata interface."""
     from adhocracy_core.interfaces import IItem

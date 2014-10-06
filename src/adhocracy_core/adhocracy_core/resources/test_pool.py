@@ -76,9 +76,8 @@ class TestPool:
         inst.add_next(context, prefix='prefix')
         assert 'prefix' + '0'.zfill(7) in inst
 
-    def test_find_service(self):
+    def test_find_service(self, service):
         inst = self._makeOne()
-        inst['service'] = testing.DummyResource()
-        inst['service'].__is_service__ = True
+        inst['service'] = service
         service = inst.find_service('service')
         assert service is inst['service']

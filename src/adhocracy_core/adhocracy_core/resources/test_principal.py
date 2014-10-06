@@ -109,11 +109,11 @@ class UserLocatorAdapterUnitTest(unittest.TestCase):
 
     def setUp(self):
         from substanced.interfaces import IFolder
+        from adhocracy_core.testing import service
         self.config = testing.setUp()
         context = testing.DummyResource(__provides__=IFolder)
-        context['principals'] = testing.DummyResource(__is_service__=True,
-                                                       __provides__=IFolder)
-        context['principals']['users'] = testing.DummyResource()
+        context['principals'] = service()
+        context['principals']['users'] = service()
         self.context = context
 
     def tearDown(self):
