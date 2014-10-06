@@ -42,13 +42,13 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     cancelCreateComment() : void;
     afterCreateComment() : ng.IPromise<void>;
     data : {
-        content : any;
-        creator : any;
-        creationDate : any;
-        modificationDate : any;
-        commentCount : any;
-        comments : any;
-        replyPoolPath : any;
+        content : string;
+        creator : string;
+        creationDate : string;
+        modificationDate : string;
+        commentCount : number;
+        comments : string[];
+        replyPoolPath : string;
     };
 }
 
