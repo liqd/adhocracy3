@@ -241,7 +241,8 @@ export var rateController = (
 
     $scope.cast = (rate : number) : void => {
         if (!$scope.optionsPostPool.POST) {
-            // if user is not logged in, rating silently refuses to work.
+            // if POST is not allowed on the Rateable's post_pool,
+            // rating silently refuses to work.
             return;
         }
 
