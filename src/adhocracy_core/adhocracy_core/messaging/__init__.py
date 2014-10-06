@@ -37,6 +37,10 @@ class Messenger():
             only if ``body`` is given
         :raise ValueError: if ``recipients`` is empty or if both ``body`` and
             ``html`` are missing or empty
+        :raise ConnectionError: if no connection to the configured mail server
+            can be established
+        :raise smtplib.SMTPException: if the mail cannot be sent because the
+            target mail server doesn't exist or rejects the connection
         """
         if not recipients:
             raise ValueError('Empty list of recipients')
@@ -81,7 +85,16 @@ class Messenger():
         :param args: dictionary or arguments to pass to the renderer
         :param sender: the email message of the sender; if None, the configured
             default sender address will be used
+        :raise ConnectionError: if no connection to the configured mail server
+            can be established
+        :raise smtplib.SMTPException: if the mail cannot be sent because the
+            target mail server doesn't exist or rejects the connection
         """
+        # FIXME Mails (subjects and template_asset_bases) should be
+        # translatable
+        # FIXME Adapt the _resource_exists check to make it work with Pyramid
+        # asset overriding, cf.
+        # http://docs.pylonsproject.org/docs/pyramid/en/latest/narr/assets.html#overriding-assets
         package, path = template_asset_base.split(':', 1)
         if self._resource_exists(package, path + '.txt.mako'):
             body = self._render(template_asset_base + '.txt.mako', args)

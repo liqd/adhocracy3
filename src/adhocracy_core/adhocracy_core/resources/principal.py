@@ -2,11 +2,13 @@
 from base64 import b64encode
 from logging import getLogger
 from os import urandom
+from smtplib import SMTPException
 
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.request import Request
 from substanced.util import find_service
+from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface import implementer
 
@@ -18,10 +20,11 @@ from adhocracy_core.interfaces import IGroupLocator
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
 from adhocracy_core.resources.service import service_metadata
+from adhocracy_core.utils import raise_colander_style_error
 from adhocracy_core.utils import get_sheet
+import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
-import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.rate
 
 
@@ -73,6 +76,10 @@ class IUser(IPool):
 
     """
 
+    active = Attribute('Whether the user account has been activated (bool)')
+    activation_path = Attribute(
+        'Activation path for not-yet-activated accounts (str)')
+
 
 @implementer(IUser)
 class User(Pool):
@@ -101,14 +108,20 @@ def send_registration_mail(context: IUser,
     email = context.email
     activation_path = _generate_activation_path()
     context.activation_path = activation_path
-    logger.warn('Sending registration mail to %s for new user named %s, '
-                'activation path=%s', email, name, context.activation_path)
+    logger.debug('Sending registration mail to %s for new user named %s, '
+                 'activation path=%s', email, name, context.activation_path)
     args = {'name': name, 'activation_path': activation_path}
-    registry.messenger.render_and_send_mail(
-        subject=subject,
-        recipients=[email],
-        template_asset_base='adhocracy_core:templates/registration_mail',
-        args=args)
+    try:
+        registry.messenger.render_and_send_mail(
+            subject=subject,
+            recipients=[email],
+            template_asset_base='adhocracy_core:templates/registration_mail',
+            args=args)
+    except SMTPException as err:
+        msg = 'Cannot send registration mail: {}'.format(str(err))
+        raise_colander_style_error(adhocracy_core.sheets.principal.IUserBasic,
+                                   'email',
+                                   msg)
 
 
 def _generate_activation_path() -> str:
