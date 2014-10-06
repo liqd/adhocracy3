@@ -106,7 +106,10 @@ export class CommentResource extends AdhResourceWidgets.ResourceWidget<any, ICom
         return this.$q.when();
     }
 
-    public _update(instance, resource) {
+    public _update<R>(
+        instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>,
+        resource : R
+    ) {
         var scope : ICommentResourceScope = instance.scope;
         scope.data = {
             content: this.adapter.content(resource),
