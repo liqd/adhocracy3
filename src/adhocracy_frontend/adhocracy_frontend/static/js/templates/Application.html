@@ -1,0 +1,281 @@
+<nav class="application-nav">
+    <ol>
+        <li><a href="#application-basic">{{ "Basic"}}</a></li>
+        <li><a href="#application-introduction">{{ "Introduction"}}</a></li>
+        <li><a href="#application-detail">{{ "In Detail"}}</a></li>
+        <li><a href="#application-motivation">{{ "Motivation"}}</a></li>
+        <li><a href="#application-finance">{{ "Finance"}}</a></li>
+        <li><a href="#application-extra">{{ "Extra"}}</a></li>
+    </ol>
+</nav>
+
+<form novalidate="novalidate" class="application-form" name="applicationForm">
+    <ng-form name="applicationBasicForm">
+        <h2 id="application-basic">{{ "1. Basic" | translate }}</h2>
+
+        <h3>{{ "User Info:" | translate }}</h3>
+        <input type="text" placeholder="{{ 'Name' | translate }}" required="required" />
+        <input type="text" placeholder="{{ 'Lastname' | translate }}" required="required" />
+        <input type="email" placeholder="{{ 'Email' | translate }}" required="required" />
+
+        <h3>{{ "Organisation Info:" | translate }}</h3>
+        <input type="text" placeholder="{{ 'Name' | translate }}" required="required" />
+        <input type="email" placeholder="{{ 'Email' | translate }}" required="required" />
+        <input type="text" placeholder="{{ 'Address' | translate }}" required="required" />
+        <input type="text" placeholder="{{ 'Postcode' | translate }}" required="required" />
+        <input type="text" placeholder="{{ 'City' | translate }}" required="required" />
+        <input type="text" placeholder="{{ 'Country' | translate }}" required="required" />
+
+        {{ "Status:" | translate }}
+        <label>
+            <input type="radio" name="organisationStatus" value="non-profit" required="required" />
+            {{ "We’re a registered non-profit, e.g. NGO" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="organisationStatus" value="possible" required="required" />
+            {{ "A non-profit registration is planned or possible" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="organisationStatus" value="support-needed" required="required" />
+            {{ "I’d like to try, but I’m gonna need some help / Support needed" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="organisationStatus" value="other" required="required" />
+            {{ "Other. Please specify:" | translate }}
+        </label>
+        <textarea
+            data-ng-if="applicationBasicForm.organisationStatus == 'other'"
+            maxlength="500"
+            placeholder="500 c. Max."></textarea>
+
+        <label>
+            {{ "About the initiative or organisation:" | translate }}
+            <textarea
+                maxlength="750"
+                placeholder="750 c. Max."></textarea>
+            <div class="description">
+                {{ "Please provide a brief description of your organisation or initiative, specifying its aims and activities. Explain the highlights your organisation or initiative has achieved so far. You can share supporting websites or examples through a link. If you are selected, this paragraph might also be used for online and offline publications." | translate }}
+            </div>
+        </label>
+
+        {{ "Size of organisation:" | translate }}
+        <label>
+            <input type="radio" name="organisationSize" value="0-5" required="required" />
+            {{ "0 - 5" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="organisationSize" value="5-10" required="required" />
+            {{ "5 - 10" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="organisationSize" value="10-20" required="required" />
+            {{ "10 - 20" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="organisationSize" value="20-50" required="required" />
+            {{ "20 - 50" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="organisationSize" value="gt50" required="required" />
+            {{ "&gt;50" | translate }}
+        </label>
+
+        {{ "Organisational Cooperation:" | translate }}
+        <label>
+            <input type="radio" name="organisationCooperation" value="1" required="required" />
+            {{ "yes" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="organisationCooperation" value="" required="required" />
+            {{ "no" | translate }}
+        </label>
+        <textarea
+            data-ng-if="applicationBasicForm.organisationCooperation == '1'"
+            maxlength="300"
+            placeholder="{{ '300 c. Max.' | translate }}"></textarea>
+        <div class="description">
+            {{ "In your project or initiaitve, does your organisation work alone? Or, do you foresee the partnership of an established institution or player with an organisation or initiative that was founded or started after the year 2000?" | translate }}
+        </div>
+    </ng-form>
+
+    <ng-form name="applicationIntroductionForm">
+        <h2 id="application-introduction">{{ "2. Introduction" | translate }}</h2>
+
+        <label>
+            {{ "Title:" | translate }}
+            <input type="text" maxlength="100" placeholder="{{ '100 c. Max' | translate }}" required="required" />
+        </label>
+
+        <label>
+            {{ "Teaser:" | translate }}
+            <textarea
+                maxlength="300"
+                placeholder="{{ '300 c. Max.' | translate }}"></textarea>
+        </label>
+
+        <input type="file" required="required" />
+    </ng-form>
+
+    <ng-form name="applicationDetailForm">
+        <h2 id="application-detail">{{ "3. In Detail" | translate }}</h2>
+
+        <label>
+            {{ "Description:" | translate }}
+            <textarea
+                maxlength="1000"
+                placeholder="{{ '1000 c. Max.' | translate }}"></textarea>
+            <div class="description">
+                {{ "Tell others what your idea is for and what it is. Think about why you are doing it, what you want to achieve and what you will do, who will benefit from your endeavour and which impact you will have. (This paragraph will appear on the main page and at the top of your contribution)." | translate }}
+            </div>
+        </label>
+
+        <label>
+            <input type="radio" name="detailLocation" value="city" required="required" />
+            {{ "City" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="detailLocation" value="country" required="required" />
+            {{ "Country" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="detailLocation" value="town" required="required" />
+            {{ "Town" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="detailLocation" value="online" required="required" />
+            {{ "Online" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="detailLocation" value="ruhr" required="required" />
+            {{ "Linkage to the Ruhr area" | translate }}
+        </label>
+
+        <label>
+            {{ "What is the story behind your idea?" | translate }}
+            <textarea
+                maxlength="800"
+                placeholder="{{ '800 c. Max.' | translate }}"></textarea>
+            <div class="description">
+                {{ "What triggers you to act? What drives you to want to make the change you propose? What’s the “big dream” behind your idea? Please also share specific examples of the target group." | translate }}
+            </div>
+        </label>
+    </ng-form>
+
+    <ng-form name="applicationMotivationForm">
+        <h2 id="application-motivation">{{ "4. Motivation" | translate }}</h2>
+
+        <label>
+            {{ "What would be a successful outcome of your project or initiative? What is the aim you want to reach?" | translate }}
+            <textarea
+                maxlength="800"
+                placeholder="{{ '800 c. Max.' | translate }}"></textarea>
+            <div class="description">
+                {{ "What is different in a year after starting your endeavour? What will have changed? What will a beneficiary of your idea tell you about it in a year from today?" | translate }}
+            </div>
+        </label>
+
+        <label>
+            {{ "How do you want to get there?" | translate }}
+            <textarea
+                maxlength="800"
+                placeholder="{{ '5 Bullet points or 800 c. Max.' | translate }}"></textarea>
+            <div class="description">
+                {{ "How will your realize your project or initiative? Which steps will you take? Describe, as practically as possible, the approach and method you plan to choose for this activity or initiative." | translate }}
+            </div>
+        </label>
+
+        <label>
+            {{ "Why does Europe need your idea?" | translate }}
+            <textarea
+                maxlength="800"
+                placeholder="{{ '800 c. Max.' | translate }}"></textarea>
+            <div class="description">
+                {{ "Which value does your idea provide for Europe? What makes your idea different from others? If you can realize it, can you then imagine transferring it to other countries, sectors or organisations?" | translate }}
+            </div>
+        </label>
+
+        <label>
+            {{ "Please list your partner organisations and team members with their relevant experiences/skills." | translate }}
+            <textarea
+                maxlength="800"
+                placeholder="{{ '800 c. Max.' | translate }}"></textarea>
+            <div class="description">
+                {{ "How was the partnership established and does it involve organisations that have never been previously involved in a similar constellation? Describe relevant experiences of your team members." | translate }}
+            </div>
+        </label>
+    </ng-form>
+
+    <ng-form name="applicationFinanceForm">
+        <h2 id="application-finance">{{ "5. Finance" | translate }}</h2>
+
+        <label>
+            {{ "Budget:" | translate }}
+            <input type="number" required="required" />
+        </label>
+
+        <label>
+            {{ "Requested Funding:" | translate }}
+            <input type="number" max="50000" required="required" />
+        </label>
+
+        {{ "Granted?" | translate }}
+        <label>
+            <input type="radio" name="organisationCooperation" value="1" required="required" />
+            {{ "yes" | translate }}
+        </label>
+        <label>
+            <input type="radio" name="organisationCooperation" value="" required="required" />
+            {{ "no" | translate }}
+        </label>
+
+        <label>
+            {{ "Upload Financial Plan Document" | translate }}
+            <input type="file" required="required" />
+        </label>
+    </ng-form>
+
+    <ng-form name="applicationExtraForm">
+        <h2 id="application-extra">{{ "6. Extra" | translate }}</h2>
+
+        <label>
+            {{ "Upload media files" | translate }}
+            <input type="file" multiple="multiple" required="required" />
+        </label>
+
+        <label>
+            {{ "Share Experience (Optional)." | translate }}
+            <textarea
+                maxlength="300"
+                placeholder="{{ '300 c. Max.' | translate }}"></textarea>
+        </label>
+
+        {{ "How did you hear about “Advocate Europe”?" | translate }}
+        <label>
+            <input type="checkbox" required="required" />
+            {{ "Colleague" | translate }}
+        </label>
+        <label>
+            <input type="checkbox" required="required" />
+            {{ "Website" | translate }}
+        </label>
+        <label>
+            <input type="checkbox" required="required" />
+            {{ "Newsletter" | translate }}
+        </label>
+        <label>
+            <input type="checkbox" required="required" />
+            {{ "Facebook" | translate }}
+        </label>
+        <label>
+            <input type="checkbox" name="hearOther" required="required" />
+            {{ "Other. Please, specify:" | translate }}
+        </label>
+        <input type="text" data-ng-if="applicationExtraForm.hearOther" required="required" />
+    </ng-form>
+
+    <input
+        type="submit"
+        value="{{ 'submit' | translate }}"
+        class="m-call-to-action"
+        data-ng-disabled="applicationForm.$invalid" />
+</form>
