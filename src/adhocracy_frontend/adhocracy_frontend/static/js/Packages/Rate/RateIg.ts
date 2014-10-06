@@ -194,6 +194,31 @@ export var register = (angular, config, meta_api) => {
                             done();
                         });
             });
+
+            it("query 2: rating totals", (done) => {
+                var ratePostPoolPath = _commentVersion.data[SICommentable.nick].post_pool;
+
+                var query : any = {};
+                query.content_type = RIRateVersion.content_type;
+                query.depth = 2;
+                query.tag = "LAST";
+                query.count = "true";
+                query.aggregateby = SIRate.nick + ":rate";
+
+                console.log(JSON.stringify(query, null, 2));  // FIXME: remove once this test works!
+
+                adhHttp.get(ratePostPoolPath, query)
+                    .then(
+                        (poolRsp) => {
+                            var rspCounts = poolRsp.data[SIPool.nick].aggregateby;
+                            expect(rspCounts.toHaveOwnProperty(SIRate.nick + ":rate"));
+                            expect(rspCounts[SIRate.nick + ":rate"]).toEqual({"-1": 0, "0": 0, "1": 1});
+                        },
+                        (msg) => {
+                            expect(msg).toBe(false);
+                            done();
+                        });
+            });
         });
     });
 };
