@@ -99,7 +99,8 @@ conditions can occur:
   * username does already exist
   * email does already exist
   * email is invalid (doesn't look like an email address)
-  * couldn't send a registration mail to the email address
+  * couldn't send a registration mail to the email address (description
+    starts with 'Cannot send registration mail')
   * password is too short (less than 6 chars)
   * password is too long (more than 100 chars)
   * internal error: something went wrong in the backend

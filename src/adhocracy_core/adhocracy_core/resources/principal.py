@@ -2,6 +2,7 @@
 from base64 import b64encode
 from logging import getLogger
 from os import urandom
+from smtplib import SMTPException
 
 from pyramid.registry import Registry
 from substanced.util import find_service
@@ -16,6 +17,7 @@ from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
 from adhocracy_core.resources.service import service_metadata
+from adhocracy_core.utils import raise_colander_style_error
 import adhocracy_core.sheets.user
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.metadata
@@ -100,14 +102,20 @@ def send_registration_mail(context: IUser,
     email = context.email
     activation_path = _generate_activation_path()
     context.activation_path = activation_path
-    logger.warn('Sending registration mail to %s for new user named %s, '
-                'activation path=%s', email, name, context.activation_path)
+    logger.debug('Sending registration mail to %s for new user named %s, '
+                 'activation path=%s', email, name, context.activation_path)
     args = {'name': name, 'activation_path': activation_path}
-    registry.messenger.render_and_send_mail(
-        subject=subject,
-        recipients=[email],
-        template_asset_base='adhocracy_core:templates/registration_mail',
-        args=args)
+    try:
+        registry.messenger.render_and_send_mail(
+            subject=subject,
+            recipients=[email],
+            template_asset_base='adhocracy_core:templates/registration_mail',
+            args=args)
+    except SMTPException as err:
+        msg = 'Cannot send registration mail: {}'.format(str(err))
+        raise_colander_style_error(adhocracy_core.sheets.user.IUserBasic,
+                                   'email',
+                                   msg)
 
 
 def _generate_activation_path() -> str:
