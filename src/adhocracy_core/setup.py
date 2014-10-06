@@ -35,9 +35,17 @@ test_requires = [
     'pytest-timeout',
     'coverage',
     'requests',
-    'ipdb',
 ]
 
+debug_requires = [
+    'ipdb',  # ipython pdb
+    'pudb',  # Graphical debugger
+    'contexttimer',  # decorator to measure time
+    'profilehooks',  # decorator to run/output cprofile
+    'pycallgraph',  # Make png with call graph and hot spot visualization
+    # GUI Viewer for Python profiling, needs wxgtk and python2:
+    # http://www.vrplumber.com/programming/runsnakerun
+]
 
 setup(name='adhocracy_core',
       version='0.0',
@@ -57,7 +65,9 @@ setup(name='adhocracy_core',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      extras_require={'test': test_requires},
+      extras_require={'test': test_requires,
+                      'debug': debug_requires,
+                      },
       entry_points="""\
       [paste.app_factory]
       main = adhocracy_core:main
