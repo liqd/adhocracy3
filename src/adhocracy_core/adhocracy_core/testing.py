@@ -263,7 +263,10 @@ def mock_sheet() -> Mock:
     # FIXME: Use spec=GenericResourceSheet for Mock; however this fails if the
     # mock object is deepcopied.
     sheet = Mock()
-    sheet.meta = sheet_metadata._replace(isheet=ISheet)
+    sheet.meta = sheet_metadata._replace(isheet=ISheet,
+                                         schema_class=colander.MappingSchema)
+    sheet.schema = colander.MappingSchema()
+    sheet.get.return_value = {}
     return sheet
 
 
@@ -291,8 +294,15 @@ def mock_resource_registry() -> Mock:
     mock = Mock(spec=ResourceContentRegistry)
     mock.sheets_meta = {}
     mock.resources_meta = {}
-    mock.resource_sheets.return_value = {}
-    mock.resource_addables.return_value = {}
+    mock.get_resources_meta_addable.return_value = []
+    mock.resources_meta_addable = {}
+    mock.get_sheets_read.return_value = []
+    mock.get_sheets_edit.return_value = []
+    mock.get_sheets_create.return_value = []
+    mock.sheets_read = {}
+    mock.sheets_edit = {}
+    mock.sheets_create = {}
+    mock.sheets_create_mandatory = {}
     return mock
 
 

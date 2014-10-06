@@ -49,12 +49,15 @@ class TestAddResourceTypeToRegistry:
         resource = config.registry.content.create(IResource.__identifier__)
         assert IResource.providedBy(resource)
 
-    def test_add_resource_type_metadata(self, config, resource_meta):
+    def test_add_resource_type_metadata(self, config, registry, resource_meta):
         config.include('adhocracy_core.registry')
-        type_id = IResource.__identifier__
+        iresource = IResource
+        resource_type = iresource.__identifier__
         self.make_one(resource_meta, config)
-        assert config.registry.content.meta[type_id]['content_name'] == type_id
-        assert config.registry.content.resources_meta[type_id] == resource_meta
+        assert registry.content.meta[resource_type]['content_name'] ==\
+               resource_type  # substance uses strings for content type ids
+        assert registry.content.resources_meta[iresource] == \
+               resource_meta  # adhocracy uses interfaces for content types ids
 
     def test_add_resource_type_metadata_with_content_name(self, config, resource_meta):
         config.include('adhocracy_core.registry')

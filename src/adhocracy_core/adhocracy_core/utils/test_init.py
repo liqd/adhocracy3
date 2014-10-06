@@ -213,30 +213,6 @@ def test_get_sheet_adapter_does_not_exists(config, context):
         get_sheet(context, ISheet)
 
 
-def test_get_all_sheets_adapter_exists(config):
-    from adhocracy_core.interfaces import IResourceSheet
-    from adhocracy_core.interfaces import ISheet
-    from . import get_all_sheets
-    adapter = testing.DummyResource(__provides__=IResourceSheet)
-    context = testing.DummyResource(__provides__=ISheet)
-    config.registry.registerAdapter(lambda x: adapter,
-                                    (ISheet,), IResourceSheet,
-                                    ISheet.__identifier__)
-    assert adapter in get_all_sheets(context)
-
-
-def test_get_all_sheets_adapter_exists(registry):
-    from adhocracy_core.interfaces import IResourceSheet
-    from adhocracy_core.interfaces import ISheet
-    from . import get_all_sheets
-    adapter = testing.DummyResource(__provides__=IResourceSheet)
-    context = testing.DummyResource(__provides__=ISheet)
-    registry.registerAdapter(lambda x: adapter,
-                             (ISheet,), IResourceSheet,
-                              ISheet.__identifier__)
-    assert adapter in get_all_sheets(context, registry=registry)
-
-
 class GetUserUnitTest(unittest.TestCase):
 
     def _make_one(self, request):

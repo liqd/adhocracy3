@@ -34,7 +34,7 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
     """
     assert hasattr(config.registry, 'content')
     resources_meta = config.registry.content.resources_meta
-    resources_meta[metadata.iresource.__identifier__] = metadata
+    resources_meta[metadata.iresource] = metadata
     iresource = metadata.iresource
     name = metadata.content_name or iresource.__identifier__
     meta = {'content_name': name}
