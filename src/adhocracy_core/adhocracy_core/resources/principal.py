@@ -6,6 +6,7 @@ from os import urandom
 from pyramid.registry import Registry
 from substanced.util import find_service
 from substanced.interfaces import IUserLocator
+from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface import implementer
 
@@ -66,6 +67,10 @@ class IUser(IPool):
     namespace for user objects.
 
     """
+
+    active = Attribute('Whether the user account has been activated (bool)')
+    activation_path = Attribute(
+        'Activation path for not-yet-activated accounts (str)')
 
 
 @implementer(IUser)
