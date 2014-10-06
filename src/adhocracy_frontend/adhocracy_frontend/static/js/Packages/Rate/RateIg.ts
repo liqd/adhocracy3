@@ -4,14 +4,14 @@
 
 import modernizr = require("modernizr");
 
-import AdhConfig = require("../Config/Config");
+// import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhMetaApi = require("../MetaApi/MetaApi");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhResource = require("../../Resources");
+// import AdhResource = require("../../Resources");
 import AdhUser = require("../User/User");
-import ResourcesBase = require("../../ResourcesBase");
-import Resources = require("../../Resources");
+// import ResourcesBase = require("../../ResourcesBase");
+// import Resources = require("../../Resources");
 import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IComment");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIProposal = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposal");
@@ -20,13 +20,13 @@ import RIRate = require("../../Resources_/adhocracy_core/resources/rate/IRate");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
 import RISection = require("../../Resources_/adhocracy_core/resources/sample_section/ISection");
 import RISectionVersion = require("../../Resources_/adhocracy_core/resources/sample_section/ISectionVersion");
-import RITag = require("../../Resources_/adhocracy_core/interfaces/ITag");
+// import RITag = require("../../Resources_/adhocracy_core/interfaces/ITag");
 import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
-import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
+// import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 
@@ -189,7 +189,7 @@ export var register = (angular, config, meta_api) => {
                         },
                         (msg) => {
                             expect(msg).toBe(false);
-                            done()
+                            done();
                         });
             });
         });
