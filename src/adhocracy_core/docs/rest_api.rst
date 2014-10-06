@@ -1206,7 +1206,7 @@ This corresponds to setting *elements=paths*.
      'http://localhost/adhocracy/Proposals/kommunismus/LAST/']
 
 Setting *elements=omit* will yield a response with an empty 'elements' listing.
-This makes only if you ask for something else instead, e.g. a count of
+This makes only sense if you ask for something else instead, e.g. a count of
 elements::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
