@@ -1,7 +1,10 @@
 """Shared acceptance test functions."""
+from time import sleep
+
 from splinter.driver.webdriver import WebDriverElement
 
-from time import sleep
+from adhocracy_core.testing import god_name
+from adhocracy_core.testing import god_password
 
 
 def wait(condition, step=0.1, max_steps=10) -> bool:
@@ -12,6 +15,46 @@ def wait(condition, step=0.1, max_steps=10) -> bool:
         else:
             sleep(step)
     return condition()
+
+
+def login(browser, name_or_email, password,
+          expect_success=True,
+          visit_root=True):
+    """Login user with name and password."""
+    if is_logged_in(browser):
+        return
+    login_url = browser.app_url + 'login'
+    browser.visit(login_url)
+    fill_input(browser, '.login [name="nameOrEmail"]', name_or_email)
+    fill_input(browser, '.login [name="password"]', password)
+    click_button(browser, '.login [type="submit"]')
+    if expect_success:
+        browser.wait_for_condition(is_logged_in, 20)
+    if visit_root:
+        browser.visit(browser.root_url)
+
+
+def login_god(browser):
+    """Login god user."""
+    login(browser, god_name, god_password)
+
+
+def logout(browser):
+    """Logout user."""
+    if is_logged_in(browser):
+        click_button(browser, '.user-indicator-logout')
+        browser.wait_for_condition(is_logged_out, 30)
+
+
+def is_logged_in(browser):
+    """Check if user is logged in."""
+    return browser.browser.is_element_present_by_css('.user-indicator-logout')
+
+
+def is_logged_out(browser):
+    """Check if user is logged out."""
+    return not browser.browser.is_element_present_by_css(
+        '.user-indicator-logout')
 
 
 def fill_input(browser, css_selector, value):
@@ -36,6 +79,7 @@ def title_is_in_listing(listing, title: str) -> bool:
 
 def get_listing_create_form(listing) -> WebDriverElement:
     """Open and return the create form of a listing."""
+    wait(lambda: listing.find_by_css('.navbar .button'))
     button = listing.find_by_css('.navbar .button').first
     wait(lambda: button.visible)
     button.click()

@@ -144,6 +144,47 @@ class TimeZoneName(AdhocracySchemaNode):
     validator = colander.OneOf(_ZONES)
 
 
+class Role(AdhocracySchemaNode):
+
+    """Permssion :term:`role` name.
+
+    Example value: 'reader'
+    """
+
+    schema_type = colander.String
+    default = 'reader'
+    missing = colander.drop
+    validator = colander.OneOf(['reader',
+                                'contributor',
+                                'editor',
+                                'manager',
+                                'admin',
+                                'god',
+                                ])
+
+
+class Roles(colander.SequenceSchema):
+
+    """List of Permssion :term:`role` names.
+
+    Example value: ['reader', 'editor']
+    """
+
+    # FIXME support the 'readonly' keyword, inherit AdhocracySchemaNode
+
+    default = []
+    missing = colander.drop
+    validator = colander.Length(min=0, max=6)
+
+    role = Role()
+
+    def preparer(self, value: Sequence) -> list:
+        if value is colander.null:
+            return value
+        value_dict = OrderedDict.fromkeys(value)
+        return list(value_dict)
+
+
 class Interface(colander.SchemaType):
 
     """A ZOPE interface in dotted name notation.
@@ -203,25 +244,25 @@ class SingleLine(colander.SchemaNode):  # noqa
 def deferred_content_type_default(node: colander.MappingSchema,
                                   kw: dict) -> str:
     """Return the content_type for the given `context`."""
-    context = kw.get('context', None)
-    iresource = get_iresource(context)
-    return iresource.__identifier__ if iresource else ''
+    context = kw.get('context')
+    return get_iresource(context) or IResource
 
 
-class ContentType(SingleLine):
+class ContentType(AdhocracySchemaNode):
 
+    schema_type = Interface
     default = deferred_content_type_default
 
 
 def get_sheet_cstructs(context: IResource, request) -> dict:
     """Serialize and return the `viewable`resource sheet data."""
-    sheets = request.registry.content.resource_sheets(context, request,
-                                                      onlyviewable=True)
+    sheets = request.registry.content.get_sheets_read(context, request)
     cstructs = {}
-    for name, sheet in sheets.items():
+    for sheet in sheets:
         appstruct = sheet.get()
         schema = sheet.schema.bind(context=context, request=request)
         cstruct = schema.serialize(appstruct)
+        name = sheet.meta.isheet.__identifier__
         cstructs[name] = cstruct
     return cstructs
 
@@ -265,11 +306,11 @@ class ResourceObject(colander.SchemaType):
             return ''
         try:
             raise_attribute_error_if_not_location_aware(value)
-            return self._serialize_location_or_url_or_content(node, value)
         except AttributeError:
             raise colander.Invalid(node,
                                    msg='This resource is not location aware',
                                    value=value)
+        return self._serialize_location_or_url_or_content(node, value)
 
     def _serialize_location_or_url_or_content(self, node, value):
         if self.serialization_form == 'path':
@@ -336,11 +377,17 @@ class Resource(AdhocracySchemaNode):
     schema_type = ResourceObject
 
 
+@colander.deferred
+def deferred_path_default(node: colander.MappingSchema, kw: dict) -> str:
+    """Return the `context`."""
+    return kw.get('context')
+
+
 class ResourcePathSchema(colander.MappingSchema):
 
     content_type = ContentType()
 
-    path = Resource()
+    path = Resource(default=deferred_path_default)
 
 
 class ResourcePathAndContentSchema(ResourcePathSchema):
@@ -504,7 +551,7 @@ def deferred_get_post_pool(node: colander.MappingSchema, kw: dict) -> IPool:
         if the :term:`post_pool` does not exists in the term:`lineage`
         of `context`.
     """
-    context = kw['context']
+    context = kw.get('context')
     post_pool = _get_post_pool(context, node.iresource_or_service_name)
     if post_pool is None:
         context_path = resource_path(context)
@@ -541,7 +588,7 @@ class PostPool(Reference):
 def deferred_validate_references_post_pool(node: colander.SchemaNode,
                                            kw: dict) -> callable:
     """Validate the :term:`post_pool` for all reference children of `node`."""
-    context = kw['context']
+    context = kw.get('context')
     reference_nodes = _get_reference_childs(node)
     validators = []
     for child in reference_nodes:

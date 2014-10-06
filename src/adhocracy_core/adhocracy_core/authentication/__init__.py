@@ -2,15 +2,19 @@
 import hashlib
 from datetime import datetime
 
+from colander import Invalid
 from persistent.dict import PersistentDict
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
+from pyramid.traversal import resource_path
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import ComponentLookupError
 
 from adhocracy_core.interfaces import ITokenManger
+from adhocracy_core.interfaces import IRolesUserLocator
+from adhocracy_core.schema import Resource
 
 
 @implementer(ITokenManger)
@@ -34,7 +38,7 @@ class TokenMangerAnnotationStorage:
             setattr(self.context, self.annotation_key, PersistentDict())
         return getattr(self.context, self.annotation_key)
 
-    def create_token(self, user_id: str, secret='', hashalg='sha512') -> str:
+    def create_token(self, userid: str, secret='', hashalg='sha512') -> str:
         """Create authentication token for user_id.
 
         :param secret:  the secret used to salt the generated token.
@@ -42,9 +46,9 @@ class TokenMangerAnnotationStorage:
                         This is used to create the authentication token.
         """
         timestamp = datetime.now()
-        value = self._build_token_value(user_id, timestamp, secret)
+        value = self._build_token_value(userid, timestamp, secret)
         token = hashlib.new(hashalg, value).hexdigest()
-        self.token_to_user_id_timestamp[token] = (user_id, timestamp)
+        self.token_to_user_id_timestamp[token] = (userid, timestamp)
         return token
 
     def _build_token_value(self, user_id: str, timestamp: datetime,
@@ -63,11 +67,11 @@ class TokenMangerAnnotationStorage:
         :returns: user id for this token
         :raises KeyError: if there is no corresponding user_id
         """
-        user_id, timestamp = self.token_to_user_id_timestamp[token]
+        userid, timestamp = self.token_to_user_id_timestamp[token]
         if self._is_expired(timestamp, timeout):
             del self.token_to_user_id_timestamp[token]
             raise KeyError
-        return user_id
+        return userid
 
     def _is_expired(self, timestamp: datetime, timeout: float=None) -> bool:
         if timeout is None:
@@ -93,10 +97,38 @@ def get_tokenmanager(request: Request, **kwargs) -> ITokenManger:
         return None
 
 
+def _get_raw_x_user_headers(request: Request) -> tuple:
+    """Return not validated tuple with the X-User-Path/Token values."""
+    user_url = request.headers.get('X-User-Path', '')
+    # FIXME find a proper solution, user_url/path as userid does not work
+    # well with the pyramid authentication system. We don't have the
+    # a context or root object to resolve the resource path when processing
+    # the unauthenticated_userid and effective_principals methods.
+    app_url_length = len(request.application_url)
+    user_path = None
+    if len(user_url) >= app_url_length:
+        user_path = user_url[app_url_length:][:-1]
+    if user_url.startswith('/'):
+        user_path = user_url
+    token = request.headers.get('X-User-Token', None)
+    return user_path, token
+
+
 def _get_x_user_headers(request: Request) -> tuple:
     """Return tuple with the X-User-Path/Token values or (None, None)."""
-    return (request.headers.get('X-User-Path', None),
-            request.headers.get('X-User-Token', None))
+    schema = Resource().bind(request=request, context=request.context)
+    user_url = request.headers.get('X-User-Path', None)
+    user_path = None
+    try:
+        user = schema.deserialize(user_url)
+        user_path = resource_path(user)
+    except Invalid:
+        # FIXME if we want to use multiple authentication policies we should
+        # ignore exceptions at all.
+        # Else we should raise a proper colander error.
+        pass
+    token = request.headers.get('X-User-Token', None)
+    return (user_path, token)
 
 
 @implementer(IAuthenticationPolicy)
@@ -109,8 +141,8 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     Constructor Arguments
 
-    :param groupfinder: callable that accepts `request` and returns the
-                        ACL groups of the current user.
+    :param groupfinder: callable that accepts `userid` and `request` and
+                        returns the ACL groups of this user.
                         The `None` value is allowed to ease unit testing.
     :param secret: random string to salt the generated token.
     :param timeout:  Maximum number of seconds which a newly create token
@@ -122,7 +154,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
                     This is used to create the authentication token.
     """
 
-    def __init__(self, secret,
+    def __init__(self, secret: str,
                  groupfinder: callable=None,
                  timeout: float=None,
                  get_tokenmanager: callable=get_tokenmanager,
@@ -135,7 +167,7 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.hashalg = hashalg
 
     def unauthenticated_userid(self, request):
-        return _get_x_user_headers(request)[0]
+        return _get_raw_x_user_headers(request)[0]
 
     def authenticated_userid(self, request):
         tokenmanager = self.get_tokenmanager(request)
@@ -148,22 +180,31 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     def _get_authenticated_user_id(self, request: Request,
                                    tokenmanager: ITokenManger) -> str:
-        user_id, token = _get_x_user_headers(request)
-        authenticated_user_id = tokenmanager.get_user_id(token,
-                                                         timeout=self.timeout)
-        if authenticated_user_id != user_id:
+        userid, token = _get_x_user_headers(request)
+        authenticated_userid = tokenmanager.get_user_id(token,
+                                                        timeout=self.timeout)
+        if authenticated_userid != userid:
             raise KeyError
-        return authenticated_user_id
+        return authenticated_userid
 
-    def remember(self, request, user_id, **kw):
+    def remember(self, request, userid, **kw) -> dict:
         tokenmanager = self.get_tokenmanager(request)
-        if tokenmanager:
-            token = tokenmanager.create_token(user_id, secret=self.secret,
+        if tokenmanager:  # for testing
+            token = tokenmanager.create_token(userid, secret=self.secret,
                                               hashalg=self.hashalg)
         else:
             token = None
-            user_id = None
-        return {'X-User-Path': user_id,
+        locator = request.registry.queryMultiAdapter(
+            (request.context, request), IRolesUserLocator)
+        if locator is not None:  # for testing
+            user = locator.get_user_by_userid(userid)
+        else:
+            user = None
+        if user is not None:
+            url = request.resource_url(user)
+        else:
+            url = None
+        return {'X-User-Path': url,
                 'X-User-Token': token}
 
     def forget(self, request):
@@ -172,6 +213,18 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
             token = _get_x_user_headers(request)[0]
             tokenmanager.delete_token(token)
         return {}
+
+    def effective_principals(self, request: Request) -> list:
+        """Return roles and groups for the current user.
+
+        THE RESULT IS CACHED for the current request!
+        """
+        cached_principals = getattr(request, '__cached_principals__', None)
+        if cached_principals:
+            return cached_principals
+        principals = super().effective_principals(request)
+        request.__cached_principals__ = principals
+        return principals
 
 
 def includeme(config):

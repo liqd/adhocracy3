@@ -5,6 +5,7 @@ API
    :maxdepth: 2
 
    embed-api
-   login
+   authentication_api
    rest_api
    websockets
+   authorization

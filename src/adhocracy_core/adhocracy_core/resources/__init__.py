@@ -5,6 +5,8 @@ from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from pyramid.config import Configurator
 from pyramid.traversal import find_interface
+from pyramid.traversal import resource_path
+from pyramid.registry import Registry
 from pytz import UTC
 from substanced.content import add_content_type
 from zope.interface import directlyProvides
@@ -32,7 +34,7 @@ def add_resource_type_to_registry(metadata: ResourceMetadata,
     """
     assert hasattr(config.registry, 'content')
     resources_meta = config.registry.content.resources_meta
-    resources_meta[metadata.iresource.__identifier__] = metadata
+    resources_meta[metadata.iresource] = metadata
     iresource = metadata.iresource
     name = metadata.content_name or iresource.__identifier__
     meta = {'content_name': name}
@@ -130,6 +132,8 @@ class ResourceFactory:
         directlyProvides(resource, self.meta.iresource)
         isheets = self.meta.basic_sheets + self.meta.extended_sheets
         alsoProvides(resource, isheets)
+        if registry is None:
+            registry = get_current_registry()
 
         if parent is not None:
             self._add(parent, resource, appstructs)
@@ -139,9 +143,9 @@ class ResourceFactory:
 
         for key, struct in appstructs.items():
             isheet = DottedNameResolver().maybe_resolve(key)
-            sheet = get_sheet(resource, isheet)
+            sheet = get_sheet(resource, isheet, registry=registry)
             if sheet.meta.creatable:
-                sheet.set(struct, send_event=False)
+                sheet.set(struct, send_event=False, registry=registry)
 
         # Fixme: Sideffect. We change here the passed creator because the
         # creator of user resources should always be the created user.
@@ -152,12 +156,14 @@ class ResourceFactory:
         if IUser.providedBy(resource):
             creator = resource
 
-        if IMetadata.providedBy(resource):
-            metadata = self._get_metadata(resource, creator)
-            sheet = get_sheet(resource, IMetadata)
-            sheet.set(metadata, send_event=False)
+        if creator is not None:
+            userid = resource_path(creator)
+            resource.__local_roles__ = {userid: ['creator']}
 
-        registry = registry if registry else get_current_registry()
+        if IMetadata.providedBy(resource):
+            metadata = self._get_metadata(resource, creator, registry)
+            sheet = get_sheet(resource, IMetadata, registry=registry)
+            sheet.set(metadata, send_event=False, registry=registry)
 
         if run_after_creation:
             for call in self.meta.after_creation:
@@ -169,7 +175,8 @@ class ResourceFactory:
 
         return resource
 
-    def _get_metadata(self, resource: IResource, creator: IResource) -> dict:
+    def _get_metadata(self, resource: IResource, creator: IResource,
+                      registry: Registry) -> dict:
         # FIXME: bad SRP, there are two places responsible to set the default
         # date, here and in adhocracy.schema.Date
         now = datetime.utcnow().replace(tzinfo=UTC)
@@ -181,7 +188,7 @@ class ResourceFactory:
                     }
         item = find_interface(resource, IItem)
         if IItemVersion.providedBy(resource) and item is not None:
-            item_sheet = get_sheet(item, IMetadata)
+            item_sheet = get_sheet(item, IMetadata, registry=registry)
             item_creation_date = item_sheet.get()['creation_date']
             metadata['item_creation_date'] = item_creation_date
         return metadata
