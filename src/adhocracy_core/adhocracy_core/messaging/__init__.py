@@ -82,6 +82,11 @@ class Messenger():
         :param sender: the email message of the sender; if None, the configured
             default sender address will be used
         """
+        # FIXME Mails (subjects and template_asset_bases) should be
+        # translatable
+        # FIXME Adapt the _resource_exists to make it work with Pyramid
+        # asset overriding, cf.
+        # http://docs.pylonsproject.org/docs/pyramid/en/latest/narr/assets.html#overriding-assets
         package, path = template_asset_base.split(':', 1)
         if self._resource_exists(package, path + '.txt.mako'):
             body = self._render(template_asset_base + '.txt.mako', args)
