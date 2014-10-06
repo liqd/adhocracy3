@@ -58,11 +58,11 @@ export class ProposalDetail {
                 adhWebSocket : AdhWebSocket.IService,
                 $scope : DetailScope<RIProposal>
             ) => {
-                var wsHandle;
+                var wsHandle : string;
 
                 var fetchAndUpdateContent = (itemPath : string) : void => {
                     adhHttp.getNewestVersionPathNoFork(itemPath)
-                        .then((versionPath) => adhHttp.get(versionPath))
+                        .then((versionPath : string) => adhHttp.get(versionPath))
                         .then((content) => {
                             $scope.content = content;
                         });
@@ -204,6 +204,14 @@ export class ProposalVersionNew {
     }
 }
 
+var explainPreliminaryGetIssue : string = (
+    "The version resources for proposal, sections, and paragraphs are created and rendered into the\n" +
+    "DOM before the user clicks on 'safe'.  Once 'safe' is clicked, these resources wake up and some-\n" +
+    "how decide they need to be updated.  This update happens before the batch post returns and can\n" +
+    "replace the preliminary paths, so there is an exception.  Fix: use ResourceWidgets for what we\n" +
+    "currently do manually here."
+);
+
 export class SectionVersionDetail {
 
     public createDirective(adhConfig : AdhConfig.Type, recursionHelper) {
@@ -224,10 +232,14 @@ export class SectionVersionDetail {
                     adhHttp.postNewVersionNoFork($scope.content.path, $scope.content);
                 };
 
-                // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
-                adhHttp.get($scope.ref).then((content) => {
-                    $scope.content = content;
-                });
+                try {
+                    adhHttp.get($scope.ref).then((content) => {
+                        $scope.content = content;
+                    });
+                } catch (msg) {
+                    console.log("info: " + msg);
+                    console.log("it is safe to ignore this error.  details:\n" + explainPreliminaryGetIssue);
+                }
 
                 // save working copy on 'commit' event from containing document.
                 $scope.$on("commit", commit);
@@ -256,9 +268,14 @@ export class ParagraphVersionDetail {
                 };
 
                 // keep pristine copy in sync with cache.  FIXME: this should be done in one gulp with postNewVersion
-                adhHttp.get($scope.ref).then((content) => {
-                    $scope.content = content;
-                });
+                try {
+                    adhHttp.get($scope.ref).then((content) => {
+                        $scope.content = content;
+                    });
+                } catch (msg) {
+                    console.log("info: " + msg);
+                    console.log("it is safe to ignore this error.  details:\n" + explainPreliminaryGetIssue);
+                }
 
                 // save working copy on 'commit' event from containing document.
                 $scope.$on("commit", commit);
