@@ -84,7 +84,7 @@ class Messenger():
         """
         # FIXME Mails (subjects and template_asset_bases) should be
         # translatable
-        # FIXME Adapt the _resource_exists to make it work with Pyramid
+        # FIXME Adapt the _resource_exists check to make it work with Pyramid
         # asset overriding, cf.
         # http://docs.pylonsproject.org/docs/pyramid/en/latest/narr/assets.html#overriding-assets
         package, path = template_asset_base.split(':', 1)
