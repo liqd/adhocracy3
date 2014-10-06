@@ -9,6 +9,7 @@ from adhocracy_core.resources.sample_paragraph import IParagraph
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_metadata
 from adhocracy_core.resources.item import item_metadata
+from adhocracy_core.resources.rate import add_ratesservice
 
 import adhocracy_core.sheets.document
 import adhocracy_core.sheets.comment
@@ -42,7 +43,10 @@ proposal_meta = item_metadata._replace(
                    IComment,
                    IProposalVersion,
                    ],
-    after_creation=item_metadata.after_creation + [add_commentsservice],
+    after_creation=item_metadata.after_creation + [
+        add_commentsservice,
+        add_ratesservice,
+    ],
     item_type=IProposalVersion,
 )
 
