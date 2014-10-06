@@ -1,9 +1,13 @@
 """Resources to handle users and groups."""
+from base64 import b64encode
+from logging import getLogger
+from os import urandom
+
 from pyramid.registry import Registry
 from pyramid.traversal import find_resource
 from pyramid.request import Request
-from zope.interface import Interface
 from substanced.util import find_service
+from zope.interface import Interface
 from zope.interface import implementer
 
 from adhocracy_core.interfaces import IPool
@@ -19,6 +23,9 @@ import adhocracy_core.sheets.principal
 import adhocracy_core.sheets.pool
 import adhocracy_core.sheets.metadata
 import adhocracy_core.sheets.rate
+
+
+logger = getLogger(__name__)
 
 
 class IPrincipalsService(IServicePool):
@@ -80,13 +87,39 @@ class User(Pool):
     password = ''
     email = ''
     name = ''
-    groupids = []
-    # fixme? let __init__ create the attributes
+    active = False
+    activation_path = None
+
+
+def send_registration_mail(context: IUser,
+                           registry: Registry,
+                           options: dict={}):
+    """Send a registration mail to validate the email of a user account."""
+    # FIXME subject should be configurable
+    subject = 'Adhocracy Account Authentication'
+    name = context.name
+    email = context.email
+    activation_path = _generate_activation_path()
+    context.activation_path = activation_path
+    logger.warn('Sending registration mail to %s for new user named %s, '
+                'activation path=%s', email, name, context.activation_path)
+    args = {'name': name, 'activation_path': activation_path}
+    registry.messenger.render_and_send_mail(
+        subject=subject,
+        recipients=[email],
+        template_asset_base='adhocracy_core:templates/registration_mail',
+        args=args)
+
+
+def _generate_activation_path() -> str:
+    random_bytes = urandom(18)
+    return '/activate/' + b64encode(random_bytes, altchars=b'-_').decode()
 
 
 user_metadata = pool_metadata._replace(
     iresource=IUser,
     content_class=User,
+    after_creation=[send_registration_mail] + pool_metadata.after_creation,
     basic_sheets=[adhocracy_core.sheets.principal.IUserBasic,
                   adhocracy_core.sheets.principal.IPermissions,
                   adhocracy_core.sheets.metadata.IMetadata,
@@ -161,6 +194,7 @@ class UserLocatorAdapter(object):
 
     def get_user_by_login(self, login: str) -> IUser:
         """Find user per `login` name or return None."""
+        # FIXME use catalog for all get_user_by_ methods
         users = find_service(self.context, 'principals', 'users')
         for user in users.values():
             if user.name == login:
@@ -178,6 +212,13 @@ class UserLocatorAdapter(object):
         users = find_service(self.context, 'principals', 'users')
         for user in users.values():
             if user.email == email:
+                return user
+
+    def get_user_by_activation_path(self, activation_path: str) -> IUser:
+        """Find user per activation path or return None."""
+        users = find_service(self.context, 'principals', 'users')
+        for user in users.values():
+            if user.activation_path == activation_path:
                 return user
 
     def get_groupids(self, userid: str) -> list:

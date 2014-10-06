@@ -106,7 +106,7 @@ conditions can occur:
   * internal error: something went wrong in the backend
 
 For example, if we try to register a user whose email address is already
-registered:
+registered::
 
     >>> prop = {'content_type': 'adhocracy_core.resources.principal.IUser',
     ...         'data': {
@@ -157,38 +157,47 @@ account. The *path* component of all such links starts with
 must post a JSON request containing the path to the
 ``activate_account`` endpoint of the backend::
 
-    >> prop = {'path': '/activate/blahblah'}
-    >> resp_data = testapp.post_json('/activate_account', prop).json
-    >> pprint(resp_data)
-    {'details': 'unknown_path',
-     'status': 'error'}
+    >>> newest_activation_path = getfixture('newest_activation_path')
+    >>> prop = {'path': newest_activation_path}
+    >>> resp_data = testapp.post_json('/activate_account', prop).json
+    >>> pprint(resp_data)
+    {'status': 'success',
+     'user_path': '.../principals/users/...',
+     'user_token': '...'}
 
-FIXME Make the above a real test once that endpoint exists.
-
-The backend responds with either 2xx response code and 'status':
+The backend responds with either response code 200 and 'status':
 'success' and 'user_path' and 'user_token', just like after a
 successful login request (see next section).  This means that the user
-account has been activated and the user is now logged in.
+account has been activated and the user is now logged in. ::
 
-Or it responds with 4xx response code and 'status': 'error' and a
-'details' field that contains one of the following values:
+    >>> prop = {'path': '/activate/blahblah'}
+    >>> resp_data = testapp.post_json('/activate_account', prop,
+    ...                               status=400).json
+    >>> pprint(resp_data)
+    {'errors': [{'description': 'Unknown or expired activation path',
+                 'location': 'body',
+                 'name': 'path'}],
+     'status': 'error'}
 
-* 'unknown_path' if the activation path is unknown to the backend
-* 'expired_path' if the activation path has expired since it was generated more
-  than 7 days ago. In this case, user activation is no longer possible for
-  security reasons and the user has to call support or register again,
-  using a different email. (More user-friendly options are planned but haven't
-  been implemented yet!)
+Or it responds with response code 400 and 'status': 'error'. Usually the error
+description will be one of:
 
-Note that activation links are deleted from the backend once the account has
-been successfully activated. (In the future, they may also be deleted if the
-user didn't click on them within 7 days.) 'unknown_path' can therefore mean
-two things: either the activation link was never valid (the user
-mistyped it or just tried to guess one), or it used to be valid but has been
-deleted. There is no way to distinguish between these cases.  The message
-displayed to the user should explain that.
+* 'String does not match expected pattern' if the path doesn't start with
+  '/activate/'
+* 'Unknown or expired activation path' if the activation path is unknown to
+  the backend or if it has expired because it was generated more
+  than 7 days ago. Note that activation links are deleted from the backend
+  once the account has been successfully activated, and expired links may
+  also be deleted. Therefore we don't know whether the activation link was
+  never valid (the user mistyped it or just tried to guess one), or it used
+  to be valid but has expired. The message displayed to the user should
+  explain that.
 
-FIXME How to test this without actually sending an email?
+If the link is expired, user activation is no longer possible for security
+reasons and the user has to call support or register again, using a different
+email. (More user-friendly options are planned but haven't been implemented
+yet!)
+
 
 User Login
 ----------
@@ -222,9 +231,8 @@ representing the logged-in user and a token that must be used to authorize
 additional requests by the user.
 
 An error is returned if the specified user name or email doesn't exist or if
-the wrong password is specified. For security reasons,
-the same error message (referring to the password) is given in all these
-cases.
+the wrong password is specified. For security reasons, the same error message
+(referring to the password) is given in all these cases::
 
     >>> prop = {'name': 'No such user',
     ...         'password': 'EckVocUbs3'}
@@ -236,8 +244,11 @@ cases.
      'status': 'error'}
 
 A different error message is given if username and password are valid but
-the user account hasn't been activated yet:
-FIXME document exact contents and test.
+the user account hasn't been activated yet::
+
+    {"description": "User account not yet activated",
+     "location": "body",
+     "name": "name"}
 
 
 User Authentication

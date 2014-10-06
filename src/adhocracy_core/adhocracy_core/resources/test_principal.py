@@ -11,8 +11,11 @@ class PrincipalIntegrationTest(unittest.TestCase):
     def setUp(self):
         from adhocracy_core.testing import create_pool_with_graph
         config = testing.setUp()
+        config.include('pyramid_mailer.testing')
+        config.include('pyramid_mako')
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
+        config.include('adhocracy_core.messaging')
         config.include('adhocracy_core.sheets.metadata')
         config.include('adhocracy_core.sheets.name')
         config.include('adhocracy_core.sheets.principal')
@@ -206,6 +209,18 @@ class TestUserLocatorAdapter:
         inst = self._make_one(context, testing.DummyRequest())
         assert inst.get_user_by_login('wrong login name') is None
 
+    def test_get_user_by_activation_path_user_exists(self, context):
+        user = testing.DummyResource(activation_path='/activate/foo')
+        context['principals']['users']['User1'] = user
+        inst = self._make_one(context, testing.DummyRequest())
+        assert inst.get_user_by_activation_path('/activate/foo') is user
+        
+    def test_get_user_by_activation_path_user_not_exists(self, context):
+        user = testing.DummyResource(activation_path=None)
+        context['principals']['users']['User1'] = user
+        inst = self._make_one(context, testing.DummyRequest())
+        assert inst.get_user_by_activation_path('/activate/no_such_link') is None
+
     def test_get_user_by_userid_user_exists(self, context):
         user = testing.DummyResource()
         context['principals']['users']['User1'] = user
@@ -352,10 +367,38 @@ class TestGroupsAndRolesFinder:
         mock_user_locator.get_groupids.return_value = ['group:Readers']
         assert self._call_fut('userid', request) == ['group:Readers']
 
-
     def test_userid_with_groups_roles(self, request, mock_group_locator,
                                       mock_user_locator):
         mock_user_locator.get_groupids.return_value = ['group:Readers']
         mock_group_locator.get_roleids.return_value = ['role:reader']
         self._call_fut('userid', request) == ['group:Readers', 'role:reader']
         assert mock_group_locator.get_roleids.call_args[0] == ('group:Readers',)
+        
+
+class TestIntegrationSendRegistrationMail():
+
+    @fixture
+    def integration(self, config):
+        config.include('pyramid_mailer.testing')
+        config.include('pyramid_mako')
+        config.include('adhocracy_core.registry')
+        config.include('adhocracy_core.messaging')
+
+    @mark.usefixtures('integration')
+    def test_send_registration_mail(self, registry):
+        from adhocracy_core.resources.principal import User
+        from adhocracy_core.resources.principal import send_registration_mail
+        mailer = registry.messenger._get_mailer()
+        assert len(mailer.outbox) == 0
+        user = User()
+        user.name = 'Anna Müller'
+        user.email = 'anna@example.org'
+        send_registration_mail(context=user, registry=registry)
+        assert user.activation_path.startswith('/activate/')
+        assert len(mailer.outbox) == 1
+        msg = mailer.outbox[0]
+        # The DummyMailer is too stupid to use a default sender, hence we add
+        # one manually
+        msg.sender = 'support@unconfigured.domain'
+        msgtext = str(msg.to_message())
+        assert user.activation_path in msgtext

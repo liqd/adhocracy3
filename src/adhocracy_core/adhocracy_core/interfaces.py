@@ -426,6 +426,9 @@ class IRolesUserLocator(IUserLocator):  # pragma: no cover
         behavior as :func:`substanced.interfaces.IUserLocator.get_groupids`.
         """
 
+    def get_user_by_activation_path(activation_path: str) -> IResource:
+        """Find user per activation path or return None."""
+
 
 class IGroupLocator(Interface):  # pragma: no cover
 

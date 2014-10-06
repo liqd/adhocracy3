@@ -58,8 +58,10 @@ def includeme(config):
     """Setup basic adhocracy."""
     settings = config.registry.settings
     config.include('pyramid_zodbconn')
-    config.include('pyramid_mailer')
     config.include('pyramid_exclog')
+    config.include('pyramid_mako')
+    config.hook_zca()  # enable global adapter lookup (used by adhocracy.utils)
+    authz_policy = RoleACLAuthorizationPolicy()
     config.hook_zca()  # global adapter lookup (used by adhocracy_core.utils)
     authz_policy = RoleACLAuthorizationPolicy()
     config.set_authorization_policy(authz_policy)
@@ -76,6 +78,7 @@ def includeme(config):
     config.include('.registry')
     config.include('.graph')
     config.include('.catalog')
+    config.include('.messaging')
     config.include('.sheets')
     config.include('.resources.pool')
     config.include('.resources.root')

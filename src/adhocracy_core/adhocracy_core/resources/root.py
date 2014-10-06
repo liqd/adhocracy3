@@ -103,8 +103,11 @@ def _add_initial_user_and_group(context, registry):
                  password_sheet.__identifier__:
                  {'password': user_password},
                  }
-    registry.content.create(IUser.__identifier__, users, appstruct,
-                            registry=registry)
+    user = registry.content.create(IUser.__identifier__, users, appstruct,
+                                   run_after_creation=False,
+                                   registry=registry)
+
+    user.active = True
 
 
 root_metadata = pool_metadata._replace(

@@ -15,6 +15,7 @@ class RootPoolIntegrationTest(unittest.TestCase):
         config.include('adhocracy_core.resources.pool')
         config.include('adhocracy_core.resources.principal')
         config.include('adhocracy_core.sheets')
+        config.include('adhocracy_core.messaging')
         self.config = config
         self.context = testing.DummyResource()
         request = testing.DummyRequest()
