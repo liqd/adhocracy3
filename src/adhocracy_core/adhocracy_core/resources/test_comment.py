@@ -38,10 +38,13 @@ class IncludemeIntegrationTest(unittest.TestCase):
 
     def test_includeme_registry_create_commentsservice(self):
         from adhocracy_core.resources.comment import ICommentsService
+        from substanced.util import find_service
         res = self.config.registry.content.create(ICommentsService.__identifier__,
                                                   self.context)
         assert ICommentsService.providedBy(res)
+        assert find_service(self.context, 'comments')
 
     def test_add_commentsservice(self):
         from adhocracy_core.resources.comment import add_commentsservice
         add_commentsservice(self.context, self.config.registry, {})
+        assert self.context['comments']
