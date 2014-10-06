@@ -106,10 +106,10 @@ def _get_raw_x_user_headers(request: Request) -> tuple:
     # the unauthenticated_userid and effective_principals methods.
     app_url_length = len(request.application_url)
     user_path = None
-    if len(user_url) >= app_url_length:
-        user_path = user_url[app_url_length:][:-1]
     if user_url.startswith('/'):
         user_path = user_url
+    elif len(user_url) >= app_url_length:
+        user_path = user_url[app_url_length:][:-1]
     token = request.headers.get('X-User-Token', None)
     return user_path, token
 
