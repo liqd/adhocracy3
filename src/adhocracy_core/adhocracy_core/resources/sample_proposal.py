@@ -3,6 +3,7 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ITag
 from adhocracy_core.interfaces import IItem
 from adhocracy_core.resources.comment import IComment
+from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.sample_section import ISection
 from adhocracy_core.resources.sample_paragraph import IParagraph
 from adhocracy_core.resources import add_resource_type_to_registry
@@ -41,6 +42,7 @@ proposal_meta = item_metadata._replace(
                    IComment,
                    IProposalVersion,
                    ],
+    after_creation=item_metadata.after_creation + [add_commentsservice],
     item_type=IProposalVersion,
 )
 
