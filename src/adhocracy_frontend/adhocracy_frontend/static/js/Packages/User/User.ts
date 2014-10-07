@@ -159,15 +159,6 @@ export class User {
         var _self : User = this;
         var promise;
 
-        // NOTE: the post requests here do not contain resources in
-        // the body, so adhHttp must not be used (because it
-        // implicitly does importContent / exportContent which expect
-        // Types.Content)!
-
-        // FIXME: Use adhHttp.post, not $http.post.  In the future,
-        // there may be other features of adhHttp that we want to use
-        // implicitly, such as caching.
-
         if (nameOrEmail.indexOf("@") === -1) {
             promise = _self.adhHttp.postRaw("/login_username", {
                 name: nameOrEmail,
