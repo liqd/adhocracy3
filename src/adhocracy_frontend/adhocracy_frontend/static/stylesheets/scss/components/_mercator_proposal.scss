@@ -5,7 +5,7 @@ $columns: 6;
     @return (100% - $gutter) / $columns * $n - $gutter;
 }
 
-.application-form {
+.mercator-proposal-form {
     position: relative;
     width: column-width(4) + $gutter;
     background: white;
@@ -31,7 +31,7 @@ $columns: 6;
     }
 }
 
-.application-nav {
+.mercator-proposal-nav {
     position: fixed;
     width: column-width(1);
     border: 1px solid $color-structure-border;

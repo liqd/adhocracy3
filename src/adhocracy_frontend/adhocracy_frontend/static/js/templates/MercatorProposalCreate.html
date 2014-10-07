@@ -1,17 +1,17 @@
-<nav class="application-nav">
+<nav class="mercator-proposal-nav">
     <ol>
-        <li><a href="#application-basic">{{ "Basic"}}</a></li>
-        <li><a href="#application-introduction">{{ "Introduction"}}</a></li>
-        <li><a href="#application-detail">{{ "In Detail"}}</a></li>
-        <li><a href="#application-motivation">{{ "Motivation"}}</a></li>
-        <li><a href="#application-finance">{{ "Finance"}}</a></li>
-        <li><a href="#application-extra">{{ "Extra"}}</a></li>
+        <li><a href="#mercator-proposal-basic">{{ "Basic"}}</a></li>
+        <li><a href="#mercator-proposal-introduction">{{ "Introduction"}}</a></li>
+        <li><a href="#mercator-proposal-detail">{{ "In Detail"}}</a></li>
+        <li><a href="#mercator-proposal-motivation">{{ "Motivation"}}</a></li>
+        <li><a href="#mercator-proposal-finance">{{ "Finance"}}</a></li>
+        <li><a href="#mercator-proposal-extra">{{ "Extra"}}</a></li>
     </ol>
 </nav>
 
-<form novalidate="novalidate" class="application-form" name="applicationForm">
-    <ng-form name="applicationBasicForm">
-        <h2 id="application-basic">{{ "1. Basic" | translate }}</h2>
+<form novalidate="novalidate" class="mercator-proposal-form" name="mercatorProposalForm">
+    <ng-form name="mercatorProposalBasicForm">
+        <h2 id="mercator-proposal-basic">{{ "1. Basic" | translate }}</h2>
 
         <h3>{{ "User Info:" | translate }}</h3>
         <input type="text" data-ng-model="data.basic.user.name" name="basic-user-name" placeholder="{{ 'Name' | translate }}" required="required" />
@@ -108,8 +108,8 @@
         </div>
     </ng-form>
 
-    <ng-form name="applicationIntroductionForm">
-        <h2 id="application-introduction">{{ "2. Introduction" | translate }}</h2>
+    <ng-form name="mercatorProposalIntroductionForm">
+        <h2 id="mercator-proposal-introduction">{{ "2. Introduction" | translate }}</h2>
 
         <label>
             {{ "Title:" | translate }}
@@ -132,8 +132,8 @@
         </label>
     </ng-form>
 
-    <ng-form name="applicationDetailForm">
-        <h2 id="application-detail">{{ "3. In Detail" | translate }}</h2>
+    <ng-form name="mercatorProposalDetailForm">
+        <h2 id="mercator-proposal-detail">{{ "3. In Detail" | translate }}</h2>
 
         <label>
             {{ "Description:" | translate }}
@@ -183,8 +183,8 @@
         </label>
     </ng-form>
 
-    <ng-form name="applicationMotivationForm">
-        <h2 id="application-motivation">{{ "4. Motivation" | translate }}</h2>
+    <ng-form name="mercatorProposalMotivationForm">
+        <h2 id="mercator-proposal-motivation">{{ "4. Motivation" | translate }}</h2>
 
         <label>
             {{ "What would be a successful outcome of your project or initiative? What is the aim you want to reach?" | translate }}
@@ -239,8 +239,8 @@
         </label>
     </ng-form>
 
-    <ng-form name="applicationFinanceForm">
-        <h2 id="application-finance">{{ "5. Finance" | translate }}</h2>
+    <ng-form name="mercatorProposalFinanceForm">
+        <h2 id="mercator-proposal-finance">{{ "5. Finance" | translate }}</h2>
 
         <label>
             {{ "Budget:" | translate }}
@@ -268,8 +268,8 @@
         </label>
     </ng-form>
 
-    <ng-form name="applicationExtraForm">
-        <h2 id="application-extra">{{ "6. Extra" | translate }}</h2>
+    <ng-form name="mercatorProposalExtraForm">
+        <h2 id="mercator-proposal-extra">{{ "6. Extra" | translate }}</h2>
 
         <label>
             {{ "Upload media files" | translate }}
@@ -318,5 +318,5 @@
         type="submit"
         value="{{ 'submit' | translate }}"
         class="m-call-to-action"
-        data-ng-disabled="applicationForm.$invalid" />
+        data-ng-disabled="mercatorProposalForm.$invalid" />
 </form>

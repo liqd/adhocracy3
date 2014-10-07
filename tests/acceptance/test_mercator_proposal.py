@@ -3,7 +3,7 @@ from pytest import fixture
 
 @fixture
 def browser(browser):
-    browser.visit(browser.app_url + 'application')
+    browser.visit(browser.app_url + 'mercator')
     return browser
 
 
