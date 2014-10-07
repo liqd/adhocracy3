@@ -697,7 +697,7 @@ class Boolean(AdhocracySchemaNode):
 
     schema_type = colander.Boolean(true_choices=('true', '1'))
     default = False
-    missing = colander.drop
+    missing = False
 
 
 class ISOCountryCode(AdhocracySchemaNode):
