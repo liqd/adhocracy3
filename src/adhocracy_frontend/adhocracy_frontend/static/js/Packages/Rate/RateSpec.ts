@@ -139,7 +139,7 @@ export var register = () => {
                     contra: 1,
                     neutral: 1
                 };
-                scopeMock.thisUsersRate = "notnull";
+                scopeMock.myRateResource = "notnull";
 
                 AdhRate.resetRates(scopeMock);
                 expect(scopeMock.rates.pro).toBe(0);
@@ -156,7 +156,7 @@ export var register = () => {
                     contra: 1,
                     neutral: 1
                 };
-                scopeMock.thisUsersRate = "notnull";
+                scopeMock.myRateResource = "notnull";
 
                 // FIXME: httpResponseStack is not the way to do this
                 // any more.  AdhRate is non-deterministic in the
@@ -173,12 +173,12 @@ export var register = () => {
 
                 var adapter = new AdhRateAdapter.RateAdapter();
 
-                AdhRate.fetchAggregateRates(adapter, scopeMock, q, httpMock, userMock).then(
+                AdhRate.fetchAggregatedRates(adapter, scopeMock, q, httpMock, userMock).then(
                     () => {
                         expect(scopeMock.rates.pro).toBe(2);
                         expect(scopeMock.rates.contra).toBe(1);
                         expect(scopeMock.rates.neutral).toBe(1);
-                        expect(scopeMock.thisUsersRate.data["adhocracy_core.sheets.rate.IRate"].subject).toBe(userMock.userPath);
+                        expect(scopeMock.myRateResource.data["adhocracy_core.sheets.rate.IRate"].subject).toBe(userMock.userPath);
                         done();
                     },
                     (msg) => {
