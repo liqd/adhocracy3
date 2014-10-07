@@ -61,6 +61,10 @@ export var register = (angular, config, meta_api) => {
                 return angular.injector(["ng"]).invoke(factory);
             })();
 
+            // When localstorage is available, adhUser will delete userPath
+            // which prevents us from setting it synchronously.
+            (<any>modernizr).localstorage = false;
+
             adhUser = (() => {
                 var factory = (
                     $q,
