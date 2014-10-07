@@ -182,6 +182,21 @@ class TestBatchView:
         inst.copy_header_if_exists('existing', subrequest)
         assert 'existing' in subrequest.headers
 
+    def test_copy_attr_if_exists_not_existing(self, context, request):
+        from copy import deepcopy
+        inst = self._make_one(context, request)
+        subrequest = deepcopy(request)
+        inst.copy_attr_if_exists('non_existing', subrequest)
+        assert not hasattr(subrequest, 'non_existing')
+
+    def test_copy_attr_if_exists_not_exists(self, context, request):
+        from copy import deepcopy
+        inst = self._make_one(context, request)
+        subrequest = deepcopy(request)
+        request.existing = 'Buh'
+        inst.copy_attr_if_exists('existing', subrequest)
+        assert hasattr(subrequest, 'existing')
+
     def test_extend_path_map_no_result_path(self, context, request):
         inst = self._make_one(context, request)
         path_map = {}
