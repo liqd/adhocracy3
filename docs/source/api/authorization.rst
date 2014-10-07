@@ -48,13 +48,13 @@ Roles with example permission mapping:
     - reviewer: do transition to specific workflow states:
         change workflow state to accepted/denied
 
-    - manager: edit meta stuff: permissions, transition to workflow states, ...:
-        add ...
-        edit ...
+    - manager: delete, edit meta stuff: permissions, transition to workflow states, ...:
+        'delete' illegal content
         change workflow state ..
         change permissions
 
     - admin: create an configure the participation process, manage principals:
+        add participation process
         set workflow
         manage principals
 
