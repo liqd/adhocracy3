@@ -1,11 +1,16 @@
 """Messaging support."""
 from collections.abc import Sequence
+from logging import getLogger
 
 from pkg_resources import resource_exists
 from pyramid.registry import Registry
 from pyramid.renderers import render
+from pyramid.settings import asbool
 from pyramid_mailer.interfaces import IMailer
 from pyramid_mailer.message import Message
+
+
+logger = getLogger(__name__)
 
 
 class Messenger():
@@ -15,9 +20,12 @@ class Messenger():
     def __init__(self, registry: Registry):
         """Create a new instance.
 
-        :param registry: used to retrieve the mailer
+        :param registry: used to retrieve and configure the mailer
         """
         self.registry = registry
+        self.use_mail_queue = asbool(registry.settings.get(
+            'adhocracy.use_mail_queue', 'false'))
+        logger.debug('Messenger will use mail queue: %s', self.use_mail_queue)
 
     def send_mail(self,
                   subject: str,
@@ -52,7 +60,10 @@ class Messenger():
                           recipients=recipients,
                           body=body,
                           html=html)
-        mailer.send_immediately(message)
+        if self.use_mail_queue:
+            mailer.send_to_queue(message)
+        else:
+            mailer.send_immediately(message)
 
     def _get_mailer(self) -> IMailer:
         return self.registry.getUtility(IMailer)
