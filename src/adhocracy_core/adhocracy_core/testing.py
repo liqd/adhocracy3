@@ -45,27 +45,32 @@ This assumes the user exists with path == 'X-User-Path'.
 reader_login = 'reader'
 reader_password = 'password'
 reader_roles = ['reader']
-contributor_header = {'X-User-Path': '/principals/users/0000002',
+annotator_header = {'X-User-Path': '/principals/users/0000002',
+                    'X-User-Token': 'SECRET_ANNOTATOR'}
+annotator_login = 'annotator'
+annotator_password = 'password'
+annotator_roles = ['annotator']
+contributor_header = {'X-User-Path': '/principals/users/0000003',
                       'X-User-Token': 'SECRET_CONTRIBUTOR'}
 contributor_login = 'contributor'
 contributor_password = 'password'
 contributor_roles = ['contributor']
-editor_header = {'X-User-Path': '/principals/users/0000003',
+editor_header = {'X-User-Path': '/principals/users/0000004',
                  'X-User-Token': 'SECRET_EDITOR'}
 editor_login = 'editor'
 editor_password = 'password'
 editor_roles = ['editor']
-reviewer_header = {'X-User-Path': '/principals/users/0000004',
+reviewer_header = {'X-User-Path': '/principals/users/0000005',
                    'X-User-Token': 'SECRET_REVIEWER'}
 reviewer_login = 'reviewer'
 reviewer_password = 'password'
 reviewer_roles = ['reviewer']
-manager_header = {'X-User-Path': '/principals/users/0000005',
+manager_header = {'X-User-Path': '/principals/users/0000006',
                   'X-User-Token': 'SECRET_EDITOR'}
 manager_login = 'manager'
 manager_password = 'password'
 manager_roles = ['manager']
-admin_header = {'X-User-Path': '/principals/users/0000006',
+admin_header = {'X-User-Path': '/principals/users/0000007',
                 'X-User-Token': 'SECRET_ADMIN'}
 admin_login = 'admin'
 admin_password = 'password'

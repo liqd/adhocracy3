@@ -33,9 +33,14 @@ Roles with example permission mapping:
     - reader: can view:
         view the proposal
 
-    - contributor: can add content:
+    - annotator: can add content metadata/annotations
         add comment to the proposal
         add voting to the proposal
+        add rating to the proposal
+        add tag to the proposal
+
+    - contributor: can add content:
+        add proposal
 
     - editor: can edit content:
         edit proposal

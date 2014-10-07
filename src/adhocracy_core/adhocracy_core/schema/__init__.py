@@ -155,6 +155,7 @@ class Role(AdhocracySchemaNode):
     default = 'reader'
     missing = colander.drop
     validator = colander.OneOf(['reader',
+                                'annotator',
                                 'contributor',
                                 'editor',
                                 'manager',
