@@ -458,13 +458,14 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("logs user in after register ", (done) => {
+                    it("does NOT log user in after register ", (done) => {
                         $scopeMock.register().then(() => {
-                            expect(adhUserMock.logIn).toHaveBeenCalled();
+                            expect(adhUserMock.logIn).not.toHaveBeenCalled();
                             done();
                         });
                     });
-                    it("redirects came from or / page after register ", (done) => {
+                    xit("redirects came from or / page after register ", (done) => {
+                        // FIXME: this condition must now be tested after click on the activation link.
                         $scopeMock.register().then(() => {
                             expect(adhTopLevelStateMock.redirectToCameFrom).toHaveBeenCalledWith("/");
                             done();
