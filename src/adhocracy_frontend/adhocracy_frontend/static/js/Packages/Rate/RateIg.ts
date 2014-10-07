@@ -150,7 +150,7 @@ export var register = (angular, config, meta_api) => {
                             done();
                         },
                         (error) : void => {
-                            expect(error).toBe(false);
+                            console.log("*** ERROR: " + error);
                             done();
                         });
             };
@@ -167,6 +167,14 @@ export var register = (angular, config, meta_api) => {
 
             it("logs in god", () => {
                 expect(adhUser.userPath).toContain("/principals/users/0000000/");
+            });
+
+            it("/adhocracy is postable", (done) => {
+                adhHttp.options("/adhocracy")
+                    .then((options) => {
+                        expect(options.POST).toBe(true);
+                        done();
+                    })
             });
 
             it("query 1: user's own rating", (done) => {
