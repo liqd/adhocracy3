@@ -14,45 +14,49 @@
         <h2 id="application-basic">{{ "1. Basic" | translate }}</h2>
 
         <h3>{{ "User Info:" | translate }}</h3>
-        <input type="text" placeholder="{{ 'Name' | translate }}" required="required" />
-        <input type="text" placeholder="{{ 'Lastname' | translate }}" required="required" />
-        <input type="email" placeholder="{{ 'Email' | translate }}" required="required" />
+        <input type="text" data-ng-model="data.basic.user.name" placeholder="{{ 'Name' | translate }}" required="required" />
+        <input type="text" data-ng-model="data.basic.user.lastname" placeholder="{{ 'Lastname' | translate }}" required="required" />
+        <input type="email" data-ng-model="data.basic.user.email" placeholder="{{ 'Email' | translate }}" required="required" />
 
         <h3>{{ "Organisation Info:" | translate }}</h3>
-        <input type="text" placeholder="{{ 'Name' | translate }}" required="required" />
-        <input type="email" placeholder="{{ 'Email' | translate }}" required="required" />
-        <input type="text" placeholder="{{ 'Address' | translate }}" required="required" />
-        <input type="text" placeholder="{{ 'Postcode' | translate }}" required="required" />
-        <input type="text" placeholder="{{ 'City' | translate }}" required="required" />
-        <input type="text" placeholder="{{ 'Country' | translate }}" required="required" />
+        <input type="text" data-ng-model="data.basic.organisation.name" placeholder="{{ 'Name' | translate }}" required="required" />
+        <input type="email" data-ng-model="data.basic.organisation.email" placeholder="{{ 'Email' | translate }}" required="required" />
+        <input type="text" data-ng-model="data.basic.organisation.address" placeholder="{{ 'Address' | translate }}" required="required" />
+        <input type="text" data-ng-model="data.basic.organisation.postcode" placeholder="{{ 'Postcode' | translate }}" required="required" />
+        <input type="text" data-ng-model="data.basic.organisation.city" placeholder="{{ 'City' | translate }}" required="required" />
+        <input type="text" data-ng-model="data.basic.organisation.country" placeholder="{{ 'Country' | translate }}" required="required" />
 
         {{ "Status:" | translate }}
         <label>
-            <input type="radio" name="organisationStatus" value="non-profit" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.status" name="organisationStatus" value="non-profit" required="required" />
             {{ "We’re a registered non-profit, e.g. NGO" | translate }}
         </label>
         <label>
-            <input type="radio" name="organisationStatus" value="possible" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.status" name="organisationStatus" value="possible" required="required" />
             {{ "A non-profit registration is planned or possible" | translate }}
         </label>
         <label>
-            <input type="radio" name="organisationStatus" value="support-needed" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.status" name="organisationStatus" value="support-needed" required="required" />
             {{ "I’d like to try, but I’m gonna need some help / Support needed" | translate }}
         </label>
         <label>
-            <input type="radio" name="organisationStatus" value="other" required="required" />
-            {{ "Other. Please specify:" | translate }}
+            <input type="radio" data-ng-model="data.basic.organisation.status" name="organisationStatus" value="other" required="required" />
+            {{ "Other." | translate }}
+            <span data-ng-if="data.basic.organisation.status == 'other'">{{ "Please specify:" | translate }}</span>
         </label>
         <textarea
-            data-ng-if="applicationBasicForm.organisationStatus == 'other'"
+            data-ng-if="data.basic.organisation.status == 'other'"
             maxlength="500"
-            placeholder="500 c. Max."></textarea>
+            placeholder="500 c. Max."
+            required="required"></textarea>
 
         <label>
             {{ "About the initiative or organisation:" | translate }}
             <textarea
+                data-ng-model="data.basic.organisation.about"
                 maxlength="750"
-                placeholder="750 c. Max."></textarea>
+                placeholder="750 c. Max."
+                required="required"></textarea>
             <div class="description">
                 {{ "Please provide a brief description of your organisation or initiative, specifying its aims and activities. Explain the highlights your organisation or initiative has achieved so far. You can share supporting websites or examples through a link. If you are selected, this paragraph might also be used for online and offline publications." | translate }}
             </div>
@@ -60,39 +64,41 @@
 
         {{ "Size of organisation:" | translate }}
         <label>
-            <input type="radio" name="organisationSize" value="0-5" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.size" name="organisationSize" value="0-5" required="required" />
             {{ "0 - 5" | translate }}
         </label>
         <label>
-            <input type="radio" name="organisationSize" value="5-10" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.size" name="organisationSize" value="5-10" required="required" />
             {{ "5 - 10" | translate }}
         </label>
         <label>
-            <input type="radio" name="organisationSize" value="10-20" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.size" name="organisationSize" value="10-20" required="required" />
             {{ "10 - 20" | translate }}
         </label>
         <label>
-            <input type="radio" name="organisationSize" value="20-50" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.size" name="organisationSize" value="20-50" required="required" />
             {{ "20 - 50" | translate }}
         </label>
         <label>
-            <input type="radio" name="organisationSize" value="gt50" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.size" name="organisationSize" value="gt50" required="required" />
             {{ "&gt;50" | translate }}
         </label>
 
         {{ "Organisational Cooperation:" | translate }}
         <label>
-            <input type="radio" name="organisationCooperation" value="1" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.cooperation" name="organisationCooperation" data-ng-value="true" required="required" />
             {{ "yes" | translate }}
         </label>
         <label>
-            <input type="radio" name="organisationCooperation" value="" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.cooperation" name="organisationCooperation" data-ng-value="false" required="required" />
             {{ "no" | translate }}
         </label>
         <textarea
-            data-ng-if="applicationBasicForm.organisationCooperation == '1'"
+            data-ng-if="data.basic.organisation.cooperation"
+            data-ng-model="data.basic.organisation.cooperationText"
             maxlength="300"
-            placeholder="{{ '300 c. Max.' | translate }}"></textarea>
+            placeholder="{{ '300 c. Max.' | translate }}"
+            required="required"></textarea>
         <div class="description">
             {{ "In your project or initiaitve, does your organisation work alone? Or, do you foresee the partnership of an established institution or player with an organisation or initiative that was founded or started after the year 2000?" | translate }}
         </div>
@@ -103,17 +109,22 @@
 
         <label>
             {{ "Title:" | translate }}
-            <input type="text" maxlength="100" placeholder="{{ '100 c. Max' | translate }}" required="required" />
+            <input type="text" data-ng-model="data.introduction.title" maxlength="100" placeholder="{{ '100 c. Max' | translate }}" required="required" />
         </label>
 
         <label>
             {{ "Teaser:" | translate }}
             <textarea
+                data-ng-model="data.introduction.teaser"
                 maxlength="300"
-                placeholder="{{ '300 c. Max.' | translate }}"></textarea>
+                placeholder="{{ '300 c. Max.' | translate }}"
+                required="required"></textarea>
         </label>
 
-        <input type="file" required="required" />
+        <label>
+            {{ "Upload a Picture" | translate }}
+            <input type="file" data-ng-model="data.introduction.picture" />
+        </label>
     </ng-form>
 
     <ng-form name="applicationDetailForm">
@@ -122,39 +133,43 @@
         <label>
             {{ "Description:" | translate }}
             <textarea
+                data-ng-model="data.detail.description"
                 maxlength="1000"
-                placeholder="{{ '1000 c. Max.' | translate }}"></textarea>
+                placeholder="{{ '1000 c. Max.' | translate }}"
+                required="required"></textarea>
             <div class="description">
                 {{ "Tell others what your idea is for and what it is. Think about why you are doing it, what you want to achieve and what you will do, who will benefit from your endeavour and which impact you will have. (This paragraph will appear on the main page and at the top of your contribution)." | translate }}
             </div>
         </label>
 
         <label>
-            <input type="radio" name="detailLocation" value="city" required="required" />
+            <input type="radio" data-ng-model="data.detail.location" name="detailLocation" value="city" required="required" />
             {{ "City" | translate }}
         </label>
         <label>
-            <input type="radio" name="detailLocation" value="country" required="required" />
+            <input type="radio" data-ng-model="data.detail.location" name="detailLocation" value="country" required="required" />
             {{ "Country" | translate }}
         </label>
         <label>
-            <input type="radio" name="detailLocation" value="town" required="required" />
+            <input type="radio" data-ng-model="data.detail.location" name="detailLocation" value="town" required="required" />
             {{ "Town" | translate }}
         </label>
         <label>
-            <input type="radio" name="detailLocation" value="online" required="required" />
+            <input type="radio" data-ng-model="data.detail.location" name="detailLocation" value="online" required="required" />
             {{ "Online" | translate }}
         </label>
         <label>
-            <input type="radio" name="detailLocation" value="ruhr" required="required" />
+            <input type="radio" data-ng-model="data.detail.location" name="detailLocation" value="ruhr" required="required" />
             {{ "Linkage to the Ruhr area" | translate }}
         </label>
 
         <label>
             {{ "What is the story behind your idea?" | translate }}
             <textarea
+                data-ng-model="data.detail.story"
                 maxlength="800"
-                placeholder="{{ '800 c. Max.' | translate }}"></textarea>
+                placeholder="{{ '800 c. Max.' | translate }}"
+                required="required"></textarea>
             <div class="description">
                 {{ "What triggers you to act? What drives you to want to make the change you propose? What’s the “big dream” behind your idea? Please also share specific examples of the target group." | translate }}
             </div>
@@ -167,8 +182,10 @@
         <label>
             {{ "What would be a successful outcome of your project or initiative? What is the aim you want to reach?" | translate }}
             <textarea
+                data-ng-model="data.motivation.success"
                 maxlength="800"
-                placeholder="{{ '800 c. Max.' | translate }}"></textarea>
+                placeholder="{{ '800 c. Max.' | translate }}"
+                required="required"></textarea>
             <div class="description">
                 {{ "What is different in a year after starting your endeavour? What will have changed? What will a beneficiary of your idea tell you about it in a year from today?" | translate }}
             </div>
@@ -177,8 +194,10 @@
         <label>
             {{ "How do you want to get there?" | translate }}
             <textarea
+                data-ng-model="data.motivation.plan"
                 maxlength="800"
-                placeholder="{{ '5 Bullet points or 800 c. Max.' | translate }}"></textarea>
+                placeholder="{{ '5 Bullet points or 800 c. Max.' | translate }}"
+                required="required"></textarea>
             <div class="description">
                 {{ "How will your realize your project or initiative? Which steps will you take? Describe, as practically as possible, the approach and method you plan to choose for this activity or initiative." | translate }}
             </div>
@@ -187,8 +206,10 @@
         <label>
             {{ "Why does Europe need your idea?" | translate }}
             <textarea
+                data-ng-model="data.motivation.relevance"
                 maxlength="800"
-                placeholder="{{ '800 c. Max.' | translate }}"></textarea>
+                placeholder="{{ '800 c. Max.' | translate }}"
+                required="required"></textarea>
             <div class="description">
                 {{ "Which value does your idea provide for Europe? What makes your idea different from others? If you can realize it, can you then imagine transferring it to other countries, sectors or organisations?" | translate }}
             </div>
@@ -197,8 +218,10 @@
         <label>
             {{ "Please list your partner organisations and team members with their relevant experiences/skills." | translate }}
             <textarea
+                data-ng-model="data.motivation.partners"
                 maxlength="800"
-                placeholder="{{ '800 c. Max.' | translate }}"></textarea>
+                placeholder="{{ '800 c. Max.' | translate }}"
+                required="required"></textarea>
             <div class="description">
                 {{ "How was the partnership established and does it involve organisations that have never been previously involved in a similar constellation? Describe relevant experiences of your team members." | translate }}
             </div>
@@ -210,27 +233,27 @@
 
         <label>
             {{ "Budget:" | translate }}
-            <input type="number" required="required" />
+            <input type="number" data-ng-model="data.finance.budget" required="required" />
         </label>
 
         <label>
             {{ "Requested Funding:" | translate }}
-            <input type="number" max="50000" required="required" />
+            <input type="number" data-ng-model="data.finance.funding" max="50000" required="required" />
         </label>
 
         {{ "Granted?" | translate }}
         <label>
-            <input type="radio" name="organisationCooperation" value="1" required="required" />
+            <input type="radio" data-ng-model="data.finance.granted" name="financeGranted" data-ng-value="true" required="required" />
             {{ "yes" | translate }}
         </label>
         <label>
-            <input type="radio" name="organisationCooperation" value="" required="required" />
+            <input type="radio" data-ng-model="data.finance.granted" name="financeGranted" data-ng-value="false" required="required" />
             {{ "no" | translate }}
         </label>
 
         <label>
             {{ "Upload Financial Plan Document" | translate }}
-            <input type="file" required="required" />
+            <input type="file" data-ng-model="data.finance.document" />
         </label>
     </ng-form>
 
@@ -239,38 +262,44 @@
 
         <label>
             {{ "Upload media files" | translate }}
-            <input type="file" multiple="multiple" required="required" />
+            <input type="file" data-ng-model="data.extra.mediaFiles" multiple="multiple" />
         </label>
 
         <label>
             {{ "Share Experience (Optional)." | translate }}
             <textarea
+                data-ng-model="data.extra.experience"
                 maxlength="300"
                 placeholder="{{ '300 c. Max.' | translate }}"></textarea>
         </label>
 
         {{ "How did you hear about “Advocate Europe”?" | translate }}
         <label>
-            <input type="checkbox" required="required" />
+            <input type="checkbox" data-ng-model="data.extra.hear.colleague" />
             {{ "Colleague" | translate }}
         </label>
         <label>
-            <input type="checkbox" required="required" />
+            <input type="checkbox" data-ng-model="data.extra.hear.website" />
             {{ "Website" | translate }}
         </label>
         <label>
-            <input type="checkbox" required="required" />
+            <input type="checkbox" data-ng-model="data.extra.hear.newsletter" />
             {{ "Newsletter" | translate }}
         </label>
         <label>
-            <input type="checkbox" required="required" />
+            <input type="checkbox" data-ng-model="data.extra.hear.facebook" />
             {{ "Facebook" | translate }}
         </label>
         <label>
-            <input type="checkbox" name="hearOther" required="required" />
-            {{ "Other. Please, specify:" | translate }}
+            <input type="checkbox" data-ng-model="data.extra.hear.other" />
+            {{ "Other." | translate }}
+            <span data-ng-if="data.extra.hear.other">{{ "Please specify:" | translate }}</span>
         </label>
-        <input type="text" data-ng-if="applicationExtraForm.hearOther" required="required" />
+        <input
+            type="text"
+            data-ng-if="data.extra.hear.other"
+            data-ng-model="data.extra.hear.otherDescription"
+            required="required" />
     </ng-form>
 
     <input
