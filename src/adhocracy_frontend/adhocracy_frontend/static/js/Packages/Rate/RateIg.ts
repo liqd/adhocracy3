@@ -183,7 +183,7 @@ export var register = (angular, config, meta_api) => {
                     .then((options) => {
                         expect(options.POST).toBe(true);
                         done();
-                    })
+                    });
             });
 
             it("query 1: user's own rating", (done) => {
