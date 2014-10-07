@@ -445,7 +445,7 @@ export var register = () => {
                             done();
                         },
                         (error) => {
-                            expect(false).toBe(true);
+                            console.log("this should not happen.");
                             done();
                         }
                     );
