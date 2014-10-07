@@ -29,7 +29,7 @@ var mkTimeoutMock = () => {
 var mkAdhMetaApiMock = () => {
     var mock = {
         objBefore: {
-            content_type: "",
+            content_type: RIParagraph.content_type,
             data: {
                 readWriteSheet: {
                     readOnlyField: 3,
@@ -42,7 +42,7 @@ var mkAdhMetaApiMock = () => {
         },
 
         objAfter: {
-            content_type: "",
+            content_type: RIParagraph.content_type,
             data: {
                 readWriteSheet: {
                     readWriteField: 8
@@ -154,7 +154,7 @@ export var register = () => {
             });
             describe("post", () => {
                 it("calls $http.post", (done) => {
-                    adhHttp.post("/some/path", {data: {}}).then(
+                    adhHttp.post("/some/path", {content_type: RIParagraph.content_type, data: {}}).then(
                         () => {
                             expect($httpMock.post).toHaveBeenCalled();
                             done();
@@ -168,7 +168,7 @@ export var register = () => {
             });
             describe("put", () => {
                 it("calls $http.put", (done) => {
-                    adhHttp.put("/some/path", {data: {}}).then(
+                    adhHttp.put("/some/path", {content_type: RIParagraph.content_type, data: {}}).then(
                         () => {
                             expect($httpMock.put).toHaveBeenCalled();
                             done();
@@ -238,9 +238,10 @@ export var register = () => {
                 };
 
                 it("posts to parent pool, adds IVersionable sheet with correct follows field", (done) => {
-                    adhHttp.postNewVersionNoFork("/ome/path", {data: {}}).then(
+                    adhHttp.postNewVersionNoFork("/ome/path", {content_type: RIParagraph.content_type, data: {}}).then(
                         (resource) => {
                             expect($httpMock.post).toHaveBeenCalledWith("/ome", {
+                                content_type: RIParagraph.content_type,
                                 data: {
                                     "adhocracy_core.sheets.versions.IVersionable": {
                                         follows: ["/ome/path"]
@@ -266,7 +267,7 @@ export var register = () => {
                     adhHttp.getNewestVersionPathNoFork = (<any>jasmine.createSpy("getNewestVersionPathNoForkSpy"))
                         .and.returnValue(q.when("next_head"));
 
-                    adhHttp.postNewVersionNoFork("/somee/path", {data: {}}).then(
+                    adhHttp.postNewVersionNoFork("/somee/path", {content_type: RIParagraph.content_type, data: {}}).then(
                         () => {
                             expect("postNewVersionNoFork should have failed!").toBe(false);
                             done();
@@ -285,7 +286,7 @@ export var register = () => {
                     };
                     $httpMock.post.and.returnValue(q.reject({ data: error }));
 
-                    adhHttp.postNewVersionNoFork("/somee/path", {data: {}}).then(
+                    adhHttp.postNewVersionNoFork("/somee/path", {content_type: RIParagraph.content_type, data: {}}).then(
                         () => {
                             expect("postNewVersionNoFork should have failed!").toBe(false);
                             done();
@@ -298,9 +299,10 @@ export var register = () => {
                 });
 
                 it("adds a root_versions field if rootVersions is passed", (done) => {
-                    adhHttp.postNewVersionNoFork("/somee/path", {data: {}}, ["foo", "bar"]).then(
+                    adhHttp.postNewVersionNoFork("/somee/path", {content_type: RIParagraph.content_type, data: {}}, ["foo", "bar"]).then(
                         () => {
                             expect($httpMock.post).toHaveBeenCalledWith("/somee", {
+                                content_type: RIParagraph.content_type,
                                 data: {
                                     "adhocracy_core.sheets.versions.IVersionable": {
                                         follows: ["/somee/path"]
@@ -334,7 +336,7 @@ export var register = () => {
 
                     spyOn(adhHttp, "getNewestVersionPathNoFork").and.callThrough();
 
-                    adhHttp.postNewVersionNoFork("/somee/path", {data: {}}).then(
+                    adhHttp.postNewVersionNoFork("/somee/path", {content_type: RIParagraph.content_type, data: {}}).then(
                         () => {
                             expect($httpMock.post.calls.count()).toEqual(2);
 
@@ -365,7 +367,7 @@ export var register = () => {
 
             describe("postToPool", () => {
                 it("calls $http.post", (done) => {
-                    adhHttp.postToPool("/some/path", {data: {}}).then(
+                    adhHttp.postToPool("/some/path", {content_type: RIParagraph.content_type, data: {}}).then(
                         () => {
                             expect($httpMock.post).toHaveBeenCalled();
                             done();
@@ -417,11 +419,11 @@ export var register = () => {
 
                 beforeEach((done) => {
                     $httpMock.post.and.returnValue(q.when({data: [
-                        {body: {content_type: "adhocracy_core.resources.pool.IBasicPool", path: "get response"}},
-                        {body: {content_type: "adhocracy_core.resources.pool.IBasicPool", path: "put response"}},
-                        {body: {content_type: "adhocracy_core.resources.pool.IBasicPool", path: "post1 response"}},
-                        {body: {content_type: "adhocracy_core.resources.pool.IBasicPool", path: "post2 response"}},
-                        {body: {content_type: "adhocracy_core.resources.pool.IBasicPool", path: "get2 response"}}
+                        {body: {content_type: RIParagraph.content_type, path: "get response"}},
+                        {body: {content_type: RIParagraph.content_type, path: "put response"}},
+                        {body: {content_type: RIParagraph.content_type, path: "post1 response"}},
+                        {body: {content_type: RIParagraph.content_type, path: "post2 response"}},
+                        {body: {content_type: RIParagraph.content_type, path: "get2 response"}}
                     ]}));
 
                     adhHttp.withTransaction((httpTrans) => {
@@ -429,13 +431,13 @@ export var register = () => {
 
                         get = httpTrans.get("/get/path");
                         put = httpTrans.put("/put/path", <any>{
-                            content_type: "content_type"
+                            content_type: RIParagraph.content_type
                         });
                         post1 = httpTrans.post("/post/path/1", <any>{
-                            content_type: "content_type"
+                            content_type: RIParagraph.content_type
                         });
                         post2 = httpTrans.post("/post/path/2", <any>{
-                            content_type: "content_type"
+                            content_type: RIParagraph.content_type
                         });
                         get2 = httpTrans.get(post1.path);
                         return httpTrans.commit();
@@ -533,8 +535,8 @@ export var register = () => {
             });
 
             it("deletes the path", () => {
-                expect(AdhConvert.exportContent(adhMetaApiMock, {content_type: "", data: {}, path: "test"}))
-                    .toEqual({content_type: "", data: {}});
+                expect(AdhConvert.exportContent(adhMetaApiMock, {content_type: RIParagraph.content_type, data: {}, path: "test"}))
+                    .toEqual({content_type: RIParagraph.content_type, data: {}});
             });
             it("deletes read-only properties", () => {
                 var x = AdhConvert.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
