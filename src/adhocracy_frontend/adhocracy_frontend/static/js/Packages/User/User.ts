@@ -118,12 +118,11 @@ export class User {
             .then((resource) => {
                 _self.data = resource.data[SIUserBasic.nick];
                 _self.loggedIn = true;
-                return resource;  // FIXME this is only here because of a bug in DefinitelyTyped
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect
                 _self.deleteToken();
-                return _self.$q.reject("failed to fetch user resource");
+                throw "failed to fetch user resource";
             });
     }
 
