@@ -484,12 +484,6 @@ export var register = () => {
                             done();
                         });
                     });
-                    it("navigates to cameFrom or / after success", (done) => {
-                        $scopeMock.register().then(() => {
-                            expect(adhTopLevelStateMock.redirectToCameFrom).toHaveBeenCalledWith("/");
-                            done();
-                        });
-                    });
                 });
             });
         });
