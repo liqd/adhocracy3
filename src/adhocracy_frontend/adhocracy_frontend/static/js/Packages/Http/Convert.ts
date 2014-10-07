@@ -6,6 +6,21 @@ import Resources = require("../../Resources");
 import Resources_ = require("../../Resources_");
 
 
+var sanityCheck = (obj : Resources.Content<any>) : void => {
+    if (typeof obj !== "object") {
+        throw ("unexpected type: " + (typeof obj).toString() + " " + JSON.stringify(obj, null, 2));
+    }
+
+    if (!obj.hasOwnProperty("content_type")) {
+        throw ("resource has no content_type field: " + JSON.stringify(obj, null, 2));
+    }
+
+    if (!Resources_.resourceRegistry.hasOwnProperty(obj.content_type)) {
+        throw ("unknown content_type: " + obj.content_type + " " + JSON.stringify(obj, null, 2));
+    }
+};
+
+
 /**
  * transform objects on the way in (all request methods)
  */
@@ -17,24 +32,13 @@ export var importContent = <Content extends Resources.Content<any>>(
     "use strict";
 
     var obj = response.data;
-
-    // construct resource
-
-    if (typeof obj !== "object") {
-        throw ("unexpected type: " + (typeof obj).toString() + " " + JSON.stringify(obj, null, 2));
-    }
-
-    if (!obj.hasOwnProperty("content_type")) {
-        throw ("resource has no content_type field: " + JSON.stringify(obj, null, 2));
-    }
+    sanityCheck(obj);
 
     if (!obj.hasOwnProperty("path")) {
         throw ("resource has no path field: " + JSON.stringify(obj, null, 2));
     }
 
-    if (!Resources_.resourceRegistry.hasOwnProperty(obj.content_type)) {
-        throw ("unknown content_type: " + obj.content_type + " " + JSON.stringify(obj, null, 2));
-    }
+    // construct resource
 
     var _rclass = Resources_.resourceRegistry[obj.content_type];
     var _obj = new _rclass({
@@ -159,6 +163,7 @@ export var importBatchContent = <Content extends Resources.Content<any>>(
 export var exportContent = <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) : Content => {
     "use strict";
 
+    sanityCheck(obj);
     var newobj : Content = _.cloneDeep(obj);
 
     // remove some fields from newobj.data[*] and empty sheets from
