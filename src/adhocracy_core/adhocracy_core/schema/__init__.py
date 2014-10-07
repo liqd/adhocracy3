@@ -686,3 +686,28 @@ class Rate(Integer):
     """
 
     validator = colander.OneOf((1, 0, -1))
+
+
+class Boolean(AdhocracySchemaNode):
+
+    """SchemaNode for boolean values.
+
+    Example value: false
+    """
+
+    schema_type = colander.Boolean(true_choices=('true', '1'))
+    default = False
+    missing = colander.drop
+
+
+class ISOCountryCode(AdhocracySchemaNode):
+
+    """An ISO 3166-1 alpha-2 country code (two uppercase ASCII letters).
+
+    Example value: US
+    """
+
+    schema_type = colander.String
+    default = 'DE'
+    missing = colander.drop
+    validator = colander.Regex(r'^[A-Z][A-Z]$')
