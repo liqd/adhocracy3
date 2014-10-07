@@ -62,6 +62,7 @@ export var logBackendBatchError = (
     }
 
     var lastBatchItemResponse : IBackendError = response.data[response.data.length - 1].body;
+    console.log("# of failed batch item: " + (response.data.length - 1));
     console.log(lastBatchItemResponse);
 
     var errors : IBackendErrorItem[] = lastBatchItemResponse.errors;
