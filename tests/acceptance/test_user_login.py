@@ -68,4 +68,4 @@ def register(browser, name, email, password, repeated_password=None,
 
 
 def is_not_yet_activated(browser):
-    return browser.browser.is_text_present("User account not yet activated")
+    return browser.is_element_present_by_css('.register-success')
