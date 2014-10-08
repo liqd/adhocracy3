@@ -256,7 +256,7 @@ class Boolean(AdhocracySchemaNode):
     Example value: false
     """
 
-    schema_type = colander.Boolean(true_choices=('true', '1'))
+    schema_type = colander.Boolean
     default = False
     missing = False
 
@@ -291,7 +291,7 @@ class CurrencyAmount(AdhocracySchemaNode):
     Example value: 1.99
     """
 
-    schema_type = colander.Decimal(quant='.01')
+    schema_type = colander.Decimal
     default = decimal.Decimal
     missing = colander.drop
 
