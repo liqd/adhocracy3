@@ -8,7 +8,65 @@ import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 var pkgLocation = "/Mercator";
 
 
-export interface IMercatorProposalScope extends AdhResourceWidgets.IResourceWidgetScope {}
+export interface IMercatorProposalScope extends AdhResourceWidgets.IResourceWidgetScope {
+    data : {
+        basic : {
+            user : {
+                name : string;
+                lastname : string;
+                email : string;
+            };
+            organisation : {
+                name : string;
+                email : string;
+                address : string;
+                postcode : string;
+                city : string;
+                country : string;
+                status : string;
+                statustext : string;
+                about : string;
+                size : string;
+                cooperation : boolean;
+                cooperationText? : string;
+            };
+        };
+        introduction : {
+            title : string;
+            teaser : string;
+            picture? : any;
+        };
+        detail : {
+            description : string;
+            location : string;
+            story : string;
+        };
+        motivation : {
+            success : string;
+            plan : string;
+            relevance : string;
+            partners : string;
+        };
+        finance : {
+            budget : number;
+            funding : number;
+            granted : boolean;
+            document? : any;
+        };
+        extra : {
+            mediaFiles? : any[];
+            experience? : string;
+            hear : {
+                colleague : boolean;
+                website : boolean;
+                newsletter : boolean;
+                facebook : boolean;
+                other : boolean;
+                otherDescription : string;
+            }
+        };
+    };
+}
 
 
 export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IMercatorProposalScope> {
