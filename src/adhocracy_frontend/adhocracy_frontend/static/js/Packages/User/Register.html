@@ -50,7 +50,7 @@
         </div>
     </form>
 
-    <div class="box-with-button">
+    <div data-ng-if="!success" class="box-with-button">
         <p>{{ "You already have an account? Go to the LogIn window." | translate }}</p>
         <a class="button" href="/login">{{ "login" | translate }}</a>
     </div>
