@@ -146,6 +146,7 @@ $font-size-small: 12px;
 $font-size-normal: 14px;
 $font-size-plus: 16px;
 $font-size-large: 21px;
+$font-size-huge: 40px;
 
 @mixin font-tracking($value) {
     @if $value == narrow {

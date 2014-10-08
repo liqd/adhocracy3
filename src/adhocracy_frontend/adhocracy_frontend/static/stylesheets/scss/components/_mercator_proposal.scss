@@ -1,0 +1,42 @@
+$gutter: 3%;
+$columns: 6;
+
+@function column-width($n) {
+    @return (100% - $gutter) / $columns * $n - $gutter;
+}
+
+.mercator-proposal-form {
+    position: relative;
+    width: column-width(4) + $gutter;
+    background: white;
+    padding-left: column-width(1) + 2 * $gutter;
+    padding-right: $gutter;
+    border: 1px solid $color-structure-border;
+    border-left: 0;
+
+    label {
+        display: block;
+    }
+
+    input[type="submit"] {
+        font-size: $font-size-huge;
+        width: 100%;
+    }
+
+    .description {
+        width: column-width(2) / column-width(4) * 100%;
+        position: absolute;
+        left: 100% + $gutter * column-width(2) / column-width(4);
+        padding: 0 0.5em;
+    }
+}
+
+.mercator-proposal-nav {
+    position: fixed;
+    width: column-width(1);
+    border: 1px solid $color-structure-border;
+    padding: 0 1em;
+    left: $gutter;
+    top: 0.5em;
+    z-index: 1;
+}
