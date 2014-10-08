@@ -7,6 +7,7 @@ from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Boolean
+from adhocracy_core.schema import CurrencyAmount
 from adhocracy_core.schema import Email
 from adhocracy_core.schema import ISOCountryCode
 from adhocracy_core.schema import SingleLine
@@ -159,6 +160,11 @@ class FinanceSchema(colander.MappingSchema):
 
     """Data structure for financial aspects."""
 
+    budget = CurrencyAmount(missing=colander.required)
+    requested_funding = CurrencyAmount(missing=colander.required)
+    granted = Boolean()
+    # financial_plan = AssetPath()  # (2 Mb. max.)
+
 
 finance_meta = sheet_metadata_defaults._replace(isheet=IFinance,
                                                 schema_class=FinanceSchema)
@@ -167,6 +173,17 @@ finance_meta = sheet_metadata_defaults._replace(isheet=IFinance,
 class ExtrasSchema(colander.MappingSchema):
 
     """Data structure for additional fields."""
+
+    # media = list of AssetPath()
+    # categories = list of enum???
+    experience = Text()
+    heard_from_colleague = Boolean()
+    heard_from_website = Boolean()
+    heard_from_newsletter = Boolean()
+    heard_from_facebook = Boolean()
+    # There is no heard_from_elsewhere Boolean, since that automatically
+    # follows iff heard_elsewhere is not empty
+    heard_elsewhere = Text()
 
 
 extras_meta = sheet_metadata_defaults._replace(isheet=IExtras,
