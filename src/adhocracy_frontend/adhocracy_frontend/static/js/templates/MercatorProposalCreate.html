@@ -45,6 +45,7 @@
             <span data-ng-if="data.basic.organisation.status == 'other'">{{ "Please specify:" | translate }}</span>
         </label>
         <textarea
+            data-msd-elastic=""
             data-ng-if="data.basic.organisation.status == 'other'"
             data-ng-model="data.basic.organisation.statustext"
             name="basic-organisation-statustext"
@@ -55,6 +56,7 @@
         <label>
             {{ "About the initiative or organisation:" | translate }}
             <textarea
+                data-msd-elastic=""
                 data-ng-model="data.basic.organisation.about"
                 name="basic-organisation-about"
                 maxlength="750"
@@ -97,6 +99,7 @@
             {{ "no" | translate }}
         </label>
         <textarea
+            data-msd-elastic=""
             data-ng-if="data.basic.organisation.cooperation"
             data-ng-model="data.basic.organisation.cooperationText"
             name="basic-organisation-cooperationText"
@@ -119,6 +122,7 @@
         <label>
             {{ "Teaser:" | translate }}
             <textarea
+                data-msd-elastic=""
                 data-ng-model="data.introduction.teaser"
                 name="introduction-teaser"
                 maxlength="300"
@@ -138,6 +142,7 @@
         <label>
             {{ "Description:" | translate }}
             <textarea
+                data-msd-elastic=""
                 data-ng-model="data.detail.description"
                 name="detail-description"
                 maxlength="1000"
@@ -172,6 +177,7 @@
         <label>
             {{ "What is the story behind your idea?" | translate }}
             <textarea
+                data-msd-elastic=""
                 data-ng-model="data.detail.story"
                 name="detail-story"
                 maxlength="800"
@@ -189,6 +195,7 @@
         <label>
             {{ "What would be a successful outcome of your project or initiative? What is the aim you want to reach?" | translate }}
             <textarea
+                data-msd-elastic=""
                 data-ng-model="data.motivation.success"
                 name="motivation-success"
                 maxlength="800"
@@ -202,6 +209,7 @@
         <label>
             {{ "How do you want to get there?" | translate }}
             <textarea
+                data-msd-elastic=""
                 data-ng-model="data.motivation.plan"
                 name="motivation-plan"
                 maxlength="800"
@@ -215,6 +223,7 @@
         <label>
             {{ "Why does Europe need your idea?" | translate }}
             <textarea
+                data-msd-elastic=""
                 data-ng-model="data.motivation.relevance"
                 name="motivation-relevance"
                 maxlength="800"
@@ -228,6 +237,7 @@
         <label>
             {{ "Please list your partner organisations and team members with their relevant experiences/skills." | translate }}
             <textarea
+                data-msd-elastic=""
                 data-ng-model="data.motivation.partners"
                 name="motivation-partners"
                 maxlength="800"
@@ -279,6 +289,7 @@
         <label>
             {{ "Share Experience (Optional)." | translate }}
             <textarea
+                data-msd-elastic=""
                 data-ng-model="data.extra.experience"
                 name="extra-experience"
                 maxlength="300"

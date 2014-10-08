@@ -17,6 +17,7 @@ require.config({
         angularAnimate: "../lib/angular-animate/angular-animate",
         angularTranslate: "../lib/angular-translate/angular-translate",
         angularTranslateLoader: "../lib/angular-translate-loader-static-files/angular-translate-loader-static-files",
+        angularElastic: "../lib/angular-elastic/elastic",
         lodash: "../lib/lodash/dist/lodash",
         q: "../lib/q/q",
         modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
@@ -40,6 +41,9 @@ require.config({
         },
         angularTranslateLoader: {
             deps: ["angularTranslate"]
+        },
+        angularElastic: {
+            deps: ["angular"]
         },
         underscore: {
             exports: "_"
