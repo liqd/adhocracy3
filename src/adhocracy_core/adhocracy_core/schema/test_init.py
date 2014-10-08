@@ -668,6 +668,51 @@ class DateTimeUnitTest(unittest.TestCase):
         assert today in result
 
 
+class BooleanUnitTest(unittest.TestCase):
+
+    def _make_one(self):
+        from adhocracy_core.schema import Boolean
+        return Boolean()
+
+    def test_deserialize_valid_empty(self):
+        inst = self._make_one()
+        assert inst.deserialize() is False
+
+    def test_serialize_valid_empty(self):
+        inst = self._make_one()
+        assert inst.serialize() == 'false'
+
+    def test_deserialize_valid_true(self):
+        inst = self._make_one()
+        assert inst.deserialize('true') is True
+
+    def test_serialize_valid_true(self):
+        inst = self._make_one()
+        assert inst.serialize(True) == 'true'
+
+    def test_deserialize_valid_false(self):
+        inst = self._make_one()
+        assert inst.deserialize('false') is False
+
+    def test_serialize_valid_false(self):
+        inst = self._make_one()
+        assert inst.serialize(False) == 'false'
+
+    def test_deserialize_valid_one(self):
+        inst = self._make_one()
+        assert inst.deserialize('1') is True
+
+    def test_deserialize_invalid(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            assert inst.deserialize('yes') is False
+
+    def test_serialize_invalid_no_bool(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('not-a-bool')
+
+
 class TestPostPool:
 
     @fixture
