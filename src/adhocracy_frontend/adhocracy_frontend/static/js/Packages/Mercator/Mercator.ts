@@ -10,12 +10,9 @@ var pkgLocation = "/Mercator";
 
 export interface IMercatorProposalScope extends AdhResourceWidgets.IResourceWidgetScope {}
 
-export interface IMercatorProposalAdapter<R> {}
-
 
 export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IMercatorProposalScope> {
     constructor(
-        private adapter : IMercatorProposalAdapter<R>,
         adhConfig : AdhConfig.Type,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames,
