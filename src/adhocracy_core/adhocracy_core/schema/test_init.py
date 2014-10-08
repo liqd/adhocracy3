@@ -713,6 +713,123 @@ class BooleanUnitTest(unittest.TestCase):
             inst.deserialize('not-a-bool')
 
 
+class CurrencyAmountUnitTest(unittest.TestCase):
+
+    def _make_one(self):
+        from adhocracy_core.schema import CurrencyAmount
+        return CurrencyAmount()
+
+    def test_deserialize_valid_empty(self):
+        inst = self._make_one()
+        assert inst.deserialize() == colander.drop
+
+    def test_serialize_valid_empty(self):
+        inst = self._make_one()
+        assert inst.serialize() == '0.00'
+
+    def test_deserialize_valid(self):
+        from decimal import Decimal
+        inst = self._make_one()
+        assert inst.deserialize('30.15') == Decimal('30.15')
+
+    def test_serialize_valid(self):
+        from decimal import Decimal
+        inst = self._make_one()
+        assert inst.serialize(Decimal('30.15')) == '30.15'
+
+    def test_deserialize_valid_no_fractional_digits(self):
+        from decimal import Decimal
+        inst = self._make_one()
+        assert inst.deserialize('77') == Decimal('77')
+
+    def test_serialize_valid_no_fractional_digits(self):
+        from decimal import Decimal
+        inst = self._make_one()
+        assert inst.serialize(Decimal('77')) == '77.00'
+
+    def test_deserialize_valid_just_fractional_digits(self):
+        from decimal import Decimal
+        inst = self._make_one()
+        assert inst.deserialize('.99') == Decimal('0.99')
+
+    def test_serialize_valid_just_fractional_digits(self):
+        from decimal import Decimal
+        inst = self._make_one()
+        assert inst.serialize(Decimal('0.99')) == '0.99'
+
+    def test_deserialize_valid_too_many_fractional_digits(self):
+        from decimal import Decimal
+        inst = self._make_one()
+        assert inst.deserialize('12.3456') == Decimal('12.35')
+
+    def test_serialize_valid_too_many_fractional_digits(self):
+        from decimal import Decimal
+        inst = self._make_one()
+        assert inst.serialize(Decimal('12.3456')) == '12.35'
+
+    def test_serialize_valid_float(self):
+        inst = self._make_one()
+        assert inst.serialize(7.77) == '7.77'
+
+    def test_serialize_valid_int(self):
+        inst = self._make_one()
+        assert inst.serialize(65) == '65.00'
+
+    def test_deserialize_invalid(self):
+        from decimal import Decimal
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('1.2.3')
+
+    def test_serialize_invalid(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.serialize('not-a-number')
+
+
+class ISOCountryCodeUnitTest(unittest.TestCase):
+
+    def _make_one(self):
+        from adhocracy_core.schema import ISOCountryCode
+        return ISOCountryCode()
+
+    def test_deserialize_valid_empty(self):
+        inst = self._make_one()
+        assert inst.deserialize() == colander.drop
+
+    def test_serialize_valid_empty(self):
+        inst = self._make_one()
+        assert inst.serialize() == 'DE'
+
+    def test_deserialize_valid(self):
+        inst = self._make_one()
+        assert inst.deserialize('US') == 'US'
+
+    def test_serialize_valid(self):
+        inst = self._make_one()
+        assert inst.serialize('US') == 'US'
+
+    def test_deserialize_invalid_too_long(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('EUR')
+
+    def test_deserialize_invalid_too_short(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('D')
+
+    def test_deserialize_invalid_lowercase_letters(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('de')
+
+    def test_deserialize_invalid_not_letters(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('1A')
+
+
 class TestPostPool:
 
     @fixture

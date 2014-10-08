@@ -296,7 +296,7 @@ class CurrencyAmount(AdhocracySchemaNode):
     def schema_type(self) -> colander.SchemaType:
         return colander.Decimal(quant='.01')
 
-    default = decimal.Decimal
+    default = decimal.Decimal(0)
     missing = colander.drop
 
 
