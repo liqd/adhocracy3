@@ -84,6 +84,9 @@ export var init = (config, meta_api) => {
                 controller: ["adhUser", "adhTopLevelState", "adhDone", "$route", "$location", AdhUser.activateController],
                 template: ""
             })
+            .when("/mercator", {
+                templateUrl: "/static/js/templates/MercatorProposalCreate.html"
+            })
             .when("/activation_error", {
                 templateUrl: "/static/js/templates/ActivationError.html",
                 controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
