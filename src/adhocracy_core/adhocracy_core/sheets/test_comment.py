@@ -1,5 +1,3 @@
-import unittest
-
 from pyramid import testing
 from pytest import fixture
 
