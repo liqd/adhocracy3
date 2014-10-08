@@ -77,8 +77,9 @@ class TestPool:
         assert 'prefix' + '0'.zfill(7) in inst
 
     def test_find_service(self):
+        from substanced.interfaces import IService
         inst = self._makeOne()
-        inst['service'] = testing.DummyResource()
+        inst['service'] = testing.DummyResource(__provides__=IService)
         inst['service'].__is_service__ = True
         service = inst.find_service('service')
         assert service is inst['service']

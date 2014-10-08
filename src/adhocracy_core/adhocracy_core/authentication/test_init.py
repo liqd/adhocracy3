@@ -279,18 +279,18 @@ class GetTokenManagerUnitTest(unittest.TestCase):
 class TokenHeaderAuthenticationPolicyIntegrationTest(unittest.TestCase):
 
     def setUp(self):
-        from substanced.interfaces import IFolder
+        from substanced.interfaces import IService
         config = testing.setUp()
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.resources.principal')
         config.include('adhocracy_core.authentication')
         self.config = config
-        context = testing.DummyResource(__provides__=IFolder,
+        context = testing.DummyResource(__provides__=IService,
                                         __is_service__=True)
-        context['principals'] = testing.DummyResource(__provides__=IFolder,
+        context['principals'] = testing.DummyResource(__provides__=IService,
                                                       __is_service__=True)
         context['principals']['users'] = testing.DummyResource(
-            __provides__=IFolder,
+            __provides__=IService,
             __is_service__=True)
         user = testing.DummyResource()
         context['principals']['users']['1'] = user
