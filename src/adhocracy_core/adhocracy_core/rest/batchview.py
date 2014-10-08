@@ -131,7 +131,8 @@ class BatchView(RESTView):
             keywords_args['content_type'] = 'application/json'
 
         request = Request.blank(path, **keywords_args)
-        request.root = self.request.root
+        self.copy_attr_if_exists('root', request)
+        self.copy_attr_if_exists('__cached_principals__', request)
         self.copy_header_if_exists('X-User-Path', request)
         self.copy_header_if_exists('X-User-Token', request)
         return request
@@ -170,6 +171,11 @@ class BatchView(RESTView):
         value = self.request.headers.get(header, None)
         if value is not None:
             request.headers[header] = value
+
+    def copy_attr_if_exists(self, attributename: str, request: Request):
+        value = getattr(self.request, attributename, None)
+        if value is not None:
+            setattr(request, attributename, value)
 
     def _try_to_decode_json(self, body: bytes) -> dict:
         """Try to decode `body` as a JSON object.

@@ -117,7 +117,7 @@ def browser_root(browser, frontend, backend, frontend_url):
     return browser
 
 
-def browser_test_helper(browser, url) -> Browser:
+def browser_test_helper(browser, url, wait=5) -> Browser:
     """Return test browser and go to url."""
     add_helper_methods_to_splinter_browser_wrapper(browser)
 
@@ -127,7 +127,7 @@ def browser_test_helper(browser, url) -> Browser:
         code = 'jsApiReporter.finished'
         return browser.browser.evaluate_script(code)
 
-    browser.wait_for_condition(jasmine_finished, 5)
+    browser.wait_for_condition(jasmine_finished, wait)
 
     return browser
 

@@ -9,6 +9,7 @@ import RISection = require("../../Resources_/adhocracy_core/resources/sample_sec
 import RISectionVersion = require("../../Resources_/adhocracy_core/resources/sample_section/ISectionVersion");
 import RITag = require("../../Resources_/adhocracy_core/interfaces/ITag");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
+import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 import AdhMetaApi = require("../MetaApi/MetaApi");
@@ -43,19 +44,19 @@ export var register = (angular, config, meta_api) => {
                 var proposal : AdhHttp.ITransactionResult =
                     transaction.post(poolPath, new RIProposal({preliminaryNames: adhPreliminaryNames, name: proposalName}));
                 var section : AdhHttp.ITransactionResult =
-                    transaction.post(proposal.path, new RISection({preliminaryNames: adhPreliminaryNames, name : "Motivation"}));
+                    transaction.post(proposal.path, new RISection({preliminaryNames: adhPreliminaryNames, name: "Motivation"}));
 
                 var sectionVersionResource = new RISectionVersion({preliminaryNames: adhPreliminaryNames});
                 var sectionVersion : AdhHttp.ITransactionResult = transaction.post(section.path, sectionVersionResource);
 
                 var proposalVersionResource = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
-                proposalVersionResource.data["adhocracy_core.sheets.document.IDocument"] =
+                proposalVersionResource.data[SIDocument.nick] =
                     new SIDocument.AdhocracyCoreSheetsDocumentIDocument({
                         title: proposalName,
                         description: "whoof",
                         elements: [sectionVersion.path]
                     });
-                proposalVersionResource.data["adhocracy_core.sheets.versions.IVersionable"] =
+                proposalVersionResource.data[SIVersionable.nick] =
                     new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
                         follows: [proposal.first_version_path]
                     });
@@ -67,14 +68,14 @@ export var register = (angular, config, meta_api) => {
                         return adhHttp.get(lastTagPath);
                     })
                     .then((lastTag : RITag) => {
-                        var lastVersionPaths : string[] = lastTag.data["adhocracy_core.sheets.tags.ITag"].elements;
+                        var lastVersionPaths : string[] = lastTag.data[SITag.nick].elements;
                         expect(lastVersionPaths.length).toBe(1);
                         expect(lastVersionPaths[0].substring(lastVersionPaths[0].length - 4)).toBe("001/");
                     })
                     .then(() => {
                         done();
                     }, (error) => {
-                        expect(false).toBe(true);
+                        expect(error).toBe(true);
                         done();
                     });
             };

@@ -81,7 +81,7 @@ export var init = (config, meta_api) => {
                 templateUrl: "/static/js/templates/Register.html"
             })
             .when("/activate/:key", {
-                controller: ["adhUser", "adhTopLevelState", "adhDone", "$route", AdhUser.activateController],
+                controller: ["adhUser", "adhTopLevelState", "adhDone", "$route", "$location", AdhUser.activateController],
                 template: ""
             })
             .when("/activation_error", {

@@ -39,6 +39,7 @@ export interface IScopeRegister {
     };
     errors : string[];
     supportEmail : string;
+    success : boolean;
 
     register : () => ng.IPromise<void>;
 }
@@ -117,12 +118,11 @@ export class User {
             .then((resource) => {
                 _self.data = resource.data[SIUserBasic.nick];
                 _self.loggedIn = true;
-                return resource;  // FIXME this is only here because of a bug in DefinitelyTyped
             }, (reason) => {
                 // The user resource that was returned by the server could not be accessed.
                 // This may happen e.g. with a network disconnect
                 _self.deleteToken();
-                return _self.$q.reject("failed to fetch user resource");
+                throw "failed to fetch user resource";
             });
     }
 
@@ -157,15 +157,6 @@ export class User {
     public logIn(nameOrEmail : string, password : string) : ng.IPromise<void> {
         var _self : User = this;
         var promise;
-
-        // NOTE: the post requests here do not contain resources in
-        // the body, so adhHttp must not be used (because it
-        // implicitly does importContent / exportContent which expect
-        // Types.Content)!
-
-        // FIXME: Use adhHttp.post, not $http.post.  In the future,
-        // there may be other features of adhHttp that we want to use
-        // implicitly, such as caching.
 
         if (nameOrEmail.indexOf("@") === -1) {
             promise = _self.adhHttp.postRaw("/login_username", {
@@ -314,10 +305,7 @@ export var registerController = (
         return adhUser.register($scope.input.username, $scope.input.email, $scope.input.password, $scope.input.passwordRepeat)
             .then((response) => {
                 $scope.errors = [];
-                return adhUser.logIn($scope.input.username, $scope.input.password).then(
-                    () => adhTopLevelState.redirectToCameFrom("/"),
-                    (errors) => bindServerErrors($scope, errors)
-                );
+                $scope.success = true;
             }, (errors) => bindServerErrors($scope, errors));
     };
 };
