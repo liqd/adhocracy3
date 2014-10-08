@@ -86,7 +86,7 @@ export var init = (config, meta_api) => {
                 template: ""
             })
             .when("/mercator", {
-                templateUrl: "/static/js/templates/MercatorProposalCreate.html"
+                templateUrl: "/static/js/templates/Package/Mercator/MercatorProposalCreate.html"
             })
             .when("/activation_error", {
                 templateUrl: "/static/js/templates/ActivationError.html",
