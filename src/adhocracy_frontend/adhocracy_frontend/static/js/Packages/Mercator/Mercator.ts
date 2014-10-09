@@ -92,6 +92,7 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
     }
 
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IMercatorProposalScope>) : ng.IPromise<R[]> {
+        console.log(instance.scope.data);
         return this.$q.when([]);
     }
 
