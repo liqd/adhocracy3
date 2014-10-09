@@ -25,8 +25,8 @@ export var register = () => {
             };
 
             httpMock = {
-                get: () => null,
-                getNewestVersionPathNoFork: () => q.when(null)
+                get: () => q.when(),
+                getNewestVersionPathNoFork: () => q.when()
             };
 
             rateResources = [
@@ -179,6 +179,33 @@ export var register = () => {
                         done();
                     }
                 );
+            });
+        });
+
+        describe("rateController", () => {
+            var adapterMock;
+            var adhPermissionsMock;
+            var adhPreliminaryNamesMock;
+            var realUpdateRates;
+
+            beforeEach((done) => {
+                adapterMock = jasmine.createSpyObj("adapterMock", ["subject", "object", "rate", "rateablePostPoolPath"]);
+                adhPermissionsMock = jasmine.createSpyObj("adhPermissionsMock", ["bindScope"]);
+
+                realUpdateRates = AdhRate.updateRates;
+                spyOn(AdhRate, "updateRates").and.returnValue(q.when());
+
+                // only used in untested functions
+                adhPreliminaryNamesMock = undefined;
+
+                AdhRate.rateController(adapterMock, scopeMock, q, httpMock, adhPermissionsMock, userMock, adhPreliminaryNamesMock)
+                    .then(done, (reason) => {
+                        expect(reason).toBe(undefined);
+                    });
+            });
+
+            afterEach(() => {
+                AdhRate.updateRates = realUpdateRates;
             });
         });
     });
