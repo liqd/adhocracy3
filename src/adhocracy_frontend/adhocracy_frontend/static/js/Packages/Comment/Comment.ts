@@ -1,3 +1,5 @@
+import _ = require("lodash");
+
 import AdhResourcesBase = require("../../ResourcesBase");
 
 import AdhConfig = require("../Config/Config");
@@ -7,7 +9,7 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
-
+import RIExternalResource = require("../../Resources_/adhocracy_core/resources/external_resource/IExternalResource");
 import Util = require("../Util/Util");
 
 var pkgLocation = "/Comment";
@@ -172,6 +174,62 @@ export var adhCommentListing = (adhConfig : AdhConfig.Type) => {
             $location : ng.ILocationService
         ) : void => {
             adhTopLevelState.setCameFrom($location.url());
+        }]
+    };
+};
+
+/**
+ * Directive which checks whether an ExternalResource exists for the given
+ * poolPath and key. ExternalResource is a commentable.
+ *
+ * If not, it is created on the fly.
+ *
+ * If it exists, the corresponding comment listing is created.
+ */
+export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
+    return {
+        restrict: "E",
+        template: "<adh-comment-listing data-ng-if=\"display\" data-path=\"{{commentablePath}}\"></adh-comment-listing>",
+        scope: {
+            poolPath: "@",
+            key: "@"
+        },
+        controller: ["adhHttp", "adhPreliminaryNames", "$scope", (
+            adhHttp : AdhHttp.Service<any>,
+            adhPreliminaryNames : AdhPreliminaryNames,
+            $scope
+        ) : void => {
+
+            $scope.display = false;
+            var commentablePath = $scope.poolPath + $scope.key + "/";
+
+            var setScope = (path) => {
+                $scope.display = true;
+                $scope.commentablePath = commentablePath;
+            };
+
+            // create commentable if it doesn't exist yet
+            // FIXME: Add Filter "adhocracy_core.sheets.name.IName:name": $scope.key (didn't work when I tried)
+            adhHttp.get($scope.poolPath, {
+                "content_type": "adhocracy_core.resources.external_resource.IExternalResource"
+            }).then(
+                (result) => {
+                    if (_.contains(result.data["adhocracy_core.sheets.pool.IPool"].elements, commentablePath)) {
+                        setScope(commentablePath);
+                    } else {
+                        var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: $scope.key});
+                        adhHttp.post($scope.poolPath, externalResource).then((obj) => {
+                            if (obj.path !== commentablePath) {
+                                throw "Created object has wrong path (internal error)";
+                            }
+                            setScope(commentablePath);
+                        });
+                    }
+                },
+                (msg) => {
+                    throw "Could not query given postPool";
+                }
+            );
         }]
     };
 };
