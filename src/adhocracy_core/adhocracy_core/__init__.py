@@ -1,7 +1,7 @@
 """Setup pyramid wsgi app."""
 from pyramid.config import Configurator
 from pyramid_zodbconn import get_connection
-from substanced.evolution import mark_unfinished_as_finished as markunf
+from substanced.db import RootAdded
 import transaction
 
 from adhocracy_core.authentication import TokenHeaderAuthenticationPolicy
@@ -10,31 +10,22 @@ from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.resources.principal import groups_and_roles_finder
 
 
-def root_factory(request, t=transaction, connection=None,
-                 mark_unfinished_as_finished=False):
-    """ A function which can be used as a Pyramid ``root_factory``.
-
-    It accepts a request and returns an instance of the ``Root`` content type.
-
-    """
-    # FIXME: Fix substanced bug: mark_unfinished_as_finished keyword
-    # is not working.
+def root_factory(request):
+    """ A function which can be used as a Pyramid ``root_factory``."""
     # Don't get the root object if the request already has one.
     # Workaround to make the subrequests in adhocracy_core.rest.batchview work.
     if getattr(request, 'root', False):
         return request.root
-    if connection is None:
-        connection = get_connection(request)
+    connection = get_connection(request)
     zodb_root = connection.root()
     if 'app_root' not in zodb_root:
         registry = request.registry
         app_root = registry.content.create(IRootPool.__identifier__,
                                            registry=request.registry)
         zodb_root['app_root'] = app_root
-        t.savepoint()  # give app_root a _p_jar
-        if mark_unfinished_as_finished:
-            markunf(app_root, registry, t)
-        t.commit()
+        transaction.savepoint()  # give app_root a _p_jar
+        registry.notify(RootAdded(app_root))
+        transaction.commit()
     add_after_commit_hooks(request)
     return zodb_root['app_root']
 
@@ -72,6 +63,7 @@ def includeme(config):
         groupfinder=groups_and_roles_finder,
         timeout=authn_timeout)
     config.set_authentication_policy(authn_policy)
+    config.include('substanced.db')
     config.include('.authentication')
     config.include('.evolution')
     config.include('.events')
@@ -95,4 +87,5 @@ def main(global_config, **settings):
     """ Return a Pyramid WSGI application. """
     config = Configurator(settings=settings, root_factory=root_factory)
     includeme(config)
-    return config.make_wsgi_app()
+    app = config.make_wsgi_app()
+    return app
