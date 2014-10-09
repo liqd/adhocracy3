@@ -358,7 +358,7 @@ def mock_group_locator(registry) -> Mock:
     locator = Mock(spec=GroupLocatorAdapter)
     locator.get_group_by_id.return_value = None
     locator.get_roleids.return_value = None
-    registry.registerAdapter(lambda x: locator, (Interface,),
+    registry.registerAdapter(lambda x, y: locator, (Interface, Interface),
                              IGroupLocator)
     return locator
 
@@ -502,6 +502,7 @@ class ManageAppAPI:
 @fixture(scope='class')
 def app(zeo, settings, websocket):
     """Return the adhocracy wsgi application."""
+    from pyramid.threadlocal import manager
     import adhocracy_core
     import adhocracy_core.resources.sample_paragraph
     import adhocracy_core.resources.sample_section
@@ -513,6 +514,8 @@ def app(zeo, settings, websocket):
     configurator.include(adhocracy_core.resources.sample_proposal)
     configurator.include(adhocracy_core.resources.sample_section)
     manageapp = configurator.make_wsgi_app()
+    manageapplocals = {'registry': manageapp.registry, 'request': None}
+    manager.push(manageapplocals)
     manageapi = ManageAppAPI(manageapp)
     manageapi.add_user_token(userid=god_header['X-User-Path'],
                              token=god_header['X-User-Token'])
@@ -522,6 +525,7 @@ def app(zeo, settings, websocket):
     manageapi.add_user_token(userid=contributor_header['X-User-Path'],
                              token=contributor_header['X-User-Token'])
     transaction.commit()
+    manager.pop()
     app = configurator.make_wsgi_app()
     return app
 

@@ -276,6 +276,45 @@ class TestReferenceHasNewVersionSubscriberUnitTest:
         assert mock_sheet.set.called is False
 
 
+class TestTagCreatedAndAddedOrModifiedSubscriber:
+
+    @fixture
+    def catalog(self):
+        from substanced.interfaces import IService
+        from substanced.interfaces import IFolder
+        from unittest.mock import Mock
+        catalog = testing.DummyResource(
+            __provides__=(IFolder, IService), __is_service__=True)
+        catalog['adhocracy'] = testing.DummyResource(
+            __provides__=(IFolder, IService), __is_service__=True)
+        catalog['adhocracy'].reindex_resource = Mock()
+        return catalog
+
+    @fixture
+    def context(self, pool, catalog):
+        pool['catalogs'] = catalog
+        return pool
+
+    def call_fut(self, event):
+        from adhocracy_core.resources.subscriber import\
+            tag_created_and_added_or_modified_subscriber
+        return tag_created_and_added_or_modified_subscriber(event)
+
+    def test_with_removed_and_added_elements(self, context, catalog):
+        registry = testing.DummyResource()
+        added_tagged = testing.DummyResource()
+        removed_tagged = testing.DummyResource()
+        old = {'elements': [removed_tagged]}
+        new = {'elements': [added_tagged]}
+        event = testing.DummyResource(object=context,
+                                      isheet=ISheet,
+                                      registry=registry,
+                                      old_appstruct=old,
+                                      new_appstruct=new)
+        self.call_fut(event)
+        catalog['adhocracy'].reindex_resource.call_count == 2
+
+
 @fixture()
 def integration(config):
     config.include('adhocracy_core.events')
@@ -295,3 +334,4 @@ def test_register_subscriber(registry):
     assert subscriber.itemversion_created_subscriber.__name__ in handlers
     assert subscriber.resource_modified_subscriber.__name__ in handlers
     assert subscriber.reference_has_new_version_subscriber.__name__ in handlers
+    assert subscriber.tag_created_and_added_or_modified_subscriber.__name__ in handlers

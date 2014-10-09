@@ -51,7 +51,8 @@ class TestCommentableSheet:
         data = inst.get()
         assert list(data['comments']) == [comment]
 
-    def test_set_with_comments(self, meta, context):
+    def test_set_with_comments(self, meta, context, mock_graph):
+        mock_graph.get_references_for_isheet.return_value = {}
         inst = meta.sheet_class(meta, context)
         inst.set({'comments': []})
         assert not 'comments' in inst._data
