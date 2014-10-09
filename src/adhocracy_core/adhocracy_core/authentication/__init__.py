@@ -217,7 +217,8 @@ class TokenHeaderAuthenticationPolicy(CallbackAuthenticationPolicy):
     def effective_principals(self, request: Request) -> list:
         """Return roles and groups for the current user.
 
-        THE RESULT IS CACHED for the current request!
+        THE RESULT IS CACHED for the current request in the request attribute
+        called: __cached_principals__ .
         """
         cached_principals = getattr(request, '__cached_principals__', None)
         if cached_principals:

@@ -1,4 +1,6 @@
 """Default item resource."""
+from copy import copy
+
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ITag
 from adhocracy_core.interfaces import IItem
@@ -45,6 +47,10 @@ item_metadata = pool_metadata._replace(
     pool_metadata.after_creation,
     item_type=IItemVersion,
 )
+
+
+item_basic_sheets_without_name_sheet = copy(item_metadata.basic_sheets)
+item_basic_sheets_without_name_sheet.remove(adhocracy_core.sheets.name.IName)
 
 
 def includeme(config):

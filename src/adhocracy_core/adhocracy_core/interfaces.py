@@ -14,6 +14,7 @@ from zope.interface.interfaces import IObjectEvent
 from substanced.interfaces import IPropertySheet
 from substanced.interfaces import ReferenceClass
 from substanced.interfaces import IUserLocator
+from substanced.interfaces import IService
 
 
 class ISheet(Interface):
@@ -260,7 +261,7 @@ class IPool(IResource):  # pragma: no cover
         """
 
 
-class IServicePool(IPool):
+class IServicePool(IPool, IService):
 
     """Pool serving as a :term:`service`."""
 

@@ -171,11 +171,12 @@ class TestUserLocatorAdapter:
 
     @fixture
     def context(self, pool):
+        from substanced.interfaces import IService
         from substanced.interfaces import IFolder
-        pool['principals'] = testing.DummyResource(__is_service__=True,
-                                                   __provides__=IFolder)
-        pool['principals']['users'] = testing.DummyResource(__is_service__=True,
-                                                            __provides__=IFolder)
+        pool['principals'] = testing.DummyResource(
+            __is_service__=True, __provides__=(IFolder, IService))
+        pool['principals']['users'] = testing.DummyResource(
+            __is_service__=True, __provides__=(IFolder, IService))
         return pool
 
     def test_create(self):
@@ -285,11 +286,12 @@ class TestGroupLocatorAdapter:
 
     @fixture
     def context(self, pool):
+        from substanced.interfaces import IService
         from substanced.interfaces import IFolder
-        pool['principals'] = testing.DummyResource(__is_service__=True,
-                                                   __provides__=IFolder)
-        pool['principals']['groups'] = testing.DummyResource(__is_service=True,
-                                                             __provides__=IFolder)
+        pool['principals'] = testing.DummyResource(
+            __is_service__=True, __provides__=(IFolder, IService))
+        pool['principals']['groups'] = testing.DummyResource(
+            __is_service=True, __provides__=(IFolder, IService))
         return pool
 
     @fixture

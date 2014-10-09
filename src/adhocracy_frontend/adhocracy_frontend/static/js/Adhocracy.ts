@@ -15,6 +15,7 @@ import angularRoute = require("angularRoute");  if (angularRoute) { return; };
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { return; };
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { return; };
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { return; };
+import angularElastic = require("angularElastic");  if (angularElastic) { return; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
@@ -37,6 +38,7 @@ import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets"
 import AdhRate = require("./Packages/Rate/Rate");
 import AdhRateAdapter = require("./Packages/Rate/Adapter");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
+import AdhMercator = require("./Packages/Mercator/Mercator");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -63,7 +65,7 @@ export var init = (config, meta_api) => {
     // FIXME: The functionality to set the locale is not yet done
     config.locale = "de";
 
-    var app = angular.module("adhocracy3SampleFrontend", ["pascalprecht.translate", "ngRoute", "ngAnimate"]);
+    var app = angular.module("adhocracy3SampleFrontend", ["monospaced.elastic", "pascalprecht.translate", "ngRoute", "ngAnimate"]);
 
     app.config(["$translateProvider", "$routeProvider", "$locationProvider", (
         $translateProvider,
@@ -81,8 +83,11 @@ export var init = (config, meta_api) => {
                 templateUrl: "/static/js/templates/Register.html"
             })
             .when("/activate/:key", {
-                controller: ["adhUser", "adhTopLevelState", "adhDone", "$route", AdhUser.activateController],
+                controller: ["adhUser", "adhTopLevelState", "adhDone", "$route", "$location", AdhUser.activateController],
                 template: ""
+            })
+            .when("/mercator", {
+                template: "<adh-resource-wrapper><adh-mercator path=\"@preliminary\"></adh-mercator></adh-resource-wrapper>"
             })
             .when("/activation_error", {
                 templateUrl: "/static/js/templates/ActivationError.html",
@@ -210,6 +215,12 @@ export var init = (config, meta_api) => {
             new AdhRateAdapter.RateAdapter(),
             adhConfig
         )]);
+
+    app.directive("adhMercator", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+        (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
+            var widget = new AdhMercator.MercatorProposal(adhConfig, adhHttp, adhPreliminaryNames, $q);
+            return widget.createDirective();
+        }]);
 
     // get going
 
