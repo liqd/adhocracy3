@@ -85,6 +85,9 @@ class DummyPool(testing.DummyResource):
         return prefix + '_0000000'
 
     def add_service(self, name, resource, **kwargs):
+        from substanced.interfaces import IService
+        from zope.interface import alsoProvides
+        alsoProvides(resource, IService)
         resource.__is_service__ = True
         self.add(name, resource)
 

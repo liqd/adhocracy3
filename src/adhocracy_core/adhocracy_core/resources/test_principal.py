@@ -282,12 +282,9 @@ class UserLocatorAdapterIntegrationTest(unittest.TestCase):
 class TestGroupLocatorAdapter:
 
     @fixture
-    def context(self, pool):
-        from substanced.interfaces import IFolder
-        pool['principals'] = testing.DummyResource(__is_service__=True,
-                                                   __provides__=IFolder)
-        pool['principals']['groups'] = testing.DummyResource(__is_service=True,
-                                                             __provides__=IFolder)
+    def context(self, pool, service):
+        pool['principals'] = service 
+        pool['principals']['groups'] = service.clone()
         return pool
 
     @fixture
