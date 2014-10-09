@@ -18,4 +18,30 @@ def main(global_config, **settings):
     """ Return a Pyramid WSGI application. """
     config = Configurator(settings=settings, root_factory=root_factory)
     includeme(config)
-    return config.make_wsgi_app()
+    app = config.make_wsgi_app()
+    warm_up_database(app)
+    return app
+
+
+def warm_up_database(app):
+    """Fill the zodb connection pool to make the application start faster."""
+    # FIXME This makes not much sense for really big databases
+    from pyramid import testing
+    from adhocracy_core.interfaces import IResource
+    from adhocracy_core.rest.views import ResourceRESTView
+    request = testing.DummyRequest()
+    request.registry = app.registry
+    request.validated = {}
+    request.errors = []
+    root = app.root_factory(request)
+    # warm up reference map
+    om = root.__objectmap__
+    [x for x in om.referencemap.refmap.values()]
+    [x for x in om.referencemap.refmap.keys()]
+    # warm up all resources in the database
+    resolve = om.object_for
+    resources = [resolve(p) for p in om.pathlookup(('',))]
+    for resource in [r for r in resources if IResource.providedBy(r)]:
+        view = ResourceRESTView(resource, request)
+        appstruct = view.get()
+        del appstruct
