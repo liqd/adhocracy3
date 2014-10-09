@@ -1,5 +1,3 @@
-from collections import Iterable
-
 from pyramid import testing
 from pytest import fixture
 
@@ -56,16 +54,12 @@ def test_includeme_register_tags_sheet(config):
 
 class MockTagSheet(TagSheet):
 
-    """Replace _reindex_resources with dummy implementation."""
-
     def __init__(self, meta, context):
         super().__init__(meta, context)
-        self._reindex_resources_called = False
-        self.resources = None
+        self.data = None
 
-    def _reindex_resources(self, resources: Iterable):
-        self._reindex_resources_called = True
-        self.resources = resources
+    def set(self, appstruct: dict, omit=(), send_event=True, registry=None):
+        self.data = appstruct
 
 
 class TestTagSheet:
@@ -93,14 +87,7 @@ class TestTagSheet:
         inst = MockTagSheet(meta, context)
         child = testing.DummyResource(__provides__=ITag)
         inst.set(appstruct={'elements': [child]})
-        assert inst._reindex_resources_called is True
-        assert inst.resources == {child}
-
-    def test_set_no_change(self, meta, context):
-        from adhocracy_core.sheets.tags import ITag
-        inst = MockTagSheet(meta, context)
-        inst.set(appstruct={'elements': []})
-        assert inst._reindex_resources_called is False
+        assert inst.data == {'elements': [child]}
 
 
 def test_includeme_register_tag_sheet(config):

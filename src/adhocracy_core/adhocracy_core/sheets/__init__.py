@@ -126,13 +126,17 @@ class GenericResourceSheet(PropertySheet):
     def set(self, appstruct: dict, omit=(), send_event=True,
             registry=None) -> bool:
         """Store appstruct."""
+        appstruct_old = self.get()
         appstruct = self._omit_forbidden_keys(appstruct, omit)
         self._store_data(appstruct)
         if registry is None:
             registry = get_current_registry(self.context)
         self._store_references(appstruct, registry)
         # FIXME: only store struct if values have changed
-        self._notify_resource_sheet_modified(send_event, registry)
+        self._notify_resource_sheet_modified(send_event,
+                                             registry,
+                                             appstruct_old,
+                                             appstruct)
         return bool(appstruct)
 
     def _omit_forbidden_keys(self, appstruct: dict, omit=()):
@@ -153,11 +157,13 @@ class GenericResourceSheet(PropertySheet):
                                                   appstruct,
                                                   registry)
 
-    def _notify_resource_sheet_modified(self, send_event, registry):
+    def _notify_resource_sheet_modified(self, send_event, registry, old, new):
         if send_event:
             event = ResourceSheetModified(self.context,
                                           self.meta.isheet,
-                                          registry)
+                                          registry,
+                                          old,
+                                          new)
             registry.notify(event)
 
 

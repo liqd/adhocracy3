@@ -41,12 +41,16 @@ class ResourceSheetModified:
     :param object(adhocracy_core.interfaces.IResource):
     :param isheet(adhocracy_core.interfaces.IISheet):
     :param registry(pyramid.registry.Request):
+    :param old_appstruct(dict): The old :term:`appstruct` data.
+    :param new_appstruct(dict): The new :term:`appstruct` data.
     """
 
-    def __init__(self, object, isheet, registry):
+    def __init__(self, object, isheet, registry, old_appstruct, new_appstruct):
         self.object = object
         self.isheet = isheet
         self.registry = registry
+        self.old_appstruct = old_appstruct
+        self.new_appstruct = new_appstruct
 
 
 @implementer(IItemVersionNewVersionAdded)
