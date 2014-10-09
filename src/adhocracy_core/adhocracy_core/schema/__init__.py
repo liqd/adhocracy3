@@ -302,7 +302,7 @@ class ResourceObject(colander.SchemaType):
         :param value: the resource to serialize
         :return: the url or path of that resource
         """
-        if value in (colander.null, ''):
+        if value in (colander.null, '', None):
             return ''
         try:
             raise_attribute_error_if_not_location_aware(value)
