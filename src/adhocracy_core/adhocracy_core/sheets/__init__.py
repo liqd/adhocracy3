@@ -1,9 +1,15 @@
 """Adhocracy sheets."""
+from logging import getLogger
+
 from persistent.mapping import PersistentMapping
 from pyramid.decorator import reify
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
+from pyramid.traversal import resource_path
 from substanced.property import PropertySheet
+from transaction.interfaces import TransientError
+from ZODB.POSException import POSError
+from ZODB.POSException import ConnectionStateError
 from zope.interface import implementer
 import colander
 
@@ -16,6 +22,9 @@ from adhocracy_core.interfaces import SheetMetadata
 from adhocracy_core.schema import Reference
 from adhocracy_core.utils import remove_keys_from_dict
 from adhocracy_core.utils import normalize_to_tuple
+
+
+logger = getLogger(__name__)
 
 
 @implementer(IResourceSheet)
@@ -37,10 +46,23 @@ class GenericResourceSheet(PropertySheet):
 
     def get(self, params: dict={}) -> dict:
         """Return appstruct."""
-        appstruct = self._default_appstruct
-        appstruct.update(self._get_data_appstruct(params))
-        appstruct.update(self._get_reference_appstruct(params))
-        appstruct.update(self._get_back_reference_appstruct(params))
+        try:
+            appstruct = self._default_appstruct
+            appstruct.update(self._get_data_appstruct(params))
+            appstruct.update(self._get_reference_appstruct(params))
+            appstruct.update(self._get_back_reference_appstruct(params))
+        except (ValueError, AttributeError, KeyError, ConnectionStateError,
+                POSError) as err:
+            # If an error is raises here it is most likely because the Database
+            # connection is closed (ConnectionStateError) somehow.
+            # FIXME!! This should never happen, TEMPORALLY WORKAROUND
+            msg = '\nError getting the sheet data for context {path}: ·{err}.'\
+                  '\nRaising TransientError instead to reattemp the request.'
+            logger.error(msg.format(path=resource_path(self.context),
+                                    err=str(err)))
+            raise TransientError(str(err))
+            # Raise TransientError to make the pyramid_tm tween reattemp the
+            # request. Hopefully it will work then.
         return appstruct
 
     @property
