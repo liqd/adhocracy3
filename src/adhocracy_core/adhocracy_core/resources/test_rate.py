@@ -51,6 +51,21 @@ def test_includeme_registry_create_rateversion(registry, pool_graph_catalog):
 
 
 @mark.usefixtures('integration')
+def test_includeme_registry_create_ratesservice(registry, pool):
+    from adhocracy_core.resources.rate import IRatesService
+    from substanced.util import find_service
+    assert registry.content.create(IRatesService.__identifier__, parent=pool)
+    assert find_service(pool, 'rates')
+
+
+@mark.usefixtures('integration')
+def test_add_ratesservice(registry, pool):
+    from adhocracy_core.resources.rate import add_ratesservice
+    add_ratesservice(pool, registry, {})
+    assert pool['rates']
+
+
+@mark.usefixtures('integration')
 def test_includeme_registry_search_rateversion(registry, pool_graph_catalog):
     from adhocracy_core.resources.rate import IRateVersion
     pool = pool_graph_catalog

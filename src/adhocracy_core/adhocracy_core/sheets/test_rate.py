@@ -2,6 +2,11 @@ from pyramid import testing
 from pytest import fixture
 from pytest import mark
 
+@fixture
+def context(context, service):
+    context['rates'] = service
+    return context
+
 
 class TestRateSheet:
 
@@ -51,7 +56,7 @@ def integration(config):
 
 
 @mark.usefixtures('integration')
-def test_includeme_register_rate_sheet(config):
+def test_includeme_register_rate_sheet(config, context):
     from adhocracy_core.sheets.rate import IRate
     from adhocracy_core.utils import get_sheet
     context = testing.DummyResource(__provides__=IRate)
@@ -60,7 +65,7 @@ def test_includeme_register_rate_sheet(config):
 
 
 @mark.usefixtures('integration')
-def test_includeme_register_index_rate(registry):
+def test_includeme_register_index_rate(registry, context):
     from .rate import IRate
     from substanced.interfaces import IIndexView
     assert registry.adapters.lookup((IRate,), IIndexView, name='adhocracy|rate')

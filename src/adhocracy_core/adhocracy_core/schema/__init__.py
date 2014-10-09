@@ -9,6 +9,7 @@ from pyramid.traversal import resource_path
 from pytz import UTC
 from pyramid.traversal import find_interface
 from substanced.util import get_dotted_name
+from substanced.util import find_service
 from zope.interface.interfaces import IInterface
 import colander
 import pytz
@@ -540,7 +541,7 @@ def _get_post_pool(context: IPool, iresource_or_service_name) -> IResource:
     if IInterface.providedBy(iresource_or_service_name):
         return find_interface(context, iresource_or_service_name)
     else:
-        return context.find_service(iresource_or_service_name)
+        return find_service(context, iresource_or_service_name)
 
 
 @colander.deferred

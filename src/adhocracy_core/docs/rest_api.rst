@@ -786,7 +786,7 @@ for more on comments and *post pools*)::
     >>> comment_path = resp.json["path"]
     >>> first_commvers_path = resp.json['first_version_path']
     >>> first_commvers_path
-    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000/'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000000/'
 
 We can create a second version that refers to the first (auto-created)
 version as predecessor::
@@ -802,7 +802,7 @@ version as predecessor::
     >>> resp = testapp.post_json(comment_path, commvers, headers=god_header)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
-    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001/'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000001/'
 
 However, if we try to add another version that *also* gives the first
 version (no longer head) as predecessor, we get an error::
@@ -844,10 +844,10 @@ We can post comments to this pool only::
     >>> resp = testapp.post_json(post_pool_path, comment, headers=god_header)
     >>> comment_path = resp.json["path"]
     >>> comment_path
-    '.../adhocracy/Proposals/kommunismus/comment_000...'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000...'
     >>> first_commvers_path = resp.json['first_version_path']
     >>> first_commvers_path
-    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000/'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000000/'
 
 The first comment version is empty (as with all versionables), so lets add
 another version to say something meaningful. A comment contains *content*
@@ -864,7 +864,7 @@ another version to say something meaningful. A comment contains *content*
     >>> resp = testapp.post_json(comment_path, commvers, headers=god_header)
     >>> snd_commvers_path = resp.json['path']
     >>> snd_commvers_path
-    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001/'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000001/'
 
 Comments can be about any versionable that allows posting comments. Hence
 it's also possible to write a comment about another comment::

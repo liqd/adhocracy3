@@ -20,10 +20,10 @@ class TestCommentableSheet:
         return commentable_meta
 
     @fixture
-    def context(self, mock_graph):
-        from adhocracy_core.interfaces import IItem
-        return testing.DummyResource(__provides__=IItem,
-                                     __graph__= mock_graph)
+    def context(self, pool, service, mock_graph):
+        pool['comments'] = service
+        pool.__graph__ = mock_graph
+        return pool
 
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject

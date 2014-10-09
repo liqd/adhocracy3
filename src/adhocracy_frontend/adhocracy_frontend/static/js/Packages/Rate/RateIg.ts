@@ -21,11 +21,11 @@ import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/I
 import RISection = require("../../Resources_/adhocracy_core/resources/sample_section/ISection");
 import RISectionVersion = require("../../Resources_/adhocracy_core/resources/sample_section/ISectionVersion");
 // import RITag = require("../../Resources_/adhocracy_core/interfaces/ITag");
-import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
+import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
 // import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
@@ -129,39 +129,46 @@ export var register = (angular, config, meta_api) => {
                 });
                 var commentVersion : AdhHttp.ITransactionResult = transaction.post(comment.path, commentVersionResource);
 
-                // post rate item
-                var rate : AdhHttp.ITransactionResult =
-                    transaction.post(comment.path, new RIRate({preliminaryNames: adhPreliminaryNames, name : "rate"}));
-
-                // post rate version
-                var rateVersionResource = new RIRateVersion({preliminaryNames: adhPreliminaryNames});
-                rateVersionResource.data[SIRate.nick] = new SIRate.AdhocracyCoreSheetsRateIRate({
-                    subject: adhUser.userPath,
-                    object: commentVersion.path,
-                    rate: 1
-                });
-                rateVersionResource.data[SIVersionable.nick] = new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
-                    follows: [rate.first_version_path]
-                });
-                var rateVersion : AdhHttp.ITransactionResult = transaction.post(rate.path, rateVersionResource);
-
                 var proposalVersionProper = transaction.get(proposalVersion.path);
                 var commentVersionProper = transaction.get(commentVersion.path);
-                var rateVersionProper = transaction.get(rateVersion.path);
 
                 // commit everything
                 return transaction.commit()
-                    .then(
-                        (responses) : void => {
-                            _proposalVersion = responses[proposalVersionProper.index];
-                            _commentVersion = responses[commentVersionProper.index];
-                            _rateVersion = responses[rateVersionProper.index];
-                            done();
-                        },
-                        (error) : void => {
-                            console.log("*** ERROR: " + error);
-                            done();
+                    .then((responses) : ng.IPromise<void> => {
+                        _proposalVersion = responses[proposalVersionProper.index];
+                        _commentVersion = responses[commentVersionProper.index];
+
+                        return adhHttp.withTransaction((transaction) => {
+                            // post rate item
+                            var ratePostPool = _commentVersion.data[SIRateable.nick].post_pool;
+                            console.log(ratePostPool);
+                            var rate : AdhHttp.ITransactionResult =
+                                transaction.post(ratePostPool, new RIRate({preliminaryNames: adhPreliminaryNames, name : "rate"}));
+
+                            // post rate version
+                            var rateVersionResource = new RIRateVersion({preliminaryNames: adhPreliminaryNames});
+                            rateVersionResource.data[SIRate.nick] = new SIRate.AdhocracyCoreSheetsRateIRate({
+                                subject: adhUser.userPath,
+                                object: _commentVersion.path,
+                                rate: 1
+                            });
+                            rateVersionResource.data[SIVersionable.nick] = new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
+                                follows: [rate.first_version_path]
+                            });
+                            var rateVersion : AdhHttp.ITransactionResult = transaction.post(rate.path, rateVersionResource);
+                            var rateVersionProper = transaction.get(rateVersion.path);
+
+                            return transaction.commit()
+                                .then((responses) : void => {
+                                    _rateVersion = responses[rateVersionProper.index];
+                                    done();
+                                });
                         });
+                    })
+                    .catch((error) : void => {
+                        console.log(error);
+                        done();
+                    });
             };
 
             adhHttp.withTransaction(cb);
@@ -191,7 +198,7 @@ export var register = (angular, config, meta_api) => {
             });
 
             it("query 1: user's own rating", (done) => {
-                var ratePostPoolPath = _commentVersion.data[SICommentable.nick].post_pool;
+                var ratePostPoolPath = _commentVersion.data[SIRateable.nick].post_pool;
 
                 var query : any = {};
                 query.content_type = RIRateVersion.content_type;
@@ -217,7 +224,7 @@ export var register = (angular, config, meta_api) => {
             });
 
             it("query 2: rating totals", (done) => {
-                var ratePostPoolPath = _commentVersion.data[SICommentable.nick].post_pool;
+                var ratePostPoolPath = _commentVersion.data[SIRateable.nick].post_pool;
 
                 var aggrkey : string = "rate";
                 var query : any = {};
