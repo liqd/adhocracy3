@@ -1,6 +1,7 @@
 """Resource type configuration and default factory."""
 from datetime import datetime
 
+from persistent.mapping import PersistentMapping
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from pyramid.config import Configurator
@@ -158,7 +159,8 @@ class ResourceFactory:
 
         if creator is not None:
             userid = resource_path(creator)
-            resource.__local_roles__ = {userid: ['creator']}
+            resource.__local_roles__ = PersistentMapping()
+            resource.__local_roles__[userid] = ['creator']
 
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator, registry)
