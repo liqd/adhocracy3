@@ -21,11 +21,11 @@ import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/I
 import RISection = require("../../Resources_/adhocracy_core/resources/sample_section/ISection");
 import RISectionVersion = require("../../Resources_/adhocracy_core/resources/sample_section/ISectionVersion");
 // import RITag = require("../../Resources_/adhocracy_core/interfaces/ITag");
-import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/ICommentable");
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
+import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
 // import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/user/IUserBasic");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
@@ -198,7 +198,7 @@ export var register = (angular, config, meta_api) => {
             });
 
             it("query 1: user's own rating", (done) => {
-                var ratePostPoolPath = _commentVersion.data[SICommentable.nick].post_pool;
+                var ratePostPoolPath = _commentVersion.data[SIRateable.nick].post_pool;
 
                 var query : any = {};
                 query.content_type = RIRateVersion.content_type;
@@ -224,7 +224,7 @@ export var register = (angular, config, meta_api) => {
             });
 
             it("query 2: rating totals", (done) => {
-                var ratePostPoolPath = _commentVersion.data[SICommentable.nick].post_pool;
+                var ratePostPoolPath = _commentVersion.data[SIRateable.nick].post_pool;
 
                 var aggrkey : string = "rate";
                 var query : any = {};
