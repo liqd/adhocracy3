@@ -207,6 +207,10 @@ export var register = () => {
             afterEach(() => {
                 AdhRate.updateRates = realUpdateRates;
             });
+
+            it("sets scope.ready when finished initializing", () => {
+                expect(scopeMock.ready).toBe(true);
+            });
         });
     });
 };

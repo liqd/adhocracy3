@@ -64,6 +64,7 @@ export interface IRateScope extends ng.IScope {
     assureUserRateExists() : ng.IPromise<void>;
     postUpdate() : ng.IPromise<void>;
     optionsPostPool : AdhHttp.IOptions;
+    ready : boolean;
 }
 
 
@@ -309,6 +310,7 @@ export var rateController = (
     return updateRates(adapter, $scope, $q, adhHttp, adhUser)
         .then(() => {
             adhPermissions.bindScope($scope, $scope.postPoolPath, "optionsPostPool");
+            $scope.ready = true;
         });
 };
 
