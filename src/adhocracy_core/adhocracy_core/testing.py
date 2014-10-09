@@ -349,7 +349,7 @@ def mock_group_locator(registry) -> Mock:
     locator = Mock(spec=GroupLocatorAdapter)
     locator.get_group_by_id.return_value = None
     locator.get_roleids.return_value = None
-    registry.registerAdapter(lambda x: locator, (Interface,),
+    registry.registerAdapter(lambda x, y: locator, (Interface, Interface),
                              IGroupLocator)
     return locator
 

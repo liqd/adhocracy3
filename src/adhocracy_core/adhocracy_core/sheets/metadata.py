@@ -30,8 +30,10 @@ class MetadataCreatorsReference(SheetToSheet):
 
 def resource_modified_metadata_subscriber(event):
     """Update the `modification_date` metadata."""
-    sheet = get_sheet(event.object, IMetadata)
-    sheet.set({'modification_date': datetime.now()}, send_event=False)
+    sheet = get_sheet(event.object, IMetadata, registry=event.registry)
+    sheet.set({'modification_date': datetime.now()},
+              send_event=False,
+              registry=event.registry)
 
 
 class MetadataSchema(colander.MappingSchema):

@@ -654,7 +654,8 @@ def validate_login_password(context, request: Request):
     user = request.validated.get('user', None)
     if user is None:
         return
-    password_sheet = get_sheet(user, IPasswordAuthentication)
+    password_sheet = get_sheet(user, IPasswordAuthentication,
+                               registry=request.registry)
     password = request.validated['password']
     try:
         valid = password_sheet.check_plaintext_password(password)
@@ -766,7 +767,8 @@ def validate_activation_path(context, request: Request):
     locator = request.registry.getMultiAdapter((context, request),
                                                IUserLocator)
     user = locator.get_user_by_activation_path(path)
-    if user is None or _activation_time_window_has_expired(user):
+    registry = request.registry
+    if user is None or _activation_time_window_has_expired(user, registry):
         request.errors.add('body', 'path',
                            'Unknown or expired activation path')
     else:
@@ -776,9 +778,9 @@ def validate_activation_path(context, request: Request):
         user.activation_path = None  # activation path can only be used once
 
 
-def _activation_time_window_has_expired(user: IUser) -> bool:
+def _activation_time_window_has_expired(user: IUser, registry) -> bool:
     """Check that user account was created less than 7 days ago."""
-    metadata = get_sheet(user, IMetadata)
+    metadata = get_sheet(user, IMetadata, registry=registry)
     creation_date = metadata.get()['creation_date']
     timedelta = datetime.now(timezone.utc) - creation_date
     return timedelta.days >= 7

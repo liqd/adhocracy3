@@ -104,7 +104,8 @@ class RootPoolIntegrationTest(unittest.TestCase):
         from adhocracy_core.sheets.principal import IGroup
         from adhocracy_core.utils import get_sheet
         inst = self.config.registry.content.create(IRootPool.__identifier__)
-        locator = self.registry.getAdapter(inst, IGroupLocator)
+        locator = self.registry.getMultiAdapter((inst, self.request),
+                                                IGroupLocator)
         group_gods = locator.get_group_by_id('gods')
         group_sheet = get_sheet(group_gods, IGroup)
         group_users = [x.__name__ for x in group_sheet.get()['users']]

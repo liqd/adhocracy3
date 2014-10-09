@@ -95,6 +95,7 @@ rateable_meta = sheet_metadata_defaults._replace(
 
 def index_rate(resource, default):
     """Return rate value of the :class:`IRate`.rate field."""
+    # FIXME?: can we pass the registry to get_sheet here?
     sheet = get_sheet(resource, IRate)
     rate = sheet.get()['rate']
     return rate

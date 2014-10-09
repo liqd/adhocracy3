@@ -81,7 +81,7 @@ def reference_has_new_version_subscriber(event):
     isheet = event.isheet
     registry = event.registry
     creator = event.creator
-    sheet = get_sheet(resource, isheet)
+    sheet = get_sheet(resource, isheet, registry=registry)
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
     editable = sheet.meta.editable
 
