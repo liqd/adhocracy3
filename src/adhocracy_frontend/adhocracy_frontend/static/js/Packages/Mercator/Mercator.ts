@@ -77,7 +77,7 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
-        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/MercatorProposalDetail.html";
+        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/MercatorProposalCreate.html";
     }
 
     public _handleDelete(
