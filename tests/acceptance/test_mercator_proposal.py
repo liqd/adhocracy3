@@ -61,7 +61,7 @@ def fill_all(browser):
     browser.find_by_name('basic-organisation-address').first.fill('address')
     browser.find_by_name('basic-organisation-postcode').first.fill('12345')
     browser.find_by_name('basic-organisation-city').first.fill('city')
-    browser.find_by_name('basic-organisation-country').first.fill('country')
+    browser.select('basic-organisation-country', 'DE')
     browser.find_by_name('basic-organisation-status').first.check()
     browser.find_by_name('basic-organisation-about').first.fill('about')
     browser.find_by_name('basic-organisation-size').first.check()
