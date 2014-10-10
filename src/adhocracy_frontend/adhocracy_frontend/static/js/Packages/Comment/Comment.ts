@@ -221,14 +221,14 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
                         var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: $scope.key});
                         adhHttp.post($scope.poolPath, externalResource).then((obj) => {
                             if (obj.path !== commentablePath) {
-                                throw "Created object has wrong path (internal error)";
+                                console.log("Created object has wrong path (internal error)");
                             }
                             setScope(commentablePath);
                         });
                     }
                 },
                 (msg) => {
-                    throw "Could not query given postPool";
+                    console.log("Could not query given postPool");
                 }
             );
         }]
