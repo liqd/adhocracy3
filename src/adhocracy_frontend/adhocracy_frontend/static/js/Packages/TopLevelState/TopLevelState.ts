@@ -18,16 +18,37 @@ import AdhEventHandler = require("../EventHandler/EventHandler");
  */
 export class TopLevelState {
     private eventHandler : AdhEventHandler.EventHandler;
+    private focus : number;
 
     constructor(
         adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
-        private $location : ng.ILocationService
+        private $location : ng.ILocationService,
+        private $routeParams: ng.route.IRouteParamsService
     ) {
         this.eventHandler = new adhEventHandlerClass();
+        this.focus = 1;
+
+        if (this.$routeParams.hasOwnProperty("focus")){
+            var column = parseInt(this.$routeParams.focus, 10);
+            if (!isNaN(column)){
+                console.log("parsed focus successfully");
+                this.focus = column;
+            } else
+                console.log("focus (" + column +") is not a number");
+        } else
+            console.log("no focus in routeParams");
+
+    }
+
+    public getFocus() : number {
+        return this.focus;
     }
 
     public setFocus(column : number) : void {
+        console.log("setting focus, url=" + this.$location.url());
         this.eventHandler.trigger("setFocus", column);
+        this.focus = column;
+        this.$location.search({focus: this.focus});
     }
 
     public onSetFocus(fn : (column : number) => void) : void {
@@ -76,22 +97,34 @@ export class TopLevelState {
     }
 }
 
+var move = (column : number, element : JQuery) => {
+    // This is likely to change in the future.
+    // So do not spend too much time interpreting this.
+    if (column <= 1) {
+        element.removeClass("is-detail");
+    } else if (column === 2) {
+        element.addClass("is-detail");
+    } else {
+        console.log("tried to focus illegal column(" + column + ")");
+    };
+};
 
-export var movingColumns = (topLevelState : TopLevelState) => {
+export var movingColumns = (
+    topLevelState : TopLevelState
+) => {
+
     return {
         link: (scope, element) => {
+
             topLevelState.onSetFocus((column : number) : void => {
-                // This is likely to change in the future.
-                // So do not spend too much time interpreting this.
-                if (column <= 1) {
-                    element.removeClass("is-detail");
-                } else if (column === 2) {
-                    element.addClass("is-detail");
-                }
+                move(column, element);
             });
+
             topLevelState.onSetContent2Url((url : string) => {
                 scope.content2Url = url;
             });
+
+            move(topLevelState.getFocus(), element);
         }
     };
 };
