@@ -28,7 +28,8 @@ export class TopLevelState {
         this.eventHandler = new adhEventHandlerClass();
         this.focus = 1;
 
-        if (this.$routeParams.hasOwnProperty("focus")) {
+        if (typeof this.$routeParams !== "undefined" &&
+            this.$routeParams.hasOwnProperty("focus")) {
             var column = parseInt(this.$routeParams.focus, 10);
             if (!isNaN(column)) {
                 console.log("parsed focus successfully");
