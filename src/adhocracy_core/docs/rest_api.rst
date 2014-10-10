@@ -871,15 +871,15 @@ it's also possible to write a comment about another comment::
 
     >>> metacomment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...                 'data': {'adhocracy_core.sheets.name.IName': {'name': 'c2'}}}
-    >>> resp = testapp.post_json(pdag_path, metacomment, headers=god_header)
+    >>> resp = testapp.post_json(post_pool_path, metacomment, headers=god_header)
     >>> metacomment_path = resp.json["path"]
     >>> metacomment_path
-    '.../adhocracy/Proposals/kommunismus/comment_000...'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000...'
     >>> comment_path != metacomment_path
     True
     >>> first_metacommvers_path = resp.json['first_version_path']
     >>> first_metacommvers_path
-    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000/'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000000/'
 
 As usual, we have to add another version to actually say something::
 
@@ -894,7 +894,7 @@ As usual, we have to add another version to actually say something::
     >>> resp = testapp.post_json(metacomment_path, metacommvers, headers=god_header)
     >>> snd_metacommvers_path = resp.json['path']
     >>> snd_metacommvers_path
-    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001/'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000001/'
 
 
 Lets view all the comments referring to the proposal.
