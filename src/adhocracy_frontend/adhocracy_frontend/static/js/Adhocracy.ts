@@ -74,7 +74,8 @@ export var init = (config, meta_api) => {
     ) => {
         $routeProvider
             .when("/", {
-                templateUrl: "/static/js/templates/Wrapper.html"
+                templateUrl: "/static/js/templates/Wrapper.html",
+                reloadOnSearch: false
             })
             .when("/login", {
                 templateUrl: "/static/js/templates/Login.html"
