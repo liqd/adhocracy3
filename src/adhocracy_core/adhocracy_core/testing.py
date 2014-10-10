@@ -507,6 +507,8 @@ def app(zeo, settings, websocket):
     import adhocracy_core.resources.sample_paragraph
     import adhocracy_core.resources.sample_section
     import adhocracy_core.resources.sample_proposal
+    import adhocracy_core.sheets.mercator
+    import adhocracy_core.resources.mercator
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy_core.root_factory)
     configurator.include(adhocracy_core)
