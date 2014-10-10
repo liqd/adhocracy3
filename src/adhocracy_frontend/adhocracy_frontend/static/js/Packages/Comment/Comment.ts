@@ -195,7 +195,8 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
             poolPath: "@",
             key: "@"
         },
-        controller: ["adhHttp", "adhPreliminaryNames", "$scope", (
+        controller: ["adhDone", "adhHttp", "adhPreliminaryNames", "$scope", (
+            adhDone,
             adhHttp : AdhHttp.Service<any>,
             adhPreliminaryNames : AdhPreliminaryNames,
             $scope
@@ -219,7 +220,7 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
                         setScope(commentablePath);
                     } else {
                         var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: $scope.key});
-                        adhHttp.post($scope.poolPath, externalResource).then((obj) => {
+                        return adhHttp.post($scope.poolPath, externalResource).then((obj) => {
                             if (obj.path !== commentablePath) {
                                 console.log("Created object has wrong path (internal error)");
                             }
@@ -230,7 +231,7 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
                 (msg) => {
                     console.log("Could not query given postPool");
                 }
-            );
+            ).then(adhDone);
         }]
     };
 };
