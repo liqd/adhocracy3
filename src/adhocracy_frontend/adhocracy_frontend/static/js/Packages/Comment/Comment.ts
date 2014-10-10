@@ -10,6 +10,7 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import RIExternalResource = require("../../Resources_/adhocracy_core/resources/external_resource/IExternalResource");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import Util = require("../Util/Util");
 
 var pkgLocation = "/Comment";
@@ -211,10 +212,10 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
             // create commentable if it doesn't exist yet
             // FIXME: Add Filter "adhocracy_core.sheets.name.IName:name": $scope.key (didn't work when I tried)
             adhHttp.get($scope.poolPath, {
-                "content_type": "adhocracy_core.resources.external_resource.IExternalResource"
+                "content_type": RIExternalResource.content_type
             }).then(
                 (result) => {
-                    if (_.contains(result.data["adhocracy_core.sheets.pool.IPool"].elements, commentablePath)) {
+                    if (_.contains(result.data[SIPool.nick].elements, commentablePath)) {
                         setScope(commentablePath);
                     } else {
                         var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: $scope.key});
