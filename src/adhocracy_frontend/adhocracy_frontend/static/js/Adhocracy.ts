@@ -170,6 +170,7 @@ export var init = (config, meta_api) => {
             new Listing.Listing(new AdhCommentAdapter.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)]);
 
     app.directive("adhCommentListing", ["adhConfig", AdhComment.adhCommentListing]);
+    app.directive("adhCreateOrShowCommentListing", ["adhConfig", AdhComment.adhCreateOrShowCommentListing]);
 
     app.directive("adhWebSocketTest",
         ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>

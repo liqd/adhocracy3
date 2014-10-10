@@ -1,3 +1,5 @@
+import _ = require("lodash");
+
 import AdhResourcesBase = require("../../ResourcesBase");
 
 import AdhConfig = require("../Config/Config");
@@ -7,7 +9,9 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
-
+import AdhUser = require("../User/User");
+import RIExternalResource = require("../../Resources_/adhocracy_core/resources/external_resource/IExternalResource");
+import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import Util = require("../Util/Util");
 
 var pkgLocation = "/Comment";
@@ -172,6 +176,72 @@ export var adhCommentListing = (adhConfig : AdhConfig.Type) => {
             $location : ng.ILocationService
         ) : void => {
             adhTopLevelState.setCameFrom($location.url());
+        }]
+    };
+};
+
+/**
+ * Directive which checks whether an ExternalResource exists for the given
+ * poolPath and key. ExternalResource is a commentable.
+ *
+ * If not, it is created on the fly.
+ *
+ * If it exists, the corresponding comment listing is created.
+ */
+export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
+    return {
+        restrict: "E",
+        template: "<adh-comment-listing data-ng-if=\"display\" data-path=\"{{commentablePath}}\"></adh-comment-listing>",
+        scope: {
+            poolPath: "@",
+            key: "@"
+        },
+        controller: ["adhDone", "adhHttp", "adhPreliminaryNames", "adhUser", "$scope", (
+            adhDone,
+            adhHttp : AdhHttp.Service<any>,
+            adhPreliminaryNames : AdhPreliminaryNames,
+            adhUser : AdhUser.User,
+            $scope
+        ) : void => {
+
+            $scope.display = false;
+            var commentablePath = $scope.poolPath + $scope.key + "/";
+
+            var setScope = (path) => {
+                $scope.display = true;
+                $scope.commentablePath = path;
+            };
+
+            // create commentable if it doesn't exist yet
+            // REFACT: Add Filter "name": $scope.key - this requires name index to be enabled in the backend
+            adhHttp.get($scope.poolPath, {
+                "content_type": RIExternalResource.content_type
+            }).then(
+                (result) => {
+                    if (_.contains(result.data[SIPool.nick].elements, commentablePath)) {
+                        setScope(commentablePath);
+                    } else {
+                        var unwatch = $scope.$watch(() => adhUser.loggedIn, (loggedIn) => {
+                            if (loggedIn) {
+                                var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: $scope.key});
+                                return adhHttp.post($scope.poolPath, externalResource).then((obj) => {
+                                    if (obj.path !== commentablePath) {
+                                        console.log("Created object has wrong path (internal error)");
+                                    }
+                                })["finally"](() => {
+                                    // If the post didn't succeed, somebody else will probably already
+                                    // have posted the resource. The error can thus be ignored.
+                                    setScope(commentablePath);
+                                    unwatch();
+                                });
+                            }
+                        });
+                    }
+                },
+                (msg) => {
+                    console.log("Could not query given postPool");
+                }
+            ).then(adhDone);
         }]
     };
 };
