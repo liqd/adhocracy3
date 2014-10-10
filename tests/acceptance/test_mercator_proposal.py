@@ -71,7 +71,8 @@ def fill_all(browser):
     browser.find_by_name('introduction-teaser').first.fill('teaser')
 
     browser.find_by_name('detail-description').first.fill('description')
-    browser.find_by_name('detail-location').first.check()
+    browser.find_by_name('detail-location-city').first.check()
+    browser.find_by_name('detail-location-ruhr').first.check()
     browser.find_by_name('detail-story').first.fill('story')
 
     browser.find_by_name('motivation-outcome').first.fill('success')
