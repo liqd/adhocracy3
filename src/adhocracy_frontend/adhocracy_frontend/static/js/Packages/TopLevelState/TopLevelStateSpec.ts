@@ -7,24 +7,51 @@ export var register = () => {
     describe("TopLevelState", () => {
         describe("TopLevelState", () => {
             var adhTopLevelState : AdhTopLevelState.TopLevelState;
+            var eventHandlerMockClass;
+            var routeParamMock;
             var locationMock;
-            var on;
-            var off;
             var trigger;
+            var off;
+            var on;
 
             beforeEach(() => {
                 on = jasmine.createSpy("on");
                 off = jasmine.createSpy("off");
                 trigger = jasmine.createSpy("trigger");
-                locationMock = jasmine.createSpyObj("locationMock", ["url"]);
+                locationMock = jasmine.createSpyObj("locationMock", ["url", "search"]);
+                routeParamMock = jasmine.createSpyObj("routeParamMock", ["focus"]);
 
-                var eventHandlerMockClass = <any>function() {
+                eventHandlerMockClass = <any>function() {
                     this.on = on;
                     this.off = off;
                     this.trigger = trigger;
                 };
 
-                adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock);
+                adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+            });
+
+            it("constructing with focus parameter 1", () => {
+                routeParamMock.focus = 1;
+                var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                expect(adhTopLevelState.getFocus()).toEqual(1);
+            });
+
+            it("constructing with focus parameter 2", () => {
+                routeParamMock.focus = 2;
+                var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                expect(adhTopLevelState.getFocus()).toEqual(2);
+            });
+
+            it("constructing with NaN focus parameter", () => {
+                routeParamMock.focus = "a";
+                var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                expect(adhTopLevelState.getFocus()).toEqual(1);
+            });
+
+            it("constructing without focus parameter", () => {
+                var routeParamMock = jasmine.createSpyObj("routeParamMock", [""]);
+                var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                expect(adhTopLevelState.getFocus()).toEqual(1);
             });
 
             it("dispatches calls to setFocus to eventHandler", () => {
