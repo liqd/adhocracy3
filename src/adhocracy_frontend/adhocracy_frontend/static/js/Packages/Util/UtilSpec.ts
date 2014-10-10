@@ -98,14 +98,31 @@ export var register = () => {
         });
 
         describe("normalizeName", () => {
-            it("returns 'foo_bar' for 'Foo Bar'", () => {
-                expect(Util.normalizeName("Foo Bar")).toBe("foo_bar");
-            });
             it("is idempotent", () => {
                 ["asdkj", "#!8 sajd ksalkjad\n", "foo bar", "Foo Bar", "foo_bar"].forEach((s) => {
                     var normalized = Util.normalizeName(s);
                     expect(Util.normalizeName(normalized)).toBe(normalized);
                 });
+            });
+
+            it("preserves ascii", () => {
+                expect(Util.normalizeName("asdASD123")).toBe("asdASD123");
+            });
+
+            it("replaces german umlauts", () => {
+                expect(Util.normalizeName("äüÄÖß")).toBe("aeueAeOess");
+            });
+
+            it("replaces spaces by underscores", () => {
+                expect(Util.normalizeName(" ")).toBe("_");
+            });
+
+            it("strips chars that are not allowed in an URI component", () => {
+                expect(Util.normalizeName("$%&/?")).toBe("");
+            });
+
+            it("strips non-ascii", () => {
+                expect(Util.normalizeName("…")).toBe("");
             });
         });
 
