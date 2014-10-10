@@ -16,6 +16,7 @@ import SIDetails = require("../../Resources_/adhocracy_core/sheets/mercator/IDet
 import SIMotivation = require("../../Resources_/adhocracy_core/sheets/mercator/IMotivation");
 import SIFinance = require("../../Resources_/adhocracy_core/sheets/mercator/IFinance");
 import SIExtras = require("../../Resources_/adhocracy_core/sheets/mercator/IExtras");
+import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 
 var pkgLocation = "/Mercator";
 
@@ -104,9 +105,6 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
     }
 
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IMercatorProposalScope>) : ng.IPromise<R[]> {
-        var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
-        mercatorProposal.parent = undefined;  // FIXME
-
         var data = instance.scope.data || <any>{};
         data.basic = data.basic || <any>{};
         data.basic.user = data.basic.user || <any>{};
@@ -117,6 +115,12 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
         data.finance = data.finance || <any>{};
         data.extra = data.extra || <any>{};
         data.extra.hear = data.extra.hear || <any>{};
+
+        var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
+        mercatorProposal.parent = undefined;  // FIXME
+        mercatorProposal.data[SIName.nick] = new SIName.AdhocracyCoreSheetsNameIName({
+            name: data.introduction.title
+        });
 
         var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposalVersion.data[SIUserInfo.nick] = new SIUserInfo.AdhocracyCoreSheetsMercatorIUserInfo({
