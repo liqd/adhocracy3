@@ -38,7 +38,7 @@ export class ListingPoolAdapter implements IListingContainerAdapter {
 export interface ListingScope<Container> extends ng.IScope {
     path : string;
     actionColumn : boolean;
-    contentType : string;
+    contentType? : string;
     container : Container;
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
