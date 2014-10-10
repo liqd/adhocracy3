@@ -9,6 +9,7 @@ import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
+import AdhUser = require("../User/User");
 import RIExternalResource = require("../../Resources_/adhocracy_core/resources/external_resource/IExternalResource");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import Util = require("../Util/Util");
@@ -195,10 +196,11 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
             poolPath: "@",
             key: "@"
         },
-        controller: ["adhDone", "adhHttp", "adhPreliminaryNames", "$scope", (
+        controller: ["adhDone", "adhHttp", "adhPreliminaryNames", "adhUser", "$scope", (
             adhDone,
             adhHttp : AdhHttp.Service<any>,
             adhPreliminaryNames : AdhPreliminaryNames,
+            adhUser : AdhUser.User,
             $scope
         ) : void => {
 
@@ -219,12 +221,20 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
                     if (_.contains(result.data[SIPool.nick].elements, commentablePath)) {
                         setScope(commentablePath);
                     } else {
-                        var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: $scope.key});
-                        return adhHttp.post($scope.poolPath, externalResource).then((obj) => {
-                            if (obj.path !== commentablePath) {
-                                console.log("Created object has wrong path (internal error)");
+                        var unwatch = $scope.$watch(() => adhUser.loggedIn, (loggedIn) => {
+                            if (loggedIn) {
+                                var externalResource = new RIExternalResource({preliminaryNames: adhPreliminaryNames, name: $scope.key});
+                                return adhHttp.post($scope.poolPath, externalResource).then((obj) => {
+                                    if (obj.path !== commentablePath) {
+                                        console.log("Created object has wrong path (internal error)");
+                                    }
+                                })["finally"](() => {
+                                    // If the post didn't succeed, somebody else will probably already
+                                    // have posted the resource. The error can thus be ignored.
+                                    setScope(commentablePath);
+                                    unwatch();
+                                });
                             }
-                            setScope(commentablePath);
                         });
                     }
                 },
