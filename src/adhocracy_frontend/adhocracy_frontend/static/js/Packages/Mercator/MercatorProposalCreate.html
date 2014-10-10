@@ -61,8 +61,8 @@
             {{ "About the initiative or organisation:" | translate }}
             <textarea
                 data-msd-elastic=""
-                data-ng-model="data.basic.organisation.about"
-                name="basic-organisation-about"
+                data-ng-model="data.basic.organisation.description"
+                name="basic-organisation-description"
                 maxlength="750"
                 placeholder="750 c. Max."
                 required="required"></textarea>
@@ -200,8 +200,8 @@
             {{ "What would be a successful outcome of your project or initiative? What is the aim you want to reach?" | translate }}
             <textarea
                 data-msd-elastic=""
-                data-ng-model="data.motivation.success"
-                name="motivation-success"
+                data-ng-model="data.motivation.outcome"
+                name="motivation-outcome"
                 maxlength="800"
                 placeholder="{{ '800 c. Max.' | translate }}"
                 required="required"></textarea>
@@ -214,8 +214,8 @@
             {{ "How do you want to get there?" | translate }}
             <textarea
                 data-msd-elastic=""
-                data-ng-model="data.motivation.plan"
-                name="motivation-plan"
+                data-ng-model="data.motivation.steps"
+                name="motivation-steps"
                 maxlength="800"
                 placeholder="{{ '5 Bullet points or 800 c. Max.' | translate }}"
                 required="required"></textarea>
@@ -228,8 +228,8 @@
             {{ "Why does Europe need your idea?" | translate }}
             <textarea
                 data-msd-elastic=""
-                data-ng-model="data.motivation.relevance"
-                name="motivation-relevance"
+                data-ng-model="data.motivation.value"
+                name="motivation-value"
                 maxlength="800"
                 placeholder="{{ '800 c. Max.' | translate }}"
                 required="required"></textarea>

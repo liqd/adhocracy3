@@ -37,7 +37,7 @@ export interface IMercatorProposalScope extends AdhResourceWidgets.IResourceWidg
                 country : string;
                 status : string;
                 statustext : string;
-                about : string;
+                description : string;
                 size : string;
                 cooperation : boolean;
                 cooperationText? : string;
@@ -54,9 +54,9 @@ export interface IMercatorProposalScope extends AdhResourceWidgets.IResourceWidg
             story : string;
         };
         motivation : {
-            success : string;
-            plan : string;
-            relevance : string;
+            outcome : string;
+            steps : string;
+            value : string;
             partners : string;
         };
         finance : {
@@ -133,7 +133,7 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
             country: data.basic.organisation.country,
             status: data.basic.organisation.status,
             status_other: data.basic.organisation.statustext,
-            description: data.basic.organisation.about,
+            description: data.basic.organisation.description,
             size: data.basic.organisation.size,
             cooperation_explanation: data.basic.organisation.cooperationText
         });
@@ -151,9 +151,9 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
             story: data.detail.story
         });
         mercatorProposalVersion.data[SIMotivation.nick] = new SIMotivation.AdhocracyCoreSheetsMercatorIMotivation({
-            outcome: data.motivation.success,
-            steps: data.motivation.plan,
-            value: data.motivation.relevance,
+            outcome: data.motivation.outcome,
+            steps: data.motivation.steps,
+            value: data.motivation.value,
             partners: data.motivation.partners
         });
         mercatorProposalVersion.data[SIFinance.nick] = new SIFinance.AdhocracyCoreSheetsMercatorIFinance({
