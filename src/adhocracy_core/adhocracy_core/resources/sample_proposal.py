@@ -25,6 +25,7 @@ proposalversion_meta = itemversion_metadata._replace(
     extended_sheets=[adhocracy_core.sheets.document.IDocument,
                      adhocracy_core.sheets.comment.ICommentable
                      ],
+    permission_add='add_proposalversion',
 )
 
 
@@ -46,6 +47,7 @@ proposal_meta = item_metadata._replace(
         add_ratesservice,
     ],
     item_type=IProposalVersion,
+    permission_add='add_proposal',
     is_implicit_addable=True,
 )
 

@@ -63,7 +63,8 @@ principals_metadata = service_metadata._replace(
     content_name='principals',
     after_creation=[create_initial_content_for_principals] +
     service_metadata.after_creation,
-    element_types=[]  # we don't want the frontend to post resources here
+    element_types=[],  # we don't want the frontend to post resources here
+    permission_add='add_service',
 )
 
 
@@ -154,19 +155,8 @@ class IUsersService(IServicePool):
 users_metadata = service_metadata._replace(
     iresource=IUsersService,
     content_name='users',
-    element_types=[IUser]
-)
-
-
-class IGroupsService(IServicePool):
-
-    """Pool for Groups."""
-
-
-groups_metadata = service_metadata._replace(
-    iresource=IGroupsService,
-    content_name='groups',
-    element_types=[]
+    element_types=[IUser],
+    permission_add='add_service',
 )
 
 
@@ -180,6 +170,20 @@ group_metadata = pool_metadata._replace(
     extended_sheets=[adhocracy_core.sheets.principal.IGroup,
                      ],
     element_types=[],  # we don't want the frontend to post resources here
+    permission_add='add_group',
+)
+
+
+class IGroupsService(IServicePool):
+
+    """Pool for Groups."""
+
+
+groups_metadata = service_metadata._replace(
+    iresource=IGroupsService,
+    content_name='groups',
+    element_types=[IGroup],
+    permission_add='add_service',
 )
 
 
@@ -191,7 +195,8 @@ class IPasswordResetsService(IServicePool):
 passwordresets_metadata = service_metadata._replace(
     iresource=IPasswordResetsService,
     content_name='resets',
-    element_types=[]
+    element_types=[],
+    permission_add='add_service',
 )
 
 

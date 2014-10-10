@@ -66,12 +66,13 @@ class RootPoolIntegrationTest(unittest.TestCase):
         from pyramid.security import ALL_PERMISSIONS
         from pyramid.security import Allow
         inst = self.config.registry.content.create(IRootPool.__identifier__)
-        assert get_acl(inst) == [(Allow, 'system.Everyone', 'view'),
-                                 (Allow, 'system.Everyone', 'add_user'),
-                                 (Allow, 'system.Everyone', 'create_sheet_password'),
-                                 (Allow, 'system.Everyone', 'create_sheet_userbasic'),
-                                 (Allow, 'role:god', ALL_PERMISSIONS),
-                                 ]
+        acl = get_acl(inst)
+        assert (Allow, 'system.Everyone', 'view') in acl
+        assert (Allow, 'system.Everyone', 'add_user') in acl
+        assert (Allow, 'system.Everyone', 'create_sheet_password') in acl
+        assert (Allow, 'system.Everyone', 'create_sheet_userbasic') in acl
+        assert (Allow, 'role:god', ALL_PERMISSIONS) in acl
+
 
     def test_includeme_registry_add_initial_god_user(self):
         from substanced.interfaces import IUserLocator

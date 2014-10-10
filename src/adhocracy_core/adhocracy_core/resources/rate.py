@@ -22,6 +22,7 @@ class IRateVersion(IItemVersion):
 rateversion_meta = itemversion_metadata._replace(
     iresource=IRateVersion,
     extended_sheets=[IRate],
+    permission_add='add_rateversion',
 )
 
 
@@ -37,6 +38,7 @@ rate_meta = item_metadata._replace(
     item_type=IRateVersion,
     use_autonaming=True,
     autonaming_prefix='rate_',
+    permission_add='add_rate',
 )
 
 

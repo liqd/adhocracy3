@@ -194,8 +194,8 @@ sheet_metadata_defaults = sheet_metadata._replace(
     sheet_class=GenericResourceSheet,
     schema_class=colander.MappingSchema,
     permission_view='view',
-    permission_edit='edit',
-    permission_create='create',
+    permission_edit='edit_sheet',
+    permission_create='create_sheet',
 )
 
 

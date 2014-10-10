@@ -5,6 +5,8 @@ from splinter.driver.webdriver import WebDriverElement
 
 from adhocracy_core.testing import god_login
 from adhocracy_core.testing import god_password
+from adhocracy_core.testing import annotator_password
+from adhocracy_core.testing import annotator_login
 
 
 def wait(condition, step=0.1, max_steps=10) -> bool:
@@ -37,6 +39,11 @@ def login(browser, name_or_email, password,
 def login_god(browser):
     """Login god user."""
     login(browser, god_login, god_password)
+
+
+def login_annotator(browser):
+    """Login god user."""
+    login(browser, annotator_login, annotator_password)
 
 
 def logout(browser):

@@ -518,17 +518,49 @@ def app(zeo, settings, websocket):
     configurator.include(adhocracy_core.resources.sample_paragraph)
     configurator.include(adhocracy_core.resources.sample_proposal)
     configurator.include(adhocracy_core.resources.sample_section)
+    configurator.include(adhocracy_core.resources.comment)
+    configurator.include(adhocracy_core.resources.rate)
     manageapp = configurator.make_wsgi_app()
     manageapplocals = {'registry': manageapp.registry, 'request': None}
     manager.push(manageapplocals)
     manageapi = ManageAppAPI(manageapp)
     manageapi.add_user_token(userid=god_header['X-User-Path'],
                              token=god_header['X-User-Token'])
+    manageapi.add_user(login='reader',
+                       password='reader',
+                       roles=['reader'])
+    manageapi.add_user_token(userid=reader_header['X-User-Path'],
+                             token=reader_header['X-User-Token'])
+    manageapi.add_user(login='annotator',
+                       password='annotator',
+                       roles=['annotator'])
+    manageapi.add_user_token(userid=annotator_header['X-User-Path'],
+                             token=annotator_header['X-User-Token'])
     manageapi.add_user(login='contributor',
                        password='contributor',
                        roles=['contributor'])
     manageapi.add_user_token(userid=contributor_header['X-User-Path'],
                              token=contributor_header['X-User-Token'])
+    manageapi.add_user(login='editor',
+                       password='editor',
+                       roles=['editor'])
+    manageapi.add_user_token(userid=editor_header['X-User-Path'],
+                             token=editor_header['X-User-Token'])
+    manageapi.add_user(login='reviewer',
+                       password='reviewer',
+                       roles=['reviewer'])
+    manageapi.add_user_token(userid=reviewer_header['X-User-Path'],
+                             token=reviewer_header['X-User-Token'])
+    manageapi.add_user(login='manager',
+                       password='manager',
+                       roles=['manager'])
+    manageapi.add_user_token(userid=manager_header['X-User-Path'],
+                             token=manager_header['X-User-Token'])
+    manageapi.add_user(login='admin',
+                       password='admin',
+                       roles=['admin'])
+    manageapi.add_user_token(userid=admin_header['X-User-Path'],
+                             token=admin_header['X-User-Token'])
     transaction.commit()
     manager.pop()
     app = configurator.make_wsgi_app()
