@@ -12,7 +12,7 @@ import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/
 import SIUserInfo = require("../../Resources_/adhocracy_core/sheets/mercator/IUserInfo");
 import SIOrganizationInfo = require("../../Resources_/adhocracy_core/sheets/mercator/IOrganizationInfo");
 import SIIntroduction = require("../../Resources_/adhocracy_core/sheets/mercator/IIntroduction");
-// import SIDetails = require("../../Resources_/adhocracy_core/sheets/mercator/IDetails");
+import SIDetails = require("../../Resources_/adhocracy_core/sheets/mercator/IDetails");
 import SIMotivation = require("../../Resources_/adhocracy_core/sheets/mercator/IMotivation");
 import SIFinance = require("../../Resources_/adhocracy_core/sheets/mercator/IFinance");
 import SIExtras = require("../../Resources_/adhocracy_core/sheets/mercator/IExtras");
@@ -141,11 +141,15 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
             title: data.introduction.title,
             teaser: data.introduction.teaser
         });
-        // mercatorProposalVersion.data[SIDetails.nick] = new SIDetails.AdhocracyCoreSheetsMercatorIDetails({
-        //     description: data.detail.description,
-        //     // data.detail.location,  // FIXME
-        //     story: data.detail.story
-        // });
+        mercatorProposalVersion.data[SIDetails.nick] = new SIDetails.AdhocracyCoreSheetsMercatorIDetails({
+            description: data.detail.description,
+            location_is_city: data.detail.location.city,
+            location_is_country: data.detail.location.country,
+            location_is_town: data.detail.location.town,
+            location_is_online: data.detail.location.online,
+            location_is_linked_to_ruhr: data.detail.location.ruhr,
+            story: data.detail.story
+        });
         mercatorProposalVersion.data[SIMotivation.nick] = new SIMotivation.AdhocracyCoreSheetsMercatorIMotivation({
             outcome: data.motivation.success,
             steps: data.motivation.plan,
