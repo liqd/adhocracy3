@@ -211,7 +211,7 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
             };
 
             // create commentable if it doesn't exist yet
-            // FIXME: Add Filter "adhocracy_core.sheets.name.IName:name": $scope.key (didn't work when I tried)
+            // REFACT: Add Filter "name": $scope.key - this requires name index to be enabled in the backend
             adhHttp.get($scope.poolPath, {
                 "content_type": RIExternalResource.content_type
             }).then(
