@@ -38,6 +38,7 @@ import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets"
 import AdhRate = require("./Packages/Rate/Rate");
 import AdhRateAdapter = require("./Packages/Rate/Adapter");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
+import AdhMercator = require("./Packages/Mercator/Mercator");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -86,7 +87,7 @@ export var init = (config, meta_api) => {
                 template: ""
             })
             .when("/mercator", {
-                templateUrl: "/static/js/templates/MercatorProposalCreate.html"
+                template: "<adh-resource-wrapper><adh-mercator path=\"@preliminary\"></adh-mercator></adh-resource-wrapper>"
             })
             .when("/activation_error", {
                 templateUrl: "/static/js/templates/ActivationError.html",
@@ -214,6 +215,12 @@ export var init = (config, meta_api) => {
             new AdhRateAdapter.RateAdapter(),
             adhConfig
         )]);
+
+    app.directive("adhMercator", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+        (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
+            var widget = new AdhMercator.MercatorProposal(adhConfig, adhHttp, adhPreliminaryNames, $q);
+            return widget.createDirective();
+        }]);
 
     // get going
 

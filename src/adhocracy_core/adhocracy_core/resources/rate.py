@@ -1,9 +1,14 @@
 """Rate resource type."""
+from pyramid.registry import Registry
+
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import IServicePool
+from adhocracy_core.interfaces import IPool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_metadata
 from adhocracy_core.resources.item import item_metadata
+from adhocracy_core.resources.service import service_metadata
 from adhocracy_core.resources.item import item_basic_sheets_without_name_sheet
 
 from adhocracy_core.sheets.rate import IRate
@@ -35,7 +40,25 @@ rate_meta = item_metadata._replace(
 )
 
 
+class IRatesService(IServicePool):
+
+    """The 'rates' ServicePool."""
+
+
+rates_meta = service_metadata._replace(
+    iresource=IRatesService,
+    content_name='rates',
+    element_types=[IRate],
+)
+
+
+def add_ratesservice(context: IPool, registry: Registry, options: dict):
+    """Add `comments` service to context."""
+    registry.content.create(IRatesService.__identifier__, parent=context)
+
+
 def includeme(config):
     """Add resource type to registry."""
     add_resource_type_to_registry(rate_meta, config)
     add_resource_type_to_registry(rateversion_meta, config)
+    add_resource_type_to_registry(rates_meta, config)

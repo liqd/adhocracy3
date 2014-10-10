@@ -4,6 +4,7 @@ from collections import Sequence
 
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
+from substanced.util import find_catalog
 
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
@@ -13,10 +14,12 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
-from adhocracy_core.sheets.versions import IVersionable
 from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
+
+import adhocracy_core.sheets.versions
+import adhocracy_core.sheets.tags
 
 
 changelog_metadata = ChangelogMetadata(False, False, None, None)
@@ -30,6 +33,16 @@ def resource_created_and_added_subscriber(event):
 def resource_modified_subscriber(event):
     """Add modified message to the transaction_changelog."""
     _add_changelog_metadata(event.registry, event.object, modified=True)
+
+
+def tag_created_and_added_or_modified_subscriber(event):
+    """Reindex tagged itemversions."""
+    adhocracy_catalog = find_catalog(event.object, 'adhocracy')
+    old_elements_set = set(event.old_appstruct['elements'])
+    new_elements_set = set(event.new_appstruct['elements'])
+    newly_tagged_or_untagged_resources = old_elements_set ^ new_elements_set
+    for tagged in newly_tagged_or_untagged_resources:
+            adhocracy_catalog.reindex_resource(tagged)
 
 
 def itemversion_created_subscriber(event):
@@ -68,7 +81,7 @@ def reference_has_new_version_subscriber(event):
     isheet = event.isheet
     registry = event.registry
     creator = event.creator
-    sheet = get_sheet(resource, isheet)
+    sheet = get_sheet(resource, isheet, registry=registry)
     autoupdate = isheet.extends(ISheetReferenceAutoUpdateMarker)
     editable = sheet.meta.editable
 
@@ -106,7 +119,8 @@ def _update_versionable(resource, isheet, appstruct, root_versions, registry,
         return resource
     else:
         appstructs = _get_writable_appstructs(resource, registry)
-        appstructs[IVersionable.__identifier__]['follows'] = [resource]
+        versionable_sheet = adhocracy_core.sheets.versions.IVersionable
+        appstructs[versionable_sheet.__identifier__]['follows'] = [resource]
         appstructs[isheet.__identifier__] = appstruct
         iresource = get_iresource(resource)
         new_resource = registry.content.create(iresource.__identifier__,
@@ -142,3 +156,9 @@ def includeme(config):
     config.add_subscriber(reference_has_new_version_subscriber,
                           ISheetReferencedItemHasNewVersion,
                           isheet=ISheetReferenceAutoUpdateMarker)
+    config.add_subscriber(tag_created_and_added_or_modified_subscriber,
+                          IResourceCreatedAndAdded,
+                          isheet=adhocracy_core.sheets.tags.ITag)
+    config.add_subscriber(tag_created_and_added_or_modified_subscriber,
+                          IResourceSheetModified,
+                          isheet=adhocracy_core.sheets.tags.ITag)

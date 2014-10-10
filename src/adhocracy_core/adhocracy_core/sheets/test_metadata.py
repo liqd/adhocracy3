@@ -22,7 +22,7 @@ class TestResourceModifiedMetadataSubscriber:
     def test_with_metadata_isheet(self, context, registry, mock_sheet):
         from datetime import datetime
         from adhocracy_core.sheets.metadata import IMetadata
-        event = testing.DummyResource(object=context)
+        event = testing.DummyResource(object=context, registry=registry)
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IMetadata)
         register_and_add_sheet(context, registry, mock_sheet)
 
