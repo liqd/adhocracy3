@@ -87,7 +87,9 @@ export var init = (config, meta_api) => {
                 template: ""
             })
             .when("/mercator", {
-                template: "<adh-resource-wrapper><adh-mercator path=\"@preliminary\"></adh-mercator></adh-resource-wrapper>"
+                template: "<adh-resource-wrapper>" +
+                    "<adh-mercator data-path=\"@preliminary\" data-mode=\"edit\">" +
+                    "</adh-mercator></adh-resource-wrapper>"
             })
             .when("/activation_error", {
                 templateUrl: "/static/js/templates/ActivationError.html",
