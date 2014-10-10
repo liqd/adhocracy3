@@ -165,7 +165,7 @@ class ResourceFactory:
         if creator is not None:
             userid = resource_path(creator)
             resource.__local_roles__ = PersistentMapping()
-            resource.__local_roles__[userid] = ['creator']
+            resource.__local_roles__[userid] = ['role:creator']
 
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator, registry)
