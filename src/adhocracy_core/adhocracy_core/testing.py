@@ -486,7 +486,7 @@ class ManageAppAPI:
         users = find_service(self.root, 'principals', 'users')
         roles = roles or []
         passwd_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
-        appstruct =\
+        appstructs =\
             {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
              {'name': login},
              adhocracy_core.sheets.principal.IPermissions.__identifier__:
@@ -496,7 +496,7 @@ class ManageAppAPI:
              }
         user = self.registry.content.create(IUser.__identifier__,
                                             parent=users,
-                                            appstruct=appstruct,
+                                            appstructs=appstructs,
                                             registry=self.registry,
                                             run_after_creation=False,
                                             )
