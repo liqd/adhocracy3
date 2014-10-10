@@ -11,6 +11,8 @@ def integration(config):
     config.include('adhocracy_core.sheets.mercator')
     config.include('adhocracy_core.resources.tag')
     config.include('adhocracy_core.resources.mercator')
+    config.include('adhocracy_core.resources.comment')
+    config.include('adhocracy_core.resources.rate')
 
 
 @mark.usefixtures('integration')
