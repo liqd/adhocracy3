@@ -152,7 +152,7 @@ class BatchView(RESTView):
             code = 500
             error_dict = internal_exception_to_dict(err)
             body = {'status': 'error', 'errors': [error_dict]}
-            logger.exception('Unexpected exception processing nested request')
+            logger.error('Unexpected exception processing nested request')
         return BatchItemResponse(code, body)
 
     def _extend_path_map(self, path_map: dict, result_path: str,

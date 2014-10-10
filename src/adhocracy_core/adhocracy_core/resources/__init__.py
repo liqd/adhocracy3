@@ -1,6 +1,7 @@
 """Resource type configuration and default factory."""
 from datetime import datetime
 
+from persistent.mapping import PersistentMapping
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from pyramid.config import Configurator
@@ -53,7 +54,8 @@ class ResourceFactory:
         self.meta = metadata
         """:class:`ResourceMetadata`."""
 
-    def _add(self, parent: IPool, resource: object, appstructs: dict) -> str:
+    def _add(self, parent: IPool, resource: object, appstructs: dict,
+             registry: Registry) -> str:
         """Add resource to parent pool.
 
         :raises substanced.folder.FolderKeyError:
@@ -69,11 +71,15 @@ class ResourceFactory:
             raise KeyError('Duplicate name: {}'.format(name))
         if IServicePool.providedBy(resource):
             name = self.meta.content_name
-            parent.add_service(name, resource, send_events=False)
+            parent.add_service(name, resource,
+                               send_events=True,
+                               registry=registry)
             return
         if name == '':
             raise KeyError('Empty name')
-        parent.add(name, resource, send_events=True)
+        parent.add(name, resource,
+                   send_events=True,
+                   registry=registry)
 
     def _notify_new_resource_created_and_added(self, resource, registry,
                                                creator):
@@ -136,7 +142,7 @@ class ResourceFactory:
             registry = get_current_registry()
 
         if parent is not None:
-            self._add(parent, resource, appstructs)
+            self._add(parent, resource, appstructs, registry)
         else:
             resource.__parent__ = None
             resource.__name__ = ''
@@ -158,7 +164,8 @@ class ResourceFactory:
 
         if creator is not None:
             userid = resource_path(creator)
-            resource.__local_roles__ = {userid: ['creator']}
+            resource.__local_roles__ = PersistentMapping()
+            resource.__local_roles__[userid] = ['creator']
 
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator, registry)

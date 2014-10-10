@@ -9,7 +9,11 @@
     </ol>
 </nav>
 
-<form novalidate="novalidate" class="mercator-proposal-form" name="mercatorProposalForm">
+<form
+        novalidate="novalidate"
+        class="mercator-proposal-form"
+        name="mercatorProposalForm"
+        data-ng-submit="submit()">
     <ng-form name="mercatorProposalBasicForm">
         <h2 id="mercator-proposal-basic">{{ "1. Basic" | translate }}</h2>
 

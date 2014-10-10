@@ -6,7 +6,6 @@ from adhocracy_core.interfaces import IPredicateSheet
 from adhocracy_core.interfaces import IPostPoolSheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.interfaces import IItem
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import Reference
 from adhocracy_core.sheets import sheet_metadata_defaults
@@ -82,7 +81,7 @@ class RateableSchema(PostPoolMappingSchema):
     `post_pool`: Pool to post new :class:`adhocracy_sample.resource.IRate`.
     """
 
-    post_pool = PostPool(iresource_or_service_name=IItem)
+    post_pool = PostPool(iresource_or_service_name='rates')
 
 
 rateable_meta = sheet_metadata_defaults._replace(
@@ -95,6 +94,7 @@ rateable_meta = sheet_metadata_defaults._replace(
 
 def index_rate(resource, default):
     """Return rate value of the :class:`IRate`.rate field."""
+    # FIXME?: can we pass the registry to get_sheet here?
     sheet = get_sheet(resource, IRate)
     rate = sheet.get()['rate']
     return rate

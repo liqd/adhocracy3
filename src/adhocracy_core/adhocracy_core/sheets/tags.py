@@ -1,14 +1,11 @@
 """Sheets for tagging."""
-from collections.abc import Iterable
 from logging import getLogger
 
 from pyramid.traversal import resource_path
-from substanced.util import find_catalog
 import colander
 
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.sheets import GenericResourceSheet
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets.versions import IVersionable
@@ -44,30 +41,8 @@ class TagSchema(colander.MappingSchema):
     elements = UniqueReferences(reftype=TagElementsReference)
 
 
-class TagSheet(GenericResourceSheet):
-
-    """Resource sheet for a tag."""
-
-    def set(self, appstruct: dict, omit=(), send_event=True, registry=None)\
-            -> bool:
-        """Store appstruct, updating the catalog."""
-        old_element_set = set(self._get_references().get('elements', []))
-        new_element_set = set(appstruct.get('elements', []))
-        newly_tagged_or_untagged_resources = old_element_set ^ new_element_set
-        result = super().set(appstruct, omit, send_event, registry=registry)
-        if newly_tagged_or_untagged_resources:
-            self._reindex_resources(newly_tagged_or_untagged_resources)
-        return result
-
-    def _reindex_resources(self, resources: Iterable):
-        adhocracy_catalog = find_catalog(self.context, 'adhocracy')
-        for resource in resources:
-            adhocracy_catalog.reindex_resource(resource)
-
-
 tag_metadata = sheet_metadata_defaults._replace(isheet=ITag,
                                                 schema_class=TagSchema,
-                                                sheet_class=TagSheet
                                                 )
 
 

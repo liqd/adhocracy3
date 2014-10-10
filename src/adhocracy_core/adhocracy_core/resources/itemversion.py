@@ -39,7 +39,7 @@ def notify_new_itemversion_created(context, registry, options):
     root_versions = options.get('root_versions', [])
     creator = options.get('creator', None)
     old_versions = []
-    versionable = get_sheet(context, IVersionable)
+    versionable = get_sheet(context, IVersionable, registry=registry)
     follows = versionable.get()['follows']
     for old_version in follows:
         old_versions.append(old_version)
@@ -96,12 +96,12 @@ def _update_last_tag(context: IResource, registry, old_versions: list):
     if parent_item is None:
         return
 
-    tag_sheet = get_sheet(parent_item, tags.ITags)
+    tag_sheet = get_sheet(parent_item, tags.ITags, registry=registry)
     taglist = tag_sheet.get()['elements']
 
     for tag in taglist:  # pragma: no branch
         if tag.__name__ == 'LAST':
-            sheet = get_sheet(tag, tags.ITag)
+            sheet = get_sheet(tag, tags.ITag, registry=registry)
             data = sheet.get()
             old_last_tagged_versions = data['elements']
             if IForkableVersionable.providedBy(context):
