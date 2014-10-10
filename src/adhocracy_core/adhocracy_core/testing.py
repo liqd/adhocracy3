@@ -31,7 +31,7 @@ god_header = {'X-User-Path': '/principals/users/0000000',
 """The authentication headers for the `god` user, used by functional fixtures.
 This assumes the initial user is created and has the `god` role.
 """
-god_name = 'god'
+god_login = 'god'
 """The login name for the god user, default value."""
 god_password = 'password'
 """The password for the god user, default value."""
