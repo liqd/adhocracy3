@@ -283,15 +283,15 @@
 
         {{ "Status:" | translate }}
         <label>
-            <input type="radio" data-ng-model="data.basic.organisation.status" name="basic-organisation-status" value="non-profit" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.status" name="basic-organisation-status" value="registered_nonprofit" required="required" />
             {{ "We’re a registered non-profit, e.g. NGO" | translate }}
         </label>
         <label>
-            <input type="radio" data-ng-model="data.basic.organisation.status" name="basic-organisation-status" value="possible" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.status" name="basic-organisation-status" value="planned_nonprofit" required="required" />
             {{ "A non-profit registration is planned or possible" | translate }}
         </label>
         <label>
-            <input type="radio" data-ng-model="data.basic.organisation.status" name="basic-organisation-status" value="support-needed" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.status" name="basic-organisation-status" value="support_needed" required="required" />
             {{ "I’d like to try, but I’m gonna need some help / Support needed" | translate }}
         </label>
         <label>
@@ -324,23 +324,23 @@
 
         {{ "Size of organisation:" | translate }}
         <label>
-            <input type="radio" data-ng-model="data.basic.organisation.size" name="basic-organisation-size" value="0-5" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.size" name="basic-organisation-size" value="0+" required="required" />
             {{ "0 - 5" | translate }}
         </label>
         <label>
-            <input type="radio" data-ng-model="data.basic.organisation.size" name="basic-organisation-size" value="5-10" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.size" name="basic-organisation-size" value="5+" required="required" />
             {{ "5 - 10" | translate }}
         </label>
         <label>
-            <input type="radio" data-ng-model="data.basic.organisation.size" name="basic-organisation-size" value="10-20" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.size" name="basic-organisation-size" value="10+" required="required" />
             {{ "10 - 20" | translate }}
         </label>
         <label>
-            <input type="radio" data-ng-model="data.basic.organisation.size" name="basic-organisation-size" value="20-50" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.size" name="basic-organisation-size" value="20+" required="required" />
             {{ "20 - 50" | translate }}
         </label>
         <label>
-            <input type="radio" data-ng-model="data.basic.organisation.size" name="basic-organisation-size" value="gt50" required="required" />
+            <input type="radio" data-ng-model="data.basic.organisation.size" name="basic-organisation-size" value="50+" required="required" />
             {{ "&gt;50" | translate }}
         </label>
 
