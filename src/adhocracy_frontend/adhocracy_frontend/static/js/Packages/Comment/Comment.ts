@@ -205,7 +205,7 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
 
             var setScope = (path) => {
                 $scope.display = true;
-                $scope.commentablePath = commentablePath;
+                $scope.commentablePath = path;
             };
 
             // create commentable if it doesn't exist yet
