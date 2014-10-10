@@ -1,5 +1,6 @@
 from pyramid import testing
 from pytest import fixture
+from pytest import raises
 
 
 class TestIncludeme:
@@ -122,6 +123,62 @@ class TestOrganizationInfoSheet:
                   'status_other': '',
                   'street_address': ''}
         assert inst.get() == wanted
+
+
+class TestOrganizationInfoSchema:
+
+    @fixture
+    def inst(self):
+        from adhocracy_core.sheets.mercator import OrganizationInfoSchema
+        return OrganizationInfoSchema()
+
+    @fixture
+    def cstruct_required(self):
+        return {'city': 'Berlin',
+                'email': 'test@test.de',
+                'name': 'Name',
+                'postcode': '10979',
+                'street_address': 'im Dudelhupf 7a',
+                'status': 'planned_nonprofit',
+                'size': '0+',
+                }
+
+    def test_deserialize_empty(self, inst):
+        from colander import Invalid
+        cstruct = {}
+        with raises(Invalid) as error:
+            inst.deserialize(cstruct)
+        assert error.value.asdict() == \
+               {'size': 'Required',
+                'name': 'Required',
+                'status': 'Required',
+                'postcode': 'Required',
+                'street_address': 'Required',
+                'city': 'Required',
+                'email': 'Required',
+               }
+
+    def test_deserialize_with_required(self, inst, cstruct_required):
+        wanted = cstruct_required   # cstruct and appstruct are the same here
+        assert inst.deserialize(cstruct_required) == wanted
+
+
+    def test_deserialize_with_status_other_and_no_description(self, inst,
+                                                              cstruct_required):
+        from colander import Invalid
+        cstruct = cstruct_required
+        cstruct['status'] = 'other'
+        with raises(Invalid) as error:
+            inst.deserialize(cstruct)
+        assert error.value.asdict() == {'status_other': 'Required'}
+
+    def test_deserialize_with_status_and_description(self, inst,
+                                                     cstruct_required):
+        cstruct = cstruct_required
+        cstruct['status'] = 'other'
+        cstruct['status_other'] = 'Description'
+        wanted = cstruct
+        assert inst.deserialize(cstruct_required) == wanted
 
 
 class TestIntroductionSheet:

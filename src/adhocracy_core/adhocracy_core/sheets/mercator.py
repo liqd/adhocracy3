@@ -108,6 +108,14 @@ class OrganizationInfoSchema(colander.MappingSchema):
     Setting this value also means 'cooperation' == True in the frontend form.
     """
 
+    def validator(self, node, value):
+        """Make `status_other` required if `status` == `other`."""
+        status = value.get('status', None)
+        status_other = value.get('status_other', None)
+        if status == 'other' and not status_other:
+            status_other = node['status_other']
+            raise colander.Invalid(status_other, msg='Required')
+
 
 organizationinfo_meta = sheet_metadata_defaults._replace(
     isheet=IOrganizationInfo, schema_class=OrganizationInfoSchema)
