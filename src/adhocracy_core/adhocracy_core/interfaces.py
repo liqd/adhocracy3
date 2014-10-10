@@ -339,6 +339,8 @@ class IResourceSheetModified(IObjectEvent):
     object = Attribute('The modified resource')
     isheet = Attribute('The modified sheet interface of the resource')
     registry = Attribute('The pyramid registry')
+    old_appstruct = Attribute('The old :term:`appstruct` data')
+    new_appstruct = Attribute('The new :term:`appstruct` data')
 
 
 class IResourceCreatedAndAdded(IObjectEvent):

@@ -35,8 +35,7 @@ checkout source code ::
 
     git clone ssh://git@foucault.liqd.net:22012/a3.git
     cd a3
-    git submodule init
-    git submodule update
+    git submodule update --init
 
 compile python 3 and PIL ::
 

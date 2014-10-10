@@ -9,6 +9,7 @@ from pyramid.traversal import resource_path
 from pytz import UTC
 from pyramid.traversal import find_interface
 from substanced.util import get_dotted_name
+from substanced.util import find_service
 from zope.interface.interfaces import IInterface
 import colander
 import pytz
@@ -303,7 +304,7 @@ class ResourceObject(colander.SchemaType):
         :param value: the resource to serialize
         :return: the url or path of that resource
         """
-        if value in (colander.null, ''):
+        if value in (colander.null, '', None):
             return ''
         try:
             raise_attribute_error_if_not_location_aware(value)
@@ -541,7 +542,7 @@ def _get_post_pool(context: IPool, iresource_or_service_name) -> IResource:
     if IInterface.providedBy(iresource_or_service_name):
         return find_interface(context, iresource_or_service_name)
     else:
-        return context.find_service(iresource_or_service_name)
+        return find_service(context, iresource_or_service_name)
 
 
 @colander.deferred
@@ -590,11 +591,15 @@ def deferred_validate_references_post_pool(node: colander.SchemaNode,
                                            kw: dict) -> callable:
     """Validate the :term:`post_pool` for all reference children of `node`."""
     context = kw.get('context')
+    request = kw.get('request', None)
+    if request is None:
+        return None
     reference_nodes = _get_reference_childs(node)
     validators = []
+    registry = request.registry
     for child in reference_nodes:
         _add_post_pool_validator(node, child, context, validators)
-        _add_referenced_post_pool_validator(node, child, validators)
+        _add_referenced_post_pool_validator(node, child, validators, registry)
     return colander.All(*validators)
 
 
@@ -618,14 +623,14 @@ def _add_post_pool_validator(node, child, context, validators):
         validators.append(validate_node)
 
 
-def _add_referenced_post_pool_validator(node, child, validators):
+def _add_referenced_post_pool_validator(node, child, validators, registry):
     referenced_isheet = child.reftype.getTaggedValue('target_isheet')
 
     def validate_node(node, value):
         references = node.get_value(value, child.name)
         references = normalize_to_tuple(references)
         for reference in references:
-            sheet = get_sheet(reference, referenced_isheet)
+            sheet = get_sheet(reference, referenced_isheet, registry=registry)
             post_pool = _get_post_pool_from_node(sheet.schema, reference)
             _validate_post_pool(child, (reference,), post_pool)
 

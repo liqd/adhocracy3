@@ -5,7 +5,6 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import IPostPoolSheet
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.interfaces import IItem
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.schema import UniqueReferences
 from adhocracy_core.schema import Reference
@@ -60,7 +59,7 @@ class CommentableSchema(PostPoolMappingSchema):
     comments = UniqueReferences(readonly=True,
                                 backref=True,
                                 reftype=CommentRefersToReference)
-    post_pool = PostPool(iresource_or_service_name=IItem)
+    post_pool = PostPool(iresource_or_service_name='comments')
 
 
 commentable_meta = sheet_metadata_defaults._replace(

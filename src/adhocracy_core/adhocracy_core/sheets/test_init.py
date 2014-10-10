@@ -162,10 +162,10 @@ class TestResourcePropertySheet:
         node = mock_node_single_reference
         inst.schema.children.append(node)
         target = testing.DummyResource()
+        mock_graph.get_references_for_isheet.return_value = {}
         inst.set({'reference': target})
         graph_set_args = mock_graph.set_references_for_isheet.call_args[0]
         assert graph_set_args == (context, ISheet, {'reference': target}, registry)
-
 
     def test_get_valid_reference(self, sheet_meta, context, mock_graph,
                                  mock_node_single_reference):
@@ -198,10 +198,13 @@ class TestResourcePropertySheet:
         config.add_subscriber(listener, IResourceSheetModified)
         inst = self.make_one(sheet_meta, context)
 
-        inst.set({'dummy': 'data'})
+        inst.set({'count': 2})
 
         assert IResourceSheetModified.providedBy(events[0])
         assert events[0].object == context
+        assert events[0].registry == config.registry
+        assert events[0].old_appstruct == {'count': 0}
+        assert events[0].new_appstruct == {'count': 2}
 
 
 class TestAddSheetToRegistry:

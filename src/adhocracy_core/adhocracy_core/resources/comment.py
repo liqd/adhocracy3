@@ -1,14 +1,18 @@
 """Comment resource type."""
+from pyramid.registry import Registry
+
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
+from adhocracy_core.interfaces import IPool
+from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_metadata
 from adhocracy_core.resources.item import item_metadata
 from adhocracy_core.resources.rate import IRate
+from adhocracy_core.resources.service import service_metadata
 
-from adhocracy_core.sheets.rate import IRateable
-from adhocracy_core.sheets.comment import IComment
-from adhocracy_core.sheets.comment import ICommentable
+import adhocracy_core.sheets.comment
+import adhocracy_core.sheets.rate
 
 
 class ICommentVersion(IItemVersion):
@@ -19,9 +23,9 @@ class ICommentVersion(IItemVersion):
 commentversion_meta = itemversion_metadata._replace(
     content_name='CommentVersion',
     iresource=ICommentVersion,
-    extended_sheets=[IComment,
-                     ICommentable,
-                     IRateable],
+    extended_sheets=[adhocracy_core.sheets.comment.IComment,
+                     adhocracy_core.sheets.comment.ICommentable,
+                     adhocracy_core.sheets.rate.IRateable],
 )
 
 
@@ -42,7 +46,25 @@ comment_meta = item_metadata._replace(
 )
 
 
+class ICommentsService(IServicePool):
+
+    """The 'comments' ServicePool."""
+
+
+comments_meta = service_metadata._replace(
+    iresource=ICommentsService,
+    content_name='comments',
+    element_types=[IComment],
+)
+
+
+def add_commentsservice(context: IPool, registry: Registry, options: dict):
+    """Add `comments` service to context."""
+    registry.content.create(ICommentsService.__identifier__, parent=context)
+
+
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(comment_meta, config)
+    add_resource_type_to_registry(comments_meta, config)
     add_resource_type_to_registry(commentversion_meta, config)
+    add_resource_type_to_registry(comment_meta, config)
