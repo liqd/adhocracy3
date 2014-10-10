@@ -64,6 +64,7 @@ def create_initial_content_for_app_root(context: IPool, registry: Registry,
     _add_catalog_service(context, registry)
     _add_principals_service(context, registry)
     _add_acl_to_app_root(context, registry)
+    _add_default_group(context, registry)
     _add_initial_user_and_group(context, registry)
     _add_platform(context, registry)
 
@@ -100,6 +101,22 @@ def _add_platform(context, registry):
     appstructs = {'adhocracy_core.sheets.name.IName': {'name': platform_id}}
     registry.content.create(IBasicPool.__identifier__, context,
                             appstructs=appstructs, registry=registry)
+
+
+def _add_default_group(context, registry):
+    group_name = 'authenticated'
+    group_roles = ['reader', 'annotator', 'contributor']
+    # FIXME these rules only makes sense for mercator
+    # FIXME groups should be created with an evolve script
+    groups = find_service(context, 'principals', 'groups')
+    appstructs = {adhocracy_core.sheets.principal.IGroup.__identifier__:
+                  {'roles': group_roles},
+                  adhocracy_core.sheets.name.IName.__identifier__:
+                  {'name': group_name},
+                  }
+    registry.content.create(IGroup.__identifier__, groups,
+                            appstructs=appstructs,
+                            registry=registry)
 
 
 def _add_initial_user_and_group(context, registry):

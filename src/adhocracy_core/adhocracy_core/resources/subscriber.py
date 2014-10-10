@@ -5,6 +5,7 @@ from collections import Sequence
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
 from substanced.util import find_catalog
+from substanced.util import find_service
 
 from adhocracy_core.interfaces import ChangelogMetadata
 from adhocracy_core.interfaces import IResource
@@ -14,6 +15,9 @@ from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
+from adhocracy_core.resources.principal import IGroup
+from adhocracy_core.resources.principal import IUser
+from adhocracy_core.sheets.principal import IPermissions
 from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
@@ -72,6 +76,25 @@ def clear_transaction_changelog_after_commit_hook(success: bool,
     """Delete all entries in the transaction changelog."""
     changelog = getattr(registry, '_transaction_changelog', dict())
     changelog.clear()
+
+
+def user_created_and_added_subscriber(event):
+    """Add default group to user."""
+    group = _get_default_group(event.object, event.registry)
+    _add_user_to_group(event.object, group, event.registry)
+
+
+def _get_default_group(context, registry: Registry) -> IGroup:
+    groups = find_service(context, 'principals', 'groups')
+    default_group = groups['authenticated']
+    return default_group
+
+
+def _add_user_to_group(user: IUser, group: IGroup, registry: Registry):
+    sheet = get_sheet(user, IPermissions)
+    groups = sheet.get()['groups']
+    groups.append(group)
+    sheet.set({'groups': groups}, registry=registry)
 
 
 def reference_has_new_version_subscriber(event):
@@ -162,3 +185,6 @@ def includeme(config):
     config.add_subscriber(tag_created_and_added_or_modified_subscriber,
                           IResourceSheetModified,
                           isheet=adhocracy_core.sheets.tags.ITag)
+    config.add_subscriber(user_created_and_added_subscriber,
+                          IResourceCreatedAndAdded,
+                          interface=IUser)

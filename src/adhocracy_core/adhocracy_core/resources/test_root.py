@@ -14,6 +14,7 @@ class RootPoolIntegrationTest(unittest.TestCase):
         config.include('adhocracy_core.resources.root')
         config.include('adhocracy_core.resources.pool')
         config.include('adhocracy_core.resources.principal')
+        config.include('adhocracy_core.resources.subscriber')
         config.include('adhocracy_core.sheets')
         config.include('adhocracy_core.messaging')
         self.config = config
@@ -115,4 +116,18 @@ class RootPoolIntegrationTest(unittest.TestCase):
         assert group_users == ['0000000']
         assert group_roles == ['god']
 
-
+    def test_includeme_registry_add_default_group(self):
+        from adhocracy_core.resources.root import IRootPool
+        from adhocracy_core.interfaces import IGroupLocator
+        from adhocracy_core.sheets.principal import IGroup
+        from adhocracy_core.utils import get_sheet
+        inst = self.config.registry.content.create(IRootPool.__identifier__)
+        locator = self.registry.getMultiAdapter((inst, self.request),
+                                                IGroupLocator)
+        group = locator.get_group_by_id('authenticated')
+        group_sheet = get_sheet(group, IGroup)
+        group_users = [x.__name__ for x in group_sheet.get()['users']]
+        group_roles = group_sheet.get()['roles']
+        assert not group is None
+        assert group_users == ['0000000']
+        assert group_roles == ['reader', 'annotator', 'contributor']

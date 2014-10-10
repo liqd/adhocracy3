@@ -10,8 +10,8 @@ On the technical level, roles are also called principles.
 
 groups (set of users):
 
-   - Authenticated (all authenticated users, standard group)
-   - Everyone (all authenticated and anonymous users, standard group)
+   - authenticated (all authenticated users, standard group)
+   - system.Everyone (all authenticated and anonymous users, standard group)
    - gods (initial custom group, no permission checks)
    - admins (custom group)
    - managers (custom group)
