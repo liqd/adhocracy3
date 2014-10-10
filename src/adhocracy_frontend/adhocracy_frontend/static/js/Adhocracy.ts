@@ -88,8 +88,11 @@ export var init = (config, meta_api) => {
             })
             .when("/mercator", {
                 template: "<adh-resource-wrapper>" +
-                    "<adh-mercator data-path=\"@preliminary\" data-mode=\"edit\">" +
-                    "</adh-mercator></adh-resource-wrapper>"
+                    "<adh-mercator data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
+                    "</adh-mercator></adh-resource-wrapper>",
+                controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
+                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
+                }]
             })
             .when("/activation_error", {
                 templateUrl: "/static/js/templates/ActivationError.html",

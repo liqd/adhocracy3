@@ -22,6 +22,7 @@ var pkgLocation = "/Mercator";
 
 
 export interface IMercatorProposalScope extends AdhResourceWidgets.IResourceWidgetScope {
+    poolPath : string;
     data : {
         basic : {
             user : {
@@ -93,6 +94,12 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/MercatorProposalCreate.html";
     }
 
+    public createDirective() : ng.IDirective {
+        var directive = super.createDirective();
+        directive.scope.poolPath = "@";
+        return directive;
+    }
+
     public _handleDelete(
         instance : AdhResourceWidgets.IResourceWidgetInstance<R, IMercatorProposalScope>,
         path : string
@@ -117,7 +124,7 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
         data.extra.hear = data.extra.hear || <any>{};
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
-        mercatorProposal.parent = undefined;  // FIXME
+        mercatorProposal.parent = instance.scope.poolPath;
         mercatorProposal.data[SIName.nick] = new SIName.AdhocracyCoreSheetsNameIName({
             name: data.introduction.title
         });
