@@ -98,14 +98,15 @@ class OrganizationInfoSchema(colander.MappingSchema):
     country = ISOCountryCode()
     status = StatusEnum()
     status_other = Text(validator=colander.Length(max=500))
-    description = Text(validator=colander.Length(min=1, max=750))
-    size = SizeEnum()
-    # cooperation is assumed to be true of cooperation_explanation is
-    # non-empty, false otherwise
-    cooperation_explanation = Text(validator=colander.Length(max=300))
-
+    """Custom description for status == other."""
     # FIXME status_other must be non-empty if status=other, otherwise it must
     # be empty or null
+    description = Text(validator=colander.Length(min=1, max=750))
+    size = SizeEnum()
+    cooperation_explanation = Text(validator=colander.Length(max=300))
+    """Custom description for cooperation.
+    Setting this value also means 'cooperation' == True in the frontend form.
+    """
 
 
 organizationinfo_meta = sheet_metadata_defaults._replace(
