@@ -143,7 +143,6 @@ user_metadata = pool_metadata._replace(
     element_types=[],  # we don't want the frontend to post resources here
     use_autonaming=True,
     permission_add='add_user',
-    is_implicit_addable=False,
 )
 
 

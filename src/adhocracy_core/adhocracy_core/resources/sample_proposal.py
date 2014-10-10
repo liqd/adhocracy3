@@ -48,6 +48,7 @@ proposal_meta = item_metadata._replace(
         add_ratesservice,
     ],
     item_type=IProposalVersion,
+    is_implicit_addable=True,
 )
 
 
