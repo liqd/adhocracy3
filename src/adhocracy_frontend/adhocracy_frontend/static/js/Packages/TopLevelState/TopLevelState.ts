@@ -28,15 +28,18 @@ export class TopLevelState {
         this.eventHandler = new adhEventHandlerClass();
         this.focus = 1;
 
-        if (this.$routeParams.hasOwnProperty("focus")){
+        if (this.$routeParams.hasOwnProperty("focus")) {
             var column = parseInt(this.$routeParams.focus, 10);
-            if (!isNaN(column)){
+            if (!isNaN(column)) {
                 console.log("parsed focus successfully");
                 this.focus = column;
-            } else
-                console.log("focus (" + column +") is not a number");
-        } else
+            } else {
+                console.log("focus (" + column + ") is not a number");
+            };
+
+        } else {
             console.log("no focus in routeParams");
+        };
 
     }
 
@@ -138,9 +141,8 @@ export var adhFocusSwitch = (topLevelState : TopLevelState) => {
         restrict: "E",
         template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
         link: (scope) => {
-            var column : number = 1;
             scope.switchFocus = () => {
-                column = column === 1 ? 2 : 1;
+                var column = topLevelState.getFocus() === 1 ? 2 : 1;
                 topLevelState.setFocus(column);
             };
         }
