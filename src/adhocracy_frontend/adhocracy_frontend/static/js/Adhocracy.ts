@@ -6,16 +6,16 @@
 /// <reference path="./_all.d.ts"/>
 
 import angular = require("angular");
-import angularRoute = require("angularRoute");  if (angularRoute) { return; };
+import angularRoute = require("angularRoute");  if (angularRoute) { ; };
 // (since angularRoute does not export any objects or types we would
 // want to use, the extra mention of the module name is needed to keep
 // tsc from purging this import entirely.  which would have undesired
 // runtime effects.)
 
-import angularAnimate = require("angularAnimate");  if (angularAnimate) { return; };
-import angularTranslate = require("angularTranslate");  if (angularTranslate) { return; };
-import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { return; };
-import angularElastic = require("angularElastic");  if (angularElastic) { return; };
+import angularAnimate = require("angularAnimate");  if (angularAnimate) { ; };
+import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
+import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
+import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
