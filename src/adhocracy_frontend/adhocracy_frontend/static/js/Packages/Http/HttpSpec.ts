@@ -182,8 +182,8 @@ export var register = () => {
             });
             describe("getNewestVersionPathNoFork", () => {
                 it("promises the unique path from the LAST tag", (done) => {
-                    var path = "path";
-                    var returnPath1 = "path1";
+                    var path = "path/";
+                    var returnPath1 = "path1/";
 
                     var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
                     dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.AdhocracyCoreSheetsTagsITag({ elements: [returnPath1] });
@@ -192,7 +192,7 @@ export var register = () => {
                     adhHttp.getNewestVersionPathNoFork(path).then(
                         (ret) => {
                             expect(ret).toBe(returnPath1);
-                            expect($httpMock.get).toHaveBeenCalledWith(path + "/LAST", { params: undefined });
+                            expect($httpMock.get).toHaveBeenCalledWith(path + "LAST/", { params: undefined });
                             done();
                         },
                         (msg) => {

@@ -150,7 +150,7 @@ export class Service<Content extends Resources.Content<any>> {
      * one version in LAST, throw an exception.
      */
     public getNewestVersionPathNoFork(path : string) : ng.IPromise<string> {
-        return this.get(path + "/LAST")
+        return this.get(path + "LAST/")
             .then((tag) => {
                 var heads = tag.data[SITag.nick].elements;
                 if (heads.length !== 1) {
