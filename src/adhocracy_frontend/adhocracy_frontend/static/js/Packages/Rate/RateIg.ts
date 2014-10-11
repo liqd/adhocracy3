@@ -160,7 +160,7 @@ export var register = (angular, config, meta_api) => {
 
                             return transaction.commit()
                                 .then((responses) : void => {
-                                    _rateVersion = responses[rateVersionProper.index];
+                                    _rateVersion = <RIRateVersion>responses[rateVersionProper.index];
                                     done();
                                 });
                         });
