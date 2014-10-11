@@ -16,7 +16,6 @@ from substanced.objectmap import ObjectMap
 from substanced.objectmap import find_objectmap
 from webtest.http import StopableWSGIServer
 import colander
-import transaction
 
 from adhocracy_core.interfaces import SheetMetadata, ChangelogMetadata
 from adhocracy_core.interfaces import ResourceMetadata
@@ -457,57 +456,104 @@ def _is_running(path_to_pid_file) -> bool:
             return True
 
 
-class ManageAppAPI:
+def add_user_token(root, userid: str, token: str, registry):
+    """Add user authentication token to :app:`Pyramid`."""
+    from datetime import datetime
+    from adhocracy_core.interfaces import ITokenManger
+    timestamp = datetime.now()
+    token_manager = registry.getAdapter(root, ITokenManger)
+    token_manager.token_to_user_id_timestamp[token] = (userid, timestamp)
 
-    # FIXME move this some where else
 
-    def __init__(self, app):
-        request = testing.DummyRequest()
-        request.registry = app.registry
-        self.request = request
-        self.registry = app.registry
-        self.root = app.root_factory(request)
+def add_user(root, login: str=None, password: str=None, roles=None,
+             registry=None) -> str:
+    """Add user to :app:`Pyramid`."""
+    from substanced.util import find_service
+    from adhocracy_core.resources.principal import IUser
+    import adhocracy_core.sheets
+    users = find_service(root, 'principals', 'users')
+    roles = roles or []
+    passwd_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
+    appstructs =\
+        {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
+         {'name': login},
+         adhocracy_core.sheets.principal.IPermissions.__identifier__:
+         {'roles': roles},
+         passwd_sheet.__identifier__:
+         {'password': password},
+         }
+    user = registry.content.create(IUser.__identifier__,
+                                   parent=users,
+                                   appstructs=appstructs,
+                                   registry=registry,
+                                   run_after_creation=False,
+                                   )
+    user.active = True
+    return user
 
-    def add_user_token(self, userid: str, token: str):
-        """Add user authentication token to :app:`Pyramid`."""
-        from datetime import datetime
-        from adhocracy_core.interfaces import ITokenManger
-        timestamp = datetime.now()
-        token_manager = self.registry.getAdapter(self.root, ITokenManger)
-        token_manager.token_to_user_id_timestamp[token] = (userid, timestamp)
 
-    def add_user(self, login: str=None, password: str=None, roles=None) -> str:
-        """Add user to :app:`Pyramid`."""
-        # FIXME? add option to set the userid
-        from substanced.util import find_service
-        from pyramid.traversal import resource_path
-        from adhocracy_core.resources.principal import IUser
-        import adhocracy_core.sheets
-        users = find_service(self.root, 'principals', 'users')
-        roles = roles or []
-        passwd_sheet = adhocracy_core.sheets.principal.IPasswordAuthentication
-        appstructs =\
-            {adhocracy_core.sheets.principal.IUserBasic.__identifier__:
-             {'name': login},
-             adhocracy_core.sheets.principal.IPermissions.__identifier__:
-             {'roles': roles},
-             passwd_sheet.__identifier__:
-             {'password': password},
-             }
-        user = self.registry.content.create(IUser.__identifier__,
-                                            parent=users,
-                                            appstructs=appstructs,
-                                            registry=self.registry,
-                                            run_after_creation=False,
-                                            )
-        user.active = True
-        return resource_path(user)
+def add_test_users(root, registry, options):
+    """Add test user and dummy authentication token for every role."""
+    add_user_token(root,
+                   god_header['X-User-Path'],
+                   god_header['X-User-Token'],
+                   registry)
+    add_user(root, login='reader', password='reader', roles=['reader'],
+             registry=registry)
+    add_user_token(root,
+                   reader_header['X-User-Path'],
+                   reader_header['X-User-Token'],
+                   registry)
+    add_user(root, login='annotator', password='annotator',
+             roles=['annotator'], registry=registry)
+    add_user_token(root,
+                   annotator_header['X-User-Path'],
+                   annotator_header['X-User-Token'],
+                   registry)
+    add_user(root, login='contributor', password='contributor',
+             roles=['contributor'], registry=registry)
+    add_user_token(root,
+                   contributor_header['X-User-Path'],
+                   contributor_header['X-User-Token'],
+                   registry)
+    add_user(root, login='editor', password='editor', roles=['editor'],
+             registry=registry)
+    add_user_token(root,
+                   editor_header['X-User-Path'],
+                   editor_header['X-User-Token'],
+                   registry)
+    add_user(root, login='reviewer', password='reviewer', roles=['reviewer'],
+             registry=registry)
+    add_user_token(root,
+                   reviewer_header['X-User-Path'],
+                   reviewer_header['X-User-Token'],
+                   registry)
+    add_user(root, login='manager', password='manager', roles=['manager'],
+             registry=registry)
+    add_user_token(root,
+                   manager_header['X-User-Path'],
+                   manager_header['X-User-Token'],
+                   registry)
+    add_user(root, login='admin', password='admin', roles=['admin'],
+             registry=registry)
+    add_user_token(root,
+                   admin_header['X-User-Path'],
+                   admin_header['X-User-Token'],
+                   registry)
+
+
+def includeme_root_with_test_users(config):
+    """Override IRootPool to create initial test users."""
+    from adhocracy_core.resources import add_resource_type_to_registry
+    from adhocracy_core.resources.root import root_metadata
+    after_creation = root_metadata.after_creation + [add_test_users]
+    root_metadata = root_metadata._replace(after_creation=after_creation)
+    add_resource_type_to_registry(root_metadata, config)
 
 
 @fixture(scope='class')
 def app(zeo, settings, websocket):
     """Return the adhocracy wsgi application."""
-    from pyramid.threadlocal import manager
     import adhocracy_core
     import adhocracy_core.resources.sample_paragraph
     import adhocracy_core.resources.sample_section
@@ -525,49 +571,8 @@ def app(zeo, settings, websocket):
     configurator.include(adhocracy_core.resources.sample_section)
     configurator.include(adhocracy_core.resources.comment)
     configurator.include(adhocracy_core.resources.rate)
-    manageapp = configurator.make_wsgi_app()
-    manageapplocals = {'registry': manageapp.registry, 'request': None}
-    manager.push(manageapplocals)
-    manageapi = ManageAppAPI(manageapp)
-    manageapi.add_user_token(userid=god_header['X-User-Path'],
-                             token=god_header['X-User-Token'])
-    manageapi.add_user(login='reader',
-                       password='reader',
-                       roles=['reader'])
-    manageapi.add_user_token(userid=reader_header['X-User-Path'],
-                             token=reader_header['X-User-Token'])
-    manageapi.add_user(login='annotator',
-                       password='annotator',
-                       roles=['annotator'])
-    manageapi.add_user_token(userid=annotator_header['X-User-Path'],
-                             token=annotator_header['X-User-Token'])
-    manageapi.add_user(login='contributor',
-                       password='contributor',
-                       roles=['contributor'])
-    manageapi.add_user_token(userid=contributor_header['X-User-Path'],
-                             token=contributor_header['X-User-Token'])
-    manageapi.add_user(login='editor',
-                       password='editor',
-                       roles=['editor'])
-    manageapi.add_user_token(userid=editor_header['X-User-Path'],
-                             token=editor_header['X-User-Token'])
-    manageapi.add_user(login='reviewer',
-                       password='reviewer',
-                       roles=['reviewer'])
-    manageapi.add_user_token(userid=reviewer_header['X-User-Path'],
-                             token=reviewer_header['X-User-Token'])
-    manageapi.add_user(login='manager',
-                       password='manager',
-                       roles=['manager'])
-    manageapi.add_user_token(userid=manager_header['X-User-Path'],
-                             token=manager_header['X-User-Token'])
-    manageapi.add_user(login='admin',
-                       password='admin',
-                       roles=['admin'])
-    manageapi.add_user_token(userid=admin_header['X-User-Path'],
-                             token=admin_header['X-User-Token'])
-    transaction.commit()
-    manager.pop()
+    configurator.commit()
+    configurator.include(includeme_root_with_test_users)
     app = configurator.make_wsgi_app()
     return app
 
