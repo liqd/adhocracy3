@@ -213,7 +213,7 @@ class TestClient:
 class TestFunctionalClient:
 
     @fixture()
-    def websocket_client(self, request, websocket, settings):
+    def websocket_client(self, request, zeo, websocket, settings):
         from adhocracy_core.websockets.client import Client
         client = Client(ws_url=settings['adhocracy.ws_url'])
         request.addfinalizer(client.stop)
