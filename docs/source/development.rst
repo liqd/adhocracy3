@@ -27,12 +27,12 @@ frontend unit tests:
 
     A.  Integrated with py.test::
 
-            bin/py.test ./src/adhocracy/adhocracy/frontend/tests/unit/
+            bin/py.test ./src/adhocracy_frontend/adhocracy_frontend/tests/unit/
 
     B.  In browser::
 
-            make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser
-            xdg-open http://localhost:6541/static/test.html
+            make -C ./src/adhocracy_frontend/adhocracy_frontend/static/js/ compile_tests_browser
+            xdg-open http://localhost:6551/static/test.html
 
         Make sure backend is running (or some means of delivering html
         and js to the browser).
@@ -45,13 +45,13 @@ frontend unit tests:
            In the debugger, it helps to disable the script tag about
            blanket in test.html.  You can do this thusly::
 
-               make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser test_no_blanket
-               xdg-open http://localhost:6541/static/test-no-blanket.html
+               make -C ./src/adhocracy_frontend/adhocracy_frontend/static/js/ compile_tests_browser test-no-blanket
+               xdg-open http://localhost:6551/static/test-no-blanket.html
 
     C.  With node.js::
 
-            make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_node
-            bin/jasmine-node ./src/adhocracy/adhocracy/frontend/static/js/
+            make -C ./src/adhocracy_frontend/adhocracy_frontend/static/js/ compile_tests_node
+            bin/jasmine-node ./src/adhocracy_frontend/adhocracy_frontend/static/js/
 
         .. note::
 
@@ -68,7 +68,7 @@ frontend unit tests:
            In order for the javascript code to work in the browser, you
            need to revert to adm::
 
-               make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser
+               make -C ./src/adhocracy_frontend/adhocracy_frontend/static/js/ compile_tests_browser
 
 frontend integration tests:
 
@@ -97,8 +97,8 @@ frontend integration tests:
 
     B.  In browser::
 
-            make -C ./src/adhocracy/adhocracy/frontend/static/js/ compile_tests_browser
-            xdg-open http://localhost:6541/static/igtest.html
+            make -C ./src/adhocracy_frontend/adhocracy_frontend/static/js/ compile_tests_browser
+            xdg-open http://localhost:6551/static/igtest.html
 
         .. note::
 
@@ -111,7 +111,7 @@ frontend integration tests:
 
 frontend functional tests::
 
-    bin/py.test ./src/adhocracy/adhocracy/frontend/tests/functional
+    bin/py.test ./src/adhocracy_frontend/adhocracy_frontend/tests/functional
 
 frontend acceptance tests::
 
@@ -129,7 +129,7 @@ frontend acceptance tests::
 
 run backend functional tests::
 
-    bin/py.test -m"functional" src/adhocrac/adhocracy/websocket src/adhocracy_sample/adhocracy_sample/docs
+    bin/py.test -m"functional" src/adhocracy_core/adhocracy_core/websocket src/adhocracy_core/docs
 
 run backend unit tests and show python test code coverage::
 
