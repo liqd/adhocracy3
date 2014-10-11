@@ -668,6 +668,139 @@ class DateTimeUnitTest(unittest.TestCase):
         assert today in result
 
 
+class TestBoolean:
+
+    @fixture
+    def inst(self):
+        from adhocracy_core.schema import Boolean
+        return Boolean()
+
+    def test_deserialize_valid_empty(self, inst):
+        assert inst.deserialize() is False
+
+    def test_serialize_valid_empty(self, inst):
+        assert inst.serialize() == 'false'
+
+    def test_deserialize_valid_true(self, inst):
+        assert inst.deserialize('true') is True
+
+    def test_serialize_valid_true(self, inst):
+        assert inst.serialize(True) == 'true'
+
+    def test_deserialize_valid_false(self, inst):
+        assert inst.deserialize('false') is False
+
+    def test_serialize_valid_false(self, inst):
+        assert inst.serialize(False) == 'false'
+
+    def test_deserialize_valid_one(self, inst):
+        assert inst.deserialize('1') is True
+
+    def test_deserialize_invalid(self, inst):
+        with raises(colander.Invalid):
+            assert inst.deserialize('yes') is False
+
+    def test_serialize_invalid_no_bool(self, inst):
+        with raises(colander.Invalid):
+            inst.deserialize('not-a-bool')
+
+
+class TestCurrencyAmount:
+
+    @fixture
+    def inst(self):
+        from adhocracy_core.schema import CurrencyAmount
+        return CurrencyAmount()
+
+    def test_deserialize_valid_empty(self, inst):
+        assert inst.deserialize() == colander.drop
+
+    def test_serialize_valid_empty(self, inst):
+        assert inst.serialize() == '0.00'
+
+    def test_deserialize_valid(self, inst):
+        from decimal import Decimal
+        assert inst.deserialize('30.15') == Decimal('30.15')
+
+    def test_serialize_valid(self, inst):
+        from decimal import Decimal
+        assert inst.serialize(Decimal('30.15')) == '30.15'
+
+    def test_deserialize_valid_no_fractional_digits(self, inst):
+        from decimal import Decimal
+        assert inst.deserialize('77') == Decimal('77')
+
+    def test_serialize_valid_no_fractional_digits(self, inst):
+        from decimal import Decimal
+        assert inst.serialize(Decimal('77')) == '77.00'
+
+    def test_deserialize_valid_just_fractional_digits(self, inst):
+        from decimal import Decimal
+        assert inst.deserialize('.99') == Decimal('0.99')
+
+    def test_serialize_valid_just_fractional_digits(self, inst):
+        from decimal import Decimal
+        assert inst.serialize(Decimal('0.99')) == '0.99'
+
+    def test_deserialize_valid_too_many_fractional_digits(self, inst):
+        from decimal import Decimal
+        assert inst.deserialize('12.3456') == Decimal('12.35')
+
+    def test_serialize_valid_too_many_fractional_digits(self, inst):
+        from decimal import Decimal
+        assert inst.serialize(Decimal('12.3456')) == '12.35'
+
+    def test_serialize_valid_float(self, inst):
+        assert inst.serialize(7.77) == '7.77'
+
+    def test_serialize_valid_int(self, inst):
+        assert inst.serialize(65) == '65.00'
+
+    def test_deserialize_invalid(self, inst):
+        with raises(colander.Invalid):
+            inst.deserialize('1.2.3')
+
+    def test_serialize_invalid(self, inst):
+        with raises(colander.Invalid):
+            inst.serialize('not-a-number')
+
+
+class TestISOCountryCode:
+
+    @fixture
+    def inst(self):
+        from adhocracy_core.schema import ISOCountryCode
+        return ISOCountryCode()
+
+    def test_deserialize_valid_empty(self, inst):
+        assert inst.deserialize() == colander.drop
+
+    def test_serialize_valid_empty(self, inst):
+        assert inst.serialize() == 'DE'
+
+    def test_deserialize_valid(self, inst):
+        assert inst.deserialize('US') == 'US'
+
+    def test_serialize_valid(self, inst):
+        assert inst.serialize('US') == 'US'
+
+    def test_deserialize_invalid_too_long(self, inst):
+        with raises(colander.Invalid):
+            inst.deserialize('EUR')
+
+    def test_deserialize_invalid_too_short(self, inst):
+        with raises(colander.Invalid):
+            inst.deserialize('D')
+
+    def test_deserialize_invalid_lowercase_letters(self, inst):
+        with raises(colander.Invalid):
+            inst.deserialize('de')
+
+    def test_deserialize_invalid_not_letters(self, inst):
+        with raises(colander.Invalid):
+            inst.deserialize('1A')
+
+
 class TestPostPool:
 
     @fixture

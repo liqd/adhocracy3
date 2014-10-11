@@ -75,12 +75,28 @@ export function parentPath(url : string) : string {
 
 
 /**
- * replace space with _, make everything lower case.
+ * Convert a any string to a valid name
  */
 export function normalizeName(name: string) : string {
     "use strict";
 
-    return name.toLowerCase().replace(/\ /g, "_");
+    // FIXME: This does work well for german.
+    // For languages with non-ascii character sets (diacritics,
+    // cyrillic, chinese, ...) this will almost certainly return "".
+
+    return name
+        // common non-ascii chars
+        .replace("ä", "ae")
+        .replace("Ä", "Ae")
+        .replace("ö", "oe")
+        .replace("Ö", "Oe")
+        .replace("ü", "ue")
+        .replace("Ü", "Ue")
+        .replace("ß", "ss")
+        // whitespace
+        .replace(/\s/, "_")
+        // everything else
+        .replace(/[^a-zA-Z0-9_\-.]/g, "");
 }
 
 /**

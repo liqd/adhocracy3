@@ -165,7 +165,7 @@ export var register = () => {
                         });
 
                         it("updates scope.container from server", () => {
-                            expect(adhHttpMock.get).toHaveBeenCalledWith(path);
+                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {});
                             expect(scope.container).toBe(container);
                         });
 
@@ -177,6 +177,23 @@ export var register = () => {
                         it("updates scope.elements using adapter from container", () => {
                             expect(adapter.elemRefs).toHaveBeenCalledWith(container);
                             expect(scope.elements).toBe(elements);
+                        });
+                    });
+
+                    describe("scope.update with content_type filter", () => {
+                        var path = "some/path";
+
+                        beforeEach((done) => {
+                            scope.path = path;
+                            scope.contentType = "some_content_type";
+                            scope.update().then(done);
+                        });
+
+                        it("updates scope.container from server", () => {
+                            expect(adhHttpMock.get).toHaveBeenCalledWith(path, {
+                                content_type: "some_content_type"
+                            });
+                            expect(scope.container).toBe(container);
                         });
                     });
 

@@ -674,6 +674,9 @@ mkFieldType = (field : MetaApi.ISheetField) : string => {
     var result : string;
 
     switch (field.valuetype) {
+    case "adhocracy_core.schema.Boolean":
+        result = "boolean";
+        break;
     case "adhocracy_core.schema.AbsolutePath":
         result = "string";
         break;
@@ -712,6 +715,18 @@ mkFieldType = (field : MetaApi.ISheetField) : string => {
         break;
     case "adhocracy_core.schema.Roles":
         result = "string[]";
+        break;
+    case "adhocracy_core.schema.CurrencyAmount":
+        result = "number";
+        break;
+    case "adhocracy_core.schema.ISOCountryCode":
+        result = "number";
+        break;
+    case "adhocracy_core.sheets.mercator.StatusEnum":
+        result = "string";
+        break;
+    case "adhocracy_core.sheets.mercator.SizeEnum":
+        result = "string";
         break;
     default:
         throw "mkFieldType: unknown value " + field.valuetype;

@@ -3,7 +3,7 @@
         <adh-web-socket-test data-paths="{{websocketTestPaths}}"></adh-web-socket-test>
     </div>
     <div class="moving-column-content">
-        <adh-listing data-path="{{path}}" data-action-column="action-column">
+        <adh-listing data-path="{{path}}" data-content-type="{{contentType}}" data-action-column="action-column">
             <div data-ng-switch="transclusionId">
                 <adh-proposal-version-new
                     data-on-new-proposal="onCreate"

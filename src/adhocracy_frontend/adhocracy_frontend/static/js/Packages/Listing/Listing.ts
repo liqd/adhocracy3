@@ -38,6 +38,7 @@ export class ListingPoolAdapter implements IListingContainerAdapter {
 export interface ListingScope<Container> extends ng.IScope {
     path : string;
     actionColumn : boolean;
+    contentType? : string;
     container : Container;
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
@@ -76,7 +77,8 @@ export class Listing<Container extends Resources.Content<any>> {
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
             scope: {
                 path: "@",
-                actionColumn: "@"
+                actionColumn: "@",
+                contentType: "@"
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
@@ -102,7 +104,11 @@ export class Listing<Container extends Resources.Content<any>> {
                 };
 
                 $scope.update = () : ng.IPromise<void> => {
-                    return adhHttp.get($scope.path).then((container) => {
+                    var params = <any>{};
+                    if (typeof $scope.contentType !== "undefined") {
+                        params.content_type = $scope.contentType;
+                    }
+                    return adhHttp.get($scope.path, params).then((container) => {
                         $scope.container = container;
                         $scope.poolPath = _self.containerAdapter.poolPath($scope.container);
                         $scope.elements = _self.containerAdapter.elemRefs($scope.container);
