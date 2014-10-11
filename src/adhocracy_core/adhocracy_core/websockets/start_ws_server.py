@@ -84,8 +84,8 @@ def _register_sigterm_handler(pid_file: str):
 
 def _start_loop(config: ConfigParser, port: int, pid_file: str):
     try:
-        connection = _get_zodb_connection(config)
-        ClientCommunicator.zodb_connection = connection
+        database = _get_zodb_database(config)
+        ClientCommunicator.zodb_database = database
         rest_url = _get_rest_url(config)
         ClientCommunicator.rest_url = rest_url
         factory = WebSocketServerFactory('ws://localhost:{}'.format(port))
@@ -123,13 +123,13 @@ def _read_config(config_file: str) -> ConfigParser:
     return config
 
 
-def _get_zodb_connection(config: ConfigParser) -> dict:
+def _get_zodb_database(config: ConfigParser) -> dict:
     zodb_uri = config['app:main']['zodbconn.uri']
-    logger.info('Opening ZEO database on {}'.format(zodb_uri))
+    logger.info('Getting ZEO database on {}'.format(zodb_uri))
     storage_factory, dbkw = resolve_uri(zodb_uri)
     storage = storage_factory()
     db = DB(storage, **dbkw)
-    return db.open()
+    return db
 
 
 def _get_rest_url(config: ConfigParser) -> dict:
