@@ -104,6 +104,10 @@ def _add_platform(context, registry):
 
 
 def _add_default_group(context, registry):
+    if not registry.settings.get('adhocracy.add_default_group', True):
+        return
+    # FIXME: the 'app' fixture  in adhocracy.testing does not work with setting
+    # a default group. So we allow to disable here.
     group_name = 'authenticated'
     group_roles = ['reader', 'annotator', 'contributor']
     # FIXME these rules only makes sense for mercator

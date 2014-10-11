@@ -346,6 +346,19 @@ class TestAddDefaultGroupToUserSubscriber:
         assert mock_sheet.set.call_args[0] == ({'groups': [default_group]},)
 
 
+    def test_default_group_not_exists(
+            self, registry, principals, event, mock_sheet):
+        from adhocracy_core.sheets.principal import IPermissions
+        del principals['groups']['authenticated']
+        user = principals['users']['000000']
+        event.object = user
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
+        add_and_register_sheet(event.object, mock_sheet, registry)
+        mock_sheet.get.return_value = {'groups': []}
+        self.call_fut(event)
+        assert mock_sheet.set.called is False
+
+
 @fixture()
 def integration(config):
     config.include('adhocracy_core.events')

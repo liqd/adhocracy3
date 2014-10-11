@@ -81,12 +81,14 @@ def clear_transaction_changelog_after_commit_hook(success: bool,
 def user_created_and_added_subscriber(event):
     """Add default group to user."""
     group = _get_default_group(event.object, event.registry)
+    if group is None:  # ease testing,
+        return
     _add_user_to_group(event.object, group, event.registry)
 
 
 def _get_default_group(context, registry: Registry) -> IGroup:
     groups = find_service(context, 'principals', 'groups')
-    default_group = groups['authenticated']
+    default_group = groups.get('authenticated', None)
     return default_group
 
 

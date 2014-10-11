@@ -514,6 +514,9 @@ def app(zeo, settings, websocket):
     import adhocracy_core.resources.sample_proposal
     import adhocracy_core.sheets.mercator
     import adhocracy_core.resources.mercator
+    # disable creating a default group, this causes
+    # ZODB.POSException.InvalidObjectReference
+    settings['adhocracy.add_default_group'] = False
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy_core.root_factory)
     configurator.include(adhocracy_core)
