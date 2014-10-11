@@ -78,39 +78,39 @@ Can read resources and normal sheets::
 
 Cannot create annotations for participation process content::
 
-   >>> resp_data = testapp.options(contributor_proposal_comments, headers=reader_header).json
-   >>> pprint(resp_data['POST']['request_body'])
-   []
+    >>> resp_data = testapp.options(contributor_proposal_comments, headers=reader_header).json
+    >>> 'POST' not in resp_data
+    True
 
 Cannot edit annotations for participation process content::
 
-   >>> resp_data = testapp.options(annotator_comment, headers=reader_header).json
-   >>> pprint(resp_data['POST']['request_body'])
-   []
+    >>> resp_data = testapp.options(annotator_comment, headers=reader_header).json
+    >>> 'POST' not in resp_data
+    True
 
 Cannot create process content::
 
     >>> resp_data = testapp.options(pool, headers=reader_header).json
-    >>> pprint([r['content_type'] for r in resp_data['POST']['request_body']])
-    []
+    >>> 'POST' not in resp_data
+    True
 
 Cannot edit process content::
 
     >>> resp_data = testapp.options(contributor_proposal, headers=reader_header).json
-    >>> pprint(resp_data['POST']['request_body'])
-    []
+    >>> 'POST' not in resp_data
+    True
 
 Cannot create process structure::
 
     >>> resp_data = testapp.options(pool, headers=reader_header).json
-    >>> pprint([r['content_type'] for r in resp_data['POST']['request_body']])
-    []
+    >>> 'POST' not in resp_data
+    True
 
 Cannot edit process structure::
 
     >>> resp_data = testapp.options(pool, headers=reader_header).json
-    >>> pprint(resp_data['PUT']['request_body'])
-    {'content_type': '', 'data': {}}
+    >>> 'PUT' not in resp_data
+    True
 
 
 Annotator
@@ -142,26 +142,26 @@ Can edit his own annotations::
 Cannot create process content::
 
     >>> resp_data = testapp.options(pool, headers=annotator_header).json
-    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
-    []
+    >>> 'POST' not in resp_data
+    True
 
 Cannot edit process content::
 
     >>> resp_data = testapp.options(contributor_proposal, headers=annotator_header).json
-    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
-    []
+    >>> 'POST' not in resp_data
+    True
 
 Cannot create process structure::
 
     >>> resp_data = testapp.options(pool, headers=annotator_header).json
-    >>> pprint([r['content_type'] for r in resp_data['POST']['request_body']])
-    []
+    >>> 'POST' not in resp_data
+    True
 
 Cannot edit process structure::
 
     >>> resp_data = testapp.options(pool, headers=annotator_header).json
-    >>> pprint(resp_data['PUT']['request_body'])
-    {'content_type': '', 'data': {}}
+    >>> 'PUT' not in resp_data
+    True
 
 Contributor
 -----------
@@ -205,8 +205,8 @@ Cannot create process structure::
 Cannot edit process structure::
 
     >>> resp_data = testapp.options(pool, headers=contributor_header).json
-    >>> pprint(resp_data['PUT']['request_body'])
-    {'content_type': '', 'data': {}}
+    >>> 'PUT' not in resp_data
+    True
 
 Reviewer
 ---------
@@ -227,8 +227,8 @@ Can read resources and normal sheets::
 Cannot create annotations ::
 
    >>> resp_data = testapp.options(contributor_proposal, headers=admin_header).json
-   >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
-   []
+   >>> 'POST' not in resp_data
+   True
 
 Cannot create process content::
 
@@ -245,8 +245,8 @@ Can create process structure::
 Can edit process structure (FIXME we have no editable sheet for testing)::
 
     >>> resp_data = testapp.options(pool, headers=admin_header).json
-    >>> pprint(resp_data['PUT']['request_body'])
-    {'content_type': '', 'data': {}}
+    >>> 'PUT' not in resp_data
+    True
 
 Can create Groups::
 

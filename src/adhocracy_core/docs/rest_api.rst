@@ -237,7 +237,7 @@ JSON object that has the allowed request methods as keys::
 
     >>> resp_data = testapp.options(rest_url + "/adhocracy", headers=god_header).json
     >>> sorted(resp_data.keys())
-    ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+    ['GET', 'HEAD', 'OPTIONS', 'POST']
 
 If a GET, POST, or PUT request is allowed, the corresponding key will point
 to an object that contains at least "request_body" and "response_body" as
@@ -246,8 +246,6 @@ keys::
     >>> sorted(resp_data['GET'].keys())
     [...'request_body', ...'response_body'...]
     >>> sorted(resp_data['POST'].keys())
-    [...'request_body', ...'response_body'...]
-    >>> sorted(resp_data['PUT'].keys())
     [...'request_body', ...'response_body'...]
 
 The "response_body" sub-key returned for a GET request gives a stub view of
@@ -283,14 +281,16 @@ If the current user has the right to modify the resource in-place, the
 "request_body" sub-key returned for PUT gives a stub view of how the actual
 request should look like::
 
-...     >>> pprint(resp_data['PUT']['request_body'])
-...     {'data': {...'adhocracy_core.sheets.name.IName': {}...}}
+..     >>> pprint(resp_data['PUT']['request_body'])
+..     {'data': {...'adhocracy_core.sheets.name.IName': {}...}}
+FIXME: PUT is missing, because the current test pool resource type has not
+editable sheet.
 
 The "response_body" sub-key gives, as usual, a stub view of the resulting
 response body::
 
-     >>> pprint(resp_data['PUT']['response_body'])
-     {'content_type': '', 'path': ''}
+..     >>> pprint(resp_data['PUT']['response_body'])
+..     {'content_type': '', 'path': ''}
 
 
 Basic calls
