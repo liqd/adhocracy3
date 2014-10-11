@@ -146,7 +146,7 @@ run all tests::
 delete database (works best on development systems without valuable data!)::
 
     rm -f ./var/Data.*
-    supervisorctl restart all
+    bin/supervisorctl restart all
 
 Generate html documentation
 ---------------------------
