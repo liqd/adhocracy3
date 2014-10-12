@@ -13,7 +13,7 @@ requires = [
     'pyramid',
     'pyramid_debugtoolbar',
     'pyramid_exclog',
-    'waitress',
+    'gunicorn',
     'substanced',
     'pyramid_tm',
     'cornice',
