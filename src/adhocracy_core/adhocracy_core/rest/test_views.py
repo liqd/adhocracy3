@@ -491,6 +491,48 @@ class TestPoolRESTView:
         assert wanted == response
 
 
+class UsersRESTView:
+
+    @fixture
+    def request(self, cornice_request, mock_resource_registry):
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
+
+    def make_one(self, context, request):
+        from adhocracy_core.rest.views import UsersRESTView
+        return UsersRESTView(context, request)
+
+    def test_create(self, request, context):
+        from adhocracy_core.rest.views import validate_post_root_versions
+        from adhocracy_core.rest.views import PoolRESTView
+        inst = self.make_one(context, request)
+        assert issubclass(inst.__class__, PoolRESTView)
+        assert 'options' in dir(inst)
+        assert 'get' in dir(inst)
+        assert 'put' in dir(inst)
+
+    def test_post_valid(self, request, context):
+        request.root = context
+        # Little cheat to prevent the POST validator from kicking in --
+        # we're working with already-validated data here
+        request.method = 'OPTIONS'
+        child = testing.DummyResource(__provides__=IResourceX,
+                                      __parent__=context,
+                                      __name__='child')
+        request.registry.content.create.return_value = child
+        request.validated = {'content_type': IResourceX,
+                                  'data': {}}
+        inst = self.make_one(context, request)
+        response = inst.post()
+
+        wanted = {'path': request.application_url + '/child/', 'content_type': IResourceX.__identifier__}
+        request.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
+                                       creator=None,
+                                       appstructs={},
+                                       root_versions=[])
+        assert wanted == response
+
+
 class TestItemRESTView:
 
     @fixture

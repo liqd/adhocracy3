@@ -308,7 +308,9 @@ class ResourceRESTView(RESTView):
         else:
             del cstruct['GET']
 
-        is_users = IUsersService.providedBy(context)
+        is_users = IUsersService.providedBy(context) \
+            and request.has_permission('add_user', self.context)
+        # FIXME move the iuser specific part the UsersRestView
         if request.has_permission('add_resource', self.context) or is_users:
             addables = registry.get_resources_meta_addable(context, request)
             if addables:
@@ -332,7 +334,8 @@ class ResourceRESTView(RESTView):
         # do we really need request/response_body, content_type,..?
         return cstruct
 
-    @view_config(request_method='GET')
+    @view_config(request_method='GET',
+                 permission='view')
     def get(self) -> dict:
         """Get resource data."""
         schema = GETResourceResponseSchema().bind(request=self.request,
@@ -384,6 +387,7 @@ class SimpleRESTView(ResourceRESTView):
     validation_PUT = (PUTResourceRequestSchema, [])
 
     @view_config(request_method='PUT',
+                 permission='edit_sheet',
                  content_type='application/json')
     def put(self) -> dict:
         """Edit resource and get response data."""
@@ -412,7 +416,8 @@ class PoolRESTView(SimpleRESTView):
 
     validation_POST = (POSTResourceRequestSchema, [])
 
-    @view_config(request_method='GET')
+    @view_config(request_method='GET',
+                 permission='view')
     def get(self) -> dict:
         """Get resource data."""
         # This delegation method is necessary since otherwise validation_GET
@@ -437,6 +442,7 @@ class PoolRESTView(SimpleRESTView):
                 return child
 
     @view_config(request_method='POST',
+                 permission='add_resource',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
@@ -461,7 +467,8 @@ class ItemRESTView(PoolRESTView):
 
     validation_POST = (POSTItemRequestSchema, [validate_post_root_versions])
 
-    @view_config(request_method='GET')
+    @view_config(request_method='GET',
+                 permission='view')
     def get(self) -> dict:
         """Get resource data."""
         schema = GETItemResponseSchema().bind(request=self.request,
@@ -475,6 +482,7 @@ class ItemRESTView(PoolRESTView):
         return cstruct
 
     @view_config(request_method='POST',
+                 permission='add_resource',
                  content_type='application/json')
     def post(self):
         """Create new resource and get response data."""
@@ -488,6 +496,22 @@ class ItemRESTView(PoolRESTView):
                                         creator=creator,
                                         root_versions=root_versions)
         return self.build_post_response(resource)
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IUsersService,
+    http_cache=0,
+)
+class UsersRESTView(PoolRESTView):
+
+    """View the IUsersService pool overwrites POST handling."""
+
+    @view_config(request_method='POST',
+                 permission='add_user',
+                 content_type='application/json')
+    def post(self):
+        return super().post()
 
 
 @view_defaults(
