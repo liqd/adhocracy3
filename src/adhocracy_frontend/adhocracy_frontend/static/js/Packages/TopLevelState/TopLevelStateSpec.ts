@@ -29,34 +29,42 @@ export var register = () => {
                 adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
             });
 
-            it("constructing with focus parameter 1", () => {
-                routeParamMock.focus = 1;
-                var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
-                expect(adhTopLevelState.getFocus()).toEqual(1);
-            });
+            describe("constructing", () => {
+                it("with focus parameter 1", () => {
+                    routeParamMock.focus = 1;
+                    var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                    expect(adhTopLevelState.getFocus()).toEqual(1);
+                });
 
-            it("constructing with focus parameter 2", () => {
-                routeParamMock.focus = 2;
-                var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
-                expect(adhTopLevelState.getFocus()).toEqual(2);
-            });
+                it("with focus parameter 2", () => {
+                    routeParamMock.focus = 2;
+                    var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                    expect(adhTopLevelState.getFocus()).toEqual(2);
+                });
 
-            it("constructing with NaN focus parameter", () => {
-                routeParamMock.focus = "a";
-                var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
-                expect(adhTopLevelState.getFocus()).toEqual(1);
-            });
+                it("with NaN focus parameter", () => {
+                    routeParamMock.focus = "a";
+                    var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                    expect(adhTopLevelState.getFocus()).toEqual(1);
+                });
 
-            it("constructing with huge NaN focus parameter", () => {
-                routeParamMock.focus = new Array(1000).join("a");
-                var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
-                expect(adhTopLevelState.getFocus()).toEqual(1);
-            });
+                it("with huge NaN focus parameter", () => {
+                    routeParamMock.focus = new Array(1000).join("a");
+                    var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                    expect(adhTopLevelState.getFocus()).toEqual(1);
+                });
 
-            it("constructing without focus parameter", () => {
-                var routeParamMock = jasmine.createSpyObj("routeParamMock", [""]);
-                var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
-                expect(adhTopLevelState.getFocus()).toEqual(1);
+                it("without focus parameter", () => {
+                    var routeParamMock = jasmine.createSpyObj("routeParamMock", [""]);
+                    var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                    expect(adhTopLevelState.getFocus()).toEqual(1);
+                });
+
+                it("with negative focus parameter", () => {
+                    routeParamMock.focus = "-1";
+                    var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                    expect(adhTopLevelState.getFocus()).toEqual(1);
+                });
             });
 
             it("dispatches calls to setFocus to eventHandler", () => {
@@ -164,10 +172,30 @@ export var register = () => {
                         expect(elementMock.addClass).toHaveBeenCalledWith("is-detail");
                     });
 
-                    it("removes class 'is-detail' if columns is less than 2", () => {
+                    it("removes class 'is-detail' if columns is 1", () => {
                         callback(1);
                         expect(elementMock.removeClass).toHaveBeenCalledWith("is-detail");
                     });
+
+                    it("does not add or remove class if columns is negative", () => {
+                        callback(-1);
+                        expect(elementMock.addClass).not.toHaveBeenCalled();
+                        expect(elementMock.removeClass).not.toHaveBeenCalled();
+                    });
+
+                    it("does not add or remove class if columns is 0", () => {
+                        callback(0);
+                        expect(elementMock.addClass).not.toHaveBeenCalled();
+                        expect(elementMock.removeClass).not.toHaveBeenCalled();
+                    });
+
+                    it("does not add or remove class if columns is greater 2", () => {
+                        callback(3);
+                        expect(elementMock.addClass).not.toHaveBeenCalled();
+                        expect(elementMock.removeClass).not.toHaveBeenCalled();
+                    });
+
+
                 });
 
                 describe("onSetContent2Url", () => {
