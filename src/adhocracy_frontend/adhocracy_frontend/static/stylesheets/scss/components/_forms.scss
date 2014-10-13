@@ -47,6 +47,10 @@ They should all look and behave similarily.
 <input type="time" placeholder="time" />
 <input type="number" placeholder="number" />
 <input type="text" placeholder="required" required="required" />
+<select required="required">
+    <option>This one</option>
+    <option>The other one</option>
+</select>
 <textarea placeholder="textarea"></textarea>
 ```
 */
@@ -71,6 +75,7 @@ input[type="email"],
 input[type="date"],
 input[type="time"],
 input[type="number"],
+select,
 textarea {
     display: block;
     width: 100%;
