@@ -144,9 +144,11 @@ export var fetchAggregatedRates = (
 
         return adhHttp.get($scope.postPoolPath, query)
             .then((poolRsp) => {
-                return adhHttp.get(poolRsp.data[SIPool.nick].elements[0]).then((rateRsp) => {
-                    $scope.myRateResource = rateRsp;
-                });
+                if (poolRsp.data[SIPool.nick].elements.length > 0) {
+                    return adhHttp.get(poolRsp.data[SIPool.nick].elements[0]).then((rateRsp) => {
+                        $scope.myRateResource = rateRsp;
+                    });
+                }
             });
     })();
 
