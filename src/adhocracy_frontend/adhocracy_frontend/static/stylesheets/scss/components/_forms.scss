@@ -121,6 +121,10 @@ textarea {
     }
 }
 
+textarea {
+    resize: vertical;
+}
+
 /*doc
 ---
 title: checkbox
