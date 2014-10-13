@@ -34,10 +34,10 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
         }
 
         resource.data[SIRate.nick] =
-            new SIRate.AdhocracyCoreSheetsRateIRate({subject: args.subject, object: args.object, rate: args.rate });
+            new SIRate.Sheet({subject: args.subject, object: args.object, rate: args.rate });
 
         resource.data[SIVersionable.nick] =
-            new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({follows: [args.follows]});
+            new SIVersionable.Sheet({follows: [args.follows]});
 
         return resource;
     }
@@ -59,7 +59,7 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
         });
 
         resource.data[SIVersionable.nick] =
-            new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({follows: [oldVersion.path]});
+            new SIVersionable.Sheet({follows: [oldVersion.path]});
 
         return resource;
     }

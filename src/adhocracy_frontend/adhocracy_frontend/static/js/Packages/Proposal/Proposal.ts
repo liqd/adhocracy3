@@ -175,7 +175,7 @@ export class ProposalVersionNew {
 
                 $scope.content = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
                 $scope.content.data[SIDocument.nick] =
-                    new SIDocument.AdhocracyCoreSheetsDocumentIDocument({
+                    new SIDocument.Sheet({
                         title: "",
                         description: "",
                         elements: []
@@ -185,7 +185,7 @@ export class ProposalVersionNew {
                 $scope.addParagraphVersion = () => {
                     var pv = new RIParagraphVersion({preliminaryNames: adhPreliminaryNames});
                     pv.data[SIParagraph.nick] =
-                        new SIParagraph.AdhocracyCoreSheetsDocumentIParagraph({
+                        new SIParagraph.Sheet({
                             content: ""
                         });
                     $scope.paragraphVersions.push(pv);
@@ -225,8 +225,8 @@ export class SectionVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Resources.Content<SISection.HasAdhocracyCoreSheetsDocumentISection>>,
-                $scope : DetailRefScope<SISection.HasAdhocracyCoreSheetsDocumentISection>
+                adhHttp : AdhHttp.Service<Resources.Content<SISection.Sheet>>,
+                $scope : DetailRefScope<SISection.Sheet>
             ) : void => {
                 var commit = (event, ...args) => {
                     adhHttp.postNewVersionNoFork($scope.content.path, $scope.content);
@@ -260,8 +260,8 @@ export class ParagraphVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Resources.Content<SIParagraph.HasAdhocracyCoreSheetsDocumentIParagraph>>,
-                $scope : DetailRefScope<SIParagraph.HasAdhocracyCoreSheetsDocumentIParagraph>
+                adhHttp : AdhHttp.Service<Resources.Content<SIParagraph.Sheet>>,
+                $scope : DetailRefScope<SIParagraph.Sheet>
             ) : void => {
                 var commit = (event, ...args) => {
                     adhHttp.postNewVersionNoFork($scope.content.path, $scope.content);
@@ -301,7 +301,7 @@ export class Service {
 
         var sectionVersion : RISectionVersion = new RISectionVersion({preliminaryNames: _self.adhPreliminaryNames});
         sectionVersion.data[SISection.nick] =
-            new SISection.AdhocracyCoreSheetsDocumentISection({
+            new SISection.Sheet({
                 title : "single_section",
                 elements : [],
                 subsections : []
@@ -336,21 +336,21 @@ export class Service {
                 // versions
                 var postParagraphVersions = paragraphVersions.map((paragraphVersion, i) => {
                     paragraphVersion.data[SIVersionable.nick] =
-                        new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
+                        new SIVersionable.Sheet({
                             follows: [postParagraphs[i].first_version_path]
                         });
                     return transaction.post(postParagraphs[i].path, paragraphVersion);
                 });
 
                 sectionVersion.data[SIVersionable.nick] =
-                    new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
+                    new SIVersionable.Sheet({
                         follows: [postSection.first_version_path]
                     });
                 sectionVersion.data[SISection.nick].elements = postParagraphVersions.map((p) => p.path);
                 var postSectionVersion = transaction.post(postSection.path, sectionVersion);
 
                 proposalVersion.data[SIVersionable.nick] =
-                    new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
+                    new SIVersionable.Sheet({
                         follows: [postProposal.first_version_path]
                     });
                 proposalVersion.data[SIDocument.nick].elements = [postSectionVersion.path];
