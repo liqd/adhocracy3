@@ -1,9 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
 import AdhTopLevelState = require("./TopLevelState");
-
-
 export var register = () => {
+
     describe("TopLevelState", () => {
         describe("TopLevelState", () => {
             var adhTopLevelState : AdhTopLevelState.TopLevelState;
@@ -44,6 +43,12 @@ export var register = () => {
 
             it("constructing with NaN focus parameter", () => {
                 routeParamMock.focus = "a";
+                var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
+                expect(adhTopLevelState.getFocus()).toEqual(1);
+            });
+
+            it("constructing with huge NaN focus parameter", () => {
+                routeParamMock.focus = new Array(1000).join("a");
                 var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
                 expect(adhTopLevelState.getFocus()).toEqual(1);
             });
@@ -131,7 +136,7 @@ export var register = () => {
             var topLevelStateMock;
 
             beforeEach(() => {
-                topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock", ["onSetFocus", "onSetContent2Url"]);
+                topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock", ["onSetFocus", "onSetContent2Url" ]);
                 directive = AdhTopLevelState.movingColumns(topLevelStateMock);
             });
 
