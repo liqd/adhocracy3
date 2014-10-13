@@ -35,17 +35,17 @@ class ResourceSheetModifiedUnitTest(unittest.TestCase):
         parent = testing.DummyResource()
         registry = testing.DummyResource()
         old_appstruct = {}
-        new_appsturct = {}
+        new_appstruct = {}
 
         inst = self._make_one(context, parent, registry, old_appstruct,
-                              new_appsturct)
+                              new_appstruct)
 
         assert IResourceSheetModified.providedBy(inst)
         assert verifyObject(IResourceSheetModified, inst)
         assert inst.object is context
         assert inst.registry is registry
         assert inst.old_appstruct is old_appstruct
-        assert inst.new_appstruct is new_appsturct
+        assert inst.new_appstruct is new_appstruct
 
 
 class ItemNewVersionAddedUnitTest(unittest.TestCase):
