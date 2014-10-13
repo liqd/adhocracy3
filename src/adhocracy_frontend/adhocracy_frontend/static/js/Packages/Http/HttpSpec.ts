@@ -186,7 +186,7 @@ export var register = () => {
                     var returnPath1 = "path1/";
 
                     var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.AdhocracyCoreSheetsTagsITag({ elements: [returnPath1] });
+                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.Sheet({ elements: [returnPath1] });
                     $httpMock.get.and.returnValue(q.when({ data: dag }));
 
                     adhHttp.getNewestVersionPathNoFork(path).then(
@@ -327,7 +327,7 @@ export var register = () => {
 
                     var newHead = "new_head";
                     var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.AdhocracyCoreSheetsTagsITag({ elements: [newHead] });
+                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.Sheet({ elements: [newHead] });
 
                     var postResponses = [q.reject({ data: error }), q.when({ data: dag })].reverse();
 

@@ -51,13 +51,13 @@ export var register = (angular, config, meta_api) => {
 
                 var proposalVersionResource = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
                 proposalVersionResource.data[SIDocument.nick] =
-                    new SIDocument.AdhocracyCoreSheetsDocumentIDocument({
+                    new SIDocument.Sheet({
                         title: proposalName,
                         description: "whoof",
                         elements: [sectionVersion.path]
                     });
                 proposalVersionResource.data[SIVersionable.nick] =
-                    new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
+                    new SIVersionable.Sheet({
                         follows: [proposal.first_version_path]
                     });
                 transaction.post(proposal.path, proposalVersionResource);

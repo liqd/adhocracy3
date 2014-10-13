@@ -115,7 +115,7 @@ export var register = () => {
             beforeEach(() => {
                 adapter = new AdhRateAdapter.RateAdapter();
                 rateVersion = new RIRateVersion({ preliminaryNames: new PreliminaryNames() });
-                rateVersion.data["adhocracy_core.sheets.rate.IRate"] = new SIRate.AdhocracyCoreSheetsRateIRate({
+                rateVersion.data["adhocracy_core.sheets.rate.IRate"] = new SIRate.Sheet({
                     subject: "sub",
                     object: "obj",
                     rate: 1
