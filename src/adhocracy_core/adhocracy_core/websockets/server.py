@@ -157,6 +157,8 @@ class ClientCommunicator(WebSocketServerProtocol):
                 root = connection.root()
                 return root['app_root']
             except KeyError:
+                logger.debug('Could not find the zodb app_root element,'
+                             ' try again later')
                 time.sleep(1)
                 connection.sync()
 
