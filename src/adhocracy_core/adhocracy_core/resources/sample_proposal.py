@@ -2,7 +2,6 @@
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import ITag
 from adhocracy_core.interfaces import IItem
-from adhocracy_core.resources.comment import IComment
 from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.sample_section import ISection
 from adhocracy_core.resources.sample_paragraph import IParagraph
@@ -26,6 +25,7 @@ proposalversion_meta = itemversion_metadata._replace(
     extended_sheets=[adhocracy_core.sheets.document.IDocument,
                      adhocracy_core.sheets.comment.ICommentable
                      ],
+    permission_add='add_proposalversion',
 )
 
 
@@ -40,7 +40,6 @@ proposal_meta = item_metadata._replace(
     element_types=[ITag,
                    ISection,
                    IParagraph,
-                   IComment,
                    IProposalVersion,
                    ],
     after_creation=item_metadata.after_creation + [
@@ -48,6 +47,8 @@ proposal_meta = item_metadata._replace(
         add_ratesservice,
     ],
     item_type=IProposalVersion,
+    permission_add='add_proposal',
+    is_implicit_addable=True,
 )
 
 

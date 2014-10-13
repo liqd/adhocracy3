@@ -8,7 +8,6 @@ from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_metadata
 from adhocracy_core.resources.item import item_metadata
-from adhocracy_core.resources.rate import IRate
 from adhocracy_core.resources.service import service_metadata
 
 import adhocracy_core.sheets.comment
@@ -26,6 +25,7 @@ commentversion_meta = itemversion_metadata._replace(
     extended_sheets=[adhocracy_core.sheets.comment.IComment,
                      adhocracy_core.sheets.comment.ICommentable,
                      adhocracy_core.sheets.rate.IRateable],
+    permission_add='add_commentversion',
 )
 
 
@@ -37,12 +37,12 @@ class IComment(IItem):
 comment_meta = item_metadata._replace(
     content_name='Comment',
     iresource=IComment,
-    element_types=[IComment,
-                   ICommentVersion,
-                   IRate],
+    element_types=[ICommentVersion,
+                   ],
     item_type=ICommentVersion,
     use_autonaming=True,
     autonaming_prefix='comment_',
+    permission_add='add_comment',
 )
 
 

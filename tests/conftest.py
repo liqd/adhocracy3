@@ -29,6 +29,7 @@ def app(zeo, settings, websocket):
     """
     from pyramid.config import Configurator
     import adhocracy
+    settings['adhocracy.add_default_group'] = False
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy.root_factory)
     configurator.include(adhocracy)

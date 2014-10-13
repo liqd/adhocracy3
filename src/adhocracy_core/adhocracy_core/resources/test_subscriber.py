@@ -315,6 +315,50 @@ class TestTagCreatedAndAddedOrModifiedSubscriber:
         catalog['adhocracy'].reindex_resource.call_count == 2
 
 
+class TestAddDefaultGroupToUserSubscriber:
+
+    @fixture
+    def principals(self, pool, service):
+        pool['principals'] = service
+        pool['principals']['groups'] = service.clone()
+        group = testing.DummyResource()
+        pool['principals']['groups']['authenticated'] = group
+        pool['principals']['users'] = service.clone()
+        user = testing.DummyResource()
+        pool['principals']['users']['000000'] = user
+        return pool['principals']
+
+    def call_fut(self, event):
+        from adhocracy_core.resources.subscriber import\
+            user_created_and_added_subscriber
+        return user_created_and_added_subscriber(event)
+
+    def test_default_group_exists(
+            self, registry, principals, event, mock_sheet):
+        from adhocracy_core.sheets.principal import IPermissions
+        default_group = principals['groups']['authenticated']
+        user = principals['users']['000000']
+        event.object = user
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
+        add_and_register_sheet(event.object, mock_sheet, registry)
+        mock_sheet.get.return_value = {'groups': []}
+        self.call_fut(event)
+        assert mock_sheet.set.call_args[0] == ({'groups': [default_group]},)
+
+
+    def test_default_group_not_exists(
+            self, registry, principals, event, mock_sheet):
+        from adhocracy_core.sheets.principal import IPermissions
+        del principals['groups']['authenticated']
+        user = principals['users']['000000']
+        event.object = user
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
+        add_and_register_sheet(event.object, mock_sheet, registry)
+        mock_sheet.get.return_value = {'groups': []}
+        self.call_fut(event)
+        assert mock_sheet.set.called is False
+
+
 @fixture()
 def integration(config):
     config.include('adhocracy_core.events')
@@ -335,3 +379,4 @@ def test_register_subscriber(registry):
     assert subscriber.resource_modified_subscriber.__name__ in handlers
     assert subscriber.reference_has_new_version_subscriber.__name__ in handlers
     assert subscriber.tag_created_and_added_or_modified_subscriber.__name__ in handlers
+    assert subscriber.user_created_and_added_subscriber.__name__ in handlers

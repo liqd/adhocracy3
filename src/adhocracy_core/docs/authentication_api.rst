@@ -265,8 +265,8 @@ of the logged-in user.
 Without authentication we may not post anything::    
 
     >>> resp_data = testapp.options(rest_url + "/adhocracy").json
-    >>> pprint(resp_data['POST']['request_body'])
-    []
+    >>> 'POST' not in resp_data
+    True
 
 With authentication instead we may::
 
