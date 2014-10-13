@@ -145,6 +145,30 @@ be checked, w.g. for accepting terms of service.
 
 /*doc
 ---
+title: radio button
+name: radio
+parent: input
+---
+
+A radio button, like a checkbox, has the two states: is-checked and
+is-unchecked.  Of a group of radio buttons, none or a single one can be
+checked. "required" in this context means that any of the buttons must be
+checked.
+
+```html_example
+<label>
+    <input name="radio-example" type="radio" />
+    One option
+</label>
+<label>
+    <input name="radio-example" type="radio" />
+    The other option
+</label>
+```
+*/
+
+/*doc
+---
 title: label
 name: label
 category: Inputs
