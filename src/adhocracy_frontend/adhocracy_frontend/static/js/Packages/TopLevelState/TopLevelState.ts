@@ -104,7 +104,7 @@ export class TopLevelState {
 var move = (column : number, element : JQuery) => {
     // This is likely to change in the future.
     // So do not spend too much time interpreting this.
-    if (column <= 1) {
+    if (column === 1) {
         element.removeClass("is-detail");
     } else if (column === 2) {
         element.addClass("is-detail");
