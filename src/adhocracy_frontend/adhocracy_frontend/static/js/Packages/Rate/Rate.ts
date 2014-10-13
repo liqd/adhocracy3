@@ -183,7 +183,6 @@ export var fetchAuditTrail = (
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>
 ) : ng.IPromise<void> => {
-
     var query : any = {};
     query.content_type = RIRateVersion.content_type;
     query.depth = 2;
