@@ -6,13 +6,13 @@ from .shared import wait
 from .shared import get_column_listing
 from .shared import get_list_element
 from .shared import get_listing_create_form
-from .shared import login_annotator
+from .shared import login_god
 from .test_proposal import proposal
 
 
 @fixture
 def browser(browser):
-    login_annotator(browser)
+    login_god(browser)
     return browser
 
 
