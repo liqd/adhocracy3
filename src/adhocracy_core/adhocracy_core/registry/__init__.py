@@ -73,7 +73,7 @@ class ResourceContentRegistry(ContentRegistry):
     def get_sheets_all(self, context: object) -> list:
         """Get all sheets for `context` and set the 'context' attribute."""
         iresource = get_iresource(context)
-        sheets = self.sheets_all[iresource]
+        sheets = self.sheets_all[iresource].copy()
         self._add_context(sheets, context)
         return sheets
 
@@ -86,7 +86,7 @@ class ResourceContentRegistry(ContentRegistry):
         :param request: If set check permissions.
         """
         iresource = iresource or get_iresource(context)
-        sheets = self.sheets_create[iresource]
+        sheets = self.sheets_create[iresource].copy()
         self._add_context(sheets, context)
         self._filter_permission(sheets, 'permission_create', context, request)
         return sheets
@@ -97,7 +97,7 @@ class ResourceContentRegistry(ContentRegistry):
         :param request: If set check permissions.
         """
         iresource = get_iresource(context)
-        sheets = self.sheets_edit[iresource]
+        sheets = self.sheets_edit[iresource].copy()
         self._add_context(sheets, context)
         self._filter_permission(sheets, 'permission_edit', context, request)
         return sheets
@@ -108,7 +108,7 @@ class ResourceContentRegistry(ContentRegistry):
         :param request: If set check permissions.
         """
         iresource = get_iresource(context)
-        sheets = self.sheets_read[iresource]
+        sheets = self.sheets_read[iresource].copy()
         self._add_context(sheets, context)
         self._filter_permission(sheets, 'permission_view', context, request)
         return sheets
