@@ -1,33 +1,56 @@
 from pyramid import testing
+from pytest import fixture
+from pytest import mark
 
-import unittest
+
+def test_paragraphversion_meta():
+    from .sample_paragraph import paragraphversion_meta
+    from .sample_paragraph import IParagraphVersion
+    meta = paragraphversion_meta
+    assert meta.iresource is IParagraphVersion
+    assert meta.permission_add == 'add_paragraphversion'
 
 
-class IncludemeIntegrationTest(unittest.TestCase):
+def test_paragraph_meta():
+    from .sample_paragraph import paragraph_meta
+    from .sample_paragraph import IParagraphVersion
+    from .sample_paragraph import IParagraph
+    from .tag import ITag
+    meta = paragraph_meta
+    assert meta.iresource is IParagraph
+    assert meta.element_types == [ITag, IParagraphVersion]
+    assert meta.item_type == IParagraphVersion
+    assert meta.permission_add == 'add_paragraph'
 
-    def setUp(self):
-        from adhocracy_core.testing import create_pool_with_graph
-        config = testing.setUp()
-        config.include('adhocracy_core.registry')
-        config.include('adhocracy_core.events')
-        config.include('adhocracy_core.catalog')
-        config.include('adhocracy_core.sheets')
-        config.include('adhocracy_core.resources.sample_paragraph')
-        self.config = config
-        self.context = create_pool_with_graph()
 
-    def tearDown(self):
-        testing.tearDown()
+@fixture
+def integration(config):
+    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.events')
+    config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.resources.sample_paragraph')
+    config.include('adhocracy_core.resources.tag')
 
-    def test_includeme_registry_register_factories(self):
-        from adhocracy_core.resources.sample_paragraph import IParagraphVersion
+
+@mark.usefixtures('integration')
+class TestParagraph:
+
+    @fixture
+    def context(self, pool):
+        return pool
+
+    def test_create_paragraph(self, context, registry):
         from adhocracy_core.resources.sample_paragraph import IParagraph
-        content_types = self.config.registry.content.factory_types
-        assert IParagraph.__identifier__ in content_types
-        assert IParagraphVersion.__identifier__ in content_types
+        from adhocracy_core.sheets.name import IName
+        appstructs = {IName.__identifier__: {'name': 'name1'}}
+        res = registry.content.create(IParagraph.__identifier__,
+                                      appstructs=appstructs,
+                                      parent=context)
+        assert IParagraph.providedBy(res)
 
-    def test_includeme_registry_create_content(self):
+    def test_create_paragraphversion(self, context, registry):
         from adhocracy_core.resources.sample_paragraph import IParagraphVersion
-        res = self.config.registry.content.create(IParagraphVersion.__identifier__,
-                                                  self.context)
+        res = registry.content.create(IParagraphVersion.__identifier__,
+                                      parent=context)
         assert IParagraphVersion.providedBy(res)

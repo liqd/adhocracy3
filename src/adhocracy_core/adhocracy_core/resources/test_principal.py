@@ -6,34 +6,91 @@ from pytest import fixture
 from pytest import mark
 
 
-class PrincipalIntegrationTest(unittest.TestCase):
+from pytest import mark
+from pytest import fixture
 
-    def setUp(self):
-        from adhocracy_core.testing import create_pool_with_graph
-        config = testing.setUp()
-        config.include('pyramid_mailer.testing')
-        config.include('pyramid_mako')
-        config.include('adhocracy_core.registry')
-        config.include('adhocracy_core.events')
-        config.include('adhocracy_core.messaging')
-        config.include('adhocracy_core.sheets.metadata')
-        config.include('adhocracy_core.sheets.name')
-        config.include('adhocracy_core.sheets.principal')
-        config.include('adhocracy_core.resources.principal')
-        self.config = config
-        self.context = create_pool_with_graph()
 
-    def tearDown(self):
-        testing.tearDown()
+def test_principals_meta():
+    from .principal import principals_metadata
+    from .principal import IPrincipalsService
+    meta = principals_metadata
+    assert meta.iresource is IPrincipalsService
+    assert meta.permission_add == 'add_service'
+    assert meta.content_name == 'principals'
 
-    def test_create_principals(self):
+
+def test_users_meta():
+    from .principal import users_metadata
+    from .principal import IUsersService
+    meta = users_metadata
+    assert meta.iresource is IUsersService
+    assert meta.permission_add == 'add_service'
+    assert meta.content_name == 'users'
+
+
+def test_groups_meta():
+    from .principal import groups_metadata
+    from .principal import IGroupsService
+    meta = groups_metadata
+    assert meta.iresource is IGroupsService
+    assert meta.permission_add == 'add_service'
+    assert meta.content_name == 'groups'
+
+
+def test_user_meta():
+    from .principal import user_metadata
+    from .principal import IUser
+    from .principal import send_registration_mail
+    from .principal import User
+    import adhocracy_core.sheets
+    meta = user_metadata
+    assert meta.iresource is IUser
+    assert meta.content_class == User  # FIXME remove ths special class
+    assert meta.permission_add == 'add_user'
+    assert meta.is_implicit_addable is False
+    assert meta.basic_sheets == [adhocracy_core.sheets.principal.IUserBasic,
+                                 adhocracy_core.sheets.principal.IPermissions,
+                                 adhocracy_core.sheets.metadata.IMetadata,
+                                 adhocracy_core.sheets.pool.IPool,
+                                 ]
+    assert meta.extended_sheets == \
+           [adhocracy_core.sheets.principal.IPasswordAuthentication,
+            adhocracy_core.sheets.rate.ICanRate,
+           ]
+    assert meta.iresource == IUser
+    assert meta.element_types == []
+    assert meta.use_autonaming is True
+    assert send_registration_mail in meta.after_creation
+
+
+@fixture
+def integration(config):
+    config.include('pyramid_mailer.testing')
+    config.include('pyramid_mako')
+    config.include('adhocracy_core.events')
+    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.messaging')
+    config.include('adhocracy_core.sheets.metadata')
+    config.include('adhocracy_core.sheets.name')
+    config.include('adhocracy_core.sheets.principal')
+    config.include('adhocracy_core.resources.principal')
+
+
+@mark.usefixtures('integration')
+class TestPrincipalsService:
+
+    @fixture
+    def context(self, pool):
+        return pool
+
+    def test_create_principals(self, context, config, registry):
         from adhocracy_core.resources.principal import IPrincipalsService
         from adhocracy_core.resources.principal import IUsersService
         from adhocracy_core.resources.principal import IGroupsService
         from adhocracy_core.resources.principal import IPasswordResetsService
 
-        inst = self.config.registry.content.create(
-            IPrincipalsService.__identifier__, parent=self.context)
+        inst = registry.content.create(
+            IPrincipalsService.__identifier__, parent=context)
 
         assert IPrincipalsService.providedBy(inst)
         assert 'users' in inst
@@ -43,35 +100,33 @@ class PrincipalIntegrationTest(unittest.TestCase):
         assert IGroupsService.providedBy(inst['groups'])
         assert IPasswordResetsService.providedBy(inst['resets'])
 
-    def test_register_services(self):
+    def test_register_services(self, context, registry):
         from adhocracy_core.resources.principal import IPrincipalsService
 
-        self.config.registry.content.create(IPrincipalsService.__identifier__,
-                                            parent=self.context)
+        registry.content.create(IPrincipalsService.__identifier__,
+                                            parent=context)
 
         from substanced.util import find_service
-        assert find_service(self.context, 'principals', 'users')
-        assert find_service(self.context, 'principals', 'groups')
-        assert find_service(self.context, 'principals', 'resets')
+        assert find_service(context, 'principals', 'users')
+        assert find_service(context, 'principals', 'groups')
+        assert find_service(context, 'principals', 'resets')
 
-    def test_create_user(self):
+    def test_create_user(self, registry):
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.resources.principal import User
 
-        inst = self.config.registry.content.create(IUser.__identifier__)
+        inst = registry.content.create(IUser.__identifier__)
 
         assert IUser.providedBy(inst)
         assert isinstance(inst, User)
 
-    def test_create_and_add_user(self):
+    def test_create_and_add_user(self, registry):
         from adhocracy_core.resources.principal import IPrincipalsService
         from adhocracy_core.resources.principal import IUser
         from adhocracy_core.sheets.principal import IPasswordAuthentication
         from adhocracy_core.sheets.principal import IUserBasic
 
-        self.config.include('adhocracy_core.sheets.principal')
-
-        principals_pool = self.config.registry.content.create(
+        principals_pool = registry.content.create(
             IPrincipalsService.__identifier__)
         users_pool = principals_pool['users']
         appstructs = {
@@ -83,17 +138,17 @@ class PrincipalIntegrationTest(unittest.TestCase):
                 'password': 'fodThyd2'
             },
         }
-        user = self.config.registry.content.create(IUser.__identifier__,
+        user = registry.content.create(IUser.__identifier__,
                                                    parent=users_pool,
                                                    appstructs=appstructs)
         assert users_pool['0000000'] is user
 
-    def test_create_group(self):
+    def test_create_group(self, registry):
         from adhocracy_core.resources.principal import IGroup
-        inst = self.config.registry.content.create(IGroup.__identifier__)
+        inst = registry.content.create(IGroup.__identifier__)
         assert IGroup.providedBy(inst)
 
-    def test_create_and_add_group(self):
+    def test_create_and_add_group(self, pool_graph, registry):
         from adhocracy_core.utils import get_sheet
         from adhocracy_core.resources.principal import IPrincipalsService
         from adhocracy_core.resources.principal import IUser
@@ -101,56 +156,30 @@ class PrincipalIntegrationTest(unittest.TestCase):
         from adhocracy_core.sheets.principal import IPermissions
         from adhocracy_core.sheets.name import IName
         import adhocracy_core.sheets.principal
+        context = pool_graph
 
-        self.config.include('adhocracy_core.sheets.principal')
-
-        principals_pool = self.config.registry.content.create(
+        principals_pool = registry.content.create(
             IPrincipalsService.__identifier__,
-            parent=self.context)
+            parent=context)
         groups_pool = principals_pool['groups']
         appstructs = {IName.__identifier__: {'name': 'Group1'},
                       adhocracy_core.sheets.principal.IGroup.__identifier__:
-                          {'roles': ['reader']}}
-        group = self.config.registry.content.create(IGroup.__identifier__,
-                                                    parent=groups_pool,
-                                                    appstructs=appstructs)
+                           {'roles': ['reader']}}
+        group = registry.content.create(IGroup.__identifier__,
+                                        parent=groups_pool,
+                                        appstructs=appstructs)
         users_pool = principals_pool['users']
         appstructs = {IPermissions.__identifier__: {'groups': [group]}}
-        user = self.config.registry.content.create(IUser.__identifier__,
-                                                   parent=users_pool,
-                                                   appstructs=appstructs)
+        user = registry.content.create(IUser.__identifier__,
+                                       parent=users_pool,
+                                       appstructs=appstructs)
         group_sheet = get_sheet(group, adhocracy_core.sheets.principal.IGroup)
         assert groups_pool['Group1'] is group
         assert group_sheet.get()['users'] == [user]
         assert group_sheet.get()['roles'] == ['reader']
 
 
-class UserMetaUnitTest(unittest.TestCase):
-
-    def _make_one(self):
-        from adhocracy_core.resources.principal import user_metadata
-        return user_metadata
-
-    def test_meta(self):
-        from adhocracy_core.resources.principal import IUser
-        import adhocracy_core.sheets
-        meta = self._make_one()
-        assert meta.iresource is IUser
-        assert meta.permission_add == 'add_user'
-        assert meta.is_implicit_addable is False
-        assert meta.basic_sheets ==\
-            [adhocracy_core.sheets.principal.IUserBasic,
-             adhocracy_core.sheets.principal.IPermissions,
-             adhocracy_core.sheets.metadata.IMetadata,
-             adhocracy_core.sheets.pool.IPool,
-             ]
-        assert meta.extended_sheets ==\
-               [adhocracy_core.sheets.principal.IPasswordAuthentication,
-                adhocracy_core.sheets.rate.ICanRate,
-               ]
-
-
-class UserUnitTest(unittest.TestCase):
+class TestUserClass:
 
     def _makeOne(self):
         from adhocracy_core.resources.principal import User
@@ -382,7 +411,7 @@ class TestGroupsAndRolesFinder:
         assert mock_group_locator.get_roleids.call_args[0] == ('group:Readers',)
         
 
-class TestIntegrationSendRegistrationMail():
+class TestIntegrationSendRegistrationMail:
 
     @fixture
     def integration(self, config):
