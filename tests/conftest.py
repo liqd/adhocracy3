@@ -2,6 +2,7 @@
 from splinter import Browser
 from pytest import fixture
 from pytest import skip
+import subprocess
 
 
 def pytest_addoption(parser):
@@ -22,7 +23,7 @@ def pytest_runtest_setup(item):
 
 
 @fixture(scope='class')
-def app(zeo, settings, websocket):
+def app(zeo, settings):
     """Return the adhocracy wsgi application.
 
     This overrides adhocracy_core.testing.app.
@@ -40,8 +41,28 @@ def app(zeo, settings, websocket):
     return app
 
 
+@fixture(scope='class')
+def frontend(request, supervisor) -> str:
+    """Start the frontend server with supervisor."""
+    output = subprocess.check_output(
+        'bin/supervisorctl restart adhocracy_test:test_frontend',
+        shell=True,
+        stderr=subprocess.STDOUT
+    )
+
+    def fin():
+        subprocess.check_output(
+            'bin/supervisorctl stop adhocracy_test:test_frontend',
+            shell=True,
+            stderr=subprocess.STDOUT
+        )
+    request.addfinalizer(fin)
+
+    return output
+
+
 @fixture
-def browser(browser, frontend, backend, frontend_url) -> Browser:
+def browser(browser, backend, websocket, frontend, frontend_url) -> Browser:
     """Return test browser, start sample application and go to `root.html`.
 
     Add attribute `root_url` pointing to the adhocracy root.html page.
@@ -57,7 +78,7 @@ def browser(browser, frontend, backend, frontend_url) -> Browser:
 
 
 @fixture
-def browser_embed(browser, frontend, backend, frontend_url) -> Browser:
+def browser_embed(browser, backend, frontend, frontend_url) -> Browser:
     """Start embedder application."""
     url = frontend_url + 'static/embed.html'
     browser.visit(url)

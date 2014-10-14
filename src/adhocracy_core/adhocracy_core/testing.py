@@ -395,44 +395,53 @@ def ws_settings(request) -> Configurator:
     return _get_settings(request, 'websockets')
 
 
-@fixture(scope='class')
-def zeo(request) -> bool:
-    """Start the test zeo server."""
-    pid_file = 'var/test_zeodata/ZEO.pid'
+@fixture(scope='session')
+def supervisor(request) -> str:
+    """Start supervisord daemon."""
+    pid_file = 'var/supervisord.pid'
     if _is_running(pid_file):
         return True
-    process = subprocess.Popen('bin/runzeo -Cetc/test_zeo.conf', shell=True,
-                               stderr=subprocess.STDOUT)
-    time.sleep(1)
-
-    def fin():
-        print('teardown zeo server')
-        process.kill()
-        _kill_pid_in_file(pid_file)
-
-    request.addfinalizer(fin)
-    return True
+    output = subprocess.check_output('bin/supervisord',
+                                     shell=True,
+                                     stderr=subprocess.STDOUT)
+    assert str(output) == ''
+    return output
 
 
 @fixture(scope='class')
-def websocket(request, zeo, ws_settings) -> bool:
-    """Start websocket server."""
-    pid_file = ws_settings['pid_file']
-    if _is_running(pid_file):
-        return True
-    config_file = request.config.getvalue('pyramid_config')
-    process = subprocess.Popen('bin/start_ws_server ' + config_file,
-                               shell=True,
-                               stderr=subprocess.STDOUT)
-    time.sleep(1)
+def zeo(request, supervisor) -> str:
+    """Start zeo server with supervisor."""
+    output = subprocess.check_output(
+        'bin/supervisorctl restart adhocracy_test:test_zeo',
+        shell=True,
+        stderr=subprocess.STDOUT)
 
     def fin():
-        print('teardown websocket server')
-        process.kill()
-        _kill_pid_in_file(pid_file)
-
+        subprocess.check_output(
+            'bin/supervisorctl stop adhocracy_test:test_zeo',
+            shell=True,
+            stderr=subprocess.STDOUT)
     request.addfinalizer(fin)
-    return True
+
+    return output
+
+
+@fixture(scope='class')
+def websocket(request, supervisor) -> bool:
+    """Start websocket server with supervisor."""
+    output = subprocess.check_output(
+        'bin/supervisorctl restart adhocracy_test:test_autobahn',
+        shell=True,
+        stderr=subprocess.STDOUT)
+
+    def fin():
+        subprocess.check_output(
+            'bin/supervisorctl stop adhocracy_test:test_autobahn',
+            shell=True,
+            stderr=subprocess.STDOUT)
+    request.addfinalizer(fin)
+
+    return output
 
 
 def _kill_pid_in_file(path_to_pid_file):
@@ -552,7 +561,7 @@ def includeme_root_with_test_users(config):
 
 
 @fixture(scope='class')
-def app(zeo, settings, websocket):
+def app(zeo, settings):
     """Return the adhocracy wsgi application."""
     import adhocracy_core
     import adhocracy_core.resources.sample_paragraph
@@ -593,5 +602,4 @@ def backend(request, settings, app):
     port = settings['port']
     backend = StopableWSGIServer.create(app, port=port)
     request.addfinalizer(backend.shutdown)
-    time.sleep(0.5)  # give the application some time to start
     return backend
