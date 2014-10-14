@@ -125,17 +125,17 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
-        mercatorProposal.data[SIName.nick] = new SIName.AdhocracyCoreSheetsNameIName({
+        mercatorProposal.data[SIName.nick] = new SIName.Sheet({
             name: data.introduction.title
         });
 
         var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
-        mercatorProposalVersion.data[SIUserInfo.nick] = new SIUserInfo.AdhocracyCoreSheetsMercatorIUserInfo({
+        mercatorProposalVersion.data[SIUserInfo.nick] = new SIUserInfo.Sheet({
             personal_name: data.basic.user.name,
             family_name: data.basic.user.lastname,
             email: data.basic.user.email
         });
-        mercatorProposalVersion.data[SIOrganizationInfo.nick] = new SIOrganizationInfo.AdhocracyCoreSheetsMercatorIOrganizationInfo({
+        mercatorProposalVersion.data[SIOrganizationInfo.nick] = new SIOrganizationInfo.Sheet({
             name: data.basic.organisation.name,
             email: data.basic.organisation.email,
             street_address: data.basic.organisation.address,
@@ -148,11 +148,11 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
             size: data.basic.organisation.size,
             cooperation_explanation: data.basic.organisation.cooperationText
         });
-        mercatorProposalVersion.data[SIIntroduction.nick] = new SIIntroduction.AdhocracyCoreSheetsMercatorIIntroduction({
+        mercatorProposalVersion.data[SIIntroduction.nick] = new SIIntroduction.Sheet({
             title: data.introduction.title,
             teaser: data.introduction.teaser
         });
-        mercatorProposalVersion.data[SIDetails.nick] = new SIDetails.AdhocracyCoreSheetsMercatorIDetails({
+        mercatorProposalVersion.data[SIDetails.nick] = new SIDetails.Sheet({
             description: data.detail.description,
             location_is_city: data.detail.location.city,
             location_is_country: data.detail.location.country,
@@ -161,18 +161,18 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
             location_is_linked_to_ruhr: data.detail.location.ruhr,
             story: data.detail.story
         });
-        mercatorProposalVersion.data[SIMotivation.nick] = new SIMotivation.AdhocracyCoreSheetsMercatorIMotivation({
+        mercatorProposalVersion.data[SIMotivation.nick] = new SIMotivation.Sheet({
             outcome: data.motivation.outcome,
             steps: data.motivation.steps,
             value: data.motivation.value,
             partners: data.motivation.partners
         });
-        mercatorProposalVersion.data[SIFinance.nick] = new SIFinance.AdhocracyCoreSheetsMercatorIFinance({
+        mercatorProposalVersion.data[SIFinance.nick] = new SIFinance.Sheet({
             budget: data.finance.budget,
             requested_funding: data.finance.funding,
             granted: data.finance.granted
         });
-        mercatorProposalVersion.data[SIExtras.nick] = new SIExtras.AdhocracyCoreSheetsMercatorIExtras({
+        mercatorProposalVersion.data[SIExtras.nick] = new SIExtras.Sheet({
             experience: data.extra.experience,
             heard_from_colleague: data.extra.hear.colleague,
             heard_from_website: data.extra.hear.website,
@@ -180,7 +180,7 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
             heard_from_facebook: data.extra.hear.facebook,
             heard_elsewhere: data.extra.hear.otherDescription
         });
-        mercatorProposalVersion.data[SIVersionable.nick] = new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
+        mercatorProposalVersion.data[SIVersionable.nick] = new SIVersionable.Sheet({
             follows: [mercatorProposal.first_version_path]
         });
         mercatorProposalVersion.parent = mercatorProposal.path;

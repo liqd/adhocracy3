@@ -27,6 +27,7 @@ from adhocracy_core.interfaces import ISimple
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ILocation
 from adhocracy_core.resources.principal import IUser
+from adhocracy_core.resources.principal import IUsersService
 from adhocracy_core.rest.schemas import ResourceResponseSchema
 from adhocracy_core.rest.schemas import ItemResponseSchema
 from adhocracy_core.rest.schemas import POSTActivateAccountViewRequestSchema
@@ -281,33 +282,60 @@ class ResourceRESTView(RESTView):
     @view_config(request_method='OPTIONS')
     def options(self) -> dict:
         """Get possible request/response data structures and http methods."""
+        context = self.context
+        request = self.request
+        registry = self.registry
         empty = {}  # tiny performance tweak
         cstruct = deepcopy(options_resource_response_data_dict)
-        edits = self.registry.get_sheets_edit(self.context, self.request)
-        put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
-        cstruct['PUT']['request_body']['data'] = dict(put_sheets)
 
-        views = self.registry.get_sheets_read(self.context, self.request)
-        get_sheets = [(s.meta.isheet.__identifier__, empty) for s in views]
-        cstruct['GET']['response_body']['data'] = dict(get_sheets)
+        if request.has_permission('edit_sheet', context):
+            edits = self.registry.get_sheets_edit(context, request)
+            put_sheets = [(s.meta.isheet.__identifier__, empty) for s in edits]
+            if put_sheets:
+                cstruct['PUT']['request_body']['data'] = dict(put_sheets)
+            else:
+                del cstruct['PUT']
+        else:
+            del cstruct['PUT']
 
-        addables = self.registry.get_resources_meta_addable(self.context,
-                                                            self.request)
-        for resource_meta in addables:
-            iresource = resource_meta.iresource
-            resource_typ = iresource.__identifier__
-            creates = self.registry.get_sheets_create(self.context,
-                                                      self.request,
-                                                      iresource)
-            sheet_typs = [s.meta.isheet.__identifier__ for s in creates]
-            sheets_dict = dict.fromkeys(sheet_typs, empty)
-            post_data = {'content_type': resource_typ,
-                         'data': sheets_dict}
-            cstruct['POST']['request_body'].append(post_data)
+        if request.has_permission('view', context):
+            views = self.registry.get_sheets_read(context, request)
+            get_sheets = [(s.meta.isheet.__identifier__, empty) for s in views]
+            if get_sheets:
+                cstruct['GET']['response_body']['data'] = dict(get_sheets)
+            else:
+                del cstruct['GET']
+        else:
+            del cstruct['GET']
 
+        is_users = IUsersService.providedBy(context) \
+            and request.has_permission('add_user', self.context)
+        # FIXME move the iuser specific part the UsersRestView
+        if request.has_permission('add_resource', self.context) or is_users:
+            addables = registry.get_resources_meta_addable(context, request)
+            if addables:
+                for resource_meta in addables:
+                    iresource = resource_meta.iresource
+                    resource_typ = iresource.__identifier__
+                    creates = registry.get_sheets_create(context, request,
+                                                         iresource)
+                    sheet_typs = [s.meta.isheet.__identifier__ for s in
+                                  creates]
+                    sheets_dict = dict.fromkeys(sheet_typs, empty)
+                    post_data = {'content_type': resource_typ,
+                                 'data': sheets_dict}
+                    cstruct['POST']['request_body'].append(post_data)
+            else:
+                del cstruct['POST']
+        else:
+            del cstruct['POST']
+
+        # FIXME? maybe simplify options response data structure,
+        # do we really need request/response_body, content_type,..?
         return cstruct
 
-    @view_config(request_method='GET')
+    @view_config(request_method='GET',
+                 permission='view')
     def get(self) -> dict:
         """Get resource data."""
         schema = GETResourceResponseSchema().bind(request=self.request,
@@ -359,6 +387,7 @@ class SimpleRESTView(ResourceRESTView):
     validation_PUT = (PUTResourceRequestSchema, [])
 
     @view_config(request_method='PUT',
+                 permission='edit_sheet',
                  content_type='application/json')
     def put(self) -> dict:
         """Edit resource and get response data."""
@@ -387,7 +416,8 @@ class PoolRESTView(SimpleRESTView):
 
     validation_POST = (POSTResourceRequestSchema, [])
 
-    @view_config(request_method='GET')
+    @view_config(request_method='GET',
+                 permission='view')
     def get(self) -> dict:
         """Get resource data."""
         # This delegation method is necessary since otherwise validation_GET
@@ -412,6 +442,7 @@ class PoolRESTView(SimpleRESTView):
                 return child
 
     @view_config(request_method='POST',
+                 permission='add_resource',
                  content_type='application/json')
     def post(self) -> dict:
         """Create new resource and get response data."""
@@ -436,7 +467,8 @@ class ItemRESTView(PoolRESTView):
 
     validation_POST = (POSTItemRequestSchema, [validate_post_root_versions])
 
-    @view_config(request_method='GET')
+    @view_config(request_method='GET',
+                 permission='view')
     def get(self) -> dict:
         """Get resource data."""
         schema = GETItemResponseSchema().bind(request=self.request,
@@ -450,6 +482,7 @@ class ItemRESTView(PoolRESTView):
         return cstruct
 
     @view_config(request_method='POST',
+                 permission='add_resource',
                  content_type='application/json')
     def post(self):
         """Create new resource and get response data."""
@@ -463,6 +496,22 @@ class ItemRESTView(PoolRESTView):
                                         creator=creator,
                                         root_versions=root_versions)
         return self.build_post_response(resource)
+
+
+@view_defaults(
+    renderer='simplejson',
+    context=IUsersService,
+    http_cache=0,
+)
+class UsersRESTView(PoolRESTView):
+
+    """View the IUsersService pool overwrites POST handling."""
+
+    @view_config(request_method='POST',
+                 permission='add_user',
+                 content_type='application/json')
+    def post(self):
+        return super().post()
 
 
 @view_defaults(

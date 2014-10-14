@@ -1,4 +1,5 @@
 """Classes used by the standalone Websocket server."""
+import time
 from collections import defaultdict
 from collections import Hashable
 from collections import Iterable
@@ -9,6 +10,7 @@ import logging
 from autobahn.asyncio.websocket import WebSocketServerProtocol
 from autobahn.websocket.protocol import ConnectionRequest
 from pyramid.traversal import resource_path
+from ZODB import Connection
 import colander
 
 from adhocracy_core.interfaces import IResource
@@ -122,8 +124,8 @@ class ClientCommunicator(WebSocketServerProtocol):
     instances of this class can be used!
     """
 
-    # All instances of this class share the same zodb connection object
-    zodb_connection = None
+    # All instances of this class share the same zodb database object
+    zodb_database = None
     # All instances of this class share the same tracker
     _tracker = ClientTracker()
     # All instances of this class share the same rest server url
@@ -133,26 +135,40 @@ class ClientCommunicator(WebSocketServerProtocol):
 
     def _create_schema(self, schema_class: colander.Schema):
         """Create schema object and bind `context` and `request`."""
-        context = self._get_context()
+        context = self._get_root()
         request = self._get_dummy_request()
         schema = schema_class()
         return schema.bind(context=context, request=request)
 
     def _get_dummy_request(self) -> DummyRequest:
         """Return a dummy :term:`request` object to resolve resource paths."""
-        context = self._get_context()
+        context = self._get_root()
         return DummyRequest(self.rest_url, context)
 
-    def _get_context(self) -> IResource:
+    def _get_root(self) -> IResource:
         """Get a context object to resolve resource paths.
 
-        :raises KeyError: if the zodb root has no app_root child.
-        :raises AttributeError: if the `zodb_connection` attribute is None.
+        :raises AttributeError: if the `zodb_database` attribute is None.
 
         """
-        self.zodb_connection.sync()
-        root = self.zodb_connection.root()
-        return root['app_root']
+        connection = self._get_zodb_connection()
+        while True:
+            try:
+                root = connection.root()
+                return root['app_root']
+            except KeyError:
+                logger.debug('Could not find the zodb app_root element,'
+                             ' try again later')
+                time.sleep(1)
+                connection.sync()
+
+    def _get_zodb_connection(self) -> Connection:
+        if not hasattr(self, '_zodb_connection'):
+            connection = self.zodb_database.open()
+            self._zodb_connection = connection
+        connection = self._zodb_connection
+        connection.sync()
+        return connection
 
     def onConnect(self, request: ConnectionRequest):  # noqa
         self._client = request.peer

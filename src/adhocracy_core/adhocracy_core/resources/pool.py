@@ -75,16 +75,24 @@ class Pool(Base, Folder):
 
 
 pool_metadata = resource_metadata_defaults._replace(
-    iresource=IBasicPool,
+    iresource=IPool,
     content_class=Pool,
     basic_sheets=[adhocracy_core.sheets.name.IName,
                   adhocracy_core.sheets.pool.IPool,
                   adhocracy_core.sheets.metadata.IMetadata,
                   ],
     element_types=[IPool],
+    permission_add='add_pool',
+)
+
+
+basicpool_metadata = pool_metadata._replace(
+    iresource=IBasicPool,
+    permission_add='add_pool',
+    is_implicit_addable=True,
 )
 
 
 def includeme(config):
     """Add resource type to registry."""
-    add_resource_type_to_registry(pool_metadata, config)
+    add_resource_type_to_registry(basicpool_metadata, config)

@@ -19,6 +19,7 @@ sectionversion_meta = itemversion_metadata._replace(
     iresource=ISectionVersion,
     extended_sheets=[adhocracy_core.sheets.document.ISection,
                      ],
+    permission_add='add_sectionversion',
 )
 
 
@@ -34,6 +35,7 @@ section_meta = item_metadata._replace(
                    ISectionVersion,
                    ],
     item_type=ISectionVersion,
+    permission_add='add_section',
 )
 
 

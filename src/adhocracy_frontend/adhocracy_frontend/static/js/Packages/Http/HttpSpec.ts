@@ -182,17 +182,17 @@ export var register = () => {
             });
             describe("getNewestVersionPathNoFork", () => {
                 it("promises the unique path from the LAST tag", (done) => {
-                    var path = "path";
-                    var returnPath1 = "path1";
+                    var path = "path/";
+                    var returnPath1 = "path1/";
 
                     var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.AdhocracyCoreSheetsTagsITag({ elements: [returnPath1] });
+                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.Sheet({ elements: [returnPath1] });
                     $httpMock.get.and.returnValue(q.when({ data: dag }));
 
                     adhHttp.getNewestVersionPathNoFork(path).then(
                         (ret) => {
                             expect(ret).toBe(returnPath1);
-                            expect($httpMock.get).toHaveBeenCalledWith(path + "/LAST", { params: undefined });
+                            expect($httpMock.get).toHaveBeenCalledWith(path + "LAST/", { params: undefined });
                             done();
                         },
                         (msg) => {
@@ -327,7 +327,7 @@ export var register = () => {
 
                     var newHead = "new_head";
                     var dag = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
-                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.AdhocracyCoreSheetsTagsITag({ elements: [newHead] });
+                    dag.data["adhocracy_core.sheets.tags.ITag"] = new SITag.Sheet({ elements: [newHead] });
 
                     var postResponses = [q.reject({ data: error }), q.when({ data: dag })].reverse();
 
