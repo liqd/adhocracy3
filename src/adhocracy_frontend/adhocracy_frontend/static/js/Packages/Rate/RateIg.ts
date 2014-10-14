@@ -141,7 +141,7 @@ export var register = (angular, config, meta_api) => {
                         var commentVersionProper = transaction.get(commentVersion.path);
 
                         return transaction.commit().then((responses) : ng.IPromise<void> => {
-                            _commentVersion = responses[commentVersionProper.index];
+                            _commentVersion = <any>(responses[commentVersionProper.index]);
 
                             return adhHttp.withTransaction((transaction) => {
 
@@ -169,7 +169,7 @@ export var register = (angular, config, meta_api) => {
 
                                 return transaction.commit()
                                     .then((responses) : void => {
-                                        _rateVersion = responses[rateVersionProper.index];
+                                        _rateVersion = <any>(responses[rateVersionProper.index]);
                                         done();
                                     });
                             });
