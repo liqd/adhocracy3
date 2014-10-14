@@ -286,7 +286,7 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
                 if (metaApi.sheets.hasOwnProperty(modulePath)) {
                     dictEntries.push(
                             "    \"" + modulePath + "\": "
-                            + mkModuleName(modulePath, metaApi) + "." + mkSheetName(mkNick(modulePath, metaApi)));
+                            + mkModuleName(modulePath, metaApi) + ".Sheet");
                 }
             }
             dictEntries.sort();
@@ -380,7 +380,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
 
     sheetI += "export var nick : string = \"" + sheet.nick + "\";\n\n";
 
-    sheetI += "export class " + mkSheetName(sheet.nick) + " extends Base.Sheet {\n";
+    sheetI += "export class Sheet extends Base.Sheet {\n";
 
     sheetI += "    public static _meta : Base.ISheetMetaApi = {\n";
     sheetI += "        readable: " + showList(sheetMetaApi.readable) + ",\n";
@@ -394,12 +394,12 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
     sheetI += mkFieldSignatures(sheet.fields, "    public ", ";\n") + "\n";
     sheetI += "}\n\n";
 
-    sheetI += "export interface Has" + mkSheetName(sheet.nick) + " {\n";
-    sheetI += "    data : { \"" + modulePath + "\": " + mkSheetName(sheet.nick) + " }\n";
+    sheetI += "export interface HasSheet {\n";
+    sheetI += "    data : { \"" + modulePath + "\": Sheet }\n";
     sheetI += "}\n\n";
 
-    hasSheetI += mkSheetSetter(sheet.nick, sheet.fields, "Has" + mkSheetName(sheet.nick));
-    hasSheetI += mkSheetGetter(sheet.nick, "Has" + mkSheetName(sheet.nick));
+    hasSheetI += mkSheetSetter(sheet.nick, sheet.fields, "HasSheet");
+    hasSheetI += mkSheetGetter(sheet.nick, "HasSheet");
 
     modules[modulePath] = sheetI + hasSheetI;
 };
@@ -450,7 +450,7 @@ mkSheetSetter = (nick : string, fields : MetaApi.ISheetField[], _selfType : stri
             return "";
         } else {
             var os = [];
-            os.push("export var _set" + mkSheetName(nick) + " = (");
+            os.push("export var _set = (");
             os.push("    _self : " + _selfType + ",");
             os.push(mkFieldSignatures(ef, "    ", ",\n"));
             os.push(") : " + _selfType + " => {");
@@ -480,9 +480,9 @@ mkSheetSetter = (nick : string, fields : MetaApi.ISheetField[], _selfType : stri
 mkSheetGetter = (nick : string, _selfType : string) : string => {
     if (config.sheetGetters) {
         var os = [];
-        os.push("export var _get" + mkSheetName(nick) + " = (");
+        os.push("export var _get = (");
         os.push("    _self : " + _selfType);
-        os.push(") : " + mkSheetName(nick) + " => {");
+        os.push(") : Sheet => {");
         os.push("    return _self.data[\"" + nick + "\"];");
         os.push("};\n");
         return Util.intercalate(os, "\n");
@@ -545,8 +545,8 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
             optArgs.name = "string";
             lines.push("    if (args.hasOwnProperty(\"name\")) {");
             lines.push("        _self.data[\"adhocracy_core.sheets.name.IName\"] =");
-            lines.push("            new " + mkModuleName("adhocracy_core.sheets.name.IName", metaApi) + "." +
-                       mkSheetName("adhocracy_core.sheets.name.IName") + "({ name : args.name })");
+            lines.push("            new " + mkModuleName("adhocracy_core.sheets.name.IName", metaApi) + ".Sheet" +
+                       "({ name : args.name })");
             lines.push("    }");
         }
 
@@ -583,7 +583,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
         for (var x in resource.sheets) {
             if (resource.sheets.hasOwnProperty(x)) {
                 var name = resource.sheets[x];
-                os.push("    \"" + name + "\" : " + mkModuleName(name, metaApi) + "." + mkSheetName(mkNick(name, metaApi)) + ";");
+                os.push("    \"" + name + "\" : " + mkModuleName(name, metaApi) + ".Sheet;");
             }
         }
         os.push("};");
@@ -599,7 +599,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
                 var name = resource.sheets[x];
                 if (config.sheetGetters) {
                     os.push("public get" + mkSheetName(mkNick(name, metaApi)) + "() {");
-                    os.push("    return " + mkModuleName(name, metaApi) + "." + "_get" + mkSheetName(mkNick(name, metaApi)) + "(this);");
+                    os.push("    return " + mkModuleName(name, metaApi) + "." + "_get(this);");
                     os.push("}");
                 }
 
@@ -610,7 +610,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
                         os.push(mkFieldSignatures(ef, "    ", ",\n"));
                         os.push(") {");
                         os.push("    var _self = this;\n");
-                        os.push("    " + mkModuleName(name, metaApi) + "." + "_set" + mkSheetName(mkNick(name, metaApi)) + "(this,");
+                        os.push("    " + mkModuleName(name, metaApi) + "." + "_set(this,");
                         os.push(Util.mkThingList(ef, (field) => field.name, "        ", ",\n    "));
                         os.push("    );");
                         os.push("    return _self;");

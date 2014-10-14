@@ -109,13 +109,13 @@ export var register = (angular, config, meta_api) => {
                 // post proposal version
                 var proposalVersionResource = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
                 proposalVersionResource.data["adhocracy_core.sheets.document.IDocument"] =
-                    new SIDocument.AdhocracyCoreSheetsDocumentIDocument({
+                    new SIDocument.Sheet({
                         title: proposalName,
                         description: "whoof",
                         elements: [sectionVersion.path]
                     });
                 proposalVersionResource.data["adhocracy_core.sheets.versions.IVersionable"] =
-                    new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
+                    new SIVersionable.Sheet({
                         follows: [proposal.first_version_path]
                     });
                 var proposalVersion : AdhHttp.ITransactionResult = transaction.post(proposal.path, proposalVersionResource);
@@ -133,7 +133,7 @@ export var register = (angular, config, meta_api) => {
 
                         // post comment version
                         var commentVersionResource = new RICommentVersion({preliminaryNames: adhPreliminaryNames});
-                        commentVersionResource.data[SIComment.nick] = new SIComment.AdhocracyCoreSheetsCommentIComment({
+                        commentVersionResource.data[SIComment.nick] = new SIComment.Sheet({
                             refers_to: _proposalVersion.path,
                             content: "this is my two cents"
                         });
@@ -141,7 +141,7 @@ export var register = (angular, config, meta_api) => {
                         var commentVersionProper = transaction.get(commentVersion.path);
 
                         return transaction.commit().then((responses) : ng.IPromise<void> => {
-                            _commentVersion = responses[commentVersionProper.index];
+                            _commentVersion = <any>(responses[commentVersionProper.index]);
 
                             return adhHttp.withTransaction((transaction) => {
 
@@ -156,12 +156,12 @@ export var register = (angular, config, meta_api) => {
 
                                 // post rate version
                                 var rateVersionResource = new RIRateVersion({preliminaryNames: adhPreliminaryNames});
-                                rateVersionResource.data[SIRate.nick] = new SIRate.AdhocracyCoreSheetsRateIRate({
+                                rateVersionResource.data[SIRate.nick] = new SIRate.Sheet({
                                     subject: adhUser.userPath,
                                     object: _commentVersion.path,
                                     rate: 1
                                 });
-                                rateVersionResource.data[SIVersionable.nick] = new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({
+                                rateVersionResource.data[SIVersionable.nick] = new SIVersionable.Sheet({
                                     follows: [rate.first_version_path]
                                 });
                                 var rateVersion : AdhHttp.ITransactionResult = transaction.post(rate.path, rateVersionResource);
@@ -169,7 +169,7 @@ export var register = (angular, config, meta_api) => {
 
                                 return transaction.commit()
                                     .then((responses) : void => {
-                                        _rateVersion = responses[rateVersionProper.index];
+                                        _rateVersion = <any>(responses[rateVersionProper.index]);
                                         done();
                                     });
                             });

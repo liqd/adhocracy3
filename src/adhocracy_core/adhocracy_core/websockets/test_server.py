@@ -478,7 +478,7 @@ class ClientTrackerUnitTests(unittest.TestCase):
 class TestFunctionalClientCommunicator:
 
     @pytest.fixture
-    def connection(self, request, backend, ws_settings, websocket):
+    def connection(self, request, ws_settings, websocket):
         from websocket import create_connection
         connection = create_connection('ws://localhost:%s' %
                                        ws_settings['port'])
@@ -504,7 +504,6 @@ class TestFunctionalClientCommunicator:
         resp = requests.post(url, data=json.dumps(data), headers=headers)
         assert resp.status_code == 200
 
-    @pytest.mark.skipif(True, reason="temporarily disabled, fix in progress")
     @pytest.mark.timeout(60)
     def test_send_child_notification(self, backend, connection):
         rest_url = backend.application_url

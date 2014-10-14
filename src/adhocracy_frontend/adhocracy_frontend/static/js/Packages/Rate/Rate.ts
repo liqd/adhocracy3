@@ -312,7 +312,7 @@ export var rateController = (
 
                     return transaction.commit()
                         .then((responses) : void => {
-                            $scope.myRateResource = responses[version.index];
+                            $scope.myRateResource = <RIRateVersion>responses[version.index];
                             adapter.subject($scope.myRateResource, adhUser.userPath);
                             adapter.object($scope.myRateResource, $scope.refersTo);
                             return;
