@@ -169,7 +169,7 @@ export var adhCommentListing = (adhConfig : AdhConfig.Type) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentListing.html",
         scope: {
-            path: "@",
+            path: "@"
         },
         controller: ["adhTopLevelState", "$location", (
             adhTopLevelState : AdhTopLevelState.TopLevelState,

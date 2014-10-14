@@ -204,7 +204,7 @@ export var fetchAuditTrail = (
                 return transaction.commit()
                     .then((responses) => {
                         gets.map((transactionResult) => {
-                            rates.push(responses[transactionResult.index]);
+                            rates.push(<any>responses[transactionResult.index]);
                         });
                     });
             }).then(() => {
@@ -214,7 +214,7 @@ export var fetchAuditTrail = (
                     return transaction.commit()
                         .then((responses) => {
                             gets.map((transactionResult) => {
-                                users.push(responses[transactionResult.index]);
+                                users.push(<any>responses[transactionResult.index]);
                             });
                         });
                 });
