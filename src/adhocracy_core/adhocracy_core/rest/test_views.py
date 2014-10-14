@@ -491,7 +491,7 @@ class TestPoolRESTView:
         assert wanted == response
 
 
-class UsersRESTView:
+class TestUsersRESTView:
 
     @fixture
     def request(self, cornice_request, mock_resource_registry):
@@ -521,7 +521,7 @@ class UsersRESTView:
                                       __name__='child')
         request.registry.content.create.return_value = child
         request.validated = {'content_type': IResourceX,
-                                  'data': {}}
+                             'data': {}}
         inst = self.make_one(context, request)
         response = inst.post()
 
@@ -529,7 +529,7 @@ class UsersRESTView:
         request.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
                                        creator=None,
                                        appstructs={},
-                                       root_versions=[])
+                                       )
         assert wanted == response
 
 
