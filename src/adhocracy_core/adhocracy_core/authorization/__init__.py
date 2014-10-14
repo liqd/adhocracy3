@@ -1,4 +1,5 @@
 """ACL Authorization with support for rules mapped to adhocracy principals."""
+from copy import copy
 from collections import defaultdict
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import ACLPermitsResult
@@ -42,12 +43,13 @@ class RoleACLAuthorizationPolicy(ACLAuthorizationPolicy):
         for location in lineage(context):
             local_roles = getattr(location, self.local_roles_key, {})
             for principal, roles in local_roles.items():
+                roles = copy(roles)
+                if self.creator_role in roles and location is not context:
+                    roles.remove(self.creator_role)
                 local_roles_map[principal].update(roles)
         return local_roles_map
 
     def _add_roles_to_principals(self, principals, roles_map):
         for canidate, roles in roles_map.items():
             if canidate in principals:
-                if self.creator_role in roles:
-                    roles.remove(self.creator_role)
                 principals.extend(list(roles))

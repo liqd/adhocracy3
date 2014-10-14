@@ -19,6 +19,7 @@ paragraphversion_meta = itemversion_metadata._replace(
     iresource=IParagraphVersion,
     extended_sheets=[adhocracy_core.sheets.document.IParagraph,
                      ],
+    permission_add='add_paragraphversion',
 )
 
 
@@ -34,6 +35,7 @@ paragraph_meta = item_metadata._replace(
                    IParagraphVersion,
                    ],
     item_type=IParagraphVersion,
+    permission_add='add_paragraph',
 )
 
 

@@ -281,28 +281,28 @@ class TestResourceRESTView:
 
 
     @fixture
-    def request(self, cornice_request, mock_resource_registry):
+    def request_(self, cornice_request, mock_resource_registry):
         cornice_request.registry.content = mock_resource_registry
         return cornice_request
 
-    def make_one(self, context, request):
+    def make_one(self, context, request_):
         from adhocracy_core.rest.views import ResourceRESTView
-        return ResourceRESTView(context, request)
+        return ResourceRESTView(context, request_)
 
-    def test_create_valid(self, request, context):
+    def test_create_valid(self, request_, context):
         from adhocracy_core.rest.views import RESTView
-        inst = self.make_one(context, request)
+        inst = self.make_one(context, request_)
         assert isinstance(inst, RESTView)
-        assert inst.registry is request.registry.content
+        assert inst.registry is request_.registry.content
 
     def test_options_valid_with_sheets_and_addables(
-            self, request, context, resource_meta, mock_sheet):
-        registry = request.registry.content
+            self, request_, context, resource_meta, mock_sheet):
+        registry = request_.registry.content
         registry.get_sheets_edit.return_value = [mock_sheet]
         registry.get_sheets_read.return_value = [mock_sheet]
         registry.get_resources_meta_addable.return_value = [resource_meta]
         registry.get_sheets_create.return_value = [mock_sheet]
-        inst = self.make_one(context, request)
+        inst = self.make_one(context, request_)
 
         response = inst.options()
 
@@ -320,25 +320,52 @@ class TestResourceRESTView:
          'PUT': {'request_body': {'content_type': '',
                                   'data': {ISheet.__identifier__: {}}},
                  'response_body': {'content_type': '', 'path': ''}}}
+        assert wanted['GET'] == response['GET']
+        assert wanted['POST'] == response['POST']
+        assert wanted['PUT'] == response['PUT']
+        assert wanted['HEAD'] == response['HEAD']
+        assert wanted['OPTIONS'] == response['OPTIONS']
+
+    def test_options_valid_with_sheets_and_addables_but_no_permissons(
+            self, config, request_, context, resource_meta, mock_sheet):
+        registry = request_.registry.content
+        registry.get_sheets_edit.return_value = [mock_sheet]
+        registry.get_sheets_read.return_value = [mock_sheet]
+        registry.get_resources_meta_addable.return_value = [resource_meta]
+        registry.get_sheets_create.return_value = [mock_sheet]
+        inst = self.make_one(context, request_)
+        config.testing_securitypolicy(userid='hank', permissive=False)
+
+        response = inst.options()
+
+        wanted = {'HEAD': {},
+                  'OPTIONS': {}}
         assert wanted == response
 
-    def test_get_valid_no_sheets(self, request, context):
+    def test_options_valid_without_sheets_and_addables(self, request_, context):
+        inst = self.make_one(context, request_)
+        response = inst.options()
+        wanted = {'HEAD': {},
+                  'OPTIONS': {}}
+        assert wanted == response
+
+    def test_get_valid_no_sheets(self, request_, context):
         from adhocracy_core.rest.schemas import GETResourceResponseSchema
 
-        inst = self.make_one(context, request)
+        inst = self.make_one(context, request_)
         response = inst.get()
 
         wanted = GETResourceResponseSchema().serialize()
-        wanted['path'] = request.application_url + '/'
+        wanted['path'] = request_.application_url + '/'
         wanted['data'] = {}
         wanted['content_type'] = IResource.__identifier__
         assert wanted == response
 
-    def test_get_valid_with_sheets(self, request, context, mock_sheet):
+    def test_get_valid_with_sheets(self, request_, context, mock_sheet):
         mock_sheet.get.return_value = {'name': 1}
         mock_sheet.schema.add(colander.SchemaNode(colander.Int(), name='name'))
-        request.registry.content.get_sheets_read.return_value = [mock_sheet]
-        inst = self.make_one(context, request)
+        request_.registry.content.get_sheets_read.return_value = [mock_sheet]
+        inst = self.make_one(context, request_)
         assert inst.get()['data'][ISheet.__identifier__] ==  {'name': '1'}
 
 
@@ -461,6 +488,48 @@ class TestPoolRESTView:
         response = inst.post()
 
         wanted = {'path': request.application_url + '/child/', 'content_type': IResourceX.__identifier__}
+        assert wanted == response
+
+
+class TestUsersRESTView:
+
+    @fixture
+    def request(self, cornice_request, mock_resource_registry):
+        cornice_request.registry.content = mock_resource_registry
+        return cornice_request
+
+    def make_one(self, context, request):
+        from adhocracy_core.rest.views import UsersRESTView
+        return UsersRESTView(context, request)
+
+    def test_create(self, request, context):
+        from adhocracy_core.rest.views import validate_post_root_versions
+        from adhocracy_core.rest.views import PoolRESTView
+        inst = self.make_one(context, request)
+        assert issubclass(inst.__class__, PoolRESTView)
+        assert 'options' in dir(inst)
+        assert 'get' in dir(inst)
+        assert 'put' in dir(inst)
+
+    def test_post_valid(self, request, context):
+        request.root = context
+        # Little cheat to prevent the POST validator from kicking in --
+        # we're working with already-validated data here
+        request.method = 'OPTIONS'
+        child = testing.DummyResource(__provides__=IResourceX,
+                                      __parent__=context,
+                                      __name__='child')
+        request.registry.content.create.return_value = child
+        request.validated = {'content_type': IResourceX,
+                             'data': {}}
+        inst = self.make_one(context, request)
+        response = inst.post()
+
+        wanted = {'path': request.application_url + '/child/', 'content_type': IResourceX.__identifier__}
+        request.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
+                                       creator=None,
+                                       appstructs={},
+                                       )
         assert wanted == response
 
 

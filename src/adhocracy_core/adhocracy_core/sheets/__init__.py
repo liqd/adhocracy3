@@ -52,7 +52,7 @@ class GenericResourceSheet(PropertySheet):
             appstruct.update(self._get_reference_appstruct(params))
             appstruct.update(self._get_back_reference_appstruct(params))
         except (ValueError, AttributeError, KeyError, ConnectionStateError,
-                POSError) as err:
+                POSError) as err:  # pragma: no cover
             # If an error is raises here it is most likely because the Database
             # connection is closed (ConnectionStateError) somehow.
             # FIXME!! This should never happen, TEMPORALLY WORKAROUND
@@ -194,8 +194,8 @@ sheet_metadata_defaults = sheet_metadata._replace(
     sheet_class=GenericResourceSheet,
     schema_class=colander.MappingSchema,
     permission_view='view',
-    permission_edit='edit',
-    permission_create='create',
+    permission_edit='edit_sheet',
+    permission_create='create_sheet',
 )
 
 

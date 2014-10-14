@@ -2,7 +2,7 @@
 from pytest import fixture
 
 from adhocracy_core.testing import god_email
-from adhocracy_core.testing import god_name
+from adhocracy_core.testing import god_login
 from adhocracy_core.testing import god_password
 
 from .shared import fill_input
@@ -32,7 +32,7 @@ class TestUserLogin:
 
     def test_login_name(self, browser):
         logout(browser)
-        login(browser, god_name, god_password)
+        login(browser, god_login, god_password)
         assert is_logged_in(browser)
 
     def test_login_error(self, browser):

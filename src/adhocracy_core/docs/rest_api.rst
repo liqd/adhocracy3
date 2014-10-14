@@ -237,7 +237,7 @@ JSON object that has the allowed request methods as keys::
 
     >>> resp_data = testapp.options(rest_url + "/adhocracy", headers=god_header).json
     >>> sorted(resp_data.keys())
-    ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+    ['GET', 'HEAD', 'OPTIONS', 'POST']
 
 If a GET, POST, or PUT request is allowed, the corresponding key will point
 to an object that contains at least "request_body" and "response_body" as
@@ -246,8 +246,6 @@ keys::
     >>> sorted(resp_data['GET'].keys())
     [...'request_body', ...'response_body'...]
     >>> sorted(resp_data['POST'].keys())
-    [...'request_body', ...'response_body'...]
-    >>> sorted(resp_data['PUT'].keys())
     [...'request_body', ...'response_body'...]
 
 The "response_body" sub-key returned for a GET request gives a stub view of
@@ -283,14 +281,16 @@ If the current user has the right to modify the resource in-place, the
 "request_body" sub-key returned for PUT gives a stub view of how the actual
 request should look like::
 
-...     >>> pprint(resp_data['PUT']['request_body'])
-...     {'data': {...'adhocracy_core.sheets.name.IName': {}...}}
+..     >>> pprint(resp_data['PUT']['request_body'])
+..     {'data': {...'adhocracy_core.sheets.name.IName': {}...}}
+FIXME: PUT is missing, because the current test pool resource type has not
+editable sheet.
 
 The "response_body" sub-key gives, as usual, a stub view of the resulting
 response body::
 
-     >>> pprint(resp_data['PUT']['response_body'])
-     {'content_type': '', 'path': ''}
+..     >>> pprint(resp_data['PUT']['response_body'])
+..     {'content_type': '', 'path': ''}
 
 
 Basic calls
@@ -871,15 +871,15 @@ it's also possible to write a comment about another comment::
 
     >>> metacomment = {'content_type': 'adhocracy_core.resources.comment.IComment',
     ...                 'data': {'adhocracy_core.sheets.name.IName': {'name': 'c2'}}}
-    >>> resp = testapp.post_json(pdag_path, metacomment, headers=god_header)
+    >>> resp = testapp.post_json(post_pool_path, metacomment, headers=god_header)
     >>> metacomment_path = resp.json["path"]
     >>> metacomment_path
-    '.../adhocracy/Proposals/kommunismus/comment_000...'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000...'
     >>> comment_path != metacomment_path
     True
     >>> first_metacommvers_path = resp.json['first_version_path']
     >>> first_metacommvers_path
-    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000000/'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000000/'
 
 As usual, we have to add another version to actually say something::
 
@@ -894,7 +894,7 @@ As usual, we have to add another version to actually say something::
     >>> resp = testapp.post_json(metacomment_path, metacommvers, headers=god_header)
     >>> snd_metacommvers_path = resp.json['path']
     >>> snd_metacommvers_path
-    '.../adhocracy/Proposals/kommunismus/comment_000.../VERSION_0000001/'
+    '.../adhocracy/Proposals/kommunismus/comments/comment_000.../VERSION_0000001/'
 
 
 Lets view all the comments referring to the proposal.

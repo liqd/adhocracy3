@@ -1,7 +1,7 @@
 from pytest import fixture
 from pytest import mark
 
-from adhocracy_core.testing import god_name
+from adhocracy_core.testing import annotator_login
 from .shared import wait
 from .shared import get_column_listing
 from .shared import get_list_element
@@ -65,7 +65,7 @@ def _ignored_test_multi_edits(browser, comment):
 def test_author(comment):
     actual = lambda element: element.find_by_css("adh-user-meta").first.text
     # the captialisation might be changed by CSS
-    assert wait(lambda: actual(comment).lower() == god_name.lower())
+    assert wait(lambda: actual(comment).lower() == annotator_login.lower())
 
 
 def show_proposal_comments(proposal):

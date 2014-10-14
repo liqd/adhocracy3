@@ -9,3 +9,4 @@ API
    rest_api
    websockets
    authorization
+   permissions

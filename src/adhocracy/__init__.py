@@ -1,7 +1,10 @@
 """Adhocracy backend server with default content and settings."""
 from pyramid.config import Configurator
+from pyramid import testing
 
 from adhocracy_core import root_factory
+from adhocracy_core.interfaces import IResource
+from adhocracy_core.rest.views import ResourceRESTView
 
 
 def includeme(config):
@@ -27,20 +30,29 @@ def main(global_config, **settings):
 
 def warm_up_database(app):
     """Fill the zodb connection pool to make the application start faster."""
-    # FIXME This makes not much sense for really big databases
-    from pyramid import testing
-    from adhocracy_core.interfaces import IResource
-    from adhocracy_core.rest.views import ResourceRESTView
+    request = _create_dummy_request(app)
+    root = app.root_factory(request)
+    _warm_up_reference_map(root)
+    _warm_up_all_resources(root, request)
+
+
+def _create_dummy_request(app):
     request = testing.DummyRequest()
     request.registry = app.registry
     request.validated = {}
     request.errors = []
-    root = app.root_factory(request)
-    # warm up reference map
+    return request
+
+
+def _warm_up_reference_map(root):
     om = root.__objectmap__
     [x for x in om.referencemap.refmap.values()]
     [x for x in om.referencemap.refmap.keys()]
-    # warm up all resources in the database
+
+
+def _warm_up_all_resources(root, request):
+    # FIXME This makes not much sense for really big databases
+    om = root.__objectmap__
     resolve = om.object_for
     resources = [resolve(p) for p in om.pathlookup(('',))]
     for resource in [r for r in resources if IResource.providedBy(r)]:

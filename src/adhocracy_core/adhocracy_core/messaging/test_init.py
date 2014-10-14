@@ -63,6 +63,25 @@ class TestSendMail():
                   html='<p>Bäh!</p>')
 
 
+class TestSendMailToQueue():
+
+    def test_send_mail_to_queue(self, config, registry):
+        config.include('pyramid_mailer.testing')
+        config.include('adhocracy_core.registry')
+        registry.settings['adhocracy.use_mail_queue'] = 'true'
+        config.include('adhocracy_core.messaging')
+        assert registry.messenger.use_mail_queue is True
+        mailer = registry.messenger._get_mailer()
+        registry.messenger.send_mail(
+              subject='Test mail',
+              recipients=['user@example.org'],
+              sender='admin@example.com',
+              body='Blah!',
+              html='<p>Bäh!</p>')
+        assert len(mailer.queue) == 1
+        assert len(mailer.outbox) == 0
+
+
 @mark.usefixtures('integration')
 class TestRenderAndSendMail:
 

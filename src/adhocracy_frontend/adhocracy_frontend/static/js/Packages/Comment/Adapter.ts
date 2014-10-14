@@ -16,11 +16,11 @@ import AdhComment = require("./Comment");
 
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
-    public elemRefs(container : AdhResource.Content<SICommentable.HasAdhocracyCoreSheetsCommentICommentable>) {
+    public elemRefs(container : AdhResource.Content<SICommentable.Sheet>) {
         return Util.latestVersionsOnly(container.data[SICommentable.nick].comments);
     }
 
-    public poolPath(container : AdhResource.Content<SICommentable.HasAdhocracyCoreSheetsCommentICommentable>) {
+    public poolPath(container : AdhResource.Content<SICommentable.Sheet>) {
         return container.data[SICommentable.nick].post_pool;
     }
 }
@@ -44,9 +44,9 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
     create(settings) : RICommentVersion {
         var resource = new RICommentVersion(settings);
         resource.data[SIComment.nick] =
-            new SIComment.AdhocracyCoreSheetsCommentIComment(settings);
+            new SIComment.Sheet(settings);
         resource.data[SIVersionable.nick] =
-            new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable(settings);
+            new SIVersionable.Sheet(settings);
         return resource;
     }
 
@@ -67,7 +67,7 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
         });
 
         resource.data[SIVersionable.nick] =
-            new SIVersionable.AdhocracyCoreSheetsVersionsIVersionable({follows: [oldVersion.path]});
+            new SIVersionable.Sheet({follows: [oldVersion.path]});
 
         return resource;
     }

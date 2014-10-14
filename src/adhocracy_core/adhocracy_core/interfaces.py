@@ -123,7 +123,7 @@ RESOURCE_METADATA = OrderedDict({
     'content_class': None,
     'permission_add': '',
     'permission_view': '',
-    'is_implicit_addable': True,
+    'is_implicit_addable': False,
     'basic_sheets': [],
     'extended_sheets': [],
     'after_creation': [],

@@ -28,10 +28,14 @@ def app(zeo, settings, websocket):
     This overrides adhocracy_core.testing.app.
     """
     from pyramid.config import Configurator
+    from adhocracy_core.testing import includeme_root_with_test_users
     import adhocracy
+    settings['adhocracy.add_default_group'] = False
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy.root_factory)
     configurator.include(adhocracy)
+    configurator.commit()
+    configurator.include(includeme_root_with_test_users)
     app = configurator.make_wsgi_app()
     return app
 
