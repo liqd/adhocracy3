@@ -498,44 +498,44 @@ def add_test_users(root, registry, options):
                    god_header['X-User-Path'],
                    god_header['X-User-Token'],
                    registry)
-    add_user(root, login='reader', password='reader', roles=['reader'],
-             registry=registry)
+    add_user(root, login=reader_login, password=reader_password,
+             roles=['reader'], registry=registry)
     add_user_token(root,
                    reader_header['X-User-Path'],
                    reader_header['X-User-Token'],
                    registry)
-    add_user(root, login='annotator', password='annotator',
+    add_user(root, login=annotator_login, password=annotator_password,
              roles=['annotator'], registry=registry)
     add_user_token(root,
                    annotator_header['X-User-Path'],
                    annotator_header['X-User-Token'],
                    registry)
-    add_user(root, login='contributor', password='contributor',
+    add_user(root, login=contributor_login, password=contributor_password,
              roles=['contributor'], registry=registry)
     add_user_token(root,
                    contributor_header['X-User-Path'],
                    contributor_header['X-User-Token'],
                    registry)
-    add_user(root, login='editor', password='editor', roles=['editor'],
-             registry=registry)
+    add_user(root, login=editor_login, password=editor_password,
+             roles=['editor'], registry=registry)
     add_user_token(root,
                    editor_header['X-User-Path'],
                    editor_header['X-User-Token'],
                    registry)
-    add_user(root, login='reviewer', password='reviewer', roles=['reviewer'],
-             registry=registry)
+    add_user(root, login=reader_login, password=reader_password,
+             roles=['reviewer'], registry=registry)
     add_user_token(root,
                    reviewer_header['X-User-Path'],
                    reviewer_header['X-User-Token'],
                    registry)
-    add_user(root, login='manager', password='manager', roles=['manager'],
-             registry=registry)
+    add_user(root, login=manager_login, password=manager_password,
+             roles=['manager'], registry=registry)
     add_user_token(root,
                    manager_header['X-User-Path'],
                    manager_header['X-User-Token'],
                    registry)
-    add_user(root, login='admin', password='admin', roles=['admin'],
-             registry=registry)
+    add_user(root, login=admin_login, password=admin_password,
+             roles=['admin'], registry=registry)
     add_user_token(root,
                    admin_header['X-User-Path'],
                    admin_header['X-User-Token'],
