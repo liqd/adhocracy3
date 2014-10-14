@@ -7,7 +7,6 @@ from .shared import get_listing_create_form
 from .shared import get_column_listing
 from .shared import get_list_element
 from .shared import login_god
-from .shared import logout
 
 
 @fixture
@@ -35,24 +34,6 @@ def test_proposal_view(browser, proposal):
     content_listing = get_column_listing(browser, 'content')
     browser.click_link_by_partial_text('test proposal')
     assert proposal_details_are_in_listing(content_listing, 'test proposal')
-
-
-def test_proposal_create_after_fail(browser):
-    logout(browser)
-
-    listing = get_column_listing(browser, 'content')
-    proposal = create_proposal(listing, 'test proposal')
-
-    # Fail due to missing login
-    assert proposal is None
-
-    login_god(browser)
-
-    listing = get_column_listing(browser, 'content')
-    proposal = create_proposal(listing, 'test proposal')
-
-    # Should now work
-    assert proposal is not None
 
 
 def create_proposal(listing: WebDriverElement, title: str, description='',
