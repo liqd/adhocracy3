@@ -36,7 +36,7 @@ var mkAdhMetaApiMock = () => {
                     readWriteField: 8
                 },
                 readOnlySheet: {
-                    readOnlyField2: 9,
+                    readOnlyField2: 9
                 }
             }
         },

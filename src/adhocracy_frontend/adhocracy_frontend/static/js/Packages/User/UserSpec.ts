@@ -289,7 +289,7 @@ export var register = () => {
                     var postRawResponse = {
                         data: {
                             user_token: "user_token_8427",
-                            user_path: "user_path_we7t",
+                            user_path: "user_path_we7t"
                         }
                     };
 
