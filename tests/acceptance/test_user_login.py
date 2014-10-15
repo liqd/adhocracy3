@@ -32,6 +32,17 @@ class TestUserLogin:
             '.login .form-error:not(.ng-hide)')
         assert not is_logged_in(browser)
 
+    def login_name_with_wrong_password(self, browser):
+        login(browser, god_login, 'wrong', expect_success=False, visit_root=False)
+        assert browser.is_element_present_by_css(
+            '.login .form-error:not(.ng-hide)', wait_time=2)
+        assert not is_logged_in(browser)
+
+    def login_name_with_password_length_lower_6(self, browser):
+        login(browser, god_login, 'short', expect_success=False, visit_root=False)
+        browser.is_text_present('password to short')
+        assert not is_logged_in(browser)
+
     def test_login_name(self, browser):
         login(browser, god_login, god_password)
         assert is_logged_in(browser)
