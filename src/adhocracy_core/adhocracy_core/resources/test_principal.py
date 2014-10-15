@@ -4,6 +4,7 @@ import unittest
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
+from pytest import raises
 
 
 class PrincipalIntegrationTest(unittest.TestCase):
@@ -391,21 +392,41 @@ class TestIntegrationSendRegistrationMail():
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.messaging')
 
-    @mark.usefixtures('integration')
-    def test_send_registration_mail(self, registry):
+    @fixture
+    def sample_user(self):
         from adhocracy_core.resources.principal import User
-        from adhocracy_core.resources.principal import send_registration_mail
-        mailer = registry.messenger._get_mailer()
-        assert len(mailer.outbox) == 0
         user = User()
         user.name = 'Anna Müller'
         user.email = 'anna@example.org'
-        send_registration_mail(context=user, registry=registry)
-        assert user.activation_path.startswith('/activate/')
+        return user
+
+    @mark.usefixtures('integration')
+    def test_send_registration_mail_successfully(self, registry, sample_user):
+        from adhocracy_core.resources.principal import send_registration_mail
+        mailer = registry.messenger._get_mailer()
+        assert len(mailer.outbox) == 0
+        send_registration_mail(context=sample_user, registry=registry)
+        assert sample_user.activation_path.startswith('/activate/')
         assert len(mailer.outbox) == 1
         msg = mailer.outbox[0]
         # The DummyMailer is too stupid to use a default sender, hence we add
         # one manually
         msg.sender = 'support@unconfigured.domain'
         msgtext = str(msg.to_message())
-        assert user.activation_path in msgtext
+        assert sample_user.activation_path in msgtext
+
+    @mark.usefixtures('integration')
+    def test_send_registration_mail_smtp_error(self, registry, sample_user):
+        from unittest.mock import Mock
+        from colander import Invalid
+        from smtplib import SMTPException
+        from adhocracy_core.messaging import Messenger
+        from adhocracy_core.resources.principal import send_registration_mail
+        mock_messenger = Mock(spec=Messenger)
+        mock_messenger.render_and_send_mail = Mock(
+            side_effect=SMTPException('bad luck'))
+        registry.messenger = mock_messenger
+        with raises(Invalid) as err_info:
+            send_registration_mail(context=sample_user, registry=registry)
+        assert 'Cannot send' in err_info.exconly()
+        assert 'bad luck' in err_info.exconly()

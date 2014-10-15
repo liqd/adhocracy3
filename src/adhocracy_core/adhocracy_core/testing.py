@@ -395,44 +395,53 @@ def ws_settings(request) -> Configurator:
     return _get_settings(request, 'websockets')
 
 
-@fixture(scope='class')
-def zeo(request) -> bool:
-    """Start the test zeo server."""
-    pid_file = 'var/test_zeodata/ZEO.pid'
+@fixture(scope='session')
+def supervisor(request) -> str:
+    """Start supervisord daemon."""
+    pid_file = 'var/supervisord.pid'
     if _is_running(pid_file):
         return True
-    process = subprocess.Popen('bin/runzeo -Cetc/test_zeo.conf', shell=True,
-                               stderr=subprocess.STDOUT)
-    time.sleep(1)
-
-    def fin():
-        print('teardown zeo server')
-        process.kill()
-        _kill_pid_in_file(pid_file)
-
-    request.addfinalizer(fin)
-    return True
+    output = subprocess.check_output('bin/supervisord',
+                                     shell=True,
+                                     stderr=subprocess.STDOUT)
+    assert str(output) == ''
+    return output
 
 
 @fixture(scope='class')
-def websocket(request, zeo, ws_settings) -> bool:
-    """Start websocket server."""
-    pid_file = ws_settings['pid_file']
-    if _is_running(pid_file):
-        return True
-    config_file = request.config.getvalue('pyramid_config')
-    process = subprocess.Popen('bin/start_ws_server ' + config_file,
-                               shell=True,
-                               stderr=subprocess.STDOUT)
-    time.sleep(1)
+def zeo(request, supervisor) -> str:
+    """Start zeo server with supervisor."""
+    output = subprocess.check_output(
+        'bin/supervisorctl restart adhocracy_test:test_zeo',
+        shell=True,
+        stderr=subprocess.STDOUT)
 
     def fin():
-        print('teardown websocket server')
-        process.kill()
-        _kill_pid_in_file(pid_file)
-
+        subprocess.check_output(
+            'bin/supervisorctl stop adhocracy_test:test_zeo',
+            shell=True,
+            stderr=subprocess.STDOUT)
     request.addfinalizer(fin)
-    return True
+
+    return output
+
+
+@fixture(scope='class')
+def websocket(request, supervisor) -> bool:
+    """Start websocket server with supervisor."""
+    output = subprocess.check_output(
+        'bin/supervisorctl restart adhocracy_test:test_autobahn',
+        shell=True,
+        stderr=subprocess.STDOUT)
+
+    def fin():
+        subprocess.check_output(
+            'bin/supervisorctl stop adhocracy_test:test_autobahn',
+            shell=True,
+            stderr=subprocess.STDOUT)
+    request.addfinalizer(fin)
+
+    return output
 
 
 def _kill_pid_in_file(path_to_pid_file):
@@ -498,44 +507,44 @@ def add_test_users(root, registry, options):
                    god_header['X-User-Path'],
                    god_header['X-User-Token'],
                    registry)
-    add_user(root, login='reader', password='reader', roles=['reader'],
-             registry=registry)
+    add_user(root, login=reader_login, password=reader_password,
+             roles=['reader'], registry=registry)
     add_user_token(root,
                    reader_header['X-User-Path'],
                    reader_header['X-User-Token'],
                    registry)
-    add_user(root, login='annotator', password='annotator',
+    add_user(root, login=annotator_login, password=annotator_password,
              roles=['annotator'], registry=registry)
     add_user_token(root,
                    annotator_header['X-User-Path'],
                    annotator_header['X-User-Token'],
                    registry)
-    add_user(root, login='contributor', password='contributor',
+    add_user(root, login=contributor_login, password=contributor_password,
              roles=['contributor'], registry=registry)
     add_user_token(root,
                    contributor_header['X-User-Path'],
                    contributor_header['X-User-Token'],
                    registry)
-    add_user(root, login='editor', password='editor', roles=['editor'],
-             registry=registry)
+    add_user(root, login=editor_login, password=editor_password,
+             roles=['editor'], registry=registry)
     add_user_token(root,
                    editor_header['X-User-Path'],
                    editor_header['X-User-Token'],
                    registry)
-    add_user(root, login='reviewer', password='reviewer', roles=['reviewer'],
-             registry=registry)
+    add_user(root, login=reader_login, password=reader_password,
+             roles=['reviewer'], registry=registry)
     add_user_token(root,
                    reviewer_header['X-User-Path'],
                    reviewer_header['X-User-Token'],
                    registry)
-    add_user(root, login='manager', password='manager', roles=['manager'],
-             registry=registry)
+    add_user(root, login=manager_login, password=manager_password,
+             roles=['manager'], registry=registry)
     add_user_token(root,
                    manager_header['X-User-Path'],
                    manager_header['X-User-Token'],
                    registry)
-    add_user(root, login='admin', password='admin', roles=['admin'],
-             registry=registry)
+    add_user(root, login=admin_login, password=admin_password,
+             roles=['admin'], registry=registry)
     add_user_token(root,
                    admin_header['X-User-Path'],
                    admin_header['X-User-Token'],
@@ -552,7 +561,7 @@ def includeme_root_with_test_users(config):
 
 
 @fixture(scope='class')
-def app(zeo, settings, websocket):
+def app(zeo, settings):
     """Return the adhocracy wsgi application."""
     import adhocracy_core
     import adhocracy_core.resources.sample_paragraph
@@ -593,5 +602,4 @@ def backend(request, settings, app):
     port = settings['port']
     backend = StopableWSGIServer.create(app, port=port)
     request.addfinalizer(backend.shutdown)
-    time.sleep(0.5)  # give the application some time to start
     return backend
