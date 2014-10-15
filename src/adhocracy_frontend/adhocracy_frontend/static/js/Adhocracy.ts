@@ -94,6 +94,13 @@ export var init = (config, meta_api) => {
                     $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
                 }]
             })
+            .when("/mercator-listing", {
+                template: "<adh-mercator-proposal-listing data-path=\"{{path}}\">" +
+                    "</adh-mercator-proposal-listing>",
+                controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
+                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
+                }]
+            })
             .when("/activation_error", {
                 templateUrl: "/static/js/templates/ActivationError.html",
                 controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
@@ -227,6 +234,10 @@ export var init = (config, meta_api) => {
             var widget = new AdhMercator.MercatorProposal(adhConfig, adhHttp, adhPreliminaryNames, $q);
             return widget.createDirective();
         }]);
+
+    app.directive("adhMercatorListing",
+        ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
+            new Listing.Listing(new AdhMercator.ListItemAdapter()).createDirective(adhConfig, adhWebSocket)]);
 
     // get going
 

@@ -60,6 +60,7 @@ def includeme(config):
     add_frontend_route(config, 'activation_error', 'activation_error')
     add_frontend_route(config, 'root', '')
     add_frontend_route(config, 'mercator', 'mercator')
+    add_frontend_route(config, 'mercator-listing', 'mercator-listing')
     config.add_subscriber(add_cors_headers_subscriber, NewResponse)
 
 
