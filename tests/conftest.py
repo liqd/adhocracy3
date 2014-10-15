@@ -23,7 +23,7 @@ def pytest_runtest_setup(item):
 
 
 @fixture(scope='class')
-def app(zeo, settings):
+def app(settings):
     """Return the adhocracy wsgi application.
 
     This overrides adhocracy_core.testing.app.
@@ -32,6 +32,8 @@ def app(zeo, settings):
     from adhocracy_core.testing import includeme_root_with_test_users
     import adhocracy
     settings['adhocracy.add_default_group'] = False
+    settings['zodbconn.uri'] = 'memory://'
+    settings['adhocracy.ws_url'] = ''
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy.root_factory)
     configurator.include(adhocracy)
@@ -62,7 +64,7 @@ def frontend(request, supervisor) -> str:
 
 
 @fixture
-def browser(browser, backend, websocket, frontend, frontend_url) -> Browser:
+def browser(browser, backend, frontend, frontend_url) -> Browser:
     """Return test browser, start sample application and go to `root.html`.
 
     Add attribute `root_url` pointing to the adhocracy root.html page.
