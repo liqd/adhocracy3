@@ -55,7 +55,8 @@ def logout(browser):
 
 def is_logged_in(browser):
     """Check if user is logged in."""
-    return browser.browser.is_element_present_by_css('.user-indicator-logout')
+    return browser.browser.is_element_present_by_css('.user-indicator-logout',
+                                                     wait_time=0)
 
 
 def is_logged_out(browser):

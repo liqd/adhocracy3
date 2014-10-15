@@ -9,14 +9,7 @@ from .shared import fill_input
 from .shared import click_button
 from .shared import login
 from .shared import logout
-from .shared import login_god
 from .shared import is_logged_in
-
-
-@fixture
-def browser(browser):
-    logout(browser)
-    return browser
 
 
 class TestUserLogin:
@@ -26,29 +19,29 @@ class TestUserLogin:
                  expect_success=False)
         assert is_not_yet_activated(browser)
 
-    def test_login_email(self, browser):
-        login(browser, god_email, god_password)
-        assert is_logged_in(browser)
-
-    def test_login_name(self, browser):
-        logout(browser)
-        login(browser, god_login, god_password)
-        assert is_logged_in(browser)
-
-    def test_login_error(self, browser):
-        login(browser, 'wrong', 'wrong', expect_success=False, visit_root=False)
-        assert browser.is_element_present_by_css(
-            '.login .form-error:not(.ng-hide)', wait_time=2)
-        assert not is_logged_in(browser)
-
     def test_register_error_wrong_password_repeat(self, browser):
+
         register(browser, 'user4', 'email4@example.com', 'password4',
                  'wrong_repeated_password', expect_success=False)
         assert browser.browser.is_element_present_by_css(
-            '.register [type="submit"]:disabled', wait_time=1)
+            '.register [type="submit"]:disabled')
+
+    def test_login_name_with_wrong_name(self, browser):
+        login(browser, 'wrong', god_password, expect_success=False, visit_root=False)
+        assert browser.is_element_present_by_css(
+            '.login .form-error:not(.ng-hide)')
+        assert not is_logged_in(browser)
+
+    def test_login_name(self, browser):
+        login(browser, god_login, god_password)
+        assert is_logged_in(browser)
+
+    def test_login_email(self, browser):
+        logout(browser)
+        login(browser, god_email, god_password)
+        assert is_logged_in(browser)
 
     def test_login_persistence(self, browser):
-        login_god(browser)
         browser.reload()
         assert is_logged_in(browser)
 
