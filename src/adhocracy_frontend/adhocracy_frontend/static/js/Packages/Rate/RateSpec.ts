@@ -191,20 +191,13 @@ export var register = () => {
                 realFetchAuditTrail = AdhRate.fetchAuditTrail;
                 spyOn(AdhRate, "fetchAuditTrail").and.returnValue(q.when());
 
-                realFetchAggregatedRates = undefined;
-                realFetchAuditTrail = undefined;
-
                 // only used in untested functions
                 adhPreliminaryNamesMock = undefined;
 
-                // FIXME: $httpMock does not give the right answers.
-                // in particular, it responds with 'undefined' to the
-                // request for the rateable in fetchPostPoolPath.
-                //
-                // AdhRate.rateController(adapterMock, scopeMock, q, httpMock, adhPermissionsMock, userMock, adhPreliminaryNamesMock)
-                //     .then(done, (reason) => {
-                //         expect(reason).toBe(undefined);
-                //     });
+                AdhRate.rateController(adapterMock, scopeMock, q, httpMock, adhPermissionsMock, userMock, adhPreliminaryNamesMock)
+                    .then(done, (reason) => {
+                        expect(reason).toBe(undefined);
+                    });
             });
 
             afterEach(() => {
@@ -212,7 +205,7 @@ export var register = () => {
                 AdhRate.fetchAuditTrail = realFetchAuditTrail;
             });
 
-            xit("sets scope.ready when finished initializing", () => {
+            it("sets scope.ready when finished initializing", () => {
                 expect(scopeMock.ready).toBe(true);
             });
         });
