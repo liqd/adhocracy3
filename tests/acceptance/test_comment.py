@@ -6,66 +6,64 @@ from .shared import wait
 from .shared import get_column_listing
 from .shared import get_list_element
 from .shared import get_listing_create_form
+from .shared import login_annotator
 from .shared import login_god
-from .test_proposal import proposal
+
+from .test_proposal import create_proposal
 
 
-@fixture
-def browser(browser):
-    login_god(browser)
-    return browser
+class TestComment:
+
+    def test_create(self, browser):
+        login_god(browser)
+        comment = create_comment(browser, 'comment1')
+        assert comment is not None
+
+    def test_reply(self, browser):
+        comment = get_column_listing(browser, 'content2').find_by_css('.comment')
+        reply = create_reply_comment(comment, 'somereply')
+        assert reply is not None
+
+    def test_edit(self, browser):
+        comment = get_column_listing(browser, 'content2').find_by_css('.comment')
+        edit_comment(comment, 'edited')
+        assert comment.find_by_css('.comment-content').text == 'edited'
+
+        browser.reload()
+
+        proposal = browser.find_by_css('.listing-element')
+        show_proposal_comments(proposal)
+        assert len(browser.find_by_css('.comment-content')) == 1
+        assert browser.find_by_css('.comment-content').text == 'edited'
 
 
-@fixture
-def comment(browser, proposal):
+    def _ignored_test_multi_edits(self, browser, comment):
+        # FIXME Test needs to be updated since the backend now throws a
+        # 'No fork allowed' error
+        parent = get_column_listing(browser, 'content2').find_by_css('.comment')
+        reply = create_reply_comment(parent, 'somereply')
+        edit_comment(reply, 'somereply edited')
+        edit_comment(parent, 'edited')
+        assert parent.find_by_css('.comment-content').first.text == 'edited'
+
+
+    @mark.skipif(True, reason='FIXME: this test passes on a single run, but not'
+                              'together with others')
+    def test_author(self, browser):
+        comment = get_column_listing(browser, 'content2').find_by_css('.comment')
+        actual = lambda element: element.find_by_css("adh-user-meta").first.text
+        # the captialisation might be changed by CSS
+        assert wait(lambda: actual(comment).lower() == annotator_login.lower())
+
+
+def create_comment(browser, name):
     """Go to content2 column and create comment with content 'comment1'."""
+    content = get_column_listing(browser, 'content')
+    proposal = create_proposal(content, 'test proposal with comments')
     show_proposal_comments(proposal)
-    listing = get_column_listing(browser, 'content2')
-    comment = create_top_level_comment(listing, 'comment1')
+    content2 = get_column_listing(browser, 'content2')
+    comment = create_top_level_comment(content2,  name)
     return comment
-
-
-def test_create(browser, proposal):
-    show_proposal_comments(proposal)
-    listing = get_column_listing(browser, 'content2')
-    comment = create_top_level_comment(listing, 'somecomment', )
-    assert comment is not None
-
-
-def test_reply(browser, comment):
-    parent = get_column_listing(browser, 'content2').find_by_css('.comment')
-    element = create_reply_comment(parent, 'somereply')
-    assert element is not None
-
-
-def test_edit(browser, comment):
-    edit_comment(comment, 'edited')
-    assert comment.find_by_css('.comment-content').text == 'edited'
-
-    browser.reload()
-
-    proposal = browser.find_by_css('.listing-element')
-    show_proposal_comments(proposal)
-    assert len(browser.find_by_css('.comment-content')) == 1
-    assert browser.find_by_css('.comment-content').text == 'edited'
-
-
-def _ignored_test_multi_edits(browser, comment):
-    # FIXME Test needs to be updated since the backend now throws a
-    # 'No fork allowed' error
-    parent = get_column_listing(browser, 'content2').find_by_css('.comment')
-    reply = create_reply_comment(parent, 'somereply')
-    edit_comment(reply, 'somereply edited')
-    edit_comment(parent, 'edited')
-    assert parent.find_by_css('.comment-content').first.text == 'edited'
-
-
-@mark.skipif(True, reason='FIXME: this test passes on a single run, but not'
-                          'together with others')
-def test_author(comment):
-    actual = lambda element: element.find_by_css("adh-user-meta").first.text
-    # the captialisation might be changed by CSS
-    assert wait(lambda: actual(comment).lower() == annotator_login.lower())
 
 
 def show_proposal_comments(proposal):

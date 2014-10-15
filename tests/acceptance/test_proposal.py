@@ -9,31 +9,26 @@ from .shared import get_list_element
 from .shared import login_god
 
 
-@fixture
-def browser(browser):
-    login_god(browser)
-    return browser
+class TestProposal:
 
 
-@fixture
-def proposal(browser):
+    def test_create(self, browser):
+        login_god(browser)
+        content = get_column_listing(browser, 'content')
+        proposal = create_proposal(content, 'test proposal')
+        assert proposal is not None
+
+
+    def test_view(self, browser):
+        content_listing = get_column_listing(browser, 'content')
+        browser.click_link_by_partial_text('test proposal')
+        assert proposal_details_are_in_listing(content_listing, 'test proposal')
+
+
+def add_proposal_to_content_listing(browser, name) -> WebDriverElement:
     """Go to content listing and create proposal with title `test proposal`."""
-    login_god(browser)
-    listing = get_column_listing(browser, 'content')
-    proposal = create_proposal(listing, 'test proposal')
+    proposal = create_proposal(listing, name)
     return proposal
-
-
-def test_proposal_create(browser):
-    content_listing = get_column_listing(browser, 'content')
-    proposal = create_proposal(content_listing, 'some title')
-    assert proposal is not None
-
-
-def test_proposal_view(browser, proposal):
-    content_listing = get_column_listing(browser, 'content')
-    browser.click_link_by_partial_text('test proposal')
-    assert proposal_details_are_in_listing(content_listing, 'test proposal')
 
 
 def create_proposal(listing: WebDriverElement, title: str, description='',
