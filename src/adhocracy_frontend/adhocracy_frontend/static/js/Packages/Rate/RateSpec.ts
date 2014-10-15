@@ -166,80 +166,11 @@ export var register = () => {
             });
 
             it("clears rates and user rate in scope.", () => {
-                scopeMock.rates = {
-                    pro: 1,
-                    contra: 1,
-                    neutral: 1
-                };
-                scopeMock.myRateResource = "notnull";
-
                 AdhRate.resetRates(scopeMock);
                 expect(scopeMock.rates.pro).toBe(0);
                 expect(scopeMock.rates.contra).toBe(0);
                 expect(scopeMock.rates.neutral).toBe(0);
                 expect(scopeMock.thisUserRate).toBeUndefined();
-            });
-        });
-
-        describe("updateRates", () => {
-            var adapter : AdhRateAdapter.RateAdapter;
-
-            beforeEach(() => {
-                httpMock = mkHttpMock();
-                rateResources = mkRateResources();
-                postPoolResource = mkPostPoolResource(rateResources);
-                rateableResource = mkRateableResource();
-                scopeMock = mkScopeMock();
-                userMock = mkUserMock();
-
-                // http must be more accurately mocked for these tests.
-                var httpMockResponder = (path, params) => {
-                    if (typeof path === "undefined") {
-                        throw "get request with undefined path.";
-                    }
-
-                    if (path === "post_pool_path") {
-                        if (params["content_type"] === RIRateVersion.content_type) {
-                            var result = _.cloneDeep(rateResources);
-                            if (params[SIRate.nick + ":subject"] === "user3") {
-                                result = result.filter((resource) =>
-                                                       resource.data["adhocracy_core.sheets.rate.IRate"].subject === "user3");
-                            }
-                            if (params[SIRate.nick + ":subject"] === "user3") {
-                                result = result.filter((resource) =>
-                                                       resource.data["adhocracy_core.sheets.rate.IRate"].subject === "user3");
-                            }
-
-                            // ...
-
-                            // FIXME: result must not be an array, but
-                            // a pool object that contains the array
-                            // as elements.  this is getting really
-                            // complicated...
-
-                            return q.when(result);
-                        }
-                    }
-                };
-                spyOn(httpMock, "get").and.callFake(httpMockResponder);
-
-                adapter = new AdhRateAdapter.RateAdapter();
-            });
-
-            it("calculates the right totals for pro, contra, neutral and stores them in the scope.", (done) => {
-                AdhRate.fetchAggregatedRates(adapter, scopeMock, q, httpMock, userMock).then(
-                    () => {
-                        expect(scopeMock.rates.pro).toBe(2);
-                        expect(scopeMock.rates.contra).toBe(1);
-                        expect(scopeMock.rates.neutral).toBe(1);
-                        expect(scopeMock.myRateResource.data["adhocracy_core.sheets.rate.IRate"].subject).toBe(userMock.userPath);
-                        done();
-                    },
-                    (msg) => {
-                        expect(msg).toBe(false);
-                        done();
-                    }
-                );
             });
         });
 
