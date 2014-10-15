@@ -43,7 +43,7 @@ def app(settings):
     return app
 
 
-@fixture(scope='class')
+@fixture(scope='session')
 def frontend(request, supervisor) -> str:
     """Start the frontend server with supervisor."""
     output = subprocess.check_output(

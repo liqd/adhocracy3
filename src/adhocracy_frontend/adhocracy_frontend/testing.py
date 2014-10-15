@@ -33,7 +33,7 @@ def frontend_url(request) -> dict:
     return url
 
 
-@fixture(scope='class')
+@fixture(scope='session')
 def frontend(request) -> bool:
     """Return a http server that only serves the static frontend files."""
     pid_file = 'var/frontend_pyramid.pid'
