@@ -91,7 +91,7 @@ export class Widget<R extends AdhResourcesBase.Resource> extends AdhResourceWidg
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
-        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
+        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";
     }
 
     public createDirective() : ng.IDirective {
@@ -191,5 +191,18 @@ export class Widget<R extends AdhResourcesBase.Resource> extends AdhResourceWidg
 
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
         return this.$q.when([]);
+    }
+}
+
+
+export class CreateWidget<R extends AdhResourcesBase.Resource> extends Widget<R> {
+    constructor(
+        adhConfig : AdhConfig.Type,
+        adhHttp : AdhHttp.Service<any>,
+        adhPreliminaryNames : AdhPreliminaryNames,
+        $q : ng.IQService
+    ) {
+        super(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
     }
 }

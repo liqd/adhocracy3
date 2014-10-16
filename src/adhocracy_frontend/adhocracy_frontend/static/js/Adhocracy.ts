@@ -88,8 +88,8 @@ export var init = (config, meta_api) => {
             })
             .when("/mercator", {
                 template: "<adh-resource-wrapper>" +
-                    "<adh-mercator-proposal data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
-                    "</adh-mercator-proposal></adh-resource-wrapper>",
+                    "<adh-mercator-proposal-create data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
+                    "</adh-mercator-proposal-create></adh-resource-wrapper>",
                 controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
                     $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
                 }]
@@ -232,6 +232,12 @@ export var init = (config, meta_api) => {
     app.directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
         (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
             var widget = new AdhMercatorProposal.Widget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+            return widget.createDirective();
+        }]);
+
+    app.directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+        (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
+            var widget = new AdhMercatorProposal.CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
             return widget.createDirective();
         }]);
 
