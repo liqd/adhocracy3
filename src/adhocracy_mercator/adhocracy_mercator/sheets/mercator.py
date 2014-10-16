@@ -14,6 +14,7 @@ from adhocracy_core.schema import Reference
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import Text
 from adhocracy_core.schema import URL
+from adhocracy_core.utils import get_sheet
 
 
 class IMercatorSubResources(ISheet, ISheetReferenceAutoUpdateMarker):
@@ -266,6 +267,18 @@ details_meta = sheet_metadata_defaults._replace(isheet=IDetails,
                                                 schema_class=DetailsSchema)
 
 
+def index_location(resource, default):
+    """Return values of the "location_is_..." fields."""
+    # FIXME?: can we pass the registry to get_sheet here?
+    sheet = get_sheet(resource, IDetails)
+    locations = []
+    appstruct = sheet.get()
+    for value in ('city', 'country', 'town', 'online', 'linked_to_ruhr'):
+        if appstruct['location_is_' + value]:
+            locations.append(value)
+    return locations if locations else default
+
+
 class StorySchema(colander.MappingSchema):
     story = Text(validator=colander.Length(min=1, max=800))
 
@@ -326,7 +339,6 @@ class ExperienceSchema(colander.MappingSchema):
     """Data structure for additional fields."""
 
     # media = list of AssetPath()
-    # categories = list of enum???
     experience = Text()
 
 
@@ -365,3 +377,7 @@ def includeme(config):
     add_sheet_to_registry(finance_meta, config.registry)
     add_sheet_to_registry(experience_meta, config.registry)
     add_sheet_to_registry(heardfrom_meta, config.registry)
+    config.add_indexview(index_location,
+                         catalog_name='adhocracy',
+                         index_name='mercator_location',
+                         context=IDetails)
