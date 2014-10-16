@@ -26,7 +26,7 @@ export class TopLevelState {
         private $routeParams: ng.route.IRouteParamsService
     ) {
         this.eventHandler = new adhEventHandlerClass();
-        this.focus = 1;
+        this.focus = 0;
 
         if (typeof this.$routeParams !== "undefined" &&
             this.$routeParams.hasOwnProperty("focus")) {
@@ -104,7 +104,7 @@ export class TopLevelState {
 var move = (column : number, element : JQuery) => {
     // This is likely to change in the future.
     // So do not spend too much time interpreting this.
-    if (column === 1) {
+    if (column === 0 || column === 1) {
         element.removeClass("is-detail");
     } else if (column === 2) {
         element.addClass("is-detail");
