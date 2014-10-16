@@ -36,31 +36,31 @@ export var register = () => {
                     expect(adhTopLevelState.getFocus()).toEqual(1);
                 });
 
-                it("with focus parameter 2", () => {
+                it("to 2 if focus param is 2", () => {
                     routeParamMock.focus = 2;
                     var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
                     expect(adhTopLevelState.getFocus()).toEqual(2);
                 });
 
-                it("with NaN focus parameter", () => {
+                it("to 0 if focus param is not a number", () => {
                     routeParamMock.focus = "a";
                     var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
                     expect(adhTopLevelState.getFocus()).toEqual(1);
                 });
 
-                it("with huge NaN focus parameter", () => {
+                it("to 0 if focus param is a long string that is not a number", () => {
                     routeParamMock.focus = new Array(1000).join("a");
                     var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
                     expect(adhTopLevelState.getFocus()).toEqual(1);
                 });
 
-                it("without focus parameter", () => {
+                it("to 0 if focus param is missing", () => {
                     var routeParamMock = jasmine.createSpyObj("routeParamMock", [""]);
                     var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
                     expect(adhTopLevelState.getFocus()).toEqual(1);
                 });
 
-                it("with negative focus parameter", () => {
+                it("to 0 if focus param is negative int", () => {
                     routeParamMock.focus = "-1";
                     var adhTopLevelState = new AdhTopLevelState.TopLevelState(eventHandlerMockClass, locationMock, routeParamMock);
                     expect(adhTopLevelState.getFocus()).toEqual(1);
