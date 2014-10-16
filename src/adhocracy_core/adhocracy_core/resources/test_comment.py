@@ -1,50 +1,78 @@
 from pyramid import testing
+from pytest import fixture
+from pytest import mark
 
-import unittest
+
+def test_comment_meta():
+    from .comment import comment_meta
+    from .comment import IComment
+    from .comment import ICommentVersion
+    meta = comment_meta
+    assert meta.iresource is IComment
+    assert meta.item_type == ICommentVersion
+    assert meta.element_types == [ICommentVersion]
+    assert meta.use_autonaming
+    assert meta.permission_add == 'add_comment'
 
 
-class IncludemeIntegrationTest(unittest.TestCase):
+def test_commentversion_meta():
+    from .comment import commentversion_meta
+    from .comment import ICommentVersion
+    import adhocracy_core.sheets
+    meta = commentversion_meta
+    assert meta.iresource is ICommentVersion
+    assert meta.extended_sheets == [adhocracy_core.sheets.comment.IComment,
+                                    adhocracy_core.sheets.comment.ICommentable,
+                                    adhocracy_core.sheets.rate.IRateable]
+    assert meta.permission_add == 'add_commentversion'
 
-    def setUp(self):
-        from adhocracy_core.testing import create_pool_with_graph
-        config = testing.setUp()
-        config.include('adhocracy_core.registry')
-        config.include('adhocracy_core.events')
-        config.include('adhocracy_core.catalog')
-        config.include('adhocracy_core.sheets')
-        config.include('adhocracy_core.sheets.comment')
-        config.include('adhocracy_core.resources.comment')
-        self.config = config
-        context = create_pool_with_graph()
-        self.context = context
 
-    def tearDown(self):
-        testing.tearDown()
+def test_commentservice_meta():
+    from .comment import comments_meta
+    from .comment import ICommentsService
+    from .comment import IComment
+    meta = comments_meta
+    assert meta.iresource is ICommentsService
+    assert meta.element_types == [IComment]
+    assert meta.content_name == 'comments'
 
-    def test_includeme_registry_register_factories(self):
-        from adhocracy_core.resources.comment import ICommentVersion
+
+@fixture
+def integration(config):
+     config.include('adhocracy_core.registry')
+     config.include('adhocracy_core.events')
+     config.include('adhocracy_core.catalog')
+     config.include('adhocracy_core.sheets')
+     config.include('adhocracy_core.sheets.comment')
+     config.include('adhocracy_core.resources.comment')
+     config.include('adhocracy_core.resources.tag')
+
+
+@mark.usefixtures('integration')
+class TestRoot:
+
+    @fixture
+    def context(self, pool):
+        return pool
+
+    def test_create_comment(self, context, registry):
         from adhocracy_core.resources.comment import IComment
-        from adhocracy_core.resources.comment import ICommentsService
-        content_types = self.config.registry.content.factory_types
-        assert IComment.__identifier__ in content_types
-        assert ICommentVersion.__identifier__ in content_types
-        assert ICommentsService.__identifier__ in content_types
+        res = registry.content.create(IComment.__identifier__, context)
+        assert IComment.providedBy(res)
 
-    def test_includeme_registry_create_commentversion(self):
+    def test_create_commentversion(self, context, registry):
         from adhocracy_core.resources.comment import ICommentVersion
-        res = self.config.registry.content.create(ICommentVersion.__identifier__,
-                                                  self.context)
+        res = registry.content.create(ICommentVersion.__identifier__, context)
         assert ICommentVersion.providedBy(res)
 
-    def test_includeme_registry_create_commentsservice(self):
+    def test_create_commentsservice(self, context, registry):
         from adhocracy_core.resources.comment import ICommentsService
         from substanced.util import find_service
-        res = self.config.registry.content.create(ICommentsService.__identifier__,
-                                                  self.context)
+        res = registry.content.create(ICommentsService.__identifier__, context)
         assert ICommentsService.providedBy(res)
-        assert find_service(self.context, 'comments')
+        assert find_service(context, 'comments')
 
-    def test_add_commentsservice(self):
+    def test_add_commentsservice(self, context, registry):
         from adhocracy_core.resources.comment import add_commentsservice
-        add_commentsservice(self.context, self.config.registry, {})
-        assert self.context['comments']
+        add_commentsservice(context, registry, {})
+        assert context['comments']

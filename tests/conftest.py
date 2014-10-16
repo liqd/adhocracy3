@@ -23,7 +23,7 @@ def pytest_runtest_setup(item):
 
 
 @fixture(scope='class')
-def app(zeo, settings):
+def app(settings):
     """Return the adhocracy wsgi application.
 
     This overrides adhocracy_core.testing.app.
@@ -32,6 +32,8 @@ def app(zeo, settings):
     from adhocracy_core.testing import includeme_root_with_test_users
     import adhocracy
     settings['adhocracy.add_default_group'] = False
+    settings['zodbconn.uri'] = 'memory://'
+    settings['adhocracy.ws_url'] = ''
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy.root_factory)
     configurator.include(adhocracy)
@@ -41,7 +43,7 @@ def app(zeo, settings):
     return app
 
 
-@fixture(scope='class')
+@fixture(scope='session')
 def frontend(request, supervisor) -> str:
     """Start the frontend server with supervisor."""
     output = subprocess.check_output(
@@ -61,8 +63,8 @@ def frontend(request, supervisor) -> str:
     return output
 
 
-@fixture
-def browser(browser, backend, websocket, frontend, frontend_url) -> Browser:
+@fixture(scope='class')
+def browser(browser_class, backend, frontend, frontend_url):
     """Return test browser, start sample application and go to `root.html`.
 
     Add attribute `root_url` pointing to the adhocracy root.html page.
@@ -70,15 +72,16 @@ def browser(browser, backend, websocket, frontend, frontend_url) -> Browser:
     Before visiting a new url the browser waits until the angular app is loaded
     """
     from adhocracy_frontend.testing import angular_app_loaded
-    browser.root_url = frontend_url
-    browser.app_url = frontend_url
-    browser.visit(browser.root_url)
-    browser.wait_for_condition(angular_app_loaded, 5)
-    return browser
+    browser_class.root_url = frontend_url
+    browser_class.app_url = frontend_url
+    browser_class.visit(browser_class.root_url)
+    browser_class.execute_script('window.localStorage.clear();')
+    browser_class.wait_for_condition(angular_app_loaded, 5)
+    return browser_class
 
 
-@fixture
-def browser_embed(browser, backend, frontend, frontend_url) -> Browser:
+@fixture(scope='class')
+def browser_embed(browser_class, backend, frontend, frontend_url) -> Browser:
     """Start embedder application."""
     url = frontend_url + 'static/embed.html'
     browser.visit(url)

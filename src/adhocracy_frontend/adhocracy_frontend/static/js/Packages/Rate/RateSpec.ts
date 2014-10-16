@@ -9,110 +9,133 @@ import AdhRateAdapter = require("./Adapter");
 import PreliminaryNames = require ("../PreliminaryNames/PreliminaryNames");
 
 
+var mkScopeMock = () => {
+    return {
+        postPoolPath: "post_pool_path",
+        refersTo: "comment_or_something",
+        rates: {
+            pro: 1,
+            contra: 1,
+            neutral: 1
+        },
+        myRateResource: "notnull"
+    };
+};
+
+var mkHttpMock = () => {
+    return {
+        get: () => q.when(),
+        getNewestVersionPathNoFork: () => q.when()
+    };
+};
+
+var mkRateResources = () => {
+    return [
+        {
+            content_type: "adhocracy_core.resources.rate.IRateVersion",
+            path: "r1",
+            data: {
+                "adhocracy_core.sheets.rate.IRate": {
+                    subject: "user1",
+                    object: "comment_or_something",
+                    rate: 1
+                }
+            }
+        },
+        {
+            content_type: "adhocracy_core.resources.rate.IRateVersion",
+            path: "r2",
+            data: {
+                "adhocracy_core.sheets.rate.IRate": {
+                    subject: "user2",
+                    object: "comment_or_something",
+                    rate: 1
+                }
+            }
+        },
+        {
+            content_type: "adhocracy_core.resources.rate.IRateVersion",
+            path: "r3",
+            data: {
+                "adhocracy_core.sheets.rate.IRate": {
+                    subject: "user3",
+                    object: "comment_or_something",
+                    rate: 0
+                }
+            }
+        },
+        {
+            content_type: "adhocracy_core.resources.rate.IRateVersion",
+            path: "r4",
+            data: {
+                "adhocracy_core.sheets.rate.IRate": {
+                    subject: "user4",
+                    object: "comment_or_something",
+                    rate: -1
+                }
+            }
+        },
+        {
+            content_type: "adhocracy_core.resources.rate.IRateVersion",
+            path: "r5",
+            data: {
+                "adhocracy_core.sheets.rate.IRate": {
+                    subject: "user3",
+                    object: "something_irrelevant",
+                    rate: -1
+                }
+            }
+        }
+    ];
+};
+
+var mkPostPoolResource = (rateResources) => {
+    return {
+        data: {
+            "adhocracy_core.sheets.pool.IPool": {
+                elements: rateResources.map((r) => r.path)
+            }
+        }
+    };
+};
+
+var mkRateableResource = () => {
+    return {
+        data: {
+            "adhocracy_core.sheets.rate.IRateable": {
+                post_pool: "post_pool_path"
+            }
+        }
+    };
+};
+
+var mkUserMock = () => {
+    return {
+        userPath: "user3"
+    };
+};
+
 export var register = () => {
     describe("Rate", () => {
-        var scopeMock;
         var httpMock;
-        var userMock;
-
-        var rateableResource;
-        var postPoolResource;
         var rateResources;
-
-        beforeEach(() => {
-            scopeMock = {
-                refersTo: "comment_or_something"
-            };
-
-            httpMock = {
-                get: () => q.when(),
-                getNewestVersionPathNoFork: () => q.when()
-            };
-
-            rateResources = [
-                {
-                    content_type: "adhocracy_core.resources.rate.IRateVersion",
-                    path: "r1",
-                    data: {
-                        "adhocracy_core.sheets.rate.IRate": {
-                            subject: "user1",
-                            object: "comment_or_something",
-                            rate: 1
-                        }
-                    }
-                },
-                {
-                    content_type: "adhocracy_core.resources.rate.IRateVersion",
-                    path: "r2",
-                    data: {
-                        "adhocracy_core.sheets.rate.IRate": {
-                            subject: "user2",
-                            object: "comment_or_something",
-                            rate: 1
-                        }
-                    }
-                },
-                {
-                    content_type: "adhocracy_core.resources.rate.IRateVersion",
-                    path: "r3",
-                    data: {
-                        "adhocracy_core.sheets.rate.IRate": {
-                            subject: "user3",
-                            object: "comment_or_something",
-                            rate: 0
-                        }
-                    }
-                },
-                {
-                    content_type: "adhocracy_core.resources.rate.IRateVersion",
-                    path: "r4",
-                    data: {
-                        "adhocracy_core.sheets.rate.IRate": {
-                            subject: "user4",
-                            object: "comment_or_something",
-                            rate: -1
-                        }
-                    }
-                },
-                {
-                    content_type: "adhocracy_core.resources.rate.IRateVersion",
-                    path: "r5",
-                    data: {
-                        "adhocracy_core.sheets.rate.IRate": {
-                            subject: "user3",
-                            object: "something_irrelevant",
-                            rate: -1
-                        }
-                    }
-                }
-            ];
-
-            postPoolResource = {
-                data: {
-                    "adhocracy_core.sheets.pool.IPool": {
-                        elements: rateResources.map((r) => r.path)
-                    }
-                }
-            };
-
-            rateableResource = {
-                data: {
-                    "adhocracy_core.sheets.rate.IRateable": {
-                        post_pool: "post_pool_path"
-                    }
-                }
-            };
-
-            userMock = {
-                userPath: "user3"
-            };
-        });
+        var postPoolResource;
+        var rateableResource;
+        var scopeMock;
+        var userMock;
 
         describe("Adapter", () => {
             var adapter : AdhRateAdapter.RateAdapter;
             var rateVersion : RIRateVersion;
 
             beforeEach(() => {
+                httpMock = mkHttpMock();
+                rateResources = mkRateResources();
+                postPoolResource = mkPostPoolResource(rateResources);
+                rateableResource = mkRateableResource();
+                scopeMock = mkScopeMock();
+                userMock = mkUserMock();
+
                 adapter = new AdhRateAdapter.RateAdapter();
                 rateVersion = new RIRateVersion({ preliminaryNames: new PreliminaryNames() });
                 rateVersion.data["adhocracy_core.sheets.rate.IRate"] = new SIRate.Sheet({
@@ -133,14 +156,16 @@ export var register = () => {
         });
 
         describe("resetRates", () => {
-            it("clears rates and user rate in scope.", () => {
-                scopeMock.rates = {
-                    pro: 1,
-                    contra: 1,
-                    neutral: 1
-                };
-                scopeMock.thisUsersRate = "notnull";
+            beforeEach(() => {
+                httpMock = mkHttpMock();
+                rateResources = mkRateResources();
+                postPoolResource = mkPostPoolResource(rateResources);
+                rateableResource = mkRateableResource();
+                scopeMock = mkScopeMock();
+                userMock = mkUserMock();
+            });
 
+            it("clears rates and user rate in scope.", () => {
                 AdhRate.resetRates(scopeMock);
                 expect(scopeMock.rates.pro).toBe(0);
                 expect(scopeMock.rates.contra).toBe(0);
@@ -149,51 +174,22 @@ export var register = () => {
             });
         });
 
-        describe("updateRates", () => {
-            it("calculates the right totals for pro, contra, neutral and stores them in the scope.", (done) => {
-                scopeMock.rates = {
-                    pro: 1,
-                    contra: 1,
-                    neutral: 1
-                };
-                scopeMock.thisUsersRate = "notnull";
-
-                var httpResponseStack =
-                    [rateableResource, postPoolResource]
-                    .concat(rateResources)
-                    .reverse();
-                spyOn(httpMock, "get").and.callFake(() => q.when(httpResponseStack.pop()));
-
-                var adapter = new AdhRateAdapter.RateAdapter();
-
-                AdhRate.updateRates(adapter, scopeMock, q, httpMock, userMock).then(
-                    () => {
-                        expect(scopeMock.rates.pro).toBe(2);
-                        expect(scopeMock.rates.contra).toBe(1);
-                        expect(scopeMock.rates.neutral).toBe(1);
-                        expect(scopeMock.thisUsersRate.data["adhocracy_core.sheets.rate.IRate"].subject).toBe(userMock.userPath);
-                        done();
-                    },
-                    (msg) => {
-                        expect(msg).toBe(false);
-                        done();
-                    }
-                );
-            });
-        });
-
         describe("rateController", () => {
             var adapterMock;
             var adhPermissionsMock;
             var adhPreliminaryNamesMock;
-            var realUpdateRates;
+            var realFetchAggregatedRates;
+            var realFetchAuditTrail;
 
             beforeEach((done) => {
                 adapterMock = jasmine.createSpyObj("adapterMock", ["subject", "object", "rate", "rateablePostPoolPath"]);
                 adhPermissionsMock = jasmine.createSpyObj("adhPermissionsMock", ["bindScope"]);
 
-                realUpdateRates = AdhRate.updateRates;
-                spyOn(AdhRate, "updateRates").and.returnValue(q.when());
+                realFetchAggregatedRates = AdhRate.fetchAggregatedRates;
+                spyOn(AdhRate, "fetchAggregatedRates").and.returnValue(q.when());
+
+                realFetchAuditTrail = AdhRate.fetchAuditTrail;
+                spyOn(AdhRate, "fetchAuditTrail").and.returnValue(q.when());
 
                 // only used in untested functions
                 adhPreliminaryNamesMock = undefined;
@@ -205,7 +201,8 @@ export var register = () => {
             });
 
             afterEach(() => {
-                AdhRate.updateRates = realUpdateRates;
+                AdhRate.fetchAggregatedRates = realFetchAggregatedRates;
+                AdhRate.fetchAuditTrail = realFetchAuditTrail;
             });
 
             it("sets scope.ready when finished initializing", () => {
