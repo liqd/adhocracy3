@@ -57,7 +57,11 @@ export class TopLevelState {
         console.log("setting focus, url=" + this.$location.url());
         this.eventHandler.trigger("setFocus", column);
         this.focus = column;
-        this.$location.search({focus: this.focus});
+        if (this.focus === DEFAULT_FOCUS) {
+            this.$location.search({focus: null});
+        } else {
+            this.$location.search({focus: this.focus});
+        };
     }
 
     public onSetFocus(fn : (column : number) => void) : void {
