@@ -1,11 +1,12 @@
 """Public fixtures to work with the test browser and the adhocracy frontend."""
 import subprocess
+import re
 import time
 import types
 import json
-
 from pytest import fixture
 from splinter import Browser
+from pytest_splinter.plugin import browser_instance_getter
 
 from adhocracy_core.testing import _get_settings
 from adhocracy_core.testing import _kill_pid_in_file
@@ -108,13 +109,80 @@ def angular_app_loaded(browser: Browser) -> bool:
     return browser.evaluate_script(code)
 
 
-@fixture
-def browser_root(browser, frontend, backend, frontend_url):
+@fixture(scope='class')
+def tmpdir_class(request):
+    """tmpdir with class scope."""
+    name = request.node.name
+    name = re.sub('[\W]', '_', name)
+    maxval = 30
+    if len(name) > maxval:
+        name = name[:maxval]
+    x = request.config._tmpdirhandler.mktemp(name, numbered=True)
+    return x
+
+
+@fixture(scope='class')
+def browser_instance_getter_class(request,
+                                  browser_patches,
+                                  splinter_browser_load_condition,
+                                  splinter_browser_load_timeout,
+                                  splinter_download_file_types,
+                                  splinter_driver_kwargs,
+                                  splinter_file_download_dir,
+                                  splinter_firefox_profile_preferences,
+                                  splinter_make_screenshot_on_failure,
+                                  splinter_remote_url,
+                                  splinter_screenshot_dir,
+                                  splinter_selenium_implicit_wait,
+                                  splinter_selenium_socket_timeout,
+                                  splinter_selenium_speed,
+                                  splinter_webdriver,
+                                  splinter_window_size,
+                                  tmpdir_class,
+                                  browser_pool,
+                                  ):
+    """Browser instance getter with class scope."""
+    return browser_instance_getter(request,
+                                   browser_patches,
+                                   splinter_browser_load_condition,
+                                   splinter_browser_load_timeout,
+                                   splinter_download_file_types,
+                                   splinter_driver_kwargs,
+                                   splinter_file_download_dir,
+                                   splinter_firefox_profile_preferences,
+                                   splinter_make_screenshot_on_failure,
+                                   splinter_remote_url,
+                                   splinter_screenshot_dir,
+                                   splinter_selenium_implicit_wait,
+                                   splinter_selenium_socket_timeout,
+                                   splinter_selenium_speed,
+                                   splinter_webdriver,
+                                   splinter_window_size,
+                                   tmpdir_class,
+                                   browser_pool,
+                                   )
+
+
+@fixture(scope='class')
+def browser_class(request, browser_instance_getter_class):
+    """Browser fixture with class scope."""
+    return browser_instance_getter_class(browser_class)
+
+
+@fixture(scope='class')
+def browser2_class(request, browser_instance_getter_class):
+    """Second Browser fixture with class scope."""
+    return browser_instance_getter_class(browser2_class)
+
+
+@fixture(scope='class')
+def browser_root(browser_class, frontend, backend, frontend_url):
     """Return test browser, start application and go to `root.html`."""
-    add_helper_methods_to_splinter_browser_wrapper(browser)
-    browser.visit(frontend_url)
-    browser.wait_for_condition(angular_app_loaded, 5)
-    return browser
+    add_helper_methods_to_splinter_browser_wrapper(browser_class)
+    browser_class.visit(frontend_url)
+    browser_class.execute_script('window.localStorage.clear();')
+    browser_class.wait_for_condition(angular_app_loaded, 5)
+    return browser_class
 
 
 def browser_test_helper(browser, url, wait=5) -> Browser:
@@ -132,8 +200,8 @@ def browser_test_helper(browser, url, wait=5) -> Browser:
     return browser
 
 
-@fixture
-def browser_test(browser, frontend, frontend_url) -> Browser:
+@fixture(scope='class')
+def browser_test(browser_class, frontend, frontend_url) -> Browser:
     """Return test browser instance with url=test.html."""
     url = frontend_url + 'static/test.html'
-    return browser_test_helper(browser, url)
+    return browser_test_helper(browser_class, url)

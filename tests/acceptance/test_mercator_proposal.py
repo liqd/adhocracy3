@@ -1,46 +1,41 @@
 from pytest import fixture
 
 
-@fixture
-def browser(browser):
-    browser.visit(browser.app_url + 'mercator')
-    return browser
 
 
-def test_happy(browser):
-    fill_all(browser)
-    assert can_submit(browser)
+class TestMercatorForm:
 
+    @fixture(scope='class')
+    def browser(self, browser):
+        browser.visit(browser.app_url + 'mercator')
+        return browser
 
-def test_optional_fields(browser):
-    fill_all(browser)
-    browser.find_by_name('extra-experience').first.fill('')
-    assert can_submit(browser)
+    def test_fill_all_fields(self, browser):
+        fill_all(browser)
+        assert can_submit(browser)
 
+    def test_field_extra_exprerience_is_optional(self, browser):
+        browser.find_by_name('extra-experience').first.fill('')
+        assert can_submit(browser)
 
-def test_name_missing(browser):
-    fill_all(browser)
-    browser.find_by_name('basic-user-name').first.fill('')
-    assert not can_submit(browser)
+    def test_field_status_text_is_not_shown_if_non_custom_status(self, browser):
+        browser.find_by_name('basic-organisation-status').first.check()
+        status_text = 'basic-organisation-statustext'
+        assert browser.is_element_not_present_by_name(status_text)
+        assert can_submit(browser)
 
+    def test_field_status_text_is_required_if_custom_status(self, browser):
+        browser.find_by_name('basic-organisation-status').last.check()
+        status_text = 'basic-organisation-statustext'
+        assert browser.is_element_present_by_name(status_text)
+        assert not can_submit(browser)
+        browser.find_by_name(status_text).first.fill('statustext')
+        assert can_submit(browser)
 
-def test_organisation_statustext_missing(browser):
-    name = 'basic-organisation-statustext'
+    def test_field_name_is_required(self, browser):
+        browser.find_by_name('basic-user-name').first.fill('')
+        assert not can_submit(browser)
 
-    assert browser.is_element_not_present_by_name(name)
-    fill_all(browser)
-    assert browser.is_element_not_present_by_name(name)
-
-    browser.find_by_name('basic-organisation-status').last.check()
-    assert browser.is_element_present_by_name(name)
-    assert not can_submit(browser)
-
-    browser.find_by_name(name).first.fill('statustext')
-    assert can_submit(browser)
-
-    browser.find_by_name('basic-organisation-status').first.check()
-    assert browser.is_element_not_present_by_name(name)
-    assert can_submit(browser)
 
 
 def can_submit(browser):
