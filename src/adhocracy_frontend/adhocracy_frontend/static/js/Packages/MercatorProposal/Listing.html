@@ -1,16 +1,11 @@
-<adh-merkator-proposal-listing-partial data-path="{{path}}">
+<adh-listing data-path="{{path}}" data-content-type="adhocracy_core.resources.mercator.IMercatorProposal">
     <div data-ng-switch="transclusionId">
-        <adh-resource-wrapper>
-        </adh-resource-wrapper>
         <adh-resource-wrapper
             data-ng-switch-when="element-id">
-            <adh-merkator-proposal-resource
+            <adh-mercator-proposal
                 data-path="{{element}}"
                 data-mode="display">
-            </adh-merkator-proposal-resource>
+            </adh-mercator-proposal>
         </adh-resource-wrapper>
     </div>
-</adh-merkator-proposal-listing-partial>
-
-
-<!-- (I copied this from CommentListing.html, but I have no idea where the ...-partial directive is introduced.) -->
+</adh-listing>

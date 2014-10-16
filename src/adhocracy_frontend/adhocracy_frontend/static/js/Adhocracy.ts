@@ -241,9 +241,7 @@ export var init = (config, meta_api) => {
             return widget.createDirective();
         }]);
 
-    app.directive("adhMercatorListing",
-        ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
-            new Listing.Listing(new AdhMercatorProposal.ListItemAdapter()).createDirective(adhConfig, adhWebSocket)]);
+    app.directive("adhMercatorProposalListing", ["adhConfig", AdhMercatorProposal.listing]);
 
     // get going
 
