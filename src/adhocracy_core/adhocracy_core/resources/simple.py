@@ -12,6 +12,7 @@ simple_metadata = \
         basic_sheets=[adhocracy_core.sheets.name.IName,
                       adhocracy_core.sheets.metadata.IMetadata,
                       ],
+        permission_add='add_simple',
     )
 
 

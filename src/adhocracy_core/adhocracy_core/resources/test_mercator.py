@@ -2,6 +2,28 @@ from pytest import fixture
 from pytest import mark
 
 
+def test_meractor_proposal_meta():
+    from .mercator import mercator_proposal_meta
+    from .mercator import IMercatorProposal
+    from .mercator import IMercatorProposalVersion
+    from .comment import add_commentsservice
+    from .rate import add_ratesservice
+    meta = mercator_proposal_meta
+    assert meta.iresource == IMercatorProposal
+    assert meta.element_types == [IMercatorProposalVersion,
+                                  ]
+    assert meta.item_type == IMercatorProposalVersion
+    assert add_ratesservice in meta.after_creation
+    assert add_commentsservice in meta.after_creation
+
+
+def test_meractor_proposal_version_meta():
+    from .mercator import mercator_proposal_version_meta
+    from .mercator import IMercatorProposalVersion
+    meta = mercator_proposal_version_meta
+    assert meta.iresource == IMercatorProposalVersion
+
+
 @fixture
 def integration(config):
     config.include('adhocracy_core.registry')
@@ -18,16 +40,11 @@ def integration(config):
 @mark.usefixtures('integration')
 class TestIncludemeIntegration:
 
-    def test_includeme_registry_register_factories(self, config):
-        from adhocracy_core.resources.mercator import IMercatorProposalVersion
-        from adhocracy_core.resources.mercator import IMercatorProposal
-        content_types = config.registry.content.factory_types
-        assert IMercatorProposal.__identifier__ in content_types
-        assert IMercatorProposalVersion.__identifier__ in content_types
+    @fixture
+    def context(self, pool):
+        return pool
 
-    def test_includeme_registry_create_content(self,
-                                               config,
-                                               pool_graph_catalog):
+    def test_create_mercator_proposal(self, context, registry):
         from adhocracy_core.resources.mercator import IMercatorProposal
         from adhocracy_core.sheets.name import IName
         appstructs = {
@@ -35,8 +52,14 @@ class TestIncludemeIntegration:
                 'name': 'dummy_proposal'
             }
         }
-        res = config.registry.content.create(
-            IMercatorProposal.__identifier__,
-            parent=pool_graph_catalog,
-            appstructs=appstructs)
+        res = registry.content.create(IMercatorProposal.__identifier__,
+                                      parent=context,
+                                      appstructs=appstructs)
         assert IMercatorProposal.providedBy(res)
+
+    def test_create_mercator_proposal_version(self, context, registry):
+        from adhocracy_core.resources.mercator import IMercatorProposalVersion
+        res = registry.content.create(IMercatorProposalVersion.__identifier__,
+                                      parent=context,
+                                      )
+        assert IMercatorProposalVersion.providedBy(res)

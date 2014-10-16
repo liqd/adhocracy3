@@ -1,29 +1,42 @@
-import unittest
-
 from pyramid import testing
+from pytest import fixture
+from pytest import mark
 
 
-class IncludemeIntegrationTest(unittest.TestCase):
+def test_tag_meta():
+    from .tag import tag_metadata
+    from .tag import ITag
+    import adhocracy_core.sheets
+    meta = tag_metadata
+    assert meta.iresource is ITag
+    assert meta.basic_sheets==[adhocracy_core.sheets.name.IName,
+                               adhocracy_core.sheets.metadata.IMetadata,
+                               adhocracy_core.sheets.tags.ITag,
+                               ]
+    assert meta.permission_add == 'add_tag'
 
-    def setUp(self):
-        from adhocracy_core.testing import create_pool_with_graph
-        config = testing.setUp()
-        config.include('adhocracy_core.registry')
-        config.include('adhocracy_core.events')
-        config.include('adhocracy_core.sheets.metadata')
-        config.include('adhocracy_core.resources.tag')
-        self.config = config
-        self.context = create_pool_with_graph()
 
-    def tearDown(self):
-        testing.tearDown()
+@fixture
+def integration(config):
+    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.events')
+    config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.resources.tag')
 
-    def test_includeme_registry_register_factories(self):
-        from adhocracy_core.interfaces import ITag
-        content_types = self.config.registry.content.factory_types
-        assert ITag.__identifier__ in content_types
 
-    def test_includeme_registry_create_content(self):
-        from adhocracy_core.interfaces import ITag
-        res = self.config.registry.content.create(ITag.__identifier__)
+@mark.usefixtures('integration')
+class TestTag:
+
+    @fixture
+    def context(self, pool):
+        return pool
+
+    def test_create_tag(self, context, registry):
+        from adhocracy_core.resources.tag import ITag
+        from adhocracy_core.sheets.name import IName
+        appstructs = {IName.__identifier__: {'name': 'name1'}}
+        res = registry.content.create(ITag.__identifier__,
+                                      appstructs=appstructs,
+                                      parent=context)
         assert ITag.providedBy(res)

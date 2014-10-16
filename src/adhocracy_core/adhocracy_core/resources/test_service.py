@@ -2,6 +2,17 @@ from pytest import mark
 from pytest import fixture
 
 
+def test_service_meta():
+    from .service import service_metadata
+    from .service import IBasicService
+    import adhocracy_core.sheets
+    meta = service_metadata
+    meta.content_name == 'Service'
+    meta.iresource == IBasicService
+    meta.basic_sheet = [adhocracy_core.sheets.pool.IPool,
+                        adhocracy_core.sheets.metadata.IMetadata,
+                        ]
+
 @fixture
 def integration(config):
     config.include('adhocracy_core.registry')
@@ -11,14 +22,15 @@ def integration(config):
 
 
 @mark.usefixtures('integration')
-def test_includeme_registry_register_factories(registry):
-    from adhocracy_core.resources.service import IBasicService
-    content_types = registry.content.factory_types
-    assert IBasicService.__identifier__ in content_types
+class TestService:
 
+    @fixture
+    def context(self, pool):
+        return pool
 
-@mark.usefixtures('integration')
-def test_includeme_registry_create_content(registry, pool):
-    from adhocracy_core.resources.service import IBasicService
-    service = registry.content.create(IBasicService.__identifier__, parent=pool)
-    assert service.__is_service__
+    def test_create_service(self, context, registry):
+        from adhocracy_core.resources.service import IBasicService
+        from substanced.interfaces import IService
+        res = registry.content.create(IBasicService.__identifier__, context)
+        assert IService.providedBy(res)
+        assert res.__is_service__

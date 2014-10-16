@@ -8,6 +8,20 @@ from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import IItemVersion
 
 
+def test_itemversion_meta():
+    from .itemversion import itemversion_metadata
+    from .itemversion import IItemVersion
+    from .itemversion import notify_new_itemversion_created
+    import adhocracy_core.sheets
+    meta = itemversion_metadata
+    assert meta.iresource == IItemVersion
+    assert meta.basic_sheets == [adhocracy_core.sheets.versions.IVersionable,
+                                 adhocracy_core.sheets.metadata.IMetadata,
+                                 ]
+    assert notify_new_itemversion_created in meta.after_creation
+    assert meta.use_autonaming
+
+
 class ItemVersionIntegrationTest(unittest.TestCase):
 
     def setUp(self):

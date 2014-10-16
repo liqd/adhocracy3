@@ -3,6 +3,32 @@ from pytest import mark
 from pytest import fixture
 
 
+def test_pool_meta():
+    from .pool import pool_metadata
+    from .pool import IPool
+    from .pool import Pool
+    import adhocracy_core.sheets
+    meta = pool_metadata
+    assert meta.iresource is IPool
+    assert meta.content_class is Pool
+    assert meta.is_implicit_addable is False
+    assert meta.basic_sheets == [adhocracy_core.sheets.name.IName,
+                                 adhocracy_core.sheets.pool.IPool,
+                                 adhocracy_core.sheets.metadata.IMetadata,
+                                 ]
+    assert meta.element_types == [IPool]
+    assert meta.is_implicit_addable is False
+    assert meta.permission_add == 'add_pool'
+
+
+def test_poolbasic_meta():
+    from .pool import basicpool_metadata
+    from .pool import IBasicPool
+    meta = basicpool_metadata
+    assert meta.iresource is IBasicPool
+    assert meta.is_implicit_addable
+
+
 @fixture
 def integration(config):
     config.include('adhocracy_core.registry')
@@ -10,26 +36,17 @@ def integration(config):
     config.include('adhocracy_core.sheets.metadata')
     config.include('adhocracy_core.resources.pool')
 
-@mark.usefixtures('integration')
-def test_includeme_registry_register_factories(config):
-    from adhocracy_core.resources.pool import IBasicPool
-    content_types = config.registry.content.factory_types
-    assert IBasicPool.__identifier__ in content_types
 
 @mark.usefixtures('integration')
-def test_includeme_registry_register_meta(config):
-    from adhocracy_core.resources.pool import IBasicPool
-    meta = config.registry.content.meta
-    assert IBasicPool.__identifier__ in meta
-
-
-@mark.usefixtures('integration')
-def test_includeme_registry_create_content(config):
-    from adhocracy_core.resources.pool import IBasicPool
-    assert config.registry.content.create(IBasicPool.__identifier__)
-
-
 class TestPool:
+
+    def test_create_pool(self, registry):
+        from adhocracy_core.resources.pool import IBasicPool
+        res = registry.content.create(IBasicPool.__identifier__)
+        assert IBasicPool.providedBy(res)
+
+
+class TestPoolClass:
 
     def _makeOne(self, d=None):
         from adhocracy_core.resources.pool import Pool
