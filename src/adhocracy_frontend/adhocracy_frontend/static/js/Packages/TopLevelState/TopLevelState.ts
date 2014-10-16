@@ -16,6 +16,11 @@ import AdhEventHandler = require("../EventHandler/EventHandler");
  * Only focus and the state of content2 column are currently
  * implemented.
  */
+
+// FIXME focus should be the first column. Since the first column (column
+// 0) might be removed, column 1 is default focus.
+var DEFAULT_FOCUS : number = 1;
+
 export class TopLevelState {
     private eventHandler : AdhEventHandler.EventHandler;
     private focus : number;
@@ -26,7 +31,7 @@ export class TopLevelState {
         private $routeParams: ng.route.IRouteParamsService
     ) {
         this.eventHandler = new adhEventHandlerClass();
-        this.focus = 0;
+        this.focus = DEFAULT_FOCUS;
 
         if (typeof this.$routeParams !== "undefined" &&
             this.$routeParams.hasOwnProperty("focus")) {
