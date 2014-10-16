@@ -1,12 +1,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhMercator = require("./Mercator");
+import AdhMercatorProposal = require("./MercatorProposal");
 
 
 export var register = () => {
-    describe("Mercator", () => {
+    describe("MercatorProposal", () => {
         xit("dummy", () => {
-            expect(AdhMercator).toBeDefined();
+            expect(AdhMercatorProposal).toBeDefined();
         });
     });
 };
