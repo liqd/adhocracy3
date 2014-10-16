@@ -13,6 +13,7 @@ tag_metadata = resource_metadata_defaults._replace(
                   adhocracy_core.sheets.metadata.IMetadata,
                   adhocracy_core.sheets.tags.ITag,
                   ],
+    permission_add='add_tag',
 )
 
 

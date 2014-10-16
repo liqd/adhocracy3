@@ -1,11 +1,9 @@
 """Mercator proposal."""
 from adhocracy_core.interfaces import IItemVersion
 from adhocracy_core.interfaces import IItem
-from adhocracy_core.interfaces import ITag
 from adhocracy_core.resources import add_resource_type_to_registry
 from adhocracy_core.resources.itemversion import itemversion_metadata
 from adhocracy_core.resources.item import item_metadata
-from adhocracy_core.resources.rate import IRate
 from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.rate import add_ratesservice
 from adhocracy_core.sheets.rate import IRateable
@@ -42,8 +40,7 @@ mercator_proposal_meta = item_metadata._replace(
     content_name='MercatorProposal',
     iresource=IMercatorProposal,
     element_types=[IMercatorProposalVersion,
-                   ITag,
-                   IRate],
+                   ],
     after_creation=item_metadata.after_creation + [
         add_commentsservice,
         add_ratesservice,

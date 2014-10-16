@@ -1,33 +1,56 @@
 from pyramid import testing
+from pytest import fixture
+from pytest import mark
 
-import unittest
+
+def test_sectionversion_meta():
+    from .sample_section import sectionversion_meta
+    from .sample_section import ISectionVersion
+    meta = sectionversion_meta
+    assert meta.iresource is ISectionVersion
+    assert meta.permission_add == 'add_sectionversion'
 
 
-class IncludemeIntegrationTest(unittest.TestCase):
+def test_section_meta():
+    from .sample_section import section_meta
+    from .sample_section import ISectionVersion
+    from .sample_section import ISection
+    from .tag import ITag
+    meta = section_meta
+    assert meta.iresource is ISection
+    assert meta.element_types == [ITag, ISectionVersion]
+    assert meta.item_type == ISectionVersion
+    assert meta.permission_add == 'add_section'
 
-    def setUp(self):
-        from adhocracy_core.testing import create_pool_with_graph
-        config = testing.setUp()
-        config.include('adhocracy_core.registry')
-        config.include('adhocracy_core.events')
-        config.include('adhocracy_core.catalog')
-        config.include('adhocracy_core.sheets')
-        config.include('adhocracy_core.resources.sample_section')
-        self.config = config
-        self.context = create_pool_with_graph()
 
-    def tearDown(self):
-        testing.tearDown()
+@fixture
+def integration(config):
+    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.events')
+    config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.resources.sample_section')
+    config.include('adhocracy_core.resources.tag')
 
-    def test_includeme_registry_register_factories(self):
-        from adhocracy_core.resources.sample_section import ISectionVersion
+
+@mark.usefixtures('integration')
+class TestSection:
+
+    @fixture
+    def context(self, pool):
+        return pool
+
+    def test_create_section(self, context, registry):
         from adhocracy_core.resources.sample_section import ISection
-        content_types = self.config.registry.content.factory_types
-        assert ISection.__identifier__ in content_types
-        assert ISectionVersion.__identifier__ in content_types
+        from adhocracy_core.sheets.name import IName
+        appstructs = {IName.__identifier__: {'name': 'name1'}}
+        res = registry.content.create(ISection.__identifier__,
+                                      appstructs=appstructs,
+                                      parent=context)
+        assert ISection.providedBy(res)
 
-    def test_includeme_registry_create_content(self):
+    def test_create_sectionversion(self, context, registry):
         from adhocracy_core.resources.sample_section import ISectionVersion
-        res = self.config.registry.content.create(ISectionVersion.__identifier__,
-                                                  self.context)
+        res = registry.content.create(ISectionVersion.__identifier__,
+                                      parent=context)
         assert ISectionVersion.providedBy(res)

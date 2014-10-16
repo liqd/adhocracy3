@@ -1,29 +1,38 @@
-import unittest
-
 from pyramid import testing
+from pytest import fixture
+from pytest import mark
 
 
-class IncludemeIntegrationTest(unittest.TestCase):
+def test_simple_meta():
+    from .simple import simple_metadata
+    from .simple import ISimple
+    meta = simple_metadata
+    assert meta.iresource is ISimple
+    assert meta.permission_add == 'add_simple'
 
-    def setUp(self):
-        from adhocracy_core.testing import create_pool_with_graph
-        config = testing.setUp()
-        config.include('adhocracy_core.registry')
-        config.include('adhocracy_core.events')
-        config.include('adhocracy_core.sheets.metadata')
-        config.include('adhocracy_core.resources.simple')
-        self.config = config
-        self.context = create_pool_with_graph()
 
-    def tearDown(self):
-        testing.tearDown()
+@fixture
+def integration(config):
+    config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.events')
+    config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.sheets')
+    config.include('adhocracy_core.resources.simple')
 
-    def test_includeme_registry_register_factories(self):
-        from adhocracy_core.interfaces import ISimple
-        content_types = self.config.registry.content.factory_types
-        assert ISimple.__identifier__ in content_types
 
-    def test_includeme_registry_create_content(self):
-        from adhocracy_core.interfaces import ISimple
-        res = self.config.registry.content.create(ISimple.__identifier__)
+@mark.usefixtures('integration')
+class TestSimple:
+
+    @fixture
+    def context(self, pool):
+        return pool
+
+    def test_create_simple(self, context, registry):
+        from adhocracy_core.resources.simple import ISimple
+        from adhocracy_core.sheets.name import IName
+        appstructs = {IName.__identifier__: {'name': 'name1'}}
+        res = registry.content.create(ISimple.__identifier__,
+                                      appstructs=appstructs,
+                                      parent=context)
         assert ISimple.providedBy(res)
+
