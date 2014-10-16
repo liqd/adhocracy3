@@ -18,10 +18,10 @@ import SIFinance = require("../../Resources_/adhocracy_core/sheets/mercator/IFin
 import SIExtras = require("../../Resources_/adhocracy_core/sheets/mercator/IExtras");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 
-var pkgLocation = "/Mercator";
+var pkgLocation = "/MercatorProposal";
 
 
-export interface IMercatorProposalScope extends AdhResourceWidgets.IResourceWidgetScope {
+export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     poolPath : string;
     data : {
         basic : {
@@ -83,7 +83,7 @@ export interface IMercatorProposalScope extends AdhResourceWidgets.IResourceWidg
 }
 
 
-export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IMercatorProposalScope> {
+export class Widget<R extends AdhResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
         adhConfig : AdhConfig.Type,
         adhHttp : AdhHttp.Service<any>,
@@ -91,7 +91,7 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
-        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/MercatorProposalCreate.html";
+        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/ListItem.html";
     }
 
     public createDirective() : ng.IDirective {
@@ -101,17 +101,17 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
     }
 
     public _handleDelete(
-        instance : AdhResourceWidgets.IResourceWidgetInstance<R, IMercatorProposalScope>,
+        instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
         path : string
     ) : ng.IPromise<void> {
         return this.$q.when();
     }
 
-    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IMercatorProposalScope>, resource : R) : ng.IPromise<void> {
+    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, resource : R) : ng.IPromise<void> {
         return this.$q.when();
     }
 
-    public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IMercatorProposalScope>) : ng.IPromise<R[]> {
+    public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data = instance.scope.data || <any>{};
         data.basic = data.basic || <any>{};
         data.basic.user = data.basic.user || <any>{};
@@ -189,7 +189,31 @@ export class MercatorProposal<R extends AdhResourcesBase.Resource> extends AdhRe
         return this.$q.when([mercatorProposal, mercatorProposalVersion]);
     }
 
-    public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IMercatorProposalScope>, old : R) : ng.IPromise<R[]> {
+    public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
         return this.$q.when([]);
     }
 }
+
+
+export class CreateWidget<R extends AdhResourcesBase.Resource> extends Widget<R> {
+    constructor(
+        adhConfig : AdhConfig.Type,
+        adhHttp : AdhHttp.Service<any>,
+        adhPreliminaryNames : AdhPreliminaryNames,
+        $q : ng.IQService
+    ) {
+        super(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
+    }
+}
+
+
+export var listing = (adhConfig : AdhConfig.Type) => {
+    return {
+        restrict: "E",
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
+        scope: {
+            path: "@"
+        }
+    };
+};

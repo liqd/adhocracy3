@@ -38,7 +38,7 @@ import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets"
 import AdhRate = require("./Packages/Rate/Rate");
 import AdhRateAdapter = require("./Packages/Rate/Adapter");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
-import AdhMercator = require("./Packages/Mercator/Mercator");
+import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
 
 import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
@@ -89,8 +89,15 @@ export var init = (config, meta_api) => {
             })
             .when("/mercator", {
                 template: "<adh-resource-wrapper>" +
-                    "<adh-mercator data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
-                    "</adh-mercator></adh-resource-wrapper>",
+                    "<adh-mercator-proposal-create data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
+                    "</adh-mercator-proposal-create></adh-resource-wrapper>",
+                controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
+                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
+                }]
+            })
+            .when("/mercator-listing", {
+                template: "<adh-mercator-proposal-listing data-path=\"{{path}}\">" +
+                    "</adh-mercator-proposal-listing>",
                 controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
                     $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
                 }]
@@ -223,11 +230,19 @@ export var init = (config, meta_api) => {
             adhConfig
         )]);
 
-    app.directive("adhMercator", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+    app.directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
         (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
-            var widget = new AdhMercator.MercatorProposal(adhConfig, adhHttp, adhPreliminaryNames, $q);
+            var widget = new AdhMercatorProposal.Widget(adhConfig, adhHttp, adhPreliminaryNames, $q);
             return widget.createDirective();
         }]);
+
+    app.directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+        (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
+            var widget = new AdhMercatorProposal.CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+            return widget.createDirective();
+        }]);
+
+    app.directive("adhMercatorProposalListing", ["adhConfig", AdhMercatorProposal.listing]);
 
     // get going
 
