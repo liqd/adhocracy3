@@ -35,7 +35,7 @@ export class TopLevelState {
 
         if (typeof this.$routeParams !== "undefined" &&
             this.$routeParams.hasOwnProperty("focus")) {
-            var column = parseInt(this.$routeParams.focus, 10);
+            var column = parseInt(this.$routeParams["focus"], 10);
             if (!isNaN(column) && column >= 0) {
                 console.log("parsed focus successfully");
                 this.focus = column;
