@@ -71,6 +71,7 @@ Start supervisor (which manages the ZODB database, the Pyramid application
 and the Autobahn websocket server)::
 
     ./bin/supervisord
+    ./bin/supervisorctl start adhocracy:*
 
 Check that everything is running smoothly::
 

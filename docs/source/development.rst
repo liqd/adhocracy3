@@ -146,7 +146,11 @@ run all tests::
 delete database (works best on development systems without valuable data!)::
 
     rm -f ./var/Data.*
-    bin/supervisorctl restart all
+    bin/supervisorctl restart adhocracy:*
+
+If you are using the supervisor group adhocracy_test:*, you don't have
+to delete anything.  The database is in-memory and will die with the
+test_zodb service.
 
 Generate html documentation
 ---------------------------
