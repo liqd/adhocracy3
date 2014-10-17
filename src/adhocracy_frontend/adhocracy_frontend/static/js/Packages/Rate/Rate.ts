@@ -130,7 +130,8 @@ export var fetchAggregatedRates = (
     $scope : IRateScope,
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
-    adhUser : AdhUser.User
+    adhUser : AdhUser.User,
+    object : string
 ) : ng.IPromise<void> => {
     var myRateResourcePromise : ng.IPromise<void> = (() => {
         var query : any = {};
@@ -138,6 +139,7 @@ export var fetchAggregatedRates = (
         query.depth = 2;
         query.tag = "LAST";
         query[SIRate.nick + ":subject"] = adhUser.userPath;
+        query[SIRate.nick + ":object"] = object;
 
         return adhHttp.get($scope.postPoolPath, query)
             .then((poolRsp) => {
@@ -156,6 +158,7 @@ export var fetchAggregatedRates = (
         query.tag = "LAST";
         query.count = "true";
         query.aggregateby = "rate";
+        query[SIRate.nick + ":object"] = object;
 
         return adhHttp.get($scope.postPoolPath, query)
             .then((poolRsp) => {
@@ -256,7 +259,7 @@ export var rateController = (
             delete $scope.auditTrail;
         } else {
             $q.all([
-                fetchAggregatedRates(adapter, $scope, $q, adhHttp, adhUser),
+                fetchAggregatedRates(adapter, $scope, $q, adhHttp, adhUser, $scope.refersTo),
                 fetchAuditTrail(adapter, $scope, $q, adhHttp)
             ]).then(() => {
                 $scope.auditTrailVisible = true;
@@ -321,7 +324,7 @@ export var rateController = (
                 .postNewVersionNoFork($scope.myRateResource.path, $scope.myRateResource)
                 .then((response : { value: RIRate }) => {
                     $scope.auditTrailVisible = false;
-                    return fetchAggregatedRates(adapter, $scope, $q, adhHttp, adhUser);
+                    return fetchAggregatedRates(adapter, $scope, $q, adhHttp, adhUser, $scope.refersTo);
                 });
         }
     };
@@ -329,7 +332,7 @@ export var rateController = (
     resetRates($scope);
     $scope.auditTrailVisible = false;
     return fetchPostPoolPath(adapter, $scope, adhHttp)
-        .then(() => fetchAggregatedRates(adapter, $scope, $q, adhHttp, adhUser))
+        .then(() => fetchAggregatedRates(adapter, $scope, $q, adhHttp, adhUser, $scope.refersTo))
         .then(() => {
             adhPermissions.bindScope($scope, $scope.postPoolPath, "optionsPostPool");
             $scope.ready = true;
