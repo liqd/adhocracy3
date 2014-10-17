@@ -179,6 +179,7 @@ export var register = () => {
             var adhPermissionsMock;
             var adhPreliminaryNamesMock;
             var realFetchAggregatedRates;
+            var realFetchMyRate;
             var realFetchAuditTrail;
 
             beforeEach((done) => {
@@ -187,6 +188,9 @@ export var register = () => {
 
                 realFetchAggregatedRates = AdhRate.fetchAggregatedRates;
                 spyOn(AdhRate, "fetchAggregatedRates").and.returnValue(q.when());
+
+                realFetchMyRate = AdhRate.fetchMyRate;
+                spyOn(AdhRate, "fetchMyRate").and.returnValue(q.when());
 
                 realFetchAuditTrail = AdhRate.fetchAuditTrail;
                 spyOn(AdhRate, "fetchAuditTrail").and.returnValue(q.when());
@@ -202,6 +206,7 @@ export var register = () => {
 
             afterEach(() => {
                 AdhRate.fetchAggregatedRates = realFetchAggregatedRates;
+                AdhRate.fetchMyRate = realFetchMyRate;
                 AdhRate.fetchAuditTrail = realFetchAuditTrail;
             });
 
