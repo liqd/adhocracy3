@@ -2,8 +2,10 @@ from pytest import mark
 
 from .shared import wait
 from .shared import get_column_listing
+from .shared import get_list_element
 from .shared import login_god
 from .test_comment import create_comment
+from .test_comment import create_top_level_comment
 
 
 class TestRate:
@@ -62,14 +64,24 @@ class TestRate:
                 return False
         assert wait(check_result)
 
-    @mark.skipif(True, reason="pending weil schlechtes wetter")
     def test_multi_rateable(self, browser):
+        content2 = get_column_listing(browser, 'content2')
 
-        # FIXME: all rate widgets are totalled over all others.  there is
-        # something wrong with the filter for the rating target (object).
-        # write a test for that, then fix it!
+        rateable1 = get_list_element(content2, 'comment1', descendant='.comment-content')
+        button1 = rateable1.find_by_css('.rate-pro').first
 
-        pass
+        rateable2 = create_top_level_comment(content2,  'comment2')
+        button2 = rateable2.find_by_css('.rate-contra').first
+
+        button2.click()
+        wait(lambda: button2.has_class('is-rate-button-active'))
+        button1.click()
+
+        def check_result():
+            return (rateable1.find_by_css('.rate-difference').first.text == '+1'
+                    and rateable2.find_by_css('.rate-difference').first.text == '-1')
+
+        assert wait(check_result)
 
     @mark.skipif(True, reason='pending weil schlechtes wetter')
     def test_multi_user(self, browser):
