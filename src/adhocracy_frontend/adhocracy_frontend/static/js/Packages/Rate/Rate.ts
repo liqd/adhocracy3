@@ -20,8 +20,6 @@ var pkgLocation = "/Rate";
 
 
 /**
- *
- *
  * Motivation and UI
  * ~~~~~~~~~~~~~~~~~
  *
@@ -42,7 +40,6 @@ var pkgLocation = "/Rate";
  * and the rating object will be deleted.  (FIXME: This requires a
  * deletion semantics, which should also become a section in this
  * document.)
- *
  */
 
 
@@ -124,7 +121,7 @@ export var fetchPostPoolPath = (
 
 /**
  * Collect aggregate information about $scope.postPoolPath specific to
- * ratings for $scope.refersTo.  Updates '$scope.thisUsers.Rate' and
+ * ratings for $scope.refersTo.  Updates '$scope.myRateResource' and
  * '$scope.rates'.  Promises a void that is resolved once the scope is
  * updated.
  */
@@ -277,18 +274,14 @@ export var rateController = (
         if ($scope.isActive(rate)) {
             // click on active button to un-rate
 
-            /*
-
-              (the current implementation does not allow withdrawing
-              of rates, so if you click on "pro" twice in a row, the
-              second time will have no effect.  the work-around is for
-              the user to rate something "neutral".  a proper fixed
-              will be provided later.)
-
-              adapter.rate($scope.myRateResource, <any>false);
-              $scope.postUpdate();
-
-            */
+            // (the current implementation does not allow withdrawing
+            // of rates, so if you click on "pro" twice in a row, the
+            // second time will have no effect.  the work-around is for
+            // the user to rate something "neutral".  a proper fixed
+            // will be provided later.)
+            //
+            // adapter.rate($scope.myRateResource, <any>false);
+            // $scope.postUpdate();
         } else {
             // click on inactive button to (re-)rate
             $scope.assureUserRateExists()
@@ -315,7 +308,6 @@ export var rateController = (
                             $scope.myRateResource = <RIRateVersion>responses[version.index];
                             adapter.subject($scope.myRateResource, adhUser.userPath);
                             adapter.object($scope.myRateResource, $scope.refersTo);
-                            return;
                         });
                 });
         }
