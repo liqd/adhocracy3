@@ -146,7 +146,7 @@ run all tests::
 delete database (works best on development systems without valuable data!)::
 
     rm -f ./var/Data.*
-    bin/supervisorctl restart all
+    bin/supervisorctl restart adhcracy:*
 
 Generate html documentation
 ---------------------------
