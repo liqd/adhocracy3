@@ -103,3 +103,23 @@ elements of a pool depend on the pool::
     200
     >> resp_data = testapp.get(rest_url + "/adhocracy/Proposals/kommunismus",
     ...                        status=404).json
+
+FIXME: I don't know if its really a good idea to 'delete' all child
+resources. This is costly and may have unwanted side effects. (joka)
+
+FIXME Other open issues:
+
+* Deleting can cause many modifications in other resources that have
+  references/back references, but we claim that versionables are not modified.
+
+  One option to handle this might be to leave the other resources intact,
+  but responding with a special HTTP status code (e.g. 410 Gone) if the
+  frontend asks for a deleted resources. In this case, the frontend would have
+  to silently skip references pointing to such a "Gone" resource.
+
+* It's not yet clear whether DELETE will only be used for "censoring"
+  purposes (i.e. removal of illegitimate content) by admins, or also by normal
+  users (e.g. removal of accidentally / redundantly submitted or
+  obsolete content). In the latter case, the API could return the deleted
+  objects if asked for -- on the other hand, it would be good to have only
+  one DELETE operation that is simple to understand.
