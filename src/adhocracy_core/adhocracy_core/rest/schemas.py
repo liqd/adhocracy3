@@ -359,7 +359,6 @@ def _maybe_arbitrary_filter_node(name, context):
     if name in catalog:
         return True
     else:
-        return False
         raise_colander_style_error(None, name, 'No such catalog')
 
 
