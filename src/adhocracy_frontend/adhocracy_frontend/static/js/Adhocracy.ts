@@ -83,7 +83,8 @@ export var init = (config, meta_api) => {
             })
             .when("/r/:path*", {
                 controller: ["adhHttp", "adhConfig", "adhTopLevelState", "$routeParams", "$scope", AdhRoute.resourceRouter],
-                template: "<adh-route-view data-template=\"{{ template }}\"></adh-route-view>"
+                templateUrl: "/static/js/templates/Wrapper.html",
+                reloadOnSearch: false
             })
             .when("/login", {
                 templateUrl: "/static/js/templates/Login.html"
