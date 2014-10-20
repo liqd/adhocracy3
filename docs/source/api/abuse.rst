@@ -9,12 +9,6 @@ Prerequisites
 
 Some imports to work with rest api calls::
 
-    >>> import copy
-    >>> from functools import reduce
-    >>> from operator import itemgetter
-    >>> import os
-    >>> import requests
-    >>> from pprint import pprint
     >>> from adhocracy_core.testing import god_header
 
 Start Adhocracy testapp::
