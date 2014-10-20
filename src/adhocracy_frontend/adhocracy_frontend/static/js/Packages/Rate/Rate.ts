@@ -20,8 +20,6 @@ var pkgLocation = "/Rate";
 
 
 /**
- *
- *
  * Motivation and UI
  * ~~~~~~~~~~~~~~~~~
  *
@@ -42,7 +40,6 @@ var pkgLocation = "/Rate";
  * and the rating object will be deleted.  (FIXME: This requires a
  * deletion semantics, which should also become a section in this
  * document.)
- *
  */
 
 
@@ -123,54 +120,56 @@ export var fetchPostPoolPath = (
 
 
 /**
- * Collect aggregate information about $scope.postPoolPath specific to
- * ratings for $scope.refersTo.  Updates '$scope.thisUsers.Rate' and
- * '$scope.rates'.  Promises a void that is resolved once the scope is
- * updated.
+ * Get rate of specified user and write results to $scope.myRateResource,
+ * but only if it exists.
+ */
+export var fetchMyRate = (
+    $scope : IRateScope,
+    adhHttp : AdhHttp.Service<any>,
+    poolPath : string,
+    object : string,
+    subject : string
+) : ng.IPromise<void> => {
+    var query : any = {};
+    query.content_type = RIRateVersion.content_type;
+    query.depth = 2;
+    query.tag = "LAST";
+    query[SIRate.nick + ":subject"] = subject;
+    query[SIRate.nick + ":object"] = object;
+
+    return adhHttp.get(poolPath, query).then((poolRsp) => {
+        if (poolRsp.data[SIPool.nick].elements.length > 0) {
+            return adhHttp.get(poolRsp.data[SIPool.nick].elements[0]).then((rateRsp) => {
+                $scope.myRateResource = rateRsp;
+            });
+        }
+    });
+};
+
+
+/**
+ * Get aggregates rates of all users and write results to $scope.rates.
  */
 export var fetchAggregatedRates = (
-    adapter : IRateAdapter<any>,
     $scope : IRateScope,
-    $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
-    adhUser : AdhUser.User
+    poolPath : string,
+    object : string
 ) : ng.IPromise<void> => {
-    var myRateResourcePromise : ng.IPromise<void> = (() => {
-        var query : any = {};
-        query.content_type = RIRateVersion.content_type;
-        query.depth = 2;
-        query.tag = "LAST";
-        query[SIRate.nick + ":subject"] = adhUser.userPath;
+    var query : any = {};
+    query.content_type = RIRateVersion.content_type;
+    query.depth = 2;
+    query.tag = "LAST";
+    query.count = "true";
+    query.aggregateby = "rate";
+    query[SIRate.nick + ":object"] = object;
 
-        return adhHttp.get($scope.postPoolPath, query)
-            .then((poolRsp) => {
-                if (poolRsp.data[SIPool.nick].elements.length > 0) {
-                    return adhHttp.get(poolRsp.data[SIPool.nick].elements[0]).then((rateRsp) => {
-                        $scope.myRateResource = rateRsp;
-                    });
-                }
-            });
-    })();
-
-    var countTotalsPromise : ng.IPromise<void> = (() => {
-        var query : any = {};
-        query.content_type = RIRateVersion.content_type;
-        query.depth = 2;
-        query.tag = "LAST";
-        query.count = "true";
-        query.aggregateby = "rate";
-
-        return adhHttp.get($scope.postPoolPath, query)
-            .then((poolRsp) => {
-                var rates = poolRsp.data[SIPool.nick].aggregateby.rate;
-                $scope.rates.pro = rates["1"] || 0;
-                $scope.rates.contra = rates["-1"] || 0;
-                $scope.rates.neutral = rates["0"] || 0;
-            });
-    })();
-
-    return $q.all([myRateResourcePromise, countTotalsPromise])
-        .then(() => null);
+    return adhHttp.get(poolPath, query).then((poolRsp) => {
+        var rates = poolRsp.data[SIPool.nick].aggregateby.rate;
+        $scope.rates.pro = rates["1"] || 0;
+        $scope.rates.contra = rates["-1"] || 0;
+        $scope.rates.neutral = rates["0"] || 0;
+    });
 };
 
 
@@ -259,7 +258,8 @@ export var rateController = (
             delete $scope.auditTrail;
         } else {
             $q.all([
-                fetchAggregatedRates(adapter, $scope, $q, adhHttp, adhUser),
+                fetchMyRate($scope, adhHttp, $scope.postPoolPath, $scope.refersTo, adhUser.userPath),
+                fetchAggregatedRates($scope, adhHttp, $scope.postPoolPath, $scope.refersTo),
                 fetchAuditTrail(adapter, $scope, $q, adhHttp)
             ]).then(() => {
                 $scope.auditTrailVisible = true;
@@ -277,18 +277,14 @@ export var rateController = (
         if ($scope.isActive(rate)) {
             // click on active button to un-rate
 
-            /*
-
-              (the current implementation does not allow withdrawing
-              of rates, so if you click on "pro" twice in a row, the
-              second time will have no effect.  the work-around is for
-              the user to rate something "neutral".  a proper fixed
-              will be provided later.)
-
-              adapter.rate($scope.myRateResource, <any>false);
-              $scope.postUpdate();
-
-            */
+            // (the current implementation does not allow withdrawing
+            // of rates, so if you click on "pro" twice in a row, the
+            // second time will have no effect.  the work-around is for
+            // the user to rate something "neutral".  a proper fixed
+            // will be provided later.)
+            //
+            // adapter.rate($scope.myRateResource, <any>false);
+            // $scope.postUpdate();
         } else {
             // click on inactive button to (re-)rate
             $scope.assureUserRateExists()
@@ -315,7 +311,6 @@ export var rateController = (
                             $scope.myRateResource = <RIRateVersion>responses[version.index];
                             adapter.subject($scope.myRateResource, adhUser.userPath);
                             adapter.object($scope.myRateResource, $scope.refersTo);
-                            return;
                         });
                 });
         }
@@ -329,15 +324,22 @@ export var rateController = (
                 .postNewVersionNoFork($scope.myRateResource.path, $scope.myRateResource)
                 .then((response : { value: RIRate }) => {
                     $scope.auditTrailVisible = false;
-                    return fetchAggregatedRates(adapter, $scope, $q, adhHttp, adhUser);
-                });
+                    return $q.all([
+                        fetchMyRate($scope, adhHttp, $scope.postPoolPath, $scope.refersTo, adhUser.userPath),
+                        fetchAggregatedRates($scope, adhHttp, $scope.postPoolPath, $scope.refersTo)
+                    ]);
+                })
+                .then(() => { return; });
         }
     };
 
     resetRates($scope);
     $scope.auditTrailVisible = false;
     return fetchPostPoolPath(adapter, $scope, adhHttp)
-        .then(() => fetchAggregatedRates(adapter, $scope, $q, adhHttp, adhUser))
+        .then(() => $q.all([
+            fetchMyRate($scope, adhHttp, $scope.postPoolPath, $scope.refersTo, adhUser.userPath),
+            fetchAggregatedRates($scope, adhHttp, $scope.postPoolPath, $scope.refersTo)
+        ]))
         .then(() => {
             adhPermissions.bindScope($scope, $scope.postPoolPath, "optionsPostPool");
             $scope.ready = true;

@@ -131,7 +131,7 @@ class ResourceContentRegistry(ContentRegistry):
 
     @reify
     def sheets_all(self) -> dict:
-        """Sheet mappping.
+        """Sheet mapping.
 
         Dictionary with key iresource (`resource type` interface) and
         value list of sheets.

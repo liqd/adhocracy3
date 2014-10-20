@@ -76,6 +76,7 @@ def create_top_level_comment(listing, content):
     form = get_listing_create_form(listing)
     form.find_by_css('textarea').first.fill(content)
     form.find_by_css('input[type="submit"]').first.click()
+    wait(lambda: get_list_element(listing, content, descendant='.comment-content'))
     comment = get_list_element(listing, content, descendant='.comment-content')
     return comment
 
