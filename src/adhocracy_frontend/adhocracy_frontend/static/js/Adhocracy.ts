@@ -45,7 +45,6 @@ import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkben
 import AdhProposal = require("./Packages/Proposal/Proposal");
 import Embed = require("./Packages/Embed/Embed");
 import AdhRoute = require("./Packages/Route/Route");
-import AdhRouteView = require("./Packages/Route/View");
 
 
 var loadComplete = () : void => {
@@ -252,7 +251,7 @@ export var init = (config, meta_api) => {
         }]);
 
     app.directive("adhMercatorProposalListing", ["adhConfig", AdhMercatorProposal.listing]);
-    app.directive("adhRouteView", ["$compile", AdhRouteView.factory]);
+    app.directive("adhRouteView", ["$compile", AdhRoute.viewFactory]);
 
     // get going
 
