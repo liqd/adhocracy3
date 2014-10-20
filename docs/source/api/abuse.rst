@@ -32,9 +32,9 @@ FIXME All tests in this document are commented-out since the described
 functionality hasn't been implemented yet!
 
 The end point /report_abuse accepts complaint objects that consist of
-a resource path and a remark::
+a URL and a remark::
 
-    >> a = {'path': '/adhocracy',
+    >> a = {'url': 'http://localhost/frontend/adhocracy',
     ...      'remark': 'i dont like the way this pool contains everything.'}
     >> resp_data = testapp.post_json(rest_url + "/report_abuse", a)
     >> resp_data.status_code
@@ -42,12 +42,9 @@ a resource path and a remark::
     >> resp_data.text
     ''
 
-If the resource does not exist, there will be an error::
-
-    >> prop = {'path': '/adhocracy/ofijweoihg_woeitysdoi_nbwoeiyt',
-    ...         'remark': 'i detest how this does not even exist.'}
-    >> resp_data = testapp.post_json(rest_url + "/report_abuse", prop,
-    ...                              status=400)
+If the URL is opened in a browser, the frontend must load and show the
+complaint-about resource. The URL is thus frontend-specific; the backend
+won't try to interpret it in any way.
 
 Censorship
 ----------
