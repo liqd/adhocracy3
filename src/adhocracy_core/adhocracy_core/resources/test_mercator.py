@@ -12,6 +12,7 @@ def test_meractor_proposal_meta():
     assert meta.iresource == IMercatorProposal
     assert meta.element_types == [IMercatorProposalVersion,
                                   ]
+    assert meta.is_implicit_addable
     assert meta.item_type == IMercatorProposalVersion
     assert add_ratesservice in meta.after_creation
     assert add_commentsservice in meta.after_creation

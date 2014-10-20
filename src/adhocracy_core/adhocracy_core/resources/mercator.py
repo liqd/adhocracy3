@@ -28,6 +28,7 @@ mercator_proposal_version_meta = itemversion_metadata._replace(
                      adhocracy_core.sheets.mercator.IExtras,
                      ICommentable,
                      IRateable],
+
 )
 
 
@@ -46,6 +47,7 @@ mercator_proposal_meta = item_metadata._replace(
         add_ratesservice,
     ],
     item_type=IMercatorProposalVersion,
+    is_implicit_addable=True,
 )
 
 

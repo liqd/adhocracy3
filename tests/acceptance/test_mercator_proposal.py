@@ -1,5 +1,6 @@
 from pytest import fixture
 from webtest import TestApp
+from .shared import login_god
 
 
 
@@ -8,6 +9,7 @@ class TestMercatorForm:
 
     @fixture(scope='class')
     def browser(self, browser):
+        login_god(browser)
         browser.visit(browser.app_url + 'mercator')
         return browser
 
@@ -15,9 +17,11 @@ class TestMercatorForm:
         fill_all(browser)
         assert can_submit(browser)
 
-    def test_submitted_object_goes_to_db(self, browser, app):
+    def test_submitting_creates_a_new_proposal(self, browser, app):
         browser.find_by_css('input[type="submit"]').first.click()
-
+        #FIXME make this test shorter and more acceptance test like
+        import time
+        time.sleep(1)
         app = TestApp(app)
         rest_url = 'http://localhost'
         post_pool = '/adhocracy'
