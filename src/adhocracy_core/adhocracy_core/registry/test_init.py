@@ -194,6 +194,12 @@ class TestResourceContentRegistry:
         with raises(ValueError):
             inst.resolve_isheet_field_from_dotted_string(dotted)
 
+    def test_resolve_with_no_such_class_dotted_string(self, inst):
+        field = 'field1'
+        dotted = 'colander.NoSuchClass' + ':' + field
+        with raises(ValueError):
+            inst.resolve_isheet_field_from_dotted_string(dotted)
+
     def test_resolve_with_isheet_but_wrong_field_dotted_string(self, inst,
                                                                sheet_meta_a):
         isheet = sheet_meta_a.isheet
