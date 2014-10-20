@@ -76,8 +76,10 @@ export var init = (config, meta_api) => {
     ) => {
         $routeProvider
             .when("/", {
-                templateUrl: "/static/js/templates/Wrapper.html",
-                reloadOnSearch: false
+                template: "",
+                controller: ["adhConfig", "$location", (adhConfig, $location) => {
+                    $location.path("/r" + adhConfig.rest_platform_path);
+                }]
             })
             .when("/r/:path*", {
                 controller: ["adhHttp", "adhConfig", "adhTopLevelState", "$routeParams", "$scope", AdhRoute.resourceRouter],
