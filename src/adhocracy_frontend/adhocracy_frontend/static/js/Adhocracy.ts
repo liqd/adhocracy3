@@ -44,6 +44,7 @@ import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
 import AdhProposal = require("./Packages/Proposal/Proposal");
 import Embed = require("./Packages/Embed/Embed");
+import AdhRoute = require("./Packages/Route/Route");
 import AdhRouteView = require("./Packages/Route/View");
 
 
@@ -77,6 +78,10 @@ export var init = (config, meta_api) => {
             .when("/", {
                 templateUrl: "/static/js/templates/Wrapper.html",
                 reloadOnSearch: false
+            })
+            .when("/r/:path*", {
+                controller: ["adhHttp", "adhConfig", "adhTopLevelState", "$routeParams", "$scope", AdhRoute.resourceRouter],
+                template: "<adh-route-view data-template=\"{{ template }}\"></adh-route-view>"
             })
             .when("/login", {
                 templateUrl: "/static/js/templates/Login.html"
