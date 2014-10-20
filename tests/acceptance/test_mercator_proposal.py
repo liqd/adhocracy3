@@ -1,4 +1,5 @@
 from pytest import fixture
+from webtest import TestApp
 
 
 
@@ -13,6 +14,18 @@ class TestMercatorForm:
     def test_fill_all_fields(self, browser):
         fill_all(browser)
         assert can_submit(browser)
+
+    def test_submitted_object_goes_to_db(self, browser, app):
+        browser.find_by_css('input[type="submit"]').first.click()
+
+        app = TestApp(app)
+        rest_url = 'http://localhost'
+        post_pool = '/adhocracy'
+
+        resp = app.get(rest_url + post_pool)
+        assert resp.status_code == 200
+        elements = resp.json['data']['adhocracy_core.sheets.pool.IPool']['elements']
+        assert len(elements) == 1
 
     def test_field_extra_exprerience_is_optional(self, browser):
         browser.find_by_name('extra-experience').first.fill('')
