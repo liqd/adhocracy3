@@ -202,18 +202,20 @@ class ResourceContentRegistry(ContentRegistry):
             resolved to isheet and field name.
         """
         if ':' not in dotted:
-            raise ValueError
+            raise ValueError(
+                'Not a colon-separated dotted string: {}'.format(dotted))
         name = ''.join(dotted.split(':')[:-1])
         field = dotted.split(':')[-1]
-        isheet = resolver.resolve(name)
-        if not IInterface.providedBy(isheet):
-            raise ValueError
-        if not isheet.isOrExtends(ISheet):
-            raise ValueError
+        try:
+            isheet = resolver.resolve(name)
+        except ImportError:
+            raise ValueError('No such sheet: {}'.format(name))
+        if not (IInterface.providedBy(isheet) and isheet.isOrExtends(ISheet)):
+            raise ValueError('Not a sheet: {}'.format(name))
         schema = self.sheets_meta[isheet].schema_class()
         node = schema.get(field, None)
         if not node:
-            raise ValueError
+            raise ValueError('No such field: {}'.format(dotted))
         return isheet, field, node
 
 
