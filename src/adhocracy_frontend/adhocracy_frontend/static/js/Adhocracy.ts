@@ -44,6 +44,7 @@ import Listing = require("./Packages/Listing/Listing");
 import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
 import AdhProposal = require("./Packages/Proposal/Proposal");
 import Embed = require("./Packages/Embed/Embed");
+import AdhRoute = require("./Packages/Route/Route");
 
 
 var loadComplete = () : void => {
@@ -74,6 +75,13 @@ export var init = (config, meta_api) => {
     ) => {
         $routeProvider
             .when("/", {
+                template: "",
+                controller: ["adhConfig", "$location", (adhConfig, $location) => {
+                    $location.path("/r" + adhConfig.rest_platform_path);
+                }]
+            })
+            .when("/r/:path*", {
+                controller: ["adhHttp", "adhConfig", "adhTopLevelState", "$routeParams", "$scope", AdhRoute.resourceRouter],
                 templateUrl: "/static/js/templates/Wrapper.html",
                 reloadOnSearch: false
             })
@@ -243,6 +251,7 @@ export var init = (config, meta_api) => {
         }]);
 
     app.directive("adhMercatorProposalListing", ["adhConfig", AdhMercatorProposal.listing]);
+    app.directive("adhRouteView", ["$compile", AdhRoute.viewFactory]);
 
     // get going
 
