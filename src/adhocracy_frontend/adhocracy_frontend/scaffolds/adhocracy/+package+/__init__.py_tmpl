@@ -1,0 +1,18 @@
+"""Adhocracy extension."""
+from pyramid.config import Configurator
+
+
+def includeme(config):
+    """Setup adhocracy frontend extension."""
+    # include adhocracy_frontend
+    config.include('adhocracy_frontend')
+    # override static javascript and css files
+    config.add_static_view('static', 'adhocracy_frontend:static')
+
+
+def main(global_config, **settings):
+    """ Return a Pyramid WSGI application. """
+    config = Configurator(settings=settings)
+    includeme(config)
+    app = config.make_wsgi_app()
+    return app

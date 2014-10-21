@@ -9,7 +9,7 @@ class AdhocracyExtensionTemplate(PyramidTemplate):
     """Basic python egg that extends adhocracy."""
 
     _template_dir = 'adhocracy'
-    summary = 'Adocracy backend extension'
+    summary = 'Adocracy frontend customizing'
 
     def pre(self, command, output_dir, vars):  # pragma: no cover
         """Create example extension package."""

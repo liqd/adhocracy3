@@ -1,21 +1,23 @@
-"""Adhocracy frontend package."""
+"""Adhocracy frontend customization package."""
 import os
 
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+README = open(os.path.join(here, 'README.rst')).read()
+CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
-requires = ['adhocracy_core',
+requires = ['adhocracy_frontend',
+            'adhocracy_core',
             ]
 
-test_requires = ['adhocracy_core[test]',
+test_requires = ['adhocracy_frontend[test]',
+                 'adhocracy_core[test]',
                  ]
 
-setup(name='adhocracy_frontend',
+setup(name='{{project}}',
       version='0.0',
-      description='Adhocracy frontend package.',
+      description='Adhocracy meta package for backend/frontend customization.',
       long_description=README + '\n\n' + CHANGES,
       classifiers=["Programming Language :: Python",
                    "Framework :: Pylons",
@@ -34,10 +36,6 @@ setup(name='adhocracy_frontend',
       extras_require={'test': test_requires},
       entry_points="""\
       [paste.app_factory]
-      main = adhocracy_frontend:main
-      [pytest11]
-      adhocracy_frontend = adhocracy_frontend.testing
-      [pyramid.scaffold]
-      adhocracy_frontend=adhocracy_frontend.scaffolds:AdhocracyExtensionTemplate
+      main = {{project}}:main
       """,
       )
