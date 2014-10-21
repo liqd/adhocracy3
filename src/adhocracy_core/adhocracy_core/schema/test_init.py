@@ -186,6 +186,43 @@ class EmailUnitTest(unittest.TestCase):
             inst.validator(inst, 'wrong')
 
 
+class TestURL:
+
+    def _make_one(self):
+        from adhocracy_core.schema import URL
+        return URL()
+
+    def test_valid(self):
+        inst = self._make_one()
+        assert inst.deserialize('http://www.w3.org/standards/') == \
+               'http://www.w3.org/standards/'
+
+    def test_valid_https(self):
+        inst = self._make_one()
+        assert inst.deserialize('https://www.w3.org/standards/') == \
+               'https://www.w3.org/standards/'
+
+    def test_invalid_no_schema(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('www.w3.org/standards/')
+
+    def test_invalid_spaces(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize(inst, 'http://www.w3.org standards')
+
+    def test_invalid_relative_url(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('http:www.w3.org/standards/')
+
+    def test_invalid_chars(self):
+        inst = self._make_one()
+        with raises(colander.Invalid):
+            inst.deserialize('http://www!w3#org/standards/')
+
+
 class TimeZoneNameUnitTest(unittest.TestCase):
 
     def _make_one(self):
