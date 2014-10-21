@@ -175,19 +175,19 @@ export var register = () => {
                         callback = topLevelStateMock.onSetFocus.calls.mostRecent().args[0];
                     });
 
-                    it("adds class 'is-detail' if columns is 2", () => {
+                    it("adds class 'is-collapsed-show-show' if columns is 2", () => {
                         callback(2);
-                        expect(elementMock.addClass).toHaveBeenCalledWith("is-detail");
+                        expect(elementMock.addClass).toHaveBeenCalledWith("is-collapsed-show-show");
                     });
 
-                    it("removes class 'is-detail' if columns is 1", () => {
+                    it("removes class 'is-collapsed-show-show' if columns is 1", () => {
                         callback(1);
-                        expect(elementMock.removeClass).toHaveBeenCalledWith("is-detail");
+                        expect(elementMock.removeClass).toHaveBeenCalledWith("is-collapsed-show-show");
                     });
 
-                    it("removes class 'is-detail' if columns is 0", () => {
+                    it("removes class 'is-collapsed-show-show' if columns is 0", () => {
                         callback(0);
-                        expect(elementMock.removeClass).toHaveBeenCalledWith("is-detail");
+                        expect(elementMock.removeClass).toHaveBeenCalledWith("is-collapsed-show-show");
                     });
 
                     it("does not add or remove class if columns is negative", () => {
