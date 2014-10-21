@@ -1,3 +1,4 @@
+"""Adhocracy frontend package."""
 import os
 
 from setuptools import setup, find_packages
@@ -6,24 +7,21 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = [
-    'adhocracy_core',
-    ]
+requires = ['adhocracy_core',
+            ]
 
-test_requires = [
-    'adhocracy_core[test]',
-    ]
+test_requires = ['adhocracy_core[test]',
+                 ]
 
 setup(name='adhocracy_frontend',
       version='0.0',
-      description='adhocracy_frontend',
-      long_description=README + '\n\n' +  CHANGES,
-      classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pylons",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+      description='Adhocracy frontend package.',
+      long_description=README + '\n\n' + CHANGES,
+      classifiers=["Programming Language :: Python",
+                   "Framework :: Pylons",
+                   "Topic :: Internet :: WWW/HTTP",
+                   "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+                   ],
       author='',
       author_email='',
       url='',
@@ -41,4 +39,3 @@ setup(name='adhocracy_frontend',
       adhocracy_frontend = adhocracy_frontend.testing
       """,
       )
-
