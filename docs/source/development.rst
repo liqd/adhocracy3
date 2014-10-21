@@ -55,10 +55,6 @@ frontend unit tests:
 
         .. note::
 
-           Note that jasmine tests are currently broken in nodejs.
-
-        .. note::
-
            Node only works with the commonjs module system;
            whereas the frontend currently uses requirejs and the amd
            module system (rationale: requirejs is more powerful with
