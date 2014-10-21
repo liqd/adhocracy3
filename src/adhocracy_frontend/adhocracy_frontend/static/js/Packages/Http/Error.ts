@@ -15,7 +15,13 @@ export interface IBackendErrorItem {
 
 var renderBackendError = (response : ng.IHttpPromiseCallbackArg<any>) : void => {
     // get rid of unrenderable junk (good for console log extraction with web driver).
-    var sanitize = (x : any) : any => JSON.parse(JSON.stringify(x));
+    var sanitize = (x : any) : any => {
+        if (typeof x === "undefined") {
+            return x;
+        } else {
+            return JSON.parse(JSON.stringify(x));
+        }
+    };
 
     console.log("http response with error status: " + response.status);
     console.log("request:", sanitize(response.config));
