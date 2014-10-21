@@ -10,7 +10,7 @@ import RIUsersService = require("Resources_/adhocracy_core/resources/principal/I
 var notFoundTemplate = "<h1>404 - not Found</h1>";
 
 
-interface IResourceRouterScope extends ng.IScope {
+export interface IResourceRouterScope extends ng.IScope {
     template : string;
 }
 
