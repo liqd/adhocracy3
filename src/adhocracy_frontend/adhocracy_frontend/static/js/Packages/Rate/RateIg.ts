@@ -5,7 +5,7 @@
 import modernizr = require("modernizr");
 
 import AdhHttp = require("../Http/Http");
-import AdhMetaApi = require("../MetaApi/MetaApi");
+import AdhMetaApi = require("../Http/MetaApi");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhUser = require("../User/User");
 

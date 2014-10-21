@@ -2,8 +2,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import AdhHttp = require("./Http");
-import AdhMetaApi = require("../MetaApi/MetaApi");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import ResourcesBase = require("../../ResourcesBase");
@@ -17,6 +15,8 @@ import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDo
 import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
+import AdhHttp = require("./Http");
+import AdhMetaApi = require("./MetaApi");
 
 export var register = (angular, config, meta_api) => {
 

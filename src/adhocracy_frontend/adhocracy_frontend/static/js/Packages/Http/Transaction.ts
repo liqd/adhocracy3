@@ -1,12 +1,12 @@
 import AdhConfig = require("../Config/Config");
-import AdhConvert = require("./Convert");
-import AdhError = require("./Error");
-import AdhHttp = require("./Http");
-import AdhMetaApi = require("../MetaApi/MetaApi");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import ResourcesBase = require("../../ResourcesBase");
 
+import AdhConvert = require("./Convert");
+import AdhError = require("./Error");
+import AdhHttp = require("./Http");
+import AdhMetaApi = require("./MetaApi");
 
 export interface ITransactionResult {
     index : number;
