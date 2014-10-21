@@ -30,13 +30,13 @@ def app(settings):
     """
     from pyramid.config import Configurator
     from adhocracy_core.testing import includeme_root_with_test_users
-    import mercator
+    from adhocracy_mercator import root_factory
     settings['adhocracy.add_default_group'] = False
     settings['zodbconn.uri'] = 'memory://'
     settings['adhocracy.ws_url'] = ''
     configurator = Configurator(settings=settings,
-                                root_factory=mercator.root_factory)
-    configurator.include(mercator)
+                                root_factory=root_factory)
+    configurator.include('adhocracy_mercator')
     configurator.commit()
     configurator.include(includeme_root_with_test_users)
     app = configurator.make_wsgi_app()

@@ -1,18 +1,19 @@
-"""Adhocracy backend server with default content and settings."""
+"""Adhocracy frontent customization for Mercator."""
 from pyramid.config import Configurator
-
-from adhocracy_core import root_factory
 
 
 def includeme(config):
-    """Setup sample app."""
-    # include adhocracy_core
-    config.include('adhocracy_mercator')
+    """Setup adhocracy frontend extension."""
+    # include adhocracy_frontend
+    config.include('adhocracy_frontend')
+    # override static javascript and css files
+    config.override_asset(to_override='adhocracy_frontend:static/',
+                          override_with='mercator:static/')
 
 
 def main(global_config, **settings):
     """ Return a Pyramid WSGI application. """
-    config = Configurator(settings=settings, root_factory=root_factory)
+    config = Configurator(settings=settings)
     includeme(config)
     app = config.make_wsgi_app()
     return app

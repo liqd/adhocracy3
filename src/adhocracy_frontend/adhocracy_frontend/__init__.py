@@ -48,7 +48,7 @@ def _build_ws_url(request: Request) -> str:
 
 def includeme(config):
     """Add routing and static view to deliver the frontend application."""
-    config.add_static_view('static', 'adhocracy_frontend:static',
+    config.add_static_view('static', 'adhocracy_frontend:static/',
                            cache_max_age=0)
     config.add_route('config_json', 'config.json')
     config.add_view(config_view, route_name='config_json', renderer='json',
