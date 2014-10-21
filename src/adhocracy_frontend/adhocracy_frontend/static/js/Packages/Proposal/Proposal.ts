@@ -92,7 +92,7 @@ export class ProposalDetail {
 export class ProposalVersionDetail {
     public static templateUrl : string = "Proposal.html";
 
-    public createDirective(adhConfig : AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.IService) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
@@ -104,7 +104,7 @@ export class ProposalVersionDetail {
                 viewmode: "@"
             },
             controller: ["adhTopLevelState", "adhHttp", "$scope", (
-                adhTopLevelState : AdhTopLevelState.TopLevelState,
+                adhTopLevelState : AdhTopLevelState.Service,
                 adhHttp : AdhHttp.Service<ResourcesBase.Resource>,
                 $scope : IProposalVersionDetailScope<any>
             ) : void => {
@@ -160,7 +160,7 @@ interface IScopeProposalVersion {
 
 export class ProposalVersionNew {
 
-    public createDirective(adhHttp : ng.IHttpService, adhConfig : AdhConfig.Type, adhProposal : Service) {
+    public createDirective(adhHttp : ng.IHttpService, adhConfig : AdhConfig.IService, adhProposal : Service) {
 
         return {
             restrict: "E",
@@ -214,7 +214,7 @@ var explainPreliminaryGetIssue : string = (
 
 export class SectionVersionDetail {
 
-    public createDirective(adhConfig : AdhConfig.Type, recursionHelper) {
+    public createDirective(adhConfig : AdhConfig.IService, recursionHelper) {
 
         return {
             restrict: "E",
@@ -250,7 +250,7 @@ export class SectionVersionDetail {
 
 export class ParagraphVersionDetail {
 
-    public createDirective(adhConfig : AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.IService) {
 
         return {
             restrict: "E",

@@ -17,8 +17,8 @@ export interface IResourceRouterScope extends ng.IScope {
 
 export var resourceRouter = (
     adhHttp : AdhHttp.Service<any>,
-    adhConfig : AdhConfig.Type,
-    adhTopLevelState : AdhTopLevelState.TopLevelState,
+    adhConfig : AdhConfig.IService,
+    adhTopLevelState : AdhTopLevelState.Service,
     $routeParams : ng.route.IRouteParamsService,
     $scope : IResourceRouterScope
 ) => {

@@ -62,7 +62,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
     constructor(private containerAdapter : IListingContainerAdapter) {}
 
-    public createDirective(adhConfig : AdhConfig.Type, adhWebSocket: AdhWebSocket.IService) {
+    public createDirective(adhConfig : AdhConfig.IService, adhWebSocket: AdhWebSocket.IService) {
         var _self = this;
         var _class = (<any>_self).constructor;
 

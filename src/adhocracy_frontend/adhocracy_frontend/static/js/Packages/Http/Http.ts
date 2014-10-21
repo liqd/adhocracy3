@@ -62,7 +62,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         private $timeout : ng.ITimeoutService,
         private adhMetaApi : AdhMetaApi.MetaApiQuery,
         private adhPreliminaryNames : AdhPreliminaryNames,
-        private adhConfig : AdhConfig.Type
+        private adhConfig : AdhConfig.IService
     ) {}
 
     private formatUrl(path) {

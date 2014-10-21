@@ -31,7 +31,7 @@ export class Transaction {
         private adhHttp : AdhHttp.Service<any>,
         private adhMetaApi : AdhMetaApi.MetaApiQuery,
         private adhPreliminaryNames : AdhPreliminaryNames,
-        private adhConfig : AdhConfig.Type
+        private adhConfig : AdhConfig.IService
     ) {
         this.requests = [];
         this.committed = false;
