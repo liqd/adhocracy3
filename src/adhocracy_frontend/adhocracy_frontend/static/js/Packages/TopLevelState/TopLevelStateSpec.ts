@@ -7,7 +7,7 @@ var DEFAULT_FOCUS : number = 1;
 export var register = () => {
 
     describe("TopLevelState", () => {
-        describe("TopLevelState", () => {
+        describe("Service", () => {
             var adhTopLevelState : AdhTopLevelState.Service;
             var eventHandlerMockClass;
             var routeParamMock;

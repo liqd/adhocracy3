@@ -9,7 +9,7 @@ declare var beforeEach : (any) => void;
 
 export var register = () => {
     describe("User", () => {
-        describe("User", () => {
+        describe("Service", () => {
             var adhUser;
             var adhHttpMock;
             var httpMock;
