@@ -157,7 +157,7 @@ export var register = () => {
 
         describe("factory", () => {
             var service;
-            var config : AdhConfig.Type;
+            var config : AdhConfig.IService;
 
             beforeEach(() => {
                 config = <any>{

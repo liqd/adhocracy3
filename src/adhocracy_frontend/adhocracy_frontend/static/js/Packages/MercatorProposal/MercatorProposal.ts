@@ -84,7 +84,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
 
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
-        adhConfig : AdhConfig.Type,
+        adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames,
         $q : ng.IQService
@@ -196,7 +196,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
 export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
     constructor(
-        adhConfig : AdhConfig.Type,
+        adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames,
         $q : ng.IQService
@@ -207,7 +207,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
 }
 
 
-export var listing = (adhConfig : AdhConfig.Type) => {
+export var listing = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",

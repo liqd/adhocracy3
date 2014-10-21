@@ -240,7 +240,7 @@ export var rateController = (
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
-    adhUser : AdhUser.User,
+    adhUser : AdhUser.Service,
     adhPreliminaryNames : AdhPreliminaryNames
 ) : ng.IPromise<void> => {
 
@@ -348,7 +348,7 @@ export var rateController = (
 
 export var createDirective = (
     adapter : IRateAdapter<any>,
-    adhConfig : AdhConfig.Type
+    adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",

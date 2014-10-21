@@ -6,29 +6,6 @@ import AdhUtil = require("./Util");
 
 export var register = () => {
     describe("Util", () => {
-        describe("cutArray", () => {
-            it("removes single items", () => {
-                expect(AdhUtil.cutArray([1, 2, 3, 4], 0)).toEqual([2, 3, 4]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], 1)).toEqual([1, 3, 4]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], -1)).toEqual([1, 2, 3]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], -2)).toEqual([1, 2, 4]);
-            });
-            it("removes single items if 'from' and 'to' are equal", () => {
-                expect(AdhUtil.cutArray([1, 2, 3, 4], 0, 0)).toEqual([2, 3, 4]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], 1, 1)).toEqual([1, 3, 4]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], -1, -1)).toEqual([1, 2, 3]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], -2, -2)).toEqual([1, 2, 4]);
-            });
-            it("removes ranges", () => {
-                expect(AdhUtil.cutArray([1, 2, 3, 4], 0, -1)).toEqual([]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], 0, 3)).toEqual([]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], 1, 3)).toEqual([1]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], 0, 2)).toEqual([4]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], 1, -2)).toEqual([1, 4]);
-                expect(AdhUtil.cutArray([1, 2, 3, 4], -3, -2)).toEqual([1, 4]);
-            });
-        });
-
         describe("isArrayMember", () => {
             var isArrayMember = AdhUtil.isArrayMember;
 
@@ -63,20 +40,6 @@ export var register = () => {
             it("returns false for array properties that are not array items (such as length)", () => {
                 expect(AdhUtil.isArrayMember("length", ["hay", "stack"])).toBe(false);
                 expect(AdhUtil.isArrayMember(0, ["hay", "stack"])).toBe(false);
-            });
-        });
-
-        describe("trickle", () => {
-            xit("calls function on every arg in array exactly once within the given timeout.", () => {
-                expect(false).toBe(true);
-
-                // there is a timeout mock object in jasmine, but any
-                // test of this function would mostly test that it is
-                // implemented *in a specific* way, which sais nothing
-                // about whether it is implemented *correctly*.
-                //
-                // `trickle` is a beautiful example of the claim that
-                // test coverage is not everything.
             });
         });
 
@@ -133,12 +96,6 @@ export var register = () => {
             });
             it("does not replace {n} if there is no n-th parameter", () => {
                 expect(AdhUtil.formatString("Hello {0} from {1}", "World")).toBe("Hello World from {1}");
-            });
-        });
-
-        describe("escapeNgExp", () => {
-            it("wraps the input in single quotes and escapes any single quotes already in there", () => {
-                expect(AdhUtil.escapeNgExp("You, me & 'the thing'")).toBe("'You, me & \\'the thing\\''");
             });
         });
 

@@ -72,7 +72,7 @@ export class Service implements IService {
         private $window : Window,
         private $rootScope,
         private trustedDomains : string[],
-        private adhUser ?: AdhUser.User
+        private adhUser ?: AdhUser.Service
     ) {
         var _self : Service = this;
 
@@ -189,7 +189,7 @@ export class Dummy implements IService {
 }
 
 
-export var factory = (adhConfig : AdhConfig.Type, $window : Window, $rootScope, adhUser ?: AdhUser.User) : IService => {
+export var factory = (adhConfig : AdhConfig.IService, $window : Window, $rootScope, adhUser ?: AdhUser.Service) : IService => {
     if (adhConfig.embedded) {
         var postMessageToParent = $window.parent.postMessage.bind($window.parent);
         return new Service(postMessageToParent, $window, $rootScope, adhConfig.trusted_domains, adhUser);
