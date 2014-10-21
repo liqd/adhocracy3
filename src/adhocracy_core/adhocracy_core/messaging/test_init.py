@@ -8,6 +8,7 @@ from pytest import raises
 @fixture
 def integration(config):
     config.include('pyramid_mailer.testing')
+    config.include('pyramid_mako')
     config.include('adhocracy_core.registry')
     config.include('adhocracy_core.messaging')
 
@@ -127,3 +128,44 @@ class TestRenderAndSendMail:
                 args={'name': 'value'})
         assert mock_resource_exists.call_count == 2
         assert not mock_render.called
+
+
+@mark.usefixtures('integration')
+class TestSendAbuseComplaint():
+
+    def test_send_abuse_complaint_with_user(self, registry):
+        from adhocracy_core.resources.principal import IUser
+        user = Mock(spec=IUser)
+        mailer = registry.messenger._get_mailer()
+        assert len(mailer.outbox) == 0
+        messenger = registry.messenger
+        messenger.abuse_handler_mail = 'abuse_handler@unconfigured.domain'
+        url = 'http://localhost/blablah'
+        remark = 'Too much blah!'
+        messenger.send_abuse_complaint(url=url, remark=remark, user=user)
+        assert len(mailer.outbox) == 1
+        msgtext = self._msg_to_str(mailer.outbox[0])
+        assert messenger.abuse_handler_mail in msgtext
+        assert url in msgtext
+        assert remark in msgtext
+        assert 'sent by user' in msgtext
+
+    def _msg_to_str(self, msg):
+        # The DummyMailer is too stupid to use a default sender, hence we add
+        # one manually
+        msg.sender = 'support@unconfigured.domain'
+        msgtext = str(msg.to_message())
+        # Undo quoted-printable encoding of spaces for convenient testing
+        return msgtext.replace('=20', ' ')
+
+    def test_send_abuse_complaint_without_user(self, registry):
+        mailer = registry.messenger._get_mailer()
+        assert len(mailer.outbox) == 0
+        messenger = registry.messenger
+        messenger.abuse_handler_mail = 'abuse_handler@unconfigured.domain'
+        url = 'http://localhost/blablah'
+        remark = 'Too much blah!'
+        messenger.send_abuse_complaint(url=url, remark=remark, user=None)
+        assert len(mailer.outbox) == 1
+        msgtext = self._msg_to_str(mailer.outbox[0])
+        assert 'sent by an anonymous user' in msgtext
