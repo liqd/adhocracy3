@@ -1,6 +1,11 @@
 import _ = require("lodash");
 
+import AdhComment = require("./Comment");
+import AdhListing = require("../Listing/Listing");
+import AdhUtil = require("../Util/Util");
+
 import ResourcesBase = require("../../ResourcesBase");
+
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IComment");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
@@ -8,15 +13,10 @@ import SICommentable = require("../../Resources_/adhocracy_core/sheets/comment/I
 import SIComment = require("../../Resources_/adhocracy_core/sheets/comment/IComment");
 import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 
-import AdhListing = require("../Listing/Listing");
-import Util = require("../Util/Util");
-
-import AdhComment = require("./Comment");
-
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
     public elemRefs(container : ResourcesBase.Resource) {
-        return Util.latestVersionsOnly(container.data[SICommentable.nick].comments);
+        return AdhUtil.latestVersionsOnly(container.data[SICommentable.nick].comments);
     }
 
     public poolPath(container : ResourcesBase.Resource) {
@@ -106,6 +106,6 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
     }
 
     commentCount(resource : RICommentVersion) : number {
-        return Util.latestVersionsOnly(resource.data[SICommentable.nick].comments).length;
+        return AdhUtil.latestVersionsOnly(resource.data[SICommentable.nick].comments).length;
     }
 }

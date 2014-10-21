@@ -1,11 +1,11 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
-import Util = require("../Util/Util");
-import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
-import AdhWebSocket = require("../WebSocket/WebSocket");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import AdhHttp = require("../Http/Http");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import AdhUtil = require("../Util/Util");
+import AdhWebSocket = require("../WebSocket/WebSocket");
 
 import ResourcesBase = require("../../ResourcesBase");
 
@@ -13,11 +13,11 @@ import RIParagraph = require("../../Resources_/adhocracy_core/resources/sample_p
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraphVersion");
 import RIProposal = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposal");
 import RIProposalVersion = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposalVersion");
-import RISectionVersion = require("../../Resources_/adhocracy_core/resources/sample_section/ISectionVersion");
 import RISection = require("../../Resources_/adhocracy_core/resources/sample_section/ISection");
+import RISectionVersion = require("../../Resources_/adhocracy_core/resources/sample_section/ISectionVersion");
+import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 import SISection = require("../../Resources_/adhocracy_core/sheets/document/ISection");
-import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/Proposal";
@@ -308,7 +308,7 @@ export class Service {
             });
 
         var name = proposalVersion.data[SIDocument.nick].title;
-        name = Util.normalizeName(name);
+        name = AdhUtil.normalizeName(name);
 
         // this is the batch-request logic.  it works a bit different
         // from the original logic in that it follows the references

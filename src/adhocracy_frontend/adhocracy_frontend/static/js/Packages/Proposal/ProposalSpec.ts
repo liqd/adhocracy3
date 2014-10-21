@@ -3,8 +3,8 @@
 
 import q = require("q");
 
-import AdhProposal = require("./Proposal");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+import AdhProposal = require("./Proposal");
 
 
 var createAdhHttpMock = () => {

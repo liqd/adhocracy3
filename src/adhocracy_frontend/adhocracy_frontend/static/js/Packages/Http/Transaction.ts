@@ -1,11 +1,11 @@
-import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import ResourcesBase = require("../../ResourcesBase");
-import MetaApi = require("../MetaApi/MetaApi");
 import AdhConfig = require("../Config/Config");
-
+import AdhConvert = require("./Convert");
 import AdhError = require("./Error");
 import AdhHttp = require("./Http");
-import AdhConvert = require("./Convert");
+import AdhMetaApi = require("../MetaApi/MetaApi");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+
+import ResourcesBase = require("../../ResourcesBase");
 
 
 export interface ITransactionResult {
@@ -29,8 +29,8 @@ export class Transaction {
 
     constructor(
         private adhHttp : AdhHttp.Service<any>,
-        private adhMetaApi : MetaApi.MetaApiQuery,
-        private adhPreliminaryNames : PreliminaryNames,
+        private adhMetaApi : AdhMetaApi.MetaApiQuery,
+        private adhPreliminaryNames : AdhPreliminaryNames,
         private adhConfig : AdhConfig.Type
     ) {
         this.requests = [];

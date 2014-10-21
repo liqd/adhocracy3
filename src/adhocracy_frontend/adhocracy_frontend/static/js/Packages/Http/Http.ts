@@ -5,15 +5,15 @@
 
 import _ = require("lodash");
 
-import Resources = require("../../Resources");
-import ResourcesBase = require("../../ResourcesBase");
-import Util = require("../Util/Util");
-import MetaApi = require("../MetaApi/MetaApi");
-import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhTransaction = require("./Transaction");
-import AdhError = require("./Error");
-import AdhConvert = require("./Convert");
 import AdhConfig = require("../Config/Config");
+import AdhConvert = require("./Convert");
+import AdhError = require("./Error");
+import AdhMetaApi = require("../MetaApi/MetaApi");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhTransaction = require("./Transaction");
+import AdhUtil = require("../Util/Util");
+
+import ResourcesBase = require("../../ResourcesBase");
 
 import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
@@ -59,8 +59,8 @@ export class Service<Content extends ResourcesBase.Resource> {
         private $http : ng.IHttpService,
         private $q : ng.IQService,
         private $timeout : ng.ITimeoutService,
-        private adhMetaApi : MetaApi.MetaApiQuery,
-        private adhPreliminaryNames : PreliminaryNames,
+        private adhMetaApi : AdhMetaApi.MetaApiQuery,
+        private adhPreliminaryNames : AdhPreliminaryNames,
         private adhConfig : AdhConfig.Type
     ) {}
 
@@ -230,7 +230,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         var timeoutRounds : number = 5;
         var waitms : number = 250;
 
-        var dagPath = Util.parentPath(oldVersionPath);
+        var dagPath = AdhUtil.parentPath(oldVersionPath);
         var _obj = _.cloneDeep(obj);
         if (typeof rootVersions !== "undefined") {
             _obj.root_versions = rootVersions;

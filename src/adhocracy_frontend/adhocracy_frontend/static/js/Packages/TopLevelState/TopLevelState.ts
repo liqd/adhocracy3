@@ -1,5 +1,3 @@
-import AdhEventHandler = require("../EventHandler/EventHandler");
-
 /**
  * TopLevelState service for managing top level state.
  *
@@ -16,6 +14,8 @@ import AdhEventHandler = require("../EventHandler/EventHandler");
  * Only focus and the state of content2 column are currently
  * implemented.
  */
+
+import AdhEventHandler = require("../EventHandler/EventHandler");
 
 // FIXME focus should be the first column. Since the first column (column
 // 0) might be removed, column 1 is default focus.

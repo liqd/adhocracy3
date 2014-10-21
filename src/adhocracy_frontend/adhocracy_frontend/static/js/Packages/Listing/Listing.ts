@@ -3,11 +3,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import AdhHttp = require("../Http/Http");
-import AdhWebSocket = require("../WebSocket/WebSocket");
 import AdhConfig = require("../Config/Config");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhHttp = require("../Http/Http");
 import AdhPermissions = require("../Permissions/Permissions");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhWebSocket = require("../WebSocket/WebSocket");
+
 import ResourcesBase = require("../../ResourcesBase");
 
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");

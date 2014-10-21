@@ -1,22 +1,21 @@
-import AdhResourcesBase = require("../../ResourcesBase");
-
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 
+import ResourcesBase = require("../../ResourcesBase");
+
 import RIMercatorProposal = require("../../Resources_/adhocracy_core/resources/mercator/IMercatorProposal");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_core/resources/mercator/IMercatorProposalVersion");
-
-import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-import SIUserInfo = require("../../Resources_/adhocracy_core/sheets/mercator/IUserInfo");
-import SIOrganizationInfo = require("../../Resources_/adhocracy_core/sheets/mercator/IOrganizationInfo");
-import SIIntroduction = require("../../Resources_/adhocracy_core/sheets/mercator/IIntroduction");
 import SIDetails = require("../../Resources_/adhocracy_core/sheets/mercator/IDetails");
-import SIMotivation = require("../../Resources_/adhocracy_core/sheets/mercator/IMotivation");
-import SIFinance = require("../../Resources_/adhocracy_core/sheets/mercator/IFinance");
 import SIExtras = require("../../Resources_/adhocracy_core/sheets/mercator/IExtras");
+import SIFinance = require("../../Resources_/adhocracy_core/sheets/mercator/IFinance");
+import SIIntroduction = require("../../Resources_/adhocracy_core/sheets/mercator/IIntroduction");
+import SIMotivation = require("../../Resources_/adhocracy_core/sheets/mercator/IMotivation");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
+import SIOrganizationInfo = require("../../Resources_/adhocracy_core/sheets/mercator/IOrganizationInfo");
+import SIUserInfo = require("../../Resources_/adhocracy_core/sheets/mercator/IUserInfo");
+import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/MercatorProposal";
 
@@ -83,7 +82,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
 }
 
 
-export class Widget<R extends AdhResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
+export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
         adhConfig : AdhConfig.Type,
         adhHttp : AdhHttp.Service<any>,
@@ -195,7 +194,7 @@ export class Widget<R extends AdhResourcesBase.Resource> extends AdhResourceWidg
 }
 
 
-export class CreateWidget<R extends AdhResourcesBase.Resource> extends Widget<R> {
+export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
     constructor(
         adhConfig : AdhConfig.Type,
         adhHttp : AdhHttp.Service<any>,

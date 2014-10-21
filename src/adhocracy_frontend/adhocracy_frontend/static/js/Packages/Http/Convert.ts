@@ -1,7 +1,8 @@
 import _ = require("lodash");
 
-import MetaApi = require("../MetaApi/MetaApi");
-import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhMetaApi = require("../MetaApi/MetaApi");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+
 import ResourcesBase = require("../../ResourcesBase");
 import Resources_ = require("../../Resources_");
 
@@ -26,8 +27,8 @@ var sanityCheck = (obj : ResourcesBase.Resource) : void => {
  */
 export var importContent = <Content extends ResourcesBase.Resource>(
     response : {data : Content},
-    metaApi : MetaApi.MetaApiQuery,
-    preliminaryNames : PreliminaryNames
+    metaApi : AdhMetaApi.MetaApiQuery,
+    preliminaryNames : AdhPreliminaryNames
 ) : Content => {
     "use strict";
 
@@ -135,8 +136,8 @@ export var importContent = <Content extends ResourcesBase.Resource>(
  */
 export var importBatchContent = <Content extends ResourcesBase.Resource>(
     responses : { data : {body : Content}[] },
-    metaApi : MetaApi.MetaApiQuery,
-    preliminaryNames : PreliminaryNames
+    metaApi : AdhMetaApi.MetaApiQuery,
+    preliminaryNames : AdhPreliminaryNames
 ) : Content[] => {
     // FIXME: description files don't appear to support array-typed
     // response bodies.  this might be a good thing (web security and
@@ -160,7 +161,7 @@ export var importBatchContent = <Content extends ResourcesBase.Resource>(
  * also, fields with create_mandatory should not be missing from the
  * posted object.
  */
-export var exportContent = <Rs extends ResourcesBase.Resource>(adhMetaApi : MetaApi.MetaApiQuery, obj : Rs) : Rs => {
+export var exportContent = <Rs extends ResourcesBase.Resource>(adhMetaApi : AdhMetaApi.MetaApiQuery, obj : Rs) : Rs => {
     "use strict";
 
     sanityCheck(obj);
@@ -170,12 +171,12 @@ export var exportContent = <Rs extends ResourcesBase.Resource>(adhMetaApi : Meta
     // newobj.data.
     for (var sheetName in newobj.data) {
         if (newobj.data.hasOwnProperty(sheetName)) {
-            var sheet : MetaApi.ISheet = newobj.data[sheetName];
+            var sheet : AdhMetaApi.ISheet = newobj.data[sheetName];
             var keepSheet : boolean = false;
 
             for (var fieldName in sheet) {
                 if (sheet.hasOwnProperty(fieldName)) {
-                    var fieldMeta : MetaApi.ISheetField = adhMetaApi.field(sheetName, fieldName);
+                    var fieldMeta : AdhMetaApi.ISheetField = adhMetaApi.field(sheetName, fieldName);
 
                     if (fieldMeta.editable || fieldMeta.creatable || fieldMeta.create_mandatory) {
                         keepSheet = true;

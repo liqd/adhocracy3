@@ -1,19 +1,16 @@
 import AdhConfig = require("../Config/Config");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhHttp = require("../Http/Http");
 import AdhPermissions = require("../Permissions/Permissions");
-import AdhResource = require("../../Resources");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhUser = require("../User/User");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import RIRate = require("../../Resources_/adhocracy_core/resources/rate/IRate");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
-// import SICanRate = require("../../Resources_/adhocracy_core/sheets/rate/ICanRate");
-import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
-// import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
+import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
 
 var pkgLocation = "/Rate";
