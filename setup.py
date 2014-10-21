@@ -1,4 +1,4 @@
-""""Adhocracy meta package."""
+""""Adhocracy meta package for Mercator."""
 import os
 
 from setuptools import setup, find_packages
@@ -15,9 +15,9 @@ test_requires = ['adhocracy_mercator[test]',
                  'adhocracy_frontend[test]',
                  ]
 
-setup(name='adhocracy',
+setup(name='mercator',
       version='0.0',
-      description='Adhocracy backend/frontend server with default settings',
+      description='Adhocracy backend/frontend server for Mercator.',
       long_description=README + '\n\n' + CHANGES,
       classifiers=["Programming Language :: Python",
                    "Framework :: Pylons",
@@ -37,6 +37,6 @@ setup(name='adhocracy',
       extras_require={'test': test_requires},
       entry_points="""\
       [paste.app_factory]
-      main = adhocracy:main
+      main = mercator:main
       """,
       )
