@@ -206,7 +206,7 @@ export var register = () => {
                         }
                     );
                 });
-                it("throws an exception if LAST.length !== 1", (done) => {
+                it("throws an exception if LAST.length === 0", (done) => {
                     $httpMock.get.and.returnValue(q.when({
                         data: {
                             "adhocracy_core.sheets.tags.ITag": {
@@ -219,7 +219,8 @@ export var register = () => {
                         () => { expect(true).toBe(false); done(); },
                         () => { expect(true).toBe(true); done(); }
                     );
-
+                });
+                it("throws an exception if LAST.length > 1", (done) => {
                     $httpMock.get.and.returnValue(q.when({
                         data: {
                             "adhocracy_core.sheets.tags.ITag": {
