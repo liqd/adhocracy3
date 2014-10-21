@@ -573,7 +573,12 @@ export var register = () => {
                         errors: []
                     };
                     expect(() => fn(wrap(backendError))).toThrow();
-                    expect(console.log).toHaveBeenCalledWith(backendError);
+
+                    if (name === "logBackendError") {
+                        expect(console.log).toHaveBeenCalledWith("response:", backendError);
+                    } else {
+                        expect(console.log).toHaveBeenCalledWith("response:", [ { body: backendError } ]);
+                    }
                 });
 
                 afterEach(() => {
