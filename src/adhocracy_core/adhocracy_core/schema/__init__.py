@@ -130,6 +130,19 @@ class Email(AdhocracySchemaNode):
     validator = colander.Email()
 
 
+class URL(AdhocracySchemaNode):
+
+    """String with a URL.
+
+    Example value: http://colander.readthedocs.org/en/latest/
+    """
+
+    schema_type = colander.String
+    default = ''
+    missing = colander.drop
+    validator = colander.url
+
+
 _ZONES = pytz.all_timezones
 
 

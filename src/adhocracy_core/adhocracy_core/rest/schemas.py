@@ -14,9 +14,11 @@ from adhocracy_core.schema import Resource
 from adhocracy_core.schema import Resources
 from adhocracy_core.schema import Reference
 from adhocracy_core.schema import References
-from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import ResourcePathSchema
 from adhocracy_core.schema import ResourcePathAndContentSchema
+from adhocracy_core.schema import SingleLine
+from adhocracy_core.schema import Text
+from adhocracy_core.schema import URL
 
 
 resolver = DottedNameResolver()
@@ -185,6 +187,14 @@ class POSTLoginEmailRequestSchema(colander.Schema):
 
     email = Email(missing=colander.required)
     password = Password(missing=colander.required)
+
+
+class POSTReportAbuseViewRequestSchema(colander.Schema):
+
+    """Schema for abuse reports."""
+
+    url = URL(missing=colander.required)
+    remark = Text(missing='')
 
 
 class BatchHTTPMethod(colander.SchemaNode):
