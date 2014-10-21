@@ -114,9 +114,9 @@ var move = (column : number, element : JQuery) => {
     // This is likely to change in the future.
     // So do not spend too much time interpreting this.
     if (column === 0 || column === 1) {
-        element.removeClass("is-detail");
+        element.removeClass("is-collapsed-show-show");
     } else if (column === 2) {
-        element.addClass("is-detail");
+        element.addClass("is-collapsed-show-show");
     } else {
         console.log("tried to focus illegal column(" + column + ")");
     };
