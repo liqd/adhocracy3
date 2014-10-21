@@ -1,10 +1,11 @@
 import _ = require("lodash");
 
-import AdhMetaApi = require("../MetaApi/MetaApi");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import ResourcesBase = require("../../ResourcesBase");
 import Resources_ = require("../../Resources_");
+
+import AdhMetaApi = require("./MetaApi");
 
 
 var sanityCheck = (obj : ResourcesBase.Resource) : void => {

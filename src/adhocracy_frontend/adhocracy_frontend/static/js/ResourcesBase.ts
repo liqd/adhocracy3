@@ -1,3 +1,5 @@
+import _ = require("lodash");
+
 import AdhUtil = require("./Packages/Util/Util");
 
 

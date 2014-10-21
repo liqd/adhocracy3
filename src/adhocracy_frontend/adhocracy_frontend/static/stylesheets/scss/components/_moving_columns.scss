@@ -7,11 +7,18 @@ category: Layout
 
 This widget represents a major design concept in Adhocracy 3.
 It contains a list of columns which may slide to either side to reveal
-new columns with additional functionality.
+new columns with additional functionality. Each column can be shown, collapsed
+or hidden completely.
 
 States:
 
--   is-detail - show a secondary content column
+-   is-show-hidden-hidden
+-   is-collapsed-show-hidden
+-   is-collapsed-show-collapsed
+-   is-collapsed-collapsed-show
+-   is-show-collapsed-collapsed
+-   is-collapsed-show-show
+-   is-show-show-collapsed
 
 ```html_example
 <div class="moving-columns" style="height: 10em; position: relative;">
@@ -19,7 +26,7 @@ States:
     <div class="moving-column-content">content column</div>
     <div class="moving-column-content2">secondary-content-column</div>
 </div>
-<a onclick="$('.moving-columns').toggleClass('is-detail')">click me</a>
+<a onclick="$('.moving-columns').toggleClass('is-collapsed-show-show')">click me</a>
 ```
 */
 
@@ -47,29 +54,114 @@ States:
 .moving-columns {
     overflow: hidden;
 
+    // is-show-show-hidden
     .moving-column-structure {
-        @include moving-column(0, 4);
+        @include moving-column(0, 6);
     }
 
     .moving-column-content {
-        @include moving-column(4, 12);
+        @include moving-column(6, 12);
     }
 
     .moving-column-content2 {
-        @include moving-column(12, 18);
+        @include moving-column(12, 13);
     }
 
-    &.is-detail {
+    &.is-show-hidden-hidden {
         .moving-column-structure {
-            @include moving-column(-4, 0);
+            @include moving-column(0, 12);
         }
 
         .moving-column-content {
-            @include moving-column(0, 6);
+            @include moving-column(12, 13);
         }
 
         .moving-column-content2 {
-            @include moving-column(6, 12);
+            @include moving-column(13, 14);
+        }
+    }
+
+    &.is-collapsed-show-hidden {
+        .moving-column-structure {
+            @include moving-column(0, 1);
+        }
+
+        .moving-column-content {
+            @include moving-column(1, 12);
+        }
+
+        .moving-column-content2 {
+            @include moving-column(12, 13);
+        }
+    }
+
+    &.is-collapsed-show-collapsed {
+        .moving-column-structure {
+            @include moving-column(0, 1);
+        }
+
+        .moving-column-content {
+            @include moving-column(1, 11);
+        }
+
+        .moving-column-content2 {
+            @include moving-column(11, 12);
+        }
+    }
+
+    &.is-collapsed-collapsed-show {
+        .moving-column-structure {
+            @include moving-column(0, 1);
+        }
+
+        .moving-column-content {
+            @include moving-column(1, 2);
+        }
+
+        .moving-column-content2 {
+            @include moving-column(2, 12);
+        }
+    }
+
+    &.is-show-collapsed-collapsed {
+        .moving-column-structure {
+            @include moving-column(0, 10);
+        }
+
+        .moving-column-content {
+            @include moving-column(10, 11);
+        }
+
+        .moving-column-content2 {
+            @include moving-column(11, 12);
+        }
+    }
+
+    &.is-collapsed-show-show {
+        .moving-column-structure {
+            @include moving-column(0, 1);
+        }
+
+        .moving-column-content {
+            @include moving-column(1, 6.5);
+        }
+
+        .moving-column-content2 {
+            @include moving-column(6.5, 12);
+        }
+    }
+
+    &.is-show-show-collapsed {
+        .moving-column-structure {
+            @include moving-column(0, 5.5);
+        }
+
+        .moving-column-content {
+            @include moving-column(5.5, 11);
+        }
+
+        .moving-column-content2 {
+            @include moving-column(11, 12);
         }
     }
 }

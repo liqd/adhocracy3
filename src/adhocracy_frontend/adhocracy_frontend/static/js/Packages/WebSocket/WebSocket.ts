@@ -252,7 +252,7 @@ class Subscriptions {
  * objects.
  */
 export var factoryIService = (
-    adhConfig : AdhConfig.Type,
+    adhConfig : AdhConfig.IService,
     constructRawWebSocket : (uri) => IRawWebSocket
 ) : IService => {
     "use strict";
@@ -533,7 +533,7 @@ export var factoryDummyWebSocket = () => ((uri : string): IRawWebSocket => {
  * factoryIRawWebSocket and factoryIService in the way it is almost
  * always used (besides in unit tests).
  */
-export var factory = (Modernizr : ModernizrStatic, adhConfig : AdhConfig.Type) : IService => {
+export var factory = (Modernizr : ModernizrStatic, adhConfig : AdhConfig.IService) : IService => {
     var websocketService;
     if (Modernizr.websockets) {
         websocketService = factoryIRawWebSocket();
@@ -564,7 +564,7 @@ interface WebSocketTestScope extends ng.IScope {
  */
 export class WebSocketTest {
 
-    public createDirective = ($timeout : ng.ITimeoutService, adhConfig : AdhConfig.Type, adhWebSocket : IService) : ng.IDirective => {
+    public createDirective = ($timeout : ng.ITimeoutService, adhConfig : AdhConfig.IService, adhWebSocket : IService) : ng.IDirective => {
         var _self = this;
 
         return {

@@ -2,17 +2,6 @@
 
 import _ = require("lodash");
 
-/**
- * cut ranges out of an array - original by John Resig (MIT Licensed)
- */
-export function cutArray(a : any[], from : number, to ?: number) : any[] {
-    "use strict";
-    var rest = a.slice((to || from) + 1 || a.length);
-    a.length = from < 0 ? a.length + from : from;
-    a.push.apply(a, rest);
-    return a;
-};
-
 
 /**
  * isArrayMember could be inlined, but is not for two reasons: (1)
@@ -27,31 +16,6 @@ export function isArrayMember(member : any, array : any[]) : boolean {
 
 
 /**
- * Take a maximum delay time, an array of arguments and a function.
- * Generate random delays (in ms) for each and calls the function
- * asynchronously (out of order) on each element of the array.  Ignore
- * return values of f.
- *
- * Example:
- *
- * | trickle($timeout, 5000, paths, (path) => $scope.messages.push({ "event": "modified", "resource": path }));
- */
-export var trickle = <T>($timeout: ng.ITimeoutService, maxdelay: number, xs: T[], f: (T) => void): void => {
-    xs.map((x) => $timeout(() => f(x), Math.random() * maxdelay, true));
-};
-
-
-/**
- * Check whether str ends with suffix.
- */
-export function endsWith(str : string, suffix : string) {
-    "use strict";
-
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
-};
-
-
-/**
  * Remove last hierarchy level from path (uris or directory paths). If given
  * url has a trailing slash, the returned url will also have a trailing slash.
  */
@@ -60,7 +24,7 @@ export function parentPath(url : string) : string {
 
     var result;
 
-    if (endsWith(url, "/")) {
+    if (url[url.length - 1] === "/") {
         result = url.substring(0, url.lastIndexOf("/", url.length - 2) + 1);
     } else {
         result = url.substring(0, url.lastIndexOf("/"));
@@ -116,19 +80,6 @@ export function formatString(format : string, ...args : string[]) {
     });
 }
 
-
-/**
- * Escape angular expression.
- *
- * This is mainly used to prevent XSS.
- *
- * If you want to use the output of this in HTML, please remember
- * to escape it using _.escape.
- */
-export function escapeNgExp(s : string) {
-    "use strict";
-    return "'" + s.replace(/'/g, "\\'") + "'";
-}
 
 /**
  * Filter a list of version paths to only contain the latests versions for each item.

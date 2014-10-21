@@ -29,10 +29,10 @@ import AdhDone = require("./Packages/Done/Done");
 import AdhEmbed = require("./Packages/Embed/Embed");
 import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
 import AdhHttp = require("./Packages/Http/Http");
+import AdhMetaApi = require("./Packages/Http/MetaApi");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
-import AdhMetaApi = require("./Packages/MetaApi/MetaApi");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProposal = require("./Packages/Proposal/Proposal");
@@ -152,7 +152,7 @@ export var init = (config, meta_api) => {
     app.filter("signum", () => (n : number) : string => n > 0 ? "+" + n.toString() : n.toString());
 
     app.service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", AdhProposal.Service]);
-    app.service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", AdhUser.User]);
+    app.service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", AdhUser.Service]);
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", AdhUser.registerDirective]);
     app.directive("adhUserIndicator", ["adhConfig", AdhUser.indicatorDirective]);
@@ -163,7 +163,7 @@ export var init = (config, meta_api) => {
     app.value("adhEventHandlerClass", AdhEventHandler.EventHandler);
 
     app.service("adhPermissions", ["adhHttp", "adhUser", AdhPermissions.Service]);
-    app.service("adhTopLevelState", ["adhEventHandlerClass", "$location", "$routeParams", AdhTopLevelState.TopLevelState]);
+    app.service("adhTopLevelState", ["adhEventHandlerClass", "$location", "$routeParams", AdhTopLevelState.Service]);
     app.directive("adhMovingColumns", ["adhTopLevelState", AdhTopLevelState.movingColumns]);
     app.directive("adhFocusSwitch", ["adhTopLevelState", AdhTopLevelState.adhFocusSwitch]);
 

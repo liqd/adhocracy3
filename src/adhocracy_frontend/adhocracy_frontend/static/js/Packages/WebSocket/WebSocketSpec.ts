@@ -11,7 +11,7 @@ export var register = () => {
     // includes all *Spec.ts modules.
 
     describe("WebSocket", () => {
-        var config: AdhConfig.Type = <any>{
+        var config: AdhConfig.IService = <any>{
             pkg_path: "mock",
             rest_url: "mock",
             rest_platform_path: "mock",

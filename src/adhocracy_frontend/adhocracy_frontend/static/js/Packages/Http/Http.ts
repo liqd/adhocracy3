@@ -6,17 +6,18 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
-import AdhConvert = require("./Convert");
-import AdhError = require("./Error");
-import AdhMetaApi = require("../MetaApi/MetaApi");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhTransaction = require("./Transaction");
 import AdhUtil = require("../Util/Util");
 
 import ResourcesBase = require("../../ResourcesBase");
 
 import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+
+import AdhConvert = require("./Convert");
+import AdhError = require("./Error");
+import AdhMetaApi = require("./MetaApi");
+import AdhTransaction = require("./Transaction");
 
 // re-exports
 export interface ITransactionResult extends AdhTransaction.ITransactionResult {};
@@ -61,7 +62,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         private $timeout : ng.ITimeoutService,
         private adhMetaApi : AdhMetaApi.MetaApiQuery,
         private adhPreliminaryNames : AdhPreliminaryNames,
-        private adhConfig : AdhConfig.Type
+        private adhConfig : AdhConfig.IService
     ) {}
 
     private formatUrl(path) {
