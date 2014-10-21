@@ -1087,6 +1087,31 @@ class TestActivateAccountView:
         assert inst.options() == {}
 
 
+class TestReportAbuseView:
+
+    @fixture
+    def request(self, cornice_request, registry):
+        from adhocracy_core.messaging import Messenger
+        registry.messenger = Mock(spec=Messenger)
+        cornice_request.registry = registry
+        cornice_request.validated['url'] = 'http://localhost/blablah'
+        cornice_request.validated['remark'] = 'Too much blah!'
+        return cornice_request
+
+    def _make_one(self, context, request):
+        from adhocracy_core.rest.views import ReportAbuseView
+        return ReportAbuseView(context, request)
+
+    def test_post(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.post() == ''
+        assert request.registry.messenger.send_abuse_complaint.called
+
+    def test_options(self, request, context):
+        inst = self._make_one(context, request)
+        assert inst.options() == {}
+
+
 @fixture()
 def integration(config):
     config.include('cornice')
