@@ -6,6 +6,7 @@ import AdhHttp = require("./Http");
 import Error = require("./Error");
 import AdhConvert = require("./Convert");
 import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import ResourcesBase = require("../../ResourcesBase");
 
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraph");
 import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
@@ -502,7 +503,7 @@ export var register = () => {
 
         describe("importContent", () => {
             it("returns response.data if it is an object", () => {
-                var obj = {
+                var obj : ResourcesBase.Resource = <any>{
                     content_type: "adhocracy_core.resources.pool.IBasicPool",
                     path: "p",
                     data: {}
@@ -535,7 +536,7 @@ export var register = () => {
             });
 
             it("deletes the path", () => {
-                expect(AdhConvert.exportContent(adhMetaApiMock, {content_type: RIParagraph.content_type, data: {}, path: "test"}))
+                expect(AdhConvert.exportContent(adhMetaApiMock, <any>{content_type: RIParagraph.content_type, data: {}, path: "test"}))
                     .toEqual({content_type: RIParagraph.content_type, data: {}});
             });
             it("deletes read-only properties", () => {

@@ -7,7 +7,7 @@ import AdhWebSocket = require("../WebSocket/WebSocket");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
 
-import Resources = require("../../Resources");
+import ResourcesBase = require("../../ResourcesBase");
 
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraphVersion");
@@ -27,7 +27,7 @@ var pkgLocation = "/Proposal";
  */
 interface DetailScope<Data> extends ng.IScope {
     viewmode : string;
-    content : Resources.Content<Data>;
+    content : ResourcesBase.Resource;
     path : string;
 }
 
@@ -105,7 +105,7 @@ export class ProposalVersionDetail {
             },
             controller: ["adhTopLevelState", "adhHttp", "$scope", (
                 adhTopLevelState : AdhTopLevelState.TopLevelState,
-                adhHttp : AdhHttp.Service<Resources.Content<any>>,
+                adhHttp : AdhHttp.Service<ResourcesBase.Resource>,
                 $scope : IProposalVersionDetailScope<any>
             ) : void => {
                 $scope.list = () => {
@@ -225,7 +225,7 @@ export class SectionVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Resources.Content<SISection.Sheet>>,
+                adhHttp : AdhHttp.Service<ResourcesBase.Resource>,
                 $scope : DetailRefScope<SISection.Sheet>
             ) : void => {
                 var commit = (event, ...args) => {
@@ -260,7 +260,7 @@ export class ParagraphVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Resources.Content<SIParagraph.Sheet>>,
+                adhHttp : AdhHttp.Service<ResourcesBase.Resource>,
                 $scope : DetailRefScope<SIParagraph.Sheet>
             ) : void => {
                 var commit = (event, ...args) => {
@@ -321,7 +321,7 @@ export class Service {
         // deal.)
 
         return _self.adhHttp
-            .withTransaction((transaction) : ng.IPromise<Resources.Content<any>> => {
+            .withTransaction((transaction) : ng.IPromise<ResourcesBase.Resource> => {
                 // items
                 var postProposal : AdhHttp.ITransactionResult =
                     transaction.post(poolPath, new RIProposal({preliminaryNames: _self.adhPreliminaryNames, name: name}));
@@ -357,7 +357,7 @@ export class Service {
                 var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
 
                 return transaction.commit()
-                    .then((responses) : Resources.Content<any> => {
+                    .then((responses) : ResourcesBase.Resource => {
                         // return the latest proposal Version
                         return responses[postProposalVersion.index];
                     });

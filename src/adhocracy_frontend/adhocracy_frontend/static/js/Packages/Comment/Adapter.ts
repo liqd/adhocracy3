@@ -1,6 +1,5 @@
 import _ = require("lodash");
 
-import AdhResource = require("../../Resources");
 import ResourcesBase = require("../../ResourcesBase");
 import RICommentVersion = require("../../Resources_/adhocracy_core/resources/comment/ICommentVersion");
 import RIComment = require("../../Resources_/adhocracy_core/resources/comment/IComment");
@@ -16,11 +15,11 @@ import AdhComment = require("./Comment");
 
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
-    public elemRefs(container : AdhResource.Content<SICommentable.Sheet>) {
+    public elemRefs(container : ResourcesBase.Resource) {
         return Util.latestVersionsOnly(container.data[SICommentable.nick].comments);
     }
 
-    public poolPath(container : AdhResource.Content<SICommentable.Sheet>) {
+    public poolPath(container : ResourcesBase.Resource) {
         return container.data[SICommentable.nick].post_pool;
     }
 }

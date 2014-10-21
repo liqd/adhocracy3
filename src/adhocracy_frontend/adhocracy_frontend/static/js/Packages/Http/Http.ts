@@ -54,7 +54,7 @@ export var emptyOptions : IOptions = {
 // FIXME: This service should be able to handle any type, not just subtypes of
 // ``Resources.Content``.  Methods like ``postNewVersion`` may need additional
 // constraints (e.g. by moving them to subclasses).
-export class Service<Content extends Resources.Content<any>> {
+export class Service<Content extends ResourcesBase.Resource> {
     constructor(
         private $http : ng.IHttpService,
         private $q : ng.IQService,

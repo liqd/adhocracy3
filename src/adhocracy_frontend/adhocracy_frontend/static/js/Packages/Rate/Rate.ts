@@ -69,7 +69,7 @@ export interface IRateScope extends ng.IScope {
 // (this type is over-restrictive in that T is used for both the
 // rate, the subject, and the target.  luckily, subtype-polymorphism
 // is too cool to complain about it here.  :-)
-export interface IRateAdapter<T extends AdhResource.Content<any>> {
+export interface IRateAdapter<T extends ResourcesBase.Resource> {
     create(settings : any) : T;
     createItem(settings : any) : any;
     derive(oldVersion : T, settings : any) : T;
