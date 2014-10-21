@@ -2,6 +2,7 @@
 /// <reference path="_all.d.ts"/>
 
 import JasmineHelpers = require("./JasmineHelpers");
+
 import ResourcesBase = require("./ResourcesBase");
 
 class Sheet1 extends ResourcesBase.Sheet {

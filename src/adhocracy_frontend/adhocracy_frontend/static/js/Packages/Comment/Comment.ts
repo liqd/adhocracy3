@@ -1,18 +1,18 @@
 import _ = require("lodash");
 
-import AdhResourcesBase = require("../../ResourcesBase");
-
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
+import AdhPermissions = require("../Permissions/Permissions");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhResourcesBase = require("../../ResourcesBase");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
+import AdhUtil = require("../Util/Util");
+
 import RIExternalResource = require("../../Resources_/adhocracy_core/resources/external_resource/IExternalResource");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-import Util = require("../Util/Util");
 
 var pkgLocation = "/Comment";
 
@@ -145,7 +145,7 @@ export class CommentResource<R extends AdhResourcesBase.Resource> extends AdhRes
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, oldVersion : R) {
         var resource = this.adapter.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
         this.adapter.content(resource, instance.scope.data.content);
-        resource.parent = Util.parentPath(oldVersion.path);
+        resource.parent = AdhUtil.parentPath(oldVersion.path);
         return this.$q.when([resource]);
     }
 }

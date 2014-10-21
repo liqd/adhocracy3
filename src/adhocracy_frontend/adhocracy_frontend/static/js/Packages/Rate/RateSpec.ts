@@ -2,12 +2,12 @@
 
 import q = require("q");
 
-import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
-import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import AdhRate = require("./Rate");
 import AdhRateAdapter = require("./Adapter");
-import PreliminaryNames = require ("../PreliminaryNames/PreliminaryNames");
+import AdhPreliminaryNames = require ("../PreliminaryNames/PreliminaryNames");
 
+import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
+import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 
 var mkScopeMock = () => {
     return {
@@ -137,7 +137,7 @@ export var register = () => {
                 userMock = mkUserMock();
 
                 adapter = new AdhRateAdapter.RateAdapter();
-                rateVersion = new RIRateVersion({ preliminaryNames: new PreliminaryNames() });
+                rateVersion = new RIRateVersion({ preliminaryNames: new AdhPreliminaryNames() });
                 rateVersion.data["adhocracy_core.sheets.rate.IRate"] = new SIRate.Sheet({
                     subject: "sub",
                     object: "obj",

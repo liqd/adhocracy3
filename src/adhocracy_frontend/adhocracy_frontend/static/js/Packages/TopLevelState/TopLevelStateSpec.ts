@@ -1,6 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
 import AdhTopLevelState = require("./TopLevelState");
+
 var DEFAULT_FOCUS : number = 1;
 
 export var register = () => {

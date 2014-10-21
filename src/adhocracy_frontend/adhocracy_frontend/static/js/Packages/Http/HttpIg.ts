@@ -2,7 +2,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import Resources = require("../../Resources");
+import AdhHttp = require("./Http");
+import AdhMetaApi = require("../MetaApi/MetaApi");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+
+import ResourcesBase = require("../../ResourcesBase");
+
 import RIProposal = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposal");
 import RIProposalVersion = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposalVersion");
 import RISection = require("../../Resources_/adhocracy_core/resources/sample_section/ISection");
@@ -11,10 +16,6 @@ import RITag = require("../../Resources_/adhocracy_core/interfaces/ITag");
 import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-
-import AdhMetaApi = require("../MetaApi/MetaApi");
-import AdhHttp = require("./Http");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 
 export var register = (angular, config, meta_api) => {
@@ -63,7 +64,7 @@ export var register = (angular, config, meta_api) => {
                 transaction.post(proposal.path, proposalVersionResource);
 
                 return transaction.commit()
-                    .then((responses) : ng.IPromise<Resources.Content<any>> => {
+                    .then((responses) : ng.IPromise<ResourcesBase.Resource> => {
                         var lastTagPath : string = responses[proposal.index].path + "LAST";
                         return adhHttp.get(lastTagPath);
                     })

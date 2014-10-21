@@ -1,5 +1,5 @@
-import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
+import AdhHttp = require("../Http/Http");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import RIBasicPool = require("Resources_/adhocracy_core/resources/pool/IBasicPool");
