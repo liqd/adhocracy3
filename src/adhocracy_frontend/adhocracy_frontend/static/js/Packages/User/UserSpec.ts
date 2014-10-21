@@ -1,6 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
 import q = require("q");
+import _ = require("lodash");
 
 import AdhUser = require("./User");
 
