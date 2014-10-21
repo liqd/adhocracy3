@@ -186,7 +186,8 @@ Can create process content::
 
     >>> resp_data = testapp.options(pool, headers=contributor_header).json
     >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
-    ['adhocracy_core.resources.sample_proposal.IProposal']
+    ['adhocracy_core.resources.external_resource.IExternalResource',
+     'adhocracy_core.resources.sample_proposal.IProposal']
 
 Can edit his own process content::
 
@@ -199,8 +200,9 @@ Can edit his own process content::
 Cannot create process structure::
 
     >>> resp_data = testapp.options(pool, headers=contributor_header).json
-    >>> pprint([r['content_type'] for r in resp_data['POST']['request_body']])
-    ['adhocracy_core.resources.sample_proposal.IProposal']
+    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
+    ['adhocracy_core.resources.external_resource.IExternalResource',
+     'adhocracy_core.resources.sample_proposal.IProposal']
 
 Cannot edit process structure::
 
