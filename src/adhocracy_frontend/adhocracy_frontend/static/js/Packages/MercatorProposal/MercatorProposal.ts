@@ -219,3 +219,28 @@ export var listing = (adhConfig : AdhConfig.IService) => {
         }
     };
 };
+
+
+export var lastVersion = (
+    $compile : ng.ICompileService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        scope: {
+            itemPath: "@"
+        },
+        link: (scope, element) => {
+            var template = element.html();
+            element.html("");
+
+            adhHttp.getNewestVersionPathNoFork(scope.itemPath).then(
+                (versionPath) => {
+                    scope.versionPath = versionPath;
+
+                    element.html(template);
+                    $compile(element.contents())(scope);
+                });
+        }
+    };
+};

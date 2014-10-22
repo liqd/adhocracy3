@@ -252,6 +252,8 @@ export var init = (config, meta_api) => {
     app.directive("adhMercatorProposalListing", ["adhConfig", AdhMercatorProposal.listing]);
     app.directive("adhRouteView", ["$compile", AdhRoute.viewFactory]);
 
+    app.directive("adhLastVersion", ["$compile", "adhHttp", AdhMercatorProposal.lastVersion]);
+
     // get going
 
     var injector = angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
