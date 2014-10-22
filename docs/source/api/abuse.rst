@@ -49,6 +49,8 @@ won't try to interpret it in any way.
 Censorship
 ----------
 
+FIXME Move this to deletion.rst and integrate with the stuff there.
+
 Bad content can be marked as non-existent using the DELETE method.
 
     >> a = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
