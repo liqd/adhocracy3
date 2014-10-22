@@ -34,6 +34,7 @@ from adhocracy_core.rest.schemas import POSTActivateAccountViewRequestSchema
 from adhocracy_core.rest.schemas import POSTItemRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginEmailRequestSchema
 from adhocracy_core.rest.schemas import POSTLoginUsernameRequestSchema
+from adhocracy_core.rest.schemas import POSTReportAbuseViewRequestSchema
 from adhocracy_core.rest.schemas import POSTResourceRequestSchema
 from adhocracy_core.rest.schemas import PUTResourceRequestSchema
 from adhocracy_core.rest.schemas import GETPoolRequestSchema
@@ -862,6 +863,34 @@ class ActivateAccountView(RESTView):
     def post(self) -> dict:
         """Activate a user account and log the user in."""
         return _login_user(self.request)
+
+
+@view_defaults(
+    renderer='string',
+    context=IRootPool,
+    http_cache=0,
+    name='report_abuse',
+)
+class ReportAbuseView(RESTView):
+
+    """Receive and process an abuse complaint."""
+
+    validation_POST = (POSTReportAbuseViewRequestSchema, [])
+
+    @view_config(request_method='OPTIONS')
+    def options(self) -> dict:
+        """Return options for view."""
+        return super().options()
+
+    @view_config(request_method='POST',
+                 content_type='application/json')
+    def post(self) -> dict:
+        """Receive and process an abuse complaint."""
+        messenger = self.request.registry.messenger
+        messenger.send_abuse_complaint(url=self.request.validated['url'],
+                                       remark=self.request.validated['remark'],
+                                       user=get_user(self.request))
+        return ''
 
 
 def includeme(config):

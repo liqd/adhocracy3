@@ -35,9 +35,21 @@ adhocracy.initial_password = god
 # The initial user group
 # Members of this group have permission for everything
 adhocracy.initial_group_name = gods
+# Set to false to use the SMTP server instead
+adhocracy.use_mail_queue = true
+# Email address receiving abuse complaints
+adhocracy.abuse_handler_mail = abuse_handler@unconfigured.domain
 
 mail.queue_path = %(here)s/../var/mail
-mail.default_sender = admin@example.com
+# Configure the following fields for sending mails via SMTP
+# See github.com/Pylons/pyramid_mailer for details
+mail.default_sender = support@unconfigured.domain
+mail.host = localhost
+mail.port = 25
+#mail.username = None
+#mail.password = None
+mail.tls = False
+mail.ssl = False
 
 [server:main]
 use = egg:gunicorn#main

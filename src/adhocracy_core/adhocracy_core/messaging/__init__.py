@@ -8,6 +8,9 @@ from pyramid.renderers import render
 from pyramid.settings import asbool
 from pyramid_mailer.interfaces import IMailer
 from pyramid_mailer.message import Message
+from pyramid.traversal import resource_path
+
+from adhocracy_core.interfaces import IResource
 
 
 logger = getLogger(__name__)
@@ -26,6 +29,8 @@ class Messenger():
         self.use_mail_queue = asbool(registry.settings.get(
             'adhocracy.use_mail_queue', 'false'))
         logger.debug('Messenger will use mail queue: %s', self.use_mail_queue)
+        self.abuse_handler_mail = registry.settings.get(
+            'adhocracy.abuse_handler_mail')
 
     def send_mail(self,
                   subject: str,
@@ -93,7 +98,7 @@ class Messenger():
         :param recipients: non-empty list of the email addresses of recipients
         :param template_asset_base: the base name of template file(s) to use,
             in format: ``packagename:path/to/file``
-        :param args: dictionary or arguments to pass to the renderer
+        :param args: dictionary of arguments to pass to the renderer
         :param sender: the email message of the sender; if None, the configured
             default sender address will be used
         :raise ConnectionError: if no connection to the configured mail server
@@ -126,6 +131,26 @@ class Messenger():
 
     def _render(self, template_name: str, args: dict) -> str:
         return render(template_name, args, None)
+
+    def send_abuse_complaint(self, url: str, remark: str,
+                             user: IResource=None):
+        """Send an abuse complaint to the preconfigured abuse handler.
+
+        :param url: the frontend URL of the resource considered offensive
+        :param remark: explanation provided by the complaining user
+        :param user: the complaining user, or `None` if not logged in
+        """
+        assert self.abuse_handler_mail, 'No abuse handler mail specified!'
+        logger.debug('Sending abuse complaint about %s', url)
+        user_path = None if user is None else resource_path(user)
+        args = {'url': url, 'remark': remark, 'user_path': user_path}
+        # FIXME For security reasons, we should check that the url starts
+        # with one of the prefixes where frontends are supposed to be running
+        self.render_and_send_mail(
+            subject='Adhocracy Abuse Complaint',
+            recipients=[self.abuse_handler_mail],
+            template_asset_base='adhocracy_core:templates/abuse_complaint',
+            args=args)
 
 
 def includeme(config):
