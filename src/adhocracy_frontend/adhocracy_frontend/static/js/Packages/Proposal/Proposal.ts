@@ -1,23 +1,23 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 
-import Util = require("../Util/Util");
-import AdhHttp = require("../Http/Http");
 import AdhConfig = require("../Config/Config");
-import AdhWebSocket = require("../WebSocket/WebSocket");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import AdhHttp = require("../Http/Http");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import AdhUtil = require("../Util/Util");
+import AdhWebSocket = require("../WebSocket/WebSocket");
 
-import Resources = require("../../Resources");
+import ResourcesBase = require("../../ResourcesBase");
 
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraph");
 import RIParagraphVersion = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraphVersion");
 import RIProposal = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposal");
 import RIProposalVersion = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposalVersion");
-import RISectionVersion = require("../../Resources_/adhocracy_core/resources/sample_section/ISectionVersion");
 import RISection = require("../../Resources_/adhocracy_core/resources/sample_section/ISection");
+import RISectionVersion = require("../../Resources_/adhocracy_core/resources/sample_section/ISectionVersion");
+import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SIParagraph = require("../../Resources_/adhocracy_core/sheets/document/IParagraph");
 import SISection = require("../../Resources_/adhocracy_core/sheets/document/ISection");
-import SIDocument = require("../../Resources_/adhocracy_core/sheets/document/IDocument");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/Proposal";
@@ -27,7 +27,7 @@ var pkgLocation = "/Proposal";
  */
 interface DetailScope<Data> extends ng.IScope {
     viewmode : string;
-    content : Resources.Content<Data>;
+    content : ResourcesBase.Resource;
     path : string;
 }
 
@@ -92,7 +92,7 @@ export class ProposalDetail {
 export class ProposalVersionDetail {
     public static templateUrl : string = "Proposal.html";
 
-    public createDirective(adhConfig : AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.IService) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
@@ -104,8 +104,8 @@ export class ProposalVersionDetail {
                 viewmode: "@"
             },
             controller: ["adhTopLevelState", "adhHttp", "$scope", (
-                adhTopLevelState : AdhTopLevelState.TopLevelState,
-                adhHttp : AdhHttp.Service<Resources.Content<any>>,
+                adhTopLevelState : AdhTopLevelState.Service,
+                adhHttp : AdhHttp.Service<ResourcesBase.Resource>,
                 $scope : IProposalVersionDetailScope<any>
             ) : void => {
                 $scope.list = () => {
@@ -160,7 +160,7 @@ interface IScopeProposalVersion {
 
 export class ProposalVersionNew {
 
-    public createDirective(adhHttp : ng.IHttpService, adhConfig : AdhConfig.Type, adhProposal : Service) {
+    public createDirective(adhHttp : ng.IHttpService, adhConfig : AdhConfig.IService, adhProposal : Service) {
 
         return {
             restrict: "E",
@@ -214,7 +214,7 @@ var explainPreliminaryGetIssue : string = (
 
 export class SectionVersionDetail {
 
-    public createDirective(adhConfig : AdhConfig.Type, recursionHelper) {
+    public createDirective(adhConfig : AdhConfig.IService, recursionHelper) {
 
         return {
             restrict: "E",
@@ -225,7 +225,7 @@ export class SectionVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Resources.Content<SISection.Sheet>>,
+                adhHttp : AdhHttp.Service<ResourcesBase.Resource>,
                 $scope : DetailRefScope<SISection.Sheet>
             ) : void => {
                 var commit = (event, ...args) => {
@@ -250,7 +250,7 @@ export class SectionVersionDetail {
 
 export class ParagraphVersionDetail {
 
-    public createDirective(adhConfig : AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.IService) {
 
         return {
             restrict: "E",
@@ -260,7 +260,7 @@ export class ParagraphVersionDetail {
                 viewmode: "="
             },
             controller: ["adhHttp", "$scope", (
-                adhHttp : AdhHttp.Service<Resources.Content<SIParagraph.Sheet>>,
+                adhHttp : AdhHttp.Service<ResourcesBase.Resource>,
                 $scope : DetailRefScope<SIParagraph.Sheet>
             ) : void => {
                 var commit = (event, ...args) => {
@@ -308,7 +308,7 @@ export class Service {
             });
 
         var name = proposalVersion.data[SIDocument.nick].title;
-        name = Util.normalizeName(name);
+        name = AdhUtil.normalizeName(name);
 
         // this is the batch-request logic.  it works a bit different
         // from the original logic in that it follows the references
@@ -321,7 +321,7 @@ export class Service {
         // deal.)
 
         return _self.adhHttp
-            .withTransaction((transaction) : ng.IPromise<Resources.Content<any>> => {
+            .withTransaction((transaction) : ng.IPromise<ResourcesBase.Resource> => {
                 // items
                 var postProposal : AdhHttp.ITransactionResult =
                     transaction.post(poolPath, new RIProposal({preliminaryNames: _self.adhPreliminaryNames, name: name}));
@@ -357,7 +357,7 @@ export class Service {
                 var postProposalVersion : AdhHttp.ITransactionResult = transaction.post(postProposal.path, proposalVersion);
 
                 return transaction.commit()
-                    .then((responses) : Resources.Content<any> => {
+                    .then((responses) : ResourcesBase.Resource => {
                         // return the latest proposal Version
                         return responses[postProposalVersion.index];
                     });

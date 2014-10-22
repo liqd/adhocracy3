@@ -404,7 +404,7 @@ def supervisor(request) -> str:
     output = subprocess.check_output('bin/supervisord',
                                      shell=True,
                                      stderr=subprocess.STDOUT)
-    assert str(output) == ''
+    assert bool(output) is False  # assert there are no error messages
     return output
 
 

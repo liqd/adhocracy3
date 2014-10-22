@@ -1,8 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import Config = require("../Config/Config");
-
-import CrossWindowMessaging = require("./CrossWindowMessaging");
+import AdhConfig = require("../Config/Config");
+import AdhCrossWindowMessaging = require("./CrossWindowMessaging");
 
 
 export var register = () => {
@@ -24,7 +23,8 @@ export var register = () => {
 
             beforeEach(() => {
                 postMessageMock = <any>jasmine.createSpy("postMessageMock");
-                service = new CrossWindowMessaging.Service(postMessageMock, windowMock, rootScopeMock, ["http://trusted.lan"], adhUserMock);
+                service = new AdhCrossWindowMessaging.Service(
+                    postMessageMock, windowMock, rootScopeMock, ["http://trusted.lan"], adhUserMock);
             });
 
             describe("registerMessageHandler", () => {
@@ -136,7 +136,7 @@ export var register = () => {
             var dummy;
 
             beforeEach(() => {
-                dummy = new CrossWindowMessaging.Dummy();
+                dummy = new AdhCrossWindowMessaging.Dummy();
             });
 
             it("has a property 'dummy'", () => {
@@ -157,7 +157,7 @@ export var register = () => {
 
         describe("factory", () => {
             var service;
-            var config : Config.Type;
+            var config : AdhConfig.IService;
 
             beforeEach(() => {
                 config = <any>{
@@ -172,18 +172,18 @@ export var register = () => {
             });
 
             it("returns a service instance", () => {
-                service = CrossWindowMessaging.factory(config, windowMock, rootScopeMock);
+                service = AdhCrossWindowMessaging.factory(config, windowMock, rootScopeMock);
                 expect(service).toBeDefined();
             });
             it("returns a dummy service when not embedded", () => {
                 config.embedded = false;
-                service = CrossWindowMessaging.factory(config, windowMock, rootScopeMock);
+                service = AdhCrossWindowMessaging.factory(config, windowMock, rootScopeMock);
                 expect(service.dummy).toBeDefined();
             });
             it("returns a service instance that uses $window.parent.postMessage", () => {
                 var name = "test";
                 var data = {x: "y"};
-                service = CrossWindowMessaging.factory(config, windowMock, rootScopeMock);
+                service = AdhCrossWindowMessaging.factory(config, windowMock, rootScopeMock);
                 service.postMessage(name, data);
                 expect(windowMock.parent.postMessage).toHaveBeenCalled();
             });

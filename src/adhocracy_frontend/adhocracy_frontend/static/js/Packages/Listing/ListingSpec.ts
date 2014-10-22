@@ -1,16 +1,16 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-// This is only used at compile time and will be stripped by the compiler
-import Config = require("../Config/Config");
-
 import q = require("q");
 
+// This is only used at compile time and will be stripped by the compiler
+import AdhConfig = require("../Config/Config");
+
 // the module under test
-import Listing = require("./Listing");
+import AdhListing = require("./Listing");
 
 
-var config : Config.Type = <any>{
+var config : AdhConfig.IService = <any>{
     pkg_path: "mock",
     rest_url: "mock",
     rest_platform_path: "mock",
@@ -54,7 +54,7 @@ export var register = () => {
                         }
                     }
                 };
-                adapter = new Listing.ListingPoolAdapter();
+                adapter = new AdhListing.ListingPoolAdapter();
             });
 
             describe("elemRefs", () => {
@@ -72,7 +72,7 @@ export var register = () => {
 
         describe("Listing", () => {
             it("has property 'templateUrl'", () => {
-                expect(Listing.Listing.templateUrl).toBeDefined();
+                expect(AdhListing.Listing.templateUrl).toBeDefined();
             });
 
             describe("createDirective", () => {
@@ -92,7 +92,7 @@ export var register = () => {
                 adapter.elemRefs.and.returnValue(elements);
                 adapter.poolPath.and.returnValue(poolPath);
 
-                var listing = new Listing.Listing(adapter);
+                var listing = new AdhListing.Listing(adapter);
                 var directive: ng.IDirective = listing.createDirective(config, adhWebSocketMock);
 
                 registerDirectiveSpec(directive);

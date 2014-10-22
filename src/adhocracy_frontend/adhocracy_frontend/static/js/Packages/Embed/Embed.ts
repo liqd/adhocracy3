@@ -2,7 +2,7 @@
 
 import _ = require("lodash");
 
-import Util = require("../Util/Util");
+import AdhUtil = require("../Util/Util");
 
 /**
  * List of directive names that can be embedded.  names must be in
@@ -23,15 +23,15 @@ export var route2template = ($route : ng.route.IRouteService) => {
     if (!params.hasOwnProperty("widget")) {
         throw "widget not specified";
     }
-    if (!Util.isArrayMember(params.widget, embeddableDirectives)) {
+    if (!AdhUtil.isArrayMember(params.widget, embeddableDirectives)) {
         throw "unknown widget: " + params.widget;
     }
     for (var key in params) {
         if (params.hasOwnProperty(key) && key !== "widget" && key !== "locale") {
-            attrs.push(Util.formatString("data-{0}=\"{1}\"", _.escape(key), _.escape(params[key])));
+            attrs.push(AdhUtil.formatString("data-{0}=\"{1}\"", _.escape(key), _.escape(params[key])));
         }
     }
-    return Util.formatString("<adh-{0} {1}></adh-{0}>", _.escape(params.widget), attrs.join(" "));
+    return AdhUtil.formatString("<adh-{0} {1}></adh-{0}>", _.escape(params.widget), attrs.join(" "));
 };
 
 export var factory = ($compile : ng.ICompileService, $route : ng.route.IRouteService) => {

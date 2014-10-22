@@ -3,14 +3,18 @@
 import q = require("q");
 
 import AdhHttp = require("./Http");
-import Error = require("./Error");
-import AdhConvert = require("./Convert");
-import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+
+import ResourcesBase = require("../../ResourcesBase");
 
 import RIParagraph = require("../../Resources_/adhocracy_core/resources/sample_paragraph/IParagraph");
 import SITag = require("../../Resources_/adhocracy_core/sheets/tags/ITag");
 
-var mkHttpMock = (adhPreliminaryNames : PreliminaryNames) => {
+import Convert = require("./Convert");
+import Error = require("./Error");
+
+
+var mkHttpMock = (adhPreliminaryNames : AdhPreliminaryNames) => {
     var mock = jasmine.createSpy("$httpMock");
 
     var response = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
@@ -82,7 +86,7 @@ export var register = () => {
             var adhHttp : AdhHttp.Service<any>;
 
             beforeEach(() => {
-                adhPreliminaryNames = new PreliminaryNames();
+                adhPreliminaryNames = new AdhPreliminaryNames();
                 $httpMock = mkHttpMock(adhPreliminaryNames);
                 $timeoutMock = mkTimeoutMock();
                 adhMetaApiMock = mkAdhMetaApiMock();
@@ -202,7 +206,7 @@ export var register = () => {
                         }
                     );
                 });
-                it("throws an exception if LAST.length !== 1", (done) => {
+                it("throws an exception if LAST.length === 0", (done) => {
                     $httpMock.get.and.returnValue(q.when({
                         data: {
                             "adhocracy_core.sheets.tags.ITag": {
@@ -215,7 +219,8 @@ export var register = () => {
                         () => { expect(true).toBe(false); done(); },
                         () => { expect(true).toBe(true); done(); }
                     );
-
+                });
+                it("throws an exception if LAST.length > 1", (done) => {
                     $httpMock.get.and.returnValue(q.when({
                         data: {
                             "adhocracy_core.sheets.tags.ITag": {
@@ -502,7 +507,7 @@ export var register = () => {
 
         describe("importContent", () => {
             it("returns response.data if it is an object", () => {
-                var obj = {
+                var obj : ResourcesBase.Resource = <any>{
                     content_type: "adhocracy_core.resources.pool.IBasicPool",
                     path: "p",
                     data: {}
@@ -511,8 +516,8 @@ export var register = () => {
                     data: obj
                 };
                 var adhMetaApiMock = mkAdhMetaApiMock();
-                var adhPreliminaryNames = new PreliminaryNames();
-                var imported = () => AdhConvert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
+                var adhPreliminaryNames = new AdhPreliminaryNames();
+                var imported = () => Convert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
                 expect(imported().path).toBe(obj.path);
             });
             it("throws if response.data is not an object", () => {
@@ -521,8 +526,8 @@ export var register = () => {
                     data: obj
                 };
                 var adhMetaApiMock = mkAdhMetaApiMock();
-                var adhPreliminaryNames = new PreliminaryNames();
-                var imported = () => AdhConvert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
+                var adhPreliminaryNames = new AdhPreliminaryNames();
+                var imported = () => Convert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
                 expect(imported).toThrow();
             });
         });
@@ -535,11 +540,11 @@ export var register = () => {
             });
 
             it("deletes the path", () => {
-                expect(AdhConvert.exportContent(adhMetaApiMock, {content_type: RIParagraph.content_type, data: {}, path: "test"}))
+                expect(Convert.exportContent(adhMetaApiMock, <any>{content_type: RIParagraph.content_type, data: {}, path: "test"}))
                     .toEqual({content_type: RIParagraph.content_type, data: {}});
             });
             it("deletes read-only properties", () => {
-                var x = AdhConvert.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
+                var x = Convert.exportContent(adhMetaApiMock, adhMetaApiMock.objBefore);
                 var y = adhMetaApiMock.objAfter;
                 expect(x).toEqual(y);  // (yes, this appears to do deep comparison of the entire structure.)
                 expect(adhMetaApiMock.field).toHaveBeenCalled();
@@ -569,24 +574,12 @@ export var register = () => {
                         errors: []
                     };
                     expect(() => fn(wrap(backendError))).toThrow();
-                    expect(console.log).toHaveBeenCalledWith(backendError);
-                });
 
-                it("logs all individual errors to console", () => {
-                    var backendError = {
-                        status: "error",
-                        errors: [
-                            { name: "where0.0", location: "where0.1", description: "what0" },
-                            { name: "where1.0", location: "where1.1", description: "what1" }
-                        ]
-                    };
-                    expect(() => fn(wrap(backendError))).toThrow();
-                    expect(console.log).toHaveBeenCalledWith("error #0");
-                    expect(console.log).toHaveBeenCalledWith("where: where0.0, where0.1");
-                    expect(console.log).toHaveBeenCalledWith("what:  what0");
-                    expect(console.log).toHaveBeenCalledWith("error #1");
-                    expect(console.log).toHaveBeenCalledWith("where: where1.0, where1.1");
-                    expect(console.log).toHaveBeenCalledWith("what:  what1");
+                    if (name === "logBackendError") {
+                        expect(console.log).toHaveBeenCalledWith("response:", backendError);
+                    } else {
+                        expect(console.log).toHaveBeenCalledWith("response:", [ { body: backendError } ]);
+                    }
                 });
 
                 afterEach(() => {

@@ -1,12 +1,14 @@
 import _ = require("lodash");
 
-import MetaApi = require("../MetaApi/MetaApi");
-import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import Resources = require("../../Resources");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+
+import ResourcesBase = require("../../ResourcesBase");
 import Resources_ = require("../../Resources_");
 
+import AdhMetaApi = require("./MetaApi");
 
-var sanityCheck = (obj : Resources.Content<any>) : void => {
+
+var sanityCheck = (obj : ResourcesBase.Resource) : void => {
     if (typeof obj !== "object") {
         throw ("unexpected type: " + (typeof obj).toString() + "\nin object:\n" + JSON.stringify(obj, null, 2));
     }
@@ -24,10 +26,10 @@ var sanityCheck = (obj : Resources.Content<any>) : void => {
 /**
  * transform objects on the way in (all request methods)
  */
-export var importContent = <Content extends Resources.Content<any>>(
+export var importContent = <Content extends ResourcesBase.Resource>(
     response : {data : Content},
-    metaApi : MetaApi.MetaApiQuery,
-    preliminaryNames : PreliminaryNames
+    metaApi : AdhMetaApi.MetaApiQuery,
+    preliminaryNames : AdhPreliminaryNames
 ) : Content => {
     "use strict";
 
@@ -133,10 +135,10 @@ export var importContent = <Content extends Resources.Content<any>>(
  * functions simultaneously and has not been deemed worthwhile so
  * far.
  */
-export var importBatchContent = <Content extends Resources.Content<any>>(
+export var importBatchContent = <Content extends ResourcesBase.Resource>(
     responses : { data : {body : Content}[] },
-    metaApi : MetaApi.MetaApiQuery,
-    preliminaryNames : PreliminaryNames
+    metaApi : AdhMetaApi.MetaApiQuery,
+    preliminaryNames : AdhPreliminaryNames
 ) : Content[] => {
     // FIXME: description files don't appear to support array-typed
     // response bodies.  this might be a good thing (web security and
@@ -160,22 +162,22 @@ export var importBatchContent = <Content extends Resources.Content<any>>(
  * also, fields with create_mandatory should not be missing from the
  * posted object.
  */
-export var exportContent = <Content extends Resources.Content<any>>(adhMetaApi : MetaApi.MetaApiQuery, obj : Content) : Content => {
+export var exportContent = <Rs extends ResourcesBase.Resource>(adhMetaApi : AdhMetaApi.MetaApiQuery, obj : Rs) : Rs => {
     "use strict";
 
     sanityCheck(obj);
-    var newobj : Content = _.cloneDeep(obj);
+    var newobj : Rs = _.cloneDeep(obj);
 
     // remove some fields from newobj.data[*] and empty sheets from
     // newobj.data.
     for (var sheetName in newobj.data) {
         if (newobj.data.hasOwnProperty(sheetName)) {
-            var sheet : MetaApi.ISheet = newobj.data[sheetName];
+            var sheet : AdhMetaApi.ISheet = newobj.data[sheetName];
             var keepSheet : boolean = false;
 
             for (var fieldName in sheet) {
                 if (sheet.hasOwnProperty(fieldName)) {
-                    var fieldMeta : MetaApi.ISheetField = adhMetaApi.field(sheetName, fieldName);
+                    var fieldMeta : AdhMetaApi.ISheetField = adhMetaApi.field(sheetName, fieldName);
 
                     if (fieldMeta.editable || fieldMeta.creatable || fieldMeta.create_mandatory) {
                         keepSheet = true;

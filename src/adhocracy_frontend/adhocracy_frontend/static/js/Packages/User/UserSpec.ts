@@ -1,14 +1,16 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
+import q = require("q");
+import _ = require("lodash");
+
+import AdhUser = require("./User");
+
 // FIXME: DefinitelyTyped is not yet compatible with jasmine 2.0.0
 declare var beforeEach : (any) => void;
 
-import AdhUser = require("./User");
-import q = require("q");
-
 export var register = () => {
     describe("User", () => {
-        describe("User", () => {
+        describe("Service", () => {
             var adhUser;
             var adhHttpMock;
             var httpMock;
@@ -50,7 +52,7 @@ export var register = () => {
                     localstorage: true
                 };
 
-                adhUser = new AdhUser.User(adhHttpMock, q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
+                adhUser = new AdhUser.Service(adhHttpMock, q, httpMock, rootScopeMock, windowMock, angularMock, modernizrMock);
             });
 
             it("registers a handler on 'storage' DOM events", () => {

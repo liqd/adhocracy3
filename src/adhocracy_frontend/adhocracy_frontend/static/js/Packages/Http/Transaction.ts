@@ -1,12 +1,12 @@
-import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhResources = require("../../Resources");
-import MetaApi = require("../MetaApi/MetaApi");
 import AdhConfig = require("../Config/Config");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
+import ResourcesBase = require("../../ResourcesBase");
+
+import AdhConvert = require("./Convert");
 import AdhError = require("./Error");
 import AdhHttp = require("./Http");
-import AdhConvert = require("./Convert");
-
+import AdhMetaApi = require("./MetaApi");
 
 export interface ITransactionResult {
     index : number;
@@ -29,9 +29,9 @@ export class Transaction {
 
     constructor(
         private adhHttp : AdhHttp.Service<any>,
-        private adhMetaApi : MetaApi.MetaApiQuery,
-        private adhPreliminaryNames : PreliminaryNames,
-        private adhConfig : AdhConfig.Type
+        private adhMetaApi : AdhMetaApi.MetaApiQuery,
+        private adhPreliminaryNames : AdhPreliminaryNames,
+        private adhConfig : AdhConfig.IService
     ) {
         this.requests = [];
         this.committed = false;
@@ -55,7 +55,7 @@ export class Transaction {
         };
     }
 
-    public put(path : string, obj : AdhResources.Content<any>) : ITransactionResult {
+    public put(path : string, obj : ResourcesBase.Resource) : ITransactionResult {
         this.checkNotCommitted();
         this.requests.push({
             method: "PUT",
@@ -68,7 +68,7 @@ export class Transaction {
         };
     }
 
-    public post(path : string, obj : AdhResources.Content<any>) : ITransactionResult {
+    public post(path : string, obj : ResourcesBase.Resource) : ITransactionResult {
         this.checkNotCommitted();
         var preliminaryPath;
         if (typeof obj.path === "string") {
@@ -96,7 +96,7 @@ export class Transaction {
         };
     }
 
-    public commit() : ng.IPromise<AdhResources.Content<any>[]> {
+    public commit() : ng.IPromise<ResourcesBase.Resource[]> {
         this.checkNotCommitted();
         this.committed = true;
         var conv = (request) => {

@@ -12,7 +12,7 @@ declare var process : any;
 
 import Base = require("./ResourcesBase");
 import Util = require("./mkResources/Util");
-import MetaApi = require("./Packages/MetaApi/MetaApi");
+import MetaApi = require("./Packages/Http/MetaApi");
 
 
 

@@ -1,19 +1,18 @@
+import _ = require("lodash");
+
 import AdhConfig = require("../Config/Config");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhHttp = require("../Http/Http");
 import AdhPermissions = require("../Permissions/Permissions");
-import AdhResource = require("../../Resources");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhUser = require("../User/User");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import RIRate = require("../../Resources_/adhocracy_core/resources/rate/IRate");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
-// import SICanRate = require("../../Resources_/adhocracy_core/sheets/rate/ICanRate");
-import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
-// import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
+import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
 
 var pkgLocation = "/Rate";
@@ -69,7 +68,7 @@ export interface IRateScope extends ng.IScope {
 // (this type is over-restrictive in that T is used for both the
 // rate, the subject, and the target.  luckily, subtype-polymorphism
 // is too cool to complain about it here.  :-)
-export interface IRateAdapter<T extends AdhResource.Content<any>> {
+export interface IRateAdapter<T extends ResourcesBase.Resource> {
     create(settings : any) : T;
     createItem(settings : any) : any;
     derive(oldVersion : T, settings : any) : T;
@@ -241,7 +240,7 @@ export var rateController = (
     $q : ng.IQService,
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
-    adhUser : AdhUser.User,
+    adhUser : AdhUser.Service,
     adhPreliminaryNames : AdhPreliminaryNames
 ) : ng.IPromise<void> => {
 
@@ -349,7 +348,7 @@ export var rateController = (
 
 export var createDirective = (
     adapter : IRateAdapter<any>,
-    adhConfig : AdhConfig.Type
+    adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",

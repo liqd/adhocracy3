@@ -9,7 +9,7 @@ var pkgLocation = "/DocumentWorkbench";
 
 interface IDocumentWorkbenchScope extends ng.IScope {
     path : string;
-    user : AdhUser.User;
+    user : AdhUser.Service;
     websocketTestPaths : string;
     contentType : string;
 }
@@ -17,7 +17,7 @@ interface IDocumentWorkbenchScope extends ng.IScope {
 export class DocumentWorkbench {
     public static templateUrl : string = pkgLocation + "/DocumentWorkbench.html";
 
-    public createDirective(adhConfig : AdhConfig.Type) {
+    public createDirective(adhConfig : AdhConfig.IService) {
         var _self = this;
         var _class = (<any>_self).constructor;
 
@@ -25,7 +25,7 @@ export class DocumentWorkbench {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
             controller: ["adhUser", "$scope", (
-                adhUser : AdhUser.User,
+                adhUser : AdhUser.Service,
                 $scope : IDocumentWorkbenchScope
             ) : void => {
                 $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;

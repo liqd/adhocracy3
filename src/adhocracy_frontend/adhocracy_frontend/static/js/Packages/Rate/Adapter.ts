@@ -1,22 +1,22 @@
 import _ = require("lodash");
 
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+
 import ResourcesBase = require("../../ResourcesBase");
-import PreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import RIRate = require("../../Resources_/adhocracy_core/resources/rate/IRate");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
-// import SICanRate = require("../../Resources_/adhocracy_core/sheets/rate/ICanRate");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
-import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 
 import AdhRate = require("./Rate");
 
 
 export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
     create(args : {
-        preliminaryNames : PreliminaryNames;
+        preliminaryNames : AdhPreliminaryNames;
         path ?: string;
         name ?: string;
         subject : string;
@@ -42,7 +42,7 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
         return resource;
     }
 
-    createItem(args : { preliminaryNames : PreliminaryNames; path ?: string }) : RIRate {
+    createItem(args : { preliminaryNames : AdhPreliminaryNames; path ?: string }) : RIRate {
         return new RIRate(args);
     }
 

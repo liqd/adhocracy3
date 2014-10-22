@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import Embed = require("./Embed");
+import AdhEmbed = require("./Embed");
 
 export var register = () => {
     describe("Embed", () => {
@@ -25,21 +25,21 @@ export var register = () => {
             it("compiles a template from the parameters given in $route", () => {
                 var expected = "<adh-document-workbench data-path=\"/this/is/a/path\" " +
                     "data-test=\"&quot;&#39;&amp;\"></adh-document-workbench>";
-                expect(Embed.route2template($routeMock)).toBe(expected);
+                expect(AdhEmbed.route2template($routeMock)).toBe(expected);
             });
             it("throws if $route does not specify a widget", () => {
                 delete $routeMock.current.params.widget;
-                expect(() => Embed.route2template($routeMock)).toThrow();
+                expect(() => AdhEmbed.route2template($routeMock)).toThrow();
             });
             it("throws if the requested widget is not available for embedding", () => {
                 $routeMock.current.params.widget = "do-not-embed";
-                expect(() => Embed.route2template($routeMock)).toThrow();
+                expect(() => AdhEmbed.route2template($routeMock)).toThrow();
             });
         });
 
         describe("factory", () => {
             it("calls $compile", () => {
-                var directive = Embed.factory($compileMock, $routeMock);
+                var directive = AdhEmbed.factory($compileMock, $routeMock);
                 directive.link(undefined, {
                     contents: () => undefined,
                     html: () => undefined

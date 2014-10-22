@@ -1,35 +1,13 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
 import JasmineHelpers = require("../../JasmineHelpers");
-import Util = require("./Util");
+
+import AdhUtil = require("./Util");
 
 export var register = () => {
     describe("Util", () => {
-        describe("cutArray", () => {
-            it("removes single items", () => {
-                expect(Util.cutArray([1, 2, 3, 4], 0)).toEqual([2, 3, 4]);
-                expect(Util.cutArray([1, 2, 3, 4], 1)).toEqual([1, 3, 4]);
-                expect(Util.cutArray([1, 2, 3, 4], -1)).toEqual([1, 2, 3]);
-                expect(Util.cutArray([1, 2, 3, 4], -2)).toEqual([1, 2, 4]);
-            });
-            it("removes single items if 'from' and 'to' are equal", () => {
-                expect(Util.cutArray([1, 2, 3, 4], 0, 0)).toEqual([2, 3, 4]);
-                expect(Util.cutArray([1, 2, 3, 4], 1, 1)).toEqual([1, 3, 4]);
-                expect(Util.cutArray([1, 2, 3, 4], -1, -1)).toEqual([1, 2, 3]);
-                expect(Util.cutArray([1, 2, 3, 4], -2, -2)).toEqual([1, 2, 4]);
-            });
-            it("removes ranges", () => {
-                expect(Util.cutArray([1, 2, 3, 4], 0, -1)).toEqual([]);
-                expect(Util.cutArray([1, 2, 3, 4], 0, 3)).toEqual([]);
-                expect(Util.cutArray([1, 2, 3, 4], 1, 3)).toEqual([1]);
-                expect(Util.cutArray([1, 2, 3, 4], 0, 2)).toEqual([4]);
-                expect(Util.cutArray([1, 2, 3, 4], 1, -2)).toEqual([1, 4]);
-                expect(Util.cutArray([1, 2, 3, 4], -3, -2)).toEqual([1, 4]);
-            });
-        });
-
         describe("isArrayMember", () => {
-            var isArrayMember = Util.isArrayMember;
+            var isArrayMember = AdhUtil.isArrayMember;
 
             it("finds nothing in empty array.", () => {
                 expect(isArrayMember(0, [])).toBe(false);
@@ -60,84 +38,64 @@ export var register = () => {
                 expect(isArrayMember(null, ["null"])).toBe(false);
             });
             it("returns false for array properties that are not array items (such as length)", () => {
-                expect(Util.isArrayMember("length", ["hay", "stack"])).toBe(false);
-                expect(Util.isArrayMember(0, ["hay", "stack"])).toBe(false);
-            });
-        });
-
-        describe("trickle", () => {
-            xit("calls function on every arg in array exactly once within the given timeout.", () => {
-                expect(false).toBe(true);
-
-                // there is a timeout mock object in jasmine, but any
-                // test of this function would mostly test that it is
-                // implemented *in a specific* way, which sais nothing
-                // about whether it is implemented *correctly*.
-                //
-                // `trickle` is a beautiful example of the claim that
-                // test coverage is not everything.
+                expect(AdhUtil.isArrayMember("length", ["hay", "stack"])).toBe(false);
+                expect(AdhUtil.isArrayMember(0, ["hay", "stack"])).toBe(false);
             });
         });
 
         describe("parentPath", () => {
             it("returns '/foo' for '/foo/bar'", () => {
-                expect(Util.parentPath("/foo/bar")).toBe("/foo");
+                expect(AdhUtil.parentPath("/foo/bar")).toBe("/foo");
             });
             it("returns '/foo/' for '/foo/bar/'", () => {
-                expect(Util.parentPath("/foo/bar/")).toBe("/foo/");
+                expect(AdhUtil.parentPath("/foo/bar/")).toBe("/foo/");
             });
             it("returns '/' for '/'", () => {
-                expect(Util.parentPath("/")).toBe("/");
+                expect(AdhUtil.parentPath("/")).toBe("/");
             });
             it("returns '/' for 'bla'", () => {
-                expect(Util.parentPath("bla")).toBe("/");
+                expect(AdhUtil.parentPath("bla")).toBe("/");
             });
             it("returns '/' for ''", () => {
-                expect(Util.parentPath("")).toBe("/");
+                expect(AdhUtil.parentPath("")).toBe("/");
             });
         });
 
         describe("normalizeName", () => {
             it("is idempotent", () => {
                 ["asdkj", "#!8 sajd ksalkjad\n", "foo bar", "Foo Bar", "foo_bar"].forEach((s) => {
-                    var normalized = Util.normalizeName(s);
-                    expect(Util.normalizeName(normalized)).toBe(normalized);
+                    var normalized = AdhUtil.normalizeName(s);
+                    expect(AdhUtil.normalizeName(normalized)).toBe(normalized);
                 });
             });
 
             it("preserves ascii", () => {
-                expect(Util.normalizeName("asdASD123")).toBe("asdASD123");
+                expect(AdhUtil.normalizeName("asdASD123")).toBe("asdASD123");
             });
 
             it("replaces german umlauts", () => {
-                expect(Util.normalizeName("äüÄÖß")).toBe("aeueAeOess");
+                expect(AdhUtil.normalizeName("äüÄÖß")).toBe("aeueAeOess");
             });
 
             it("replaces spaces by underscores", () => {
-                expect(Util.normalizeName(" ")).toBe("_");
+                expect(AdhUtil.normalizeName(" ")).toBe("_");
             });
 
             it("strips chars that are not allowed in an URI component", () => {
-                expect(Util.normalizeName("$%&/?")).toBe("");
+                expect(AdhUtil.normalizeName("$%&/?")).toBe("");
             });
 
             it("strips non-ascii", () => {
-                expect(Util.normalizeName("…")).toBe("");
+                expect(AdhUtil.normalizeName("…")).toBe("");
             });
         });
 
         describe("formatString", () => {
             it("formats a string", () => {
-                expect(Util.formatString("Hello {0} from {1}", "World", "Bernd")).toBe("Hello World from Bernd");
+                expect(AdhUtil.formatString("Hello {0} from {1}", "World", "Bernd")).toBe("Hello World from Bernd");
             });
             it("does not replace {n} if there is no n-th parameter", () => {
-                expect(Util.formatString("Hello {0} from {1}", "World")).toBe("Hello World from {1}");
-            });
-        });
-
-        describe("escapeNgExp", () => {
-            it("wraps the input in single quotes and escapes any single quotes already in there", () => {
-                expect(Util.escapeNgExp("You, me & 'the thing'")).toBe("'You, me & \\'the thing\\''");
+                expect(AdhUtil.formatString("Hello {0} from {1}", "World")).toBe("Hello World from {1}");
             });
         });
 
@@ -154,12 +112,12 @@ export var register = () => {
             it("returns only the most recent versions from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
                 jasmine.addMatchers(JasmineHelpers.customMatchers);
 
-                var result = Util.latestVersionsOnly(testCase);
+                var result = AdhUtil.latestVersionsOnly(testCase);
                 (<any>expect(result)).toSetEqual(["/asd/version3", "/foo/version2", "/bar/version1"]);
             });
 
             it("does not alter the input list", () => {
-                Util.latestVersionsOnly(testCase);
+                AdhUtil.latestVersionsOnly(testCase);
                 expect(testCase).toEqual([
                     "/asd/version2",
                     "/asd/version3",
@@ -174,7 +132,7 @@ export var register = () => {
         describe("sortDagTopologically", () => {
 
             it("sorts a given dag topologically", () => {
-                var dag : Util.IDag<string> = {
+                var dag : AdhUtil.IDag<string> = {
                     "A": {
                         "content": "AA",
                         "incoming": [],
@@ -201,12 +159,12 @@ export var register = () => {
                     }
                 };
 
-                var result = Util.sortDagTopologically(dag, ["A"]);
+                var result = AdhUtil.sortDagTopologically(dag, ["A"]);
                 expect(result).toEqual(["AA", "BB", "CC", "DD"]);
             });
 
             it("throws a cycle detected error if the given graph contains cycles", () => {
-                var dag : Util.IDag<string> = {
+                var dag : AdhUtil.IDag<string> = {
                     "A": {
                         "content": "AA",
                         "incoming": [],
@@ -227,7 +185,7 @@ export var register = () => {
                     }
                 };
 
-                expect(() => Util.sortDagTopologically(dag, ["A"])).toThrow();
+                expect(() => AdhUtil.sortDagTopologically(dag, ["A"])).toThrow();
             });
         });
     });

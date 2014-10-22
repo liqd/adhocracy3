@@ -1244,7 +1244,7 @@ versions of all sections::
 *package.sheets.sheet.ISheet:FieldName* filters: you can add arbitrary custom
 filters that refer to sheet fields with references. The key is the name of
 the isheet plus the field name separated by ':' The value is the wanted
-reference target.
+reference target. ::
 
     >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
     ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
@@ -1253,6 +1253,36 @@ reference target.
     ...             'depth': 'all', 'tag': 'LAST'}).json
     >>> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
     ['http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000001/']
+
+If the specified sheet or field doesn't exist or if the field exists but is
+not a reference field, the backend responds with an error::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'adhocracy_core.sheets.NoSuchSheet:nowhere':
+    ...             'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000000/'},
+    ...     status=400).json
+    >>> resp_data['errors'][0]['description']
+    'No such sheet or field'
+    >>> resp_data['errors'][0]['location']
+    'querystring'
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'adhocracy_core.sheets.name.IName:name':
+    ...             'http://localhost/adhocracy/Proposals/kommunismus/kapitel2/VERSION_0000000/'},
+    ...     status=400).json
+    >>> resp_data['errors'][0]['description']
+    'Not a reference node'
+    >>> resp_data['errors'][0]['name']
+    'adhocracy_core.sheets.name.IName:name'
+
+You'll also get an error if try to filter by a catalog that doesn't exist::
+
+    >>> resp_data = testapp.get('/adhocracy/Proposals/kommunismus',
+    ...     params={'content_type': 'adhocracy_core.resources.sample_section.ISectionVersion',
+    ...             'foocat': 'whatever'},
+    ...     status=400).json
+    >>> resp_data['errors'][0]['description']
+    'No such catalog'
 
 *aggregateby* allows you to add the additional field `aggregateby` with
 aggregated index values of all result resources. You have to set the value

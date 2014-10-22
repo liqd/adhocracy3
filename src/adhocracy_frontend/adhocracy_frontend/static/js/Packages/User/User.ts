@@ -1,11 +1,12 @@
 import _ = require("lodash");
 
+import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhConfig = require("../Config/Config");
 
-import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
 import SIPasswordAuthentication = require("../../Resources_/adhocracy_core/sheets/principal/IPasswordAuthentication");
+import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
+
 
 var pkgLocation = "/User";
 
@@ -17,7 +18,7 @@ export interface IUserBasic {
 
 
 export interface IScopeLogin {
-    user : User;
+    user : Service;
     credentials : {
         nameOrEmail : string;
         password : string;
@@ -63,7 +64,7 @@ var bindServerErrors = (
 };
 
 
-export class User {
+export class Service {
     public loggedIn : boolean = false;
     public data : IUserBasic;
     public token : string;
@@ -78,7 +79,7 @@ export class User {
         private angular : ng.IAngularStatic,
         private Modernizr
     ) {
-        var _self : User = this;
+        var _self : Service = this;
 
         var updateTokenFromStorage = () => {
             if (_self.Modernizr.localstorage) {
@@ -107,7 +108,7 @@ export class User {
     }
 
     private enableToken(token : string, userPath : string) : ng.IPromise<void> {
-        var _self : User = this;
+        var _self : Service = this;
 
         _self.token = token;
         _self.userPath = userPath;
@@ -127,7 +128,7 @@ export class User {
     }
 
     private storeAndEnableToken(token : string, userPath : string) : ng.IPromise<void> {
-        var _self : User = this;
+        var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
             _self.$window.localStorage.setItem("user-token", token);
@@ -140,7 +141,7 @@ export class User {
     }
 
     private deleteToken() : void {
-        var _self : User = this;
+        var _self : Service = this;
 
         if (_self.Modernizr.localstorage) {
             _self.$window.localStorage.removeItem("user-token");
@@ -155,7 +156,7 @@ export class User {
     }
 
     public logIn(nameOrEmail : string, password : string) : ng.IPromise<void> {
-        var _self : User = this;
+        var _self : Service = this;
         var promise;
 
         if (nameOrEmail.indexOf("@") === -1) {
@@ -179,14 +180,14 @@ export class User {
     }
 
     public logOut() : void {
-        var _self : User = this;
+        var _self : Service = this;
 
         // The server does not have a logout yet.
         _self.deleteToken();
     }
 
     public register(username : string, email : string, password : string, passwordRepeat : string) : ng.IPromise<IRegisterResponse> {
-        var _self : User = this;
+        var _self : Service = this;
 
         var resource = {
             "content_type": "adhocracy_core.resources.principal.IUser",
@@ -204,7 +205,7 @@ export class User {
     }
 
     public activate(path : string) : ng.IPromise<void> {
-        var _self : User = this;
+        var _self : Service = this;
 
         var success = (response) => {
             return _self.storeAndEnableToken(response.data.user_token, response.data.user_path);
@@ -217,8 +218,8 @@ export class User {
 
 
 export var activateController = (
-    adhUser : User,
-    adhTopLevelState : AdhTopLevelState.TopLevelState,
+    adhUser : Service,
+    adhTopLevelState : AdhTopLevelState.Service,
     adhDone,
     $route : ng.route.IRouteService,
     $location : ng.ILocationService
@@ -243,9 +244,9 @@ export var activateController = (
 
 
 export var loginController = (
-    adhUser : User,
-    adhTopLevelState : AdhTopLevelState.TopLevelState,
-    adhConfig : AdhConfig.Type,
+    adhUser : Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhConfig : AdhConfig.IService,
     $scope : IScopeLogin
 ) : void => {
     $scope.errors = [];
@@ -275,7 +276,7 @@ export var loginController = (
 };
 
 
-export var loginDirective = (adhConfig : AdhConfig.Type) => {
+export var loginDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Login.html",
@@ -286,9 +287,9 @@ export var loginDirective = (adhConfig : AdhConfig.Type) => {
 
 
 export var registerController = (
-    adhUser : User,
-    adhTopLevelState : AdhTopLevelState.TopLevelState,
-    adhConfig : AdhConfig.Type,
+    adhUser : Service,
+    adhTopLevelState : AdhTopLevelState.Service,
+    adhConfig : AdhConfig.IService,
     $scope : IScopeRegister
 ) => {
     $scope.input = {
@@ -311,7 +312,7 @@ export var registerController = (
 };
 
 
-export var registerDirective = (adhConfig : AdhConfig.Type) => {
+export var registerDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Register.html",
@@ -321,12 +322,12 @@ export var registerDirective = (adhConfig : AdhConfig.Type) => {
 };
 
 
-export var indicatorDirective = (adhConfig : AdhConfig.Type) => {
+export var indicatorDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Indicator.html",
         scope: {},
-        controller: ["adhUser", "$scope", (adhUser : User, $scope) => {
+        controller: ["adhUser", "$scope", (adhUser : Service, $scope) => {
             $scope.user = adhUser;
             $scope.pkgUrl = adhConfig.pkg_path + pkgLocation;
 
@@ -338,7 +339,7 @@ export var indicatorDirective = (adhConfig : AdhConfig.Type) => {
 };
 
 
-export var metaDirective = (adhConfig : AdhConfig.Type) => {
+export var metaDirective = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Meta.html",

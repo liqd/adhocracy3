@@ -1,4 +1,6 @@
-import Util = require("./Packages/Util/Util");
+import _ = require("lodash");
+
+import AdhUtil = require("./Packages/Util/Util");
 
 
 export interface ISheetMetaApi {
@@ -61,13 +63,13 @@ export function sortResourcesTopologically(resources : Resource[], adhPreliminar
 
     // prepare DAG
     // sources are resource paths without incoming references
-    var dag : Util.IDag<Resource> = (<any>_).object(_.map(resources, (resource) => [resource.path, {
+    var dag : AdhUtil.IDag<Resource> = (<any>_).object(_.map(resources, (resource) => [resource.path, {
             content: resource, incoming: [], outgoing: [], done: false
     }]));
     var sources : string[] = [];
 
     // fill edges, determine possible starter sources
-    _.forEach(dag, (vertex : Util.IVertex<Resource>, key, l) => {
+    _.forEach(dag, (vertex : AdhUtil.IVertex<Resource>, key, l) => {
         var references = vertex.content.getReferences();
 
         if (typeof vertex.content.parent !== "undefined") {
@@ -88,5 +90,5 @@ export function sortResourcesTopologically(resources : Resource[], adhPreliminar
         });
     });
 
-    return Util.sortDagTopologically(dag, sources);
+    return AdhUtil.sortDagTopologically(dag, sources);
 }

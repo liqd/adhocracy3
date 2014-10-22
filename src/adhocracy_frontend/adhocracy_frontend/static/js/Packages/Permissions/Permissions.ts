@@ -5,7 +5,7 @@ import AdhUser = require("../User/User");
 
 
 export class Service {
-    constructor(private adhHttp : AdhHttp.Service<any>, private adhUser : AdhUser.User) {}
+    constructor(private adhHttp : AdhHttp.Service<any>, private adhUser : AdhUser.Service) {}
 
     /**
      * Set result of OPTIONS request to scope.key and keep it fresh.

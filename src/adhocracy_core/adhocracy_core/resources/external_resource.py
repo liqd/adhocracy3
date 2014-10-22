@@ -23,6 +23,7 @@ external_resource_meta = pool_metadata._replace(
     iresource=IExternalResource,
     element_types=[IComment],  # FIXME remove IComment, this is the wrong place
     is_implicit_addable=True,
+    permission_add='add_externalresource',
     extended_sheets=[adhocracy_core.sheets.comment.ICommentable],
     after_creation=([add_commentsservice, add_ratesservice]
                     + pool_metadata.after_creation),

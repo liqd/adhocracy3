@@ -6,7 +6,7 @@
  * This module only holds the interface for type-checking.
  */
 
-export interface Type {
+export interface IService {
     rest_url : string;
     rest_platform_path : string;
     pkg_path : string;

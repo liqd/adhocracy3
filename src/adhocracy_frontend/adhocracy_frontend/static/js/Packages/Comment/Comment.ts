@@ -1,18 +1,18 @@
 import _ = require("lodash");
 
-import AdhResourcesBase = require("../../ResourcesBase");
-
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
-import AdhPermissions = require("../Permissions/Permissions");
-import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhListing = require("../Listing/Listing");
+import AdhPermissions = require("../Permissions/Permissions");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhResourcesBase = require("../../ResourcesBase");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
+import AdhUtil = require("../Util/Util");
+
 import RIExternalResource = require("../../Resources_/adhocracy_core/resources/external_resource/IExternalResource");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
-import Util = require("../Util/Util");
 
 var pkgLocation = "/Comment";
 
@@ -57,7 +57,7 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
 export class CommentResource<R extends AdhResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, ICommentResourceScope> {
     constructor(
         private adapter : ICommentAdapter<R>,
-        adhConfig : AdhConfig.Type,
+        adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames,
@@ -145,7 +145,7 @@ export class CommentResource<R extends AdhResourcesBase.Resource> extends AdhRes
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, oldVersion : R) {
         var resource = this.adapter.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
         this.adapter.content(resource, instance.scope.data.content);
-        resource.parent = Util.parentPath(oldVersion.path);
+        resource.parent = AdhUtil.parentPath(oldVersion.path);
         return this.$q.when([resource]);
     }
 }
@@ -153,7 +153,7 @@ export class CommentResource<R extends AdhResourcesBase.Resource> extends AdhRes
 export class CommentCreate<R extends AdhResourcesBase.Resource> extends CommentResource<R> {
     constructor(
         adapter : ICommentAdapter<R>,
-        adhConfig : AdhConfig.Type,
+        adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
         adhPreliminaryNames : AdhPreliminaryNames,
@@ -164,7 +164,7 @@ export class CommentCreate<R extends AdhResourcesBase.Resource> extends CommentR
     }
 }
 
-export var adhCommentListing = (adhConfig : AdhConfig.Type) => {
+export var adhCommentListing = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/CommentListing.html",
@@ -172,7 +172,7 @@ export var adhCommentListing = (adhConfig : AdhConfig.Type) => {
             path: "@"
         },
         controller: ["adhTopLevelState", "$location", (
-            adhTopLevelState : AdhTopLevelState.TopLevelState,
+            adhTopLevelState : AdhTopLevelState.Service,
             $location : ng.ILocationService
         ) : void => {
             adhTopLevelState.setCameFrom($location.url());
@@ -188,7 +188,7 @@ export var adhCommentListing = (adhConfig : AdhConfig.Type) => {
  *
  * If it exists, the corresponding comment listing is created.
  */
-export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
+export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         template: "<adh-comment-listing data-ng-if=\"display\" data-path=\"{{commentablePath}}\"></adh-comment-listing>",
@@ -200,7 +200,7 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.Type) => {
             adhDone,
             adhHttp : AdhHttp.Service<any>,
             adhPreliminaryNames : AdhPreliminaryNames,
-            adhUser : AdhUser.User,
+            adhUser : AdhUser.Service,
             $scope
         ) : void => {
 

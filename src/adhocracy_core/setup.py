@@ -32,7 +32,6 @@ test_requires = [
     'selenium',
     'webtest',
     'pytest-splinter',
-    'pytest-xdist',  # FIXME missing dependency of pytest-splinter
     'pytest-pyramid',
     'pytest-timeout',
     'coverage',

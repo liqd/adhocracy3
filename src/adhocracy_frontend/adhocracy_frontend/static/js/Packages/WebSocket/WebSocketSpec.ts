@@ -1,7 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import Config = require("../Config/Config");
-import WebSocket = require("../WebSocket/WebSocket");
+import AdhConfig = require("../Config/Config");
+import AdhWebSocket = require("../WebSocket/WebSocket");
+
 
 export var register = () => {
     // FIXME: This should be ``describe("WebSocket")`` and should be wrapped in a
@@ -10,7 +11,7 @@ export var register = () => {
     // includes all *Spec.ts modules.
 
     describe("WebSocket", () => {
-        var config: Config.Type = <any>{
+        var config: AdhConfig.IService = <any>{
             pkg_path: "mock",
             rest_url: "mock",
             rest_platform_path: "mock",
@@ -22,14 +23,14 @@ export var register = () => {
         // constructor for a mock raw web socket that leaks the
         // constructee for inspection.
         var wsRaw: any;
-        var constructRawWebSocket = (uri: string): WebSocket.IRawWebSocket => {
+        var constructRawWebSocket = (uri: string): AdhWebSocket.IRawWebSocket => {
             wsRaw = <any>jasmine.createSpyObj("RawWebSocketMock", ["send", "onmessage", "onerror", "onopen", "onclose"]);
             return wsRaw;
         };
         var ws;
 
         beforeEach(() => {
-            ws = WebSocket.factoryIService(config, constructRawWebSocket);
+            ws = AdhWebSocket.factoryIService(config, constructRawWebSocket);
         });
 
         it("does not initially call the send method of web socket", () => {

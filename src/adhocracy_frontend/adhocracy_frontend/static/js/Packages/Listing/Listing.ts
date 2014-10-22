@@ -3,13 +3,14 @@
 /// <reference path="../../../lib/DefinitelyTyped/lodash/lodash.d.ts"/>
 /// <reference path="../../_all.d.ts"/>
 
-import AdhHttp = require("../Http/Http");
-import AdhWebSocket = require("../WebSocket/WebSocket");
 import AdhConfig = require("../Config/Config");
-import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhHttp = require("../Http/Http");
 import AdhPermissions = require("../Permissions/Permissions");
+import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhWebSocket = require("../WebSocket/WebSocket");
 
-import Resources = require("../../Resources");
+import ResourcesBase = require("../../ResourcesBase");
+
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 
 var pkgLocation = "/Listing";
@@ -26,11 +27,11 @@ export interface IListingContainerAdapter {
 }
 
 export class ListingPoolAdapter implements IListingContainerAdapter {
-    public elemRefs(container : Resources.Content<SIPool.Sheet>) {
+    public elemRefs(container : ResourcesBase.Resource) {
         return container.data[SIPool.nick].elements;
     }
 
-    public poolPath(container : Resources.Content<SIPool.Sheet>) {
+    public poolPath(container : ResourcesBase.Resource) {
         return container.path;
     }
 }
@@ -56,12 +57,12 @@ export interface ListingScope<Container> extends ng.IScope {
 // FIXME: as the listing elements are tracked by their $id (the element path) in the listing template, we don't allow duplicate elements
 // in one listing. We should add a proper warning if that occurs or handle that case properly.
 
-export class Listing<Container extends Resources.Content<any>> {
+export class Listing<Container extends ResourcesBase.Resource> {
     public static templateUrl : string = pkgLocation + "/Listing.html";
 
     constructor(private containerAdapter : IListingContainerAdapter) {}
 
-    public createDirective(adhConfig : AdhConfig.Type, adhWebSocket: AdhWebSocket.IService) {
+    public createDirective(adhConfig : AdhConfig.IService, adhWebSocket: AdhWebSocket.IService) {
         var _self = this;
         var _class = (<any>_self).constructor;
 

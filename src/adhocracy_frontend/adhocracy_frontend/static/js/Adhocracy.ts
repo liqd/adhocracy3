@@ -20,30 +20,30 @@ import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import modernizr = require("modernizr");
 import moment = require("moment");
 
-import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
-import AdhHttp = require("./Packages/Http/Http");
-import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
-import AdhUser = require("./Packages/User/User");
-import AdhDone = require("./Packages/Done/Done");
-import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
-import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
-import AdhInject = require("./Packages/Inject/Inject");
-import AdhMetaApi = require("./Packages/MetaApi/MetaApi");
-import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
-import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
-import AdhComment = require("./Packages/Comment/Comment");
 import AdhCommentAdapter = require("./Packages/Comment/Adapter");
+import AdhComment = require("./Packages/Comment/Comment");
+import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
-import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
-import AdhRate = require("./Packages/Rate/Rate");
-import AdhRateAdapter = require("./Packages/Rate/Adapter");
-import AdhPermissions = require("./Packages/Permissions/Permissions");
+import AdhDocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
+import AdhDone = require("./Packages/Done/Done");
+import AdhEmbed = require("./Packages/Embed/Embed");
+import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
+import AdhHttp = require("./Packages/Http/Http");
+import AdhMetaApi = require("./Packages/Http/MetaApi");
+import AdhInject = require("./Packages/Inject/Inject");
+import AdhListing = require("./Packages/Listing/Listing");
 import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
-
-import Listing = require("./Packages/Listing/Listing");
-import DocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
+import AdhPermissions = require("./Packages/Permissions/Permissions");
+import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProposal = require("./Packages/Proposal/Proposal");
-import Embed = require("./Packages/Embed/Embed");
+import AdhRateAdapter = require("./Packages/Rate/Adapter");
+import AdhRate = require("./Packages/Rate/Rate");
+import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
+import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
+import AdhRoute = require("./Packages/Route/Route");
+import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
+import AdhUser = require("./Packages/User/User");
+import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
 
 
 var loadComplete = () : void => {
@@ -74,6 +74,13 @@ export var init = (config, meta_api) => {
     ) => {
         $routeProvider
             .when("/", {
+                template: "",
+                controller: ["adhConfig", "$location", (adhConfig, $location) => {
+                    $location.path("/r" + adhConfig.rest_platform_path);
+                }]
+            })
+            .when("/r/:path*", {
+                controller: ["adhHttp", "adhConfig", "adhTopLevelState", "$routeParams", "$scope", AdhRoute.resourceRouter],
                 templateUrl: "/static/js/templates/Wrapper.html",
                 reloadOnSearch: false
             })
@@ -145,7 +152,7 @@ export var init = (config, meta_api) => {
     app.filter("signum", () => (n : number) : string => n > 0 ? "+" + n.toString() : n.toString());
 
     app.service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", AdhProposal.Service]);
-    app.service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", AdhUser.User]);
+    app.service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", AdhUser.Service]);
     app.directive("adhLogin", ["adhConfig", AdhUser.loginDirective]);
     app.directive("adhRegister", ["adhConfig", AdhUser.registerDirective]);
     app.directive("adhUserIndicator", ["adhConfig", AdhUser.indicatorDirective]);
@@ -156,7 +163,7 @@ export var init = (config, meta_api) => {
     app.value("adhEventHandlerClass", AdhEventHandler.EventHandler);
 
     app.service("adhPermissions", ["adhHttp", "adhUser", AdhPermissions.Service]);
-    app.service("adhTopLevelState", ["adhEventHandlerClass", "$location", "$routeParams", AdhTopLevelState.TopLevelState]);
+    app.service("adhTopLevelState", ["adhEventHandlerClass", "$location", "$routeParams", AdhTopLevelState.Service]);
     app.directive("adhMovingColumns", ["adhTopLevelState", AdhTopLevelState.movingColumns]);
     app.directive("adhFocusSwitch", ["adhTopLevelState", AdhTopLevelState.adhFocusSwitch]);
 
@@ -172,15 +179,15 @@ export var init = (config, meta_api) => {
         app.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", "adhUser", AdhCrossWindowMessaging.factory]);
     }
 
-    app.directive("adhEmbed", ["$compile", "$route", Embed.factory]);
+    app.directive("adhEmbed", ["$compile", "$route", AdhEmbed.factory]);
 
     app.directive("adhListing",
         ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
-            new Listing.Listing(new Listing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
+            new AdhListing.Listing(new AdhListing.ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
 
     app.directive("adhCommentListingPartial",
         ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
-            new Listing.Listing(new AdhCommentAdapter.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)]);
+            new AdhListing.Listing(new AdhCommentAdapter.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)]);
 
     app.directive("adhCommentListing", ["adhConfig", AdhComment.adhCommentListing]);
     app.directive("adhCreateOrShowCommentListing", ["adhConfig", AdhComment.adhCreateOrShowCommentListing]);
@@ -195,7 +202,7 @@ export var init = (config, meta_api) => {
     // adhCrossWindowMessaging does work by itself. We only need to inject in anywhere in order to instantiate it.
     app.directive("adhDocumentWorkbench",
         ["adhConfig", (adhConfig) =>
-            new DocumentWorkbench.DocumentWorkbench().createDirective(adhConfig)]);
+            new AdhDocumentWorkbench.DocumentWorkbench().createDirective(adhConfig)]);
 
     app.directive("adhResourceWrapper", AdhResourceWidgets.resourceWrapper);
     app.directive("adhCommentResource", ["adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "recursionHelper", "$q",
@@ -243,6 +250,7 @@ export var init = (config, meta_api) => {
         }]);
 
     app.directive("adhMercatorProposalListing", ["adhConfig", AdhMercatorProposal.listing]);
+    app.directive("adhRouteView", ["$compile", AdhRoute.viewFactory]);
 
     // get going
 

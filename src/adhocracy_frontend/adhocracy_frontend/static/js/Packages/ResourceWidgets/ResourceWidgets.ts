@@ -14,11 +14,13 @@
  * See IResourceWrapperController for a description of the interface.
  */
 
-import ResourcesBase = require("../../ResourcesBase");
+import _ = require("lodash");
 
-import AdhHttp = require("../Http/Http");
 import AdhEventHandler = require("../EventHandler/EventHandler");
+import AdhHttp = require("../Http/Http");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+
+import ResourcesBase = require("../../ResourcesBase");
 
 
 export enum Mode {display, edit};

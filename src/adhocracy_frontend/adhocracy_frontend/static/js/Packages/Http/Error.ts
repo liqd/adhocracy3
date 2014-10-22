@@ -13,26 +13,28 @@ export interface IBackendErrorItem {
     description : string;
 }
 
-var renderBackendError = (errors : IBackendErrorItem[]) : void => {
-    for (var e in errors) {
-        if (errors.hasOwnProperty(e)) {
-            console.log("error #" + e);
-            console.log("where: " + errors[e].name + ", " + errors[e].location);
-            console.log("what:  " + errors[e].description);
+var renderBackendError = (response : ng.IHttpPromiseCallbackArg<any>) : void => {
+    // get rid of unrenderable junk (good for console log extraction with web driver).
+    var sanitize = (x : any) : any => {
+        try {
+            return JSON.parse(JSON.stringify(x));
+        } catch (e) {
+            return x;
         }
-    }
+    };
+
+    console.log("http response with error status: " + response.status);
+    console.log("request (.config):", sanitize(response.config));
+    console.log("headers (.headers()):", sanitize((<any>response).headers()));  // FIXME: need to update DefinitelyTyped...
+    console.log("response (.data):", sanitize(response.data));
 };
 
 export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendError>) : void => {
     "use strict";
 
+    renderBackendError(response);
+
     var errors : IBackendErrorItem[] = response.data.errors;
-
-    console.log("http response with error status: " + response.status);
-    console.log(response.config);
-    console.log(response.data);
-
-    renderBackendError(errors);
     throw errors;
 };
 
@@ -54,19 +56,9 @@ export var logBackendBatchError = (
 ) : void => {
     "use strict";
 
-    console.log("http batch response with error status: " + response.status);
-    console.log(response.config);
-
-    if (response.data.length < 1) {
-        throw "no batch item responses!";
-    }
+    renderBackendError(response);
 
     var lastBatchItemResponse : IBackendError = response.data[response.data.length - 1].body;
-    console.log("# of failed batch item: " + (response.data.length - 1));
-    console.log(lastBatchItemResponse);
-
     var errors : IBackendErrorItem[] = lastBatchItemResponse.errors;
-
-    renderBackendError(errors);
     throw errors;
 };
