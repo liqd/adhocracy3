@@ -47,7 +47,7 @@ The effect of these flags is as follows:
   GET, the backend normally responds with HTTP status code *410 Gone*. The
   frontend can override this by adding the parameter
   *show=deleted|hidden|all* to the GET request, just as in search queries.
-  The same restriction apples, i.e. anybody can specify *show=deleted* (and
+  The same restriction applies, i.e. anybody can specify *show=deleted* (and
   then retrieve the resource if it was merely deleted), but only managers
   can specify *show=hidden|all* (and then retrieve the resource if it was
   hidden).
