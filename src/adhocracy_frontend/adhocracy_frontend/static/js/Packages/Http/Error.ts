@@ -24,9 +24,9 @@ var renderBackendError = (response : ng.IHttpPromiseCallbackArg<any>) : void => 
     };
 
     console.log("http response with error status: " + response.status);
-    console.log("request:", sanitize(response.config));
-    console.log("headers:", sanitize(response.headers()));
-    console.log("response:", sanitize(response.data));
+    console.log("request (.config):", sanitize(response.config));
+    console.log("headers (.headers()):", sanitize(response.headers()));
+    console.log("response (.data):", sanitize(response.data));
 };
 
 export var logBackendError = (response : ng.IHttpPromiseCallbackArg<IBackendError>) : void => {
