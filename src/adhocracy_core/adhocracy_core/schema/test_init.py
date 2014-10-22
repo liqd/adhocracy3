@@ -210,7 +210,7 @@ class TestURL:
     def test_invalid_spaces(self):
         inst = self._make_one()
         with raises(colander.Invalid):
-            inst.deserialize(inst, 'http://www.w3.org standards')
+            inst.deserialize('http://www.w3.org standards')
 
     def test_invalid_relative_url(self):
         inst = self._make_one()
