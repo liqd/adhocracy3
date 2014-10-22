@@ -1,4 +1,4 @@
-"""Adhocracy frontent customization for Mercator."""
+"""Adhocracy frontend customization for Mercator."""
 from pyramid.config import Configurator
 
 
