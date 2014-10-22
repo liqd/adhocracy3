@@ -1,27 +1,34 @@
 Deleting and Hiding Resources
 =============================
 
-All resources that can be deleted implement the *Deletable* sheet.
-Typically all Simples and all Items can be deleted and hence implement this
-sheet. Versions typically won't be deletable (since they are immutable) and
-hence don't implement this sheet.
+Two boolean fields (flags) defined in the
+*adhocracy_core.sheets.metadata.IMetadata* sheet can be used to delete or
+hide resources: *deleted* and *hidden*. Both default to false. If this sheet
+is omitted when POSTing new resources, the default values are used.
 
-The *Deletable* sheet has two boolean fields (flags): *deleted* and
-*hidden*. Both default to false. For simplicity, the sheet may be omitted
-when POSTing new resources -- in this case, the default values will be
-used.
+Deleting or hiding an existing resource is only possible for updatable
+resources, i.e. *not* for Versions (which are immutable and hence don't
+allow PUT).
 
 Anyone who can edit a resource (editor role) can *delete* it by PUTting an
-update with *Deletable { deleted: true }*. Likewise they can undelete a
-deleted resource by PUTting a new version with *Deletable { deleted: false
+update with *IMetadata { deleted: true }*. Likewise they can undelete a
+deleted resource by PUTting an update with *IMetadata { deleted: false
 }*. For simplicity, our PUT works like the HTTP PATCH command (added in RFC
 5789): any sheet and fields not mentioned in the PUTted data structure are
 left unchanged.
 
-Anyone with the manager role can *hide* a resource by PUTting an update
-with *Deletable { hidden: true }*. Likewise they can un-hide a hidden
-resource by PUTting a new version with *Deletable { hidden: false }*.
-Nobody else can change the value of the *hidden* field.
+Anyone with the *canhide* permission (typically granted to the manager role)
+can *hide* a resource by PUTting an update with *IMetadata { hidden: true }*.
+Likewise they can un-hide a hidden resource by PUTting an update with
+*IMetadata { hidden: false }*. Nobody else can change the value of the
+*hidden* field.
+
+Newly created resources can also be marked as *deleted* or *hidden* by
+setting the initial value of these flags accordingly. However,
+the same permission restrictions apply. This might be useful for creating a
+*deleted* version as a successor of another version to mark the preceding
+version as obsolete. POSTing a resource with *IMetadata { hidden: true }*
+requires the *canhide* permission and, frankly, doesn't make any sense.
 
 The effect of these flags is as follows:
 
@@ -30,39 +37,54 @@ The effect of these flags is as follows:
   deleted/hidden ancestor as prefix). Hence a *deleted* resource is one
   that has its own *deleted* flag set to true or that has an ancestor whose
   *deleted* flag is true. Likewise for *hidden* resources.
-* Only resources that are neither *deleted* nor *hidden* are listed in
-  parent pools.
-* Only resources that are neither *deleted* nor *hidden* show up in normal
-  search queries.
-* The search parameter *show=deleted|hidden|all* can be used to include
-  deleted and/or hidden resources in search queries. If its value is
-  *deleted*, resources will be found regardless of the value of their
-  *deleted* flag, but only if they are not *hidden.* Anyone can do this. If
-  its value is *hidden*, resources will be found regardless of the value of
-  their *hidden* flag, but only if they are not *deleted.* Only managers
-  can do this. If its value is *all*, all resources will be found. Only
-  managers can do this. If a non-manager searches with *show=hidden|all*, the
-  backend responds with an error.
+* Normally, only resources that are neither *deleted* nor *hidden* are
+  listed in parent pools and  search queries.
+* The parameter *include=deleted|hidden|all* can be used to include
+  deleted and/or hidden resources in pool listings and other search queries.
+  If its value is *deleted*, resources will be found regardless of the value
+  of their *deleted* flag, but only if they are not *hidden.* If its value is
+  *hidden*, resources will be found regardless of the value of their *hidden*
+  flag, but only if they are not *deleted.* If its value is *all*, all
+  resources will be found. Anyone can specify these flags and get the paths
+  of deleted and/or hidden resources. However, only those with *canhide*
+  permission are ever able to view the contents of hidden resources.
 * If the frontend attempts to retrieve a *deleted* or *hidden* resource via
   GET, the backend normally responds with HTTP status code *410 Gone*. The
   frontend can override this by adding the parameter
-  *show=deleted|hidden|all* to the GET request, just as in search queries.
-  The same restriction applies, i.e. anybody can specify *show=deleted* (and
-  then retrieve the resource if it was merely deleted), but only managers
-  can specify *show=hidden|all* (and then retrieve the resource if it was
-  hidden).
-* FIXME Should the *410 Gone* response have a JSON body explaining the
-  reason: `{ 'reason': 'deleted|hidden|both' }` ?
+  *include=deleted|hidden|all* to the GET request, just as in search queries.
+  Anybody can view deleted resources in this way, and managers (those with
+  *canhide* permission) can view hidden resources in these ways. Those
+  without this permission will still get a *410 Gone* if the resource is
+  hidden.
+* The body of the *410 Gone* is a small JSON document that explains why the
+  resource is gone (whether it was deleted or hidden). It also shows who
+  made the last change to the resource and when::
+
+      { "reason": "deleted|hidden|both",
+        "modified_by:" "<path-to-user>",
+        "modification_date": "<timestamp>"}
+
+  Typically the last modification will have been the deletion or hiding of
+  the resource, but there is no guarantee that this is always the case.
 * *Deleted* or *hidden* resources may still be referenced from other
   resources. If the frontend follows such references it must therefore
   be proposed to encounter *410 Gone* responses and deal with them
   appropriately (e.g. by silently skipping them or by showing an
   explanation such as "Comment deleted").
-* *Deleted* and *hidden* resources will *normally* not be shown in
-  backreferences, which are calculated on demand. However, due to caching,
-  they may still show up, so the frontend should be prepared to deal with
+* *Deleted* and *hidden* resources will normally not be shown in
+  backreferences, which are calculated on demand. The
+  *include=deleted|hidden|all* parameter can be used to change that and
+  include backreferences to deleted and/or hidden resources. The same
+  restrictions apply, i.e. normal users can use this parameter to find out
+  whether hidden backreferences exist, but they won't be able to see their
+  contents. In any case the frontend should be prepared to deal with
   *410 Gone* when following backreferences in the same way as when
-  following forward reference.
+  following forward reference -- even if it didn't explicitly ask to include
+  them, they might show up to due caching.
+
+FIXME We should extend the Meta API to expose the distinction between
+references and backreferences to the frontend, currently only the backend
+knows this.
 
 Notes:
 
