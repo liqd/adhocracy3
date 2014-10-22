@@ -53,7 +53,7 @@ The effect of these flags is as follows:
   hidden).
 * FIXME Should the *410 Gone* response have a JSON body explaining the
   reason: `{ 'reason': 'deleted|hidden|both' }` ?
-* *Deleted* or *hidden* resources may still by referenced from other
+* *Deleted* or *hidden* resources may still be referenced from other
   resources. If the frontend follows such references it must therefore
   be proposed to encounter *410 Gone* responses and deal with them
   appropriately (e.g. by silently skipping them or by showing an
