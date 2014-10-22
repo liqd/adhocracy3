@@ -14,7 +14,7 @@ used.
 Anyone who can edit a resource (editor role) can *delete* it by PUTting an
 update with *Deletable { deleted: true }*. Likewise they can undelete a
 deleted resource by PUTting a new version with *Deletable { deleted: false
-}*. For simplicity, out PUT works like the HTTP PATCH command (added in RFC
+}*. For simplicity, our PUT works like the HTTP PATCH command (added in RFC
 5789): any sheet and fields not mentioned in the PUTted data structure are
 left unchanged.
 
@@ -41,23 +41,23 @@ The effect of these flags is as follows:
   its value is *hidden*, resources will be found regardless of the value of
   their *hidden* flag, but only if they are not *deleted.* Only managers
   can do this. If its value is *all*, all resources will be found. Only
-  managers can do this. If a non-manager search with *show=hidden|all*, the
+  managers can do this. If a non-manager searches with *show=hidden|all*, the
   backend responds with an error.
 * If the frontend attempts to retrieve a *deleted* or *hidden* resource via
-  GET, the backend normally responds with HTTP status code *410 Gone*. By
+  GET, the backend normally responds with HTTP status code *410 Gone*. The
   frontend can override this by adding the parameter
   *show=deleted|hidden|all* to the GET request, just as in search queries.
-  The same restriction apply, i.e. anybody can specify *show=deleted* (and
+  The same restriction apples, i.e. anybody can specify *show=deleted* (and
   then retrieve the resource if it was merely deleted), but only managers
   can specify *show=hidden|all* (and then retrieve the resource if it was
   hidden).
 * FIXME Should the *410 Gone* response have a JSON body explaining the
-  reason: `{ 'reason': 'deleted|hidden|both' }` ? `
-* *Deleted* or *hidden* resource may still by referenced from other
-  resources. If the frontend follows by such a references it must therefore
+  reason: `{ 'reason': 'deleted|hidden|both' }` ?
+* *Deleted* or *hidden* resources may still by referenced from other
+  resources. If the frontend follows such references it must therefore
   be proposed to encounter *410 Gone* responses and deal with them
   appropriately (e.g. by silently skipping them or by showing an
-  explanation such as "Commented deleted").
+  explanation such as "Comment deleted").
 * *Deleted* and *hidden* resources will *normally* not be shown in
   backreferences, which are calculated on demand. However, due to caching,
   they may still show up, so the frontend should be prepared to deal with
@@ -67,9 +67,9 @@ The effect of these flags is as follows:
 Notes:
 
 * Physical deletion of resources (pruning them from the DB without hope of
-  resurrection) is not current possible through the REST API. There may be
+  resurrection) is not currently possible through the REST API. There may be
   server-side processes that prune some specific or even all *hidden*
-  resource from the DB from time to time or when started by an admin, but
+  resources from the DB from time to time or when started by an admin, but
   they cannot be controlled via REST and are not specified or documented
   here.
 * The HTTP DELETE command is not used since it would imply physically
