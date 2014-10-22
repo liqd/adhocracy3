@@ -48,6 +48,8 @@ The effect of these flags is as follows:
   resources will be found. Anyone can specify these flags and get the paths
   of deleted and/or hidden resources. However, only those with *canhide*
   permission are ever able to view the contents of hidden resources.
+  It's also possible to set *include=visible* to get only non-deleted and
+  non-hidden resources, but it's not necessary since that is the default.
 * If the frontend attempts to retrieve a *deleted* or *hidden* resource via
   GET, the backend normally responds with HTTP status code *410 Gone*. The
   frontend can override this by adding the parameter
@@ -68,7 +70,7 @@ The effect of these flags is as follows:
   the resource, but there is no guarantee that this is always the case.
 * *Deleted* or *hidden* resources may still be referenced from other
   resources. If the frontend follows such references it must therefore
-  be proposed to encounter *410 Gone* responses and deal with them
+  be prepared to encounter *410 Gone* responses and deal with them
   appropriately (e.g. by silently skipping them or by showing an
   explanation such as "Comment deleted").
 * *Deleted* and *hidden* resources will normally not be shown in
