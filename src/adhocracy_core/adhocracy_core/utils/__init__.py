@@ -175,12 +175,16 @@ def raise_colander_style_error(sheet: Interface, field_name: str,
                                description: str):
     """Raise a Colander Invalid error without requiring a node object.
 
-    :param sheet: the error will be located within this sheet
+    :param sheet: the error will be located within this sheet; set to `None`
+        to create a error outside of the "data" element, e.g. in a query string
     :param field_name: the error will be located within this field in the sheet
     :param description: the description of the error
     :raises colander.Invalid: constructed from the given parameters
     """
-    name = 'data.{}.{}'.format(sheet.__identifier__, field_name)
+    if sheet is not None:
+        name = 'data.{}.{}'.format(sheet.__identifier__, field_name)
+    else:
+        name = field_name
     raise colander.Invalid(_named_object(name), description)
 
 

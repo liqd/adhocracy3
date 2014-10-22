@@ -17,6 +17,7 @@ from adhocracy_core.schema import References
 from adhocracy_core.schema import SingleLine
 from adhocracy_core.schema import ResourcePathSchema
 from adhocracy_core.schema import ResourcePathAndContentSchema
+from adhocracy_core.utils import raise_colander_style_error
 
 
 resolver = DottedNameResolver()
@@ -328,17 +329,22 @@ def _get_unknown_fields(cstruct, schema):
 
 
 def _maybe_reference_filter_node(name, registry):
+    """
+    Check whether a name refers to a reference node in a sheet.
+
+    Raises an error if `name` contains a colon but is not a reference node.
+    """
     if ':' not in name:
         return False
     resolve = registry.content.resolve_isheet_field_from_dotted_string
     try:
         isheet, field, node = resolve(name)
     except ValueError:
-        return False
+        raise_colander_style_error(None, name, 'No such sheet or field')
     if isinstance(node, (Reference, References)):
         return True
     else:
-        return False
+        raise_colander_style_error(None, name, 'Not a reference node')
 
 
 def _add_reference_filter_node(name, schema):
@@ -353,7 +359,7 @@ def _maybe_arbitrary_filter_node(name, context):
     if name in catalog:
         return True
     else:
-        return False
+        raise_colander_style_error(None, name, 'No such catalog')
 
 
 def _add_arbitrary_filter_node(name, schema):

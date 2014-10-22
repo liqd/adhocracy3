@@ -109,8 +109,12 @@ def validate_body_or_querystring(body, qs, schema: MappingSchema,
     This allows using just a single schema for all kinds of requests.
     """
     if isinstance(schema, GETPoolRequestSchema):
-        schema = add_get_pool_request_extra_fields(qs, schema, context,
-                                                   request.registry)
+        try:
+            schema = add_get_pool_request_extra_fields(qs, schema, context,
+                                                       request.registry)
+        except Invalid as err:  # pragma: no cover
+            _add_colander_invalid_error_to_request(err, request,
+                                                   location='querystring')
     if request.method.upper() == 'GET':
         _validate_schema(qs, schema, request,
                          location='querystring')
