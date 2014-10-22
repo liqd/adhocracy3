@@ -106,10 +106,13 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return this.$q.when();
     }
 
+    // NOTE: _update takes an item *version*, whereas _create
+    // constructs an *item plus a new version*.
     public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, resource : R) : ng.IPromise<void> {
         return this.$q.when();
     }
 
+    // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data = instance.scope.data || <any>{};
         data.basic = data.basic || <any>{};
