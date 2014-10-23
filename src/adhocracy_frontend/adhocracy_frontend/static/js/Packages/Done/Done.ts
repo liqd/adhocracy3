@@ -3,4 +3,10 @@
  * dependency injection is used and where you want to be able to inject
  * a real callback in your tests.
  */
-export var done = () => null;
+export var moduleName = "adhDone";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [])
+        .value("adhDone", () => null);
+};

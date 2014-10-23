@@ -158,3 +158,16 @@ export var adhFocusSwitch = (topLevelState : Service) => {
         }
     };
 };
+
+
+export var moduleName = "adhTopLevelState";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhEventHandler.moduleName
+        ])
+        .service("adhTopLevelState", ["adhEventHandlerClass", "$location", "$routeParams", Service])
+        .directive("adhMovingColumns", ["adhTopLevelState", movingColumns])
+        .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch]);
+};

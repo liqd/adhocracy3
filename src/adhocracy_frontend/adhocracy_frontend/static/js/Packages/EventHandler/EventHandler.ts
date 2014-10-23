@@ -39,3 +39,12 @@ export class EventHandler {
         }
     }
 }
+
+
+export var moduleName = "adhEventHandler";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [])
+        .value("adhEventHandlerClass", EventHandler);
+};

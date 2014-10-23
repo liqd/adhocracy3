@@ -3,6 +3,7 @@
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+import AdhRecursionHelper = require("../RecursionHelper/RecursionHelper");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 import AdhWebSocket = require("../WebSocket/WebSocket");
@@ -366,4 +367,30 @@ export class Service {
                     });
             });
     }
+};
+
+
+export var moduleName = "adhProposal";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhHttp.moduleName,
+            AdhPreliminaryNames.moduleName,
+            AdhRecursionHelper.moduleName,
+            AdhTopLevelState.moduleName,
+            AdhWebSocket.moduleName
+        ])
+        .service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", Service])
+        .directive("adhProposalDetail", () => new ProposalDetail().createDirective())
+        .directive("adhProposalVersionDetail",
+            ["adhConfig", (adhConfig) => new ProposalVersionDetail().createDirective(adhConfig)])
+        .directive("adhProposalVersionNew",
+            ["adhHttp", "adhConfig", "adhProposal", (adhHttp, adhConfig, adhProposal) =>
+                new ProposalVersionNew().createDirective(adhHttp, adhConfig, adhProposal)])
+        .directive("adhSectionVersionDetail",
+            ["adhConfig", "recursionHelper", (adhConfig, recursionHelper) =>
+                new SectionVersionDetail().createDirective(adhConfig, recursionHelper)])
+        .directive("adhParagraphVersionDetail",
+            ["adhConfig", (adhConfig) => new ParagraphVersionDetail().createDirective(adhConfig)]);
 };

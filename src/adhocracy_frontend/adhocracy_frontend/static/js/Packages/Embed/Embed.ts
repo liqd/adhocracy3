@@ -48,3 +48,12 @@ export var factory = ($compile : ng.ICompileService, $route : ng.route.IRouteSer
         }
     };
 };
+
+
+export var moduleName = "adhEmbed";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, ["ngRoute"])
+        .directive("adhEmbed", ["$compile", "$route", factory]);
+};

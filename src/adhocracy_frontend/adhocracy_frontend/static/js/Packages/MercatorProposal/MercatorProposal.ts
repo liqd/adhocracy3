@@ -1,5 +1,6 @@
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhInject = require("../Inject/Inject");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 
@@ -290,7 +291,7 @@ export var lastVersion = (
             itemPath: "@"
         },
         transclude: true,
-        template: "<inject></inject>",
+        template: "<adh-inject></adh-inject>",
         link: (scope) => {
             adhHttp.getNewestVersionPathNoFork(scope.itemPath).then(
                 (versionPath) => {
@@ -298,4 +299,29 @@ export var lastVersion = (
                 });
         }
     };
+};
+
+
+export var moduleName = "adhMercatorProposal";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhHttp.moduleName,
+            AdhInject.moduleName,
+            AdhPreliminaryNames.moduleName,
+            AdhResourceWidgets.moduleName
+        ])
+        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
+                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+                return widget.createDirective();
+            }])
+        .directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
+                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+                return widget.createDirective();
+            }])
+        .directive("adhMercatorProposalListing", ["adhConfig", listing])
+        .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion]);
 };

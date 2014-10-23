@@ -15,6 +15,8 @@ import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
 import SIUserBasic = require("../../Resources_/adhocracy_core/sheets/principal/IUserBasic");
 
+import Adapter = require("./Adapter");
+
 var pkgLocation = "/Rate";
 
 
@@ -363,4 +365,22 @@ export var createDirective = (
                 ($scope, $q, adhHttp, adhPermissions, adhUser, adhPreliminaryNames) =>
                     rateController(adapter, $scope, $q, adhHttp, adhPermissions, adhUser, adhPreliminaryNames)]
     };
+};
+
+
+export var moduleName = "adhRate";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhHttp.moduleName,
+            AdhPermissions.moduleName,
+            AdhPreliminaryNames.moduleName,
+            AdhUser.moduleName
+        ])
+        .directive("adhRate", ["$q", "adhConfig", "adhPreliminaryNames", ($q, adhConfig, adhPreliminaryNames) =>
+            createDirective(
+                new Adapter.RateAdapter(),
+                adhConfig
+            )]);
 };

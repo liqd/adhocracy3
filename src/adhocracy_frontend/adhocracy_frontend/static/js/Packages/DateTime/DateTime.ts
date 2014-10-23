@@ -26,3 +26,12 @@ export var createDirective = (config : AdhConfig.IService, moment : MomentStatic
         }
     };
 };
+
+
+export var moduleName = "adhDateTime";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [])
+        .directive("adhTime", ["adhConfig", "moment", "$interval", createDirective]);
+};
