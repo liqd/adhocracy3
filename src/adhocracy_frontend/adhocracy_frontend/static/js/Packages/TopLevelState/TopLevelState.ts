@@ -18,6 +18,12 @@
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
 
+export class ColumnState {
+    static SHOW : string = "show";
+    static HIDE : string = "hidden";
+    static COLLAPS : string = "collapsed";
+}
+
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
     private movingColumns : {
@@ -35,9 +41,9 @@ export class Service {
 
         this.eventHandler = new adhEventHandlerClass();
         this.movingColumns = {
-            "0": "hidden",
-            "1": "collapsed",
-            "2": "show"
+            "0": ColumnState.HIDE,
+            "1": ColumnState.COLLAPS,
+            "2": ColumnState.SHOW
         };
 
         this.$rootScope.$watch(() => self.$location.search()["mc0"], (state) => {
@@ -161,14 +167,14 @@ export var adhFocusSwitch = (topLevelState : Service) => {
             scope.switchFocus = () => {
                 var currentState = topLevelState.getMovingColumns();
 
-                if (currentState["0"] === "show") {
-                    topLevelState.setMovingColumn("0", "collapsed");
-                    topLevelState.setMovingColumn("1", "show");
-                    topLevelState.setMovingColumn("2", "show");
+                if (currentState["0"] === ColumnState.SHOW) {
+                    topLevelState.setMovingColumn("0", ColumnState.COLLAPS);
+                    topLevelState.setMovingColumn("1", ColumnState.SHOW);
+                    topLevelState.setMovingColumn("2", ColumnState.SHOW);
                 } else {
-                    topLevelState.setMovingColumn("0", "show");
-                    topLevelState.setMovingColumn("1", "show");
-                    topLevelState.setMovingColumn("2", "hidden");
+                    topLevelState.setMovingColumn("0", ColumnState.SHOW);
+                    topLevelState.setMovingColumn("1", ColumnState.SHOW);
+                    topLevelState.setMovingColumn("2", ColumnState.HIDE);
                 }
             };
         }
