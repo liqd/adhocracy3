@@ -553,37 +553,12 @@ export var register = () => {
 
         var _logBackendError = (name, fn, wrap) => {
             describe(name, () => {
-                var origConsoleLog;
-
-                beforeEach(() => {
-                    origConsoleLog = console.log;
-                    spyOn(console, "log").and.callThrough();
-                });
-
                 it("always throws an exception", () => {
                     var backendError = {
                         status: "error",
                         errors: []
                     };
                     expect(() => fn(wrap(backendError))).toThrow();
-                });
-
-                it("logs the raw backend error to console", () => {
-                    var backendError = {
-                        status: "error",
-                        errors: []
-                    };
-                    expect(() => fn(wrap(backendError))).toThrow();
-
-                    if (name === "logBackendError") {
-                        expect(console.log).toHaveBeenCalledWith("response:", backendError);
-                    } else {
-                        expect(console.log).toHaveBeenCalledWith("response:", [ { body: backendError } ]);
-                    }
-                });
-
-                afterEach(() => {
-                    console.log = origConsoleLog;
                 });
             });
         };
