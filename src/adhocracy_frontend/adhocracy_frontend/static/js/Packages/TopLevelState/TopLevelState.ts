@@ -136,6 +136,10 @@ export var movingColumns = (
     return {
         link: (scope, element) => {
             var move = (state) => {
+                if (typeof state === "undefined") {
+                    return;
+                };
+
                 var newCls = stateToClass(state);
 
                 if (newCls !== cls) {
