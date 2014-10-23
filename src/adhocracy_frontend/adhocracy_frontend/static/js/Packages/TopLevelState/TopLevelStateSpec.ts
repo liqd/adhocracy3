@@ -1,6 +1,7 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
 import AdhTopLevelState = require("./TopLevelState");
+var state = AdhTopLevelState.ColumnState;
 
 export var register = () => {
 
@@ -97,7 +98,13 @@ export var register = () => {
 
             beforeEach(() => {
                 topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock",
-                                   ["onSetFocus", "onSetContent2Url", "getMovingColumns", "onMovingColumns"]);
+                               ["onSetContent2Url", "getMovingColumns", "onMovingColumns", "movingColumns"]);
+                topLevelStateMock.movingColumns = {
+                    "0": state.HIDE,
+                    "1": state.COLLAPS,
+                    "2": state.SHOW
+                };
+
                 directive = AdhTopLevelState.movingColumns(topLevelStateMock);
             });
 
@@ -113,42 +120,38 @@ export var register = () => {
                     link(scopeMock, elementMock);
                 });
 
-                describe("onSetFocus", () => {
+                describe("onMovingColumns", () => {
                     var callback;
 
                     beforeEach(() => {
-                        callback = topLevelStateMock.onSetFocus.calls.mostRecent().args[0];
+                        callback = topLevelStateMock.onMovingColumns.calls.mostRecent().args[0];
                     });
 
-                    it("adds class 'is-collapsed-show-show' if columns is 2", () => {
-                        callback(2);
+                    it("adds class 'is-collapsed-show-show' if state is collapsed-show-show", () => {
+                        callback({"0": state.COLLAPS, "1": state.SHOW, "2": state.SHOW});
                         expect(elementMock.addClass).toHaveBeenCalledWith("is-collapsed-show-show");
                     });
 
-                    it("removes class 'is-collapsed-show-show' if columns is 1", () => {
-                        callback(1);
+                    it("removes class 'is-collapsed-show-show' if columns is show-show-hide", () => {
+                        callback({"0": state.COLLAPS, "1": state.SHOW, "2": state.SHOW});
+                        callback({"0": state.SHOW, "1": state.SHOW, "2": state.HIDE});
                         expect(elementMock.removeClass).toHaveBeenCalledWith("is-collapsed-show-show");
                     });
 
-                    it("removes class 'is-collapsed-show-show' if columns is 0", () => {
-                        callback(0);
-                        expect(elementMock.removeClass).toHaveBeenCalledWith("is-collapsed-show-show");
+                    it("adds class 'is-show-show-hidden' if state is show-show-hide", () => {
+                        callback({"0": state.SHOW, "1": state.SHOW, "2": state.HIDE});
+                        expect(elementMock.addClass).toHaveBeenCalledWith("is-show-show-hidden");
                     });
 
-                    it("does not add or remove class if columns is negative", () => {
-                        callback(-1);
-                        expect(elementMock.addClass).not.toHaveBeenCalled();
-                        expect(elementMock.removeClass).not.toHaveBeenCalled();
-                    });
-
-                    it("does not add or remove class if columns is greater 2", () => {
-                        callback(3);
-                        expect(elementMock.addClass).not.toHaveBeenCalled();
-                        expect(elementMock.removeClass).not.toHaveBeenCalled();
+                    it("removes class 'is-show-show-hidden' if columns is show-show-hide", () => {
+                        callback({"0": state.SHOW, "1": state.SHOW, "2": state.HIDE});
+                        callback({"0": state.COLLAPS, "1": state.SHOW, "2": state.SHOW});
+                        expect(elementMock.removeClass).toHaveBeenCalledWith("is-show-show-hidden");
                     });
 
 
                 });
+
 
                 describe("onSetContent2Url", () => {
                     var callback;
