@@ -25,6 +25,7 @@ export class ColumnState {
 }
 
 export class Service {
+    private viewmode : Array<string>;
     private eventHandler : AdhEventHandler.EventHandler;
     private movingColumns : {
         "0" : string;
@@ -38,6 +39,7 @@ export class Service {
         private $rootScope : ng.IScope
     ) {
         var self = this;
+        this.viewmode = new Array;
 
         this.eventHandler = new adhEventHandlerClass();
         this.movingColumns = {
@@ -63,6 +65,15 @@ export class Service {
 
     public onSetContent2Url(fn : (url : string) => void) : void {
         this.eventHandler.on("setContent2Url", fn);
+    }
+
+    public setViewMode(elem : string, mode : string) : void {
+        console.log("setting viewmode " + mode + " for elem " + elem);
+        this.viewmode[elem] = mode;
+    }
+
+    public getViewMode(elem : string) : string {
+        return this.viewmode[elem];
     }
 
     // FIXME: {set,get}CameFrom should be worked into the class
@@ -136,6 +147,9 @@ export var movingColumns = (
     return {
         link: (scope, element) => {
             var move = (state) => {
+                if (typeof state === "undefined") {
+                    return;
+                };
                 var newCls = stateToClass(state);
 
                 if (newCls !== cls) {

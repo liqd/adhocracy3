@@ -147,6 +147,25 @@ export class ProposalVersionDetail {
                     adhTopLevelState.setMovingColumn("1", state.SHOW);
                     adhTopLevelState.setMovingColumn("2", state.SHOW);
                 };
+
+                $scope.$watch("content", (content) => {
+                    if (typeof $scope.content !== "undefined") {
+                        var title = $scope.content.data["adhocracy_core.sheets.document.IDocument"].title;
+                        var viewmode = adhTopLevelState.getViewMode(title);
+
+                        if (typeof viewmode !== "undefined") {
+                            console.log("setting viewmode " + viewmode + " for elem " + title);
+                            $scope.viewmode = viewmode;
+
+                            if (adhTopLevelState.getMovingColumns()[2] === state.SHOW &&
+                                viewmode === "display") {
+                                adhTopLevelState.setContent2Url($scope.content.path);
+                            };
+
+                        };
+                    };
+                });
+
             }]
         };
     }
