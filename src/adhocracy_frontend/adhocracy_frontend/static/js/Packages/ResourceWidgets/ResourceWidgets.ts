@@ -194,7 +194,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
 
     constructor(
         public adhHttp : AdhHttp.Service<any>,
-        public adhPreliminaryNames : AdhPreliminaryNames,
+        public adhPreliminaryNames : AdhPreliminaryNames.Service,
         public $q : ng.IQService
     ) {}
 

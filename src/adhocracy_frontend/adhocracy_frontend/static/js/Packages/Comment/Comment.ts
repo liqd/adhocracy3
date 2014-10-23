@@ -60,7 +60,7 @@ export class CommentResource<R extends AdhResourcesBase.Resource> extends AdhRes
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
-        adhPreliminaryNames : AdhPreliminaryNames,
+        adhPreliminaryNames : AdhPreliminaryNames.Service,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -156,7 +156,7 @@ export class CommentCreate<R extends AdhResourcesBase.Resource> extends CommentR
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
-        adhPreliminaryNames : AdhPreliminaryNames,
+        adhPreliminaryNames : AdhPreliminaryNames.Service,
         $q : ng.IQService
     ) {
         super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
@@ -199,7 +199,7 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.IService) => {
         controller: ["adhDone", "adhHttp", "adhPreliminaryNames", "adhUser", "$scope", (
             adhDone,
             adhHttp : AdhHttp.Service<any>,
-            adhPreliminaryNames : AdhPreliminaryNames,
+            adhPreliminaryNames : AdhPreliminaryNames.Service,
             adhUser : AdhUser.Service,
             $scope
         ) : void => {

@@ -241,7 +241,7 @@ export var rateController = (
     adhHttp : AdhHttp.Service<any>,
     adhPermissions : AdhPermissions.Service,
     adhUser : AdhUser.Service,
-    adhPreliminaryNames : AdhPreliminaryNames
+    adhPreliminaryNames : AdhPreliminaryNames.Service
 ) : ng.IPromise<void> => {
 
     $scope.isActive = (rate : number) : boolean =>

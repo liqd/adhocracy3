@@ -170,7 +170,10 @@ export class ProposalVersionNew {
                 onCancel: "=",
                 poolPath: "@"
             },
-            controller: ["$scope", "adhPreliminaryNames", ($scope : IScopeProposalVersion, adhPreliminaryNames : AdhPreliminaryNames) => {
+            controller: ["$scope", "adhPreliminaryNames", (
+                $scope : IScopeProposalVersion,
+                adhPreliminaryNames : AdhPreliminaryNames.Service
+            ) => {
                 $scope.viewmode = "edit";
 
                 $scope.content = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
@@ -287,7 +290,7 @@ export class ParagraphVersionDetail {
 export class Service {
     constructor(
         private adhHttp : AdhHttp.Service<any>,
-        private adhPreliminaryNames : AdhPreliminaryNames,
+        private adhPreliminaryNames : AdhPreliminaryNames.Service,
         private $q : ng.IQService
     ) {}
 

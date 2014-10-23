@@ -34,7 +34,7 @@ export var register = (angular, config, meta_api) => {
 
     describe("[]", () => {
         var adhMetaApi : AdhMetaApi.MetaApiQuery;
-        var adhPreliminaryNames : AdhPreliminaryNames;
+        var adhPreliminaryNames : AdhPreliminaryNames.Service;
         var adhHttp : AdhHttp.Service<any>;
         var adhUser : AdhUser.Service;
 
@@ -44,7 +44,7 @@ export var register = (angular, config, meta_api) => {
 
         beforeEach((done) => {
             adhMetaApi = angular.injector(["ng"]).invoke(() => new AdhMetaApi.MetaApiQuery(meta_api));
-            adhPreliminaryNames = angular.injector(["ng"]).invoke(() => new AdhPreliminaryNames());
+            adhPreliminaryNames = angular.injector(["ng"]).invoke(() => new AdhPreliminaryNames.Service());
 
             adhHttp = (() => {
                 var factory = ($http, $q, $timeout) => {

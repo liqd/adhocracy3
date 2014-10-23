@@ -137,7 +137,7 @@ export var register = () => {
                 userMock = mkUserMock();
 
                 adapter = new AdhRateAdapter.RateAdapter();
-                rateVersion = new RIRateVersion({ preliminaryNames: new AdhPreliminaryNames() });
+                rateVersion = new RIRateVersion({ preliminaryNames: new AdhPreliminaryNames.Service() });
                 rateVersion.data["adhocracy_core.sheets.rate.IRate"] = new SIRate.Sheet({
                     subject: "sub",
                     object: "obj",

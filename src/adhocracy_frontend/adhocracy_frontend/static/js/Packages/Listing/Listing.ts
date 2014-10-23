@@ -90,7 +90,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
             controller: ["$scope", "adhHttp", "adhPreliminaryNames", "adhPermissions", (
                 $scope: ListingScope<Container>,
                 adhHttp: AdhHttp.Service<Container>,
-                adhPreliminaryNames : AdhPreliminaryNames,
+                adhPreliminaryNames : AdhPreliminaryNames.Service,
                 adhPermissions : AdhPermissions.Service
             ) : void => {
                 $scope.show = {createForm: false};

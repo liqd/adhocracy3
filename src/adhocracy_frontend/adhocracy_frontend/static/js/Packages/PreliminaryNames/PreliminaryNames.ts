@@ -1,4 +1,4 @@
-class PreliminaryNames {
+export class Service {
     private state : number;
 
     constructor() {
@@ -14,5 +14,3 @@ class PreliminaryNames {
         return path.length > 2 && path[0] === "@" && path[1] !== "@";
     }
 }
-
-export = PreliminaryNames;

@@ -87,7 +87,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     constructor(
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
-        adhPreliminaryNames : AdhPreliminaryNames,
+        adhPreliminaryNames : AdhPreliminaryNames.Service,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -260,7 +260,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
     constructor(
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
-        adhPreliminaryNames : AdhPreliminaryNames,
+        adhPreliminaryNames : AdhPreliminaryNames.Service,
         $q : ng.IQService
     ) {
         super(adhConfig, adhHttp, adhPreliminaryNames, $q);

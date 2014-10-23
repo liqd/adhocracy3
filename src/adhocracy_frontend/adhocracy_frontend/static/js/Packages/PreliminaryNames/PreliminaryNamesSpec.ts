@@ -4,10 +4,10 @@ import AdhPreliminaryNames = require("./PreliminaryNames");
 
 export var register = () => {
     describe("PreliminaryNames", () => {
-        var pn : AdhPreliminaryNames;
+        var pn : AdhPreliminaryNames.Service;
 
         beforeEach(() => {
-            pn = new AdhPreliminaryNames();
+            pn = new AdhPreliminaryNames.Service();
         });
 
         describe("nextPreliminary", () => {

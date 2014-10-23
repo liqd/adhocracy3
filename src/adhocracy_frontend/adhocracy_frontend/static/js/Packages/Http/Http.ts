@@ -61,7 +61,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         private $q : ng.IQService,
         private $timeout : ng.ITimeoutService,
         private adhMetaApi : AdhMetaApi.MetaApiQuery,
-        private adhPreliminaryNames : AdhPreliminaryNames,
+        private adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhConfig : AdhConfig.IService
     ) {}
 

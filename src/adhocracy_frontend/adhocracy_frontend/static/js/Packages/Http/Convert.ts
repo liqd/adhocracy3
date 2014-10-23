@@ -29,7 +29,7 @@ var sanityCheck = (obj : ResourcesBase.Resource) : void => {
 export var importContent = <Content extends ResourcesBase.Resource>(
     response : {data : Content},
     metaApi : AdhMetaApi.MetaApiQuery,
-    preliminaryNames : AdhPreliminaryNames
+    preliminaryNames : AdhPreliminaryNames.Service
 ) : Content => {
     "use strict";
 
@@ -138,7 +138,7 @@ export var importContent = <Content extends ResourcesBase.Resource>(
 export var importBatchContent = <Content extends ResourcesBase.Resource>(
     responses : { data : {body : Content}[] },
     metaApi : AdhMetaApi.MetaApiQuery,
-    preliminaryNames : AdhPreliminaryNames
+    preliminaryNames : AdhPreliminaryNames.Service
 ) : Content[] => {
     // FIXME: description files don't appear to support array-typed
     // response bodies.  this might be a good thing (web security and

@@ -517,7 +517,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
         var optArgs : any = {};
         var lines : string[] = [];
 
-        reqArgs.preliminaryNames = "PreliminaryNames";
+        reqArgs.preliminaryNames = "PreliminaryNames.Service";
 
         // resource path is either optional arg or (if n/a)
         // preliminary name.
