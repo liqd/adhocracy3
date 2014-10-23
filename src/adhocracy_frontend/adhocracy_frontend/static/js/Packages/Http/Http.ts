@@ -149,6 +149,10 @@ export class Service<Content extends ResourcesBase.Resource> {
      * For resources that do not support fork: Return the unique head
      * version provided by the LAST tag.  If there is no or more than
      * one version in LAST, throw an exception.
+     *
+     * FIXME: rename to getLastVersionPathNoFork for consistency with
+     * LAST tag and adh-last-version directive.  (even though arguably
+     * there is a difference between the LAST tag and this function.)
      */
     public getNewestVersionPathNoFork(path : string) : ng.IPromise<string> {
         return this.get(path + "LAST/")
