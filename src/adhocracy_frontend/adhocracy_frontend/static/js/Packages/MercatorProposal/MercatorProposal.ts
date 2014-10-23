@@ -289,16 +289,12 @@ export var lastVersion = (
         scope: {
             itemPath: "@"
         },
-        link: (scope, element) => {
-            var template = element.html();
-            element.html("");
-
+        transclude: true,
+        template: "<inject></inject>",
+        link: (scope) => {
             adhHttp.getNewestVersionPathNoFork(scope.itemPath).then(
                 (versionPath) => {
                     scope.versionPath = versionPath;
-
-                    element.html(template);
-                    $compile(element.contents())(scope);
                 });
         }
     };
