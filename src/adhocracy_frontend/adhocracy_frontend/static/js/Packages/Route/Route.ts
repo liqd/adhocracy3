@@ -6,7 +6,6 @@ import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBa
 import RIMercatorProposal = require("../../Resources_/adhocracy_core/resources/mercator/IMercatorProposal");
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
-import RISampleProposal = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposal");
 
 var notFoundTemplate = "<h1>404 - not Found</h1>";
 
@@ -24,6 +23,7 @@ export var resourceRouter = (
     $scope : IResourceRouterScope
 ) => {
     var resourceUrl = adhConfig.rest_url + "/" + $routeParams["path"];
+
     adhHttp.get(resourceUrl).then((resource) => {
         switch (resource.content_type) {
             case RIBasicPool.content_type:
@@ -31,11 +31,6 @@ export var resourceRouter = (
                 break;
             case RIMercatorProposal.content_type:
                 $scope.template = "<adh-document-workbench></adh-document-workbench>";
-                break;
-            case RISampleProposal.content_type:
-                $scope.template = "<adh-document-workbench></adh-document-workbench>";
-                var proposal = $routeParams["path"].split("/")[1];
-                adhTopLevelState.setViewMode(proposal, "display");
                 break;
             case RIUser.content_type:
                 $scope.template = "<h1>User</h1>";
