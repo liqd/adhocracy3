@@ -1,6 +1,8 @@
 """Adhocracy frontend customization for Mercator."""
 from pyramid.config import Configurator
 
+from adhocracy_frontend import add_frontend_route
+
 
 def includeme(config):
     """Setup adhocracy frontend extension."""
@@ -9,6 +11,8 @@ def includeme(config):
     # override static javascript and css files
     config.override_asset(to_override='adhocracy_frontend:build/',
                           override_with='mercator:build/')
+    add_frontend_route(config, 'mercator', 'mercator')
+    add_frontend_route(config, 'mercator-listing', 'mercator-listing')
 
 
 def main(global_config, **settings):

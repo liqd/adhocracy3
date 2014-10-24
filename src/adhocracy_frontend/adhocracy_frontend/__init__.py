@@ -59,8 +59,6 @@ def includeme(config):
     add_frontend_route(config, 'activate', 'activate/{key}')
     add_frontend_route(config, 'activation_error', 'activation_error')
     add_frontend_route(config, 'root', '')
-    add_frontend_route(config, 'mercator', 'mercator')
-    add_frontend_route(config, 'mercator-listing', 'mercator-listing')
     add_frontend_route(config, 'resource', 'r/*path')
     config.add_subscriber(add_cors_headers_subscriber, NewResponse)
 
