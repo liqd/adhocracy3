@@ -20,8 +20,8 @@ import AdhEventHandler = require("../EventHandler/EventHandler");
 
 export class ColumnState {
     static SHOW : string = "show";
-    static HIDE : string = "hidden";
-    static COLLAPS : string = "collapsed";
+    static HIDE : string = "hide";
+    static COLLAPSE : string = "collapse";
 }
 
 export class Service {
@@ -42,7 +42,7 @@ export class Service {
         this.eventHandler = new adhEventHandlerClass();
         this.movingColumns = {
             "0": ColumnState.HIDE,
-            "1": ColumnState.COLLAPS,
+            "1": ColumnState.COLLAPSE,
             "2": ColumnState.SHOW
         };
 
@@ -182,7 +182,7 @@ export var adhFocusSwitch = (topLevelState : Service) => {
                 var currentState = topLevelState.getMovingColumns();
 
                 if (currentState["0"] === ColumnState.SHOW) {
-                    topLevelState.setMovingColumn("0", ColumnState.COLLAPS);
+                    topLevelState.setMovingColumn("0", ColumnState.COLLAPSE);
                     topLevelState.setMovingColumn("1", ColumnState.SHOW);
                     topLevelState.setMovingColumn("2", ColumnState.SHOW);
                 } else {

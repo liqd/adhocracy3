@@ -137,13 +137,13 @@ export class ProposalVersionDetail {
 
                 $scope.showComments = () => {
                     adhTopLevelState.setContent2Url($scope.content.path);
-                    adhTopLevelState.setMovingColumn("0", AdhTopLevelState.ColumnState.COLLAPS);
+                    adhTopLevelState.setMovingColumn("0", AdhTopLevelState.ColumnState.COLLAPSE);
                     adhTopLevelState.setMovingColumn("1", AdhTopLevelState.ColumnState.SHOW);
                     adhTopLevelState.setMovingColumn("2", AdhTopLevelState.ColumnState.SHOW);
                 };
 
                 $scope.hideComments = () => {
-                    adhTopLevelState.setMovingColumn("0", AdhTopLevelState.ColumnState.COLLAPS);
+                    adhTopLevelState.setMovingColumn("0", AdhTopLevelState.ColumnState.COLLAPSE);
                     adhTopLevelState.setMovingColumn("1", AdhTopLevelState.ColumnState.SHOW);
                     adhTopLevelState.setMovingColumn("2", AdhTopLevelState.ColumnState.SHOW);
                 };
