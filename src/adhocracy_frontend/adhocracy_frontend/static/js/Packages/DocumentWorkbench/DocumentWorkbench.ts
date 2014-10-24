@@ -1,6 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/angularjs/angular.d.ts"/>
 
+import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
+import AdhProposal = require("../Proposal/Proposal");
 import AdhUser = require("../User/User");
 
 import RIProposal = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposal");
@@ -36,3 +38,17 @@ export class DocumentWorkbench {
         };
     }
 }
+
+
+export var moduleName = "adhDocumentWorkbench";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhComment.moduleName,
+            AdhProposal.moduleName,
+            AdhUser.moduleName
+        ])
+        .directive("adhDocumentWorkbench", ["adhConfig", (adhConfig) =>
+            new DocumentWorkbench().createDirective(adhConfig)]);
+};

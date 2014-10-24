@@ -91,3 +91,12 @@ export var factory = () => {
         }
     };
 };
+
+
+export var moduleName = "adhInject";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [])
+        .directive("adhInject", factory);
+};

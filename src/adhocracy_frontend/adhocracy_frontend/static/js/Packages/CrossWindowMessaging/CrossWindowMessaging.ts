@@ -198,3 +198,19 @@ export var factory = (adhConfig : AdhConfig.IService, $window : Window, $rootSco
         return new Dummy();
     }
 };
+
+
+export var moduleName = "adhCrossWindowMessaging";
+
+export var register = (angular, trusted = false) => {
+    var mod = angular
+        .module(moduleName, [
+            AdhUser.moduleName
+        ]);
+
+    if (trusted) {
+        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", factory]);
+    } else {
+        mod.factory("adhCrossWindowMessaging", ["adhConfig", "$window", "$rootScope", "adhUser", factory]);
+    }
+};

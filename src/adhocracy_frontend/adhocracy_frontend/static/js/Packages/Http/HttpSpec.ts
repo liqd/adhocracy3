@@ -14,7 +14,7 @@ import Convert = require("./Convert");
 import Error = require("./Error");
 
 
-var mkHttpMock = (adhPreliminaryNames : AdhPreliminaryNames) => {
+var mkHttpMock = (adhPreliminaryNames : AdhPreliminaryNames.Service) => {
     var mock = jasmine.createSpy("$httpMock");
 
     var response = new RIParagraph({ preliminaryNames: adhPreliminaryNames });
@@ -86,7 +86,7 @@ export var register = () => {
             var adhHttp : AdhHttp.Service<any>;
 
             beforeEach(() => {
-                adhPreliminaryNames = new AdhPreliminaryNames();
+                adhPreliminaryNames = new AdhPreliminaryNames.Service();
                 $httpMock = mkHttpMock(adhPreliminaryNames);
                 $timeoutMock = mkTimeoutMock();
                 adhMetaApiMock = mkAdhMetaApiMock();
@@ -516,7 +516,7 @@ export var register = () => {
                     data: obj
                 };
                 var adhMetaApiMock = mkAdhMetaApiMock();
-                var adhPreliminaryNames = new AdhPreliminaryNames();
+                var adhPreliminaryNames = new AdhPreliminaryNames.Service();
                 var imported = () => Convert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
                 expect(imported().path).toBe(obj.path);
             });
@@ -526,7 +526,7 @@ export var register = () => {
                     data: obj
                 };
                 var adhMetaApiMock = mkAdhMetaApiMock();
-                var adhPreliminaryNames = new AdhPreliminaryNames();
+                var adhPreliminaryNames = new AdhPreliminaryNames.Service();
                 var imported = () => Convert.importContent(response, <any>adhMetaApiMock, adhPreliminaryNames);
                 expect(imported).toThrow();
             });

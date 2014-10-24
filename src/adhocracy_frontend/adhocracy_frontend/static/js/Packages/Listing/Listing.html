@@ -7,11 +7,11 @@
             data-ng-disabled="show.createForm">{{ "Add" | translate }}</a>
     </div>
     <div class="listing-create-form" data-ng-if="show.createForm">
-        <inject data-transclusion-id="create-form-id"></inject>
+        <adh-inject data-transclusion-id="create-form-id"></adh-inject>
     </div>
     <ol class="listing-elements">
         <li class="listing-element" data-ng-repeat="element in elements">
-            <inject data-transclusion-id="element-id"></inject>
+            <adh-inject data-transclusion-id="element-id"></adh-inject>
         </li>
     </ol>
 </div>

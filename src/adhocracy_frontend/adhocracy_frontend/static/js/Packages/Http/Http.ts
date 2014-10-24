@@ -61,7 +61,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         private $q : ng.IQService,
         private $timeout : ng.ITimeoutService,
         private adhMetaApi : AdhMetaApi.MetaApiQuery,
-        private adhPreliminaryNames : AdhPreliminaryNames,
+        private adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhConfig : AdhConfig.IService
     ) {}
 
@@ -370,3 +370,15 @@ export class Service<Content extends ResourcesBase.Resource> {
         return callback(new AdhTransaction.Transaction(this, this.adhMetaApi, this.adhPreliminaryNames, this.adhConfig));
     }
 }
+
+
+export var moduleName = "adhHttp";
+
+export var register = (angular, metaApi) => {
+    angular
+        .module(moduleName, [
+            AdhPreliminaryNames.moduleName
+        ])
+        .service("adhHttp", ["$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", Service])
+        .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi));
+};

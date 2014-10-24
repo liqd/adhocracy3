@@ -30,7 +30,7 @@ export class Transaction {
     constructor(
         private adhHttp : AdhHttp.Service<any>,
         private adhMetaApi : AdhMetaApi.MetaApiQuery,
-        private adhPreliminaryNames : AdhPreliminaryNames,
+        private adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhConfig : AdhConfig.IService
     ) {
         this.requests = [];

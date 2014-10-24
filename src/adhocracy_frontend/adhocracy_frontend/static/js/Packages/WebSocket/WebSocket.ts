@@ -601,3 +601,15 @@ export class WebSocketTrackerButton {
 }
 
 */
+
+
+export var moduleName = "adhWebSocket";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [])
+        .factory("adhWebSocket", ["Modernizr", "adhConfig", factory])
+        .directive("adhWebSocketTest",
+            ["$timeout", "adhConfig", "adhWebSocket", ($timeout, adhConfig, adhWebSocket) =>
+                new WebSocketTest().createDirective($timeout, adhConfig, adhWebSocket)]);
+};

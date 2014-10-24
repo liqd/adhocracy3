@@ -1,23 +1,29 @@
 import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
+import AdhDateTime = require("../DateTime/DateTime");
 import AdhHttp = require("../Http/Http");
 import AdhListing = require("../Listing/Listing");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
-import AdhResourcesBase = require("../../ResourcesBase");
+import AdhRate = require("../Rate/Rate");
+import AdhRecursionHelper = require("../RecursionHelper/RecursionHelper");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
 
+import ResourcesBase = require("../../ResourcesBase");
+
 import RIExternalResource = require("../../Resources_/adhocracy_core/resources/external_resource/IExternalResource");
 import SIPool = require("../../Resources_/adhocracy_core/sheets/pool/IPool");
+
+import Adapter = require("./Adapter");
 
 var pkgLocation = "/Comment";
 
 
-export interface ICommentAdapter<T extends AdhResourcesBase.Resource> extends AdhListing.IListingContainerAdapter {
+export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhListing.IListingContainerAdapter {
     create(settings : any) : T;
     createItem(settings : any) : any;
     derive(oldVersion : T, settings : any) : T;
@@ -54,24 +60,24 @@ export interface ICommentResourceScope extends AdhResourceWidgets.IResourceWidge
     };
 }
 
-export class CommentResource<R extends AdhResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, ICommentResourceScope> {
+export class CommentResource<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, ICommentResourceScope> {
     constructor(
         private adapter : ICommentAdapter<R>,
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
-        adhPreliminaryNames : AdhPreliminaryNames,
+        adhPreliminaryNames : AdhPreliminaryNames.Service,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/CommentDetail.html";
     }
 
-    createRecursionDirective(recursionHelper) {
+    createRecursionDirective(adhRecursionHelper) {
         var self = this;
 
         var directive = this.createDirective();
-        directive.compile = (element) => recursionHelper.compile(element, directive.link);
+        directive.compile = (element) => adhRecursionHelper.compile(element, directive.link);
 
         directive.scope.refersTo = "@";
         directive.scope.poolPath = "@";
@@ -150,13 +156,13 @@ export class CommentResource<R extends AdhResourcesBase.Resource> extends AdhRes
     }
 }
 
-export class CommentCreate<R extends AdhResourcesBase.Resource> extends CommentResource<R> {
+export class CommentCreate<R extends ResourcesBase.Resource> extends CommentResource<R> {
     constructor(
         adapter : ICommentAdapter<R>,
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         public adhPermissions : AdhPermissions.Service,
-        adhPreliminaryNames : AdhPreliminaryNames,
+        adhPreliminaryNames : AdhPreliminaryNames.Service,
         $q : ng.IQService
     ) {
         super(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
@@ -199,7 +205,7 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.IService) => {
         controller: ["adhDone", "adhHttp", "adhPreliminaryNames", "adhUser", "$scope", (
             adhDone,
             adhHttp : AdhHttp.Service<any>,
-            adhPreliminaryNames : AdhPreliminaryNames,
+            adhPreliminaryNames : AdhPreliminaryNames.Service,
             adhUser : AdhUser.Service,
             $scope
         ) : void => {
@@ -244,4 +250,40 @@ export var adhCreateOrShowCommentListing = (adhConfig : AdhConfig.IService) => {
             ).then(adhDone);
         }]
     };
+};
+
+
+export var moduleName = "adhComment";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhDateTime.moduleName,
+            AdhHttp.moduleName,
+            AdhListing.moduleName,
+            AdhPermissions.moduleName,
+            AdhPreliminaryNames.moduleName,
+            AdhRate.moduleName,
+            AdhRecursionHelper.moduleName,
+            AdhResourceWidgets.moduleName,
+            AdhTopLevelState.moduleName,
+            AdhUser.moduleName
+        ])
+        .directive("adhCommentListingPartial",
+            ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
+                new AdhListing.Listing(new Adapter.ListingCommentableAdapter()).createDirective(adhConfig, adhWebSocket)])
+        .directive("adhCommentListing", ["adhConfig", adhCommentListing])
+        .directive("adhCreateOrShowCommentListing", ["adhConfig", adhCreateOrShowCommentListing])
+        .directive("adhCommentResource", ["adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhRecursionHelper", "$q",
+            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhRecursionHelper, $q) => {
+                var adapter = new Adapter.CommentAdapter();
+                var widget = new CommentResource(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
+                return widget.createRecursionDirective(adhRecursionHelper);
+            }])
+        .directive("adhCommentCreate", ["adhConfig", "adhHttp", "adhPermissions", "adhPreliminaryNames", "adhRecursionHelper", "$q",
+            (adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, adhRecursionHelper, $q) => {
+                var adapter = new Adapter.CommentAdapter();
+                var widget = new CommentCreate(adapter, adhConfig, adhHttp, adhPermissions, adhPreliminaryNames, $q);
+                return widget.createRecursionDirective(adhRecursionHelper);
+            }]);
 };

@@ -30,3 +30,15 @@ export class Service {
         return update();
     }
 }
+
+
+export var moduleName = "adhPermissions";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhHttp.moduleName,
+            AdhUser.moduleName
+        ])
+        .service("adhPermissions", ["adhHttp", "adhUser", Service]);
+};

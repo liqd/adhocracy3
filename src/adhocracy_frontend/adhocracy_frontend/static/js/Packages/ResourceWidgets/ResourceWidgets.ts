@@ -194,7 +194,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
 
     constructor(
         public adhHttp : AdhHttp.Service<any>,
-        public adhPreliminaryNames : AdhPreliminaryNames,
+        public adhPreliminaryNames : AdhPreliminaryNames.Service,
         public $q : ng.IQService
     ) {}
 
@@ -342,3 +342,16 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         throw "not implemented";
     }
 }
+
+
+export var moduleName = "adhResourceWidgets";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhEventHandler.moduleName,
+            AdhHttp.moduleName,
+            AdhPreliminaryNames.moduleName
+        ])
+        .directive("adhResourceWrapper", resourceWrapper);
+};
