@@ -22,7 +22,6 @@ import SISection = require("../../Resources_/adhocracy_core/sheets/document/ISec
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/Proposal";
-var state = AdhTopLevelState.ColumnState;
 
 /**
  * contents of the resource with view mode.
@@ -137,15 +136,16 @@ export class ProposalVersionDetail {
                 };
 
                 $scope.showComments = () => {
-                    adhTopLevelState.setMovingColumn("0", state.COLLAPS);
-                    adhTopLevelState.setMovingColumn("1", state.SHOW);
-                    adhTopLevelState.setMovingColumn("2", state.SHOW);
+                    adhTopLevelState.setContent2Url($scope.content.path);
+                    adhTopLevelState.setMovingColumn("0", AdhTopLevelState.ColumnState.COLLAPS);
+                    adhTopLevelState.setMovingColumn("1", AdhTopLevelState.ColumnState.SHOW);
+                    adhTopLevelState.setMovingColumn("2", AdhTopLevelState.ColumnState.SHOW);
                 };
 
                 $scope.hideComments = () => {
-                    adhTopLevelState.setMovingColumn("0", state.COLLAPS);
-                    adhTopLevelState.setMovingColumn("1", state.SHOW);
-                    adhTopLevelState.setMovingColumn("2", state.SHOW);
+                    adhTopLevelState.setMovingColumn("0", AdhTopLevelState.ColumnState.COLLAPS);
+                    adhTopLevelState.setMovingColumn("1", AdhTopLevelState.ColumnState.SHOW);
+                    adhTopLevelState.setMovingColumn("2", AdhTopLevelState.ColumnState.SHOW);
                 };
             }]
         };

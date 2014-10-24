@@ -1,7 +1,6 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
 import AdhTopLevelState = require("./TopLevelState");
-var state = AdhTopLevelState.ColumnState;
 
 export var register = () => {
 
@@ -100,9 +99,9 @@ export var register = () => {
                 topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock",
                                ["onSetContent2Url", "getMovingColumns", "onMovingColumns", "movingColumns"]);
                 topLevelStateMock.movingColumns = {
-                    "0": state.HIDE,
-                    "1": state.COLLAPS,
-                    "2": state.SHOW
+                    "0": AdhTopLevelState.ColumnState.HIDE,
+                    "1": AdhTopLevelState.ColumnState.COLLAPS,
+                    "2": AdhTopLevelState.ColumnState.SHOW
                 };
 
                 directive = AdhTopLevelState.movingColumns(topLevelStateMock);
@@ -128,24 +127,48 @@ export var register = () => {
                     });
 
                     it("adds class 'is-collapsed-show-show' if state is collapsed-show-show", () => {
-                        callback({"0": state.COLLAPS, "1": state.SHOW, "2": state.SHOW});
+                        callback({
+                            "0": AdhTopLevelState.ColumnState.COLLAPS,
+                            "1": AdhTopLevelState.ColumnState.SHOW,
+                            "2": AdhTopLevelState.ColumnState.SHOW
+                        });
                         expect(elementMock.addClass).toHaveBeenCalledWith("is-collapsed-show-show");
                     });
 
                     it("removes class 'is-collapsed-show-show' if columns is show-show-hide", () => {
-                        callback({"0": state.COLLAPS, "1": state.SHOW, "2": state.SHOW});
-                        callback({"0": state.SHOW, "1": state.SHOW, "2": state.HIDE});
+                        callback({
+                            "0": AdhTopLevelState.ColumnState.COLLAPS,
+                            "1": AdhTopLevelState.ColumnState.SHOW,
+                            "2": AdhTopLevelState.ColumnState.SHOW
+                        });
+                        callback({
+                            "0": AdhTopLevelState.ColumnState.SHOW,
+                            "1": AdhTopLevelState.ColumnState.SHOW,
+                            "2": AdhTopLevelState.ColumnState.HIDE
+                        });
                         expect(elementMock.removeClass).toHaveBeenCalledWith("is-collapsed-show-show");
                     });
 
                     it("adds class 'is-show-show-hidden' if state is show-show-hide", () => {
-                        callback({"0": state.SHOW, "1": state.SHOW, "2": state.HIDE});
+                        callback({
+                            "0": AdhTopLevelState.ColumnState.SHOW,
+                            "1": AdhTopLevelState.ColumnState.SHOW,
+                            "2": AdhTopLevelState.ColumnState.HIDE
+                        });
                         expect(elementMock.addClass).toHaveBeenCalledWith("is-show-show-hidden");
                     });
 
                     it("removes class 'is-show-show-hidden' if columns is show-show-hide", () => {
-                        callback({"0": state.SHOW, "1": state.SHOW, "2": state.HIDE});
-                        callback({"0": state.COLLAPS, "1": state.SHOW, "2": state.SHOW});
+                        callback({
+                            "0": AdhTopLevelState.ColumnState.SHOW,
+                            "1": AdhTopLevelState.ColumnState.SHOW,
+                            "2": AdhTopLevelState.ColumnState.HIDE
+                        });
+                        callback({
+                            "0": AdhTopLevelState.ColumnState.COLLAPS,
+                            "1": AdhTopLevelState.ColumnState.SHOW,
+                            "2": AdhTopLevelState.ColumnState.SHOW
+                        });
                         expect(elementMock.removeClass).toHaveBeenCalledWith("is-show-show-hidden");
                     });
 
