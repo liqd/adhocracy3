@@ -7,18 +7,18 @@ category: Layout
 
 This widget represents a major design concept in Adhocracy 3.
 It contains a list of columns which may slide to either side to reveal
-new columns with additional functionality. Each column can be shown, collapsed
-or hidden completely.
+new columns with additional functionality. Each column can be shown, collapse
+or hide completely.
 
 States:
 
--   is-show-hidden-hidden
--   is-collapsed-show-hidden
--   is-collapsed-show-collapsed
--   is-collapsed-collapsed-show
--   is-show-collapsed-collapsed
--   is-collapsed-show-show
--   is-show-show-collapsed
+-   is-show-hide-hide
+-   is-collapse-show-hide
+-   is-collapse-show-collapse
+-   is-collapse-collapse-show
+-   is-show-collapse-collapse
+-   is-collapse-show-show
+-   is-show-show-collapse
 
 ```html_example
 <div class="moving-columns" style="height: 10em; position: relative;">
@@ -26,7 +26,7 @@ States:
     <div class="moving-column-content">content column</div>
     <div class="moving-column-content2">secondary-content-column</div>
 </div>
-<a onclick="$('.moving-columns').toggleClass('is-collapsed-show-show')">click me</a>
+<a onclick="$('.moving-columns').toggleClass('is-collapse-show-show')">click me</a>
 ```
 */
 
@@ -54,7 +54,7 @@ States:
 .moving-columns {
     overflow: hidden;
 
-    // is-show-show-hidden
+    // is-show-show-hide
     .moving-column-structure {
         @include moving-column(0, 6);
     }
@@ -67,7 +67,7 @@ States:
         @include moving-column(12, 13);
     }
 
-    &.is-show-hidden-hidden {
+    &.is-show-hide-hide {
         .moving-column-structure {
             @include moving-column(0, 12);
         }
@@ -81,7 +81,7 @@ States:
         }
     }
 
-    &.is-collapsed-show-hidden {
+    &.is-collapse-show-hide {
         .moving-column-structure {
             @include moving-column(0, 1);
         }
@@ -95,7 +95,7 @@ States:
         }
     }
 
-    &.is-collapsed-show-collapsed {
+    &.is-collapse-show-collapse {
         .moving-column-structure {
             @include moving-column(0, 1);
         }
@@ -109,7 +109,7 @@ States:
         }
     }
 
-    &.is-collapsed-collapsed-show {
+    &.is-collapse-collapse-show {
         .moving-column-structure {
             @include moving-column(0, 1);
         }
@@ -123,7 +123,7 @@ States:
         }
     }
 
-    &.is-show-collapsed-collapsed {
+    &.is-show-collapse-collapse {
         .moving-column-structure {
             @include moving-column(0, 10);
         }
@@ -137,7 +137,7 @@ States:
         }
     }
 
-    &.is-collapsed-show-show {
+    &.is-collapse-show-show {
         .moving-column-structure {
             @include moving-column(0, 1);
         }
@@ -151,7 +151,7 @@ States:
         }
     }
 
-    &.is-show-show-collapsed {
+    &.is-show-show-collapse {
         .moving-column-structure {
             @include moving-column(0, 5.5);
         }
