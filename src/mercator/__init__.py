@@ -7,8 +7,8 @@ def includeme(config):
     # include adhocracy_frontend
     config.include('adhocracy_frontend')
     # override static javascript and css files
-    config.override_asset(to_override='adhocracy_frontend:static/',
-                          override_with='mercator:static_compiled/')
+    config.override_asset(to_override='adhocracy_frontend:build/',
+                          override_with='mercator:build/')
 
 
 def main(global_config, **settings):
