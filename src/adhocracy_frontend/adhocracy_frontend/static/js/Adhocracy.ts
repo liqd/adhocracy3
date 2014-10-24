@@ -71,6 +71,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhComment.moduleName,
         AdhDocumentWorkbench.moduleName,
         AdhCrossWindowMessaging.moduleName,
+        AdhEmbed.moduleName,
         AdhMercatorProposal.moduleName,
         AdhRoute.moduleName,
         AdhProposal.moduleName
