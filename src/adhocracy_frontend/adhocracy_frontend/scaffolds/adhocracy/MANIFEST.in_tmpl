@@ -1,2 +1,8 @@
-include *.txt *.ini *.cfg *.rst
-recursive-include {{package}} *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.js *.html *.xml
+recursive-include src/{{project}}/static_compiled *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.jpg *.ico *.gif *.png *.html *.md *.mako *.pt
+global-exclude *Spec.js
+global-exclude *Ig.js
+prune src/{{project}}/static_compiled/styleguide
+prune src/{{project}}/static_compiled/lib/DefinitelyTyped
+prune src/{{project}}/static_compiled/lib/q
+prune src/{{project}}/static_compiled/lib/jasmine
+prune src/{{project}}/static_compiled/lib/blanket

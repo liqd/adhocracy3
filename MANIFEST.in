@@ -1,4 +1,4 @@
-recursive-include src/mercator/static_compiled *.js *.css *.woff *.eot *.ttf *.svg *.xml *.json *.ico *.jpg *.gif *.png *.html *.md *.mako *.pt
+recursive-include src/mercator/static_compiled *.js *.css *.woff *.eot *.ttf *.svg *.xml *.ico *.json *.jpg *.gif *.png *.html *.md *.mako *.pt
 global-exclude *Spec.js
 global-exclude *Ig.js
 prune src/mercator/static_compiled/styleguide
