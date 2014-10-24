@@ -96,7 +96,8 @@ export var register = () => {
             var topLevelStateMock;
 
             beforeEach(() => {
-                topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock", ["onSetFocus", "onSetContent2Url", "getFocus"]);
+                topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock",
+                                   ["onSetFocus", "onSetContent2Url", "getMovingColumns", "onMovingColumns"]);
                 directive = AdhTopLevelState.movingColumns(topLevelStateMock);
             });
 
