@@ -46,14 +46,24 @@ export class Service {
             "2": ColumnState.SHOW
         };
 
-        this.$rootScope.$watch(() => self.$location.search()["mc0"], (state) => {
+        this.watchUrlParam("mc0", (state) => {
             self.setMovingColumn("0", state);
         });
-        this.$rootScope.$watch(() => self.$location.search()["mc1"], (state) => {
+        this.watchUrlParam("mc1", (state) => {
             self.setMovingColumn("1", state);
         });
-        this.$rootScope.$watch(() => self.$location.search()["mc2"], (state) => {
+        this.watchUrlParam("mc2", (state) => {
             self.setMovingColumn("2", state);
+        });
+    }
+
+    private watchUrlParam(key, fn) {
+        var self = this;
+
+        self.$rootScope.$watch(() => self.$location.search()[key], (n, o) => {
+            // to not break the back button, we do not directly push another history entry
+            self.$location.replace();
+            fn(n, o);
         });
     }
 
