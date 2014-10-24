@@ -20,13 +20,35 @@ import AdhEventHandler = require("../EventHandler/EventHandler");
 
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
+    private movingColumns : {
+        "0" : string;
+        "1" : string;
+        "2" : string;
+    };
 
     constructor(
         adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
         private $location : ng.ILocationService,
-        private $routeParams: ng.route.IRouteParamsService
+        private $rootScope : ng.IScope
     ) {
+        var self = this;
+
         this.eventHandler = new adhEventHandlerClass();
+        this.movingColumns = {
+            "0": "hidden",
+            "1": "collapsed",
+            "2": "show"
+        };
+
+        this.$rootScope.$watch(() => self.$location.search()["mc0"], (state) => {
+            self.setMovingColumn("0", state);
+        });
+        this.$rootScope.$watch(() => self.$location.search()["mc1"], (state) => {
+            self.setMovingColumn("1", state);
+        });
+        this.$rootScope.$watch(() => self.$location.search()["mc2"], (state) => {
+            self.setMovingColumn("2", state);
+        });
     }
 
     public setContent2Url(url : string) : void {
@@ -69,17 +91,60 @@ export class Service {
             this.$location.url(_default);
         }
     }
-}
 
+    public setMovingColumn(index : string, state : string) : void {
+        var defaultState = "show";
+
+        if (typeof state === "undefined") {
+            state = defaultState;
+        }
+
+        if (state === defaultState) {
+            this.$location.search("mc" + index, undefined);
+        } else {
+            this.$location.search("mc" + index, state);
+        }
+
+        this.movingColumns[index] = state;
+        this.eventHandler.trigger("setMovingColumns", this.movingColumns);
+    }
+
+    public onMovingColumns(fn : (state) => void) : void {
+        this.eventHandler.on("setMovingColumns", fn);
+    }
+
+    public getMovingColumns() {
+        return this.movingColumns;
+    }
+}
 
 export var movingColumns = (
     topLevelState : Service
 ) => {
+    var cls;
+
+    var stateToClass = (state) : string => {
+        return "is-" + state["0"] + "-" + state["1"] + "-" + state["2"];
+    };
+
     return {
         link: (scope, element) => {
+            var move = (state) => {
+                var newCls = stateToClass(state);
+
+                if (newCls !== cls) {
+                    element.removeClass(cls);
+                    element.addClass(newCls);
+                    cls = newCls;
+                }
+            };
+
             topLevelState.onSetContent2Url((url : string) => {
                 scope.content2Url = url;
             });
+
+            topLevelState.onMovingColumns(move);
+            move(topLevelState.getMovingColumns());
         }
     };
 };
@@ -94,6 +159,17 @@ export var adhFocusSwitch = (topLevelState : Service) => {
         template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
         link: (scope) => {
             scope.switchFocus = () => {
+                var currentState = topLevelState.getMovingColumns();
+
+                if (currentState["0"] === "show") {
+                    topLevelState.setMovingColumn("0", "collapsed");
+                    topLevelState.setMovingColumn("1", "show");
+                    topLevelState.setMovingColumn("2", "show");
+                } else {
+                    topLevelState.setMovingColumn("0", "show");
+                    topLevelState.setMovingColumn("1", "show");
+                    topLevelState.setMovingColumn("2", "hidden");
+                }
             };
         }
     };
@@ -107,7 +183,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEventHandler.moduleName
         ])
-        .service("adhTopLevelState", ["adhEventHandlerClass", "$location", "$routeParams", Service])
+        .service("adhTopLevelState", ["adhEventHandlerClass", "$location", "$rootScope", Service])
         .directive("adhMovingColumns", ["adhTopLevelState", movingColumns])
         .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch]);
 };

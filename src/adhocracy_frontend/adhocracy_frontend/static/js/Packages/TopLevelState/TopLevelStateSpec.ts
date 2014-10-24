@@ -8,8 +8,8 @@ export var register = () => {
         describe("Service", () => {
             var adhTopLevelState : AdhTopLevelState.Service;
             var eventHandlerMockClass;
-            var routeParamMock;
             var locationMock;
+            var rootScopeMock;
             var trigger;
             var off;
             var on;
@@ -19,7 +19,7 @@ export var register = () => {
                 off = jasmine.createSpy("off");
                 trigger = jasmine.createSpy("trigger");
                 locationMock = jasmine.createSpyObj("locationMock", ["url", "search"]);
-                routeParamMock = jasmine.createSpyObj("routeParamMock", ["focus"]);
+                rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
 
                 eventHandlerMockClass = <any>function() {
                     this.on = on;
@@ -27,7 +27,7 @@ export var register = () => {
                     this.trigger = trigger;
                 };
 
-                adhTopLevelState = new AdhTopLevelState.Service(eventHandlerMockClass, locationMock, routeParamMock);
+                adhTopLevelState = new AdhTopLevelState.Service(eventHandlerMockClass, locationMock, rootScopeMock);
             });
 
             it("dispatches calls to setContent2Url to eventHandler", () => {
