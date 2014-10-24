@@ -96,8 +96,12 @@ export var register = () => {
             var topLevelStateMock;
 
             beforeEach(() => {
-                topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock",
-                               ["onSetContent2Url", "getMovingColumns", "onMovingColumns", "movingColumns"]);
+                topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock", [
+                    "onSetContent2Url",
+                    "getMovingColumns",
+                    "onMovingColumns",
+                    "movingColumns"
+                ]);
                 topLevelStateMock.movingColumns = {
                     "0": AdhTopLevelState.ColumnState.HIDE,
                     "1": AdhTopLevelState.ColumnState.COLLAPS,
@@ -174,7 +178,6 @@ export var register = () => {
 
 
                 });
-
 
                 describe("onSetContent2Url", () => {
                     var callback;
