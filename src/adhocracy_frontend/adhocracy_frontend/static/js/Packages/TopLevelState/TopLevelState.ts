@@ -17,13 +17,9 @@
 
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
-// FIXME focus should be the first column. Since the first column (column
-// 0) might be removed, column 1 is default focus.
-var DEFAULT_FOCUS : number = 1;
 
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
-    private focus : number;
 
     constructor(
         adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
@@ -31,41 +27,6 @@ export class Service {
         private $routeParams: ng.route.IRouteParamsService
     ) {
         this.eventHandler = new adhEventHandlerClass();
-        this.focus = DEFAULT_FOCUS;
-
-        if (typeof this.$routeParams !== "undefined" &&
-            this.$routeParams.hasOwnProperty("focus")) {
-            var column = parseInt(this.$routeParams["focus"], 10);
-            if (!isNaN(column) && column >= 0) {
-                console.log("parsed focus successfully");
-                this.focus = column;
-            } else {
-                console.log("focus (" + column + ") is not a number");
-            };
-
-        } else {
-            console.log("no focus in routeParams");
-        };
-
-    }
-
-    public getFocus() : number {
-        return this.focus;
-    }
-
-    public setFocus(column : number) : void {
-        console.log("setting focus, url=" + this.$location.url());
-        this.eventHandler.trigger("setFocus", column);
-        this.focus = column;
-        if (this.focus === DEFAULT_FOCUS) {
-            this.$location.search({focus: null});
-        } else {
-            this.$location.search({focus: this.focus});
-        };
-    }
-
-    public onSetFocus(fn : (column : number) => void) : void {
-        this.eventHandler.on("setFocus", fn);
     }
 
     public setContent2Url(url : string) : void {
@@ -110,34 +71,15 @@ export class Service {
     }
 }
 
-var move = (column : number, element : JQuery) => {
-    // This is likely to change in the future.
-    // So do not spend too much time interpreting this.
-    if (column === 0 || column === 1) {
-        element.removeClass("is-collapsed-show-show");
-    } else if (column === 2) {
-        element.addClass("is-collapsed-show-show");
-    } else {
-        console.log("tried to focus illegal column(" + column + ")");
-    };
-};
 
 export var movingColumns = (
     topLevelState : Service
 ) => {
-
     return {
         link: (scope, element) => {
-
-            topLevelState.onSetFocus((column : number) : void => {
-                move(column, element);
-            });
-
             topLevelState.onSetContent2Url((url : string) => {
                 scope.content2Url = url;
             });
-
-            move(topLevelState.getFocus(), element);
         }
     };
 };
@@ -152,8 +94,6 @@ export var adhFocusSwitch = (topLevelState : Service) => {
         template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
         link: (scope) => {
             scope.switchFocus = () => {
-                var column = topLevelState.getFocus() === 1 ? 2 : 1;
-                topLevelState.setFocus(column);
             };
         }
     };
