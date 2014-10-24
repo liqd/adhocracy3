@@ -109,7 +109,7 @@ export class Service {
     }
 
     public setMovingColumn(index : string, state : string) : void {
-        var defaultState = "show";
+        var defaultState = ColumnState.SHOW;
 
         if (typeof state === "undefined") {
             state = defaultState;
