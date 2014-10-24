@@ -162,7 +162,12 @@ export var movingColumns = (
 
     return {
         link: (scope, element) => {
+            var space = topLevelState.getSpace();
+
             var move = (state) => {
+                if (topLevelState.getSpace() !== space) {
+                    return;
+                };
                 if (typeof state === "undefined") {
                     return;
                 };
