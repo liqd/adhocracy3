@@ -1,15 +1,14 @@
 """User wants to register and login"""
-from pytest import fixture
 
 from adhocracy_core.testing import god_email
 from adhocracy_core.testing import god_login
 from adhocracy_core.testing import god_password
 
-from .shared import fill_input
-from .shared import click_button
-from .shared import login
-from .shared import logout
-from .shared import is_logged_in
+from adhocracy_frontend.tests.acceptance.shared import fill_input
+from adhocracy_frontend.tests.acceptance.shared import click_button
+from adhocracy_frontend.tests.acceptance.shared import login
+from adhocracy_frontend.tests.acceptance.shared import logout
+from adhocracy_frontend.tests.acceptance.shared import is_logged_in
 
 
 class TestUserLogin:

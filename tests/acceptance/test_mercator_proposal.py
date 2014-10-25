@@ -1,8 +1,7 @@
 from pytest import fixture
 from webtest import TestApp
-from .shared import login_god
 
-
+from adhocracy_frontend.tests.acceptance.shared import login_god
 
 
 class TestMercatorForm:

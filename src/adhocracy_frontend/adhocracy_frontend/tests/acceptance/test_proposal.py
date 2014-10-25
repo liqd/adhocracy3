@@ -1,12 +1,11 @@
 """User wants to create, edit and view proposal."""
 from splinter.driver.webdriver import WebDriverElement
-from pytest import fixture
 
-from .shared import wait
-from .shared import get_listing_create_form
-from .shared import get_column_listing
-from .shared import get_list_element
-from .shared import login_god
+from adhocracy_frontend.tests.acceptance.shared import wait
+from adhocracy_frontend.tests.acceptance.shared import get_listing_create_form
+from adhocracy_frontend.tests.acceptance.shared import get_column_listing
+from adhocracy_frontend.tests.acceptance.shared import get_list_element
+from adhocracy_frontend.tests.acceptance.shared import login_god
 
 
 class TestProposal:

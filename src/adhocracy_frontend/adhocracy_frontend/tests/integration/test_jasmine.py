@@ -17,12 +17,12 @@ from adhocracy_frontend.tests.unit.console import Formatter
 pytestmark = mark.jasmine
 
 
-@fixture
-def browser_igtest(browser, frontend, backend, frontend_url) -> Browser:
-    """Return test browser instance with url=igtest.html."""
-    url = frontend_url + 'static/igtest.html'
-    # long timeout to ease debugging, jasmine tests already have a short one
-    return browser_test_helper(browser, url, wait=180)
+@fixture(scope='class')
+def settings(settings):
+    """Return app:main and server:main settings in memory zodb database."""
+    settings['zodbconn.uri'] = 'memory://'
+    settings['adhocracy.ws_url'] = ''
+    return settings
 
 
 class TestJasmine:

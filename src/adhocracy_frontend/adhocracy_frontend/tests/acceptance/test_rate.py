@@ -4,8 +4,8 @@ from .shared import wait
 from .shared import get_column_listing
 from .shared import get_list_element
 from .shared import login_god
-from .test_comment import create_comment
-from .test_comment import create_top_level_comment
+from adhocracy_frontend.tests.acceptance.test_comment import create_comment
+from adhocracy_frontend.tests.acceptance.test_comment import create_top_level_comment
 
 
 class TestRate:

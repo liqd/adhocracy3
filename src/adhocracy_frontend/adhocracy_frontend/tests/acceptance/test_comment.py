@@ -1,15 +1,12 @@
-from pytest import fixture
 from pytest import mark
 
 from adhocracy_core.testing import annotator_login
-from .shared import wait
-from .shared import get_column_listing
-from .shared import get_list_element
-from .shared import get_listing_create_form
-from .shared import login_annotator
-from .shared import login_god
-
-from .test_proposal import create_proposal
+from adhocracy_frontend.tests.acceptance.test_proposal import create_proposal
+from adhocracy_frontend.tests.acceptance.shared import wait
+from adhocracy_frontend.tests.acceptance.shared import get_column_listing
+from adhocracy_frontend.tests.acceptance.shared import get_list_element
+from adhocracy_frontend.tests.acceptance.shared import get_listing_create_form
+from adhocracy_frontend.tests.acceptance.shared import login_god
 
 
 class TestComment:
