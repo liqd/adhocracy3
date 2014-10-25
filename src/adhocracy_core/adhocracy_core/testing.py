@@ -369,7 +369,8 @@ def mock_group_locator(registry) -> Mock:
 def _get_settings(request, part, config_path_key='pyramid_config'):
     """Return settings of a config part."""
     config_parser = ConfigParser()
-    config_file = request.config.getvalue(config_path_key)
+    config_file = request.config.getoption(config_path_key) \
+        or 'etc/test_with_ws.ini'
     config_parser.read(config_file)
     settings = {}
     for option, value in config_parser.items(part):
@@ -385,6 +386,30 @@ def settings(request) -> dict:
     settings.update(app)
     server = _get_settings(request, 'server:main')
     settings.update(server)
+    return settings
+
+
+@fixture(scope='session')
+def app_settings(request) -> dict:
+    """Return settings to start the test wsgi app."""
+    settings = {}
+    # disable creating a default group, this causes
+    # ZODB.POSException.InvalidObjectReference
+    settings['adhocracy.add_default_group'] = False
+    # don't look for the websocket server
+    settings['adhocracy.ws_url'] = ''
+    # use in memory database without zeo
+    settings['zodbconn.uri'] = 'memory://'
+    # satisfy substanced
+    settings['substanced.secret'] = 'secret'
+    # extra dependenies
+    settings['pyramid.includes'] = [
+        # commit after request
+        'pyramid_tm',
+        # mock mail server
+        'pyramid_mailer.testing',
+    ]
+    settings['mail.default_sender'] = 'substanced_demo@example.com'
     return settings
 
 
@@ -426,7 +451,7 @@ def zeo(request, supervisor) -> str:
 
 
 @fixture(scope='class')
-def websocket(request, zeo, supervisor) -> bool:
+def websocket(request, supervisor) -> bool:
     """Start websocket server with supervisor."""
     output = subprocess.check_output(
         'bin/supervisorctl restart adhocracy_test:test_autobahn',
@@ -560,19 +585,15 @@ def includeme_root_with_test_users(config):
 
 
 @fixture(scope='class')
-def app(zeo, settings):
-    """Return the adhocracy wsgi application."""
+def app(app_settings):
+    """Return the adhocracy test wsgi application."""
     import adhocracy_core
     import adhocracy_core.resources.sample_paragraph
     import adhocracy_core.resources.sample_section
     import adhocracy_core.resources.sample_proposal
     import adhocracy_core.sheets.mercator
     import adhocracy_core.resources.mercator
-    # disable creating a default group, this causes
-    # ZODB.POSException.InvalidObjectReference
-    settings['adhocracy.add_default_group'] = False
-    settings['adhocracy.ws_url'] = ''
-    configurator = Configurator(settings=settings,
+    configurator = Configurator(settings=app_settings,
                                 root_factory=adhocracy_core.root_factory)
     configurator.include(adhocracy_core)
     configurator.include(adhocracy_core.resources.sample_paragraph)
@@ -608,6 +629,26 @@ def backend(request, zeo, supervisor):
     def fin():
         subprocess.check_output(
             'bin/supervisorctl stop adhocracy_test:test_backend',
+            shell=True,
+            stderr=subprocess.STDOUT
+        )
+    request.addfinalizer(fin)
+
+    return output
+
+
+@fixture(scope='class')
+def backend_with_ws(request, zeo, websocket, supervisor):
+    """Start the backend and websocket server with supervisor."""
+    output = subprocess.check_output(
+        'bin/supervisorctl restart test_backend_with_ws',
+        shell=True,
+        stderr=subprocess.STDOUT
+    )
+
+    def fin():
+        subprocess.check_output(
+            'bin/supervisorctl stop test_backend_with_ws',
             shell=True,
             stderr=subprocess.STDOUT
         )

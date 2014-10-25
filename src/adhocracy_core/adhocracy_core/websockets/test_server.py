@@ -478,7 +478,7 @@ class ClientTrackerUnitTests(unittest.TestCase):
 class TestFunctionalClientCommunicator:
 
     @pytest.fixture
-    def connection(self, request, ws_settings, websocket):
+    def connection(self, request, ws_settings):
         from websocket import create_connection
         connection = create_connection('ws://localhost:%s' %
                                        ws_settings['port'])
@@ -505,7 +505,8 @@ class TestFunctionalClientCommunicator:
         assert resp.status_code == 200
 
     @pytest.mark.timeout(60)
-    def test_send_child_notification(self, backend, settings, connection):
+    def test_send_child_notification(
+            self, backend_with_ws, settings, connection):
         rest_url = 'http://{}:{}/'.format(settings['host'], settings['port'])
         connection.send('{"resource": "' + rest_url + 'adhocracy/", "action": "subscribe"}')
         connection.recv()
