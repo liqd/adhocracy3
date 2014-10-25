@@ -572,6 +572,7 @@ def app(zeo, settings):
     # disable creating a default group, this causes
     # ZODB.POSException.InvalidObjectReference
     settings['adhocracy.add_default_group'] = False
+    settings['adhocracy.ws_url'] = ''
     configurator = Configurator(settings=settings,
                                 root_factory=adhocracy_core.root_factory)
     configurator.include(adhocracy_core)
