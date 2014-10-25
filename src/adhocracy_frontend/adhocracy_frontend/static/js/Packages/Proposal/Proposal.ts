@@ -137,11 +137,15 @@ export class ProposalVersionDetail {
 
                 $scope.showComments = () => {
                     adhTopLevelState.setContent2Url($scope.content.path);
-                    adhTopLevelState.setFocus(2);
+                    adhTopLevelState.setMovingColumn("0", AdhTopLevelState.ColumnState.COLLAPSE);
+                    adhTopLevelState.setMovingColumn("1", AdhTopLevelState.ColumnState.SHOW);
+                    adhTopLevelState.setMovingColumn("2", AdhTopLevelState.ColumnState.SHOW);
                 };
 
                 $scope.hideComments = () => {
-                    adhTopLevelState.setFocus(1);
+                    adhTopLevelState.setMovingColumn("0", AdhTopLevelState.ColumnState.COLLAPSE);
+                    adhTopLevelState.setMovingColumn("1", AdhTopLevelState.ColumnState.SHOW);
+                    adhTopLevelState.setMovingColumn("2", AdhTopLevelState.ColumnState.SHOW);
                 };
             }]
         };

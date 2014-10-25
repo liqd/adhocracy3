@@ -84,6 +84,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
             .when("/", {
                 template: "",
                 controller: ["adhConfig", "$location", (adhConfig, $location) => {
+                    $location.replace();
                     $location.path("/r" + adhConfig.rest_platform_path);
                 }]
             })
