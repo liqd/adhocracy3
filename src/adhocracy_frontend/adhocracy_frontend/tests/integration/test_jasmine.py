@@ -17,14 +17,6 @@ from adhocracy_frontend.tests.unit.console import Formatter
 pytestmark = mark.jasmine
 
 
-@fixture(scope='class')
-def settings(settings):
-    """Return app:main and server:main settings in memory zodb database."""
-    settings['zodbconn.uri'] = 'memory://'
-    settings['adhocracy.ws_url'] = ''
-    return settings
-
-
 class TestJasmine:
     def test_all(self, browser_igtest):
         data = browser_igtest.evaluate_script('jsApiReporter.specs()')

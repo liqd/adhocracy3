@@ -14,7 +14,6 @@ from pyramid.traversal import resource_path_tuple
 from pytest import fixture
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import find_objectmap
-from webtest.http import StopableWSGIServer
 import colander
 
 from adhocracy_core.interfaces import SheetMetadata, ChangelogMetadata
@@ -427,7 +426,7 @@ def zeo(request, supervisor) -> str:
 
 
 @fixture(scope='class')
-def websocket(request, supervisor) -> bool:
+def websocket(request, zeo, supervisor) -> bool:
     """Start websocket server with supervisor."""
     output = subprocess.check_output(
         'bin/supervisorctl restart adhocracy_test:test_autobahn',
@@ -598,9 +597,20 @@ def newest_activation_path(app):
 
 
 @fixture(scope='class')
-def backend(request, settings, app):
-    """Return a http server with the adhocracy wsgi application."""
-    port = settings['port']
-    backend = StopableWSGIServer.create(app, port=port)
-    request.addfinalizer(backend.shutdown)
-    return backend
+def backend(request, zeo, supervisor):
+    """Start the backend server with supervisor."""
+    output = subprocess.check_output(
+        'bin/supervisorctl restart adhocracy_test:test_backend',
+        shell=True,
+        stderr=subprocess.STDOUT
+    )
+
+    def fin():
+        subprocess.check_output(
+            'bin/supervisorctl stop adhocracy_test:test_backend',
+            shell=True,
+            stderr=subprocess.STDOUT
+        )
+    request.addfinalizer(fin)
+
+    return output
