@@ -1,7 +1,6 @@
 """Public fixtures to work with the test browser and the adhocracy frontend."""
 import subprocess
 import re
-import time
 import types
 import json
 from pytest import fixture
@@ -9,8 +8,6 @@ from splinter import Browser
 from pytest_splinter.plugin import browser_instance_getter
 
 from adhocracy_core.testing import _get_settings
-from adhocracy_core.testing import _kill_pid_in_file
-from adhocracy_core.testing import _is_running
 
 
 def pytest_addoption(parser):
@@ -35,25 +32,23 @@ def frontend_url(request) -> dict:
 
 
 @fixture(scope='session')
-def frontend(request) -> bool:
-    """Return a http server that only serves the static frontend files."""
-    pid_file = 'var/frontend_pyramid.pid'
-    if _is_running(pid_file):
-        return True
+def frontend(request, supervisor) -> str:
+    """Start the frontend server with supervisor."""
+    output = subprocess.check_output(
+        'bin/supervisorctl restart adhocracy_test:test_frontend',
+        shell=True,
+        stderr=subprocess.STDOUT
+    )
 
     def fin():
-        print('teardown zeo server')
-        process.kill()
-        _kill_pid_in_file(pid_file)
-
-    config_file = request.config.getvalue('frontend_pyramid_config')
-    process = subprocess.Popen('bin/pserve ' + config_file
-                               + ' --daemon --pid-file=' + pid_file,
-                               shell=True,
-                               stderr=subprocess.STDOUT)
-    time.sleep(1)
+        subprocess.check_output(
+            'bin/supervisorctl stop adhocracy_test:test_frontend',
+            shell=True,
+            stderr=subprocess.STDOUT
+        )
     request.addfinalizer(fin)
-    return True
+
+    return output
 
 
 def evaluate_script_with_kwargs(self, code: str, **kwargs) -> object:
@@ -176,9 +171,15 @@ def browser2_class(request, browser_instance_getter_class):
 
 
 @fixture(scope='class')
-def browser_root(browser_class, frontend, backend, frontend_url):
-    """Return test browser, start application and go to `root.html`."""
+def browser_root(browser_class, backend, frontend, frontend_url):
+    """Return test browser, start application and go to `root.html`.
+
+    Add attribute `root_url` pointing to the adhocracy root.html page.
+    Add attribute `app_url` pointing to the adhocracy application page
+    """
     add_helper_methods_to_splinter_browser_wrapper(browser_class)
+    browser_class.root_url = frontend_url
+    browser_class.app_url = frontend_url  # FIXME do we still need this?
     browser_class.visit(frontend_url)
     browser_class.execute_script('window.localStorage.clear();')
     browser_class.wait_for_condition(angular_app_loaded, 5)
@@ -205,3 +206,11 @@ def browser_test(browser_class, frontend, frontend_url) -> Browser:
     """Return test browser instance with url=test.html."""
     url = frontend_url + 'static/test.html'
     return browser_test_helper(browser_class, url)
+
+
+@fixture(scope='class')
+def browser_igtest(browser_class, backend, frontend, frontend_url) -> Browser:
+    """Return test browser instance with url=igtest.html."""
+    url = frontend_url + 'static/igtest.html'
+    # long timeout to ease debugging, jasmine tests already have a short one
+    return browser_test_helper(browser_class, url, wait=180)

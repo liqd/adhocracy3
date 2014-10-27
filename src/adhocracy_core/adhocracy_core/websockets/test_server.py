@@ -478,7 +478,7 @@ class ClientTrackerUnitTests(unittest.TestCase):
 class TestFunctionalClientCommunicator:
 
     @pytest.fixture
-    def connection(self, request, ws_settings, websocket):
+    def connection(self, request, ws_settings):
         from websocket import create_connection
         connection = create_connection('ws://localhost:%s' %
                                        ws_settings['port'])
@@ -491,12 +491,12 @@ class TestFunctionalClientCommunicator:
 
         return connection
 
-    def _add_pool(self, backend, path, name):
+    def _add_pool(self, rest_url, path, name):
         import json
         import requests
         from adhocracy_core.resources.pool import IBasicPool
         from adhocracy_core.testing import god_header
-        url = backend.application_url + 'adhocracy' + path
+        url = rest_url + 'adhocracy' + path
         data = {'content_type': IBasicPool.__identifier__,
                 'data': {'adhocracy_core.sheets.name.IName': {'name': name}}}
         headers = {'content-type': 'application/json'}
@@ -505,10 +505,11 @@ class TestFunctionalClientCommunicator:
         assert resp.status_code == 200
 
     @pytest.mark.timeout(60)
-    def test_send_child_notification(self, backend, connection):
-        rest_url = backend.application_url
+    def test_send_child_notification(
+            self, backend_with_ws, settings, connection):
+        rest_url = 'http://{}:{}/'.format(settings['host'], settings['port'])
         connection.send('{"resource": "' + rest_url + 'adhocracy/", "action": "subscribe"}')
         connection.recv()
-        self._add_pool(backend, '/', 'Proposals')
+        self._add_pool(rest_url, '/', 'Proposals')
         response = connection.recv()
         assert 'Proposals' in response
