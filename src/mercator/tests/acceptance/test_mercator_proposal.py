@@ -1,4 +1,5 @@
 from pytest import fixture
+from pytest import mark
 from webtest import TestApp
 
 from adhocracy_frontend.tests.acceptance.shared import login_god
@@ -16,6 +17,10 @@ class TestMercatorForm:
         fill_all(browser)
         assert can_submit(browser)
 
+    @mark.skipif(True, reason="pending")
+    # FIXME: this should work, but: (1) it may alter state and confuse
+    # subsequent tests; and (2) i'm not sure if it does even work
+    # itself.
     def test_submitting_creates_a_new_proposal(self, browser, app):
         browser.find_by_css('input[type="submit"]').first.click()
         #FIXME make this test shorter and more acceptance test like
