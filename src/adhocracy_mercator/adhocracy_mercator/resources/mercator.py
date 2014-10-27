@@ -8,7 +8,7 @@ from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.rate import add_ratesservice
 from adhocracy_core.sheets.rate import IRateable
 from adhocracy_core.sheets.comment import ICommentable
-import adhocracy_core.sheets.mercator
+import adhocracy_mercator.sheets.mercator
 
 
 class IMercatorProposalVersion(IItemVersion):
@@ -19,13 +19,13 @@ class IMercatorProposalVersion(IItemVersion):
 mercator_proposal_version_meta = itemversion_metadata._replace(
     content_name='MercatorProposalVersion',
     iresource=IMercatorProposalVersion,
-    extended_sheets=[adhocracy_core.sheets.mercator.IUserInfo,
-                     adhocracy_core.sheets.mercator.IOrganizationInfo,
-                     adhocracy_core.sheets.mercator.IIntroduction,
-                     adhocracy_core.sheets.mercator.IDetails,
-                     adhocracy_core.sheets.mercator.IMotivation,
-                     adhocracy_core.sheets.mercator.IFinance,
-                     adhocracy_core.sheets.mercator.IExtras,
+    extended_sheets=[adhocracy_mercator.sheets.mercator.IUserInfo,
+                     adhocracy_mercator.sheets.mercator.IOrganizationInfo,
+                     adhocracy_mercator.sheets.mercator.IIntroduction,
+                     adhocracy_mercator.sheets.mercator.IDetails,
+                     adhocracy_mercator.sheets.mercator.IMotivation,
+                     adhocracy_mercator.sheets.mercator.IFinance,
+                     adhocracy_mercator.sheets.mercator.IExtras,
                      ICommentable,
                      IRateable],
 

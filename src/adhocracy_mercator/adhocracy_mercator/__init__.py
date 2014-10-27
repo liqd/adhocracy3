@@ -15,8 +15,8 @@ def includeme(config):
     config.include('adhocracy_core.resources.sample_paragraph')
     config.include('adhocracy_core.resources.sample_section')
     config.include('adhocracy_core.resources.sample_proposal')
-    config.include('adhocracy_core.sheets.mercator')
-    config.include('adhocracy_core.resources.mercator')
+    config.include('.sheets.mercator')
+    config.include('.resources.mercator')
 
 
 def main(global_config, **settings):

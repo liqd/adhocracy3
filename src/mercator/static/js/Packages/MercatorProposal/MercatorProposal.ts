@@ -6,17 +6,17 @@ import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 
 import ResourcesBase = require("../../ResourcesBase");
 
-import RIMercatorProposal = require("../../Resources_/adhocracy_core/resources/mercator/IMercatorProposal");
-import RIMercatorProposalVersion = require("../../Resources_/adhocracy_core/resources/mercator/IMercatorProposalVersion");
-import SIDetails = require("../../Resources_/adhocracy_core/sheets/mercator/IDetails");
-import SIExtras = require("../../Resources_/adhocracy_core/sheets/mercator/IExtras");
-import SIFinance = require("../../Resources_/adhocracy_core/sheets/mercator/IFinance");
-import SIIntroduction = require("../../Resources_/adhocracy_core/sheets/mercator/IIntroduction");
+import RIMercatorProposal = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposal");
+import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
+import SIDetails = require("../../Resources_/adhocracy_mercator/sheets/mercator/IDetails");
+import SIExtras = require("../../Resources_/adhocracy_mercator/sheets/mercator/IExtras");
+import SIFinance = require("../../Resources_/adhocracy_mercator/sheets/mercator/IFinance");
+import SIIntroduction = require("../../Resources_/adhocracy_mercator/sheets/mercator/IIntroduction");
 import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
-import SIMotivation = require("../../Resources_/adhocracy_core/sheets/mercator/IMotivation");
+import SIMotivation = require("../../Resources_/adhocracy_mercator/sheets/mercator/IMotivation");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
-import SIOrganizationInfo = require("../../Resources_/adhocracy_core/sheets/mercator/IOrganizationInfo");
-import SIUserInfo = require("../../Resources_/adhocracy_core/sheets/mercator/IUserInfo");
+import SIOrganizationInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IOrganizationInfo");
+import SIUserInfo = require("../../Resources_/adhocracy_mercator/sheets/mercator/IUserInfo");
 import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
 
 var pkgLocation = "/MercatorProposal";

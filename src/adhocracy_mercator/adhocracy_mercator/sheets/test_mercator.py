@@ -6,51 +6,51 @@ from pytest import raises
 class TestIncludeme:
 
     def test_includeme_register_userinfo_sheet(self, config):
-        from adhocracy_core.sheets.mercator import IUserInfo
+        from adhocracy_mercator.sheets.mercator import IUserInfo
         from adhocracy_core.utils import get_sheet
-        config.include('adhocracy_core.sheets.mercator')
+        config.include('adhocracy_mercator.sheets.mercator')
         context = testing.DummyResource(__provides__=IUserInfo)
         assert get_sheet(context, IUserInfo)
 
     def test_includeme_register_organizationinfo_sheet(self, config):
-        from adhocracy_core.sheets.mercator import IOrganizationInfo
+        from adhocracy_mercator.sheets.mercator import IOrganizationInfo
         from adhocracy_core.utils import get_sheet
-        config.include('adhocracy_core.sheets.mercator')
+        config.include('adhocracy_mercator.sheets.mercator')
         context = testing.DummyResource(__provides__=IOrganizationInfo)
         assert get_sheet(context, IOrganizationInfo)
 
     def test_includeme_register_introduction_sheet(self, config):
-        from adhocracy_core.sheets.mercator import IIntroduction
+        from adhocracy_mercator.sheets.mercator import IIntroduction
         from adhocracy_core.utils import get_sheet
-        config.include('adhocracy_core.sheets.mercator')
+        config.include('adhocracy_mercator.sheets.mercator')
         context = testing.DummyResource(__provides__=IIntroduction)
         assert get_sheet(context, IIntroduction)
 
     def test_includeme_register_details_sheet(self, config):
-        from adhocracy_core.sheets.mercator import IDetails
+        from adhocracy_mercator.sheets.mercator import IDetails
         from adhocracy_core.utils import get_sheet
-        config.include('adhocracy_core.sheets.mercator')
+        config.include('adhocracy_mercator.sheets.mercator')
         context = testing.DummyResource(__provides__=IDetails)
         assert get_sheet(context, IDetails)
 
     def test_includeme_register_motivation_sheet(self, config):
-        from adhocracy_core.sheets.mercator import IMotivation
+        from adhocracy_mercator.sheets.mercator import IMotivation
         from adhocracy_core.utils import get_sheet
-        config.include('adhocracy_core.sheets.mercator')
+        config.include('adhocracy_mercator.sheets.mercator')
         context = testing.DummyResource(__provides__=IMotivation)
         assert get_sheet(context, IMotivation)
 
     def test_includeme_register_finance_sheet(self, config):
-        from adhocracy_core.sheets.mercator import IFinance
+        from adhocracy_mercator.sheets.mercator import IFinance
         from adhocracy_core.utils import get_sheet
-        config.include('adhocracy_core.sheets.mercator')
+        config.include('adhocracy_mercator.sheets.mercator')
         context = testing.DummyResource(__provides__=IFinance)
         assert get_sheet(context, IFinance)
 
     def test_includeme_register_extras_sheet(self, config):
-        from adhocracy_core.sheets.mercator import IExtras
+        from adhocracy_mercator.sheets.mercator import IExtras
         from adhocracy_core.utils import get_sheet
-        config.include('adhocracy_core.sheets.mercator')
+        config.include('adhocracy_mercator.sheets.mercator')
         context = testing.DummyResource(__provides__=IExtras)
         assert get_sheet(context, IExtras)
 
@@ -59,7 +59,7 @@ class TestUserInfoSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.mercator import userinfo_meta
+        from adhocracy_mercator.sheets.mercator import userinfo_meta
         return userinfo_meta
 
     @fixture
@@ -70,8 +70,8 @@ class TestUserInfoSheet:
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_core.sheets.mercator import IUserInfo
-        from adhocracy_core.sheets.mercator import UserInfoSchema
+        from adhocracy_mercator.sheets.mercator import IUserInfo
+        from adhocracy_mercator.sheets.mercator import UserInfoSchema
         inst = meta.sheet_class(meta, context)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
@@ -90,7 +90,7 @@ class TestOrganizationInfoSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.mercator import organizationinfo_meta
+        from adhocracy_mercator.sheets.mercator import organizationinfo_meta
         return organizationinfo_meta
 
     @fixture
@@ -101,8 +101,8 @@ class TestOrganizationInfoSheet:
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_core.sheets.mercator import IOrganizationInfo
-        from adhocracy_core.sheets.mercator import OrganizationInfoSchema
+        from adhocracy_mercator.sheets.mercator import IOrganizationInfo
+        from adhocracy_mercator.sheets.mercator import OrganizationInfoSchema
         inst = meta.sheet_class(meta, context)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
@@ -129,7 +129,7 @@ class TestOrganizationInfoSchema:
 
     @fixture
     def inst(self):
-        from adhocracy_core.sheets.mercator import OrganizationInfoSchema
+        from adhocracy_mercator.sheets.mercator import OrganizationInfoSchema
         return OrganizationInfoSchema()
 
     @fixture
@@ -185,7 +185,7 @@ class TestIntroductionSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.mercator import introduction_meta
+        from adhocracy_mercator.sheets.mercator import introduction_meta
         return introduction_meta
 
     @fixture
@@ -196,8 +196,8 @@ class TestIntroductionSheet:
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_core.sheets.mercator import IIntroduction
-        from adhocracy_core.sheets.mercator import IntroductionSchema
+        from adhocracy_mercator.sheets.mercator import IIntroduction
+        from adhocracy_mercator.sheets.mercator import IntroductionSchema
         inst = meta.sheet_class(meta, context)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
@@ -214,7 +214,7 @@ class TestDetailsSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.mercator import details_meta
+        from adhocracy_mercator.sheets.mercator import details_meta
         return details_meta
 
     @fixture
@@ -225,8 +225,8 @@ class TestDetailsSheet:
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_core.sheets.mercator import IDetails
-        from adhocracy_core.sheets.mercator import DetailsSchema
+        from adhocracy_mercator.sheets.mercator import IDetails
+        from adhocracy_mercator.sheets.mercator import DetailsSchema
         inst = meta.sheet_class(meta, context)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
@@ -249,7 +249,7 @@ class TestMotivationSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.mercator import motivation_meta
+        from adhocracy_mercator.sheets.mercator import motivation_meta
         return motivation_meta
 
     @fixture
@@ -260,8 +260,8 @@ class TestMotivationSheet:
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_core.sheets.mercator import IMotivation
-        from adhocracy_core.sheets.mercator import MotivationSchema
+        from adhocracy_mercator.sheets.mercator import IMotivation
+        from adhocracy_mercator.sheets.mercator import MotivationSchema
         inst = meta.sheet_class(meta, context)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
@@ -278,7 +278,7 @@ class TestFinanceSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.mercator import finance_meta
+        from adhocracy_mercator.sheets.mercator import finance_meta
         return finance_meta
 
     @fixture
@@ -289,8 +289,8 @@ class TestFinanceSheet:
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_core.sheets.mercator import IFinance
-        from adhocracy_core.sheets.mercator import FinanceSchema
+        from adhocracy_mercator.sheets.mercator import IFinance
+        from adhocracy_mercator.sheets.mercator import FinanceSchema
         inst = meta.sheet_class(meta, context)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)
@@ -310,7 +310,7 @@ class TestExtrasSheet:
 
     @fixture
     def meta(self):
-        from adhocracy_core.sheets.mercator import extras_meta
+        from adhocracy_mercator.sheets.mercator import extras_meta
         return extras_meta
 
     @fixture
@@ -321,8 +321,8 @@ class TestExtrasSheet:
     def test_create_valid(self, meta, context):
         from zope.interface.verify import verifyObject
         from adhocracy_core.interfaces import IResourceSheet
-        from adhocracy_core.sheets.mercator import IExtras
-        from adhocracy_core.sheets.mercator import ExtrasSchema
+        from adhocracy_mercator.sheets.mercator import IExtras
+        from adhocracy_mercator.sheets.mercator import ExtrasSchema
         inst = meta.sheet_class(meta, context)
         assert IResourceSheet.providedBy(inst)
         assert verifyObject(IResourceSheet, inst)

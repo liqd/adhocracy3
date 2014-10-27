@@ -3,7 +3,7 @@ import AdhHttp = require("../Http/Http");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
-import RIMercatorProposal = require("../../Resources_/adhocracy_core/resources/mercator/IMercatorProposal");
+import RIMercatorProposal = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposal");
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 

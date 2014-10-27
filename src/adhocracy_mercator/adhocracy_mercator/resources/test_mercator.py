@@ -6,8 +6,8 @@ def test_meractor_proposal_meta():
     from .mercator import mercator_proposal_meta
     from .mercator import IMercatorProposal
     from .mercator import IMercatorProposalVersion
-    from .comment import add_commentsservice
-    from .rate import add_ratesservice
+    from adhocracy_core.resources.comment import add_commentsservice
+    from adhocracy_core.resources.rate import add_ratesservice
     meta = mercator_proposal_meta
     assert meta.iresource == IMercatorProposal
     assert meta.element_types == [IMercatorProposalVersion,
@@ -31,11 +31,11 @@ def integration(config):
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.sheets')
-    config.include('adhocracy_core.sheets.mercator')
     config.include('adhocracy_core.resources.tag')
-    config.include('adhocracy_core.resources.mercator')
     config.include('adhocracy_core.resources.comment')
     config.include('adhocracy_core.resources.rate')
+    config.include('adhocracy_mercator.sheets.mercator')
+    config.include('adhocracy_mercator.resources.mercator')
 
 
 @mark.usefixtures('integration')
@@ -46,7 +46,7 @@ class TestIncludemeIntegration:
         return pool
 
     def test_create_mercator_proposal(self, context, registry):
-        from adhocracy_core.resources.mercator import IMercatorProposal
+        from .mercator import IMercatorProposal
         from adhocracy_core.sheets.name import IName
         appstructs = {
             IName.__identifier__ : {
@@ -59,7 +59,7 @@ class TestIncludemeIntegration:
         assert IMercatorProposal.providedBy(res)
 
     def test_create_mercator_proposal_version(self, context, registry):
-        from adhocracy_core.resources.mercator import IMercatorProposalVersion
+        from .mercator import IMercatorProposalVersion
         res = registry.content.create(IMercatorProposalVersion.__identifier__,
                                       parent=context,
                                       )
