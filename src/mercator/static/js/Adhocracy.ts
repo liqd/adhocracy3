@@ -60,9 +60,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         window.document.body.className += " is-embedded";
     }
 
-    // FIXME: The functionality to set the locale is not yet done
-    config.locale = "de";
-
     var app = angular.module("adhocracy3SampleFrontend", [
         "monospaced.elastic",
         "pascalprecht.translate",

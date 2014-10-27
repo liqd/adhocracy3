@@ -29,6 +29,7 @@ def config_view(request):
         settings.get('adhocracy.trusted_domains', []))
     config['support_email'] = settings.get('adhocracy.frontend.support_email',
                                            'support@unconfigured.domain')
+    config['locale'] = settings.get('adhocracy.frontend.locale', 'en')
     return config
 
 
