@@ -722,10 +722,10 @@ mkFieldType = (field : MetaApi.ISheetField) : string => {
     case "adhocracy_core.schema.ISOCountryCode":
         result = "number";
         break;
-    case "adhocracy_mercator.sheets.mercator.StatusEnum":
+    case "adhocracy_mercator.sheets.mercator.StatusEnum":  // FIXME: this needs to go to the mercator package
         result = "string";
         break;
-    case "adhocracy_mercator.sheets.mercator.SizeEnum":
+    case "adhocracy_mercator.sheets.mercator.SizeEnum":  // FIXME: this needs to go to the mercator package
         result = "string";
         break;
     default:
