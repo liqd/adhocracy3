@@ -39,3 +39,12 @@ export var factory = ($compile) => {
         }
     };
 };
+
+
+export var moduleName = "adhRecursionHelper";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [])
+        .factory("adhRecursionHelper", ["$compile", factory]);
+};

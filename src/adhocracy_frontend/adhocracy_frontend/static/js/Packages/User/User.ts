@@ -364,3 +364,19 @@ export var metaDirective = (adhConfig : AdhConfig.IService) => {
         }]
     };
 };
+
+
+export var moduleName = "adhUser";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhHttp.moduleName,
+            AdhTopLevelState.moduleName
+        ])
+        .service("adhUser", ["adhHttp", "$q", "$http", "$rootScope", "$window", "angular", "Modernizr", Service])
+        .directive("adhLogin", ["adhConfig", loginDirective])
+        .directive("adhRegister", ["adhConfig", registerDirective])
+        .directive("adhUserIndicator", ["adhConfig", indicatorDirective])
+        .directive("adhUserMeta", ["adhConfig", metaDirective]);
+};

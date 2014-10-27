@@ -61,7 +61,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         private $q : ng.IQService,
         private $timeout : ng.ITimeoutService,
         private adhMetaApi : AdhMetaApi.MetaApiQuery,
-        private adhPreliminaryNames : AdhPreliminaryNames,
+        private adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhConfig : AdhConfig.IService
     ) {}
 
@@ -149,6 +149,10 @@ export class Service<Content extends ResourcesBase.Resource> {
      * For resources that do not support fork: Return the unique head
      * version provided by the LAST tag.  If there is no or more than
      * one version in LAST, throw an exception.
+     *
+     * FIXME: rename to getLastVersionPathNoFork for consistency with
+     * LAST tag and adh-last-version directive.  (even though arguably
+     * there is a difference between the LAST tag and this function.)
      */
     public getNewestVersionPathNoFork(path : string) : ng.IPromise<string> {
         return this.get(path + "LAST/")
@@ -366,3 +370,15 @@ export class Service<Content extends ResourcesBase.Resource> {
         return callback(new AdhTransaction.Transaction(this, this.adhMetaApi, this.adhPreliminaryNames, this.adhConfig));
     }
 }
+
+
+export var moduleName = "adhHttp";
+
+export var register = (angular, metaApi) => {
+    angular
+        .module(moduleName, [
+            AdhPreliminaryNames.moduleName
+        ])
+        .service("adhHttp", ["$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", Service])
+        .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi));
+};

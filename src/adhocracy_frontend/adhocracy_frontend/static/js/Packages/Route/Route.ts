@@ -61,3 +61,15 @@ export var viewFactory = ($compile : ng.ICompileService) => {
         }
     };
 };
+
+
+export var moduleName = "adhRoute";
+
+export var register = (angular, trusted = false) => {
+    var mod = angular
+        .module(moduleName, [
+            AdhHttp.moduleName,
+            AdhTopLevelState.moduleName
+        ])
+        .directive("adhRouteView", ["$compile", viewFactory]);
+};

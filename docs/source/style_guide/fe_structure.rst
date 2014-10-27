@@ -63,29 +63,27 @@ feature. A package may contain services, directives and filters. Each
 package has its own folder in ``Packages/``.
 
 A package may contain arbitrary TypeScript modules. But it is always
-required to contains a TypeScript module with the same name as the
+required to contain a TypeScript module with the same name as the
 package. This TypeScript module wires all contents of the package into
 an angular module.
 
-.. FIXME: Alternatively, the application can import services, directives
-   and filters directly. See FIXME in angular modules section.
+This angular module is exposed by a variable ``moduleName`` and a
+function ``register``. ``moduleName`` contains the name that should be
+used for this module. By convention the module name is the package name
+in camel case prefixed with 'adh'.  ``register`` takes angular as a
+first argument and registers the module with all of its services and
+directives.
 
 .. FIXME: Packages should also include all CSS and other static content
    they depend on.
 
-A Package may only import TypeScipt modules from other Packages or
-parent directories for type-checking. When you want to actually use the
-code from other packages, you must import the corresponding angular
-module.
+A package must not directly use TypeScipt modules from other Packages.
+When you want to actually use the code from other packages, you must
+import the corresponding angular module referenced by the TypeScript
+module's ``moduleName`` variable. This way it is also made sure that
+requirejs will actually load the code.
 
 .. FIXME: We might want to have exceptions, e.g. Util
-
-Be aware that depending on the angular module will not automatically
-load the required file in a browser environment. We will however take
-care of that on the application level.
-
-.. FIXME: Is it a wise idea to push all forceLoads to the application
-   layer?
 
 Resources
 +++++++++

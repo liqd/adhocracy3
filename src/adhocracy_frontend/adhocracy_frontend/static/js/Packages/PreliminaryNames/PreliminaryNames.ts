@@ -1,4 +1,4 @@
-class PreliminaryNames {
+export class Service {
     private state : number;
 
     constructor() {
@@ -15,4 +15,11 @@ class PreliminaryNames {
     }
 }
 
-export = PreliminaryNames;
+
+export var moduleName = "adhPreliminaryNames";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [])
+        .service("adhPreliminaryNames", Service);
+};

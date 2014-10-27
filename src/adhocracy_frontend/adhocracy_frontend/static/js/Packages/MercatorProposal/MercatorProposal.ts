@@ -1,5 +1,6 @@
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhInject = require("../Inject/Inject");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 
@@ -11,6 +12,7 @@ import SIDetails = require("../../Resources_/adhocracy_core/sheets/mercator/IDet
 import SIExtras = require("../../Resources_/adhocracy_core/sheets/mercator/IExtras");
 import SIFinance = require("../../Resources_/adhocracy_core/sheets/mercator/IFinance");
 import SIIntroduction = require("../../Resources_/adhocracy_core/sheets/mercator/IIntroduction");
+import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIMotivation = require("../../Resources_/adhocracy_core/sheets/mercator/IMotivation");
 import SIName = require("../../Resources_/adhocracy_core/sheets/name/IName");
 import SIOrganizationInfo = require("../../Resources_/adhocracy_core/sheets/mercator/IOrganizationInfo");
@@ -86,7 +88,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     constructor(
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
-        adhPreliminaryNames : AdhPreliminaryNames,
+        adhPreliminaryNames : AdhPreliminaryNames.Service,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -106,21 +108,82 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         return this.$q.when();
     }
 
-    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, resource : R) : ng.IPromise<void> {
-        return this.$q.when();
-    }
+    private initializeScope(scope) {
+        if (!scope.hasOwnProperty("data")) {
+            scope.data = {};
+        }
 
-    public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
-        var data = instance.scope.data || <any>{};
+        var data = scope.data;
+
         data.basic = data.basic || <any>{};
         data.basic.user = data.basic.user || <any>{};
         data.basic.organisation = data.basic.organisation || <any>{};
         data.introduction = data.introduction || <any>{};
         data.detail = data.detail || <any>{};
+        data.detail.location = data.detail.location || <any>{};
         data.motivation = data.motivation || <any>{};
         data.finance = data.finance || <any>{};
         data.extra = data.extra || <any>{};
         data.extra.hear = data.extra.hear || <any>{};
+
+        return data;
+    }
+
+    // NOTE: _update takes an item *version*, whereas _create
+    // constructs an *item plus a new version*.
+    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, mercatorProposalVersion : R) : ng.IPromise<void> {
+        var data = this.initializeScope(instance.scope);
+
+        data.basic.user.name = mercatorProposalVersion.data[SIUserInfo.nick].personal_name;
+        data.basic.user.lastname = mercatorProposalVersion.data[SIUserInfo.nick].family_name;
+        data.basic.user.email = mercatorProposalVersion.data[SIUserInfo.nick].email;
+        data.basic.createtime = mercatorProposalVersion.data[SIMetadata.nick].creation_date;
+
+        data.basic.organisation.name = mercatorProposalVersion.data[SIOrganizationInfo.nick].name;
+        data.basic.organisation.email = mercatorProposalVersion.data[SIOrganizationInfo.nick].email;
+        data.basic.organisation.address = mercatorProposalVersion.data[SIOrganizationInfo.nick].street_address;
+        data.basic.organisation.postcode = mercatorProposalVersion.data[SIOrganizationInfo.nick].postcode;
+        data.basic.organisation.city = mercatorProposalVersion.data[SIOrganizationInfo.nick].city;
+        data.basic.organisation.country = mercatorProposalVersion.data[SIOrganizationInfo.nick].country;
+        data.basic.organisation.status = mercatorProposalVersion.data[SIOrganizationInfo.nick].status;
+        data.basic.organisation.statustext = mercatorProposalVersion.data[SIOrganizationInfo.nick].status_other;
+        data.basic.organisation.description = mercatorProposalVersion.data[SIOrganizationInfo.nick].description;
+        data.basic.organisation.size = mercatorProposalVersion.data[SIOrganizationInfo.nick].size;
+        data.basic.organisation.cooperationText = mercatorProposalVersion.data[SIOrganizationInfo.nick].cooperation_explanation;
+
+        data.introduction.title = mercatorProposalVersion.data[SIIntroduction.nick].title;
+        data.introduction.teaser = mercatorProposalVersion.data[SIIntroduction.nick].teaser;
+
+        data.detail.description = mercatorProposalVersion.data[SIDetails.nick].description;
+        data.detail.location.city = mercatorProposalVersion.data[SIDetails.nick].location_is_city;
+        data.detail.location.country = mercatorProposalVersion.data[SIDetails.nick].location_is_country;
+        data.detail.location.town = mercatorProposalVersion.data[SIDetails.nick].location_is_town;
+        data.detail.location.online = mercatorProposalVersion.data[SIDetails.nick].location_is_online;
+        data.detail.location.ruhr = mercatorProposalVersion.data[SIDetails.nick].location_is_linked_to_ruhr;
+        data.detail.story = mercatorProposalVersion.data[SIDetails.nick].story;
+
+        data.motivation.outcome = mercatorProposalVersion.data[SIMotivation.nick].outcome;
+        data.motivation.steps = mercatorProposalVersion.data[SIMotivation.nick].steps;
+        data.motivation.value = mercatorProposalVersion.data[SIMotivation.nick].value;
+        data.motivation.partners = mercatorProposalVersion.data[SIMotivation.nick].partners;
+
+        data.finance.budget = mercatorProposalVersion.data[SIFinance.nick].budget;
+        data.finance.funding = mercatorProposalVersion.data[SIFinance.nick].requested_funding;
+        data.finance.granted = mercatorProposalVersion.data[SIFinance.nick].granted;
+
+        data.extra.experience = mercatorProposalVersion.data[SIExtras.nick].experience;
+        data.extra.hear.colleague = mercatorProposalVersion.data[SIExtras.nick].heard_from_colleague;
+        data.extra.hear.website = mercatorProposalVersion.data[SIExtras.nick].heard_from_website;
+        data.extra.hear.newsletter = mercatorProposalVersion.data[SIExtras.nick].heard_from_newsletter;
+        data.extra.hear.facebook = mercatorProposalVersion.data[SIExtras.nick].heard_from_facebook;
+        data.extra.hear.otherDescription = mercatorProposalVersion.data[SIExtras.nick].heard_elsewhere;
+
+        return this.$q.when();
+    }
+
+    // NOTE: see _update.
+    public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
+        var data = this.initializeScope(instance.scope);
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
@@ -198,7 +261,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
     constructor(
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
-        adhPreliminaryNames : AdhPreliminaryNames,
+        adhPreliminaryNames : AdhPreliminaryNames.Service,
         $q : ng.IQService
     ) {
         super(adhConfig, adhHttp, adhPreliminaryNames, $q);
@@ -215,4 +278,50 @@ export var listing = (adhConfig : AdhConfig.IService) => {
             path: "@"
         }
     };
+};
+
+
+export var lastVersion = (
+    $compile : ng.ICompileService,
+    adhHttp : AdhHttp.Service<any>
+) => {
+    return {
+        restrict: "E",
+        scope: {
+            itemPath: "@"
+        },
+        transclude: true,
+        template: "<adh-inject></adh-inject>",
+        link: (scope) => {
+            adhHttp.getNewestVersionPathNoFork(scope.itemPath).then(
+                (versionPath) => {
+                    scope.versionPath = versionPath;
+                });
+        }
+    };
+};
+
+
+export var moduleName = "adhMercatorProposal";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhHttp.moduleName,
+            AdhInject.moduleName,
+            AdhPreliminaryNames.moduleName,
+            AdhResourceWidgets.moduleName
+        ])
+        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
+                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+                return widget.createDirective();
+            }])
+        .directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
+                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+                return widget.createDirective();
+            }])
+        .directive("adhMercatorProposalListing", ["adhConfig", listing])
+        .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion]);
 };

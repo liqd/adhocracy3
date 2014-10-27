@@ -3,6 +3,7 @@
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhPreliminaryNames = require("../../Packages/PreliminaryNames/PreliminaryNames");
+import AdhRecursionHelper = require("../RecursionHelper/RecursionHelper");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 import AdhWebSocket = require("../WebSocket/WebSocket");
@@ -136,11 +137,15 @@ export class ProposalVersionDetail {
 
                 $scope.showComments = () => {
                     adhTopLevelState.setContent2Url($scope.content.path);
-                    adhTopLevelState.setFocus(2);
+                    adhTopLevelState.setMovingColumn("0", AdhTopLevelState.ColumnState.COLLAPSE);
+                    adhTopLevelState.setMovingColumn("1", AdhTopLevelState.ColumnState.SHOW);
+                    adhTopLevelState.setMovingColumn("2", AdhTopLevelState.ColumnState.SHOW);
                 };
 
                 $scope.hideComments = () => {
-                    adhTopLevelState.setFocus(1);
+                    adhTopLevelState.setMovingColumn("0", AdhTopLevelState.ColumnState.COLLAPSE);
+                    adhTopLevelState.setMovingColumn("1", AdhTopLevelState.ColumnState.SHOW);
+                    adhTopLevelState.setMovingColumn("2", AdhTopLevelState.ColumnState.SHOW);
                 };
             }]
         };
@@ -170,7 +175,10 @@ export class ProposalVersionNew {
                 onCancel: "=",
                 poolPath: "@"
             },
-            controller: ["$scope", "adhPreliminaryNames", ($scope : IScopeProposalVersion, adhPreliminaryNames : AdhPreliminaryNames) => {
+            controller: ["$scope", "adhPreliminaryNames", (
+                $scope : IScopeProposalVersion,
+                adhPreliminaryNames : AdhPreliminaryNames.Service
+            ) => {
                 $scope.viewmode = "edit";
 
                 $scope.content = new RIProposalVersion({preliminaryNames: adhPreliminaryNames});
@@ -287,7 +295,7 @@ export class ParagraphVersionDetail {
 export class Service {
     constructor(
         private adhHttp : AdhHttp.Service<any>,
-        private adhPreliminaryNames : AdhPreliminaryNames,
+        private adhPreliminaryNames : AdhPreliminaryNames.Service,
         private $q : ng.IQService
     ) {}
 
@@ -363,4 +371,30 @@ export class Service {
                     });
             });
     }
+};
+
+
+export var moduleName = "adhProposal";
+
+export var register = (angular) => {
+    angular
+        .module(moduleName, [
+            AdhHttp.moduleName,
+            AdhPreliminaryNames.moduleName,
+            AdhRecursionHelper.moduleName,
+            AdhTopLevelState.moduleName,
+            AdhWebSocket.moduleName
+        ])
+        .service("adhProposal", ["adhHttp", "adhPreliminaryNames", "$q", Service])
+        .directive("adhProposalDetail", () => new ProposalDetail().createDirective())
+        .directive("adhProposalVersionDetail",
+            ["adhConfig", (adhConfig) => new ProposalVersionDetail().createDirective(adhConfig)])
+        .directive("adhProposalVersionNew",
+            ["adhHttp", "adhConfig", "adhProposal", (adhHttp, adhConfig, adhProposal) =>
+                new ProposalVersionNew().createDirective(adhHttp, adhConfig, adhProposal)])
+        .directive("adhSectionVersionDetail",
+            ["adhConfig", "recursionHelper", (adhConfig, recursionHelper) =>
+                new SectionVersionDetail().createDirective(adhConfig, recursionHelper)])
+        .directive("adhParagraphVersionDetail",
+            ["adhConfig", (adhConfig) => new ParagraphVersionDetail().createDirective(adhConfig)]);
 };

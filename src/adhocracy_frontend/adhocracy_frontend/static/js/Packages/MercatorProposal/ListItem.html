@@ -2,12 +2,12 @@
     <img src="" alt="" />
     <div class="body">
         <h3>{{ data.introduction.title }}</h3>
-        <span>{{ creator }}</span>
+        <span>{{ data.basic.user.name }} {{ data.basic.user.lastname }}</span>
         <div class="meta">
-            <span>{{ data }}</span>
-            <span>{{ votes }}</span>
-            <span>{{ data.finance.budget }}</span>
-            <span>{{ comment }}</span>
+            <span>when: {{ data.basic.createtime }}</span>
+            <span>budget: {{ data.finance.funding }} / {{ data.finance.budget }}</span>
+            <span>comments: [#comments]</span>
+            <span>votes: [#votes]</span>
         </div>
     </div>
 </div>

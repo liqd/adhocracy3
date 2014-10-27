@@ -16,7 +16,7 @@ import AdhRate = require("./Rate");
 
 export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
     create(args : {
-        preliminaryNames : AdhPreliminaryNames;
+        preliminaryNames : AdhPreliminaryNames.Service;
         path ?: string;
         name ?: string;
         subject : string;
@@ -42,7 +42,7 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
         return resource;
     }
 
-    createItem(args : { preliminaryNames : AdhPreliminaryNames; path ?: string }) : RIRate {
+    createItem(args : { preliminaryNames : AdhPreliminaryNames.Service; path ?: string }) : RIRate {
         return new RIRate(args);
     }
 
