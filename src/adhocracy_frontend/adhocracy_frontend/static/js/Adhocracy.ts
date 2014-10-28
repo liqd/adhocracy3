@@ -66,6 +66,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "ngAnimate",
         AdhComment.moduleName,
         AdhDocumentWorkbench.moduleName,
+        AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
         AdhRoute.moduleName,
