@@ -229,9 +229,11 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             deferred: self.$q.defer()
         };
 
-        var setModeID = wrapper.eventHandler.on("setMode", (mode : Mode) => self.setMode(instance, mode));
-        var submitID = wrapper.eventHandler.on("submit", () => self.provide(instance)
-            .then((resources) => instance.deferred.resolve(resources)));
+        var setModeID = wrapper.eventHandler.on("setMode", (mode : Mode) =>
+            self.setMode(instance, mode));
+
+        var submitID = wrapper.eventHandler.on("submit", () =>
+            self.provide(instance).then((resources) => instance.deferred.resolve(resources)));
 
         var cancelID = wrapper.eventHandler.on("cancel", () => {
             if (scope.mode === Mode.edit) {
