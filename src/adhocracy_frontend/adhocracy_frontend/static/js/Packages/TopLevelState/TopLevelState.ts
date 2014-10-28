@@ -15,24 +15,12 @@
  * implemented.
  */
 
-import _ = require("lodash");
-
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
 
-export class ColumnState {
-    static SHOW : string = "show";
-    static HIDE : string = "hide";
-    static COLLAPSE : string = "collapse";
-}
-
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
-    private movingColumns : {
-        "0" : string;
-        "1" : string;
-        "2" : string;
-    };
+    private movingColumns : string;
     private space : string;
 
     constructor(
@@ -43,21 +31,11 @@ export class Service {
         var self = this;
 
         this.eventHandler = new adhEventHandlerClass();
-        this.movingColumns = {
-            "0": ColumnState.HIDE,
-            "1": ColumnState.COLLAPSE,
-            "2": ColumnState.SHOW
-        };
+        this.movingColumns = "is-show-hide-hide";
         this.space = "content";
 
-        this.watchUrlParam("mc0", (state) => {
-            self.setMovingColumn("0", state);
-        });
-        this.watchUrlParam("mc1", (state) => {
-            self.setMovingColumn("1", state);
-        });
-        this.watchUrlParam("mc2", (state) => {
-            self.setMovingColumn("2", state);
+        this.watchUrlParam("movingColumns", (state) => {
+            self.setMovingColumns(state);
         });
     }
 
@@ -112,20 +90,8 @@ export class Service {
         }
     }
 
-    public setMovingColumn(index : string, state : string) : void {
-        var defaultState = ColumnState.SHOW;
-
-        if (typeof state === "undefined") {
-            state = defaultState;
-        }
-
-        if (state === defaultState) {
-            this.$location.search("mc" + index, undefined);
-        } else {
-            this.$location.search("mc" + index, state);
-        }
-
-        this.movingColumns[index] = state;
+    public setMovingColumns(state : string) : void {
+        this.movingColumns = state;
         this.eventHandler.trigger("setMovingColumns", this.movingColumns);
     }
 
@@ -156,23 +122,17 @@ export var movingColumns = (
 ) => {
     var cls;
 
-    var stateToClass = (state) : string => {
-        return "is-" + state["0"] + "-" + state["1"] + "-" + state["2"];
-    };
-
     return {
         link: (scope, element) => {
             var space = topLevelState.getSpace();
 
-            var move = (state) => {
+            var move = (newCls) => {
                 if (topLevelState.getSpace() !== space) {
                     return;
                 };
-                if (typeof state === "undefined") {
+                if (typeof newCls === "undefined") {
                     return;
                 };
-
-                var newCls = stateToClass(state);
 
                 if (newCls !== cls) {
                     element.removeClass(cls);
@@ -203,14 +163,10 @@ export var adhFocusSwitch = (topLevelState : Service) => {
             scope.switchFocus = () => {
                 var currentState = topLevelState.getMovingColumns();
 
-                if (currentState["0"] === ColumnState.SHOW) {
-                    topLevelState.setMovingColumn("0", ColumnState.COLLAPSE);
-                    topLevelState.setMovingColumn("1", ColumnState.SHOW);
-                    topLevelState.setMovingColumn("2", ColumnState.SHOW);
+                if (currentState.split("-")[1] === "show") {
+                    topLevelState.setMovingColumns("is-collapse-show-show");
                 } else {
-                    topLevelState.setMovingColumn("0", ColumnState.SHOW);
-                    topLevelState.setMovingColumn("1", ColumnState.SHOW);
-                    topLevelState.setMovingColumn("2", ColumnState.HIDE);
+                    topLevelState.setMovingColumns("is-show-show-hide");
                 }
             };
         }
@@ -229,12 +185,9 @@ export var spaces = (
             // FIXME: also save content2Url
             var movingColumns = {};
             topLevelState.onSetSpace((space : string) => {
-                movingColumns[scope.currentSpace] = _.clone(topLevelState.getMovingColumns());
+                movingColumns[scope.currentSpace] = topLevelState.getMovingColumns();
                 scope.currentSpace = space;
-
-                _.forOwn(movingColumns[space], (value, key) => {
-                    topLevelState.setMovingColumn(key, value);
-                });
+                topLevelState.setMovingColumns(movingColumns[space]);
             });
             scope.currentSpace = topLevelState.getSpace();
         }
