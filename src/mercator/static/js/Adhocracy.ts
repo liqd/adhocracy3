@@ -118,8 +118,13 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 }]
             })
             .when("/mercator-detail", {  // FIXME: this always shows proposal with title "title".  for testing only.
-                template: "<adh-mercator-proposal-detail-view data-path=\"{{path}}\">" +
-                    "</adh-mercator-proposal-detail-view>",
+                template:
+                    "<adh-resource-wrapper>" +
+                    "<adh-last-version data-item-path=\"{{path}}\">" +
+                    "<adh-mercator-proposal-detail-view data-path=\"{{versionPath}}\">" +
+                    "</adh-mercator-proposal-detail-view>" +
+                    "</adh-last-version>" +
+                    "</adh-resource-wrapper>",
                 controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
                     $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path + "title/";
                 }]

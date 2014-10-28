@@ -270,21 +270,23 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
 }
 
 
+export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
+    constructor(
+        adhConfig : AdhConfig.IService,
+        adhHttp : AdhHttp.Service<any>,
+        adhPreliminaryNames : AdhPreliminaryNames.Service,
+        $q : ng.IQService
+    ) {
+        super(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";
+    }
+}
+
+
 export var listing = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
-        scope: {
-            path: "@"
-        }
-    };
-};
-
-
-export var detailView = (adhConfig : AdhConfig.IService) => {
-    return {
-        restrict: "E",
-        template: "<pre>{{path}}</pre>",
         scope: {
             path: "@"
         }
@@ -328,12 +330,16 @@ export var register = (angular) => {
                 var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, $q);
                 return widget.createDirective();
             }])
+        .directive("adhMercatorProposalDetailView", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
+                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+                return widget.createDirective();
+            }])
         .directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
                 var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
-        .directive("adhMercatorProposalDetailView", ["adhConfig", detailView])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion]);
 };
