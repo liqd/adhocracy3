@@ -106,11 +106,10 @@ export class Service {
 export var movingColumns = (
     topLevelState : Service
 ) => {
-    var cls;
-
     return {
         link: (scope, element) => {
             var space = topLevelState.get("space");
+            var cls;
 
             var move = (newCls) => {
                 if (topLevelState.get("space") !== space) {
