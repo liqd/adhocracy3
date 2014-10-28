@@ -45,31 +45,6 @@ test: warn_orphan_js tslint compile_tests_node test_node
 tslint:
 	tslint_check_adhocracy | $(FIX_TSLINT_ERROR_FORMAT)
 
-tslint_fast:
-	@echo "\n\n"
-	@echo "tslint starts node repeatedly for each file.  there is a pull request that"
-	@echo "accepts multiple -f arguments, which reduces the run time from 11.6s to <4s."
-	@echo "until the pull request has been accepted and released, this rule is"
-	@echo "experimental.  if in doubt, use tslint instead."
-	@echo "More info / updates: https://github.com/palantir/tslint/pull/176."
-	@echo "\n\n"
-	$(TSLINT) -c ../../../../../../etc/tslint.json \
-		-f ./Adhocracy/Resources.ts \
-		-f ./Adhocracy/Util.ts \
-		-f ./Adhocracy/Pages/DocumentWorkbench.ts \
-		-f ./Adhocracy/Widgets.ts \
-		-f ./Adhocracy/WidgetsSpec.ts \
-		-f ./Adhocracy/Css.ts \
-		-f ./Adhocracy/Types.ts \
-		-f ./Adhocracy/Services/Http.ts \
-		-f ./Adhocracy/Services/WS.ts \
-		-f ./Adhocracy/Services/Done.ts \
-		-f ./Adhocracy/Services/Config.ts \
-		-f ./Adhocracy/Services/User.ts \
-		-f ./Adhocracy/UtilSpec.ts \
-		-f ./AdhocracySpec.ts \
-		-f ./Adhocracy.ts
-
 test_node:
 	../../../../../bin/jasmine-node .
 	@echo "NOTE: leaving commonjs modules in place."
