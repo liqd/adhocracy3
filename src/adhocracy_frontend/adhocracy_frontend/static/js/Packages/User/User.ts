@@ -221,10 +221,9 @@ export var activateController = (
     adhUser : Service,
     adhTopLevelState : AdhTopLevelState.Service,
     adhDone,
-    $route : ng.route.IRouteService,
     $location : ng.ILocationService
 ) : void => {
-    var key = $route.current.params.key;
+    var key = $location.path().split("/")[2];
     var path = "/activate/" + key;
 
     var success = () => {
