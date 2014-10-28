@@ -17,7 +17,10 @@
 
 import _ = require("lodash");
 
+import AdhConfig = require("../Config/Config");
 import AdhEventHandler = require("../EventHandler/EventHandler");
+
+var pkgLocation = "/TopLevelState";
 
 
 export interface IAreaInput {
@@ -360,6 +363,15 @@ export var spaceSwitch = (
 };
 
 
+export var pageWrapperDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        transclude: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Wrapper.html"
+    };
+};
+
+
 export var moduleName = "adhTopLevelState";
 
 export var register = (angular) => {
@@ -368,6 +380,7 @@ export var register = (angular) => {
             AdhEventHandler.moduleName
         ])
         .provider("adhTopLevelState", Provider)
+        .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])
         .directive("adhMovingColumns", ["adhTopLevelState", movingColumns])
         .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch])
         .directive("adhSpaces", ["adhTopLevelState", spaces])

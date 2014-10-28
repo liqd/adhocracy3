@@ -125,7 +125,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
             })
             .when("/r/:path*", {
                 controller: ["adhHttp", "adhConfig", "adhTopLevelState", "$routeParams", "$scope", AdhRoute.resourceRouter],
-                templateUrl: "/static/js/templates/Wrapper.html",
+                template: "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>",
                 reloadOnSearch: false
             })
             .when("/login", {
