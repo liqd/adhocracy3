@@ -87,7 +87,7 @@ Check that everything is running smoothly::
 
 Open the javascript front-end with your web browser::
 
-    xdg-open http://localhost:6541/
+    xdg-open http://localhost:6551/
 
 Shutdown everything nicely::
 
