@@ -7,7 +7,6 @@ declare module "angular" {
     export var module: any;
     export var bootstrap: any;
 }
-declare module "angularRoute" {}
 
 declare module "angularAnimate" {}
 declare module "angularTranslate" {}

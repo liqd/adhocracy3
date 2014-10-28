@@ -13,7 +13,6 @@ require.config({
         text: "../lib/requirejs-text/text",
         jquery: "../lib/jquery/dist/jquery",
         angular: "../lib/angular/angular",
-        angularRoute: "../lib/angular-route/angular-route",
         angularAnimate: "../lib/angular-animate/angular-animate",
         angularTranslate: "../lib/angular-translate/angular-translate",
         angularTranslateLoader: "../lib/angular-translate-loader-static-files/angular-translate-loader-static-files",
@@ -29,9 +28,6 @@ require.config({
         },
         angular: {
             exports: "angular"
-        },
-        angularRoute: {
-            deps: ["angular"]
         },
         angularAnimate: {
             deps: ["angular"]
