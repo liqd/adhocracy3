@@ -41,7 +41,7 @@ class TestIMetadataSchema:
     def test_deserialize_empty(self):
         inst = self._make_one()
         result = inst.deserialize({})
-        assert result == {}
+        assert result == {'deleted': False, 'hidden': False}
 
     def test_serialize_empty(self):
         from colander import null
@@ -51,6 +51,8 @@ class TestIMetadataSchema:
         assert result['item_creation_date'] == null
         assert result['modification_date'] == null
         assert result['creator'] == ''
+        assert result['deleted'] == 'false'
+        assert result['hidden'] == 'false'
 
     def test_serialize_empty_and_bind(self):
         from datetime import datetime
@@ -75,8 +77,8 @@ class TestMetadataSheet:
         inst = meta.sheet_class(meta, context)
         assert inst.meta.isheet == IMetadata
         assert inst.meta.schema_class == MetadataSchema
-        assert inst.meta.editable is False
-        assert inst.meta.creatable is False
+        assert inst.meta.editable is True
+        assert inst.meta.creatable is True
         assert inst.meta.readable is True
 
 

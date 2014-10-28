@@ -1056,7 +1056,7 @@ class TestValidateActivationPathUnitTest:
         appstruct = metadata.get()
         appstruct['creation_date'] = datetime(
             year=2010, month=1, day=1, tzinfo=timezone.utc)
-        metadata.set(appstruct)
+        metadata.set(appstruct, force=True)
         self._call_fut(context, request)
         assert 'Unknown or expired activation path' == request.errors[0][
             'description']

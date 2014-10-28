@@ -97,6 +97,7 @@ class ResourceFactory:
                  run_after_creation=True,
                  creator=None,
                  registry=None,
+                 request=None,
                  **kwargs
                  ):
         """Triggered when a ResourceFactory instance is called.
@@ -151,7 +152,10 @@ class ResourceFactory:
             isheet = DottedNameResolver().maybe_resolve(key)
             sheet = get_sheet(resource, isheet, registry=registry)
             if sheet.meta.creatable:
-                sheet.set(struct, send_event=False, registry=registry)
+                sheet.set(struct,
+                          send_event=False,
+                          registry=registry,
+                          request=request)
 
         # Fixme: Sideffect. We change here the passed creator because the
         # creator of user resources should always be the created user.
@@ -170,7 +174,11 @@ class ResourceFactory:
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator, registry)
             sheet = get_sheet(resource, IMetadata, registry=registry)
-            sheet.set(metadata, send_event=False, registry=registry)
+            sheet.set(metadata,
+                      send_event=False,
+                      registry=registry,
+                      request=request,
+                      force=True)
 
         if run_after_creation:
             for call in self.meta.after_creation:

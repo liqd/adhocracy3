@@ -9,6 +9,7 @@ from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
 from adhocracy_core.utils import get_sheet
@@ -33,7 +34,9 @@ def resource_modified_metadata_subscriber(event):
     sheet = get_sheet(event.object, IMetadata, registry=event.registry)
     sheet.set({'modification_date': datetime.now()},
               send_event=False,
-              registry=event.registry)
+              registry=event.registry,
+              request=event.request,
+              force=True)
 
 
 class MetadataSchema(colander.MappingSchema):
@@ -51,19 +54,25 @@ class MetadataSchema(colander.MappingSchema):
                          defaults to now.
     `modification_date`: Modification date of this resource. defaults to now.
     `creator`: creator (list of user resources) of this resource.
+    `deleted`: whether the resource is marked as deleted (only shown to those
+               that specifically ask for it)
+    `hidden`: whether the resource is marked as hidden (only shown to those
+               that have special permissions and ask for it)
     """
 
-    creator = Reference(reftype=MetadataCreatorsReference)
-    creation_date = DateTime(missing=colander.drop)
-    item_creation_date = DateTime(missing=colander.drop)
-    modification_date = DateTime(missing=colander.drop)
+    creator = Reference(reftype=MetadataCreatorsReference, readonly=True)
+    creation_date = DateTime(missing=colander.drop, readonly=True)
+    item_creation_date = DateTime(missing=colander.drop, readonly=True)
+    modification_date = DateTime(missing=colander.drop, readonly=True)
+    deleted = Boolean()
+    hidden = Boolean()
 
 
 metadata_metadata = sheet_metadata_defaults._replace(
     isheet=IMetadata,
     schema_class=MetadataSchema,
-    editable=False,
-    creatable=False,
+    editable=True,
+    creatable=True,
     readable=True,
 )
 

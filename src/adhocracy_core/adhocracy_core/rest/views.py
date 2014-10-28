@@ -401,7 +401,9 @@ class SimpleRESTView(ResourceRESTView):
         for sheet in sheets:
             name = sheet.meta.isheet.__identifier__
             if name in appstructs:
-                sheet.set(appstructs[name], registry=self.request.registry)
+                sheet.set(appstructs[name],
+                          registry=self.request.registry,
+                          request=self.request)
         schema = ResourceResponseSchema().bind(request=self.request,
                                                context=self.context)
         cstruct = schema.serialize()
@@ -455,10 +457,18 @@ class PoolRESTView(SimpleRESTView):
         resource_type = iresource.__identifier__
         appstructs = self.request.validated.get('data', {})
         creator = get_user(self.request)
-        resource = self.registry.create(resource_type, self.context,
+        resource = self.registry.create(resource_type,
+                                        self.context,
                                         creator=creator,
-                                        appstructs=appstructs)
+                                        appstructs=appstructs,
+                                        request=self.request)
         return self.build_post_response(resource)
+
+    @view_config(request_method='PUT',
+                 permission='edit_sheet',
+                 content_type='application/json')
+    def put(self) -> dict:
+        return super().put()
 
 
 @view_defaults(
@@ -496,10 +506,12 @@ class ItemRESTView(PoolRESTView):
         appstructs = self.request.validated.get('data', {})
         creator = get_user(self.request)
         root_versions = self.request.validated.get('root_versions', [])
-        resource = self.registry.create(resource_type, self.context,
+        resource = self.registry.create(resource_type,
+                                        self.context,
                                         appstructs=appstructs,
                                         creator=creator,
-                                        root_versions=root_versions)
+                                        root_versions=root_versions,
+                                        request=self.request)
         return self.build_post_response(resource)
 
 

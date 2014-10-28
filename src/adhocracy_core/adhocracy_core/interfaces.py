@@ -341,6 +341,7 @@ class IResourceSheetModified(IObjectEvent):
     registry = Attribute('The pyramid registry')
     old_appstruct = Attribute('The old :term:`appstruct` data')
     new_appstruct = Attribute('The new :term:`appstruct` data')
+    request = Attribute('The current request')
 
 
 class IResourceCreatedAndAdded(IObjectEvent):
