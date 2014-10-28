@@ -229,9 +229,11 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             deferred: self.$q.defer()
         };
 
-        var setModeID = wrapper.eventHandler.on("setMode", (mode : Mode) => self.setMode(instance, mode));
-        var submitID = wrapper.eventHandler.on("submit", () => self.provide(instance)
-            .then((resources) => instance.deferred.resolve(resources)));
+        var setModeID = wrapper.eventHandler.on("setMode", (mode : Mode) =>
+            self.setMode(instance, mode));
+
+        var submitID = wrapper.eventHandler.on("submit", () =>
+            self.provide(instance).then((resources) => instance.deferred.resolve(resources)));
 
         var cancelID = wrapper.eventHandler.on("cancel", () => {
             if (scope.mode === Mode.edit) {
@@ -300,20 +302,6 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
     }
 
     /**
-     * Handle delete events from children.
-     */
-    public _handleDelete(instance : IResourceWidgetInstance<R, S>, path : string) : ng.IPromise<void> {
-        throw "not implemented";
-    }
-
-    /**
-     * Update scope from resource.
-     */
-    public _update(instance : IResourceWidgetInstance<R, S>, resource : R) : ng.IPromise<void> {
-        throw "not implemented";
-    }
-
-    /**
      * Create resource(s) from scope.
      *
      * Calls _create/_edit if scope.path is preliminary/not preliminary.
@@ -329,17 +317,31 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
     }
 
     /**
+     * Handle delete events from children.
+     */
+    public _handleDelete(instance : IResourceWidgetInstance<R, S>, path : string) : ng.IPromise<void> {
+        throw "abstract method: not implemented";
+    }
+
+    /**
+     * Update scope from resource.
+     */
+    public _update(instance : IResourceWidgetInstance<R, S>, resource : R) : ng.IPromise<void> {
+        throw "abstract method: not implemented";
+    }
+
+    /**
      * Initially create resource(s) from scope.
      */
     public _create(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<R[]> {
-        throw "not implemented";
+        throw "abstract method: not implemented";
     }
 
     /**
      * Create modified resource(s) from scope.
      */
     public _edit(instance : IResourceWidgetInstance<R, S>, old : R) : ng.IPromise<R[]> {
-        throw "not implemented";
+        throw "abstract method: not implemented";
     }
 }
 

@@ -16,25 +16,23 @@ var embeddableDirectives = [
     "create-or-show-comment-listing"
 ];
 
-export var route2template = ($route : ng.route.IRouteService) => {
-    var params = $route.current.params;
+export var location2template = ($location : ng.ILocationService) => {
+    var widget : string = $location.path().split("/")[2];
+    var search = $location.search();
 
     var attrs = [];
-    if (!params.hasOwnProperty("widget")) {
-        throw "widget not specified";
+    if (!AdhUtil.isArrayMember(widget, embeddableDirectives)) {
+        throw "unknown widget: " + widget;
     }
-    if (!AdhUtil.isArrayMember(params.widget, embeddableDirectives)) {
-        throw "unknown widget: " + params.widget;
-    }
-    for (var key in params) {
-        if (params.hasOwnProperty(key) && key !== "widget" && key !== "locale") {
-            attrs.push(AdhUtil.formatString("data-{0}=\"{1}\"", _.escape(key), _.escape(params[key])));
+    for (var key in search) {
+        if (search.hasOwnProperty(key) && key !== "locale") {
+            attrs.push(AdhUtil.formatString("data-{0}=\"{1}\"", _.escape(key), _.escape(search[key])));
         }
     }
-    return AdhUtil.formatString("<adh-{0} {1}></adh-{0}>", _.escape(params.widget), attrs.join(" "));
+    return AdhUtil.formatString("<adh-{0} {1}></adh-{0}>", _.escape(widget), attrs.join(" "));
 };
 
-export var factory = ($compile : ng.ICompileService, $route : ng.route.IRouteService) => {
+export var factory = ($compile : ng.ICompileService, $location : ng.ILocationService) => {
     return {
         restrict: "E",
         scope: {},
@@ -42,7 +40,7 @@ export var factory = ($compile : ng.ICompileService, $route : ng.route.IRouteSer
             var template = "<header class=\"l-header main-header\">" +
                 "<adh-user-indicator></adh-user-indicator>" +
                 "</header>";
-            template += route2template($route);
+            template += location2template($location);
             element.html(template);
             $compile(element.contents())(scope);
         }
@@ -54,6 +52,6 @@ export var moduleName = "adhEmbed";
 
 export var register = (angular) => {
     angular
-        .module(moduleName, ["ngRoute"])
-        .directive("adhEmbed", ["$compile", "$route", factory]);
+        .module(moduleName, [])
+        .directive("adhEmbed", ["$compile", "$location", factory]);
 };
