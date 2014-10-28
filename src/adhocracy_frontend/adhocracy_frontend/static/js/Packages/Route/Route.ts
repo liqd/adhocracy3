@@ -47,22 +47,6 @@ export var resourceRouter = (
 };
 
 
-export var viewFactory = ($compile : ng.ICompileService) => {
-    return {
-        restrict: "E",
-        scope: {
-            template: "@"
-        },
-        link: (scope, element) => {
-            scope.$watch("template", (template) => {
-                element.html(template);
-                $compile(element.contents())(scope);
-            });
-        }
-    };
-};
-
-
 export var moduleName = "adhRoute";
 
 export var register = (angular, trusted = false) => {
@@ -70,6 +54,5 @@ export var register = (angular, trusted = false) => {
         .module(moduleName, [
             AdhHttp.moduleName,
             AdhTopLevelState.moduleName
-        ])
-        .directive("adhRouteView", ["$compile", viewFactory]);
+        ]);
 };

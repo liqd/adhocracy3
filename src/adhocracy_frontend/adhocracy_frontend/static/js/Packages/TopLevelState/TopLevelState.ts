@@ -372,6 +372,19 @@ export var pageWrapperDirective = (adhConfig : AdhConfig.IService) => {
 };
 
 
+export var viewFactory = (adhTopLevelState : Service, $compile : ng.ICompileService) => {
+    return {
+        restrict: "E",
+        link: (scope, element) => {
+            scope.$watch(() => adhTopLevelState.getTemplate(), (template) => {
+                element.html(template);
+                $compile(element.contents())(scope);
+            });
+        }
+    };
+};
+
+
 export var moduleName = "adhTopLevelState";
 
 export var register = (angular) => {
@@ -384,5 +397,6 @@ export var register = (angular) => {
         .directive("adhMovingColumns", ["adhTopLevelState", movingColumns])
         .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch])
         .directive("adhSpaces", ["adhTopLevelState", spaces])
-        .directive("adhSpaceSwitch", ["adhTopLevelState", spaceSwitch]);
+        .directive("adhSpaceSwitch", ["adhTopLevelState", spaceSwitch])
+        .directive("adhView", ["adhTopLevelState", "$compile", viewFactory]);
 };

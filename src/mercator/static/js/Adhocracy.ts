@@ -89,6 +89,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 };
 
                 return {
+                    template: "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>",
                     route: (path, search) => {
                         for (var key in defaults) {
                             if (defaults.hasOwnProperty(key)) {
