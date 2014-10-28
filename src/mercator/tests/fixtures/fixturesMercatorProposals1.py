@@ -1,5 +1,5 @@
-#!/usr/bin/python
 # -*- encoding: utf-8 -*-
+# [call this script from a3 root with ./bin/python3.4 as interpreter.]
 
 import os
 import json
