@@ -278,12 +278,11 @@ export var movingColumns = (
     topLevelState : Service
 ) => {
     return {
-        link: (scope, element) => {
-            var space = topLevelState.get("space");
+        link: (scope, element, attrs) => {
             var cls;
 
             var move = (newCls) => {
-                if (topLevelState.get("space") === space) {
+                if (topLevelState.get("space") === attrs["space"]) {
                     if (newCls !== cls) {
                         element.removeClass(cls);
                         element.addClass(newCls);

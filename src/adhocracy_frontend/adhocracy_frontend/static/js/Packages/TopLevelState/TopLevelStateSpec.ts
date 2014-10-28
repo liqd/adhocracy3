@@ -115,13 +115,17 @@ export var register = () => {
             describe("link", () => {
                 var scopeMock;
                 var elementMock;
+                var attrsMock;
 
                 beforeEach(() => {
                     scopeMock = {};
+                    attrsMock = {
+                        space: "space"
+                    };
                     elementMock = <any>jasmine.createSpyObj("elementMock", ["addClass", "removeClass"]);
 
                     var link = directive.link;
-                    link(scopeMock, elementMock);
+                    link(scopeMock, elementMock, attrsMock);
                 });
 
                 describe("on MovingColumns", () => {
