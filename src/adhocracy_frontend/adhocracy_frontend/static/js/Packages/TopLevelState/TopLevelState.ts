@@ -20,8 +20,7 @@ import AdhEventHandler = require("../EventHandler/EventHandler");
 
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
-    private movingColumns : string;
-    private space : string;
+    private data : {[key : string] : string};
 
     constructor(
         adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
@@ -31,11 +30,14 @@ export class Service {
         var self = this;
 
         this.eventHandler = new adhEventHandlerClass();
-        this.movingColumns = "is-show-hide-hide";
-        this.space = "content";
+
+        this.data = {
+            movingColumns: "is-show-hide-hide",
+            space: "content"
+        };
 
         this.watchUrlParam("movingColumns", (state) => {
-            self.setMovingColumns(state);
+            self.set("movingColumns", state);
         });
     }
 
@@ -49,12 +51,22 @@ export class Service {
         });
     }
 
-    public setContent2Url(url : string) : void {
-        this.eventHandler.trigger("setContent2Url", url);
+    public set(key : string, value) : boolean {
+        if (this.get(key) !== value) {
+            this.data[key] = value;
+            this.eventHandler.trigger(key, value);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public onSetContent2Url(fn : (url : string) => void) : void {
-        this.eventHandler.on("setContent2Url", fn);
+    public get(key : string) {
+        return this.data[key];
+    }
+
+    public on(key : string, fn) : void {
+        this.eventHandler.on(key, fn);
     }
 
     // FIXME: {set,get}CameFrom should be worked into the class
@@ -89,32 +101,6 @@ export class Service {
             this.$location.url(_default);
         }
     }
-
-    public setMovingColumns(state : string) : void {
-        this.movingColumns = state;
-        this.eventHandler.trigger("setMovingColumns", this.movingColumns);
-    }
-
-    public onMovingColumns(fn : (state) => void) : void {
-        this.eventHandler.on("setMovingColumns", fn);
-    }
-
-    public getMovingColumns() {
-        return this.movingColumns;
-    }
-
-    public setSpace(space : string) : void {
-        this.space = space;
-        this.eventHandler.trigger("setSpace", space);
-    }
-
-    public onSetSpace(fn : (space : string) => void) : void {
-        this.eventHandler.on("setSpace", fn);
-    }
-
-    public getSpace() : string {
-        return this.space;
-    }
 }
 
 export var movingColumns = (
@@ -124,10 +110,10 @@ export var movingColumns = (
 
     return {
         link: (scope, element) => {
-            var space = topLevelState.getSpace();
+            var space = topLevelState.get("space");
 
             var move = (newCls) => {
-                if (topLevelState.getSpace() !== space) {
+                if (topLevelState.get("space") !== space) {
                     return;
                 };
                 if (typeof newCls === "undefined") {
@@ -141,12 +127,12 @@ export var movingColumns = (
                 }
             };
 
-            topLevelState.onSetContent2Url((url : string) => {
+            topLevelState.on("content2Url", (url : string) => {
                 scope.content2Url = url;
             });
 
-            topLevelState.onMovingColumns(move);
-            move(topLevelState.getMovingColumns());
+            topLevelState.on("movingColumns", move);
+            move(topLevelState.get("movingColumns"));
         }
     };
 };
@@ -161,12 +147,12 @@ export var adhFocusSwitch = (topLevelState : Service) => {
         template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
         link: (scope) => {
             scope.switchFocus = () => {
-                var currentState = topLevelState.getMovingColumns();
+                var currentState = topLevelState.get("movingColumns");
 
                 if (currentState.split("-")[1] === "show") {
-                    topLevelState.setMovingColumns("is-collapse-show-show");
+                    topLevelState.set("movingColumns", "is-collapse-show-show");
                 } else {
-                    topLevelState.setMovingColumns("is-show-show-hide");
+                    topLevelState.set("movingColumns", "is-show-show-hide");
                 }
             };
         }
@@ -184,12 +170,12 @@ export var spaces = (
         link: (scope) => {
             // FIXME: also save content2Url
             var movingColumns = {};
-            topLevelState.onSetSpace((space : string) => {
-                movingColumns[scope.currentSpace] = topLevelState.getMovingColumns();
+            topLevelState.on("space", (space : string) => {
+                movingColumns[scope.currentSpace] = topLevelState.get("movingColumns");
                 scope.currentSpace = space;
-                topLevelState.setMovingColumns(movingColumns[space]);
+                topLevelState.set("movingColumns", movingColumns[space]);
             });
-            scope.currentSpace = topLevelState.getSpace();
+            scope.currentSpace = topLevelState.get("space");
         }
     };
 };
@@ -204,7 +190,7 @@ export var spaceSwitch = (
             "<a href=\"\" data-ng-click=\"setSpace('user')\">User</a>",
         link: (scope) => {
             scope.setSpace = (space : string) => {
-                topLevelState.setSpace(space);
+                topLevelState.set("space", space);
             };
         }
     };

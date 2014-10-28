@@ -136,12 +136,12 @@ export class ProposalVersionDetail {
                 };
 
                 $scope.showComments = () => {
-                    adhTopLevelState.setContent2Url($scope.content.path);
-                    adhTopLevelState.setMovingColumns("is-collapse-show-show");
+                    adhTopLevelState.set("content2Url", $scope.content.path);
+                    adhTopLevelState.set("movingColumns", "is-collapse-show-show");
                 };
 
                 $scope.hideComments = () => {
-                    adhTopLevelState.setMovingColumns("is-show-show-hide");
+                    adhTopLevelState.set("movingColumns", "is-show-show-hide");
                 };
             }]
         };
