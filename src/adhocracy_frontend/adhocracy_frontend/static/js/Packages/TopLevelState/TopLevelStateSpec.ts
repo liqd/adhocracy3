@@ -1,6 +1,9 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
+import q = require("q");
+
 import AdhTopLevelState = require("./TopLevelState");
+
 
 export var register = () => {
 
@@ -27,7 +30,8 @@ export var register = () => {
                     this.trigger = trigger;
                 };
 
-                adhTopLevelState = new AdhTopLevelState.Service(null, eventHandlerMockClass, locationMock, rootScopeMock);
+                adhTopLevelState = new AdhTopLevelState.Service(
+                    null, eventHandlerMockClass, locationMock, rootScopeMock, null, q, null, null);
             });
 
             it("dispatches calls to set() to eventHandler", () => {

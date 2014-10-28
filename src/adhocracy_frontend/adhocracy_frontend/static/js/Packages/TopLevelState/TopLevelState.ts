@@ -15,6 +15,8 @@
  * implemented.
  */
 
+import _ = require("lodash");
+
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
 
@@ -26,6 +28,17 @@ export interface IAreaInput {
     };
     template? : string;
     templateUrl? : string;
+}
+
+
+export interface IArea {
+    prefix : string;
+    route : (path : string, search : {[key : string] : string}) => ng.IPromise<{[key : string] : string}>;
+    reverse : (data : {[key : string] : string}) => {
+        path : string;
+        search : {[key : string] : string};
+    };
+    template : string;
 }
 
 
@@ -44,9 +57,9 @@ export class Provider {
             };
         };
 
-        this.$get = ["adhEventHandlerClass", "$location", "$rootScope",
-            (adhEventHandlerClass, $location, $rootScope) => {
-                return new Service(self, adhEventHandlerClass, $location, $rootScope);
+        this.$get = ["adhEventHandlerClass", "$location", "$rootScope", "$http", "$q", "$templateCache", "$injector",
+            (adhEventHandlerClass, $location, $rootScope, $http, $q, $templateCache, $injector) => {
+                return new Service(self, adhEventHandlerClass, $location, $rootScope, $http, $q, $templateCache, $injector);
             }];
     }
 
@@ -69,12 +82,17 @@ export class Provider {
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
     private data : {[key : string] : string};
+    private area : IArea;
 
     constructor(
         private provider : Provider,
         adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
         private $location : ng.ILocationService,
-        private $rootScope : ng.IScope
+        private $rootScope : ng.IScope,
+        private $http : ng.IHttpService,
+        private $q : ng.IQService,
+        private $templateCache : ng.ITemplateCacheService,
+        private $injector : ng.auto.IInjectorService
     ) {
         var self = this;
 
@@ -98,6 +116,66 @@ export class Service {
             self.$location.replace();
             fn(n, o);
         });
+    }
+
+    private templateRequest(url) : ng.IPromise<string> {
+        // FIXME: in future versions of angular, this should be replaced by $templateRequest
+        var template = this.$templateCache.get(url);
+
+        if (typeof template === "undefined") {
+            return this.$http.get(url).then((response) => {
+                var template = response.data;
+                this.$templateCache.put(url, template);
+                return template;
+            });
+        } else {
+            return this.$q.when(template);
+        }
+    }
+
+    private getArea() : IArea {
+        var self = this;
+
+        var defaultRoute = (path, search) => {
+            var data = _.clone(search);
+            data["path"] = path;
+            return self.$q.when(data);
+        };
+
+        var defaultReverse = (data) => {
+            var ret = {
+                path: data["path"],
+                search: _.clone(data)
+            };
+            delete ret.search["path"];
+            return ret;
+        };
+
+        var prefix : string = this.$location.path().split("/")[1];
+
+        if (typeof this.area === "undefined" || prefix !== this.area.prefix) {
+            var fn = this.provider.areas.hasOwnProperty(prefix) ? this.provider.areas[prefix] : this.provider.default;
+            var areaInput : IAreaInput = this.$injector.invoke(fn);
+            var area : IArea = {
+                prefix: prefix,
+                route: typeof areaInput.route !== "undefined" ? areaInput.route : defaultRoute,
+                reverse: typeof areaInput.reverse !== "undefined" ? areaInput.reverse : defaultReverse,
+                template: ""
+            };
+
+            if (typeof areaInput.template !== "undefined") {
+                area.template = areaInput.template;
+            } else if (typeof areaInput.templateUrl !== "undefined") {
+                // NOTE: we do not wait for the template to be loaded
+                this.templateRequest(areaInput.templateUrl).then((template) => {
+                    area.template = template;
+                });
+            }
+
+            this.area = area;
+        }
+
+        return this.area;
     }
 
     public set(key : string, value) : boolean {
