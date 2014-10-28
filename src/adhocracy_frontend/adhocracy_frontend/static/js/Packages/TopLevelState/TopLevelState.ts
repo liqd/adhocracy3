@@ -94,7 +94,7 @@ export class Service {
         private $templateCache : ng.ITemplateCacheService,
         private $injector : ng.auto.IInjectorService
     ) {
-        var self = this;
+        var self : Service = this;
 
         this.eventHandler = new adhEventHandlerClass();
         this.data = {};
@@ -270,6 +270,7 @@ export class Service {
     }
 }
 
+
 export var movingColumns = (
     topLevelState : Service
 ) => {
@@ -279,17 +280,12 @@ export var movingColumns = (
             var cls;
 
             var move = (newCls) => {
-                if (topLevelState.get("space") !== space) {
-                    return;
-                };
-                if (typeof newCls === "undefined") {
-                    return;
-                };
-
-                if (newCls !== cls) {
-                    element.removeClass(cls);
-                    element.addClass(newCls);
-                    cls = newCls;
+                if (topLevelState.get("space") === space) {
+                    if (newCls !== cls) {
+                        element.removeClass(cls);
+                        element.addClass(newCls);
+                        cls = newCls;
+                    }
                 }
             };
 
@@ -335,6 +331,7 @@ export var spaces = (
         template: "<adh-inject></adh-inject>",
         link: (scope) => {
             // FIXME: also save content2Url
+            // IDEA: getAll/setAll on TLS (getAll needs to clone), maybe also clear
             var movingColumns = {};
             topLevelState.on("space", (space : string) => {
                 movingColumns[scope.currentSpace] = topLevelState.get("movingColumns");
