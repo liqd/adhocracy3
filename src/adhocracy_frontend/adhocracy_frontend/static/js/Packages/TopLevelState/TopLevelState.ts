@@ -18,16 +18,50 @@
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
 
+export interface IAreaInput {
+    route? : (path : string, search : {[key : string] : string}) => ng.IPromise<{[key : string] : string}>;
+    reverse? : (data : {[key : string] : string}) => {
+        path : string;
+        search : {[key : string] : string};
+    };
+    template? : string;
+    templateUrl? : string;
+}
+
+
 export class Provider {
+    public areas : {[key : string]: any};
+    public default : any;
     public $get;
 
     constructor() {
         var self = this;
 
+        this.areas = {};
+        this.default = () => {
+            return {
+                template: "<h1>404 Not Found</h1>"
+            };
+        };
+
         this.$get = ["adhEventHandlerClass", "$location", "$rootScope",
             (adhEventHandlerClass, $location, $rootScope) => {
                 return new Service(self, adhEventHandlerClass, $location, $rootScope);
             }];
+    }
+
+    public when(prefix : string, factory : (...args : any[]) => IAreaInput);
+    public when(prefix : string, factory : any[]);
+    public when(prefix, factory) {
+        this.areas[prefix] = factory;
+        return this;
+    }
+
+    public otherwise(factory : (...args : any[]) => IAreaInput);
+    public otherwise(factory : any[]);
+    public otherwise(factory) {
+        this.default = factory;
+        return this;
     }
 }
 
