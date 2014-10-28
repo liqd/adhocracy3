@@ -1,3 +1,4 @@
+""""Adhocracy sample backend customizing."""
 import os
 
 from setuptools import setup, find_packages
@@ -5,24 +6,21 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 
-requires = [
-    'adhocracy_core',
-    ]
+requires = ['adhocracy_core',
+            ]
 
-test_requires = [
-    'adhocracy_core[test]',
-    ]
+test_requires = ['adhocracy_core[test]',
+                 ]
 
 setup(name='adhocracy_sample',
       version='0.0',
       description='adhocracy sample app',
       long_description=README,
-      classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pylons",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+      classifiers=["Programming Language :: Python",
+                   "Framework :: Pylons",
+                   "Topic :: Internet :: WWW/HTTP",
+                   "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+                   ],
       author='',
       author_email='',
       url='',
