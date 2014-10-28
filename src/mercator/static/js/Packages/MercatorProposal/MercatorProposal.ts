@@ -281,6 +281,17 @@ export var listing = (adhConfig : AdhConfig.IService) => {
 };
 
 
+export var detailView = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        template: "<pre>{{path}}</pre>",
+        scope: {
+            path: "@"
+        }
+    };
+};
+
+
 export var lastVersion = (
     $compile : ng.ICompileService,
     adhHttp : AdhHttp.Service<any>
@@ -323,5 +334,6 @@ export var register = (angular) => {
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
+        .directive("adhMercatorProposalDetailView", ["adhConfig", detailView])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion]);
 };
