@@ -73,11 +73,48 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhProposal.moduleName
     ]);
 
-    app.config(["$translateProvider", "$routeProvider", "$locationProvider", (
+    app.config(["adhTopLevelStateProvider", "$translateProvider", "$routeProvider", "$locationProvider", (
+        adhTopLevelStateProvider : AdhTopLevelState.Provider,
         $translateProvider,
         $routeProvider,
         $locationProvider
     ) => {
+        adhTopLevelStateProvider
+            .when("r", ["$q", ($q) : AdhTopLevelState.IAreaInput => {
+                var defaults = {
+                    movingColumns: "is-show-show-hide",
+                    space: "content"
+                };
+
+                return {
+                    route: (path, search) => {
+                        for (var key in defaults) {
+                            if (defaults.hasOwnProperty(key)) {
+                                if (typeof search[key] === "undefined") {
+                                    search[key] = defaults[key];
+                                }
+                            }
+                        }
+                        search["path"] = path;
+                        return $q.when(search);
+                    },
+                    reverse: (data) => {
+                        var search = <any>{};
+                        for (var key in defaults) {
+                            if (defaults.hasOwnProperty(key)) {
+                                if (data[key] !== defaults[key] && key !== "path") {
+                                    search[key] = data[key];
+                                }
+                            }
+                        }
+                        return {
+                            path: data["path"],
+                            search: search
+                        };
+                    }
+                };
+            }]);
+
         $routeProvider
             .when("/", {
                 template: "",

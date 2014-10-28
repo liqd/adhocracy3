@@ -97,11 +97,7 @@ export class Service {
         var self = this;
 
         this.eventHandler = new adhEventHandlerClass();
-
-        this.data = {
-            movingColumns: "is-show-hide-hide",
-            space: "content"
-        };
+        this.data = {};
 
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
             self.fromLocation();
