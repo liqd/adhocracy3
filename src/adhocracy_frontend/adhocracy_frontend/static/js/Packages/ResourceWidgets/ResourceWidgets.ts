@@ -305,14 +305,14 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
      * Handle delete events from children.
      */
     public _handleDelete(instance : IResourceWidgetInstance<R, S>, path : string) : ng.IPromise<void> {
-        throw "not implemented";
+        throw "abstract method: not implemented";
     }
 
     /**
      * Update scope from resource.
      */
     public _update(instance : IResourceWidgetInstance<R, S>, resource : R) : ng.IPromise<void> {
-        throw "not implemented";
+        throw "abstract method: not implemented";
     }
 
     /**
@@ -334,14 +334,14 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
      * Initially create resource(s) from scope.
      */
     public _create(instance : IResourceWidgetInstance<R, S>) : ng.IPromise<R[]> {
-        throw "not implemented";
+        throw "abstract method: not implemented";
     }
 
     /**
      * Create modified resource(s) from scope.
      */
     public _edit(instance : IResourceWidgetInstance<R, S>, old : R) : ng.IPromise<R[]> {
-        throw "not implemented";
+        throw "abstract method: not implemented";
     }
 }
 
