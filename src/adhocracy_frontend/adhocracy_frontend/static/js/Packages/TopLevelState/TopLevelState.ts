@@ -15,6 +15,8 @@
  * implemented.
  */
 
+import _ = require("lodash");
+
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
 
@@ -31,6 +33,7 @@ export class Service {
         "1" : string;
         "2" : string;
     };
+    private space : string;
 
     constructor(
         adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
@@ -45,6 +48,7 @@ export class Service {
             "1": ColumnState.COLLAPSE,
             "2": ColumnState.SHOW
         };
+        this.space = "content";
 
         this.watchUrlParam("mc0", (state) => {
             self.setMovingColumn("0", state);
@@ -132,6 +136,19 @@ export class Service {
     public getMovingColumns() {
         return this.movingColumns;
     }
+
+    public setSpace(space : string) : void {
+        this.space = space;
+        this.eventHandler.trigger("setSpace", space);
+    }
+
+    public onSetSpace(fn : (space : string) => void) : void {
+        this.eventHandler.on("setSpace", fn);
+    }
+
+    public getSpace() : string {
+        return this.space;
+    }
 }
 
 export var movingColumns = (
@@ -145,7 +162,12 @@ export var movingColumns = (
 
     return {
         link: (scope, element) => {
+            var space = topLevelState.getSpace();
+
             var move = (state) => {
+                if (topLevelState.getSpace() !== space) {
+                    return;
+                };
                 if (typeof state === "undefined") {
                     return;
                 };
@@ -196,6 +218,46 @@ export var adhFocusSwitch = (topLevelState : Service) => {
 };
 
 
+export var spaces = (
+    topLevelState : Service
+) => {
+    return {
+        restrict: "E",
+        transclude: true,
+        template: "<adh-inject></adh-inject>",
+        link: (scope) => {
+            // FIXME: also save content2Url
+            var movingColumns = {};
+            topLevelState.onSetSpace((space : string) => {
+                movingColumns[scope.currentSpace] = _.clone(topLevelState.getMovingColumns());
+                scope.currentSpace = space;
+
+                _.forOwn(movingColumns[space], (value, key) => {
+                    topLevelState.setMovingColumn(key, value);
+                });
+            });
+            scope.currentSpace = topLevelState.getSpace();
+        }
+    };
+};
+
+
+export var spaceSwitch = (
+    topLevelState : Service
+) => {
+    return {
+        restrict: "E",
+        template: "<a href=\"\" data-ng-click=\"setSpace('content')\">Content</a>" +
+            "<a href=\"\" data-ng-click=\"setSpace('user')\">User</a>",
+        link: (scope) => {
+            scope.setSpace = (space : string) => {
+                topLevelState.setSpace(space);
+            };
+        }
+    };
+};
+
+
 export var moduleName = "adhTopLevelState";
 
 export var register = (angular) => {
@@ -205,5 +267,7 @@ export var register = (angular) => {
         ])
         .service("adhTopLevelState", ["adhEventHandlerClass", "$location", "$rootScope", Service])
         .directive("adhMovingColumns", ["adhTopLevelState", movingColumns])
-        .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch]);
+        .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch])
+        .directive("adhSpaces", ["adhTopLevelState", spaces])
+        .directive("adhSpaceSwitch", ["adhTopLevelState", spaceSwitch]);
 };
