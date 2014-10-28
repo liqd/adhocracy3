@@ -36,8 +36,8 @@ import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNam
 import AdhProposal = require("./Packages/Proposal/Proposal");
 import AdhRate = require("./Packages/Rate/Rate");
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
+import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
-import AdhRoute = require("./Packages/Route/Route");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhUser = require("./Packages/User/User");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
@@ -69,7 +69,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
-        AdhRoute.moduleName,
+        AdhResourceArea.moduleName,
         AdhProposal.moduleName
     ]);
 
@@ -80,41 +80,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         $locationProvider
     ) => {
         adhTopLevelStateProvider
-            .when("r", ["$q", ($q) : AdhTopLevelState.IAreaInput => {
-                var defaults = {
-                    movingColumns: "is-show-show-hide",
-                    space: "content"
-                };
-
-                return {
-                    template: "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>",
-                    route: (path, search) => {
-                        for (var key in defaults) {
-                            if (defaults.hasOwnProperty(key)) {
-                                if (typeof search[key] === "undefined") {
-                                    search[key] = defaults[key];
-                                }
-                            }
-                        }
-                        search["path"] = path;
-                        return $q.when(search);
-                    },
-                    reverse: (data) => {
-                        var search = <any>{};
-                        for (var key in defaults) {
-                            if (defaults.hasOwnProperty(key)) {
-                                if (data[key] !== defaults[key] && key !== "path") {
-                                    search[key] = data[key];
-                                }
-                            }
-                        }
-                        return {
-                            path: data["path"],
-                            search: search
-                        };
-                    }
-                };
-            }]);
+            .when("r", ["adhHttp", "adhConfig", AdhResourceArea.resourceArea]);
 
         $routeProvider
             .when("/", {
@@ -123,11 +89,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                     $location.replace();
                     $location.path("/r" + adhConfig.rest_platform_path);
                 }]
-            })
-            .when("/r/:path*", {
-                controller: ["adhHttp", "adhConfig", "adhTopLevelState", "$routeParams", "$scope", AdhRoute.resourceRouter],
-                template: "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>",
-                reloadOnSearch: false
             })
             .when("/login", {
                 templateUrl: "/static/js/templates/Login.html"
@@ -198,8 +159,8 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhProposal.register(angular);
     AdhRate.register(angular);
     AdhRecursionHelper.register(angular);
+    AdhResourceArea.register(angular);
     AdhResourceWidgets.register(angular);
-    AdhRoute.register(angular);
     AdhTopLevelState.register(angular);
     AdhUser.register(angular);
     AdhWebSocket.register(angular);

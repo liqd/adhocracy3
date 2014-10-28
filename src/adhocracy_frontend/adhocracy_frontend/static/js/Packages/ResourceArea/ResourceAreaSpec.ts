@@ -1,12 +1,12 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
-import AdhRoute = require("./Route");
+import AdhResourceArea = require("./ResourceArea");
 
 
 export var register = () => {
-    describe("Route", () => {
+    describe("ResourceArea", () => {
         xit("dummy", () => {
-            expect(AdhRoute).toBeDefined();
+            expect(AdhResourceArea).toBeDefined();
         });
     });
 };
