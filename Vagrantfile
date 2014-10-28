@@ -3,13 +3,15 @@
 
 VAGRANTFILE_API_VERSION = "2"
 
-PROVISION = <<eos
+PROVISION_ROOT = <<eos
   echo "Installing Adhocracy 3 dependencies ..."
   apt-get update
   apt-get dist-upgrade -y
   apt-get -y install python python-setuptools ruby-dev build-essential libbz2-dev libyaml-dev libncurses5-dev libreadline6-dev zlib1g-dev libssl-dev libjpeg62-dev vim git graphviz
+eos
 
-  cd /home/vagrant/adhocracy3
+PROVISION_USER = <<eos
+  cd adhocracy3
   git submodule update --init
 
   echo "Compiling Python 3.4.x ..."
@@ -70,7 +72,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, guest: 6551, host: 6551
   config.vm.network :forwarded_port, guest: 8080, host: 8080
 
-  config.vm.provision :shell, inline: PROVISION
+  config.vm.provision :shell, inline: PROVISION_ROOT
+  config.vm.provision :shell, inline: PROVISION_USER, :privileged => false
 
   # Optional settings
 
