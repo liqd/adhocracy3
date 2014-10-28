@@ -121,7 +121,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 template:
                     "<adh-resource-wrapper>" +
                     "<adh-last-version data-item-path=\"{{path}}\">" +
-                    "<adh-mercator-proposal-detail-view data-path=\"{{versionPath}}\">" +
+                    "<adh-mercator-proposal-detail-view data-ng-if=\"versionPath\" data-path=\"{{versionPath}}\">" +
                     "</adh-mercator-proposal-detail-view>" +
                     "</adh-last-version>" +
                     "</adh-resource-wrapper>",
