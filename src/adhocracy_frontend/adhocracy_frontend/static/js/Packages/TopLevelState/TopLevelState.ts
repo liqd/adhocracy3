@@ -103,18 +103,8 @@ export class Service {
             space: "content"
         };
 
-        this.watchUrlParam("movingColumns", (state) => {
-            self.set("movingColumns", state);
-        });
-    }
-
-    private watchUrlParam(key, fn) {
-        var self = this;
-
-        self.$rootScope.$watch(() => self.$location.search()[key], (n, o) => {
-            // to not break the back button, we do not directly push another history entry
-            self.$location.replace();
-            fn(n, o);
+        this.$rootScope.$watch(() => self.$location.absUrl(), () => {
+            self.fromLocation();
         });
     }
 
@@ -183,13 +173,62 @@ export class Service {
         return area.template;
     }
 
-    public set(key : string, value) : boolean {
+    private fromLocation() : ng.IPromise<void> {
+        var area = this.getArea();
+        var path = this.$location.path().replace(/\/[^/]*/, "");
+        var search = this.$location.search();
+
+        return area.route(path, search).then((data) => {
+            for (var key in this.data) {
+                if (!data.hasOwnProperty(key)) {
+                    delete this.data[key];
+                }
+            }
+            for (var key2 in data) {
+                if (data.hasOwnProperty(key2)) {
+                    this._set(key2, data[key2]);
+                }
+            }
+
+            // normalize location
+            this.$location.replace();
+            this.toLocation();
+        });
+    }
+
+    private toLocation() : void {
+        var area = this.getArea();
+        var search = this.$location.search();
+        var ret = area.reverse(this.data);
+
+        this.$location.path("/" + area.prefix + ret.path);
+
+        for (var key in search) {
+            if (search.hasOwnProperty(key)) {
+                this.$location.search(key, ret.search[key]);
+            }
+        }
+        for (var key2 in ret.search) {
+            if (ret.search.hasOwnProperty(key2)) {
+                this.$location.search(key2, ret.search[key2]);
+            }
+        }
+    }
+
+    private _set(key : string, value) : boolean {
         if (this.get(key) !== value) {
             this.data[key] = value;
             this.eventHandler.trigger(key, value);
             return true;
         } else {
             return false;
+        }
+    }
+
+    public set(key : string, value) : void {
+        var updated : boolean = this._set(key, value);
+        if (updated) {
+            this.toLocation();
         }
     }
 
