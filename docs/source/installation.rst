@@ -11,7 +11,8 @@ Requirements:
 
 create virtual machine and login:
 
-    wget https://raw.github.com/adhocracy/adhocracy-3/master/Vagrantfile
+    (LINUX:)    wget https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile 
+    (OSX:)      curl "https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile"
     vagrant up
     vagrant ssh
     cd /home/vagrant/
@@ -31,10 +32,16 @@ Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 4. graphviz
 5. ruby-dev
 
+create SSH key and upload to github ::
+
+    ssh-keygen -t rsa -C "your_email@example.com"
+
 checkout source code ::
 
+    cd /vagrant
     git clone git@github.com:liqd/adhocracy3.git
-    cd a3
+    ln -s /vagrant/adhocracy3 /home/vagrant (if you want to work from home folder)
+    cd adhocracy3
     git submodule update --init
 
 compile python 3 and PIL ::
