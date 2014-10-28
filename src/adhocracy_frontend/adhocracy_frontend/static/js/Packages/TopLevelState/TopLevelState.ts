@@ -18,11 +18,26 @@
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
 
+export class Provider {
+    public $get;
+
+    constructor() {
+        var self = this;
+
+        this.$get = ["adhEventHandlerClass", "$location", "$rootScope",
+            (adhEventHandlerClass, $location, $rootScope) => {
+                return new Service(self, adhEventHandlerClass, $location, $rootScope);
+            }];
+    }
+}
+
+
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
     private data : {[key : string] : string};
 
     constructor(
+        private provider : Provider,
         adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
         private $location : ng.ILocationService,
         private $rootScope : ng.IScope
@@ -203,7 +218,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEventHandler.moduleName
         ])
-        .service("adhTopLevelState", ["adhEventHandlerClass", "$location", "$rootScope", Service])
+        .provider("adhTopLevelState", Provider)
         .directive("adhMovingColumns", ["adhTopLevelState", movingColumns])
         .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch])
         .directive("adhSpaces", ["adhTopLevelState", spaces])

@@ -27,7 +27,7 @@ export var register = () => {
                     this.trigger = trigger;
                 };
 
-                adhTopLevelState = new AdhTopLevelState.Service(eventHandlerMockClass, locationMock, rootScopeMock);
+                adhTopLevelState = new AdhTopLevelState.Service(null, eventHandlerMockClass, locationMock, rootScopeMock);
             });
 
             it("dispatches calls to set() to eventHandler", () => {
