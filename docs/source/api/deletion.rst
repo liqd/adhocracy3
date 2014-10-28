@@ -98,6 +98,102 @@ Notes:
   here.
 * The HTTP DELETE command is not used since it would imply physically
   deleting a resource.
-* This proposal is about deletion of resources (JSON documents). Deletion
-  of uploaded assets (images, PDFs etc.) is outside the scope of this
-  proposal and will be dealt with (if needed) in the File Upload story.
+* This document is about deletion of resources (JSON documents). Deletion
+  of uploaded assets (images, PDFs etc.) is outside its current scope.
+
+
+A Censorship Example
+--------------------
+
+Lets put the above theory into practice by hiding (censoring) some content!
+
+First, lets import the needed stuff and start the Adhocracy testapp::
+
+    >>> from adhocracy_core.testing import god_header
+    >>> from webtest import TestApp
+    >>> app = getfixture('app')
+    >>> websocket = getfixture('websocket')
+    >>> testapp = TestApp(app)
+    >>> rest_url = 'http://localhost'
+
+Now, we can create and then hide some content, just for the fun of it::
+
+    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    ...        'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
+    >>> resp_data = testapp.post_json(rest_url + "/adhocracy", data,
+    ...                               headers=god_header)
+    >>> resp_data.status_code
+    200
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/Proposals")
+    >>> resp_data.status_code
+    200
+    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    ...         'data': {'adhocracy_core.sheets.metadata.IMetadata':
+    ...                      {'hidden': True}}}
+    >>> resp_data = testapp.put_json(rest_url + "/adhocracy/Proposals", data,
+    ...                              headers=god_header)
+    >>> resp_data.status_code
+    200
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/Proposals",
+    ...                         status=410).json
+
+FIXME Make the example work and adapt the remaining stuff.
+
+The authorization for 'delete' is restricted to admin roles, god, etc.
+Ordinary users will never be allowed to delete anything.  (For them,
+deletion will always be removal from a container.  The rest is garbage
+collection.)
+
+The backend should keep deleted objects, but never admit that they
+exist over the rest api.  If a new resource is created in the place of
+a deleted one, it must appear to the outside world as if there had
+never been a resource.
+
+One way to implement this is to store them as a dictionary of paths to
+json objects in a file with a timestamp.
+
+Rationale: Content may be required as evidence in legal disputes;
+users may be unhappy about illegitimate deletions and the site may
+wish to undo a deletion.
+
+Deletion of dependent objects
+-----------------------------
+
+Dependent resources are implicitly deleted.  For instance, the
+elements of a pool depend on the pool::
+
+    >> a = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    ...      'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
+    >> resp_data = testapp.post_json(rest_url + "/adhocracy", prop, headers=god_header)
+    >> resp_data.status_code
+    200
+    >> b = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
+    ...      'data': {'adhocracy_core.sheets.name.IName': {'name': 'kommunismus'}}}
+    >> resp_data = testapp.post_json(rest_url + "/adhocracy/Proposals", prop, headers=god_header)
+    >> resp_data.status_code
+    200
+    >> resp_data = testapp.delete(rest_url + "/adhocracy/Proposals", headers=god_header).json
+    >> resp_data.status_code
+    200
+    >> resp_data = testapp.get(rest_url + "/adhocracy/Proposals/kommunismus",
+    ...                        status=404).json
+
+FIXME: I don't know if its really a good idea to 'delete' all child
+resources. This is costly and may have unwanted side effects. (joka)
+
+FIXME Other open issues:
+
+* Deleting can cause many modifications in other resources that have
+  references/back references, but we claim that versionables are not modified.
+
+  One option to handle this might be to leave the other resources intact,
+  but responding with a special HTTP status code (e.g. 410 Gone) if the
+  frontend asks for a deleted resources. In this case, the frontend would have
+  to silently skip references pointing to such a "Gone" resource.
+
+* It's not yet clear whether DELETE will only be used for "censoring"
+  purposes (i.e. removal of illegitimate content) by admins, or also by normal
+  users (e.g. removal of accidentally / redundantly submitted or
+  obsolete content). In the latter case, the API could return the deleted
+  objects if asked for -- on the other hand, it would be good to have only
+  one DELETE operation that is simple to understand.
