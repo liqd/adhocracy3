@@ -178,6 +178,11 @@ export class Service {
         return this.area;
     }
 
+    public getTemplate() : string {
+        var area = this.getArea();
+        return area.template;
+    }
+
     public set(key : string, value) : boolean {
         if (this.get(key) !== value) {
             this.data[key] = value;
