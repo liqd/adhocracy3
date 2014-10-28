@@ -1,7 +1,7 @@
 SHELL=/bin/bash --login
-TSC=../../../../../bin/tsc
-TSLINT=../../../../../bin/tslint
-NODE=../../../../../bin/node
+TSC=tsc
+TSLINT=tslint
+NODE=node
 # (for more info on tsc, see http://www.typescriptlang.org/)
 FIX_TSC_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\((\d+),(\d+)\):(.*)/) { print "$$1:$$2:$$3:\n$$4\n\n"; } else { print "$$_\n"; }'
 # (this line makes tsc output work for IDEs that expect gcc error message syntax.)
@@ -43,7 +43,7 @@ warn_orphan_js:
 test: warn_orphan_js tslint compile_tests_node test_node
 
 tslint:
-	../../../../../bin/tslint_check_adhocracy | $(FIX_TSLINT_ERROR_FORMAT)
+	tslint_check_adhocracy | $(FIX_TSLINT_ERROR_FORMAT)
 
 tslint_fast:
 	@echo "\n\n"

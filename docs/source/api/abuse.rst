@@ -43,6 +43,8 @@ The 'remark' is optional, it may be omitted or empty.
 Censorship
 ----------
 
+FIXME Move this to deletion.rst and integrate with the stuff there.
+
 FIXME All remaining tests in this document are commented-out since the
 described functionality hasn't been implemented yet!
 

@@ -1,6 +1,3 @@
 [submodule "python/buildout.python"]
 	path = python/buildout.python
 	url = https://github.com/collective/buildout.python.git
-[submodule "src/substanced"]
-	path = src/substanced
-	url = https://github.com/Pylons/substanced.git

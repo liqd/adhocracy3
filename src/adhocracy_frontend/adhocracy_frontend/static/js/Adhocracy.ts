@@ -31,7 +31,6 @@ import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
 import AdhHttp = require("./Packages/Http/Http");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
-import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProposal = require("./Packages/Proposal/Proposal");
@@ -60,9 +59,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         window.document.body.className += " is-embedded";
     }
 
-    // FIXME: The functionality to set the locale is not yet done
-    config.locale = "de";
-
     var app = angular.module("adhocracy3SampleFrontend", [
         "monospaced.elastic",
         "pascalprecht.translate",
@@ -70,9 +66,9 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "ngAnimate",
         AdhComment.moduleName,
         AdhDocumentWorkbench.moduleName,
+        AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
-        AdhMercatorProposal.moduleName,
         AdhRoute.moduleName,
         AdhProposal.moduleName
     ]);
@@ -102,23 +98,8 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 templateUrl: "/static/js/templates/Register.html"
             })
             .when("/activate/:key", {
-                controller: ["adhUser", "adhTopLevelState", "adhDone", "$route", "$location", AdhUser.activateController],
+                controller: ["adhUser", "adhTopLevelState", "adhDone", "$location", AdhUser.activateController],
                 template: ""
-            })
-            .when("/mercator", {
-                template: "<adh-resource-wrapper>" +
-                    "<adh-mercator-proposal-create data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
-                    "</adh-mercator-proposal-create></adh-resource-wrapper>",
-                controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
-                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
-                }]
-            })
-            .when("/mercator-listing", {
-                template: "<adh-mercator-proposal-listing data-path=\"{{path}}\">" +
-                    "</adh-mercator-proposal-listing>",
-                controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
-                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
-                }]
             })
             .when("/activation_error", {
                 templateUrl: "/static/js/templates/ActivationError.html",
@@ -174,7 +155,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhHttp.register(angular, meta_api);
     AdhInject.register(angular);
     AdhListing.register(angular);
-    AdhMercatorProposal.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
     AdhProposal.register(angular);
