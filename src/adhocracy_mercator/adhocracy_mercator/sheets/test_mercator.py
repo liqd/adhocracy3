@@ -184,6 +184,24 @@ class TestOrganizationInfoSchema:
             inst.deserialize(cstruct)
         assert error.value.asdict() == {'status_other': 'Required'}
 
+    def test_deserialize_without_name(self, inst, cstruct_required):
+        from colander import Invalid
+        cstruct = cstruct_required
+        cstruct['status'] = 'planned_nonprofit'
+        cstruct['name'] = None
+        with raises(Invalid) as error:
+            inst.deserialize(cstruct)
+        assert error.value.asdict() == {'name': 'Required'}
+
+    def test_deserialize_without_country(self, inst, cstruct_required):
+        from colander import Invalid
+        cstruct = cstruct_required
+        cstruct['status'] = 'planned_nonprofit'
+        cstruct['country'] = None
+        with raises(Invalid) as error:
+            inst.deserialize(cstruct)
+        assert error.value.asdict() == {'country': 'Required'}
+
     def test_deserialize_with_status_and_description(self, inst,
                                                      cstruct_required):
         cstruct = cstruct_required
