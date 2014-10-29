@@ -52,7 +52,8 @@ export var resourceArea = (
         reverse: (data) => {
             var defaults = {
                 space: "content",
-                movingColumns: "is-show-show-hide"
+                movingColumns: "is-show-show-hide",
+                content2Url: ""
             };
 
             return {
