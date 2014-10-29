@@ -3,6 +3,7 @@ import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import ResourcesBase = require("../../ResourcesBase");
 
@@ -323,8 +324,40 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhInject.moduleName,
             AdhPreliminaryNames.moduleName,
-            AdhResourceWidgets.moduleName
+            AdhResourceWidgets.moduleName,
+            AdhTopLevelState.moduleName
         ])
+        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
+            adhTopLevelStateProvider
+                .when("mercator", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
+                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
+                    return {
+                        template: "<adh-resource-wrapper>" +
+                            "<adh-mercator-proposal-create data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
+                            "</adh-mercator-proposal-create></adh-resource-wrapper>"
+                    };
+                }])
+                .when("mercator-listing", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
+                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
+                    return {
+                        template: "<adh-mercator-proposal-listing data-path=\"{{path}}\">" +
+                            "</adh-mercator-proposal-listing>"
+                    };
+                }])
+                .when("mercator-detail", ["adhConfig", "$rootScope", (adhConfig, $rootScope) : AdhTopLevelState.IAreaInput => {
+                    // FIXME: this always shows proposal with title "title".  for testing only.
+                    $rootScope.path = adhConfig.rest_url + adhConfig.rest_platform_path + "title/";
+                    return {
+                        template:
+                            "<adh-resource-wrapper>" +
+                            "<adh-last-version data-item-path=\"{{path}}\">" +
+                            "<adh-mercator-proposal-detail-view data-ng-if=\"versionPath\" data-path=\"{{versionPath}}\">" +
+                            "</adh-mercator-proposal-detail-view>" +
+                            "</adh-last-version>" +
+                            "</adh-resource-wrapper>"
+                    };
+                }]);
+        }])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
                 var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, $q);

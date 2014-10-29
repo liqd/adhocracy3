@@ -2,6 +2,7 @@ import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
 import RIMercatorProposal = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposal");
@@ -74,6 +75,11 @@ export var moduleName = "adhResourceArea";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhHttp.moduleName
-        ]);
+            AdhHttp.moduleName,
+            AdhTopLevelState.moduleName
+        ])
+        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
+            adhTopLevelStateProvider
+                .when("r", ["adhHttp", "adhConfig", resourceArea]);
+        }]);
 };
