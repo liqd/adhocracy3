@@ -2,17 +2,19 @@
  * TopLevelState service for managing top level state.
  *
  * This service is used to interact with the general state of the
- * application.  In the UI, this state is represented in the moving
- * columns widget.  This state is also what should be encoded in the
- * URL.
+ * application.  It also takes care of reflecting this state in the
+ * URI by the means of areas.
  *
- * The state consists of the state of each column and the currently
- * focused column. Note that the "column" metaphor is derived from the
- * moving columns widget. This does not need to be represented by
- * actual columns in every implementation.
+ * An area consists of a routing function (which translates URI to
+ * state), a reverse routing function (which translates state to URI),
+ * and a template.
  *
- * Only focus and the state of content2 column are currently
- * implemented.
+ * The application can interact with this service via the functions
+ * get(), set(), and on().
+ *
+ * This service very much resembles ngRoute, especially in the way
+ * the areas are configured.  It differs from ngRoute in that it can
+ * change paths without a reload and in being more flexibel.
  */
 
 import _ = require("lodash");
@@ -84,8 +86,10 @@ export class Provider {
 
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
-    private data : {[key : string] : string};
     private area : IArea;
+
+    // NOTE: data and on could be replaced by a scope and $watch, respectively.
+    private data : {[key : string] : string};
 
     constructor(
         private provider : Provider,
