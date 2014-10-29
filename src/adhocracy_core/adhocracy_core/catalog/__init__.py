@@ -13,6 +13,7 @@ class Reference(IndexFactory):
 
 class AdhocracyCatalogFactory:
     tag = catalog.Keyword()
+    visibility = catalog.Keyword()  # visible / deleted / hidden
     rate = catalog.Field()
     reference = Reference()
 

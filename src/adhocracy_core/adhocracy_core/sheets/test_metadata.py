@@ -19,10 +19,13 @@ class TestResourceModifiedMetadataSubscriber:
         from adhocracy_core.sheets.metadata import resource_modified_metadata_subscriber
         return resource_modified_metadata_subscriber(event)
 
-    def test_with_metadata_isheet(self, context, registry, mock_sheet):
+    def test_with_metadata_isheet(self, context, registry, mock_sheet,
+                                  cornice_request):
         from datetime import datetime
         from adhocracy_core.sheets.metadata import IMetadata
-        event = testing.DummyResource(object=context, registry=registry)
+        event = testing.DummyResource(object=context,
+                                      registry=registry,
+                                      request=cornice_request)
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IMetadata)
         register_and_add_sheet(context, registry, mock_sheet)
 
@@ -48,9 +51,10 @@ class TestIMetadataSchema:
         inst = self._make_one()
         result = inst.serialize({})
         assert result['creation_date'] == null
+        assert result['creator'] == ''
         assert result['item_creation_date'] == null
         assert result['modification_date'] == null
-        assert result['creator'] == ''
+        assert result['modified_by'] == ''
         assert result['deleted'] == 'false'
         assert result['hidden'] == 'false'
 
@@ -84,6 +88,7 @@ class TestMetadataSheet:
 
 @fixture
 def integration(config):
+    config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.sheets.metadata')
 
