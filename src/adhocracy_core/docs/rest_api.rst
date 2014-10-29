@@ -267,7 +267,8 @@ add new details to it, the "request_body" sub-key returned for POST points
 to a array of stub views of allowed requests::
 
     >>> data_post_pool = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
-    ...                   'data': {'adhocracy_core.sheets.name.IName': {}}}
+    ...                   'data': {'adhocracy_core.sheets.metadata.IMetadata': {},
+    ...                            'adhocracy_core.sheets.name.IName': {}}}
     >>> data_post_pool in resp_data["POST"]["request_body"]
     True
 

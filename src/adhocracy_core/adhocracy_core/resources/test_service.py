@@ -15,6 +15,7 @@ def test_service_meta():
 
 @fixture
 def integration(config):
+    config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.registry')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.sheets.metadata')

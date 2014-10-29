@@ -529,6 +529,7 @@ class TestUsersRESTView:
         request.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
                                        creator=None,
                                        appstructs={},
+                                       request=request,
                                        )
         assert wanted == response
 
@@ -600,7 +601,8 @@ class TestItemRESTView:
         request.registry.content.create.assert_called_with(IResourceX.__identifier__, context,
                                        creator=None,
                                        appstructs={},
-                                       root_versions=[])
+                                       root_versions=[],
+                                       request=request)
         assert wanted == response
 
     def test_post_valid_item(self, request, context):
@@ -1022,6 +1024,7 @@ class TestValidateActivationPathUnitTest:
     @fixture
     def user_with_metadata(self, config):
         from adhocracy_core.sheets.metadata import IMetadata
+        config.include('adhocracy_core.catalog')
         config.include('adhocracy_core.registry')
         config.include('adhocracy_core.events')
         config.include('adhocracy_core.sheets.metadata')
