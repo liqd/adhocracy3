@@ -90,7 +90,7 @@ export var register = () => {
                 $httpMock = mkHttpMock(adhPreliminaryNames);
                 $timeoutMock = mkTimeoutMock();
                 adhMetaApiMock = mkAdhMetaApiMock();
-                adhConfigMock = {};
+                adhConfigMock = { rest_url: "" };
                 adhHttp = new AdhHttp.Service($httpMock, q, $timeoutMock, adhMetaApiMock, adhPreliminaryNames, adhConfigMock);
             });
 
