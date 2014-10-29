@@ -8,6 +8,7 @@ from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import AdhocracySchemaNode
 from adhocracy_core.schema import Email
 from adhocracy_core.schema import ContentType
+from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Interface
 from adhocracy_core.schema import Password
 from adhocracy_core.schema import Resource
@@ -61,6 +62,15 @@ def add_put_data_subschemas(node: colander.MappingSchema, kw: dict):
             continue
         subschema = sheet.meta.schema_class(name=name)
         node.add(subschema.bind(**kw))
+
+
+class BlockExplanationResponseSchema(colander.Schema):
+
+    """Data structure explaining a 410 Gone response."""
+
+    reason = SingleLine()
+    modified_by = Reference()
+    modification_date = DateTime()
 
 
 class PUTResourceRequestSchema(colander.Schema):

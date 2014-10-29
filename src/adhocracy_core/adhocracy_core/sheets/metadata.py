@@ -152,9 +152,7 @@ def view_blocked_by_metadata(resource: IResource,
 
 
 def _blocked_with_reason(resource: IResource) -> str:
-    """
-    Return the reason if a resource is blocked, None otherwise.
-    """
+    """Return the reason if a resource is blocked, None otherwise."""
     reason = None
     if is_deleted(resource):
         reason = 'deleted'
