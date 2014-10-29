@@ -176,6 +176,7 @@ def metadata_modified_subscriber(event):
     """Invoked after PUTting modified metadata fields."""
     is_deleted = event.new_appstruct['deleted']
     is_hidden = event.new_appstruct['hidden']
+    was_deleted = event.old_appstruct['deleted']
     was_hidden = event.old_appstruct['hidden']
 
     if was_hidden != is_hidden:
@@ -188,9 +189,23 @@ def metadata_modified_subscriber(event):
             raise_colander_style_error(IMetadata,
                                        'hidden',
                                        'Changing this field is not allowed')
+
     # Store hidden/deleted status in object for efficient access
     event.object.deleted = is_deleted
     event.object.hidden = is_hidden
+
+    if (was_hidden != is_hidden) or (was_deleted != is_deleted):
+        _reindex_resource_and_descendants(event.object)
+
+
+def _reindex_resource_and_descendants(resource: IResource):
+    system_catalog = find_catalog(resource, 'system')
+    adhocracy_catalog = find_catalog(resource, 'adhocracy')
+    path_index = system_catalog['path']
+    query = path_index.eq(resource_path(resource), include_origin=True)
+    resource_and_descendants = query.execute()
+    for res in resource_and_descendants:
+        adhocracy_catalog.reindex_resource(res)
 
 
 def includeme(config):

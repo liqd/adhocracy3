@@ -47,8 +47,6 @@ class FilteringPoolSheet(PoolSheet):
     """Resource sheet that allows filtering and aggregating pools."""
 
     def _get_reference_appstruct(self, params: dict={}) -> dict:
-        if not params or not self._custom_filtering_necessary(params):
-            return super()._get_reference_appstruct(params)
         depth = self._build_depth(params)
         ifaces = self._build_iface_filter(params)
         arbitraries = self._get_arbitrary_filters(params)
@@ -65,19 +63,12 @@ class FilteringPoolSheet(PoolSheet):
                                        )
         appstruct = {}
         if resolve_resources:
-            appstruct['elements'] = result.elements
+            appstruct['elements'] = list(result.elements)
         if self._count_matching_elements(params):
             appstruct['count'] = result.count
         if aggregate_filter:
             appstruct['aggregateby'] = result.aggregateby
         return appstruct
-
-    def _custom_filtering_necessary(self, params: dict) -> bool:
-        params_copy = params.copy()
-        return params_copy.pop('depth', '1') != '1' or\
-            params_copy.pop('elements', 'path') != 'path' or \
-            params_copy.pop('count', False) is not False or\
-            params_copy != {}
 
     def _get_arbitrary_filters(self, params: dict) -> dict:
         filter = filtering_pool_default_filter
@@ -96,6 +87,10 @@ class FilteringPoolSheet(PoolSheet):
         iface_filter = []
         append_if_not_none(iface_filter, params.get('content_type', None))
         append_if_not_none(iface_filter, params.get('sheet', None))
+        if not iface_filter:
+            # By default, filter by the target_isheet of elements
+            reftype = self._reference_nodes['elements'].reftype
+            iface_filter.append(reftype.getTaggedValue('target_isheet'))
         return iface_filter
 
     def _get_serialization_form(self, param) -> str:
@@ -136,6 +131,9 @@ class FilteringPoolSheet(PoolSheet):
                 query &= index.eq(isheet, isheet_field, value)
         identity = lambda x: x  # pragma: no branch
         resolver = None if resolve_resources else identity
+        # Only show visible elements (not hidden or deleted)
+        visibility_index = adhocracy_catalog['visibility']
+        query &= visibility_index.eq('visible')
         elements = query.execute(resolver=resolver)
         count = len(elements)
         aggregateby = {}
