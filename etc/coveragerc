@@ -2,7 +2,7 @@
 branch = True
 omit =
     *test*py
-    *bootstrap.py* 
+    *bootstrap.py*
     # indirectly tested via websocket fixture:
     src/adhocracy_core/adhocracy_core/websockets/start_ws_server.py
     # no unit test coverage
