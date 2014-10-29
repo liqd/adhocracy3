@@ -17,9 +17,9 @@ deleted resource by PUTting an update with *IMetadata { deleted: false
 5789): any sheet and fields not mentioned in the PUTted data structure are
 left unchanged.
 
-Anyone with the *canhide* permission (typically granted to the manager role)
-can *hide* a resource by PUTting an update with *IMetadata { hidden: true }*.
-Likewise they can un-hide a hidden resource by PUTting an update with
+Anyone with the *hide_resource* permission (typically granted to the manager
+role) can *hide* a resource by PUTting an update with *IMetadata { hidden:
+true }*. Likewise they can un-hide a hidden resource by PUTting an update with
 *IMetadata { hidden: false }*. Nobody else can change the value of the
 *hidden* field.
 
@@ -28,7 +28,7 @@ setting the initial value of these flags accordingly. However,
 the same permission restrictions apply. This might be useful for creating a
 *deleted* version as a successor of another version to mark the preceding
 version as obsolete. POSTing a resource with *IMetadata { hidden: true }*
-requires the *canhide* permission and, frankly, doesn't make any sense.
+requires the *hide_resource* permission and, frankly, doesn't make any sense.
 
 The effect of these flags is as follows:
 
@@ -46,7 +46,7 @@ The effect of these flags is as follows:
   *hidden*, resources will be found regardless of the value of their *hidden*
   flag, but only if they are not *deleted.* If its value is *all*, all
   resources will be found. Anyone can specify these flags and get the paths
-  of deleted and/or hidden resources. However, only those with *canhide*
+  of deleted and/or hidden resources. However, only those with *hide_resource*
   permission are ever able to view the contents of hidden resources.
   It's also possible to set *include=visible* to get only non-deleted and
   non-hidden resources, but it's not necessary since that is the default.
@@ -55,7 +55,7 @@ The effect of these flags is as follows:
   frontend can override this by adding the parameter
   *include=deleted|hidden|all* to the GET request, just as in search queries.
   Anybody can view deleted resources in this way, and managers (those with
-  *canhide* permission) can view hidden resources in these ways. Those
+  *hide_resource* permission) can view hidden resources in these ways. Those
   without this permission will still get a *410 Gone* if the resource is
   hidden.
 * The body of the *410 Gone* is a small JSON document that explains why the
@@ -109,6 +109,7 @@ Lets put the above theory into practice by hiding (censoring) some content!
 
 First, lets import the needed stuff and start the Adhocracy testapp::
 
+    >>> from pprint import pprint
     >>> from adhocracy_core.testing import god_header
     >>> from webtest import TestApp
     >>> app = getfixture('app')
@@ -116,84 +117,67 @@ First, lets import the needed stuff and start the Adhocracy testapp::
     >>> testapp = TestApp(app)
     >>> rest_url = 'http://localhost'
 
-Now, we can create and then hide some content, just for the fun of it::
+Lets create some content::
 
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
-    ...        'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
+    ...        'data': {'adhocracy_core.sheets.name.IName': {'name':  'GoodProposal'}}}
     >>> resp_data = testapp.post_json(rest_url + "/adhocracy", data,
     ...                               headers=god_header)
-    >>> resp_data.status_code
-    200
-    >>> resp_data = testapp.get(rest_url + "/adhocracy/Proposals")
-    >>> resp_data.status_code
-    200
+    >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
+    ...        'data': {'adhocracy_core.sheets.name.IName': {'name': 'BadProposal'}}}
+    >>> resp_data = testapp.post_json(rest_url + "/adhocracy", data,
+    ...                               headers=god_header)
+    >>> data = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
+    ...         'data': {'adhocracy_core.sheets.name.IName': {'name': 'kommunismus'}}}
+    >>> resp_data = testapp.post_json(rest_url + "/adhocracy/BadProposal",
+    ...                               data, headers=god_header)
+
+As expected, we can retrieve the BadProposal and its child::
+
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/BadProposal").json
+    >>> 'data' in resp_data
+    True
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/BadProposal/kommunismus").json
+    >>> 'data' in resp_data
+    True
+
+Both proposals show up in the pool::
+
+    >>> resp_data = testapp.get(rest_url + "/adhocracy").json
+    >>> pprint(sorted(resp_data['data']['adhocracy_core.sheets.pool.IPool']
+    ...                        ['elements']))
+    ['.../adhocracy/BadProposal/',
+     '.../adhocracy/GoodProposal/']
+
+Lets hide the bad proposal::
+
     >>> data = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
     ...         'data': {'adhocracy_core.sheets.metadata.IMetadata':
     ...                      {'hidden': True}}}
-    >>> resp_data = testapp.put_json(rest_url + "/adhocracy/Proposals", data,
+    >>> resp_data = testapp.put_json(rest_url + "/adhocracy/BadProposal", data,
     ...                              headers=god_header)
-    >>> resp_data.status_code
-    200
-    >>> resp_data = testapp.get(rest_url + "/adhocracy/Proposals",
+
+Now we get an error message when trying to retrieve the BadProposal::
+
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/BadProposal",
     ...                         status=410).json
+    >>> resp_data['reason']
+    'hidden'
+    >>> resp_data['modified_by']
+    '.../principals/users/0000000/'
+    >>> 'modification_date' in resp_data
+    True
 
-FIXME Make the example work and adapt the remaining stuff.
+Nested resources inherit the deleted/hidden flag from their ancestors. Hence
+the child of the BadProposal is now hidden too::
 
-The authorization for 'delete' is restricted to admin roles, god, etc.
-Ordinary users will never be allowed to delete anything.  (For them,
-deletion will always be removal from a container.  The rest is garbage
-collection.)
+    >>> resp_data = testapp.get(rest_url + "/adhocracy/BadProposal/kommunismus",
+    ...                        status=410).json
+    >>> resp_data['reason']
+    'hidden'
 
-The backend should keep deleted objects, but never admit that they
-exist over the rest api.  If a new resource is created in the place of
-a deleted one, it must appear to the outside world as if there had
-never been a resource.
+Only the GoodProposal is still visible in the pool::
 
-One way to implement this is to store them as a dictionary of paths to
-json objects in a file with a timestamp.
-
-Rationale: Content may be required as evidence in legal disputes;
-users may be unhappy about illegitimate deletions and the site may
-wish to undo a deletion.
-
-Deletion of dependent objects
------------------------------
-
-Dependent resources are implicitly deleted.  For instance, the
-elements of a pool depend on the pool::
-
-    >> a = {'content_type': 'adhocracy_core.resources.pool.IBasicPool',
-    ...      'data': {'adhocracy_core.sheets.name.IName': {'name': 'Proposals'}}}
-    >> resp_data = testapp.post_json(rest_url + "/adhocracy", prop, headers=god_header)
-    >> resp_data.status_code
-    200
-    >> b = {'content_type': 'adhocracy_core.resources.sample_proposal.IProposal',
-    ...      'data': {'adhocracy_core.sheets.name.IName': {'name': 'kommunismus'}}}
-    >> resp_data = testapp.post_json(rest_url + "/adhocracy/Proposals", prop, headers=god_header)
-    >> resp_data.status_code
-    200
-    >> resp_data = testapp.delete(rest_url + "/adhocracy/Proposals", headers=god_header).json
-    >> resp_data.status_code
-    200
-    >> resp_data = testapp.get(rest_url + "/adhocracy/Proposals/kommunismus",
-    ...                        status=404).json
-
-FIXME: I don't know if its really a good idea to 'delete' all child
-resources. This is costly and may have unwanted side effects. (joka)
-
-FIXME Other open issues:
-
-* Deleting can cause many modifications in other resources that have
-  references/back references, but we claim that versionables are not modified.
-
-  One option to handle this might be to leave the other resources intact,
-  but responding with a special HTTP status code (e.g. 410 Gone) if the
-  frontend asks for a deleted resources. In this case, the frontend would have
-  to silently skip references pointing to such a "Gone" resource.
-
-* It's not yet clear whether DELETE will only be used for "censoring"
-  purposes (i.e. removal of illegitimate content) by admins, or also by normal
-  users (e.g. removal of accidentally / redundantly submitted or
-  obsolete content). In the latter case, the API could return the deleted
-  objects if asked for -- on the other hand, it would be good to have only
-  one DELETE operation that is simple to understand.
+    >>> resp_data = testapp.get(rest_url + "/adhocracy").json
+    >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
+    ['.../adhocracy/GoodProposal/']
