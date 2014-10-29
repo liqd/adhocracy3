@@ -13,6 +13,7 @@ def includeme(config):
                           override_with='mercator:build/')
     add_frontend_route(config, 'mercator', 'mercator')
     add_frontend_route(config, 'mercator-listing', 'mercator-listing')
+    add_frontend_route(config, 'mercator-detail', 'mercator-detail')
 
 
 def main(global_config, **settings):

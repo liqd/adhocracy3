@@ -270,6 +270,19 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
 }
 
 
+export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
+    constructor(
+        adhConfig : AdhConfig.IService,
+        adhHttp : AdhHttp.Service<any>,
+        adhPreliminaryNames : AdhPreliminaryNames.Service,
+        $q : ng.IQService
+    ) {
+        super(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";
+    }
+}
+
+
 export var listing = (adhConfig : AdhConfig.IService) => {
     return {
         restrict: "E",
@@ -315,6 +328,11 @@ export var register = (angular) => {
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
                 var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+                return widget.createDirective();
+            }])
+        .directive("adhMercatorProposalDetailView", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
+                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
