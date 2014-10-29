@@ -10,64 +10,66 @@ import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUs
 import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 
 
-export var resourceArea = (
-    adhHttp : AdhHttp.Service<any>,
-    adhConfig : AdhConfig.IService
-) => {
-    return {
-        template: "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>",
-        route: (path, search) : ng.IPromise<{[key : string]: string}> => {
-            var resourceUrl = adhConfig.rest_url + path;
+export class ResourceArea implements AdhTopLevelState.IAreaInput {
+    public template : string = "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>";
 
-            return adhHttp.get(resourceUrl).then((resource) => {
-                var data = {};
+    constructor(
+        private adhHttp : AdhHttp.Service<any>,
+        private adhConfig : AdhConfig.IService
+    ) {}
 
-                switch (resource.content_type) {
-                    case RIBasicPool.content_type:
-                        data["space"] = "content";
-                        data["movingColumns"] = "is-show-show-hide";
-                        break;
-                    case RIMercatorProposal.content_type:
-                        data["space"] = "content";
-                        data["movingColumns"] = "is-show-show-hide";
-                        break;
-                    case RIUser.content_type:
-                        data["space"] = "user";
-                        data["movingColumns"] = "is-show-show-hide";
-                        break;
-                    case RIUsersService.content_type:
-                        data["space"] = "user";
-                        data["movingColumns"] = "is-show-show-hide";
-                        break;
-                    default:
-                        throw "404";
+    public route(path : string, search : {[key : string]: string}) : ng.IPromise<{[key : string]: string}> {
+        var resourceUrl = this.adhConfig.rest_url + path;
+
+        return this.adhHttp.get(resourceUrl).then((resource) => {
+            var data = {};
+
+            switch (resource.content_type) {
+                case RIBasicPool.content_type:
+                    data["space"] = "content";
+                    data["movingColumns"] = "is-show-show-hide";
+                    break;
+                case RIMercatorProposal.content_type:
+                    data["space"] = "content";
+                    data["movingColumns"] = "is-show-show-hide";
+                    break;
+                case RIUser.content_type:
+                    data["space"] = "user";
+                    data["movingColumns"] = "is-show-show-hide";
+                    break;
+                case RIUsersService.content_type:
+                    data["space"] = "user";
+                    data["movingColumns"] = "is-show-show-hide";
+                    break;
+                default:
+                    throw "404";
+            }
+            for (var key in search) {
+                if (search.hasOwnProperty(key)) {
+                    data[key] = search[key];
                 }
-                for (var key in search) {
-                    if (search.hasOwnProperty(key)) {
-                        data[key] = search[key];
-                    }
-                }
-                return data;
-            });
-        },
-        reverse: (data) => {
-            var defaults = {
-                space: "content",
-                movingColumns: "is-show-show-hide",
-                content2Url: ""
-            };
+            }
+            return data;
+        });
+    }
 
-            return {
-                path: "/adhocracy",
-                search: _.transform(data, (result, value, key) => {
-                    if (defaults.hasOwnProperty(key) && value !== defaults[key]) {
-                        result[key] = value;
-                    }
-                })
-            };
-        }
-    };
-};
+    public reverse(data : {[key : string]: string}) {
+        var defaults = {
+            space: "content",
+            movingColumns: "is-show-show-hide",
+            content2Url: ""
+        };
+
+        return {
+            path: "/adhocracy",
+            search: _.transform(data, (result, value : string, key : string) => {
+                if (defaults.hasOwnProperty(key) && value !== defaults[key]) {
+                    result[key] = value;
+                }
+            })
+        };
+    }
+}
 
 
 export var moduleName = "adhResourceArea";
@@ -80,6 +82,6 @@ export var register = (angular) => {
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
             adhTopLevelStateProvider
-                .when("r", ["adhHttp", "adhConfig", resourceArea]);
+                .when("r", ["adhHttp", "adhConfig", (adhHttp, adhConfig) => new ResourceArea(adhHttp, adhConfig)]);
         }]);
 };
