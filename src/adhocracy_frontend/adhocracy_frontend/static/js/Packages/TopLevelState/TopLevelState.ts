@@ -132,16 +132,16 @@ export class Service {
 
         var defaultRoute = (path, search) => {
             var data = _.clone(search);
-            data["path"] = path;
+            data["_path"] = path;
             return self.$q.when(data);
         };
 
         var defaultReverse = (data) => {
             var ret = {
-                path: data["path"],
+                path: data["_path"],
                 search: _.clone(data)
             };
-            delete ret.search["path"];
+            delete ret.search["_path"];
             return ret;
         };
 
