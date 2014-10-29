@@ -242,6 +242,7 @@ class TestResourceFactory:
 
         set_appstructs = dummy_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] is None
+        assert set_appstructs['modified_by'] is None
         today = datetime.utcnow().date()
         assert set_appstructs['creation_date'].date() == today
         assert set_appstructs['item_creation_date'] == set_appstructs['creation_date']
@@ -290,6 +291,7 @@ class TestResourceFactory:
 
         set_appstructs = dummy_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] == authenticated_user
+        assert set_appstructs['modified_by'] == authenticated_user
         userid = resource_path(authenticated_user)
         assert resource.__local_roles__ == {userid: ['role:creator']}
 
@@ -306,6 +308,7 @@ class TestResourceFactory:
 
         set_appstructs = dummy_sheet.set.call_args[0][0]
         assert set_appstructs['creator'] == created_user
+        assert set_appstructs['modified_by'] == created_user
         userid = resource_path(created_user)
         assert created_user.__local_roles__[userid] == ['role:creator']
 

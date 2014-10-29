@@ -199,6 +199,7 @@ class ResourceFactory:
         metadata = {'creator': creator,
                     'creation_date': now,
                     'item_creation_date': now,
+                    'modified_by': creator,
                     'modification_date': now,
                     }
         item = find_interface(resource, IItem)

@@ -183,7 +183,7 @@ def metadata_modified_subscriber(event):
             logger.warning('Ignoring request to change hidden status to %s '
                            'since we cannot check permissions',
                            is_hidden)
-        return
+            return
         if not event.request.has_permission('hide_resource', event.object):
             raise_colander_style_error(IMetadata,
                                        'hidden',
