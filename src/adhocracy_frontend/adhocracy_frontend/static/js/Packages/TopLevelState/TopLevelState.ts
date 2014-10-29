@@ -87,6 +87,7 @@ export class Provider {
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
     private area : IArea;
+    private blockTemplate : boolean;
 
     // NOTE: data and on could be replaced by a scope and $watch, respectively.
     private data : {[key : string] : string};
@@ -147,6 +148,7 @@ export class Service {
         var prefix : string = this.$location.path().split("/")[1];
 
         if (typeof this.area === "undefined" || prefix !== this.area.prefix) {
+            this.blockTemplate = true;
             var fn = this.provider.areas.hasOwnProperty(prefix) ? this.provider.areas[prefix] : this.provider.default;
             var areaInput : IAreaInput = this.$injector.invoke(fn);
             var area : IArea = {
@@ -172,8 +174,12 @@ export class Service {
     }
 
     public getTemplate() : string {
-        var area = this.getArea();
-        return area.template;
+        if (!this.blockTemplate) {
+            var area = this.getArea();
+            return area.template;
+        } else {
+            return "";
+        }
     }
 
     private fromLocation() : ng.IPromise<void> {
@@ -196,6 +202,8 @@ export class Service {
             // normalize location
             this.$location.replace();
             this.toLocation();
+
+            this.blockTemplate = false;
         });
     }
 
