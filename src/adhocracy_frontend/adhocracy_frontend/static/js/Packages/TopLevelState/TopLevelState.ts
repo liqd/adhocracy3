@@ -352,7 +352,9 @@ export var spaces = (
             topLevelState.on("space", (space : string) => {
                 movingColumns[scope.currentSpace] = topLevelState.get("movingColumns");
                 scope.currentSpace = space;
-                topLevelState.set("movingColumns", movingColumns[space]);
+                if (typeof movingColumns[space] !== "undefined") {
+                    topLevelState.set("movingColumns", movingColumns[space]);
+                }
             });
             scope.currentSpace = topLevelState.get("space");
         }
