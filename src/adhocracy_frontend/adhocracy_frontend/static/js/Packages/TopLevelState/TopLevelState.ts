@@ -249,6 +249,9 @@ export class Service {
 
     public on(key : string, fn) : void {
         this.eventHandler.on(key, fn);
+
+        // initially trigger callback
+        fn(this.get(key));
     }
 
     // FIXME: {set,get}CameFrom should be worked into the class
@@ -308,7 +311,6 @@ export var movingColumns = (
             });
 
             topLevelState.on("movingColumns", move);
-            move(topLevelState.get("movingColumns"));
         }
     };
 };
