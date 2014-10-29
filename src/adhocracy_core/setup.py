@@ -1,4 +1,4 @@
-"""adhocracy core setuptools config."""
+"""Adhocracy core backend package."""
 import os
 import sys
 
@@ -50,7 +50,7 @@ debug_requires = [
 
 setup(name='adhocracy_core',
       version='0.0',
-      description='adhocracy_core',
+      description='Adhocracy core backend package.',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
           "Programming Language :: Python",
@@ -77,6 +77,6 @@ setup(name='adhocracy_core',
       [console_scripts]
       start_ws_server = adhocracy_core.websockets.start_ws_server:main
       [pyramid.scaffold]
-      adhocracy_extension=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
+      adhocracy=adhocracy_core.scaffolds:AdhocracyExtensionTemplate
       """,
       )

@@ -9,6 +9,7 @@
 @import "third_party/normalize";
 @import "general/normalize";
 @import "general/variables";
+@import "general/util";
 
 @import "layout";
 
@@ -21,7 +22,6 @@
 @import "components/listing";
 @import "components/user_indicator";
 @import "components/comment";
-@import "components/mercator_proposal";
 
 // Debug (these should not be importet in productive setups
 @import "debug/placeholder";

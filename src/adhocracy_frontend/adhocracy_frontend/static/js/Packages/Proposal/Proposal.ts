@@ -393,8 +393,8 @@ export var register = (angular) => {
             ["adhHttp", "adhConfig", "adhProposal", (adhHttp, adhConfig, adhProposal) =>
                 new ProposalVersionNew().createDirective(adhHttp, adhConfig, adhProposal)])
         .directive("adhSectionVersionDetail",
-            ["adhConfig", "recursionHelper", (adhConfig, recursionHelper) =>
-                new SectionVersionDetail().createDirective(adhConfig, recursionHelper)])
+            ["adhConfig", "adhRecursionHelper", (adhConfig, adhRecursionHelper) =>
+                new SectionVersionDetail().createDirective(adhConfig, adhRecursionHelper)])
         .directive("adhParagraphVersionDetail",
             ["adhConfig", (adhConfig) => new ParagraphVersionDetail().createDirective(adhConfig)]);
 };

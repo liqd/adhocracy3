@@ -100,13 +100,15 @@ export var register = () => {
                     "onSetContent2Url",
                     "getMovingColumns",
                     "onMovingColumns",
-                    "movingColumns"
+                    "movingColumns",
+                    "getSpace"
                 ]);
                 topLevelStateMock.movingColumns = {
                     "0": AdhTopLevelState.ColumnState.HIDE,
                     "1": AdhTopLevelState.ColumnState.COLLAPSE,
                     "2": AdhTopLevelState.ColumnState.SHOW
                 };
+                topLevelStateMock.getSpace.and.returnValue("space");
 
                 directive = AdhTopLevelState.movingColumns(topLevelStateMock);
             });

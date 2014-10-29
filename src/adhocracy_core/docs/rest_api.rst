@@ -21,7 +21,6 @@ Start Adhocracy testapp::
 
     >>> from webtest import TestApp
     >>> app = getfixture('app')
-    >>> websocket = getfixture('websocket')
     >>> testapp = TestApp(app)
     >>> rest_url = 'http://localhost'
 

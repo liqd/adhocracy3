@@ -66,7 +66,14 @@ export class Service<Content extends ResourcesBase.Resource> {
     ) {}
 
     private formatUrl(path) {
-        if (path.lastIndexOf("/", 0) === 0 && typeof this.adhConfig.rest_url !== "undefined") {
+        if (!path) {
+            throw "empty path!";
+        }
+        if (typeof this.adhConfig.rest_url === "undefined") {
+            throw "no adhConfig.rest_url!";
+        }
+
+        if (path.lastIndexOf("/", 0) === 0) {
             return this.adhConfig.rest_url + path;
         } else {
             return path;
