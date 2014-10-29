@@ -218,15 +218,18 @@ class OrganizationInfoSchema(colander.MappingSchema):
         if status == 'other':
             if not value.get('status_other', None):
                 status_other = node['status_other']
-                raise colander.Invalid(status_other, msg='Required')
+                raise colander.Invalid(status_other,
+                                       msg='Required iff status == other')
         else:
             # FIXME: Allow multiple errors at the same time
             name = node['name']
             if not value.get('name', None):
-                raise colander.Invalid(name, msg='Required')
+                raise colander.Invalid(name,
+                                       msg='Required iff status != other')
             country = node['country']
             if not value.get('country', None):
-                raise colander.Invalid(country, msg='Required')
+                raise colander.Invalid(country,
+                                       msg='Required iff status != other')
 
 
 organizationinfo_meta = sheet_metadata_defaults._replace(
