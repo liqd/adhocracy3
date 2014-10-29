@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
 # [call this script from a3 root with ./bin/python3.4 as interpreter.]
+# FIXME: Doesn't work as requests is missing. Use a Python with requests
+# installed.
 
 import os
 import json
