@@ -2,81 +2,256 @@
  * TopLevelState service for managing top level state.
  *
  * This service is used to interact with the general state of the
- * application.  In the UI, this state is represented in the moving
- * columns widget.  This state is also what should be encoded in the
- * URL.
+ * application.  It also takes care of reflecting this state in the
+ * URI by the means of areas.
  *
- * The state consists of the state of each column and the currently
- * focused column. Note that the "column" metaphor is derived from the
- * moving columns widget. This does not need to be represented by
- * actual columns in every implementation.
+ * An area consists of a routing function (which translates URI to
+ * state), a reverse routing function (which translates state to URI),
+ * and a template.
  *
- * Only focus and the state of content2 column are currently
- * implemented.
+ * The application can interact with this service via the functions
+ * get(), set(), and on().
+ *
+ * This service very much resembles ngRoute, especially in the way
+ * the areas are configured.  It differs from ngRoute in that it can
+ * change paths without a reload and in being more flexibel.
  */
 
 import _ = require("lodash");
 
+import AdhConfig = require("../Config/Config");
 import AdhEventHandler = require("../EventHandler/EventHandler");
 
+var pkgLocation = "/TopLevelState";
 
-export class ColumnState {
-    static SHOW : string = "show";
-    static HIDE : string = "hide";
-    static COLLAPSE : string = "collapse";
+
+export interface IAreaInput {
+    route? : (path : string, search : {[key : string] : string}) => ng.IPromise<{[key : string] : string}>;
+    reverse? : (data : {[key : string] : string}) => {
+        path : string;
+        search : {[key : string] : string};
+    };
+    template? : string;
+    templateUrl? : string;
 }
+
+
+export interface IArea {
+    prefix : string;
+    route : (path : string, search : {[key : string] : string}) => ng.IPromise<{[key : string] : string}>;
+    reverse : (data : {[key : string] : string}) => {
+        path : string;
+        search : {[key : string] : string};
+    };
+    template : string;
+}
+
+
+export class Provider {
+    public areas : {[key : string]: any};
+    public default : any;
+    public $get;
+
+    constructor() {
+        var self = this;
+
+        this.areas = {};
+        this.default = () => {
+            return {
+                template: "<h1>404 Not Found</h1>"
+            };
+        };
+
+        this.$get = ["adhEventHandlerClass", "$location", "$rootScope", "$http", "$q", "$templateCache", "$injector",
+            (adhEventHandlerClass, $location, $rootScope, $http, $q, $templateCache, $injector) => {
+                return new Service(self, adhEventHandlerClass, $location, $rootScope, $http, $q, $templateCache, $injector);
+            }];
+    }
+
+    public when(prefix : string, factory : (...args : any[]) => IAreaInput);
+    public when(prefix : string, factory : any[]);
+    public when(prefix, factory) {
+        this.areas[prefix] = factory;
+        return this;
+    }
+
+    public otherwise(factory : (...args : any[]) => IAreaInput);
+    public otherwise(factory : any[]);
+    public otherwise(factory) {
+        this.default = factory;
+        return this;
+    }
+}
+
 
 export class Service {
     private eventHandler : AdhEventHandler.EventHandler;
-    private movingColumns : {
-        "0" : string;
-        "1" : string;
-        "2" : string;
-    };
-    private space : string;
+    private area : IArea;
+    private blockTemplate : boolean;
+
+    // NOTE: data and on could be replaced by a scope and $watch, respectively.
+    private data : {[key : string] : string};
 
     constructor(
+        private provider : Provider,
         adhEventHandlerClass : typeof AdhEventHandler.EventHandler,
         private $location : ng.ILocationService,
-        private $rootScope : ng.IScope
+        private $rootScope : ng.IScope,
+        private $http : ng.IHttpService,
+        private $q : ng.IQService,
+        private $templateCache : ng.ITemplateCacheService,
+        private $injector : ng.auto.IInjectorService
     ) {
-        var self = this;
+        var self : Service = this;
 
         this.eventHandler = new adhEventHandlerClass();
-        this.movingColumns = {
-            "0": ColumnState.HIDE,
-            "1": ColumnState.COLLAPSE,
-            "2": ColumnState.SHOW
-        };
-        this.space = "content";
+        this.data = {};
 
-        this.watchUrlParam("mc0", (state) => {
-            self.setMovingColumn("0", state);
-        });
-        this.watchUrlParam("mc1", (state) => {
-            self.setMovingColumn("1", state);
-        });
-        this.watchUrlParam("mc2", (state) => {
-            self.setMovingColumn("2", state);
+        this.$rootScope.$watch(() => self.$location.absUrl(), () => {
+            self.fromLocation();
         });
     }
 
-    private watchUrlParam(key, fn) {
+    private templateRequest(url) : ng.IPromise<string> {
+        // FIXME: in future versions of angular, this should be replaced by $templateRequest
+        var template = this.$templateCache.get(url);
+
+        if (typeof template === "undefined") {
+            return this.$http.get(url).then((response) => {
+                var template = response.data;
+                this.$templateCache.put(url, template);
+                return template;
+            });
+        } else {
+            return this.$q.when(template);
+        }
+    }
+
+    private getArea() : IArea {
         var self = this;
 
-        self.$rootScope.$watch(() => self.$location.search()[key], (n, o) => {
-            // to not break the back button, we do not directly push another history entry
-            self.$location.replace();
-            fn(n, o);
+        var defaultRoute = (path, search) => {
+            var data = _.clone(search);
+            data["_path"] = path;
+            return self.$q.when(data);
+        };
+
+        var defaultReverse = (data) => {
+            var ret = {
+                path: data["_path"],
+                search: _.clone(data)
+            };
+            delete ret.search["_path"];
+            return ret;
+        };
+
+        var prefix : string = this.$location.path().split("/")[1];
+
+        if (typeof this.area === "undefined" || prefix !== this.area.prefix) {
+            this.blockTemplate = true;
+            var fn = this.provider.areas.hasOwnProperty(prefix) ? this.provider.areas[prefix] : this.provider.default;
+            var areaInput : IAreaInput = this.$injector.invoke(fn);
+            var area : IArea = {
+                prefix: prefix,
+                route: typeof areaInput.route !== "undefined" ? areaInput.route : defaultRoute,
+                reverse: typeof areaInput.reverse !== "undefined" ? areaInput.reverse : defaultReverse,
+                template: ""
+            };
+
+            if (typeof areaInput.template !== "undefined") {
+                area.template = areaInput.template;
+            } else if (typeof areaInput.templateUrl !== "undefined") {
+                // NOTE: we do not wait for the template to be loaded
+                this.templateRequest(areaInput.templateUrl).then((template) => {
+                    area.template = template;
+                });
+            }
+
+            this.area = area;
+        }
+
+        return this.area;
+    }
+
+    public getTemplate() : string {
+        if (!this.blockTemplate) {
+            var area = this.getArea();
+            return area.template;
+        } else {
+            return "";
+        }
+    }
+
+    private fromLocation() : ng.IPromise<void> {
+        var area = this.getArea();
+        var path = this.$location.path().replace(/\/[^/]*/, "");
+        var search = this.$location.search();
+
+        return area.route(path, search).then((data) => {
+            for (var key in this.data) {
+                if (!data.hasOwnProperty(key)) {
+                    delete this.data[key];
+                }
+            }
+            for (var key2 in data) {
+                if (data.hasOwnProperty(key2)) {
+                    this._set(key2, data[key2]);
+                }
+            }
+
+            // normalize location
+            this.$location.replace();
+            this.toLocation();
+
+            this.blockTemplate = false;
         });
     }
 
-    public setContent2Url(url : string) : void {
-        this.eventHandler.trigger("setContent2Url", url);
+    private toLocation() : void {
+        var area = this.getArea();
+        var search = this.$location.search();
+        var ret = area.reverse(this.data);
+
+        this.$location.path("/" + area.prefix + ret.path);
+
+        for (var key in search) {
+            if (search.hasOwnProperty(key)) {
+                this.$location.search(key, ret.search[key]);
+            }
+        }
+        for (var key2 in ret.search) {
+            if (ret.search.hasOwnProperty(key2)) {
+                this.$location.search(key2, ret.search[key2]);
+            }
+        }
     }
 
-    public onSetContent2Url(fn : (url : string) => void) : void {
-        this.eventHandler.on("setContent2Url", fn);
+    private _set(key : string, value) : boolean {
+        if (this.get(key) !== value) {
+            this.data[key] = value;
+            this.eventHandler.trigger(key, value);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public set(key : string, value) : void {
+        var updated : boolean = this._set(key, value);
+        if (updated) {
+            this.toLocation();
+        }
+    }
+
+    public get(key : string) {
+        return this.data[key];
+    }
+
+    public on(key : string, fn) : void {
+        this.eventHandler.on(key, fn);
+
+        // initially trigger callback
+        fn(this.get(key));
     }
 
     // FIXME: {set,get}CameFrom should be worked into the class
@@ -111,82 +286,31 @@ export class Service {
             this.$location.url(_default);
         }
     }
-
-    public setMovingColumn(index : string, state : string) : void {
-        var defaultState = ColumnState.SHOW;
-
-        if (typeof state === "undefined") {
-            state = defaultState;
-        }
-
-        if (state === defaultState) {
-            this.$location.search("mc" + index, undefined);
-        } else {
-            this.$location.search("mc" + index, state);
-        }
-
-        this.movingColumns[index] = state;
-        this.eventHandler.trigger("setMovingColumns", this.movingColumns);
-    }
-
-    public onMovingColumns(fn : (state) => void) : void {
-        this.eventHandler.on("setMovingColumns", fn);
-    }
-
-    public getMovingColumns() {
-        return this.movingColumns;
-    }
-
-    public setSpace(space : string) : void {
-        this.space = space;
-        this.eventHandler.trigger("setSpace", space);
-    }
-
-    public onSetSpace(fn : (space : string) => void) : void {
-        this.eventHandler.on("setSpace", fn);
-    }
-
-    public getSpace() : string {
-        return this.space;
-    }
 }
+
 
 export var movingColumns = (
     topLevelState : Service
 ) => {
-    var cls;
-
-    var stateToClass = (state) : string => {
-        return "is-" + state["0"] + "-" + state["1"] + "-" + state["2"];
-    };
-
     return {
-        link: (scope, element) => {
-            var space = topLevelState.getSpace();
+        link: (scope, element, attrs) => {
+            var cls;
 
-            var move = (state) => {
-                if (topLevelState.getSpace() !== space) {
-                    return;
-                };
-                if (typeof state === "undefined") {
-                    return;
-                };
-
-                var newCls = stateToClass(state);
-
-                if (newCls !== cls) {
-                    element.removeClass(cls);
-                    element.addClass(newCls);
-                    cls = newCls;
+            var move = (newCls) => {
+                if (topLevelState.get("space") === attrs["space"]) {
+                    if (newCls !== cls) {
+                        element.removeClass(cls);
+                        element.addClass(newCls);
+                        cls = newCls;
+                    }
                 }
             };
 
-            topLevelState.onSetContent2Url((url : string) => {
+            topLevelState.on("content2Url", (url : string) => {
                 scope.content2Url = url;
             });
 
-            topLevelState.onMovingColumns(move);
-            move(topLevelState.getMovingColumns());
+            topLevelState.on("movingColumns", move);
         }
     };
 };
@@ -201,16 +325,12 @@ export var adhFocusSwitch = (topLevelState : Service) => {
         template: "<a href=\"\" ng-click=\"switchFocus()\">X</a>",
         link: (scope) => {
             scope.switchFocus = () => {
-                var currentState = topLevelState.getMovingColumns();
+                var currentState = topLevelState.get("movingColumns");
 
-                if (currentState["0"] === ColumnState.SHOW) {
-                    topLevelState.setMovingColumn("0", ColumnState.COLLAPSE);
-                    topLevelState.setMovingColumn("1", ColumnState.SHOW);
-                    topLevelState.setMovingColumn("2", ColumnState.SHOW);
+                if (currentState.split("-")[1] === "show") {
+                    topLevelState.set("movingColumns", "is-collapse-show-show");
                 } else {
-                    topLevelState.setMovingColumn("0", ColumnState.SHOW);
-                    topLevelState.setMovingColumn("1", ColumnState.SHOW);
-                    topLevelState.setMovingColumn("2", ColumnState.HIDE);
+                    topLevelState.set("movingColumns", "is-show-show-hide");
                 }
             };
         }
@@ -227,16 +347,16 @@ export var spaces = (
         template: "<adh-inject></adh-inject>",
         link: (scope) => {
             // FIXME: also save content2Url
+            // IDEA: getAll/setAll on TLS (getAll needs to clone), maybe also clear
             var movingColumns = {};
-            topLevelState.onSetSpace((space : string) => {
-                movingColumns[scope.currentSpace] = _.clone(topLevelState.getMovingColumns());
+            topLevelState.on("space", (space : string) => {
+                movingColumns[scope.currentSpace] = topLevelState.get("movingColumns");
                 scope.currentSpace = space;
-
-                _.forOwn(movingColumns[space], (value, key) => {
-                    topLevelState.setMovingColumn(key, value);
-                });
+                if (typeof movingColumns[space] !== "undefined") {
+                    topLevelState.set("movingColumns", movingColumns[space]);
+                }
             });
-            scope.currentSpace = topLevelState.getSpace();
+            scope.currentSpace = topLevelState.get("space");
         }
     };
 };
@@ -251,8 +371,30 @@ export var spaceSwitch = (
             "<a href=\"\" data-ng-click=\"setSpace('user')\">User</a>",
         link: (scope) => {
             scope.setSpace = (space : string) => {
-                topLevelState.setSpace(space);
+                topLevelState.set("space", space);
             };
+        }
+    };
+};
+
+
+export var pageWrapperDirective = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        transclude: true,
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/templates/" + "Wrapper.html"
+    };
+};
+
+
+export var viewFactory = (adhTopLevelState : Service, $compile : ng.ICompileService) => {
+    return {
+        restrict: "E",
+        link: (scope, element) => {
+            scope.$watch(() => adhTopLevelState.getTemplate(), (template) => {
+                element.html(template);
+                $compile(element.contents())(scope);
+            });
         }
     };
 };
@@ -265,9 +407,11 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhEventHandler.moduleName
         ])
-        .service("adhTopLevelState", ["adhEventHandlerClass", "$location", "$rootScope", Service])
+        .provider("adhTopLevelState", Provider)
+        .directive("adhPageWrapper", ["adhConfig", pageWrapperDirective])
         .directive("adhMovingColumns", ["adhTopLevelState", movingColumns])
         .directive("adhFocusSwitch", ["adhTopLevelState", adhFocusSwitch])
         .directive("adhSpaces", ["adhTopLevelState", spaces])
-        .directive("adhSpaceSwitch", ["adhTopLevelState", spaceSwitch]);
+        .directive("adhSpaceSwitch", ["adhTopLevelState", spaceSwitch])
+        .directive("adhView", ["adhTopLevelState", "$compile", viewFactory]);
 };

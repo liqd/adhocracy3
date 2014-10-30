@@ -6,11 +6,6 @@
 /// <reference path="./_all.d.ts"/>
 
 import angular = require("angular");
-import angularRoute = require("angularRoute");  if (angularRoute) { ; };
-// (since angularRoute does not export any objects or types we would
-// want to use, the extra mention of the module name is needed to keep
-// tsc from purging this import entirely.  which would have undesired
-// runtime effects.)
 
 import angularAnimate = require("angularAnimate");  if (angularAnimate) { ; };
 import angularTranslate = require("angularTranslate");  if (angularTranslate) { ; };
@@ -36,8 +31,8 @@ import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNam
 import AdhProposal = require("./Packages/Proposal/Proposal");
 import AdhRate = require("./Packages/Rate/Rate");
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
+import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
-import AdhRoute = require("./Packages/Route/Route");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhUser = require("./Packages/User/User");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
@@ -62,65 +57,69 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     var app = angular.module("adhocracy3SampleFrontend", [
         "monospaced.elastic",
         "pascalprecht.translate",
-        "ngRoute",
         "ngAnimate",
         AdhComment.moduleName,
         AdhDocumentWorkbench.moduleName,
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
-        AdhRoute.moduleName,
+        AdhResourceArea.moduleName,
         AdhProposal.moduleName
     ]);
 
-    app.config(["$translateProvider", "$routeProvider", "$locationProvider", (
+    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", (
+        adhTopLevelStateProvider : AdhTopLevelState.Provider,
         $translateProvider,
-        $routeProvider,
         $locationProvider
     ) => {
-        $routeProvider
-            .when("/", {
-                template: "",
-                controller: ["adhConfig", "$location", (adhConfig, $location) => {
-                    $location.replace();
-                    $location.path("/r" + adhConfig.rest_platform_path);
-                }]
+        adhTopLevelStateProvider
+            .when("", ["$location", ($location) : AdhTopLevelState.IAreaInput => {
+                $location.replace();
+                $location.path("/r/adhocracy/");
+                return {
+                    template: ""
+                };
+            }])
+            .when("login", () : AdhTopLevelState.IAreaInput => {
+                return {
+                    templateUrl: "/static/js/templates/Login.html"
+                };
             })
-            .when("/r/:path*", {
-                controller: ["adhHttp", "adhConfig", "adhTopLevelState", "$routeParams", "$scope", AdhRoute.resourceRouter],
-                templateUrl: "/static/js/templates/Wrapper.html",
-                reloadOnSearch: false
+            .when("register", () : AdhTopLevelState.IAreaInput => {
+                return {
+                    templateUrl: "/static/js/templates/Register.html"
+                };
             })
-            .when("/login", {
-                templateUrl: "/static/js/templates/Login.html"
-            })
-            .when("/register", {
-                templateUrl: "/static/js/templates/Register.html"
-            })
-            .when("/activate/:key", {
-                controller: ["adhUser", "adhTopLevelState", "adhDone", "$location", AdhUser.activateController],
-                template: ""
-            })
-            .when("/activation_error", {
-                templateUrl: "/static/js/templates/ActivationError.html",
-                controller: ["adhConfig", "$scope", (adhConfig, $scope) => {
-                    $scope.translationData = {
-                        supportEmail: adhConfig.support_email
+            .when("activate", ["adhUser", "adhTopLevelState", "adhDone", "$location",
+                (adhUser, adhTopLevelState, adhDone, $location) : AdhTopLevelState.IAreaInput => {
+                    AdhUser.activateController(adhUser, adhTopLevelState, adhDone, $location);
+                    return {
+                        template: ""
                     };
-                }]
-            })
-            .when("/embed/:widget", {
-                template: "<adh-embed></adh-embed>",
-                controller: ["$translate", "$route", ($translate, $route : ng.route.IRouteService) => {
-                    var params = $route.current.params;
-                    if (params.hasOwnProperty("locale")) {
-                        $translate.use(params.locale);
-                    }
-                }]
-            })
-            .otherwise({
-                // FIXME: proper error template
-                template: "<h1>404 - not Found</h1>"
+                }
+            ])
+            .when("activation_error", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
+                $scope.translationData = {
+                    supportEmail: adhConfig.support_email
+                };
+                return {
+                    templateUrl: "/static/js/templates/ActivationError.html"
+                };
+            }])
+            .when("embed", ["$translate", "$location", ($translate, $location : ng.ILocationService) : AdhTopLevelState.IAreaInput => {
+                var params = $location.search();
+                if (params.hasOwnProperty("locale")) {
+                    $translate.use(params.locale);
+                }
+                return {
+                    template: "<adh-embed></adh-embed>"
+                };
+            }])
+            .when("r", ["adhHttp", "adhConfig", AdhResourceArea.resourceArea])
+            .otherwise(() : AdhTopLevelState.IAreaInput => {
+                return {
+                    template: "<adh-page-wrapper><h1>404 - Not Found</h1></adh-page-wrapper>"
+                };
             });
 
         // Make sure HTML5 history API works.  (If support for older
@@ -160,8 +159,8 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhProposal.register(angular);
     AdhRate.register(angular);
     AdhRecursionHelper.register(angular);
+    AdhResourceArea.register(angular);
     AdhResourceWidgets.register(angular);
-    AdhRoute.register(angular);
     AdhTopLevelState.register(angular);
     AdhUser.register(angular);
     AdhWebSocket.register(angular);
