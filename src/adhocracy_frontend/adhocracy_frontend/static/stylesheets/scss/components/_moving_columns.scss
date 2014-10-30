@@ -1,3 +1,5 @@
+$moving-column-menu-height: 3em;
+
 /*doc
 ---
 title: Moving Columns
@@ -7,8 +9,8 @@ category: Layout
 
 This widget represents a major design concept in Adhocracy 3.
 It contains a list of columns which may slide to either side to reveal
-new columns with additional functionality. Each column can be shown, collapse
-or hide completely.
+new columns with additional functionality. Each column can be shown, collapsed
+or hidden completely.
 
 States:
 
@@ -22,28 +24,22 @@ States:
 
 ```html_example
 <div class="moving-columns" style="height: 10em; position: relative;">
-    <div class="moving-column-structure">structure column</div>
-    <div class="moving-column-content">content column</div>
-    <div class="moving-column-content2">secondary-content-column</div>
+    <div class="moving-column moving-column-structure">
+        <div class="placeholder moving-column-menu">menu</div>
+        <div class="placeholder moving-column-body">structure column</div>
+    </div>
+    <div class="moving-column moving-column-content">
+        <div class="placeholder moving-column-menu">menu</div>
+        <div class="placeholder moving-column-body">content column</div>
+    </div>
+    <div class="moving-column moving-column-content2">
+        <div class="placeholder moving-column-menu">menu</div>
+        <div class="placeholder moving-column-body">secondary-content-column</div>
+    </div>
 </div>
 <a onclick="$('.moving-columns').toggleClass('is-collapse-show-show')">click me</a>
 ```
 */
-
-.moving-column-structure,
-.moving-column-content,
-.moving-column-content2 {
-    // layout
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    overflow-y: auto;
-    @include transition(width 0.5s, right 0.5s);
-
-    // look
-    border-right: 1px solid $color-structure-border;
-    padding: 0.5em;
-}
 
 @mixin moving-column($from, $to, $gutter: 0, $total: 12) {
     $column-width: (100% + $gutter) / $total;
@@ -164,4 +160,81 @@ States:
             @include moving-column(11, 12);
         }
     }
+}
+
+/*doc
+---
+title: Moving Column
+name: moving-column
+parent: moving-columns
+---
+
+States:
+
+-   `is-show` (*default*)
+-   `is-hidden`
+-   `is-collapsed`
+
+Each moving column has a menu. The menu may contain some arbitrary control
+elements.  Many columns do also have control elements to close (hide) or
+collapse the column.
+
+The menu is fixed to the top of the column.
+
+The menu should always have the same state as its columns.
+*/
+.moving-column {
+    // layout
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    @include transition(width 0.5s, right 0.5s);
+
+    // look
+    border-right: 1px solid $color-structure-border;
+}
+
+.moving-column-body {
+    // layout
+    position: absolute;
+    top: $moving-column-menu-height;
+    bottom: 0;
+    width: 100%;
+    overflow-y: auto;
+
+    // look
+    padding: 0.5em;
+}
+
+/*doc
+---
+title: Moving Column Menu
+name: moving-column-menu
+parent: moving-columns
+---
+
+States:
+
+-   `is-show` (*default*)
+-   `is-hidden`
+-   `is-collapsed`
+
+**Warning**: This widget currently has a fixed height.
+
+```html_example
+<div class="moving-column-menu">
+    <span class="placeholder">icon</span>
+    <span class="placeholder">button</span>
+    <span class="placeholder">button</span>
+    <span class="placeholder">button</span>
+    <span class="placeholder">button</span>
+    <span class="placeholder">icon</span>
+    <span class="placeholder">icon</span>
+</div>
+```
+*/
+.moving-column-menu {
+    background: $color-prime-normal;
+    padding: 0.5em;
+    line-height: $moving-column-menu-height / 1em - 1;
 }
