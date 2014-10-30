@@ -10,10 +10,21 @@ import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUs
 import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 
 
+export class Provider implements ng.IServiceProvider {
+    public $get;
+
+    constructor() {
+        var self = this;
+        this.$get = ["adhHttp", "adhConfig", (adhHttp, adhConfig) => new Service(self, adhHttp, adhConfig)];
+    }
+}
+
+
 export class Service implements AdhTopLevelState.IAreaInput {
     public template : string = "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>";
 
     constructor(
+        private provider : Provider,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService
     ) {}
@@ -84,5 +95,5 @@ export var register = (angular) => {
             adhTopLevelStateProvider
                 .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
         }])
-        .service("adhResourceArea", ["adhHttp", "adhConfig", Service]);
+        .provider("adhResourceArea", Provider);
 };
