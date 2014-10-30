@@ -10,7 +10,7 @@ import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUs
 import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 
 
-export class ResourceArea implements AdhTopLevelState.IAreaInput {
+export class Service implements AdhTopLevelState.IAreaInput {
     public template : string = "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>";
 
     constructor(
@@ -82,6 +82,7 @@ export var register = (angular) => {
         ])
         .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
             adhTopLevelStateProvider
-                .when("r", ["adhHttp", "adhConfig", (adhHttp, adhConfig) => new ResourceArea(adhHttp, adhConfig)]);
-        }]);
+                .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
+        }])
+        .service("adhResourceArea", ["adhHttp", "adhConfig", Service]);
 };
