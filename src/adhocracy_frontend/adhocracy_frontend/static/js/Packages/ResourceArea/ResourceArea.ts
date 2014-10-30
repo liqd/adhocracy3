@@ -40,7 +40,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         private adhConfig : AdhConfig.IService
     ) {}
 
-    public route(path : string, search : {[key : string]: string}) : ng.IPromise<{[key : string]: string}> {
+    public route(path : string, search : Dict) : ng.IPromise<Dict> {
         var self : Service = this;
         var resourceUrl = this.adhConfig.rest_url + path;
 
@@ -56,7 +56,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         });
     }
 
-    public reverse(data : {[key : string]: string}) {
+    public reverse(data : Dict) {
         var defaults = {
             space: "content",
             movingColumns: "is-show-show-hide",
