@@ -33,21 +33,6 @@ export var location2template = ($location : ng.ILocationService) => {
     return AdhUtil.formatString("<adh-{0} {1}></adh-{0}>", _.escape(widget), attrs.join(" "));
 };
 
-export var factory = ($compile : ng.ICompileService, $location : ng.ILocationService) => {
-    return {
-        restrict: "E",
-        scope: {},
-        link: (scope, element) => {
-            var template = "<header class=\"l-header main-header\">" +
-                "<adh-user-indicator></adh-user-indicator>" +
-                "</header>";
-            template += location2template($location);
-            element.html(template);
-            $compile(element.contents())(scope);
-        }
-    };
-};
-
 
 export var moduleName = "adhEmbed";
 
@@ -63,10 +48,13 @@ export var register = (angular) => {
                     if (params.hasOwnProperty("locale")) {
                         $translate.use(params.locale);
                     }
+
                     return {
-                        template: "<adh-embed></adh-embed>"
+                        template:  "<header class=\"l-header main-header\">" +
+                        "<adh-user-indicator></adh-user-indicator>" +
+                        "</header>" +
+                        location2template($location)
                     };
                 }]);
-        }])
-        .directive("adhEmbed", ["$compile", "$location", factory]);
+        }]);
 };
