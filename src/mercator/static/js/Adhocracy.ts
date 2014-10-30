@@ -123,6 +123,19 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                         "</adh-mercator-proposal-listing>"
                 };
             }])
+            .when("mercator-detail", ["adhConfig", "$rootScope", (adhConfig, $rootScope) : AdhTopLevelState.IAreaInput => {
+                // FIXME: this always shows proposal with title "title".  for testing only.
+                $rootScope.path = adhConfig.rest_url + adhConfig.rest_platform_path + "title/";
+                return {
+                    template:
+                        "<adh-resource-wrapper>" +
+                        "<adh-last-version data-item-path=\"{{path}}\">" +
+                        "<adh-mercator-proposal-detail-view data-ng-if=\"versionPath\" data-path=\"{{versionPath}}\">" +
+                        "</adh-mercator-proposal-detail-view>" +
+                        "</adh-last-version>" +
+                        "</adh-resource-wrapper>"
+                };
+            }])
             .when("embed", ["$translate", "$location", ($translate, $location : ng.ILocationService) : AdhTopLevelState.IAreaInput => {
                 var params = $location.search();
                 if (params.hasOwnProperty("locale")) {
