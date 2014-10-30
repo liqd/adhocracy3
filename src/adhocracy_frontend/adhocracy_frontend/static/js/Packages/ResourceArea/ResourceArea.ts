@@ -10,12 +10,28 @@ import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUs
 import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 
 
+export interface Dict {
+    [key : string]: string;
+}
+
+
 export class Provider implements ng.IServiceProvider {
     public $get;
+    private data : {[resourceType : string]: Dict};
 
     constructor() {
         var self = this;
+        this.data = {};
         this.$get = ["adhHttp", "adhConfig", (adhHttp, adhConfig) => new Service(self, adhHttp, adhConfig)];
+    }
+
+    public when(resourceType : string, defaults : Dict) : Provider {
+        this.data[resourceType] = defaults;
+        return this;
+    }
+
+    public get(resourceType : string) : Dict {
+        return _.clone(this.data[resourceType]);
     }
 }
 
