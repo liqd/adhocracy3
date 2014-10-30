@@ -2,6 +2,7 @@
 
 import _ = require("lodash");
 
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
 
 /**
@@ -52,6 +53,20 @@ export var moduleName = "adhEmbed";
 
 export var register = (angular) => {
     angular
-        .module(moduleName, [])
+        .module(moduleName, [
+            AdhTopLevelState.moduleName
+        ])
+        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
+            adhTopLevelStateProvider
+                .when("embed", ["$translate", "$location", ($translate, $location : ng.ILocationService) : AdhTopLevelState.IAreaInput => {
+                    var params = $location.search();
+                    if (params.hasOwnProperty("locale")) {
+                        $translate.use(params.locale);
+                    }
+                    return {
+                        template: "<adh-embed></adh-embed>"
+                    };
+                }]);
+        }])
         .directive("adhEmbed", ["$compile", "$location", factory]);
 };
