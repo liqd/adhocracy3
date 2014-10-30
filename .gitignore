@@ -47,7 +47,7 @@ etc/tslint.json
 /src/sphinx-autodoc-annotation/
 /source_env
 /.vagrant
-/.ropeproject/
+.ropeproject/
 /.cache/
 /.coverage
 /htmlcov/

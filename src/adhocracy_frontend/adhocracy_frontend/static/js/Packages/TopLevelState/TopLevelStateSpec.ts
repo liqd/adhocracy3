@@ -1,6 +1,9 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
+import q = require("q");
+
 import AdhTopLevelState = require("./TopLevelState");
+
 
 export var register = () => {
 
@@ -27,18 +30,21 @@ export var register = () => {
                     this.trigger = trigger;
                 };
 
-                adhTopLevelState = new AdhTopLevelState.Service(eventHandlerMockClass, locationMock, rootScopeMock);
+                adhTopLevelState = new AdhTopLevelState.Service(
+                    null, eventHandlerMockClass, locationMock, rootScopeMock, null, q, null, null);
+
+                spyOn(adhTopLevelState, "toLocation");
             });
 
-            it("dispatches calls to setContent2Url to eventHandler", () => {
-                adhTopLevelState.setContent2Url("some/path");
-                expect(trigger).toHaveBeenCalledWith("setContent2Url", "some/path");
+            it("dispatches calls to set() to eventHandler", () => {
+                adhTopLevelState.set("content2Url", "some/path");
+                expect(trigger).toHaveBeenCalledWith("content2Url", "some/path");
             });
 
-            it("dispatches calls to onSetContent2Url to eventHandler", () => {
+            it("dispatches calls to on() to eventHandler", () => {
                 var callback = (url) => undefined;
-                adhTopLevelState.onSetContent2Url(callback);
-                expect(on).toHaveBeenCalledWith("setContent2Url", callback);
+                adhTopLevelState.on("content2Url", callback);
+                expect(on).toHaveBeenCalledWith("content2Url", callback);
             });
 
             describe("cameFrom", () => {
@@ -96,96 +102,67 @@ export var register = () => {
             var topLevelStateMock;
 
             beforeEach(() => {
-                topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock", [
-                    "onSetContent2Url",
-                    "getMovingColumns",
-                    "onMovingColumns",
-                    "movingColumns",
-                    "getSpace"
-                ]);
-                topLevelStateMock.movingColumns = {
-                    "0": AdhTopLevelState.ColumnState.HIDE,
-                    "1": AdhTopLevelState.ColumnState.COLLAPSE,
-                    "2": AdhTopLevelState.ColumnState.SHOW
-                };
-                topLevelStateMock.getSpace.and.returnValue("space");
-
+                topLevelStateMock = <any>jasmine.createSpyObj("topLevelStateMock", ["on", "get"]);
                 directive = AdhTopLevelState.movingColumns(topLevelStateMock);
+                topLevelStateMock.get.and.callFake((key) => {
+                    return {
+                        space: "space",
+                        movingColumns: "initial"
+                    }[key];
+                });
             });
 
             describe("link", () => {
                 var scopeMock;
                 var elementMock;
+                var attrsMock;
 
                 beforeEach(() => {
                     scopeMock = {};
+                    attrsMock = {
+                        space: "space"
+                    };
                     elementMock = <any>jasmine.createSpyObj("elementMock", ["addClass", "removeClass"]);
 
                     var link = directive.link;
-                    link(scopeMock, elementMock);
+                    link(scopeMock, elementMock, attrsMock);
                 });
 
-                describe("onMovingColumns", () => {
+                describe("on MovingColumns", () => {
                     var callback;
 
                     beforeEach(() => {
-                        callback = topLevelStateMock.onMovingColumns.calls.mostRecent().args[0];
+                        callback = topLevelStateMock.on.calls.argsFor(1)[1];
                     });
 
                     it("adds class 'is-collapse-show-show' if state is collapse-show-show", () => {
-                        callback({
-                            "0": AdhTopLevelState.ColumnState.COLLAPSE,
-                            "1": AdhTopLevelState.ColumnState.SHOW,
-                            "2": AdhTopLevelState.ColumnState.SHOW
-                        });
+                        callback("is-collapse-show-show");
                         expect(elementMock.addClass).toHaveBeenCalledWith("is-collapse-show-show");
                     });
 
                     it("removes class 'is-collapse-show-show' if columns is show-show-hide", () => {
-                        callback({
-                            "0": AdhTopLevelState.ColumnState.COLLAPSE,
-                            "1": AdhTopLevelState.ColumnState.SHOW,
-                            "2": AdhTopLevelState.ColumnState.SHOW
-                        });
-                        callback({
-                            "0": AdhTopLevelState.ColumnState.SHOW,
-                            "1": AdhTopLevelState.ColumnState.SHOW,
-                            "2": AdhTopLevelState.ColumnState.HIDE
-                        });
+                        callback("is-collapse-show-show");
+                        callback("is-show-show-hide");
                         expect(elementMock.removeClass).toHaveBeenCalledWith("is-collapse-show-show");
                     });
 
                     it("adds class 'is-show-show-hide' if state is show-show-hide", () => {
-                        callback({
-                            "0": AdhTopLevelState.ColumnState.SHOW,
-                            "1": AdhTopLevelState.ColumnState.SHOW,
-                            "2": AdhTopLevelState.ColumnState.HIDE
-                        });
+                        callback("is-show-show-hide");
                         expect(elementMock.addClass).toHaveBeenCalledWith("is-show-show-hide");
                     });
 
                     it("removes class 'is-show-show-hide' if columns is show-show-hide", () => {
-                        callback({
-                            "0": AdhTopLevelState.ColumnState.SHOW,
-                            "1": AdhTopLevelState.ColumnState.SHOW,
-                            "2": AdhTopLevelState.ColumnState.HIDE
-                        });
-                        callback({
-                            "0": AdhTopLevelState.ColumnState.COLLAPSE,
-                            "1": AdhTopLevelState.ColumnState.SHOW,
-                            "2": AdhTopLevelState.ColumnState.SHOW
-                        });
+                        callback("is-show-show-hide");
+                        callback("is-collapse-show-show");
                         expect(elementMock.removeClass).toHaveBeenCalledWith("is-show-show-hide");
                     });
-
-
                 });
 
-                describe("onSetContent2Url", () => {
+                describe("on Content2Url", () => {
                     var callback;
 
                     beforeEach(() => {
-                        callback = topLevelStateMock.onSetContent2Url.calls.mostRecent().args[0];
+                        callback = topLevelStateMock.on.calls.argsFor(0)[1];
                     });
 
                     it("sets content2Url in scope", () => {
