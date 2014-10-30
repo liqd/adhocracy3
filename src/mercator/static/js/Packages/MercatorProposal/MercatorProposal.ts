@@ -2,6 +2,7 @@ import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
@@ -324,10 +325,14 @@ export var register = (angular) => {
             AdhHttp.moduleName,
             AdhInject.moduleName,
             AdhPreliminaryNames.moduleName,
+            AdhResourceArea.moduleName,
             AdhResourceWidgets.moduleName,
             AdhTopLevelState.moduleName
         ])
-        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
+        .config(["adhResourceAreaProvider", "adhTopLevelStateProvider", (
+            adhResourceAreaProvider : AdhResourceArea.Provider,
+            adhTopLevelStateProvider : AdhTopLevelState.Provider
+        ) => {
             adhTopLevelStateProvider
                 .when("mercator", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
                     $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
@@ -357,6 +362,11 @@ export var register = (angular) => {
                             "</adh-resource-wrapper>"
                     };
                 }]);
+            adhResourceAreaProvider
+                .when(RIMercatorProposal.content_type, {
+                     space: "content",
+                     movingColumns: "is-show-show-hide"
+                });
         }])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, $q) => {

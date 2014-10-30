@@ -4,11 +4,6 @@ import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
-import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
-import RIMercatorProposal = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposal");
-import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
-import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
-
 
 export interface Dict {
     [key : string]: string;
@@ -46,31 +41,12 @@ export class Service implements AdhTopLevelState.IAreaInput {
     ) {}
 
     public route(path : string, search : {[key : string]: string}) : ng.IPromise<{[key : string]: string}> {
+        var self : Service = this;
         var resourceUrl = this.adhConfig.rest_url + path;
 
         return this.adhHttp.get(resourceUrl).then((resource) => {
-            var data = {};
+            var data = self.provider.get(resource.content_type);
 
-            switch (resource.content_type) {
-                case RIBasicPool.content_type:
-                    data["space"] = "content";
-                    data["movingColumns"] = "is-show-show-hide";
-                    break;
-                case RIMercatorProposal.content_type:
-                    data["space"] = "content";
-                    data["movingColumns"] = "is-show-show-hide";
-                    break;
-                case RIUser.content_type:
-                    data["space"] = "user";
-                    data["movingColumns"] = "is-show-show-hide";
-                    break;
-                case RIUsersService.content_type:
-                    data["space"] = "user";
-                    data["movingColumns"] = "is-show-show-hide";
-                    break;
-                default:
-                    throw "404";
-            }
             for (var key in search) {
                 if (search.hasOwnProperty(key)) {
                     data[key] = search[key];
