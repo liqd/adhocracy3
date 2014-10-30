@@ -11,14 +11,10 @@ Requirements:
 
 create virtual machine and login:
 
-    (LINUX:)    wget https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile 
-    (OSX:)      curl "https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile"
+    (LINUX:)    wget https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile
+    (OSX:)      curl https://raw.githubusercontent.com/liqd/adhocracy3/master/Vagrantfile
     vagrant up
     vagrant ssh
-    cd /home/vagrant/
-
-proceed with installing the server
-TODO: make the automatic setup work (vagrant shell provisioner or salt)
 
 
 Installation (backend)
@@ -26,9 +22,9 @@ Installation (backend)
 
 Requirements (Tested on Debian\Ubuntu,  64-Bit is mandatory):
 
-1. python3 (FIXME probably not required?)
-2. git
-3. build-essential libbz2-dev libyaml-dev python3-dev libncurses5-dev python-virtualenv python-setuptools
+1. git
+2. python python-setuptools
+3. build-essential libssl-dev libbz2-dev libyaml-dev libncurses5-dev
 4. graphviz
 5. ruby-dev
 
@@ -38,9 +34,7 @@ create SSH key and upload to github ::
 
 checkout source code ::
 
-    cd /vagrant
     git clone git@github.com:liqd/adhocracy3.git
-    ln -s /vagrant/adhocracy3 /home/vagrant (if you want to work from home folder)
     cd adhocracy3
     git submodule update --init
 
