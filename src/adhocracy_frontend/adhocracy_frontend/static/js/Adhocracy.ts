@@ -54,7 +54,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         window.document.body.className += " is-embedded";
     }
 
-    var app = angular.module("adhocracy3SampleFrontend", [
+    var app = angular.module("A3", [
         "monospaced.elastic",
         "pascalprecht.translate",
         "ngAnimate",
@@ -130,7 +130,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhWebSocket.register(angular);
 
     // force-load some services
-    var injector = angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
+    var injector = angular.bootstrap(document, ["A3"]);
     injector.get("adhCrossWindowMessaging");
 
     loadComplete();
