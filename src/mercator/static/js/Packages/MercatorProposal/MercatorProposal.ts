@@ -189,7 +189,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         subResourcePromises.then((subResources : ResourcesBase.Resource[]) => {
             subResources.forEach((subResource : ResourcesBase.Resource) => {
                 switch (subResource.content_type) {
-                    case RIMercatorOrganizationInfo.content_type: (() => {
+                    case RIMercatorOrganizationInfoVersion.content_type: (() => {
                         var scope = data.organization_info;
                         var res : SIMercatorOrganizationInfo.Sheet = subResource.data[SIMercatorOrganizationInfo.nick];
 
@@ -202,7 +202,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.status_other = res.status_other;
                     })();
                     break;
-                    case RIMercatorIntroduction.content_type: (() => {
+                    case RIMercatorIntroductionVersion.content_type: (() => {
                         var scope = data.introduction;
                         var res : SIMercatorIntroduction.Sheet = subResource.data[SIMercatorIntroduction.nick];
 
@@ -210,7 +210,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.teaser = res.teaser;
                     })();
                     break;
-                    case RIMercatorDetails.content_type: (() => {
+                    case RIMercatorDetailsVersion.content_type: (() => {
                         var scope = data.details;
                         var res : SIMercatorDetails.Sheet = subResource.data[SIMercatorDetails.nick];
 
@@ -223,32 +223,32 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.location_is_linked_to_ruhr = res.location_is_linked_to_ruhr;
                     })();
                     break;
-                    case RIMercatorStory.content_type: (() => {
+                    case RIMercatorStoryVersion.content_type: (() => {
                         var res : SIMercatorStory.Sheet = subResource.data[SIMercatorStory.nick];
                         data.story = res.story;
                     })();
                     break;
-                    case RIMercatorOutcome.content_type: (() => {
+                    case RIMercatorOutcomeVersion.content_type: (() => {
                         var res : SIMercatorOutcome.Sheet = subResource.data[SIMercatorOutcome.nick];
                         data.outcome = res.outcome;
                     })();
                     break;
-                    case RIMercatorSteps.content_type: (() => {
+                    case RIMercatorStepsVersion.content_type: (() => {
                         var res : SIMercatorSteps.Sheet = subResource.data[SIMercatorSteps.nick];
                         data.steps = res.steps;
                     })();
                     break;
-                    case RIMercatorValue.content_type: (() => {
+                    case RIMercatorValueVersion.content_type: (() => {
                         var res : SIMercatorValue.Sheet = subResource.data[SIMercatorValue.nick];
                         data.value = res.value;
                     })();
                     break;
-                    case RIMercatorPartners.content_type: (() => {
+                    case RIMercatorPartnersVersion.content_type: (() => {
                         var res : SIMercatorPartners.Sheet = subResource.data[SIMercatorPartners.nick];
                         data.partners = res.partners;
                     })();
                     break;
-                    case RIMercatorFinance.content_type: (() => {
+                    case RIMercatorFinanceVersion.content_type: (() => {
                         var scope = data.finance;
                         var res : SIMercatorFinance.Sheet = subResource.data[SIMercatorFinance.nick];
 
@@ -258,7 +258,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         scope.granted = res.granted;
                     })();
                     break;
-                    case RIMercatorExperience.content_type: (() => {
+                    case RIMercatorExperienceVersion.content_type: (() => {
                         var res : SIMercatorExperience.Sheet = subResource.data[SIMercatorExperience.nick];
                         data.experience = res.experience;
                     })();
