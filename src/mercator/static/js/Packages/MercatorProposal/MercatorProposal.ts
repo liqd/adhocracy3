@@ -5,6 +5,7 @@ import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
+import AdhUtil = require("../Util/Util");
 
 import ResourcesBase = require("../../ResourcesBase");
 
@@ -394,7 +395,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.data[SIName.nick] = new SIName.Sheet({
-            name: data.introduction.title
+            name: AdhUtil.normalizeName(data.introduction.title)
         });
 
         var mercatorProposalVersion = new RIMercatorProposalVersion({preliminaryNames : this.adhPreliminaryNames});
