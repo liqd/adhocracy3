@@ -402,9 +402,9 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
             follows: [mercatorProposal.first_version_path]
         });
         mercatorProposalVersion.data[SIMercatorUserInfo.nick] = new SIMercatorUserInfo.Sheet({
-            personal_name: data.user_info.user.name,
-            family_name: data.user_info.lastname,
-            country: data.user_info.user.country
+            personal_name: data.user_info.first_name,
+            family_name: data.user_info.last_name,
+            country: data.user_info.country
         });
         mercatorProposalVersion.data[SIMercatorHeardFrom.nick] = new SIMercatorHeardFrom.Sheet({
             heard_from_colleague: data.heard_from.colleague,
