@@ -21,8 +21,7 @@
         <input type="text" data-ng-model="data.basic.user.name" name="basic-user-name" placeholder="{{ 'Name' | translate }}" required="required" />
         <input type="text" data-ng-model="data.basic.user.lastname" name="basic-user-lastname" placeholder="{{ 'Lastname' | translate }}" required="required" />
         <input type="email" data-ng-model="data.basic.user.email" name="basic-user-email" placeholder="{{ 'Email' | translate }}" required="required" />
-        <country-select data-ng-model="data.basic.user.country"></country-select>
-        <!-- select data-ng-model="data.basic.user.country" name="basic-user-country" required="required" ng-options="data.countries.name for data.countries.code in data.countries"></select -->
+        <country-select data-ng-model="data.user_info.country" data-name="user_info-country" data-required="required"></country-select>
 
         <h3>{{ "Organisation Info:" | translate }}</h3>
         <label>
@@ -30,13 +29,13 @@
             {{ "We’re a registered non-profit, e.g. NGO" | translate }}
         </label>
         <input type="text" data-ng-model="data.basic.organisation.name" name="basic-organisation-name" placeholder="{{ 'Name of organisation *' | translate }}" required="required" />
-        <!-- select data-ng-model="data.basic.organisation.country" name="basic-organisation-country" required="required" ng-options="data.countries.name for data.countries.code in data.countries"></select -->
 
         <input type="email" data-ng-model="data.basic.organisation.email" name="basic-organisation-email" placeholder="{{ 'Email' | translate }}" required="required" />
         <input type="text" data-ng-model="data.basic.organisation.address" name="basic-organisation-address" placeholder="{{ 'Address' | translate }}" required="required" />
         <input type="text" data-ng-model="data.basic.organisation.postcode" name="basic-organisation-postcode" placeholder="{{ 'Postcode' | translate }}" required="required" />
         <input type="text" data-ng-model="data.basic.organisation.city" name="basic-organisation-city" placeholder="{{ 'City' | translate }}" required="required" />
 
+        <country-select data-ng-model="data.organization_info.country" data-name="organization_info-country" data-required="required"></country-select>
 
         {{ "Status:" | translate }}
         <label>

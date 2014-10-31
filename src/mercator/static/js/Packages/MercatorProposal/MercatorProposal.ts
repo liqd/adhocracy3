@@ -792,11 +792,16 @@ export var countrySelect = () => {
 
     return {
         scope: {
-            countries: "="
+            name: "@",
+            required: "@",
+            value: "=ngModel"
         },
         restrict: "E",
-        template: function(elem, attrs, data) {
-            return '<select data-ng-model="' + attrs.ngModel + '" ng-options="country.name as country.code for country in countries"></select>';
+        template:
+            "<select data-ng-model=\"value\" name=\"{{name}}\"" +
+            "    data-ng-options=\"c.code as c.name for c in countries\" required=\"required\"></select>",
+        link: (scope) => {
+            scope.countries = countries;
         }
     };
 };
