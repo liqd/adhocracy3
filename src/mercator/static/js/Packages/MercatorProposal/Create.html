@@ -45,11 +45,11 @@
         <label>
             <input type="radio" data-ng-model="data.organization_info.status_enum" name="organization_info-status_enum" value="other" required="required" />
             {{ "Other." | translate }}
-            <span data-ng-if="data.organization_info.status == 'other'">{{ "Please specify:" | translate }}</span>
+            <span data-ng-if="data.organization_info.status_enum == 'other'">{{ "Please specify:" | translate }}</span>
         </label>
         <textarea
             data-msd-elastic=""
-            data-ng-if="data.organization_info.status == 'other'"
+            data-ng-if="data.organization_info.status_enum == 'other'"
             data-ng-model="data.organization_info.status_other"
             name="organization_info-status_other"
             maxlength="500"
