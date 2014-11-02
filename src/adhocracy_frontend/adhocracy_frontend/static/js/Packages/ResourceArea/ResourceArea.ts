@@ -13,7 +13,6 @@ export interface Dict {
 export class Provider implements ng.IServiceProvider {
     public $get;
     private data : {[resourceType : string]: Dict};
-    private template : string;
 
     constructor() {
         var self = this;
@@ -29,37 +28,27 @@ export class Provider implements ng.IServiceProvider {
     public get(resourceType : string) : Dict {
         return _.clone(this.data[resourceType]);
     }
-
-    public getTemplate() : string {
-        return this.template;
-    }
-
-    public setTemplate(template : string) : void {
-        this.template = template;
-    }
 }
 
 
 export class Service implements AdhTopLevelState.IAreaInput {
-    public template : string;
+    public template : string = "<adh-page-wrapper><adh-platform></adh-platform></adh-page-wrapper>";
+    private path : string;
 
     constructor(
         private provider : Provider,
         private adhHttp : AdhHttp.Service<any>,
         private adhConfig : AdhConfig.IService
-    ) {
-        this.template = this.provider.getTemplate();
-        if (typeof this.template === "undefined") {
-            throw "please set a template for ResourceArea.";
-        }
-    }
+    ) {}
 
     public route(path : string, search : Dict) : ng.IPromise<Dict> {
         var self : Service = this;
+        self.path = path;
         var resourceUrl = this.adhConfig.rest_url + path;
 
         return this.adhHttp.get(resourceUrl).then((resource) => {
             var data = self.provider.get(resource.content_type);
+            data["platform"] = self.path.split("/")[1];
 
             for (var key in search) {
                 if (search.hasOwnProperty(key)) {
@@ -78,7 +67,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         };
 
         return {
-            path: "/adhocracy",
+            path: "/" + data["platform"],
             search: _.transform(data, (result, value : string, key : string) => {
                 if (defaults.hasOwnProperty(key) && value !== defaults[key]) {
                     result[key] = value;
@@ -87,6 +76,24 @@ export class Service implements AdhTopLevelState.IAreaInput {
         };
     }
 }
+
+
+export var platformDirective = (adhTopLevelState : Service) => {
+    this.adhTopLevelState = adhTopLevelState;
+
+    return {
+        template:
+            "<div data-ng-switch=\"platform\">" +
+            "<div data-ng-switch-when=\"adhocracy\"><adh-document-workbench></div>" +
+            // FIXME: move mercator specifics away
+            "<div data-ng-switch-when=\"mercator\"><adh-mercator-workbench></div>" +
+            "</div>",
+        restrict: "E",
+        link: (scope, element) => {
+            scope.platform = this.adhTopLevelState.data["platform"];
+        }
+    };
+};
 
 
 export var moduleName = "adhResourceArea";
@@ -101,5 +108,6 @@ export var register = (angular) => {
             adhTopLevelStateProvider
                 .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
         }])
+        .directive("adhPlatform", ["adhTopLevelState", platformDirective])
         .provider("adhResourceArea", Provider);
 };

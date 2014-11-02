@@ -67,9 +67,8 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhProposal.moduleName
     ]);
 
-    app.config(["adhTopLevelStateProvider", "adhResourceAreaProvider", "$translateProvider", "$locationProvider", (
+    app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", (
         adhTopLevelStateProvider : AdhTopLevelState.Provider,
-        adhResourceAreaProvider : adhResourceAreaProvider.Provider,
         $translateProvider,
         $locationProvider
     ) => {
@@ -86,10 +85,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                     template: "<adh-page-wrapper><h1>404 - Not Found</h1></adh-page-wrapper>"
                 };
             });
-
-        adhResourceAreaProvider.setTemplate(
-            "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>"
-        );
 
         // Make sure HTML5 history API works.  (If support for older
         // browsers is required, we may have to study angular support
