@@ -30,7 +30,7 @@ export class MercatorWorkbench {
                 adhUser : AdhUser.Service,
                 $scope : IMercatorWorkbenchScope
             ) : void => {
-                $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
+                $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
                 $scope.contentType = RIProposal.content_type;
                 $scope.user = adhUser;
                 $scope.websocketTestPaths = JSON.stringify([$scope.path]);
