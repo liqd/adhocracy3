@@ -1,5 +1,4 @@
 """User wants to create, edit and view proposal."""
-from pytest import mark
 from splinter.driver.webdriver import WebDriverElement
 
 from adhocracy_frontend.tests.acceptance.shared import wait
@@ -9,7 +8,6 @@ from adhocracy_frontend.tests.acceptance.shared import get_list_element
 from adhocracy_frontend.tests.acceptance.shared import login_god
 
 
-@mark.skipif(True, reason='see src/mercator/static/js/Adhocracy.ts near "import AdhDocumentWorkbench"')
 class TestProposal:
 
 

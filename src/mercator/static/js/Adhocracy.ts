@@ -19,22 +19,7 @@ import AdhConfig = require("./Packages/Config/Config");
 import AdhComment = require("./Packages/Comment/Comment");
 import AdhCrossWindowMessaging = require("./Packages/CrossWindowMessaging/CrossWindowMessaging");
 import AdhDateTime = require("./Packages/DateTime/DateTime");
-// import AdhDocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
-
-// FIXME: mercator replaces DocumentWorkbench with MercatorWorkbench,
-// which makes a lot of the acceptance tests of the core components
-// fail.  SUGGESTED FIX STRATEGY: find a way to test (combinations of)
-// components separately so that tests for the core components will
-// not see the mercator component.  this is the only way i can think
-// of off the top of my head that keeps core component tests from
-// having to anticipate all future customization components and
-// everything they change and overwrite in the core.
-//
-// (In order to run the tests right now, remove the '//' in front of
-// the lines in this file matching /document-?workbench/ and un-skip
-// the respective tests.)
-
-import AdhMercatorWorkbench = require("./Packages/MercatorWorkbench/MercatorWorkbench");
+import AdhDocumentWorkbench = require("./Packages/DocumentWorkbench/DocumentWorkbench");
 import AdhDone = require("./Packages/Done/Done");
 import AdhEmbed = require("./Packages/Embed/Embed");
 import AdhEventHandler = require("./Packages/EventHandler/EventHandler");
@@ -42,6 +27,7 @@ import AdhHttp = require("./Packages/Http/Http");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
+import AdhMercatorWorkbench = require("./Packages/MercatorWorkbench/MercatorWorkbench");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProposal = require("./Packages/Proposal/Proposal");
@@ -75,12 +61,12 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "pascalprecht.translate",
         "ngAnimate",
         AdhComment.moduleName,
-//        AdhDocumentWorkbench.moduleName,
-        AdhMercatorWorkbench.moduleName,
+        AdhDocumentWorkbench.moduleName,
         AdhDone.moduleName,
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
         AdhMercatorProposal.moduleName,
+        AdhMercatorWorkbench.moduleName,
         AdhResourceArea.moduleName,
         AdhProposal.moduleName
     ]);
@@ -129,6 +115,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhComment.register(angular);
     AdhCrossWindowMessaging.register(angular, config.trusted_domains === []);
     AdhDateTime.register(angular);
+    AdhDocumentWorkbench.register(angular);
     AdhDone.register(angular);
     AdhEmbed.register(angular);
     AdhEventHandler.register(angular);
@@ -136,7 +123,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhInject.register(angular);
     AdhListing.register(angular);
     AdhMercatorProposal.register(angular);
-//    AdhDocumentWorkbench.register(angular);
     AdhMercatorWorkbench.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
