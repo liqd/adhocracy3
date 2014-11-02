@@ -96,7 +96,7 @@ def get_listing_create_form(listing) -> WebDriverElement:
 def get_column_listing(browser, column_name: str) -> WebDriverElement:
     """Return the listing in the content column ."""
     column = browser.browser.find_by_css('.moving-column-' + column_name)
-    listing = column.find_by_css('.listing')
+    listing = column.first.find_by_css('.listing')
     return listing
 
 
