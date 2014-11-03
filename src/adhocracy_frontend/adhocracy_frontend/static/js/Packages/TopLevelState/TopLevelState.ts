@@ -212,18 +212,16 @@ export class Service {
         var search = this.$location.search();
         var ret = area.reverse(this.data);
 
-        if (typeof ret.path !== "undefined") {
-            this.$location.path("/" + area.prefix + ret.path);
+        this.$location.path("/" + area.prefix + ret.path);
 
-            for (var key in search) {
-                if (search.hasOwnProperty(key)) {
-                    this.$location.search(key, ret.search[key]);
-                }
+        for (var key in search) {
+            if (search.hasOwnProperty(key)) {
+                this.$location.search(key, ret.search[key]);
             }
-            for (var key2 in ret.search) {
-                if (ret.search.hasOwnProperty(key2)) {
-                    this.$location.search(key2, ret.search[key2]);
-                }
+        }
+        for (var key2 in ret.search) {
+            if (ret.search.hasOwnProperty(key2)) {
+                this.$location.search(key2, ret.search[key2]);
             }
         }
     }

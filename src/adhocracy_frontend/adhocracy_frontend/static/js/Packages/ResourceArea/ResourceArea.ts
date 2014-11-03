@@ -66,12 +66,8 @@ export class Service implements AdhTopLevelState.IAreaInput {
             content2Url: ""
         };
 
-        var path;
-        if (typeof data["platform"] !== "undefined") {
-            path = "/" + data["platform"];
-        }
         return {
-            path: path,
+            path: "/" + data["platform"],
             search: _.transform(data, (result, value : string, key : string) => {
                 if (defaults.hasOwnProperty(key) && value !== defaults[key]) {
                     result[key] = value;
