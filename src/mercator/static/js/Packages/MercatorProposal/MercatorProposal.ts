@@ -832,19 +832,6 @@ export var register = (angular) => {
                             "<adh-mercator-proposal-create data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
                             "</adh-mercator-proposal-create></adh-resource-wrapper>"
                     };
-                }])
-                .when("mercator-detail", ["adhConfig", "$rootScope", (adhConfig, $rootScope) : AdhTopLevelState.IAreaInput => {
-                    // FIXME: this always shows proposal with title "title".  for testing only.
-                    $rootScope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"] + "title/";
-                    return {
-                        template:
-                            "<adh-resource-wrapper>" +
-                            "<adh-last-version data-item-path=\"{{path}}\">" +
-                            "<adh-mercator-proposal-detail-view data-ng-if=\"versionPath\" data-path=\"{{versionPath}}\">" +
-                            "</adh-mercator-proposal-detail-view>" +
-                            "</adh-last-version>" +
-                            "</adh-resource-wrapper>"
-                    };
                 }]);
             adhResourceAreaProvider
                 .when(RIMercatorProposal.content_type, {
