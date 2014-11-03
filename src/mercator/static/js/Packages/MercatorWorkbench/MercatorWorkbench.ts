@@ -2,6 +2,7 @@
 
 import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
+import AdhListing = require("../Listing/Listing");
 import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
 import AdhUser = require("../User/User");
 
@@ -14,6 +15,7 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     user : AdhUser.Service;
     websocketTestPaths : string;
     contentType : string;
+    facets : AdhListing.IFacet[];
 }
 
 export class MercatorWorkbench {
@@ -34,6 +36,17 @@ export class MercatorWorkbench {
                 $scope.contentType = RIMercatorProposalVersion.content_type;
                 $scope.user = adhUser;
                 $scope.websocketTestPaths = JSON.stringify([$scope.path]);
+                $scope.facets = [
+                    {
+                        key: "mercator_location",
+                        name: "Location",
+                        items: [
+                            {key: "specific", name: "Specific"},
+                            {key: "online", name: "Online"},
+                            {key: "linked_to_ruhr", name: "Linked to the Ruhr area"}
+                        ]
+                    }
+                ];
             }]
         };
     }

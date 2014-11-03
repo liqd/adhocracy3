@@ -530,7 +530,8 @@ export var listing = (adhConfig : AdhConfig.IService) => {
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
         scope: {
             path: "@",
-            contentType: "@"
+            contentType: "@",
+            facets: "="
         }
     };
 };
