@@ -1,13 +1,22 @@
 <adh-spaces>
     <div data-adh-moving-columns="" data-space="content" class="moving-columns" data-ng-class="{'hidden': currentSpace !== 'content'}">
-        <div class="moving-column-structure">
-            <adh-web-socket-test data-paths="{{websocketTestPaths}}"></adh-web-socket-test>
+        <div class="moving-column moving-column-structure">
+            <div class="moving-column-menu placeholder"></div>
+            <div class="moving-column-body">
+                <adh-web-socket-test data-paths="{{websocketTestPaths}}"></adh-web-socket-test>
+            </div>
         </div>
-        <div class="moving-column-content">
-            <adh-mercator-proposal-listing data-path="{{path}}" data-content-type="{{contentType}}"></adh-mercator-proposal-listing>
+        <div class="moving-column moving-column-content">
+            <div class="moving-column-menu placeholder"></div>
+            <div class="moving-column-body">
+                <adh-mercator-proposal-listing data-path="{{path}}" data-content-type="{{contentType}}"></adh-mercator-proposal-listing>
+            </div>
         </div>
-        <div class="moving-column-content2">
-            <adh-comment-listing data-path="{{content2Url}}">
+        <div class="moving-column moving-column-content2">
+            <div class="moving-column-menu placeholder"></div>
+            <div class="moving-column-body">
+                <adh-comment-listing data-path="{{content2Url}}">
+            </div>
         </div>
     </div>
     <div data-ng-class="{'hidden': currentSpace !== 'user'}">
