@@ -800,7 +800,7 @@ export var countrySelect = () => {
         restrict: "E",
         template:
             "<select data-ng-model=\"value\" name=\"{{name}}\"" +
-            "    data-ng-options=\"c.code as c.name for c in countries\" required=\"required\"></select>",
+            "    data-ng-options=\"c.code as c.name for c in countries\" data-ng-required=\"required\"></select>",
         link: (scope) => {
             scope.countries = countries;
         }
