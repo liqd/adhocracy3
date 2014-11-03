@@ -5,7 +5,7 @@ import AdhConfig = require("../Config/Config");
 import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
 import AdhUser = require("../User/User");
 
-import RIProposal = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposal");
+import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
 
 var pkgLocation = "/MercatorWorkbench";
 
@@ -31,7 +31,7 @@ export class MercatorWorkbench {
                 $scope : IMercatorWorkbenchScope
             ) : void => {
                 $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
-                $scope.contentType = RIProposal.content_type;
+                $scope.contentType = RIMercatorProposalVersion.content_type;
                 $scope.user = adhUser;
                 $scope.websocketTestPaths = JSON.stringify([$scope.path]);
             }]

@@ -8,6 +8,7 @@ import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
 import AdhPermissions = require("../Permissions/Permissions");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhUtil = require("../Util/Util");
 import AdhWebSocket = require("../WebSocket/WebSocket");
 
 import ResourcesBase = require("../../ResourcesBase");
@@ -109,6 +110,11 @@ export class Listing<Container extends ResourcesBase.Resource> {
                     var params = <any>{};
                     if (typeof $scope.contentType !== "undefined") {
                         params.content_type = $scope.contentType;
+                        if (AdhUtil.endsWith($scope.contentType, "Version")) {
+                            params.depth = 2;
+                            params.tag = "LAST";
+                        }
+                    }
                     }
                     return adhHttp.get($scope.path, params).then((container) => {
                         $scope.container = container;
