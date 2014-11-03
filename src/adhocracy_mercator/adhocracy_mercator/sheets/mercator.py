@@ -343,6 +343,29 @@ finance_meta = sheet_metadata_defaults._replace(isheet=IFinance,
                                                 schema_class=FinanceSchema)
 
 
+BUDGET_LIMITS = [5000, 10000, 20000, 50000]
+
+
+def index_budget(resource, default):
+    """Return values of the "location_is_..." fields."""
+    sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
+    sub_resources_appstruct = sub_resources_sheet.get()
+
+    finance_resource = sub_resources_appstruct['finance']
+
+    # FIXME: Why is finance_resource '' in the first pass of that function
+    # during MercatorProposal create?
+    if finance_resource:
+        finance_sheet = get_sheet(finance_resource, IFinance)
+        finance_appstruct = finance_sheet.get()
+
+        for limit in BUDGET_LIMITS:
+            if finance_appstruct['budget'] < limit:
+                return [str(limit)]
+
+    return default
+
+
 class ExperienceSchema(colander.MappingSchema):
 
     """Data structure for additional fields."""
@@ -389,4 +412,8 @@ def includeme(config):
     config.add_indexview(index_location,
                          catalog_name='adhocracy',
                          index_name='mercator_location',
+                         context=IMercatorSubResources)
+    config.add_indexview(index_budget,
+                         catalog_name='adhocracy',
+                         index_name='mercator_budget',
                          context=IMercatorSubResources)
