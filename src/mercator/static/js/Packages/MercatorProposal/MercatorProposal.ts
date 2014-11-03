@@ -496,14 +496,14 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
 
     }
 
-    //Tobys code so i can add functions to the scope
+    // Tobi's code so i can add functions to the scope
     public createDirective() : ng.IDirective {
         var directive = super.createDirective();
 
         var originalLink = directive.link.bind(this);
 
         directive.link = (scope : IScope, element, attrs, wrapper) => {
-        
+
             originalLink(scope, element, attrs, wrapper);
 
             scope.showError = (elem, fieldName, errorType) => {
@@ -514,11 +514,11 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
                 var field : any;
                 var fieldNameArr : string[];
 
-                fieldNameArr = fieldName.split(".");    
+                fieldNameArr = fieldName.split(".");
 
                 field = elem.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]];
                 return (field.$error[errorType] && field.$dirty);
-            };    
+            };
 
         };
 
