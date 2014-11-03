@@ -270,12 +270,21 @@ details_meta = sheet_metadata_defaults._replace(isheet=IDetails,
 def index_location(resource, default):
     """Return values of the "location_is_..." fields."""
     # FIXME?: can we pass the registry to get_sheet here?
-    sheet = get_sheet(resource, IDetails)
+    sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
+    sub_resources_appstruct = sub_resources_sheet.get()
+
+    details_resource = sub_resources_appstruct['details']
     locations = []
-    appstruct = sheet.get()
-    for value in ('city', 'country', 'town', 'online', 'linked_to_ruhr'):
-        if appstruct['location_is_' + value]:
-            locations.append(value)
+
+    # FIXME: Why is details_resource '' in the first pass of that function
+    # during MercatorProposal create?
+    if details_resource:
+        details_sheet = get_sheet(details_resource, IDetails)
+        details_appstruct = details_sheet.get()
+
+        for value in ('specific', 'online', 'linked_to_ruhr'):
+            if details_appstruct['location_is_' + value]:
+                locations.append(value)
     return locations if locations else default
 
 
@@ -380,4 +389,4 @@ def includeme(config):
     config.add_indexview(index_location,
                          catalog_name='adhocracy',
                          index_name='mercator_location',
-                         context=IDetails)
+                         context=IMercatorSubResources)
