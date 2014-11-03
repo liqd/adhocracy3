@@ -81,7 +81,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 $location.replace();
                 $location.path("/r/adhocracy/");
                 return {
-                    template: ""
+                    skip: true
                 };
             }])
             .otherwise(() : AdhTopLevelState.IAreaInput => {
