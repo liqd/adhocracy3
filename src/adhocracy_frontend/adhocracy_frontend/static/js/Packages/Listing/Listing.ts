@@ -38,10 +38,24 @@ export class ListingPoolAdapter implements IListingContainerAdapter {
     }
 }
 
+export interface IFacetItem {
+    key : string;
+    name : string;
+    enabled? : boolean;
+}
+
+export interface IFacet {
+    /* NOTE: Facets currently have a fixed set of items. */
+    key : string;
+    name : string;
+    items : IFacetItem[];
+}
+
 export interface ListingScope<Container> extends ng.IScope {
     path : string;
     actionColumn : boolean;
     contentType? : string;
+    facets? : IFacet[];
     container : Container;
     poolPath : string;
     poolOptions : AdhHttp.IOptions;
@@ -54,6 +68,9 @@ export interface ListingScope<Container> extends ng.IScope {
     onCreate : () => void;
     showCreateForm : () => void;
     hideCreateForm : () => void;
+    enableItem : (IFacetItem) => void;
+    disableItem : (IFacetItem) => void;
+    toggleItem : (IFacetItem) => void;
 }
 
 // FIXME: as the listing elements are tracked by their $id (the element path) in the listing template, we don't allow duplicate elements
@@ -81,7 +98,8 @@ export class Listing<Container extends ResourcesBase.Resource> {
             scope: {
                 path: "@",
                 actionColumn: "@",
-                contentType: "@"
+                contentType: "@",
+                facets: "="
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
@@ -115,6 +133,14 @@ export class Listing<Container extends ResourcesBase.Resource> {
                             params.tag = "LAST";
                         }
                     }
+                    if ($scope.facets) {
+                        $scope.facets.forEach((facet : IFacet) => {
+                            facet.items.forEach((item : IFacetItem) => {
+                                if (item.enabled) {
+                                    params[facet.key] = item.key;
+                                }
+                            });
+                        });
                     }
                     return adhHttp.get($scope.path, params).then((container) => {
                         $scope.container = container;
@@ -157,6 +183,26 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         $scope.clear();
                     }
                 });
+
+                $scope.enableItem = (item : IFacetItem) => {
+                    if (!item.enabled) {
+                        item.enabled = true;
+                        $scope.update();
+                    }
+                };
+                $scope.disableItem = (item : IFacetItem) => {
+                    if (item.enabled) {
+                        item.enabled = false;
+                        $scope.update();
+                    }
+                };
+                $scope.toggleItem = (item : IFacetItem) => {
+                    if (item.enabled) {
+                        $scope.disableItem(item);
+                    } else {
+                        $scope.enableItem(item);
+                    }
+                };
             }]
         };
     }
