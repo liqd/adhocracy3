@@ -76,7 +76,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
 }
 
 
-export var platformDirective = (adhTopLevelState : Service) => {
+export var platformDirective = (adhTopLevelState : AdhTopLevelState.Service) => {
     return {
         template:
             "<div data-ng-switch=\"platform\">" +
