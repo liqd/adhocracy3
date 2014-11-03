@@ -506,7 +506,12 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
 
             originalLink(scope, element, attrs, wrapper);
 
-            scope.showError = (elem, fieldName, errorType) => {
+            // FIXME: type-cast scope to any so we don't have to worry
+            // about IScope missing the showError function.  if this
+            // is to be permanent, the type case must be removed and
+            // IScope must be extended with a field 'showError' of
+            // proper type.
+            (<any>scope).showError = (elem, fieldName, errorType) => {
 
                 var elem : any;
                 var fieldName : string;
