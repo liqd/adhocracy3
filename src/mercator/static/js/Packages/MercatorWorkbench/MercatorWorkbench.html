@@ -3,19 +3,21 @@
         <div class="moving-column moving-column-structure">
             <div class="moving-column-menu placeholder"></div>
             <div class="moving-column-body">
-                <adh-web-socket-test data-paths="{{websocketTestPaths}}"></adh-web-socket-test>
+                <adh-mercator-proposal-listing data-path="{{path}}" data-content-type="{{contentType}}"></adh-mercator-proposal-listing>
             </div>
         </div>
         <div class="moving-column moving-column-content">
             <div class="moving-column-menu placeholder"></div>
             <div class="moving-column-body">
-                <adh-mercator-proposal-listing data-path="{{path}}" data-content-type="{{contentType}}"></adh-mercator-proposal-listing>
+                <adh-resource-wrapper>
+                    <adh-mercator-proposal-detail-view data-ng-if="content2Url" data-path="{{content2Url}}"></adh-mercator-proposal-detail-view>
+                </adh-resource-wrapper>
             </div>
         </div>
         <div class="moving-column moving-column-content2">
             <div class="moving-column-menu placeholder"></div>
             <div class="moving-column-body">
-                <adh-comment-listing data-path="{{content2Url}}">
+                <adh-comment-listing data-ng-if="content2Url" data-path="{{content2Url}}">
             </div>
         </div>
     </div>
