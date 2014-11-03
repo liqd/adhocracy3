@@ -514,7 +514,8 @@ export var listing = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
         scope: {
-            path: "@"
+            path: "@",
+            contentType: "@"
         }
     };
 };
@@ -825,23 +826,16 @@ export var register = (angular) => {
         ) => {
             adhTopLevelStateProvider
                 .when("mercator", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
+                    $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
                     return {
                         template: "<adh-resource-wrapper>" +
                             "<adh-mercator-proposal-create data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
                             "</adh-mercator-proposal-create></adh-resource-wrapper>"
                     };
                 }])
-                .when("mercator-listing", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
-                    return {
-                        template: "<adh-mercator-proposal-listing data-path=\"{{path}}\">" +
-                            "</adh-mercator-proposal-listing>"
-                    };
-                }])
                 .when("mercator-detail", ["adhConfig", "$rootScope", (adhConfig, $rootScope) : AdhTopLevelState.IAreaInput => {
                     // FIXME: this always shows proposal with title "title".  for testing only.
-                    $rootScope.path = adhConfig.rest_url + adhConfig.rest_platform_path + "title/";
+                    $rootScope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"] + "title/";
                     return {
                         template:
                             "<adh-resource-wrapper>" +

@@ -33,6 +33,7 @@ export interface IAreaInput {
     };
     template? : string;
     templateUrl? : string;
+    skip? : boolean;
 }
 
 
@@ -44,6 +45,7 @@ export interface IArea {
         search : {[key : string] : string};
     };
     template : string;
+    skip : boolean;
 }
 
 
@@ -155,7 +157,8 @@ export class Service {
                 prefix: prefix,
                 route: typeof areaInput.route !== "undefined" ? areaInput.route.bind(areaInput) : defaultRoute,
                 reverse: typeof areaInput.reverse !== "undefined" ? areaInput.reverse.bind(areaInput) : defaultReverse,
-                template: ""
+                template: "",
+                skip: !!areaInput.skip
             };
 
             if (typeof areaInput.template !== "undefined") {
@@ -187,24 +190,28 @@ export class Service {
         var path = this.$location.path().replace(/\/[^/]*/, "");
         var search = this.$location.search();
 
-        return area.route(path, search).then((data) => {
-            for (var key in this.data) {
-                if (!data.hasOwnProperty(key)) {
-                    delete this.data[key];
+        if (area.skip) {
+            return this.$q.when();
+        } else {
+            return area.route(path, search).then((data) => {
+                for (var key in this.data) {
+                    if (!data.hasOwnProperty(key)) {
+                        delete this.data[key];
+                    }
                 }
-            }
-            for (var key2 in data) {
-                if (data.hasOwnProperty(key2)) {
-                    this._set(key2, data[key2]);
+                for (var key2 in data) {
+                    if (data.hasOwnProperty(key2)) {
+                        this._set(key2, data[key2]);
+                    }
                 }
-            }
 
-            // normalize location
-            this.$location.replace();
-            this.toLocation();
+                // normalize location
+                this.$location.replace();
+                this.toLocation();
 
-            this.blockTemplate = false;
-        });
+                this.blockTemplate = false;
+            });
+        }
     }
 
     private toLocation() : void {

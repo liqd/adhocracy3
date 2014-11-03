@@ -27,6 +27,7 @@ import AdhHttp = require("./Packages/Http/Http");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
+import AdhMercatorWorkbench = require("./Packages/MercatorWorkbench/MercatorWorkbench");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProposal = require("./Packages/Proposal/Proposal");
@@ -65,6 +66,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
         AdhMercatorProposal.moduleName,
+        AdhMercatorWorkbench.moduleName,
         AdhResourceArea.moduleName,
         AdhProposal.moduleName
     ]);
@@ -79,7 +81,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 $location.replace();
                 $location.path("/r/adhocracy/");
                 return {
-                    template: ""
+                    skip: true
                 };
             }])
             .otherwise(() : AdhTopLevelState.IAreaInput => {
@@ -121,6 +123,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhInject.register(angular);
     AdhListing.register(angular);
     AdhMercatorProposal.register(angular);
+    AdhMercatorWorkbench.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
     AdhProposal.register(angular);
