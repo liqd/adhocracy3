@@ -511,11 +511,9 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
             // is to be permanent, the type case must be removed and
             // IScope must be extended with a field 'showError' of
             // proper type.
-            (<any>scope).showError = (elem, fieldName, errorType) => {
+            (<any>scope).showError = (elem, fieldName : string, errorType : string) => {
 
                 var elem : any;
-                var fieldName : string;
-                var errorType : string;
                 var field : any;
                 var fieldNameArr : string[];
 
@@ -920,7 +918,7 @@ export var register = (angular) => {
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
         .controller('testController', ['$scope', function($scope) {
-            //FIXME: to be deleted, just for Caroline running tests
+            // FIXME: to be deleted, just for Caroline running tests
             $scope.changefield = function() {
                 //console.log($scope.);
             }
