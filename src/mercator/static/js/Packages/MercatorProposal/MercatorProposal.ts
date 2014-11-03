@@ -52,6 +52,7 @@ var pkgLocation = "/MercatorProposal";
 
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     poolPath : string;
+    showDetails() : void;
     data : {
         countries : any;
         // 1. basic
@@ -121,6 +122,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
+        private adhTopLevelState : AdhTopLevelState.Service,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -130,6 +132,17 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public createDirective() : ng.IDirective {
         var directive = super.createDirective();
         directive.scope.poolPath = "@";
+
+        var originalLink = directive.link.bind(this);
+
+        directive.link = (scope : IScope, element, attrs, wrapper) => {
+            originalLink(scope, element, attrs, wrapper);
+
+            scope.showDetails = () => {
+                this.adhTopLevelState.set("content2Url", scope.path);
+            };
+        };
+
         return directive;
     }
 
@@ -488,9 +501,10 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
+        adhTopLevelState : AdhTopLevelState.Service,
         $q : ng.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
     }
 }
@@ -501,9 +515,10 @@ export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
+        adhTopLevelState : AdhTopLevelState.Service,
         $q : ng.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";
     }
 }
@@ -839,19 +854,19 @@ export var register = (angular) => {
                      movingColumns: "is-show-show-hide"
                 });
         }])
-        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
-                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
+                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
                 return widget.createDirective();
             }])
-        .directive("adhMercatorProposalDetailView", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
-                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        .directive("adhMercatorProposalDetailView", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
+                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
                 return widget.createDirective();
             }])
-        .directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
-                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        .directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
+                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
