@@ -86,7 +86,9 @@ export var platformDirective = (adhTopLevelState : Service) => {
             "</div>",
         restrict: "E",
         link: (scope, element) => {
-            scope.platform = adhTopLevelState.data["platform"];
+            adhTopLevelState.on("platform", (value : string) => {
+                scope.platform = value;
+            });
         }
     };
 };
