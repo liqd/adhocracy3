@@ -141,6 +141,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     }
 
     private initializeScope(scope) {
+
         if (!scope.hasOwnProperty("data")) {
             scope.data = {};
         }
@@ -429,7 +430,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         mercatorProposal.parent = instance.scope.poolPath;
         mercatorProposalVersion.parent = mercatorProposal.path;
-
         subResOrganizationInfo.parent = mercatorProposal.path;
         subResOrganizationInfoV.parent = subResOrganizationInfo.path;
         subResIntroduction.parent = mercatorProposal.path;
@@ -492,7 +492,39 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
     ) {
         super(adhConfig, adhHttp, adhPreliminaryNames, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
+
+
     }
+
+    //Tobys code so i can add functions to the scope
+    public createDirective() : ng.IDirective {
+        var directive = super.createDirective();
+
+        var originalLink = directive.link.bind(this);
+
+        directive.link = (scope : IScope, element, attrs, wrapper) => {
+        
+            originalLink(scope, element, attrs, wrapper);
+
+            scope.showError = (elem, fieldName, errorType) => {
+
+                var elem : any;
+                var fieldName : string;
+                var errorType : string;
+                var field : any;
+                var fieldNameArr : string[];
+
+                fieldNameArr = fieldName.split(".");    
+
+                field = elem.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]];
+                return (field.$error[errorType] && field.$dirty);
+            };    
+
+        };
+
+        return directive;
+    }
+
 }
 
 
@@ -799,8 +831,13 @@ export var countrySelect = () => {
         },
         restrict: "E",
         template:
-            "<select data-ng-model=\"value\" name=\"{{name}}\"" +
-            "    data-ng-options=\"c.code as c.name for c in countries\" data-ng-required=\"required\"></select>",
+            function(elm,attr) {
+                attr.star = (attr.required=="required") ? "*" : "";
+                return "<select data-ng-model=\"value\" name=\"{{name}}\"" +
+                "       data-ng-options=\"c.code as c.name for c in countries\" data-ng-required=\"required\">" +
+                "           <option value=\"\" disabled selected>{{ 'Country" + attr.star + "' | translate }}</option>" +
+                "</select>";
+            },
         link: (scope) => {
             scope.countries = countries;
         }
@@ -876,5 +913,11 @@ export var register = (angular) => {
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
-        .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion]);
+        .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
+        .controller('testController', ['$scope', function($scope) {
+            //FIXME: to be deleted, just for Caroline running tests
+            $scope.changefield = function() {
+                //console.log($scope.);
+            }
+        }]);
 };

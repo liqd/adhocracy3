@@ -13,48 +13,105 @@
         novalidate="novalidate"
         class="mercator-proposal-form"
         name="mercatorProposalForm"
-        data-ng-submit="submit()">
+        data-ng-submit="submit()"
+        ng-controller="testController" comment="FIXME: controller just for testring, and this!" >
     <ng-form name="mercatorProposalBasicForm">
         <h2 id="mercator-proposal-basic">{{ "1. Basic" | translate }}</h2>
 
         <h3>{{ "User Info:" | translate }}</h3>
-        <input type="text" data-ng-model="data.user_info.first_name" name="user_info-first_name" placeholder="{{ 'Name' | translate }}" required="required" />
+        <input type="text" ng-change="changefield()"  ng-model-options="{ updateOn: 'blur' }" data-ng-model="data.user_info.first_name" name="user_info-first_name" placeholder="{{ 'Name' | translate }}" required="required" />
+            <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.user_info-first_name','required')">{{ "Please enter your first name" | translate }}</span>
+
         <input type="text" data-ng-model="data.user_info.last_name" name="user_info-last_name" placeholder="{{ 'Lastname' | translate }}" required="required" />
-        <country-select data-ng-model="data.user_info.country" data-name="user_info-country" data-required="required"></country-select>
+            <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.user_info.last_name','required')">{{ "Please enter your last name" | translate }}</span>
 
+        <country-select  ng-change="changefield()" data-ng-model="data.user_info.country" data-name="user_info-country" data-required="required"></country-select>
+            <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.user_info-country','required')">{{ "Please select a country" | translate }}</span>
         <h3>{{ "Organisation Info:" | translate }}</h3>
-        <input type="text" data-ng-model="data.organization_info.name" name="organization_info-name" placeholder="{{ 'Name of organisation *' | translate }}" required="required" />
-        <country-select data-ng-model="data.organization_info.country" data-name="organization_info-country" data-required="required"></country-select>
-        <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}" required="required" />
-        <input type="text" data-ng-model="data.organization_info.date_of_foreseen_registration" name="organization_info-date_of_foreseen_registration" placeholder="{{ 'Date of foreseen registration (month/year)' | translate }}" required="required" />
-        <input type="text" data-ng-model="data.organization_info.how_can_we_help_you" name="organization_info-how_can_we_help_you" placeholder="{{ 'How can we help you' | translate }}" />
 
-        {{ "Status:" | translate }}
         <label>
             <input type="radio" data-ng-model="data.organization_info.status_enum" name="organization_info-status_enum" value="registered_nonprofit" required="required" />
             {{ "We’re a registered non-profit, e.g. NGO" | translate }}
         </label>
+
+        <fieldset id="fields_registered_nonprofit" ng-if="data.organization_info.status_enum == 'registered_nonprofit'">
+
+            <input type="text" data-ng-model="data.organization_info.name" name="organization_info-name" placeholder="{{ 'Name of organisation *' | translate }}" required="required" />
+
+            <country-select data-ng-model="data.organization_info.country" data-name="organization_info-country" data-required="required"></country-select>
+
+            <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}" required="required" />
+
+        </fieldset>
+
         <label>
             <input type="radio" data-ng-model="data.organization_info.status_enum" name="organization_info-status_enum" value="planned_nonprofit" required="required" />
-            {{ "A non-profit registration is planned or possible" | translate }}
+            {{ "A non-profit registration is planned or in process" | translate }}
         </label>
+
+        <fieldset ng-if="data.organization_info.status_enum == 'planned_nonprofit'">
+
+            <input type="text" data-ng-model="data.organization_info.name" name="organization_info-name" placeholder="{{ 'Name of initiative or organisation *' | translate }}" required="required" />
+
+            <country-select data-ng-model="data.organization_info.country" data-name="organization_info-country" data-required="required"></country-select>
+
+            <input type="text" data-ng-model="data.organization_info.date_of_foreseen_registration" name="organization_info-date_of_foreseen_registration" placeholder="{{ 'Date of foreseen registration (month/year)' | translate }}" required="required" />
+
+            <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}" required="required" />
+
+        </fieldset>
+
         <label>
             <input type="radio" data-ng-model="data.organization_info.status_enum" name="organization_info-status_enum" value="support_needed" required="required" />
-            {{ "I’d like to try, but I’m gonna need some help / Support needed" | translate }}
+            {{ "We’d like to try to realise the idea, but will need help with registering a non-profit" | translate }}
         </label>
+
+        <fieldset ng-if="data.organization_info.status_enum == 'support_needed'">
+
+            <input type="text" data-ng-model="data.organization_info.name" name="organization_info-name" placeholder="{{ 'Name of initiative *' | translate }}" required="required" />
+
+            <country-select data-ng-model="data.organization_info.country" data-name="organization_info-country" data-required="required"></country-select>
+
+            <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}" required="required" />
+
+            <label>
+                {{ "How can we help you? Please specify:" | translate }}
+                <input type="text" data-ng-model="data.organization_info.how_can_we_help_you" name="organization_info-how_can_we_help_you" placeholder="{{ '500 c. Max.' | translate }}" />
+            </label>
+
+        </fieldset>
+
         <label>
             <input type="radio" data-ng-model="data.organization_info.status_enum" name="organization_info-status_enum" value="other" required="required" />
             {{ "Other." | translate }}
             <span data-ng-if="data.organization_info.status_enum == 'other'">{{ "Please specify:" | translate }}</span>
         </label>
-        <textarea
-            data-msd-elastic=""
-            data-ng-if="data.organization_info.status_enum == 'other'"
-            data-ng-model="data.organization_info.status_other"
-            name="organization_info-status_other"
-            maxlength="500"
-            placeholder="500 c. Max."
-            required="required"></textarea>
+
+        <fieldset ng-if="data.organization_info.status_enum == 'other'">
+
+            <textarea
+                data-msd-elastic=""
+                data-ng-if="data.organization_info.status_enum == 'other'"
+                data-ng-model="data.organization_info.status_other"
+                name="organization_info-status_other"
+                maxlength="500"
+                placeholder="500 c. Max."
+                required="required"></textarea>
+
+        </fieldset>
+
+
+
+
+
+        
+        
+        
+        
+
+        {{ "Status:" | translate }}
+
+
 
     </ng-form>
 
