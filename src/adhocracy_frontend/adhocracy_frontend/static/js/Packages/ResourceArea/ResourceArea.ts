@@ -33,7 +33,6 @@ export class Provider implements ng.IServiceProvider {
 
 export class Service implements AdhTopLevelState.IAreaInput {
     public template : string = "<adh-page-wrapper><adh-platform></adh-platform></adh-page-wrapper>";
-    private path : string;
 
     constructor(
         private provider : Provider,
@@ -43,12 +42,11 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
     public route(path : string, search : Dict) : ng.IPromise<Dict> {
         var self : Service = this;
-        self.path = path;
         var resourceUrl = this.adhConfig.rest_url + path;
 
         return this.adhHttp.get(resourceUrl).then((resource) => {
             var data = self.provider.get(resource.content_type);
-            data["platform"] = self.path.split("/")[1];
+            data["platform"] = path.split("/")[1];
 
             for (var key in search) {
                 if (search.hasOwnProperty(key)) {
@@ -79,8 +77,6 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
 
 export var platformDirective = (adhTopLevelState : Service) => {
-    this.adhTopLevelState = adhTopLevelState;
-
     return {
         template:
             "<div data-ng-switch=\"platform\">" +
@@ -90,7 +86,7 @@ export var platformDirective = (adhTopLevelState : Service) => {
             "</div>",
         restrict: "E",
         link: (scope, element) => {
-            scope.platform = this.adhTopLevelState.data["platform"];
+            scope.platform = adhTopLevelState.data["platform"];
         }
     };
 };
