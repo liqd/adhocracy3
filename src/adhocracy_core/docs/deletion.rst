@@ -39,7 +39,8 @@ The effect of these flags is as follows:
   *deleted* flag is true. Likewise for *hidden* resources.
 * Normally, only resources that are neither *deleted* nor *hidden* are
   listed in parent pools and  search queries.
-* The parameter *include=deleted|hidden|all* can be used to include
+* FIXME Not implemented yet, since the frontend doesn't yet need it:
+  The parameter *include=deleted|hidden|all* can be used to include
   deleted and/or hidden resources in pool listings and other search queries.
   If its value is *deleted*, resources will be found regardless of the value
   of their *deleted* flag, but only if they are not *hidden.* If its value is
@@ -51,8 +52,9 @@ The effect of these flags is as follows:
   It's also possible to set *include=visible* to get only non-deleted and
   non-hidden resources, but it's not necessary since that is the default.
 * If the frontend attempts to retrieve a *deleted* or *hidden* resource via
-  GET, the backend normally responds with HTTP status code *410 Gone*. The
-  frontend can override this by adding the parameter
+  GET, the backend normally responds with HTTP status code *410 Gone*.
+  FIXME Not implemented yet, since the frontend doesn't yet need it:
+  The frontend can override this by adding the parameter
   *include=deleted|hidden|all* to the GET request, just as in search queries.
   Anybody can view deleted resources in this way, and managers (those with
   *hide_resource* permission) can view hidden resources in these ways. Those
@@ -66,14 +68,20 @@ The effect of these flags is as follows:
         "modified_by:" "<path-to-user>",
         "modification_date": "<timestamp>"}
 
-  Typically the last modification will have been the deletion or hiding of
+  Often the last modification will have been the deletion or hiding of
   the resource, but there is no guarantee that this is always the case.
+  Especially, the resource may be marked as hidden/deleted because one of its
+  ancestors was hidden/deleted (as that status is inherited). In that case,
+  the person who last modified the child resource likely has nothing to do
+  with the person who hid/deleted the ancestor resource.
 * *Deleted* or *hidden* resources may still be referenced from other
   resources. If the frontend follows such references it must therefore
   be prepared to encounter *410 Gone* responses and deal with them
   appropriately (e.g. by silently skipping them or by showing an
   explanation such as "Comment deleted").
-* *Deleted* and *hidden* resources will normally not be shown in
+* FIXME Not implemented yet -- currently backreferences include all resources,
+  regardless of their visibility.
+  *Deleted* and *hidden* resources will normally not be shown in
   backreferences, which are calculated on demand. The
   *include=deleted|hidden|all* parameter can be used to change that and
   include backreferences to deleted and/or hidden resources. The same
@@ -181,3 +189,12 @@ Only the GoodProposal is still visible in the pool::
     >>> resp_data = testapp.get(rest_url + "/adhocracy").json
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
     ['.../adhocracy/GoodProposal/']
+
+Sanity check: internally, the backend uses a *priv_visibility* index to keep
+track of the visibility/deletion status of resources. But this filter is
+private and cannot be directly queried from the frontend::
+
+    >>> resp_data = testapp.get(rest_url + "/adhocracy",
+    ...     params={'priv_visibility': 'hidden'}, status=400).json
+    >>> resp_data['errors'][0]['description']
+    'No such catalog'
