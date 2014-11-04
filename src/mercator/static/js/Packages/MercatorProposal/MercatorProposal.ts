@@ -524,7 +524,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
                 fieldNameArr = fieldName.split(".");
 
                 field = elem.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]];
-                if(field) return (field.$error[errorType] && field.$dirty);
+                if(field) return (field.$error[errorType] && (field.$dirty || elem.mercatorProposalForm.$submitted) );
             };
 
         };
@@ -842,7 +842,7 @@ export var countrySelect = () => {
                 attr.star = (attr.required=="required") ? "*" : "";
                 return "<select data-ng-model=\"value\" name=\"{{name}}\"" +
                 "       data-ng-options=\"c.code as c.name for c in countries\" data-ng-required=\"required\">" +
-                "           <option value=\"\" disabled selected>{{ 'Country" + attr.star + "' | translate }}</option>" +
+                "           <option value=\"\" selected>{{ 'Country" + attr.star + "' | translate }}</option>" +
                 "</select>";
             },
         link: (scope) => {
@@ -921,10 +921,23 @@ export var register = (angular) => {
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .controller('testController', ['$scope', function($scope) {
-            // FIXME: to be deleted, just for Caroline running tests
-            $scope.changefield = function() {
-                //console.log($scope.);
+        .controller('mercatorProposalFormController', ['$scope', function($scope) {
+
+
+
+            this.submit = function(isValid, data) {
+
+                if(!isValid) return;
+
+                // FIXME: Call submit from here !!submit();
             }
+
+
+            // FIXME: to be deleted, just for Caroline running tests
+            $scope.$watch(function(scope) { return  },
+                function(newValue, oldValue) {
+                    console.log(newValue);
+                }
+            );
         }]);
 };

@@ -9,39 +9,28 @@
     </ol>
 </nav>
 
-    <div class="form_row">
-
-        <div class="form_body">
-
-        </div>
-        <div class="form_description">
-
-        </div><!-- /.form_description -->
-
-    </div><!-- /.form_row -->
-
 <form
         novalidate="novalidate"
         class="mercator-proposal-form"
         name="mercatorProposalForm"
-        data-ng-submit="submit()"
-        ng-controller="testController" comment="FIXME: controller just for testring, and this!" >
+        ng-controller="mercatorProposalFormController as form"
+        ng-submit="form.submit(mercatorProposalForm.$valid, data)">
 
-    <div class="form_row">
+    <div class="row">
 
         <div class="form_body">
-        
+
             <ng-form name="mercatorProposalBasicForm">
 
                 <h2 id="mercator-proposal-basic">{{ "1. Basic" | translate }}</h2>
 
                 <h3>{{ "User Info:" | translate }}</h3>
-                <input type="text" ng-change="changefield()"  ng-model-options="{ updateOn: 'blur' }" data-ng-model="data.user_info.first_name" name="user_info-first_name" placeholder="{{ 'Name' | translate }}" required="required" />
-         
+
+                <input type="text" ng-change="changefield()" data-ng-model="data.user_info.first_name" name="user_info-first_name" placeholder="{{ 'Name' | translate }}" required="required" />
                     <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.user_info-first_name','required')">{{ "Please enter your first name" | translate }}</span>
 
                 <input type="text" data-ng-model="data.user_info.last_name" name="user_info-last_name" placeholder="{{ 'Lastname' | translate }}" required="required" />
-                    <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.user_info.last_name','required')">{{ "Please enter your last name" | translate }}</span>
+                    <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.user_info-last_name','required')">{{ "Please enter your last name" | translate }}</span>
 
                 <country-select  ng-change="changefield()" data-ng-model="data.user_info.country" data-name="user_info-country" data-required="required"></country-select>
                     <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.user_info-country','required')">{{ "Please select a country" | translate }}</span>
@@ -55,10 +44,12 @@
                 <fieldset id="fields_registered_nonprofit" ng-if="data.organization_info.status_enum == 'registered_nonprofit'">
 
                     <input type="text" data-ng-model="data.organization_info.name" name="organization_info-name" placeholder="{{ 'Name of organisation *' | translate }}" required="required" />
+                        <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.organization_info-name','required')">{{ "Please enter your organization name" | translate }}</span>
 
                     <country-select data-ng-model="data.organization_info.country" data-name="organization_info-country" data-required="required"></country-select>
+                        <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.organization_info-country','required')">{{ "Please enter your organization country" | translate }}</span>
 
-                    <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}" required="required" />
+                    <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}" />
 
                 </fieldset>
 
@@ -70,12 +61,15 @@
                 <fieldset ng-if="data.organization_info.status_enum == 'planned_nonprofit'">
 
                     <input type="text" data-ng-model="data.organization_info.name" name="organization_info-name" placeholder="{{ 'Name of initiative or organisation *' | translate }}" required="required" />
+                        <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.organization_info-name','required')">{{ "Please enter your organization name" | translate }}</span>
 
                     <country-select data-ng-model="data.organization_info.country" data-name="organization_info-country" data-required="required"></country-select>
+                        <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.organization_info-country','required')">{{ "Please enter your organization country" | translate }}</span>
 
-                    <input type="text" data-ng-model="data.organization_info.date_of_foreseen_registration" name="organization_info-date_of_foreseen_registration" placeholder="{{ 'Date of foreseen registration (month/year)' | translate }}" required="required" />
+                    <input type="date" data-ng-model="data.organization_info.date_of_foreseen_registration" name="organization_info-date_of_foreseen_registration" placeholder="{{ 'Date of foreseen registration (month/year)' | translate }}" required="required" />
+                        <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.organization_info-date_of_foreseen_registration','required')">{{ "Please enter your registration date" | translate }}</span>
 
-                    <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}" required="required" />
+                    <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}"/>
 
                 </fieldset>
 
@@ -87,10 +81,12 @@
                 <fieldset ng-if="data.organization_info.status_enum == 'support_needed'">
 
                     <input type="text" data-ng-model="data.organization_info.name" name="organization_info-name" placeholder="{{ 'Name of initiative *' | translate }}" required="required" />
+                        <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.organization_info-name','required')">{{ "Please enter your organization name" | translate }}</span>
 
                     <country-select data-ng-model="data.organization_info.country" data-name="organization_info-country" data-required="required"></country-select>
+                        <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.organization_info-country','required')">{{ "Please enter your organization country" | translate }}</span>
 
-                    <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}" required="required" />
+                    <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}" />
 
                     <label>
                         {{ "How can we help you? Please specify:" | translate }}
@@ -101,6 +97,7 @@
 
                 <label>
                     <input type="radio" data-ng-model="data.organization_info.status_enum" name="organization_info-status_enum" value="other" required="required" />
+
                     {{ "Other." | translate }}
                     <span data-ng-if="data.organization_info.status_enum == 'other'">{{ "Please specify:" | translate }}</span>
                 </label>
@@ -115,6 +112,7 @@
                         maxlength="500"
                         placeholder="500 c. Max."
                         required="required"></textarea>
+                            <span class="input-error" ng-show="showError(this, 'mercatorProposalBasicForm.organization_info-status_other','required')">{{ "Please enter some text" | translate }}</span>
 
                 </fieldset>
 
@@ -147,12 +145,12 @@
 
         </div><!-- /.form_body -->
 
-    </div><!-- /.form_row -->
+    </div><!-- /.row -->
 
     <ng-form name="mercatorProposalDetailForm">
 
 
-        <div class="form_row">
+        <div class="row">
 
             <div class="form_body">
 
@@ -162,11 +160,11 @@
 
         </div>
 
-        <div class="form_row">
+        <div class="row">
 
             <div class="form_description">
                 {{ "Tell others what your idea is for and what it is. Think about why you are doing it, what you want to achieve and what you will do, who will benefit from your endeavour and which impact you will have. (This paragraph will appear on the main page and at the top of your contribution)." | translate }}
-            </div>  
+            </div>
             <div class="form_body">
 
                 <label>
@@ -180,12 +178,12 @@
                         required="required"></textarea>
                 </label>
 
-            </div><!-- /.form_body --> 
- 
-        </div><!-- /.form_row -->
+            </div><!-- /.form_body -->
 
-        
-        <div class="form_row">
+        </div><!-- /.row -->
+
+
+        <div class="row">
 
             <div class="form_description">
                 {{ "Tell others what your idea is for and what it is. Think about why you are doing it, what you want to achieve and what you will do, who will benefit from your endeavour and which impact you will have. (This paragraph will appear on the main page and at the top of your contribution)." | translate }}
@@ -209,11 +207,11 @@
                     {{ "Linkage to the Ruhr area" | translate }}
                 </label>
 
-            </div><!-- /.form_body -->    
+            </div><!-- /.form_body -->
 
-        </div><!-- /.form_row -->
+        </div><!-- /.row -->
 
-        <div class="form_row">
+        <div class="row">
 
             <div class="form_description">
                 {{ "What triggers you to act? What drives you to want to make the change you propose? What’s the “big dream” behind your idea? Please also share specific examples of the target group." | translate }}
@@ -232,14 +230,14 @@
                         required="required"></textarea>
 
                 </label>
- 
+
             </div><!-- /. form_body -->
-        </div><!-- /.form_row -->
+        </div><!-- /.row -->
     </ng-form>
 
     <ng-form name="mercatorProposalMotivationForm">
 
-        <div class="form_row">
+        <div class="row">
 
             <div class="form_body">
 
@@ -247,9 +245,9 @@
 
             </div><!-- /.form_body -->
 
-        </div><!-- /.form_row -->
+        </div><!-- /.row -->
 
-        <div class="form_row">
+        <div class="row">
 
             <div class="form_description">
                 What is different in a year after starting your
@@ -275,15 +273,15 @@
 
             </div><!-- /.form_body -->
 
-        </div><!-- /.form_row -->
-        <div class="form_row">
+        </div><!-- /.row -->
+        <div class="row">
 
             <div class="form_description">
                 {{ "How will your realize your project or initia-
                     tive? Which steps will you take? Describe, as
                     practically as possible, the approach and
                     method you plan to choose for this activity or
-                    initiative. "  | translate }} 
+                    initiative. "  | translate }}
 
             </div><!-- /.form_description -->
 
@@ -302,14 +300,14 @@
 
             </div><!-- /.form_body -->
 
-        </div><!-- /.form_row -->
+        </div><!-- /.row -->
 
-        <div class="form_row">
+        <div class="row">
 
             <div class="form_description">
                 {{ "Which value does your idea provide for Europe? What makes your idea different from others? If you can realize it, can you then imagine transferring it to other countries, sectors or organisations?" | translate }}
             </div><!--/.form_description -->
-               
+
             <div class="form_body">
 
                 <label>
@@ -322,17 +320,17 @@
                         placeholder="{{ '800 c. Max.' | translate }}"
                         required="required"></textarea>
                 </label>
-               
-            </div><!--/.form_body -->
-               
-        </div><!-- /.form_row -->
 
-        <div class="form_row">
+            </div><!--/.form_body -->
+
+        </div><!-- /.row -->
+
+        <div class="row">
 
             <div class="form_description">
 
                 {{ "How was the partnership established and does it involve organisations that have never been previously involved in a similar constellation? Describe relevant experiences of your team members." | translate }}
-               
+
             </div><!--/.form_description -->
             <div class="form_body">
 
@@ -346,16 +344,16 @@
                         placeholder="{{ '800 c. Max.' | translate }}"
                         required="required"></textarea>
                 </label>
-               
+
             </div><!--/.form_body -->
-                
+
         </div><!--/.form_description -->
-           
+
     </ng-form>
 
     <ng-form name="mercatorProposalFinanceForm">
 
-        <div class="form_row">
+        <div class="row">
 
             <div class="form_body">
 
@@ -365,16 +363,16 @@
                     {{ "Total budget:" | translate }}
                     <input type="number" data-ng-model="data.finance.budget" name="finance-budget" required="required" />
                 </label>
-               
+
             </div><!--/.form_body -->
-           
-        </div><!--/.form_row -->
-        <div class="form_row">
+
+        </div><!--/.row -->
+        <div class="row">
 
             <div class="form_description">
                 Maximum 50,000€
             </div><!--/.form_description -->
-               
+
             <div class="form_body">
 
                 <label>
@@ -403,9 +401,9 @@
                 </label>
 
             </div><!--/.form_body -->
-           
-        </div><!--/.form_row -->
-        <div class="form_row">
+
+        </div><!--/.row -->
+        <div class="row">
            <div class="form_description">
                 Once we review all submitted entries,
                 we might come back to you and ask
@@ -415,21 +413,21 @@
                 already use it while preparing your
                 application.
            </div><!--/.form_description -->
-              
-        </div><!--/.form_row -->
-           
-        
+
+        </div><!--/.row -->
+
+
     </ng-form>
 
     <ng-form name="mercatorProposalExtraForm">
 
-        <div class="form_row">
+        <div class="row">
             <div class="form_body">
                 <h2 id="mercator-proposal-extra">{{ "6. Extra" | translate }}</h2>
             </div><!--/.form_body -->
-               
-        </div><!--/.form_row -->
-        <div class="form_row">
+
+        </div><!--/.row -->
+        <div class="row">
 
             <div class="form_description">
                 Which kind of advice, comments, or lessons
@@ -489,21 +487,24 @@
                     {{ "I accept that all will be publically visible and available on the platform." | translate }}
                 </label>
             </div><!--/.form_body -->
-               
-                     
-        </div><!--/.form_row -->
+
+
+        </div><!--/.row -->
 
     </ng-form>
 
-    <div class="form_row">
-        <div class="form_body">  
+    <div class="row">
+        <div class="form_body">
             <input
                 type="submit"
                 value="{{ 'submit' | translate }}"
                 class="m-call-to-action"
-                data-ng-disabled="mercatorProposalForm.$invalid" /> 
-        </div><!--/.form_body -->
-           
-    </div><!--/.form_row -->
-    
+
+
+                />
+        </div><!--/.form_body
+        data-ng-disabled="mercatorProposalForm.$invalid" -->
+
+    </div><!--/.row -->
+
 </form>
