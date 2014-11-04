@@ -7,6 +7,7 @@ from pytest import raises
 @fixture()
 def integration(config):
         config.include('adhocracy_core.catalog')
+        config.include('adhocracy_core.registry')
         config.include('adhocracy_mercator.sheets.mercator')
 
 
@@ -282,53 +283,46 @@ class TestDetailsSheet:
 
 class TestLocationIndex:
 
-    @fixture
-    def resource(self):
+    def _make_resource(self, pool_graph, details_appstruct={}):
+        from adhocracy_core.interfaces import IResource
         from adhocracy_mercator.sheets.mercator import IMercatorSubResources
         from adhocracy_mercator.sheets.mercator import IDetails
         from adhocracy_core.utils import get_sheet
-        resource = testing.DummyResource(__provides__=IMercatorSubResources)
-        details_resource = testing.DummyResource(__provides__=IDetails)
-
+        resource = testing.DummyResource(__provides__=[IResource,
+                                                       IMercatorSubResources])
+        pool_graph['res'] = resource
         sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
-
-        # FIXME: This following .set instruction doesn't work
-        sub_resources_sheet.set({
-            'details': details_resource,
-        })
-
+        details_resource = testing.DummyResource(__provides__=[IResource,
+                                                               IDetails])
+        details_sheet = get_sheet(details_resource, IDetails)
+        details_sheet.set(details_appstruct)
+        pool_graph['details'] = details_resource
+        sub_resources_sheet.set({'details': details_resource})
         return resource
 
     @mark.usefixtures('integration')
-    def test_index_location_default(self, resource):
+    def test_index_location_default(self, pool_graph):
         from adhocracy_mercator.sheets.mercator import index_location
+        resource = self._make_resource(pool_graph=pool_graph)
         result = index_location(resource, 'default')
         assert result == 'default'
 
     @mark.usefixtures('integration')
-    def test_index_location_is_linked_to_ruhr(self, resource):
-        from adhocracy_mercator.sheets.mercator import IMercatorSubResources
-        from adhocracy_mercator.sheets.mercator import IDetails
+    def test_index_location_is_linked_to_ruhr(self, pool_graph):
         from adhocracy_mercator.sheets.mercator import index_location
-        from adhocracy_core.utils import get_sheet
-        sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
-        sub_resources_appstruct = sub_resources_sheet.get()
-        details_resource = sub_resources_appstruct['details']
-        details_sheet = get_sheet(details_resource, IDetails)
-        details_sheet.set({'location_is_linked_to_ruhr': True})
+        resource = self._make_resource(
+            pool_graph=pool_graph,
+            details_appstruct={'location_is_linked_to_ruhr': True})
         result = index_location(resource, 'default')
         assert result == ['linked_to_ruhr']
 
     @mark.usefixtures('integration')
-    def test_index_location_is_online_and_linked_to_ruhr(self, resource):
-        from adhocracy_mercator.sheets.mercator import IDetails
+    def test_index_location_is_online_and_linked_to_ruhr(self, pool_graph):
         from adhocracy_mercator.sheets.mercator import index_location
-        from adhocracy_core.utils import get_sheet
-        sheet = get_sheet(resource, IDetails)
-        sheet.set({
-            'location_is_online': True,
-            'location_is_linked_to_ruhr': True,
-        })
+        resource = self._make_resource(
+            pool_graph=pool_graph,
+            details_appstruct={'location_is_online': True,
+                               'location_is_linked_to_ruhr': True})
         result = index_location(resource, 'default')
         assert set(result) == set(['online', 'linked_to_ruhr'])
 
