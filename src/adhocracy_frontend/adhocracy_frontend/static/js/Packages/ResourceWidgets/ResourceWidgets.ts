@@ -113,6 +113,16 @@ export var resourceWrapper = () => {
                 }
             };
 
+            // FIXME: This is currently undocumented and I also don't like it.
+            // We should think of a better way to do it.
+            var displayOrClear = () : void => {
+                if (typeof $attrs["clearOnSubmit"] !== "undefined") {
+                    self.triggerClear();
+                } else {
+                    self.triggerSetMode(Mode.display);
+                }
+            };
+
             self.eventHandler = new adhEventHandlerClass();
 
             self.registerResourceDirective = (promise : ng.IPromise<ResourcesBase.Resource[]>) => {
@@ -135,7 +145,7 @@ export var resourceWrapper = () => {
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
                     .then((resources) => adhHttp.deepPost(resources))
-                    .then(() => self.triggerClear(), (reason) => {
+                    .then(() => displayOrClear(), (reason) => {
                         self.triggerSetMode(Mode.edit);
                         throw reason;
                     })
