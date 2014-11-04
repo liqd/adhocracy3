@@ -65,6 +65,11 @@ export interface IResourceWrapperController {
      * all promised resources will be posted to the server via deepPost.
      */
     triggerSubmit() : ng.IPromise<void>;
+
+    /**
+     * triggers a "clear" event on eventHandler.
+     */
+    triggerClear() : void;
 }
 
 /**
@@ -136,6 +141,10 @@ export var resourceWrapper = () => {
                     })
                     .then(() => triggerCallback("onSubmit"));
             };
+
+            self.triggerClear = () => {
+                self.eventHandler.trigger("clear");
+            };
         }]
     };
 };
@@ -164,6 +173,11 @@ export interface IResourceWidgetScope extends ng.IScope {
      * Emit an angular "delete" event.
      */
     delete() : void;
+
+    /**
+     * Trigger clear on resourceWrapper.
+     */
+    clear() : void;
 }
 
 export interface IResourceWidgetInstance<R extends ResourcesBase.Resource, S extends IResourceWidgetScope> {
@@ -248,11 +262,15 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             }
         });
 
+        var clearID = wrapper.eventHandler.on("clear", () =>
+            self.clear(instance));
+
         scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(instance, path));
         scope.$on("$delete", () => {
             wrapper.eventHandler.off("setMode", setModeID);
             wrapper.eventHandler.off("submit", submitID);
             wrapper.eventHandler.off("cancel", cancelID);
+            wrapper.eventHandler.off("clear", clearID);
             instance.deferred.resolve([]);
         });
 
@@ -260,6 +278,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         scope.submit = () => wrapper.triggerSubmit();
         scope.cancel = () => wrapper.triggerCancel();
         scope.delete = () => scope.$emit("triggerDelete", scope.path);
+        scope.clear = () => wrapper.triggerClear();
 
         self.setMode(instance, scope.mode);
         self.update(instance);
@@ -319,6 +338,13 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         }
     }
 
+    public clear(instance : IResourceWidgetInstance<R, S>) : void {
+        instance.deferred.resolve([]);
+        instance.deferred = this.$q.defer();
+        instance.wrapper.registerResourceDirective(instance.deferred.promise);
+        this._clear(instance);
+    }
+
     /**
      * Handle delete events from children.
      */
@@ -345,6 +371,13 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
      */
     public _edit(instance : IResourceWidgetInstance<R, S>, old : R) : ng.IPromise<R[]> {
         throw "abstract method: not implemented";
+    }
+
+    /**
+     * Clear the scope.
+     */
+    public _clear(instance : IResourceWidgetInstance<R, S>) : void {
+        return;
     }
 }
 
