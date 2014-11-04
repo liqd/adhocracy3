@@ -53,7 +53,6 @@ export interface IFacet {
 
 export interface ListingScope<Container> extends ng.IScope {
     path : string;
-    actionColumn : boolean;
     contentType? : string;
     facets? : IFacet[];
     container : Container;
@@ -94,7 +93,6 @@ export class Listing<Container extends ResourcesBase.Resource> {
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
             scope: {
                 path: "@",
-                actionColumn: "@",
                 contentType: "@",
                 facets: "="
             },

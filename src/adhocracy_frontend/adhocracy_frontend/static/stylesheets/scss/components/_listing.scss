@@ -51,18 +51,3 @@ a form for creating new elements. This form is then always visible.
     margin-right: -0.5em;
     margin-bottom: 2em;
 }
-
-/*doc
----
-title: action-column modifier
-name: listing.m-action-column
-parent: listing
----
-
-Sometimes you need some space to the right to list available actions on listing
-elements. This modifier makes the listing leave space according to the
-`width-action` variable.
-*/
-.listing.m-action-column {
-    padding-right: $width-action;
-}
