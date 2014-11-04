@@ -265,3 +265,24 @@ class TestVisibility:
         result = view_blocked_by_metadata(resource_with_metadata, registry)
         assert result['modified_by'] == user
         assert result['modification_date'] == now
+
+    def test_index_visibility_visible(self, context):
+        from adhocracy_core.sheets.metadata import index_visibility
+        assert index_visibility(context, 'default') == ['visible']
+
+    def test_index_visibility_deleted(self, context):
+        from adhocracy_core.sheets.metadata import index_visibility
+        context.deleted = True
+        assert index_visibility(context, 'default') == ['deleted']
+
+    def test_index_visibility_hidden(self, context):
+        from adhocracy_core.sheets.metadata import index_visibility
+        context.hidden = True
+        assert index_visibility(context, 'default') == ['hidden']
+
+    def test_index_visibility_both(self, context):
+        from adhocracy_core.sheets.metadata import index_visibility
+        context.deleted = True
+        context.hidden = True
+        assert sorted(index_visibility(context, 'default')) == ['deleted',
+                                                                'hidden']
