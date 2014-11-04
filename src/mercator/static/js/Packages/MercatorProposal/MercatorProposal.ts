@@ -53,6 +53,7 @@ var pkgLocation = "/MercatorProposal";
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     poolPath : string;
     showDetails() : void;
+    mercatorProposalForm?;
     data : {
         countries : any;
         // 1. basic
@@ -493,6 +494,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
         return this.$q.when([]);
     }
+
+    public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
+        delete instance.scope.data;
+    }
 }
 
 
@@ -506,6 +511,14 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
     ) {
         super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
+    }
+
+    public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
+        super._clear(instance);
+
+        // FIXME: I do not whether both are needed.
+        instance.scope.mercatorProposalForm.$setPristine();
+        instance.scope.mercatorProposalForm.$setUntouched();
     }
 }
 
