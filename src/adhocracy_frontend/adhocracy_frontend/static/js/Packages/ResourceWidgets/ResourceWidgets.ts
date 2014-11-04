@@ -135,7 +135,7 @@ export var resourceWrapper = () => {
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
                     .then((resources) => adhHttp.deepPost(resources))
-                    .then(() => self.triggerSetMode(Mode.display), (reason) => {
+                    .then(() => self.triggerClear(), (reason) => {
                         self.triggerSetMode(Mode.edit);
                         throw reason;
                     })
@@ -374,7 +374,8 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
     }
 
     /**
-     * Clear the scope.
+     * Reset the directive to initial state. This function should probably
+     * clear the scope and reset all forms to prestine state.
      */
     public _clear(instance : IResourceWidgetInstance<R, S>) : void {
         return;
