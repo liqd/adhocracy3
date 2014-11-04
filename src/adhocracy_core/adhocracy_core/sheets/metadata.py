@@ -3,7 +3,6 @@ from datetime import datetime
 from logging import getLogger
 
 from pyramid.registry import Registry
-from pyramid.traversal import resource_path
 import colander
 
 from adhocracy_core.interfaces import IResource
@@ -16,7 +15,6 @@ from adhocracy_core.sheets.principal import IUserBasic
 from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
-from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_user
 
@@ -162,17 +160,11 @@ def _blocked_with_reason(resource: IResource) -> str:
 
 
 def index_visibility(resource, default):
-    """Return value for the visibility index.
+    """Return value for the priv_visibility index.
 
     The return value will be one of [visible], [deleted], [hidden], or
     [deleted, hidden].
     """
-    graph = find_graph(resource)
-    if graph is None:  # pragma: no cover
-        logger.warning(
-            'Cannot update visibility index: No graph found for %s',
-            resource_path(resource))
-        return default
     result = []
     if is_deleted(resource):
         result.append('deleted')
@@ -192,6 +184,6 @@ def includeme(config):
                           interface=IMetadata)
     config.add_indexview(index_visibility,
                          catalog_name='adhocracy',
-                         index_name='visibility',
+                         index_name='priv_visibility',
                          context=IMetadata,
                          )

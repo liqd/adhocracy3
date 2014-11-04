@@ -67,7 +67,7 @@ class GenericResourceSheet(PropertySheet):
 
     @property
     def _default_appstruct(self) -> dict:
-        # context might have changed, so we don`t bind bind it unit needed
+        # context might have changed, so we don`t bind it until needed
         schema = self.schema.bind(context=self.context)
         items = [(n.name, n.default) for n in schema]
         return dict(items)

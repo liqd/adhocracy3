@@ -372,11 +372,11 @@ def _add_reference_filter_node(name, schema):
     schema.add(node)
 
 
-def _maybe_arbitrary_filter_node(name, context):
+def _maybe_arbitrary_filter_node(name: str, context: IResource) -> bool:
     catalog = find_catalog(context, 'adhocracy')
     if not catalog:
         return False
-    if name in catalog:
+    if name in catalog and not name.startswith('priv_'):
         return True
     else:
         raise_colander_style_error(None, name, 'No such catalog')
