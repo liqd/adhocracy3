@@ -130,7 +130,10 @@ export var resourceWrapper = () => {
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
                     .then((resources) => adhHttp.deepPost(resources))
-                    .then(() => self.triggerSetMode(Mode.display))
+                    .then(() => self.triggerSetMode(Mode.display), (reason) => {
+                        self.triggerSetMode(Mode.edit);
+                        throw reason;
+                    })
                     .then(() => triggerCallback("onSubmit"));
             };
         }]
