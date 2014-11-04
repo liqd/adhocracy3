@@ -111,8 +111,12 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
             facebook : boolean;
             other : boolean;
             other_specify : string
-        }
+        };
+
+        accept_disclaimer: string;
     };
+
+    showError :  (elem, fieldName : string, errorType : string) => void;
 }
 
 
@@ -511,7 +515,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
             // is to be permanent, the type case must be removed and
             // IScope must be extended with a field 'showError' of
             // proper type.
-            (<any>scope).showError = (elem, fieldName : string, errorType : string) => {
+            scope.showError = (elem, fieldName : string, errorType : string) => {
 
                 var elem : any;
                 var field : any;
@@ -520,7 +524,7 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
                 fieldNameArr = fieldName.split(".");
 
                 field = elem.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]];
-                return (field.$error[errorType] && field.$dirty);
+                if(field) return (field.$error[errorType] && field.$dirty);
             };
 
         };
