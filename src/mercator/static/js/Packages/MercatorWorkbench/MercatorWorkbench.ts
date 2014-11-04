@@ -2,10 +2,11 @@
 
 import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
+import AdhListing = require("../Listing/Listing");
 import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
 import AdhUser = require("../User/User");
 
-import RIProposal = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposal");
+import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
 
 var pkgLocation = "/MercatorWorkbench";
 
@@ -14,6 +15,7 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     user : AdhUser.Service;
     websocketTestPaths : string;
     contentType : string;
+    facets : AdhListing.IFacet[];
 }
 
 export class MercatorWorkbench {
@@ -31,9 +33,30 @@ export class MercatorWorkbench {
                 $scope : IMercatorWorkbenchScope
             ) : void => {
                 $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
-                $scope.contentType = RIProposal.content_type;
+                $scope.contentType = RIMercatorProposalVersion.content_type;
                 $scope.user = adhUser;
                 $scope.websocketTestPaths = JSON.stringify([$scope.path]);
+                $scope.facets = [
+                    {
+                        key: "mercator_location",
+                        name: "Location",
+                        items: [
+                            {key: "specific", name: "Specific"},
+                            {key: "online", name: "Online"},
+                            {key: "linked_to_ruhr", name: "Linked to the Ruhr area"}
+                        ]
+                    },
+                    {
+                        key: "mercator_budget",
+                        name: "Budget",
+                        items: [
+                            {key: "5000", name: "0 - 5000 €"},
+                            {key: "10000", name: "5000 - 10000 €"},
+                            {key: "20000", name: "10000 - 20000 €"},
+                            {key: "50000", name: "20000 - 50000 €"}
+                        ]
+                    }
+                ];
             }]
         };
     }

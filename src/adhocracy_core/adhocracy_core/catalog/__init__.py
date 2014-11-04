@@ -15,6 +15,9 @@ class AdhocracyCatalogFactory:
     tag = catalog.Keyword()
     rate = catalog.Field()
     reference = Reference()
+    # FIXME This almost certainly does not belong here
+    mercator_location = catalog.Keyword()
+    mercator_budget = catalog.Keyword()
 
 
 def includeme(config):

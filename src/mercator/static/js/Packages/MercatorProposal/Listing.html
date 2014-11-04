@@ -1,17 +1,15 @@
-<adh-listing data-path="{{path}}" data-content-type="{{contentType}}" data-action-column="action-column">
+<adh-listing data-path="{{path}}" data-content-type="{{contentType}}" data-facets="facets" data-action-column="action-column">
     <div data-ng-switch="transclusionId">
         <div data-ng-switch-when="create-form-id">
             [disabled. please go to http://localhost:6551/mercator for now.]
         </div>
         <adh-resource-wrapper
             data-ng-switch-when="element-id">
-            <adh-last-version data-item-path="{{element}}">
-                <adh-mercator-proposal
-                     data-ng-if="versionPath"
-                     data-path="{{versionPath}}"
-                     data-mode="display">
-                </adh-mercator-proposal>
-            </adh-last-version>
+            <adh-mercator-proposal
+                 data-ng-if="element"
+                 data-path="{{element}}"
+                 data-mode="display">
+            </adh-mercator-proposal>
         </adh-resource-wrapper>
     </div>
 </adh-listing>

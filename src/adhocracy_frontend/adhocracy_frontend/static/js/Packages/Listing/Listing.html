@@ -9,6 +9,18 @@
     <div class="listing-create-form" data-ng-if="show.createForm">
         <adh-inject data-transclusion-id="create-form-id"></adh-inject>
     </div>
+    <div ng-if="facets">
+        {{ "Filter list" | translate }}
+        <ul>
+            <li data-ng-repeat="facet in facets">{{ facet.name | translate }}
+                <ul>
+                    <li data-ng-repeat="item in facet.items">
+                        <a href="" data-ng-click="toggleItem(item)">{{ item.name | translate }}</a> <span ng-if="item.enabled">(enabled)</span>
+                    </li>
+                </ul>
+            </li>
+        </ol>
+    </div>
     <ol class="listing-elements">
         <li class="listing-element" data-ng-repeat="element in elements">
             <adh-inject data-transclusion-id="element-id"></adh-inject>
