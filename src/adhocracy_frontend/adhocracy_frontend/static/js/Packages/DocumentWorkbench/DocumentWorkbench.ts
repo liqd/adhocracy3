@@ -8,6 +8,7 @@ import AdhUser = require("../User/User");
 
 import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
 import RIProposal = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposal");
+import RIProposalVersion = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposalVersion");
 import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
 import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
 
@@ -60,6 +61,10 @@ export var register = (angular) => {
                 .when(RIBasicPool.content_type, {
                      space: "content",
                      movingColumns: "is-show-show-hide"
+                })
+                .when(RIProposalVersion.content_type, {
+                     space: "content",
+                     movingColumns: "is-collapsed-show-show"
                 })
                 .when(RIUser.content_type, {
                      space: "user",
