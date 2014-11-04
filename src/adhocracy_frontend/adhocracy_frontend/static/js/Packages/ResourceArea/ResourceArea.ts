@@ -48,6 +48,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
             var data = self.provider.get(resource.content_type);
             data["platform"] = path.split("/")[1];
 
+            // if path contains more than just the platform
             if (path.split("/").length > 2) {
                 data["content2Url"] = this.adhConfig.rest_url + path;
             }
