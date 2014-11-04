@@ -279,6 +279,26 @@ class TestDetailsSheet:
                   }
         assert inst.get() == wanted
 
+
+class TestLocationIndex:
+
+    @fixture
+    def resource(self):
+        from adhocracy_mercator.sheets.mercator import IMercatorSubResources
+        from adhocracy_mercator.sheets.mercator import IDetails
+        from adhocracy_core.utils import get_sheet
+        resource = testing.DummyResource(__provides__=IMercatorSubResources)
+        details_resource = testing.DummyResource(__provides__=IDetails)
+
+        sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
+
+        # FIXME: This following .set instruction doesn't work
+        sub_resources_sheet.set({
+            'details': details_resource,
+        })
+
+        return resource
+
     @mark.usefixtures('integration')
     def test_index_location_default(self, resource):
         from adhocracy_mercator.sheets.mercator import index_location
@@ -287,11 +307,15 @@ class TestDetailsSheet:
 
     @mark.usefixtures('integration')
     def test_index_location_is_linked_to_ruhr(self, resource):
+        from adhocracy_mercator.sheets.mercator import IMercatorSubResources
         from adhocracy_mercator.sheets.mercator import IDetails
         from adhocracy_mercator.sheets.mercator import index_location
         from adhocracy_core.utils import get_sheet
-        sheet = get_sheet(resource, IDetails)
-        sheet.set({'location_is_linked_to_ruhr': True})
+        sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
+        sub_resources_appstruct = sub_resources_sheet.get()
+        details_resource = sub_resources_appstruct['details']
+        details_sheet = get_sheet(details_resource, IDetails)
+        details_sheet.set({'location_is_linked_to_ruhr': True})
         result = index_location(resource, 'default')
         assert result == ['linked_to_ruhr']
 
