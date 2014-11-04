@@ -106,3 +106,162 @@ def test_includeme_register_metadata_update_subscriber(config):
     handlers = config.registry.registeredHandlers()
     handler_names = [x.handler.__name__ for x in handlers]
     assert 'resource_modified_metadata_subscriber' in handler_names
+
+
+class TestVisibility:
+
+    @fixture
+    def resource_with_metadata(self, integration):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import IMetadata
+        return testing.DummyResource(__provides__=[IResource, IMetadata])
+
+    def test_is_deleted_attribute_is_true(self, context):
+        from adhocracy_core.sheets.metadata import is_deleted
+        context.deleted = True
+        assert is_deleted(context) is True
+
+    def test_is_deleted_attribute_is_false(self, context):
+        from adhocracy_core.sheets.metadata import is_deleted
+        context.deleted = False
+        assert is_deleted(context) is False
+
+    def test_is_deleted_attribute_not_set(self, context):
+        from adhocracy_core.sheets.metadata import is_deleted
+        assert is_deleted(context) is False
+
+    def test_is_deleted_parent_attribute_is_true(self, context):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import is_deleted
+        child = testing.DummyResource(__provides__=IResource)
+        context['child'] = child
+        context.deleted = True
+        assert is_deleted(child) is True
+
+    def test_is_deleted_parent_attribute_is_false(self, context):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import is_deleted
+        child = testing.DummyResource(__provides__=IResource)
+        context['child'] = child
+        context.deleted = False
+        assert is_deleted(child) is False
+
+    def test_is_deleted_parent_attribute_not_set(self, context):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import is_deleted
+        child = testing.DummyResource(__provides__=IResource)
+        context['child'] = child
+        assert is_deleted(child) is False
+
+    def test_is_deleted_parent_attrib_true_child_attrib_false(self, context):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import is_deleted
+        child = testing.DummyResource(__provides__=IResource)
+        context['child'] = child
+        context.deleted = True
+        child.deleted = False
+        assert is_deleted(child) is True
+
+    def test_is_hidden_attribute_is_true(self, context):
+        from adhocracy_core.sheets.metadata import is_hidden
+        context.hidden = True
+        assert is_hidden(context) is True
+
+    def test_is_hidden_attribute_is_false(self, context):
+        from adhocracy_core.sheets.metadata import is_hidden
+        context.hidden = False
+        assert is_hidden(context) is False
+
+    def test_is_hidden_attribute_not_set(self, context):
+        from adhocracy_core.sheets.metadata import is_hidden
+        assert is_hidden(context) is False
+
+    def test_is_hidden_parent_attribute_is_true(self, context):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import is_hidden
+        child = testing.DummyResource(__provides__=IResource)
+        context['child'] = child
+        context.hidden = True
+        assert is_hidden(child) is True
+
+    def test_is_hidden_parent_attribute_is_false(self, context):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import is_hidden
+        child = testing.DummyResource(__provides__=IResource)
+        context['child'] = child
+        context.hidden = False
+        assert is_hidden(child) is False
+
+    def test_is_hidden_parent_attribute_not_set(self, context):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import is_hidden
+        child = testing.DummyResource(__provides__=IResource)
+        context['child'] = child
+        assert is_hidden(child) is False
+
+    def test_is_hidden_parent_attrib_true_child_attrib_false(self, context):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import is_hidden
+        child = testing.DummyResource(__provides__=IResource)
+        context['child'] = child
+        context.hidden = True
+        child.hidden = False
+        assert is_hidden(child) is True
+
+    def test_view_blocked_by_metadata_no_metadata(self, registry):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+        resource = testing.DummyResource(__provides__=IResource)
+        assert view_blocked_by_metadata(resource, registry) is None
+
+    @mark.usefixtures('integration')
+    def test_view_blocked_by_metadata_not_blocked(self, registry):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import IMetadata
+        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+        resource = testing.DummyResource(__provides__=[IResource, IMetadata])
+        assert view_blocked_by_metadata(resource, registry) is None
+
+    def test_view_blocked_by_metadata_deleted(self, resource_with_metadata,
+                                              registry):
+        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+        resource_with_metadata.deleted = True
+        result = view_blocked_by_metadata(resource_with_metadata, registry)
+        assert result['reason'] == 'deleted'
+
+    def test_view_blocked_by_metadata_hidden(self, resource_with_metadata,
+                                              registry):
+        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+        resource_with_metadata.hidden = True
+        result = view_blocked_by_metadata(resource_with_metadata, registry)
+        assert result['reason'] == 'hidden'
+
+    def test_view_blocked_by_metadata_both(self, resource_with_metadata,
+                                              registry):
+        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+        resource_with_metadata.deleted = True
+        resource_with_metadata.hidden = True
+        result = view_blocked_by_metadata(resource_with_metadata, registry)
+        assert result['reason'] == 'both'
+
+    def test_view_blocked_by_metadata_result_fields_correct(
+            self, pool_graph, resource_with_metadata, registry):
+        from datetime import datetime
+        from adhocracy_core.resources.principal import IUser
+        from adhocracy_core.sheets.metadata import IMetadata
+        from adhocracy_core.sheets.metadata import view_blocked_by_metadata
+        from adhocracy_core.utils import get_sheet
+        pool_graph['res'] = resource_with_metadata
+        metadata = get_sheet(resource_with_metadata, IMetadata,
+                             registry=registry)
+        appstruct = metadata.get()
+        user = testing.DummyRequest(__provides__=IUser)
+        pool_graph['user'] = user
+        now = datetime.now()
+        appstruct['modified_by'] = user
+        appstruct['modification_date'] = now
+        metadata.set(appstruct, force=True, send_event=False)
+        resource_with_metadata.hidden = True
+        result = view_blocked_by_metadata(resource_with_metadata, registry)
+        assert result['modified_by'] == user
+        assert result['modification_date'] == now
