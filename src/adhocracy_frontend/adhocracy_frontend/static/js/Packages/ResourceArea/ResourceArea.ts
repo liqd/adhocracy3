@@ -48,6 +48,11 @@ export class Service implements AdhTopLevelState.IAreaInput {
             var data = self.provider.get(resource.content_type);
             data["platform"] = path.split("/")[1];
 
+            // if path contains more than just the platform
+            if (path.split("/").length > 2) {
+                data["content2Url"] = this.adhConfig.rest_url + path;
+            }
+
             for (var key in search) {
                 if (search.hasOwnProperty(key)) {
                     data[key] = search[key];
@@ -60,12 +65,19 @@ export class Service implements AdhTopLevelState.IAreaInput {
     public reverse(data : Dict) {
         var defaults = {
             space: "content",
-            movingColumns: "is-show-show-hide",
-            content2Url: ""
+            movingColumns: "is-show-show-hide"
         };
 
+        var path;
+
+        if (data["content2Url"]) {
+            path = data["content2Url"].replace(this.adhConfig.rest_url, "");
+        } else {
+            path = "/" + data["platform"];
+        }
+
         return {
-            path: "/" + data["platform"],
+            path: path,
             search: _.transform(data, (result, value : string, key : string) => {
                 if (defaults.hasOwnProperty(key) && value !== defaults[key]) {
                     result[key] = value;
