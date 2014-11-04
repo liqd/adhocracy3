@@ -37,18 +37,6 @@ var toggleListing = function() {
 </script>
 ```
 */
-.listing {
-    .listing-create-form {
-        display: none;
-    }
-
-    &.show-create-form {
-        .listing-create-form {
-            display: block;
-        }
-    }
-}
-
 .listing-elements {
     margin: 0;
     padding: 0;
