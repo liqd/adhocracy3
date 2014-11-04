@@ -6,9 +6,9 @@ from pytest import raises
 
 @fixture()
 def integration(config):
-        config.include('adhocracy_core.catalog')
-        config.include('adhocracy_core.registry')
-        config.include('adhocracy_mercator.sheets.mercator')
+    config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.registry')
+    config.include('adhocracy_mercator.sheets.mercator')
 
 
 @mark.usefixtures('integration')
@@ -173,8 +173,8 @@ class TestOrganizationInfoSchema:
         wanted = cstruct_required   # cstruct and appstruct are the same here
         assert inst.deserialize(cstruct_required) == wanted
 
-    def test_deserialize_with_status_other_and_no_description(self, inst,
-                                                              cstruct_required):
+    def test_deserialize_with_status_other_and_no_description(
+            self, inst, cstruct_required):
         from colander import Invalid
         cstruct = cstruct_required
         cstruct['status'] = 'other'
