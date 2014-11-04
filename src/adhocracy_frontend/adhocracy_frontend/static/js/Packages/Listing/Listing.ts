@@ -94,7 +94,8 @@ export class Listing<Container extends ResourcesBase.Resource> {
             scope: {
                 path: "@",
                 contentType: "@",
-                facets: "="
+                facets: "=",
+                noCreateForm: "="
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
