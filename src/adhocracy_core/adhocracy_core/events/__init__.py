@@ -23,7 +23,7 @@ class ResourceCreatedAndAdded:
 
     :param object(adhocracy_core.interfaces.IResource):
     :param parent(adhocracy_core.interfaces.IResource):
-    :param registry(pyramid.registry.Request):
+    :param registry(pyramid.registry.Registry):
     :param creator(adhocracy_core.resource.principal.IUser):
     """
 
@@ -41,7 +41,7 @@ class ResourceSheetModified:
 
     :param object: adhocracy_core.interfaces.IResource
     :param isheet: adhocracy_core.interfaces.IISheet
-    :param registry: pyramid.registry.Request
+    :param registry: pyramid.registry.Registry
     :param old_appstruct: The old :term:`appstruct` data (dict)
     :param new_appstruct: The new :term:`appstruct` data (dict)
     :param request: The current request
@@ -69,7 +69,7 @@ class ItemVersionNewVersionAdded:
 
     :param object(adhocracy_core.interfaces.IItem):
     :param new_version(adhocracy_core.interfaces.IItemVersion):
-    :param registry(pyramid.registry.Request):
+    :param registry(pyramid.registry.Registry):
     :param creator(adhocracy_core.resource.principal.IUser':
     """
 
@@ -92,7 +92,7 @@ class SheetReferencedItemHasNewVersion:
                                                            resource
     :param new_version(adhocracy_core.interfaces.IItemVersion): new referenced
                                                            resource
-    :param registry(pyramid.registry.Request):
+    :param registry(pyramid.registry.Registry):
     :param root_versions(list): IItemVersions not in the subtree of
                                 these root resources should ignore
                                 this event. Optional.
