@@ -368,6 +368,21 @@ class TestResourceRESTView:
         inst = self.make_one(context, request_)
         assert inst.get()['data'][ISheet.__identifier__] ==  {'name': '1'}
 
+    def test_get_blocked(self, config, request_):
+        config.include('adhocracy_core.catalog')
+        config.include('adhocracy_core.events')
+        config.include('adhocracy_core.sheets.metadata')
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import IMetadata
+        resource = testing.DummyResource(__provides__=[IResource, IMetadata])
+        resource.hidden = True
+        inst = self.make_one(resource, request_)
+        response = inst.get()
+        assert response['reason'] == 'hidden'
+        assert set(response.keys()) == {'reason',
+                                        'modification_date',
+                                        'modified_by'}
+
 
 class TestSimpleRESTView:
 
@@ -490,6 +505,14 @@ class TestPoolRESTView:
         wanted = {'path': request.application_url + '/child/', 'content_type': IResourceX.__identifier__}
         assert wanted == response
 
+    def test_put_valid_no_sheets(self, request, context, mock_sheet):
+        request.registry.content.get_sheets_edit.return_value = [mock_sheet]
+        request.validated = {"content_type": "X", "data": {}}
+        inst = self.make_one(context, request)
+        response = inst.put()
+        wanted = {'path': request.application_url + '/', 'content_type': IResource.__identifier__}
+        assert wanted == response
+
 
 class TestUsersRESTView:
 
@@ -583,6 +606,18 @@ class TestItemRESTView:
                   'first_version_path': ''}
         assert inst.get() == wanted
 
+    def test_get_blocked(self, request):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.sheets.metadata import IMetadata
+        resource = testing.DummyResource(__provides__=[IResource, IMetadata])
+        resource.hidden = True
+        inst = self.make_one(resource, request)
+        wanted = {'reason': 'deleted',
+                  'modification_date': 'yesterday',
+                  'modified_by': 'me'}
+        inst.respond_if_blocked = lambda: wanted
+        assert inst.get() == wanted
+
     def test_post_valid(self, request, context):
         request.root = context
         # Little cheat to prevent the POST validator from kicking in --
@@ -643,6 +678,14 @@ class TestItemRESTView:
         wanted = {'path': request.application_url + '/child/',
                   'content_type': IItemVersion.__identifier__}
         assert request.registry.content.create.call_args[1]['root_versions'] == [root]
+        assert wanted == response
+
+    def test_put_valid_no_sheets(self, request, context, mock_sheet):
+        request.registry.content.get_sheets_edit.return_value = [mock_sheet]
+        request.validated = {"content_type": "X", "data": {}}
+        inst = self.make_one(context, request)
+        response = inst.put()
+        wanted = {'path': request.application_url + '/', 'content_type': IResource.__identifier__}
         assert wanted == response
 
 
