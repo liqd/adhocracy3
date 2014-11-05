@@ -15,4 +15,5 @@ export interface IService {
     trusted_domains : string[];
     locale : string;
     support_email : string;
+    custom : {[key : string]: string};
 }

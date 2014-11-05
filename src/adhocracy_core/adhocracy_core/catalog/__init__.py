@@ -24,6 +24,9 @@ class AdhocracyCatalogFactory:
     priv_visibility = catalog.Keyword()  # visible / deleted / hidden
     rate = catalog.Field()
     reference = Reference()
+    # FIXME This almost certainly does not belong here
+    mercator_location = catalog.Keyword()
+    mercator_budget = catalog.Keyword()
 
 
 def includeme(config):

@@ -2,68 +2,105 @@ import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
-
-import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
-import RIMercatorProposal = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposal");
-import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
-import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 
 
-export var resourceArea = (
-    adhHttp : AdhHttp.Service<any>,
-    adhConfig : AdhConfig.IService
-) => {
+export interface Dict {
+    [key : string]: string;
+}
+
+
+export class Provider implements ng.IServiceProvider {
+    public $get;
+    private data : {[resourceType : string]: Dict};
+
+    constructor() {
+        var self = this;
+        this.data = {};
+        this.$get = ["adhHttp", "adhConfig", (adhHttp, adhConfig) => new Service(self, adhHttp, adhConfig)];
+    }
+
+    public when(resourceType : string, defaults : Dict) : Provider {
+        this.data[resourceType] = defaults;
+        return this;
+    }
+
+    public get(resourceType : string) : Dict {
+        return _.clone(this.data[resourceType]);
+    }
+}
+
+
+export class Service implements AdhTopLevelState.IAreaInput {
+    public template : string = "<adh-page-wrapper><adh-platform></adh-platform></adh-page-wrapper>";
+
+    constructor(
+        private provider : Provider,
+        private adhHttp : AdhHttp.Service<any>,
+        private adhConfig : AdhConfig.IService
+    ) {}
+
+    public route(path : string, search : Dict) : ng.IPromise<Dict> {
+        var self : Service = this;
+        var resourceUrl = this.adhConfig.rest_url + path;
+
+        return this.adhHttp.get(resourceUrl).then((resource) => {
+            var data = self.provider.get(resource.content_type);
+            data["platform"] = path.split("/")[1];
+
+            // if path contains more than just the platform
+            if (path.split("/").length > 2) {
+                data["content2Url"] = this.adhConfig.rest_url + path;
+            }
+
+            for (var key in search) {
+                if (search.hasOwnProperty(key)) {
+                    data[key] = search[key];
+                }
+            }
+            return data;
+        });
+    }
+
+    public reverse(data : Dict) {
+        var defaults = {
+            space: "content",
+            movingColumns: "is-show-show-hide"
+        };
+
+        var path;
+
+        if (data["content2Url"]) {
+            path = data["content2Url"].replace(this.adhConfig.rest_url, "");
+        } else {
+            path = "/" + data["platform"];
+        }
+
+        return {
+            path: path,
+            search: _.transform(data, (result, value : string, key : string) => {
+                if (defaults.hasOwnProperty(key) && value !== defaults[key]) {
+                    result[key] = value;
+                }
+            })
+        };
+    }
+}
+
+
+export var platformDirective = (adhTopLevelState : AdhTopLevelState.Service) => {
     return {
-        template: "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>",
-        route: (path, search) : ng.IPromise<{[key : string]: string}> => {
-            var resourceUrl = adhConfig.rest_url + path;
-
-            return adhHttp.get(resourceUrl).then((resource) => {
-                var data = {};
-
-                switch (resource.content_type) {
-                    case RIBasicPool.content_type:
-                        data["space"] = "content";
-                        data["movingColumns"] = "is-show-show-hide";
-                        break;
-                    case RIMercatorProposal.content_type:
-                        data["space"] = "content";
-                        data["movingColumns"] = "is-show-show-hide";
-                        break;
-                    case RIUser.content_type:
-                        data["space"] = "user";
-                        data["movingColumns"] = "is-show-show-hide";
-                        break;
-                    case RIUsersService.content_type:
-                        data["space"] = "user";
-                        data["movingColumns"] = "is-show-show-hide";
-                        break;
-                    default:
-                        throw "404";
-                }
-                for (var key in search) {
-                    if (search.hasOwnProperty(key)) {
-                        data[key] = search[key];
-                    }
-                }
-                return data;
+        template:
+            "<div data-ng-switch=\"platform\">" +
+            "<div data-ng-switch-when=\"adhocracy\"><adh-document-workbench></div>" +
+            // FIXME: move mercator specifics away
+            "<div data-ng-switch-when=\"mercator\"><adh-mercator-workbench></div>" +
+            "</div>",
+        restrict: "E",
+        link: (scope, element) => {
+            adhTopLevelState.on("platform", (value : string) => {
+                scope.platform = value;
             });
-        },
-        reverse: (data) => {
-            var defaults = {
-                space: "content",
-                movingColumns: "is-show-show-hide",
-                content2Url: ""
-            };
-
-            return {
-                path: "/adhocracy",
-                search: _.transform(data, (result, value, key) => {
-                    if (defaults.hasOwnProperty(key) && value !== defaults[key]) {
-                        result[key] = value;
-                    }
-                })
-            };
         }
     };
 };
@@ -74,6 +111,13 @@ export var moduleName = "adhResourceArea";
 export var register = (angular) => {
     angular
         .module(moduleName, [
-            AdhHttp.moduleName
-        ]);
+            AdhHttp.moduleName,
+            AdhTopLevelState.moduleName
+        ])
+        .config(["adhTopLevelStateProvider", (adhTopLevelStateProvider : AdhTopLevelState.Provider) => {
+            adhTopLevelStateProvider
+                .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
+        }])
+        .directive("adhPlatform", ["adhTopLevelState", platformDirective])
+        .provider("adhResourceArea", Provider);
 };

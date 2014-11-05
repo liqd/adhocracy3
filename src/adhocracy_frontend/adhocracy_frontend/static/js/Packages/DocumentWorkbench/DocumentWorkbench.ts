@@ -3,9 +3,15 @@
 import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
 import AdhProposal = require("../Proposal/Proposal");
+import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhUser = require("../User/User");
 
+import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
 import RIProposal = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposal");
+import RIProposalVersion = require("../../Resources_/adhocracy_core/resources/sample_proposal/IProposalVersion");
+import RIUser = require("../../Resources_/adhocracy_core/resources/principal/IUser");
+import RIUsersService = require("../../Resources_/adhocracy_core/resources/principal/IUsersService");
+
 
 var pkgLocation = "/DocumentWorkbench";
 
@@ -47,8 +53,28 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhComment.moduleName,
             AdhProposal.moduleName,
+            AdhResourceArea.moduleName,
             AdhUser.moduleName
         ])
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+            adhResourceAreaProvider
+                .when(RIBasicPool.content_type, {
+                     space: "content",
+                     movingColumns: "is-show-show-hide"
+                })
+                .when(RIProposalVersion.content_type, {
+                     space: "content",
+                     movingColumns: "is-collapsed-show-show"
+                })
+                .when(RIUser.content_type, {
+                     space: "user",
+                     movingColumns: "is-show-show-hide"
+                })
+                .when(RIUsersService.content_type, {
+                     space: "user",
+                     movingColumns: "is-show-show-hide"
+                });
+        }])
         .directive("adhDocumentWorkbench", ["adhConfig", (adhConfig) =>
             new DocumentWorkbench().createDirective(adhConfig)]);
 };

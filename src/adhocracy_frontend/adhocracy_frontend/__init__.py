@@ -30,6 +30,9 @@ def config_view(request):
     config['support_email'] = settings.get('adhocracy.frontend.support_email',
                                            'support@unconfigured.domain')
     config['locale'] = settings.get('adhocracy.frontend.locale', 'en')
+    custom_keys = settings.get('adhocracy.custom', '').split()
+    config['custom'] = {k: settings.get('adhocracy.custom.%s' % k)
+                        for k in custom_keys}
     return config
 
 

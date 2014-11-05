@@ -27,6 +27,7 @@ import AdhHttp = require("./Packages/Http/Http");
 import AdhInject = require("./Packages/Inject/Inject");
 import AdhListing = require("./Packages/Listing/Listing");
 import AdhMercatorProposal = require("./Packages/MercatorProposal/MercatorProposal");
+import AdhMercatorWorkbench = require("./Packages/MercatorWorkbench/MercatorWorkbench");
 import AdhPermissions = require("./Packages/Permissions/Permissions");
 import AdhPreliminaryNames = require("./Packages/PreliminaryNames/PreliminaryNames");
 import AdhProposal = require("./Packages/Proposal/Proposal");
@@ -55,7 +56,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         window.document.body.className += " is-embedded";
     }
 
-    var app = angular.module("adhocracy3SampleFrontend", [
+    var app = angular.module("a3Mercator", [
         "monospaced.elastic",
         "pascalprecht.translate",
         "ngAnimate",
@@ -65,6 +66,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhCrossWindowMessaging.moduleName,
         AdhEmbed.moduleName,
         AdhMercatorProposal.moduleName,
+        AdhMercatorWorkbench.moduleName,
         AdhResourceArea.moduleName,
         AdhProposal.moduleName
     ]);
@@ -79,73 +81,9 @@ export var init = (config : AdhConfig.IService, meta_api) => {
                 $location.replace();
                 $location.path("/r/adhocracy/");
                 return {
-                    template: ""
+                    skip: true
                 };
             }])
-            .when("login", () : AdhTopLevelState.IAreaInput => {
-                return {
-                    templateUrl: "/static/js/templates/Login.html"
-                };
-            })
-            .when("register", () : AdhTopLevelState.IAreaInput => {
-                return {
-                    templateUrl: "/static/js/templates/Register.html"
-                };
-            })
-            .when("activate", ["adhUser", "adhTopLevelState", "adhDone", "$location",
-                (adhUser, adhTopLevelState, adhDone, $location) : AdhTopLevelState.IAreaInput => {
-                    AdhUser.activateController(adhUser, adhTopLevelState, adhDone, $location);
-                    return {
-                        template: ""
-                    };
-                }
-            ])
-            .when("activation_error", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                $scope.translationData = {
-                    supportEmail: adhConfig.support_email
-                };
-                return {
-                    templateUrl: "/static/js/templates/ActivationError.html"
-                };
-            }])
-            .when("mercator", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
-                return {
-                    template: "<adh-resource-wrapper>" +
-                        "<adh-mercator-proposal-create data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
-                        "</adh-mercator-proposal-create></adh-resource-wrapper>"
-                };
-            }])
-            .when("mercator-listing", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
-                return {
-                    template: "<adh-mercator-proposal-listing data-path=\"{{path}}\">" +
-                        "</adh-mercator-proposal-listing>"
-                };
-            }])
-            .when("mercator-detail", ["adhConfig", "$rootScope", (adhConfig, $rootScope) : AdhTopLevelState.IAreaInput => {
-                // FIXME: this always shows proposal with title "title".  for testing only.
-                $rootScope.path = adhConfig.rest_url + adhConfig.rest_platform_path + "title/";
-                return {
-                    template:
-                        "<adh-resource-wrapper>" +
-                        "<adh-last-version data-item-path=\"{{path}}\">" +
-                        "<adh-mercator-proposal-detail-view data-ng-if=\"versionPath\" data-path=\"{{versionPath}}\">" +
-                        "</adh-mercator-proposal-detail-view>" +
-                        "</adh-last-version>" +
-                        "</adh-resource-wrapper>"
-                };
-            }])
-            .when("embed", ["$translate", "$location", ($translate, $location : ng.ILocationService) : AdhTopLevelState.IAreaInput => {
-                var params = $location.search();
-                if (params.hasOwnProperty("locale")) {
-                    $translate.use(params.locale);
-                }
-                return {
-                    template: "<adh-embed></adh-embed>"
-                };
-            }])
-            .when("r", ["adhHttp", "adhConfig", AdhResourceArea.resourceArea])
             .otherwise(() : AdhTopLevelState.IAreaInput => {
                 return {
                     template: "<adh-page-wrapper><h1>404 - Not Found</h1></adh-page-wrapper>"
@@ -185,6 +123,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhInject.register(angular);
     AdhListing.register(angular);
     AdhMercatorProposal.register(angular);
+    AdhMercatorWorkbench.register(angular);
     AdhPermissions.register(angular);
     AdhPreliminaryNames.register(angular);
     AdhProposal.register(angular);
@@ -197,7 +136,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhWebSocket.register(angular);
 
     // force-load some services
-    var injector = angular.bootstrap(document, ["adhocracy3SampleFrontend"]);
+    var injector = angular.bootstrap(document, ["a3Mercator"]);
     injector.get("adhCrossWindowMessaging");
 
     loadComplete();

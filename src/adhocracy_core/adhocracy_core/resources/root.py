@@ -69,6 +69,8 @@ def create_initial_content_for_app_root(context: IPool, registry: Registry,
     _add_default_group(context, registry)
     _add_initial_user_and_group(context, registry)
     _add_platform(context, registry)
+    # FIXME: Move mercator platform creation to mercator package
+    _add_platform(context, registry, 'mercator')
 
 
 def _add_objectmap_to_app_root(root):
@@ -98,8 +100,10 @@ def _add_acl_to_app_root(context, registry):
     set_acl(context, root_acl, registry=registry)
 
 
-def _add_platform(context, registry):
-    platform_id = registry.settings.get('adhocracy.platform_id', 'adhocracy')
+def _add_platform(context, registry, platform_id=None):
+    if platform_id is None:
+        platform_id = registry.settings.get('adhocracy.platform_id',
+                                            'adhocracy')
     appstructs = {'adhocracy_core.sheets.name.IName': {'name': platform_id}}
     registry.content.create(IBasicPool.__identifier__, context,
                             appstructs=appstructs, registry=registry)

@@ -186,35 +186,6 @@ A label can be used to describe an input.
 
 /*doc
 ---
-title: tooltip modifier
-name: label.m-tooltip
-parent: label
----
-
-If you do not want to show a label directly but to have an info icon with a
-tooltip instead you may use this modifier.
-
-```html_example
-<label class="m-tooltip" title="description">
-    <input type="text" />
-</label>
-```
-*/
-label.m-tooltip {
-    &::after {
-        content: "i";
-        display: block;
-        height: 2em;
-        line-height: 2;
-        width: 2em;
-        border: 1px solid $color-structure-border;
-        @include border-radius(50%);
-        @include text-align(center);
-    }
-}
-
-/*doc
----
 title: Errors
 name: errors
 category: Inputs
