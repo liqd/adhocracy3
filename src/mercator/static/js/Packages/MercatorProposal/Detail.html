@@ -1,4 +1,4 @@
-<div class="mercator-proposal-detail-view">
+<div class="mercator-proposal-detail-view" id="mercator-detail-view-top">
     <div class="cover">
         <div>
             <img src="" alt="" />
@@ -94,7 +94,75 @@
                     <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
                 </div>
                 <div>
-                    [uploaded image, i think?]
+                    [FIXME: using form user name rather than profile
+                    user name for now.  anyway: if this place is
+                    supposed to show the name from the user profile
+                    rather than from the mercator proposal create
+                    form, then why do we enter the latter in the first
+                    place?  (note that we don't have
+                    first-name-last-name in the user profile, but just
+                    one text field containing the full name.  i
+                    suppose that's not a problem here.)]
+
+                    <div data-ng-switch="data.organization_info.status_enum">
+                        <div data-ng-switch-when="registered_nonprofit">
+                            <div>
+                                {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                            </div>
+                            <div>
+                                <div>
+                                    <p>{{ data.organisation_info.name }}</p>
+                                    <p>{{ data.organisation_info.website }}</p>
+                                    <p>{{ "We are a registered non-profil" | translate }}</p>
+                                </div>
+                                <div>
+                                    {{ data.organisation_info.country }}
+                                </div>
+                            </div>
+                        </div>
+                        <div data-ng-switch-when="planned_nonprofit">
+                            <div>
+                                {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                            </div>
+                            <div>
+                                <div>
+                                    <p>{{ data.organisation_info.name }}</p>
+                                    <p>{{ data.organisation_info.website }}</p>
+                                    <p>
+                                        {{ "NGO registration is planned or in process " | translate }}
+                                        {{ data.organisation_info.date_of_foreseen_registration }}
+                                    </p>
+                                </div>
+                                <div>
+                                    {{ data.organisation_info.country }}
+                                </div>
+                            </div>
+                        </div>
+                        <div data-ng-switch-when="support_needed">
+                            <div>
+                                {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                            </div>
+                            <div>
+                                <div>
+                                    <p>{{ data.organisation_info.name }}</p>
+                                    <p>{{ data.organisation_info.website }}</p>
+                                    <p>{{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}</p>
+                                    <p>{{ data.organisation_info.how_can_we_help_you }}</p>
+                                </div>
+                                <div>
+                                    {{ data.organisation_info.country }}
+                                </div>
+                            </div>
+                        </div>
+                        <div data-ng-switch-when="other">
+                            <div>
+                                {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                            </div>
+                            <div>
+                                <p>{{ data.organisation_info.status_other }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="mercator-detail-view-detailed-proposal">
@@ -156,7 +224,8 @@
                     everybody?  shouldn't we offer to pull that out of
                     the database and send the statistics to mercator
                     separately?  it seems odd to show that information
-                    to other users.]
+                    to other users.  especially the fact that you can
+                    comment on it.  :)]
 
                     [FIXME: if we want to keep this: javascript data
                     contains boolean fields that contain string
@@ -174,6 +243,8 @@
         <div>[here you should see a second manifestation of the
         support butten in the cover section.  obviously, if one of
         them is clicked, the other should change automatically.]</div>
+
+        <a href="#mercator-detail-view-top">go to top</a>
 
     </div>
 </div>
