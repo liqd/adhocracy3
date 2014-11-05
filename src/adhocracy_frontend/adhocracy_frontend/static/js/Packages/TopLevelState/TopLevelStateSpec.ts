@@ -1,9 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
 import q = require("q");
-
+import _ = require("lodash");
 import AdhTopLevelState = require("./TopLevelState");
-
 
 export var register = () => {
 
@@ -21,7 +20,7 @@ export var register = () => {
                 on = jasmine.createSpy("on");
                 off = jasmine.createSpy("off");
                 trigger = jasmine.createSpy("trigger");
-                locationMock = jasmine.createSpyObj("locationMock", ["url", "search"]);
+                locationMock = jasmine.createSpyObj("locationMock", ["url", "search", "path"]);
                 rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
 
                 eventHandlerMockClass = <any>function() {
@@ -30,10 +29,78 @@ export var register = () => {
                     this.trigger = trigger;
                 };
 
-                adhTopLevelState = new AdhTopLevelState.Service(
+                adhTopLevelState = <any>new AdhTopLevelState.Service(
                     null, eventHandlerMockClass, locationMock, rootScopeMock, null, q, null, null);
 
                 spyOn(adhTopLevelState, "toLocation");
+
+            });
+
+            describe("location parser", () => {
+                var TLS : any;
+                var areaMock;
+
+                beforeEach(() => {
+                    areaMock = jasmine.createSpyObj("areaMock", ["route", "reverse", "_data"]);
+                    areaMock.route = function(path, search) {
+                        return {then: function(fn) {
+                                        fn(areaMock._data);
+                                      }
+                               };
+                    };
+
+                    TLS = <any>adhTopLevelState;
+                    TLS.getArea = function() {
+                        return areaMock;
+                    };
+
+                    locationMock.url = "/r/adhocracy";
+                    locationMock.path = function() { return locationMock.url; };
+                    locationMock.search = function() { return {}; };
+                    locationMock.replace = function() { return; };
+                });
+
+                it("adds parameters to TopLevelState", () => {
+                    var data = { mykey: "myvalue"};
+                    areaMock._data = data;
+
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            expect(TLS.data[key]).toBeUndefined();
+                        };
+                    };
+
+                    TLS.fromLocation();
+
+                    for (var key2 in data) {
+                        if (data.hasOwnProperty(key2)) {
+                            if (TLS.data.hasOwnProperty(key2)) {
+                                expect(TLS.data[key2]).toBe(data[key2]);
+                            };
+                        };
+                    };
+
+                });
+
+                it("removes parameters from TopLevelState", () => {
+                    var data = {};
+                    areaMock._data = data;
+
+                    TLS.data = {mykey: "myvalue"};
+                    var old = _.clone(TLS.data);
+
+                    TLS.fromLocation();
+
+                    for (var key in old) {
+                        if (old.hasOwnProperty(key) &&
+                            !data.hasOwnProperty(key)) {
+                            expect(TLS.data[key]).toBeUndefined();
+                        };
+                    };
+
+                });
+
+
             });
 
             it("dispatches calls to set() to eventHandler", () => {
