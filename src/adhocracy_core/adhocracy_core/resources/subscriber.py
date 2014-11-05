@@ -167,7 +167,7 @@ def _get_writable_appstructs(resource, registry) -> dict:
     for sheet in sheets:
         editable = sheet.meta.editable
         creatable = sheet.meta.creatable
-        if editable or creatable:
+        if editable or creatable:  # pragma: no branch
             appstructs[sheet.meta.isheet.__identifier__] = sheet.get()
     return appstructs
 
