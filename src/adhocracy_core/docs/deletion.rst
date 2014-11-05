@@ -108,6 +108,12 @@ Notes:
   deleting a resource.
 * This document is about deletion of resources (JSON documents). Deletion
   of uploaded assets (images, PDFs etc.) is outside its current scope.
+* Currently, the deleted/hidden status of resources isn't treated as special
+  by the Websocket server. So, if an resource is flagged as deleted/hidden
+  (or undeleted etc.), a "modified" event is sent to subscribers of that
+  resource and a "modified_child" event is sent to subscribers of the parent
+  pool. FIXME At same point in the future, we might want to change that and
+  send "removed"/"removed_child" messages instead.
 
 
 A Censorship Example
