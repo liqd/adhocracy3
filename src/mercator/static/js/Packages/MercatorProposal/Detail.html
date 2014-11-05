@@ -4,9 +4,7 @@
             <img src="" alt="" />
         </div>
         <div>
-            <div>
-                {{ data.introduction.title }}
-            </div>
+            <h2>{{ data.introduction.title }}</h2>
             <div>
                 <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
             </div>
@@ -28,24 +26,154 @@
         </div>
     </div>
 
-<!--
-
-    this ends up in the wrong place in the workbench:
-
-    <div class="body">
-        <nav class="mercator-proposal-nav">
+    <div> <!-- class="body" -->
+        <div> <!-- class="mercator-proposal-nav" -->
             <ol>
-                <li><a href="#mercator-proposal-basic">{{ "Basic" | translate }}</a></li>
-                <li><a href="#mercator-proposal-introduction">{{ "Introduction" | translate }}</a></li>
-                <li><a href="#mercator-proposal-detail">{{ "In Detail" | translate }}</a></li>
-                <li><a href="#mercator-proposal-motivation">{{ "Motivation" | translate }}</a></li>
-                <li><a href="#mercator-proposal-finance">{{ "Finance" | translate }}</a></li>
-                <li><a href="#mercator-proposal-extra">{{ "Extra" | translate }}</a></li>
+                <li><a href="#mercator-detail-view-brief-proposal">{{ "Brief Proposal" | translate }}</a></li>
+                <li><a href="#mercator-detail-view-detailed-proposal">{{ "Detailed Proposal" | translate }}</a></li>
+                <li><a href="#mercator-detail-view-goals-and-vision">{{ "Goals and Vision" | translate }}</a></li>
+                <li><a href="#mercator-detail-view-additional">{{ "Additional" | translate }}</a></li>
             </ol>
-        </nav>
+        </div>
+        <div> <!-- class="chapters" -->
+            <div id="mercator-detail-view-brief-proposal">
+                <h3>{{ "Brief Proposal" | translate }}</h3>
+                <div>
+                    <hr>
+                    <div>{{ "Pitch (Teaser)" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                </div>
+                <div>{{ data.introduction.teaser }}</div>
+                <div>{{ "Where will this project take place?" | translate }}</div>
+                <div>
+                    <div>
+                        online: {{ data.details.location_is_online }}
 
--->
+                        [FIXME: how should this just disappear if online is not checked in this proposal?]
+                    </div>
+                    <div data-ng-if="data.details.location_specific_1">
+                        {{ data.details.location_specific_1 }}
+                    </div>
+                    <div data-ng-if="data.details.location_specific_2">
+                        {{ data.details.location_specific_2 }}
+                    </div>
+                    <div data-ng-if="data.details.location_specific_3">
+                        {{ data.details.location_specific_3 }}
+                    </div>
+                    <div data-ng-if="details.location_is_linked_to_ruhr">
+                        Ruhr Gebiet, Germanye
 
-        [body]
+                        [FIXME: what's with the blue bubble in the wireframe?]
+                    </div>
+                </div>
+                <div>
+                    <hr>
+                    <div>{{ "Finance" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                </div>
+                <div>{{ data.finance.budget }} {{ "total project budget" | translate }}</div>
+                <div>{{ data.finance.requested_funding }} {{ "requested" | translate }}</div>
+                <div data-ng-if="data.finance.granted">
+                    [project is granted]
+                </div>
+                <div>
+                    {{ data.finance.other_sources }}
+
+                    [FIXME: the context in which this text is
+                    displayed gives a lot less clue about what the
+                    text is about than the context of the same text in
+                    the form where the proposal is entered.  this
+                    could encourage users enter sentence fragments
+                    there rather than sentences that remain
+                    self-explanatory here.  Perhaps the question from
+                    the form should be repeated here?]
+                </div>
+                <div>
+                    <hr>
+                    <div>{{ "Who is behind it?" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                </div>
+                <div>
+                    [uploaded image, i think?]
+                </div>
+            </div>
+            <div id="mercator-detail-view-detailed-proposal">
+                <h3>{{ "Detailed Proposal" | translate }}</h3>
+                <div>
+                    <hr>
+                    <div>{{ "Description?" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                </div>
+                <div>{{ data.details.description }}</div>
+                <div>
+                    <hr>
+                    <div>{{ "Story behind the idea" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                </div>
+                <div>{{ data.story }}</div>
+            </div>
+            <div id="mercator-proposal-detail-view-goals-and-vision">
+                <h3>{{ "Goals and Vision" | translate }}</h3>
+                <div>
+                    <hr>
+                    <div>{{ "What would be a successful outcome of your project or initiative?" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                </div>
+                <div>{{ data.outcome }}</div>
+                <div>
+                    <hr>
+                    <div>{{ "How do you want to get there?" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                </div>
+                <div>{{ data.steps }}</div>
+                <div>
+                    <hr>
+                    <div>{{ "Why does Europe need your idea?" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                </div>
+                <div>{{ data.value }}</div>
+                <div>
+                    <hr>
+                    <div>{{ "Partner organisations and members list" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                </div>
+                <div>{{ data.partners }}</div>
+            </div>
+            <div id="mercator-proposal-detail-view-additional">
+                <h3>{{ "Additional" | translate }}</h3>
+                <div>
+                    <hr>
+                    <div>{{ "Share your experience" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                </div>
+                <div>{{ data.experience }}</div>
+                <div>
+                    <hr>
+                    <div>{{ "Where did you find out about Advocate Europe?" | translate }}</div>
+                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+
+                    [FIXME: do we really want to display that for
+                    everybody?  shouldn't we offer to pull that out of
+                    the database and send the statistics to mercator
+                    separately?  it seems odd to show that information
+                    to other users.]
+
+                    [FIXME: if we want to keep this: javascript data
+                    contains boolean fields that contain string
+                    "false", which evaluate to true.  not sure what's
+                    going on there, but it can't be very complicated.]
+                </div>
+                <div data-ng-if="data.heard_from.colleague">colleague</div>
+                <div data-ng-if="data.heard_from.website">website</div>
+                <div data-ng-if="data.heard_from.newsletter">newsletter</div>
+                <div data-ng-if="data.heard_from.facebook">facebook</div>
+                <div data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</div>
+            </div>
+        </div>
+
+        <div>[here you should see a second manifestation of the
+        support butten in the cover section.  obviously, if one of
+        them is clicked, the other should change automatically.]</div>
+
     </div>
 </div>
