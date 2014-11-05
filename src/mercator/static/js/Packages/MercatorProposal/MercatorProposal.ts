@@ -866,6 +866,10 @@ export var register = (angular) => {
                 .when(RIMercatorProposal.content_type, {
                      space: "content",
                      movingColumns: "is-show-show-hide"
+                })
+                .when(RIMercatorProposalVersion.content_type, {
+                     space: "content",
+                     movingColumns: "is-show-show-hide"
                 });
         }])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
