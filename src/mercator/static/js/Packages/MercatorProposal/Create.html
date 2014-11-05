@@ -214,7 +214,7 @@
                         <input type="text" data-ng-model="data.details.location_specific_3" name="details-location_specific_3" placeholder="{{ 'City, Country' | translate }}" />
                     </div>
                     <label>
-                        <input type="checkbox" data-ng-model="data.details.location_is_online" ng-click="setCheckboxValidity('mercatorProposalDetailForm.details-location', data.details)" ng-valid="isOneChecked(data.details)" />
+                        <input type="checkbox" data-ng-model="data.details.location_is_online" name="details-location" ng-click="setCheckboxValidity('mercatorProposalDetailForm.details-location', data.details)" ng-valid="isOneChecked(data.details)" />
                         {{ "Online" | translate }}
                     </label>
                     <label>
