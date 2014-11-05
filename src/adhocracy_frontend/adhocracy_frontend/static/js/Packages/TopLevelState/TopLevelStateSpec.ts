@@ -91,12 +91,9 @@ export var register = () => {
 
                     TLS.fromLocation();
 
-                    for (var key in old) {
-                        if (old.hasOwnProperty(key) &&
-                            !data.hasOwnProperty(key)) {
-                            expect(TLS.data[key]).toBeUndefined();
-                        };
-                    };
+                    _.forOwn(old, (k, v) => {
+                        expect(TLS.data[k]).toBeUndefined();
+                    });
 
                 });
 
