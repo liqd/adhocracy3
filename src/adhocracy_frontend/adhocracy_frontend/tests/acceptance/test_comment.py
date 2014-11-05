@@ -19,11 +19,18 @@ class TestComment:
     def test_edit(self, browser):
         comment = get_column_listing(browser, 'content2').find_by_css('.comment').first
         edit_comment(comment, 'edited')
-        assert comment.find_by_css('.comment-content').first.text == 'edited'
+        assert comment.find_by_css('.comment-content div').first.text == 'edited'
 
         browser.reload()
 
         assert wait(lambda: browser.find_by_css('.comment-content').first.text == 'edited')
+
+    def test_edit_twice(self, browser):
+        comment = get_column_listing(browser, 'content2').find_by_css('.comment').first
+        edit_comment(comment, 'edited 1')
+        assert comment.find_by_css('.comment-content div').first.text == 'edited 1'
+        edit_comment(comment, 'edited 2')
+        assert comment.find_by_css('.comment-content div').first.text == 'edited 2'
 
     def test_reply(self, browser):
         comment = get_column_listing(browser, 'content2').find_by_css('.comment').first
