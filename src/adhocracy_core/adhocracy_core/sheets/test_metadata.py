@@ -214,13 +214,11 @@ class TestVisibility:
         resource = testing.DummyResource(__provides__=IResource)
         assert view_blocked_by_metadata(resource, registry) is None
 
-    @mark.usefixtures('integration')
-    def test_view_blocked_by_metadata_not_blocked(self, registry):
-        from adhocracy_core.interfaces import IResource
-        from adhocracy_core.sheets.metadata import IMetadata
+    def test_view_blocked_by_metadata_not_blocked(self, resource_with_metadata,
+                                                  registry):
         from adhocracy_core.sheets.metadata import view_blocked_by_metadata
-        resource = testing.DummyResource(__provides__=[IResource, IMetadata])
-        assert view_blocked_by_metadata(resource, registry) is None
+        result = view_blocked_by_metadata(resource_with_metadata, registry)
+        assert result is None
 
     def test_view_blocked_by_metadata_deleted(self, resource_with_metadata,
                                               registry):
