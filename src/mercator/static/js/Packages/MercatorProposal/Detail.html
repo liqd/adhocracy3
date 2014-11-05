@@ -1,19 +1,51 @@
 <div class="mercator-proposal-detail-view">
-    <pre>path: {{ path }}</pre>
-    <pre>data: {{ data }}</pre>
-    <img src="" alt="" />
-    <div class="body">
-        <h3>{{ data.introduction.title }}</h3>
-        <span>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</span>
+    <div class="cover">
+        <div>
+            <img src="" alt="" />
+        </div>
+        <div>
+            <div>
+                {{ data.introduction.title }}
+            </div>
+            <div>
+                <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+            </div>
+        </div>
         <div class="meta">
-            <span>when: {{ data.basic.createtime }}</span>
-            <span>budget: {{ data.finance.funding }} / {{ data.finance.budget }}</span>
-            <span>comments: [#comments]</span>
-            <span>votes: [#votes]</span>
+            <span>requested: EUR {{ data.finance.requested_funding }}</span>
+            <span>author: {{ data.user_info.first_name }} {{ data.user_info.last_name }}</span>
+            <span>published: {{ data.basic.createtime }}</span>
+            <div>
+                #comments
+            </div>
+            <div>
+                #supporters
+            </div>
+            <adh-rate data-refers-to="{{path}}"
+                      data-post-pool-sheet="adhocracy.sheets.rate.IRateable"
+                      data-post-pool-field="post_pool">
+            </adh-rate>
         </div>
     </div>
-    <adh-rate data-refers-to="{{path}}"
-        data-post-pool-sheet="adhocracy.sheets.rate.IRateable"
-        data-post-pool-field="post_pool">
-    </adh-rate>
+
+<!--
+
+    this ends up in the wrong place in the workbench:
+
+    <div class="body">
+        <nav class="mercator-proposal-nav">
+            <ol>
+                <li><a href="#mercator-proposal-basic">{{ "Basic" | translate }}</a></li>
+                <li><a href="#mercator-proposal-introduction">{{ "Introduction" | translate }}</a></li>
+                <li><a href="#mercator-proposal-detail">{{ "In Detail" | translate }}</a></li>
+                <li><a href="#mercator-proposal-motivation">{{ "Motivation" | translate }}</a></li>
+                <li><a href="#mercator-proposal-finance">{{ "Finance" | translate }}</a></li>
+                <li><a href="#mercator-proposal-extra">{{ "Extra" | translate }}</a></li>
+            </ol>
+        </nav>
+
+-->
+
+        [body]
+    </div>
 </div>
