@@ -53,7 +53,6 @@ export interface IFacet {
 
 export interface ListingScope<Container> extends ng.IScope {
     path : string;
-    actionColumn : boolean;
     contentType? : string;
     facets? : IFacet[];
     container : Container;
@@ -64,10 +63,7 @@ export interface ListingScope<Container> extends ng.IScope {
     update : () => ng.IPromise<void>;
     wshandle : string;
     clear : () => void;
-    show : { createForm : boolean };
     onCreate : () => void;
-    showCreateForm : () => void;
-    hideCreateForm : () => void;
     enableItem : (IFacetItem) => void;
     disableItem : (IFacetItem) => void;
     toggleItem : (IFacetItem) => void;
@@ -97,9 +93,9 @@ export class Listing<Container extends ResourcesBase.Resource> {
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
             scope: {
                 path: "@",
-                actionColumn: "@",
                 contentType: "@",
-                facets: "="
+                facets: "=",
+                noCreateForm: "="
             },
             transclude: true,
             link: (scope, element, attrs, controller, transclude) => {
@@ -113,16 +109,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 adhPreliminaryNames : AdhPreliminaryNames.Service,
                 adhPermissions : AdhPermissions.Service
             ) : void => {
-                $scope.show = {createForm: false};
-
-                $scope.showCreateForm = () => {
-                    $scope.show.createForm = true;
-                    $scope.createPath = adhPreliminaryNames.nextPreliminary();
-                };
-
-                $scope.hideCreateForm = () => {
-                    $scope.show.createForm = false;
-                };
+                $scope.createPath = adhPreliminaryNames.nextPreliminary();
 
                 $scope.update = () : ng.IPromise<void> => {
                     var params = <any>{};
@@ -159,7 +146,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
 
                 $scope.onCreate = () : void => {
                     $scope.update();
-                    $scope.hideCreateForm();
+                    $scope.createPath = adhPreliminaryNames.nextPreliminary();
                 };
 
                 $scope.$watch("path", (newPath : string) => {

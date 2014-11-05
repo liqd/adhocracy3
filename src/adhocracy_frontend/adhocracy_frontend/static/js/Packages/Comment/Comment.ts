@@ -155,6 +155,10 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         resource.parent = AdhUtil.parentPath(oldVersion.path);
         return this.$q.when([resource]);
     }
+
+    public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>) {
+        instance.scope.data = <any>{};
+    }
 }
 
 export class CommentCreate<R extends ResourcesBase.Resource> extends CommentResource<R> {

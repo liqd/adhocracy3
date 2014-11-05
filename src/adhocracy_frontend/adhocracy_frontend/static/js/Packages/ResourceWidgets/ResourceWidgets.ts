@@ -65,6 +65,11 @@ export interface IResourceWrapperController {
      * all promised resources will be posted to the server via deepPost.
      */
     triggerSubmit() : ng.IPromise<void>;
+
+    /**
+     * triggers a "clear" event on eventHandler.
+     */
+    triggerClear() : void;
 }
 
 /**
@@ -108,6 +113,16 @@ export var resourceWrapper = () => {
                 }
             };
 
+            // FIXME: This is currently undocumented and I also don't like it.
+            // We should think of a better way to do it.
+            var displayOrClear = () : void => {
+                if (typeof $attrs["clearOnSubmit"] !== "undefined") {
+                    self.triggerClear();
+                } else {
+                    self.triggerSetMode(Mode.display);
+                }
+            };
+
             self.eventHandler = new adhEventHandlerClass();
 
             self.registerResourceDirective = (promise : ng.IPromise<ResourcesBase.Resource[]>) => {
@@ -130,8 +145,15 @@ export var resourceWrapper = () => {
                     .then(resetResourcePromises)
                     .then((resourceLists) => _.reduce(resourceLists, (a : any[], b) => a.concat(b)))
                     .then((resources) => adhHttp.deepPost(resources))
-                    .then(() => self.triggerSetMode(Mode.display))
+                    .then(() => displayOrClear(), (reason) => {
+                        self.triggerSetMode(Mode.edit);
+                        throw reason;
+                    })
                     .then(() => triggerCallback("onSubmit"));
+            };
+
+            self.triggerClear = () => {
+                self.eventHandler.trigger("clear");
             };
         }]
     };
@@ -161,6 +183,11 @@ export interface IResourceWidgetScope extends ng.IScope {
      * Emit an angular "delete" event.
      */
     delete() : void;
+
+    /**
+     * Trigger clear on resourceWrapper.
+     */
+    clear() : void;
 }
 
 export interface IResourceWidgetInstance<R extends ResourcesBase.Resource, S extends IResourceWidgetScope> {
@@ -245,11 +272,15 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
             }
         });
 
+        var clearID = wrapper.eventHandler.on("clear", () =>
+            self.clear(instance));
+
         scope.$on("triggerDelete", (ev, path : string) => self._handleDelete(instance, path));
         scope.$on("$delete", () => {
             wrapper.eventHandler.off("setMode", setModeID);
             wrapper.eventHandler.off("submit", submitID);
             wrapper.eventHandler.off("cancel", cancelID);
+            wrapper.eventHandler.off("clear", clearID);
             instance.deferred.resolve([]);
         });
 
@@ -257,6 +288,7 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         scope.submit = () => wrapper.triggerSubmit();
         scope.cancel = () => wrapper.triggerCancel();
         scope.delete = () => scope.$emit("triggerDelete", scope.path);
+        scope.clear = () => wrapper.triggerClear();
 
         self.setMode(instance, scope.mode);
         self.update(instance);
@@ -316,6 +348,13 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
         }
     }
 
+    public clear(instance : IResourceWidgetInstance<R, S>) : void {
+        instance.deferred.resolve([]);
+        instance.deferred = this.$q.defer();
+        instance.wrapper.registerResourceDirective(instance.deferred.promise);
+        this._clear(instance);
+    }
+
     /**
      * Handle delete events from children.
      */
@@ -342,6 +381,14 @@ export class ResourceWidget<R extends ResourcesBase.Resource, S extends IResourc
      */
     public _edit(instance : IResourceWidgetInstance<R, S>, old : R) : ng.IPromise<R[]> {
         throw "abstract method: not implemented";
+    }
+
+    /**
+     * Reset the directive to initial state. This function should probably
+     * clear the scope and reset all forms to prestine state.
+     */
+    public _clear(instance : IResourceWidgetInstance<R, S>) : void {
+        return;
     }
 }
 

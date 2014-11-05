@@ -9,11 +9,10 @@
         <div class="moving-column moving-column-content">
             <div class="moving-column-menu placeholder"></div>
             <div class="moving-column-body">
-                <adh-listing data-path="{{path}}" data-content-type="{{contentType}}" data-action-column="action-column">
+                <adh-listing data-path="{{path}}" data-content-type="{{contentType}}">
                     <div data-ng-switch="transclusionId">
                         <adh-proposal-version-new
                             data-on-new-proposal="onCreate"
-                            data-on-cancel="hideCreateForm"
                             data-pool-path="{{poolPath}}"
                             data-ng-switch-when="create-form-id">
                         </adh-proposal-version-new>

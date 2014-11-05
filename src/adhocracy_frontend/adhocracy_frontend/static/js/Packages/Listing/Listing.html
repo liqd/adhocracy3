@@ -1,12 +1,5 @@
-<div class="listing" data-ng-class="{'show-create-form': show.createForm, 'm-action-column': actionColumn}">
-    <div class="navbar">
-        <div class="navbar-left listing-sort placeholder">sort</div>
-        <div class="navbar-left listing-view placeholder">view</div>
-        <a data-ng-if="poolOptions.POST" class="navbar-right button m-call-to-action"
-            data-ng-click="showCreateForm()"
-            data-ng-disabled="show.createForm">{{ "Add" | translate }}</a>
-    </div>
-    <div class="listing-create-form" data-ng-if="show.createForm">
+<div class="listing">
+    <div class="listing-create-form" data-ng-if="!noCreateForm && poolOptions.POST">
         <adh-inject data-transclusion-id="create-form-id"></adh-inject>
     </div>
     <div ng-if="facets">
