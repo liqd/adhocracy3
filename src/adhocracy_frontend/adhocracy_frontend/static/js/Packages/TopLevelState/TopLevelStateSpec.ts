@@ -64,21 +64,17 @@ export var register = () => {
                     var data = { mykey: "myvalue"};
                     areaMock._data = data;
 
-                    for (var key in data) {
-                        if (data.hasOwnProperty(key)) {
-                            expect(TLS.data[key]).toBeUndefined();
-                        };
-                    };
+                    _.forOwn(data, (k, v) => {
+                        expect(TLS.data[k]).toBeUndefined();
+                    });
 
                     TLS.fromLocation();
 
-                    for (var key2 in data) {
-                        if (data.hasOwnProperty(key2)) {
-                            if (TLS.data.hasOwnProperty(key2)) {
-                                expect(TLS.data[key2]).toBe(data[key2]);
-                            };
+                    _.forOwn(data, (k, v) => {
+                        if (TLS.data.hasOwnProperty()) {
+                            expect(TLS.data[k]).toBe(data[k]);
                         };
-                    };
+                    });
 
                 });
 
