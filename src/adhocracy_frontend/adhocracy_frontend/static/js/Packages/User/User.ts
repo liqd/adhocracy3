@@ -389,7 +389,7 @@ export var register = (angular) => {
                     (adhUser, adhTopLevelState, adhDone, $location) : AdhTopLevelState.IAreaInput => {
                         activateController(adhUser, adhTopLevelState, adhDone, $location);
                         return {
-                            template: ""
+                            skip: true
                         };
                     }
                 ])

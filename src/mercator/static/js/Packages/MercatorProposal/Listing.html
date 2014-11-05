@@ -1,14 +1,12 @@
-<adh-listing data-path="{{path}}" data-content-type="adhocracy_mercator.resources.mercator.IMercatorProposal">
+<adh-listing data-path="{{path}}" data-content-type="{{contentType}}" data-facets="facets" data-no-create-form="true">
     <div data-ng-switch="transclusionId">
         <adh-resource-wrapper
             data-ng-switch-when="element-id">
-            <adh-last-version data-item-path="{{element}}">
-                <adh-mercator-proposal
-                     data-ng-if="versionPath"
-                     data-path="{{versionPath}}"
-                     data-mode="display">
-                </adh-mercator-proposal>
-            </adh-last-version>
+            <adh-mercator-proposal
+                 data-ng-if="element"
+                 data-path="{{element}}"
+                 data-mode="display">
+            </adh-mercator-proposal>
         </adh-resource-wrapper>
     </div>
 </adh-listing>

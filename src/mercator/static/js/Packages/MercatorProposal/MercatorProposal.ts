@@ -52,6 +52,8 @@ var pkgLocation = "/MercatorProposal";
 
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     poolPath : string;
+    showDetails() : void;
+    mercatorProposalForm?;
     data : {
         countries : any;
         // 1. basic
@@ -124,6 +126,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
+        private adhTopLevelState : AdhTopLevelState.Service,
         $q : ng.IQService
     ) {
         super(adhHttp, adhPreliminaryNames, $q);
@@ -133,6 +136,17 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public createDirective() : ng.IDirective {
         var directive = super.createDirective();
         directive.scope.poolPath = "@";
+
+        var originalLink = directive.link.bind(this);
+
+        directive.link = (scope : IScope, element, attrs, wrapper) => {
+            originalLink(scope, element, attrs, wrapper);
+
+            scope.showDetails = () => {
+                this.adhTopLevelState.set("content2Url", scope.path);
+            };
+        };
+
         return directive;
     }
 
@@ -483,6 +497,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
         return this.$q.when([]);
     }
+
+    public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
+        delete instance.scope.data;
+    }
 }
 
 
@@ -491,9 +509,10 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
+        adhTopLevelState : AdhTopLevelState.Service,
         $q : ng.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
 
 
@@ -514,6 +533,14 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         return directive;
     }
 
+    public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
+        super._clear(instance);
+
+        // FIXME: I do not whether both are needed.
+        instance.scope.mercatorProposalForm.$setPristine();
+        instance.scope.mercatorProposalForm.$setUntouched();
+    }
+
 }
 
 
@@ -522,9 +549,10 @@ export class DetailWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
+        adhTopLevelState : AdhTopLevelState.Service,
         $q : ng.IQService
     ) {
-        super(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Detail.html";
     }
 }
@@ -535,7 +563,9 @@ export var listing = (adhConfig : AdhConfig.IService) => {
         restrict: "E",
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Listing.html",
         scope: {
-            path: "@"
+            path: "@",
+            contentType: "@",
+            facets: "="
         }
     };
 };
@@ -851,31 +881,11 @@ export var register = (angular) => {
         ) => {
             adhTopLevelStateProvider
                 .when("mercator", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
+                    $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
                     return {
                         template: "<adh-resource-wrapper>" +
                             "<adh-mercator-proposal-create data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
                             "</adh-mercator-proposal-create></adh-resource-wrapper>"
-                    };
-                }])
-                .when("mercator-listing", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                    $scope.path = adhConfig.rest_url + adhConfig.rest_platform_path;
-                    return {
-                        template: "<adh-mercator-proposal-listing data-path=\"{{path}}\">" +
-                            "</adh-mercator-proposal-listing>"
-                    };
-                }])
-                .when("mercator-detail", ["adhConfig", "$rootScope", (adhConfig, $rootScope) : AdhTopLevelState.IAreaInput => {
-                    // FIXME: this always shows proposal with title "title".  for testing only.
-                    $rootScope.path = adhConfig.rest_url + adhConfig.rest_platform_path + "title/";
-                    return {
-                        template:
-                            "<adh-resource-wrapper>" +
-                            "<adh-last-version data-item-path=\"{{path}}\">" +
-                            "<adh-mercator-proposal-detail-view data-ng-if=\"versionPath\" data-path=\"{{versionPath}}\">" +
-                            "</adh-mercator-proposal-detail-view>" +
-                            "</adh-last-version>" +
-                            "</adh-resource-wrapper>"
                     };
                 }]);
             adhResourceAreaProvider
@@ -884,19 +894,19 @@ export var register = (angular) => {
                      movingColumns: "is-show-show-hide"
                 });
         }])
-        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
-                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
+                var widget = new Widget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
                 return widget.createDirective();
             }])
-        .directive("adhMercatorProposalDetailView", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
-                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        .directive("adhMercatorProposalDetailView", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
+                var widget = new DetailWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
                 return widget.createDirective();
             }])
-        .directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "$q",
-            (adhConfig, adhHttp, adhPreliminaryNames, $q) => {
-                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, $q);
+        .directive("adhMercatorProposalCreate", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
+            (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
+                var widget = new CreateWidget(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
                 return widget.createDirective();
             }])
         .directive("adhMercatorProposalListing", ["adhConfig", listing])

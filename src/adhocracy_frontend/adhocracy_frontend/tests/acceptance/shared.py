@@ -86,17 +86,13 @@ def title_is_in_listing(listing, title: str) -> bool:
 
 def get_listing_create_form(listing) -> WebDriverElement:
     """Open and return the create form of a listing."""
-    wait(lambda: listing.find_by_css('.navbar .button'))
-    button = listing.find_by_css('.navbar .button').first
-    wait(lambda: button.visible)
-    button.click()
     return listing.find_by_css('.listing-create-form').first
 
 
 def get_column_listing(browser, column_name: str) -> WebDriverElement:
     """Return the listing in the content column ."""
     column = browser.browser.find_by_css('.moving-column-' + column_name)
-    listing = column.find_by_css('.listing')
+    listing = column.first.find_by_css('.listing')
     return listing
 
 

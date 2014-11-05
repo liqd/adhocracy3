@@ -167,7 +167,7 @@ export var register = () => {
                         });
 
                         it("unregisters all listeners on wrapper.eventHandler", () => {
-                            expect(instance.wrapper.eventHandler.off.calls.count()).toBe(3);
+                            expect(instance.wrapper.eventHandler.off.calls.count()).toBe(4);
                         });
                     });
 

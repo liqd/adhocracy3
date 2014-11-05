@@ -126,14 +126,6 @@ export var register = () => {
                         controller(scope, adhHttpMock, adhPreliminaryNamesMock, adhPermissionsMock);
                     });
 
-                    it("defines scope.show", () => {
-                        expect(scope.show).toBeDefined();
-                    });
-
-                    it("defines scope.show.createForm", () => {
-                        expect(scope.show.createForm).toBeDefined();
-                    });
-
                     it("watches scope.path", () => {
                         expect(scope.$watch).toHaveBeenCalled();
                         expect(scope.$watch.calls.mostRecent().args[0]).toBe("path");
@@ -230,34 +222,6 @@ export var register = () => {
                         it("calls scope.clear on path clear", () => {
                             callback("");
                             expect(scope.clear).toHaveBeenCalled();
-                        });
-                    });
-
-                    it("intializes scope.show.createForm to false", () => {
-                        expect(scope.show).toBeDefined();
-                        expect(scope.show.createForm).toBeDefined();
-                        expect(scope.show.createForm).toBe(false);
-                    });
-
-                    describe("showCreateForm", () => {
-                        it("sets $scope.show.createForm to true", () => {
-                            expect(scope.showCreateForm).toBeDefined();
-                            scope.showCreateForm();
-                            expect(scope.show.createForm).toBe(true);
-                        });
-
-                        it("sets $scope.createPath to a preliminary name", () => {
-                            adhPreliminaryNamesMock.nextPreliminary.and.returnValue("preliminary name");
-                            scope.showCreateForm();
-                            expect(scope.createPath).toBe("preliminary name");
-                        });
-                    });
-
-                    describe("hideCreateForm", () => {
-                        it("sets $scope.show.createForm to false", () => {
-                            expect(scope.hideCreateForm).toBeDefined();
-                            scope.hideCreateForm();
-                            expect(scope.show.createForm).toBe(false);
                         });
                     });
                 });

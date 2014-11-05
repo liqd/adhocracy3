@@ -158,3 +158,15 @@ export function sortDagTopologically(dag : IDag<any>, sources : string[]) : any[
 
     return sorted;
 }
+
+
+/**
+ * String ending comparison from http://stackoverflow.com/a/2548133/201743
+ *
+ * Could also be done with underscore.string.
+ */
+export function endsWith(str, suffix) {
+    "use strict";
+
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}

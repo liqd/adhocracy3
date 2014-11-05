@@ -32,7 +32,7 @@ export class Provider implements ng.IServiceProvider {
 
 
 export class Service implements AdhTopLevelState.IAreaInput {
-    public template : string = "<adh-page-wrapper><adh-document-workbench></adh-document-workbench></adh-page-wrapper>";
+    public template : string = "<adh-page-wrapper><adh-platform></adh-platform></adh-page-wrapper>";
 
     constructor(
         private provider : Provider,
@@ -46,6 +46,12 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
         return this.adhHttp.get(resourceUrl).then((resource) => {
             var data = self.provider.get(resource.content_type);
+            data["platform"] = path.split("/")[1];
+
+            // if path contains more than just the platform
+            if (path.split("/").length > 2) {
+                data["content2Url"] = this.adhConfig.rest_url + path;
+            }
 
             for (var key in search) {
                 if (search.hasOwnProperty(key)) {
@@ -59,12 +65,19 @@ export class Service implements AdhTopLevelState.IAreaInput {
     public reverse(data : Dict) {
         var defaults = {
             space: "content",
-            movingColumns: "is-show-show-hide",
-            content2Url: ""
+            movingColumns: "is-show-show-hide"
         };
 
+        var path;
+
+        if (data["content2Url"]) {
+            path = data["content2Url"].replace(this.adhConfig.rest_url, "");
+        } else {
+            path = "/" + data["platform"];
+        }
+
         return {
-            path: "/adhocracy",
+            path: path,
             search: _.transform(data, (result, value : string, key : string) => {
                 if (defaults.hasOwnProperty(key) && value !== defaults[key]) {
                     result[key] = value;
@@ -73,6 +86,24 @@ export class Service implements AdhTopLevelState.IAreaInput {
         };
     }
 }
+
+
+export var platformDirective = (adhTopLevelState : AdhTopLevelState.Service) => {
+    return {
+        template:
+            "<div data-ng-switch=\"platform\">" +
+            "<div data-ng-switch-when=\"adhocracy\"><adh-document-workbench></div>" +
+            // FIXME: move mercator specifics away
+            "<div data-ng-switch-when=\"mercator\"><adh-mercator-workbench></div>" +
+            "</div>",
+        restrict: "E",
+        link: (scope, element) => {
+            adhTopLevelState.on("platform", (value : string) => {
+                scope.platform = value;
+            });
+        }
+    };
+};
 
 
 export var moduleName = "adhResourceArea";
@@ -87,5 +118,6 @@ export var register = (angular) => {
             adhTopLevelStateProvider
                 .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
         }])
+        .directive("adhPlatform", ["adhTopLevelState", platformDirective])
         .provider("adhResourceArea", Provider);
 };
