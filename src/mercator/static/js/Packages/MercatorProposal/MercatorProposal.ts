@@ -116,7 +116,6 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
         accept_disclaimer: string;
     };
 
-    showError :  (elem, fieldName : string, errorType : string) => void;
 }
 
 
@@ -509,23 +508,6 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         directive.link = (scope : IScope, element, attrs, wrapper) => {
 
             originalLink(scope, element, attrs, wrapper);
-
-            // FIXME: type-cast scope to any so we don't have to worry
-            // about IScope missing the showError function.  if this
-            // is to be permanent, the type case must be removed and
-            // IScope must be extended with a field 'showError' of
-            // proper type.
-            scope.showError = (elem, fieldName : string, errorType : string) => {
-
-                var elem : any;
-                var field : any;
-                var fieldNameArr : string[];
-
-                fieldNameArr = fieldName.split(".");
-
-                field = elem.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]];
-                if(field) return (field.$error[errorType] && (field.$dirty || elem.mercatorProposalForm.$submitted) );
-            };
 
         };
 
@@ -923,20 +905,69 @@ export var register = (angular) => {
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
         .controller('mercatorProposalFormController', ['$scope', function($scope) {
 
+            // FIXME: type-cast scope to any so we don't have to worry
+            // about IScope missing the showError function.  if this
+            // is to be permanent, the type case must be removed and
+            // IScope must be extended with a field 'showError' of
+            // proper type.
+            $scope.showError = (fieldName, errorType : string) => {
 
+                var fieldNameArr : string[] = fieldName.split(".");
+                var field : any = fieldNameArr[1] ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]] : $scope.mercatorProposalForm[fieldNameArr[0]];
 
-            this.submit = function(isValid, data) {
+                if(field) return (field.$error[errorType] && (field.$dirty || $scope.mercatorProposalForm.$submitted) );
+            };
+
+            // function to return valid if at least one checkbox is checked
+            $scope.isOneChecked = (data : any) => {
+
+                var count : number = 0;
+                var key : any;
+
+                for(key in data) {
+                    if (data[key]===true) count++;
+                }
+
+                return (count>0) ? true : false;
+
+            };
+
+            // checkboxes are valid if only one is checked (not all)
+            // also mark them as dirty
+            $scope.setCheckboxValidity = (fieldName : string, data : any) => {
+
+                var fieldNameArr : string[] = fieldName.split(".");
+                var field : any = fieldNameArr[1] ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]] : $scope.mercatorProposalForm[fieldNameArr[0]];
+
+                field.$dirty = true;
+
+                field.$error.noneChecked = ($scope.isOneChecked(data)) ? false : true;
+
+            };
+
+            $scope.setFormDefaults = () => {
+                //set checkboxes to invalid
+                $scope.$watch('$scope.mercatorProposalDetailForm["details-location"]', () => {
+                    $scope.mercatorProposalDetailForm["details-location"].$error.noneChecked = true;
+                });
+                $scope.$watch('$scope.mercatorProposalExtraForm["heard_from"]', () => {
+                    $scope.mercatorProposalExtraForm["heard_from"].$error.noneChecked = true;
+                });
+            };
+
+            //form is submitted
+            this.submit = (isValid, data) => {
 
                 if(!isValid) return;
 
-                // FIXME: Call submit from here !!submit();
+                $scope.submit();
             }
 
 
             // FIXME: to be deleted, just for Caroline running tests
-            $scope.$watch(function(scope) { return  },
-                function(newValue, oldValue) {
-                    console.log(newValue);
+            $scope.$watch((scope) => { return  },
+                (newValue, oldValue) => {
+                    //console.log(newValue);
                 }
             );
         }]);
