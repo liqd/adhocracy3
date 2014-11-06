@@ -18,7 +18,8 @@ import RIMercatorFinanceVersion = require("../../Resources_/adhocracy_mercator/r
 import RIMercatorIntroduction = require("../../Resources_/adhocracy_mercator/resources/mercator/IIntroduction");
 import RIMercatorIntroductionVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IIntroductionVersion");
 import RIMercatorOrganizationInfo = require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfo");
-import RIMercatorOrganizationInfoVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfoVersion");
+import RIMercatorOrganizationInfoVersion =
+    require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfoVersion");
 import RIMercatorOutcome = require("../../Resources_/adhocracy_mercator/resources/mercator/IOutcome");
 import RIMercatorOutcomeVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IOutcomeVersion");
 import RIMercatorPartners = require("../../Resources_/adhocracy_mercator/resources/mercator/IPartners");
@@ -177,7 +178,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
     // NOTE: _update takes an item *version*, whereas _create
     // constructs an *item plus a new version*.
-    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, mercatorProposalVersion : R) : ng.IPromise<void> {
+    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
+    mercatorProposalVersion : R) : ng.IPromise<void> {
         var data = this.initializeScope(instance.scope);
 
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
@@ -514,23 +516,6 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
     ) {
         super(adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q);
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
-
-
-    }
-
-    // Tobi's code so i can add functions to the scope
-    public createDirective() : ng.IDirective {
-        var directive = super.createDirective();
-
-        var originalLink = directive.link.bind(this);
-
-        directive.link = (scope : IScope, element, attrs, wrapper) => {
-
-            originalLink(scope, element, attrs, wrapper);
-
-        };
-
-        return directive;
     }
 
     public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
@@ -850,8 +835,8 @@ export var countrySelect = () => {
         },
         restrict: "E",
         template:
-            function(elm,attr) {
-                attr.star = (attr.required=="required") ? "*" : "";
+            (elm, attr) => {
+                attr.star = (attr.required === "required") ? "*" : "";
                 return "<select data-ng-model=\"value\" name=\"{{name}}\"" +
                 "       data-ng-options=\"c.code as c.name for c in countries\" data-ng-required=\"required\">" +
                 "           <option value=\"\" selected>{{ 'Country" + attr.star + "' | translate }}</option>" +
@@ -884,7 +869,8 @@ export var register = (angular) => {
                     $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
                     return {
                         template: "<adh-resource-wrapper>" +
-                            "<adh-mercator-proposal-create data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
+                            "<adh-mercator-proposal-create data-path=\"@preliminary\"" +
+                            "data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
                             "</adh-mercator-proposal-create></adh-resource-wrapper>"
                     };
                 }]);
@@ -913,72 +899,45 @@ export var register = (angular) => {
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .controller('mercatorProposalFormController', ['$scope', function($scope) {
-
-            // FIXME: type-cast scope to any so we don't have to worry
-            // about IScope missing the showError function.  if this
-            // is to be permanent, the type case must be removed and
-            // IScope must be extended with a field 'showError' of
-            // proper type.
+        .controller("mercatorProposalFormController", ["$scope", function($scope) {
             $scope.showError = (fieldName, errorType : string) => {
-
                 var fieldNameArr : string[] = fieldName.split(".");
-                var field : any = fieldNameArr[1] ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]] : $scope.mercatorProposalForm[fieldNameArr[0]];
-
-                if(field) return (field.$error[errorType] && (field.$dirty || $scope.mercatorProposalForm.$submitted) );
+                var field : any = fieldNameArr[1] ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]] :
+                $scope.mercatorProposalForm[fieldNameArr[0]];
+                if (field) { return ( field.$error[errorType] && ( field.$dirty || $scope.mercatorProposalForm.$submitted ) ); };
             };
-
             // function to return valid if at least one checkbox is checked
             $scope.isOneChecked = (data : any) => {
-
                 var count : number = 0;
-                var key : any;
-
-                for(key in data) {
-                    if (data[key]===true) count++;
-                }
-
-                return (count>0) ? true : false;
-
+                _.forOwn(data, function(dat) {;
+                    if (dat === true) { count++; };
+                });
+                return (count > 0) ? true : false;
             };
-
             // checkboxes are valid if only one is checked (not all)
             // also mark them as dirty
             $scope.setCheckboxValidity = (fieldName : string, data : any) => {
-
                 var fieldNameArr : string[] = fieldName.split(".");
-                var field : any = fieldNameArr[1] ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]] : $scope.mercatorProposalForm[fieldNameArr[0]];
-
+                var field : any = fieldNameArr[1] ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]] :
+                $scope.mercatorProposalForm[fieldNameArr[0]];
                 field.$dirty = true;
-
                 field.$error.noneChecked = ($scope.isOneChecked(data)) ? false : true;
-
             };
 
             $scope.setFormDefaults = () => {
-                //set checkboxes to invalid
-                $scope.$watch('$scope.mercatorProposalDetailForm["details-location"]', () => {
+                // set checkboxes to invalid
+                $scope.$watch("$scope.mercatorProposalDetailForm['details-location']", () => {
                     $scope.mercatorProposalDetailForm["details-location"].$error.noneChecked = true;
                 });
-                $scope.$watch('$scope.mercatorProposalExtraForm["heard_from"]', () => {
+                $scope.$watch("$scope.mercatorProposalExtraForm['heard_from']", () => {
                     $scope.mercatorProposalExtraForm["heard_from"].$error.noneChecked = true;
                 });
             };
 
-            //form is submitted
+            // form is submitted
             this.submit = (isValid, data) => {
-
-                if(!isValid) return;
-
+                if (!isValid) { return; };
                 $scope.submit();
-            }
-
-
-            // FIXME: to be deleted, just for Caroline running tests
-            $scope.$watch((scope) => { return  },
-                (newValue, oldValue) => {
-                    //console.log(newValue);
-                }
-            );
+            };
         }]);
 };

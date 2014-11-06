@@ -157,7 +157,8 @@
 
                         <span
                             class="input-error"
-                            ng-show="showError('mercatorProposalBasicForm.organization_info-date_of_foreseen_registration','required')">
+                            ng-show="showError('mercatorProposalBasicForm.organization_info-date_of_foreseen_registration',
+                            'required')">
                             {{ "Please enter your registration date" | translate }}</span>
 
                         <input
@@ -654,7 +655,8 @@
 
                 {{ "Granted?" | translate }}
 
-                <div ng-class="{ 'is-invalid': mercatorProposalFinanceForm['finance-granted'].$invalid && mercatorProposalForm.$submitted }">
+                <div ng-class="{ 'is-invalid': mercatorProposalFinanceForm['finance-granted'].$invalid &&
+                mercatorProposalForm.$submitted }">
 
                     <label>
                         <input
