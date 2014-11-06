@@ -60,6 +60,28 @@ export var register = () => {
                     locationMock.replace = function() { return; };
                 });
 
+                it("removes area prefix from path", () => {
+                    locationMock.url = "/r/adhocracy";
+                    var path = "/adhocracy";
+                    areaMock.prefix = "r";
+                    var search = {};
+                    spyOn(areaMock, "route").and.callThrough();
+
+                    TLS.fromLocation();
+                    expect(areaMock.route).toHaveBeenCalledWith(path, search);
+                });
+
+                it("does not remove non-area prefixes from path", () => {
+                    locationMock.url = "/foo/adhocracy";
+                    var path = "/foo/adhocracy";
+                    areaMock.prefix = "r";
+                    var search = {};
+                    spyOn(areaMock, "route").and.callThrough();
+
+                    TLS.fromLocation();
+                    expect(areaMock.route).toHaveBeenCalledWith(path, search);
+                });
+
                 it("adds parameters to TopLevelState", () => {
                     var data = { mykey: "myvalue"};
                     areaMock._data = data;
@@ -92,8 +114,6 @@ export var register = () => {
                     });
 
                 });
-
-
             });
 
             it("dispatches calls to set() to eventHandler", () => {
