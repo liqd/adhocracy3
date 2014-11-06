@@ -36,7 +36,7 @@ export var register = () => {
 
             });
 
-            describe("location parser", () => {
+            describe("fromLocation", () => {
                 var topLevelState : any;
                 var areaMock;
 
