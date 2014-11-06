@@ -52,13 +52,12 @@ export var register = () => {
                     locationMock.path.and.callFake(() => {return locationMock.url; });
                     locationMock.search.and.returnValue({});
 
-                    spyOn(topLevelState.$q, "when");
                 });
 
                 it("skips routing if area.skip is true", () => {
                     areaMock.skip = true;
                     topLevelState.fromLocation();
-                    expect(topLevelState.$q.when).toHaveBeenCalled();
+                    expect(areaMock.route).not.toHaveBeenCalled();
                 });
 
                 it("removes area prefix from path", () => {
