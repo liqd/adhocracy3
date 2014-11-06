@@ -20,7 +20,7 @@ export var register = () => {
                 on = jasmine.createSpy("on");
                 off = jasmine.createSpy("off");
                 trigger = jasmine.createSpy("trigger");
-                locationMock = jasmine.createSpyObj("locationMock", ["url", "search", "path"]);
+                locationMock = jasmine.createSpyObj("locationMock", ["url", "search", "path", "replace"]);
                 rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
 
                 eventHandlerMockClass = <any>function() {
@@ -42,12 +42,8 @@ export var register = () => {
 
                 beforeEach(() => {
                     areaMock = jasmine.createSpyObj("areaMock", ["route", "reverse", "_data"]);
-                    areaMock.route = function(path, search) {
-                        return {then: function(fn) {
-                                        fn(areaMock._data);
-                                      }
-                               };
-                    };
+                    areaMock.route.and.returnValue({then: (fn) => fn(areaMock._data)});
+                    areaMock.prefix = "r";
 
                     TLS = <any>adhTopLevelState;
                     TLS.getArea = function() {
@@ -55,17 +51,14 @@ export var register = () => {
                     };
 
                     locationMock.url = "/r/adhocracy";
-                    locationMock.path = function() { return locationMock.url; };
-                    locationMock.search = function() { return {}; };
-                    locationMock.replace = function() { return; };
+                    locationMock.path.and.callFake(() => {return locationMock.url; });
+                    locationMock.search.and.returnValue({});
                 });
 
                 it("removes area prefix from path", () => {
                     locationMock.url = "/r/adhocracy";
                     var path = "/adhocracy";
-                    areaMock.prefix = "r";
                     var search = {};
-                    spyOn(areaMock, "route").and.callThrough();
 
                     TLS.fromLocation();
                     expect(areaMock.route).toHaveBeenCalledWith(path, search);
@@ -74,9 +67,7 @@ export var register = () => {
                 it("does not remove non-area prefixes from path", () => {
                     locationMock.url = "/foo/adhocracy";
                     var path = "/foo/adhocracy";
-                    areaMock.prefix = "r";
                     var search = {};
-                    spyOn(areaMock, "route").and.callThrough();
 
                     TLS.fromLocation();
                     expect(areaMock.route).toHaveBeenCalledWith(path, search);
