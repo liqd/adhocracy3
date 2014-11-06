@@ -37,7 +37,7 @@ export var register = () => {
             });
 
             describe("location parser", () => {
-                var TLS : any;
+                var topLevelState : any;
                 var areaMock;
 
                 beforeEach(() => {
@@ -45,31 +45,31 @@ export var register = () => {
                     areaMock.route.and.returnValue({then: (fn) => fn(areaMock._data)});
                     areaMock.prefix = "r";
 
-                    TLS = <any>adhTopLevelState;
-                    TLS.getArea = function() {
-                        return areaMock;
-                    };
+                    topLevelState = <any>adhTopLevelState;
+                    spyOn(topLevelState, "getArea").and.returnValue(areaMock);
 
                     locationMock.url = "/r/adhocracy";
                     locationMock.path.and.callFake(() => {return locationMock.url; });
                     locationMock.search.and.returnValue({});
+
+                    spyOn(topLevelState.$q, "when");
                 });
 
                 it("removes area prefix from path", () => {
                     locationMock.url = "/r/adhocracy";
+                    topLevelState.fromLocation();
+
                     var path = "/adhocracy";
                     var search = {};
-
-                    TLS.fromLocation();
                     expect(areaMock.route).toHaveBeenCalledWith(path, search);
                 });
 
                 it("does not remove non-area prefixes from path", () => {
                     locationMock.url = "/foo/adhocracy";
+                    topLevelState.fromLocation();
+
                     var path = "/foo/adhocracy";
                     var search = {};
-
-                    TLS.fromLocation();
                     expect(areaMock.route).toHaveBeenCalledWith(path, search);
                 });
 
@@ -78,30 +78,29 @@ export var register = () => {
                     areaMock._data = data;
 
                     _.forOwn(data, (k, v) => {
-                        expect(TLS.data[k]).toBeUndefined();
+                        expect(topLevelState.data[k]).toBeUndefined();
                     });
 
-                    TLS.fromLocation();
+                    topLevelState.fromLocation();
 
                     _.forOwn(data, (k, v) => {
-                        if (TLS.data.hasOwnProperty()) {
-                            expect(TLS.data[k]).toBe(data[k]);
+                        if (topLevelState.data.hasOwnProperty()) {
+                            expect(topLevelState.data[k]).toBe(data[k]);
                         };
                     });
-
                 });
 
                 it("removes parameters from TopLevelState", () => {
                     var data = {};
                     areaMock._data = data;
 
-                    TLS.data = {mykey: "myvalue"};
-                    var old = _.clone(TLS.data);
+                    topLevelState.data = {mykey: "myvalue"};
+                    var old = _.clone(topLevelState.data);
 
-                    TLS.fromLocation();
+                    topLevelState.fromLocation();
 
                     _.forOwn(old, (k, v) => {
-                        expect(TLS.data[k]).toBeUndefined();
+                        expect(topLevelState.data[k]).toBeUndefined();
                     });
 
                 });
