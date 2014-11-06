@@ -127,11 +127,7 @@ export var register = () => {
                             expect(topLevelState.data[k]).toBe(data[k]);
                         };
                     });
-
                 });
-
-
-
             });
 
             it("dispatches calls to set() to eventHandler", () => {
