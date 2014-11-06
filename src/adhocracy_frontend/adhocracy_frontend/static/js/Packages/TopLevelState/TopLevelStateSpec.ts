@@ -37,7 +37,7 @@ export var register = () => {
             });
 
             describe("fromLocation", () => {
-                var topLevelState : any;
+                var adhTopLevelStateWithPrivates : any;
                 var areaMock;
 
                 beforeEach(() => {
@@ -45,8 +45,8 @@ export var register = () => {
                     areaMock.route.and.returnValue({then: (fn) => fn(areaMock._data)});
                     areaMock.prefix = "r";
 
-                    topLevelState = <any>adhTopLevelState;
-                    spyOn(topLevelState, "getArea").and.returnValue(areaMock);
+                    adhTopLevelStateWithPrivates = <any>adhTopLevelState;
+                    spyOn(adhTopLevelStateWithPrivates, "getArea").and.returnValue(areaMock);
 
                     locationMock.url = "/r/adhocracy";
                     locationMock.path.and.callFake(() => {return locationMock.url; });
@@ -56,13 +56,13 @@ export var register = () => {
 
                 it("skips routing if area.skip is true", () => {
                     areaMock.skip = true;
-                    topLevelState.fromLocation();
+                    adhTopLevelStateWithPrivates.fromLocation();
                     expect(areaMock.route).not.toHaveBeenCalled();
                 });
 
                 it("removes area prefix from path", () => {
                     locationMock.url = "/r/adhocracy";
-                    topLevelState.fromLocation();
+                    adhTopLevelStateWithPrivates.fromLocation();
 
                     var path = "/adhocracy";
                     var search = {};
@@ -71,7 +71,7 @@ export var register = () => {
 
                 it("does not remove non-area prefixes from path", () => {
                     locationMock.url = "/foo/adhocracy";
-                    topLevelState.fromLocation();
+                    adhTopLevelStateWithPrivates.fromLocation();
 
                     var path = "/foo/adhocracy";
                     var search = {};
@@ -83,14 +83,14 @@ export var register = () => {
                     areaMock._data = data;
 
                     _.forOwn(data, (v, k) => {
-                        expect(topLevelState.data[k]).toBeUndefined();
+                        expect(adhTopLevelStateWithPrivates.data[k]).toBeUndefined();
                     });
 
-                    topLevelState.fromLocation();
+                    adhTopLevelStateWithPrivates.fromLocation();
 
                     _.forOwn(data, (v, k) => {
-                        if (topLevelState.data.hasOwnProperty()) {
-                            expect(topLevelState.data[k]).toBe(data[k]);
+                        if (adhTopLevelStateWithPrivates.data.hasOwnProperty()) {
+                            expect(adhTopLevelStateWithPrivates.data[k]).toBe(data[k]);
                         };
                     });
                 });
@@ -99,32 +99,32 @@ export var register = () => {
                     var data = {};
                     areaMock._data = data;
 
-                    topLevelState.data = {mykey: "myvalue"};
-                    var old = _.clone(topLevelState.data);
+                    adhTopLevelStateWithPrivates.data = {mykey: "myvalue"};
+                    var old = _.clone(adhTopLevelStateWithPrivates.data);
 
-                    topLevelState.fromLocation();
+                    adhTopLevelStateWithPrivates.fromLocation();
 
                     _.forOwn(old, (v, k) => {
-                        expect(topLevelState.data[k]).toBeUndefined();
+                        expect(adhTopLevelStateWithPrivates.data[k]).toBeUndefined();
                     });
                 });
 
                 it("updates parameters in TopLevelState", () => {
-                    topLevelState.data = { mykey: "otherValue"};
+                    adhTopLevelStateWithPrivates.data = { mykey: "otherValue"};
                     var data = { mykey: "myvalue"};
                     areaMock._data = data;
 
                     _.forOwn(data, (v, k) => {
-                        if (topLevelState.data.hasOwnProperty(k)) {
-                            expect(topLevelState.data[k]).not.toEqual(v);
+                        if (adhTopLevelStateWithPrivates.data.hasOwnProperty(k)) {
+                            expect(adhTopLevelStateWithPrivates.data[k]).not.toEqual(v);
                         };
                     });
 
-                    topLevelState.fromLocation();
+                    adhTopLevelStateWithPrivates.fromLocation();
 
                     _.forOwn(data, (v, k) => {
-                        if (topLevelState.data.hasOwnProperty()) {
-                            expect(topLevelState.data[k]).toBe(data[k]);
+                        if (adhTopLevelStateWithPrivates.data.hasOwnProperty()) {
+                            expect(adhTopLevelStateWithPrivates.data[k]).toBe(data[k]);
                         };
                     });
                 });
