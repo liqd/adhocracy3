@@ -83,13 +83,13 @@ export var register = () => {
                     var data = { mykey: "myvalue"};
                     areaMock._data = data;
 
-                    _.forOwn(data, (k, v) => {
+                    _.forOwn(data, (v, k) => {
                         expect(topLevelState.data[k]).toBeUndefined();
                     });
 
                     topLevelState.fromLocation();
 
-                    _.forOwn(data, (k, v) => {
+                    _.forOwn(data, (v, k) => {
                         if (topLevelState.data.hasOwnProperty()) {
                             expect(topLevelState.data[k]).toBe(data[k]);
                         };
@@ -105,7 +105,7 @@ export var register = () => {
 
                     topLevelState.fromLocation();
 
-                    _.forOwn(old, (k, v) => {
+                    _.forOwn(old, (v, k) => {
                         expect(topLevelState.data[k]).toBeUndefined();
                     });
 
