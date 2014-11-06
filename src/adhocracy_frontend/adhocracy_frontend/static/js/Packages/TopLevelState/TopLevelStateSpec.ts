@@ -1,9 +1,8 @@
 /// <reference path="../../../lib/DefinitelyTyped/jasmine/jasmine.d.ts"/>
 
 import q = require("q");
-
+import _ = require("lodash");
 import AdhTopLevelState = require("./TopLevelState");
-
 
 export var register = () => {
 
@@ -21,7 +20,7 @@ export var register = () => {
                 on = jasmine.createSpy("on");
                 off = jasmine.createSpy("off");
                 trigger = jasmine.createSpy("trigger");
-                locationMock = jasmine.createSpyObj("locationMock", ["url", "search"]);
+                locationMock = jasmine.createSpyObj("locationMock", ["url", "search", "path", "replace"]);
                 rootScopeMock = jasmine.createSpyObj("rootScopeMock", ["$watch"]);
 
                 eventHandlerMockClass = <any>function() {
@@ -30,10 +29,105 @@ export var register = () => {
                     this.trigger = trigger;
                 };
 
-                adhTopLevelState = new AdhTopLevelState.Service(
+                adhTopLevelState = <any>new AdhTopLevelState.Service(
                     null, eventHandlerMockClass, locationMock, rootScopeMock, null, q, null, null);
 
                 spyOn(adhTopLevelState, "toLocation");
+
+            });
+
+            describe("fromLocation", () => {
+                var adhTopLevelStateWithPrivates : any;
+                var areaMock;
+
+                beforeEach(() => {
+                    areaMock = jasmine.createSpyObj("areaMock", ["route", "reverse", "_data"]);
+                    areaMock.route.and.returnValue({then: (fn) => fn(areaMock._data)});
+                    areaMock.prefix = "r";
+
+                    adhTopLevelStateWithPrivates = <any>adhTopLevelState;
+                    spyOn(adhTopLevelStateWithPrivates, "getArea").and.returnValue(areaMock);
+
+                    locationMock.url = "/r/adhocracy";
+                    locationMock.path.and.callFake(() => {return locationMock.url; });
+                    locationMock.search.and.returnValue({});
+
+                });
+
+                it("skips routing if area.skip is true", () => {
+                    areaMock.skip = true;
+                    adhTopLevelStateWithPrivates.fromLocation();
+                    expect(areaMock.route).not.toHaveBeenCalled();
+                });
+
+                it("removes area prefix from path", () => {
+                    locationMock.url = "/r/adhocracy";
+                    adhTopLevelStateWithPrivates.fromLocation();
+
+                    var path = "/adhocracy";
+                    var search = {};
+                    expect(areaMock.route).toHaveBeenCalledWith(path, search);
+                });
+
+                it("does not remove non-area prefixes from path", () => {
+                    locationMock.url = "/foo/adhocracy";
+                    adhTopLevelStateWithPrivates.fromLocation();
+
+                    var path = "/foo/adhocracy";
+                    var search = {};
+                    expect(areaMock.route).toHaveBeenCalledWith(path, search);
+                });
+
+                it("adds parameters to TopLevelState", () => {
+                    var data = { mykey: "myvalue"};
+                    areaMock._data = data;
+
+                    _.forOwn(data, (v, k) => {
+                        expect(adhTopLevelStateWithPrivates.data[k]).toBeUndefined();
+                    });
+
+                    adhTopLevelStateWithPrivates.fromLocation();
+
+                    _.forOwn(data, (v, k) => {
+                        if (adhTopLevelStateWithPrivates.data.hasOwnProperty()) {
+                            expect(adhTopLevelStateWithPrivates.data[k]).toBe(data[k]);
+                        };
+                    });
+                });
+
+                it("removes parameters from TopLevelState", () => {
+                    var data = {};
+                    areaMock._data = data;
+
+                    adhTopLevelStateWithPrivates.data = {mykey: "myvalue"};
+                    var old = _.clone(adhTopLevelStateWithPrivates.data);
+
+                    adhTopLevelStateWithPrivates.fromLocation();
+
+                    _.forOwn(old, (v, k) => {
+                        expect(adhTopLevelStateWithPrivates.data[k]).toBeUndefined();
+                    });
+                });
+
+                it("updates parameters in TopLevelState", () => {
+                    adhTopLevelStateWithPrivates.data = { mykey: "otherValue"};
+                    var data = { mykey: "myvalue"};
+                    areaMock._data = data;
+
+                    _.forOwn(data, (v, k) => {
+                        if (adhTopLevelStateWithPrivates.data.hasOwnProperty(k)) {
+                            expect(adhTopLevelStateWithPrivates.data[k]).not.toEqual(v);
+                        };
+                    });
+
+                    adhTopLevelStateWithPrivates.fromLocation();
+
+                    _.forOwn(data, (v, k) => {
+                        if (adhTopLevelStateWithPrivates.data.hasOwnProperty()) {
+                            expect(adhTopLevelStateWithPrivates.data[k]).toBe(data[k]);
+                        };
+                    });
+                });
             });
 
             it("dispatches calls to set() to eventHandler", () => {

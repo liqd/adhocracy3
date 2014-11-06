@@ -187,7 +187,7 @@ export class Service {
 
     private fromLocation() : ng.IPromise<void> {
         var area = this.getArea();
-        var path = this.$location.path().replace(/\/[^/]*/, "");
+        var path = this.$location.path().replace("/" + area.prefix, "");
         var search = this.$location.search();
 
         if (area.skip) {
