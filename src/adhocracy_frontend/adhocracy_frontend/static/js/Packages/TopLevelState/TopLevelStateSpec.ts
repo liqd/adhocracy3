@@ -108,8 +108,31 @@ export var register = () => {
                     _.forOwn(old, (v, k) => {
                         expect(topLevelState.data[k]).toBeUndefined();
                     });
+                });
+
+                it("updates parameters in TopLevelState", () => {
+                    topLevelState.data = { mykey: "otherValue"};
+                    var data = { mykey: "myvalue"};
+                    areaMock._data = data;
+
+                    _.forOwn(data, (v, k) => {
+                        if (topLevelState.data.hasOwnProperty(k)) {
+                            expect(topLevelState.data[k]).not.toEqual(v);
+                        };
+                    });
+
+                    topLevelState.fromLocation();
+
+                    _.forOwn(data, (v, k) => {
+                        if (topLevelState.data.hasOwnProperty()) {
+                            expect(topLevelState.data[k]).toBe(data[k]);
+                        };
+                    });
 
                 });
+
+
+
             });
 
             it("dispatches calls to set() to eventHandler", () => {
