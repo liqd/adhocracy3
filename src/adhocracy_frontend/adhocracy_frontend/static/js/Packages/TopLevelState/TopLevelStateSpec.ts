@@ -55,6 +55,12 @@ export var register = () => {
                     spyOn(topLevelState.$q, "when");
                 });
 
+                it("skips routing if area.skip is true", () => {
+                    areaMock.skip = true;
+                    topLevelState.fromLocation();
+                    expect(topLevelState.$q.when).toHaveBeenCalled();
+                });
+
                 it("removes area prefix from path", () => {
                     locationMock.url = "/r/adhocracy";
                     topLevelState.fromLocation();
