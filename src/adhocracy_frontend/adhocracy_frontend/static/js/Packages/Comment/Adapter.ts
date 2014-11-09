@@ -16,7 +16,7 @@ import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMe
 
 export class ListingCommentableAdapter implements AdhListing.IListingContainerAdapter {
     public elemRefs(container : ResourcesBase.Resource) {
-        return AdhUtil.latestVersionsOnly(container.data[SICommentable.nick].comments);
+        return AdhUtil.eachItemOnce(container.data[SICommentable.nick].comments);
     }
 
     public poolPath(container : ResourcesBase.Resource) {
@@ -106,6 +106,6 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
     }
 
     commentCount(resource : RICommentVersion) : number {
-        return AdhUtil.latestVersionsOnly(resource.data[SICommentable.nick].comments).length;
+        return AdhUtil.eachItemOnce(resource.data[SICommentable.nick].comments).length;
     }
 }

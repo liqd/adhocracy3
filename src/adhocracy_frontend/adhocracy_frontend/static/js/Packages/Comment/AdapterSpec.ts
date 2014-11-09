@@ -35,12 +35,12 @@ export var register = () => {
 
                 };
 
-                it("returns only the most recent versions from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
+                it("returns the refered comment items from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
                     jasmine.addMatchers(JasmineHelpers.customMatchers);
 
                     var resource = generateResource();
                     var result = adapter.elemRefs(resource);
-                    (<any>expect(result)).toSetEqual(["/asd/version3", "/foo/version2", "/bar/version1"]);
+                    (<any>expect(result)).toSetEqual(["/asd", "/foo", "/bar"]);
                 });
 
                 it("does not modify the resource", () => {

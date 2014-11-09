@@ -99,7 +99,7 @@ export var register = () => {
             });
         });
 
-        describe("latestVersionsOnly", () => {
+        describe("eachItemOnce", () => {
             var testCase = [
                 "/asd/version2",
                 "/asd/version3",
@@ -112,12 +112,12 @@ export var register = () => {
             it("returns only the most recent versions from the adhocracy_core.sheets.comment.ICommentable sheet", () => {
                 jasmine.addMatchers(JasmineHelpers.customMatchers);
 
-                var result = AdhUtil.latestVersionsOnly(testCase);
-                (<any>expect(result)).toSetEqual(["/asd/version3", "/foo/version2", "/bar/version1"]);
+                var result = AdhUtil.eachItemOnce(testCase);
+                (<any>expect(result)).toSetEqual(["/asd", "/foo", "/bar"]);
             });
 
             it("does not alter the input list", () => {
-                AdhUtil.latestVersionsOnly(testCase);
+                AdhUtil.eachItemOnce(testCase);
                 expect(testCase).toEqual([
                     "/asd/version2",
                     "/asd/version3",

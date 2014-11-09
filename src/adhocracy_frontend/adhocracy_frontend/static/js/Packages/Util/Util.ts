@@ -82,23 +82,13 @@ export function formatString(format : string, ...args : string[]) {
 
 
 /**
- * Filter a list of version paths to only contain the latests versions for each item.
+ * Given a list of version paths this function returns a list of corresponding
+ * items, but each item only once.
  */
-export function latestVersionsOnly(refs : string[]) : string[] {
+export function eachItemOnce(refs : string[]) : string[] {
     "use strict";
 
-    var latestVersions : string[] = [];
-    var lastCommentPath : string = undefined;
-
-    _.cloneDeep(refs).sort().reverse().forEach((versionPath : string) => {
-        var commentPath = parentPath(versionPath);
-        if (commentPath !== lastCommentPath) {
-            latestVersions.push(versionPath);
-            lastCommentPath = commentPath;
-        }
-    });
-
-    return latestVersions;
+    return _.uniq(_.map(refs, parentPath));
 };
 
 

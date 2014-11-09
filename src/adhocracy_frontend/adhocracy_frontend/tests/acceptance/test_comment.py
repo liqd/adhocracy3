@@ -16,6 +16,11 @@ class TestComment:
         comment = create_comment(browser, 'comment1')
         assert comment is not None
 
+    def test_reply(self, browser):
+        comment = get_column_listing(browser, 'content2').find_by_css('.comment').first
+        reply = create_reply_comment(comment, 'somereply')
+        assert reply is not None
+
     def test_edit(self, browser):
         comment = get_column_listing(browser, 'content2').find_by_css('.comment').first
         edit_comment(comment, 'edited')
@@ -31,11 +36,6 @@ class TestComment:
         assert comment.find_by_css('.comment-content div').first.text == 'edited 1'
         edit_comment(comment, 'edited 2')
         assert comment.find_by_css('.comment-content div').first.text == 'edited 2'
-
-    def test_reply(self, browser):
-        comment = get_column_listing(browser, 'content2').find_by_css('.comment').first
-        reply = create_reply_comment(comment, 'somereply')
-        assert reply is not None
 
     @mark.skipif(True, reason='FIXME Test needs to be updated since the '
                               'backend now throws a "No fork allowed" error')
