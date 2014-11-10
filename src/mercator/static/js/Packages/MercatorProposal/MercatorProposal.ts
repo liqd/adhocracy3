@@ -907,11 +907,11 @@ export var register = (angular) => {
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
         .controller("mercatorProposalFormController", ["$scope", ($scope) => {
             var heardFromCheckboxes = [
-                "heard_from-colleague",
-                "heard_from-website",
-                "heard_from-newsletter",
-                "heard_from-facebook",
-                "heard_from-other"
+                "heard-from-colleague",
+                "heard-from-website",
+                "heard-from-newsletter",
+                "heard-from-facebook",
+                "heard-from-other"
             ];
 
             var detailsLocationCheckboxes = [

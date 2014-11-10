@@ -20,12 +20,12 @@ $columns: 6;
     border: 1px solid $color-structure-border;
     border-left: 0;
 
-    .form_body {
+    .form-body {
         float: left;
         padding-right: $gutter;
         width: column-width(4);
     }
-    .form_description {
+    .form-description {
         float: right;
         padding-bottom: $gutter;
         width: column-width(2); 
