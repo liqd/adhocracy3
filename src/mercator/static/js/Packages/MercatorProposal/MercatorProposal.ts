@@ -906,6 +906,20 @@ export var register = (angular) => {
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
         .controller("mercatorProposalFormController", ["$scope", ($scope) => {
+            var heardFromCheckboxes = [
+                "heard_from-colleague",
+                "heard_from-website",
+                "heard_from-newsletter",
+                "heard_from-facebook",
+                "heard_from-other"
+            ];
+
+            var detailsLocationCheckboxes = [
+                "details-location-specific",
+                "details-location-online",
+                "details-location-ruhr"
+            ];
+
             var getFieldByName = (fieldName : string) => {
                 var fieldNameArr : string[] = fieldName.split(".");
                 return fieldNameArr[1]
@@ -913,29 +927,34 @@ export var register = (angular) => {
                     : $scope.mercatorProposalForm[fieldNameArr[0]];
             };
 
-            $scope.showError = (fieldName : string, errorType : string) => {
+            var getCheckBoxGroupValidity = (form, names : string[]) : boolean => {
+                return _.some(names, (name) => form[name].$modelValue);
+            };
+
+            var showCheckboxGroupError = (form, names : string[]) : boolean => {
+                var dirty = $scope.mercatorProposalForm.$submitted || _.some(names, (name) => form[name].$dirty);
+                return !getCheckBoxGroupValidity(form, names) && dirty;
+            };
+
+            $scope.showError = (fieldName : string, errorType : string) : boolean => {
                 var field = getFieldByName(fieldName);
                 return field.$error[errorType] && (field.$dirty || $scope.mercatorProposalForm.$submitted);
             };
 
-            $scope.isOneChecked = (data) => {
-                return _.some(data);
+            $scope.getHeardFromValidity = () : boolean => {
+                return getCheckBoxGroupValidity($scope.mercatorProposalExtraForm, heardFromCheckboxes);
             };
 
-            $scope.setCheckboxValidity = (fieldName : string, data) => {
-                var field = getFieldByName(fieldName);
-                field.$dirty = true;
-                field.$error.noneChecked = !$scope.isOneChecked(data);
+            $scope.showHeardFromError = () : boolean => {
+                return showCheckboxGroupError($scope.mercatorProposalExtraForm, heardFromCheckboxes);
             };
 
-            $scope.setFormDefaults = () => {
-                // this $watch is triggered only one time when the field is initialized
-                $scope.$watch("$scope.mercatorProposalDetailForm['details-location']", () => {
-                    $scope.mercatorProposalDetailForm["details-location"].$error.noneChecked = true;
-                });
-                $scope.$watch("$scope.mercatorProposalExtraForm['heard_from']", () => {
-                    $scope.mercatorProposalExtraForm["heard_from"].$error.noneChecked = true;
-                });
+            $scope.getDetailsLocationValidity = () : boolean => {
+                return getCheckBoxGroupValidity($scope.mercatorProposalDetailForm, detailsLocationCheckboxes);
+            };
+
+            $scope.showDetailsLocationError = () : boolean => {
+                return showCheckboxGroupError($scope.mercatorProposalDetailForm, detailsLocationCheckboxes);
             };
 
             $scope.submitIfValid = () => {

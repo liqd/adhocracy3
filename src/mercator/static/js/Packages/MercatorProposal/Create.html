@@ -367,14 +367,13 @@
 
                 <!-- FIXME: red border should show on dirty -->
                 <div
-                    data-ng-class="{ 'is-invalid': showError('mercatorProposalDetailForm.details-location', 'noneChecked') }">
+                    data-ng-class="{ 'is-invalid': showDetailsLocationError() }">
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.details.location_is_specific"
-                            name="details-location"
-                            data-ng-click="setCheckboxValidity('mercatorProposalDetailForm.details-location', data.details)"
-                            data-ng-valid="isOneChecked(data.details)" />
+                            name="details-location-specific"
+                            data-ng-valid="getDetailLocationValidity()" />
                         {{ "Specific Location" | translate }}
                     </label>
 
@@ -403,25 +402,23 @@
                         <input
                             type="checkbox"
                             data-ng-model="data.details.location_is_online"
-                            name="details-location"
-                            data-ng-click="setCheckboxValidity('mercatorProposalDetailForm.details-location', data.details)"
-                            data-ng-valid="isOneChecked(data.details)" />
+                            name="details-location-online"
+                            data-ng-valid="getDetailLocationValidity()" />
                         {{ "Online" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.details.location_is_linked_to_ruhr"
-                            data-ng-click="setCheckboxValidity('mercatorProposalDetailForm.details-location', data.details)"
-                            name="details-location"
-                            data-ng-valid="isOneChecked(data.details)"/>
+                            name="details-location-ruhr"
+                            data-ng-valid="getDetailLocationValidity()"/>
                         {{ "Linkage to the Ruhr area" | translate }}
                     </label>
 
                 </div><!-- /.ng-invalid -->
                 <span
                     class="input-error"
-                    data-ng-if="showError('mercatorProposalDetailForm.details-location', 'noneChecked')">
+                    data-ng-if="showDetailsLocationError()">
                     {{ "Please choose one" | translate }}</span>
 
             </div><!-- /.form_body -->
@@ -734,50 +731,45 @@
 
                 {{ "How did you hear about “Advocate Europe”?" | translate }}
 
-                <div data-ng-class="{ 'is-invalid': showError('mercatorProposalExtraForm.heard_from', 'noneChecked') }">
+                <div data-ng-class="{ 'is-invalid': showHeardFromError() }">
 
                     <label>
                         <input type="checkbox"
                             data-ng-model="data.heard_from.colleague"
-                            name="heard_from"
-                            data-ng-click="setCheckboxValidity('mercatorProposalExtraForm.heard_from', data.heard_from)"
-                            data-ng-valid="isOneChecked(data.heard_from)" />
+                            name="heard_from-colleague"
+                            data-ng-valid="getHeardFromValidity()" />
                         {{ "Colleague" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.heard_from.website"
-                            name="heard_from"
-                            data-ng-click="setCheckboxValidity('mercatorProposalExtraForm.heard_from', data.heard_from)"
-                            data-ng-valid="isOneChecked(data.heard_from)" />
+                            name="heard_from-website"
+                            data-ng-valid="getHeardFromValidity()" />
                         {{ "Website" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.heard_from.newsletter"
-                            name="heard_from"
-                            data-ng-click="setCheckboxValidity('mercatorProposalExtraForm.heard_from', data.heard_from)"
-                            data-ng-valid="isOneChecked(data.heard_from)" />
+                            name="heard_from-newsletter"
+                            data-ng-valid="getHeardFromValidity()" />
                         {{ "Newsletter" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.heard_from.facebook"
-                            name="heard_from"
-                            data-ng-click="setCheckboxValidity('mercatorProposalExtraForm.heard_from', data.heard_from)"
-                            data-ng-valid="isOneChecked(data.heard_from)" />
+                            name="heard_from-facebook"
+                            data-ng-valid="getHeardFromValidity()" />
                         {{ "Facebook" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.heard_from.other"
-                            name="heard_from"
-                            data-ng-click="setCheckboxValidity('mercatorProposalExtraForm.heard_from', data.heard_from)"
-                            data-ng-valid="isOneChecked(data.heard_from)" />
+                            name="heard_from-other"
+                            data-ng-valid="getHeardFromValidity()" />
                         {{ "Other." | translate }}
                         <span data-ng-if="data.heard_from.other">{{ "Please specify:" | translate }}</span>
                     </label>
@@ -790,7 +782,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-if="showError('mercatorProposalExtraForm.heard_from', 'noneChecked')">
+                        data-ng-if="showHeardFromError()">
                         {{ "Please select one" | translate }}</span>
                 </div><!-- /.ng-invalid -->
 
