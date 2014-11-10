@@ -683,14 +683,6 @@
                         ng-show="showError('mercatorProposalFinanceForm.finance-granted','required')">
                         {{ "Please select one" | translate }}</span>
 
-                <label>
-                    {{ "Upload Financial Plan Document" | translate }}
-                    <input
-                        type="file"
-                        data-ng-model="data.finance.document"
-                        name="finance-document" />
-                </label>
-
             </div><!--/.form_body -->
 
         </div><!--/.row -->
@@ -728,11 +720,6 @@
             </div><!--/.form_description -->
 
             <div class="form_body">
-
-                <label>
-                    {{ "Upload media files" | translate }}
-                    <input type="file" data-ng-model="data.extra.mediaFiles" name="extra-mediaFiles" multiple="multiple" />
-                </label>
 
                 <label>
                     {{ "Share Experience (Optional)." | translate }}
