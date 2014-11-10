@@ -6,8 +6,9 @@ from pytest import raises
 
 @fixture()
 def integration(config):
-    config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.events')
     config.include('adhocracy_core.registry')
+    config.include('adhocracy_core.catalog')
     config.include('adhocracy_mercator.sheets.mercator')
 
 
@@ -282,7 +283,7 @@ class TestDetailsSheet:
 
 
 @mark.usefixtures('integration')
-class TestLocationIndex:
+class TestMercatorLocationIndex:
 
     def _make_resource(self, pool_graph, details_appstruct={}):
         from adhocracy_core.interfaces import IResource
@@ -300,6 +301,21 @@ class TestLocationIndex:
         pool_graph['details'] = details_resource
         sub_resources_sheet.set({'details': details_resource})
         return resource
+
+    def test_add_mercator_location_index_subscriber_register(self, registry):
+        from .mercator import add_mercator_location_index_subscriber
+        handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
+        assert add_mercator_location_index_subscriber.__name__ in handlers
+
+    def test_add_mercator_location_index_subscriber_call(self, pool_graph_catalog):
+        from .mercator import add_mercator_location_index_subscriber
+        from substanced.util import find_catalog
+        from substanced.catalog.indexes import KeywordIndex
+        context = pool_graph_catalog
+        event = testing.DummyResource(object=context)
+        add_mercator_location_index_subscriber(event)
+        adhocracy_catalog = find_catalog(context, 'adhocracy')
+        assert isinstance(adhocracy_catalog['mercator_location'], KeywordIndex)
 
     def test_index_location_default(self, pool_graph):
         from adhocracy_mercator.sheets.mercator import index_location
@@ -323,6 +339,25 @@ class TestLocationIndex:
                                'location_is_linked_to_ruhr': True})
         result = index_location(resource, 'default')
         assert set(result) == set(['online', 'linked_to_ruhr'])
+
+
+@mark.usefixtures('integration')
+class TestMercatorBudgetIndex:
+
+    def test_add_mercator_budget_index_subscriber_register(self, registry):
+        from .mercator import add_mercator_budget_index_subscriber
+        handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
+        assert add_mercator_budget_index_subscriber.__name__ in handlers
+
+    def test_add_mercator_budget_index_subscriber_call(self, pool_graph_catalog):
+        from .mercator import add_mercator_budget_index_subscriber
+        from substanced.util import find_catalog
+        from substanced.catalog.indexes import KeywordIndex
+        context = pool_graph_catalog
+        event = testing.DummyResource(object=context)
+        add_mercator_budget_index_subscriber(event)
+        adhocracy_catalog = find_catalog(context, 'adhocracy')
+        assert isinstance(adhocracy_catalog['mercator_budget'], KeywordIndex)
 
 
 class TestOutcomeSheet:
