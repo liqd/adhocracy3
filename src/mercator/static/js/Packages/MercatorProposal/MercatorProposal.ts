@@ -927,13 +927,17 @@ export var register = (angular) => {
                     : $scope.mercatorProposalForm[fieldNameArr[0]];
             };
 
-            var getCheckBoxGroupValidity = (form, names : string[]) : boolean => {
-                return _.some(names, (name) => form[name].$modelValue);
+            var updateCheckBoxGroupValidity = (form, names : string[]) : boolean => {
+                var valid =  _.some(names, (name) => form[name].$modelValue);
+                _.forOwn(names, (name) => {
+                    form[name].$setValidity("groupRequired", valid);
+                });
+                return valid;
             };
 
             var showCheckboxGroupError = (form, names : string[]) : boolean => {
                 var dirty = $scope.mercatorProposalForm.$submitted || _.some(names, (name) => form[name].$dirty);
-                return !getCheckBoxGroupValidity(form, names) && dirty;
+                return !updateCheckBoxGroupValidity(form, names) && dirty;
             };
 
             $scope.showError = (fieldName : string, errorType : string) : boolean => {
@@ -941,16 +945,8 @@ export var register = (angular) => {
                 return field.$error[errorType] && (field.$dirty || $scope.mercatorProposalForm.$submitted);
             };
 
-            $scope.getHeardFromValidity = () : boolean => {
-                return getCheckBoxGroupValidity($scope.mercatorProposalExtraForm, heardFromCheckboxes);
-            };
-
             $scope.showHeardFromError = () : boolean => {
                 return showCheckboxGroupError($scope.mercatorProposalExtraForm, heardFromCheckboxes);
-            };
-
-            $scope.getDetailsLocationValidity = () : boolean => {
-                return getCheckBoxGroupValidity($scope.mercatorProposalDetailForm, detailsLocationCheckboxes);
             };
 
             $scope.showDetailsLocationError = () : boolean => {

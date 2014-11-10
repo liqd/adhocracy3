@@ -371,8 +371,7 @@
                         <input
                             type="checkbox"
                             data-ng-model="data.details.location_is_specific"
-                            name="details-location-is-specific"
-                            data-ng-valid="getDetailLocationValidity()" />
+                            name="details-location-is-specific" />
                         {{ "Specific Location" | translate }}
                     </label>
 
@@ -401,16 +400,14 @@
                         <input
                             type="checkbox"
                             data-ng-model="data.details.location_is_online"
-                            name="details-location-is-online"
-                            data-ng-valid="getDetailLocationValidity()" />
+                            name="details-location-is-online" />
                         {{ "Online" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.details.location_is_linked_to_ruhr"
-                            name="details-location-is-linked-to-ruhr"
-                            data-ng-valid="getDetailLocationValidity()"/>
+                            name="details-location-is-linked-to-ruhr" />
                         {{ "Linkage to the Ruhr area" | translate }}
                     </label>
 
@@ -735,40 +732,35 @@
                     <label>
                         <input type="checkbox"
                             data-ng-model="data.heard_from.colleague"
-                            name="heard-from-colleague"
-                            data-ng-valid="getHeardFromValidity()" />
+                            name="heard-from-colleague" />
                         {{ "Colleague" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.heard_from.website"
-                            name="heard-from-website"
-                            data-ng-valid="getHeardFromValidity()" />
+                            name="heard-from-website" />
                         {{ "Website" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.heard_from.newsletter"
-                            name="heard-from-newsletter"
-                            data-ng-valid="getHeardFromValidity()" />
+                            name="heard-from-newsletter" />
                         {{ "Newsletter" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.heard_from.facebook"
-                            name="heard-from-facebook"
-                            data-ng-valid="getHeardFromValidity()" />
+                            name="heard-from-facebook" />
                         {{ "Facebook" | translate }}
                     </label>
                     <label>
                         <input
                             type="checkbox"
                             data-ng-model="data.heard_from.other"
-                            name="heard-from-other"
-                            data-ng-valid="getHeardFromValidity()" />
+                            name="heard-from-other" />
                         {{ "Other." | translate }}
                         <span data-ng-if="data.heard_from.other">{{ "Please specify:" | translate }}</span>
                     </label>
