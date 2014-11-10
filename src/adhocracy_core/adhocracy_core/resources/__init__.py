@@ -178,7 +178,7 @@ class ResourceFactory:
                       send_event=False,
                       registry=registry,
                       request=request,
-                      force=True)
+                      omit_readonly=False)
 
         if run_after_creation:
             for call in self.meta.after_creation:

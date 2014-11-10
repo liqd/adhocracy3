@@ -250,7 +250,7 @@ class TestVisibility:
         now = datetime.now()
         appstruct['modified_by'] = user
         appstruct['modification_date'] = now
-        metadata.set(appstruct, force=True, send_event=False)
+        metadata.set(appstruct, omit_readonly=False, send_event=False)
         resource_with_metadata.hidden = True
         result = view_blocked_by_metadata(resource_with_metadata, registry)
         assert result['modified_by'] == user

@@ -107,14 +107,14 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
     meta = Attribute('SheetMetadata')
 
     def set(appstruct, omit=(), send_event=True, registry=None, request=None,
-            force=False) -> bool:
+            omit_readonly=True) -> bool:
         """ Store ``appstruct`` dictionary data.
 
         :param send_event: throw edit event.
         :param registry: the pyramid registry to use.
         :param request: the current pyramid request for additional permission
                         checks, may be None.
-        :param force: store readonly ``appstruct`` data.
+        :param omit_readonly: do not store readonly ``appstruct`` data.
         """
 
     def get(params: dict={}) -> dict:

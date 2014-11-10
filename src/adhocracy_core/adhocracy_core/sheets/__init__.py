@@ -145,12 +145,18 @@ class GenericResourceSheet(PropertySheet):
                 nodes[node.name] = node
         return nodes
 
-    def set(self, appstruct: dict, omit=(), send_event=True,
-            registry=None, request: Request=None, force: bool=False) -> bool:
+    def set(self,
+            appstruct: dict,
+            omit=(),
+            send_event=True,
+            registry=None,
+            request: Request=None,
+            omit_readonly: bool=True) -> bool:
         """Store appstruct."""
         appstruct_old = self.get()
-        if not force:
-            appstruct = self._omit_forbidden_keys(appstruct, omit)
+        appstruct = self._omit_omit_keys(appstruct, omit)
+        if omit_readonly:
+            appstruct = self._omit_readonly_keys(appstruct)
         self._store_data(appstruct)
         if registry is None:
             registry = get_current_registry(self.context)
@@ -163,8 +169,12 @@ class GenericResourceSheet(PropertySheet):
                                              request)
         return bool(appstruct)
 
-    def _omit_forbidden_keys(self, appstruct: dict, omit=()):
-        omit_keys = normalize_to_tuple(omit) + tuple(self._readonly_keys)
+    def _omit_readonly_keys(self, appstruct: dict):
+        omit_keys = tuple(self._readonly_keys)
+        return remove_keys_from_dict(appstruct, keys_to_remove=omit_keys)
+
+    def _omit_omit_keys(self, appstruct: dict, omit):
+        omit_keys = normalize_to_tuple(omit)
         return remove_keys_from_dict(appstruct, keys_to_remove=omit_keys)
 
     @reify

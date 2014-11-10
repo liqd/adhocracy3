@@ -56,7 +56,7 @@ def resource_modified_metadata_subscriber(event):
               send_event=False,
               registry=event.registry,
               request=request,
-              force=True)
+              omit_readonly=False)
 
 
 class MetadataSchema(colander.MappingSchema):
