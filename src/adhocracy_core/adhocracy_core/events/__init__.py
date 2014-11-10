@@ -44,7 +44,7 @@ class ResourceSheetModified:
     :param registry: pyramid.registry.Registry
     :param old_appstruct: The old :term:`appstruct` data (dict)
     :param new_appstruct: The new :term:`appstruct` data (dict)
-    :param request: The current request
+    :param request: The current request or None
     """
 
     def __init__(self,
