@@ -127,7 +127,6 @@ First, lets import the needed stuff and start the Adhocracy testapp::
     >>> from adhocracy_core.testing import god_header
     >>> from webtest import TestApp
     >>> app = getfixture('app')
-    >>> websocket = getfixture('websocket')
     >>> testapp = TestApp(app)
     >>> rest_url = 'http://localhost'
 
