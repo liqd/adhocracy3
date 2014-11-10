@@ -133,18 +133,15 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public createDirective() : ng.IDirective {
         var directive = super.createDirective();
         directive.scope.poolPath = "@";
-
-        var originalLink = directive.link.bind(this);
-
-        directive.link = (scope : IScope, element, attrs, wrapper) => {
-            originalLink(scope, element, attrs, wrapper);
-
-            scope.showDetails = () => {
-                this.adhTopLevelState.set("content2Url", scope.path);
-            };
-        };
-
         return directive;
+    }
+
+    public link(scope, element, attrs, wrapper) {
+        var instance = super.link(scope, element, attrs, wrapper);
+        instance.scope.showDetails = () => {
+            this.adhTopLevelState.set("content2Url", instance.scope.path);
+        };
+        return instance;
     }
 
     public _handleDelete(
