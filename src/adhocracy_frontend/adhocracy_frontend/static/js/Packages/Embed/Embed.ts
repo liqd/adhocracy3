@@ -14,7 +14,10 @@ var embeddableDirectives = [
     "document-workbench",
     "paragraph-version-detail",
     "comment-listing",
-    "create-or-show-comment-listing"
+    "create-or-show-comment-listing",
+    "login",
+    "register",
+    "user-indicator"
 ];
 
 export var location2template = ($location : ng.ILocationService) => {
