@@ -906,14 +906,11 @@ export var register = (angular) => {
                 $scope.mercatorProposalForm[fieldNameArr[0]];
                 if (field) { return ( field.$error[errorType] && ( field.$dirty || $scope.mercatorProposalForm.$submitted ) ); };
             };
-            // function to return valid if at least one checkbox is checked
-            $scope.isOneChecked = (data : any) => {
-                var count : number = 0;
-                _.forOwn(data, function(dat) {;
-                    if (dat === true) { count++; };
-                });
-                return (count > 0) ? true : false;
+
+            $scope.isOneChecked = (data) => {
+                return _.some(data);
             };
+
             // checkboxes are valid if only one is checked (not all)
             // also mark them as dirty
             $scope.setCheckboxValidity = (fieldName : string, data : any) => {
