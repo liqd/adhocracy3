@@ -20,7 +20,7 @@
     <div class="comment-main">
         <div class="comment-title">
             <adh-user-meta data-path="{{data.creator}}"></adh-user-meta>
-            <adh-rate data-refers-to="{{path}}"
+            <adh-rate data-refers-to="{{data.path}}"
                       data-post-pool-sheet="adhocracy.sheets.rate.IRateable"
                       data-post-pool-field="post_pool">
             </adh-rate>
@@ -67,7 +67,7 @@
             <adh-comment-create
                 data-path="{{createPath}}"
                 data-mode="edit"
-                data-refers-to="{{path}}"
+                data-refers-to="{{data.path}}"
                 data-pool-path="{{data.replyPoolPath}}">
             </adh-comment-create>
         </adh-resource-wrapper>
