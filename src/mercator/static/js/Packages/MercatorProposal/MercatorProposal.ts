@@ -518,6 +518,12 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
     }
 
+    public link(scope, element, attrs, wrapper) {
+        var instance = super.link(scope, element, attrs, wrapper);
+        instance.scope.data = <any>{};
+        return instance;
+    }
+
     public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
         super._clear(instance);
 
