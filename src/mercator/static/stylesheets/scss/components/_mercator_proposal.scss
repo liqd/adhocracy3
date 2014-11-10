@@ -25,10 +25,11 @@ $columns: 6;
         padding-right: $gutter;
         width: column-width(4);
     }
+
     .form-description {
         float: right;
         padding-bottom: $gutter;
-        width: column-width(2); 
+        width: column-width(2);
     }
 
     label {
