@@ -921,7 +921,7 @@ export var register = (angular) => {
                 var field : any = fieldNameArr[1] ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]] :
                 $scope.mercatorProposalForm[fieldNameArr[0]];
                 field.$dirty = true;
-                field.$error.noneChecked = ($scope.isOneChecked(data)) ? false : true;
+                field.$error.noneChecked = !$scope.isOneChecked(data);
             };
 
             $scope.setFormDefaults = () => {
@@ -936,8 +936,9 @@ export var register = (angular) => {
 
             // form is submitted
             this.submit = (isValid, data) => {
-                if (!isValid) { return; };
-                $scope.submit();
+                if (isValid) {
+                    $scope.submit();
+                };
             };
         }]);
 };
