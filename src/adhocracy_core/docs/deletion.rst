@@ -196,11 +196,11 @@ Only the GoodProposal is still visible in the pool::
     >>> resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements']
     ['.../adhocracy/GoodProposal/']
 
-Sanity check: internally, the backend uses a *priv_visibility* index to keep
+Sanity check: internally, the backend uses a *private_visibility* index to keep
 track of the visibility/deletion status of resources. But this filter is
 private and cannot be directly queried from the frontend::
 
     >>> resp_data = testapp.get(rest_url + "/adhocracy",
-    ...     params={'priv_visibility': 'hidden'}, status=400).json
+    ...     params={'private_visibility': 'hidden'}, status=400).json
     >>> resp_data['errors'][0]['description']
     'No such catalog'

@@ -157,7 +157,7 @@ def _blocked_with_reason(resource: IResource) -> str:
 
 
 def index_visibility(resource, default):
-    """Return value for the priv_visibility index.
+    """Return value for the private_visibility index.
 
     The return value will be one of [visible], [deleted], [hidden], or
     [deleted, hidden].
@@ -181,6 +181,6 @@ def includeme(config):
                           interface=IMetadata)
     config.add_indexview(index_visibility,
                          catalog_name='adhocracy',
-                         index_name='priv_visibility',
+                         index_name='private_visibility',
                          context=IMetadata,
                          )

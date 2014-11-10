@@ -16,12 +16,12 @@ class AdhocracyCatalogFactory:
     """
     Factory that creates all needed catalogs.
 
-    Catalogs starting with `priv_` are private (not queryable from the
+    Catalogs starting with `private_` are private (not queryable from the
     frontend).
     """
 
     tag = catalog.Keyword()
-    priv_visibility = catalog.Keyword()  # visible / deleted / hidden
+    private_visibility = catalog.Keyword()  # visible / deleted / hidden
     rate = catalog.Field()
     reference = Reference()
     # FIXME This almost certainly does not belong here

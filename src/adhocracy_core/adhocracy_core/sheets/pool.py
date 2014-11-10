@@ -132,7 +132,7 @@ class FilteringPoolSheet(PoolSheet):
         identity = lambda x: x  # pragma: no branch
         resolver = None if resolve_resources else identity
         # Only show visible elements (not hidden or deleted)
-        visibility_index = adhocracy_catalog['priv_visibility']
+        visibility_index = adhocracy_catalog['private_visibility']
         query &= visibility_index.eq('visible')
         elements = query.execute(resolver=resolver)
         count = len(elements)
