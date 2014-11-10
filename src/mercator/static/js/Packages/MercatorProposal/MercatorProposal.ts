@@ -923,7 +923,7 @@ export var register = (angular) => {
             };
 
             $scope.setFormDefaults = () => {
-                // set checkboxes to invalid
+                // this $watch is triggered only one time when the field is initialized
                 $scope.$watch("$scope.mercatorProposalDetailForm['details-location']", () => {
                     $scope.mercatorProposalDetailForm["details-location"].$error.noneChecked = true;
                 });
