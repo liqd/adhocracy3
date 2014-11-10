@@ -899,7 +899,7 @@ export var register = (angular) => {
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .controller("mercatorProposalFormController", ["$scope", function($scope) {
+        .controller("mercatorProposalFormController", ["$scope", ($scope) => {
             $scope.showError = (fieldName, errorType : string) => {
                 var fieldNameArr : string[] = fieldName.split(".");
                 var field : any = fieldNameArr[1] ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]] :
