@@ -907,18 +907,16 @@ export var register = (angular) => {
                     : $scope.mercatorProposalForm[fieldNameArr[0]];
             };
 
-            $scope.showError = (fieldName, errorType : string) => {
+            $scope.showError = (fieldName : string, errorType : string) => {
                 var field = getFieldByName(fieldName);
-                if (field) { return ( field.$error[errorType] && ( field.$dirty || $scope.mercatorProposalForm.$submitted ) ); };
+                return field.$error[errorType] && (field.$dirty || $scope.mercatorProposalForm.$submitted);
             };
 
             $scope.isOneChecked = (data) => {
                 return _.some(data);
             };
 
-            // checkboxes are valid if only one is checked (not all)
-            // also mark them as dirty
-            $scope.setCheckboxValidity = (fieldName : string, data : any) => {
+            $scope.setCheckboxValidity = (fieldName : string, data) => {
                 var field = getFieldByName(fieldName);
                 field.$dirty = true;
                 field.$error.noneChecked = !$scope.isOneChecked(data);
