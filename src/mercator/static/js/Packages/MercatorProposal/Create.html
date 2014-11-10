@@ -14,7 +14,7 @@
         class="mercator-proposal-form"
         name="mercatorProposalForm"
         ng-controller="mercatorProposalFormController as form"
-        ng-submit="form.submit(mercatorProposalForm.$valid, data)"
+        ng-submit="submitIfValid()"
         ng-init="setFormDefaults()">
 
     <div class="row">

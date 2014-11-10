@@ -938,9 +938,8 @@ export var register = (angular) => {
                 });
             };
 
-            // form is submitted
-            this.submit = (isValid, data) => {
-                if (isValid) {
+            $scope.submitIfValid = () => {
+                if ($scope.mercatorProposalForm.$valid) {
                     $scope.submit();
                 };
             };
