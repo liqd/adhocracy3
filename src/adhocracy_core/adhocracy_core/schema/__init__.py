@@ -749,17 +749,3 @@ class Integer(AdhocracySchemaNode):
     schema_type = colander.Integer
     default = 0
     missing = colander.drop
-
-
-class Rate(Integer):
-
-    """SchemaNode for rate integer values.
-
-    The following values are allowed:
-
-      * 1: pro
-      * 0: neutral
-      * -1: contra
-    """
-
-    validator = colander.OneOf((1, 0, -1))
