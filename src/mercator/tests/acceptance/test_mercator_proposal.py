@@ -53,6 +53,14 @@ class TestMercatorForm:
         browser.find_by_name(status_text).first.fill('statustext')
         assert is_valid(browser)
 
+    def test_location_is_required(self, browser):
+        browser.uncheck('details-location-is-specific')
+        browser.uncheck('details-location-is-online')
+        browser.uncheck('details-location-is-linked-to-ruhr')
+        assert not is_valid(browser)
+        browser.check('details-location-is-online')
+        assert is_valid(browser)
+
     def test_field_name_is_required(self, browser):
         browser.find_by_name('user-info-first-name').first.fill('')
         assert not is_valid(browser)
