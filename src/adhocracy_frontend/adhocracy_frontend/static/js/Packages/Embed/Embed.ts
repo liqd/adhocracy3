@@ -48,12 +48,15 @@ export var register = (angular) => {
                     if (params.hasOwnProperty("locale")) {
                         $translate.use(params.locale);
                     }
+                    var template = location2template($location);
 
-                    return {
-                        template:  "<header class=\"l-header main-header\">" +
+                    if (!params.hasOwnProperty("noheader")) {
+                        template = "<header class=\"l-header main-header\">" +
                         "<adh-user-indicator></adh-user-indicator>" +
-                        "</header>" +
-                        location2template($location)
+                        "</header>" + template;
+                    }
+                    return {
+                        template: template
                     };
                 }]);
         }]);
