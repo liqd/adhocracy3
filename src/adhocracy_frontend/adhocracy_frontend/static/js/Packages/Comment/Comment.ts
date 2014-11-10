@@ -117,20 +117,22 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>,
         resource : R
     ) {
-        return this.adhHttp.getNewestVersionPathNoFork(resource.path).then((path) => this.adhHttp.get(path)).then((resource => {
-            var scope : ICommentResourceScope = instance.scope;
-            scope.data = {
-                path: resource.path,
-                content: this.adapter.content(resource),
-                creator: this.adapter.creator(resource),
-                creationDate: this.adapter.creationDate(resource),
-                modificationDate: this.adapter.modificationDate(resource),
-                commentCount: this.adapter.commentCount(resource),
-                comments: this.adapter.elemRefs(resource),
-                replyPoolPath: this.adapter.poolPath(resource)
-            };
-            this.adhPermissions.bindScope(scope, scope.data.replyPoolPath, "poolOptions");
-        }));
+        return this.adhHttp.getNewestVersionPathNoFork(resource.path)
+            .then((path) => this.adhHttp.get(path))
+            .then((resource) => {
+                var scope : ICommentResourceScope = instance.scope;
+                scope.data = {
+                    path: resource.path,
+                    content: this.adapter.content(resource),
+                    creator: this.adapter.creator(resource),
+                    creationDate: this.adapter.creationDate(resource),
+                    modificationDate: this.adapter.modificationDate(resource),
+                    commentCount: this.adapter.commentCount(resource),
+                    comments: this.adapter.elemRefs(resource),
+                    replyPoolPath: this.adapter.poolPath(resource)
+                };
+                this.adhPermissions.bindScope(scope, scope.data.replyPoolPath, "poolOptions");
+            });
     }
 
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>) {
@@ -152,12 +154,14 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
     }
 
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>, oldItem : R) {
-        return this.adhHttp.getNewestVersionPathNoFork(oldItem.path).then((path) => this.adhHttp.get(path)).then((oldVersion => {
-            var resource = this.adapter.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
-            this.adapter.content(resource, instance.scope.data.content);
-            resource.parent = AdhUtil.parentPath(oldVersion.path);
-            return [resource];
-        }));
+        return this.adhHttp.getNewestVersionPathNoFork(oldItem.path)
+            .then((path) => this.adhHttp.get(path))
+            .then((oldVersion) => {
+                var resource = this.adapter.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
+                this.adapter.content(resource, instance.scope.data.content);
+                resource.parent = AdhUtil.parentPath(oldVersion.path);
+                return [resource];
+            });
     }
 
     public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, ICommentResourceScope>) {
