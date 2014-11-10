@@ -281,6 +281,7 @@ class TestDetailsSheet:
         assert inst.get() == wanted
 
 
+@mark.usefixtures('integration')
 class TestLocationIndex:
 
     def _make_resource(self, pool_graph, details_appstruct={}):
@@ -300,14 +301,12 @@ class TestLocationIndex:
         sub_resources_sheet.set({'details': details_resource})
         return resource
 
-    @mark.usefixtures('integration')
     def test_index_location_default(self, pool_graph):
         from adhocracy_mercator.sheets.mercator import index_location
         resource = self._make_resource(pool_graph=pool_graph)
         result = index_location(resource, 'default')
         assert result == 'default'
 
-    @mark.usefixtures('integration')
     def test_index_location_is_linked_to_ruhr(self, pool_graph):
         from adhocracy_mercator.sheets.mercator import index_location
         resource = self._make_resource(
@@ -316,7 +315,6 @@ class TestLocationIndex:
         result = index_location(resource, 'default')
         assert result == ['linked_to_ruhr']
 
-    @mark.usefixtures('integration')
     def test_index_location_is_online_and_linked_to_ruhr(self, pool_graph):
         from adhocracy_mercator.sheets.mercator import index_location
         resource = self._make_resource(
