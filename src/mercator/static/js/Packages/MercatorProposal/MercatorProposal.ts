@@ -116,7 +116,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
             other_specify : string
         };
 
-        accept_disclaimer: string;
+        accept_disclaimer : string;
     };
 
 }
@@ -159,7 +159,6 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     }
 
     private initializeScope(scope) {
-
         if (!scope.hasOwnProperty("data")) {
             scope.data = {};
         }
@@ -449,6 +448,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
         mercatorProposal.parent = instance.scope.poolPath;
         mercatorProposalVersion.parent = mercatorProposal.path;
+
         subResOrganizationInfo.parent = mercatorProposal.path;
         subResOrganizationInfoV.parent = subResOrganizationInfo.path;
         subResIntroduction.parent = mercatorProposal.path;
@@ -531,7 +531,6 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         instance.scope.mercatorProposalForm.$setPristine();
         instance.scope.mercatorProposalForm.$setUntouched();
     }
-
 }
 
 
