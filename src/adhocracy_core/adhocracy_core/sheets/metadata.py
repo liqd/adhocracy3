@@ -3,6 +3,7 @@ from datetime import datetime
 from logging import getLogger
 
 from pyramid.registry import Registry
+from pyramid.location import lineage
 import colander
 
 from adhocracy_core.interfaces import IResource
@@ -105,11 +106,9 @@ def is_deleted(resource: IResource) -> dict:
     This also returns True for descendants of deleted resources, as a positive
     deleted status is inherited.
     """
-    context = resource
-    while context is not None:
+    for context in lineage(resource):
         if getattr(context, 'deleted', False):
             return True
-        context = getattr(context, '__parent__', None)
     return False
 
 
@@ -119,11 +118,9 @@ def is_hidden(resource: IResource) -> dict:
     This also returns True for descendants of hidden resources, as a positive
     hidden status is inherited.
     """
-    context = resource
-    while context is not None:
+    for context in lineage(resource):
         if getattr(context, 'hidden', False):
             return True
-        context = getattr(context, '__parent__', None)
     return False
 
 
