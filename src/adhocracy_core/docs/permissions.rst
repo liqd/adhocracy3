@@ -243,33 +243,34 @@ Can create process structure::
     >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
     ['adhocracy_core.resources.pool.IBasicPool']
 
-Can edit process structure (FIXME we have no editable sheet for testing)::
+Can edit process structure::
 
     >>> resp_data = testapp.options(pool, headers=admin_header).json
-    >>> 'PUT' not in resp_data
+    >>> 'adhocracy_core.sheets.metadata.IMetadata' in resp_data['PUT']['request_body']['data']
     True
 
-Can create Groups::
+
+Can create groups::
 
    >>> resp_data = testapp.options(groups, headers=admin_header).json
    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
    ['adhocracy_core.resources.principal.IGroup']
 
 
-Can create Users::
+Can create users::
 
    >>> resp_data = testapp.options(users, headers=admin_header).json
    >>> pprint(sorted([r['content_type'] for r in resp_data['POST']['request_body']]))
    ['adhocracy_core.resources.principal.IUser']
 
 
-Can assign User to groups, and roles to users::
+Can assign users to groups, and roles to users::
 
    >>> god = users + '0000000'
    >>> resp_data = testapp.options(god, headers=admin_header).json
    >>> pprint(sorted([s for s in resp_data['PUT']['request_body']['data']]))
-   ['adhocracy_core.sheets.principal.IPasswordAuthentication',
+   [...'adhocracy_core.sheets.principal.IPasswordAuthentication',
     'adhocracy_core.sheets.principal.IPermissions',
     'adhocracy_core.sheets.principal.IUserBasic',
-    'adhocracy_core.sheets.rate.ICanRate']
+    'adhocracy_core.sheets.rate.ICanRate'...]
 

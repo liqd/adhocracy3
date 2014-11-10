@@ -1,17 +1,26 @@
 """Metadata Sheet."""
 from datetime import datetime
+from logging import getLogger
 
+from pyramid.registry import Registry
+from pyramid.location import lineage
 import colander
 
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.events import ResourceSheetModified
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.sheets.principal import IUserBasic
+from adhocracy_core.schema import Boolean
 from adhocracy_core.schema import DateTime
 from adhocracy_core.schema import Reference
 from adhocracy_core.utils import get_sheet
+from adhocracy_core.utils import get_user
+
+
+logger = getLogger(__name__)
 
 
 class IMetadata(ISheet):
@@ -28,12 +37,26 @@ class MetadataCreatorsReference(SheetToSheet):
     target_isheet = IUserBasic
 
 
+class MetadataModifiedByReference(SheetToSheet):
+
+    """Points to the last person who modified a resource."""
+
+    source_isheet = IMetadata
+    source_isheet_field = 'modified_by'
+    target_isheet = IUserBasic
+
+
 def resource_modified_metadata_subscriber(event):
-    """Update the `modification_date` metadata."""
+    """Update the `modified_by` and `modification_date` metadata."""
     sheet = get_sheet(event.object, IMetadata, registry=event.registry)
-    sheet.set({'modification_date': datetime.now()},
+    request = event.request
+    modified_by = None if request is None else get_user(request)
+    sheet.set({'modified_by': modified_by,
+               'modification_date': datetime.now()},
               send_event=False,
-              registry=event.registry)
+              registry=event.registry,
+              request=request,
+              omit_readonly=False)
 
 
 class MetadataSchema(colander.MappingSchema):
@@ -49,23 +72,105 @@ class MetadataSchema(colander.MappingSchema):
                           to make :class:`adhocracy_core.interfaces.Item`
                          /`IItemVersion` one `thing`.
                          defaults to now.
+    `creator`: creator (user resources) of this resource.
+    `modified_by`: the last person (user resources) who modified a resource,
+                   initally the creator
     `modification_date`: Modification date of this resource. defaults to now.
-    `creator`: creator (list of user resources) of this resource.
+    `deleted`: whether the resource is marked as deleted (only shown to those
+               that specifically ask for it)
+    `hidden`: whether the resource is marked as hidden (only shown to those
+               that have special permissions and ask for it)
     """
 
-    creator = Reference(reftype=MetadataCreatorsReference)
-    creation_date = DateTime(missing=colander.drop)
-    item_creation_date = DateTime(missing=colander.drop)
-    modification_date = DateTime(missing=colander.drop)
+    creator = Reference(reftype=MetadataCreatorsReference, readonly=True)
+    creation_date = DateTime(missing=colander.drop, readonly=True)
+    item_creation_date = DateTime(missing=colander.drop, readonly=True)
+    modified_by = Reference(reftype=MetadataModifiedByReference, readonly=True)
+    modification_date = DateTime(missing=colander.drop, readonly=True)
+    deleted = Boolean()
+    hidden = Boolean()
 
 
 metadata_metadata = sheet_metadata_defaults._replace(
     isheet=IMetadata,
     schema_class=MetadataSchema,
-    editable=False,
-    creatable=False,
+    editable=True,
+    creatable=True,
     readable=True,
 )
+
+
+def is_deleted(resource: IResource) -> dict:
+    """Check whether a resource is deleted.
+
+    This also returns True for descendants of deleted resources, as a positive
+    deleted status is inherited.
+    """
+    for context in lineage(resource):
+        if getattr(context, 'deleted', False):
+            return True
+    return False
+
+
+def is_hidden(resource: IResource) -> dict:
+    """Check whether a resource is hidden.
+
+    This also returns True for descendants of hidden resources, as a positive
+    hidden status is inherited.
+    """
+    for context in lineage(resource):
+        if getattr(context, 'hidden', False):
+            return True
+    return False
+
+
+def view_blocked_by_metadata(resource: IResource,
+                             registry: Registry) -> dict:
+    """
+    Return a dict with an explanation if viewing this resource is not allowed.
+
+    This is the case if the resources provides metadata and the `deleted`
+    or `hidden` flag is set.
+
+    Otherwise, None is returned which means that the resource is viewable.
+    """
+    result = None
+    if IMetadata.providedBy(resource):
+        metadata = get_sheet(resource, IMetadata, registry=registry)
+        appstruct = metadata.get()
+        block_reason = _blocked_with_reason(resource)
+        if block_reason:
+            result = {'reason': block_reason,
+                      'modification_date': appstruct['modification_date'],
+                      'modified_by': appstruct['modified_by']}
+    return result
+
+
+def _blocked_with_reason(resource: IResource) -> str:
+    """Return the reason if a resource is blocked, None otherwise."""
+    reason = None
+    if is_deleted(resource):
+        reason = 'deleted'
+    if is_hidden(resource):
+        reason = 'both' if reason else 'hidden'
+    return reason
+
+
+def index_visibility(resource, default):
+    """Return value for the private_visibility index.
+
+    The return value will be one of [visible], [deleted], [hidden], or
+    [deleted, hidden].
+    """
+    result = []
+    if is_deleted(resource):
+        result.append('deleted')
+    if is_hidden(resource):
+        result.append('hidden')
+    if not result:
+        # resources that are neither deleted nor hidden are visible
+        result.append('visible')
+    return result
 
 
 def includeme(config):
@@ -74,3 +179,8 @@ def includeme(config):
     config.add_subscriber(resource_modified_metadata_subscriber,
                           ResourceSheetModified,
                           interface=IMetadata)
+    config.add_indexview(index_visibility,
+                         catalog_name='adhocracy',
+                         index_name='private_visibility',
+                         context=IMetadata,
+                         )

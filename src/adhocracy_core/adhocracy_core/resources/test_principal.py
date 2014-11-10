@@ -68,6 +68,7 @@ def test_user_meta():
 def integration(config):
     config.include('pyramid_mailer.testing')
     config.include('pyramid_mako')
+    config.include('adhocracy_core.catalog')
     config.include('adhocracy_core.events')
     config.include('adhocracy_core.registry')
     config.include('adhocracy_core.messaging')

@@ -12,7 +12,16 @@ class Reference(IndexFactory):
 
 
 class AdhocracyCatalogFactory:
+
+    """
+    Factory that creates all needed catalogs.
+
+    Catalogs starting with `private_` are private (not queryable from the
+    frontend).
+    """
+
     tag = catalog.Keyword()
+    private_visibility = catalog.Keyword()  # visible / deleted / hidden
     rate = catalog.Field()
     reference = Reference()
     # FIXME This almost certainly does not belong here

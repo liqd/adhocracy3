@@ -1,7 +1,8 @@
+from unittest.mock import Mock
+
 from pyramid import testing
 from pytest import fixture
 from pytest import mark
-from unittest.mock import Mock
 
 from adhocracy_core.resources.pool import IBasicPool
 
@@ -61,7 +62,9 @@ class TestFilteringPoolSheet:
                                                                     1, {})
         return inst
 
-    def test_create(self, inst):
+    def test_create(self, context):
+        from adhocracy_core.sheets.pool import pool_metadata
+        inst = pool_metadata.sheet_class(pool_metadata, context)
         from adhocracy_core.interfaces import IResourceSheet
         from adhocracy_core.sheets.pool import IPool
         from adhocracy_core.sheets.pool import PoolSchema
@@ -74,28 +77,6 @@ class TestFilteringPoolSheet:
         assert inst.meta.isheet == IPool
         assert inst.meta.editable is False
         assert inst.meta.creatable is False
-
-    def test_get_empty(self, inst):
-        assert inst.get() == {'elements': []}
-
-    #FIXME: add check if the schema has a children named 'elements' with tagged
-    #Value 'target_isheet'. This isheet is used to filter return data.
-
-    def test_get_not_empty_with_target_isheet(self, inst, context):
-        from adhocracy_core.interfaces import ISheet
-        child = testing.DummyResource(__provides__=ISheet)
-        context['child1'] = child
-        assert inst.get() == {'elements': [child]}
-
-    def test_get_not_empty_without_target_isheet(self, inst, context):
-        child = testing.DummyResource()
-        context['child1'] = child
-        assert inst.get() == {'elements': []}
-
-    def test_get_reference_appstruct_without_params(self, inst):
-        appstruct = inst._get_reference_appstruct()
-        assert inst._filter_elements.called is False
-        assert appstruct == {'elements': []}
 
     def test_get_reference_appstruct_with_depth(self, inst):
         appstruct = inst._get_reference_appstruct(
@@ -123,17 +104,12 @@ class TestFilteringPoolSheet:
             }
         assert appstruct == {'elements': ['Dummy']}
 
-    def test_get_reference_appstruct_with_default_params(self, inst):
-        appstruct = inst._get_reference_appstruct(
-            {'depth': '1', 'count': False})
-        assert inst._filter_elements.called is False
-        assert appstruct == {'elements': []}
-
     def test_get_reference_appstruct_with_depth_all(self, inst):
+        from adhocracy_core.interfaces import ISheet
         appstruct = inst._get_reference_appstruct({'depth': 'all'})
         assert inst._filter_elements.call_args[1] == \
                {'depth': None,
-                'ifaces': [],
+                'ifaces': [ISheet],  # default target isheet
                 'arbitrary_filters': {},
                 'resolve_resources': True,
                 'references': {},
@@ -147,10 +123,11 @@ class TestFilteringPoolSheet:
         assert 'elements' not in appstruct
 
     def test_get_reference_appstruct_aggregateby(self, inst):
+        from adhocracy_core.interfaces import ISheet
         appstruct = inst._get_reference_appstruct({'aggregateby': 'interfaces'})
         assert inst._filter_elements.call_args[1] == \
                {'depth': 1,
-                'ifaces': [],
+                'ifaces': [ISheet],  # default target isheet
                 'arbitrary_filters': {},
                 'resolve_resources': True,
                 'references': {},
@@ -186,6 +163,55 @@ class TestIntegrationPoolSheet:
         appstructs = {IName.__identifier__: {'name': name}}
         return registry.content.create(
             content_type.__identifier__, parent, appstructs)
+
+    def _get_pool_sheet(self, pool):
+        from adhocracy_core.sheets.pool import IPool
+        from adhocracy_core.utils import get_sheet
+        return get_sheet(pool, IPool)
+
+    def test_get_empty(self, registry,  pool_graph_catalog):
+        pool = self._make_resource(registry, parent=pool_graph_catalog)
+        poolsheet = self._get_pool_sheet(pool)
+        assert poolsheet.get() == {'elements': []}
+
+    #FIXME: add check if the schema has a children named 'elements' with tagged
+    #Value 'target_isheet'. This isheet is used to filter return data.
+
+    def test_get_not_empty_with_target_isheet(self, registry,
+                                              pool_graph_catalog):
+        from adhocracy_core.interfaces import ISheet
+        pool = self._make_resource(registry, parent=pool_graph_catalog)
+        poolsheet = self._get_pool_sheet(pool)
+        child = self._make_resource(registry, parent=pool, name='child')
+        assert ISheet.providedBy(child)  # default element target isheet
+        assert poolsheet._reference_nodes['elements'].reftype.getTaggedValue('target_isheet') == ISheet
+        assert poolsheet.get() == {'elements': [child]}
+
+    def test_get_not_empty_without_target_isheet(self, registry,
+                                                 pool_graph_catalog):
+        from adhocracy_core.sheets.rate import IRate
+        pool = self._make_resource(registry, parent=pool_graph_catalog)
+        poolsheet = self._get_pool_sheet(pool)
+        child = self._make_resource(registry, parent=pool, name='child')
+        assert not IRate.providedBy(child)
+        poolsheet._reference_nodes['elements'].reftype.setTaggedValue(
+            'target_isheet', IRate)
+        assert poolsheet.get() == {'elements': []}
+
+    def test_get_reference_appstruct_without_params(self, registry,
+                                                    pool_graph_catalog):
+        pool = self._make_resource(registry, parent=pool_graph_catalog)
+        poolsheet = self._get_pool_sheet(pool)
+        appstruct = poolsheet._get_reference_appstruct()
+        assert appstruct == {'elements': []}
+
+    def test_get_reference_appstruct_with_default_params(self, registry,
+                                                         pool_graph_catalog):
+        pool = self._make_resource(registry, parent=pool_graph_catalog)
+        poolsheet = self._get_pool_sheet(pool)
+        appstruct = poolsheet._get_reference_appstruct(
+            {'depth': '1', 'count': False})
+        assert appstruct == {'elements': []}
 
     def test_filter_elements_no_filters_with_direct_children(
             self, registry, pool_graph_catalog):

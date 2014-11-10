@@ -106,8 +106,16 @@ class IResourceSheet(IPropertySheet):  # pragma: no cover
 
     meta = Attribute('SheetMetadata')
 
-    def set(appstruct, omit=(), send_event=True, registry=None) -> bool:
-        """ Store ``appstruct`` dictionary data."""
+    def set(appstruct, omit=(), send_event=True, registry=None, request=None,
+            omit_readonly=True) -> bool:
+        """ Store ``appstruct`` dictionary data.
+
+        :param send_event: throw edit event.
+        :param registry: the pyramid registry to use.
+        :param request: the current pyramid request for additional permission
+                        checks, may be None.
+        :param omit_readonly: do not store readonly ``appstruct`` data.
+        """
 
     def get(params: dict={}) -> dict:
         """ Get ``appstruct`` dictionary data.
@@ -341,6 +349,8 @@ class IResourceSheetModified(IObjectEvent):
     registry = Attribute('The pyramid registry')
     old_appstruct = Attribute('The old :term:`appstruct` data')
     new_appstruct = Attribute('The new :term:`appstruct` data')
+    request = Attribute('The current request for additional permission checks'
+                        'or None (for testing/scripting).')
 
 
 class IResourceCreatedAndAdded(IObjectEvent):
