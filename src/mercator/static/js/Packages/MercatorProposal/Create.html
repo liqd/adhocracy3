@@ -37,7 +37,7 @@
 
                 <span
                     class="input-error"
-                    data-ng-show="showError('mercatorProposalBasicForm.user_info-first_name','required')">
+                    data-ng-show="showError('mercatorProposalBasicForm.user_info-first_name', 'required')">
                     {{ "Please enter your first name" | translate }}</span>
 
                 <input
@@ -49,7 +49,7 @@
 
                 <span
                     class="input-error"
-                    data-ng-show="showError('mercatorProposalBasicForm.user_info-last_name','required')">
+                    data-ng-show="showError('mercatorProposalBasicForm.user_info-last_name', 'required')">
                     {{ "Please enter your last name" | translate }}</span>
 
                 <country-select
@@ -60,7 +60,7 @@
 
                 <span
                     class="input-error"
-                    data-ng-show="showError('mercatorProposalBasicForm.user_info-country','required')">
+                    data-ng-show="showError('mercatorProposalBasicForm.user_info-country', 'required')">
                     {{ "Please select a country" | translate }}</span>
 
                 <h3>{{ "Organisation Info:" | translate }}</h3>
@@ -92,7 +92,7 @@
 
                         <span
                             class="input-error"
-                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-name','required')">
+                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-name', 'required')">
                             {{ "Please enter your organization name" | translate }}</span>
 
                         <country-select
@@ -102,7 +102,7 @@
 
                         <span
                             class="input-error"
-                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-country','required')">
+                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-country', 'required')">
                             {{ "Please enter your organization country" | translate }}</span>
 
                         <input
@@ -135,7 +135,7 @@
 
                         <span
                             class="input-error"
-                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-name','required')">
+                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-name', 'required')">
                             {{ "Please enter your organization name" | translate }}</span>
 
                         <country-select
@@ -145,7 +145,7 @@
 
                         <span
                             class="input-error"
-                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-country','required')">
+                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-country', 'required')">
                             {{ "Please enter your organization country" | translate }}</span>
 
                         <input
@@ -191,7 +191,7 @@
 
                         <span
                             class="input-error"
-                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-name','required')">{
+                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-name', 'required')">{
                             { "Please enter your organization name" | translate }}</span>
 
                         <country-select
@@ -201,7 +201,7 @@
 
                         <span
                             class="input-error"
-                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-country','required')">
+                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-country', 'required')">
                             {{ "Please enter your organization country" | translate }}</span>
 
                         <input
@@ -247,7 +247,7 @@
 
                         <span
                             class="input-error"
-                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-status_other','required')">
+                            data-ng-show="showError('mercatorProposalBasicForm.organization_info-status_other', 'required')">
                             {{ "Please enter some text" | translate }}</span>
 
                     </fieldset>
@@ -256,7 +256,7 @@
 
                 <span
                     class="input-error"
-                    data-ng-show="showError('mercatorProposalBasicForm.organization_info-status_enum','required')">
+                    data-ng-show="showError('mercatorProposalBasicForm.organization_info-status_enum', 'required')">
                     {{ "Please select one" | translate }}</span>
 
             </ng-form>
@@ -277,7 +277,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalIntroductionForm.introduction-title','required')">
+                        data-ng-show="showError('mercatorProposalIntroductionForm.introduction-title', 'required')">
                         {{ "Please enter a title" | translate }}</span>
                 </label>
 
@@ -293,7 +293,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalIntroductionForm.introduction-teaser','required')">
+                        data-ng-show="showError('mercatorProposalIntroductionForm.introduction-teaser', 'required')">
                         {{ "Please enter a teaser" | translate }}</span>
                 </label>
 
@@ -345,7 +345,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalDetailForm.details-form_description','required')">
+                        data-ng-show="showError('mercatorProposalDetailForm.details-form_description', 'required')">
                         {{ "Please enter a description" | translate }}</span>
                 </label>
 
@@ -367,7 +367,7 @@
 
                 <!-- FIXME: red border should show on dirty -->
                 <div
-                    data-ng-class="{ 'is-invalid': showError('mercatorProposalDetailForm.details-location','noneChecked') }">
+                    data-ng-class="{ 'is-invalid': showError('mercatorProposalDetailForm.details-location', 'noneChecked') }">
                     <label>
                         <input
                             type="checkbox"
@@ -421,7 +421,7 @@
                 </div><!-- /.ng-invalid -->
                 <span
                     class="input-error"
-                    data-ng-show="showError('mercatorProposalDetailForm.details-location','noneChecked')">
+                    data-ng-show="showError('mercatorProposalDetailForm.details-location', 'noneChecked')">
                     {{ "Please choose one" | translate }}</span>
 
             </div><!-- /.form_body -->
@@ -449,7 +449,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalDetailForm.story','required')">
+                        data-ng-show="showError('mercatorProposalDetailForm.story', 'required')">
                         {{ "Please enter some text" | translate }}</span>
 
                 </label>
@@ -497,7 +497,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalMotivationForm.outcome','required')">
+                        data-ng-show="showError('mercatorProposalMotivationForm.outcome', 'required')">
                         {{ "Please enter some text" | translate }}</span>
                 </label>
 
@@ -529,7 +529,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalMotivationForm.steps','required')">
+                        data-ng-show="showError('mercatorProposalMotivationForm.steps', 'required')">
                         {{ "Please enter some text" | translate }}</span>
                 </label>
 
@@ -559,7 +559,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalMotivationForm.value','required')">
+                        data-ng-show="showError('mercatorProposalMotivationForm.value', 'required')">
                         {{ "Please enter some text" | translate }}</span>
                 </label>
 
@@ -591,7 +591,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalMotivationForm.partners','required')">
+                        data-ng-show="showError('mercatorProposalMotivationForm.partners', 'required')">
                         {{ "Please enter some text" | translate }}</span>
                 </label>
 
@@ -619,7 +619,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalFinanceForm.finance-budget','required')">
+                        data-ng-show="showError('mercatorProposalFinanceForm.finance-budget', 'required')">
                         {{ "Please enter a total budget" | translate }}</span>
                 </label>
 
@@ -645,7 +645,7 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalFinanceForm.finance-requested_funding','required')">
+                        data-ng-show="showError('mercatorProposalFinanceForm.finance-requested_funding', 'required')">
                         {{ "Please enter requested funding" | translate }}</span>
                 </label>
 
@@ -681,7 +681,7 @@
                 </div><!-- /.ng-invalid -->
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalFinanceForm.finance-granted','required')">
+                        data-ng-show="showError('mercatorProposalFinanceForm.finance-granted', 'required')">
                         {{ "Please select one" | translate }}</span>
 
             </div><!--/.form_body -->
@@ -734,7 +734,7 @@
 
                 {{ "How did you hear about “Advocate Europe”?" | translate }}
 
-                <div data-ng-class="{ 'is-invalid': showError('mercatorProposalExtraForm.heard_from','noneChecked') }">
+                <div data-ng-class="{ 'is-invalid': showError('mercatorProposalExtraForm.heard_from', 'noneChecked') }">
 
                     <label>
                         <input type="checkbox"
@@ -790,12 +790,12 @@
 
                     <span
                         class="input-error"
-                        data-ng-show="showError('mercatorProposalExtraForm.heard_from','noneChecked')">
+                        data-ng-show="showError('mercatorProposalExtraForm.heard_from', 'noneChecked')">
                         {{ "Please select one" | translate }}</span>
                 </div><!-- /.ng-invalid -->
 
                 {{ "DISCLAIMER*:" | translate }}
-                <label data-ng-class="{ 'is-invalid': showError('mercatorProposalExtraForm.accept_disclaimer','required') }">
+                <label data-ng-class="{ 'is-invalid': showError('mercatorProposalExtraForm.accept_disclaimer', 'required') }">
                     <input
                         type="checkbox"
                         data-ng-model="data.accept_disclaimer"
