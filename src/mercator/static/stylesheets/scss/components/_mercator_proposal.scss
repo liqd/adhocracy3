@@ -40,6 +40,17 @@ $columns: 6;
         font-size: $font-size-huge;
         width: 100%;
     }
+
+    .description {
+        width: column-width(2) / column-width(4) * 100%;
+        position: absolute;
+        left: 100% + $gutter * column-width(2) / column-width(4);
+        padding: 0 0.5em;
+    }
+
+    ng-form {
+        overflow: hidden;
+    }
 }
 
 .mercator-proposal-nav {
@@ -50,4 +61,39 @@ $columns: 6;
     left: $gutter;
     top: 0.5em;
     z-index: 1;
+
+    a {
+        &.active {
+            font-weight: bold;
+        }
+    }
+}
+
+// Detail page very quick styles for presentation will be made nice
+// at a later date!
+
+.mercator-detail-nav, .mercator-detail-body {
+    float: left;
+}
+
+.mercator-detail-nav {
+    width: column-width(2);
+}
+
+.mercator-detail-body {
+    h2 {
+        margin-top: 0;
+    }
+}
+
+.mercator-detail-body {
+    width: column-width(4);
+    ul.meta {
+        padding: 0;
+        li {
+            border-bottom: 1px solid $color-structure-border;
+            list-style-type: none;
+        }
+    }
+
 }
