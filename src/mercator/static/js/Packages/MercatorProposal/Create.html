@@ -371,7 +371,7 @@
                         <input
                             type="checkbox"
                             data-ng-model="data.details.location_is_specific"
-                            name="details-location-specific"
+                            name="details-location-is-specific"
                             data-ng-valid="getDetailLocationValidity()" />
                         {{ "Specific Location" | translate }}
                     </label>
@@ -401,7 +401,7 @@
                         <input
                             type="checkbox"
                             data-ng-model="data.details.location_is_online"
-                            name="details-location-online"
+                            name="details-location-is-online"
                             data-ng-valid="getDetailLocationValidity()" />
                         {{ "Online" | translate }}
                     </label>
@@ -409,7 +409,7 @@
                         <input
                             type="checkbox"
                             data-ng-model="data.details.location_is_linked_to_ruhr"
-                            name="details-location-ruhr"
+                            name="details-location-is-linked-to-ruhr"
                             data-ng-valid="getDetailLocationValidity()"/>
                         {{ "Linkage to the Ruhr area" | translate }}
                     </label>
@@ -653,7 +653,7 @@
                 {{ "Granted?" | translate }}
 
                 <div data-ng-class="{ 'is-invalid': mercatorProposalFinanceForm['finance-granted'].$invalid &&
-                mercatorProposalForm.$submitted }">
+                    mercatorProposalForm.$submitted }">
 
                     <label>
                         <input

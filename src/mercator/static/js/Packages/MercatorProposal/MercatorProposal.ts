@@ -915,9 +915,9 @@ export var register = (angular) => {
             ];
 
             var detailsLocationCheckboxes = [
-                "details-location-specific",
-                "details-location-online",
-                "details-location-ruhr"
+                "details-location-is-specific",
+                "details-location-is-online",
+                "details-location-is-linked-to-ruhr"
             ];
 
             var getFieldByName = (fieldName : string) => {

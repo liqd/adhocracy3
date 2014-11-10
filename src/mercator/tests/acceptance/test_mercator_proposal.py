@@ -15,7 +15,7 @@ class TestMercatorForm:
 
     def test_fill_all_fields(self, browser):
         fill_all(browser)
-        assert can_submit(browser)
+        assert is_valid(browser)
 
     @mark.skipif(True, reason="pending")
     # FIXME: this should work, but: (1) it may alter state and confuse
@@ -37,31 +37,31 @@ class TestMercatorForm:
 
     def test_field_extra_exprerience_is_optional(self, browser):
         browser.find_by_name('experience').first.fill('')
-        assert can_submit(browser)
+        assert is_valid(browser)
 
     def test_field_status_text_is_not_shown_if_non_custom_status(self, browser):
         browser.find_by_name('organization-info-status-enum').first.check()
         status_text = 'organization-info-status-other'
         assert browser.is_element_not_present_by_name(status_text)
-        assert can_submit(browser)
+        assert is_valid(browser)
 
     def test_field_status_text_is_required_if_custom_status(self, browser):
         browser.find_by_name('organization-info-status-enum').last.check()
         status_text = 'organization-info-status-other'
         assert browser.is_element_present_by_name(status_text)
-        assert not can_submit(browser)
+        assert not is_valid(browser)
         browser.find_by_name(status_text).first.fill('statustext')
-        assert can_submit(browser)
+        assert is_valid(browser)
 
     def test_field_name_is_required(self, browser):
         browser.find_by_name('user-info-first-name').first.fill('')
-        assert not can_submit(browser)
+        assert not is_valid(browser)
 
 
 
-def can_submit(browser):
-    return browser.is_element_present_by_css(
-        'input[type="submit"]:not(:disabled)')
+def is_valid(browser):
+    form = browser.find_by_css('.mercator-proposal-form').first
+    return not form.has_class('ng-invalid')
 
 
 def fill_all(browser):
@@ -73,19 +73,17 @@ def fill_all(browser):
     # DOM, and an index is used instead.
     browser.select('user-info-country', '1')
 
+    browser.find_by_name('organization-info-status-enum').first.check()
     browser.find_by_name('organization-info-name').first.fill(
         'organisation name')
+    browser.find_by_name('organization-info-country').first.select('2')
     browser.find_by_name('organization-info-website').first.fill(
         'http://example.com')
-    browser.find_by_name('organization-info-date-of-foreseen-registration')\
-        .first.fill('02/2015')
-    browser.select('organization-info-country', '2')
-    browser.find_by_name('organization-info-status-enum').first.check()
 
     browser.find_by_name('introduction-title').first.fill('title')
     browser.find_by_name('introduction-teaser').first.fill('teaser')
 
-    browser.find_by_name('details-description').first.fill('description')
+    browser.find_by_name('details-form-description').first.fill('description')
     browser.find_by_name('details-location-is-specific').first.check()
     browser.find_by_name('details-location-specific-1').first.fill('Bonn')
     browser.find_by_name('details-location-is-linked-to-ruhr').first.check()
@@ -102,3 +100,5 @@ def fill_all(browser):
 
     browser.find_by_name('experience').first.fill('experience')
     browser.find_by_name('heard-from-colleague').first.check()
+
+    browser.find_by_name('accept-disclaimer').first.check()
