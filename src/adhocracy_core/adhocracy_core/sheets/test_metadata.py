@@ -131,32 +131,28 @@ class TestVisibility:
         assert is_deleted(context) is False
 
     def test_is_deleted_parent_attribute_is_true(self, context):
-        from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import is_deleted
-        child = testing.DummyResource(__provides__=IResource)
+        child = testing.DummyResource()
         context['child'] = child
         context.deleted = True
         assert is_deleted(child) is True
 
     def test_is_deleted_parent_attribute_is_false(self, context):
-        from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import is_deleted
-        child = testing.DummyResource(__provides__=IResource)
+        child = testing.DummyResource()
         context['child'] = child
         context.deleted = False
         assert is_deleted(child) is False
 
     def test_is_deleted_parent_attribute_not_set(self, context):
-        from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import is_deleted
-        child = testing.DummyResource(__provides__=IResource)
+        child = testing.DummyResource()
         context['child'] = child
         assert is_deleted(child) is False
 
     def test_is_deleted_parent_attrib_true_child_attrib_false(self, context):
-        from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import is_deleted
-        child = testing.DummyResource(__provides__=IResource)
+        child = testing.DummyResource()
         context['child'] = child
         context.deleted = True
         child.deleted = False
@@ -177,32 +173,28 @@ class TestVisibility:
         assert is_hidden(context) is False
 
     def test_is_hidden_parent_attribute_is_true(self, context):
-        from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import is_hidden
-        child = testing.DummyResource(__provides__=IResource)
+        child = testing.DummyResource()
         context['child'] = child
         context.hidden = True
         assert is_hidden(child) is True
 
     def test_is_hidden_parent_attribute_is_false(self, context):
-        from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import is_hidden
-        child = testing.DummyResource(__provides__=IResource)
+        child = testing.DummyResource()
         context['child'] = child
         context.hidden = False
         assert is_hidden(child) is False
 
     def test_is_hidden_parent_attribute_not_set(self, context):
-        from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import is_hidden
-        child = testing.DummyResource(__provides__=IResource)
+        child = testing.DummyResource()
         context['child'] = child
         assert is_hidden(child) is False
 
     def test_is_hidden_parent_attrib_true_child_attrib_false(self, context):
-        from adhocracy_core.interfaces import IResource
         from adhocracy_core.sheets.metadata import is_hidden
-        child = testing.DummyResource(__provides__=IResource)
+        child = testing.DummyResource()
         context['child'] = child
         context.hidden = True
         child.hidden = False
