@@ -6,7 +6,7 @@ from adhocracy_core.resources.itemversion import itemversion_metadata
 from adhocracy_core.resources.item import item_metadata
 from adhocracy_core.resources.comment import add_commentsservice
 from adhocracy_core.resources.rate import add_ratesservice
-from adhocracy_core.sheets.rate import IRateable
+from adhocracy_core.sheets.rate import ILikeable
 from adhocracy_core.sheets.comment import ICommentable
 import adhocracy_mercator.sheets.mercator
 
@@ -333,7 +333,7 @@ mercator_proposal_version_meta = itemversion_metadata._replace(
                      adhocracy_mercator.sheets.mercator.IHeardFrom,
                      adhocracy_mercator.sheets.mercator.IMercatorSubResources,
                      ICommentable,
-                     IRateable],
+                     ILikeable],
 )
 
 
