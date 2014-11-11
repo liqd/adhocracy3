@@ -5,14 +5,32 @@ $columns: 6;
     @return (100% - $gutter) / $columns * $n - $gutter;
 }
 
+.row {
+    clear: both;
+    float: left;
+    width: 100%;
+}
+
 .mercator-proposal-form {
     position: relative;
-    width: column-width(4) + $gutter;
+    width: 100%;
     background: white;
     padding-left: column-width(1) + 2 * $gutter;
     padding-right: $gutter;
     border: 1px solid $color-structure-border;
     border-left: 0;
+
+    .form-body {
+        float: left;
+        padding-right: $gutter;
+        width: column-width(4);
+    }
+
+    .form-description {
+        float: right;
+        padding-bottom: $gutter;
+        width: column-width(2);
+    }
 
     label {
         display: block;
@@ -21,13 +39,6 @@ $columns: 6;
     input[type="submit"] {
         font-size: $font-size-huge;
         width: 100%;
-    }
-
-    .description {
-        width: column-width(2) / column-width(4) * 100%;
-        position: absolute;
-        left: 100% + $gutter * column-width(2) / column-width(4);
-        padding: 0 0.5em;
     }
 }
 

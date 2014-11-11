@@ -42,15 +42,36 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
     public route(path : string, search : Dict) : ng.IPromise<Dict> {
         var self : Service = this;
-        var resourceUrl = this.adhConfig.rest_url + path;
+        var segs : string[] = path.replace(/\/+$/, "").split("/");
+
+        if (segs.length < 2 || segs[0] !== "") {
+            throw "bad path: " + path;
+        }
+
+        var platform : string = segs[1];
+        var resourceUrl : string;
+        var view : string;
+
+        // if path contains more than just the platform
+        if (segs.length > 2) {
+            resourceUrl = this.adhConfig.rest_url;
+
+            // if path has a view segment
+            if (_.last(segs).match(/^@/)) {
+                view = segs.pop().replace(/^@/, "");
+            }
+            resourceUrl += segs.join("/");
+        } else {
+            resourceUrl = this.adhConfig.rest_url + "/" + platform;
+        }
 
         return this.adhHttp.get(resourceUrl).then((resource) => {
             var data = self.provider.get(resource.content_type);
-            data["platform"] = path.split("/")[1];
 
-            // if path contains more than just the platform
-            if (path.replace(/\/+$/, "").split("/").length > 2) {
-                data["content2Url"] = this.adhConfig.rest_url + path;
+            data["platform"] = platform;
+            data["view"] = view;
+            if (segs.length > 2) {
+                data["content2Url"] = resourceUrl;
             }
 
             for (var key in search) {
@@ -58,11 +79,12 @@ export class Service implements AdhTopLevelState.IAreaInput {
                     data[key] = search[key];
                 }
             }
+
             return data;
         });
     }
 
-    public reverse(data : Dict) {
+    public reverse(data : Dict) : { path : string; search : Dict; } {
         var defaults = {
             space: "content",
             movingColumns: "is-show-show-hide"
@@ -74,6 +96,10 @@ export class Service implements AdhTopLevelState.IAreaInput {
             path = data["content2Url"].replace(this.adhConfig.rest_url, "");
         } else {
             path = "/" + data["platform"];
+        }
+
+        if (data["view"]) {
+            path += "/@" + data["view"];
         }
 
         return {

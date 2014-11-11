@@ -12,16 +12,16 @@ FIX_TSLINT_ERROR_FORMAT=perl -ne 'chomp; if (/^(\S+)\[(\d+),\s*(\d+)\]:(.*)/) { 
 
 compile: compile_tests_browser
 
-AdhocracySpec.ts: .dummy
+AdhocracySpec.ts: .phony
 	./AdhocracySpec.sh > AdhocracySpec.ts
 
-AdhocracyIg.ts: .dummy
+AdhocracyIg.ts: .phony
 	./AdhocracyIg.sh > AdhocracyIg.ts
 
 compile_tests_browser: AdhocracySpec.ts AdhocracyIg.ts
 	$(TSC) --module amd --sourcemap Adhocracy*.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 
-test-no-blanket: .dummy
+test-no-blanket: .phony
 	cat ../test.html | perl -pe 's/(data-cover-flags=".*)(")$$/$$1 engineOnly$$2/' > ../test-no-blanket.html
 
 compile_tests_node: AdhocracySpec.ts
@@ -67,7 +67,7 @@ wc:
 	git ls-files | grep \\.ts$$ | wc
 	git ls-files | grep \\.ts$$ | xargs wc
 
-tags: .dummy
+tags: .phony
 	@echo
 	@echo "for emacs tag files, include '-e' in CTAGS in your shell env."
 	@echo "(note that ctags 5.9 seems to have a bug that keeps it from"
@@ -88,17 +88,16 @@ tags: .dummy
 		--regex-typescript='/^[ \t]*(export)?[ \t]*enum[ \t]+([a-zA-Z0-9_]+)/\2/e,enums/' \
 	        --language-force=typescript
 
-.dummy:
+.phony:
 
 
-
-mkResources: .dummy
+mkResources: .phony
 	git ls-files --other Resources_ | xargs rm -f
 	$(TSC) --module commonjs --sourcemap mkResources.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 #	$(TSLINT) -c ../../../../../etc/tslint.json -f mkResources.ts 2>&1 | $(FIX_TSLINT_ERROR_FORMAT)
 	$(NODE) mkResources.js
 
 
-testMkResources: .dummy
+testMkResources: .phony
 	$(TSC) --module commonjs --sourcemap mkResources/Util.ts 2>&1 | $(FIX_TSC_ERROR_FORMAT)
 	cd mkResources && ../$(NODE) Util.js

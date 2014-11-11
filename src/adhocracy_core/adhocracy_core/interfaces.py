@@ -475,3 +475,14 @@ class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
         called to retrieve the list of roles for this principal. These
         roles extend the given `principals`.
         """
+
+
+class IRateValidator(Interface):  # pragma: no cover
+
+    """Adapter responsible for validating rates about rateables."""
+
+    def validate(self, rate: int) -> bool:
+        """Return True if rate is valid, False otherwise."""
+
+    def helpful_error_message(self) -> str:
+        """Return a error message that explains which values are allowed."""

@@ -26,7 +26,21 @@ var pkgLocation = "/TopLevelState";
 
 
 export interface IAreaInput {
+    /**
+     * Convert (ng) location to (a3 top-level) state: Take a path and
+     * a search query dictionary, and promise a state dictionary that
+     * can be sored stored in a 'TopLevelState'.
+     *
+     * This is the reverse of 'this.reverse'.
+     */
     route? : (path : string, search : {[key : string] : string}) => ng.IPromise<{[key : string] : string}>;
+    /**
+     * Convert (a3 top-level) state to (ng) location: Take a
+     * 'TopLevelState' and return a path and a search query
+     * dictionary.
+     *
+     * This is the reverse of 'this.route'.
+     */
     reverse? : (data : {[key : string] : string}) => {
         path : string;
         search : {[key : string] : string};

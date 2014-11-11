@@ -16,13 +16,16 @@ They can have the following states:
 -   is-dirty
 
 Is-invalid should generally only change the presentation of the input widget if
-it is also dirty.
+it is also dirty or the form has been submitted.
 
 ```html_example
 <input type="text" placeholder="required and dirty" required="required" class="is-dirty" />
 <input type="text" placeholder="invalid and dirty" class="is-invalid is-dirty" />
 <input type="text" placeholder="invalid and prestine" class="is-invalid" />
 <input type="text" disabled="disabled" placeholder="disabled" />
+<form class="ng-submitted">
+    <input type="text" placeholder="invalid in submitted form" class="is-invalid" />
+</form>
 ```
 */
 
@@ -68,6 +71,19 @@ Textinput that represents a title.
 <input type="text" placeholder="title" class="m-title"/>
 ```
 */
+
+.error-state {
+    border-color: lightcoral;
+    outline: 1px solid lightcoral;
+
+    &.has-focus,
+    &:focus {
+        border-color: $color-highlight-invalid;
+        color: $color-highlight-invalid;
+        outline: 1px solid $color-highlight-invalid;
+    }
+}
+
 input[type="text"],
 input[type="url"],
 input[type="password"],
@@ -102,14 +118,7 @@ textarea {
 
     &.ng-dirty, &.is-dirty {
         &.ng-invalid, &:invalid, &.is-invalid {
-            border-color: lightcoral;
-            outline: 1px solid lightcoral;
-
-            &.has-focus,
-            &:focus {
-                border-color: $color-highlight-invalid;
-                outline: 1px solid $color-highlight-invalid;
-            }
+            @extend .error-state;
         }
     }
 
@@ -121,8 +130,68 @@ textarea {
     }
 }
 
+.ng-submitted {
+    input[type="text"],
+    input[type="url"],
+    input[type="password"],
+    input[type="email"],
+    input[type="date"],
+    input[type="time"],
+    input[type="number"],
+    label,
+    div,
+    select,
+    textarea {
+        &.ng-invalid, &:invalid, &.is-invalid {
+            @extend .error-state;
+        }
+    }
+}
+
 textarea {
     resize: vertical;
+}
+
+/*doc
+---
+title: error text
+name: error-text
+parent: input
+---
+
+When text is in error it shows in an invalid color state
+
+```html_example
+<span class="input-error">Please enter your first name</span>
+```
+*/
+
+/*doc
+---
+title: radio button
+name: radio
+parent: input
+---
+
+A radio button, like a checkbox, has the two states: is-checked and
+is-unchecked.  Of a group of radio buttons, none or a single one can be
+checked. "required" in this context means that any of the buttons must be
+checked.
+
+```html_example
+<label>
+    <input name="radio-example" type="radio" />
+    One option
+</label>
+<label>
+    <input name="radio-example" type="radio" />
+    The other option
+</label>
+```
+*/
+
+.input-error {
+    color: $color-highlight-invalid;
 }
 
 /*doc
