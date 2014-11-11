@@ -50,3 +50,32 @@ $columns: 6;
         }
     }
 }
+
+// Detail page very quick styles for presentation will be made nice
+// at a later date!
+
+.mercator-detail-nav, .mercator-detail-body {
+    float: left;
+}
+
+.mercator-detail-nav {
+    width: column-width(2);
+}
+
+.mercator-detail-body {
+    h2 {
+        margin-top: 0;
+    }
+}
+
+.mercator-detail-body {
+    width: column-width(4);
+    ul.meta {
+        padding: 0;
+        li {
+            border-bottom: 1px solid $color-structure-border;
+            list-style-type: none;
+        }
+    }
+
+}

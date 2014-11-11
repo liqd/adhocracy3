@@ -1,250 +1,326 @@
 <div class="mercator-proposal-detail-view" id="mercator-detail-view-top">
-    <div class="cover">
-        <div>
-            <img src="" alt="" />
-        </div>
-        <div>
-            <h2>{{ data.introduction.title }}</h2>
-            <div>
-                <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-            </div>
-        </div>
-        <div class="meta">
-            <span>requested: EUR {{ data.finance.requested_funding }}</span>
-            <span>author: {{ data.user_info.first_name }} {{ data.user_info.last_name }}</span>
-            <span>published: {{ data.basic.createtime }}</span>
-            <div>
-                #comments
-            </div>
-            <div>
-                #supporters
-            </div>
-            <adh-rate data-refers-to="{{path}}"
-                      data-post-pool-sheet="adhocracy.sheets.rate.IRateable"
-                      data-post-pool-field="post_pool">
-            </adh-rate>
-        </div>
-    </div>
+    <nav class="mercator-detail-nav"> <!-- class="mercator-proposal-nav" -->
+        <ol data-du-scroll-container="moving-column2-body" data-du-smooth-scroll="">
+            <li><a href="#mercator-detail-view-brief-proposal" data-du-smooth-scroll="">{{ "Brief Proposal" | translate }}</a></li>
+            <li><a href="#mercator-detail-view-detailed-proposal" data-du-smooth-scroll="">{{ "Detailed Proposal" | translate }}</a></li>
+            <li><a href="#mercator-detail-view-goals-and-vision" data-du-smooth-scroll="">{{ "Goals and Vision" | translate }}</a></li>
+            <li><a href="#mercator-detail-view-additional" data-du-smooth-scroll="">{{ "Additional" | translate }}</a></li>
+        </ol>
+    </nav>
 
-    <div> <!-- class="body" -->
-        <div> <!-- class="mercator-proposal-nav" -->
-            <ol>
-                <li><a href="#mercator-detail-view-brief-proposal">{{ "Brief Proposal" | translate }}</a></li>
-                <li><a href="#mercator-detail-view-detailed-proposal">{{ "Detailed Proposal" | translate }}</a></li>
-                <li><a href="#mercator-detail-view-goals-and-vision">{{ "Goals and Vision" | translate }}</a></li>
-                <li><a href="#mercator-detail-view-additional">{{ "Additional" | translate }}</a></li>
-            </ol>
+    <div class="mercator-detail-body">
+
+        <div class="cover">
+            <h2>{{ data.introduction.title }}
+                <span class="pull-right">
+                    <!-- FIXME: Dummy data -->
+                    <i class="icon-speachbubble-outline"></i> 3
+                </span>
+            </h2>
+
+            <ul class="meta">
+                <li>
+                    <strong>{{data.finance.requested_funding}} &euro;</strong> requested
+                </li>
+                <li>
+                    <!-- FIXME: Link to profile -->
+                    <a href="#">{{data.user_info.first_name}} {{data.user_info.last_name}}</a>
+                </li>
+                <li>
+                    {{ data.basic.createtime }}
+                    published
+                </li>
+                <li>
+                    <!-- FIXME: Dummy data -->
+                    <i class="icon-speachbubble-outline"></i> 33
+                </li>
+                <li>
+                    <!-- FIXME: Dummy data -->
+                    231 supporters
+                </li>
+                <li>
+                    <adh-rate data-refers-to="{{path}}"
+                          data-post-pool-sheet="adhocracy.sheets.rate.IRateable"
+                          data-post-pool-field="post_pool">
+                    </adh-rate>
+                </li>
+            </ul>
+
+            <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+
         </div>
-        <div> <!-- class="chapters" -->
-            <div id="mercator-detail-view-brief-proposal">
-                <h3>{{ "Brief Proposal" | translate }}</h3>
-                <div>
-                    <hr>
-                    <div>{{ "Pitch (Teaser)" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-                </div>
-                <div>{{ data.introduction.teaser }}</div>
-                <div>{{ "Where will this project take place?" | translate }}</div>
-                <div>
+
+        <div> <!-- class="body" -->
+            <div> <!-- class="chapters" -->
+                <div id="mercator-detail-view-brief-proposal">
+                    <h3>{{ "Brief Proposal" | translate }}</h3>
                     <div>
-                        online: {{ data.details.location_is_online }}
-
-                        [FIXME: how should this just disappear if online is not checked in this proposal?]
+                        <hr>
+                        <div>{{ "Pitch (Teaser)" | translate }}
+                            <span class="pull-right">
+                                <!-- FIXME: Dummy data -->
+                                <i class="icon-speachbubble-outline"></i> 3
+                            </span>
+                        </div>
+                        <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
                     </div>
-                    <div data-ng-if="data.details.location_specific_1">
-                        {{ data.details.location_specific_1 }}
-                    </div>
-                    <div data-ng-if="data.details.location_specific_2">
-                        {{ data.details.location_specific_2 }}
-                    </div>
-                    <div data-ng-if="data.details.location_specific_3">
-                        {{ data.details.location_specific_3 }}
-                    </div>
-                    <div data-ng-if="details.location_is_linked_to_ruhr">
-                        Ruhr Gebiet, Germanye
-
-                        [FIXME: what's with the blue bubble in the wireframe?]
-                    </div>
-                </div>
-                <div>
+                    <div>{{ data.introduction.teaser }}</div>
                     <hr>
-                    <div>{{ "Finance" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-                </div>
-                <div>{{ data.finance.budget }} {{ "total project budget" | translate }}</div>
-                <div>{{ data.finance.requested_funding }} {{ "requested" | translate }}</div>
-                <div data-ng-if="data.finance.granted">
-                    [project is granted]
-                </div>
-                <div>
-                    {{ data.finance.other_sources }}
+                    <h4>{{ "Where will this project take place?" | translate }}
+                        <span class="pull-right">
+                            <!-- FIXME: Dummy data -->
+                            <i class="icon-speachbubble-outline"></i> 3
+                        </span>
+                    </h4>
+                    <div>
 
-                    [FIXME: the context in which this text is
-                    displayed gives a lot less clue about what the
-                    text is about than the context of the same text in
-                    the form where the proposal is entered.  this
-                    could encourage users enter sentence fragments
-                    there rather than sentences that remain
-                    self-explanatory here.  Perhaps the question from
-                    the form should be repeated here?]
-                </div>
-                <div>
-                    <hr>
-                    <div>{{ "Who is behind it?" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-                </div>
-                <div>
-                    [FIXME: using form user name rather than profile
-                    user name for now.  anyway: if this place is
-                    supposed to show the name from the user profile
-                    rather than from the mercator proposal create
-                    form, then why do we enter the latter in the first
-                    place?  (note that we don't have
-                    first-name-last-name in the user profile, but just
-                    one text field containing the full name.  i
-                    suppose that's not a problem here.)]
+                        <strong ng-if="details.location_is_online">{{ "ONLINE" | translate }}</strong>
+                        <!-- FIXME: Dummy data -->
+                        <ul>
+                            <li>Online</li>
+                            <li>Berlin, Germany</li>
+                            <li>London, UK</li>
+                            <li>Paris, France</li>
+                        </ul>
 
-                    <div data-ng-switch="data.organization_info.status_enum">
-                        <div data-ng-switch-when="registered_nonprofit">
-                            <div>
-                                {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                        <!-- FIXME: map this data to location names -->
+                        <div ng-if="false">
+                            <div data-ng-if="data.details.location_specific_1">
+                                {{ data.details.location_specific_1 }}
                             </div>
-                            <div>
-                                <div>
-                                    <p>{{ data.organisation_info.name }}</p>
-                                    <p>{{ data.organisation_info.website }}</p>
-                                    <p>{{ "We are a registered non-profil" | translate }}</p>
-                                </div>
-                                <div>
-                                    {{ data.organisation_info.country }}
-                                </div>
+                            <div data-ng-if="data.details.location_specific_2">
+                                {{ data.details.location_specific_2 }}
                             </div>
-                        </div>
-                        <div data-ng-switch-when="planned_nonprofit">
-                            <div>
-                                {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                            <div data-ng-if="data.details.location_specific_3">
+                                {{ data.details.location_specific_3 }}
                             </div>
-                            <div>
-                                <div>
-                                    <p>{{ data.organisation_info.name }}</p>
-                                    <p>{{ data.organisation_info.website }}</p>
-                                    <p>
-                                        {{ "NGO registration is planned or in process " | translate }}
-                                        {{ data.organisation_info.date_of_foreseen_registration }}
-                                    </p>
-                                </div>
-                                <div>
-                                    {{ data.organisation_info.country }}
-                                </div>
-                            </div>
-                        </div>
-                        <div data-ng-switch-when="support_needed">
-                            <div>
-                                {{ data.user_info.first_name }} {{ data.user_info.last_name }}
-                            </div>
-                            <div>
-                                <div>
-                                    <p>{{ data.organisation_info.name }}</p>
-                                    <p>{{ data.organisation_info.website }}</p>
-                                    <p>{{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}</p>
-                                    <p>{{ data.organisation_info.how_can_we_help_you }}</p>
-                                </div>
-                                <div>
-                                    {{ data.organisation_info.country }}
-                                </div>
-                            </div>
-                        </div>
-                        <div data-ng-switch-when="other">
-                            <div>
-                                {{ data.user_info.first_name }} {{ data.user_info.last_name }}
-                            </div>
-                            <div>
-                                <p>{{ data.organisation_info.status_other }}</p>
+                            <div data-ng-if="details.location_is_linked_to_ruhr">
+                                Ruhr Gebiet, Germanye
+
+                                <!-- FIXME: what's with the blue bubble in the wireframe? -->
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div id="mercator-detail-view-detailed-proposal">
-                <h3>{{ "Detailed Proposal" | translate }}</h3>
-                <div>
-                    <hr>
-                    <div>{{ "Description?" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-                </div>
-                <div>{{ data.details.description }}</div>
-                <div>
-                    <hr>
-                    <div>{{ "Story behind the idea" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-                </div>
-                <div>{{ data.story }}</div>
-            </div>
-            <div id="mercator-proposal-detail-view-goals-and-vision">
-                <h3>{{ "Goals and Vision" | translate }}</h3>
-                <div>
-                    <hr>
-                    <div>{{ "What would be a successful outcome of your project or initiative?" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-                </div>
-                <div>{{ data.outcome }}</div>
-                <div>
-                    <hr>
-                    <div>{{ "How do you want to get there?" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-                </div>
-                <div>{{ data.steps }}</div>
-                <div>
-                    <hr>
-                    <div>{{ "Why does Europe need your idea?" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-                </div>
-                <div>{{ data.value }}</div>
-                <div>
-                    <hr>
-                    <div>{{ "Partner organisations and members list" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-                </div>
-                <div>{{ data.partners }}</div>
-            </div>
-            <div id="mercator-proposal-detail-view-additional">
-                <h3>{{ "Additional" | translate }}</h3>
-                <div>
-                    <hr>
-                    <div>{{ "Share your experience" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
-                </div>
-                <div>{{ data.experience }}</div>
-                <div>
-                    <hr>
-                    <div>{{ "Where did you find out about Advocate Europe?" | translate }}</div>
-                    <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                    <div>
+                        <hr>
+                        <h3>{{ "Finance" | translate }}
+                            <span class="pull-right">
+                                <!-- FIXME: Dummy data -->
+                                <i class="icon-speachbubble-outline"></i> 3
+                            </span>
+                        </h3>
+                        <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                    </div>
+                    <div><strong>{{ data.finance.budget }} &euro;</strong> {{ "total project budget" | translate }}</div>
+                    <div><strong>{{ data.finance.requested_funding }} &euro;</strong> {{ "requested" | translate }}</div>
+                    <p data-ng-if="data.finance.granted"><strong class="color-highlight-valid">project is granted</strong></p>
+                    <p>{{ data.finance.other_sources }}</p>
 
-                    [FIXME: do we really want to display that for
-                    everybody?  shouldn't we offer to pull that out of
-                    the database and send the statistics to mercator
-                    separately?  it seems odd to show that information
-                    to other users.  especially the fact that you can
-                    comment on it.  :)]
+                        <!-- FIXME: the context in which this text is
+                        displayed gives a lot less clue about what the
+                        text is about than the context of the same text in
+                        the form where the proposal is entered.  this
+                        could encourage users enter sentence fragments
+                        there rather than sentences that remain
+                        self-explanatory here.  Perhaps the question from
+                        the form should be repeated here? -->
 
-                    [FIXME: if we want to keep this: javascript data
-                    contains boolean fields that contain string
-                    "false", which evaluate to true.  not sure what's
-                    going on there, but it can't be very complicated.]
+                        <hr>
+                        <h3>{{ "Who is behind it?" | translate }}
+                            <span class="pull-right">
+                                <!-- FIXME: Dummy data -->
+                                <i class="icon-speachbubble-outline"></i> 3
+                            </span>
+                        </h3>
+                        <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+
+                    <div>
+                        <!-- FIXME: using form user name rather than profile
+                        user name for now.  anyway: if this place is
+                        supposed to show the name from the user profile
+                        rather than from the mercator proposal create
+                        form, then why do we enter the latter in the first
+                        place?  (note that we don't have
+                        first-name-last-name in the user profile, but just
+                        one text field containing the full name.  i
+                        suppose that's not a problem here.) -->
+
+                        <div data-ng-switch="data.organization_info.status_enum">
+                            <div data-ng-switch-when="registered_nonprofit">
+                                <div>
+                                    {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                                </div>
+                                <div>
+                                    <div>
+                                        <p>{{ data.organisation_info.name }}</p>
+                                        <p>{{ data.organisation_info.website }}</p>
+                                        <p>{{ "We are a registered non-profil" | translate }}</p>
+                                    </div>
+                                    <div>
+                                        {{ data.organisation_info.country }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-ng-switch-when="planned_nonprofit">
+                                <div>
+                                    {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                                </div>
+                                <div>
+                                    <div>
+                                        <p>{{ data.organisation_info.name }}</p>
+                                        <p>{{ data.organisation_info.website }}</p>
+                                        <p>
+                                            {{ "NGO registration is planned or in process " | translate }}
+                                            {{ data.organisation_info.date_of_foreseen_registration }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        {{ data.organisation_info.country }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-ng-switch-when="support_needed">
+                                <div>
+                                    {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                                </div>
+                                <div>
+                                    <div>
+                                        <p>{{ data.organisation_info.name }}</p>
+                                        <p>{{ data.organisation_info.website }}</p>
+                                        <p>{{ "We’d like to try to realise the idea, but will need help with registering a non-profit." | translate }}</p>
+                                        <p>{{ data.organisation_info.how_can_we_help_you }}</p>
+                                    </div>
+                                    <div>
+                                        {{ data.organisation_info.country }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-ng-switch-when="other">
+                                <div>
+                                    {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                                </div>
+                                <div>
+                                    <p>{{ data.organisation_info.status_other }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p><a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a></p>
                 </div>
-                <div data-ng-if="data.heard_from.colleague">colleague</div>
-                <div data-ng-if="data.heard_from.website">website</div>
-                <div data-ng-if="data.heard_from.newsletter">newsletter</div>
-                <div data-ng-if="data.heard_from.facebook">facebook</div>
-                <div data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</div>
+                <div id="mercator-detail-view-detailed-proposal">
+                    <h2>{{ "Detailed Proposal" | translate }}</h2>
+                    <div>
+                        <hr>
+                        <h3>{{ "Description?" | translate }}
+                            <span class="pull-right">
+                                <!-- FIXME: Dummy data -->
+                                <i class="icon-speachbubble-outline"></i> 3
+                            </span>
+                        </h3>
+                        <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                    </div>
+                    <p>{{ data.details.description }}</p>
+                    <div>
+                        <hr>
+                        <h3>{{ "Story behind the idea" | translate }}
+                            <span class="pull-right">
+                                <!-- FIXME: Dummy data -->
+                                <i class="icon-speachbubble-outline"></i> 3
+                            </span>
+                        </h3>
+                        <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                    </div>
+                    <p>{{ data.story }}</p>
+                    <p><a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a></p>
+                </div>
+                <div id="mercator-detail-view-goals-and-vision">
+                    <h2>{{ "Goals and Vision" | translate }}</h2>
+                    <div>
+                        <hr>
+                        <h3>{{ "What would be a successful outcome of your project or initiative?" | translate }}
+                            <span class="pull-right">
+                                <!-- FIXME: Dummy data -->
+                                <i class="icon-speachbubble-outline"></i> 3
+                            </span>
+                        </h3>
+                        <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                    </div>
+                    <p>{{ data.outcome }}</p>
+                    <div>
+                        <hr>
+                        <h3>{{ "How do you want to get there?" | translate }}
+                            <span class="pull-right">
+                                <!-- FIXME: Dummy data -->
+                                <i class="icon-speachbubble-outline"></i> 3
+                            </span>
+                        </h3>
+                        <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                    </div>
+                    <p>{{ data.steps }}</p>
+                    <div>
+                        <hr>
+                        <h3>{{ "Why does Europe need your idea?" | translate }}
+                            <span class="pull-right">
+                                <!-- FIXME: Dummy data -->
+                                <i class="icon-speachbubble-outline"></i> 3
+                            </span>
+                        </h3>
+                        <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                    </div>
+                    <p>{{ data.value }}</p>
+                    <div>
+                        <hr>
+                        <h3>{{ "Partner organisations and members list" | translate }}
+                            <span class="pull-right">
+                                <!-- FIXME: Dummy data -->
+                                <i class="icon-speachbubble-outline"></i> 3
+                            </span>
+                        </h3>
+                        <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                    </div>
+                    <p>{{ data.partners }}</p>
+                    <p><a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a></p>
+                </div>
+                <div id="mercator-detail-view-additional">
+                    <h3>{{ "Additional" | translate }}</h3>
+                    <div>
+                        <hr>
+                        <div>{{ "Share your experience" | translate }}</div>
+                        <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+                    </div>
+                    <div>{{ data.experience }}</div>
+                    <div>
+                        <hr>
+                        <div>{{ "Where did you find out about Advocate Europe?" | translate }}</div>
+                        <button type="button" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+
+                        [FIXME: do we really want to display that for
+                        everybody?  shouldn't we offer to pull that out of
+                        the database and send the statistics to mercator
+                        separately?  it seems odd to show that information
+                        to other users.  especially the fact that you can
+                        comment on it.  :)]
+
+                        [FIXME: if we want to keep this: javascript data
+                        contains boolean fields that contain string
+                        "false", which evaluate to true.  not sure what's
+                        going on there, but it can't be very complicated.]
+                    </div>
+                    <div data-ng-if="data.heard_from.colleague">colleague</div>
+                    <div data-ng-if="data.heard_from.website">website</div>
+                    <div data-ng-if="data.heard_from.newsletter">newsletter</div>
+                    <div data-ng-if="data.heard_from.facebook">facebook</div>
+                    <div data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</div>
+                    <p><a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a></p>
+                </div>
             </div>
+
+            <div>[here you should see a second manifestation of the
+            support butten in the cover section.  obviously, if one of
+            them is clicked, the other should change automatically.]</div>
+
+            <p><a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a></p>
+
         </div>
-
-        <div>[here you should see a second manifestation of the
-        support butten in the cover section.  obviously, if one of
-        them is clicked, the other should change automatically.]</div>
-
-        <a href="#mercator-detail-view-top">go to top</a>
-
     </div>
 </div>

@@ -226,6 +226,7 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                     break;
                     case RIMercatorDetailsVersion.content_type: (() => {
                         var scope = data.details;
+                        console.log(data);
                         var res : SIMercatorDetails.Sheet = subResource.data[SIMercatorDetails.nick];
 
                         scope.description = res.description;
