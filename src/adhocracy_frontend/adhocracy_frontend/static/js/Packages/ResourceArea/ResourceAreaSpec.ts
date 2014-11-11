@@ -37,18 +37,47 @@ export var register = () => {
                     });
                 });
 
-                it("does not set 'content2Url' if path consists of not more than the platform", (done) => {
+                it("does not set 'content2Url' if path consists ONLY of the platform", (done) => {
                     service.route("/platform", {}).then((data) => {
                         expect(data["content2Url"]).not.toBeDefined();
                         done();
                     });
                 });
 
-                it("does not set 'content2Url' if path consists of not more than the platform with trailing /", (done) => {
+                it("does not set 'content2Url' if path consists ONLY of the platform plus trailing '/'", (done) => {
                     service.route("/platform/", {}).then((data) => {
                         expect(data["content2Url"]).not.toBeDefined();
                         done();
                     });
+                });
+
+                it("sets view field if specified", (done) => {
+                    service.route("/platform/wlog/@blarg", {}).then((data) => {
+                        expect(data["view"]).toBe("blarg");
+                        done();
+                    });
+                    service.route("/platform/wlog/@blarg/", {}).then((data) => {
+                        expect(data["view"]).toBe("blarg");
+                        done();
+                    });
+                });
+
+                it("does not set view field if not specified", (done) => {
+                    service.route("/platform/blarg", {}).then((data) => {
+                        expect(data["view"]).toBeFalsy();
+                        done();
+                    });
+                    service.route("/platform/blarg/", {}).then((data) => {
+                        expect(data["view"]).toBeFalsy();
+                        done();
+                    });
+                });
+            });
+
+            describe("reverse", () => {
+                it("renders view correctly if specified", () => {
+                    var answer = service.reverse({ content2Url: "/platform/wlog", view: "blarg" });
+                    expect(answer.path).toMatch(/@blarg$/);
                 });
             });
         });
