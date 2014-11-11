@@ -1,3 +1,4 @@
+import colander
 from pyramid import testing
 from pytest import mark
 from pytest import fixture
@@ -478,6 +479,51 @@ class TestFinanceSheet:
                   'other_sources': '',
                   'requested_funding': Decimal(0)}
         assert inst.get() == wanted
+
+
+class TestFinanceSchema:
+
+    @fixture
+    def inst(self):
+        from adhocracy_mercator.sheets.mercator import FinanceSchema
+        return FinanceSchema()
+
+    @fixture
+    def cstruct_required(self):
+        return {'requested_funding': '500',
+                'budget': '100.00',
+                }
+
+    def test_deserialize_empty(self, inst):
+        cstruct = {}
+        with raises(colander.Invalid) as error:
+            inst.deserialize(cstruct)
+        assert error.value.asdict() == {'requested_funding': 'Required',
+                                        'budget': 'Required'}
+
+    def test_deserialize_with_required(self, inst, cstruct_required):
+        from decimal import Decimal
+        wanted = {'requested_funding': Decimal(500),
+                  'budget': Decimal(100),
+                  'granted': False,
+                  }
+        assert inst.deserialize(cstruct_required) == wanted
+
+    def test_deserialize_budget_field_lt_0(self, inst, cstruct_required):
+        cstruct_required['budget'] = '50000.00'
+        with raises(colander.Invalid):
+            inst.deserialize(cstruct_required)
+
+    def test_deserialize_budget_field_gte_0(self, inst, cstruct_required):
+        from decimal import Decimal
+        cstruct_required['budget'] = '0.00'
+        result = inst.deserialize(cstruct_required)
+        assert result['budget'] == Decimal(0)
+
+    def test_deserialize_budget_field_gt_49999(self, inst, cstruct_required):
+        cstruct_required['budget'] = '500000.00'
+        with raises(colander.Invalid):
+            inst.deserialize(cstruct_required)
 
 
 class TestExperienceSheet:

@@ -343,7 +343,8 @@ class FinanceSchema(colander.MappingSchema):
 
     """Data structure for financial aspects."""
 
-    budget = CurrencyAmount(missing=colander.required)
+    budget = CurrencyAmount(missing=colander.required,
+                            validator=colander.Range(min=0, max=49999))
     requested_funding = CurrencyAmount(missing=colander.required)
     other_sources = SingleLine()
     granted = Boolean()
@@ -372,8 +373,6 @@ def index_budget(resource: IResource, default) -> str:
         if budget < limit:
             return [str(limit)]
     return default
-    # FIXME: if we dont index values >= 50000, we should not allow values that
-    # big [joka]
 
 
 def _get_sheet_field(resource, isheet: ISheet, field_name: str) -> object:
