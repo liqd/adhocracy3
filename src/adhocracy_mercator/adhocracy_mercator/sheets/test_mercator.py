@@ -282,25 +282,39 @@ class TestDetailsSheet:
         assert inst.get() == wanted
 
 
-@mark.usefixtures('integration')
-class TestMercatorLocationIndex:
-
-    def _make_resource(self, pool_graph, details_appstruct={}):
-        from adhocracy_core.interfaces import IResource
-        from adhocracy_mercator.sheets.mercator import IMercatorSubResources
-        from adhocracy_mercator.sheets.mercator import IDetails
-        from adhocracy_core.utils import get_sheet
-        resource = testing.DummyResource(__provides__=[IResource,
-                                                       IMercatorSubResources])
-        pool_graph['res'] = resource
-        sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
+def _make_mercator_resource(context, details_appstruct={}, finance_appstruct={}):
+    from adhocracy_core.interfaces import IResource
+    from adhocracy_mercator.sheets.mercator import IMercatorSubResources
+    from adhocracy_mercator.sheets.mercator import IDetails
+    from adhocracy_mercator.sheets.mercator import IFinance
+    from adhocracy_core.utils import get_sheet
+    resource = testing.DummyResource(__provides__=[IResource,
+                                                   IMercatorSubResources])
+    context['res'] = resource
+    sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
+    if details_appstruct:
         details_resource = testing.DummyResource(__provides__=[IResource,
                                                                IDetails])
         details_sheet = get_sheet(details_resource, IDetails)
         details_sheet.set(details_appstruct)
-        pool_graph['details'] = details_resource
+        context['details'] = details_resource
         sub_resources_sheet.set({'details': details_resource})
-        return resource
+    if finance_appstruct:
+        finance_resource = testing.DummyResource(__provides__=[IResource,
+                                                               IFinance])
+        finance_sheet = get_sheet(finance_resource, IFinance)
+        finance_sheet.set(finance_appstruct)
+        context['finance'] = finance_resource
+        sub_resources_sheet.set({'finance': finance_resource})
+    return resource
+
+
+@mark.usefixtures('integration')
+class TestMercatorLocationIndex:
+
+    @fixture
+    def context(self, pool_graph):
+        return pool_graph
 
     def test_add_mercator_location_index_subscriber_register(self, registry):
         from .mercator import add_mercator_location_index_subscriber
@@ -317,24 +331,24 @@ class TestMercatorLocationIndex:
         adhocracy_catalog = find_catalog(context, 'adhocracy')
         assert isinstance(adhocracy_catalog['mercator_location'], KeywordIndex)
 
-    def test_index_location_default(self, pool_graph):
+    def test_index_location_default(self, context):
         from adhocracy_mercator.sheets.mercator import index_location
-        resource = self._make_resource(pool_graph=pool_graph)
+        resource = _make_mercator_resource(context)
         result = index_location(resource, 'default')
         assert result == 'default'
 
-    def test_index_location_is_linked_to_ruhr(self, pool_graph):
+    def test_index_location_is_linked_to_ruhr(self, context):
         from adhocracy_mercator.sheets.mercator import index_location
-        resource = self._make_resource(
-            pool_graph=pool_graph,
+        resource = _make_mercator_resource(
+            context,
             details_appstruct={'location_is_linked_to_ruhr': True})
         result = index_location(resource, 'default')
         assert result == ['linked_to_ruhr']
 
-    def test_index_location_is_online_and_linked_to_ruhr(self, pool_graph):
+    def test_index_location_is_online_and_linked_to_ruhr(self, context):
         from adhocracy_mercator.sheets.mercator import index_location
-        resource = self._make_resource(
-            pool_graph=pool_graph,
+        resource = _make_mercator_resource(
+            context,
             details_appstruct={'location_is_online': True,
                                'location_is_linked_to_ruhr': True})
         result = index_location(resource, 'default')
@@ -343,6 +357,10 @@ class TestMercatorLocationIndex:
 
 @mark.usefixtures('integration')
 class TestMercatorBudgetIndex:
+
+    @fixture
+    def context(self, pool_graph):
+        return pool_graph
 
     def test_add_mercator_budget_index_subscriber_register(self, registry):
         from .mercator import add_mercator_budget_index_subscriber
@@ -358,6 +376,46 @@ class TestMercatorBudgetIndex:
         add_mercator_budget_index_subscriber(event)
         adhocracy_catalog = find_catalog(context, 'adhocracy')
         assert isinstance(adhocracy_catalog['mercator_budget'], KeywordIndex)
+
+    def test_index_buget_default(self, context):
+        from adhocracy_mercator.sheets.mercator import index_budget
+        resource = _make_mercator_resource(context)
+        result = index_budget(resource, 'default')
+        assert result == 'default'
+
+    def test_index_budget_lt_5000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_budget
+        resource = _make_mercator_resource(context,
+                                           finance_appstruct={'budget': 4999})
+        result = index_budget(resource, 'default')
+        assert result == ['5000']
+
+    def test_index_budget_lt_10000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_budget
+        resource = _make_mercator_resource(context,
+                                           finance_appstruct={'budget': 9999})
+        result = index_budget(resource, 'default')
+        assert result == ['10000']
+
+    def test_index_budget_lt_20000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_budget
+        resource = _make_mercator_resource(context,
+                                           finance_appstruct={'budget': 19999})
+        result = index_budget(resource, 'default')
+        assert result == ['20000']
+
+    def test_index_budget_lt_50000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_budget
+        resource = _make_mercator_resource(context,
+                                           finance_appstruct={'budget': 50000})
+        result = index_budget(resource, 'default')
+        assert result == 'default'
+
+    def test_index_budget_gte_50000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_budget
+        resource = _make_mercator_resource(context,
+                                           finance_appstruct={'budget': 50000})
+        result = index_budget(resource, 'default')
 
 
 class TestOutcomeSheet:

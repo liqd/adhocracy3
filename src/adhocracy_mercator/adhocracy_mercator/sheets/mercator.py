@@ -5,6 +5,7 @@ from substanced.util import find_catalog
 from substanced.catalog import Keyword
 
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
@@ -272,24 +273,20 @@ details_meta = sheet_metadata_defaults._replace(isheet=IDetails,
                                                 schema_class=DetailsSchema)
 
 
-def index_location(resource, default):
-    """Return values of the "location_is_..." fields."""
-    # FIXME?: can we pass the registry to get_sheet here?
-    sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
-    sub_resources_appstruct = sub_resources_sheet.get()
+LOCATION_INDEX_KEYWORDS = ['specific', 'online', 'linked_to_ruhr']
 
-    details_resource = sub_resources_appstruct['details']
-    locations = []
 
-    # FIXME: Why is details_resource '' in the first pass of that function
+def index_location(resource, default) -> list:
+    """Return search index keywords based on the "location_is_..." fields."""
+    details = _get_sheet_field(resource, IMercatorSubResources, 'details')
+    # FIXME: Why is details '' in the first pass of that function
     # during MercatorProposal create?
-    if details_resource:
-        details_sheet = get_sheet(details_resource, IDetails)
-        details_appstruct = details_sheet.get()
-
-        for value in ('specific', 'online', 'linked_to_ruhr'):
-            if details_appstruct['location_is_' + value]:
-                locations.append(value)
+    if details is None or details == '':
+        return default
+    locations = []
+    for keyword in LOCATION_INDEX_KEYWORDS:
+        if _get_sheet_field(details, IDetails, 'location_is_' + keyword):
+            locations.append(keyword)
     return locations if locations else default
 
 
@@ -357,27 +354,32 @@ finance_meta = sheet_metadata_defaults._replace(isheet=IFinance,
                                                 schema_class=FinanceSchema)
 
 
-BUDGET_LIMITS = [5000, 10000, 20000, 50000]
+BUDGET_INDEX_LIMIT_KEYWORDS = [5000, 10000, 20000, 50000]
 
 
-def index_budget(resource, default):
-    """Return values of the "location_is_..." fields."""
-    sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
-    sub_resources_appstruct = sub_resources_sheet.get()
-
-    finance_resource = sub_resources_appstruct['finance']
-
-    # FIXME: Why is finance_resource '' in the first pass of that function
+def index_budget(resource: IResource, default) -> str:
+    """Return search index keyword based on the "budget" field."""
+    # FIXME: Why is finance '' in the first pass of that function
     # during MercatorProposal create?
-    if finance_resource:
-        finance_sheet = get_sheet(finance_resource, IFinance)
-        finance_appstruct = finance_sheet.get()
-
-        for limit in BUDGET_LIMITS:
-            if finance_appstruct['budget'] < limit:
-                return [str(limit)]
-
+    # This sounds like a bug, the default value for References is None,
+    # Note: you should not cast resources to Boolean because a resource without
+    # sub resources is equal False [joka]
+    finance = _get_sheet_field(resource, IMercatorSubResources, 'finance')
+    if finance is None or finance == '':
+            return default
+    budget = _get_sheet_field(finance, IFinance, 'budget')
+    for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
+        if budget < limit:
+            return [str(limit)]
     return default
+    # FIXME: if we dont index values >= 50000, we should not allow values that
+    # big [joka]
+
+
+def _get_sheet_field(resource, isheet: ISheet, field_name: str) -> object:
+    sheet = get_sheet(resource, isheet)
+    field = sheet.get()[field_name]
+    return field
 
 
 def add_mercator_budget_index_subscriber(event):
