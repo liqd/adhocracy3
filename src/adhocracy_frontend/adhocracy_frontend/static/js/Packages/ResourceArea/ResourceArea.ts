@@ -42,36 +42,42 @@ export class Service implements AdhTopLevelState.IAreaInput {
 
     public route(path : string, search : Dict) : ng.IPromise<Dict> {
         var self : Service = this;
-        var resourceUrl = this.adhConfig.rest_url + path;
+        var segs : string[] = path.replace(/\/+$/, "").split("/");
 
-        return this.adhHttp.get(resourceUrl).then((resource) => {
+        if (segs.length < 2 || segs[0] !== "") {
+            throw "bad path: " + path;
+        }
+
+        var platform : string = segs[1];
+        var content2Url : string;
+        var view : string;
+
+        // if path contains more than just the platform
+        if (segs.length > 2) {
+            content2Url = this.adhConfig.rest_url;
+
+            // if path has a view segment
+            if (_.last(segs).match(/^@/)) {
+                view = segs.pop().replace(/^@/, "");
+            }
+            content2Url += segs.join("/");
+        } else {
+            content2Url = this.adhConfig.rest_url + "/" + platform;
+        }
+
+        return this.adhHttp.get(content2Url).then((resource) => {
             var data = self.provider.get(resource.content_type);
-            var segs : string[] = path.replace(/\/+$/, "").split("/");
 
-            if (segs.length < 2 || segs[0] !== "") {
-                throw "bad path: " + path;
-            }
-
-            data["platform"] = segs[1];
-
-            // if path contains more than just the platform
-            if (segs.length > 2) {
-                data["content2Url"] = this.adhConfig.rest_url;
-
-                // if path has a view segment
-                if (_.last(segs).match(/^@/)) {
-                    data["view"] = segs.pop().replace(/^@/, "");
-                    data["content2Url"] += segs.join("/");
-                } else {
-                    data["content2Url"] += segs.join("/");
-                }
-            }
+            data["platform"] = platform;
+            data["view"] = view;
+            data["content2Url"] = content2Url;
 
             for (var key in search) {
                 if (search.hasOwnProperty(key)) {
                     data[key] = search[key];
                 }
             }
+
             return data;
         });
     }
