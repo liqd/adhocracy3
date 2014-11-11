@@ -384,39 +384,40 @@ class TestMercatorBudgetIndex:
         result = index_budget(resource, 'default')
         assert result == 'default'
 
-    def test_index_budget_lt_5000(self, context):
+    def test_index_budget_lte_5000(self, context):
         from adhocracy_mercator.sheets.mercator import index_budget
         resource = _make_mercator_resource(context,
-                                           finance_appstruct={'budget': 4999})
+                                           finance_appstruct={'budget': 5000})
         result = index_budget(resource, 'default')
         assert result == ['5000']
 
-    def test_index_budget_lt_10000(self, context):
+    def test_index_budget_lte_10000(self, context):
         from adhocracy_mercator.sheets.mercator import index_budget
         resource = _make_mercator_resource(context,
-                                           finance_appstruct={'budget': 9999})
+                                           finance_appstruct={'budget': 10000})
         result = index_budget(resource, 'default')
         assert result == ['10000']
 
-    def test_index_budget_lt_20000(self, context):
+    def test_index_budget_lte_20000(self, context):
         from adhocracy_mercator.sheets.mercator import index_budget
         resource = _make_mercator_resource(context,
-                                           finance_appstruct={'budget': 19999})
+                                           finance_appstruct={'budget': 20000})
         result = index_budget(resource, 'default')
         assert result == ['20000']
 
-    def test_index_budget_lt_50000(self, context):
+    def test_index_budget_lte_50000(self, context):
         from adhocracy_mercator.sheets.mercator import index_budget
         resource = _make_mercator_resource(context,
                                            finance_appstruct={'budget': 50000})
+        result = index_budget(resource, 'default')
+        assert result == ['50000']
+
+    def test_index_budget_gt_50000(self, context):
+        from adhocracy_mercator.sheets.mercator import index_budget
+        resource = _make_mercator_resource(context,
+                                           finance_appstruct={'budget': 50001})
         result = index_budget(resource, 'default')
         assert result == 'default'
-
-    def test_index_budget_gte_50000(self, context):
-        from adhocracy_mercator.sheets.mercator import index_budget
-        resource = _make_mercator_resource(context,
-                                           finance_appstruct={'budget': 50000})
-        result = index_budget(resource, 'default')
 
 
 class TestOutcomeSheet:
@@ -520,8 +521,8 @@ class TestFinanceSchema:
         result = inst.deserialize(cstruct_required)
         assert result['budget'] == Decimal(0)
 
-    def test_deserialize_budget_field_gt_49999(self, inst, cstruct_required):
-        cstruct_required['budget'] = '500000.00'
+    def test_deserialize_budget_field_gt_50000(self, inst, cstruct_required):
+        cstruct_required['budget'] = '500000.01'
         with raises(colander.Invalid):
             inst.deserialize(cstruct_required)
 

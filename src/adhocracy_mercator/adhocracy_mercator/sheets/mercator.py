@@ -370,7 +370,7 @@ def index_budget(resource: IResource, default) -> str:
             return default
     budget = _get_sheet_field(finance, IFinance, 'budget')
     for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
-        if budget < limit:
+        if budget <= limit:
             return [str(limit)]
     return default
 
