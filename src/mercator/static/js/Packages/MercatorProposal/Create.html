@@ -17,9 +17,9 @@
         data-ng-submit="submitIfValid()"
         data-ng-init="setFormDefaults()">
 
-    <div class="row">
+    <div class="annotated-section">
 
-        <div class="form-body">
+        <div class="annotated-section-body">
 
             <ng-form name="mercatorProposalBasicForm">
 
@@ -307,14 +307,14 @@
 
         </div><!-- /.form_body -->
 
-    </div><!-- /.row -->
+    </div><!-- /.annotated-section -->
 
     <ng-form name="mercatorProposalDetailForm">
 
 
-        <div class="row">
+        <div class="annotated-section">
 
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 <h2 id="mercator-proposal-detail">{{ "3. In Detail" | translate }}</h2>
 
@@ -322,45 +322,45 @@
 
         </div>
 
-        <div class="row">
+        <div class="annotated-section">
 
-            <div class="form-description">
+            <div class="annotated-section-annotation">
                 {{ "Tell others what your idea is for and what it is. Think about why you are doing it,
                 what you want to achieve and what you will do, who will benefit from your endeavour and
                 which impact you will have. (This paragraph will appear on the main page and at the top
                 of your contribution)." | translate }}
             </div>
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 <label>
                     {{ "form_description:" | translate }}
                     <textarea
                         data-msd-elastic=""
                         data-ng-model="data.details.form_description"
-                        name="details-form-description"
+                        name="details-annotated-section-annotation"
                         maxlength="1000"
                         placeholder="{{ '1000 c. Max.' | translate }}"
                         required="required"></textarea>
 
                     <span
                         class="input-error"
-                        data-ng-if="showError('mercatorProposalDetailForm.details-form-description', 'required')">
+                        data-ng-if="showError('mercatorProposalDetailForm.details-annotated-section-annotation', 'required')">
                         {{ "Please enter a description" | translate }}</span>
                 </label>
 
             </div><!-- /.form_body -->
 
-        </div><!-- /.row -->
+        </div><!-- /.annotated-section -->
 
 
-        <div class="row">
+        <div class="annotated-section">
 
-            <div class="form-description">
+            <div class="annotated-section-annotation">
                 {{ "Tell others what your idea is for and what it is. Think about why you are doing it, what you want
                 to achieve and what you will do, who will benefit from your endeavour and which impact you will have.
                 (This paragraph will appear on the main page and at the top of your contribution)." | translate }}
             </div>
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 {{ "Where will your project, initiative or activity mainly take place?" | translate }}
 
@@ -417,18 +417,18 @@
                     data-ng-if="showDetailsLocationError()">
                     {{ "Please choose one" | translate }}</span>
 
-            </div><!-- /.form-body -->
+            </div><!-- /.annotated-section-body -->
 
-        </div><!-- /.row -->
+        </div><!-- /.annotated-section -->
 
-        <div class="row">
+        <div class="annotated-section">
 
-            <div class="form-description">
+            <div class="annotated-section-annotation">
                 {{ "What triggers you to act? What drives you to want to make the change you propose? What’s the
                 “big dream” behind your idea? Please also share specific examples of the target group." | translate }}
-            </div><!-- /.form-description -->
+            </div><!-- /.annotated-section-annotation -->
 
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 <label>
                     {{ "What is the story behind your idea?" | translate }}
@@ -447,25 +447,25 @@
 
                 </label>
 
-            </div><!-- /.form-body -->
-        </div><!-- /.row -->
+            </div><!-- /.annotated-section-body -->
+        </div><!-- /.annotated-section -->
     </ng-form>
 
     <ng-form name="mercatorProposalMotivationForm">
 
-        <div class="row">
+        <div class="annotated-section">
 
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 <h2 id="mercator-proposal-motivation">{{ "4. Motivation" | translate }}</h2>
 
-            </div><!-- /.form-body -->
+            </div><!-- /.annotated-section-body -->
 
-        </div><!-- /.row -->
+        </div><!-- /.annotated-section -->
 
-        <div class="row">
+        <div class="annotated-section">
 
-            <div class="form-description">
+            <div class="annotated-section-annotation">
                 What is different in a year after starting your
                 endeavour? What will have changed? What
                 will a beneficiary of your idea tell you about it
@@ -474,7 +474,7 @@
                 have changed? What will a beneficiary of your
                 idea tell you about it in a year from today?
             </div>
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 <label>
                     {{ "What would be a successful outcome of your project or initiative?
@@ -494,21 +494,21 @@
                         {{ "Please enter some text" | translate }}</span>
                 </label>
 
-            </div><!-- /.form-body -->
+            </div><!-- /.annotated-section-body -->
 
-        </div><!-- /.row -->
-        <div class="row">
+        </div><!-- /.annotated-section -->
+        <div class="annotated-section">
 
-            <div class="form-description">
+            <div class="annotated-section-annotation">
                 {{ "How will your realize your project or initia-
                     tive? Which steps will you take? Describe, as
                     practically as possible, the approach and
                     method you plan to choose for this activity or
                     initiative. "  | translate }}
 
-            </div><!-- /.form-description -->
+            </div><!-- /.annotated-section-annotation -->
 
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 <label>
                     {{ "How do you want to get there?" | translate }}
@@ -526,19 +526,19 @@
                         {{ "Please enter some text" | translate }}</span>
                 </label>
 
-            </div><!-- /.form-body -->
+            </div><!-- /.annotated-section-body -->
 
-        </div><!-- /.row -->
+        </div><!-- /.annotated-section -->
 
-        <div class="row">
+        <div class="annotated-section">
 
-            <div class="form-description">
+            <div class="annotated-section-annotation">
                 {{ "Which value does your idea provide for Europe? What makes your idea different from others?
                 If you can realize it, can you then imagine transferring it to other countries, sectors or
                 organisations?" | translate }}
-            </div><!--/.form-description -->
+            </div><!--/.annotated-section-annotation -->
 
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 <label>
                     {{ "Why does Europe need your idea?" | translate }}
@@ -556,20 +556,20 @@
                         {{ "Please enter some text" | translate }}</span>
                 </label>
 
-            </div><!--/.form-body -->
+            </div><!--/.annotated-section-body -->
 
-        </div><!-- /.row -->
+        </div><!-- /.annotated-section -->
 
-        <div class="row">
+        <div class="annotated-section">
 
-            <div class="form-description">
+            <div class="annotated-section-annotation">
 
                 {{ "How was the partnership established and does it involve organisations that have never been
                 previously involved in a similar constellation? Describe relevant experiences of your team members."
                 | translate }}
 
-            </div><!--/.form-description -->
-            <div class="form-body">
+            </div><!--/.annotated-section-annotation -->
+            <div class="annotated-section-body">
 
                 <label>
                     {{ "Please list your partner organisations and team members with their relevant
@@ -588,17 +588,17 @@
                         {{ "Please enter some text" | translate }}</span>
                 </label>
 
-            </div><!--/.form-body -->
+            </div><!--/.annotated-section-body -->
 
-        </div><!--/.form-description -->
+        </div><!--/.annotated-section-annotation -->
 
     </ng-form>
 
     <ng-form name="mercatorProposalFinanceForm">
 
-        <div class="row">
+        <div class="annotated-section">
 
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 <h2 id="mercator-proposal-finance">{{ "5. Financial Planning" | translate }}</h2>
 
@@ -616,16 +616,16 @@
                         {{ "Please enter a total budget" | translate }}</span>
                 </label>
 
-            </div><!--/.form-body -->
+            </div><!--/.annotated-section-body -->
 
-        </div><!--/.row -->
-        <div class="row">
+        </div><!--/.annotated-section -->
+        <div class="annotated-section">
 
-            <div class="form-description">
+            <div class="annotated-section-annotation">
                 Maximum 50,000€
-            </div><!--/.form-description -->
+            </div><!--/.annotated-section-annotation -->
 
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 <label>
                     {{ "Requested Funding:" | translate }}
@@ -677,11 +677,11 @@
                         data-ng-if="showError('mercatorProposalFinanceForm.finance-granted', 'required')">
                         {{ "Please select one" | translate }}</span>
 
-            </div><!--/.form-body -->
+            </div><!--/.annotated-section-body -->
 
-        </div><!--/.row -->
-        <div class="row">
-           <div class="form-description">
+        </div><!--/.annotated-section -->
+        <div class="annotated-section">
+           <div class="annotated-section-annotation">
                 Once we review all submitted entries,
                 we might come back to you and ask
                 for a more detailed financial plan.
@@ -689,31 +689,31 @@
                 to file that we will provide) and
                 already use it while preparing your
                 application.
-           </div><!--/.form-description -->
+           </div><!--/.annotated-section-annotation -->
 
-        </div><!--/.row -->
+        </div><!--/.annotated-section -->
 
 
     </ng-form>
 
     <ng-form name="mercatorProposalExtraForm">
 
-        <div class="row">
-            <div class="form-body">
+        <div class="annotated-section">
+            <div class="annotated-section-body">
                 <h2 id="mercator-proposal-extra">{{ "6. Extra" | translate }}</h2>
-            </div><!--/.form-body -->
+            </div><!--/.annotated-section-body -->
 
-        </div><!--/.row -->
-        <div class="row">
+        </div><!--/.annotated-section -->
+        <div class="annotated-section">
 
-            <div class="form-description">
+            <div class="annotated-section-annotation">
                 Which kind of advice, comments, or lessons
                 do you wish to receive from others on the
                 platform regarding your idea or project pro-
                 posal?
-            </div><!--/.form-description -->
+            </div><!--/.annotated-section-annotation -->
 
-            <div class="form-body">
+            <div class="annotated-section-body">
 
                 <label>
                     {{ "Share Experience (Optional)." | translate }}
@@ -787,22 +787,22 @@
                     {{ "I accept that all will be publically visible and available on the platform." | translate }}
                 </label>
 
-            </div><!--/.form-body -->
+            </div><!--/.annotated-section-body -->
 
 
-        </div><!--/.row -->
+        </div><!--/.annotated-section -->
 
     </ng-form>
 
-    <div class="row">
-        <div class="form-body">
+    <div class="annotated-section">
+        <div class="annotated-section-body">
             <input
                 type="submit"
                 name="submit"
                 value="{{ 'submit' | translate }}"
                 class="m-call-to-action" />
-        </div><!--/.form-body -->
+        </div><!--/.annotated-section-body -->
 
-    </div><!--/.row -->
+    </div><!--/.annotated-section -->
 
 </form>
