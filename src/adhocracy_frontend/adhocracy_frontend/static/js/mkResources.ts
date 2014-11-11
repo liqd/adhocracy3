@@ -704,6 +704,9 @@ mkFieldType = (field : MetaApi.ISheetField) : string => {
     case "Integer":
         result = "number";
         break;
+    case "adhocracy_core.schema.Integer":
+        result = "number";
+        break;
     case "adhocracy_core.schema.Rate":
         result = "number";
         break;
