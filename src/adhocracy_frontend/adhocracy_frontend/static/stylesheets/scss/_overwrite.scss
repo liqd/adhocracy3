@@ -25,6 +25,11 @@ body {
     background: $color-structure-surface;
     @include text-align(end);
     overflow: hidden;
+
+    .user-indicator {
+        float: right;
+        min-width: 12em;
+    }
 }
 
 .is-rate-button-active {
