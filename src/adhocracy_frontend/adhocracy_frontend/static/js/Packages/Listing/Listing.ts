@@ -64,6 +64,11 @@ export interface ListingScope<Container> extends ng.IScope {
     wshandle : string;
     clear : () => void;
     onCreate : () => void;
+}
+
+export interface IFacetsScope extends ng.IScope {
+    facets : IFacet[];
+    update : () => ng.IPromise<void>;
     enableItem : (IFacetItem) => void;
     disableItem : (IFacetItem) => void;
     toggleItem : (IFacetItem) => void;
@@ -170,30 +175,43 @@ export class Listing<Container extends ResourcesBase.Resource> {
                         $scope.clear();
                     }
                 });
-
-                $scope.enableItem = (item : IFacetItem) => {
-                    if (!item.enabled) {
-                        item.enabled = true;
-                        $scope.update();
-                    }
-                };
-                $scope.disableItem = (item : IFacetItem) => {
-                    if (item.enabled) {
-                        item.enabled = false;
-                        $scope.update();
-                    }
-                };
-                $scope.toggleItem = (item : IFacetItem) => {
-                    if (item.enabled) {
-                        $scope.disableItem(item);
-                    } else {
-                        $scope.enableItem(item);
-                    }
-                };
             }]
         };
     }
 }
+
+
+export var facets = (adhConfig : AdhConfig.IService) => {
+    return {
+        restrict: "E",
+        scope: {
+            facets: "=",
+            update: "="
+        },
+        templateUrl: adhConfig.pkg_path + pkgLocation + "/Facets.html",
+        link: (scope : IFacetsScope) => {
+            scope.enableItem = (item : IFacetItem) => {
+                if (!item.enabled) {
+                    item.enabled = true;
+                    scope.update();
+                }
+            };
+            scope.disableItem = (item : IFacetItem) => {
+                if (item.enabled) {
+                    item.enabled = false;
+                    scope.update();
+                }
+            };
+            scope.toggleItem = (item : IFacetItem) => {
+                if (item.enabled) {
+                    scope.disableItem(item);
+                } else {
+                    scope.enableItem(item);
+                }
+            };
+        }
+    };
+};
 
 
 export var moduleName = "adhListing";
@@ -207,6 +225,7 @@ export var register = (angular) => {
             AdhPreliminaryNames.moduleName,
             AdhWebSocket.moduleName
         ])
+        .directive("adhFacets", facets)
         .directive("adhListing",
             ["adhConfig", "adhWebSocket", (adhConfig, adhWebSocket) =>
                 new Listing(new ListingPoolAdapter()).createDirective(adhConfig, adhWebSocket)]);
