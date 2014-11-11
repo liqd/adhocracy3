@@ -18,6 +18,7 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     proposalListingData : {
         facets : AdhListing.IFacet[];
         showFacets : boolean;
+        update?;
     };
 }
 

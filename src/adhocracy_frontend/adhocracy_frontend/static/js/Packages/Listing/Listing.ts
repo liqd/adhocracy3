@@ -100,6 +100,7 @@ export class Listing<Container extends ResourcesBase.Resource> {
                 path: "@",
                 contentType: "@",
                 facets: "=",
+                update: "=",
                 noCreateForm: "="
             },
             transclude: true,
