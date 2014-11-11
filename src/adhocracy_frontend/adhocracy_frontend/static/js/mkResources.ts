@@ -12,7 +12,6 @@ declare var process : any;
 
 import Base = require("./ResourcesBase");
 import UtilR = require("./mkResources/Util");
-import UtilA = require("./Packages/Util/Util");
 import MetaApi = require("./Packages/Http/MetaApi");
 
 
@@ -265,7 +264,7 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
                 }
             }
             imports.sort();
-            rootModule += UtilA.intercalate(imports, "") + "\n";
+            rootModule += imports.join("") + "\n";
         })();
 
         // resource registry.
@@ -277,7 +276,7 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
                 }
             }
             dictEntries.sort();
-            rootModule += "export var resourceRegistry = {\n" + UtilA.intercalate(dictEntries, ",\n") + "\n};\n\n";
+            rootModule += "export var resourceRegistry = {\n" + dictEntries.join(",\n") + "\n};\n\n";
         })();
 
         // sheet registry.
@@ -291,7 +290,7 @@ compileAll = (metaApi : MetaApi.IMetaApi, outPath : string) : void => {
                 }
             }
             dictEntries.sort();
-            rootModule += "export var sheetRegistry = {\n" + UtilA.intercalate(dictEntries, ",\n") + "\n};\n";
+            rootModule += "export var sheetRegistry = {\n" + dictEntries.join(",\n") + "\n};\n";
         })();
 
         var absfp = outPath + "/Resources_.ts";
@@ -362,10 +361,10 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
         }
 
         var s = "";
-        s += "    constructor(" + UtilA.intercalate(args, "\n") + ") {\n";
+        s += "    constructor(" + args.join("\n") + ") {\n";
         s += "        super();\n";
         if (lines.length > 0) {
-            s += UtilA.intercalate(lines, "\n") + "\n";
+            s += lines.join("\n") + "\n";
         }
         s += "    }\n";
         return s;
@@ -375,7 +374,7 @@ renderSheet = (modulePath : string, sheet : MetaApi.ISheet, modules : MetaApi.IM
         if (elems.length === 0) {
             return "[]";
         } else {
-            return "[\"" + UtilA.intercalate(elems, "\", \"") + "\"]";
+            return "[\"" + elems.join("\", \"") + "\"]";
         }
     };
 
@@ -471,7 +470,7 @@ mkSheetSetter = (nick : string, fields : MetaApi.ISheetField[], _selfType : stri
             os.push("    };");
             os.push("    return _self;");
             os.push("};\n");
-            return UtilA.intercalate(os, "\n");
+            return os.join("\n");
         }
     } else {
         return "";
@@ -486,7 +485,7 @@ mkSheetGetter = (nick : string, _selfType : string) : string => {
         os.push(") : Sheet => {");
         os.push("    return _self.data[\"" + nick + "\"];");
         os.push("};\n");
-        return UtilA.intercalate(os, "\n");
+        return os.join("\n");
     } else {
         return "";
     }
@@ -568,13 +567,13 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
         })();
 
         // construct constructor function code.
-        os.push("constructor(args : { " + UtilA.intercalate(args, "; ") + " }) {");
+        os.push("constructor(args : { " + args.join("; ") + " }) {");
         os.push("    super(\"" + modulePath + "\");");
         os.push("    var _self = this;");
         lines.forEach((line) => os.push(line));
         os.push("}");
 
-        return UtilA.intercalate(os.map((s) => tab + s), "\n");
+        return os.map((s) => tab + s).join("\n");
     };
 
     var mkDataDeclaration = (tab : string) : string => {
@@ -589,7 +588,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
         }
         os.push("};");
 
-        return UtilA.intercalate(os.map((s) => tab + s), "\n");
+        return os.map((s) => tab + s).join("\n");
     };
 
     var mkGettersSetters = (tab : string) : string => {
@@ -620,7 +619,7 @@ renderResource = (modulePath : string, resource : MetaApi.IResource, modules : M
                 }
             }
         }
-        return UtilA.intercalate(os.map((s) => tab + s), "\n") + "";
+        return os.map((s) => tab + s).join("\n") + "";
     };
 
     resourceC += "class " + mkResourceClassName(mkNick(modulePath, metaApi)) + " extends Base.Resource {\n";
@@ -782,11 +781,11 @@ mkFlags = (field : MetaApi.ISheetField, comment ?: boolean) : string => {
 mkdirForFile = (filepath : string) : void => {
     var dirpath : string[] = _s.words(filepath, "/");
     dirpath.pop();
-    _fs.mkdirSync(UtilA.intercalate(dirpath, "/"), 0755, true);
+    _fs.mkdirSync(dirpath.join("/"), 0755, true);
 };
 
 pyModuleToTsModule = (filepath : string) : string =>
-    "./" + UtilA.intercalate(_s.words(filepath, "\."), "/");
+    "./" + _s.words(filepath, "\.").join("/");
 
 /**
  * The `relativeRoot` always points from file containing contents to
@@ -796,7 +795,7 @@ mkRelativeRoot = (source : string) : string => {
     var arr = _s.words(source, "/");
     arr.pop();  // don't count leading `.`.
     arr.pop();  // just count directories, not the file name.
-    return UtilA.intercalate(arr.map(() => ".."), "/") + "/";
+    return arr.map(() => "..").join("/") + "/";
 };
 
 canonicalizePath = (filepath : string) : string => {

@@ -3,7 +3,6 @@ import _ = require("lodash");
 import AdhConfig = require("../Config/Config");
 import AdhHttp = require("../Http/Http");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
-import AdhUtil = require("../Util/Util");
 
 
 export interface Dict {
@@ -62,9 +61,9 @@ export class Service implements AdhTopLevelState.IAreaInput {
                 // if path has a view segment
                 if (_.last(segs).match(/^@/)) {
                     data["view"] = segs.pop().replace(/^@/, "");
-                    data["content2Url"] += AdhUtil.intercalate(segs, "/");
+                    data["content2Url"] += segs.join("/");
                 } else {
-                    data["content2Url"] += AdhUtil.intercalate(segs, "/");
+                    data["content2Url"] += segs.join("/");
                 }
             }
 

@@ -7,8 +7,6 @@ var _s : any = require("underscore.string");
 
 import _ = require("lodash");
 
-import UtilA = require("../Packages/Util/Util");
-
 export var mkThingList : <T>(things : T[], render : (T) => string, tab : string, separator : string) => string;
 export var dotAndUnderscoreToCaml : (string) => string;
 export var capitalizeHead : (string) => string;
@@ -34,7 +32,7 @@ mkThingList = <T>(things : T[], render : (T) => string, tab : string, separator 
             os.push(render(things[thing]));
         }
     }
-    return (tab + UtilA.intercalate(os, separator + tab));
+    return (tab + os.join(separator + tab));
 };
 
 dotAndUnderscoreToCaml = (i : string) : string => {
@@ -109,7 +107,7 @@ mkNickDictFromNamesX = (fullNames : string[][]) : { [index : string] : string } 
     var flushClashes = () : void => {
         if (clashes.length === 1) {
             var nick = clashes[0][0];
-            var full = UtilA.intercalate(_.cloneDeep(clashes[0]).reverse(), ".");
+            var full = _.cloneDeep(clashes[0]).reverse().join(".");
             nicksRec[full] = nick;
         } else {
             var chopOk : boolean = true;
@@ -133,7 +131,7 @@ mkNickDictFromNamesX = (fullNames : string[][]) : { [index : string] : string } 
                 }
             } else {
                 clashes.forEach((clash) => {
-                    var n = UtilA.intercalate(_.cloneDeep(clash).reverse(), ".");
+                    var n = _.cloneDeep(clash).reverse().join(".");
                     nicksRec[n] = n;
                 });
             }
