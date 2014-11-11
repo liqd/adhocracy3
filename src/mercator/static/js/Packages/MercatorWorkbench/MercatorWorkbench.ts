@@ -15,7 +15,10 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     user : AdhUser.Service;
     websocketTestPaths : string;
     contentType : string;
-    facets : AdhListing.IFacet[];
+    proposalListingData : {
+        facets : AdhListing.IFacet[];
+        showFacets : boolean;
+    };
 }
 
 export class MercatorWorkbench {
@@ -36,8 +39,8 @@ export class MercatorWorkbench {
                 $scope.contentType = RIMercatorProposalVersion.content_type;
                 $scope.user = adhUser;
                 $scope.websocketTestPaths = JSON.stringify([$scope.path]);
-                $scope.facets = [
-                    {
+                $scope.proposalListingData = {
+                    facets: [{
                         key: "mercator_location",
                         name: "Location",
                         items: [
@@ -45,8 +48,7 @@ export class MercatorWorkbench {
                             {key: "online", name: "Online"},
                             {key: "linked_to_ruhr", name: "Linked to the Ruhr area"}
                         ]
-                    },
-                    {
+                    }, {
                         key: "mercator_budget",
                         name: "Budget",
                         items: [
@@ -55,8 +57,9 @@ export class MercatorWorkbench {
                             {key: "20000", name: "10000 - 20000 €"},
                             {key: "50000", name: "20000 - 50000 €"}
                         ]
-                    }
-                ];
+                    }],
+                    showFacets: false
+                };
             }]
         };
     }

@@ -1,9 +1,20 @@
 <adh-spaces>
     <div data-adh-moving-columns="" data-space="content" class="moving-columns" data-ng-class="{'hidden': currentSpace !== 'content'}">
         <div class="moving-column moving-column-structure">
-            <div class="moving-column-menu placeholder"></div>
+            <div class="moving-column-menu placeholder">
+                <a href="" data-ng-click="proposalListingData.showFacets = !proposalListingData.showFacets">{{ "filters" | translate }}</a>
+            </div>
+            <div
+                class="moving-column-sidebar placeholder"
+                data-ng-class="{'is-visible': proposalListingData.showFacets}"
+                aria-visible="{{proposalListingData.showFacets}}">
+            </div>
             <div class="moving-column-body">
-                <adh-mercator-proposal-listing data-path="{{path}}" data-content-type="{{contentType}}" data-facets="facets"></adh-mercator-proposal-listing>
+                <adh-mercator-proposal-listing
+                    data-path="{{path}}"
+                    data-content-type="{{contentType}}"
+                    data-facets="proposalListingData.facets">
+                </adh-mercator-proposal-listing>
             </div>
         </div>
         <div class="moving-column moving-column-content">

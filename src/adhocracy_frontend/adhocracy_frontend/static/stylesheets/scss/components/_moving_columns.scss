@@ -25,8 +25,36 @@ States:
 ```html_example
 <div class="moving-columns" style="height: 10em; position: relative;">
     <div class="moving-column moving-column-structure">
-        <div class="placeholder moving-column-menu">menu</div>
-        <div class="placeholder moving-column-body">structure column</div>
+        <div class="placeholder moving-column-menu">
+            <a onclick="$('.moving-column-sidebar').toggleClass('is-visible')">toggle sidebar</a>
+        </div>
+        <div class="placeholder moving-column-sidebar">sidebar</div>
+        <div class="placeholder moving-column-body">structure column
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+            this is scrolling
+        </div>
     </div>
     <div class="moving-column moving-column-content">
         <div class="placeholder moving-column-menu">menu</div>
@@ -179,15 +207,21 @@ Each moving column has a menu. The menu may contain some arbitrary control
 elements.  Many columns do also have control elements to close (hide) or
 collapse the column.
 
-The menu is fixed to the top of the column.
+Additionally, the moving column optionally contains a sidebar that is not shown
+by default. It can be shown by adding the `is-visible` state to the
+`moving-column-sidebar` element.
+
+The menu and sidebar are fixed to the top/side of the column.
 
 The menu should always have the same state as its columns.
+
 */
 .moving-column {
     // layout
     position: absolute;
     top: 0;
     bottom: 0;
+    overflow: hidden;
     @include transition(width 0.5s, right 0.5s);
 
     // look
@@ -237,4 +271,21 @@ States:
     background: $color-prime-normal;
     padding: 0.5em;
     line-height: $moving-column-menu-height / 1em - 1;
+}
+
+.moving-column-sidebar {
+    position: absolute;
+    top: $moving-column-menu-height;
+    bottom: 0;
+    overflow-y: auto;
+    left: -30%;
+    width: 30%;
+    @include transition(left 0.5s);
+    z-index: 1;
+    background-color: $color-structure-surface;
+    padding: 0.5em;
+
+    &.is-visible {
+        left: 0;
+    }
 }
