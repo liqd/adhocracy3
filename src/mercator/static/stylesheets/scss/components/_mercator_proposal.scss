@@ -24,6 +24,30 @@ $columns: 6;
     }
 }
 
+/*doc
+---
+title: Annotated section
+name: annotated-section
+category: widgets
+---
+
+A section with a additional annotation, typically displayed in a second column.
+
+```html_example
+<section class="annotated-section">
+    <div class="annotated-section-body">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
+        lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam
+        viverra nec consectetur ante hendrerit.
+    </div>
+    <div class="annotated-section-annotation">
+        Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit
+        amet vitae augue. Nam tincidunt congue enim, ut porta lorem lacinia
+        consectetur.
+    </div>
+</section>
+```
+*/
 .annotated-section {
     clear: both;
     float: left;
