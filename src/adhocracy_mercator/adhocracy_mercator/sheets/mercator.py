@@ -360,7 +360,7 @@ BUDGET_INDEX_LIMIT_KEYWORDS = [5000, 10000, 20000, 50000]
 
 
 def index_budget(resource: IResource, default) -> str:
-    """Return search index keyword based on the "budget" field."""
+    """Return search index keyword based on the "requested_funding" field."""
     # FIXME: Why is finance '' in the first pass of that function
     # during MercatorProposal create?
     # This sounds like a bug, the default value for References is None,
@@ -369,9 +369,9 @@ def index_budget(resource: IResource, default) -> str:
     finance = _get_sheet_field(resource, IMercatorSubResources, 'finance')
     if finance is None or finance == '':
             return default
-    budget = _get_sheet_field(finance, IFinance, 'budget')
+    funding = _get_sheet_field(finance, IFinance, 'requested_funding')
     for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
-        if budget <= limit:
+        if funding <= limit:
             return [str(limit)]
     return default
 
