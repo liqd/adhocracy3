@@ -24,269 +24,795 @@
         novalidate="novalidate"
         class="mercator-proposal-form"
         name="mercatorProposalForm"
-        data-ng-submit="submit()">
-    <ng-form name="mercatorProposalBasicForm">
-        <h2 id="mercator-proposal-basic">{{ "1. Basic" | translate }}</h2>
+        data-ng-controller="mercatorProposalFormController as form"
+        data-ng-submit="submitIfValid()"
+        data-ng-init="setFormDefaults()">
 
-        <h3>{{ "User Info:" | translate }}</h3>
-        <input type="text" data-ng-model="data.user_info.first_name" name="user_info-first_name" placeholder="{{ 'Name' | translate }}" required="required" />
-        <input type="text" data-ng-model="data.user_info.last_name" name="user_info-last_name" placeholder="{{ 'Lastname' | translate }}" required="required" />
-        <country-select data-ng-model="data.user_info.country" data-name="user_info-country" data-required="required"></country-select>
+    <div class="row">
 
-        <h3>{{ "Organisation Info:" | translate }}</h3>
-        <input type="text" data-ng-model="data.organization_info.name" name="organization_info-name" placeholder="{{ 'Name of organisation *' | translate }}" required="required" />
-        <country-select data-ng-model="data.organization_info.country" data-name="organization_info-country" data-required="required"></country-select>
-        <input type="text" data-ng-model="data.organization_info.website" name="organization_info-website" placeholder="{{ 'Website' | translate }}" required="required" />
-        <input type="text" data-ng-model="data.organization_info.date_of_foreseen_registration" name="organization_info-date_of_foreseen_registration" placeholder="{{ 'Date of foreseen registration (month/year)' | translate }}" required="required" />
-        <input type="text" data-ng-model="data.organization_info.how_can_we_help_you" name="organization_info-how_can_we_help_you" placeholder="{{ 'How can we help you' | translate }}" />
+        <div class="form-body">
 
-        {{ "Status:" | translate }}
-        <label>
-            <input type="radio" data-ng-model="data.organization_info.status_enum" name="organization_info-status_enum" value="registered_nonprofit" required="required" />
-            {{ "We’re a registered non-profit, e.g. NGO" | translate }}
-        </label>
-        <label>
-            <input type="radio" data-ng-model="data.organization_info.status_enum" name="organization_info-status_enum" value="planned_nonprofit" required="required" />
-            {{ "A non-profit registration is planned or possible" | translate }}
-        </label>
-        <label>
-            <input type="radio" data-ng-model="data.organization_info.status_enum" name="organization_info-status_enum" value="support_needed" required="required" />
-            {{ "I’d like to try, but I’m gonna need some help / Support needed" | translate }}
-        </label>
-        <label>
-            <input type="radio" data-ng-model="data.organization_info.status_enum" name="organization_info-status_enum" value="other" required="required" />
-            {{ "Other." | translate }}
-            <span data-ng-if="data.organization_info.status_enum == 'other'">{{ "Please specify:" | translate }}</span>
-        </label>
-        <textarea
-            data-msd-elastic=""
-            data-ng-if="data.organization_info.status_enum == 'other'"
-            data-ng-model="data.organization_info.status_other"
-            name="organization_info-status_other"
-            maxlength="500"
-            placeholder="500 c. Max."
-            required="required"></textarea>
+            <ng-form name="mercatorProposalBasicForm">
 
-    </ng-form>
+                <h2 id="mercator-proposal-basic">{{ "1. Basic" | translate }}</h2>
 
-    <ng-form name="mercatorProposalIntroductionForm">
-        <h2 id="mercator-proposal-introduction">{{ "2. Introduction" | translate }}</h2>
+                <h3>{{ "User Info:" | translate }}</h3>
 
-        <label>
-            {{ "Title:" | translate }}
-            <input type="text" data-ng-model="data.introduction.title" name="introduction-title" maxlength="100" placeholder="{{ '100 c. Max' | translate }}" required="required" />
-        </label>
+                <input
+                    type="text"
+                    data-ng-change="changefield()"
+                    data-ng-model="data.user_info.first_name"
+                    name="user-info-first-name"
+                    placeholder="{{ 'Name' | translate }}"
+                    required="required" />
 
-        <label>
-            {{ "Teaser:" | translate }}
-            <textarea
-                data-msd-elastic=""
-                data-ng-model="data.introduction.teaser"
-                name="introduction-teaser"
-                maxlength="300"
-                placeholder="{{ '300 c. Max.' | translate }}"
-                required="required"></textarea>
-        </label>
+                <span
+                    class="input-error"
+                    data-ng-if="showError('mercatorProposalBasicForm.user-info-first-name', 'required')">
+                    {{ "Please enter your first name" | translate }}</span>
 
-        <label>
-            {{ "Upload a Picture" | translate }}
-            <input type="file" data-ng-model="data.introduction.picture" name="introduction-picture" />
-        </label>
-    </ng-form>
+                <input
+                    type="text"
+                    data-ng-model="data.user_info.last_name"
+                    name="user-info-last-name"
+                    placeholder="{{ 'Lastname' | translate }}"
+                    required="required" />
+
+                <span
+                    class="input-error"
+                    data-ng-if="showError('mercatorProposalBasicForm.user-info-last-name', 'required')">
+                    {{ "Please enter your last name" | translate }}</span>
+
+                <country-select
+                    data-ng-change="changefield()"
+                    data-ng-model="data.user_info.country"
+                    data-name="user-info-country"
+                    data-required="required"></country-select>
+
+                <span
+                    class="input-error"
+                    data-ng-if="showError('mercatorProposalBasicForm.user-info-country', 'required')">
+                    {{ "Please select a country" | translate }}</span>
+
+                <h3>{{ "Organisation Info:" | translate }}</h3>
+
+                <div
+                    data-ng-class="{ 'is-invalid': mercatorProposalBasicForm['organization-info-status-enum'].$invalid
+                        && mercatorProposalForm.$submitted }">
+
+                    <label>
+                        <input
+                            type="radio"
+                            data-ng-model="data.organization_info.status_enum"
+                            name="organization-info-status-enum"
+                            value="registered_nonprofit"
+                            required="required" />
+                            {{ "We’re a registered non-profit, e.g. NGO" | translate }}
+                    </label>
+
+                    <fieldset
+                        data-ng-if="data.organization_info.status_enum == 'registered_nonprofit'">
+
+                        <input
+                            type="text"
+                            data-ng-model="data.organization_info.name"
+                            name="organization-info-name"
+                            placeholder="{{ 'Name of organisation *' | translate }}"
+                            required="required" />
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalBasicForm.organization-info-name', 'required')">
+                            {{ "Please enter your organization name" | translate }}</span>
+
+                        <country-select
+                            data-ng-model="data.organization_info.country"
+                            data-name="organization-info-country"
+                            data-required="required"></country-select>
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalBasicForm.organization-info-country', 'required')">
+                            {{ "Please enter your organization country" | translate }}</span>
+
+                        <input
+                            type="url"
+                            data-ng-model="data.organization_info.website"
+                            name="organization-info-website"
+                            placeholder="{{ 'Website' | translate }}" />
+
+                    </fieldset>
+
+                    <label>
+                        <input
+                            type="radio"
+                            data-ng-model="data.organization_info.status_enum"
+                            name="organization-info-status-enum"
+                            value="planned_nonprofit"
+                            required="required" />
+                        {{ "A non-profit registration is planned or in process" | translate }}
+                    </label>
+
+                    <fieldset
+                        data-ng-if="data.organization_info.status_enum == 'planned_nonprofit'">
+
+                        <input
+                            type="text"
+                            data-ng-model="data.organization_info.name"
+                            name="organization-info-name"
+                            placeholder="{{ 'Name of initiative or organisation *' | translate }}"
+                            required="required" />
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalBasicForm.organization-info-name', 'required')">
+                            {{ "Please enter your organization name" | translate }}</span>
+
+                        <country-select
+                            data-ng-model="data.organization_info.country"
+                            data-name="organization-info-country"
+                            data-required="required"></country-select>
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalBasicForm.organization-info-country', 'required')">
+                            {{ "Please enter your organization country" | translate }}</span>
+
+                        <input
+                            type="date"
+                            data-ng-model="data.organization_info.date_of_foreseen_registration"
+                            name="organization-info-date-of-foreseen-registration"
+                            placeholder="{{ 'Date of foreseen registration (month/year)' | translate }}"
+                            required="required" />
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalBasicForm.organization-info-date-of-foreseen-registration',
+                            'required')">
+                            {{ "Please enter your registration date" | translate }}</span>
+
+                        <input
+                            type="text"
+                            data-ng-model="data.organization_info.website"
+                            name="organization-info-website"
+                            placeholder="{{ 'Website' | translate }}"/>
+
+                    </fieldset>
+
+                    <label>
+                        <input
+                            type="radio"
+                            data-ng-model="data.organization_info.status_enum"
+                            name="organization-info-status-enum"
+                            value="support_needed"
+                            required="required" />
+                        {{ "We’d like to try to realise the idea, but will need help with registering a non-profit" | translate }}
+                    </label>
+
+                    <fieldset
+                         data-ng-if="data.organization_info.status_enum == 'support_needed'">
+
+                        <input
+                            type="text"
+                            data-ng-model="data.organization_info.name"
+                            name="organization-info-name"
+                            placeholder="{{ 'Name of initiative *' | translate }}"
+                            required="required" />
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalBasicForm.organization-info-name', 'required')">{
+                            { "Please enter your organization name" | translate }}</span>
+
+                        <country-select
+                            data-ng-model="data.organization_info.country"
+                            data-name="organization-info-country"
+                            data-required="required"></country-select>
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalBasicForm.organization-info-country', 'required')">
+                            {{ "Please enter your organization country" | translate }}</span>
+
+                        <input
+                            type="text"
+                            data-ng-model="data.organization_info.website"
+                            name="organization-info-website"
+                            placeholder="{{ 'Website' | translate }}" />
+
+                        <label>
+                            {{ "How can we help you? Please specify:" | translate }}
+                            <input
+                                type="text"
+                                data-ng-model="data.organization_info.how_can_we_help_you"
+                                name="organization-info-how-can-we-help-you"
+                                placeholder="{{ '500 c. Max.' | translate }}" />
+                        </label>
+
+                    </fieldset>
+
+                    <label>
+                        <input
+                            type="radio"
+                            data-ng-model="data.organization_info.status_enum"
+                            name="organization-info-status-enum" value="other"
+                            required="required" />
+
+                        {{ "Other." | translate }}
+                        <span
+                            data-ng-if="data.organization_info.status_enum == 'other'">
+                            {{ "Please specify:" | translate }}</span>
+                    </label>
+
+                    <fieldset data-ng-if="data.organization_info.status_enum == 'other'">
+
+                        <textarea
+                            data-msd-elastic=""
+                            data-ng-if="data.organization_info.status_enum == 'other'"
+                            data-ng-model="data.organization_info.status_other"
+                            name="organization-info-status-other"
+                            maxlength="500"
+                            placeholder="500 c. Max."
+                            required="required"></textarea>
+
+                        <span
+                            class="input-error"
+                            data-ng-if="showError('mercatorProposalBasicForm.organization-info-status-other', 'required')">
+                            {{ "Please enter some text" | translate }}</span>
+
+                    </fieldset>
+
+                </div><!-- /.ng-invalid -->
+
+                <span
+                    class="input-error"
+                    data-ng-if="showError('mercatorProposalBasicForm.organization-info-status-enum', 'required')">
+                    {{ "Please select one" | translate }}</span>
+
+            </ng-form>
+
+            <ng-form name="mercatorProposalIntroductionForm">
+
+                <h2 id="mercator-proposal-introduction">{{ "2. Introduction" | translate }}</h2>
+
+                <label>
+                    {{ "Title:" | translate }}
+                    <input
+                        type="text"
+                        data-ng-model="data.introduction.title"
+                        name="introduction-title"
+                        maxlength="100"
+                        placeholder="{{ '100 c. Max' | translate }}"
+                        required="required" />
+
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalIntroductionForm.introduction-title', 'required')">
+                        {{ "Please enter a title" | translate }}</span>
+                </label>
+
+                <label>
+                    {{ "Teaser:" | translate }}
+                    <textarea
+                        data-msd-elastic=""
+                        data-ng-model="data.introduction.teaser"
+                        name="introduction-teaser"
+                        maxlength="300"
+                        placeholder="{{ '300 c. Max.' | translate }}"
+                        required="required"></textarea>
+
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalIntroductionForm.introduction-teaser', 'required')">
+                        {{ "Please enter a teaser" | translate }}</span>
+                </label>
+
+                <label>
+                    {{ "Upload a Picture" | translate }}
+                    <input
+                        type="file"
+                        data-ng-model="data.introduction.picture"
+                        name="introduction-picture" />
+                </label>
+            </ng-form>
+
+        </div><!-- /.form_body -->
+
+    </div><!-- /.row -->
 
     <ng-form name="mercatorProposalDetailForm">
-        <h2 id="mercator-proposal-detail">{{ "3. In Detail" | translate }}</h2>
 
-        <label>
-            {{ "Description:" | translate }}
-            <textarea
-                data-msd-elastic=""
-                data-ng-model="data.details.description"
-                name="details-description"
-                maxlength="1000"
-                placeholder="{{ '1000 c. Max.' | translate }}"
-                required="required"></textarea>
-            <div class="description">
-                {{ "Tell others what your idea is for and what it is. Think about why you are doing it, what you want to achieve and what you will do, who will benefit from your endeavour and which impact you will have. (This paragraph will appear on the main page and at the top of your contribution)." | translate }}
+
+        <div class="row">
+
+            <div class="form-body">
+
+                <h2 id="mercator-proposal-detail">{{ "3. In Detail" | translate }}</h2>
+
             </div>
-        </label>
 
-        <label>
-            <input type="checkbox" data-ng-model="data.details.location_is_specific" name="details-location_is_specific" />
-            {{ "Specific Location" | translate }}
-        </label>
-        <input type="text" data-ng-model="data.details.location_specific_1" name="details-location_specific_1" placeholder="{{ 'City, Country' | translate }}" required="required" />
-        <input type="text" data-ng-model="data.details.location_specific_2" name="details-location_specific_2" placeholder="{{ 'City, Country' | translate }}" />
-        <input type="text" data-ng-model="data.details.location_specific_3" name="details-location_specific_3" placeholder="{{ 'City, Country' | translate }}" />
-        <label>
-            <input type="checkbox" data-ng-model="data.details.location_is_online" name="details-location_is_online" />
-            {{ "Online" | translate }}
-        </label>
-        <label>
-            <input type="checkbox" data-ng-model="data.details.location_is_linked_to_ruhr" name="details-location_is_linked_to_ruhr" />
-            {{ "Linkage to the Ruhr area" | translate }}
-        </label>
+        </div>
 
-        <label>
-            {{ "What is the story behind your idea?" | translate }}
-            <textarea
-                data-msd-elastic=""
-                data-ng-model="data.story"
-                name="story"
-                maxlength="800"
-                placeholder="{{ '800 c. Max.' | translate }}"
-                required="required"></textarea>
-            <div class="description">
-                {{ "What triggers you to act? What drives you to want to make the change you propose? What’s the “big dream” behind your idea? Please also share specific examples of the target group." | translate }}
+        <div class="row">
+
+            <div class="form-description">
+                {{ "Tell others what your idea is for and what it is. Think about why you are doing it,
+                what you want to achieve and what you will do, who will benefit from your endeavour and
+                which impact you will have. (This paragraph will appear on the main page and at the top
+                of your contribution)." | translate }}
             </div>
-        </label>
+            <div class="form-body">
+
+                <label>
+                    {{ "form_description:" | translate }}
+                    <textarea
+                        data-msd-elastic=""
+                        data-ng-model="data.details.form_description"
+                        name="details-form-description"
+                        maxlength="1000"
+                        placeholder="{{ '1000 c. Max.' | translate }}"
+                        required="required"></textarea>
+
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalDetailForm.details-form-description', 'required')">
+                        {{ "Please enter a description" | translate }}</span>
+                </label>
+
+            </div><!-- /.form_body -->
+
+        </div><!-- /.row -->
+
+
+        <div class="row">
+
+            <div class="form-description">
+                {{ "Tell others what your idea is for and what it is. Think about why you are doing it, what you want
+                to achieve and what you will do, who will benefit from your endeavour and which impact you will have.
+                (This paragraph will appear on the main page and at the top of your contribution)." | translate }}
+            </div>
+            <div class="form-body">
+
+                {{ "Where will your project, initiative or activity mainly take place?" | translate }}
+
+                <!-- FIXME: red border should show on dirty -->
+                <div
+                    data-ng-class="{ 'is-invalid': showDetailsLocationError() }">
+                    <label>
+                        <input
+                            type="checkbox"
+                            data-ng-model="data.details.location_is_specific"
+                            name="details-location-is-specific" />
+                        {{ "Specific Location" | translate }}
+                    </label>
+
+                    <div data-ng-show="data.details.location_is_specific" >
+                        <input
+                            type="text"
+                            data-ng-model="data.details.location_specific_1"
+                            name="details-location-specific-1"
+                            placeholder="{{ 'City, Country' | translate }}"
+                            data-ng-required="data.details.location_is_specific" />
+
+                        <input
+                            type="text"
+                            data-ng-model="data.details.location_specific_2"
+                            name="details-location-specific-2"
+                            placeholder="{{ 'City, Country' | translate }}" />
+
+                        <input
+                            type="text"
+                            data-ng-model="data.details.location_specific_3"
+                            name="details-location-specific-3"
+                            placeholder="{{ 'City, Country' | translate }}" />
+                    </div>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            data-ng-model="data.details.location_is_online"
+                            name="details-location-is-online" />
+                        {{ "Online" | translate }}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            data-ng-model="data.details.location_is_linked_to_ruhr"
+                            name="details-location-is-linked-to-ruhr" />
+                        {{ "Linkage to the Ruhr area" | translate }}
+                    </label>
+
+                </div><!-- /.ng-invalid -->
+                <span
+                    class="input-error"
+                    data-ng-if="showDetailsLocationError()">
+                    {{ "Please choose one" | translate }}</span>
+
+            </div><!-- /.form-body -->
+
+        </div><!-- /.row -->
+
+        <div class="row">
+
+            <div class="form-description">
+                {{ "What triggers you to act? What drives you to want to make the change you propose? What’s the
+                “big dream” behind your idea? Please also share specific examples of the target group." | translate }}
+            </div><!-- /.form-description -->
+
+            <div class="form-body">
+
+                <label>
+                    {{ "What is the story behind your idea?" | translate }}
+                    <textarea
+                        data-msd-elastic=""
+                        data-ng-model="data.story"
+                        name="story"
+                        maxlength="800"
+                        placeholder="{{ '800 c. Max.' | translate }}"
+                        required="required"></textarea>
+
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalDetailForm.story', 'required')">
+                        {{ "Please enter some text" | translate }}</span>
+
+                </label>
+
+            </div><!-- /.form-body -->
+        </div><!-- /.row -->
     </ng-form>
 
     <ng-form name="mercatorProposalMotivationForm">
-        <h2 id="mercator-proposal-motivation">{{ "4. Motivation" | translate }}</h2>
 
-        <label>
-            {{ "What would be a successful outcome of your project or initiative? What is the aim you want to reach?" | translate }}
-            <textarea
-                data-msd-elastic=""
-                data-ng-model="data.outcome"
-                name="outcome"
-                maxlength="800"
-                placeholder="{{ '800 c. Max.' | translate }}"
-                required="required"></textarea>
-            <div class="description">
-                {{ "What is different in a year after starting your endeavour? What will have changed? What will a beneficiary of your idea tell you about it in a year from today?" | translate }}
-            </div>
-        </label>
+        <div class="row">
 
-        <label>
-            {{ "How do you want to get there?" | translate }}
-            <textarea
-                data-msd-elastic=""
-                data-ng-model="data.steps"
-                name="steps"
-                maxlength="800"
-                placeholder="{{ '5 Bullet points or 800 c. Max.' | translate }}"
-                required="required"></textarea>
-            <div class="description">
-                {{ "How will your realize your project or initiative? Which steps will you take? Describe, as practically as possible, the approach and method you plan to choose for this activity or initiative." | translate }}
-            </div>
-        </label>
+            <div class="form-body">
 
-        <label>
-            {{ "Why does Europe need your idea?" | translate }}
-            <textarea
-                data-msd-elastic=""
-                data-ng-model="data.value"
-                name="value"
-                maxlength="800"
-                placeholder="{{ '800 c. Max.' | translate }}"
-                required="required"></textarea>
-            <div class="description">
-                {{ "Which value does your idea provide for Europe? What makes your idea different from others? If you can realize it, can you then imagine transferring it to other countries, sectors or organisations?" | translate }}
-            </div>
-        </label>
+                <h2 id="mercator-proposal-motivation">{{ "4. Motivation" | translate }}</h2>
 
-        <label>
-            {{ "Please list your partner organisations and team members with their relevant experiences/skills." | translate }}
-            <textarea
-                data-msd-elastic=""
-                data-ng-model="data.partners"
-                name="partners"
-                maxlength="800"
-                placeholder="{{ '800 c. Max.' | translate }}"
-                required="required"></textarea>
-            <div class="description">
-                {{ "How was the partnership established and does it involve organisations that have never been previously involved in a similar constellation? Describe relevant experiences of your team members." | translate }}
+            </div><!-- /.form-body -->
+
+        </div><!-- /.row -->
+
+        <div class="row">
+
+            <div class="form-description">
+                What is different in a year after starting your
+                endeavour? What will have changed? What
+                will a beneficiary of your idea tell you about it
+                in a year from today? What is different in a
+                year after starting your endeavour? What will
+                have changed? What will a beneficiary of your
+                idea tell you about it in a year from today?
             </div>
-        </label>
+            <div class="form-body">
+
+                <label>
+                    {{ "What would be a successful outcome of your project or initiative?
+                    What is the aim you want to reach?" | translate }}
+
+                    <textarea
+                        data-msd-elastic=""
+                        data-ng-model="data.outcome"
+                        name="outcome"
+                        maxlength="800"
+                        placeholder="{{ '800 c. Max.' | translate }}"
+                        required="required"></textarea>
+
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalMotivationForm.outcome', 'required')">
+                        {{ "Please enter some text" | translate }}</span>
+                </label>
+
+            </div><!-- /.form-body -->
+
+        </div><!-- /.row -->
+        <div class="row">
+
+            <div class="form-description">
+                {{ "How will your realize your project or initia-
+                    tive? Which steps will you take? Describe, as
+                    practically as possible, the approach and
+                    method you plan to choose for this activity or
+                    initiative. "  | translate }}
+
+            </div><!-- /.form-description -->
+
+            <div class="form-body">
+
+                <label>
+                    {{ "How do you want to get there?" | translate }}
+                    <textarea
+                        data-msd-elastic=""
+                        data-ng-model="data.steps"
+                        name="steps"
+                        maxlength="800"
+                        placeholder="{{ '5 Bullet points or 800 c. Max.' | translate }}"
+                        required="required"></textarea>
+
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalMotivationForm.steps', 'required')">
+                        {{ "Please enter some text" | translate }}</span>
+                </label>
+
+            </div><!-- /.form-body -->
+
+        </div><!-- /.row -->
+
+        <div class="row">
+
+            <div class="form-description">
+                {{ "Which value does your idea provide for Europe? What makes your idea different from others?
+                If you can realize it, can you then imagine transferring it to other countries, sectors or
+                organisations?" | translate }}
+            </div><!--/.form-description -->
+
+            <div class="form-body">
+
+                <label>
+                    {{ "Why does Europe need your idea?" | translate }}
+                    <textarea
+                        data-msd-elastic=""
+                        data-ng-model="data.value"
+                        name="value"
+                        maxlength="800"
+                        placeholder="{{ '800 c. Max.' | translate }}"
+                        required="required"></textarea>
+
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalMotivationForm.value', 'required')">
+                        {{ "Please enter some text" | translate }}</span>
+                </label>
+
+            </div><!--/.form-body -->
+
+        </div><!-- /.row -->
+
+        <div class="row">
+
+            <div class="form-description">
+
+                {{ "How was the partnership established and does it involve organisations that have never been
+                previously involved in a similar constellation? Describe relevant experiences of your team members."
+                | translate }}
+
+            </div><!--/.form-description -->
+            <div class="form-body">
+
+                <label>
+                    {{ "Please list your partner organisations and team members with their relevant
+                    experiences/skills." | translate }}
+                    <textarea
+                        data-msd-elastic=""
+                        data-ng-model="data.partners"
+                        name="partners"
+                        maxlength="800"
+                        placeholder="{{ '800 c. Max.' | translate }}"
+                        required="required"></textarea>
+
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalMotivationForm.partners', 'required')">
+                        {{ "Please enter some text" | translate }}</span>
+                </label>
+
+            </div><!--/.form-body -->
+
+        </div><!--/.form-description -->
+
     </ng-form>
 
     <ng-form name="mercatorProposalFinanceForm">
-        <h2 id="mercator-proposal-finance">{{ "5. Finance" | translate }}</h2>
 
-        <label>
-            {{ "Budget:" | translate }}
-            <input type="number" data-ng-model="data.finance.budget" name="finance-budget" required="required" />
-        </label>
+        <div class="row">
 
-        <label>
-            {{ "Requested Funding:" | translate }}
-            <input type="number" data-ng-model="data.finance.requested_funding" name="finance-requested_funding" max="50000" required="required" />
-        </label>
+            <div class="form-body">
 
-        <label>
-            {{ "Other source of income" | translate }}
-            <input type="text" data-ng-model="data.finance.other_sources" name="finance-other_sources" />
-        </label>
+                <h2 id="mercator-proposal-finance">{{ "5. Financial Planning" | translate }}</h2>
 
-        {{ "Granted?" | translate }}
-        <label>
-            <input type="radio" data-ng-model="data.finance.granted" name="finance-granted" name="financeGranted" data-ng-value="true" required="required" />
-            {{ "yes" | translate }}
-        </label>
-        <label>
-            <input type="radio" data-ng-model="data.finance.granted" name="finance-granted" name="financeGranted" data-ng-value="false" required="required" />
-            {{ "no" | translate }}
-        </label>
+                <label>
+                    {{ "Total budget:" | translate }}
+                    <input
+                        type="number"
+                        data-ng-model="data.finance.budget"
+                        name="finance-budget"
+                        required="required" />
 
-        <label>
-            {{ "Upload Financial Plan Document" | translate }}
-            <input type="file" data-ng-model="data.finance.document" name="finance-document" />
-        </label>
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalFinanceForm.finance-budget', 'required')">
+                        {{ "Please enter a total budget" | translate }}</span>
+                </label>
+
+            </div><!--/.form-body -->
+
+        </div><!--/.row -->
+        <div class="row">
+
+            <div class="form-description">
+                Maximum 50,000€
+            </div><!--/.form-description -->
+
+            <div class="form-body">
+
+                <label>
+                    {{ "Requested Funding:" | translate }}
+                    <input
+                        type="number"
+                        data-ng-model="data.finance.requested_funding"
+                        name="finance-requested-funding"
+                        max="50000"
+                        required="required" />
+
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalFinanceForm.finance-requested-funding', 'required')">
+                        {{ "Please enter requested funding" | translate }}</span>
+                </label>
+
+                <label>
+                    {{ "Other source of income" | translate }}
+                    <input type="text" data-ng-model="data.finance.other_sources" name="finance-other-sources" />
+                </label>
+
+                {{ "Granted?" | translate }}
+
+                <div data-ng-class="{ 'is-invalid': mercatorProposalFinanceForm['finance-granted'].$invalid &&
+                    mercatorProposalForm.$submitted }">
+
+                    <label>
+                        <input
+                            type="radio"
+                            data-ng-model="data.finance.granted"
+                            name="finance-granted"
+                            data-ng-value="true"
+                            required="required" />
+                        {{ "yes" | translate }}
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            data-ng-model="data.finance.granted"
+                            name="finance-granted"
+                            data-ng-value="false"
+                            required="required" />
+                        {{ "no" | translate }}
+                    </label>
+
+                </div><!-- /.ng-invalid -->
+                    <span
+                        class="input-error"
+                        data-ng-if="showError('mercatorProposalFinanceForm.finance-granted', 'required')">
+                        {{ "Please select one" | translate }}</span>
+
+            </div><!--/.form-body -->
+
+        </div><!--/.row -->
+        <div class="row">
+           <div class="form-description">
+                Once we review all submitted entries,
+                we might come back to you and ask
+                for a more detailed financial plan.
+                You can see the template here (link
+                to file that we will provide) and
+                already use it while preparing your
+                application.
+           </div><!--/.form-description -->
+
+        </div><!--/.row -->
+
+
     </ng-form>
 
     <ng-form name="mercatorProposalExtraForm">
-        <h2 id="mercator-proposal-extra">{{ "6. Extra" | translate }}</h2>
 
-        <label>
-            {{ "Upload media files" | translate }}
-            <input type="file" data-ng-model="data.extra.mediaFiles" name="extra-mediaFiles" multiple="multiple" />
-        </label>
+        <div class="row">
+            <div class="form-body">
+                <h2 id="mercator-proposal-extra">{{ "6. Extra" | translate }}</h2>
+            </div><!--/.form-body -->
 
-        <label>
-            {{ "Share Experience (Optional)." | translate }}
-            <textarea
-                data-msd-elastic=""
-                data-ng-model="data.experience"
-                name="experience"
-                maxlength="300"
-                placeholder="{{ '300 c. Max.' | translate }}"></textarea>
-        </label>
+        </div><!--/.row -->
+        <div class="row">
 
-        {{ "How did you hear about “Advocate Europe”?" | translate }}
-        <label>
-            <input type="checkbox" data-ng-model="data.heard_from.colleague" name="heard_from-colleague" />
-            {{ "Colleague" | translate }}
-        </label>
-        <label>
-            <input type="checkbox" data-ng-model="data.heard_from.website" name="heard_from-website" />
-            {{ "Website" | translate }}
-        </label>
-        <label>
-            <input type="checkbox" data-ng-model="data.heard_from.newsletter" name="heard_from-newsletter" />
-            {{ "Newsletter" | translate }}
-        </label>
-        <label>
-            <input type="checkbox" data-ng-model="data.heard_from.facebook" name="heard_from-facebook" />
-            {{ "Facebook" | translate }}
-        </label>
-        <label>
-            <input type="checkbox" data-ng-model="data.heard_from.other" name="heard_from-other" />
-            {{ "Other." | translate }}
-            <span data-ng-if="data.heard_from.other">{{ "Please specify:" | translate }}</span>
-        </label>
-        <input
-            type="text"
-            data-ng-if="data.hear_from.other"
-            data-ng-model="data.hear_from.other_specify"
-            name="heard_from-other_specify"
-            required="required" />
+            <div class="form-description">
+                Which kind of advice, comments, or lessons
+                do you wish to receive from others on the
+                platform regarding your idea or project pro-
+                posal?
+            </div><!--/.form-description -->
+
+            <div class="form-body">
+
+                <label>
+                    {{ "Share Experience (Optional)." | translate }}
+                    <textarea
+                        data-msd-elastic=""
+                        data-ng-model="data.experience"
+                        name="experience"
+                        maxlength="300"
+                        placeholder="{{ '300 c. Max.' | translate }}"></textarea>
+                </label>
+
+                {{ "How did you hear about “Advocate Europe”?" | translate }}
+
+                <div data-ng-class="{ 'is-invalid': showHeardFromError() }">
+
+                    <label>
+                        <input type="checkbox"
+                            data-ng-model="data.heard_from.colleague"
+                            name="heard-from-colleague" />
+                        {{ "Colleague" | translate }}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            data-ng-model="data.heard_from.website"
+                            name="heard-from-website" />
+                        {{ "Website" | translate }}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            data-ng-model="data.heard_from.newsletter"
+                            name="heard-from-newsletter" />
+                        {{ "Newsletter" | translate }}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            data-ng-model="data.heard_from.facebook"
+                            name="heard-from-facebook" />
+                        {{ "Facebook" | translate }}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            data-ng-model="data.heard_from.other"
+                            name="heard-from-other" />
+                        {{ "Other." | translate }}
+                        <span data-ng-if="data.heard_from.other">{{ "Please specify:" | translate }}</span>
+                    </label>
+                    <input
+                        type="text"
+                        data-ng-if="data.heard_from.other"
+                        data-ng-model="data.hear_from.other_specify"
+                        name="heard-from-other-specify"
+                        data-ng-required="data.heard_from.other" />
+
+                    <span
+                        class="input-error"
+                        data-ng-if="showHeardFromError()">
+                        {{ "Please select one" | translate }}</span>
+                </div><!-- /.ng-invalid -->
+
+                {{ "DISCLAIMER*:" | translate }}
+                <label data-ng-class="{ 'is-invalid': showError('mercatorProposalExtraForm.accept-disclaimer', 'required') }">
+                    <input
+                        type="checkbox"
+                        data-ng-model="data.accept_disclaimer"
+                        name="accept-disclaimer"
+                        required="required"/>
+                    {{ "I accept that all will be publically visible and available on the platform." | translate }}
+                </label>
+
+            </div><!--/.form-body -->
+
+
+        </div><!--/.row -->
+
     </ng-form>
 
-    <input
-        type="submit"
-        value="{{ 'submit' | translate }}"
-        class="m-call-to-action"
-        data-ng-disabled="mercatorProposalForm.$invalid" />
+    <div class="row">
+        <div class="form-body">
+            <input
+                type="submit"
+                name="submit"
+                value="{{ 'submit' | translate }}"
+                class="m-call-to-action" />
+        </div>
+    </div>
+
 </form>

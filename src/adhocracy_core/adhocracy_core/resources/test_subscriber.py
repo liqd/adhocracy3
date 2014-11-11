@@ -1,4 +1,8 @@
+from unittest.mock import call
+from unittest.mock import Mock
+
 from pytest import mark
+from pytest import raises
 from pytest import fixture
 
 from pyramid import testing
@@ -282,7 +286,6 @@ class TestTagCreatedAndAddedOrModifiedSubscriber:
     def catalog(self):
         from substanced.interfaces import IService
         from substanced.interfaces import IFolder
-        from unittest.mock import Mock
         catalog = testing.DummyResource(
             __provides__=(IFolder, IService), __is_service__=True)
         catalog['adhocracy'] = testing.DummyResource(
@@ -357,6 +360,186 @@ class TestAddDefaultGroupToUserSubscriber:
         mock_sheet.get.return_value = {'groups': []}
         self.call_fut(event)
         assert mock_sheet.set.called is False
+
+
+class TestMetadataModifiedSubscriber:
+
+    @fixture
+    def mock_reindex(self, monkeypatch):
+        from adhocracy_core.resources import subscriber
+        mock_reindex = Mock(spec=subscriber._reindex_resource_and_descendants)
+        monkeypatch.setattr(subscriber,
+                            '_reindex_resource_and_descendants',
+                            mock_reindex)
+        return mock_reindex
+
+    def test_newly_hidden(self, context, registry, request, mock_reindex):
+        from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
+        from adhocracy_core.sheets.metadata import IMetadata
+        old_appstruct = {'deleted': False, 'hidden': False}
+        new_appstruct = {'deleted': False, 'hidden': True}
+        request.has_permission = Mock(return_value=True)
+        event = ResourceSheetModified(object=context,
+                                      isheet=IMetadata,
+                                      registry=registry,
+                                      old_appstruct=old_appstruct,
+                                      new_appstruct=new_appstruct,
+                                      request=request)
+        metadata_modified_subscriber(event)
+        assert context.deleted is False
+        assert context.hidden is True
+        assert mock_reindex.called
+
+    def test_newly_undeleted(self, context, registry, request, mock_reindex):
+        from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
+        from adhocracy_core.sheets.metadata import IMetadata
+        old_appstruct = {'deleted': True, 'hidden': False}
+        new_appstruct = {'deleted': False, 'hidden': False}
+        request.has_permission = Mock(return_value=True)
+        event = ResourceSheetModified(object=context,
+                                      isheet=IMetadata,
+                                      registry=registry,
+                                      old_appstruct=old_appstruct,
+                                      new_appstruct=new_appstruct,
+                                      request=request)
+        metadata_modified_subscriber(event)
+        assert context.deleted is False
+        assert context.hidden is False
+        assert mock_reindex.called
+
+    def test_no_change(self, context, registry, request, mock_reindex):
+        from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
+        from adhocracy_core.sheets.metadata import IMetadata
+        old_appstruct = {'deleted': False, 'hidden': True}
+        new_appstruct = {'deleted': False, 'hidden': True}
+        request.has_permission = Mock(return_value=True)
+        event = ResourceSheetModified(object=context,
+                                      isheet=IMetadata,
+                                      registry=registry,
+                                      old_appstruct=old_appstruct,
+                                      new_appstruct=new_appstruct,
+                                      request=request)
+        metadata_modified_subscriber(event)
+        assert context.deleted is False
+        assert context.hidden is True
+        assert not mock_reindex.called
+
+    def test_hiding_requires_permission(self, context, registry, request,
+                                        mock_reindex):
+        from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
+        from adhocracy_core.sheets.metadata import IMetadata
+        import colander
+        old_appstruct = {'deleted': False, 'hidden': False}
+        new_appstruct = {'deleted': False, 'hidden': True}
+        request.has_permission = Mock(return_value=False)
+        context.deleted = None
+        context.hidden = None
+        event = ResourceSheetModified(object=context,
+                                      isheet=IMetadata,
+                                      registry=registry,
+                                      old_appstruct=old_appstruct,
+                                      new_appstruct=new_appstruct,
+                                      request=request)
+        with raises(colander.Invalid):
+            metadata_modified_subscriber(event)
+        assert context.deleted is None
+        assert context.hidden is None
+        assert not mock_reindex.called
+
+    def test_deletion_doesnt_require_permission(self, context, registry,
+                                               request, mock_reindex):
+        from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
+        from adhocracy_core.sheets.metadata import IMetadata
+        old_appstruct = {'deleted': False, 'hidden': False}
+        new_appstruct = {'deleted': True, 'hidden': False}
+        request.has_permission = Mock(return_value=False)
+        context.deleted = None
+        context.hidden = None
+        event = ResourceSheetModified(object=context,
+                                      isheet=IMetadata,
+                                      registry=registry,
+                                      old_appstruct=old_appstruct,
+                                      new_appstruct=new_appstruct,
+                                      request=request)
+        metadata_modified_subscriber(event)
+        assert context.deleted is True
+        assert context.hidden is False
+        assert mock_reindex.called
+
+    def test_no_hiding_without_request(self, context, registry, mock_reindex):
+        from adhocracy_core.events import ResourceSheetModified
+        from adhocracy_core.resources.subscriber import metadata_modified_subscriber
+        from adhocracy_core.sheets.metadata import IMetadata
+        old_appstruct = {'deleted': False, 'hidden': False}
+        new_appstruct = {'deleted': False, 'hidden': True}
+        context.deleted = None
+        context.hidden = None
+        event = ResourceSheetModified(object=context,
+                                      isheet=IMetadata,
+                                      registry=registry,
+                                      old_appstruct=old_appstruct,
+                                      new_appstruct=new_appstruct,
+                                      request=None)
+        metadata_modified_subscriber(event)
+        assert context.deleted is None
+        assert context.hidden is None
+        assert not mock_reindex.called
+
+
+class TestReindexResourceAndDescendants:
+
+    @fixture
+    def mock_reindex_resource(self, monkeypatch, pool_graph_catalog):
+        from substanced.util import find_catalog
+        adhocracy_catalog = find_catalog(pool_graph_catalog, 'adhocracy')
+        mock_reindex_resource = Mock(spec=adhocracy_catalog.reindex_resource)
+        monkeypatch.setattr(adhocracy_catalog,
+                            'reindex_resource',
+                            mock_reindex_resource)
+        return mock_reindex_resource
+
+    def test_resource_reindexed(self, config, context, pool_graph_catalog,
+                                mock_reindex_resource):
+        from adhocracy_core.resources.subscriber import _reindex_resource_and_descendants
+        config.include('adhocracy_core.catalog')
+        pool_graph_catalog['res'] = context
+        _reindex_resource_and_descendants(context)
+        mock_reindex_resource.assert_called_with(context)
+        assert mock_reindex_resource.call_count == 1
+
+    def test_child_reindexed(self, config, pool, pool_graph_catalog,
+                                mock_reindex_resource):
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.resources.subscriber import _reindex_resource_and_descendants
+        config.include('adhocracy_core.catalog')
+        child = testing.DummyResource(__provides__=IResource)
+        pool['child'] = child
+        pool_graph_catalog['res'] = pool
+        _reindex_resource_and_descendants(pool)
+        assert mock_reindex_resource.call_count == 2
+        assert call(child) in mock_reindex_resource.call_args_list
+
+    def test_grandchild_reindexed(self, config, pool, pool_graph_catalog,
+                                  mock_reindex_resource):
+        from substanced.interfaces import IFolder
+        from adhocracy_core.interfaces import IPool
+        from adhocracy_core.interfaces import IResource
+        from adhocracy_core.resources.subscriber import _reindex_resource_and_descendants
+        from adhocracy_core.testing import DummyPool
+        config.include('adhocracy_core.catalog')
+        grandchild = testing.DummyResource(__provides__=IResource)
+        childpool = DummyPool(__provides__=(IPool, IFolder))
+        childpool['grandchild'] = grandchild
+        pool['childpool'] = childpool
+        pool_graph_catalog['res'] = pool
+        _reindex_resource_and_descendants(pool)
+        assert mock_reindex_resource.call_count == 3
+        assert call(grandchild) in mock_reindex_resource.call_args_list
 
 
 @fixture()

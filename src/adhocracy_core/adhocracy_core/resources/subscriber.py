@@ -1,6 +1,7 @@
 """Subscriber to track changed resources during one transaction."""
 from collections import defaultdict
 from collections import Sequence
+from logging import getLogger
 
 from pyramid.registry import Registry
 from pyramid.traversal import resource_path
@@ -18,15 +19,18 @@ from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy_core.resources.principal import IGroup
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.sheets.principal import IPermissions
+from adhocracy_core.sheets.metadata import IMetadata
 from adhocracy_core.utils import find_graph
 from adhocracy_core.utils import get_sheet
 from adhocracy_core.utils import get_iresource
+from adhocracy_core.utils import raise_colander_style_error
 
 import adhocracy_core.sheets.versions
 import adhocracy_core.sheets.tags
 
 
 changelog_metadata = ChangelogMetadata(False, False, None, None)
+logger = getLogger(__name__)
 
 
 def resource_created_and_added_subscriber(event):
@@ -163,9 +167,45 @@ def _get_writable_appstructs(resource, registry) -> dict:
     for sheet in sheets:
         editable = sheet.meta.editable
         creatable = sheet.meta.creatable
-        if editable or creatable:
+        if editable or creatable:  # pragma: no branch
             appstructs[sheet.meta.isheet.__identifier__] = sheet.get()
     return appstructs
+
+
+def metadata_modified_subscriber(event):
+    """Invoked after PUTting modified metadata fields."""
+    is_deleted = event.new_appstruct['deleted']
+    is_hidden = event.new_appstruct['hidden']
+    was_deleted = event.old_appstruct['deleted']
+    was_hidden = event.old_appstruct['hidden']
+
+    if was_hidden != is_hidden:
+        if event.request is None:
+            logger.warning('Ignoring request to change hidden status to %s '
+                           'since we cannot check permissions',
+                           is_hidden)
+            return
+        if not event.request.has_permission('hide_resource', event.object):
+            raise_colander_style_error(IMetadata,
+                                       'hidden',
+                                       'Changing this field is not allowed')
+
+    # Store hidden/deleted status in object for efficient access
+    event.object.deleted = is_deleted
+    event.object.hidden = is_hidden
+
+    if (was_hidden != is_hidden) or (was_deleted != is_deleted):
+        _reindex_resource_and_descendants(event.object)
+
+
+def _reindex_resource_and_descendants(resource: IResource):
+    system_catalog = find_catalog(resource, 'system')
+    adhocracy_catalog = find_catalog(resource, 'adhocracy')
+    path_index = system_catalog['path']
+    query = path_index.eq(resource_path(resource), include_origin=True)
+    resource_and_descendants = query.execute()
+    for res in resource_and_descendants:
+        adhocracy_catalog.reindex_resource(res)
 
 
 def includeme(config):
@@ -190,3 +230,6 @@ def includeme(config):
     config.add_subscriber(user_created_and_added_subscriber,
                           IResourceCreatedAndAdded,
                           interface=IUser)
+    config.add_subscriber(metadata_modified_subscriber,
+                          IResourceSheetModified,
+                          isheet=IMetadata)

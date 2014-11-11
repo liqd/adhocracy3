@@ -410,6 +410,8 @@ def app_settings(request) -> dict:
         'pyramid_mailer.testing',
     ]
     settings['mail.default_sender'] = 'substanced_demo@example.com'
+    settings['adhocracy.abuse_handler_mail'] \
+        = 'abuse_handler@unconfigured.domain'
     return settings
 
 

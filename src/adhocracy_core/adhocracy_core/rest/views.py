@@ -28,6 +28,7 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import ILocation
 from adhocracy_core.resources.principal import IUser
 from adhocracy_core.resources.principal import IUsersService
+from adhocracy_core.rest.schemas import BlockExplanationResponseSchema
 from adhocracy_core.rest.schemas import ResourceResponseSchema
 from adhocracy_core.rest.schemas import ItemResponseSchema
 from adhocracy_core.rest.schemas import POSTActivateAccountViewRequestSchema
@@ -45,6 +46,7 @@ from adhocracy_core.rest.schemas import add_get_pool_request_extra_fields
 from adhocracy_core.schema import AbsolutePath
 from adhocracy_core.schema import References
 from adhocracy_core.sheets.metadata import IMetadata
+from adhocracy_core.sheets.metadata import view_blocked_by_metadata
 from adhocracy_core.utils import strip_optional_prefix
 from adhocracy_core.utils import to_dotted_name
 from adhocracy_core.utils import get_sheet
@@ -342,12 +344,32 @@ class ResourceRESTView(RESTView):
     @view_config(request_method='GET',
                  permission='view')
     def get(self) -> dict:
-        """Get resource data."""
+        """Get resource data (unless deleted or hidden)."""
+        response_if_blocked = self.respond_if_blocked()
+        if response_if_blocked is not None:
+            return response_if_blocked
         schema = GETResourceResponseSchema().bind(request=self.request,
                                                   context=self.context)
         cstruct = schema.serialize()
         cstruct['data'] = self._get_sheets_data_cstruct()
         return cstruct
+
+    def respond_if_blocked(self):
+        """
+        Set 410 Gone and construct response if resource is deleted or hidden.
+
+        Otherwise return None.
+        Note that subclasses MUST overwriting `get()` MUST invoke this method!
+        """
+        block_explanation = view_blocked_by_metadata(self.context,
+                                                     self.request.registry)
+        if block_explanation:
+            self.request.response.status_code = 410  # Gone
+            schema = BlockExplanationResponseSchema().bind(
+                request=self.request, context=self.context)
+            return schema.serialize(block_explanation)
+        else:
+            return None
 
     def _get_sheets_data_cstruct(self):
         queryparams = self.request.validated if self.request.validated else {}
@@ -401,7 +423,9 @@ class SimpleRESTView(ResourceRESTView):
         for sheet in sheets:
             name = sheet.meta.isheet.__identifier__
             if name in appstructs:
-                sheet.set(appstructs[name], registry=self.request.registry)
+                sheet.set(appstructs[name],
+                          registry=self.request.registry,
+                          request=self.request)
         schema = ResourceResponseSchema().bind(request=self.request,
                                                context=self.context)
         cstruct = schema.serialize()
@@ -455,10 +479,18 @@ class PoolRESTView(SimpleRESTView):
         resource_type = iresource.__identifier__
         appstructs = self.request.validated.get('data', {})
         creator = get_user(self.request)
-        resource = self.registry.create(resource_type, self.context,
+        resource = self.registry.create(resource_type,
+                                        self.context,
                                         creator=creator,
-                                        appstructs=appstructs)
+                                        appstructs=appstructs,
+                                        request=self.request)
         return self.build_post_response(resource)
+
+    @view_config(request_method='PUT',
+                 permission='edit_sheet',
+                 content_type='application/json')
+    def put(self) -> dict:
+        return super().put()
 
 
 @view_defaults(
@@ -476,6 +508,9 @@ class ItemRESTView(PoolRESTView):
                  permission='view')
     def get(self) -> dict:
         """Get resource data."""
+        response_if_blocked = self.respond_if_blocked()
+        if response_if_blocked is not None:
+            return response_if_blocked
         schema = GETItemResponseSchema().bind(request=self.request,
                                               context=self.context)
         appstruct = {}
@@ -496,10 +531,12 @@ class ItemRESTView(PoolRESTView):
         appstructs = self.request.validated.get('data', {})
         creator = get_user(self.request)
         root_versions = self.request.validated.get('root_versions', [])
-        resource = self.registry.create(resource_type, self.context,
+        resource = self.registry.create(resource_type,
+                                        self.context,
                                         appstructs=appstructs,
                                         creator=creator,
-                                        root_versions=root_versions)
+                                        root_versions=root_versions,
+                                        request=self.request)
         return self.build_post_response(resource)
 
 

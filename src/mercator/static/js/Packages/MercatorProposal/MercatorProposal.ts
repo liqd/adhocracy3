@@ -18,7 +18,8 @@ import RIMercatorFinanceVersion = require("../../Resources_/adhocracy_mercator/r
 import RIMercatorIntroduction = require("../../Resources_/adhocracy_mercator/resources/mercator/IIntroduction");
 import RIMercatorIntroductionVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IIntroductionVersion");
 import RIMercatorOrganizationInfo = require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfo");
-import RIMercatorOrganizationInfoVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfoVersion");
+import RIMercatorOrganizationInfoVersion =
+    require("../../Resources_/adhocracy_mercator/resources/mercator/IOrganizationInfoVersion");
 import RIMercatorOutcome = require("../../Resources_/adhocracy_mercator/resources/mercator/IOutcome");
 import RIMercatorOutcomeVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IOutcomeVersion");
 import RIMercatorPartners = require("../../Resources_/adhocracy_mercator/resources/mercator/IPartners");
@@ -113,8 +114,11 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
             facebook : boolean;
             other : boolean;
             other_specify : string
-        }
+        };
+
+        accept_disclaimer : string;
     };
+
 }
 
 
@@ -133,18 +137,15 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     public createDirective() : ng.IDirective {
         var directive = super.createDirective();
         directive.scope.poolPath = "@";
-
-        var originalLink = directive.link.bind(this);
-
-        directive.link = (scope : IScope, element, attrs, wrapper) => {
-            originalLink(scope, element, attrs, wrapper);
-
-            scope.showDetails = () => {
-                this.adhTopLevelState.set("content2Url", scope.path);
-            };
-        };
-
         return directive;
+    }
+
+    public link(scope, element, attrs, wrapper) {
+        var instance = super.link(scope, element, attrs, wrapper);
+        instance.scope.showDetails = () => {
+            this.adhTopLevelState.set("content2Url", instance.scope.path);
+        };
+        return instance;
     }
 
     public _handleDelete(
@@ -173,7 +174,8 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
     // NOTE: _update takes an item *version*, whereas _create
     // constructs an *item plus a new version*.
-    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, mercatorProposalVersion : R) : ng.IPromise<void> {
+    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
+    mercatorProposalVersion : R) : ng.IPromise<void> {
         var data = this.initializeScope(instance.scope);
 
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
@@ -514,10 +516,16 @@ export class CreateWidget<R extends ResourcesBase.Resource> extends Widget<R> {
         this.templateUrl = adhConfig.pkg_path + pkgLocation + "/Create.html";
     }
 
+    public link(scope, element, attrs, wrapper) {
+        var instance = super.link(scope, element, attrs, wrapper);
+        instance.scope.data = <any>{};
+        return instance;
+    }
+
     public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
         super._clear(instance);
 
-        // FIXME: I do not whether both are needed.
+        // FIXME: I do not know whether both are needed.
         instance.scope.mercatorProposalForm.$setPristine();
         instance.scope.mercatorProposalForm.$setUntouched();
     }
@@ -830,8 +838,13 @@ export var countrySelect = () => {
         },
         restrict: "E",
         template:
-            "<select data-ng-model=\"value\" name=\"{{name}}\"" +
-            "    data-ng-options=\"c.code as c.name for c in countries\" data-ng-required=\"required\"></select>",
+            (elm, attr) => {
+                attr.star = (attr.required === "required") ? "*" : "";
+                return "<select data-ng-model=\"value\" name=\"{{name}}\"" +
+                "       data-ng-options=\"c.code as c.name for c in countries\" data-ng-required=\"required\">" +
+                "           <option value=\"\" selected>{{ 'Country" + attr.star + "' | translate }}</option>" +
+                "</select>";
+            },
         link: (scope) => {
             scope.countries = countries;
         }
@@ -859,7 +872,8 @@ export var register = (angular) => {
                     $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
                     return {
                         template: "<adh-resource-wrapper>" +
-                            "<adh-mercator-proposal-create data-path=\"@preliminary\" data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
+                            "<adh-mercator-proposal-create data-path=\"@preliminary\"" +
+                            "data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
                             "</adh-mercator-proposal-create></adh-resource-wrapper>"
                     };
                 }]);
@@ -891,5 +905,59 @@ export var register = (angular) => {
         .directive("adhMercatorProposalListing", ["adhConfig", listing])
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
-        .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion]);
+        .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
+        .controller("mercatorProposalFormController", ["$scope", ($scope) => {
+            var heardFromCheckboxes = [
+                "heard-from-colleague",
+                "heard-from-website",
+                "heard-from-newsletter",
+                "heard-from-facebook",
+                "heard-from-other"
+            ];
+
+            var detailsLocationCheckboxes = [
+                "details-location-is-specific",
+                "details-location-is-online",
+                "details-location-is-linked-to-ruhr"
+            ];
+
+            var getFieldByName = (fieldName : string) => {
+                var fieldNameArr : string[] = fieldName.split(".");
+                return fieldNameArr[1]
+                    ? $scope.mercatorProposalForm[fieldNameArr[0]][fieldNameArr[1]]
+                    : $scope.mercatorProposalForm[fieldNameArr[0]];
+            };
+
+            var updateCheckBoxGroupValidity = (form, names : string[]) : boolean => {
+                var valid =  _.some(names, (name) => form[name].$modelValue);
+                _.forOwn(names, (name) => {
+                    form[name].$setValidity("groupRequired", valid);
+                });
+                return valid;
+            };
+
+            var showCheckboxGroupError = (form, names : string[]) : boolean => {
+                var dirty = $scope.mercatorProposalForm.$submitted || _.some(names, (name) => form[name].$dirty);
+                return !updateCheckBoxGroupValidity(form, names) && dirty;
+            };
+
+            $scope.showError = (fieldName : string, errorType : string) : boolean => {
+                var field = getFieldByName(fieldName);
+                return field.$error[errorType] && (field.$dirty || $scope.mercatorProposalForm.$submitted);
+            };
+
+            $scope.showHeardFromError = () : boolean => {
+                return showCheckboxGroupError($scope.mercatorProposalExtraForm, heardFromCheckboxes);
+            };
+
+            $scope.showDetailsLocationError = () : boolean => {
+                return showCheckboxGroupError($scope.mercatorProposalDetailForm, detailsLocationCheckboxes);
+            };
+
+            $scope.submitIfValid = () => {
+                if ($scope.mercatorProposalForm.$valid) {
+                    $scope.submit();
+                };
+            };
+        }]);
 };
