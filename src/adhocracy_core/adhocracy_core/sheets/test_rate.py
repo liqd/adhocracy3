@@ -1,11 +1,27 @@
 from pyramid import testing
 from pytest import fixture
+from pytest import raises
 from pytest import mark
+
+import colander
+
+from adhocracy_core.sheets.rate import IRateable
+
 
 @fixture
 def context(context, service):
     context['rates'] = service
     return context
+
+
+@fixture
+def integration(config):
+    config.include('adhocracy_core.catalog')
+    config.include('adhocracy_core.sheets.rate')
+
+
+def _make_rateable(provides=IRateable):
+    return testing.DummyResource(__provides__=provides)
 
 
 class TestRateSheet:
@@ -33,6 +49,138 @@ class TestRateSheet:
                               }
 
 
+@mark.usefixtures('integration')
+class TestRateSchema:
+
+    @fixture
+    def subject(self):
+        from adhocracy_core.sheets.rate import ICanRate
+        return testing.DummyResource(__provides__=ICanRate)
+
+    def test_deserialize_valid(self, context, cornice_request, subject):
+        from adhocracy_core.sheets.rate import RateSchema
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        context['subject'] = subject
+        object = _make_rateable()
+        context['object'] = object
+        data = {'subject': '/subject', 'object': '/object', 'rate': '1'}
+        assert schema.deserialize(data) == {'subject': subject,
+                                            'object': object,
+                                            'rate': 1}
+
+    def test_deserialize_valid_minus_one(self, context, cornice_request,
+                                         subject):
+        from adhocracy_core.sheets.rate import RateSchema
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        context['subject'] = subject
+        object = _make_rateable()
+        context['object'] = object
+        data = {'subject': '/subject', 'object': '/object', 'rate': '-1'}
+        assert schema.deserialize(data) == {'subject': subject,
+                                            'object': object,
+                                            'rate': -1}
+
+    def test_deserialize_invalid_rate(self, context, cornice_request, subject):
+        from adhocracy_core.sheets.rate import RateSchema
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        context['subject'] = subject
+        object = _make_rateable()
+        context['object'] = object
+        data = {'subject': '/subject', 'object': '/object', 'rate': '77'}
+        with raises(colander.Invalid):
+            schema.deserialize(data)
+
+    def test_deserialize_invalid_subject(self, context, cornice_request):
+        from adhocracy_core.sheets.rate import RateSchema
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        subject = testing.DummyResource()
+        context['subject'] = subject
+        object = _make_rateable()
+        context['object'] = object
+        data = {'subject': '/subject', 'object': '/object', 'rate': '0'}
+        with raises(colander.Invalid):
+            schema.deserialize(data)
+
+    def test_deserialize_invalid_subject_missing(self, context,
+                                                 cornice_request):
+        from adhocracy_core.sheets.rate import RateSchema
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        object = _make_rateable()
+        context['object'] = object
+        data = {'subject': '', 'object': '/object', 'rate': '0'}
+        with raises(colander.Invalid):
+            schema.deserialize(data)
+
+    def test_deserialize_invalid_object(self, context, cornice_request,
+                                        subject):
+        from adhocracy_core.sheets.rate import RateSchema
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        context['subject'] = subject
+        object = testing.DummyResource()
+        context['object'] = object
+        data = {'subject': '/subject', 'object': '/object', 'rate': '0'}
+        with raises(colander.Invalid):
+            schema.deserialize(data)
+
+    def test_deserialize_invalid_object_missing(self, context, cornice_request,
+                                        subject):
+        from adhocracy_core.sheets.rate import RateSchema
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        context['subject'] = subject
+        data = {'subject': '/subject', 'object': '', 'rate': '0'}
+        with raises(colander.Invalid):
+            schema.deserialize(data)
+
+    def test_deserialize_valid_likeable(self, context, cornice_request,
+                                        subject):
+        from adhocracy_core.sheets.rate import ILikeable
+        from adhocracy_core.sheets.rate import RateSchema
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        context['subject'] = subject
+        object = _make_rateable(ILikeable)
+        context['object'] = object
+        data = {'subject': '/subject', 'object': '/object', 'rate': '1'}
+        assert schema.deserialize(data) == {'subject': subject,
+                                            'object': object,
+                                            'rate': 1}
+
+    def test_deserialize_invalid_rate_with_likeable(self, context,
+                                                    cornice_request, subject):
+        from adhocracy_core.sheets.rate import ILikeable
+        from adhocracy_core.sheets.rate import RateSchema
+        schema = RateSchema().bind(request=cornice_request, context=context)
+        context['subject'] = subject
+        object = _make_rateable(ILikeable)
+        context['object'] = object
+        data = {'subject': '/subject', 'object': '/object', 'rate': '-1'}
+        with raises(colander.Invalid):
+            assert schema.deserialize(data)
+
+
+@mark.usefixtures('integration')
+class TestRateValidators:
+
+    def test_rateable_rate_validator(self, registry):
+        from adhocracy_core.interfaces import IRateValidator
+        rateable = _make_rateable()
+        validator = registry.getAdapter(rateable, IRateValidator)
+        assert validator.validate(1) is True
+        assert validator.validate(0) is True
+        assert validator.validate(-1) is True
+        assert validator.validate(2) is False
+        assert validator.validate(-2) is False
+
+    def test_likeable_rate_validator(self, registry):
+        from adhocracy_core.interfaces import IRateValidator
+        from adhocracy_core.sheets.rate import ILikeable
+        rateable = _make_rateable(ILikeable)
+        validator = registry.getAdapter(rateable, IRateValidator)
+        assert validator.validate(1) is True
+        assert validator.validate(0) is True
+        assert validator.validate(-1) is False
+        assert validator.validate(2) is False
+
+
 @fixture
 def mock_sheet(context, mock_sheet, registry):
     from adhocracy_core.testing import add_and_register_sheet
@@ -47,12 +195,6 @@ def test_index_rate(context, mock_sheet):
     context['referenced'] = testing.DummyResource()
     mock_sheet.get.return_value = {'rate': 1}
     assert index_rate(context, None) == 1
-
-
-@fixture
-def integration(config):
-    config.include('adhocracy_core.catalog')
-    config.include('adhocracy_core.sheets.rate')
 
 
 @mark.usefixtures('integration')

@@ -55,7 +55,7 @@ rates_meta = service_metadata._replace(
 
 
 def add_ratesservice(context: IPool, registry: Registry, options: dict):
-    """Add `comments` service to context."""
+    """Add `rates` service to context."""
     registry.content.create(IRatesService.__identifier__, parent=context)
 
 

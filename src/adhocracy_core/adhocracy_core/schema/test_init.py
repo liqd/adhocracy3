@@ -1015,29 +1015,6 @@ class TestInteger:
         assert inst.missing == colander.drop
 
 
-class TestRate:
-
-    def _make_one(self):
-        from adhocracy_core.schema import Rate
-        return Rate()
-
-    def test_create(self):
-        inst = self._make_one()
-        assert inst.schema_type == colander.Integer
-        assert inst.default == 0
-        assert inst.missing == colander.drop
-        assert inst.validator.choices == (1, 0, -1)
-
-    def test_deserialize_valid(self):
-        inst = self._make_one()
-        assert inst.deserialize('-1') == -1
-
-    def test_deserialize_invalid(self):
-        inst = self._make_one()
-        with raises(colander.Invalid):
-            inst.deserialize('-12')
-
-
 class TestRole:
 
     @fixture
