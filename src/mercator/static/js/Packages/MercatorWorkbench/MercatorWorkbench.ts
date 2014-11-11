@@ -4,6 +4,7 @@ import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
 import AdhListing = require("../Listing/Listing");
 import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
@@ -15,6 +16,7 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     user : AdhUser.Service;
     websocketTestPaths : string;
     contentType : string;
+    view : string;
     proposalListingData : {
         facets : AdhListing.IFacet[];
         showFacets : boolean;
@@ -32,8 +34,9 @@ export class MercatorWorkbench {
         return {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
-            controller: ["adhUser", "$scope", (
+            controller: ["adhUser", "adhTopLevelState", "$scope", (
                 adhUser : AdhUser.Service,
+                adhTopLevelState : AdhTopLevelState.Service,
                 $scope : IMercatorWorkbenchScope
             ) : void => {
                 $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
@@ -61,6 +64,10 @@ export class MercatorWorkbench {
                     }],
                     showFacets: false
                 };
+
+                adhTopLevelState.on("view", (value : string) => {
+                    $scope.view = value;
+                });
             }]
         };
     }
@@ -74,6 +81,7 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhComment.moduleName,
             AdhMercatorProposal.moduleName,
+            AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])
         .directive("adhMercatorWorkbench", ["adhConfig", (adhConfig) =>
