@@ -49,28 +49,30 @@ export class Service implements AdhTopLevelState.IAreaInput {
         }
 
         var platform : string = segs[1];
-        var content2Url : string;
+        var resourceUrl : string;
         var view : string;
 
         // if path contains more than just the platform
         if (segs.length > 2) {
-            content2Url = this.adhConfig.rest_url;
+            resourceUrl = this.adhConfig.rest_url;
 
             // if path has a view segment
             if (_.last(segs).match(/^@/)) {
                 view = segs.pop().replace(/^@/, "");
             }
-            content2Url += segs.join("/");
+            resourceUrl += segs.join("/");
         } else {
-            content2Url = this.adhConfig.rest_url + "/" + platform;
+            resourceUrl = this.adhConfig.rest_url + "/" + platform;
         }
 
-        return this.adhHttp.get(content2Url).then((resource) => {
+        return this.adhHttp.get(resourceUrl).then((resource) => {
             var data = self.provider.get(resource.content_type);
 
             data["platform"] = platform;
             data["view"] = view;
-            data["content2Url"] = content2Url;
+            if (segs.length > 2) {
+                data["content2Url"] = resourceUrl;
+            }
 
             for (var key in search) {
                 if (search.hasOwnProperty(key)) {
