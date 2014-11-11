@@ -510,19 +510,22 @@ class TestFinanceSchema:
                   }
         assert inst.deserialize(cstruct_required) == wanted
 
-    def test_deserialize_budget_field_lt_0(self, inst, cstruct_required):
-        cstruct_required['budget'] = '50000.00'
+    def test_deserialize_requested_funding_field_lt_0(
+            self, inst, cstruct_required):
+        cstruct_required['requested_funding'] = '-1'
         with raises(colander.Invalid):
             inst.deserialize(cstruct_required)
 
-    def test_deserialize_budget_field_gte_0(self, inst, cstruct_required):
+    def test_deserialize_requested_funding_field_gte_0(
+            self, inst, cstruct_required):
         from decimal import Decimal
-        cstruct_required['budget'] = '0.00'
+        cstruct_required['requested_funding'] = '0.00'
         result = inst.deserialize(cstruct_required)
-        assert result['budget'] == Decimal(0)
+        assert result['requested_funding'] == Decimal(0)
 
-    def test_deserialize_budget_field_gt_50000(self, inst, cstruct_required):
-        cstruct_required['budget'] = '500000.01'
+    def test_deserialize_requested_funding_field_gt_50000(
+            self, inst, cstruct_required):
+        cstruct_required['requested_funding'] = '500000.01'
         with raises(colander.Invalid):
             inst.deserialize(cstruct_required)
 

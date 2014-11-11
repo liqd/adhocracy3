@@ -343,9 +343,10 @@ class FinanceSchema(colander.MappingSchema):
 
     """Data structure for financial aspects."""
 
-    budget = CurrencyAmount(missing=colander.required,
-                            validator=colander.Range(min=0, max=49999))
-    requested_funding = CurrencyAmount(missing=colander.required)
+    budget = CurrencyAmount(missing=colander.required)
+    requested_funding = CurrencyAmount(
+        missing=colander.required,
+        validator=colander.Range(min=0, max=50000))
     other_sources = SingleLine()
     granted = Boolean()
     # financial_plan = AssetPath()  # (2 Mb. max.)
