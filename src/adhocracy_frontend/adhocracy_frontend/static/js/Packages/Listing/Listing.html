@@ -2,9 +2,6 @@
     <div class="listing-create-form" data-ng-if="!noCreateForm && poolOptions.POST">
         <adh-inject data-transclusion-id="create-form-id"></adh-inject>
     </div>
-    <div ng-if="facets">
-        <adh-facets data-facets="facets" data-update="update"></adh-facets>
-    </div>
     <ol class="listing-elements">
         <li class="listing-element" data-ng-repeat="element in elements">
             <adh-inject data-transclusion-id="element-id"></adh-inject>
