@@ -24,46 +24,6 @@ $columns: 6;
     }
 }
 
-/*doc
----
-title: Annotated section
-name: annotated-section
-category: widgets
----
-
-A section with a additional annotation, typically displayed in a second column.
-
-```html_example
-<section class="annotated-section">
-    <div class="annotated-section-body">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
-        lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam
-        viverra nec consectetur ante hendrerit.
-    </div>
-    <div class="annotated-section-annotation">
-        Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit
-        amet vitae augue. Nam tincidunt congue enim, ut porta lorem lacinia
-        consectetur.
-    </div>
-</section>
-```
-*/
-.annotated-section {
-    @include clearfix;
-
-    .annotated-section-body {
-        float: left;
-        padding-right: $gutter;
-        width: column-width(4);
-    }
-
-    .annotated-section-annotation {
-        float: right;
-        padding-bottom: $gutter;
-        width: column-width(2);
-    }
-}
-
 .mercator-proposal-nav {
     position: fixed;
     width: column-width(1);
