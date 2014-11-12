@@ -218,10 +218,16 @@ class UserLocatorAdapter(object):
 
     def get_user_by_userid(self, userid: str) -> IUser:
         """Find user by :term:`userid` or return None."""
-        try:
-            return find_resource(self.context, userid)
-        except KeyError:
-            return None
+        # This method is called multiple times, so we cache the result
+        # FIXME use decorator for caching with request scope instead
+        user = getattr(self.request, '__user__' + userid, None)
+        if user is None:
+            try:
+                user = find_resource(self.context, userid)
+                setattr(self.request, '__user__' + userid, user)
+            except KeyError:
+                return None
+        return user
 
     def get_user_by_email(self, email: str) -> IUser:
         """Find user per email or return None."""
