@@ -97,6 +97,11 @@ export class Provider {
         this.default = factory;
         return this;
     }
+
+    public getArea(prefix : string) : any {
+        return this.areas.hasOwnProperty(prefix) ? this.areas[prefix] : this.default;
+    }
+
 }
 
 
@@ -165,7 +170,7 @@ export class Service {
 
         if (typeof this.area === "undefined" || prefix !== this.area.prefix) {
             this.blockTemplate = true;
-            var fn = this.provider.areas.hasOwnProperty(prefix) ? this.provider.areas[prefix] : this.provider.default;
+            var fn = this.provider.getArea(prefix);
             var areaInput : IAreaInput = this.$injector.invoke(fn);
             var area : IArea = {
                 prefix: prefix,
