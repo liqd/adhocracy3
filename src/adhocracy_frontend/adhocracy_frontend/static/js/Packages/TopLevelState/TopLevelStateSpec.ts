@@ -62,7 +62,7 @@ export var register = () => {
                     var areaInput;
 
                     beforeEach(() => {
-                        areaInput = jasmine.createSpyObj("areaInput", ["template", "templateUrl"]);
+                        areaInput = {};
                         providerMock = jasmine.createSpyObj("providerMock", ["getArea"]);
                         injectorMock = jasmine.createSpyObj("injectorMock", ["invoke"]);
                         injectorMock.invoke.and.returnValue(areaInput);
@@ -101,14 +101,12 @@ export var register = () => {
 
                         it("while passing template", () => {
                             areaInput.template = template;
-                            delete areaInput.templateUrl;
 
                             var newArea = adhTopLevelStateWithPrivates.getArea();
                             expect(newArea.template).toBe(template);
                         });
 
                         it("while passing templateUrl", () => {
-                            delete areaInput.template;
                             areaInput.templateUrl = "/path/to/template";
 
                             var newArea = adhTopLevelStateWithPrivates.getArea();
