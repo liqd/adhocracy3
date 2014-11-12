@@ -41,9 +41,10 @@ export var register = () => {
                 var areaMock;
 
                 beforeEach(() => {
-                    areaMock = jasmine.createSpyObj("areaMock", ["route", "reverse", "_data", "_basePath"]);
-                    areaMock.prefix = "r";
+                    areaMock = jasmine.createSpyObj("areaMock", ["route", "reverse"]);
                     areaMock._basePath = "/adhocracy";
+                    areaMock.prefix = "r";
+                    areaMock._data = "";
 
                     adhTopLevelStateWithPrivates = <any>adhTopLevelState;
                     spyOn(adhTopLevelStateWithPrivates, "getArea").and.returnValue(areaMock);
