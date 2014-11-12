@@ -214,6 +214,10 @@ def test_includeme_register_userbasic_sheet(config):
 
 class TestPermissionsSchemaSchema:
 
+    @fixture
+    def context(self, context):
+        context.roles = []
+        return context
 
     @fixture
     def request(self, context, registry):
@@ -225,16 +229,9 @@ class TestPermissionsSchemaSchema:
     @fixture
     def group(self, context):
         group = testing.DummyResource()
+        group.roles = []
         context['group'] = group
         return group
-
-    @fixture
-    def group_sheet(self, group, registry, mock_sheet):
-        from adhocracy_core.sheets.principal import IGroup
-        from adhocracy_core.testing import add_and_register_sheet
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=IGroup)
-        add_and_register_sheet(group, mock_sheet, registry)
-        return mock_sheet
 
     @fixture
     def permissions_sheet(self, context, registry, mock_sheet):
@@ -261,10 +258,10 @@ class TestPermissionsSchemaSchema:
                                       'roles_and_group_roles': []}
 
     def test_serialize_with_groups_and_roles(self, context, group, request,
-                                             group_sheet, permissions_sheet):
-        permissions_sheet.get.return_value = {'roles': ['view'],
-                                              'groups': [group]}
-        group_sheet.get.return_value = {'roles': ['admin']}
+                                             permissions_sheet):
+        context.roles = ['view']
+        group.roles = ['admin']
+        permissions_sheet.get.return_value = {'groups': [group]}
         appstruct = {'groups': [group], 'roles': ['view']}
         inst = self.make_one().bind(context=context, request=request)
         assert inst.serialize(appstruct) == \

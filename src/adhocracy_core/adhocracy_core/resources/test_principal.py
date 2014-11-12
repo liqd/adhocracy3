@@ -64,6 +64,18 @@ def test_user_meta():
     assert send_registration_mail in meta.after_creation
 
 
+def test_group_meta():
+    from .principal import group_metadata
+    from .principal import IGroup
+    from .principal import Group
+    meta = group_metadata
+    assert meta.iresource is IGroup
+    assert meta.content_class == Group
+    assert meta.permission_add == 'add_group'
+    assert meta.is_implicit_addable is False
+    assert meta.element_types == []
+
+
 @fixture
 def integration(config):
     config.include('pyramid_mailer.testing')
@@ -188,10 +200,30 @@ class TestUserClass:
         return User()
 
     def test_create(self):
-        user = self._makeOne()
-        assert user.email == ''
-        assert user.password == ''
-        assert user.tzname == 'UTC'
+        from zope.interface.verify import verifyObject
+        from .principal import IUser
+        inst = self._makeOne()
+        assert IUser.providedBy(inst)
+        assert verifyObject(IUser, inst)
+        assert inst.email == ''
+        assert inst.password == ''
+        assert inst.tzname == 'UTC'
+        assert inst.roles == []
+
+
+class TestGroupClass:
+
+    def _makeOne(self):
+        from adhocracy_core.resources.principal import Group
+        return Group()
+
+    def test_create(self):
+        from zope.interface.verify import verifyObject
+        from .principal import IGroup
+        inst = self._makeOne()
+        assert IGroup.providedBy(inst)
+        assert verifyObject(IGroup, inst)
+        assert inst.roles == []
 
 
 class TestUserLocatorAdapter:
@@ -283,19 +315,14 @@ class TestUserLocatorAdapter:
         assert inst.get_groupids('/principals/users/User1') is None
 
     def test_get_group_roleids_user_exists(self, context, mock_sheet, request):
-        from copy import deepcopy
         from adhocracy_core.sheets.principal import IPermissions
-        from adhocracy_core.sheets.principal import IGroup
         from adhocracy_core.testing import add_and_register_sheet
-        group = testing.DummyResource(__name__='group1')
+        group = testing.DummyResource(__name__='group1', roles=[])
         user = testing.DummyResource()
         mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
         mock_sheet.get.return_value = {'groups': [group]}
         add_and_register_sheet(user, mock_sheet, request.registry)
-        mock_sheet2 = deepcopy(mock_sheet)
-        mock_sheet2.meta = mock_sheet.meta._replace(isheet=IGroup)
-        mock_sheet2.get.return_value = {'roles': ['role1']}
-        add_and_register_sheet(group, mock_sheet2, request.registry)
+        group.roles = ['role1']
         context['principals']['users']['User1'] = user
         inst = self._make_one(context, request)
         assert inst.get_group_roleids('/principals/users/User1') == ['role:role1']
@@ -305,11 +332,8 @@ class TestUserLocatorAdapter:
         assert inst.get_group_roleids('/principals/users/User1') is None
 
     def test_get_roleids_user_exists(self, context, mock_sheet, request):
-        from adhocracy_core.sheets.principal import IPermissions
         from adhocracy_core.testing import add_and_register_sheet
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
-        mock_sheet.get.return_value = {'roles': ['role1']}
-        user = testing.DummyResource()
+        user = testing.DummyResource(roles=['role1'])
         add_and_register_sheet(user, mock_sheet, request.registry)
         context['principals']['users']['User1'] = user
         inst = self._make_one(context, request)

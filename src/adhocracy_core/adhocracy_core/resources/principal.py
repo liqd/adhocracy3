@@ -79,6 +79,7 @@ class IUser(IPool):
     active = Attribute('Whether the user account has been activated (bool)')
     activation_path = Attribute(
         'Activation path for not-yet-activated accounts (str)')
+    roles = Attribute('List of :term:`role`s')
 
 
 @implementer(IUser)
@@ -96,6 +97,10 @@ class User(Pool):
     name = ''
     active = False
     activation_path = None
+
+    def __init__(self, data=None, family=None):
+        super().__init__(data, family)
+        self.roles = []
 
 
 def send_registration_mail(context: IUser,
@@ -164,8 +169,19 @@ class IGroup(IPool):
     """Group for Users."""
 
 
+@implementer(IGroup)
+class Group(Pool):
+
+    """Group implementation with roles attribute to improve performance."""
+
+    def __init__(self, data=None, family=None):
+        super().__init__(data, family)
+        self.roles = []
+
+
 group_metadata = pool_metadata._replace(
     iresource=IGroup,
+    content_class=Group,
     extended_sheets=[adhocracy_core.sheets.principal.IGroup,
                      ],
     element_types=[],  # we don't want the frontend to post resources here
@@ -276,11 +292,7 @@ class UserLocatorAdapter(object):
         user = self.get_user_by_userid(userid)
         if user is None:
             return None
-        roles_sheet = get_sheet(user,
-                                adhocracy_core.sheets.principal.IPermissions,
-                                registry=self.request.registry)
-        roles = roles_sheet.get()['roles']
-        roleids = ['role:' + r for r in roles]
+        roleids = ['role:' + r for r in user.roles]
         return roleids
 
     def get_group_roleids(self, userid: str) -> list:
@@ -291,11 +303,7 @@ class UserLocatorAdapter(object):
         groups = self.get_groups(userid)
         roleids = set()
         for group in groups:
-            group_sheet = get_sheet(group,
-                                    adhocracy_core.sheets.principal.IGroup,
-                                    registry=self.request.registry)
-            group_roles = group_sheet.get()['roles']
-            group_roleids = ['role:' + r for r in group_roles]
+            group_roleids = ['role:' + r for r in group.roles]
             roleids.update(group_roleids)
         return sorted(list(roleids))
 
