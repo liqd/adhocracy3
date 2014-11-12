@@ -29,10 +29,6 @@ $columns: 6;
         left: 100% + $gutter * column-width(2) / column-width(4);
         padding: 0 0.5em;
     }
-
-    ng-form {
-        overflow: hidden;
-    }
 }
 
 .mercator-proposal-nav {
@@ -48,55 +44,5 @@ $columns: 6;
         &.active {
             font-weight: bold;
         }
-    }
-}
-
-.mercator-proposal-detail-view {
-    .mercator-detail-nav, .mercator-detail-body {
-        float: left;
-    }
-
-    .mercator-detail-nav {
-        width: column-width(2);
-    }
-
-    .cover {
-        @include clearfix;
-
-        .meta {
-            &, li {
-                float: left;
-            }
-
-            @extend .listing-elements;
-            width: column-width(3);
-
-            li {
-                width: column-width(2);
-            }
-        }
-    }
-    .mercator-detail-body {
-        width: column-width(4);
-
-        h2 {
-            background-color: $color-secondary-introvert;
-            padding: .5em 1em;
-        }
-    }
-}
-
-.commentable-section {
-    border-bottom: 1px solid $color-secondary-introvert;
-    margin-bottom: 1em;
-    padding-bottom: 1em;
-    padding-right: column-width(1);
-    position: relative;
-
-    .show-comments {
-        min-width: column-width(1);
-        position: absolute;
-        right: 0;
-        top: 0;
     }
 }

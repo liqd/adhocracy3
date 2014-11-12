@@ -1,35 +1,32 @@
-<div class="mercator-proposal-detail-view" id="mercator-detail-view-top">
-    <div class="cover">
-        <h2>{{ data.introduction.title }}
+<div class="mercator-proposal-detail-view proposal" id="mercator-detail-view-top">
+    <div class="proposal-cover">
+        <h2 class="proposal-chapter-header">{{ data.introduction.title }}
             <span class="pull-right">
                 <!-- FIXME: Dummy data -->
                 <i class="icon-speachbubble-outline"></i> 3
             </span>
         </h2>
-
-        <ul class="meta">
-            <li>
+        <ul class="proposal-meta">
+            <li class="proposal-meta-column">
                 <strong>{{data.finance.requested_funding}} &euro;</strong> requested
             </li>
-            <li>
+            <li class="proposal-meta-column">
                 <!-- FIXME: Link to profile -->
                 <a href="#">{{data.user_info.first_name}} {{data.user_info.last_name}}</a>
             </li>
-            <li>
+            <li class="proposal-meta-column">
                 {{ data.basic.createtime }}
                 published
             </li>
-        </ul>
-        <ul class="meta">
-            <li>
+            <li class="proposal-meta-column">
                 <!-- FIXME: Dummy data -->
                 <i class="icon-speachbubble-outline"></i> 33
             </li>
-            <li>
+            <li class="proposal-meta-column">
                 <!-- FIXME: Dummy data -->
                 231 supporters
             </li>
-            <li>
+            <li class="proposal-meta-column">
                 <adh-like data-refers-to="{{path}}"
                     data-post-pool-sheet="adhocracy.sheets.rate.ILikeable"
                     data-post-pool-field="post_pool">
@@ -37,7 +34,7 @@
             </li>
         </ul>
     </div><!-- /.cover -->
-    <nav class="mercator-detail-nav">
+    <nav class="proposal-jumpnavi">
         <ol>
             <li><a href="#mercator-detail-view-brief-proposal" data-du-smooth-scroll="">{{ "Brief Proposal" | translate }}</a></li>
             <li><a href="#mercator-detail-view-detailed-proposal" data-du-smooth-scroll="">{{ "Detailed Proposal" | translate }}</a></li>
@@ -45,19 +42,19 @@
             <li><a href="#mercator-detail-view-additional" data-du-smooth-scroll="">{{ "Additional" | translate }}</a></li>
         </ol>
     </nav>
-    <div class="mercator-detail-body">
-        <section id="mercator-detail-view-brief-proposal">
-            <h2>{{ "Brief Proposal" | translate }}</h2>
+    <div class="proposal-chapters">
+        <section class="proposal-chapter" id="mercator-detail-view-brief-proposal">
+            <h2 class="proposal-chapter-header">{{ "Brief Proposal" | translate }}</h2>
             <section class="commentable-section">
-                <h3>{{ "Pitch (Teaser)" | translate }}</h3>
-                <div>{{ data.introduction.teaser }}</div>
+                <h3 class="commentable-section-header">{{ "Pitch (Teaser)" | translate }}</h3>
+                <p>{{ data.introduction.teaser }}</p>
                 <button class="show-comments" data-ng-click="showComments()">
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
             <section class="commentable-section">
-                <h3>{{ "Where will this project take place?" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "Where will this project take place?" | translate }}</h3>
                 <ul>
                     <li ng-if="details.location_is_online">{{ "ONLINE" | translate }}</li>
                     <li data-ng-if="data.details.location_specific_1">{{ data.details.location_specific_1 }}</li>
@@ -71,7 +68,7 @@
                 </button>
             </section><!-- /.commentable-section -->
             <section class="commentable-section">
-                <h3>{{ "Finance" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "Finance" | translate }}</h3>
                 <p class="text-functional"><strong>{{ data.finance.budget }} &euro;</strong> {{ "total project budget" | translate }}</p>
                 <p class="text-functional"><strong>{{ data.finance.requested_funding }} &euro;</strong> {{ "requested" | translate }}</p>
                 <p data-ng-if="data.finance.granted"><strong class="color-highlight-valid">project is granted</strong></p>
@@ -90,7 +87,7 @@
                 </button>
             </section><!-- /.commentable-section -->
             <section class="commentable-section">
-                <h3>{{ "Who is behind it?" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "Who is behind it?" | translate }}</h3>
                 <!-- FIXME: using form user name rather than profile
                 user name for now.  anyway: if this place is
                 supposed to show the name from the user profile
@@ -166,10 +163,10 @@
             </section><!-- /.commentable-section -->
             <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
         </section><!-- /chapter -->
-        <section id="mercator-detail-view-detailed-proposal">
-            <h2>{{ "Detailed Proposal" | translate }}</h2>
+        <section class="proposal-chapter" id="mercator-detail-view-detailed-proposal">
+            <h2 class="proposal-chapter-header">{{ "Detailed Proposal" | translate }}</h2>
             <section class="commentable-section">
-                <h3>{{ "Description?" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "Description?" | translate }}</h3>
                 <p>{{ data.details.description }}</p>
                 <button class="show-comments" data-ng-click="showComments()">
                     <!-- FIXME: Dummy data -->
@@ -177,7 +174,7 @@
                 </button>
             </section><!-- /.commentable-section -->
             <section class="commentable-section">
-                <h3>{{ "Story behind the idea" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "Story behind the idea" | translate }}</h3>
                 <p>{{ data.story }}</p>
                 <button class="show-comments" data-ng-click="showComments()">
                     <!-- FIXME: Dummy data -->
@@ -186,10 +183,10 @@
             </section><!-- /.commentable-section -->
             <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
         </section><!-- /chapter -->
-        <section id="mercator-detail-view-goals-and-vision">
-            <h2>{{ "Goals and Vision" | translate }}</h2>
+        <section class="proposal-chapter" id="mercator-detail-view-goals-and-vision">
+            <h2 class="proposal-chapter-header">{{ "Goals and Vision" | translate }}</h2>
             <section class="commentable-section">
-                <h3>{{ "What would be a successful outcome of your project or initiative?" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "What would be a successful outcome of your project or initiative?" | translate }}</h3>
                 <p>{{ data.outcome }}</p>
                 <button class="show-comments" data-ng-click="showComments()">
                     <!-- FIXME: Dummy data -->
@@ -197,7 +194,7 @@
                 </button>
             </section><!-- /.commentable-section -->
             <section class="commentable-section">
-                <h3>{{ "How do you want to get there?" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "How do you want to get there?" | translate }}</h3>
                 <p>{{ data.steps }}</p>
                 <button class="show-comments" data-ng-click="showComments()">
                     <!-- FIXME: Dummy data -->
@@ -205,7 +202,7 @@
                 </button>
             </section><!-- /.commentable-section -->
             <section class="commentable-section">
-                <h3>{{ "Why does Europe need your idea?" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "Why does Europe need your idea?" | translate }}</h3>
                 <p>{{ data.value }}</p>
                 <button class="show-comments" data-ng-click="showComments()">
                     <!-- FIXME: Dummy data -->
@@ -213,7 +210,7 @@
                 </button>
             </section><!-- /.commentable-section -->
             <section class="commentable-section">
-                <h3>{{ "Partner organisations and members list" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "Partner organisations and members list" | translate }}</h3>
                 <p>{{ data.partners }}</p>
                 <button class="show-comments" data-ng-click="showComments()">
                     <!-- FIXME: Dummy data -->
@@ -222,10 +219,10 @@
             </section><!-- /.commentable-section -->
             <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
         </section>
-        <section id="mercator-detail-view-additional">
-            <h2>{{ "Additional" | translate }}</h2>
+        <section class="proposal-chapter" id="mercator-detail-view-additional">
+            <h2 class="proposal-chapter-header">{{ "Additional" | translate }}</h2>
             <section class="commentable-section">
-                <h3>{{ "Share your experience" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "Share your experience" | translate }}</h3>
                 <p>{{ data.experience }}</p>
                 <button class="show-comments" data-ng-click="showComments()">
                     <!-- FIXME: Dummy data -->
@@ -233,7 +230,7 @@
                 </button>
             </section><!-- /.commentable-section -->
             <section class="commentable-section">
-                <h3>{{ "Where did you find out about Advocate Europe?" | translate }}</h3>
+                <h3 class="commentable-section-header">{{ "Where did you find out about Advocate Europe?" | translate }}</h3>
                 <!-- FIXME: do we really want to display that for
                 everybody?  shouldn't we offer to pull that out of
                 the database and send the statistics to mercator
