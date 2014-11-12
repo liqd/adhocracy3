@@ -37,5 +37,6 @@
     "title": "Titel",
     "username": "Nutzername",
     "Shorter than minimum length 6": "Kürzer als minimale Länge 6",
-    "User doesn't exist or password is wrong": "Nutzer*in existiert nicht oder Passwort ist falsch"
+    "User doesn't exist or password is wrong": "Nutzer*in existiert nicht oder Passwort ist falsch",
+    "CALL_FOR_ACTIVATION": "Nachdem Sie auf den Aktivierungslink geklickt haben, können Sie {{siteName}} verwenden."
 }

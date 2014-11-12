@@ -111,7 +111,15 @@ def send_registration_mail(context: IUser,
     context.activation_path = activation_path
     logger.debug('Sending registration mail to %s for new user named %s, '
                  'activation path=%s', email, name, context.activation_path)
-    args = {'name': name, 'activation_path': activation_path}
+    site_name = registry.settings.get('adhocracy.site_name', 'Adhocracy')
+    frontend_url = registry.settings.get('adhocracy.frontend_url',
+                                         'http://localhost:6551')
+    args = {
+        'activation_path': activation_path,
+        'frontend_url': frontend_url,
+        'name': name,
+        'site_name': site_name,
+    }
     try:
         registry.messenger.render_and_send_mail(
             subject=subject,
