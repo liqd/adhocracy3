@@ -17,6 +17,7 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     websocketTestPaths : string;
     contentType : string;
     view : string;
+    goToListing() : void;
     proposalListingData : {
         facets : AdhListing.IFacet[];
         showFacets : boolean;
@@ -34,10 +35,11 @@ export class MercatorWorkbench {
         return {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
-            controller: ["adhUser", "adhTopLevelState", "$scope", (
+            controller: ["adhUser", "adhTopLevelState", "$scope", "$location", (
                 adhUser : AdhUser.Service,
                 adhTopLevelState : AdhTopLevelState.Service,
-                $scope : IMercatorWorkbenchScope
+                $scope : IMercatorWorkbenchScope,
+                $location : ng.ILocationService
             ) : void => {
                 $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
                 $scope.contentType = RIMercatorProposalVersion.content_type;
@@ -68,6 +70,9 @@ export class MercatorWorkbench {
                 adhTopLevelState.on("view", (value : string) => {
                     $scope.view = value;
                 });
+                $scope.goToListing = () => {
+                    $location.url("/r/mercator");
+                };
             }]
         };
     }

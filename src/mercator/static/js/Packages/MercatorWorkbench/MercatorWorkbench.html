@@ -5,7 +5,7 @@
                 <div data-ng-switch-when="create_proposal">
                     <div class="moving-column-menu placeholder"></div>
                     <div class="moving-column-body">
-                        <adh-resource-wrapper>
+                        <adh-resource-wrapper data-on-submit="goToListing()" data-on-cancel="goToListing()">
                             <adh-mercator-proposal-create
                                 data-path="@preliminary"
                                 data-mode="edit"
