@@ -1,7 +1,7 @@
 <adh-comment-listing-partial data-path="{{path}}">
     <div data-ng-switch="transclusionId">
         <adh-resource-wrapper
-            data-on-submit="onCreate"
+            data-on-submit="onCreate()"
             data-clear-on-submit=""
             data-ng-switch-when="create-form-id">
             <adh-comment-create

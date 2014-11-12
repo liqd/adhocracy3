@@ -62,8 +62,8 @@
 
     <div class="comment-children-create-form" data-ng-if="show.createForm">
         <adh-resource-wrapper
-            data-on-submit="afterCreateComment"
-            data-on-cancel="cancelCreateComment">
+            data-on-submit="afterCreateComment()"
+            data-on-cancel="cancelCreateComment()">
             <adh-comment-create
                 data-path="{{createPath}}"
                 data-mode="edit"
