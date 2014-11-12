@@ -174,8 +174,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
     // NOTE: _update takes an item *version*, whereas _create
     // constructs an *item plus a new version*.
-    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
-    mercatorProposalVersion : R) : ng.IPromise<void> {
+    public _update(
+        instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
+        mercatorProposalVersion : R
+    ) : ng.IPromise<void> {
         var data = this.initializeScope(instance.scope);
 
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
