@@ -4,8 +4,11 @@ import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
 import AdhListing = require("../Listing/Listing");
 import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
+import AdhResourceArea = require("../ResourceArea/ResourceArea");
+import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 
+import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
 
 var pkgLocation = "/MercatorWorkbench";
@@ -15,6 +18,8 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     user : AdhUser.Service;
     websocketTestPaths : string;
     contentType : string;
+    view : string;
+    goToListing() : void;
     proposalListingData : {
         facets : AdhListing.IFacet[];
         showFacets : boolean;
@@ -32,9 +37,11 @@ export class MercatorWorkbench {
         return {
             restrict: "E",
             templateUrl: adhConfig.pkg_path + _class.templateUrl,
-            controller: ["adhUser", "$scope", (
+            controller: ["adhUser", "adhTopLevelState", "$scope", "$location", (
                 adhUser : AdhUser.Service,
-                $scope : IMercatorWorkbenchScope
+                adhTopLevelState : AdhTopLevelState.Service,
+                $scope : IMercatorWorkbenchScope,
+                $location : ng.ILocationService
             ) : void => {
                 $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
                 $scope.contentType = RIMercatorProposalVersion.content_type;
@@ -61,6 +68,13 @@ export class MercatorWorkbench {
                     }],
                     showFacets: false
                 };
+
+                adhTopLevelState.on("view", (value : string) => {
+                    $scope.view = value;
+                });
+                $scope.goToListing = () => {
+                    $location.url("/r/mercator");
+                };
             }]
         };
     }
@@ -74,8 +88,15 @@ export var register = (angular) => {
         .module(moduleName, [
             AdhComment.moduleName,
             AdhMercatorProposal.moduleName,
+            AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+            adhResourceAreaProvider
+                .whenView(RIBasicPool.content_type, "create_proposal", {
+                    movingColumns: "is-show-hide-hide"
+                });
+        }])
         .directive("adhMercatorWorkbench", ["adhConfig", (adhConfig) =>
             new MercatorWorkbench().createDirective(adhConfig)]);
 };

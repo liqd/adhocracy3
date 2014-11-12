@@ -25,7 +25,7 @@ $columns: 6;
 }
 
 .mercator-proposal-nav {
-    position: fixed;
+    position: absolute;
     width: column-width(1);
     border: 1px solid $color-structure-border;
     padding: 0 1em;
