@@ -1,13 +1,24 @@
 <div class="mercator-proposal-detail-view" id="mercator-detail-view-top">
-    <div class="cover">
-        <h2>{{ data.introduction.title }}
-            <span class="pull-right">
-                <!-- FIXME: Dummy data -->
-                <i class="icon-speachbubble-outline"></i> 3
-            </span>
-        </h2>
-        <div class="meta">
-            <ul>
+    <nav class="mercator-detail-nav"> <!-- class="mercator-proposal-nav" -->
+        <ol data-du-scroll-container="moving-column2-body" data-du-smooth-scroll="">
+            <li><a href="#mercator-detail-view-brief-proposal" data-du-smooth-scroll="">{{ "Brief Proposal" | translate }}</a></li>
+            <li><a href="#mercator-detail-view-detailed-proposal" data-du-smooth-scroll="">{{ "Detailed Proposal" | translate }}</a></li>
+            <li><a href="#mercator-detail-view-goals-and-vision" data-du-smooth-scroll="">{{ "Goals and Vision" | translate }}</a></li>
+            <li><a href="#mercator-detail-view-additional" data-du-smooth-scroll="">{{ "Additional" | translate }}</a></li>
+        </ol>
+    </nav>
+
+    <div class="mercator-detail-body" data-du-scroll-container="moving-column2-body">
+
+        <div class="cover">
+            <h2>{{ data.introduction.title }}
+                <span class="pull-right">
+                    <!-- FIXME: Dummy data -->
+                    <i class="icon-speachbubble-outline"></i> 3
+                </span>
+            </h2>
+
+            <ul class="meta">
                 <li>
                     <strong>{{data.finance.requested_funding}} &euro;</strong> requested
                 </li>
@@ -20,7 +31,7 @@
                     published
                 </li>
             </ul>
-            <ul>
+            <ul class="meta">
                 <li>
                     <!-- FIXME: Dummy data -->
                     <i class="icon-speachbubble-outline"></i> 33
