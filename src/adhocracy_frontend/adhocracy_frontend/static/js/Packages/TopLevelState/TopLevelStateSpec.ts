@@ -126,9 +126,9 @@ export var register = () => {
                                         search: adhTopLevelStateWithPrivates.data
                         });
                         adhTopLevelStateWithPrivates.toLocation.and.callThrough();
-                        locationMock.search.and.callFake((k?, v?) => {
-                                        if (k && v) {
-                                            searchData[k] = v;
+                        locationMock.search.and.callFake((key?, value?) => {
+                                        if (key && value) {
+                                            searchData[key] = value;
                                         };
                                         return searchData;
                         });
@@ -247,7 +247,7 @@ export var register = () => {
                         areaMock._data = data;
 
                         _.forOwn(data, (value, key) => {
-                            if (adhTopLevelStateWithPrivates.data.hasOwnProperty(k)) {
+                            if (adhTopLevelStateWithPrivates.data.hasOwnProperty(key)) {
                                 expect(adhTopLevelStateWithPrivates.data[key]).not.toEqual(value);
                             };
                         });
@@ -255,7 +255,7 @@ export var register = () => {
                         adhTopLevelStateWithPrivates.fromLocation();
 
                         _.forOwn(data, (value, key) => {
-                            if (adhTopLevelStateWithPrivates.data.hasOwnProperty()) {
+                            if (adhTopLevelStateWithPrivates.data.hasOwnProperty(key)) {
                                 expect(adhTopLevelStateWithPrivates.data[key]).toBe(data[key]);
                             };
                         });
