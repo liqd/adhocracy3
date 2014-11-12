@@ -37,8 +37,8 @@
             </li>
         </ul>
     </div><!-- /.cover -->
-    <nav class="mercator-detail-nav"> <!-- class="mercator-proposal-nav" -->
-        <ol data-du-scroll-container="moving-column2-body" data-du-smooth-scroll="">
+    <nav class="mercator-detail-nav">
+        <ol>
             <li><a href="#mercator-detail-view-brief-proposal" data-du-smooth-scroll="">{{ "Brief Proposal" | translate }}</a></li>
             <li><a href="#mercator-detail-view-detailed-proposal" data-du-smooth-scroll="">{{ "Detailed Proposal" | translate }}</a></li>
             <li><a href="#mercator-detail-view-goals-and-vision" data-du-smooth-scroll="">{{ "Goals and Vision" | translate }}</a></li>
@@ -47,9 +47,9 @@
     </nav>
     <div class="mercator-detail-body">
         <section id="mercator-detail-view-brief-proposal">
-            <h3>{{ "Brief Proposal" | translate }}</h3>
+            <h2>{{ "Brief Proposal" | translate }}</h2>
             <section class="commentable-section">
-                <h4>{{ "Pitch (Teaser)" | translate }}</h4>
+                <h3>{{ "Pitch (Teaser)" | translate }}</h3>
                 <div>{{ data.introduction.teaser }}</div>
                 <button class="show-comments" data-ng-click="showComments()">
                     <!-- FIXME: Dummy data -->
@@ -57,7 +57,7 @@
                 </button>
             </section><!-- /.commentable-section -->
             <section class="commentable-section">
-                <h4>{{ "Where will this project take place?" | translate }}</h4>
+                <h3>{{ "Where will this project take place?" | translate }}</h3>
                 <ul>
                     <li ng-if="details.location_is_online">{{ "ONLINE" | translate }}</li>
                     <li data-ng-if="data.details.location_specific_1">{{ data.details.location_specific_1 }}</li>
@@ -244,14 +244,14 @@
                 contains boolean fields that contain string
                 "false", which evaluate to true.  not sure what's
                 going on there, but it can't be very complicated. -->
-                <p data-ng-if="data.heard_from.colleague">colleague</p>
-                <p data-ng-if="data.heard_from.website">website</p>
-                <p data-ng-if="data.heard_from.newsletter">newsletter</p>
-                <p data-ng-if="data.heard_from.facebook">facebook</p>
-                <p data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</p>
+                <p><span data-ng-if="data.heard_from.colleague">colleague</span>
+                <span data-ng-if="data.heard_from.website">website</span>
+                <span data-ng-if="data.heard_from.newsletter">newsletter</span>
+                <span data-ng-if="data.heard_from.facebook">facebook</span>
+                <span data-ng-if="data.heard_from.other">Other: {{ data.heard_from.other_specify }}</span></p>
                 <button class="show-comments" data-ng-click="showComments()">
                     <!-- FIXME: Dummy data -->
-                    <i class="icon-speachbubble-outline"></i> 3
+                    <i class="icon-speachbubble-outline"></i>
                 </button>
             </section><!-- /.commentable-section -->
         </section>

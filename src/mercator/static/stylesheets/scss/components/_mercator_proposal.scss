@@ -55,28 +55,48 @@ $columns: 6;
     .mercator-detail-nav, .mercator-detail-body {
         float: left;
     }
+
     .mercator-detail-nav {
         width: column-width(2);
     }
+
     .cover {
         @include clearfix;
+
         .meta {
-            ul, li {
+            &, li {
                 float: left;
             }
-            ul {
-                @extend .listing-elements;
-                width: column-width(3);
-                li {
-                    width: column-width(2);
-                }
+
+            @extend .listing-elements;
+            width: column-width(3);
+
+            li {
+                width: column-width(2);
             }
         }
     }
     .mercator-detail-body {
         width: column-width(4);
+
         h2 {
-            margin-top: 0;
+            background-color: $color-secondary-introvert;
+            padding: .5em 1em;
         }
+    }
+}
+
+.commentable-section {
+    border-bottom: 1px solid $color-secondary-introvert;
+    margin-bottom: 1em;
+    padding-bottom: 1em;
+    padding-right: column-width(1);
+    position: relative;
+
+    .show-comments {
+        min-width: column-width(1);
+        position: absolute;
+        right: 0;
+        top: 0;
     }
 }
