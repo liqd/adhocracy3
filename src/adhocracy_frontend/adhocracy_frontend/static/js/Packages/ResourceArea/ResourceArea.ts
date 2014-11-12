@@ -25,8 +25,17 @@ export class Provider implements ng.IServiceProvider {
         return this;
     }
 
-    public get(resourceType : string) : Dict {
-        return _.clone(this.data[resourceType]);
+    public whenView(resourceType : string, view : string, defaults : Dict) : Provider {
+        this.data[resourceType + "@" + view] = defaults;
+        return this;
+    }
+
+    public get(resourceType : string, view? : string) : Dict {
+        var defaults = _.clone(this.data[resourceType]);
+        if (typeof view !== "undefined") {
+            defaults = <Dict>_.extend(defaults, this.data[resourceType + "@" + view]);
+        }
+        return defaults;
     }
 }
 
@@ -58,7 +67,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
         var resourceUrl : string = this.adhConfig.rest_url + segs.join("/");
 
         return this.adhHttp.get(resourceUrl).then((resource) => {
-            var data = self.provider.get(resource.content_type);
+            var data = self.provider.get(resource.content_type, view);
 
             data["platform"] = segs[1];
             data["view"] = view;
