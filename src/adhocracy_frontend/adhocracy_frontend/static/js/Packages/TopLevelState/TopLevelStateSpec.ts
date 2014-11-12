@@ -54,6 +54,67 @@ export var register = () => {
 
                 });
 
+                describe("getArea", () => {
+                    var injectorMock;
+                    var prefix = "p";
+                    var areasMock;
+                    var areaInput;
+
+                    beforeEach(() => {
+                        areaInput = jasmine.createSpyObj("areaInput", ["template", "templateUrl"]);
+                        areasMock = jasmine.createSpyObj("areasMock", ["hasOwnProperty"]);
+                        injectorMock = jasmine.createSpyObj("injectorMock", ["invoke"]);
+                        injectorMock.invoke.and.returnValue(areaInput);
+
+                        adhTopLevelStateWithPrivates.provider = {areas: areasMock};
+                        adhTopLevelStateWithPrivates.$injector = injectorMock;
+                        adhTopLevelStateWithPrivates.getArea.and.callThrough();
+                        adhTopLevelStateWithPrivates.area = areaMock;
+
+                        locationMock.url = "/" + prefix + "/foo/bar";
+                    });
+
+                    it("extracts prefix", () => {
+                        adhTopLevelStateWithPrivates.getArea();
+                        expect(areasMock.hasOwnProperty).toHaveBeenCalledWith(prefix);
+                    });
+
+                    it("returns area with route method", () => {
+                        var area = adhTopLevelStateWithPrivates.getArea();
+                        expect(area.route).not.toBeUndefined();
+                    });
+
+                    it("returns area with reverse method", () => {
+                        var area = adhTopLevelStateWithPrivates.getArea();
+                        expect(area.reverse).not.toBeUndefined();
+                    });
+
+                    describe("returns area with template", () => {
+                        var template = {};
+
+                        beforeEach(() => {
+                            spyOn(adhTopLevelStateWithPrivates, "templateRequest");
+                            adhTopLevelStateWithPrivates.templateRequest.and.returnValue({then: (fn) => fn(template)});
+                        });
+
+                        it("while passing template", () => {
+                            areaInput.template = template;
+                            delete areaInput.templateUrl;
+
+                            var newArea = adhTopLevelStateWithPrivates.getArea();
+                            expect(newArea.template).toBe(template);
+                        });
+
+                        it("while passing templateUrl", () => {
+                            delete areaInput.template;
+                            areaInput.templateUrl = "/path/to/template";
+
+                            var newArea = adhTopLevelStateWithPrivates.getArea();
+                            expect(newArea.template).toBe(template);
+                        });
+                    });
+                });
+
                 describe("toLocation", () => {
                     var searchData = {};
                     var areaPath = "/foo/bar";
