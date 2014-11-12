@@ -136,14 +136,7 @@ export var register = () => {
 
                     it("adds parameters to location path", () => {
                         adhTopLevelStateWithPrivates.toLocation();
-
-                        _.forOwn(searchData, (value, key) => {
-                            expect(value).toBe(adhTopLevelStateWithPrivates.data[key]);
-                        });
-
-                        _.forOwn(adhTopLevelStateWithPrivates.data, (value, key) => {
-                            expect(value).toBe(searchData[key]);
-                        });
+                        expect(searchData).toEqual(adhTopLevelStateWithPrivates.data);
                     });
 
                     it("updates parameters in location path", () => {
