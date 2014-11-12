@@ -141,6 +141,29 @@ export var register = () => {
                             expect(v).toBe(adhTopLevelStateWithPrivates.data[k]);
                         });
                     });
+
+                    it("sets location path", () => {
+                        adhTopLevelStateWithPrivates.toLocation();
+
+                        var path = locationMock.url + areaPath;
+                        expect(locationMock.path).toHaveBeenCalledWith(path);
+                    });
+
+                    it("updates parameters in location path", () => {
+                        searchData["mykey"] = "oldvalue";
+
+                        adhTopLevelStateWithPrivates.data["mykey"] = "newvalue";
+                        adhTopLevelStateWithPrivates.toLocation();
+
+                        expect(searchData["mykey"]).toBe("newvalue");
+                    });
+
+                    it("sets location path", () => {
+                        adhTopLevelStateWithPrivates.toLocation();
+
+                        var path = locationMock.url + areaPath;
+                        expect(locationMock.path).toHaveBeenCalledWith(path);
+                   });
                 });
 
                 describe("fromLocation", () => {
