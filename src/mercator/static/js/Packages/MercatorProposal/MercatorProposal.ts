@@ -865,20 +865,7 @@ export var register = (angular) => {
             AdhResourceWidgets.moduleName,
             AdhTopLevelState.moduleName
         ])
-        .config(["adhResourceAreaProvider", "adhTopLevelStateProvider", (
-            adhResourceAreaProvider : AdhResourceArea.Provider,
-            adhTopLevelStateProvider : AdhTopLevelState.Provider
-        ) => {
-            adhTopLevelStateProvider
-                .when("mercator", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                    $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
-                    return {
-                        template: "<adh-resource-wrapper>" +
-                            "<adh-mercator-proposal-create data-path=\"@preliminary\"" +
-                            "data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
-                            "</adh-mercator-proposal-create></adh-resource-wrapper>"
-                    };
-                }]);
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
                 .when(RIMercatorProposal.content_type, {
                      space: "content",
