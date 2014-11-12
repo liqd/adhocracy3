@@ -1,0 +1,11 @@
+.chapters {
+    float: left;
+    width: column-width(4);
+}
+
+.chapter {
+    .chapter-header {
+        background-color: $color-secondary-introvert;
+        padding: 0.5em 1em;
+    }
+}

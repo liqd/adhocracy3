@@ -25,6 +25,8 @@
 @import "components/annotated_section";
 @import "components/proposal";
 @import "components/mercator_proposal";
+@import "components/chapters";
+@import "components/commentable_section";
 
 // Debug (these should not be importet in productive setups
 @import "debug/placeholder";

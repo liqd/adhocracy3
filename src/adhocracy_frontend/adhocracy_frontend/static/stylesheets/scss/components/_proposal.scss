@@ -15,35 +15,7 @@ $columns: 6;
     }
 }
 
-.proposal-jumpnavi, .proposal-chapters {
-    float: left;
-}
-
 .proposal-jumpnavi {
+    float: left;
     width: column-width(2);
-}
-
-.proposal-chapters {
-    width: column-width(4);
-    .proposal-chapter {
-        .proposal-chapter-header {
-            background-color: $color-secondary-introvert;
-            padding: .5em 1em;
-        }
-    }
-}
-
-.commentable-section {
-    border-bottom: 1px solid $color-secondary-introvert;
-    margin-bottom: 1em;
-    padding-bottom: 1em;
-    padding-right: column-width(1);
-    position: relative;
-
-    .show-comments {
-        min-width: column-width(1);
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
 }
