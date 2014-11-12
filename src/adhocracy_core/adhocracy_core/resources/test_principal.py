@@ -1,5 +1,6 @@
 """Tests for the principal package."""
 import unittest
+from unittest.mock import Mock
 
 from pyramid import testing
 from pytest import fixture
@@ -314,6 +315,21 @@ class TestUserLocatorAdapter:
         inst = self._make_one(context, request)
         assert inst.get_groupids('/principals/users/User1') is None
 
+    def test_get_role_and_group_role_ids_user_exists(self, context, request):
+        inst = self._make_one(context, request)
+        inst.get_user_by_userid = Mock()
+        inst.get_user_by_userid.return_value = context
+        inst.get_roleids = Mock()
+        inst.get_roleids.return_value = ['role:admin']
+        inst.get_group_roleids = Mock()
+        inst.get_group_roleids.return_value = ['role:reader']
+        assert inst.get_role_and_group_roleids('/principals/users/User1') ==\
+               ['role:admin', 'role:reader']
+
+    def test_get_role_and_group_roleids_user_not_exists(self, context, request):
+        inst = self._make_one(context, request)
+        assert inst.get_role_and_group_roleids('/principals/users/User1') is None
+
     def test_get_group_roleids_user_exists(self, context, mock_sheet, request):
         from adhocracy_core.sheets.principal import IPermissions
         from adhocracy_core.testing import add_and_register_sheet
@@ -422,7 +438,6 @@ class TestIntegrationSendRegistrationMail:
 
     @mark.usefixtures('integration')
     def test_send_registration_mail_smtp_error(self, registry, sample_user):
-        from unittest.mock import Mock
         from colander import Invalid
         from smtplib import SMTPException
         from adhocracy_core.messaging import Messenger
