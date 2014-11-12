@@ -904,6 +904,12 @@ export var register = (angular) => {
             };
 
             $scope.submitIfValid = () => {
+                // FIXME: dump file meta data on console, then ignore it.
+                var flow = angular.element($("#introduction-picture-upload")).scope().$flow;
+                _.forOwn(flow.files, (value, key) => {
+                    console.log(JSON.stringify(value.file, null, 2));
+                });
+
                 if ($scope.mercatorProposalForm.$valid) {
                     $scope.submit();
                 };

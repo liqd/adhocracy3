@@ -298,10 +298,20 @@
 
                 <label>
                     {{ "Upload a Picture" | translate }}
-                    <input
-                        type="file"
-                        data-ng-model="data.introduction.picture"
-                        name="introduction-picture" />
+                    <div flow-init>
+                        <input flow-btn
+                               type="file"
+                               data-ng-model="data.introduction.file"
+                               id="introduction-picture-upload"
+                               name="introduction-picture-upload" />
+                        <table>
+                            <tr ng-repeat="file in $flow.files">
+                                <td>{{$index+1}}</td>
+                                <td>{{file.name}}</td>
+                                <td>{{file.msg}}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </label>
             </section>
 

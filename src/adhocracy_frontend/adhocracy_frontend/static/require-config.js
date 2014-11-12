@@ -18,6 +18,8 @@ require.config({
         angularTranslateLoader: "../lib/angular-translate-loader-static-files/angular-translate-loader-static-files",
         angularElastic: "../lib/angular-elastic/elastic",
         angularScroll: "../lib/angular-scroll/angular-scroll.min",
+        angularFlow: "../lib/ng-flow/dist/ng-flow",
+        flow: "../lib/flow.js/dist/flow",
         lodash: "../lib/lodash/dist/lodash",
         q: "../lib/q/q",
         modernizr: "../lib2/modernizr/modernizr-2.8.3.min",
@@ -45,8 +47,8 @@ require.config({
         angularScroll: {
             deps: ["angular"]
         },
-        underscore: {
-            exports: "_"
+        angularFlow: {
+            deps: ["angular", "flow"]
         },
         modernizr: {
             exports: "Modernizr"

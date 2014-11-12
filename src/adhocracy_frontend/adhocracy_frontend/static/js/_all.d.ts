@@ -13,6 +13,7 @@ declare module "angularTranslate" {}
 declare module "angularTranslateLoader" {}
 declare module "angularElastic" {}
 declare module "angularScroll" {}
+declare module "angularFlow" {}
 
 declare module "modernizr" {
     export var Modernizr : ModernizrStatic;

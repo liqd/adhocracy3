@@ -12,6 +12,7 @@ import angularTranslate = require("angularTranslate");  if (angularTranslate) { 
 import angularTranslateLoader = require("angularTranslateLoader");  if (angularTranslateLoader) { ; };
 import angularElastic = require("angularElastic");  if (angularElastic) { ; };
 import angularScroll = require("angularScroll");  if (angularScroll) { ; };
+import angularFlow = require("angularFlow");  if (angularFlow) { ; };
 
 import modernizr = require("modernizr");
 import moment = require("moment");
@@ -62,6 +63,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         "pascalprecht.translate",
         "ngAnimate",
         "duScroll",
+        "flow",
         AdhComment.moduleName,
         AdhDocumentWorkbench.moduleName,
         AdhDone.moduleName,
@@ -72,6 +74,14 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhResourceArea.moduleName,
         AdhProposal.moduleName
     ]);
+
+    app.config(["flowFactoryProvider", (flowFactoryProvider) => {
+        flowFactoryProvider.defaults = {
+            maxChunkRetries: 1,
+            chunkRetryInterval: 5000,
+            simultaneousUploads: 4
+        };
+    }]);
 
     app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", (
         adhTopLevelStateProvider : AdhTopLevelState.Provider,
