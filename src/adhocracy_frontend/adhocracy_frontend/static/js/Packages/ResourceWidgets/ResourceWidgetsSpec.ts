@@ -22,6 +22,7 @@ export var register = () => {
             describe("controller", () => {
                 var scopeMock;
                 var attrsMock;
+                var parseMock;
                 var controller;
                 var eventHandlerClassMock = function() {
                     this.on = jasmine.createSpy("on");
@@ -32,14 +33,15 @@ export var register = () => {
 
                 beforeEach(() => {
                     scopeMock = {
-                        $parent: jasmine.createSpyObj("$parent", ["onCancel", "onSubmitX"])
+                        $parent: {}
                     };
                     attrsMock = {
-                        onCancel: "onCancel",
-                        onSubmit: "onSubmitX"
+                        onCancel: "onCancel()",
+                        onSubmit: "onSubmitX()"
                     };
+                    parseMock = jasmine.createSpy("$parse").and.returnValue(() => null);
                     adhHttpMock = jasmine.createSpyObj("adhHttpMock", ["deepPost"]);
-                    controller = new directive.controller[5](scopeMock, attrsMock, q, eventHandlerClassMock, adhHttpMock);
+                    controller = new directive.controller[6](scopeMock, attrsMock, q, parseMock, eventHandlerClassMock, adhHttpMock);
                 });
 
                 it("does not pollute the scope", () => {
@@ -64,7 +66,7 @@ export var register = () => {
                     });
 
                     it("calls onSubmit callback", () => {
-                        expect(scopeMock.$parent.onSubmitX).toHaveBeenCalled();
+                        expect(parseMock).toHaveBeenCalledWith("onSubmitX()");
                     });
 
                     // FIXME
@@ -80,7 +82,7 @@ export var register = () => {
                     });
 
                     it("calls onCancel callback", () => {
-                        expect(scopeMock.$parent.onCancel).toHaveBeenCalled();
+                        expect(parseMock).toHaveBeenCalledWith("onCancel()");
                     });
                 });
 
