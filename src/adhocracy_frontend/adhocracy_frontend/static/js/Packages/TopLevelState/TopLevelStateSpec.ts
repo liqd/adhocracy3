@@ -41,13 +41,14 @@ export var register = () => {
                 var areaMock;
 
                 beforeEach(() => {
-                    areaMock = jasmine.createSpyObj("areaMock", ["route", "reverse", "_data"]);
+                    areaMock = jasmine.createSpyObj("areaMock", ["route", "reverse", "_data", "_basePath"]);
                     areaMock.prefix = "r";
+                    areaMock._basePath = "/adhocracy";
 
                     adhTopLevelStateWithPrivates = <any>adhTopLevelState;
                     spyOn(adhTopLevelStateWithPrivates, "getArea").and.returnValue(areaMock);
 
-                    locationMock.url = "/r/adhocracy";
+                    locationMock.url = "/" + areaMock.prefix + areaMock._basePath;
                     locationMock.path.and.callFake(() => {return locationMock.url; });
                     locationMock.search.and.returnValue({});
 
@@ -55,11 +56,12 @@ export var register = () => {
 
                 describe("toLocation", () => {
                     var searchData = {};
+                    var areaPath = "/foo/bar";
 
                     beforeEach(() => {
                         adhTopLevelStateWithPrivates.data = {mykey : "myValue", mykey2: "myValue2"};
                         areaMock.reverse.and.returnValue({
-                                        path: locationMock.url,
+                                        path: areaMock._basePath + areaPath,
                                         search: adhTopLevelStateWithPrivates.data
                         });
                         adhTopLevelStateWithPrivates.toLocation.and.callThrough();
