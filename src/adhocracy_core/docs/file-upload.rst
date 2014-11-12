@@ -1,8 +1,110 @@
 File and Image Upload
 =====================
 
-TODO All of this still needs to be implemented. This document will be
+FIXME All of this still needs to be implemented. This document will be
 revised and made testable along with the implementation.
+
+*Assets* are files of arbitrary type that can be uploaded to and downloaded
+from the backend. From the viewpoints of the backend, they are just "blobs"
+-- binary objects without any specific semantic.
+
+*Images* are a subtype of assets; they an be resized and cropped to
+different target formats.
+
+To manage assets, the backend has the `adhocracy_core.resources.asset.IAsset`
+resource type, which is a special kind of *Pool.* (FIXME Or maybe it's a
+*Simple*? In any case, it's not versionable.)
+
+Assets can be uploaded to an *asset post pool,* which is a kind of post poll
+(just as there are post pools for comments and rates). A resource that
+allows asset upload provides the
+`adhocracy_core.sheets.asset.IAssetContainer` sheet (just like
+commentable resources provide the `adhocracy_core.sheets.comment.ICommentable`
+sheet).
+
+`AssetContainer`s has two fields:
+
+* `post_pool`: path to the asset post pool where assets can be posted
+* `assets`: a list of assets that have already been attached to the resource
+ -- this is a readonly list of backreferences which is automatically populated
+ by the backend (like the `comments` field in `ICommentable`s)
+
+The `adhocracy_core.resources.asset.IAsset` resource type provides two sheets,
+`adhocracy_core.sheets.metadata.IMetadata` and either
+`adhocracy_core.sheets.asset.IAsset`.
+
+The `IMetadata` is automatically created and updated by the backend.
+The `adhocracy_core.sheets.asset.IAsset` sheet has just one field that must be
+set by the frontend when posting a new asset: the `mime_type` of the asset.I
+
+Asset Subtypes and MIME Type Validators
+---------------------------------------
+
+Note: this section is mostly backend-specific.
+
+The generic `adhocracy_core.resources.asset.IAsset` resource type allows
+uploading resources of an arbitrary MIME type. To allow uploading only files
+of specific types, subclass it and register a
+`adhocracy_core.interfaces.IMimeTypeValidator` implementation for that
+subtype (same as with `IRateValidator` for rates).
+
+E.g. to create a spreadsheet asset type that only accepts OpenDocument and
+Excel spreadsheets::
+
+    class ISpreadsheetAsset(IAsset):
+        """Empty marker interface for spreadsheet assets."""
+
+    @implementer(IMimeTypeValidator)
+    class SpreadsheetMimeTypeValidator:
+
+        def validate(self, mime_type: str) -> bool:
+            return mime_type in (
+                'application/vnd.oasis.opendocument.spreadsheet',
+                'application/vnd.ms-excel')
+
+    config.registry.registerAdapter(SpreadsheetMimeTypeValidator,
+                                    (ISpreadsheetAsset,),
+                                    IMimeTypeValidator)
+
+Images and Size Mappers
+-----------------------
+
+Note: this section is mostly backend-specific.
+
+A predefined IAsset subtype is `adhocracy_core.resources.asset.IImage`. Its
+adapter allows MIME types that start with 'image/', i.e.,
+arbitrary image files (subtypes of IImage can restrict that further,
+as desired).
+
+The backend can resize and crop images to different target formats. To do
+this, define a IImage subtype and register a
+`adhocracy_core.interfaces.ImageSizeMapper` implementation for that
+subtype::
+
+    class ProposalIntroImage(IImage):
+        """Empty marker interface."""
+
+    @implementer(ImageSizeMapper)
+    class ProposalIntroImageSizeMapper:
+
+        def sizemap -> dict:
+            return {
+                'thumbnail': Dimensions(width=160, height=120),
+                'detail': Dimensions(width=600, height=300),
+            }
+
+    # register adapter as above
+
+This means that the image will be made available in 'thumbnail' and in
+'detail' size, each with the specified dimensions,
+as well as in its original (raw) size.
+
+
+Uploading Assets
+----------------
+
+To upload assets, the frontend sends a "multipart/form-data" POST request to
+an asset post pool. TODO asset, mime_type, content_type.
 
 Defining File and Image Nodes in Sheets
 ---------------------------------------
@@ -42,7 +144,7 @@ images and specifies two target sizes::
     from adhocracy_core.schema import Image, ImageSize
     picture = Image(mime_type=['image/jpeg', 'image/png'],
                     sizes=[
-                        ImageSize(name='thumbnail, width=160, height=120)
+                        ImageSize(name='thumbnail', width=160, height=120)
                         ImageSize(name='detail', width=600, height=300)
                     ])
 
