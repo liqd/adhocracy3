@@ -48,28 +48,21 @@ export class Service implements AdhTopLevelState.IAreaInput {
             throw "bad path: " + path;
         }
 
-        var platform : string = segs[1];
-        var resourceUrl : string;
         var view : string;
 
-        // if path contains more than just the platform
-        if (segs.length > 2) {
-            resourceUrl = this.adhConfig.rest_url;
-
-            // if path has a view segment
-            if (_.last(segs).match(/^@/)) {
-                view = segs.pop().replace(/^@/, "");
-            }
-            resourceUrl += segs.join("/");
-        } else {
-            resourceUrl = this.adhConfig.rest_url + "/" + platform;
+        // if path has a view segment
+        if (_.last(segs).match(/^@/)) {
+            view = segs.pop().replace(/^@/, "");
         }
+
+        var resourceUrl : string = this.adhConfig.rest_url + segs.join("/");
 
         return this.adhHttp.get(resourceUrl).then((resource) => {
             var data = self.provider.get(resource.content_type);
 
-            data["platform"] = platform;
+            data["platform"] = segs[1];
             data["view"] = view;
+
             if (segs.length > 2) {
                 data["content2Url"] = resourceUrl;
             }
@@ -90,7 +83,7 @@ export class Service implements AdhTopLevelState.IAreaInput {
             movingColumns: "is-show-show-hide"
         };
 
-        var path;
+        var path : string;
 
         if (data["content2Url"]) {
             path = data["content2Url"].replace(this.adhConfig.rest_url, "");
