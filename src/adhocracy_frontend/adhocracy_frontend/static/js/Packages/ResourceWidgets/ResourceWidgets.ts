@@ -91,10 +91,11 @@ export interface IResourceWrapperController {
 export var resourceWrapper = () => {
     return {
         restrict: "E",
-        controller: ["$scope", "$attrs", "$q", "adhEventHandlerClass", "adhHttp", function(
+        controller: ["$scope", "$attrs", "$q", "$parse", "adhEventHandlerClass", "adhHttp", function(
             $scope : ng.IScope,
             $attrs : ng.IAttributes,
             $q : ng.IQService,
+            $parse : ng.IParseService,
             adhEventHandlerClass,
             adhHttp : AdhHttp.Service<any>
         ) {
@@ -108,8 +109,8 @@ export var resourceWrapper = () => {
 
             var triggerCallback = (key : string) : void => {
                 if (typeof $attrs[key] !== "undefined") {
-                    var fn = $scope.$parent[$attrs[key]];
-                    fn.call($scope.$parent);
+                    var fn = $parse($attrs[key]);
+                    fn($scope.$parent);
                 }
             };
 
