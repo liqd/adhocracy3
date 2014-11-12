@@ -22,6 +22,7 @@ class ConfigViewTest(unittest.TestCase):
              'trusted_domains': [],
              'support_email': 'support@unconfigured.domain',
              'locale': 'en',
+             'site_name': 'Adhocracy',
              }
 
     def test_ws_url_without_ws_url_settings_scheme_https(self):

@@ -16,4 +16,5 @@ export interface IService {
     locale : string;
     support_email : string;
     custom : {[key : string]: string};
+    site_name : string;
 }
