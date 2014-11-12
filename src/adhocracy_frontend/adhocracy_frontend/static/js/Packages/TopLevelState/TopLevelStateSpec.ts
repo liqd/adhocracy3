@@ -58,16 +58,17 @@ export var register = () => {
                 describe("getArea", () => {
                     var injectorMock;
                     var prefix = "p";
-                    var areasMock;
+                    var providerMock;
                     var areaInput;
 
                     beforeEach(() => {
                         areaInput = jasmine.createSpyObj("areaInput", ["template", "templateUrl"]);
-                        areasMock = jasmine.createSpyObj("areasMock", ["hasOwnProperty"]);
+                        providerMock = jasmine.createSpyObj("providerMock", ["getArea"]);
                         injectorMock = jasmine.createSpyObj("injectorMock", ["invoke"]);
                         injectorMock.invoke.and.returnValue(areaInput);
+                        providerMock.getArea.and.callThrough();
 
-                        adhTopLevelStateWithPrivates.provider = {areas: areasMock};
+                        adhTopLevelStateWithPrivates.provider = providerMock;
                         adhTopLevelStateWithPrivates.$injector = injectorMock;
                         adhTopLevelStateWithPrivates.getArea.and.callThrough();
                         adhTopLevelStateWithPrivates.area = areaMock;
@@ -77,7 +78,7 @@ export var register = () => {
 
                     it("extracts prefix", () => {
                         adhTopLevelStateWithPrivates.getArea();
-                        expect(areasMock.hasOwnProperty).toHaveBeenCalledWith(prefix);
+                        expect(providerMock.getArea).toHaveBeenCalledWith(prefix);
                     });
 
                     it("returns area with route method", () => {
