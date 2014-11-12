@@ -439,23 +439,17 @@ class IRolesUserLocator(IUserLocator):  # pragma: no cover
         behavior as :func:`substanced.interfaces.IUserLocator.get_groupids`.
         """
 
+    def get_group_roleids(userid: str) -> list:
+        """Return the group roleids for :term:`userid` or None."""
+
+    def get_groupids(userid: str) -> list:
+        """Get :term:`groupid`s for term:`userid` or return None."""
+
+    def get_groups(userid: str) -> list:
+        """Get :term:`group`s for term:`userid` or return None."""
+
     def get_user_by_activation_path(activation_path: str) -> IResource:
         """Find user per activation path or return None."""
-
-
-class IGroupLocator(Interface):  # pragma: no cover
-
-    """Adapter responsible for returning a group or get info about it."""
-
-    def get_roleids(groupid: str) -> list:
-        """Return the roles for :term:`groupid` or `None`.
-
-        We return 'None' if the the group does not exists to provide a similar
-        behavior as :func:`substanced.interfaces.IUserLocator.get_groupids`.
-        """
-
-    def get_group_by_id(groupid: str) -> IResource:
-        """Return the group for :term:`groupid` or None."""
 
 
 class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
@@ -471,8 +465,8 @@ class IRoleACLAuthorizationPolicy(IAuthorizationPolicy):  # pragma: no cover
         """Check that one `principal` has the `permission` for `context`.
 
         This method extends the behavior of :func:`ACLAuthorizationPolicy`.
-        If a principal has the suffix 'group:' the :class:`IGroupLocator` is
-        called to retrieve the list of roles for this principal. These
+        If a principal has the suffix 'group:' the :class:`IRolesUserLocator`
+        is called to retrieve the list of roles for this principal. These
         roles extend the given `principals`.
         """
 

@@ -16,7 +16,6 @@ from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IServicePool
 from adhocracy_core.interfaces import IRolesUserLocator
 from adhocracy_core.resources import add_resource_type_to_registry
-from adhocracy_core.interfaces import IGroupLocator
 from adhocracy_core.resources.pool import Pool
 from adhocracy_core.resources.pool import pool_metadata
 from adhocracy_core.resources.service import service_metadata
@@ -239,7 +238,14 @@ class UserLocatorAdapter(object):
                 return user
 
     def get_groupids(self, userid: str) -> list:
-        """Get :term:`groupid`s for _term:`userid` or return None."""
+        """Get :term:`groupid`s for term:`userid` or return None."""
+        groups = self.get_groups(userid)
+        if groups is None:
+            return None
+        return ['group:' + g.__name__ for g in groups]
+
+    def get_groups(self, userid: str) -> list:
+        """Get :term:`group`s for term:`userid` or return None."""
         user = self.get_user_by_userid(userid)
         if user is None:
             return None
@@ -247,8 +253,17 @@ class UserLocatorAdapter(object):
                                adhocracy_core.sheets.principal.IPermissions,
                                registry=self.request.registry)
         groups = user_sheet.get()['groups']
-        groupids = ['group:' + g.__name__ for g in groups]
-        return groupids
+        return groups
+
+    def get_role_and_group_roleids(self, userid: str) -> list:
+        """Return the roles for :term:`userid` and all its groups or None."""
+        user = self.get_user_by_userid(userid)
+        if user is None:
+            return None
+        roleids = self.get_roleids(userid)
+        group_roleids = self.get_group_roleids(userid)
+        role_and_group_roleids = set(roleids + group_roleids)
+        return sorted(list(role_and_group_roleids))
 
     def get_roleids(self, userid: str) -> list:
         """Return the roles for :term:`userid` or None."""
@@ -262,51 +277,30 @@ class UserLocatorAdapter(object):
         roleids = ['role:' + r for r in roles]
         return roleids
 
-
-@implementer(IGroupLocator)
-class GroupLocatorAdapter:
-
-    """Provides helper methods to get information about groups."""
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    def get_roleids(self, groupid: str) -> list:
-        """Return the roles for `groupid` or None. Read the interface."""
-        group = self.get_group_by_id(groupid)
-        if group is None:
+    def get_group_roleids(self, userid: str) -> list:
+        """Return the group roleids for :term:`userid` or None."""
+        user = self.get_user_by_userid(userid)
+        if user is None:
             return None
-        group_sheet = get_sheet(group, adhocracy_core.sheets.principal.IGroup,
-                                registry=self.request.registry)
-        roles = group_sheet.get()['roles']
-        roleids = ['role:' + r for r in roles]
-        return roleids
-
-    def get_group_by_id(self, groupid: str) -> IGroup:
-        """Return the group for :term:`groupid` or None. Read the interface."""
-        groups = find_service(self.context, 'principals', 'groups')
-        if ':' not in groupid:
-            return groups.get(groupid, None)
-        name = groupid.split(':')[1]
-        return groups.get(name, None)
+        groups = self.get_groups(userid)
+        roleids = set()
+        for group in groups:
+            group_sheet = get_sheet(group,
+                                    adhocracy_core.sheets.principal.IGroup,
+                                    registry=self.request.registry)
+            group_roles = group_sheet.get()['roles']
+            group_roleids = ['role:' + r for r in group_roles]
+            roleids.update(group_roleids)
+        return sorted(list(roleids))
 
 
 def groups_and_roles_finder(userid: str, request: Request) -> list:
     """A Pyramid authentication policy groupfinder callback."""
-    context = request.context
-    userlocator = request.registry.getMultiAdapter((context, request),
+    userlocator = request.registry.getMultiAdapter((request.context, request),
                                                    IRolesUserLocator)
     groupids = userlocator.get_groupids(userid) or []
-    roleids = userlocator.get_roleids(userid) or []
-    grouplocator = request.registry.getMultiAdapter((context, request),
-                                                    IGroupLocator)
-    groups_roleids = []
-    for groupid in groupids:
-        group_roleids = grouplocator.get_roleids(groupid) or []
-        groups_roleids.extend(group_roleids)
-    groups_and_roles = set(groupids + roleids + groups_roleids)
-    return sorted(list(groups_and_roles))
+    roleids = userlocator.get_role_and_group_roleids(userid) or []
+    return groupids + roleids
 
 
 def includeme(config):
@@ -320,6 +314,3 @@ def includeme(config):
     config.registry.registerAdapter(UserLocatorAdapter,
                                     (Interface, Interface),
                                     IRolesUserLocator)
-    config.registry.registerAdapter(GroupLocatorAdapter,
-                                    (Interface, Interface),
-                                    IGroupLocator)

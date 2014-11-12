@@ -282,6 +282,28 @@ class TestUserLocatorAdapter:
         inst = self._make_one(context, request)
         assert inst.get_groupids('/principals/users/User1') is None
 
+    def test_get_group_roleids_user_exists(self, context, mock_sheet, request):
+        from copy import deepcopy
+        from adhocracy_core.sheets.principal import IPermissions
+        from adhocracy_core.sheets.principal import IGroup
+        from adhocracy_core.testing import add_and_register_sheet
+        group = testing.DummyResource(__name__='group1')
+        user = testing.DummyResource()
+        mock_sheet.meta = mock_sheet.meta._replace(isheet=IPermissions)
+        mock_sheet.get.return_value = {'groups': [group]}
+        add_and_register_sheet(user, mock_sheet, request.registry)
+        mock_sheet2 = deepcopy(mock_sheet)
+        mock_sheet2.meta = mock_sheet.meta._replace(isheet=IGroup)
+        mock_sheet2.get.return_value = {'roles': ['role1']}
+        add_and_register_sheet(group, mock_sheet2, request.registry)
+        context['principals']['users']['User1'] = user
+        inst = self._make_one(context, request)
+        assert inst.get_group_roleids('/principals/users/User1') == ['role:role1']
+
+    def test_get_group_roleids_user_not_exists(self, context, request):
+        inst = self._make_one(context, request)
+        assert inst.get_group_roleids('/principals/users/User1') is None
+
     def test_get_roleids_user_exists(self, context, mock_sheet, request):
         from adhocracy_core.sheets.principal import IPermissions
         from adhocracy_core.testing import add_and_register_sheet
@@ -316,68 +338,6 @@ class UserLocatorAdapterIntegrationTest(unittest.TestCase):
             (self.context,  testing.DummyRequest), IRolesUserLocator)
 
 
-class TestGroupLocatorAdapter:
-
-    @fixture
-    def context(self, pool, service):
-        pool['principals'] = service 
-        pool['principals']['groups'] = service.clone()
-        return pool
-    
-    @fixture
-    def request(self, registry):
-        request = testing.DummyRequest()
-        request.registry = registry
-        return request
-
-    @fixture
-    def inst(self, context, request):
-        from adhocracy_core.resources.principal import GroupLocatorAdapter
-        return GroupLocatorAdapter(context, request)
-
-    def test_create(self, inst):
-        from adhocracy_core.interfaces import IGroupLocator
-        from zope.interface.verify import verifyObject
-        assert IGroupLocator.providedBy(inst)
-        assert verifyObject(IGroupLocator, inst)
-
-    def test_get_roleids_group_exists_no_roles(self, inst, context, mock_sheet, registry):
-        from adhocracy_core.sheets.principal import IGroup
-        from adhocracy_core.testing import add_and_register_sheet
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=IGroup)
-        mock_sheet.get.return_value = {'roles': []}
-        group = testing.DummyResource()
-        context['principals']['groups']['Group1'] = group
-        add_and_register_sheet(group, mock_sheet, registry)
-        assert inst.get_roleids('Group1') == []
-
-    def test_get_roleids_group_exists_roles(self, inst, context, mock_sheet, registry):
-        from adhocracy_core.sheets.principal import IGroup
-        from adhocracy_core.testing import add_and_register_sheet
-        mock_sheet.meta = mock_sheet.meta._replace(isheet=IGroup)
-        mock_sheet.get.return_value = {'roles': ['role1']}
-        group = testing.DummyResource()
-        context['principals']['groups']['Group1'] = group
-        add_and_register_sheet(group, mock_sheet, registry)
-        assert inst.get_roleids('Group1') == ['role:role1']
-
-    def test_get_roleids_by_id_group_not_exists(self, inst):
-        assert inst.get_roleids('Group1') is None
-
-    def test_get_group_by_id_with_prefix_group_exists(self, inst, context):
-        group = testing.DummyResource()
-        context['principals']['groups']['Group1'] = group
-        assert inst.get_group_by_id('group:Group1') is group
-
-    def test_get_group_by_id_without_prefix_group_exists(self, inst, context):
-        group = testing.DummyResource()
-        context['principals']['groups']['Group1'] = group
-        assert inst.get_group_by_id('Group1') is group
-
-    def test_get_group_by_id_group_not_exists(self, inst):
-        assert inst.get_group_by_id('Group1') is None
-
-
 class TestGroupsAndRolesFinder:
 
     @fixture
@@ -390,28 +350,19 @@ class TestGroupsAndRolesFinder:
         from adhocracy_core.resources.principal import groups_and_roles_finder
         return groups_and_roles_finder(userid, request)
 
-    def test_userid_wrong(self, request, mock_group_locator, mock_user_locator):
+    def test_userid_wrong(self, request,  mock_user_locator):
         assert self._call_fut('WRONG', request) == []
         assert mock_user_locator.get_groupids.call_args[0] == ('WRONG',)
-        assert mock_user_locator.get_roleids.call_args[0] == ('WRONG',)
+        assert mock_user_locator.get_role_and_group_roleids.call_args[0] == ('WRONG',)
 
-    def test_userid_with_roles(self, request, mock_group_locator,
-                               mock_user_locator):
-        mock_user_locator.get_roleids.return_value = ['role:reader']
+    def test_userid_with_roles(self, request, mock_user_locator):
+        mock_user_locator.get_role_and_group_roleids.return_value = ['role:reader']
         assert self._call_fut('userid', request) == ['role:reader']
 
-    def test_userid_with_groups(self, request, mock_group_locator,
-                                mock_user_locator):
-        mock_user_locator.get_groupids.return_value = ['group:Readers']
+    def test_userid_with_groups_and_group_roles(self, request, mock_user_locator):
+        mock_user_locator.get_role_and_group_roleids.return_value = ['group:Readers']
         assert self._call_fut('userid', request) == ['group:Readers']
 
-    def test_userid_with_groups_roles(self, request, mock_group_locator,
-                                      mock_user_locator):
-        mock_user_locator.get_groupids.return_value = ['group:Readers']
-        mock_group_locator.get_roleids.return_value = ['role:reader']
-        self._call_fut('userid', request) == ['group:Readers', 'role:reader']
-        assert mock_group_locator.get_roleids.call_args[0] == ('group:Readers',)
-        
 
 class TestIntegrationSendRegistrationMail:
 

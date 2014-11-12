@@ -102,28 +102,27 @@ class TestRoot:
         assert user_god.email == 'c@test.de'
 
     def test_create_root_with_initial_god_group(self, registry, request_):
+        from substanced.util import find_service
         from adhocracy_core.resources.root import IRootPool
-        from adhocracy_core.interfaces import IGroupLocator
         from adhocracy_core.sheets.principal import IGroup
         from adhocracy_core.utils import get_sheet
         inst = registry.content.create(IRootPool.__identifier__)
-        locator = registry.getMultiAdapter((inst, request_), IGroupLocator)
-        group_gods = locator.get_group_by_id('gods')
+        groups = find_service(inst, 'principals', 'groups')
+        group_gods = groups['gods']
         group_sheet = get_sheet(group_gods, IGroup)
         group_users = [x.__name__ for x in group_sheet.get()['users']]
         group_roles = group_sheet.get()['roles']
-        assert not group_gods is None
         assert group_users == ['0000000']
         assert group_roles == ['god']
 
     def test_includeme_registry_add_default_group(self, registry, request_):
+        from substanced.util import find_service
         from adhocracy_core.resources.root import IRootPool
-        from adhocracy_core.interfaces import IGroupLocator
         from adhocracy_core.sheets.principal import IGroup
         from adhocracy_core.utils import get_sheet
         inst = registry.content.create(IRootPool.__identifier__)
-        locator = registry.getMultiAdapter((inst, request_), IGroupLocator)
-        group = locator.get_group_by_id('authenticated')
+        groups = find_service(inst, 'principals', 'groups')
+        group = groups['authenticated']
         group_sheet = get_sheet(group, IGroup)
         group_users = [x.__name__ for x in group_sheet.get()['users']]
         group_roles = group_sheet.get()['roles']

@@ -347,22 +347,10 @@ def mock_user_locator(registry) -> Mock:
     locator.get_user_by_userid.return_value = None
     locator.get_user_by_login.return_value = None
     locator.get_user_by_email.return_value = None
+    locator.get_group_roleids.return_value = None
+    locator.get_role_and_group_roleids.return_value = None
     registry.registerAdapter(lambda y, x: locator, (Interface, Interface),
                              IRolesUserLocator)
-    return locator
-
-
-@fixture
-def mock_group_locator(registry) -> Mock:
-    """Mock :class:`adhocracy.resource.principal.GroupLocatorAdapter`."""
-    from zope.interface import Interface
-    from adhocracy_core.interfaces import IGroupLocator
-    from adhocracy_core.resources.principal import GroupLocatorAdapter
-    locator = Mock(spec=GroupLocatorAdapter)
-    locator.get_group_by_id.return_value = None
-    locator.get_roleids.return_value = None
-    registry.registerAdapter(lambda x, y: locator, (Interface, Interface),
-                             IGroupLocator)
     return locator
 
 
