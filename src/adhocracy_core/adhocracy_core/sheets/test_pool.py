@@ -183,19 +183,19 @@ class TestIntegrationPoolSheet:
         pool = self._make_resource(registry, parent=pool_graph_catalog)
         poolsheet = self._get_pool_sheet(pool)
         child = self._make_resource(registry, parent=pool, name='child')
-        assert ISheet.providedBy(child)  # default element target isheet
+        assert ISheet.providedBy(child)  # ISheet is the default element target isheet
         assert poolsheet._reference_nodes['elements'].reftype.getTaggedValue('target_isheet') == ISheet
         assert poolsheet.get() == {'elements': [child]}
 
     def test_get_not_empty_without_target_isheet(self, registry,
                                                  pool_graph_catalog):
-        from adhocracy_core.sheets.rate import IRate
+        from adhocracy_core.interfaces import ISheet
+        from zope.interface.declarations import noLongerProvides
         pool = self._make_resource(registry, parent=pool_graph_catalog)
         poolsheet = self._get_pool_sheet(pool)
         child = self._make_resource(registry, parent=pool, name='child')
-        assert not IRate.providedBy(child)
-        poolsheet._reference_nodes['elements'].reftype.setTaggedValue(
-            'target_isheet', IRate)
+        noLongerProvides(child, ISheet)
+        assert poolsheet._reference_nodes['elements'].reftype.getTaggedValue('target_isheet') == ISheet
         assert poolsheet.get() == {'elements': []}
 
     def test_get_reference_appstruct_without_params(self, registry,
