@@ -184,6 +184,8 @@ extra rule:
     Versions 0.0.* are considered alpha and do not have to follow the
     major-minor-patch rules of semantic versioning.
 
+Git tag and `setup.py`-version must be the same string.
+
 In order to create a new version, first make sure that:
 
     1. you are on master.  (this rule is motivated by the fact that
@@ -199,7 +201,7 @@ Then, to upgrade to version 0.0.3, carry out the following steps:
     4. update `setup.py` to the new version (search for `name=...` and
        `version=...`).  Commit this change.
 
-    5. `git tag -a v0.0.3 -m '...'`.  The commit comment can be
+    5. `git tag -a 0.0.3 -m '...'`.  The commit comment can be
        literally `'...'` if there is nothing special to say about this
        release, or something like e.g. `Presentation <customer>
        <date>`.
@@ -210,14 +212,14 @@ Then, to upgrade to version 0.0.3, carry out the following steps:
 Browse existing tags and check out a specific release::
 
     git tag
-    git checkout v1.8.19
+    git checkout 1.8.19
 
 Apply a hotfix to an old release::
 
-    git checkout -b v1.8.19-hotfix-remote-root-exploit v1.8.19
+    git checkout -b 1.8.19-hotfix-remote-root-exploit 1.8.19
     ...  # (edit)
     git commit ...
-    git tag -a v1.8.20 -m 'Fix: remote-root exploit'
+    git tag -a 1.8.20 -m 'Fix: remote-root exploit'
 
 There is more to tags, such as deleting and signing.  See `git tag
 --help`.
