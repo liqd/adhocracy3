@@ -174,3 +174,50 @@ Check whether new Python versions exist::
 
 You may then update the pinned Python versions in `versions.cfg` if
 appropriate.
+
+Adhocracy Releases
+------------------
+
+Adhocracy uses `semantic versions <http://semver.org/>`_ with one
+extra rule:
+
+    Versions 0.0.* are considered alpha and do not have to follow the
+    major-minor-patch rules of semantic versioning.
+
+In order to create a new version, first make sure that:
+
+    1. you are on master.  (this rule is motivated by the fact that
+       rebasing tags is really nothing we want to have to deal with.)
+
+    2. the last commit contains everything you want to release and
+       nothing else.
+
+    3. you have git-pushed everything to origin.
+
+Then, to upgrade to version 0.0.3, carry out the following steps:
+
+    4. update `setup.py` to the new version (search for `name=...` and
+       `version=...`).  Commit this change.
+
+    5. `git tag -a v0.0.3 -m '...'`.  The commit comment can be
+       literally `'...'` if there is nothing special to say about this
+       release, or something like e.g. `Presentation <customer>
+       <date>`.
+
+    6. `git push --tags` (`git push` ignores tags by default, even
+       though `git fetch` and `git pull` don't).
+
+Browse existing tags and check out a specific release::
+
+    git tag
+    git checkout v1.8.19
+
+Apply a hotfix to an old release::
+
+    git checkout -b v1.8.19-hotfix-remote-root-exploit v1.8.19
+    ...  # (edit)
+    git commit ...
+    git tag -a v1.8.20 -m 'Fix: remote-root exploit'
+
+There is more to tags, such as deleting and signing.  See `git tag
+--help`.

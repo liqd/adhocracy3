@@ -16,7 +16,7 @@ test_requires = ['adhocracy_mercator[test]',
                  ]
 
 setup(name='mercator',
-      version='0.0',
+      version='0.0.1',
       description='Adhocracy backend/frontend server for Mercator.',
       long_description=README + '\n\n' + CHANGES,
       classifiers=["Programming Language :: Python",
