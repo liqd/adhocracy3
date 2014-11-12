@@ -6,6 +6,7 @@ import ResourcesBase = require("../../ResourcesBase");
 
 import RIRate = require("../../Resources_/adhocracy_core/resources/rate/IRate");
 import RIRateVersion = require("../../Resources_/adhocracy_core/resources/rate/IRateVersion");
+import SILikeable = require("../../Resources_/adhocracy_core/sheets/rate/ILikeable");
 import SIMetadata = require("../../Resources_/adhocracy_core/sheets/metadata/IMetadata");
 import SIRateable = require("../../Resources_/adhocracy_core/sheets/rate/IRateable");
 import SIRate = require("../../Resources_/adhocracy_core/sheets/rate/IRate");
@@ -69,11 +70,20 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
     }
 
     isRateable(resource : ResourcesBase.Resource) : boolean {
-        return resource.data.hasOwnProperty(SIRateable.nick);
+        return (
+            resource.data.hasOwnProperty(SIRateable.nick) ||
+            resource.data.hasOwnProperty(SILikeable.nick)
+        );
     }
 
     rateablePostPoolPath(resource : ResourcesBase.Resource) : string {
-        return resource.data[SIRateable.nick].post_pool;
+        if (resource.data.hasOwnProperty(SIRateable.nick)) {
+            return resource.data[SIRateable.nick].post_pool;
+        } else if (resource.data.hasOwnProperty(SILikeable.nick)) {
+            return resource.data[SILikeable.nick].post_pool;
+        } else {
+            throw "could not find any sub-sheet of IRateable!";
+        }
     }
 
     subject(resource : RIRateVersion) : string;
