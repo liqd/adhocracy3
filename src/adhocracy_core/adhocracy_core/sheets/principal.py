@@ -55,6 +55,7 @@ class GroupSchema(colander.MappingSchema):
 group_metadata = sheet_metadata_defaults._replace(
     isheet=IGroup,
     schema_class=GroupSchema,
+    sheet_class=AttributeStorageSheet,
 )
 
 
@@ -171,6 +172,7 @@ permissions_metadata = sheet_metadata_defaults._replace(
     schema_class=PermissionsSchema,
     permission_create='manage_principals',
     permission_edit='manage_principals',
+    sheet_class=AttributeStorageSheet,
 )
 
 
