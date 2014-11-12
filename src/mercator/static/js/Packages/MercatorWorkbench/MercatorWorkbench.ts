@@ -4,9 +4,11 @@ import AdhComment = require("../Comment/Comment");
 import AdhConfig = require("../Config/Config");
 import AdhListing = require("../Listing/Listing");
 import AdhMercatorProposal = require("../MercatorProposal/MercatorProposal");
+import AdhResourceArea = require("../ResourceArea/ResourceArea");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 
+import RIBasicPool = require("../../Resources_/adhocracy_core/resources/pool/IBasicPool");
 import RIMercatorProposalVersion = require("../../Resources_/adhocracy_mercator/resources/mercator/IMercatorProposalVersion");
 
 var pkgLocation = "/MercatorWorkbench";
@@ -89,6 +91,12 @@ export var register = (angular) => {
             AdhTopLevelState.moduleName,
             AdhUser.moduleName
         ])
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
+            adhResourceAreaProvider
+                .whenView(RIBasicPool.content_type, "create_proposal", {
+                    movingColumns: "is-show-hide-hide"
+                });
+        }])
         .directive("adhMercatorWorkbench", ["adhConfig", (adhConfig) =>
             new MercatorWorkbench().createDirective(adhConfig)]);
 };
