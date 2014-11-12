@@ -106,6 +106,18 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         $translateProvider.fallbackLanguage("en");
     }]);
 
+    // update hash when using anchor scroll
+    app.run(($rootScope, $location) => {
+        $rootScope.$on("duScrollspy:becameActive", ($event, $element) => {
+          // Automaticly update location
+          var hash = $element.prop("hash");
+          if (hash) {
+            $location.hash(hash.substr(1)).replace();
+            $rootScope.$apply();
+          }
+        });
+    });
+
     app.value("angular", angular);
     app.value("Modernizr", modernizr);
     app.value("moment", moment);
