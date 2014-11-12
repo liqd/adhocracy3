@@ -1,9 +1,15 @@
 """Sheets for Mercator proposals."""
 import colander
 
+from substanced.util import find_catalog
+from substanced.catalog import Keyword
+
 from adhocracy_core.interfaces import ISheet
+from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
+from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.schema import AdhocracySchemaNode
@@ -267,25 +273,30 @@ details_meta = sheet_metadata_defaults._replace(isheet=IDetails,
                                                 schema_class=DetailsSchema)
 
 
-def index_location(resource, default):
-    """Return values of the "location_is_..." fields."""
-    # FIXME?: can we pass the registry to get_sheet here?
-    sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
-    sub_resources_appstruct = sub_resources_sheet.get()
+LOCATION_INDEX_KEYWORDS = ['specific', 'online', 'linked_to_ruhr']
 
-    details_resource = sub_resources_appstruct['details']
-    locations = []
 
-    # FIXME: Why is details_resource '' in the first pass of that function
+def index_location(resource, default) -> list:
+    """Return search index keywords based on the "location_is_..." fields."""
+    details = _get_sheet_field(resource, IMercatorSubResources, 'details')
+    # FIXME: Why is details '' in the first pass of that function
     # during MercatorProposal create?
-    if details_resource:
-        details_sheet = get_sheet(details_resource, IDetails)
-        details_appstruct = details_sheet.get()
-
-        for value in ('specific', 'online', 'linked_to_ruhr'):
-            if details_appstruct['location_is_' + value]:
-                locations.append(value)
+    if details is None or details == '':
+        return default
+    locations = []
+    for keyword in LOCATION_INDEX_KEYWORDS:
+        if _get_sheet_field(details, IDetails, 'location_is_' + keyword):
+            locations.append(keyword)
     return locations if locations else default
+
+
+def add_mercator_location_index_subscriber(event):
+    """Add mercator_location index to the adhocracy catalog."""
+    catalog = find_catalog(event.object, 'adhocracy')
+    index = Keyword()('adhocracy', 'mercator_location')
+    index.__sdi_deletable__ = False
+    catalog.replace('mercator_location', index)
+    catalog.reindex(indexes=['mercator_location'])
 
 
 class StorySchema(colander.MappingSchema):
@@ -333,7 +344,9 @@ class FinanceSchema(colander.MappingSchema):
     """Data structure for financial aspects."""
 
     budget = CurrencyAmount(missing=colander.required)
-    requested_funding = CurrencyAmount(missing=colander.required)
+    requested_funding = CurrencyAmount(
+        missing=colander.required,
+        validator=colander.Range(min=0, max=50000))
     other_sources = SingleLine()
     granted = Boolean()
     # financial_plan = AssetPath()  # (2 Mb. max.)
@@ -343,27 +356,38 @@ finance_meta = sheet_metadata_defaults._replace(isheet=IFinance,
                                                 schema_class=FinanceSchema)
 
 
-BUDGET_LIMITS = [5000, 10000, 20000, 50000]
+BUDGET_INDEX_LIMIT_KEYWORDS = [5000, 10000, 20000, 50000]
 
 
-def index_budget(resource, default):
-    """Return values of the "location_is_..." fields."""
-    sub_resources_sheet = get_sheet(resource, IMercatorSubResources)
-    sub_resources_appstruct = sub_resources_sheet.get()
-
-    finance_resource = sub_resources_appstruct['finance']
-
-    # FIXME: Why is finance_resource '' in the first pass of that function
+def index_budget(resource: IResource, default) -> str:
+    """Return search index keyword based on the "requested_funding" field."""
+    # FIXME: Why is finance '' in the first pass of that function
     # during MercatorProposal create?
-    if finance_resource:
-        finance_sheet = get_sheet(finance_resource, IFinance)
-        finance_appstruct = finance_sheet.get()
-
-        for limit in BUDGET_LIMITS:
-            if finance_appstruct['budget'] < limit:
-                return [str(limit)]
-
+    # This sounds like a bug, the default value for References is None,
+    # Note: you should not cast resources to Boolean because a resource without
+    # sub resources is equal False [joka]
+    finance = _get_sheet_field(resource, IMercatorSubResources, 'finance')
+    if finance is None or finance == '':
+            return default
+    funding = _get_sheet_field(finance, IFinance, 'requested_funding')
+    for limit in BUDGET_INDEX_LIMIT_KEYWORDS:
+        if funding <= limit:
+            return [str(limit)]
     return default
+
+
+def _get_sheet_field(resource, isheet: ISheet, field_name: str) -> object:
+    sheet = get_sheet(resource, isheet)
+    field = sheet.get()[field_name]
+    return field
+
+
+def add_mercator_budget_index_subscriber(event):
+    """Add mercator_budget index to the adhocracy catalog."""
+    catalog = find_catalog(event.object, 'adhocracy')
+    index = Keyword()('adhocracy', 'mercator_budget')
+    catalog.replace('mercator_budget', index)
+    catalog.reindex(indexes=['mercator_budget'])
 
 
 class ExperienceSchema(colander.MappingSchema):
@@ -417,3 +441,9 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='mercator_budget',
                          context=IMercatorSubResources)
+    config.add_subscriber(add_mercator_location_index_subscriber,
+                          IResourceCreatedAndAdded,
+                          interface=IRootPool)
+    config.add_subscriber(add_mercator_budget_index_subscriber,
+                          IResourceCreatedAndAdded,
+                          interface=IRootPool)
