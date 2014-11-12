@@ -1,57 +1,44 @@
 <div class="mercator-proposal-detail-view" id="mercator-detail-view-top">
-    <nav class="mercator-detail-nav"> <!-- class="mercator-proposal-nav" -->
-        <ol data-du-scroll-container="moving-column2-body" data-du-smooth-scroll="">
-            <li><a href="#mercator-detail-view-brief-proposal" data-du-smooth-scroll="">{{ "Brief Proposal" | translate }}</a></li>
-            <li><a href="#mercator-detail-view-detailed-proposal" data-du-smooth-scroll="">{{ "Detailed Proposal" | translate }}</a></li>
-            <li><a href="#mercator-detail-view-goals-and-vision" data-du-smooth-scroll="">{{ "Goals and Vision" | translate }}</a></li>
-            <li><a href="#mercator-detail-view-additional" data-du-smooth-scroll="">{{ "Additional" | translate }}</a></li>
-        </ol>
-    </nav>
+    <div class="cover">
+        <h2>{{ data.introduction.title }}
+            <span class="pull-right">
+                <!-- FIXME: Dummy data -->
+                <i class="icon-speachbubble-outline"></i> 3
+            </span>
+        </h2>
 
-    <div class="mercator-detail-body" data-du-scroll-container="moving-column2-body">
-
-        <div class="cover">
-            <h2>{{ data.introduction.title }}
-                <span class="pull-right">
-                    <!-- FIXME: Dummy data -->
-                    <i class="icon-speachbubble-outline"></i> 3
-                </span>
-            </h2>
-
-            <ul class="meta">
-                <li>
-                    <strong>{{data.finance.requested_funding}} &euro;</strong> requested
-                </li>
-                <li>
-                    <!-- FIXME: Link to profile -->
-                    <a href="#">{{data.user_info.first_name}} {{data.user_info.last_name}}</a>
-                </li>
-                <li>
-                    {{ data.basic.createtime }}
-                    published
-                </li>
-            </ul>
-            <ul class="meta">
-                <li>
-                    <!-- FIXME: Dummy data -->
-                    <i class="icon-speachbubble-outline"></i> 33
-                </li>
-                <li>
-                    <!-- FIXME: Dummy data -->
-                    231 supporters
-                </li>
-                <li>
-                    <adh-like data-refers-to="{{path}}"
-                        data-post-pool-sheet="adhocracy.sheets.rate.ILikeable"
-                        data-post-pool-field="post_pool">
-                    </adh-like>
-                </li>
-            </ul>
-        </div><!-- /.meta -->
-        <button type="button" class="hidden" data-ng-click="showComments()">{{ "Show comments" | translate }}</button>
+        <ul class="meta">
+            <li>
+                <strong>{{data.finance.requested_funding}} &euro;</strong> requested
+            </li>
+            <li>
+                <!-- FIXME: Link to profile -->
+                <a href="#">{{data.user_info.first_name}} {{data.user_info.last_name}}</a>
+            </li>
+            <li>
+                {{ data.basic.createtime }}
+                published
+            </li>
+        </ul>
+        <ul class="meta">
+            <li>
+                <!-- FIXME: Dummy data -->
+                <i class="icon-speachbubble-outline"></i> 33
+            </li>
+            <li>
+                <!-- FIXME: Dummy data -->
+                231 supporters
+            </li>
+            <li>
+                <adh-like data-refers-to="{{path}}"
+                    data-post-pool-sheet="adhocracy.sheets.rate.ILikeable"
+                    data-post-pool-field="post_pool">
+                </adh-like>
+            </li>
+        </ul>
     </div><!-- /.cover -->
     <nav class="mercator-detail-nav"> <!-- class="mercator-proposal-nav" -->
-        <ol>
+        <ol data-du-scroll-container="moving-column2-body" data-du-smooth-scroll="">
             <li><a href="#mercator-detail-view-brief-proposal" data-du-smooth-scroll="">{{ "Brief Proposal" | translate }}</a></li>
             <li><a href="#mercator-detail-view-detailed-proposal" data-du-smooth-scroll="">{{ "Detailed Proposal" | translate }}</a></li>
             <li><a href="#mercator-detail-view-goals-and-vision" data-du-smooth-scroll="">{{ "Goals and Vision" | translate }}</a></li>
