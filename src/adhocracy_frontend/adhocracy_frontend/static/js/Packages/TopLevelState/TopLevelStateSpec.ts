@@ -81,12 +81,12 @@ export var register = () => {
 
                     it("returns area with route method", () => {
                         var area = adhTopLevelStateWithPrivates.getArea();
-                        expect(area.route).not.toBeUndefined();
+                        expect(area.route).toBeDefined();
                     });
 
                     it("returns area with reverse method", () => {
                         var area = adhTopLevelStateWithPrivates.getArea();
-                        expect(area.reverse).not.toBeUndefined();
+                        expect(area.reverse).toBeDefined();
                     });
 
                     describe("returns area with template", () => {
