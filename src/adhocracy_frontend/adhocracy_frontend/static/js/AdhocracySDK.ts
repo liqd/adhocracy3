@@ -84,8 +84,18 @@
             $ = (<any>window).jQuery.noConflict(true);
 
             $(window).on("message", (event) => {
-                var message = JSON.parse(event.originalEvent.data);
-                handleMessage(message.name, message.data, event.originalEvent.source);
+                // Only parse messages from embedded windows
+                //
+                // FIXME: We should maintain a list of embedded windows
+                if (event.originalEvent.source !== window) {
+                    try {
+                        var message = JSON.parse(event.originalEvent.data);
+                        handleMessage(message.name, message.data, event.originalEvent.source);
+                    } catch (e) {
+                        // Make invalid messages fail silently as it may come
+                        // from another window
+                    }
+                }
             });
 
             callback(adhocracy);

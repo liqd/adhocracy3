@@ -174,8 +174,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
 
     // NOTE: _update takes an item *version*, whereas _create
     // constructs an *item plus a new version*.
-    public _update(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
-    mercatorProposalVersion : R) : ng.IPromise<void> {
+    public _update(
+        instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>,
+        mercatorProposalVersion : R
+    ) : ng.IPromise<void> {
         var data = this.initializeScope(instance.scope);
 
         data.user_info.first_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].personal_name;
@@ -864,20 +866,7 @@ export var register = (angular) => {
             AdhResourceWidgets.moduleName,
             AdhTopLevelState.moduleName
         ])
-        .config(["adhResourceAreaProvider", "adhTopLevelStateProvider", (
-            adhResourceAreaProvider : AdhResourceArea.Provider,
-            adhTopLevelStateProvider : AdhTopLevelState.Provider
-        ) => {
-            adhTopLevelStateProvider
-                .when("mercator", ["adhConfig", "$rootScope", (adhConfig, $scope) : AdhTopLevelState.IAreaInput => {
-                    $scope.path = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
-                    return {
-                        template: "<adh-resource-wrapper>" +
-                            "<adh-mercator-proposal-create data-path=\"@preliminary\"" +
-                            "data-mode=\"edit\" data-pool-path=\"{{path}}\">" +
-                            "</adh-mercator-proposal-create></adh-resource-wrapper>"
-                    };
-                }]);
+        .config(["adhResourceAreaProvider", (adhResourceAreaProvider : AdhResourceArea.Provider) => {
             adhResourceAreaProvider
                 .when(RIMercatorProposal.content_type, {
                      space: "content",

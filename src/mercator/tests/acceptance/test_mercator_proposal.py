@@ -10,7 +10,7 @@ class TestMercatorForm:
     @fixture(scope='class')
     def browser(self, browser):
         login_god(browser)
-        browser.visit(browser.app_url + 'mercator')
+        browser.visit(browser.app_url + 'r/mercator/@create_proposal')
         return browser
 
     def test_fill_all_fields(self, browser):

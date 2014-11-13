@@ -349,12 +349,13 @@ export var rateController = (
 
 
 export var createDirective = (
+    template : string,
     adapter : IRateAdapter<any>,
     adhConfig : AdhConfig.IService
 ) => {
     return {
         restrict: "E",
-        templateUrl: adhConfig.pkg_path + pkgLocation + "/Rate.html",
+        templateUrl: adhConfig.pkg_path + pkgLocation + template,
         scope: {
             refersTo: "@",
             postPoolSheet : "@",
@@ -380,6 +381,13 @@ export var register = (angular) => {
         ])
         .directive("adhRate", ["$q", "adhConfig", "adhPreliminaryNames", ($q, adhConfig, adhPreliminaryNames) =>
             createDirective(
+                "/Rate.html",
+                new Adapter.RateAdapter(),
+                adhConfig
+            )])
+        .directive("adhLike", ["$q", "adhConfig", "adhPreliminaryNames", ($q, adhConfig, adhPreliminaryNames) =>
+            createDirective(
+                "/Like.html",
                 new Adapter.RateAdapter(),
                 adhConfig
             )]);
