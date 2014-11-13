@@ -193,9 +193,8 @@ class TestResourcePropertySheet:
 
     def test_notify_resource_sheet_modified(self, sheet_meta, context, config):
         from adhocracy_core.interfaces import IResourceSheetModified
-        events = []
-        listener = lambda event: events.append(event)
-        config.add_subscriber(listener, IResourceSheetModified)
+        from adhocracy_core.testing import create_event_listener
+        events = create_event_listener(config, IResourceSheetModified)
         inst = self.make_one(sheet_meta, context)
 
         inst.set({'count': 2})
