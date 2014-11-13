@@ -134,6 +134,17 @@ export var platformDirective = (adhTopLevelState : AdhTopLevelState.Service) => 
 };
 
 
+export var resourceUrl = (adhConfig : AdhConfig.IService) => {
+    return (path : string, view? : string) => {
+        var url = "/r" + path.replace(adhConfig.rest_url, "");
+        if (typeof view !== "undefined") {
+            url += "/@" + view;
+        }
+        return url;
+    };
+};
+
+
 export var moduleName = "adhResourceArea";
 
 export var register = (angular) => {
@@ -147,5 +158,6 @@ export var register = (angular) => {
                 .when("r", ["adhResourceArea", (adhResourceArea : Service) => adhResourceArea]);
         }])
         .directive("adhPlatform", ["adhTopLevelState", platformDirective])
-        .provider("adhResourceArea", Provider);
+        .provider("adhResourceArea", Provider)
+        .filter("adhResourceUrl", ["adhConfig", resourceUrl]);
 };
