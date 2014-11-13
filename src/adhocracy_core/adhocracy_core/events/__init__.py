@@ -5,6 +5,7 @@ https://substanced.readthedocs.org/en/latest/api.html#module-substanced.event
 
 """
 from pyramid.request import Request
+from pyramid.registry import Registry
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.interface.interfaces import IInterface
@@ -13,6 +14,7 @@ from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
 from adhocracy_core.interfaces import IResourceSheetModified
+from adhocracy_core.interfaces import ILocalRolesModfied
 from adhocracy_core.interfaces import ISheet
 
 
@@ -116,6 +118,19 @@ class SheetReferencedItemHasNewVersion:
         self.registry = registry
         self.creator = creator
         self.root_versions = root_versions
+
+
+@implementer(ILocalRolesModfied)
+class LocalRolesModified:
+
+    """An event type send when an resource`s :term:`local role` is modified."""
+
+    def __init__(self, object, new_local_roles: dict, old_local_roles: dict,
+                 registry: Registry):
+        self.object = object
+        self.new_local_roles = new_local_roles
+        self.old_local_roles = old_local_roles
+        self.registry = registry
 
 
 class _ISheetPredicate:

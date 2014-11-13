@@ -1,7 +1,6 @@
 """Resource type configuration and default factory."""
 from datetime import datetime
 
-from persistent.mapping import PersistentMapping
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_registry
 from pyramid.config import Configurator
@@ -14,6 +13,7 @@ from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 from substanced.interfaces import IRoot
 
+from adhocracy_core.authorization import set_local_roles
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import IPool
 from adhocracy_core.interfaces import IItemVersion
@@ -170,8 +170,7 @@ class ResourceFactory:
 
         if creator is not None:
             userid = resource_path(creator)
-            resource.__local_roles__ = PersistentMapping()
-            resource.__local_roles__[userid] = ['role:creator']
+            set_local_roles(resource, {userid: {'role:creator'}})
 
         if IMetadata.providedBy(resource):
             metadata = self._get_metadata(resource, creator, registry)
