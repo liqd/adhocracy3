@@ -39,11 +39,31 @@
             </div>
         </div>
         <div class="moving-column moving-column-content">
-            <div class="moving-column-menu placeholder"></div>
-            <div class="moving-column-body" data-du-scroll-container="">
-                <adh-resource-wrapper>
-                    <adh-mercator-proposal-detail-view data-ng-if="content2Url" data-path="{{content2Url}}"></adh-mercator-proposal-detail-view>
-                </adh-resource-wrapper>
+            <div data-ng-switch="view">
+                <div data-ng-switch-when="edit">
+                    <div class="moving-column-menu placeholder"></div>
+                    <div class="moving-column-body" data-du-scroll-container="">
+                        <adh-resource-wrapper data-on-submit="" data-on-cancel="">
+                            <adh-mercator-proposal-create
+                                data-ng-if="content2Url"
+                                data-path="{{content2Url}}"
+                                data-mode="edit"
+                                data-pool-path="{{path}}">
+                            </adh-mercator-proposal-create>
+                        </adh-resource-wrapper>
+                    </div>
+                </div>
+                <div data-ng-switch-default="">
+                    <div class="moving-column-menu">
+                        <!-- FIXME -->
+                        <a href="{{content2Url}}/@edit">{{ "edit" | translate }}</a>
+                    </div>
+                    <div class="moving-column-body" data-du-scroll-container="">
+                        <adh-resource-wrapper>
+                            <adh-mercator-proposal-detail-view data-ng-if="content2Url" data-path="{{content2Url}}"></adh-mercator-proposal-detail-view>
+                        </adh-resource-wrapper>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="moving-column moving-column-content2">
