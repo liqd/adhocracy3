@@ -23,10 +23,8 @@
 @import "components/user_indicator";
 @import "components/comment";
 @import "components/annotated_section";
-@import "components/proposal";
-@import "components/mercator_proposal";
-@import "components/chapters";
 @import "components/commentable_section";
+@import "components/mercator_proposal";
 
 // Debug (these should not be importet in productive setups
 @import "debug/placeholder";

@@ -24,7 +24,7 @@ $columns: 6;
     }
 }
 
-.mercator-proposal-nav {
+.mercator-proposal-form-nav {
     position: absolute;
     width: column-width(1);
     border: 1px solid $color-structure-border;
@@ -37,5 +37,32 @@ $columns: 6;
         &.active {
             font-weight: bold;
         }
+    }
+}
+
+.mercator-proposal-cover {
+    @include clearfix;
+
+    .proposal-meta {
+        .proposal-meta-column {
+            float: left;
+        }
+    }
+}
+
+.mercator-proposal-detail-nav {
+    float: left;
+    width: column-width(2);
+}
+
+.mercator-proposal-chapters {
+    float: left;
+    width: column-width(4);
+}
+
+.chapter {
+    .chapter-header {
+        background-color: $color-secondary-introvert;
+        padding: 0.5em 1em;
     }
 }
