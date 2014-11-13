@@ -2,11 +2,11 @@
     border-bottom: 1px solid $color-secondary-introvert;
     margin-bottom: 1em;
     padding-bottom: 1em;
-    padding-right: column-width(1);
+    padding-right: 30%;
     position: relative;
 
     .show-comments {
-        min-width: column-width(1);
+        min-width: 30%;
         position: absolute;
         right: 0;
         top: 0;
