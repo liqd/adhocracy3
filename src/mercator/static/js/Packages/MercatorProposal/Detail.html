@@ -239,14 +239,8 @@
 
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Where did you find out about Advocate Europe?" | translate }}</h3>
-                <!-- FIXME: do we really want to display that for
-                everybody?  shouldn't we offer to pull that out of
-                the database and send the statistics to mercator
-                separately?  it seems odd to show that information
-                to other users.  especially the fact that you can
-                comment on it.  :) -->
-                <!-- FIXME: if we want to keep this: javascript data
-                contains boolean fields that contain string
+                <!-- FIXME: This should only be displayed to mercator people. -->
+                <!-- FIXME: javascript data contains boolean fields that contain string
                 "false", which evaluate to true.  not sure what's
                 going on there, but it can't be very complicated. -->
                 <p><span data-ng-if="data.heard_from.colleague">colleague</span>
