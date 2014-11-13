@@ -5,7 +5,7 @@ from pytest import fixture
 from pytest import mark
 
 
-def test_create_adhocracy_catalog_factory():
+def test_create_adhocracy_catalog_indexes():
     from substanced.catalog import Keyword
     from . import AdhocracyCatalogIndexes
     from . import Reference
@@ -13,9 +13,6 @@ def test_create_adhocracy_catalog_factory():
     assert isinstance(inst.tag, Keyword)
     assert isinstance(inst.reference, Reference)
 
-    def setUp(self):
-        self.config = testing.setUp()
-        self.config.include('adhocracy_core.catalog')
 
 @fixture
 def integration(config):
