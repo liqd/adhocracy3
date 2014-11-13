@@ -6,6 +6,7 @@
                 <i class="icon-speachbubble-outline"></i> 3
             </span>
         </h2>
+
         <ul class="proposal-meta">
             <li class="proposal-meta-column">
                 <strong>{{data.finance.requested_funding}} &euro;</strong> requested
@@ -34,6 +35,7 @@
             </li>
         </ul>
     </div><!-- /.cover -->
+
     <nav class="mercator-proposal-detail-nav">
         <ol>
             <li><a href="#mercator-detail-view-brief-proposal" data-du-smooth-scroll="">{{ "Brief Proposal" | translate }}</a></li>
@@ -42,9 +44,11 @@
             <li><a href="#mercator-detail-view-additional" data-du-smooth-scroll="">{{ "Additional" | translate }}</a></li>
         </ol>
     </nav>
+
     <div class="mercator-proposal-chapters">
         <section class="chapter" id="mercator-detail-view-brief-proposal">
             <h2 class="chapter-header">{{ "Brief Proposal" | translate }}</h2>
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Pitch (Teaser)" | translate }}</h3>
                 <p>{{ data.introduction.teaser }}</p>
@@ -53,6 +57,7 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Where will this project take place?" | translate }}</h3>
                 <ul>
@@ -67,12 +72,15 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Finance" | translate }}</h3>
+
                 <p class="text-functional"><strong>{{ data.finance.budget }} &euro;</strong> {{ "total project budget" | translate }}</p>
                 <p class="text-functional"><strong>{{ data.finance.requested_funding }} &euro;</strong> {{ "requested" | translate }}</p>
                 <p data-ng-if="data.finance.granted"><strong class="color-highlight-valid">project is granted</strong></p>
                 <p class="functional-introvert">{{ data.finance.other_sources }}</p>
+
                 <!-- FIXME: the context in which this text is
                 displayed gives a lot less clue about what the
                 text is about than the context of the same text in
@@ -86,6 +94,7 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Who is behind it?" | translate }}</h3>
                 <!-- FIXME: using form user name rather than profile
@@ -161,10 +170,13 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
         </section><!-- /chapter -->
+
         <section class="chapter" id="mercator-detail-view-detailed-proposal">
             <h2 class="chapter-header">{{ "Detailed Proposal" | translate }}</h2>
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Description?" | translate }}</h3>
                 <p>{{ data.details.description }}</p>
@@ -173,6 +185,7 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Story behind the idea" | translate }}</h3>
                 <p>{{ data.story }}</p>
@@ -181,10 +194,13 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
         </section><!-- /chapter -->
+
         <section class="chapter" id="mercator-detail-view-goals-and-vision">
             <h2 class="chapter-header">{{ "Goals and Vision" | translate }}</h2>
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "What would be a successful outcome of your project or initiative?" | translate }}</h3>
                 <p>{{ data.outcome }}</p>
@@ -193,6 +209,7 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "How do you want to get there?" | translate }}</h3>
                 <p>{{ data.steps }}</p>
@@ -201,6 +218,7 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Why does Europe need your idea?" | translate }}</h3>
                 <p>{{ data.value }}</p>
@@ -209,6 +227,7 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Partner organisations and members list" | translate }}</h3>
                 <p>{{ data.partners }}</p>
@@ -217,8 +236,10 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
         </section>
+
         <section class="chapter" id="mercator-detail-view-additional">
             <h2 class="chapter-header">{{ "Additional" | translate }}</h2>
             <section class="commentable-section">
@@ -229,6 +250,7 @@
                     <i class="icon-speachbubble-outline"></i> 3
                 </button>
             </section><!-- /.commentable-section -->
+
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Where did you find out about Advocate Europe?" | translate }}</h3>
                 <!-- FIXME: do we really want to display that for
@@ -252,9 +274,10 @@
                 </button>
             </section><!-- /.commentable-section -->
         </section>
-            <div>[here you should see a second manifestation of the
-            support butten in the cover section.  obviously, if one of
-            them is clicked, the other should change automatically.]</div>
+
+        <div>[here you should see a second manifestation of the
+        support butten in the cover section.  obviously, if one of
+        them is clicked, the other should change automatically.]</div>
         <a href="#mercator-detail-view-top" data-du-smooth-scroll="">Back to top</a>
     </div><!-- /.mercator-detail-body -->
 </div><!-- /.mercator-proposal-detail-view -->
