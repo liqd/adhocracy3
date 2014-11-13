@@ -14,6 +14,7 @@ from pyramid.traversal import resource_path_tuple
 from pytest import fixture
 from substanced.objectmap import ObjectMap
 from substanced.objectmap import find_objectmap
+from zope.interface.interfaces import IInterface
 import colander
 
 from adhocracy_core.interfaces import SheetMetadata, ChangelogMetadata
@@ -135,6 +136,14 @@ def add_and_register_sheet(context, mock_sheet, registry):
     registry.registerAdapter(lambda x: mock_sheet, (isheet,),
                              IResourceSheet,
                              isheet.__identifier__)
+
+
+def create_event_listener(config: Configurator, ievent: IInterface) -> list:
+    """Register dummy event listener that adds events to the returned List."""
+    events = []
+    listener = lambda event: events.append(event)
+    config.add_subscriber(listener, ievent)
+    return events
 
 
 ##################

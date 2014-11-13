@@ -12,6 +12,7 @@ from pytz import UTC
 from substanced.content import add_content_type
 from zope.interface import directlyProvides
 from zope.interface import alsoProvides
+from substanced.interfaces import IRoot
 
 from adhocracy_core.interfaces import ResourceMetadata
 from adhocracy_core.interfaces import IPool
@@ -84,7 +85,8 @@ class ResourceFactory:
     def _notify_new_resource_created_and_added(self, resource, registry,
                                                creator):
         has_parent = resource.__parent__ is not None
-        if has_parent and registry is not None:
+        is_root = IRoot.providedBy(resource)
+        if (has_parent or is_root) and registry is not None:
             event = ResourceCreatedAndAdded(object=resource,
                                             parent=resource.__parent__,
                                             registry=registry,

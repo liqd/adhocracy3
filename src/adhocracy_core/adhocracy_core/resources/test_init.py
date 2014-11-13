@@ -6,6 +6,7 @@ from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import sheet_metadata
 from adhocracy_core.interfaces import IResourceCreatedAndAdded
+from adhocracy_core.testing import create_event_listener
 
 
 class ISheetY(ISheet):
@@ -23,6 +24,7 @@ def register_sheet(isheet, mock_sheet, registry):
                              IResourceSheet,
                              isheet.__identifier__)
     return mock_sheet
+
 
 @fixture
 def resource_meta(resource_meta):
@@ -313,12 +315,8 @@ class TestResourceFactory:
         assert created_user.__local_roles__[userid] == ['role:creator']
 
     def test_notify_new_resource_created_and_added(self, resource_meta, config, pool):
-        events = []
-        listener = lambda event: events.append(event)
-        config.add_subscriber(listener, IResourceCreatedAndAdded)
-
-        meta = resource_meta._replace(iresource=IResource,
-                                      use_autonaming=True)
+        events = create_event_listener(config, IResourceCreatedAndAdded)
+        meta = resource_meta._replace(iresource=IResource, use_autonaming=True)
         user = testing.DummyResource()
 
         resource = self.make_one(meta)(parent=pool, creator=user)
@@ -326,4 +324,18 @@ class TestResourceFactory:
         assert IResourceCreatedAndAdded.providedBy(events[0])
         assert events[0].object == resource
         assert events[0].parent == pool
-        assert events[0].creator == user
+
+    def test_notify_new_resource_created_and_added_without_parent(
+        self, resource_meta, config, pool):
+        events = create_event_listener(config, IResourceCreatedAndAdded)
+        meta = resource_meta._replace(iresource=IResource, use_autonaming=True)
+        self.make_one(meta)(parent=None)
+        assert len(events) == 0
+
+    def test_notify_new_resource_created_and_added_without_parent_but_is_IRootPool(
+        self, resource_meta, config, pool):
+        from adhocracy_core.resources.root import IRootPool
+        events = create_event_listener(config, IResourceCreatedAndAdded)
+        meta = resource_meta._replace(iresource=IRootPool, use_autonaming=True)
+        self.make_one(meta)(parent=None)
+        assert len(events) == 1

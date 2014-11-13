@@ -317,21 +317,6 @@ class TestMercatorLocationIndex:
     def context(self, pool_graph):
         return pool_graph
 
-    def test_add_mercator_location_index_subscriber_register(self, registry):
-        from .mercator import add_mercator_location_index_subscriber
-        handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
-        assert add_mercator_location_index_subscriber.__name__ in handlers
-
-    def test_add_mercator_location_index_subscriber_call(self, pool_graph_catalog):
-        from .mercator import add_mercator_location_index_subscriber
-        from substanced.util import find_catalog
-        from substanced.catalog.indexes import KeywordIndex
-        context = pool_graph_catalog
-        event = testing.DummyResource(object=context)
-        add_mercator_location_index_subscriber(event)
-        adhocracy_catalog = find_catalog(context, 'adhocracy')
-        assert isinstance(adhocracy_catalog['mercator_location'], KeywordIndex)
-
     def test_index_location_default(self, context):
         from adhocracy_mercator.sheets.mercator import index_location
         resource = _make_mercator_resource(context)
@@ -362,21 +347,6 @@ class TestMercatorBudgetIndex:
     @fixture
     def context(self, pool_graph):
         return pool_graph
-
-    def test_add_mercator_budget_index_subscriber_register(self, registry):
-        from .mercator import add_mercator_budget_index_subscriber
-        handlers = [x.handler.__name__ for x in registry.registeredHandlers()]
-        assert add_mercator_budget_index_subscriber.__name__ in handlers
-
-    def test_add_mercator_budget_index_subscriber_call(self, pool_graph_catalog):
-        from .mercator import add_mercator_budget_index_subscriber
-        from substanced.util import find_catalog
-        from substanced.catalog.indexes import KeywordIndex
-        context = pool_graph_catalog
-        event = testing.DummyResource(object=context)
-        add_mercator_budget_index_subscriber(event)
-        adhocracy_catalog = find_catalog(context, 'adhocracy')
-        assert isinstance(adhocracy_catalog['mercator_budget'], KeywordIndex)
 
     def test_index_buget_default(self, context):
         from adhocracy_mercator.sheets.mercator import index_budget

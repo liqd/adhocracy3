@@ -6,6 +6,7 @@ from adhocracy_core.interfaces import ISheetReferencedItemHasNewVersion
 from adhocracy_core.interfaces import SheetToSheet
 from adhocracy_core.interfaces import IItemVersionNewVersionAdded
 from adhocracy_core.interfaces import IItemVersion
+from adhocracy_core.testing import create_event_listener
 
 
 def test_itemversion_meta():
@@ -64,9 +65,7 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         assert IItemVersion.providedBy(version_0)
 
     def test_create_new_version(self):
-        events = []
-        listener = lambda event: events.append(event)
-        self.config.add_subscriber(listener, IItemVersionNewVersionAdded)
+        events = create_event_listener(self.config, IItemVersionNewVersionAdded)
         creator = self._make_one()
 
         version_0 = self._make_one()
@@ -78,9 +77,8 @@ class ItemVersionIntegrationTest(unittest.TestCase):
         assert events[0].creator == creator
 
     def test_create_new_version_with_referencing_resources(self):
-        events = []
-        listener = lambda event: events.append(event)
-        self.config.add_subscriber(listener, ISheetReferencedItemHasNewVersion)
+        events = create_event_listener(self.config,
+                                       ISheetReferencedItemHasNewVersion)
         creator = self._make_one()
 
         version_0 = self._make_one()
