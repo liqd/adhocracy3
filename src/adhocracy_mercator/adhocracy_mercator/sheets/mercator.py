@@ -1,15 +1,10 @@
 """Sheets for Mercator proposals."""
 import colander
 
-from substanced.util import find_catalog
-from substanced.catalog import Keyword
-
 from adhocracy_core.interfaces import ISheet
 from adhocracy_core.interfaces import IResource
 from adhocracy_core.interfaces import ISheetReferenceAutoUpdateMarker
 from adhocracy_core.interfaces import SheetToSheet
-from adhocracy_core.interfaces import IResourceCreatedAndAdded
-from adhocracy_core.resources.root import IRootPool
 from adhocracy_core.sheets import add_sheet_to_registry
 from adhocracy_core.sheets import sheet_metadata_defaults
 from adhocracy_core.schema import AdhocracySchemaNode
@@ -290,15 +285,6 @@ def index_location(resource, default) -> list:
     return locations if locations else default
 
 
-def add_mercator_location_index_subscriber(event):
-    """Add mercator_location index to the adhocracy catalog."""
-    catalog = find_catalog(event.object, 'adhocracy')
-    index = Keyword()('adhocracy', 'mercator_location')
-    index.__sdi_deletable__ = False
-    catalog.replace('mercator_location', index)
-    catalog.reindex(indexes=['mercator_location'])
-
-
 class StorySchema(colander.MappingSchema):
     story = Text(validator=colander.Length(min=1, max=800))
 
@@ -382,14 +368,6 @@ def _get_sheet_field(resource, isheet: ISheet, field_name: str) -> object:
     return field
 
 
-def add_mercator_budget_index_subscriber(event):
-    """Add mercator_budget index to the adhocracy catalog."""
-    catalog = find_catalog(event.object, 'adhocracy')
-    index = Keyword()('adhocracy', 'mercator_budget')
-    catalog.replace('mercator_budget', index)
-    catalog.reindex(indexes=['mercator_budget'])
-
-
 class ExperienceSchema(colander.MappingSchema):
 
     """Data structure for additional fields."""
@@ -441,9 +419,3 @@ def includeme(config):
                          catalog_name='adhocracy',
                          index_name='mercator_budget',
                          context=IMercatorSubResources)
-    config.add_subscriber(add_mercator_location_index_subscriber,
-                          IResourceCreatedAndAdded,
-                          interface=IRootPool)
-    config.add_subscriber(add_mercator_budget_index_subscriber,
-                          IResourceCreatedAndAdded,
-                          interface=IRootPool)
