@@ -11,12 +11,11 @@ class Reference(IndexFactory):
     index_type = ReferenceIndex
 
 
-class AdhocracyCatalogFactory:
+class AdhocracyCatalogIndexes:
 
-    """
-    Factory that creates all needed catalogs.
+    """Default indexes for the adhocracy catalog.
 
-    Catalogs starting with `private_` are private (not queryable from the
+    Indexes starting with `private_` are private (not queryable from the
     frontend).
     """
 
@@ -37,5 +36,5 @@ def includeme(config):
                                     (Interface,),
                                     IIndexingActionProcessor)
     config.scan('substanced.catalog')
-    config.add_catalog_factory('adhocracy', AdhocracyCatalogFactory)
+    config.add_catalog_factory('adhocracy', AdhocracyCatalogIndexes)
     config.scan('adhocracy_core.catalog.index')

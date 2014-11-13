@@ -7,9 +7,9 @@ from pytest import mark
 
 def test_create_adhocracy_catalog_factory():
     from substanced.catalog import Keyword
-    from . import AdhocracyCatalogFactory
+    from . import AdhocracyCatalogIndexes
     from . import Reference
-    inst = AdhocracyCatalogFactory()
+    inst = AdhocracyCatalogIndexes()
     assert isinstance(inst.tag, Keyword)
     assert isinstance(inst.reference, Reference)
 
@@ -58,6 +58,4 @@ def test_index_resource(pool_graph_catalog,):
     pool.add('child', testing.DummyResource())
     name_index = find_service(pool, 'catalogs', 'system', 'name')
     assert 'child' in [x for x in name_index.unique_values()]
-
-
 
