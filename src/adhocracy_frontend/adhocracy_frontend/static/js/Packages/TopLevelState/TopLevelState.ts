@@ -78,9 +78,9 @@ export class Provider {
             };
         };
 
-        this.$get = ["adhEventHandlerClass", "$location", "$rootScope", "$http", "$q", "$templateCache", "$injector", "$templateRequest",
-            (adhEventHandlerClass, $location, $rootScope, $http, $q, $templateCache, $injector, $templateRequest) => {
-                return new Service(self, adhEventHandlerClass, $location, $rootScope, $http, $q, $templateCache, $injector,
+        this.$get = ["adhEventHandlerClass", "$location", "$rootScope", "$http", "$q", "$injector", "$templateRequest",
+            (adhEventHandlerClass, $location, $rootScope, $http, $q, $injector, $templateRequest) => {
+                return new Service(self, adhEventHandlerClass, $location, $rootScope, $http, $q, $injector,
                                    $templateRequest);
             }];
     }
@@ -121,7 +121,6 @@ export class Service {
         private $rootScope : ng.IScope,
         private $http : ng.IHttpService,
         private $q : ng.IQService,
-        private $templateCache : ng.ITemplateCacheService,
         private $injector : ng.auto.IInjectorService,
         private $templateRequest : ng.ITemplateRequestService
     ) {
