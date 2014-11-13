@@ -78,9 +78,10 @@ export class Provider {
             };
         };
 
-        this.$get = ["adhEventHandlerClass", "$location", "$rootScope", "$http", "$q", "$templateCache", "$injector",
-            (adhEventHandlerClass, $location, $rootScope, $http, $q, $templateCache, $injector) => {
-                return new Service(self, adhEventHandlerClass, $location, $rootScope, $http, $q, $templateCache, $injector);
+        this.$get = ["adhEventHandlerClass", "$location", "$rootScope", "$http", "$q", "$templateCache", "$injector", "$templateRequest",
+            (adhEventHandlerClass, $location, $rootScope, $http, $q, $templateCache, $injector, $templateRequest) => {
+                return new Service(self, adhEventHandlerClass, $location, $rootScope, $http, $q, $templateCache, $injector,
+                                   $templateRequest);
             }];
     }
 
@@ -121,7 +122,8 @@ export class Service {
         private $http : ng.IHttpService,
         private $q : ng.IQService,
         private $templateCache : ng.ITemplateCacheService,
-        private $injector : ng.auto.IInjectorService
+        private $injector : ng.auto.IInjectorService,
+        private $templateRequest : ng.ITemplateRequestService
     ) {
         var self : Service = this;
 
@@ -131,21 +133,6 @@ export class Service {
         this.$rootScope.$watch(() => self.$location.absUrl(), () => {
             self.fromLocation();
         });
-    }
-
-    private templateRequest(url) : ng.IPromise<string> {
-        // FIXME: in future versions of angular, this should be replaced by $templateRequest
-        var template = this.$templateCache.get(url);
-
-        if (typeof template === "undefined") {
-            return this.$http.get(url).then((response) => {
-                var template = response.data;
-                this.$templateCache.put(url, template);
-                return template;
-            });
-        } else {
-            return this.$q.when(template);
-        }
     }
 
     private getArea() : IArea {
@@ -184,7 +171,7 @@ export class Service {
                 area.template = areaInput.template;
             } else if (typeof areaInput.templateUrl !== "undefined") {
                 // NOTE: we do not wait for the template to be loaded
-                this.templateRequest(areaInput.templateUrl).then((template) => {
+                this.$templateRequest(areaInput.templateUrl).then((template) => {
                     area.template = template;
                 });
             }
