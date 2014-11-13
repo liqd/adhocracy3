@@ -91,19 +91,11 @@
 
             <section class="commentable-section">
                 <h3 class="commentable-section-header">{{ "Who is behind it?" | translate }}</h3>
-                <!-- FIXME: using form user name rather than profile
-                user name for now.  anyway: if this place is
-                supposed to show the name from the user profile
-                rather than from the mercator proposal create
-                form, then why do we enter the latter in the first
-                place?  (note that we don't have
-                first-name-last-name in the user profile, but just
-                one text field containing the full name.  i
-                suppose that's not a problem here.) -->
+                <!-- FIXME: Link to creator profile -->
                 <div data-ng-switch="data.organization_info.status_enum">
                     <div data-ng-switch-when="registered_nonprofit">
                         <div>
-                            {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                            <a>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>
                         </div>
                         <div>
                             <div>
@@ -118,7 +110,7 @@
                     </div>
                     <div data-ng-switch-when="planned_nonprofit">
                         <div>
-                            {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                            <a>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>
                         </div>
                         <div>
                             <div>
@@ -136,7 +128,7 @@
                     </div>
                     <div data-ng-switch-when="support_needed">
                         <div>
-                            {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                            <a>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>
                         </div>
                         <div>
                             <div>
@@ -152,7 +144,7 @@
                     </div>
                     <div data-ng-switch-when="other">
                         <div>
-                            {{ data.user_info.first_name }} {{ data.user_info.last_name }}
+                            <a>{{ data.user_info.first_name }} {{ data.user_info.last_name }}</a>
                         </div>
                         <div>
                             <p>{{ data.organisation_info.status_other }}</p>
