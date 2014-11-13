@@ -95,6 +95,25 @@ class SheetReferencedItemHasNewVersionUnitTest(unittest.TestCase):
         assert verifyObject(ISheetReferencedItemHasNewVersion, inst)
 
 
+class TestLocalRolesModified:
+
+    def _make_one(self, *arg, **kwargs):
+        from . import LocalRolesModified
+        return LocalRolesModified(*arg, **kwargs)
+
+    def test_create(self):
+        from adhocracy_core.interfaces import ILocalRolesModfied
+        context = testing.DummyResource()
+        old_local_roles = dict()
+        new_local_roles = dict()
+        registry = testing.DummyResource()
+        inst = self._make_one(context, new_local_roles, old_local_roles,
+                              registry)
+
+        assert ILocalRolesModfied.providedBy(inst)
+        assert verifyObject(ILocalRolesModfied, inst)
+
+
 class _ISheetPredicateUnitTest(unittest.TestCase):
 
     def _make_one(self, *arg):

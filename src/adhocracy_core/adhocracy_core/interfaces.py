@@ -390,6 +390,16 @@ class ISheetReferencedItemHasNewVersion(IObjectEvent):
     creator = Attribute('User resource object of the authenticated User')
 
 
+class ILocalRolesModfied(IObjectEvent):
+
+    """An event type send when an resource`s :term:`local role` is modified."""
+
+    object = Attribute('The resource being modified')
+    new_local_roles = Attribute('The new resource`s local roles')
+    old_local_roles = Attribute('The old resource`s local roles')
+    registry = Attribute('The pyramid registry')
+
+
 class ITokenManger(Interface):  # pragma: no cover
 
     def create_token(userid: str) -> str:

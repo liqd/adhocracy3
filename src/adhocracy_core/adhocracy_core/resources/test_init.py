@@ -293,7 +293,7 @@ class TestResourceFactory:
         assert set_appstructs['creator'] == authenticated_user
         assert set_appstructs['modified_by'] == authenticated_user
         userid = resource_path(authenticated_user)
-        assert resource.__local_roles__ == {userid: ['role:creator']}
+        assert resource.__local_roles__ == {userid: {'role:creator'}}
 
     def test_with_creator_and_resource_implements_imetadata_and_iuser(self, resource_meta, registry, mock_sheet):
         from adhocracy_core.resources.principal import IUser
@@ -310,7 +310,7 @@ class TestResourceFactory:
         assert set_appstructs['creator'] == created_user
         assert set_appstructs['modified_by'] == created_user
         userid = resource_path(created_user)
-        assert created_user.__local_roles__[userid] == ['role:creator']
+        assert created_user.__local_roles__[userid] == {'role:creator'}
 
     def test_notify_new_resource_created_and_added(self, resource_meta, config, pool):
         events = []
