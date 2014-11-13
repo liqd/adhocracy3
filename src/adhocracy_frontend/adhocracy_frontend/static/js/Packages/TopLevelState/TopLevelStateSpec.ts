@@ -30,7 +30,8 @@ export var register = () => {
                 };
 
                 adhTopLevelState = <any>new AdhTopLevelState.Service(
-                    null, eventHandlerMockClass, locationMock, rootScopeMock, null, q, null, null);
+                    null, eventHandlerMockClass, locationMock, rootScopeMock, null,
+                    q, null, null, null);
 
                 spyOn(adhTopLevelState, "toLocation");
 
@@ -95,8 +96,9 @@ export var register = () => {
                         var template = {};
 
                         beforeEach(() => {
-                            spyOn(adhTopLevelStateWithPrivates, "templateRequest");
-                            adhTopLevelStateWithPrivates.templateRequest.and.returnValue({then: (fn) => fn(template)});
+                            spyOn(adhTopLevelStateWithPrivates, "$templateRequest");
+                            adhTopLevelStateWithPrivates.$templateRequest
+                                       .and.returnValue({then: (fn) => fn(template)});
                         });
 
                         it("while passing template", () => {
