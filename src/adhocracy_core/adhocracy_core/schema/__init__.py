@@ -200,11 +200,14 @@ class Roles(colander.SequenceSchema):
 
     # FIXME support the 'readonly' keyword, inherit AdhocracySchemaNode
 
-    default = []
     missing = colander.drop
     validator = colander.Length(min=0, max=6)
 
     role = Role()
+
+    @property
+    def default(self):
+        return []
 
     def preparer(self, value: Sequence) -> list:
         if value is colander.null:
@@ -504,9 +507,13 @@ class Resources(colander.SequenceSchema):
 
     """List of :class:`Resource:`s."""
 
-    resource = Resource()
-    default = []
     missing = []
+
+    resource = Resource()
+
+    @property
+    def default(self):
+        return []
 
 
 def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
