@@ -331,3 +331,11 @@ class TestResourceFactory:
         meta = resource_meta._replace(iresource=IResource, use_autonaming=True)
         self.make_one(meta)(parent=None)
         assert len(events) == 0
+
+    def test_notify_new_resource_created_and_added_without_parent_but_is_IRootPool(
+        self, resource_meta, config, pool):
+        from adhocracy_core.resources.root import IRootPool
+        events = create_event_listener(config, IResourceCreatedAndAdded)
+        meta = resource_meta._replace(iresource=IRootPool, use_autonaming=True)
+        self.make_one(meta)(parent=None)
+        assert len(events) == 1
