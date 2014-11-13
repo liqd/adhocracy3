@@ -333,18 +333,18 @@
             <div class="annotated-section-body">
 
                 <label>
-                    {{ "form_description:" | translate }}
+                    {{ "description:" | translate }}
                     <textarea
                         data-msd-elastic=""
-                        data-ng-model="data.details.form_description"
-                        name="details-form-description"
+                        data-ng-model="data.details.description"
+                        name="details-description"
                         maxlength="1000"
                         placeholder="{{ '1000 c. Max.' | translate }}"
                         required="required"></textarea>
 
                     <span
                         class="input-error"
-                        data-ng-if="showError('mercatorProposalDetailForm.details-form-description', 'required')">
+                        data-ng-if="showError('mercatorProposalDetailForm.details-description', 'required')">
                         {{ "Please enter a description" | translate }}</span>
                 </label>
 
