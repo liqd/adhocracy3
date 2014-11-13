@@ -675,7 +675,7 @@ mkFieldType = (field : MetaApi.ISheetField) : string => {
 
     switch (field.valuetype) {
     case "adhocracy_core.schema.Boolean":
-        result = "boolean";
+        result = "string";
         break;
     case "adhocracy_core.schema.AbsolutePath":
         result = "string";
@@ -723,7 +723,7 @@ mkFieldType = (field : MetaApi.ISheetField) : string => {
         result = "string[]";
         break;
     case "adhocracy_core.schema.CurrencyAmount":
-        result = "number";
+        result = "string";
         break;
     case "adhocracy_core.schema.ISOCountryCode":
         result = "number";
