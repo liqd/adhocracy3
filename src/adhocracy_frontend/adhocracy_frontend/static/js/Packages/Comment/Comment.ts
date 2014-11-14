@@ -13,6 +13,7 @@ import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
+import AdhResourceUtil = require("../Util/ResourceUtil");
 
 import ResourcesBase = require("../../ResourcesBase");
 
@@ -156,7 +157,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         return this.adhHttp.getNewestVersionPathNoFork(oldItem.path)
             .then((path) => this.adhHttp.get(path))
             .then((oldVersion) => {
-                var resource = AdhUtil.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
+                var resource = AdhResourceUtil.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
                 this.adapter.content(resource, instance.scope.data.content);
                 resource.parent = AdhUtil.parentPath(oldVersion.path);
                 return [resource];

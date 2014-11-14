@@ -3,6 +3,7 @@ import AdhHttp = require("../Http/Http");
 import AdhInject = require("../Inject/Inject");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 import AdhResourceArea = require("../ResourceArea/ResourceArea");
+import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUtil = require("../Util/Util");
@@ -438,14 +439,14 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         var self : Widget<R> = this;
         var data = this.initializeScope(instance.scope);
 
-        var mercatorProposalVersion = AdhUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
+        var mercatorProposalVersion = AdhResourceUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
         mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
         this.fill(data, mercatorProposalVersion);
 
         return this.$q
             .all(_.map(old.data[SIMercatorSubResources.nick], (path : string, key : string) => {
                 return self.adhHttp.get(path).then((oldSubresource) => {
-                    var subresource = AdhUtil.derive(oldSubresource, {preliminaryNames : self.adhPreliminaryNames});
+                    var subresource = AdhResourceUtil.derive(oldSubresource, {preliminaryNames : self.adhPreliminaryNames});
                     subresource.parent = AdhUtil.parentPath(oldSubresource.path);
                     self.fill(data, subresource);
                     mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = subresource.path;

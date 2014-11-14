@@ -2,7 +2,7 @@
 
 import q = require("q");
 
-import AdhUtil = require("../Util/Util");
+import AdhResourceUtil = require("../Util/ResourceUtil");
 
 import AdhComment = require("./Comment");
 
@@ -30,8 +30,8 @@ export var register = () => {
             adapterMock.create.and.returnValue(RESOURCE);
             adapterMock.createItem.and.returnValue(RESOURCE);
 
-            originalDerive = AdhUtil.derive;
-            spyOn(AdhUtil, "derive").and.returnValue(RESOURCE);
+            originalDerive = AdhResourceUtil.derive;
+            spyOn(AdhResourceUtil, "derive").and.returnValue(RESOURCE);
 
             adhHttpMock = <any>jasmine.createSpyObj("adhHttpMock", ["postToPool", "resolve", "postNewVersion", "getNewestVersionPathNoFork",
                 "get"]);
@@ -43,7 +43,7 @@ export var register = () => {
         });
 
         afterEach(() => {
-            AdhUtil.derive = originalDerive;
+            AdhResourceUtil.derive = originalDerive;
         });
 
         describe("commentResource", () => {
@@ -235,7 +235,7 @@ export var register = () => {
                 });
 
                 it("creates a new resource using the adapter", () => {
-                    expect((<any>AdhUtil).derive.calls.count()).toBe(1);
+                    expect((<any>AdhResourceUtil).derive.calls.count()).toBe(1);
                     expect(adapterMock.content.calls.count()).toBe(1);
                     expect(adapterMock.content.calls.first().args[1]).toBe(content);
                 });
