@@ -136,11 +136,13 @@ export var platformDirective = (adhTopLevelState : AdhTopLevelState.Service) => 
 
 export var resourceUrl = (adhConfig : AdhConfig.IService) => {
     return (path : string, view? : string) => {
-        var url = "/r" + path.replace(adhConfig.rest_url, "");
-        if (typeof view !== "undefined") {
-            url += "/@" + view;
+        if (typeof path !== "undefined") {
+            var url = "/r" + path.replace(adhConfig.rest_url, "");
+            if (typeof view !== "undefined") {
+                url += "/@" + view;
+            }
+            return url;
         }
-        return url;
     };
 };
 
