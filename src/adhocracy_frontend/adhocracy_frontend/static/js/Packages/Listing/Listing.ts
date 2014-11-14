@@ -69,9 +69,9 @@ export interface ListingScope<Container> extends ng.IScope {
 export interface IFacetsScope extends ng.IScope {
     facets : IFacet[];
     update : () => ng.IPromise<void>;
-    enableItem : (IFacetItem) => void;
-    disableItem : (IFacetItem) => void;
-    toggleItem : (IFacetItem) => void;
+    enableItem : (IFacet, IFacetItem) => void;
+    disableItem : (IFacet, IFacetItem) => void;
+    toggleItem : (IFacet, IFacetItem) => void;
 }
 
 // FIXME: as the listing elements are tracked by their $id (the element path) in the listing template, we don't allow duplicate elements
@@ -191,23 +191,25 @@ export var facets = (adhConfig : AdhConfig.IService) => {
         },
         templateUrl: adhConfig.pkg_path + pkgLocation + "/Facets.html",
         link: (scope : IFacetsScope) => {
-            scope.enableItem = (item : IFacetItem) => {
+            scope.enableItem = (facet : IFacet, item : IFacetItem) => {
                 if (!item.enabled) {
-                    item.enabled = true;
+                    facet.items.forEach((_item : IFacetItem) => {
+                        _item.enabled = (item === _item);
+                    });
                     scope.update();
                 }
             };
-            scope.disableItem = (item : IFacetItem) => {
+            scope.disableItem = (facet : IFacet, item : IFacetItem) => {
                 if (item.enabled) {
                     item.enabled = false;
                     scope.update();
                 }
             };
-            scope.toggleItem = (item : IFacetItem) => {
+            scope.toggleItem = (facet : IFacet, item : IFacetItem) => {
                 if (item.enabled) {
-                    scope.disableItem(item);
+                    scope.disableItem(facet, item);
                 } else {
-                    scope.enableItem(item);
+                    scope.enableItem(facet, item);
                 }
             };
         }

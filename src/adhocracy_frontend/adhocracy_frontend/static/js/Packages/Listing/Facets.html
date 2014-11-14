@@ -3,7 +3,7 @@
     <li data-ng-repeat="facet in facets">{{ facet.name | translate }}
         <ul>
             <li data-ng-repeat="item in facet.items">
-                <a href="" data-ng-click="toggleItem(item)">{{ item.name | translate }}</a> <span ng-if="item.enabled">(enabled)</span>
+                <a href="" data-ng-click="toggleItem(facet, item)">{{ item.name | translate }}</a> <span ng-if="item.enabled">(enabled)</span>
             </li>
         </ul>
     </li>
