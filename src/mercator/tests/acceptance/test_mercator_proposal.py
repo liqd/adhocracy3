@@ -91,7 +91,7 @@ def fill_all(browser):
     browser.find_by_name('introduction-title').first.fill('title')
     browser.find_by_name('introduction-teaser').first.fill('teaser')
 
-    browser.find_by_name('details-form-description').first.fill('description')
+    browser.find_by_name('details-description').first.fill('description')
     browser.find_by_name('details-location-is-specific').first.check()
     browser.find_by_name('details-location-specific-1').first.fill('Bonn')
     browser.find_by_name('details-location-is-linked-to-ruhr').first.check()
