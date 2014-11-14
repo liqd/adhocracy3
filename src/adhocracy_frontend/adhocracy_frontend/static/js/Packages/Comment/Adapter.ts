@@ -1,5 +1,3 @@
-import _ = require("lodash");
-
 import AdhComment = require("./Comment");
 import AdhListing = require("../Listing/Listing");
 import AdhUtil = require("../Util/Util");
@@ -51,24 +49,6 @@ export class CommentAdapter extends ListingCommentableAdapter implements AdhComm
 
     createItem(settings) : RIComment {
         return new RIComment(settings);
-    }
-
-    // FIXME: move to a service (also do it in Rating)
-    derive<R extends ResourcesBase.Resource>(oldVersion : R, settings) : R {
-        var resource = new (<any>oldVersion).constructor(settings);
-
-        _.forOwn(oldVersion.data, (sheet, key) => {
-            resource.data[key] = new sheet.constructor(settings);
-
-            _.forOwn(sheet, (value, field) => {
-                resource.data[key][field] = _.cloneDeep(value);
-            });
-        });
-
-        resource.data[SIVersionable.nick] =
-            new SIVersionable.Sheet({follows: [oldVersion.path]});
-
-        return resource;
     }
 
     content(resource : RICommentVersion) : string;

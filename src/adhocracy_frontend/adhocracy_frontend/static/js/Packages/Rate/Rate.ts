@@ -73,7 +73,6 @@ export interface IRateScope extends ng.IScope {
 export interface IRateAdapter<T extends ResourcesBase.Resource> {
     create(settings : any) : T;
     createItem(settings : any) : any;
-    derive(oldVersion : T, settings : any) : T;
     isRate(resource : T) : boolean;
     isRateable(resource : T) : boolean;
     rateablePostPoolPath(resource : T) : string;

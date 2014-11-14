@@ -2,6 +2,10 @@
 
 import _ = require("lodash");
 
+import ResourcesBase = require("../../ResourcesBase");
+
+import SIVersionable = require("../../Resources_/adhocracy_core/sheets/versions/IVersionable");
+
 
 /**
  * isArrayMember could be inlined, but is not for two reasons: (1)
@@ -160,3 +164,23 @@ export function endsWith(str, suffix) {
 
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
+
+
+/**
+ * Create a new version following an existing one.
+ */
+export var derive = function<R extends ResourcesBase.Resource>(oldVersion : R, settings) : R {
+    var resource = new (<any>oldVersion).constructor(settings);
+
+    _.forOwn(oldVersion.data, (sheet, key) => {
+        resource.data[key] = new sheet.constructor(settings);
+
+        _.forOwn(sheet, (value, field) => {
+            resource.data[key][field] = _.cloneDeep(value);
+        });
+    });
+
+    resource.data[SIVersionable.nick] = new SIVersionable.Sheet({follows: [oldVersion.path]});
+
+    return resource;
+};

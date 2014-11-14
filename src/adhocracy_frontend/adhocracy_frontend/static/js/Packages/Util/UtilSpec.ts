@@ -188,5 +188,37 @@ export var register = () => {
                 expect(() => AdhUtil.sortDagTopologically(dag, ["A"])).toThrow();
             });
         });
+
+        describe("derive", () => {
+            var oldResource;
+            var resource;
+            var testResource = function(settings) {
+                this.data = {};
+                this.content_type = "test.resource";
+            };
+            var testSheet = function(settings) {
+                this.foo = "bar";
+            };
+
+            beforeEach(() => {
+                oldResource = new testResource({});
+                oldResource.path = "/old/path";
+                oldResource.data["test.sheet"] = new testSheet({});
+                resource = AdhUtil.derive(oldResource, {});
+            });
+
+            it("sets the right content type", () => {
+                expect(resource.content_type).toBe("test.resource");
+            });
+
+            it("clones all sheets", () => {
+                expect(resource.data["test.sheet"]).toBeDefined();
+                expect(resource.data["test.sheet"].foo).toBe("bar");
+            });
+
+            it("creates a follos entry referencing the old version", () => {
+                expect(resource.data["adhocracy_core.sheets.versions.IVersionable"].follows).toEqual(["/old/path"]);
+            });
+        });
     });
 };
