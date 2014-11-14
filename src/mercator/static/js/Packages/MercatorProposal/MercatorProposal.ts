@@ -184,11 +184,11 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         data.user_info.last_name = mercatorProposalVersion.data[SIMercatorUserInfo.nick].family_name;
         data.user_info.country = mercatorProposalVersion.data[SIMercatorUserInfo.nick].country;
 
-        data.heard_from.colleague = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_colleague;
-        data.heard_from.website = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_website;
-        data.heard_from.newsletter = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_newsletter;
-        data.heard_from.facebook = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_facebook;
-        data.heard_from.other = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere;
+        data.heard_from.colleague = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_colleague === "true";
+        data.heard_from.website = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_website === "true";
+        data.heard_from.newsletter = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_newsletter === "true";
+        data.heard_from.facebook = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_from_facebook === "true";
+        data.heard_from.other = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere !== "";
         data.heard_from.other_specify = mercatorProposalVersion.data[SIMercatorHeardFrom.nick].heard_elsewhere;
 
         var subResourcePaths : SIMercatorSubResources.Sheet = mercatorProposalVersion.data[SIMercatorSubResources.nick];
@@ -233,12 +233,12 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         var res : SIMercatorDetails.Sheet = subResource.data[SIMercatorDetails.nick];
 
                         scope.description = res.description;
-                        scope.location_is_specific = res.location_is_specific;
+                        scope.location_is_specific = res.location_is_specific === "true";
                         scope.location_specific_1 = res.location_specific_1;
                         scope.location_specific_2 = res.location_specific_2;
                         scope.location_specific_3 = res.location_specific_3;
-                        scope.location_is_online = res.location_is_online;
-                        scope.location_is_linked_to_ruhr = res.location_is_linked_to_ruhr;
+                        scope.location_is_online = res.location_is_online === "true";
+                        scope.location_is_linked_to_ruhr = res.location_is_linked_to_ruhr === "true";
                     })();
                     break;
                     case RIMercatorStoryVersion.content_type: (() => {
@@ -270,10 +270,10 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
                         var scope = data.finance;
                         var res : SIMercatorFinance.Sheet = subResource.data[SIMercatorFinance.nick];
 
-                        scope.budget = res.budget;
-                        scope.requested_funding = res.requested_funding;
+                        scope.budget = parseInt(res.budget, 10);
+                        scope.requested_funding = parseInt(res.requested_funding, 10);
                         scope.other_sources = res.other_sources;
-                        scope.granted = res.granted;
+                        scope.granted = res.granted === "True";
                     })();
                     break;
                     case RIMercatorExperienceVersion.content_type: (() => {
