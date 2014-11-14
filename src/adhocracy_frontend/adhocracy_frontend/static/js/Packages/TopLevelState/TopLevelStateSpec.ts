@@ -30,8 +30,7 @@ export var register = () => {
                 };
 
                 adhTopLevelState = <any>new AdhTopLevelState.Service(
-                    null, eventHandlerMockClass, locationMock, rootScopeMock, null,
-                    q, null, null, null);
+                    null, eventHandlerMockClass, locationMock, rootScopeMock, null, q, null, null);
 
                 spyOn(adhTopLevelState, "toLocation");
 
