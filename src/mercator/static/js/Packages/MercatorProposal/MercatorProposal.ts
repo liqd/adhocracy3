@@ -435,7 +435,24 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
     }
 
     public _edit(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>, old : R) : ng.IPromise<R[]> {
-        return this.$q.when([]);
+        var self : Widget<R> = this;
+        var data = this.initializeScope(instance.scope);
+
+        var mercatorProposalVersion = AdhUtil.derive(old, {preliminaryNames : this.adhPreliminaryNames});
+        mercatorProposalVersion.parent = AdhUtil.parentPath(old.path);
+        this.fill(data, mercatorProposalVersion);
+
+        return this.$q
+            .all(_.map(old.data[SIMercatorSubResources.nick], (path : string, key : string) => {
+                return self.adhHttp.get(path).then((oldSubresource) => {
+                    var subresource = AdhUtil.derive(oldSubresource, {preliminaryNames : self.adhPreliminaryNames});
+                    subresource.parent = AdhUtil.parentPath(oldSubresource.path);
+                    self.fill(data, subresource);
+                    mercatorProposalVersion.data[SIMercatorSubResources.nick][key] = subresource.path;
+                    return subresource;
+                });
+            }))
+            .then((subresources) => _.flatten([mercatorProposalVersion, subresources]));
     }
 
     public _clear(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : void {
