@@ -205,9 +205,10 @@ class Roles(colander.SequenceSchema):
 
     role = Role()
 
-    @property
-    def default(self):
-        return []
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'default' not in kwargs:
+            self.default = []
 
     def preparer(self, value: Sequence) -> list:
         if value is colander.null:
@@ -511,9 +512,10 @@ class Resources(colander.SequenceSchema):
 
     resource = Resource()
 
-    @property
-    def default(self):
-        return []
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'default' not in kwargs:
+            self.default = []
 
 
 def _validate_reftypes(node: colander.SchemaNode, value: Sequence):
