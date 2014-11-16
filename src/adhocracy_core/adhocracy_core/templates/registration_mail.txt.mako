@@ -3,7 +3,8 @@ For German version scroll down.
 
 Dear ${name},
 
-Thank you for registering on one of our ${site_name} Platforms.
+Thank you for registering on ${site_name}.
+
 This email has the purpose to validate your identity.
 Please use the link below to activate your account on
 ${site_name}.
