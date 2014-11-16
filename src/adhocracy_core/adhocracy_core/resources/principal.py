@@ -108,7 +108,6 @@ def send_registration_mail(context: IUser,
                            options: dict={}):
     """Send a registration mail to validate the email of a user account."""
     # FIXME subject should be configurable
-    subject = 'Adhocracy Account Authentication'
     name = context.name
     email = context.email
     activation_path = _generate_activation_path()
@@ -118,6 +117,8 @@ def send_registration_mail(context: IUser,
     site_name = registry.settings.get('adhocracy.site_name', 'Adhocracy')
     frontend_url = registry.settings.get('adhocracy.frontend_url',
                                          'http://localhost:6551')
+    subject = '%s account verification' % site_name
+
     args = {
         'activation_path': activation_path,
         'frontend_url': frontend_url,
