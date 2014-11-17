@@ -7,6 +7,7 @@ import _ = require("lodash");
 
 import AdhConfig = require("../Config/Config");
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
+import AdhResourceUtil = require("../Util/ResourceUtil");
 import AdhUtil = require("../Util/Util");
 
 import ResourcesBase = require("../../ResourcesBase");
@@ -205,7 +206,7 @@ export class Service<Content extends ResourcesBase.Resource> {
         resources : ResourcesBase.Resource[]
     ) : ng.IPromise<ResourcesBase.Resource[]> {
 
-        var sortedResources : ResourcesBase.Resource[] = ResourcesBase.sortResourcesTopologically(resources, this.adhPreliminaryNames);
+        var sortedResources : ResourcesBase.Resource[] = AdhResourceUtil.sortResourcesTopologically(resources, this.adhPreliminaryNames);
 
         // post stuff
         return this.withTransaction((transaction) : ng.IPromise<ResourcesBase.Resource[]> => {
