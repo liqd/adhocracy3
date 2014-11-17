@@ -24,6 +24,21 @@ export var register = () => {
                     "data-test=\"&quot;&#39;&amp;\"></adh-document-workbench>";
                 expect(AdhEmbed.location2template($locationMock)).toBe(expected);
             });
+            it("does not include meta params as attributes", () => {
+                var expected = "<adh-document-workbench data-path=\"/this/is/a/path\"></adh-document-workbench>";
+                $locationMock.search.and.returnValue({
+                    path: "/this/is/a/path",
+                    noheader: "",
+                    nocenter: "",
+                    locale: "de"
+                });
+                expect(AdhEmbed.location2template($locationMock)).toBe(expected);
+            });
+            it("returns '' if widget is 'empty'", () => {
+                var expected = "";
+                $locationMock.path.and.returnValue("/embed/empty");
+                expect(AdhEmbed.location2template($locationMock)).toBe(expected);
+            });
             it("throws if $location does not specify a widget", () => {
                 $locationMock.path.and.returnValue("/embed/");
                 expect(() => AdhEmbed.location2template($locationMock)).toThrow();
