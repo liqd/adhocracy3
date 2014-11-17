@@ -1,5 +1,3 @@
-import _ = require("lodash");
-
 import AdhPreliminaryNames = require("../PreliminaryNames/PreliminaryNames");
 
 import ResourcesBase = require("../../ResourcesBase");
@@ -45,24 +43,6 @@ export class RateAdapter implements AdhRate.IRateAdapter<RIRateVersion> {
 
     createItem(args : { preliminaryNames : AdhPreliminaryNames.Service; path ?: string }) : RIRate {
         return new RIRate(args);
-    }
-
-    // FIXME: move to a service (also do it in Comment)
-    derive<R extends ResourcesBase.Resource>(oldVersion : R, settings) : R {
-        var resource = new (<any>oldVersion).constructor(settings);
-
-        _.forOwn(oldVersion.data, (sheet, key) => {
-            resource.data[key] = new sheet.constructor(settings);
-
-            _.forOwn(sheet, (value, field) => {
-                resource.data[key][field] = _.cloneDeep(value);
-            });
-        });
-
-        resource.data[SIVersionable.nick] =
-            new SIVersionable.Sheet({follows: [oldVersion.path]});
-
-        return resource;
     }
 
     isRate(resource : ResourcesBase.Resource) : boolean {

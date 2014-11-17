@@ -13,6 +13,7 @@ import AdhResourceWidgets = require("../ResourceWidgets/ResourceWidgets");
 import AdhTopLevelState = require("../TopLevelState/TopLevelState");
 import AdhUser = require("../User/User");
 import AdhUtil = require("../Util/Util");
+import AdhResourceUtil = require("../Util/ResourceUtil");
 
 import ResourcesBase = require("../../ResourcesBase");
 
@@ -27,7 +28,6 @@ var pkgLocation = "/Comment";
 export interface ICommentAdapter<T extends ResourcesBase.Resource> extends AdhListing.IListingContainerAdapter {
     create(settings : any) : T;
     createItem(settings : any) : any;
-    derive(oldVersion : T, settings : any) : T;
     content(resource : T) : string;
     content(resource : T, value : string) : T;
     refersTo(resource : T) : string;
@@ -157,7 +157,7 @@ export class CommentResource<R extends ResourcesBase.Resource> extends AdhResour
         return this.adhHttp.getNewestVersionPathNoFork(oldItem.path)
             .then((path) => this.adhHttp.get(path))
             .then((oldVersion) => {
-                var resource = this.adapter.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
+                var resource = AdhResourceUtil.derive(oldVersion, {preliminaryNames: this.adhPreliminaryNames});
                 this.adapter.content(resource, instance.scope.data.content);
                 resource.parent = AdhUtil.parentPath(oldVersion.path);
                 return [resource];

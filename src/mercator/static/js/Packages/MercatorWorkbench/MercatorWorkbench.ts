@@ -20,6 +20,7 @@ interface IMercatorWorkbenchScope extends ng.IScope {
     contentType : string;
     view : string;
     goToListing() : void;
+    goToProposal(path : string) : void;
     proposalListingData : {
         facets : AdhListing.IFacet[];
         showFacets : boolean;
@@ -33,6 +34,9 @@ export class MercatorWorkbench {
     public createDirective(adhConfig : AdhConfig.IService) {
         var _self = this;
         var _class = (<any>_self).constructor;
+
+        // FIXME: use dependency injection instead
+        var resourceUrl = AdhResourceArea.resourceUrl(adhConfig);
 
         return {
             restrict: "E",
@@ -74,6 +78,9 @@ export class MercatorWorkbench {
                 });
                 $scope.goToListing = () => {
                     $location.url("/r/mercator");
+                };
+                $scope.goToProposal = (path) => {
+                    $location.url(resourceUrl(path));
                 };
             }]
         };
