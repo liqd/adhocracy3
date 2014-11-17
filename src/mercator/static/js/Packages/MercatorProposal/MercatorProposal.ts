@@ -84,6 +84,7 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
         introduction : {
             title : string;
             teaser : string;
+            imageUpload : Flow;
         };
 
         // 3. in detail
@@ -128,9 +129,37 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
 }
 
 
+/**
+ * upload mercator proposal image file.  this function can potentially
+ * be more flexible; for now it just handles the Flow object and
+ * promises the path of the image resource as a string.
+ *
+ * FIXME: implement this function!
+ */
+export var uploadImageFile = (
+    adhConfig : AdhConfig.IService,
+    adhHttp : AdhHttp.Service<any>,
+    $q : ng.IQService,
+    flow : Flow
+) : ng.IPromise<string> => {
+
+    console.log("uploadImageFile: not fully implemented, but we already collect the file meta data locally in the browser:");
+
+    flow.opts.target = adhConfig.rest_url + adhConfig.custom["mercator_platform_path"];
+
+    console.log(JSON.stringify(flow.opts, null, 2));
+    _.forOwn(flow.files, (value, key) => {
+        console.log(JSON.stringify(value.file, null, 2));
+    });
+
+    flow.resume();
+    return (<any>$q.reject("blöp"));
+};
+
+
 export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets.ResourceWidget<R, IScope> {
     constructor(
-        adhConfig : AdhConfig.IService,
+        public adhConfig : AdhConfig.IService,
         adhHttp : AdhHttp.Service<any>,
         adhPreliminaryNames : AdhPreliminaryNames.Service,
         private adhTopLevelState : AdhTopLevelState.Service,
@@ -383,11 +412,22 @@ export class Widget<R extends ResourcesBase.Resource> extends AdhResourceWidgets
         }
     }
 
-
-
     // NOTE: see _update.
     public _create(instance : AdhResourceWidgets.IResourceWidgetInstance<R, IScope>) : ng.IPromise<R[]> {
         var data = this.initializeScope(instance.scope);
+        var imagePathPromise = uploadImageFile(this.adhConfig, this.adhHttp, this.$q, data.introduction.imageUpload);
+
+        // FIXME: attach imagePath to proposal intro resource.  (need to wait for backend.)
+        // FIXME: handle file upload in _update.
+        imagePathPromise.then(
+            (path) => {
+                console.log("upload successful:");
+                console.log(path);
+            },
+            () => {
+                console.log("upload error:");
+                console.log(arguments);
+            });
 
         var mercatorProposal = new RIMercatorProposal({preliminaryNames : this.adhPreliminaryNames});
         mercatorProposal.parent = instance.scope.poolPath;
@@ -815,6 +855,7 @@ export var countrySelect = () => {
     };
 };
 
+
 export var moduleName = "adhMercatorProposal";
 
 export var register = (angular) => {
@@ -840,6 +881,21 @@ export var register = (angular) => {
                 .whenView(RIMercatorProposalVersion.content_type, "edit", {
                      movingColumns: "is-collapse-show-hide"
                 });
+        }])
+        .config(["flowFactoryProvider", (flowFactoryProvider) => {
+            if (typeof flowFactoryProvider.defaults === "undefined") {
+                flowFactoryProvider.defaults = {};
+            }
+
+            flowFactoryProvider.defaults.singleFile = true;
+            flowFactoryProvider.defaults.maxChunkRetries = 1;
+            flowFactoryProvider.defaults.chunkRetryInterval = 5000;
+            flowFactoryProvider.defaults.simultaneousUploads = 4;
+            flowFactoryProvider.defaults.permanentErrors = [404, 500, 501, 502, 503];
+
+            flowFactoryProvider.on("catchAll", () => {
+                console.log(arguments);
+            });
         }])
         .directive("adhMercatorProposal", ["adhConfig", "adhHttp", "adhPreliminaryNames", "adhTopLevelState", "$q",
             (adhConfig, adhHttp, adhPreliminaryNames, adhTopLevelState, $q) => {
@@ -909,13 +965,10 @@ export var register = (angular) => {
             };
 
             $scope.submitIfValid = () => {
-                // FIXME: dump file meta data on console, then ignore it.
-                var flow = angular.element($("#introduction-picture-upload")).scope().$flow;
-                _.forOwn(flow.files, (value, key) => {
-                    console.log(JSON.stringify(value.file, null, 2));
-                });
-
                 if ($scope.mercatorProposalForm.$valid) {
+                    // pluck flow object from file upload scope, and
+                    // attach it to where ResourceWidgets can find it.
+                    $scope.data.introduction.imageUpload = angular.element($("#introduction-picture-upload")).scope().$flow;
                     $scope.submit();
                 };
             };

@@ -298,17 +298,18 @@
 
                 <label>
                     {{ "Upload a Picture" | translate }}
-                    <div flow-init>
-                        <input flow-btn
-                               type="file"
-                               data-ng-model="data.introduction.file"
-                               id="introduction-picture-upload"
-                               name="introduction-picture-upload" />
+                    <div flow-init
+                        id="introduction-picture-upload"
+                        name="introduction-picture-upload">
+                        <span ng-show="!$flow.files.length" flow-btn>Select Image</span>
+                        <span ng-show="$flow.files.length" flow-btn>Change Image</span>
+                        <span ng-show="$flow.files.length" ng-click="$flow.cancel()">Remove Image</span>
                         <table>
                             <tr ng-repeat="file in $flow.files">
                                 <td>{{$index+1}}</td>
                                 <td>{{file.name}}</td>
                                 <td>{{file.msg}}</td>
+                                <td><img flow-img="file" height="120" /></td>
                             </tr>
                         </table>
                     </div>

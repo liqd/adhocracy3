@@ -75,14 +75,6 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhProposal.moduleName
     ]);
 
-    app.config(["flowFactoryProvider", (flowFactoryProvider) => {
-        flowFactoryProvider.defaults = {
-            maxChunkRetries: 1,
-            chunkRetryInterval: 5000,
-            simultaneousUploads: 4
-        };
-    }]);
-
     app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", (
         adhTopLevelStateProvider : AdhTopLevelState.Provider,
         $translateProvider,
