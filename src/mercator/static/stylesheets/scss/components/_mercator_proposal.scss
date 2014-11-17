@@ -55,7 +55,5 @@
 }
 
 .mercator-proposal-chapters {
-    border-left: 1px solid $color-structure-border;
-    padding-left: gutter()/2;
     @include span(last 10 of 12);
 }
