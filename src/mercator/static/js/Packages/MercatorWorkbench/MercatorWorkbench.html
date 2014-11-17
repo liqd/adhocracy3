@@ -43,7 +43,9 @@
                 <div data-ng-switch-when="edit">
                     <div class="moving-column-menu placeholder"></div>
                     <div class="moving-column-body" data-du-scroll-container="">
-                        <adh-resource-wrapper data-on-submit="" data-on-cancel="">
+                        <adh-resource-wrapper
+                            data-on-submit="goToProposal(content2Url)"
+                            data-on-cancel="goToProposal(content2Url)">
                             <adh-mercator-proposal-create
                                 data-ng-if="content2Url"
                                 data-path="{{content2Url}}"
