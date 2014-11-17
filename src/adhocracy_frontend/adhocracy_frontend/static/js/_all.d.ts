@@ -45,3 +45,50 @@ declare module "q" {
     export function when<T>(value: T): ng.IPromise<T>;
     export function when(): ng.IPromise<void>;
 }
+
+/**
+ * Flow, ng-flow do not have DefinitelyTyped interfaces.  This is a
+ * preliminary attempt to fix that.
+*/
+declare class Flow {
+    events : any;
+    files : FlowFile[];
+    opts : FlowOpts;
+    preventEvent : (event : any) => any;
+    support : boolean;
+    supportDirectory : boolean;
+    resume : () => any;
+    pause : () => any;
+    cancel : () => any;
+}
+
+declare class FlowFile {
+    webkitRelativePath : string;
+    lastModifiedDate : string;
+    name : string;
+    type : string;
+    size : number;
+}
+
+declare class FlowOpts {
+    chunkSize : number;
+    forceChunkSize : boolean;
+    simultaneousUploads : number;
+    singleFile : boolean;
+    fileParameterName : string;
+    progressCallbacksInterval : number;
+    speedSmoothingFactor : number;
+    query : any;
+    headers : any;
+    withCredentials : boolean;
+    preprocess : any;
+    method : string;
+    prioritizeFirstAndLastChunk : boolean;
+    target : string;
+    testChunks : boolean;
+    generateUniqueIdentifier : any;
+    maxChunkRetries : number;
+    chunkRetryInterval : number;
+    permanentErrors : number[];
+    onDropStopPropagation : boolean;
+}
