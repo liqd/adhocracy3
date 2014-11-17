@@ -1,5 +1,5 @@
 .mercator-proposal-form {
-    @include span(10 last);
+    @include span(last 10 of 12);
     position: relative;
     background: white;
     border: 1px solid $color-structure-border;
@@ -16,7 +16,7 @@
 }
 
 .mercator-proposal-form-nav {
-    @include span(2);
+    @include span(first 2 of 12);
     border: 1px solid $color-structure-border;
     top: 0.5em;
     z-index: 1;
@@ -51,11 +51,11 @@
 }
 
 .mercator-proposal-detail-nav {
-    @include span(2 of 12);
+    @include span(first 2 of 12);
 }
 
 .mercator-proposal-chapters {
-    @include span(10 last);
     border-left: 1px solid $color-structure-border;
     padding-left: gutter()/2;
+    @include span(last 10 of 12);
 }
