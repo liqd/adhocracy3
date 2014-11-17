@@ -36,6 +36,7 @@ import AdhRate = require("./Packages/Rate/Rate");
 import AdhRecursionHelper = require("./Packages/RecursionHelper/RecursionHelper");
 import AdhResourceArea = require("./Packages/ResourceArea/ResourceArea");
 import AdhResourceWidgets = require("./Packages/ResourceWidgets/ResourceWidgets");
+import AdhSticky = require("./Packages/Sticky/Sticky");
 import AdhTopLevelState = require("./Packages/TopLevelState/TopLevelState");
 import AdhUser = require("./Packages/User/User");
 import AdhWebSocket = require("./Packages/WebSocket/WebSocket");
@@ -70,7 +71,8 @@ export var init = (config : AdhConfig.IService, meta_api) => {
         AdhMercatorProposal.moduleName,
         AdhMercatorWorkbench.moduleName,
         AdhResourceArea.moduleName,
-        AdhProposal.moduleName
+        AdhProposal.moduleName,
+        AdhSticky.moduleName
     ]);
 
     app.config(["adhTopLevelStateProvider", "$translateProvider", "$locationProvider", (
@@ -145,6 +147,7 @@ export var init = (config : AdhConfig.IService, meta_api) => {
     AdhRecursionHelper.register(angular);
     AdhResourceArea.register(angular);
     AdhResourceWidgets.register(angular);
+    AdhSticky.register(angular);
     AdhTopLevelState.register(angular);
     AdhUser.register(angular);
     AdhWebSocket.register(angular);
