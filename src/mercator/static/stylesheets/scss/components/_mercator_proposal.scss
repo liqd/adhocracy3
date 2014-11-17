@@ -1,16 +1,7 @@
-$gutter: 3%;
-$columns: 6;
-
-@function column-width($n) {
-    @return (100% - $gutter) / $columns * $n - $gutter;
-}
-
 .mercator-proposal-form {
+    @include span(10 last);
     position: relative;
-    width: 100%;
     background: white;
-    padding-left: column-width(1) + 2 * $gutter;
-    padding-right: $gutter;
     border: 1px solid $color-structure-border;
     border-left: 0;
 
@@ -25,11 +16,8 @@ $columns: 6;
 }
 
 .mercator-proposal-form-nav {
-    position: absolute;
-    width: column-width(1);
+    @include span(2);
     border: 1px solid $color-structure-border;
-    padding: 0 1em;
-    left: $gutter;
     top: 0.5em;
     z-index: 1;
 
@@ -40,12 +28,20 @@ $columns: 6;
     }
 }
 
+.mercator-proposal-detail-view {
+    @include container;
+}
+
 .mercator-proposal-cover {
     @include clearfix;
 
     .proposal-meta {
+        padding-bottom: gutter();
+        padding-left: 0;
+
         .proposal-meta-column {
             float: left;
+            padding-right: gutter()/2;
         }
     }
 }
@@ -55,11 +51,11 @@ $columns: 6;
 }
 
 .mercator-proposal-detail-nav {
-    float: left;
-    width: column-width(2);
+    @include span(2 of 12);
 }
 
 .mercator-proposal-chapters {
-    float: left;
-    width: column-width(4);
+    @include span(10 last);
+    border-left: 1px solid $color-structure-border;
+    padding-left: gutter()/2;
 }
