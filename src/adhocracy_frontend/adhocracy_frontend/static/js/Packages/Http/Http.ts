@@ -388,5 +388,6 @@ export var register = (angular, metaApi) => {
             AdhPreliminaryNames.moduleName
         ])
         .service("adhHttp", ["$http", "$q", "$timeout", "adhMetaApi", "adhPreliminaryNames", "adhConfig", Service])
-        .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi));
+        .factory("adhMetaApi", () => new AdhMetaApi.MetaApiQuery(metaApi))
+        .filter("adhFormatError", () => AdhError.formatError);
 };
