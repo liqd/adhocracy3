@@ -33,15 +33,27 @@
 }
 
 .mercator-proposal-cover {
-    @include clearfix;
+    @include span(full);
 
     .proposal-meta {
-        padding-bottom: gutter();
-        padding-left: 0;
+        // reset ul default styling
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        @include container;
+        margin-bottom: gutter(12);
 
         .proposal-meta-column {
-            float: left;
-            padding-right: gutter()/2;
+            @include span(2 of 12);
+
+            &:first-child {
+                @include span(first 2 of 12);
+            }
+
+            &:last-child {
+                @include span(last 2 of 12);
+            }
         }
     }
 }
