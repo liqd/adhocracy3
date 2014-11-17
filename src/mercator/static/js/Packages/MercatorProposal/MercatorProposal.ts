@@ -54,8 +54,14 @@ var pkgLocation = "/MercatorProposal";
 
 export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
     poolPath : string;
-    showDetails() : void;
-    mercatorProposalForm?;
+    showDetails : () => void;
+    showError : (fieldName : string, errorType : string) => boolean;
+    showHeardFromError : () => boolean;
+    showDetailsLocationError : () => boolean;
+    submitIfValid : () => void;
+    mercatorProposalForm? : any;
+    mercatorProposalExtraForm? : any;
+    mercatorProposalDetailForm? : any;
     data : {
         countries : any;
         // 1. basic
@@ -119,7 +125,6 @@ export interface IScope extends AdhResourceWidgets.IResourceWidgetScope {
 
         accept_disclaimer : string;
     };
-
 }
 
 
@@ -855,7 +860,7 @@ export var register = (angular) => {
         // FIXME: These should both be moved to ..core ?
         .directive("countrySelect", ["adhConfig", countrySelect])
         .directive("adhLastVersion", ["$compile", "adhHttp", lastVersion])
-        .controller("mercatorProposalFormController", ["$scope", ($scope) => {
+        .controller("mercatorProposalFormController", ["$scope", ($scope : IScope) => {
             var heardFromCheckboxes = [
                 "heard-from-colleague",
                 "heard-from-website",
