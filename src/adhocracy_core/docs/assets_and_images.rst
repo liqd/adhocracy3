@@ -1,6 +1,9 @@
 Assets and Images
 =================
 
+Introduction
+------------
+
 FIXME All of this still needs to be implemented. This document will be
 revised and turned into a doctest along with the implementation.
 
@@ -15,48 +18,53 @@ To manage assets, the backend has the `adhocracy_core.resources.asset.IAsset`
 resource type, which is a special kind of *Pool.* (FIXME Or possibly it's a
 *Simple*? In any case, it's not versionable.)
 
-Assets can be uploaded to an *asset post pool,* which is a kind of post pool
-(just as there are post pools for comments and rates). A resource that
-allows asset upload provides the
-`adhocracy_core.sheets.asset.IAssetContainer` sheet (just like
-commentable resources provide the `adhocracy_core.sheets.comment.ICommentable`
-sheet).
+Assets can be uploaded to an *asset pool.* Resources that provide an asset
+pool implement the `adhocracy_core.sheets.asset.IHasAssetPool` sheet, which
+has a single field:
 
-`IAssetContainer`s have two fields:
+:asset_pool: path to the asset pool where assets can be posted
 
-:post_pool: path to the asset post pool where assets can be posted
-:assets: a list of assets that have already been attached to the resource
-    -- this is a read-only list of backreferences which is automatically
-   populated by the backend (like the `comments` field in `ICommentable`)
+The `adhocracy_core.resources.asset.IAsset` resource type provides three
+sheets:
 
-The `adhocracy_core.resources.asset.IAsset` resource type provides two sheets,
-`adhocracy_core.sheets.metadata.IMetadata` and
-`adhocracy_core.sheets.asset.IAsset`.
+* `adhocracy_core.sheets.metadata.IMetadata`: provided by all resources,
+  automatically created and updated by the backend
+* `adhocracy_core.sheets.asset.IAssetMetadata` with the fields:
 
-The `adhocracy_core.sheets.metadata.IMetadata` sheet is automatically created
-and updated by the backend. The `adhocracy_core.sheets.asset.IAsset` sheet
-has two fields that must be set by the frontend when posting a new asset:
+  :mime_type: the MIME type of the asset; must be specified by the frontend,
+      but the backend will sanity-check the posted data and reject the asset
+      in case of an detectable mismatch (e.g. if the frontend posts a Word file
+      but gives "image/jpeg" as MIME type). Not all mismatches will be
+      detectable, e.g. different "text/" subtypes can be hard to distinguish.
+  :size: the size of the asset (in bytes)
+  :filename: the name of the file uploaded by the frontend (in the backend,
+      the asset will have a different, auto-generated path)
+  :attached_to: a list of backreferences pointing to resources that refer
+      to the asset; this attribute is read-only and managed by the backend
 
-:mime_type: the MIME type of the asset
-:attached_to: the path of the resource to which the asset belongs, which must
-    provide the `adhocracy_core.sheets.asset.IAssetContainer` sheet (like
-    the `refers_to` field in `IComment`)
+* `adhocracy_core.sheets.asset.IAssetData` with a single field:
+
+  :data: the binary data of the asset ("blob")
+
+  This sheet is POST/PUT-only, see below on how to download/view the binary
+  data.
 
 Asset Subtypes and MIME Type Validators
 ---------------------------------------
 
 Note: this section is mostly backend-specific.
 
-The generic `adhocracy_core.resources.asset.IAsset` resource type allows
-uploading resources of arbitrary MIME types. To allow uploading only files
-of specific types, subclass it and register a
-`adhocracy_core.interfaces.IMimeTypeValidator` implementation for that
-subtype (same as with `IRateValidator` for rates).
+The generic `adhocracy_core.sheets.asset.IAssetMetadata` sheet doesn't limit
+the MIME type of assets. Since this is rarely desirable, it is considered
+abstract and cannot be instantiated -- only subclasses that provide a *MIME
+Type Validator* can. To do so, create a subclass of the sheet (empty marker
+interface) and register a `adhocracy_core.interfaces.IMimeTypeValidator`
+implementation for that subclass (same as with `IRateValidator` for rates).
 
 E.g. to create a spreadsheet asset type that only accepts OpenDocument and
 Excel spreadsheets::
 
-    class ISpreadsheetAsset(IAsset):
+    class ISpreadsheetAsset(IAssetMetadata):
         """Empty marker interface for spreadsheet assets."""
 
     @implementer(IMimeTypeValidator)
@@ -71,22 +79,25 @@ Excel spreadsheets::
                                     (ISpreadsheetAsset,),
                                     IMimeTypeValidator)
 
+FIXME Maybe we'll extend the SheetMetadata instead of using an adapter
+(likewise for Size Mappers).
+
 Images and Size Mappers
 -----------------------
 
 Note: this section is mostly backend-specific.
 
-A predefined IAsset subtype is `adhocracy_core.resources.asset.IImage`. Its
-adapter allows MIME types that start with 'image/', i.e.,
-arbitrary image files (subtypes of IImage can restrict that further,
-if desired).
+A predefined IAssetMetadata subtype is
+`adhocracy_core.resources.asset.IImageMetadata`. Its adapter allows MIME
+types that start with 'image/', i.e., arbitrary image files (subtypes of
+IImage can restrict that further, if desired).
 
 The backend can resize and crop images to different target formats. To do
-this, define an IImage subtype and register a
+this, define an IImageMetadata subtype and register a
 `adhocracy_core.interfaces.ImageSizeMapper` implementation for that
 subtype::
 
-    class IProposalIntroImage(IImage):
+    class IProposalIntroImage(IImageMetadata):
         """Empty marker interface."""
 
     @implementer(ImageSizeMapper)
@@ -115,22 +126,20 @@ cropped to reach the target size.
 Uploading Assets
 ----------------
 
-To upload assets, the frontend sends a POST request with
-enctype="multipart/form-data" to an asset post pool. The request must have
-the following fields:
+Assets are uploaded (POST) and updated (PUT) in a special way. Instead of
+sending a JSON document, the field names and values are flattened into
+key/value pairs that are sent as a "multipart/form-data" request. Hence, the
+request will typically have the following keys:
 
 :content_type: the type of the resource that shall be created, e.g.
     "adhocracy_core.resources.sample_proposal.IProposalIntroImage"
-:mime_type: the MIME type of the uploaded file, e.g. "image/jpeg"
-:attached_to: the path of the resource to which the asset belongs
-:asset: the binary data of the uploaded file, as per the HTML
-    `<input type="file" name="asset">` tag.
-
-FIXME Alternatively, the frontend could upload *two* files: (1) the binary
-data of the uploaded file and (2) a small JSON document containing the
-content type of the resource and the values of the
-`adhocracy_core.sheets.asset.IAsset` in our usual way. Would that be easier
-for the frontend and/or the backend??
+:data.adhocracy_core.sheets.asset.IAssetMetadata.mime_type: the MIME type of
+    the uploaded file, e.g. "image/jpeg"
+:data.adhocracy_core.sheets.asset.IAssetMetadata.size: the size of the file
+:data.adhocracy_core.sheets.asset.IAssetMetadata.filename: the original name
+    of the file
+:data.adhocracy_core.sheets.asset.IAssetData.data: the binary data of the
+    uploaded file, as per the HTML `<input type="file" name="asset">` tag.
 
 In response, the backend sends a JSON document with the resource type and
 path of the new resource (just as with other resource types)::
@@ -138,10 +147,31 @@ path of the new resource (just as with other resource types)::
     {"content_type": "adhocracy_core.resources.sample_proposal.IProposalIntroImage",
      "path": "http://localhost/adhocracy/proposals/myfirstproposal/assets/0000000"}
 
-FIXME It should be possible to restrict the types of assets that can be
-posted to a specific asset post pool; e.g. an asset post pool might only
-accept IProposalIntroImages and/or ISpreadsheetAssets,
-but no other asset types. What's the best way to do that?
+Updating Assets
+---------------
+
+To upload a new version of an asset, the frontend sends a PUT request with
+enctype="multipart/form-data" to the asset URL. The PUT request may contain
+the same keys as a POST request used to create a new asset,
+but all of them are optional -- if a field isn't change by the update,
+there is no need to include the key.
+
+If the `content_type` key is given, is *must* be identical to the current
+content type of the asset (changing the type of resources is generally not
+allowed).
+
+Typically, the PUT request will be used to replace the binary data of the
+asset, hence it will contain the
+`data.adhocracy_core.sheets.asset.IAssetData.data` key. But it's also
+allowed to omit that key and only change the
+`data.adhocracy_core.sheets.asset.IAssetMetadata.filename`, for example.
+
+Only those who have *editor* rights for an asset can PUT a replacement asset.
+If an image is replaced, all its cropped sizes will be automatically
+updated as well.
+
+Since assets aren't versioned, the old binary "blob" will be physically and
+irreversibly discarded once a replacement blob is uploaded.
 
 Downloading Assets
 ------------------
@@ -168,21 +198,14 @@ the asset::
              'hidden': 'false',
              'modification_date': '...',
              'modified_by': '...'},
-         'adhocracy_core.sheets.asset.IAsset': {
-             'attached_to': 'http://localhost/adhocracy/proposals/myfirstproposal/VERSION_0000001',
-             'mime_type': 'image/jpeg'}},
+         'adhocracy_core.sheets.asset.IAssetMetadata': {
+             'attached_to': [
+                 'http://localhost/adhocracy/proposals/myfirstproposal/VERSION_0000001'
+              ],
+             'mime_type': 'image/jpeg'},
+             'filename': 'greatpicture.jpg',
+             'size': '1906117'},
      'path': '"http://localhost/adhocracy/proposals/myfirstproposal/assets/0000000"'}
-
-FIXME If that information is important/useful for the frontend, it might
-also be possible to have a read-only `adhocracy_core.sheets.asset.IImage`
-sheet that lists the sizes supported by the ImageSizeMapper::
-
-    "adhocracy_core.sheets.asset.IImage": {
-        "sizes": {
-            "thumbnail": "160x120",
-            "detail": "600x300"
-        }
-    }
 
 It can retrieve the raw uploaded data by GETting its `raw` child::
 
@@ -200,22 +223,6 @@ child element::
     >> resp_data["content_type"]
     'image/jpeg'
 
-Replacing an Asset
-------------------
-
-To upload a new version of an asset, the frontend can sent a PUT request with
-enctype="multipart/form-data" to the asset URL. The PUT request *must* contain
-an `asset` field with the binary data of the new upload. It *may* contain the
-other fields used when POSTing new assets -- they can be omitted if their value
-hasn't changed.
-
-Only those who have *editor* rights for an asset can PUT a replacement asset.
-If an image is replaced, all its cropped sizes will be automatically be
-updated as well.
-
-Since assets aren't versioned, the old binary "blob" will be physically and
-irreversibly discarded once a replacement blob is uploaded.
-
 Deleting and Hiding Assets
 --------------------------
 
@@ -228,19 +235,13 @@ It is possible to undelete or unhide a deleted/hidden asset,
 but the "raw" view and any alternative sizes defined for images will be empty
 until a replacement blob is uploaded.
 
-Asset Containers and Asset Filtering
-------------------------------------
+FIXME Settle with product owner whether this is the desired behavior.
 
-The `assets` field of an `adhocracy_core.sheets.asset.IAssetContainer` will
-list *all* the assets *attached_to* that resource, regardless of their type.
-If multiple asset types belong to a resource, the frontend can query its
-asset post pool to retrieve just assets of a specific type (see the
-"Filtering Pools" section in :ref:`rest_api`)::
+Referring to Assets
+-------------------
 
-    >> resp_data = testapp.get('http://localhost/adhocracy/proposals/myfirstproposal/assets',
-    ...     params={'content_type': 'adhocracy_core.resources.sample_proposal.IProposalIntroImage',
-    ...             'adhocracy_core.sheets.asset.IAsset:attached_to':
-    ...             'http://localhost/adhocracy/proposals/myfirstproposal/VERSION_0000001'
-    ...             }).json
-    >> pprint(resp_data['data']['adhocracy_core.sheets.pool.IPool']['elements'])
-    ['http://localhost/adhocracy/proposals/myfirstproposal/assets/0000000']
+Sheets can have fields that refer to assets of a specific type. This is done
+in the usual way be setting the type of the field to `Reference` (to refer
+to a single asset) or `UniqueReferences` (to refer to a list of assets) and
+defining a suitable `reftype` (e.g. with `target_isheet =
+IProposalIntroImage`).
