@@ -13,7 +13,9 @@ declare module "angularTranslate" {}
 declare module "angularTranslateLoader" {}
 declare module "angularElastic" {}
 declare module "angularScroll" {}
-
+declare module "sticky" {
+    export var Sticky : any;
+}
 declare module "modernizr" {
     export var Modernizr : ModernizrStatic;
 }
