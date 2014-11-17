@@ -34,6 +34,7 @@
 
 .mercator-proposal-cover {
     @include span(full);
+    border-bottom: 1px solid $color-structure-border;
 
     .proposal-meta {
         // reset ul default styling
