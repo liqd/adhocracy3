@@ -21,6 +21,12 @@ var embeddableDirectives = [
     "empty"
 ];
 
+var metaParams = [
+    "locale",
+    "nocenter",
+    "noheader"
+];
+
 export var location2template = ($location : ng.ILocationService) => {
     var widget : string = $location.path().split("/")[2];
     var search = $location.search();
@@ -34,7 +40,7 @@ export var location2template = ($location : ng.ILocationService) => {
         return "";
     }
     for (var key in search) {
-        if (search.hasOwnProperty(key) && key !== "locale") {
+        if (search.hasOwnProperty(key) && metaParams.indexOf(key) === -1) {
             attrs.push(AdhUtil.formatString("data-{0}=\"{1}\"", _.escape(key), _.escape(search[key])));
         }
     }
