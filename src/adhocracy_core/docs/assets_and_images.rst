@@ -4,9 +4,6 @@ Assets and Images
 Introduction
 ------------
 
-FIXME All of this still needs to be implemented. This document will be
-revised and turned into a doctest along with the implementation.
-
 *Assets* are files of arbitrary type that can be uploaded to and downloaded
 from the backend. From the viewpoint of the backend, they are just "blobs"
 -- binary objects without any specific semantic.
@@ -15,8 +12,8 @@ from the backend. From the viewpoint of the backend, they are just "blobs"
 different target formats.
 
 To manage assets, the backend has the `adhocracy_core.resources.asset.IAsset`
-resource type, which is a special kind of *Pool.* (FIXME Or possibly it's a
-*Simple*? In any case, it's not versionable.)
+resource type, which is a special kind of *Simple.* (FIXME Or possibly it's a
+*Pool*? In any case, it's not versionable.)
 
 Assets can be uploaded to an *asset pool.* Resources that provide an asset
 pool implement the `adhocracy_core.sheets.asset.IHasAssetPool` sheet, which
@@ -49,6 +46,32 @@ sheets:
   This sheet is POST/PUT-only, see below on how to download/view the binary
   data.
 
+For testing, we import the needed stuff and start the Adhocracy testapp::
+
+    >>> from pprint import pprint
+    >>> from adhocracy_core.testing import god_header
+    >>> from webtest import TestApp
+    >>> app = getfixture('app')
+    >>> testapp = TestApp(app)
+    >>> rest_url = 'http://localhost'
+
+We need a pool with an asset pool::
+
+    >>> data = {'content_type': 'adhocracy_core.resources.asset.IPoolWithAssets',
+    ...        'data': {'adhocracy_core.sheets.name.IName': {
+    ...                     'name':  'ProposalPool'}}}
+    >>> resp_data = testapp.post_json(rest_url + '/adhocracy', data,
+    ...                               headers=god_header).json
+    >>> proposal_pool_path = resp_data['path']
+    >>> proposal_pool_path
+    ['http://localhost/adhocracy/ProposalPool']
+
+We can ask the pool for the location of the asset pool:
+
+    >>> resp_data = testapp.get(proposal_pool_path).json
+    >>> resp_data['data']['adhocracy_core.sheets.asset.IHasAssetPool']['name']
+    ['http://localhost/adhocracy/ProposalPool/assets']
+
 Asset Subtypes and MIME Type Validators
 ---------------------------------------
 
@@ -60,6 +83,8 @@ abstract and cannot be instantiated -- only subclasses that provide a *MIME
 Type Validator* can. To do so, create a subclass of the sheet (empty marker
 interface) and register a `adhocracy_core.interfaces.IMimeTypeValidator`
 implementation for that subclass (same as with `IRateValidator` for rates).
+
+TODO Make testable:
 
 E.g. to create a spreadsheet asset type that only accepts OpenDocument and
 Excel spreadsheets::
