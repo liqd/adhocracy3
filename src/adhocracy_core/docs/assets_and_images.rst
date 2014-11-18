@@ -252,15 +252,7 @@ Deleting and Hiding Assets
 --------------------------
 
 Assets can be deleted or censored ("hidden") in the usual way, see
-:ref:`deletion`. In contrast to deletion or hiding of normal resource,
-asset deletion/hiding will however physically discard the binary "blob",
-so it's not really reversible.
-
-It is possible to undelete or unhide a deleted/hidden asset,
-but the "raw" view and any alternative sizes defined for images will be empty
-until a replacement blob is uploaded.
-
-FIXME Settle with product owner whether this is the desired behavior.
+:ref:`deletion`.
 
 Referring to Assets
 -------------------
