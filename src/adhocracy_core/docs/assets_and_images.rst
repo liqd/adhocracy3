@@ -26,18 +26,22 @@ sheets:
 
 * `adhocracy_core.sheets.metadata.IMetadata`: provided by all resources,
   automatically created and updated by the backend
-* `adhocracy_core.sheets.asset.IAssetMetadata` with the fields:
+* `adhocracy_core.sheets.asset.IAssetMetadata` with only one read-write field:
 
   :mime_type: the MIME type of the asset; must be specified by the frontend,
       but the backend will sanity-check the posted data and reject the asset
       in case of an detectable mismatch (e.g. if the frontend posts a Word file
       but gives "image/jpeg" as MIME type). Not all mismatches will be
       detectable, e.g. different "text/" subtypes can be hard to distinguish.
+
+  All other following fields are read-only, they are automatically created and
+  updated by the backend:
+
   :size: the size of the asset (in bytes)
   :filename: the name of the file uploaded by the frontend (in the backend,
       the asset will have a different, auto-generated path)
   :attached_to: a list of backreferences pointing to resources that refer
-      to the asset; this attribute is read-only and managed by the backend
+      to the asset
 
 * `adhocracy_core.sheets.asset.IAssetData` with a single field:
 
@@ -160,9 +164,6 @@ request will typically have the following keys:
     "adhocracy_core.resources.sample_proposal.IProposalIntroImage"
 :data.adhocracy_core.sheets.asset.IAssetMetadata.mime_type: the MIME type of
     the uploaded file, e.g. "image/jpeg"
-:data.adhocracy_core.sheets.asset.IAssetMetadata.size: the size of the file
-:data.adhocracy_core.sheets.asset.IAssetMetadata.filename: the original name
-    of the file
 :data.adhocracy_core.sheets.asset.IAssetData.data: the binary data of the
     uploaded file, as per the HTML `<input type="file" name="asset">` tag.
 
@@ -177,19 +178,18 @@ Updating Assets
 
 To upload a new version of an asset, the frontend sends a PUT request with
 enctype="multipart/form-data" to the asset URL. The PUT request may contain
-the same keys as a POST request used to create a new asset,
-but all of them are optional -- if a field isn't change by the update,
-there is no need to include the key.
+the same keys as a POST request used to create a new asset.
+
+The `data.adhocracy_core.sheets.asset.IAssetData.data` key is required,
+since the only use case for a PUT request is uploading a new version of the
+binary data (everything else is just metadata).
+
+The `data.adhocracy_core.sheets.asset.IAssetMetadata.mime_type` may be
+omitted if the new MIME type is the same as the old one.
 
 If the `content_type` key is given, is *must* be identical to the current
 content type of the asset (changing the type of resources is generally not
 allowed).
-
-Typically, the PUT request will be used to replace the binary data of the
-asset, hence it will contain the
-`data.adhocracy_core.sheets.asset.IAssetData.data` key. But it's also
-allowed to omit that key and only change the
-`data.adhocracy_core.sheets.asset.IAssetMetadata.filename`, for example.
 
 Only those who have *editor* rights for an asset can PUT a replacement asset.
 If an image is replaced, all its cropped sizes will be automatically
