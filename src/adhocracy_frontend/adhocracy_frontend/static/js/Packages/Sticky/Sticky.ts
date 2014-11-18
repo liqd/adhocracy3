@@ -1,7 +1,8 @@
 /// <reference path="../../_all.d.ts"/>
 
 import Sticky = require("sticky"); if (Sticky) { ; };
-console.log(Sticky);  // required to keep tsc from optimizing the import away.  :(
+
+
 export var createDirective = () => {
     return {
         restrict: "A",
@@ -12,10 +13,10 @@ export var createDirective = () => {
             // if we are in a moving column use this as our parent by default
             var opts = (par.length > 0) ? { scrolling_parent: par } : {};
             el.stick_in_parent(opts);
-
         }
     };
 };
+
 
 export var moduleName = "adhSticky";
 
